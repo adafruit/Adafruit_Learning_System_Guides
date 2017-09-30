@@ -1,14 +1,14 @@
-# Gemma IO demo - I2C scan
+# Gemma/Trinket IO demo - I2C scan
 
-from digitalio import *
-from board import *
+import board
 import busio
 import time
 
-led = DigitalInOut(D13)
-led.direction = Direction.OUTPUT
+# can also use board.SDA and board.SCL for neater looking code!
+i2c = busio.I2C(board.D2, board.D0)
 
-i2c = busio.I2C(D2, D0)
+while not i2c.try_lock():
+    pass
 
 while True:
     print("I2C addresses found:", [hex(i) for i in i2c.scan()])
