@@ -1,4 +1,4 @@
-# Gemma IO demo - Keyboard emu
+# CircuitPlayground demo - Keyboard emu
 
 from digitalio import DigitalInOut, Direction, Pull
 import touchio

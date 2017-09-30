@@ -1,4 +1,4 @@
-# Gemma IO demo - Dotstar
+# CircuitPython demo - Dotstar
 
 import board
 import adafruit_dotstar

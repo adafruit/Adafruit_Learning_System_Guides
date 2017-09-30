@@ -1,4 +1,4 @@
-# Gemma IO demo - NeoPixel
+# CircuitPython demo - NeoPixel
 
 import board
 import neopixel
