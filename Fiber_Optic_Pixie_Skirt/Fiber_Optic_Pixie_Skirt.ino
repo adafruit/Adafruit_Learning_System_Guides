@@ -36,11 +36,11 @@ uint8_t myFavoriteColors[][3] = {{255,   0,   0},   // red
 void setup() 
 {
   Serial.begin(9600);
-     // Initialize the sensors
-   accel.begin();
-   mag.begin();
+  // Initialize the sensors
+  accel.begin();
+  mag.begin();
    
-  strip.begin();
+  pixieSerial.begin(115200);
   strip.show(); // Initialize all pixels to 'off
 }
 
