@@ -11,11 +11,6 @@ led.direction = Direction.OUTPUT
 
 strip = neopixel.NeoPixel(pixpin, numpix, brightness=1, auto_write=True)
 
-def colorWipe(color, wait):
-    for j in range(len(strip)):
-	strip[j] = (color)
-	time.sleep(wait)
-
 def wheel(pos):
     # Input a value 0 to 255 to get a color value.
     # The colours are a transition r - g - b - back to r.
