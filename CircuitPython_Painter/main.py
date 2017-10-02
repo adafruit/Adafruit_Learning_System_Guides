@@ -1,28 +1,21 @@
-# Dotstar (or neopixel) painter!
+# Dotstar painter! Can handle up to ~2300 pixel size image (e.g. 36 x 64)
 
 import board
 import digitalio
 import time
 import gc
+import busio
 
 FILENAME = "blinka.bmp"
-IMAGE_DELAY = 0.5
+IMAGE_DELAY = 0.2
 REPEAT = True
 BRIGHTNESS = 0.3
-NEOPIXEL = False  # we use dotstar by default
+PIXEL_DELAY = 0.001
 
-if NEOPIXEL:
-    from neopixel_write import neopixel_write
-    neopin = digitalio.DigitalInOut(board.D1)
-    neopin.switch_to_output()
-    PIXEL_DELAY = 0.005
-else: # Dotstar
-    import busio
-    dotstar = busio.SPI(board.SCK, board.MOSI)
-    while not dotstar.try_lock():
-        pass
-    dotstar.configure(baudrate=12000000)
-    PIXEL_DELAY = 0.002
+dotstar = busio.SPI(board.SCK, board.MOSI)
+while not dotstar.try_lock():
+    pass
+dotstar.configure(baudrate=12000000)
 
 # we'll resize this later
 databuf = bytearray(0)
@@ -71,11 +64,11 @@ try:
         if read_le(f.read(2)) != 0:
             raise BMPError("Compressed file")
 
-        print("Image Format OK!")
+        print("Image OK!")
 
         rowSize = (bmpWidth * 3 + 3) & ~3 # 32-bit line boundary
 
-        databuf = bytearray(bmpWidth * bmpHeight * 4) # its huge! but its also fast :)
+        databuf = bytearray(2250 * 4) # its huge! but its also fast :)
 
         for row in range(bmpHeight): # For each scanline...
             if(flip): # Bitmap is stored bottom-to-top order (normal BMP)
@@ -88,14 +81,10 @@ try:
             for col in range(bmpWidth):
                 b,g,r = bytearray(f.read(3))    # BMP files store RGB in BGR
                 # front load brightness, gamma and reordering here!
-                if NEOPIXEL:
-                    order = [g, r, b]
-                    idx = (col * bmpHeight + (bmpHeight - row - 1))*3
-                else:
-                    order = [b, g, r]
-                    idx = (col * bmpHeight + (bmpHeight - row - 1))*4
-                    databuf[idx] = 0xFF  # first byte is 'brightness'
-                    idx += 1
+                order = [b, g, r]
+                idx = (col * bmpHeight + (bmpHeight - row - 1))*4
+                databuf[idx] = 0xFF  # first byte is 'brightness'
+                idx += 1
                 for color in order:
                     databuf[idx] = int(pow((color * BRIGHTNESS) / 255, 2.7) * 255 + 0.5)
                     idx += 1
@@ -114,28 +103,21 @@ print("Ready to go!")
 while True:
     print("Draw!")
     index = 0
+
     for col in range(bmpWidth):
-        if NEOPIXEL:
-            row = databuf[index:index+bmpHeight*3]
-            neopixel_write(neopin, row)
-            index += bmpHeight * 3
-        else:
-            row = databuf[index:index+bmpHeight*4]
-            dotstar.write(bytearray([0x00, 0x00, 0x00, 0x00] ))
-            dotstar.write(row)
-            dotstar.write(bytearray([0x00, 0x00, 0x00, 0x00]))
-            index += bmpHeight * 4
+        row = databuf[index:index+bmpHeight*4]
+        dotstar.write(bytearray([0x00, 0x00, 0x00, 0x00] ))
+        dotstar.write(row)
+        dotstar.write(bytearray([0x00, 0x00, 0x00, 0x00]))
+        index += bmpHeight * 4
         time.sleep(PIXEL_DELAY)
         
     # clear it out
-    if NEOPIXEL:
-        neopixel_write(neopin, bytearray(bmpHeight * [0, 0, 0]))
-    else:
-        dotstar.write(bytearray([0x00, 0x00, 0x00, 0x00]))
-        for r in range(bmpHeight * 5):
-            dotstar.write(bytearray([0xFF, 0x00, 0x00, 0x00]))
-        dotstar.write(bytearray([0xff, 0xff, 0xff, 0xff]))
-
+    dotstar.write(bytearray([0x00, 0x00, 0x00, 0x00]))
+    for r in range(bmpHeight * 5):
+        dotstar.write(bytearray([0xFF, 0x00, 0x00, 0x00]))
+    dotstar.write(bytearray([0xff, 0xff, 0xff, 0xff]))
+    gc.collect()
 
     if not REPEAT:
         break
