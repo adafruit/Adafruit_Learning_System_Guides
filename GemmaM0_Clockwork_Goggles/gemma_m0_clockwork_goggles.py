@@ -11,35 +11,35 @@ pixpinRight = board.D0 #Data In attached to Gemma pin D0
 numpix = 16
 
 #Use these lines for RGBW NeoPixels
-stripLeft = neopixel.NeoPixel(pixpinLeft, numpix, bpp=4, brightness=.18,
-    auto_write=False)
-stripRight = neopixel.NeoPixel(pixpinRight, numpix, bpp=4, brightness=.18,
-    auto_write=False)
+#stripLeft = neopixel.NeoPixel(pixpinLeft, numpix, bpp=4, brightness=.18,
+#    auto_write=False)
+#stripRight = neopixel.NeoPixel(pixpinRight, numpix, bpp=4, brightness=.18,
+#    auto_write=False)
 #uncomment the lines below for RGB NeoPixels
-#stripLeft = neopixel.NeoPixel(pixpinLeft, numpix, bpp=3, brightness=.18,
-#    auto_write=False)
-#stripRight = neopixel.NeoPixel(pixpinRight, numpix, bpp=3, brightness=.18,
-#    auto_write=False)
+stripLeft = neopixel.NeoPixel(pixpinLeft, numpix, bpp=3, brightness=.18,
+    auto_write=False)
+stripRight = neopixel.NeoPixel(pixpinRight, numpix, bpp=3, brightness=.18,
+    auto_write=False)
 
 
 def cog(pos):
     # Input a value 0 to 255 to get a color value.
     # Note: switch the commented lines below if using RGB vs. RGBW NeoPixles
     if (pos < 8) or (pos > 250):
-        return (120, 0, 0, 0) #first color, red: for RGBW NeoPixels
-        #return (120, 0, 0) #first color, red: for RGB NeoPixels
+        #return (120, 0, 0, 0) #first color, red: for RGBW NeoPixels
+        return (120, 0, 0) #first color, red: for RGB NeoPixels
     if (pos < 85):
-        #return (int(pos * 3), int(255 - (pos*3)), 0, 0)
-        return (125, 35, 0, 0) #second color, brass: for RGBW NeoPixels
-        #return (125, 35, 0) #second color, brass: for RGB NeoPixels
+        return (int(pos * 3), int(255 - (pos*3)), 0, 0)
+        #return (125, 35, 0, 0) #second color, brass: for RGBW NeoPixels
+        return (125, 35, 0) #second color, brass: for RGB NeoPixels
     elif (pos < 170):
         pos -= 85
-        return (int(255 - pos*3), 0, int(pos*3), 0)#: for RGBW NeoPixels
-        #return (int(255 - pos*3), 0, int(pos*3))#: for RGB NeoPixels
+        #return (int(255 - pos*3), 0, int(pos*3), 0)#: for RGBW NeoPixels
+        return (int(255 - pos*3), 0, int(pos*3))#: for RGB NeoPixels
     else:
         pos -= 170
-        return (0, int(pos*3), int(255 - pos*3), 0)#: for RGBW NeoPixels
-        #return (0, int(pos*3), int(255 - pos*3))#: for RGB NeoPixels
+        #return (0, int(pos*3), int(255 - pos*3), 0)#: for RGBW NeoPixels
+        return (0, int(pos*3), int(255 - pos*3))#: for RGB NeoPixels
 
 def brass_cycle(wait, patternL, patternR):
     # patterns do different things, try:
