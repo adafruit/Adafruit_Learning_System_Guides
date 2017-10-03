@@ -10,16 +10,17 @@ pixpinLeft = board.D1 #Data In attached to Gemma pin D1
 pixpinRight = board.D0 #Data In attached to Gemma pin D0
 numpix = 16
 
-#Use these lines for RGBW NeoPixels
-#stripLeft = neopixel.NeoPixel(pixpinLeft, numpix, bpp=4, brightness=.18,
-#    auto_write=False)
-#stripRight = neopixel.NeoPixel(pixpinRight, numpix, bpp=4, brightness=.18,
-#    auto_write=False)
 #uncomment the lines below for RGB NeoPixels
 stripLeft = neopixel.NeoPixel(pixpinLeft, numpix, bpp=3, brightness=.18,
     auto_write=False)
 stripRight = neopixel.NeoPixel(pixpinRight, numpix, bpp=3, brightness=.18,
     auto_write=False)
+#Use these lines for RGBW NeoPixels
+#stripLeft = neopixel.NeoPixel(pixpinLeft, numpix, bpp=4, brightness=.18,
+#    auto_write=False)
+#stripRight = neopixel.NeoPixel(pixpinRight, numpix, bpp=4, brightness=.18,
+#    auto_write=False)
+
 
 
 def cog(pos):
