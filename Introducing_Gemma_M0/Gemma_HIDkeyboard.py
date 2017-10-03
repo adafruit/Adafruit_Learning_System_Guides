@@ -38,14 +38,14 @@ print("Waiting for button presses")
 while True:
     # check each button
     for button in buttons:
-        if (not button.value):   # pressed?
+        if not button.value:   # pressed?
             i = buttons.index(button)
             print("Button #%d Pressed" % i)
 
             # turn on the LED
             led.value = True
 
-            while (not button.value):
+            while not button.value:
                 pass  # wait for it to be released!
             # type the keycode or string
             k = buttonkeys[i]    # get the corresp. keycode/str
