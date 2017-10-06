@@ -30,7 +30,7 @@ def cog(pos):
         #return (120, 0, 0, 0) #first color, red: for RGBW NeoPixels
         return (120, 0, 0) #first color, red: for RGB NeoPixels
     if (pos < 85):
-        return (int(pos * 3), int(255 - (pos*3)), 0, 0)
+        return (int(pos * 3), int(255 - (pos*3)), 0)
         #return (125, 35, 0, 0) #second color, brass: for RGBW NeoPixels
         return (125, 35, 0) #second color, brass: for RGB NeoPixels
     elif (pos < 170):
