@@ -4,7 +4,7 @@ import digitalio
 import board
 import time
 
-led = digitalio.DigitalInOut(board.D13) #define the variable 'led'
+led = digitalio.DigitalInOut(board.D13) #defines the variable 'led'
 led.direction = digitalio.Direction.OUTPUT #set the pin as output
 
 while True: #code below this point loops over and over
