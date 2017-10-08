@@ -17,4 +17,4 @@ def colorWipe(color, wait):
 	time.sleep(wait)
 
 while True:
-    colorWipe( (50, 0, 50), .1 ) # Purple
+    colorWipe( (50, 0, 50), .1 ) # Purple LEDs
