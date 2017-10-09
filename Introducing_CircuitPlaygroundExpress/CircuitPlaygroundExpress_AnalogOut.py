@@ -1,5 +1,6 @@
 # CircuitPlaygroundExpress_AnalogOut
-
+# hook up ground an A0 to a voltmeter or scope
+# to watch the voltage rise!
 from analogio import AnalogOut
 import board
 import time
@@ -11,3 +12,4 @@ while True:
   # which ends up corresponding to the DAC's 10-bit range
   for i in range (0,65535,64):
     aout.value = i
+    time.sleep(0.01)
