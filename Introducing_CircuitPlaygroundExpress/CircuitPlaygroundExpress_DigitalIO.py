@@ -17,4 +17,4 @@ while True:
     else:
         led.value = False
 
-    time.sleep(0.01) # debounce delay
+    time.sleep(0.01) # debounce delay time
