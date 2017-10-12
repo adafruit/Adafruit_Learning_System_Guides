@@ -13,8 +13,8 @@ button.pull = Pull.DOWN
 
 while True:
     if button.value == True: #button is pushed
-        led.value = True
+	led.value = True
     else:
-		led.value = False
+	led.value = False
 
     time.sleep(0.01) # debounce delay
