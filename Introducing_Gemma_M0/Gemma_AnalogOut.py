@@ -1,4 +1,4 @@
-# Gemma IO demo - analog output
+# CircuitPython IO demo - analog output
      
 from analogio import AnalogOut
 import board
