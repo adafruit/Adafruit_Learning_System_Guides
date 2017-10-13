@@ -1,17 +1,13 @@
 # CircuitPlaygroundExpress_AnalogIn
-# reads the on-board light sensor's analog voltage level
-# and prints the results to REPL
+# reads the analog voltage level from a 10k potentiometer
+# connected to GND, 3.3V, and pin A1
+# and prints the results to the REPL
 
-from digitalio import DigitalInOut, Direction
 from analogio import AnalogIn
 import board
 import time
 
-led = DigitalInOut(board.D13)
-led.direction = Direction.OUTPUT
-
-analogin = AnalogIn(board.LIGHT)
-
+analogin = AnalogIn(board.A1)
 
 def getVoltage(pin):  # helper 
     return (pin.value * 3.3) / 65536
