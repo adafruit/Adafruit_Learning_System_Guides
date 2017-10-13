@@ -7,14 +7,14 @@ import time
 led = DigitalInOut(board.D13)
 led.direction = Direction.OUTPUT
 
-button = DigitalInOut(board.BUTTON_A) #button_a
+button = DigitalInOut(board.BUTTON_A)
 button.direction = Direction.INPUT
 button.pull = Pull.DOWN
 
 while True:
-    if button.value == True: #button is pushed
+    if button.value == True:  # button is pushed
         led.value = True
     else:
-		led.value = False
+        led.value = False
 
-    time.sleep(0.01) # debounce delay
+    time.sleep(0.01)
