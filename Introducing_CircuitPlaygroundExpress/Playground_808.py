@@ -29,8 +29,8 @@ for i in range(7):
 
 # The seven files assigned to the touchpads
 audiofiles = ["bd_tek.wav", "elec_hi_snare.wav", "elec_cymbal.wav",
-              "elec_blip2.wav", "bd_zome.wav", "bass_hit_c.wav",
-              "drum cowbell.wav"]
+               "elec_blip2.wav", "bd_zome.wav", "bass_hit_c.wav",
+               "drum_cowbell.wav"]
 
 def play_file(filename):
     print("playing file "+filename)
