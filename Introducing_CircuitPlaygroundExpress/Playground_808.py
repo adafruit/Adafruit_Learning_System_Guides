@@ -1,6 +1,6 @@
 # Playground 808
 # Drum machine
-from digitalio import DigitalInOut, Direction, Pull
+from digitalio import DigitalInOut, Direction
 import audioio
 import touchio
 import board
@@ -17,15 +17,6 @@ capPins = (board.A1, board.A2, board.A3, board.A4, board.A5,
 touchPad = []
 for i in range(7):
     touchPad.append(touchio.TouchIn(capPins[i]))
-
-# make the inputs buttons
-# buttonA = DigitalInOut(board.BUTTON_A)
-# buttonA.direction = Direction.INPUT
-# buttonA.pull = Pull.DOWN
-#
-# buttonB = DigitalInOut(board.BUTTON_B)
-# buttonB.direction = Direction.INPUT
-# buttonB.pull = Pull.DOWN
 
 # The seven files assigned to the touchpads
 audiofiles = ["bd_tek.wav", "elec_hi_snare.wav", "elec_cymbal.wav",
@@ -46,8 +37,3 @@ while True:
     for i in range(7):
         if touchPad[i].value:
             play_file(audiofiles[i])
-
-    # if buttonA.value:
-        # play_file(audiofiles[0])
-    # if buttonB.value:
-        # play_file(audiofiles[1])
