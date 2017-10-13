@@ -1,5 +1,3 @@
-# Circuit Playground Express sine wave player
-
 from digitalio import DigitalInOut, Direction
 import audioio
 import board
@@ -22,6 +20,7 @@ spkrenable.direction = Direction.OUTPUT
 spkrenable.value = True
 
 sample = audioio.AudioOut(board.SPEAKER, sine_wave)
+sample.frequency = SAMPLERATE
 sample.play(loop=True)  # keep playing the sample over and over
 time.sleep(1)           # until...
 sample.stop()           # we tell the board to stop
