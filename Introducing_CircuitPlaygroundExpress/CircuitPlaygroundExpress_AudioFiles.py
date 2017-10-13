@@ -17,7 +17,7 @@ buttonB.direction = Direction.INPUT
 buttonB.pull = Pull.DOWN
 
 # The two files assigned to buttons A & B
-audiofiles = ["rimshot.wav", "laugh2.wav"]
+audiofiles = ["rimshot.wav", "laugh.wav"]
 
 def play_file(filename):
     print("playing file "+filename)
