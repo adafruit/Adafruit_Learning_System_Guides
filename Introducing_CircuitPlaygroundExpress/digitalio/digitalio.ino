@@ -1,16 +1,16 @@
 #include <Adafruit_CircuitPlayground.h>
 
 void setup() {
-  // Initialize the circuit playground
-  CircuitPlayground.begin();
+  pinMode(CPLAY_LEFTBUTTON, INPUT_PULLDOWN);
+  pinMode(CPLAY_REDLED, OUTPUT);
 }
 
 void loop() {
   // If the left button is pressed....
-  if (CircuitPlayground.leftButton()) {
-      CircuitPlayground.redLED(HIGH);  // LED on
+  if (digitalRead(CPLAY_LEFTBUTTON)) {
+      digitalWrite(CPLAY_REDLED, HIGH);  // LED on
   } else {
-      CircuitPlayground.redLED(LOW);   // LED off
+      digitalWrite(CPLAY_REDLED, LOW);  // LED off
   }
 }
 
