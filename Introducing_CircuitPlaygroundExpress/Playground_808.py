@@ -4,6 +4,9 @@ from digitalio import DigitalInOut, Direction
 import audioio
 import touchio
 import board
+import time
+
+bpm = 120 #beats per minute for sustained hold, change this to suit your tempo
 
 # enable the speaker
 spkrenable = DigitalInOut(board.SPEAKER_ENABLE)
@@ -28,9 +31,7 @@ def play_file(filename):
     f = open(filename, "rb")
     a = audioio.AudioOut(board.A0, f)
     a.play()
-    while a.playing:
-        pass
-    print("finished")
+    time.sleep(bpm/960) #sixteenthNote delay
 
 while True:
 
