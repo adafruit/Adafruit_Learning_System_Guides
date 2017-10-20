@@ -26,8 +26,6 @@ while True:
         print('Touched A1!')
         cpx.pixels.fill((0, 15, 15))
         cpx.start_tone(392)
-# touch2 and touch3 are coded to allow for touching each for a note and both
-# for a third note.
     elif cpx.touch_A2 and not cpx.touch_A3:
         print('Touched A2!')
         cpx.pixels.fill((0, 0, 15))
@@ -36,8 +34,6 @@ while True:
         print('Touched A3!')
         cpx.pixels.fill((5, 0, 15))
         cpx.start_tone(494)
-# There are seven capacitive touch pads - this allows for a full 8-note octave.
-# Touch both A2 and A3 together to play the last note.
     elif cpx.touch_A2 and cpx.touch_A3:
         print('Touched "8"!')
         cpx.pixels.fill((15, 0, 15))
