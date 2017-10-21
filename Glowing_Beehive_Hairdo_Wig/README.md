@@ -1,4 +1,4 @@
-# Gemma_3D_Printed_Tree_Topper
+# Glowing_Beehive_Hairdo_Wig
 
 Code to accompany this tutorial:
-https://learn.adafruit.com/gemma-3d-printed-tree-topper
+https://learn.adafruit.com/glowing-beehive-hairdo-wig
