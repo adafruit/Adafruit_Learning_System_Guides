@@ -8,15 +8,15 @@ import neopixel
 import board
 import time
 
-
+#create neopixel object. set brightness lower if needed, say .2
 pixels = neopixel.NeoPixel(board.NEOPIXEL, 10, brightness=.8)
 
-def simpleCircle(wait, R, G, B): # timing, color values per channel
-    baseFreq = int(20 + (G * 0.3)) # tone value derived from rotation
+def simpleCircle(wait, R, G, B):  # timing, color values per channel
+    baseFreq = int(20 + (G * 0.3))  # tone value derived from rotation
 
     for i in range(10):
         pixels[i] = ((0, 0, 0))
-        cpx.start_tone(baseFreq + i) # increasing pitch sweep
+        cpx.start_tone(baseFreq + i)  # increasing pitch sweep
         time.sleep(wait)
 
     for i in range(10):
@@ -37,9 +37,9 @@ while True:
 
     # check for upside down state on z axis
     if z < 0:  # any negative number on z axis means it's upside down enough
-        speed=(0.01 * (B * 0.025))
+        speed = (0.01 * (B * 0.025))
         simpleCircle(speed, R, G, B)  # speed based on tilt, .01 is good start
 
-    else: # right side up means no colors or sound!
+    else:  # right side up means no colors or sound!
         pixels.fill((0, 0, 0))
         cpx.stop_tone()
