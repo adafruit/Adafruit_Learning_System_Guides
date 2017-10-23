@@ -1,4 +1,5 @@
-#  UFO Circuit Playground Express
+#  UFO Flying Saucer with Circuit Playground Express
+#  https://learn.adafruit.com/ufo-circuit-playground-express/
 #  Plays UFO lights and sounds if the board is upside down only,
 #  Tilt to change light color, cycle speed, tone pitch
 
@@ -11,7 +12,6 @@ import time
 pixels = neopixel.NeoPixel(board.NEOPIXEL, 10, brightness=.8)
 
 def simpleCircle(wait, R, G, B): # timing, color values per channel
-
     baseFreq = int(20 + (G * 0.3)) # tone value derived from rotation
 
     for i in range(10):
@@ -24,7 +24,7 @@ def simpleCircle(wait, R, G, B): # timing, color values per channel
         time.sleep(wait)
 
 # Main loop gets x, y and z axis acceleration, prints the values, and turns on
-# lights if the UFO is upside down, plays music
+# lights if the UFO is upside down, plays tones
 while True:
     R = 0
     G = 0
