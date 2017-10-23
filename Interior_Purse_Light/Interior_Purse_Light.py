@@ -11,9 +11,8 @@ led.direction = Direction.OUTPUT
 
 while True:
     if button.value:
-		led.value = True 	# check if the pushbutton is pressed. 
- 
+        led.value = True 	# check if the pushbutton is pressed. 
     else:
-		led.value = False	# turn LED off
+        led.value = False	# turn LED off
 
     time.sleep(0.01) # debounce delay
