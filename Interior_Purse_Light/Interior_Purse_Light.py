@@ -10,10 +10,7 @@ led = DigitalInOut(board.D2)
 led.direction = Direction.OUTPUT
 
 while True:
-    if button.value:
-		led.value = True 	# check if the pushbutton is pressed. 
- 
-    else:
-		led.value = False	# turn LED off
-
-    time.sleep(0.01) # debounce delay
+    # When the button is True (pressed), the LED should be True (on).
+    led.value = button.value
+    # Wait a little bit to reduce flicker.
+    time.sleep(0.01)
