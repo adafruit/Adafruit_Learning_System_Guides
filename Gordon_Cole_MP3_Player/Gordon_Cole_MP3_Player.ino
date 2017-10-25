@@ -27,12 +27,17 @@
 #define KNOB_MAX        1023  // max ADC value
 #define VOL_MIN         0     // min volume (most loud)
 #define VOL_MAX         50    // max volume (most quiet)
+#define VOL_UPDATE      250   // update rate in ms
+#define VOL_SAMPLES     10    // number of reads for average
+#define VOL_SAMPLE_RATE 5     // ms delay per sample
+#define VOL_THRESHOLD   20    // vol must change by this many counts
 // Maximum number of files (tracks) to load
 #define TRACKS_MAX      100
 // Player behavior
 #define AUTO_PLAY_NEXT  true  // true to automatically go to next track
 
-unsigned long currentMillis, previousMillis;
+unsigned long currentMillis;
+unsigned long previousBlinkMillis, previousVolMillis;
 int currentKnob, previousKnob;
 int volume;
 int currentTrack, totalTracks;
@@ -59,7 +64,7 @@ void setup() {
   pinMode(LED_STATUS, OUTPUT);
 
   // Initialize status LED
-  previousMillis = millis();
+  previousBlinkMillis = millis();
   digitalWrite(LED_STATUS, LOW);
 
   Serial.println("\n\nGordon Cole MP3 Player");
@@ -67,7 +72,10 @@ void setup() {
   // Initialize the music player  
   if (! musicPlayer.begin()) { 
      Serial.println(F("Couldn't find VS1053, do you have the right pins defined?"));
-     while (1);
+     while (1) {
+       digitalWrite(LED_STATUS, !digitalRead(LED_STATUS));
+       delay(100);        
+     }
   }
   Serial.println(F("VS1053 found"));
   musicPlayer.softReset();
@@ -76,6 +84,7 @@ void setup() {
   musicPlayer.sineTest(0x44, 500);    
 
   // Set volume for left, right channels. lower numbers == louder volume!
+  previousVolMillis = millis();  
   previousKnob = analogRead(KNOB_VOLUME);
   volume = map(previousKnob, KNOB_MIN, KNOB_MAX, VOL_MIN, VOL_MAX);
   Serial.print("Volume = "); Serial.println(volume);
@@ -84,7 +93,10 @@ void setup() {
   // Initialize the SD card
   if (!SD.begin(CARDCS)) {
     Serial.println(F("SD failed, or not present"));
-    while (1);
+    while (1) {
+       digitalWrite(LED_STATUS, !digitalRead(LED_STATUS));
+       delay(100);        
+    }
   }
   Serial.println("SD OK!");
 
@@ -169,12 +181,25 @@ void loop() {
 
 //-----------------------------------------------------------------------------
 void updateVolume() {
-  // Read current value
-  currentKnob = analogRead(KNOB_VOLUME);
+  // Rate limit
+  currentMillis = millis();
+  if (currentMillis - previousVolMillis < VOL_UPDATE) return;
+  previousVolMillis = currentMillis;
+  // Get an average reading
+  currentKnob = 0;
+  for (int i=0; i<VOL_SAMPLES; i++) {
+    currentKnob += analogRead(KNOB_VOLUME);
+    delay(VOL_SAMPLE_RATE);
+  }
+  currentKnob /= VOL_SAMPLES;
   // Only update if it's changed
-  if (currentKnob != previousKnob) {
+  if (abs(currentKnob-previousKnob) > VOL_THRESHOLD) {
+    Serial.print("["); Serial.print(currentKnob);
+    Serial.print(","); Serial.print(previousKnob);
+    Serial.print("] ");
     previousKnob = currentKnob;
     volume = map(currentKnob, KNOB_MIN, KNOB_MAX, VOL_MIN, VOL_MAX);
+    Serial.print("Volume set to: "); Serial.println(volume);
     musicPlayer.setVolume(volume, volume);  
   }  
 }
@@ -184,8 +209,8 @@ void updateStatusLED() {
   if (musicPlayer.paused()) {
     // Blink it like a polaroid
     currentMillis = millis();
-    if (currentMillis - previousMillis > BLINK_RATE) {
-       previousMillis = currentMillis;
+    if (currentMillis - previousBlinkMillis > BLINK_RATE) {
+       previousBlinkMillis = currentMillis;
        digitalWrite(LED_STATUS, !digitalRead(LED_STATUS));
     }
   } else if (!musicPlayer.stopped()) {
