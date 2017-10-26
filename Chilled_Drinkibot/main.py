@@ -16,18 +16,20 @@ chiller.direction = Direction.OUTPUT
 
 pump = DigitalInOut(board.D4)  # Pin to control the pump
 
-chillTime = 10  # How many seconds of cooling
+chillTime = 30  # How many seconds of cooling
 
 pumpTime = 5  # How many seconds of pumping
 
 while True:
     # we could also just do "led.value = not button.value" !
     if button.value:
+        print('not')
         led.value = False
+        chiller.value = False
+    else:
+        print('pressed')
+        led.value = True
         chiller.value = True
         time.sleep(chillTime)
-    else:
-        led.value = True
-        chiller.value = False
 
     time.sleep(0.01)  # debounce delay
