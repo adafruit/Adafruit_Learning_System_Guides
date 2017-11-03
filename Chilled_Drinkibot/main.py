@@ -18,7 +18,7 @@ pump = DigitalInOut(board.D4)  # Pin to control the pump
 pump.direction = Direction.OUTPUT
 
 
-chillTime = 1  # How many _minutes_ of cooling
+chillTime = 5  # How many _minutes_ of cooling
 
 pumpTime = 35  # How many seconds of pumping
 
