@@ -1,0 +1,54 @@
+# Chilled Drinkibot
+# by John Park
+# w sonic-pi
+
+
+use_synth :dark_ambience
+
+#chords
+in_thread do
+  loop do
+    4. times do
+      play 72, attack: 2.5
+      play 75
+      play 79
+      play 30, amp: 5
+      sleep 1
+      play 62, release: 3.5, amp: 0.5
+      play 65, amp: 0.5
+      play 69, amp: 0.5
+      sleep 1
+    end
+    4. times do
+      play 70
+      play 73
+      sleep 1
+      play 60, release: 2, amp: 1.5
+      play 63
+      play 10
+      sleep 1
+    end
+  end
+end
+
+# breakbeat drums
+in_thread do
+  loop do
+    with_fx :echo, mix: 0.05, phase: 0.25 do
+      sample :loop_breakbeat, rate: 0.95, amp: 1
+      sample :ambi_glass_rub, rate: 0.07, amp: 0.3
+      sleep 2
+    end
+  end
+end
+
+loop do
+  cordAmpVal = 1.5
+  play choose(chord(:F3, :minor)), release: 1, cutoff: rrand(60, 120), amp: cordAmpVal, pan: -1
+  play choose(chord(:F4, :minor)), release: 0.3, cutoff: rrand(60, 70), amp: cordAmpVal, pan: 1
+  play choose(chord(:F2, :minor)), release: 1, cutoff: rrand(60, 120), amp: cordAmpVal, pan: 1
+  play choose(chord(:F1, :minor)), release: 0.3, cutoff: rrand(60, 70), amp: cordAmpVal, pan: 1
+  play choose(chord(:F1, :minor)), release: 1, cutoff: rrand(60, 120), amp: cordAmpVal, pan: -1
+  play choose(chord(:F4, :minor)), release: 0.3, cutoff: rrand(60, 70), amp: cordAmpVal, pan: -1
+  sleep 8
+end

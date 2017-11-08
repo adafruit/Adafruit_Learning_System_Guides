@@ -17,9 +17,10 @@ chiller.direction = Direction.OUTPUT
 pump = DigitalInOut(board.D4)  # Pin to control the pump
 pump.direction = Direction.OUTPUT
 
-chillTime = 60  # How many seconds of cooling
 
-pumpTime = 15  # How many seconds of pumping
+chillTime = 5  # How many _minutes_ of cooling
+
+pumpTime = 35  # How many seconds of pumping
 
 while True:
     # we could also just do "led.value = not button.value" !
@@ -32,7 +33,7 @@ while True:
         print('pressed')
         led.value = True       # turn ON LED
         chiller.value = True   # turn ON chiller
-        time.sleep(chillTime)  # wait chiller time
+        time.sleep(chillTime * 60)  # wait chiller time (in seconds)
         chiller.value = False  # turn OFF chiller
         pump.value = True      # turn ON pump
         time.sleep(pumpTime)   # wait pump time
