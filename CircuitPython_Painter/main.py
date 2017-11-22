@@ -68,7 +68,7 @@ try:
 
         rowSize = (bmpWidth * 3 + 3) & ~3 # 32-bit line boundary
 
-        databuf = bytearray(2250 * 4) # its huge! but its also fast :)
+        databuf = bytearray(bmpWidth * bmpHeight * 4) # its huge! but its also fast :)
 
         for row in range(bmpHeight): # For each scanline...
             if(flip): # Bitmap is stored bottom-to-top order (normal BMP)
