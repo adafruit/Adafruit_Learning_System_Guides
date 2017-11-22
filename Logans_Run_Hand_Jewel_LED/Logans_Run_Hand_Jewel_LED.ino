@@ -4,7 +4,7 @@
 
 #include <Adafruit_NeoPixel.h>
 
-#define PIXEL_PIN    4  // Pin connected to neo pixels
+#define PIXEL_PIN    1  // Pin connected to neo pixels
 #define PIXEL_COUNT  7  // Count of neo pixels
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(PIXEL_COUNT, PIXEL_PIN, NEO_GRB + NEO_KHZ800);
