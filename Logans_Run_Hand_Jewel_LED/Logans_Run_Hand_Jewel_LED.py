@@ -18,13 +18,9 @@ def lerp(x, x0, x1, y0, y1):
     # Clamp x within x0 and x1 bounds.
     if ( x > x1 ):
         x = x1
-    else:
-        x = x
     
     if ( x < x0 ):
         x = x0
-    else:
-        x = x    
 
     # Calculate linear interpolation of y value.
     return (y0 + (y1-y0) * ( (x-x0) / (x1-x0) ) )
