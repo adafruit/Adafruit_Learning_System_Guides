@@ -1,9 +1,12 @@
 #
 # 3D_Printed_NeoPixel_Ring_Hair_Dress.py
 #
-# this is was ported from the 'gemma hoop animator' - unless you
-# don't like the preset animations or find a major bug, you don't need to
-# change anything here
+# this was ported to CircuitPython from the 'Gemma Hoop Animator' 
+#
+# https://github.com/HerrRausB/GemmaHoopAnimator
+#
+# unless you # don't like the preset animations or find a 
+# major bug, you don't need tochange anything here
 #
 import board
 import neopixel
