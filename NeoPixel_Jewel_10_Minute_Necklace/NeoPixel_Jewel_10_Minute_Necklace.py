@@ -3,7 +3,7 @@ import neopixel
 import time
 
 pixpin = board.D1
-numpix = 40
+numpix = 7
 
 pixels = neopixel.NeoPixel(pixpin, numpix, brightness=.3, auto_write=False)
  
