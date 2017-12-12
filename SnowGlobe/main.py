@@ -21,26 +21,26 @@ new_roll = False
 rolling = False
 
 
-def pixelFade(fadeColor):  # pick from colors defined above, e.g., RED, GREEN, BLUE, WHITE, etc.
+def fade_pixels(fade_color):  # pick from colors defined above, e.g., RED, GREEN, BLUE, WHITE, etc.
     # fade up
     for j in range(25):
-        pixelBright = (j * 0.01)
-        cpx.pixels.brightness = pixelBright
+        pixel_brightness = (j * 0.01)
+        cpx.pixels.brightness = pixel_brightness
         for i in range(10):
-            cpx.pixels[i] = fadeColor
+            cpx.pixels[i] = fade_color
 
     # fade down
     for k in range(25):
-        pixelBright = (0.25 - (k * 0.01))
-        cpx.pixels.brightness = pixelBright
+        pixel_brightness = (0.25 - (k * 0.01))
+        cpx.pixels.brightness = pixel_brightness
         for i in range(10):
-            cpx.pixels[i] = fadeColor
+            cpx.pixels[i] = fade_color
 
 # fade in the pixels
-pixelFade(GREEN)
+fade_pixels(GREEN)
 
 
-def playSong(song):
+def play_song(song_number):
     # 1: Jingle bells
     # 2: Let It Snow
 
@@ -69,32 +69,32 @@ def playSong(song):
     Bb4 = 466
     B4 = 494
 
-    if(song == 1):
+    if song_number == 1:
         # jingle bells
-        jingleBellsSong = [[E4, quarter_note], [E4, quarter_note],
+        jingle_bells_song = [[E4, quarter_note], [E4, quarter_note],
         [E4, half_note], [E4, quarter_note], [E4, quarter_note],
         [E4, half_note], [E4, quarter_note], [G4, quarter_note],
         [C4, dotted_quarter_note], [D4, eighth_note], [E4, whole_note]]
 
-        for n in range(len(jingleBellsSong)):
-            cpx.start_tone(jingleBellsSong[n][0])
-            time.sleep(jingleBellsSong[n][1])
+        for n in range(len(jingle_bells_song)):
+            cpx.start_tone(jingle_bells_song[n][0])
+            time.sleep(jingle_bells_song[n][1])
             cpx.stop_tone()
 
 
-    if(song == 2):
+    if song_number == 2:
         # Let It Snow
-        letItSnowSong = [[B4, dotted_quarter_note], [A4, eighth_note],
+        let_it_snow_song = [[B4, dotted_quarter_note], [A4, eighth_note],
         [G4, quarter_note], [G4, dotted_quarter_note], [F4, eighth_note],
         [E4, quarter_note], [E4, dotted_quarter_note], [D4, eighth_note],
         [C4, whole_note]]
 
-        for n in range(len(letItSnowSong)):
-            cpx.start_tone(letItSnowSong[n][0])
-            time.sleep(letItSnowSong[n][1])
+        for n in range(len(let_it_snow_song)):
+            cpx.start_tone(let_it_snow_song[n][0])
+            time.sleep(let_it_snow_song[n][1])
             cpx.stop_tone()
 
-playSong(1)  # play music on start
+play_song(1)  # play music on start
 
 
 # Loop forever
@@ -131,16 +131,16 @@ while True:
 
     # Light show
     if rolling:
-        pixelFade(SKYBLUE)
-        pixelFade(WHITE)
+        fade_pixels(SKYBLUE)
+        fade_pixels(WHITE)
         cpx.pixels.brightness = 0.8
         cpx.pixels.fill(WHITE)
 
     elif new_roll:
         new_roll = False
         # play a song!
-        playSong(2)
+        play_song(2)
         #return to resting color
-        pixelFade(GREEN)
+        fade_pixels(GREEN)
         cpx.pixels.brightness = 0.05
         cpx.pixels.fill(GREEN)

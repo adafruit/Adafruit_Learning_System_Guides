@@ -24,27 +24,27 @@ BLACK = (0, 0, 0)
 cpx.pixels.brightness = 0.1  # set brightness value
 
 # The seven files assigned to the touchpads
-audiofiles = ["fB_bd_tek.wav", "fB_elec_hi_snare.wav", "fB_elec_cymbal.wav",
-              "fB_elec_blip2.wav", "fB_bd_zome.wav", "fB_bass_hit_c.wav",
-              "fB_drum_cowbell.wav"]
+audio_files = ["fB_bd_tek.wav", "fB_elec_hi_snare.wav", "fB_elec_cymbal.wav",
+               "fB_elec_blip2.wav", "fB_bd_zome.wav", "fB_bass_hit_c.wav",
+               "fB_drum_cowbell.wav"]
 
-stepAdvance = 0  # to count steps
+step_advance = 0  # to count steps
 step = 0
 
 # sixteen steps in a sequence
-stepNote = [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1]
+step_note = [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1]
 
 # step pixels
-stepPixel = [9, 8, 7, 6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
+step_pixel = [9, 8, 7, 6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
 
 # step colors
-stepCol = [WHITE, RED, YELLOW, GREEN, AQUA, BLUE, PURPLE, BLACK]
+step_col = [WHITE, RED, YELLOW, GREEN, AQUA, BLUE, PURPLE, BLACK]
 
 def prog_mode(i):
-    cpx.play_file(audiofiles[i])
-    stepNote[step] = i
-    cpx.pixels[stepPixel[step]] = stepCol[stepNote[step]]
-    print("playing file " + audiofiles[i])
+    cpx.play_file(audio_files[i])
+    step_note[step] = i
+    cpx.pixels[step_pixel[step]] = step_col[step_note[step]]
+    print("playing file " + audio_files[i])
 
 
 while True:
@@ -62,11 +62,11 @@ while True:
             for i in range(16):
                 step = i
                 # light a pixel
-                cpx.pixels[stepPixel[i]] = stepCol[stepNote[i]]
-                cpx.pixels[stepPixel[i - 1]] = BLACK
+                cpx.pixels[step_pixel[i]] = step_col[step_note[i]]
+                cpx.pixels[step_pixel[i - 1]] = BLACK
 
                 # play a file
-                cpx.play_file(audiofiles[stepNote[i]])
+                cpx.play_file(audio_files[step_note[i]])
 
                 # sleep a beat
                 time.sleep(beat)
@@ -81,15 +81,15 @@ while True:
             cpx.pixels.fill(BLACK)
             cpx.pixels[9] = WHITE
             step = 0
-            stepAdvance = 0
+            step_advance = 0
 
         # press B button to advance neo pixel steps
         if cpx.button_b:  # button has been pressed
-            stepAdvance += 1
-            step = stepAdvance % 16
-            cpx.play_file(audiofiles[stepNote[step]])
-            cpx.pixels[stepPixel[step]] = stepCol[stepNote[step]]
-            cpx.pixels[stepPixel[step - 1]] = BLACK
+            step_advance += 1
+            step = step_advance % 16
+            cpx.play_file(audio_files[step_note[step]])
+            cpx.pixels[step_pixel[step]] = step_col[step_note[step]]
+            cpx.pixels[step_pixel[step - 1]] = BLACK
 
         if cpx.touch_A1:
             prog_mode(0)
