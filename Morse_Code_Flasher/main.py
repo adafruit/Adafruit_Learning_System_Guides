@@ -33,19 +33,6 @@ class MorseFlasher:
         else:
             pixels.fill((0,0,0))
         pixels.show()
-         
-    def display(self, code=".-.-.- "):
-        # iterate through morse code symbols
-        for c in code:
-            # show a dot
-            if c == ".":
-                self.showDot()
-            # show a dash
-            elif c == "-":
-                self.showDash()
-            # show a gap
-            elif c == " ":
-                time.sleep(character_gap)
         
     def showDot(self):
         self.light(True)
@@ -72,6 +59,19 @@ class MorseFlasher:
             output += " "
         #save complete morse code output to display
         self.display(output)
+         
+    def display(self, code=".-.-.- "):
+        # iterate through morse code symbols
+        for c in code:
+            # show a dot
+            if c == ".":
+                self.showDot()
+            # show a dash
+            elif c == "-":
+                self.showDash()
+            # show a gap
+            elif c == " ":
+                time.sleep(character_gap)
 
 # Initialize NeoPixels
 pixels = neopixel.NeoPixel(board.NEOPIXEL, 10, auto_write=False)
