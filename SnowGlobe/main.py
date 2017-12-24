@@ -22,22 +22,19 @@ rolling = False
 
 
 def fade_pixels(fade_color):  # pick from colors defined above, e.g., RED, GREEN, BLUE, WHITE, etc.
-    cpx.pixels.fill(fade_color)
     # fade up
     for j in range(25):
         pixel_brightness = (j * 0.01)
         cpx.pixels.brightness = pixel_brightness
-        cpx.pixels.show()
-        time.sleep(0.03)
-
+        for i in range(10):
+            cpx.pixels[i] = fade_color
 
     # fade down
     for k in range(25):
         pixel_brightness = (0.25 - (k * 0.01))
         cpx.pixels.brightness = pixel_brightness
-        cpx.pixels.show()
-        time.sleep(0.02)
-
+        for i in range(10):
+            cpx.pixels[i] = fade_color
 
 # fade in the pixels
 fade_pixels(GREEN)
