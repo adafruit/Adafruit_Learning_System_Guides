@@ -20,7 +20,7 @@
 #define N_GRAINS     20 // Number of grains of sand
 #define WIDTH        15 // Display width in pixels
 #define HEIGHT        7 // Display height in pixels
-#define MAX_FPS      60 // Maximum redraw rate, frames/second
+#define MAX_FPS      45 // Maximum redraw rate, frames/second
 
 // The 'sand' grains exist in an integer coordinate space that's 256X
 // the scale of the pixel grid, allowing them to move and interact at
@@ -138,15 +138,20 @@ void loop() {
 
   // Read accelerometer...
   accel.read();
-  int16_t ax = -accel.x / 256, // Transform accelerometer axes
-          ay =  accel.y / 256; // to grain coordinate space
+  int16_t ax = -accel.y / 256,      // Transform accelerometer axes
+          ay =  accel.x / 256,      // to grain coordinate space
+          az = abs(accel.z) / 2048; // Random motion factor
+  az = (az >= 3) ? 1 : 4 - az;      // Clip & invert
+  ax -= az;                         // Subtract motion factor from X, Y
+  ay -= az;
+  int16_t az2 = az * 2 + 1;         // Range of random motion to add back in
 
   // ...and apply 2D accel vector to grain velocities...
   int32_t v2; // Velocity squared
   float   v;  // Absolute velocity
   for(int i=0; i<N_GRAINS; i++) {
-    grain[i].vx += ax + random(5) - 2; // A little randomness makes
-    grain[i].vy += ay + random(5) - 2; // tall stacks topple better!
+    grain[i].vx += ax + random(az2); // A little randomness makes
+    grain[i].vy += ay + random(az2); // tall stacks topple better!
     // Terminal velocity (in any direction) is 256 units -- equal to
     // 1 pixel -- which keeps moving grains from passing through each other
     // and other such mayhem.  Though it takes some extra math, velocity is
@@ -260,7 +265,7 @@ void loop() {
   pageSelect(backbuffer); // Select background buffer
   for(i=bytes=0; i<sizeof(remap); i++) {
     if(!bytes) bytes = writeRegister(0x24 + i);
-    Wire.write(img[pgm_read_byte(ptr++)]); // Write each byte to matrix
+    Wire.write(img[pgm_read_byte(ptr++)] / 3); // Write each byte to matrix
     if(++bytes >= 32) bytes = Wire.endTransmission();
   }
   if(bytes) Wire.endTransmission();
