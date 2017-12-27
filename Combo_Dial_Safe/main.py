@@ -74,8 +74,8 @@ while True:
     if cpx.button_a:  # this means the button has been pressed
         # grab the current_dial_position value and add to the list
         entered_combo.append(current_dial_position)
-        dialMsg = 'Dial Position: ' + str(entered_combo[(len(entered_combo)-1)])
-        print(dialMsg)
+        dial_msg = 'Dial Position: ' + str(entered_combo[(len(entered_combo)-1)])
+        print(dial_msg)
         cpx.play_tone(320, 0.3)  # beep
         time.sleep(1)  # slow down button checks
 
