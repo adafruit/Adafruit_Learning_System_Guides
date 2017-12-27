@@ -33,12 +33,11 @@ void loop() {
     Serial.println();
     Serial.println("---------------------------------------");
     Serial.println("Concentration Units (standard)");
-    Serial.println("---------------------------------------");
     Serial.print("PM 1.0: "); Serial.print(data.pm10_standard);
     Serial.print("\t\tPM 2.5: "); Serial.print(data.pm25_standard);
     Serial.print("\t\tPM 10: "); Serial.println(data.pm100_standard);
-    Serial.println("Concentration Units (environmental)");
     Serial.println("---------------------------------------");
+    Serial.println("Concentration Units (environmental)");
     Serial.print("PM 1.0: "); Serial.print(data.pm10_env);
     Serial.print("\t\tPM 2.5: "); Serial.print(data.pm25_env);
     Serial.print("\t\tPM 10: "); Serial.println(data.pm100_env);
