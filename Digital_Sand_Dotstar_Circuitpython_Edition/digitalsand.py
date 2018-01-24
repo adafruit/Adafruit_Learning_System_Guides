@@ -32,7 +32,7 @@ import random
 import board
 import busio
 
-import lsm303
+import adafruit_lsm303
 import adafruit_dotstar
 
 N_GRAINS = 10 # Number of grains of sand
@@ -57,7 +57,7 @@ class Grain:
 
 grains = [Grain() for _ in range(N_GRAINS)]
 i2c = busio.I2C(board.SCL, board.SDA)
-sensor = lsm303.LSM303(i2c)
+sensor = adafruit_lsm303.LSM303(i2c)
 wing = adafruit_dotstar.DotStar(board.D13, board.D11, WIDTH * HEIGHT, 0.25, False)
 
 oldidx = 0
