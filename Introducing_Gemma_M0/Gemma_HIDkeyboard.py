@@ -19,6 +19,8 @@ buttonkeys = [Keycode.A, Keycode.B, "Hello World!\n"]
 controlkey = Keycode.SHIFT
 
 # the keyboard object!
+# sleep for a bit to avoid a race condition on some systems
+time.sleep(1)
 kbd = Keyboard()
 # we're americans :)
 layout = KeyboardLayoutUS(kbd)
