@@ -24,26 +24,15 @@
 # animating.  This will ensure the capacitive touch sensing isn't accidentally
 # calibrated with your body touching it (making it less accurate).
 #
-# Also note this depends on two external modules to be loaded on the Gemma M0:
-#  - Adafruit CircuitPython DotStar: https://github.com/adafruit/Adafruit_CircuitPython_DotStar
-#  - Adafruit CircuitPython FancyLED: https://github.com/adafruit/Adafruit_CircuitPython_FancyLED
-#
-# You _must_ have both adafruit_dotstar.mpy and the adafruit_fancyled folder
-# and files within it on your board for this code to work!  If you run into
-# trouble or can't get the dependencies see the main_simple.py code as an
-# alternative that has no dependencies but slightly more complex code.
-#
 # Author: Tony DiCola
 # License: MIT License
 import math
 import time
 
 import board
+import busio
 import digitalio
 import touchio
-
-import adafruit_dotstar
-import adafruit_fancyled.adafruit_fancyled as fancy
 
 
 # Variables that control the code.  Try changing these to modify speed, color,
@@ -81,8 +70,31 @@ HEARTBEAT_HUE = 300.0   # The color hue to use when animating the heartbeat
                         # A value of 300 is a nice pink color.
 
 # First initialize the DotStar LED and turn it off.
-dotstar = adafruit_dotstar.DotStar(board.APA102_SCK, board.APA102_MOSI, 1)
-dotstar[0] = (0,0,0)
+# We'll manually drive the dotstar instead of depending on the adafruit_dotstar
+# library for simplicity--there's no need to install other dependencies for
+# driving this one LED.
+dotstar_spi = busio.SPI(clock=board.APA102_SCK, MOSI=board.APA102_MOSI)
+# Raw dotstar protocol, start with 4 bytes of zero, then 0xFF and B, G, R
+# pixel data, followed by bytes of 0xFF tail (just one for 1 pixel).
+dotstar_data = bytearray([0x00, 0x00, 0x00, 0x00, 0xFF, 0x00, 0x00, 0x00,
+                          0xFF])
+# Define a function to simplify setting dotstar color.
+def dotstar_color(rgb_color):
+    # Set the color of the dot star LED.  This is barebones dotstar driving
+    # code for simplicity and less dependency on other libraries.  We're only
+    # driving one LED!
+    try:
+        while not dotstar_spi.try_lock():
+            pass
+        dotstar_spi.configure(baudrate=4000000)
+        dotstar_data[5] = rgb_color[2] & 0xFF  # Blue
+        dotstar_data[6] = rgb_color[1] & 0xFF  # Green
+        dotstar_data[7] = rgb_color[0] & 0xFF  # Red
+        dotstar_spi.write(dotstar_data)
+    finally:
+        dotstar_spi.unlock()
+# Call the function above to turn off the dotstar initially (set it to all 0).
+dotstar_color((0, 0, 0))
 
 # Also make sure the on-board red LED is turned off.
 red_led = digitalio.DigitalInOut(board.L)
@@ -114,7 +126,65 @@ beat_phase = beat_period/5.0           # Phase controls how long in-between
                                        # the two parts of the heart beat
                                        # (the 'ba-boom' of the beat).
 
-# Handy function for linear interpolation of a value.  Pass in a value
+# Define a gamma correction lookup table to make colors more accurate.
+# See this guide for more background on gamma correction:
+#   https://learn.adafruit.com/led-tricks-gamma-correction/
+gamma8 = bytearray(256)
+for i in range(len(gamma8)):
+    gamma8[i] = int(math.pow(i/255.0, 2.8)*255.0+0.5) & 0xFF
+
+# Define a function to convert from HSV (hue, saturation, value) color to
+# RGB colors that DotStar LEDs speak.  The HSV color space is a nicer for
+# animations because you can easily change the hue and value (brightness)
+# vs. RGB colors.  Pass in a hue (in degrees from 0-360) and saturation and
+# value that range from 0 to 1.0.  This will also use the gamma correction
+# table above to get the most accurate color.  Adapted from C/C++ code here:
+#   https://www.cs.rit.edu/~ncs/color/t_convert.html
+def HSV_to_RGB(h, s, v):
+    r = 0
+    g = 0
+    b = 0
+    if s == 0.0:
+        r = v
+        g = v
+        b = v
+    else:
+        h /= 60.0       # sector 0 to 5
+        i = int(math.floor(h))
+        f = h - i       # factorial part of h
+        p = v * (1.0 - s)
+        q = v * (1.0 - s * f)
+        t = v * (1.0 - s * (1.0 - f))
+        if i == 0:
+            r = v
+            g = t
+            b = p
+        elif i == 1:
+            r = q
+            g = v
+            b = p
+        elif i == 2:
+            r = p
+            g = v
+            b = t
+        elif i == 3:
+            r = p
+            g = q
+            b = v
+        elif i == 4:
+            r = t
+            g = p
+            b = v
+        else:
+            r = v
+            g = p
+            b = q
+    r = gamma8[int(255.0*r)]
+    g = gamma8[int(255.0*g)]
+    b = gamma8[int(255.0*b)]
+    return (r, g, b)
+
+# Another handy function for linear interpolation of a value.  Pass in a value
 # x that's within the range x0...x1 and a range y0...y1 to get an output value
 # y that's proportionally within y0...y1 based on x within x0...x1.  Handy for
 # transforming a value in one range to a value in another (like Arduino's map
@@ -149,8 +219,7 @@ while True:
         # like we expect for full bright to zero brightness with HSV color
         # (i.e. no interpolation is necessary).
         val = max(x0, x1) * BRIGHTNESS
-        color = fancy.gamma_adjust(fancy.CHSV(HEARTBEAT_HUE/359.0, 1.0, val))
-        dotstar[0] = color.pack()
+        dotstar_color(HSV_to_RGB(HEARTBEAT_HUE, 1.0, val))
     else:
         # The touch input is not being touched (touch.value is False) so
         # compute the hue with a smooth cycle over time.
@@ -158,9 +227,8 @@ while True:
         # from -1.0 to 1.0 at a certain frequency to match the rainbow period.
         x = math.sin(2.0*math.pi*rainbow_freq*current)
         # Then compute the hue by converting the sine wave value from something
-        # that goes from -1.0 to 1.0 to instead go from 0 to 1.0 hue.
-        hue = lerp(x, -1.0, 1.0, 0.0, 1.0)
+        # that goes from -1.0 to 1.0 to instead go from 0 to 359 degrees.
+        hue = lerp(x, -1.0, 1.0, 0.0, 359.0)
         # Finally update the DotStar LED by converting the HSV color at the
         # specified hue to a RGB color the LED understands.
-        color = fancy.gamma_adjust(fancy.CHSV(hue, 1.0, BRIGHTNESS))
-        dotstar[0] = color.pack()
+        dotstar_color(HSV_to_RGB(hue, 1.0, BRIGHTNESS))

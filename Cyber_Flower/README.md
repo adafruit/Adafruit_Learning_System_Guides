@@ -23,3 +23,13 @@ indication that it's waiting to power on.  Place the flower down so nothing
 is touching it and then pick it up again after the DotStar LED starts
 animating.  This will ensure the capacitive touch sensing isn't accidentally
 calibrated with your body touching it (making it less accurate).
+
+The main.py version of the code depends on the following external modules to
+also be loaded on the board:
+-   Adafruit CircuitPython DotStar: https://github.com/adafruit/Adafruit_CircuitPython_DotStar
+-   Adafruit CircuitPython FancyLED: https://github.com/adafruit/Adafruit_CircuitPython_FancyLED
+
+You _must_ have both adafruit_dotstar.mpy and the adafruit_fancyled folder
+and files within it on your board for this code to work!  If you run into
+trouble or can't get the dependencies see the main_simple.py code as an
+alternative that has no dependencies but slightly more complex code.
