@@ -8,7 +8,7 @@ pixpin = board.D0         # what pin the LEDs are on
 numpix = 16               # number of LEDs in ring!
 BPP = 4                   # required for RGBW ring
 
-ring = neopixel.NeoPixel(pixpin, numpix, bpp=BPP, brightness=1.0)
+ring = neopixel.NeoPixel(pixpin, numpix, bpp=BPP, brightness=0.9)
 
 def val(pin):
     # divides voltage (65535) to get a value between 0 and 255
@@ -20,5 +20,5 @@ while True:
     # time.sleep(1)    
     
     # change floating point value to an int
-    ring.fill(0, 0, 0, int(val(pot)))
+    ring.fill((0, 0, 0, int(val(pot))))
     time.sleep(0.01)
