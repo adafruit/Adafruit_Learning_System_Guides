@@ -1,15 +1,14 @@
 import time
 from adafruit_circuitplayground.express import cpx
-
-
 # pylint: disable=redefined-outer-name
+
+
 def upright(x, y, z):
     return abs(x) < accel_threshold and abs(y) < accel_threshold and abs(9.8 - z) < accel_threshold
 
 
 def left_side(x, y, z):
     return abs(9.8 - x) < accel_threshold and abs(y) < accel_threshold and abs(z) < accel_threshold
-# pylint: enable=redefined-outer-name
 
 
 state = None
