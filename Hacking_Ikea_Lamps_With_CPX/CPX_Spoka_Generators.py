@@ -1,5 +1,6 @@
 import time
 from adafruit_circuitplayground.express import cpx
+# pylint: disable=stop-iteration-return
 
 
 def wheel(pos):
@@ -25,7 +26,6 @@ def cycle_sequence(seq):
 def rainbow_lamp(seq):
     g = cycle_sequence(seq)
     while True:
-        # pylint: disable=stop-iteration-return
         cpx.pixels.fill(wheel(next(g)))
         yield
 
