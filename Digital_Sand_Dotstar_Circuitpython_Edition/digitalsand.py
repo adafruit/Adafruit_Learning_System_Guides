@@ -108,7 +108,7 @@ while True:
     wing.show()
 
     # Read accelerometer...
-    f_x, f_y, f_z = sensor.raw_accelerometer
+    f_x, f_y, f_z = sensor.raw_acceleration
     ax = f_x >> 8                     # Transform accelerometer axes
     ay = f_y >> 8                     # to grain coordinate space
     az = abs(f_z) >> 11               # Random motion factor
