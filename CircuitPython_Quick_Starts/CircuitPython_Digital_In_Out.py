@@ -16,7 +16,7 @@ switch.pull = Pull.DOWN  # For Gemma M0, Trinket M0, Metro M0 Exp, ItsyBitsy M0 
 
 
 while True:
-    # We could also just do "led.value = not button.value" !
+    # We could also just do "led.value = not switch.value" !
     if switch.value:
         led.value = False
     else:
