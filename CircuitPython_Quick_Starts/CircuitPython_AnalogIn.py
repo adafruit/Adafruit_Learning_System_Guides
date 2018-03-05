@@ -1,11 +1,10 @@
 # CircuitPython AnalogIn Demo
 
+import time
 from analogio import AnalogIn
 import board
-import time
 
-analog1in = AnalogIn(board.A1)  # For Gemma M0, Metro M0 Exp, Feather M0 Exp, ItsyBitsy M0 Exp, CPX
-# analog1in = AnalogIn(board.D1)  # For Trinket M0
+analog1in = AnalogIn(board.A1)
 
 
 def get_voltage(pin):
