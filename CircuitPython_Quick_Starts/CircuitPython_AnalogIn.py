@@ -4,7 +4,7 @@ import time
 from analogio import AnalogIn
 import board
 
-analog1in = AnalogIn(board.A1)
+analog_in = AnalogIn(board.A1)
 
 
 def get_voltage(pin):
@@ -12,5 +12,5 @@ def get_voltage(pin):
 
 
 while True:
-    print("A1: %f" % (get_voltage(analog1in)))
+    print("A1: %f" % get_voltage(analog_in))
     time.sleep(0.1)
