@@ -37,7 +37,7 @@ byte prevKeyState = HIGH;
 
 //FIRST ACTIVE MODE
 #define NUM_MODES 1     // actually 2 modes, mode 0 (off) and mode 1 (on)
-int ledMode = 0;       // change to 1 to make the LEDs light up on startup
+int ledMode = 1;       // change to 0 to make the LEDs dark on startup
 
 //READ CAP TOUCH BUTTON STATE
 boolean capButton(uint8_t pad) {
