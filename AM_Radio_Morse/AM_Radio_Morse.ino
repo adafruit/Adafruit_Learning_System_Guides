@@ -1,16 +1,16 @@
 // For Adafruit_AMRadio library -- Morse code transmits on AM 540.
 // Connect antenna (40" wire) to pin A0 and GND
 // RANGE IS LIMITED TO A FEW FEET
-// Morse "dot" key is a contact switch connected to D0 and GND
-// "Dash" key is switch connected to D2 and GND
+// Morse "dot" key is a contact switch connected to D2 and GND
+// "Dash" key is switch connected to D0 and GND
 // Adapted from Phil Burgess's AMRadio sketch
 
 #include <Adafruit_AMRadio.h>
 
 Adafruit_AMRadio radio;
 
-const int buttonDotPin = 0; //pushbutton pin for dit
-const int buttonDashPin = 2; //pushbutton pin for dah
+const int buttonDotPin = 2; //pushbutton pin for dit
+const int buttonDashPin = 0; //pushbutton pin for dah
 const int ledPin = 13; //to light the onboard LED
 
 int buttonDotState = 0; //to store button state
