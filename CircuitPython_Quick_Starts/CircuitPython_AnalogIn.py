@@ -12,5 +12,5 @@ def get_voltage(pin):
 
 
 while True:
-    print("A1: %f" % get_voltage(analog_in))
+    print((get_voltage(analog_in),))
     time.sleep(0.1)
