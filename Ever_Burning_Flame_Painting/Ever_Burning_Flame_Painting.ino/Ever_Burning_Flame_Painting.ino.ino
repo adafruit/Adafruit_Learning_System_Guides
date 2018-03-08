@@ -142,7 +142,7 @@ void Fire2012WithPalette2()
   random16_add_entropy( random());
   static byte heat2[NUM_LEDS_2];
     for( int i = 0; i < NUM_LEDS_2; i++) {
-      heat2[i] = qsub8( heat[i],  random8(0, ((COOLING * 10) / NUM_LEDS_2) + 2));
+      heat2[i] = qsub8( heat2[i],  random8(0, ((COOLING * 10) / NUM_LEDS_2) + 2));
     }
     for( int k= NUM_LEDS_2 - 3; k > 0; k--) {
       heat2[k] = (heat2[k - 1] + heat2[k - 2] + heat2[k - 2] ) / 3;
