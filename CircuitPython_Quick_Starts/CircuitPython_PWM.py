@@ -1,5 +1,5 @@
-import pulseio
 import time
+import pulseio
 import board
 
 led = pulseio.PWMOut(board.D13, frequency=5000, duty_cycle=0)

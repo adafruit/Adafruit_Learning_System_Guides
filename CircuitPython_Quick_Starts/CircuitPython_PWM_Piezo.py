@@ -1,5 +1,5 @@
-import pulseio
 import time
+import pulseio
 import board
 
 piezo = pulseio.PWMOut(board.A2, duty_cycle=0, frequency=440, variable_frequency=True)
