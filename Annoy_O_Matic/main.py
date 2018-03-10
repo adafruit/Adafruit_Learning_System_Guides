@@ -17,7 +17,7 @@ piezo = pulseio.PWMOut(board.D0, duty_cycle=0, frequency=440,
 annoy_mode = 3
 
 # set general parameters here
-interval = 5  # how many seconds before next annoyance. Default 120 (2 minutes)
+interval = 300  # seconds before next annoyance. Default 300 (5 minutes)
 
 # set beep details here
 frequency = 5000  # pitch of the beep in Hz.              Default 5000
