@@ -14,7 +14,7 @@ piezo = pulseio.PWMOut(board.D0, duty_cycle=0, frequency=440,
 #  4 = crickets
 #  5 = teen tone
 #  6 = demo mode
-annoy_mode = 6
+annoy_mode = 3
 
 # set general parameters here
 interval = 5  # how many seconds before next annoyance. Default 120 (2 minutes)
