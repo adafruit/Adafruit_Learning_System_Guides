@@ -178,7 +178,7 @@ def download_image():
 
     # this says where to save image, and where to get it
     led.value = False
-    layout.write('curl -o ~/Desktop/hackimage.jpg https://www.adafruit.com/includes/templates/adafruit2013//images/adabox/adabox_logo_black.png')
+    layout.write('curl -o ~/Desktop/hackimage.jpg https://cdn-learn.adafruit.com/assets/assets/000/051/840/original/hacks_foulFowl.jpg')
     time.sleep(pause)
     kbd.press(Keycode.ENTER)
     led.value = True
