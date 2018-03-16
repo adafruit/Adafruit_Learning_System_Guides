@@ -1,4 +1,4 @@
-# CircuitPython demo - NeoPixel
+# CircuitPython demo - NeoPixel RGBW
 
 import time
 import board
