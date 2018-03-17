@@ -58,9 +58,9 @@ def color_chase(wait):
 
 def rainbow_cycle(wait):
     for j in range(255):
-        rc_i = j % num_pixels
-        rc_index = int((rc_i * 256 / num_pixels) + j)
-        pixels[rc_i] = wheel(rc_index & 255)
+        for i in range(num_pixels):
+            idx = int((i * 256 / num_pixels) + j)
+            pixels[i] = wheel(idx & 255)
         time.sleep(wait)
 
 
