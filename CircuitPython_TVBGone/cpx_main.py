@@ -42,7 +42,6 @@ while True:
     for line in f:
         code = eval(line)
         print(code)
-        pwm.frequency = code['freq']
         if switch.value:
             led.value = True
         else:
@@ -62,9 +61,11 @@ while True:
             pulses += table[i]  # and add to the list of pulses
         pulses.pop()  # remove one final 'low' pulse
 
+        pwm.frequency = code['freq']
         for i in range(repeat):
             pulse.send(array.array('H', pulses))
             time.sleep(delay)
+        
         led.value = False
         spkr.value = False
         time.sleep(code['delay'])
