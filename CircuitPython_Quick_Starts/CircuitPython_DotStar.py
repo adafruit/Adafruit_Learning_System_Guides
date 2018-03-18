@@ -5,7 +5,7 @@ import board
 import adafruit_dotstar
 
 num_pixels = 72
-pixels = adafruit_dotstar.DotStar(board.A1, board.A2, num_pixels, brightness=0.1)
+pixels = adafruit_dotstar.DotStar(board.A1, board.A2, num_pixels, brightness=0.1, auto_write=True)
 
 
 def slice_alternating(wait):
