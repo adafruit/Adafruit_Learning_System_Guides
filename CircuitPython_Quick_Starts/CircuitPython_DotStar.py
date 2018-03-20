@@ -22,6 +22,12 @@ def wheel(pos):
     return (pos * 3, 0, 255 - pos * 3)
 
 
+def color_fill(color, wait):
+    pixels.fill(color)
+    pixels.show()
+    time.sleep(wait)
+
+
 def slice_alternating(wait):
     pixels[::2] = [RED] * (num_pixels // 2)
     pixels.show()
@@ -97,42 +103,20 @@ MAGENTA = (255, 0, 20)
 WHITE = (255, 255, 255)
 
 while True:
-    pixels.fill(RED)
-    pixels.show()
-    time.sleep(0.5)  # Change this number to change how long it stays on each solid color.
-    pixels.fill(ORANGE)
-    pixels.show()
-    time.sleep(0.5)
-    pixels.fill(YELLOW)
-    pixels.show()
-    time.sleep(0.5)
-    pixels.fill(GREEN)
-    pixels.show()
-    time.sleep(0.5)
-    pixels.fill(TEAL)
-    pixels.show()
-    time.sleep(0.5)
-    pixels.fill(CYAN)
-    pixels.show()
-    time.sleep(0.5)
-    pixels.fill(BLUE)
-    pixels.show()
-    time.sleep(0.5)
-    pixels.fill(PURPLE)
-    pixels.show()
-    time.sleep(0.5)
-    pixels.fill(MAGENTA)
-    pixels.show()
-    time.sleep(0.5)
-    pixels.fill(WHITE)
-    pixels.show()
-    time.sleep(0.5)
+    color_fill(RED, 0.5)  # Change this number to change how long it stays on each solid color.
+    color_fill(YELLOW, 0.5)
+    color_fill(ORANGE, 0.5)
+    color_fill(GREEN, 0.5)
+    color_fill(TEAL, 0.5)
+    color_fill(CYAN, 0.5)
+    color_fill(BLUE, 0.5)
+    color_fill(PURPLE, 0.5)
+    color_fill(MAGENTA, 0.5)
+    color_fill(WHITE, 0.5)
 
     slice_alternating(0.1)  # Increase or decrease this to speed up or slow down the animation.
 
-    pixels.fill(WHITE)
-    pixels.show()
-    time.sleep(0.5)
+    color_fill(WHITE, 0.5)
 
     slice_rainbow(0.1)  # Increase or decrease this to speed up or slow down the animation.
 
