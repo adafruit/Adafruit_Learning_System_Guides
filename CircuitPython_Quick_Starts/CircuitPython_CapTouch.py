@@ -2,7 +2,8 @@ import time
 import board
 import touchio
 
-touch_pad = board.A0
+touch_pad = board.A0  # Will not work for Circuit Playground Express!
+# touch_pad = board.A1  # For Circuit Playground Express
 
 touch = touchio.TouchIn(touch_pad)
 
