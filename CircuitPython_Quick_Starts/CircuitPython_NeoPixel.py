@@ -24,39 +24,9 @@ def wheel(pos):
     return (pos * 3, 0, 255 - pos * 3)
 
 
-def color_chase(wait):
+def color_chase(color, wait):
     for i in range(num_pixels):
-        pixels[i] = RED
-        time.sleep(wait)
-        pixels.show()
-    time.sleep(0.5)
-
-    for i in range(num_pixels):
-        pixels[i] = YELLOW
-        time.sleep(wait)
-        pixels.show()
-    time.sleep(0.5)
-
-    for i in range(num_pixels):
-        pixels[i] = GREEN
-        time.sleep(wait)
-        pixels.show()
-    time.sleep(0.5)
-
-    for i in range(num_pixels):
-        pixels[i] = CYAN
-        time.sleep(wait)
-        pixels.show()
-    time.sleep(0.5)
-
-    for i in range(num_pixels):
-        pixels[i] = BLUE
-        time.sleep(wait)
-        pixels.show()
-    time.sleep(0.5)
-
-    for i in range(num_pixels):
-        pixels[i] = PURPLE
+        pixels[i] = color
         time.sleep(wait)
         pixels.show()
     time.sleep(0.5)
@@ -89,6 +59,11 @@ while True:
     pixels.show()
     time.sleep(1)
 
-    color_chase(0.1)  # Increase the number to slow down the color chase
+    color_chase(RED, 0.1)  # Increase the number to slow down the color chase
+    color_chase(YELLOW, 0.1)
+    color_chase(GREEN, 0.1)
+    color_chase(CYAN, 0.1)
+    color_chase(BLUE, 0.1)
+    color_chase(PURPLE, 0.1)
 
     rainbow_cycle(0)  # Increase the number to slow down the rainbow
