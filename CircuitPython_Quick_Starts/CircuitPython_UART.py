@@ -1,4 +1,4 @@
-# Gemma IO demo - USB/Serial echo
+# CircuitPython Demo - USB/Serial echo
 
 import digitalio
 import board
