@@ -1,25 +1,25 @@
-# I2C sensor demo
+# CircuitPython Demo - I2C sensor
 
 import board
 import busio
-import adafruit_si7021
+import adafruit_tsl2561
 import time
 
 i2c = busio.I2C(board.SCL, board.SDA)
 
-# lock the I2C device before we try to scan
+# Lock the I2C device before we try to scan
 while not i2c.try_lock():
     pass
-print("I2C addresses found:", [hex(i) for i in i2c.scan()])
+# Print the addresses found once
+print("I2C addresses found:", [hex(device_address) for device_address in i2c.scan()])
 
-# unlock I2C now that we're done scanning.
+# Unlock I2C now that we're done scanning.
 i2c.unlock()
 
 # Create library object on our I2C port
-si7021 = adafruit_si7021.SI7021(i2c)
+tsl2561 = adafruit_tsl2561.TSL2561(i2c)
 
-
-# Use library to read the data!
+# Use the object to print the sensor readings
 while True:
-    print("Temp: %0.2F *C   Humidity: %0.1F %%" % (si7021.temperature, si7021.relative_humidity))
-    time.sleep(1)
+    print("Lux:", tsl2561.lux)
+    time.sleep(1.0)
