@@ -1,3 +1,6 @@
+# Plays the 007 theme song
+# Gemma M0 with Piezo on D0 and GND
+
 import pulseio
 import board
 import time
@@ -236,30 +239,28 @@ def song_playback(song):
         piezo.duty_cycle = 0  # off
         time.sleep(0.01)
 
-while True:
-        song_playback(Bond01)
-        song_playback(Bond01)
-        song_playback(Bond02)
-        song_playback(Bond03)
-        song_playback(Bond02)
-        song_playback(Bond03)
-        song_playback(Bond02)
-        song_playback(Bond04)
-        song_playback(Bond05)
-        song_playback(Bond06)
-        song_playback(Bond07)
-        song_playback(Bond06)
-        song_playback(Bond08)
-        song_playback(Bond09)
-        song_playback(Bond10)
-        song_playback(Bond09)
-        song_playback(Bond10)
-        song_playback(Bond11)
-        song_playback(Bond01)
-        song_playback(Bond01)
-        song_playback(Bond01)
-        song_playback(Bond01)
-        song_playback(Bond05)
-        song_playback(Bond12)
-
-        time.sleep(5)
+# this plays the full song roadmap
+song_playback(Bond01)
+song_playback(Bond01)
+song_playback(Bond02)
+song_playback(Bond03)
+song_playback(Bond02)
+song_playback(Bond03)
+song_playback(Bond02)
+song_playback(Bond04)
+song_playback(Bond05)
+song_playback(Bond06)
+song_playback(Bond07)
+song_playback(Bond06)
+song_playback(Bond08)
+song_playback(Bond09)
+song_playback(Bond10)
+song_playback(Bond09)
+song_playback(Bond10)
+song_playback(Bond11)
+song_playback(Bond01)
+song_playback(Bond01)
+song_playback(Bond01)
+song_playback(Bond01)
+song_playback(Bond05)
+song_playback(Bond12)
