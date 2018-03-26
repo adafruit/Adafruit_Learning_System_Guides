@@ -1,21 +1,19 @@
 import time
-from analogio import AnalogIn
+import analogio
 import board
 import digitalio
 from adafruit_hid.mouse import Mouse
-from adafruit_hid.keyboard import Keyboard
 
 mouse = Mouse()
-keyboard = Keyboard()
 
-x_axis = AnalogIn(board.A0)
-y_axis = AnalogIn(board.A1)
+x_axis = analogio.AnalogIn(board.A0)
+y_axis = analogio.AnalogIn(board.A1)
 select = digitalio.DigitalInOut(board.A2)
 select.direction = digitalio.Direction.INPUT
 select.pull = digitalio.Pull.UP
 
-pot_max = 3.29
 pot_min = 0.00
+pot_max = 3.29
 step = (pot_max - pot_min) / 20.0
 
 
@@ -23,7 +21,7 @@ def get_voltage(pin):
     return (pin.value * 3.3) / 65536
 
 
-def steps(axis):  # Maps the potentiometer voltage range from 0-20 in whole numbers
+def steps(axis):  # Maps the potentiometer voltage range to 0-20 in whole numbers
     return round((axis - pot_min) / step)
 
 
