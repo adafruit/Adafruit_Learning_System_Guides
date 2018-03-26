@@ -56,7 +56,7 @@ while True:
 
     if steps(y) > 19.0:
         # print(steps(y))
-        mouse.move(y=-7)
+        mouse.move(y=-8)
     if steps(y) < 1.0:
         # print(steps(y))
-        mouse.move(y=7)
+        mouse.move(y=8)
