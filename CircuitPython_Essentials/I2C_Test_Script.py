@@ -19,6 +19,8 @@ def get_unique_pins():
         pin_names.remove("APA102_MOSI")
     if "APA102_SCK" in pin_names:
         pin_names.remove("APA102_SCK")
+    if "D13" in pin_names:
+        pin_names.remove("D13")
     pins = [getattr(board, p) for p in pin_names]
     unique = []
     for p in pins:
