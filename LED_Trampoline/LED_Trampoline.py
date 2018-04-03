@@ -7,7 +7,7 @@ import digitalio
 pixel_pin = board.D10  # The pin the NeoPixels are connected to
 button_switch_pin = board.D9  # Pin button is attached to
 vibration_switch_pin = board.D7  # Pin vibration switch is attached to.
-pixel_count = 180  # Number of pixels in your strip
+pixel_count = 40  # Number of pixels in your strip
 chase_color_duration = 3  # Time in seconds each color lasts in the color chase mode
 
 pixels = neopixel.NeoPixel(pixel_pin, pixel_count, brightness=.4, auto_write=False)
