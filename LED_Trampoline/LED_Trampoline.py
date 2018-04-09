@@ -119,8 +119,8 @@ while True:
             except StopIteration:
                 pass
         if mode == 1 and not vibration_switch.value:
-            pixels.brightness = 1
             print("Sparkle mode activate!")
+            pixels.brightness = 1
             sparkle_color_index = (sparkle_color_index + 1) % len(sparkle_color_list)
             sparkle_code(sparkle_color_list[sparkle_color_index])
         if mode == 2 and not vibration_switch.value:
@@ -140,7 +140,5 @@ while True:
                 pixels.fill((0, 0, 0))
                 chase_last_color = now
                 chase_next_color = chase_last_color + chase_color_duration
-        else:
-            led.value = False
     except MemoryError:
         pass
