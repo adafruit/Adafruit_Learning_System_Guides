@@ -4,6 +4,7 @@
 import board
 import neopixel
 import time
+import adafruit_dotstar as dotstar
 try:
 	import urandom as random  # for v1.0 API support
 except ImportError:
@@ -12,6 +13,11 @@ except ImportError:
 numpix = 16  # Number of NeoPixels (e.g. 16-pixel ring)
 pixpin = board.D0  # Pin where NeoPixels are connected
 strip  = neopixel.NeoPixel(pixpin, numpix, brightness=.3)
+
+# Turn off the onboard dotstar RGB to avoid distractions
+dot = dotstar.DotStar(board.APA102_SCK, board.APA102_MOSI, 1, brightness=0.2)
+dot[0] = (0, 0, 0)
+dot.show()
 
 def wheel(pos):
 	# Input a value 0 to 255 to get a color value.
