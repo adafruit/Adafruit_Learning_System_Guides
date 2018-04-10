@@ -18,8 +18,10 @@ except ImportError:
 
 numpix = 16  # Number of NeoPixels (e.g. 16-pixel ring)
 pixpin = board.D0  # Pin where NeoPixels are connected
-strip  = neopixel.NeoPixel(pixpin, numpix, brightness=.3) # for RGB
-# strip  = neopixel.NeoPixel(pixpin, numpix, brightness=.3, bpp=4) # for RGBW
+strip  = neopixel.NeoPixel(pixpin, numpix, brightness=.3,
+                           auto_write=False) # for RGB
+# strip  = neopixel.NeoPixel(pixpin, numpix, brightness=.3, bpp=4,
+#                            auto_write=False) # for RGBW
 
 def wheel(pos):
 	# Input a value 0 to 255 to get a color value.
