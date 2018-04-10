@@ -38,7 +38,7 @@ while True:  # Loop forever...
 	if mode == 0:  # Random sparkles - lights just one LED at a time
 		i = random.randint(0, numpix - 1)  # Choose random pixel
 		strip[i] = color   # Set it to current color
-		strip.write()      # Refresh LED states
+		strip.show()       # Refresh LED states
 		# Set same pixel to "off" color now but DON'T refresh...
 		# it stays on for now...bot this and the next random
 		# pixel will be refreshed on the next pass.
@@ -50,7 +50,7 @@ while True:  # Loop forever...
 				strip[i] = color    # are set to current color
 			else:
 				strip[i] = [0,0,0]  # other pixels are off
-		strip.write()    # Refresh LED states
+		strip.show()     # Refresh LED states
 		time.sleep(0.04) # 40 millisecond delay
 		offset += 1      # Shift animation by 1 pixel on next frame
 		if offset >= 8: offset = 0
