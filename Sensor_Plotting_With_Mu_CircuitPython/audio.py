@@ -1,8 +1,8 @@
 ﻿import audiobusio
+import time
 import board
 import array
 import math
-import time
 
 
 def mean(values):
@@ -11,7 +11,7 @@ def mean(values):
 
 def normalized_rms(values):
     minbuf = int(mean(values))
-    return math.sqrt(sum(float((sample-minbuf)*(sample-minbuf)) for sample in values)/len(values))
+    return math.sqrt(sum(float(sample-minbuf)*(sample-minbuf) for sample in values) / len(values))
 
 
 mic = audiobusio.PDMIn(board.MICROPHONE_CLOCK, board.MICROPHONE_DATA, frequency=16000, bit_depth=16)
