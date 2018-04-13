@@ -96,18 +96,24 @@ while True:
     except:
       time.sleep(1)
       continue
+        
+#DirtyDaveMcGee edit to improve readability
+#192.168.x.x addresses were being cut off on my display
+#and i wanted to keep the cpu, disk, and memory stats
 
-    draw.text((x, top),       "IP: " + str(IP) + "( " + HOST + ")",  font=font, fill=255)
+    draw.text((x, top),	      str(HOST), font=font, fill=255)
     draw.text((x, top+8),     "Ads Blocked: " + str(ADSBLOCKED), font=font, fill=255)
     draw.text((x, top+16),    "Clients:     " + str(CLIENTS),  font=font, fill=255)
     draw.text((x, top+24),    "DNS Queries: " + str(DNSQUERIES),  font=font, fill=255)
-
-    # skip over original stats
-    #draw.text((x, top+8),     str(CPU), font=font, fill=255)
-    #draw.text((x, top+16),    str(MemUsage),  font=font, fill=255)
-    #draw.text((x, top+25),    str(Disk),  font=font, fill=255)
-
-    # Display image.
     disp.image(image)
     disp.display()
-    time.sleep(.1)
+    #Dirty hack
+    time.sleep(9)
+    draw.rectangle((0,0,width,height), outline=0, fill=0)
+    draw.text((x, top),       "IP: " + str(IP) + " ",  font=font, fill=255)
+    draw.text((x, top+8),     str(CPU), font=font, fill=255)
+    draw.text((x, top+16),    str(MemUsage),  font=font, fill=255)
+    draw.text((x, top+24),    str(Disk),  font=font, fill=255)
+    disp.image(image)
+    disp.display()
+    time.sleep(10)
