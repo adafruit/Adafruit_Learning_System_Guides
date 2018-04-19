@@ -5,7 +5,7 @@ import adafruit_dotstar
 
 # For Trinket M0, Gemma M0, and ItsyBitsy M0 Express
 led = adafruit_dotstar.DotStar(board.APA102_SCK, board.APA102_MOSI, 1)
-# For Feather M0 Express, Metro M0 Express, and Circuit Playground Express
+# For Feather M0 Express, Metro M0 and Metro M4 Express and Circuit Playground Express
 # led = neopixel.NeoPixel(board.NEOPIXEL, 1)
 
 
