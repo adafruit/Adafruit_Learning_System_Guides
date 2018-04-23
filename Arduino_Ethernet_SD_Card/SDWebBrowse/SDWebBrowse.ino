@@ -8,18 +8,18 @@
  * Arduino Ethernet WebServer example and the rest is from Limor Fried
  * (Adafruit) so its probably under GPL
  *
- * Tutorial is at https://learn.adafruit.com/
+ * Tutorial is at https://learn.adafruit.com/arduino-ethernet-sd-card/serving-files-over-ethernet
  */
-
-#include <SD.h>
-#include <Ethernet2.h>
+ 
 #include <SPI.h>
+#include <SD.h>
+#include <Ethernet2.h>  // Using WIZ5500 Ethernet chip so Ethernet2 library is required
 
 /************ ETHERNET STUFF ************/
-byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-byte ip[] = { 192, 168, 1, 177 };
+byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };  // change if necessary
+byte ip[] = { 192, 168, 1, 177 };                     // change if necessary
 EthernetServer server(80);
-const int W5500_SS = 10; // Adafruit/Seeed Studio shield + Uno, 53 for Mega
+
 /************ SDCARD STUFF ************/
 Sd2Card card;
 SdVolume volume;
@@ -43,14 +43,15 @@ void error_P(const char* str) {
 
 void setup() {
   Serial.begin(9600);
+  while (!Serial);      // For 32u4 based microcontrollers like 32u4 Adalogger Feather
  
   PgmPrint("Free RAM: ");
   Serial.println(FreeRam());  
   
   // initialize the SD card at SPI_HALF_SPEED to avoid bus errors with
   // breadboards.  use SPI_FULL_SPEED for better performance.
-  pinMode(W5500_SS, OUTPUT);     // set the SS pin as an output (necessary!)
-  digitalWrite(W5500_SS, HIGH);  // but turn off the W5100 chip!
+  pinMode(10, OUTPUT);                       // set the SS pin as an output (necessary!)
+  digitalWrite(10, HIGH);                    // but turn off the WIZ5500 chip!
 
   if (!card.init(SPI_HALF_SPEED, 4)) error("card.init failed!");
   
@@ -80,14 +81,14 @@ void setup() {
   server.begin();
 }
 
-void ListFiles(EthernetClient client, uint8_t flags) {
+void ListFiles(EthernetClient client, uint8_t flags, SdFile dir) {
   // This code is just copied from SdFile.cpp in the SDFat library
   // and tweaked to print to the client output in html!
   dir_t p;
   
-  root.rewind();
+  dir.rewind();
   client.println("<ul>");
-  while (root.readDir(p) > 0) {
+  while (dir.readDir(&p) > 0) {
     // done if past last used entry
     if (p.name[0] == DIR_NAME_FREE) break;
 
@@ -106,6 +107,9 @@ void ListFiles(EthernetClient client, uint8_t flags) {
       }
       client.print((char)p.name[i]);
     }
+    if (DIR_IS_SUBDIR(&p)) {
+      client.print('/');
+    }
     client.print("\">");
     
     // print file name with possible blank fill
@@ -116,18 +120,16 @@ void ListFiles(EthernetClient client, uint8_t flags) {
       }
       client.print((char)p.name[i]);
     }
+    if (DIR_IS_SUBDIR(&p)) 
+      client.print('/');
     
     client.print("</a>");
-    
-    if (DIR_IS_SUBDIR(&p)) {
-      client.print('/');
-    }
 
     // print modify date/time if requested
     if (flags & LS_DATE) {
-       root.printFatDate(p.lastWriteDate);
+       dir.printFatDate(p.lastWriteDate);
        client.print(' ');
-       root.printFatTime(p.lastWriteTime);
+       dir.printFatTime(p.lastWriteTime);
     }
     // print size if requested
     if (!DIR_IS_SUBDIR(&p) && (flags & LS_SIZE)) {
@@ -145,7 +147,9 @@ void ListFiles(EthernetClient client, uint8_t flags) {
 void loop()
 {
   char clientline[BUFSIZ];
+  char name[17];
   int index = 0;
+  int err;
   
   EthernetClient client = server.available();
   if (client) {
@@ -186,40 +190,58 @@ void loop()
           
           // print all the files, use a helper to keep it clean
           client.println("<h2>Files:</h2>");
-          ListFiles(client, LS_SIZE);
+          ListFiles(client, LS_SIZE, root);
         } else if (strstr(clientline, "GET /") != 0) {
           // this time no space after the /, so a sub-file!
           char *filename;
           
-          filename = clientline + 5; // look after the "GET /" (5 chars)
+          filename = clientline + 5; // look after the "GET /" (5 chars)  *******
           // a little trick, look for the " HTTP/1.1" string and 
           // turn the first character of the substring into a 0 to clear it out.
           (strstr(clientline, " HTTP"))[0] = 0;
+ 
+          if(filename[strlen(filename)-1] == '/') {  // Trim a directory filename
+            filename[strlen(filename)-1] = 0;        //  as Open throws error with trailing /
+          }
           
-          // print the file we want
-          Serial.println(filename);
+          Serial.println(filename);                  // print the file we want
 
-          if (! file.open(&root, filename, O_READ)) {
+          err = file.open(&root, filename, O_READ);
+          if ( err == 0 ) {  // Opening the file with return code of 0 is an error in SDFile.open
             client.println("HTTP/1.1 404 Not Found");
             client.println("Content-Type: text/html");
             client.println();
             client.println("<h2>File Not Found!</h2>");
-            break;
+            client.println("<br><h3>Couldn't open the File!</h3>");
+            break; 
           }
           
-          Serial.println("Opened!");
+          Serial.println("File Opened!");
                     
           client.println("HTTP/1.1 200 OK");
-          client.println("Content-Type: text/plain");
-          client.println();
+          if(file.isDir()) {
+            Serial.println("is a directory");
+            //file.close();
+            client.println("Content-Type: text/html");
+            client.println();
+            client.print("<h2>Files in /");
+            client.print(filename); 
+            client.println("/:</h2>");
+            ListFiles(client,LS_SIZE,file);  // So this will list a subdirectory BUT this
+            file.close();                    // program is not recursive (subdir opens FAIL)
+          }
+          else {
+            client.println("Content-Type: text/plain");
+            client.println();
           
           int16_t c;
           while ((c = file.read()) > 0) {
               // uncomment the serial to debug (slow!)
               //Serial.print((char)c);
               client.print((char)c);
+            }
+            file.close();
           }
-          file.close();
         } else {
           // everything else is a 404
           client.println("HTTP/1.1 404 Not Found");
