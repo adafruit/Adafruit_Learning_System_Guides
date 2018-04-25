@@ -36,6 +36,7 @@ while True:
 
     frame_len = struct.unpack(">H", bytes(buffer[2:4]))[0]
     if frame_len != 28:
+        buffer = []
         continue
 
     frame = struct.unpack(">HHHHHHHHHHHHHH", bytes(buffer[4:]))
@@ -45,7 +46,9 @@ while True:
     check = sum(buffer[0:30])
     
     if check != checksum:
+        buffer = []
         continue
+
     print("Concentration Units (standard)")
     print("---------------------------------------")
     print("PM 1.0: %d\tPM2.5: %d\tPM10: %d" % (pm10_standard, pm25_standard, pm100_standard))
