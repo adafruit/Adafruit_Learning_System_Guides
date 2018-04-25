@@ -2,7 +2,10 @@ from digitalio import DigitalInOut, Direction
 import board
 import busio
 import time
-import ustruct as struct
+try:
+    import struct
+except ImportError:
+    import ustruct as struct
 
 led = DigitalInOut(board.D13)
 led.direction = Direction.OUTPUT
@@ -22,6 +25,8 @@ while True:
     while buffer and buffer[0] != 0x42:
         buffer.pop(0)
     
+    if len(buffer) > 200:
+        buffer = []   # avoid an overrun if all bad data
     if len(buffer) < 32:
         continue
 
