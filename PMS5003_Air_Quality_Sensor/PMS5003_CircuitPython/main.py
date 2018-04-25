@@ -2,7 +2,10 @@ from digitalio import DigitalInOut, Direction
 import board
 import busio
 import time
-import ustruct as struct
+try:
+    import struct
+except ImportError:
+    import ustruct as struct
 
 led = DigitalInOut(board.D13)
 led.direction = Direction.OUTPUT
@@ -22,6 +25,8 @@ while True:
     while buffer and buffer[0] != 0x42:
         buffer.pop(0)
     
+    if len(buffer) > 200:
+        buffer = []   # avoid an overrun if all bad data
     if len(buffer) < 32:
         continue
 
@@ -31,6 +36,7 @@ while True:
 
     frame_len = struct.unpack(">H", bytes(buffer[2:4]))[0]
     if frame_len != 28:
+        buffer = []
         continue
 
     frame = struct.unpack(">HHHHHHHHHHHHHH", bytes(buffer[4:]))
@@ -40,7 +46,9 @@ while True:
     check = sum(buffer[0:30])
     
     if check != checksum:
+        buffer = []
         continue
+
     print("Concentration Units (standard)")
     print("---------------------------------------")
     print("PM 1.0: %d\tPM2.5: %d\tPM10: %d" % (pm10_standard, pm25_standard, pm100_standard))
