@@ -50,7 +50,7 @@ def log_scale(input_value, input_min, input_max, output_min, output_max):
 # Remove DC bias before computing RMS.
 def normalized_rms(values):
     minbuf = int(mean(values))
-    return math.sqrt(sum(float((sample-minbuf)*(sample-minbuf)) for sample in values)/len(values))
+    return math.sqrt(sum(float(sample-minbuf)*(sample-minbuf) for sample in values) / len(values))
 
 def mean(values):
     return (sum(values) / len(values))
