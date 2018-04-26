@@ -1,8 +1,8 @@
 import time
-from analogio import AnalogIn
+import analogio
 import board
 
-potentiometer = AnalogIn(board.A1)
+potentiometer = analogio.AnalogIn(board.A1)
 
 
 def get_voltage(pin):
