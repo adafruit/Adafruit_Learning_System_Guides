@@ -1,18 +1,10 @@
-﻿import neopixel
+﻿﻿import neopixel
 import analogio
-import digitalio
 import time
 import board
 
 pixels = neopixel.NeoPixel(board.NEOPIXEL, 10, brightness=1.0)
 light = analogio.AnalogIn(board.LIGHT)
-
-button_a = digitalio.DigitalInOut(board.BUTTON_A)
-button_a.direction = digitalio.Direction.INPUT
-button_a.pull = digitalio.Pull.DOWN
-button_b = digitalio.DigitalInOut(board.BUTTON_B)
-button_b.direction = digitalio.Direction.INPUT
-button_b.pull = digitalio.Pull.DOWN
 
 while True:
     pixels.fill((0, 0, 0))
