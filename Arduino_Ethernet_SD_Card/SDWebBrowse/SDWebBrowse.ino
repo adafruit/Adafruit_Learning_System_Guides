@@ -1,7 +1,7 @@
 /*
  * SDWebBrowse.ino
  *
- * This sketch uses the microSD card slot on the a W5500 Ethernet shield
+ * This sketch uses the microSD card slot on the a WIZ5500 Ethernet shield
  * to serve up files over a very minimal browsing interface
  *
  * Some code is from Bill Greiman's SdFatLib examples, some is from the
@@ -9,11 +9,13 @@
  * (Adafruit) so its probably under GPL
  *
  * Tutorial is at https://learn.adafruit.com/arduino-ethernet-sd-card/serving-files-over-ethernet
+ * 
+ * Please use the Adafruit Ethernet2 library https://github.com/adafruit/Ethernet2
  */
  
 #include <SPI.h>
 #include <SD.h>
-#include <Ethernet2.h>  // Using WIZ5500 Ethernet chip so Ethernet2 library is required
+#include <Ethernet2.h>  // Using WIZ5500 Ethernet chip so Adafruit Ethernet2 library is required
 
 /************ ETHERNET STUFF ************/
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };  // change if necessary
@@ -39,7 +41,6 @@ File root;
 #else   // default for 328p, 32u4 and m0
   #define WIZ_CS 10
 #endif
-
 
 // store error strings in flash to save RAM
 #define error(s) error_P(PSTR(s))
@@ -74,17 +75,16 @@ void setup() {
   // Debugging complete, we start the server!
   Serial.println(F("Initializing WizNet"));
   Ethernet.init(WIZ_CS);
-  // give the ethernet module time to boot up:
+  // give the ethernet module time to boot up
   delay(1000);
-  // start the Ethernet connection:
-  if (Ethernet.begin(mac) == 0) {
-    Serial.println("Failed to configure Ethernet using DHCP");
-    // no point in carrying on, so do nothing forevermore:
-    // try to congifure using IP address instead of DHCP:
-    Ethernet.begin(mac, ip);
-  }
+  // start the Ethernet connection
+  // Use the fixed IP specified. If you want to use DHCP first
+  //   then switch the Ethernet.begin statements
+  Ethernet.begin(mac, ip);
+  // try to congifure using DHCP address instead of IP:
+  //  Ethernet.begin(mac);
   
-  // print the Ethernet board/shield's IP address:
+  // print the Ethernet board/shield's IP address to Serial monitor
   Serial.print(F("My IP address: "));
   Serial.println(Ethernet.localIP());
 
@@ -144,7 +144,6 @@ void loop()
   char clientline[BUFSIZ];
   char name[17];
   int index = 0;
-  int err;
   
   EthernetClient client = server.available();
   if (client) {
@@ -190,7 +189,7 @@ void loop()
             filename[strlen(filename)-1] = 0;        //  as Open throws error with trailing /
           }
           
-          Serial.print(F("Web request for: ")); Serial.println(filename);                  // print the file we want
+          Serial.print(F("Web request for: ")); Serial.println(filename);  // print the file we want
 
           File file = SD.open(filename, O_READ);
           if ( file == 0 ) {  // Opening the file with return code of 0 is an error in SDFile.open
@@ -213,9 +212,9 @@ void loop()
             client.print("<h2>Files in /");
             client.print(filename); 
             client.println(":</h2>");
-            ListFiles(client,LS_SIZE,file);  // So this will list a subdirectory BUT this
-            file.close();                    // program is not recursive (subdir opens FAIL)
-          } else {
+            ListFiles(client,LS_SIZE,file);  
+            file.close();                   
+          } else { // Any non-directory clicked, server will send file to client for download
             client.println("Content-Type: application/octet-stream");
             client.println();
           
