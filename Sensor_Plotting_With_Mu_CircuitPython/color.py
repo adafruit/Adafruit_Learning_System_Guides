@@ -1,6 +1,5 @@
 ﻿﻿import neopixel
 import analogio
-import time
 import board
 
 pixels = neopixel.NeoPixel(board.NEOPIXEL, 10, brightness=1.0)
@@ -9,15 +8,12 @@ light = analogio.AnalogIn(board.LIGHT)
 while True:
     pixels.fill((0, 0, 0))
     pixels[1] = (255, 0, 0)
-    time.sleep(0.5)
     raw_red = light.value
     red = int(raw_red * (255/65535))
     pixels[1] = (0, 255, 0)
-    time.sleep(0.5)
     raw_green = light.value
     green = int(raw_green * (255/65535))
     pixels[1] = (0, 0, 255)
-    time.sleep(0.5)
     raw_blue = light.value
     blue = int(raw_blue * (255/65535))
     pixels.fill((0, 0, 0))
