@@ -4,10 +4,10 @@ import adafruit_dotstar
 import touchio
 import board
 
-LED = adafruit_dotstar.DotStar(board.APA102_SCK, board.APA102_MOSI, 1)
-TOUCH_A0 = touchio.TouchIn(board.A0)
-TOUCH_A1 = touchio.TouchIn(board.A1)
-TOUCH_A2 = touchio.TouchIn(board.A2)
+led = adafruit_dotstar.DotStar(board.APA102_SCK, board.APA102_MOSI, 1)
+touch_A0 = touchio.TouchIn(board.A0)
+touch_A1 = touchio.TouchIn(board.A1)
+touch_A2 = touchio.TouchIn(board.A2)
 
 
 def wheel(pos):
@@ -36,7 +36,7 @@ def rainbow_lamp(seq):
     rainbow = cycle_sequence(seq)
     while True:
         # pylint: disable=stop-iteration-return
-        LED[0] = (wheel(next(rainbow)))
+        led[0] = (wheel(next(rainbow)))
         yield
 
 
@@ -45,11 +45,11 @@ def brightness_lamp():
     brightness_value = cycle_sequence([1, 0.8, 0.6, 0.4, 0.2])
     while True:
         # pylint: disable=stop-iteration-return
-        LED.brightness = next(brightness_value)
+        led.brightness = next(brightness_value)
         yield
 
 
-COLOR_SEQUENCES = cycle_sequence(
+color_sequences = cycle_sequence(
     [
         range(256),  # rainbow_cycle
         [50, 160],  # Python colors!
@@ -60,42 +60,42 @@ COLOR_SEQUENCES = cycle_sequence(
 )
 
 
-CYCLE_SPEEDS = cycle_sequence([0.1, 0.3, 0.5])
+cycle_speeds = cycle_sequence([0.1, 0.3, 0.5])
 
-BRIGHTNESS = brightness_lamp()
+brightness = brightness_lamp()
 
-CYCLE_SPEED_INITIAL = 0.3
-CYCLE_SPEED_START = time.monotonic()
-CYCLE_SPEED = CYCLE_SPEED_START + CYCLE_SPEED_INITIAL
+cycle_speed_initial = 0.3
+cycle_speed_start = time.monotonic()
+cycle_speed = cycle_speed_start + cycle_speed_initial
 
-RAINBOW = None
-TOUCH_A0_STATE = None
-TOUCH_A1_STATE = None
-TOUCH_A2_STATE = None
+rainbow = None
+touch_A0_state = None
+touch_A1_state = None
+touch_A2_state = None
 
 while True:
-    NOW = time.monotonic()
+    now = time.monotonic()
 
-    if not TOUCH_A0.value and TOUCH_A0_STATE is None:
-        TOUCH_A0_STATE = "touched"
-    if TOUCH_A0.value and TOUCH_A0_STATE == "touched" or RAINBOW is None:
-        RAINBOW = rainbow_lamp(next(COLOR_SEQUENCES))
-        TOUCH_A0_STATE = None
+    if not touch_A0.value and touch_A0_state is None:
+        touch_A0_state = "touched"
+    if touch_A0.value and touch_A0_state == "touched" or rainbow is None:
+        rainbow = rainbow_lamp(next(color_sequences))
+        touch_A0_state = None
 
-    if NOW >= CYCLE_SPEED:
-        next(RAINBOW)
-        CYCLE_SPEED_START = NOW
-        CYCLE_SPEED = CYCLE_SPEED_START + CYCLE_SPEED_INITIAL
+    if now >= cycle_speed:
+        next(rainbow)
+        cycle_speed_start = now
+        cycle_speed = cycle_speed_start + cycle_speed_initial
 
-    if not TOUCH_A1.value and TOUCH_A1_STATE is None:
-        TOUCH_A1_STATE = "touched"
-    if TOUCH_A1.value and TOUCH_A1_STATE == "touched":
-        CYCLE_SPEED_INITIAL = next(CYCLE_SPEEDS)
-        CYCLE_SPEED_START = NOW
-        CYCLE_SPEED = CYCLE_SPEED_START + CYCLE_SPEED_INITIAL
-        TOUCH_A1_STATE = None
+    if not touch_A1.value and touch_A1_state is None:
+        touch_A1_state = "touched"
+    if touch_A1.value and touch_A1_state == "touched":
+        cycle_speed_initial = next(cycle_speeds)
+        cycle_speed_start = now
+        cycle_speed = cycle_speed_start + cycle_speed_initial
+        touch_A1_state = None
 
-    if not TOUCH_A2.value and TOUCH_A2_STATE is None:
-        TOUCH_A2_STATE = "touched"
-    if TOUCH_A2.value and TOUCH_A2_STATE == "touched":
-        next(BRIGHTNESS)
+    if not touch_A2.value and touch_A2_state is None:
+        touch_A2_state = "touched"
+    if touch_A2.value and touch_A2_state == "touched":
+        next(brightness)
