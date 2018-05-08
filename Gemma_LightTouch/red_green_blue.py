@@ -4,7 +4,7 @@ import touchio
 import adafruit_dotstar
 import board
 
-dotstar = adafruit_dotstar.DotStar(board.APA102_SCK, board.APA102_MOSI, 1)
+led = adafruit_dotstar.DotStar(board.APA102_SCK, board.APA102_MOSI, 1)
 touch_A0 = touchio.TouchIn(board.A0)
 touch_A1 = touchio.TouchIn(board.A1)
 touch_A2 = touchio.TouchIn(board.A2)
@@ -19,6 +19,6 @@ while True:
     if touch_A2.value:
         b = (b + 1) % 256
 
-    dotstar[0] = (r, g, b)
+    led[0] = (r, g, b)
     print((r, g, b))
     time.sleep(0.01)
