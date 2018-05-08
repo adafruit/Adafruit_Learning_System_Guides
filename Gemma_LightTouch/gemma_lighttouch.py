@@ -31,7 +31,7 @@ def cycle_sequence(seq):
             yield elem
 
 
-def rainbow_lamp(seq):
+def rainbow_cycle(seq):
     """Rainbow cycle generator"""
     rainbow = cycle_sequence(seq)
     while True:
@@ -40,7 +40,7 @@ def rainbow_lamp(seq):
         yield
 
 
-def brightness_lamp():
+def brightness_cycle():
     """Allows cycling through brightness levels"""
     brightness_value = cycle_sequence([1, 0.8, 0.6, 0.4, 0.2])
     while True:
@@ -62,7 +62,7 @@ color_sequences = cycle_sequence(
 
 cycle_speeds = cycle_sequence([0.1, 0.3, 0.5])
 
-brightness = brightness_lamp()
+brightness = brightness_cycle()
 
 cycle_speed_initial = 0.3
 cycle_speed_start = time.monotonic()
@@ -79,7 +79,7 @@ while True:
     if not touch_A0.value and touch_A0_state is None:
         touch_A0_state = "touched"
     if touch_A0.value and touch_A0_state == "touched" or rainbow is None:
-        rainbow = rainbow_lamp(next(color_sequences))
+        rainbow = rainbow_cycle(next(color_sequences))
         touch_A0_state = None
 
     if now >= cycle_speed:
