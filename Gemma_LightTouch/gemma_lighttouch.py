@@ -77,8 +77,8 @@ while True:
     now = time.monotonic()
 
     if not touch_A0.value and touch_A0_state is None:
-        touch_A0_state = "touched"
-    if touch_A0.value and touch_A0_state == "touched" or rainbow is None:
+        touch_A0_state = "ready"
+    if touch_A0.value and touch_A0_state == "ready" or rainbow is None:
         rainbow = rainbow_cycle(next(color_sequences))
         touch_A0_state = None
 
@@ -88,14 +88,14 @@ while True:
         cycle_speed = cycle_speed_start + cycle_speed_initial
 
     if not touch_A1.value and touch_A1_state is None:
-        touch_A1_state = "touched"
-    if touch_A1.value and touch_A1_state == "touched":
+        touch_A1_state = "ready"
+    if touch_A1.value and touch_A1_state == "ready":
         cycle_speed_initial = next(cycle_speeds)
         cycle_speed_start = now
         cycle_speed = cycle_speed_start + cycle_speed_initial
         touch_A1_state = None
 
     if not touch_A2.value and touch_A2_state is None:
-        touch_A2_state = "touched"
-    if touch_A2.value and touch_A2_state == "touched":
+        touch_A2_state = "ready"
+    if touch_A2.value and touch_A2_state == "ready":
         next(brightness)
