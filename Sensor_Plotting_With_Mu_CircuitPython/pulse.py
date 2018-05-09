@@ -22,7 +22,7 @@ while True:
         for s in range(NUM_OVERSAMPLE):
             oversample += float(light.value)
         # and save the average from the oversamples
-        samples[i] = oversample / NUM_OVERSAMPLE        # Find the aver
+        samples[i] = oversample / NUM_OVERSAMPLE        # Find the average
 
         mean = sum(samples) / float(len(samples))  # take the average
         print((samples[i]-mean,))                  # 'center' the reading
