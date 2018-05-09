@@ -25,5 +25,5 @@ while True:
         samples[i] = oversample / NUM_OVERSAMPLE        # Find the average
 
         mean = sum(samples) / float(len(samples))  # take the average
-        print((samples[i]-mean,))                  # 'center' the reading
+        print((samples[i] - mean,))                # 'center' the reading
         time.sleep(0.025)                          # change to go faster/slower
