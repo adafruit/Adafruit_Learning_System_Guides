@@ -64,9 +64,9 @@ cycle_speeds = cycle_sequence([0.1, 0.3, 0.5])
 
 brightness = brightness_cycle()
 
-cycle_speed_initial = 0.3
+CYCLE_SPEED_INITIAL = 0.3
 cycle_speed_start = time.monotonic()
-cycle_speed = cycle_speed_start + cycle_speed_initial
+cycle_speed = cycle_speed_start + CYCLE_SPEED_INITIAL
 
 rainbow = None
 touch_A0_state = None
@@ -85,14 +85,14 @@ while True:
     if now >= cycle_speed:
         next(rainbow)
         cycle_speed_start = now
-        cycle_speed = cycle_speed_start + cycle_speed_initial
+        cycle_speed = cycle_speed_start + CYCLE_SPEED_INITIAL
 
     if not touch_A1.value and touch_A1_state is None:
         touch_A1_state = "ready"
     if touch_A1.value and touch_A1_state == "ready":
-        cycle_speed_initial = next(cycle_speeds)
+        CYCLE_SPEED_INITIAL = next(cycle_speeds)
         cycle_speed_start = now
-        cycle_speed = cycle_speed_start + cycle_speed_initial
+        cycle_speed = cycle_speed_start + CYCLE_SPEED_INITIAL
         touch_A1_state = None
 
     if not touch_A2.value and touch_A2_state is None:
