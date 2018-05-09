@@ -12,12 +12,12 @@ pixels[1] = (0, 255, 0)
 # How many light readings per sample
 NUM_OVERSAMPLE = 10
 # How many samples we take to calculate 'average'
-NUMSAMPLES = 20
-samples = [0] * NUMSAMPLES
+NUM_SAMPLES = 20
+samples = [0] * NUM_SAMPLES
 
 while True:
-    for i in range(NUMSAMPLES):
-        # Take 'NUM_OVERSAMPLE'  # readings really fast
+    for i in range(NUM_SAMPLES):
+        # Take NUM_OVERSAMPLE number of readings really fast
         oversample = 0
         for s in range(NUM_OVERSAMPLE):
             oversample += float(light.value)
