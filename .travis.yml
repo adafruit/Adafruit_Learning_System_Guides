@@ -6,6 +6,9 @@ python:
 
 cache:
     pip: true
+    
+install:
+  - pip install pylint
 
 script:
   - pylint --disable=missing-docstring,invalid-name,bad-whitespace **/*.py
