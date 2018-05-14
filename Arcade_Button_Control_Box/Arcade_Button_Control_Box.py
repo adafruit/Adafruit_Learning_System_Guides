@@ -3,7 +3,7 @@ import time
 import digitalio
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keycode import Keycode
-from board import *
+from board import D12, D11, D10, D9, D6, D5, A0, A1, A2, A3, A4, A5
 
 # A simple neat keyboard demo in circuitpython
 

@@ -71,7 +71,8 @@ while True:
     # Draw a black filled box to clear the image.
     draw.rectangle((0, 0, width, height), outline=0, fill=0)
 
-    # Shell scripts for system monitoring from here : https://unix.stackexchange.com/questions/119126/command-to-display-memory-usage-disk-usage-and-cpu-load
+    # Shell scripts for system monitoring from here :
+    # https://unix.stackexchange.com/questions/119126/command-to-display-memory-usage-disk-usage-and-cpu-load
     cmd = "hostname -I | cut -d\' \' -f1"
     IP = subprocess.check_output(cmd, shell=True)
     cmd = "hostname"
@@ -90,7 +91,7 @@ while True:
         DNSQUERIES = data['dns_queries_today']
         ADSBLOCKED = data['ads_blocked_today']
         CLIENTS = data['unique_clients']
-    except:
+    except KeyError:
         time.sleep(1)
         continue
 

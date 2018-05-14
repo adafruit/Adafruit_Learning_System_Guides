@@ -75,8 +75,8 @@ def Move(upDown_axis, isBackward):
     # If you are touching A4, walk backwards, else walk forwards
     if isBackward:
         print("backwards")  # Debugging
-        if (axis_new > 1.2):  # walk threshold
-            if (axis_new > 2.5):  # run threshold
+        if axis_new > 1.2:  # walk threshold
+            if axis_new > 2.5:  # run threshold
                 kbd.press(Keycode.LEFT_CONTROL, Keycode.S)
                 time.sleep(0.1)
                 kbd.release_all()
@@ -85,8 +85,8 @@ def Move(upDown_axis, isBackward):
                 time.sleep(0.1)
             kbd.release_all()
     else:
-        if (axis_new > 1.2):  # walk threshold
-            if (axis_new > 2.5):  # run threshold
+        if axis_new > 1.2:  # walk threshold
+            if axis_new > 2.5:  # run threshold
                 kbd.press(Keycode.LEFT_CONTROL)
                 time.sleep(0.1)
                 kbd.release_all()
@@ -96,12 +96,12 @@ def Move(upDown_axis, isBackward):
             kbd.release_all()
 
 
-def Turn(upDown_axis, frontBack_axis, leftRight_axis, lookUp):
+def Turn(upDown_axis, leftRight_axis, lookUp):
     leftRight_adj = int(leftRight_axis)  # currently z_axis
     upDown_adj = int(upDown_axis)  # currently y_axis
 
     leftRight_new = Map(leftRight_adj, -3, 3, -100, 100)
-    if (lookUp and abs(upDown_adj) < 1.2):
+    if lookUp and abs(upDown_adj) < 1.2:
         upDown_new = Map(upDown_adj, -1, 1, -100, 100)
     else:
         upDown_new = 0
@@ -113,7 +113,7 @@ def Turn(upDown_axis, frontBack_axis, leftRight_axis, lookUp):
 
 def Jump(upDown_axis):
     upDown = abs(upDown_axis)
-    if (upDown > 3):
+    if upDown > 3:
         kbd.press(Keycode.SPACE, Keycode.W)
     kbd.release_all()
 
@@ -121,7 +121,7 @@ def Jump(upDown_axis):
 def Give(upDown_axis, frontBack_axis):
     frontBack_new = abs(frontBack_axis)
     if abs(upDown_axis) < 1:
-        if (frontBack_new > 2):
+        if frontBack_new > 2:
             print("give")
             mouse.click(Mouse.RIGHT_BUTTON)
             mouse.release_all()
@@ -163,7 +163,7 @@ def readAxes():
 ###########################
 while True:
     # Read accelerometer values (in G).  Returns a 3-tuple of x, y, x axis
-    x, y, z = readAxes()
+    pos_x, pos_y, pos_z = readAxes()
 
     # Read finger pads and act accordingly
     if touch_a1.value:
@@ -175,14 +175,14 @@ while True:
     if touch_a3.value:
         ESC()
 
-    isBackward = touch_a4.value
-    lookUp = touch_a4.value
+    is_backward = touch_a4.value
+    look_up = touch_a4.value
 
     # Run through the motions! .. literally :)
-    Move(y, isBackward)
-    Turn(y, x, z, lookUp)
-    Jump(y)
-    Give(y, x)
+    Move(pos_y, is_backward)
+    Turn(pos_y, pos_z, look_up)
+    Jump(pos_y)
+    Give(pos_y, pos_x)
 
     # Small delay to keep things responsive but give time for interrupt processing.
     time.sleep(0.01)

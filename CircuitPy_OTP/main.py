@@ -8,7 +8,8 @@ import ntptime
 import ubinascii
 import uhashlib
 
-totp = [("Discord ", 'JBSWY3DPEHPK3PXP'),  # https://github.com/pyotp/pyotp exmple
+# https://github.com/pyotp/pyotp example
+totp = [("Discord ", 'JBSWY3DPEHPK3PXP'),
         ("Gmail   ", 'abcdefghijklmnopqrstuvwxyz234567'),
         ("Accounts", 'asfdkwefoaiwejfa323nfjkl')]
 ssid = 'my_wifi_ssid'
@@ -164,7 +165,7 @@ t = None
 while not t:
     try:
         t = ntptime.time()
-    except:
+    except Exception:
         pass
     time.sleep(0.1)
 
@@ -195,7 +196,7 @@ while ALWAYS_ON or (countdown > 0):
         print(name + " OTP output: ", otp)  # serial debugging output
         oled.text(name + ": " + str(otp), 0, y)  # display name & OTP on OLED
         y += 10  # Go to next line on OLED
-    # We'll display a little bar that 'counts down' how many seconds you have left
+    # Display a little bar that 'counts down' how many seconds you have left
     oled.framebuf.line(0, 31, 128 - (unix_time % 30) * 4, 31, True)
     oled.show()
     # We'll update every 1/4 second, we can hash very fast so its no biggie!

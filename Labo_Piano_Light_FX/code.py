@@ -68,6 +68,6 @@ while True:
     vlvl = remapRangeSafe(lvl, 0, 255, wheelStart, wheelEnd)
     for i in range(0, len(strip)):
         strip[i] = wheel(vlvl)
-        # Set strip brightness based on audio level
+        # Set strip brightness based oncode audio level
         strip.brightness = float(remapRangeSafe(lvl, 50, 255, 0, maxbrt)) / 255.0
     strip.show()

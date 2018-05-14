@@ -96,7 +96,8 @@ class DirectoryNode(object):
 
     def __get_files(self):
         """Return a list of the files in this directory.
-           If this is not the top directory on the SD card, a ".." entry is the first element.
+           If this is not the top directory on the SD card, a
+           ".." entry is the first element.
            Any directories have a slash appended to their name."""
         if len(self.files) == 0:
             self.files = os.listdir(self.__path())
@@ -112,7 +113,9 @@ class DirectoryNode(object):
         if self.top_offset != self.old_top_offset:
             self.__get_files()
             self.display.fill(0)
-            for i in range(self.top_offset, min(self.top_offset + 4, self.__number_of_files())):
+            min_offset = min(self.top_offset + 4, self.__number_of_files())
+
+            for i in range(self.top_offset, min_offset):
                 self.display.text(self.files[i], 10, (i - self.top_offset) * 8)
             self.display.show()
             self.old_top_offset = self.top_offset
@@ -121,10 +124,12 @@ class DirectoryNode(object):
         """Update the selected file lighlight if required."""
         if self.selected_offset != self.old_selected_offset:
             if self.old_selected_offset > -1:
-                self.display.text(
-                    ">", 0, (self.old_selected_offset - self.top_offset) * 8, 0)
-            self.display.text(
-                ">", 0, (self.selected_offset - self.top_offset) * 8, 1)
+                old_offset = (self.old_selected_offset - self.top_offset) * 8
+
+                self.display.text(">", 0, old_offset, 0)
+
+            new_offset = (self.selected_offset - self.top_offset) * 8
+            self.display.text(">", 0, new_offset, 1)
             self.display.show()
             self.old_selected_offset = self.selected_offset
 
@@ -153,8 +158,8 @@ class DirectoryNode(object):
         self.__update_selection()
 
     def down(self):
-        """Move down in the file list if possible, adjusting the selected file indicator
-           and scrolling the display as required."""
+        """Move down in the file list if possible, adjusting the selected file
+        indicator and scrolling the display as required."""
         if self.selected_offset < self.__number_of_files() - 1:
             self.selected_offset += 1
             if self.selected_offset == self.top_offset + 4:
@@ -174,7 +179,8 @@ class DirectoryNode(object):
 
     def click(self):
         """Handle a selection and return the new current directory.
-           If the selected file is the parent, i.e. "..", return to the parent directory.
+           If the selected file is the parent, i.e. "..", return to the parent
+           directory.
            If the selected file is a directory, go into it."""
         if self.selected_filename == "..":
             if self.parent:
