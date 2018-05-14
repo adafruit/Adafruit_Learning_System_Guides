@@ -1,12 +1,13 @@
-from analogio import AnalogIn
-import board
 import time
+
+import board
 import neopixel
+from analogio import AnalogIn
 
 pot = AnalogIn(board.A1)  # what pin the pot is on
-pixpin = board.D0         # what pin the LEDs are on
-numpix = 16               # number of LEDs in ring!
-BPP = 4                   # required for RGBW ring
+pixpin = board.D0  # what pin the LEDs are on
+numpix = 16  # number of LEDs in ring!
+BPP = 4  # required for RGBW ring
 
 ring = neopixel.NeoPixel(pixpin, numpix, bpp=BPP, brightness=0.9)
 

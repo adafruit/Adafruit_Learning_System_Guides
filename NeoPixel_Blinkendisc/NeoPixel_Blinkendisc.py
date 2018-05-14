@@ -1,32 +1,34 @@
+import time
+
+import analogio
 import board
 import digitalio
-import analogio
 import neopixel
-import time
+
 try:
     import urandom as random  # for v1.0 API support
 except:
     import random
 
-num_leds = 24         # 24 LED NeoPixel ring
-neopixel_pin = board.D0   # Pin where NeoPixels are connected
-vibration_pin = board.D1   # Pin where vibration switch is connected
-analog_pin = board.A0   # Not connected to anything
+num_leds = 24  # 24 LED NeoPixel ring
+neopixel_pin = board.D0  # Pin where NeoPixels are connected
+vibration_pin = board.D1  # Pin where vibration switch is connected
+analog_pin = board.A0  # Not connected to anything
 strip = neopixel.NeoPixel(neopixel_pin, num_leds)
 
-default_frame_len = 0.06   # Time (in seconds) of typical animation frame
-max_frame_len = 0.25   # Gradually slows toward this
+default_frame_len = 0.06  # Time (in seconds) of typical animation frame
+max_frame_len = 0.25  # Gradually slows toward this
 min_frame_len = 0.005  # But sometimes as little as this
-cooldown_at = 2.0    # After this many seconds, start slowing down
-dim_at = 2.5    # After this many seconds, dim LEDs
-brightness_high = 0.5    # Active brightness
+cooldown_at = 2.0  # After this many seconds, start slowing down
+dim_at = 2.5  # After this many seconds, dim LEDs
+brightness_high = 0.5  # Active brightness
 brightness_low = 0.125  # Idle brightness
 
-color = [0, 120, 30]       # Initial LED color
-offset = 0                  # Animation position
+color = [0, 120, 30]  # Initial LED color
+offset = 0  # Animation position
 frame_len = default_frame_len  # Frame-to-frame time, seconds
-last_vibration = 0.0                # Time of last vibration
-last_frame = 0.0                # Time of last animation frame
+last_vibration = 0.0  # Time of last vibration
+last_frame = 0.0  # Time of last animation frame
 
 # Random number generator is seeded from an unused 'floating'
 # analog input - this helps ensure the random color choices
@@ -55,10 +57,10 @@ while True:  # Loop forever...
                 random.randint(32, 255),
                 random.randint(32, 255)]
             frame_len = default_frame_len  # Reset frame timing
-            last_vibration = t             # Save last trigger time
+            last_vibration = t  # Save last trigger time
 
     # Stretch out frames if nothing has happened in a couple of seconds:
-    if((t - last_vibration) > cooldown_at):
+    if ((t - last_vibration) > cooldown_at):
         frame_len += 0.001  # Add 1 ms
         if frame_len > max_frame_len:
             frame_len = min_frame_len

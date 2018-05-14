@@ -1,7 +1,7 @@
-from digitalio import DigitalInOut, Direction
 import board
 import busio
-import time
+from digitalio import DigitalInOut, Direction
+
 try:
     import struct
 except ImportError:
@@ -26,7 +26,7 @@ while True:
         buffer.pop(0)
 
     if len(buffer) > 200:
-        buffer = []   # avoid an overrun if all bad data
+        buffer = []  # avoid an overrun if all bad data
     if len(buffer) < 32:
         continue
 
@@ -66,4 +66,4 @@ while True:
     print("---------------------------------------")
 
     buffer = buffer[32:]
-    #print("Buffer ", buffer)
+    # print("Buffer ", buffer)

@@ -7,30 +7,67 @@
 # License: MIT License (https://opensource.org/licenses/MIT)
 
 import time
+
 import board
 import neopixel
 
 # Configuration:
 # Message to display (capital letters and numbers only)
 message = 'SOS'
-dot_length = 0.15                   # Duration of one Morse dot
-dash_length = (dot_length * 3.0)    # Duration of one Morse dash
-symbol_gap = dot_length             # Duration of gap between dot or dash
+dot_length = 0.15  # Duration of one Morse dot
+dash_length = (dot_length * 3.0)  # Duration of one Morse dash
+symbol_gap = dot_length  # Duration of gap between dot or dash
 character_gap = (dot_length * 3.0)  # Duration of gap between characters
-flash_color = (255, 0, 0)           # Color of the morse display.
-brightness = 0.5                    # Display brightness (0.0 - 1.0)
-morse = [('A', '.-'), ('B', '-...'), ('C', '-.-.'), ('D', '-..'), ('E', '.'), ('F', '..-.'), ('G', '--.'), ('H', '....'), ('I', '..'), ('J', '.---'), ('K', '-.-'), ('L', '.-..'), ('M', '--'), ('N', '-.'), ('O', '---'), ('P', '.--.'), ('Q', '--.-'), ('R', '.-.'), ('S',
-                                                                                                                                                                                                                                                                        '...'), ('T', '-'), ('U', '..-'), ('V', '...-'), ('W', '.--'), ('X', '-..-'), ('Y', '-.--'), ('Z', '--..'), ('0', '-----'), ('1', '.----'), ('2', '..---'), ('3', '...--'), ('4', '....-'), ('5', '.....'), ('6', '-....'), ('7', '--...'), ('8', '---..'), ('9', '----.')]
+flash_color = (255, 0, 0)  # Color of the morse display.
+brightness = 0.5  # Display brightness (0.0 - 1.0)
+morse = [
+    ('A', '.-'),
+    ('B', '-...'),
+    ('C', '-.-.'),
+    ('D', '-..'),
+    ('E', '.'),
+    ('F', '..-.'),
+    ('G', '--.'),
+    ('H', '....'),
+    ('I', '..'),
+    ('J', '.---'),
+    ('K', '-.-'),
+    ('L', '.-..'),
+    ('M', '--'),
+    ('N', '-.'),
+    ('O', '---'),
+    ('P', '.--.'),
+    ('Q', '--.-'),
+    ('R', '.-.'),
+    ('S', '...'),
+    ('T', '-'),
+    ('U', '..-'),
+    ('V', '...-'),
+    ('W', '.--'),
+    ('X', '-..-'),
+    ('Y', '-.--'),
+    ('Z', '--..'),
+    ('0', '-----'),
+    ('1', '.----'),
+    ('2', '..---'),
+    ('3', '...--'),
+    ('4', '....-'),
+    ('5', '.....'),
+    ('6', '-....'),
+    ('7', '--...'),
+    ('8', '---..'),
+    ('9', '----.'),
+]
+
 
 # Define a class that represents the morse flasher.
 
 
 class MorseFlasher:
-
     def __init__(self, color=(255, 255, 255)):
         # set the color adjusted for brightness
         self._color = (
-            int(color[0]*brightness), int(color[1]*brightness), int(color[2]*brightness))
+            int(color[0] * brightness), int(color[1] * brightness), int(color[2] * brightness))
 
     def light(self, on=True):
         if on:

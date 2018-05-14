@@ -1,10 +1,11 @@
 import time
-from analogio import AnalogIn
+
+import adafruit_character_lcd
 import adafruit_fancyled.adafruit_fancyled as fancy
 import board
 import digitalio
-import adafruit_character_lcd
 import neopixel
+from analogio import AnalogIn
 
 lcd_rs = digitalio.DigitalInOut(board.D5)
 lcd_en = digitalio.DigitalInOut(board.D6)
