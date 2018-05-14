@@ -10,8 +10,8 @@ touch = touchio.TouchIn(board.D1)
 i2c = io.I2C(board.SCL, board.SDA)
 matrix = adafruit_ht16k33.matrix.Matrix8x8(i2c)
 
-# pixels initializers 
-xpix = ypix = 8
+# pixels initializers
+x_pix = y_pix = 8
 x = y = 0
 matrix.fill(0)
 matrix.show()
@@ -24,7 +24,7 @@ frame_delay = [.25, .25, .25, .25, .25, .25, .25, .25, .25, .25, .25, .25,
 frame_count = 0
 
 # animation bitmaps
-anim = [
+animation = [
     # frame 0 - alien #1 frame 1
     [[0, 0, 0, 1, 1, 0, 0, 0], [0, 0, 1, 1, 1, 1, 0, 0], [0, 1, 1, 1, 1, 1, 1, 0],
      [1, 1, 0, 1, 1, 0, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1], [0, 0, 1, 0, 0, 1, 0, 0],
@@ -114,10 +114,10 @@ anim = [
 # populate matrix
 while True:
 
-    if frame_count < len(anim):
-        for x in range(xpix):
-            for y in range(ypix):
-                matrix.pixel(x, y, anim[frame_count][x][y])
+    if frame_count < len(animation):
+        for x in range(x_pix):
+            for y in range(y_pix):
+                matrix.pixel(x, y, animation[frame_count][x][y])
 
         # next animation frame
         frame_count += 1
