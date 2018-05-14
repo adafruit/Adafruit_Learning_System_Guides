@@ -65,11 +65,11 @@ def normalized_rms(values):
 
 
 def mean(values):
-    return (sum(values) / len(values))
+    return sum(values) / len(values)
 
 
-def volume_color(i):
-    return (200, i * (255 // NUM_PIXELS), 0)
+def volume_color(volume):
+    return 200, volume * (255 // NUM_PIXELS), 0
 
 
 # Main program

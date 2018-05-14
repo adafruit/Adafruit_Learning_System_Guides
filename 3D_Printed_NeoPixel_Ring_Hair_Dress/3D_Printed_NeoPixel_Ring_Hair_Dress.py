@@ -162,7 +162,7 @@ def nextspectrumcolor():
     global spectrum_part, color_idx, curr_color_granularity, color
 
     # spectral wipe from green to red
-    if (spectrum_part == 2):
+    if spectrum_part == 2:
         color = (color_idx, 0, 255 - color_idx)
         color_idx += curr_color_granularity
         if (color_idx > 255):
@@ -170,18 +170,18 @@ def nextspectrumcolor():
             color_idx = 0
 
     # spectral wipe from blue to green
-    elif (spectrum_part == 1):
+    elif spectrum_part == 1:
         color = (0, 255 - color_idx, color_idx)
         color_idx += curr_color_granularity
-        if (color_idx > 255):
+        if color_idx > 255:
             spectrum_part = 2
             color_idx = 0
 
     # spectral wipe from red to blue
-    elif (spectrum_part == 0):
+    elif spectrum_part == 0:
         color = (255 - color_idx, color_idx, 0)
         color_idx += curr_color_granularity
-        if (color_idx > 255):
+        if color_idx > 255:
             spectrum_part = 1
             color_idx = 0
 
@@ -206,7 +206,7 @@ def nextrandomcolor():
 
 def nextcolor():
     # save some RAM for more animation actions
-    if (curr_color_gen & COL_RANDOM):
+    if curr_color_gen & COL_RANDOM:
         nextrandomcolor()
     else:
         nextspectrumcolor()
@@ -228,7 +228,7 @@ setup()
 while True:  # Loop forever...
 
     # do we need to load the next action?
-    if ((time.monotonic() - action_timer) > curr_action_duration):
+    if (time.monotonic() - action_timer) > curr_action_duration:
         curr_action_duration = theactionlist[curr_action_idx][action_duration]
         curr_action = theactionlist[curr_action_idx][action_and_color_gen] & 0x3F
         curr_action_step_duration = theactionlist[curr_action_idx][action_step_duration]
@@ -242,16 +242,16 @@ while True:  # Loop forever...
         action_timer = time.monotonic()
 
     # do we need to change to the next color?
-    if ((time.monotonic() - color_timer) > curr_color_interval):
+    if (time.monotonic() - color_timer) > curr_color_interval:
         nextcolor()
         color_timer = time.monotonic()
 
     # do we need to step up the current action?
-    if ((time.monotonic() - action_step_timer) > curr_action_step_duration):
+    if (time.monotonic() - action_step_timer) > curr_action_step_duration:
 
-        if (curr_action):
+        if curr_action:
 
-            if (curr_action == ACT_NOP):
+            if curr_action == ACT_NOP:
                 # rather trivial even tho this will be repeated as long as the
                 # NOP continues - i could have prevented it from repeating
                 # unnecessarily, but that would mean more code and less
@@ -259,14 +259,14 @@ while True:  # Loop forever...
                 for i in range(0, numpix):
                     strip[i] = (0, 0, 0)
 
-            elif (curr_action == ACT_SIMPLE_RING):
+            elif curr_action == ACT_SIMPLE_RING:
                 # even more trivial - just set the new color, if there is one
                 for i in range(0, numpix):
                     strip[i] = color
 
-            elif (curr_action == (ACT_CYCLING_RING_ACLK or ACT_CYCLING_RING_CLKW)):
+            elif curr_action == (ACT_CYCLING_RING_ACLK or ACT_CYCLING_RING_CLKW):
                 # spin the ring clockwise or anti clockwise
-                if (curr_action == ACT_CYCLING_RING_ACLK):
+                if curr_action == ACT_CYCLING_RING_ACLK:
                     idx += 1
                 else:
                     idx -= 1
@@ -277,17 +277,17 @@ while True:  # Loop forever...
                 # set the new color, if there is one
                 strip[idx] = color
 
-            elif (curr_action == ACT_WHEEL_ACLK or ACT_WHEEL_CLKW):
+            elif curr_action == ACT_WHEEL_ACLK or ACT_WHEEL_CLKW:
                 # switch on / off the appropriate pixels according to
                 # the current offset
                 for idx in range(0, numpix):
-                    if (((offset + idx) & 7) < 2):
+                    if ((offset + idx) & 7) < 2:
                         strip[idx] = color
                     else:
                         strip[idx] = (0, 0, 0)
 
                 # advance the offset and thus, spin the wheel
-                if (curr_action == ACT_WHEEL_CLKW):
+                if curr_action == ACT_WHEEL_CLKW:
                     offset += 1
                 else:
                     offset -= 1
@@ -295,7 +295,7 @@ while True:  # Loop forever...
                 # prevent overflows or underflows
                 offset %= numpix
 
-            elif (curr_action == ACT_SPARKLING_RING):
+            elif curr_action == ACT_SPARKLING_RING:
                 # switch current pixel off
                 strip[idx] = (0, 0, 0)
                 # pick a new pixel

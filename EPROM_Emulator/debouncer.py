@@ -46,7 +46,7 @@ class Debouncer(object):
         self.state = 0x00
         self.pin = digitalio.DigitalInOut(pin)
         self.pin.direction = digitalio.Direction.INPUT
-        if mode != None:
+        if mode is not None:
             self.pin.pull = mode
         if self.pin.value:
             self.__set_state(Debouncer.DEBOUNCED_STATE |

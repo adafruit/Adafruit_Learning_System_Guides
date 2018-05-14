@@ -92,7 +92,7 @@ def h2rgb(hue):
     hue %= 90
     h = hue_table[hue >> 1]
 
-    if (hue & 1):
+    if hue & 1:
         ret = h & 15
     else:
         ret = (h >> 4)
@@ -116,15 +116,15 @@ def wave_setup():
 
 
 def vibration_detector():
-    while (True):
+    while True:
         if not pin.value:
-            return (True)
+            return True
 
 
-while (True):
+while True:
 
     # wait for vibration sensor to trigger
-    if (ramping_up == False):
+    if ramping_up == False:
         ramping_up = vibration_detector()
         wave_setup()
 
@@ -137,7 +137,7 @@ while (True):
     brightness = int(((brightness * 7) + 207) / 8)
     count += 1
 
-    if (count == (circumference + num_leds + 5)):
+    if count == (circumference + num_leds + 5):
         ramping_up = False
         count = 0
 
@@ -147,7 +147,7 @@ while (True):
         wave[w][center] += wave[w][speed]
 
         # Hue not currently changing?
-        if (wave[w][hue] == wave[w][hue_target]):
+        if wave[w][hue] == wave[w][hue_target]:
 
             # There's a tiny random chance of picking a new hue...
             if (not random.randint(frames_per_second * 4, 255)):
@@ -158,13 +158,13 @@ while (True):
         # This wave's hue is currently shifting...
         else:
 
-            if (wave[w][hue] < wave[w][hue_target]):
+            if wave[w][hue] < wave[w][hue_target]:
                 wave[w][hue] += 1  # Move up or
             else:
                 wave[w][hue] -= 1  # down as needed
 
             # Reached destination?
-            if (wave[w][hue] == wave[w][hue_target]):
+            if wave[w][hue] == wave[w][hue_target]:
                 wave[w][hue] = 90 + wave[w][hue] % 90  # Clamp to 90-180 range
                 wave[w][hue_target] = wave[w][hue]  # Copy to target
 
@@ -200,7 +200,7 @@ while (True):
                 # that 'wraps around' the ends of the strip as
                 # necessary...it's a contiguous ring, and waves
                 # can move smoothly across the gap.
-                if (d2 < d1):
+                if d2 < d1:
                     d1 = d2  # d1 is pixel-to-wave-center distance
 
                 # d2 distance, relative to wave width, is then
@@ -208,14 +208,14 @@ while (True):
                 # pixel (basic linear y=mx+b stuff).
                 # Is distance within wave's influence?
                 # d2 is opposite; distance to wave's end
-                if (d1 < wave[w][width]):
+                if d1 < wave[w][width]:
                     d2 = wave[w][width] - d1
                     y = int(brightness * d2 / wave[w][width])  # 0 to 200
 
                     # y is a brightness scale value --
                     # proportional to, but not exactly equal
                     # to, the resulting RGB value.
-                    if (y < 128):  # Fade black to RGB color
+                    if y < 128:  # Fade black to RGB color
                         # In HSV colorspace, this would be
                         # tweaking 'value'
                         n = int(y * 2 + 1)  # 1-256
@@ -235,11 +235,11 @@ while (True):
             # r,g,b are 16-bit types that accumulate brightness
             # from all waves that affect this pixel; may exceed
             # 255.  Now clip to 0-255 range:
-            if (r > 255):
+            if r > 255:
                 r = 255
-            if (g > 255):
+            if g > 255:
                 g = 255
-            if (b > 255):
+            if b > 255:
                 b = 255
 
             # Store resulting RGB value and we're done with
