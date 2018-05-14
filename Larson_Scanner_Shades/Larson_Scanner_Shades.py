@@ -4,7 +4,7 @@ import board
 import neopixel
 
 numpix = 22  # Number of NeoPixels
-pixpin = board.D1  # Pin where NeoPixels are connected Gemma M0 = D1 | Trinket M0 = D4
+pixpin = board.D1  # NeoPixels pin. For Gemma M0 = D1, Trinket M0 = D4
 strip = neopixel.NeoPixel(pixpin, numpix, brightness=1, auto_write=False)
 pos = 0  # position
 direction = 1  # direction of "eye"

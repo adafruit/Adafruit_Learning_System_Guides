@@ -13,7 +13,7 @@ except ImportError:
     import random
 
 neo_pin = board.D0  # DIGITAL IO pin for NeoPixel OUTPUT from GEMMA
-touch_pin = board.D2  # DIGITAL IO pin for momentary touch sensor INPUT to GEMMA
+touch_pin = board.D2  # DIGITAL IO pin for momentary touch sensor to GEMMA
 pixel_count = 30  # Number of NeoPixels connected to GEMMA
 delay_sec = .010  # delay between blinks, smaller numbers are faster
 delay_mult = 8  # Randomization multiplier, delay speed of the effect
