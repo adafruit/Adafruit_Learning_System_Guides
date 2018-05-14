@@ -1,19 +1,21 @@
-# This Code uses the:
-# * Adafruit LCD backpack using MCP23008 I2C expander 
-# * Maxbotic LV-EZ1 Ultrasonic Sensor
-#
-# Tested with the Trinket M0
-# The ultrasonic sensor and pin use should be Gemma M0 compatible
-# This sketch reads the LV-EZ1 by pulse count 
-# Then prints the distance to the LCD and python console
-#
-# The circuit:
-# * 5V to Trinket M0 USB or BAT pin, I2C Backpack 5V and EZ1 +5
-# * GND to Trinket M0 GND pin, I2C Backpack GND and EZ1 GND
-# * Display I2C Backpack SLK to Trinket GPIO #2 
-# * Display I2C backpack SDA to Trinket GPIO #0 
-# * LV-EZ1 Ultrasonic Sensor PW pin to Trinket GPIO #1 
-# * Backlight can be hard wired by connecting LCD pin 16, 17 or 18 to GND
+"""
+This Code uses the:
+* Adafruit LCD backpack using MCP23008 I2C expander
+* Maxbotic LV-EZ1 Ultrasonic Sensor
+
+Tested with the Trinket M0
+The ultrasonic sensor and pin use should be Gemma M0 compatible
+This sketch reads the LV-EZ1 by pulse count
+Then prints the distance to the LCD and python console
+
+The circuit:
+* 5V to Trinket M0 USB or BAT pin, I2C Backpack 5V and EZ1 +5
+* GND to Trinket M0 GND pin, I2C Backpack GND and EZ1 GND
+* Display I2C Backpack SLK to Trinket GPIO #2
+* Display I2C backpack SDA to Trinket GPIO #0
+* LV-EZ1 Ultrasonic Sensor PW pin to Trinket GPIO #1
+* Backlight can be hard wired by connecting LCD pin 16, 17 or 18 to GND
+"""
 
 import time
 
@@ -33,7 +35,7 @@ lcd = adafruit_character_lcd.Character_LCD_I2C(i2c, cols, rows)
 # calculated mode or median distance
 mode_result = 0
 
-# pulseio can store multiple pulses 
+# pulseio can store multiple pulses
 # read in time for pin to transition
 samples = 18
 pulses = pulseio.PulseIn(board.D1, maxlen=samples)
@@ -45,24 +47,24 @@ rangevalue = [0, 0, 0, 0, 0, 0, 0, 0, 0]
 time.sleep(.25)
 
 
-def tof_cm(tof):
+def tof_cm(time_of_flight):
     """
     EZ1 ultrasonic sensor is measuring "time of flight"
     Converts time of flight into distance in centimeters
     """
     convert_to_cm = 58
-    cm = tof / convert_to_cm
+    cm = time_of_flight / convert_to_cm
 
     return cm
 
 
-def tof_inches(tof):
+def tof_inches(time_of_flight):
     """
     EZ1 ultrasonic sensor is measuring "time of flight"
     Converts time of flight into distance in inches
     """
     convert_to_inches = 147
-    inches = tof / convert_to_inches
+    inches = time_of_flight / convert_to_inches
 
     return inches
 
