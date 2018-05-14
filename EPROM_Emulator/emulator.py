@@ -104,7 +104,8 @@ class Emulator(object):
         self.address_clock_pin.value = CLOCK_INACTIVE
 
     def __output_on_port_a(self, data_byte):
-        """A hack to get around the limitation of the 23017 library to use 8-bit ports"""
+        """A hack to get around the limitation of the 23017
+        library to use 8-bit ports"""
         self.mcp.gpio = (self.mcp.gpio & 0xFF00) | (data_byte & 0x00FF)
 
     def enter_program_mode(self):
@@ -113,7 +114,8 @@ class Emulator(object):
         self.led_pin.value = LED_OFF
 
     def enter_emulate_mode(self):
-        """Enter emulate mode, giving control of the emulator ram to the host."""
+        """Enter emulate mode, giving control of the emulator
+        ram to the host."""
         self.mode_pin.value = EMULATE_USE
         self.led_pin.value = LED_ON
 
