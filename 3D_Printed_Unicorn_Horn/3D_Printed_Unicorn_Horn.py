@@ -1,7 +1,7 @@
-from digitalio import DigitalInOut, Direction
-import board 
-import neopixel
 import time
+from digitalio import DigitalInOut, Direction
+import board
+import neopixel
 
 pixpin = board.D1
 numpix = 8
@@ -16,9 +16,9 @@ def wheel(pos):
     # The colours are a transition r - g - b - back to r.
     if (pos < 0) or (pos > 255):
         return (0, 0, 0)
-    if (pos < 85):
+    if pos < 85:
         return (int(pos * 3), int(255 - (pos*3)), 0)
-    elif (pos < 170):
+    elif pos < 170:
         pos -= 85
         return (int(255 - pos*3), 0, int(pos*3))
     else:
