@@ -1,6 +1,7 @@
-import digitalio
-import board
 import time
+
+import board
+import digitalio
 
 button_a = digitalio.DigitalInOut(board.BUTTON_A)
 button_a.direction = digitalio.Direction.INPUT

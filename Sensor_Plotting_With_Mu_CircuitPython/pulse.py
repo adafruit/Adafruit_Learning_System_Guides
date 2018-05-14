@@ -1,7 +1,8 @@
-import neopixel
-import analogio
 import time
+
+import analogio
 import board
+import neopixel
 
 pixels = neopixel.NeoPixel(board.NEOPIXEL, 10, brightness=1.0)
 light = analogio.AnalogIn(board.LIGHT)
@@ -22,8 +23,8 @@ while True:
         for s in range(NUM_OVERSAMPLE):
             oversample += float(light.value)
         # and save the average from the oversamples
-        samples[i] = oversample / NUM_OVERSAMPLE        # Find the average
+        samples[i] = oversample / NUM_OVERSAMPLE  # Find the average
 
         mean = sum(samples) / float(len(samples))  # take the average
-        print((samples[i] - mean,))                # 'center' the reading
-        time.sleep(0.025)                          # change to go faster/slower
+        print((samples[i] - mean,))  # 'center' the reading
+        time.sleep(0.025)  # change to go faster/slower
