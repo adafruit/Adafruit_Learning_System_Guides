@@ -85,19 +85,16 @@ gammas = [
     215, 218, 220, 223, 225, 228, 231, 233, 236, 239, 241, 244, 247, 249, 252, 255]
 
 
-def h2rgb(hue):
-    # return value
-    ret = 0
+def h2rgb(colour_hue):
+    colour_hue %= 90
+    h = hue_table[colour_hue >> 1]
 
-    hue %= 90
-    h = hue_table[hue >> 1]
-
-    if hue & 1:
+    if colour_hue & 1:
         ret = h & 15
     else:
         ret = (h >> 4)
 
-    return (ret * 17)
+    return ret * 17
 
 
 def wave_setup():
@@ -108,11 +105,11 @@ def wave_setup():
             [0, 7, 30, 0, 0, 0, 0, 0]]
 
     # assign random starting colors to waves
-    for w in range(n_waves):
-        wave[w][hue] = wave[w][hue_target] = 90 + random.randint(0, 90)
-        wave[w][red] = h2rgb(wave[w][hue] - 30)
-        wave[w][green] = h2rgb(wave[w][hue])
-        wave[w][blue] = h2rgb(wave[w][hue] + 30)
+    for wave_index in range(n_waves):
+        wave[wave_index][hue] = wave[wave_index][hue_target] = 90 + random.randint(0, 90)
+        wave[wave_index][red] = h2rgb(wave[wave_index][hue] - 30)
+        wave[wave_index][green] = h2rgb(wave[wave_index][hue])
+        wave[wave_index][blue] = h2rgb(wave[wave_index][hue] + 30)
 
 
 def vibration_detector():
@@ -124,7 +121,7 @@ def vibration_detector():
 while True:
 
     # wait for vibration sensor to trigger
-    if ramping_up == False:
+    if not ramping_up:
         ramping_up = vibration_detector()
         wave_setup()
 
@@ -150,7 +147,7 @@ while True:
         if wave[w][hue] == wave[w][hue_target]:
 
             # There's a tiny random chance of picking a new hue...
-            if (not random.randint(frames_per_second * 4, 255)):
+            if not random.randint(frames_per_second * 4, 255):
                 # Within 1/3 color wheel
                 wave[w][hue_target] = random.randint(
                     wave[w][hue] - 30, wave[w][hue] + 30)

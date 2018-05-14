@@ -34,10 +34,10 @@ def cycle_sequence(seq):
 
 def rainbow_cycle(seq):
     """Rainbow cycle generator"""
-    rainbow = cycle_sequence(seq)
+    rainbow_sequence = cycle_sequence(seq)
     while True:
         # pylint: disable=stop-iteration-return
-        led[0] = (wheel(next(rainbow)))
+        led[0] = (wheel(next(rainbow_sequence)))
         yield
 
 
