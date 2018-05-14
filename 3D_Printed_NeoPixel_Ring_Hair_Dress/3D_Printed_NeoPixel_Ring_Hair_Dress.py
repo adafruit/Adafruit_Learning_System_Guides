@@ -1,20 +1,21 @@
 #
 # 3D_Printed_NeoPixel_Ring_Hair_Dress.py
 #
-# this was ported to CircuitPython from the 'Gemma Hoop Animator' 
+# this was ported to CircuitPython from the 'Gemma Hoop Animator'
 #
 # https://github.com/HerrRausB/GemmaHoopAnimator
 #
-# unless you # don't like the preset animations or find a 
+# unless you # don't like the preset animations or find a
 # major bug, you don't need tochange anything here
 #
+import time
 import board
 import neopixel
-import time
+
 try:
-	import urandom as random  # for v1.0 API support
+    import urandom as random  # for v1.0 API support
 except ImportError:
-	import random
+    import random
 from analogio import AnalogIn
 
 # available actions
@@ -65,7 +66,7 @@ curr_action = 0
 curr_color_gen = COL_RANDOM
 idx = 0
 offset = 0
-number_of_actions = 31 
+number_of_actions = 31
 curr_action_idx = 0
 curr_color_granularity = 1
 spectrum_part = 0
@@ -81,7 +82,7 @@ spectrum_part = 0
 #      ACT_WHEEL_ACLK              anti clockwise spinning wheel
 #      ACT_WHEEL_CLKW              clockwise spinning wheel
 #      ACT_SPARKLING_RING          sparkling effect
-#   
+#
 #   valid color options are:
 #      COL_RANDOM                  colors will be selected randomly, which might
 #                                  be not very sufficient due to well known
@@ -92,64 +93,63 @@ spectrum_part = 0
 # action    action name &                          action step    color        color change
 # duration  color generation method                duration       granularity  interval
 theactionlist = [
-  [ 5,      ACT_SPARKLING_RING | COL_RANDOM,       0.01,            25,         1      ],
-  [ 2,      ACT_CYCLING_RING_CLKW | COL_RANDOM,    0.02,            1,          0.005  ],
-  [ 5,      ACT_SPARKLING_RING | COL_RANDOM,       0.01,            25,         1      ],
-  [ 2,      ACT_CYCLING_RING_ACLK | COL_RANDOM,    0.02,            1,          0.005  ],
-  [ 5,      ACT_SPARKLING_RING | COL_RANDOM,       0.01,            25,         1      ],
-  [ 2.5,    ACT_CYCLING_RING_CLKW | COL_SPECTRUM,  0.25,            20,         0.020  ],
-  [ 1,      ACT_CYCLING_RING_CLKW | COL_SPECTRUM,  0.50,            1,          0.020  ],
-  [ .750,   ACT_CYCLING_RING_CLKW | COL_SPECTRUM,  0.075,           1,          0.020  ],
-  [ .500,   ACT_CYCLING_RING_CLKW | COL_SPECTRUM,  0.100,           1,          0.020  ],
-  [ .500,   ACT_CYCLING_RING_CLKW | COL_SPECTRUM,  0.125,           1,          0.020  ],
-  [ .500,   ACT_CYCLING_RING_CLKW | COL_SPECTRUM,  0.150,           1,          0.050  ],
-  [ .500,   ACT_CYCLING_RING_CLKW | COL_SPECTRUM,  0.175,           1,          0.100  ],
-  [ .500,   ACT_CYCLING_RING_CLKW | COL_SPECTRUM,  0.200,           1,          0.200  ],
-  [ .750,   ACT_CYCLING_RING_CLKW | COL_SPECTRUM,  0.225,           1,          0.250  ],
-  [ 1,      ACT_CYCLING_RING_CLKW | COL_SPECTRUM,  0.250,           1,          0.350  ],
-  [ 30,     ACT_SIMPLE_RING | COL_SPECTRUM,        0.050,           1,          0.010  ],
-  [ 2.5,    ACT_WHEEL_ACLK | COL_SPECTRUM,         0.010,           1,          0.010  ],
-  [ 2.5,    ACT_WHEEL_ACLK | COL_SPECTRUM,         0.015,           1,          0.020  ],
-  [ 2,      ACT_WHEEL_ACLK | COL_SPECTRUM,         0.025,           1,          0.030  ],
-  [ 1,      ACT_WHEEL_ACLK | COL_SPECTRUM,         0.050,           1,          0.040  ],
-  [ 1,      ACT_WHEEL_ACLK | COL_SPECTRUM,         0.075,           1,          0.040  ],
-  [ 1,      ACT_WHEEL_ACLK | COL_SPECTRUM,         0.100,           1,          0.050  ],
-  [ .500,   ACT_WHEEL_ACLK | COL_SPECTRUM,         0.125,           1,          0.060  ],
-  [ .500,   ACT_WHEEL_CLKW | COL_SPECTRUM,         0.125,           5,          0.050  ],
-  [ 1,      ACT_WHEEL_CLKW | COL_SPECTRUM,         0.100,           10,         0.040  ],
-  [ 1.5,    ACT_WHEEL_CLKW | COL_SPECTRUM,         0.075,           15,         0.030  ],
-  [ 2,      ACT_WHEEL_CLKW | COL_SPECTRUM,         0.050,           20,         0.020  ],
-  [ 2.5,    ACT_WHEEL_CLKW | COL_SPECTRUM,         0.025,           25,         0.010  ],
-  [ 3,      ACT_WHEEL_CLKW | COL_SPECTRUM,         0.010,           30,         0.005  ],
-  [ 5,      ACT_SPARKLING_RING | COL_RANDOM,       0.010,           25,         1     ],
-  [ 5,      ACT_NOP,                               0,               0,          0 ]
+  [5,      ACT_SPARKLING_RING | COL_RANDOM,       0.01,            25,         1     ],
+  [2,      ACT_CYCLING_RING_CLKW | COL_RANDOM,    0.02,            1,          0.005 ],
+  [5,      ACT_SPARKLING_RING | COL_RANDOM,       0.01,            25,         1     ],
+  [2,      ACT_CYCLING_RING_ACLK | COL_RANDOM,    0.02,            1,          0.005 ],
+  [5,      ACT_SPARKLING_RING | COL_RANDOM,       0.01,            25,         1     ],
+  [2.5,    ACT_CYCLING_RING_CLKW | COL_SPECTRUM,  0.25,            20,         0.020 ],
+  [1,      ACT_CYCLING_RING_CLKW | COL_SPECTRUM,  0.50,            1,          0.020 ],
+  [.750,   ACT_CYCLING_RING_CLKW | COL_SPECTRUM,  0.075,           1,          0.020 ],
+  [.500,   ACT_CYCLING_RING_CLKW | COL_SPECTRUM,  0.100,           1,          0.020 ],
+  [.500,   ACT_CYCLING_RING_CLKW | COL_SPECTRUM,  0.125,           1,          0.020 ],
+  [.500,   ACT_CYCLING_RING_CLKW | COL_SPECTRUM,  0.150,           1,          0.050 ],
+  [.500,   ACT_CYCLING_RING_CLKW | COL_SPECTRUM,  0.175,           1,          0.100 ],
+  [.500,   ACT_CYCLING_RING_CLKW | COL_SPECTRUM,  0.200,           1,          0.200 ],
+  [.750,   ACT_CYCLING_RING_CLKW | COL_SPECTRUM,  0.225,           1,          0.250 ],
+  [1,      ACT_CYCLING_RING_CLKW | COL_SPECTRUM,  0.250,           1,          0.350 ],
+  [30,     ACT_SIMPLE_RING | COL_SPECTRUM,        0.050,           1,          0.010 ],
+  [2.5,    ACT_WHEEL_ACLK | COL_SPECTRUM,         0.010,           1,          0.010 ],
+  [2.5,    ACT_WHEEL_ACLK | COL_SPECTRUM,         0.015,           1,          0.020 ],
+  [2,      ACT_WHEEL_ACLK | COL_SPECTRUM,         0.025,           1,          0.030 ],
+  [1,      ACT_WHEEL_ACLK | COL_SPECTRUM,         0.050,           1,          0.040 ],
+  [1,      ACT_WHEEL_ACLK | COL_SPECTRUM,         0.075,           1,          0.040 ],
+  [1,      ACT_WHEEL_ACLK | COL_SPECTRUM,         0.100,           1,          0.050 ],
+  [.500,   ACT_WHEEL_ACLK | COL_SPECTRUM,         0.125,           1,          0.060 ],
+  [.500,   ACT_WHEEL_CLKW | COL_SPECTRUM,         0.125,           5,          0.050 ],
+  [1,      ACT_WHEEL_CLKW | COL_SPECTRUM,         0.100,           10,         0.040 ],
+  [1.5,    ACT_WHEEL_CLKW | COL_SPECTRUM,         0.075,           15,         0.030 ],
+  [2,      ACT_WHEEL_CLKW | COL_SPECTRUM,         0.050,           20,         0.020 ],
+  [2.5,    ACT_WHEEL_CLKW | COL_SPECTRUM,         0.025,           25,         0.010 ],
+  [3,      ACT_WHEEL_CLKW | COL_SPECTRUM,         0.010,           30,         0.005 ],
+  [5,      ACT_SPARKLING_RING | COL_RANDOM,       0.010,           25,         1    ],
+  [5,      ACT_NOP,                               0,               0,          0]
 ]
 
 
 def nextspectrumcolor():
     global spectrum_part, color_idx, curr_color_granularity, color
-    
     # spectral wipe from green to red
-    if (spectrum_part == 2):  
+    if spectrum_part == 2:
         color = (color_idx, 0, 255-color_idx)
         color_idx += curr_color_granularity
-        if (color_idx > 255):
+        if color_idx > 255:
             spectrum_part = 0
             color_idx = 0
 
     # spectral wipe from blue to green
-    elif (spectrum_part == 1):
+    elif spectrum_part == 1:
         color = (0, 255 - color_idx, color_idx)
         color_idx += curr_color_granularity
-        if (color_idx > 255):
+        if color_idx > 255:
             spectrum_part = 2
             color_idx = 0
 
     # spectral wipe from red to blue
-    elif (spectrum_part == 0 ):
+    elif spectrum_part == 0:
         color = (255 - color_idx, color_idx, 0)
         color_idx += curr_color_granularity
-        if (color_idx > 255):
+        if color_idx > 255:
             spectrum_part = 1
             color_idx = 0
 
@@ -162,19 +162,19 @@ def nextrandomcolor():
     random_red = random.randint(0, int (256 / curr_color_granularity))
     random_red *= curr_color_granularity
 
-    random_green = random.randint(0, int (256 / curr_color_granularity)) 
+    random_green = random.randint(0, int (256 / curr_color_granularity))
     random_green *= curr_color_granularity
 
-    random_blue = random.randint(0, int (256 / curr_color_granularity)) 
+    random_blue = random.randint(0, int (256 / curr_color_granularity))
     random_blue *= curr_color_granularity
 
     color = (random_red, random_green, random_blue)
 
 def nextcolor():
     # save some RAM for more animation actions
-    if (curr_color_gen & COL_RANDOM):
-        nextrandomcolor() 
-    else: 
+    if curr_color_gen & COL_RANDOM:
+        nextrandomcolor()
+    else:
         nextspectrumcolor()
 
 def setup():
@@ -187,13 +187,13 @@ def setup():
     # let's go!
     nextcolor()
     strip.write()
-    
+
 setup()
 
 while True:  # Loop forever...
 
     # do we need to load the next action?
-    if ( (time.monotonic()  - action_timer) > curr_action_duration ):
+    if (time.monotonic() - action_timer) > curr_action_duration:
         curr_action_duration = theactionlist[curr_action_idx][action_duration]
         curr_action = theactionlist[curr_action_idx][action_and_color_gen] & 0x3F
         curr_action_step_duration = theactionlist[curr_action_idx][action_step_duration]
@@ -204,36 +204,36 @@ while True:  # Loop forever...
 
         # take care to rotate the action list!
         curr_action_idx %= number_of_actions
-        action_timer = time.monotonic() 
- 
+        action_timer = time.monotonic()
+
     # do we need to change to the next color?
-    if ((time.monotonic() - color_timer) > curr_color_interval):
+    if (time.monotonic() - color_timer) > curr_color_interval:
         nextcolor()
-        color_timer = time.monotonic() 
+        color_timer = time.monotonic()
 
     # do we need to step up the current action?
-    if ((time.monotonic() - action_step_timer) > curr_action_step_duration):
+    if (time.monotonic() - action_step_timer) > curr_action_step_duration:
 
-        if (curr_action):
+        if curr_action:
 
-            if (curr_action == ACT_NOP):
+            if curr_action == ACT_NOP:
                 # rather trivial even tho this will be repeated as long as the
                 # NOP continues - i could have prevented it from repeating
                 # unnecessarily, but that would mean more code and less
                 # space for more actions within the animation
                 for i in range(0, numpix):
-                    strip[i] = (0,0,0)
+                    strip[i] = (0, 0, 0)
 
-            elif (curr_action == ACT_SIMPLE_RING):
+            elif curr_action == ACT_SIMPLE_RING:
                 # even more trivial - just set the new color, if there is one
                 for i in range(0, numpix):
                     strip[i] = color
 
-            elif ( curr_action == (ACT_CYCLING_RING_ACLK or ACT_CYCLING_RING_CLKW)):
+            elif curr_action == (ACT_CYCLING_RING_ACLK or ACT_CYCLING_RING_CLKW):
                 # spin the ring clockwise or anti clockwise
-                if (curr_action == ACT_CYCLING_RING_ACLK):
+                if curr_action == ACT_CYCLING_RING_ACLK:
                     idx += 1
-                else: 
+                else:
                     idx -= 1
 
                 # prevent overflows or underflows
@@ -246,23 +246,23 @@ while True:  # Loop forever...
                 # switch on / off the appropriate pixels according to
                 # the current offset
                 for idx in range(0, numpix):
-                    if ( ((offset + idx) & 7 ) < 2 ):
+                    if ((offset + idx) & 7) < 2:
                         strip[idx] = color
                     else:
-                        strip[idx] = (0,0,0)
+                        strip[idx] = (0, 0, 0)
 
                 # advance the offset and thus, spin the wheel
-                if (curr_action == ACT_WHEEL_CLKW): 
+                if curr_action == ACT_WHEEL_CLKW:
                     offset += 1
-                else: 
+                else:
                     offset -= 1
 
                 # prevent overflows or underflows
                 offset %= numpix
- 
-            elif (curr_action == ACT_SPARKLING_RING):
+
+            elif curr_action == ACT_SPARKLING_RING:
                 # switch current pixel off
-                strip[idx] = (0,0,0)
+                strip[idx] = (0, 0, 0)
                 # pick a new pixel
                 idx = random.randint(0, numpix)
                 # set new pixel to the current color
