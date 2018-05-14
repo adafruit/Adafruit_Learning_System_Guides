@@ -75,7 +75,7 @@ try:
         databuf = bytearray(bmpWidth * bmpHeight * 4)
 
         for row in range(bmpHeight):  # For each scanline...
-            if (flip):  # Bitmap is stored bottom-to-top order (normal BMP)
+            if flip:  # Bitmap is stored bottom-to-top order (normal BMP)
                 pos = bmpImageoffset + (bmpHeight - 1 - row) * rowSize
             else:  # Bitmap is stored top-to-bottom
                 pos = bmpImageoffset + row * rowSize
