@@ -6,12 +6,13 @@
 
 # Use a jumper wire from D2 to GND to prevent injection while programming!
 
-from digitalio import DigitalInOut, Direction, Pull
-import board
 import time
+
+import board
 from adafruit_hid.keyboard import Keyboard
-from adafruit_hid.keycode import Keycode
 from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS
+from adafruit_hid.keycode import Keycode
+from digitalio import DigitalInOut, Direction, Pull
 
 ####################################################################
 # Select the target operating system for payload:
@@ -53,7 +54,10 @@ led.value = True
 # Wait a moment
 pause = 0.25
 
+
 # The functions that follow are the various payloads to deliver
+
+
 def launch_terminal():
     if operating_system is 0:
         led.value = False
@@ -105,7 +109,8 @@ def launch_terminal():
         time.sleep(2)
 
         led.value = False
-        layout.write("echo \'Try to be more careful what you put in your USB port.\'")
+        layout.write(
+            "echo \'Try to be more careful what you put in your USB port.\'")
         time.sleep(pause)
         kbd.press(Keycode.ENTER)
         kbd.release_all()
@@ -138,19 +143,24 @@ def launch_terminal():
             # time.sleep(pause)
         time.sleep(2)
 
-        layout.write(" _   _ _____ _     _     ___    _____ ____  ___ _____ _   _ ____")
+        layout.write(
+            " _   _ _____ _     _     ___    _____ ____  ___ _____ _   _ ____")
         kbd.press(Keycode.ENTER)
         kbd.release_all()
-        layout.write("| | | | ____| |   | |   / _ \  |  ___|  _ \|_ _| ____| \ | |  _ \ ")
+        layout.write(
+            "| | | | ____| |   | |   / _ \  |  ___|  _ \|_ _| ____| \ | |  _ \ ")
         kbd.press(Keycode.ENTER)
         kbd.release_all()
-        layout.write("| |_| |  _| | |   | |  | | | | | |_  | |_) || ||  _| |  \| | | | |")
+        layout.write(
+            "| |_| |  _| | |   | |  | | | | | |_  | |_) || ||  _| |  \| | | | |")
         kbd.press(Keycode.ENTER)
         kbd.release_all()
-        layout.write("|  _  | |___| |___| |__| |_| | |  _| |  _ < | || |___| |\  | |_| |")
+        layout.write(
+            "|  _  | |___| |___| |__| |_| | |  _| |  _ < | || |___| |\  | |_| |")
         kbd.press(Keycode.ENTER)
         kbd.release_all()
-        layout.write("|_| |_|_____|_____|_____\___/  |_|   |_| \_\___|_____|_| \_|____/ ")
+        layout.write(
+            "|_| |_|_____|_____|_____\___/  |_|   |_| \_\___|_____|_| \_|____/ ")
         kbd.press(Keycode.ENTER)
         kbd.release_all()
 
@@ -158,6 +168,7 @@ def launch_terminal():
         time.sleep(pause)
         kbd.press(Keycode.ENTER)
         kbd.release_all()
+
 
 def download_image():
     led.value = False
@@ -178,7 +189,8 @@ def download_image():
 
     # this says where to save image, and where to get it
     led.value = False
-    layout.write('curl -o ~/Desktop/hackimage.jpg https://cdn-learn.adafruit.com/assets/assets/000/051/840/original/hacks_foulFowl.jpg')
+    layout.write(
+        'curl -o ~/Desktop/hackimage.jpg https://cdn-learn.adafruit.com/assets/assets/000/051/840/original/hacks_foulFowl.jpg')
     time.sleep(pause)
     kbd.press(Keycode.ENTER)
     led.value = True
@@ -200,7 +212,8 @@ def replace_background():
     led.value = False
     # run this after download_image (which ran after launch_terminal)
     # it uses actionscript to change the background
-    layout.write('osascript -e \'tell application \"System Events\" to set picture of every desktop to (POSIX path of (path to home folder) & \"/Desktop/hackimage.jpg\" as POSIX file as alias)\'')
+    layout.write(
+        'osascript -e \'tell application \"System Events\" to set picture of every desktop to (POSIX path of (path to home folder) & \"/Desktop/hackimage.jpg\" as POSIX file as alias)\'')
     time.sleep(pause)
     kbd.press(Keycode.ENTER)
     kbd.release_all()
@@ -216,6 +229,7 @@ def replace_background():
     led.value = True
     time.sleep(3)  # give it a moment to refresh dock and BG
 
+
 def hide_everything():
     led.value = False
     # print("Hiding stuff... ")
@@ -223,6 +237,7 @@ def hide_everything():
     led.value = True
     time.sleep(10)
     kbd.release_all()
+
 
 while True:
     # check for presence of jumper from GND to D2
@@ -235,8 +250,7 @@ while True:
         led.value = False
         payload_delivered = 1
 
-
-    if buttons[0].value is True and payload_delivered is 0:  #run it
+    if buttons[0].value is True and payload_delivered is 0:  # run it
         led.value = True
         print("Release the water fowl!")  # for debugging in screen or putty
         for i in range(10):  # blink 5 times

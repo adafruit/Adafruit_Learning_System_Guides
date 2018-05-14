@@ -1,4 +1,5 @@
 import time
+
 from adafruit_circuitplayground.express import cpx
 
 blink_speed = 0.5

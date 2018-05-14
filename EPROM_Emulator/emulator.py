@@ -25,8 +25,8 @@ THE SOFTWARE.
 Manage the emulator hardware.
 """
 
-import digitalio
 import adafruit_mcp230xx
+import digitalio
 
 # control pin values
 
@@ -57,7 +57,7 @@ class Emulator(object):
 
     def __init__(self, i2c):
         self.mcp = adafruit_mcp230xx.MCP23017(i2c)
-        self.mcp.iodir = 0x0000           # Make all pins outputs
+        self.mcp.iodir = 0x0000  # Make all pins outputs
 
         # Configure the individual control pins
 
@@ -85,46 +85,37 @@ class Emulator(object):
         self.led_pin.direction = digitalio.Direction.OUTPUT
         self.led_pin.value = False
 
-
     def __pulse_write(self):
         self.write_pin.value = WRITE_ENABLED
         self.write_pin.value = WRITE_DISABLED
 
-
     def __deactivate_ram(self):
         self.chip_select_pin.value = CHIP_DISABLED
 
-
     def __activate_ram(self):
         self.chip_select_pin.value = CHIP_ENABLED
-
 
     def __reset_address_counter(self):
         self.clock_reset_pin.value = RESET_ACTIVE
         self.clock_reset_pin.value = RESET_INACTIVE
 
-
     def __advance_address_counter(self):
         self.address_clock_pin.value = CLOCK_ACTIVE
         self.address_clock_pin.value = CLOCK_INACTIVE
 
-
     def __output_on_port_a(self, data_byte):
         """A hack to get around the limitation of the 23017 library to use 8-bit ports"""
         self.mcp.gpio = (self.mcp.gpio & 0xFF00) | (data_byte & 0x00FF)
-
 
     def enter_program_mode(self):
         """Enter program mode, allowing loading of the emulator RAM."""
         self.mode_pin.value = PROGRAMMER_USE
         self.led_pin.value = LED_OFF
 
-
     def enter_emulate_mode(self):
         """Enter emulate mode, giving control of the emulator ram to the host."""
         self.mode_pin.value = EMULATE_USE
         self.led_pin.value = LED_ON
-
 
     def load_ram(self, code):
         """Load the emulator RAM. Automatically switched to program mode.

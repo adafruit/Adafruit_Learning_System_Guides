@@ -1,8 +1,8 @@
 # CircuitPython Demo - USB/Serial echo
 
-import digitalio
 import board
 import busio
+import digitalio
 
 led = digitalio.DigitalInOut(board.D13)
 led.direction = digitalio.Direction.OUTPUT
@@ -16,7 +16,8 @@ while True:
     if data is not None:
         led.value = True
 
-        data_string = ''.join([chr(b) for b in data])  # convert bytearray to string
+        # convert bytearray to string
+        data_string = ''.join([chr(b) for b in data])
         print(data_string, end="")
 
         led.value = False

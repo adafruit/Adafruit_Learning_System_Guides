@@ -1,7 +1,7 @@
 # CircuitPython IO demo - analog output
 
-from analogio import AnalogOut
 import board
+from analogio import AnalogOut
 
 analog_out = AnalogOut(board.A0)
 

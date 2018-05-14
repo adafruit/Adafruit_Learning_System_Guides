@@ -8,9 +8,11 @@
 # unless you # don't like the preset animations or find a
 # major bug, you don't need tochange anything here
 #
+import time
+
 import board
 import neopixel
-import time
+
 try:
     import urandom as random  # for v1.0 API support
 except ImportError:
@@ -18,37 +20,37 @@ except ImportError:
 from analogio import AnalogIn
 
 # available actions
-ACT_NOP = 0x00                      # all leds off, do nothing
-ACT_SIMPLE_RING = 0x01              # all leds on
-ACT_CYCLING_RING_ACLK = 0x02        # anti clockwise cycling colors
-ACT_CYCLING_RING_CLKW = 0x04       # clockwise cycling colors
-ACT_WHEEL_ACLK = 0x08               # anti clockwise spinning wheel
-ACT_WHEEL_CLKW = 0x10               # clockwise spinning wheel
-ACT_SPARKLING_RING = 0x20           # sparkling effect
+ACT_NOP = 0x00  # all leds off, do nothing
+ACT_SIMPLE_RING = 0x01  # all leds on
+ACT_CYCLING_RING_ACLK = 0x02  # anti clockwise cycling colors
+ACT_CYCLING_RING_CLKW = 0x04  # clockwise cycling colors
+ACT_WHEEL_ACLK = 0x08  # anti clockwise spinning wheel
+ACT_WHEEL_CLKW = 0x10  # clockwise spinning wheel
+ACT_SPARKLING_RING = 0x20  # sparkling effect
 
-numpix = 16                         # total number of NeoPixels
-pixel_output = board.D0             # pin where NeoPixels are connected
-analog_input = board.A0             # needed to seed the random generator
+numpix = 16  # total number of NeoPixels
+pixel_output = board.D0  # pin where NeoPixels are connected
+analog_input = board.A0  # needed to seed the random generator
 strip = neopixel.NeoPixel(pixel_output, numpix,
                           brightness=.3, auto_write=False)
 
 # available color generation methods
-COL_RANDOM = 0x40                   # colors will be generated randomly
-COL_SPECTRUM = 0x80                 # colors will be set as cyclic spectral wipe
+COL_RANDOM = 0x40  # colors will be generated randomly
+COL_SPECTRUM = 0x80  # colors will be set as cyclic spectral wipe
 
 # specifiyng the action list
 # the action's overall duration in milliseconds (be careful not
 action_duration = 0
 # to use values > 2^16-1 - roughly one minute :-)
 
-action_and_color_gen = 1    # the color generation method
+action_and_color_gen = 1  # the color generation method
 
 # the duration of each action step rsp. the delay of the main
 action_step_duration = 2
 # loop in milliseconds - thus, controls the action speed (be
 # careful not to use values > 2^16-1 - roughly one minute :-)
 
-color_granularity = 3       # controls the increment of the R, G, and B portions of the
+color_granularity = 3  # controls the increment of the R, G, and B portions of the
 # rsp. color. 1 means the increment is 0,1,2,3,..., 10 means
 # the increment is 0,10,20,... don't use values > 255, and note
 # that even values > 127 wouldn't make much sense...
@@ -96,63 +98,63 @@ spectrum_part = 0
 # action    action name &                          action step    color        color change
 # duration  color generation method                duration       granularity  interval
 theactionlist = [
-    [5,      ACT_SPARKLING_RING | COL_RANDOM,       0.01,            25,         1],
-    [2,      ACT_CYCLING_RING_CLKW | COL_RANDOM,
-        0.02,            1,          0.005],
-    [5,      ACT_SPARKLING_RING | COL_RANDOM,       0.01,            25,         1],
-    [2,      ACT_CYCLING_RING_ACLK | COL_RANDOM,
-        0.02,            1,          0.005],
-    [5,      ACT_SPARKLING_RING | COL_RANDOM,       0.01,            25,         1],
-    [2.5,    ACT_CYCLING_RING_CLKW | COL_SPECTRUM,
-        0.25,            20,         0.020],
-    [1,      ACT_CYCLING_RING_CLKW | COL_SPECTRUM,
-        0.50,            1,          0.020],
-    [.750,   ACT_CYCLING_RING_CLKW | COL_SPECTRUM,
-        0.075,           1,          0.020],
-    [.500,   ACT_CYCLING_RING_CLKW | COL_SPECTRUM,
-        0.100,           1,          0.020],
-    [.500,   ACT_CYCLING_RING_CLKW | COL_SPECTRUM,
-        0.125,           1,          0.020],
-    [.500,   ACT_CYCLING_RING_CLKW | COL_SPECTRUM,
-        0.150,           1,          0.050],
-    [.500,   ACT_CYCLING_RING_CLKW | COL_SPECTRUM,
-        0.175,           1,          0.100],
-    [.500,   ACT_CYCLING_RING_CLKW | COL_SPECTRUM,
-        0.200,           1,          0.200],
-    [.750,   ACT_CYCLING_RING_CLKW | COL_SPECTRUM,
-        0.225,           1,          0.250],
-    [1,      ACT_CYCLING_RING_CLKW | COL_SPECTRUM,
-        0.250,           1,          0.350],
-    [30,     ACT_SIMPLE_RING | COL_SPECTRUM,
-        0.050,           1,          0.010],
-    [2.5,    ACT_WHEEL_ACLK | COL_SPECTRUM,
-        0.010,           1,          0.010],
-    [2.5,    ACT_WHEEL_ACLK | COL_SPECTRUM,
-        0.015,           1,          0.020],
-    [2,      ACT_WHEEL_ACLK | COL_SPECTRUM,
-        0.025,           1,          0.030],
-    [1,      ACT_WHEEL_ACLK | COL_SPECTRUM,
-        0.050,           1,          0.040],
-    [1,      ACT_WHEEL_ACLK | COL_SPECTRUM,
-        0.075,           1,          0.040],
-    [1,      ACT_WHEEL_ACLK | COL_SPECTRUM,
-        0.100,           1,          0.050],
-    [.500,   ACT_WHEEL_ACLK | COL_SPECTRUM,
-        0.125,           1,          0.060],
-    [.500,   ACT_WHEEL_CLKW | COL_SPECTRUM,
-        0.125,           5,          0.050],
-    [1,      ACT_WHEEL_CLKW | COL_SPECTRUM,
-        0.100,           10,         0.040],
-    [1.5,    ACT_WHEEL_CLKW | COL_SPECTRUM,
-        0.075,           15,         0.030],
-    [2,      ACT_WHEEL_CLKW | COL_SPECTRUM,
-        0.050,           20,         0.020],
-    [2.5,    ACT_WHEEL_CLKW | COL_SPECTRUM,
-        0.025,           25,         0.010],
-    [3,      ACT_WHEEL_CLKW | COL_SPECTRUM,
-        0.010,           30,         0.005],
-    [5,      ACT_SPARKLING_RING | COL_RANDOM,       0.010,           25,         1],
-    [5,      ACT_NOP,                               0,               0,          0]
+    [5, ACT_SPARKLING_RING | COL_RANDOM, 0.01, 25, 1],
+    [2, ACT_CYCLING_RING_CLKW | COL_RANDOM,
+     0.02, 1, 0.005],
+    [5, ACT_SPARKLING_RING | COL_RANDOM, 0.01, 25, 1],
+    [2, ACT_CYCLING_RING_ACLK | COL_RANDOM,
+     0.02, 1, 0.005],
+    [5, ACT_SPARKLING_RING | COL_RANDOM, 0.01, 25, 1],
+    [2.5, ACT_CYCLING_RING_CLKW | COL_SPECTRUM,
+     0.25, 20, 0.020],
+    [1, ACT_CYCLING_RING_CLKW | COL_SPECTRUM,
+     0.50, 1, 0.020],
+    [.750, ACT_CYCLING_RING_CLKW | COL_SPECTRUM,
+     0.075, 1, 0.020],
+    [.500, ACT_CYCLING_RING_CLKW | COL_SPECTRUM,
+     0.100, 1, 0.020],
+    [.500, ACT_CYCLING_RING_CLKW | COL_SPECTRUM,
+     0.125, 1, 0.020],
+    [.500, ACT_CYCLING_RING_CLKW | COL_SPECTRUM,
+     0.150, 1, 0.050],
+    [.500, ACT_CYCLING_RING_CLKW | COL_SPECTRUM,
+     0.175, 1, 0.100],
+    [.500, ACT_CYCLING_RING_CLKW | COL_SPECTRUM,
+     0.200, 1, 0.200],
+    [.750, ACT_CYCLING_RING_CLKW | COL_SPECTRUM,
+     0.225, 1, 0.250],
+    [1, ACT_CYCLING_RING_CLKW | COL_SPECTRUM,
+     0.250, 1, 0.350],
+    [30, ACT_SIMPLE_RING | COL_SPECTRUM,
+     0.050, 1, 0.010],
+    [2.5, ACT_WHEEL_ACLK | COL_SPECTRUM,
+     0.010, 1, 0.010],
+    [2.5, ACT_WHEEL_ACLK | COL_SPECTRUM,
+     0.015, 1, 0.020],
+    [2, ACT_WHEEL_ACLK | COL_SPECTRUM,
+     0.025, 1, 0.030],
+    [1, ACT_WHEEL_ACLK | COL_SPECTRUM,
+     0.050, 1, 0.040],
+    [1, ACT_WHEEL_ACLK | COL_SPECTRUM,
+     0.075, 1, 0.040],
+    [1, ACT_WHEEL_ACLK | COL_SPECTRUM,
+     0.100, 1, 0.050],
+    [.500, ACT_WHEEL_ACLK | COL_SPECTRUM,
+     0.125, 1, 0.060],
+    [.500, ACT_WHEEL_CLKW | COL_SPECTRUM,
+     0.125, 5, 0.050],
+    [1, ACT_WHEEL_CLKW | COL_SPECTRUM,
+     0.100, 10, 0.040],
+    [1.5, ACT_WHEEL_CLKW | COL_SPECTRUM,
+     0.075, 15, 0.030],
+    [2, ACT_WHEEL_CLKW | COL_SPECTRUM,
+     0.050, 20, 0.020],
+    [2.5, ACT_WHEEL_CLKW | COL_SPECTRUM,
+     0.025, 25, 0.010],
+    [3, ACT_WHEEL_CLKW | COL_SPECTRUM,
+     0.010, 30, 0.005],
+    [5, ACT_SPARKLING_RING | COL_RANDOM, 0.010, 25, 1],
+    [5, ACT_NOP, 0, 0, 0]
 ]
 
 
@@ -161,7 +163,7 @@ def nextspectrumcolor():
 
     # spectral wipe from green to red
     if (spectrum_part == 2):
-        color = (color_idx, 0, 255-color_idx)
+        color = (color_idx, 0, 255 - color_idx)
         color_idx += curr_color_granularity
         if (color_idx > 255):
             spectrum_part = 0
@@ -211,7 +213,6 @@ def nextcolor():
 
 
 def setup():
-
     # fingers corssed, the seeding makes sense to really get random colors...
     apin = AnalogIn(analog_input)
     random.seed(apin.value)

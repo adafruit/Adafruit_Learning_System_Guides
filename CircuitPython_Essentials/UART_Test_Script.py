@@ -2,7 +2,7 @@ import board
 import busio
 
 
-def is_hardware_UART(tx, rx):
+def is_hardware_uart(tx, rx):
     try:
         p = busio.UART(tx, rx)
         p.deinit()
@@ -32,7 +32,7 @@ for tx_pin in get_unique_pins():
         if rx_pin is tx_pin:
             continue
         else:
-            if is_hardware_UART(tx_pin, rx_pin):
+            if is_hardware_uart(tx_pin, rx_pin):
                 print("RX pin:", rx_pin, "\t TX pin:", tx_pin)
             else:
                 pass

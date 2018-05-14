@@ -1,12 +1,13 @@
 # Playground 808
 # Drum machine
-from digitalio import DigitalInOut, Direction
-import audioio
-import touchio
-import board
 import time
 
-bpm = 120 #beats per minute for sustained hold, change this to suit your tempo
+import audioio
+import board
+import touchio
+from digitalio import DigitalInOut, Direction
+
+bpm = 120  # beats per minute for sustained hold, change this to suit your tempo
 
 # enable the speaker
 spkrenable = DigitalInOut(board.SPEAKER_ENABLE)
@@ -23,15 +24,17 @@ for i in range(7):
 
 # The seven files assigned to the touchpads
 audiofiles = ["bd_tek.wav", "elec_hi_snare.wav", "elec_cymbal.wav",
-               "elec_blip2.wav", "bd_zome.wav", "bass_hit_c.wav",
-               "drum_cowbell.wav"]
+              "elec_blip2.wav", "bd_zome.wav", "bass_hit_c.wav",
+              "drum_cowbell.wav"]
+
 
 def play_file(filename):
-    print("playing file "+filename)
+    print("playing file " + filename)
     f = open(filename, "rb")
     a = audioio.AudioOut(board.A0, f)
     a.play()
-    time.sleep(bpm/960) #sixteenthNote delay
+    time.sleep(bpm / 960)  # sixteenthNote delay
+
 
 while True:
 

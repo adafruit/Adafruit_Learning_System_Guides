@@ -28,6 +28,7 @@ Manage a directory in the file system.
 
 import os
 
+
 class DirectoryNode(object):
     """Display and navigate the SD card contents"""
 
@@ -46,7 +47,6 @@ class DirectoryNode(object):
         self.selected_offset = 0
         self.old_selected_offset = -1
 
-
     def __cleanup(self):
         """Dereference things for speedy gc."""
         self.display = None
@@ -54,7 +54,6 @@ class DirectoryNode(object):
         self.name = None
         self.files = None
         return self
-
 
     def __is_dir(self, path):
         """Determine whether a path identifies a machine code bin file.
@@ -68,7 +67,6 @@ class DirectoryNode(object):
         except OSError:
             return False
 
-
     def __sanitize(self, name):
         """Nondestructively strip off a trailing slash, if any, and return the result.
            :param string name: the filename
@@ -77,7 +75,6 @@ class DirectoryNode(object):
             return name[:-1]
         return name
 
-
     def __path(self):
         """Return the result of recursively follow the parent links, building a full
            path to this directory."""
@@ -85,20 +82,17 @@ class DirectoryNode(object):
             return self.parent.__path() + os.sep + self.__sanitize(self.name)
         return self.__sanitize(self.name)
 
-
     def __make_path(self, filename):
         """Return a full path to the specified file in this directory.
            :param string filename: the name of the file in this directory
          """
         return self.__path() + os.sep + filename
 
-
     def __number_of_files(self):
         """The number of files in this directory, including the ".." for the parent
             directory if this isn't the top directory on the SD card."""
         self.__get_files()
         return len(self.files)
-
 
     def __get_files(self):
         """Return a list of the files in this directory.
@@ -113,7 +107,6 @@ class DirectoryNode(object):
                 if self.__is_dir(self.__make_path(name)):
                     self.files[index] = name + "/"
 
-
     def __update_display(self):
         """Update the displayed list of files if required."""
         if self.top_offset != self.old_top_offset:
@@ -124,16 +117,16 @@ class DirectoryNode(object):
             self.display.show()
             self.old_top_offset = self.top_offset
 
-
     def __update_selection(self):
         """Update the selected file lighlight if required."""
         if self.selected_offset != self.old_selected_offset:
             if self.old_selected_offset > -1:
-                self.display.text(">", 0, (self.old_selected_offset - self.top_offset) * 8, 0)
-            self.display.text(">", 0, (self.selected_offset - self.top_offset) * 8, 1)
+                self.display.text(
+                    ">", 0, (self.old_selected_offset - self.top_offset) * 8, 0)
+            self.display.text(
+                ">", 0, (self.selected_offset - self.top_offset) * 8, 1)
             self.display.show()
             self.old_selected_offset = self.selected_offset
-
 
     def __is_directory_name(self, filename):
         """Is a filename the name of a directory.
@@ -141,19 +134,16 @@ class DirectoryNode(object):
         """
         return filename[-1] == '/'
 
-
     @property
     def selected_filename(self):
         """The name of the currently selected file in this directory."""
         self.__get_files()
         return self.files[self.selected_offset]
 
-
     @property
     def selected_filepath(self):
         """The full path of the currently selected file in this directory."""
         return self.__make_path(self.selected_filename)
-
 
     def force_update(self):
         """Force an update of the file list and selected file highlight."""
@@ -161,7 +151,6 @@ class DirectoryNode(object):
         self.old_top_offset = -1
         self.__update_display()
         self.__update_selection()
-
 
     def down(self):
         """Move down in the file list if possible, adjusting the selected file indicator
@@ -173,7 +162,6 @@ class DirectoryNode(object):
                 self.__update_display()
         self.__update_selection()
 
-
     def up(self):
         """Move up in the file list if possible, adjusting the selected file indicator
            and scrolling the display as required."""
@@ -183,7 +171,6 @@ class DirectoryNode(object):
                 self.top_offset -= 1
                 self.__update_display()
         self.__update_selection()
-
 
     def click(self):
         """Handle a selection and return the new current directory.
@@ -196,7 +183,8 @@ class DirectoryNode(object):
                 self.__cleanup()
                 return p
         elif self.__is_directory_name(self.selected_filename):
-            new_node = DirectoryNode(self.display, self, self.selected_filename)
+            new_node = DirectoryNode(
+                self.display, self, self.selected_filename)
             new_node.force_update()
             return new_node
         return self

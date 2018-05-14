@@ -1,8 +1,9 @@
-import digitalio
-from board import *
 import time
+
+import digitalio
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keycode import Keycode
+from board import *
 
 # A simple neat keyboard demo in circuitpython
 

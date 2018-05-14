@@ -1,9 +1,10 @@
 import time
-import adafruit_sdcard
+
 import adafruit_am2320
+import adafruit_sdcard
+import analogio
 import board
 import busio
-import analogio
 import digitalio
 import storage
 
@@ -42,7 +43,7 @@ while True:
             print("VBat voltage: {:.2f}".format(battery_voltage))
             print()
             sdc.write("{}, {}, {}, {:.2f}\n".format(int(time_stamp), temperature,
-                                                        humidity, battery_voltage))
+                                                    humidity, battery_voltage))
         time.sleep(3)
     except OSError:
         pass

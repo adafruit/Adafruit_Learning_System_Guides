@@ -1,8 +1,9 @@
-import time
 import random
+import time
+
 import board
-import neopixel
 import digitalio
+import neopixel
 
 pixel_pin = board.D10  # The pin the NeoPixels are connected to
 button_switch_pin = board.D9  # Pin button is attached to
@@ -10,7 +11,8 @@ vibration_switch_pin = board.D7  # Pin vibration switch is attached to.
 pixel_count = 40  # Number of pixels in your strip
 chase_color_duration = 3  # Time in seconds each color lasts in the color chase mode
 
-pixels = neopixel.NeoPixel(pixel_pin, pixel_count, brightness=.4, auto_write=False)
+pixels = neopixel.NeoPixel(pixel_pin, pixel_count,
+                           brightness=.4, auto_write=False)
 
 button_switch = digitalio.DigitalInOut(button_switch_pin)
 button_switch.direction = digitalio.Direction.INPUT
@@ -69,7 +71,6 @@ def sparkle_code(color_values):
 
 fade = fade_control()
 
-
 flash_color = cycle_sequence([RED, YELLOW, ORANGE, GREEN, TEAL, CYAN,
                               BLUE, PURPLE, MAGENTA, WHITE])
 
@@ -121,7 +122,8 @@ while True:
         if mode == 1 and not vibration_switch.value:
             print("Sparkle mode activate!")
             pixels.brightness = 1
-            sparkle_color_index = (sparkle_color_index + 1) % len(sparkle_color_list)
+            sparkle_color_index = (
+                                      sparkle_color_index + 1) % len(sparkle_color_list)
             sparkle_code(sparkle_color_list[sparkle_color_index])
         if mode == 2 and not vibration_switch.value:
             print("Chase mode activate!")
@@ -135,7 +137,8 @@ while True:
             pixels.show()
             offset += 1
             if now >= chase_next_color:
-                chase_color_index = (chase_color_index + 1) % len(chase_color_list)
+                chase_color_index = (chase_color_index +
+                                     1) % len(chase_color_list)
                 chase_color_cycle = chase_color_list[chase_color_index]
                 pixels.fill((0, 0, 0))
                 chase_last_color = now

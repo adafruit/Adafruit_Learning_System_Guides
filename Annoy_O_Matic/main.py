@@ -1,8 +1,9 @@
 # Annoy-O-Matic Sound Prank Device
 # choose from a variety of sounds and timings to drive your victim bonkers
-import pulseio
-import board
 import time
+
+import board
+import pulseio
 
 piezo = pulseio.PWMOut(board.D0, duty_cycle=0, frequency=440,
                        variable_frequency=True)
@@ -35,23 +36,25 @@ ringtone_tempo = 1.6  # suggested Nokia 0.9 , iPhone 1.3 , Rickroll 2.0
 def annoy_beep(frequency, length, repeat, rest, interval):
     for r in range(repeat):
         piezo.frequency = frequency  # 2600 is a nice choice
-        piezo.duty_cycle = 65536//2  # on 50%
+        piezo.duty_cycle = 65536 // 2  # on 50%
         time.sleep(length)  # sound on
         piezo.duty_cycle = 0  # off
         time.sleep(rest)
     time.sleep(interval)  # wait time until next beep
 
+
 def annoy_doorbell(interval):
     piezo.frequency = 740
-    piezo.duty_cycle = 65536//2
+    piezo.duty_cycle = 65536 // 2
     time.sleep(0.85)
     piezo.duty_cycle = 0
     time.sleep(0.05)
     piezo.frequency = 588
-    piezo.duty_cycle = 65536//2
+    piezo.duty_cycle = 65536 // 2
     time.sleep(1.25)
     piezo.duty_cycle = 0
     time.sleep(interval)
+
 
 def annoy_ringtone(ringtone, tempo, interval):
     # ringtone 1: Nokia
@@ -135,7 +138,7 @@ def annoy_ringtone(ringtone, tempo, interval):
     C6 = C5 * 2
     Cs6 = Cs5 * 2
     Db6 = Db5 * 2
-    D6 = D5  * 2
+    D6 = D5 * 2
     Ds6 = Ds5 * 2
     Eb6 = Eb5 * 2
     E6 = E5 * 2
@@ -162,7 +165,7 @@ def annoy_ringtone(ringtone, tempo, interval):
 
         for n in range(len(nokia_ringtone)):
             piezo.frequency = (nokia_ringtone[n][0])
-            piezo.duty_cycle = 65536//2  # on 50%
+            piezo.duty_cycle = 65536 // 2  # on 50%
             time.sleep(nokia_ringtone[n][1])  # note duration
             piezo.duty_cycle = 0  # off
             time.sleep(0.01)
@@ -178,51 +181,54 @@ def annoy_ringtone(ringtone, tempo, interval):
 
         for n in range(len(iPhone_ringtone)):
             piezo.frequency = (iPhone_ringtone[n][0])
-            piezo.duty_cycle = 65536//2  # on 50%
+            piezo.duty_cycle = 65536 // 2  # on 50%
             time.sleep(iPhone_ringtone[n][1])  # note duration
             piezo.duty_cycle = 0  # off
             time.sleep(0.01)
 
     if ringtone == 3:
         # Rickroll
-        rick_ringtone =   [[A3, sixteenth_note], [B3, sixteenth_note],
-                           [D4, sixteenth_note], [B3, sixteenth_note],
-                           [Fs4, dotted_eighth_note], [Fs4, sixteenth_note],
-                           [Fs4, eighth_note], [E4, eighth_note],
-                           [E4, quarter_note],
-                           [A3, sixteenth_note], [B3, sixteenth_note],
-                           [Cs4, sixteenth_note], [A3, sixteenth_note],
-                           [E4, dotted_eighth_note], [E4, sixteenth_note],
-                           [E4, eighth_note], [D4, eighth_note],
-                           [D4, sixteenth_note], [Cs4, sixteenth_note],
-                           [B3, eighth_note]]
+        rick_ringtone = [[A3, sixteenth_note], [B3, sixteenth_note],
+                         [D4, sixteenth_note], [B3, sixteenth_note],
+                         [Fs4, dotted_eighth_note], [Fs4, sixteenth_note],
+                         [Fs4, eighth_note], [E4, eighth_note],
+                         [E4, quarter_note],
+                         [A3, sixteenth_note], [B3, sixteenth_note],
+                         [Cs4, sixteenth_note], [A3, sixteenth_note],
+                         [E4, dotted_eighth_note], [E4, sixteenth_note],
+                         [E4, eighth_note], [D4, eighth_note],
+                         [D4, sixteenth_note], [Cs4, sixteenth_note],
+                         [B3, eighth_note]]
 
         for n in range(len(rick_ringtone)):
             piezo.frequency = (rick_ringtone[n][0])
-            piezo.duty_cycle = 65536//2  # on 50%
+            piezo.duty_cycle = 65536 // 2  # on 50%
             time.sleep(rick_ringtone[n][1])  # note duration
             piezo.duty_cycle = 0  # off
             time.sleep(0.035)
 
     time.sleep(interval)
 
+
 def annoy_crickets(repeat, interval):
     for i in range(repeat):
         for r in range(6):
             piezo.frequency = 8000  # 2600 is a nice choice
-            piezo.duty_cycle = 65536//2  # on 50%
+            piezo.duty_cycle = 65536 // 2  # on 50%
             time.sleep(0.02)  # sound on
             piezo.duty_cycle = 0  # off
             time.sleep(0.05)
         time.sleep(0.2)
     time.sleep(interval)  # wait time until next beep
 
+
 def annoy_teen_tone(interval):
     piezo.frequency = 17400
-    piezo.duty_cycle = 65536//2  # on 50%
+    piezo.duty_cycle = 65536 // 2  # on 50%
     time.sleep(10)
     piezo.duty_cycle = 0
     time.sleep(interval)
+
 
 while True:
     if annoy_mode is 1:

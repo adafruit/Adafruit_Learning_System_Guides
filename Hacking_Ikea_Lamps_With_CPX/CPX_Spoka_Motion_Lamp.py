@@ -1,4 +1,5 @@
 import time
+
 from adafruit_circuitplayground.express import cpx
 
 
@@ -8,12 +9,12 @@ def wheel(pos):
     if pos < 0 or pos > 255:
         return 0, 0, 0
     if pos < 85:
-        return int(255 - pos*3), int(pos*3), 0
+        return int(255 - pos * 3), int(pos * 3), 0
     if pos < 170:
         pos -= 85
-        return 0, int(255 - pos*3), int(pos*3)
+        return 0, int(255 - pos * 3), int(pos * 3)
     pos -= 170
-    return int(pos * 3), 0, int(255 - (pos*3))
+    return int(pos * 3), 0, int(255 - (pos * 3))
 
 
 # pylint: disable=redefined-outer-name
@@ -27,6 +28,8 @@ def right_side(x, y, z):
 
 def left_side(x, y, z):
     return abs(9.8 - x) < accel_threshold and abs(y) < accel_threshold and abs(z) < accel_threshold
+
+
 # pylint: enable=redefined-outer-name
 
 
@@ -54,13 +57,13 @@ def brightness_lamp():
 
 color_sequences = cycle_sequence([
     range(256),  # rainbow_cycle
-    [0],         # red
-    [10],        # orange
-    [30],        # yellow
-    [85],        # green
-    [137],       # cyan
-    [170],       # blue
-    [213],       # purple
+    [0],  # red
+    [10],  # orange
+    [30],  # yellow
+    [85],  # green
+    [137],  # cyan
+    [170],  # blue
+    [213],  # purple
     [0, 10, 30, 85, 137, 170, 213],  # party mode
 ])
 

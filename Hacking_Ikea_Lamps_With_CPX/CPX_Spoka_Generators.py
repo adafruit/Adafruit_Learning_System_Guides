@@ -1,5 +1,8 @@
 import time
+
 from adafruit_circuitplayground.express import cpx
+
+
 # pylint: disable=stop-iteration-return
 
 
@@ -9,12 +12,12 @@ def wheel(pos):
     if pos < 0 or pos > 255:
         return 0, 0, 0
     if pos < 85:
-        return int(255 - pos*3), int(pos*3), 0
+        return int(255 - pos * 3), int(pos * 3), 0
     if pos < 170:
         pos -= 85
-        return 0, int(255 - pos*3), int(pos*3)
+        return 0, int(255 - pos * 3), int(pos * 3)
     pos -= 170
-    return int(pos * 3), 0, int(255 - (pos*3))
+    return int(pos * 3), 0, int(255 - (pos * 3))
 
 
 def cycle_sequence(seq):
@@ -32,13 +35,13 @@ def rainbow_lamp(seq):
 
 color_sequences = cycle_sequence([
     range(256),  # rainbow_cycle
-    [0],         # red
-    [10],        # orange
-    [30],        # yellow
-    [85],        # green
-    [137],       # cyan
-    [170],       # blue
-    [213],       # purple
+    [0],  # red
+    [10],  # orange
+    [30],  # yellow
+    [85],  # green
+    [137],  # cyan
+    [170],  # blue
+    [213],  # purple
     [0, 10, 30, 85, 137, 170, 213],  # party mode
 ])
 

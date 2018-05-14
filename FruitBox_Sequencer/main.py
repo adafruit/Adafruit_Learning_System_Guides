@@ -2,8 +2,9 @@
 # for Adafruit Circuit Playground express
 # with CircuitPython
 
-from adafruit_circuitplayground.express import cpx
 import time
+
+from adafruit_circuitplayground.express import cpx
 
 # Change this number to adjust touch sensitivity threshold, 0 is default
 cpx.adjust_touch_threshold(600)
@@ -39,6 +40,7 @@ step_pixel = [9, 8, 7, 6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
 
 # step colors
 step_col = [WHITE, RED, YELLOW, GREEN, AQUA, BLUE, PURPLE, BLACK]
+
 
 def prog_mode(i):
     cpx.play_file(audio_files[i])

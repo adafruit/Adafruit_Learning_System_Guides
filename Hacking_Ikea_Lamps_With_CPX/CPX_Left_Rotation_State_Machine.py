@@ -1,5 +1,8 @@
 import time
+
 from adafruit_circuitplayground.express import cpx
+
+
 # pylint: disable=redefined-outer-name
 
 

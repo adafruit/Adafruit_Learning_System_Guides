@@ -1,7 +1,8 @@
-from digitalio import DigitalInOut, Direction
+import time
+
 import board
 import neopixel
-import time
+from digitalio import DigitalInOut, Direction
 
 pixpin = board.D1
 numpix = 8
@@ -18,17 +19,17 @@ def wheel(pos):
     if (pos < 0) or (pos > 255):
         return (0, 0, 0)
     if (pos < 85):
-        return (int(pos * 3), int(255 - (pos*3)), 0)
+        return (int(pos * 3), int(255 - (pos * 3)), 0)
     elif (pos < 170):
         pos -= 85
-        return (int(255 - pos*3), 0, int(pos*3))
+        return (int(255 - pos * 3), 0, int(pos * 3))
     else:
         pos -= 170
-        return (0, int(pos*3), int(255 - pos*3))
+        return (0, int(pos * 3), int(255 - pos * 3))
 
 
 def rainbow_cycle(wait):
-    for j in range(255*5):
+    for j in range(255 * 5):
         for i in range(len(strip)):
             idx = int((i * 256 / len(strip)) + j)
             strip[i] = wheel(idx & 255)
@@ -38,7 +39,7 @@ def rainbow_cycle(wait):
 def rainbow(wait):
     for j in range(255):
         for i in range(len(strip)):
-            idx = int(i+j)
+            idx = int(i + j)
             strip[i] = wheel(idx & 255)
 
 

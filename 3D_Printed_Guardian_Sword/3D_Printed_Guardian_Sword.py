@@ -1,17 +1,18 @@
 # 3D_Printed_Guardian_Sword
 # https://learn.adafruit.com/breath-of-the-wild-guardian-sword-led-3d-printed
 
-import board
-import neopixel
 import time
 
-pin = board.D4      # DIGITAL IO pin for NeoPixel OUTPUT from GEMMA
-pixel_count = 93    # number of neopixels
-delayval = .01      # 10 ms delay
+import board
+import neopixel
 
-APIXELS = 14        # number of first orange pixels
-BPIXELS = 84        # number of blue pixels
-CPIXELS = 93        # second orange pixels
+pin = board.D4  # DIGITAL IO pin for NeoPixel OUTPUT from GEMMA
+pixel_count = 93  # number of neopixels
+delayval = .01  # 10 ms delay
+
+APIXELS = 14  # number of first orange pixels
+BPIXELS = 84  # number of blue pixels
+CPIXELS = 93  # second orange pixels
 
 # initialize neopixels
 pixels = neopixel.NeoPixel(pin, pixel_count, brightness=1, auto_write=False)

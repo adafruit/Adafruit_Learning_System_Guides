@@ -34,40 +34,39 @@ import busio
 import digitalio
 import touchio
 
-
 # Variables that control the code.  Try changing these to modify speed, color,
 # etc.
-START_DELAY = 5.0       # How many seconds to wait after power up before
-                        # jumping into the animation and initializing the
-                        # touch input.  This gives you time to take move your
-                        # fingers off the flower so the capacitive touch
-                        # sensing is better calibrated.  During the delay
-                        # the small red LED on the board will flash.
+START_DELAY = 5.0  # How many seconds to wait after power up before
+# jumping into the animation and initializing the
+# touch input.  This gives you time to take move your
+# fingers off the flower so the capacitive touch
+# sensing is better calibrated.  During the delay
+# the small red LED on the board will flash.
 
-TOUCH_PIN = board.D0    # The board pin to listen for touches and trigger the
-                        # heart beat animation.  You can change this to any
-                        # other pin like board.D2 or board.D1.  Make sure not
-                        # to touch this pin as the board powers on or the
-                        # capacitive sensing will get confused (just reset
-                        # the board and try again).
+TOUCH_PIN = board.D0  # The board pin to listen for touches and trigger the
+# heart beat animation.  You can change this to any
+# other pin like board.D2 or board.D1.  Make sure not
+# to touch this pin as the board powers on or the
+# capacitive sensing will get confused (just reset
+# the board and try again).
 
-BRIGHTNESS = 1.0        # The brightness of the colors.  Set this to a value
-                        # anywhere within 0 and 1.0, where 1.0 is full bright.
-                        # For example 0.5 would be half brightness.
+BRIGHTNESS = 1.0  # The brightness of the colors.  Set this to a value
+# anywhere within 0 and 1.0, where 1.0 is full bright.
+# For example 0.5 would be half brightness.
 
-RAINBOW_PERIOD_S = 18.0 # How many seconds it takes for the default rainbow
-                        # cycle animation to perform a full cycle.  Increase
-                        # this to slow down the animation or decrease to speed
-                        # it up.
+RAINBOW_PERIOD_S = 18.0  # How many seconds it takes for the default rainbow
+# cycle animation to perform a full cycle.  Increase
+# this to slow down the animation or decrease to speed
+# it up.
 
-HEARTBEAT_BPM = 60.0    # Heartbeat animation beats per minute.  Increase to
-                        # speed up the heartbeat, and decrease to slow down.
+HEARTBEAT_BPM = 60.0  # Heartbeat animation beats per minute.  Increase to
+# speed up the heartbeat, and decrease to slow down.
 
-HEARTBEAT_HUE = 300.0   # The color hue to use when animating the heartbeat
-                        # animation.  Pick a value in the range of 0 to 359
-                        # degrees, see the hue spectrum here:
-                        #   https://en.wikipedia.org/wiki/Hue
-                        # A value of 300 is a nice pink color.
+HEARTBEAT_HUE = 300.0  # The color hue to use when animating the heartbeat
+# animation.  Pick a value in the range of 0 to 359
+# degrees, see the hue spectrum here:
+#   https://en.wikipedia.org/wiki/Hue
+# A value of 300 is a nice pink color.
 
 # First initialize the DotStar LED and turn it off.
 # We'll manually drive the dotstar instead of depending on the adafruit_dotstar
@@ -78,7 +77,11 @@ dotstar_spi = busio.SPI(clock=board.APA102_SCK, MOSI=board.APA102_MOSI)
 # pixel data, followed by bytes of 0xFF tail (just one for 1 pixel).
 dotstar_data = bytearray([0x00, 0x00, 0x00, 0x00, 0xFF, 0x00, 0x00, 0x00,
                           0xFF])
+
+
 # Define a function to simplify setting dotstar color.
+
+
 def dotstar_color(rgb_color):
     # Set the color of the dot star LED.  This is barebones dotstar driving
     # code for simplicity and less dependency on other libraries.  We're only
@@ -93,6 +96,8 @@ def dotstar_color(rgb_color):
         dotstar_spi.write(dotstar_data)
     finally:
         dotstar_spi.unlock()
+
+
 # Call the function above to turn off the dotstar initially (set it to all 0).
 dotstar_color((0, 0, 0))
 
@@ -115,23 +120,24 @@ while time.monotonic() - start <= START_DELAY:
 touch = touchio.TouchIn(TOUCH_PIN)
 
 # Convert periods to frequencies that are used later in animations.
-rainbow_freq = 1.0/RAINBOW_PERIOD_S
+rainbow_freq = 1.0 / RAINBOW_PERIOD_S
 
 # Calculcate periods and values used by the heartbeat animation.
-beat_period = 60.0/HEARTBEAT_BPM
-beat_quarter_period = beat_period/4.0  # Quarter period controls the speed of
-                                       # the heartbeat drop-off (using an
-                                       # exponential decay function).
-beat_phase = beat_period/5.0           # Phase controls how long in-between
-                                       # the two parts of the heart beat
-                                       # (the 'ba-boom' of the beat).
+beat_period = 60.0 / HEARTBEAT_BPM
+beat_quarter_period = beat_period / 4.0  # Quarter period controls the speed of
+# the heartbeat drop-off (using an
+# exponential decay function).
+beat_phase = beat_period / 5.0  # Phase controls how long in-between
+# the two parts of the heart beat
+# (the 'ba-boom' of the beat).
 
 # Define a gamma correction lookup table to make colors more accurate.
 # See this guide for more background on gamma correction:
 #   https://learn.adafruit.com/led-tricks-gamma-correction/
 gamma8 = bytearray(256)
 for i in range(len(gamma8)):
-    gamma8[i] = int(math.pow(i/255.0, 2.8)*255.0+0.5) & 0xFF
+    gamma8[i] = int(math.pow(i / 255.0, 2.8) * 255.0 + 0.5) & 0xFF
+
 
 # Define a function to convert from HSV (hue, saturation, value) color to
 # RGB colors that DotStar LEDs speak.  The HSV color space is a nicer for
@@ -140,6 +146,8 @@ for i in range(len(gamma8)):
 # value that range from 0 to 1.0.  This will also use the gamma correction
 # table above to get the most accurate color.  Adapted from C/C++ code here:
 #   https://www.cs.rit.edu/~ncs/color/t_convert.html
+
+
 def HSV_to_RGB(h, s, v):
     r = 0
     g = 0
@@ -149,9 +157,9 @@ def HSV_to_RGB(h, s, v):
         g = v
         b = v
     else:
-        h /= 60.0       # sector 0 to 5
+        h /= 60.0  # sector 0 to 5
         i = int(math.floor(h))
-        f = h - i       # factorial part of h
+        f = h - i  # factorial part of h
         p = v * (1.0 - s)
         q = v * (1.0 - s * f)
         t = v * (1.0 - s * (1.0 - f))
@@ -179,18 +187,22 @@ def HSV_to_RGB(h, s, v):
             r = v
             g = p
             b = q
-    r = gamma8[int(255.0*r)]
-    g = gamma8[int(255.0*g)]
-    b = gamma8[int(255.0*b)]
+    r = gamma8[int(255.0 * r)]
+    g = gamma8[int(255.0 * g)]
+    b = gamma8[int(255.0 * b)]
     return (r, g, b)
+
 
 # Another handy function for linear interpolation of a value.  Pass in a value
 # x that's within the range x0...x1 and a range y0...y1 to get an output value
 # y that's proportionally within y0...y1 based on x within x0...x1.  Handy for
 # transforming a value in one range to a value in another (like Arduino's map
 # function).
+
+
 def lerp(x, x0, x1, y0, y1):
-    return y0+(x-x0)*((y1-y0)/(x1-x0))
+    return y0 + (x - x0) * ((y1 - y0) / (x1 - x0))
+
 
 # Main loop below will run forever:
 while True:
@@ -209,8 +221,8 @@ while True:
         # out of phase so one occurs a little bit after the other.
         t0 = current % beat_period
         t1 = (current + beat_phase) % beat_period
-        x0 = math.pow(math.e, -t0/beat_quarter_period)
-        x1 = math.pow(math.e, -t1/beat_quarter_period)
+        x0 = math.pow(math.e, -t0 / beat_quarter_period)
+        x1 = math.pow(math.e, -t1 / beat_quarter_period)
         # After calculating both exponential decay values pick the biggest one
         # as the secondary one will occur after the first.  Scale each by
         # the global brightness and then convert to RGB color using the fixed
@@ -225,7 +237,7 @@ while True:
         # compute the hue with a smooth cycle over time.
         # First use the sine function to smoothly generate a value that goes
         # from -1.0 to 1.0 at a certain frequency to match the rainbow period.
-        x = math.sin(2.0*math.pi*rainbow_freq*current)
+        x = math.sin(2.0 * math.pi * rainbow_freq * current)
         # Then compute the hue by converting the sine wave value from something
         # that goes from -1.0 to 1.0 to instead go from 0 to 359 degrees.
         hue = lerp(x, -1.0, 1.0, 0.0, 359.0)

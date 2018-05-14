@@ -27,27 +27,27 @@
 # Modified fromhere code by Greg Shakar
 # Ported to Circuit Python by Mikey Sklar
 
+import time
+
 import board
 import neopixel
-import time
 from analogio import AnalogIn
-import array
 
-n_pixels = 16                    # Number of pixels you are using
-mic_pin = AnalogIn(board.A1)    # Microphone is attached to this analog pin
-led_pin = board.D1              # NeoPixel LED strand is connected to this pin
-sample_window = .1                  # Sample window for average level
-peak_hang = 24                      # Time of pause before peak dot falls
-peak_fall = 4                       # Rate of falling peak dot
-input_floor = 10                    # Lower range of analogRead input
+n_pixels = 16  # Number of pixels you are using
+mic_pin = AnalogIn(board.A1)  # Microphone is attached to this analog pin
+led_pin = board.D1  # NeoPixel LED strand is connected to this pin
+sample_window = .1  # Sample window for average level
+peak_hang = 24  # Time of pause before peak dot falls
+peak_fall = 4  # Rate of falling peak dot
+input_floor = 10  # Lower range of analogRead input
 # Max range of analogRead input, the lower the value the more sensitive (1023 = max)
 input_ceiling = 300
 
-peak = 16                           # Peak level of column; used for falling dots
+peak = 16  # Peak level of column; used for falling dots
 sample = 0
 
-dotcount = 0                        # Frame counter for peak dot
-dothangcount = 0                    # Frame counter for holding peak dot
+dotcount = 0  # Frame counter for peak dot
+dothangcount = 0  # Frame counter for holding peak dot
 
 strip = neopixel.NeoPixel(led_pin, n_pixels, brightness=1, auto_write=False)
 
@@ -58,13 +58,13 @@ def wheel(pos):
     if (pos < 0) or (pos > 255):
         return (0, 0, 0)
     if (pos < 85):
-        return (int(pos * 3), int(255 - (pos*3)), 0)
+        return (int(pos * 3), int(255 - (pos * 3)), 0)
     elif (pos < 170):
         pos -= 85
-        return (int(255 - pos*3), 0, int(pos*3))
+        return (int(255 - pos * 3), 0, int(pos * 3))
     else:
         pos -= 170
-        return (0, int(pos*3), int(255 - pos*3))
+        return (0, int(pos * 3), int(255 - pos * 3))
 
 
 def remapRange(value, leftMin, leftMax, rightMin, rightMax):
@@ -125,18 +125,17 @@ def fscale(originalmin, originalmax, newbegin, newend, inputvalue, curve):
     # -the math for all other cases
     # i.e. negative numbers seems to work out fine
     if (originalmin > originalmax):
-        return(0)
+        return (0)
 
     if (invflag == 0):
         rangedvalue = (pow(normalizedcurval, curve) * newrange) + newbegin
-    else:         # invert the ranges
+    else:  # invert the ranges
         rangedvalue = newbegin - (pow(normalizedcurval, curve) * newrange)
 
-    return(rangedvalue)
+    return (rangedvalue)
 
 
 def drawLine(fromhere, to):
-
     fromheretemp = 0
 
     if (fromhere > to):
@@ -150,8 +149,8 @@ def drawLine(fromhere, to):
 
 while True:
 
-    time_start = time.monotonic()   # current time used for sample window
-    peaktopeak = 0                  # peak-to-peak level
+    time_start = time.monotonic()  # current time used for sample window
+    peaktopeak = 0  # peak-to-peak level
     signalmax = 0
     signalmin = 1023
     c = 0
@@ -163,12 +162,12 @@ while True:
         # convert to arduino 10-bit [1024] fromhere 16-bit [65536]
         sample = mic_pin.value / 64
 
-        if (sample < 1024):         # toss out spurious readings
+        if (sample < 1024):  # toss out spurious readings
 
             if (sample > signalmax):
-                signalmax = sample      # save just the max levels
+                signalmax = sample  # save just the max levels
             elif (sample < signalmin):
-                signalmin = sample      # save just the min levels
+                signalmin = sample  # save just the min levels
 
     peaktopeak = signalmax - signalmin  # max - min = peak-peak amplitude
 
@@ -180,10 +179,10 @@ while True:
     c = fscale(input_floor, input_ceiling, (n_pixels - 1), 0, peaktopeak, 2)
 
     if (c < peak):
-        peak = c                # keep dot on top
-        dothangcount = 0        # make the dot hang before falling
+        peak = c  # keep dot on top
+        dothangcount = 0  # make the dot hang before falling
 
-    if (c <= n_pixels):         # fill partial column with off pixels
+    if (c <= n_pixels):  # fill partial column with off pixels
         drawLine(n_pixels, n_pixels - int(c))
 
     # Set the peak dot to match the rainbow gradient
@@ -192,8 +191,8 @@ while True:
     strip.write()
 
     # Frame based peak dot animation
-    if(dothangcount > peak_hang):           # Peak pause length
-        if(++dotcount >= peak_fall):        # Fall rate
+    if (dothangcount > peak_hang):  # Peak pause length
+        if (++dotcount >= peak_fall):  # Fall rate
             peak += 1
             dotcount = 0
     else:

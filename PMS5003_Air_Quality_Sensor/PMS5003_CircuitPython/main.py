@@ -18,13 +18,13 @@ buffer = []
 while True:
     data = uart.read(32)  # read up to 32 bytes
     data = list(data)
-    #print("read: ", data)          # this is a bytearray type
+    # print("read: ", data)          # this is a bytearray type
 
     buffer += data
-    
+
     while buffer and buffer[0] != 0x42:
         buffer.pop(0)
-    
+
     if len(buffer) > 200:
         buffer = []   # avoid an overrun if all bad data
     if len(buffer) < 32:
@@ -44,14 +44,15 @@ while True:
     pm10_standard, pm25_standard, pm100_standard, pm10_env, pm25_env, pm100_env, particles_03um, particles_05um, particles_10um, particles_25um, particles_50um, particles_100um, skip, checksum = frame
 
     check = sum(buffer[0:30])
-    
+
     if check != checksum:
         buffer = []
         continue
 
     print("Concentration Units (standard)")
     print("---------------------------------------")
-    print("PM 1.0: %d\tPM2.5: %d\tPM10: %d" % (pm10_standard, pm25_standard, pm100_standard))
+    print("PM 1.0: %d\tPM2.5: %d\tPM10: %d" %
+          (pm10_standard, pm25_standard, pm100_standard))
     print("Concentration Units (environmental)")
     print("---------------------------------------")
     print("PM 1.0: %d\tPM2.5: %d\tPM10: %d" % (pm10_env, pm25_env, pm100_env))

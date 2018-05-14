@@ -1,8 +1,9 @@
 """Interactive light show using built-in LED and capacitive touch"""
 import time
+
 import adafruit_dotstar
-import touchio
 import board
+import touchio
 
 led = adafruit_dotstar.DotStar(board.APA102_SCK, board.APA102_MOSI, 1)
 touch_A0 = touchio.TouchIn(board.A0)
@@ -58,7 +59,6 @@ color_sequences = cycle_sequence(
         [170],  # blue
     ]
 )
-
 
 cycle_speeds = cycle_sequence([0.1, 0.3, 0.5])
 

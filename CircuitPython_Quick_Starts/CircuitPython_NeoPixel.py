@@ -1,13 +1,15 @@
 # CircuitPython demo - NeoPixel
 
 import time
+
 import board
 import neopixel
 
 pixel_pin = board.A1
 num_pixels = 8
 
-pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=0.3, auto_write=False)
+pixels = neopixel.NeoPixel(pixel_pin, num_pixels,
+                           brightness=0.3, auto_write=False)
 
 
 def wheel(pos):
@@ -51,7 +53,8 @@ PURPLE = (180, 0, 255)
 while True:
     pixels.fill(RED)
     pixels.show()
-    time.sleep(1)  # Increase or decrease to change the speed of the solid color change.
+    # Increase or decrease to change the speed of the solid color change.
+    time.sleep(1)
     pixels.fill(GREEN)
     pixels.show()
     time.sleep(1)

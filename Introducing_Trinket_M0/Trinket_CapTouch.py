@@ -1,8 +1,9 @@
 # Trinket IO demo - captouch
 
-import touchio
-import board
 import time
+
+import board
+import touchio
 
 touch0 = touchio.TouchIn(board.D1)
 touch1 = touchio.TouchIn(board.D3)

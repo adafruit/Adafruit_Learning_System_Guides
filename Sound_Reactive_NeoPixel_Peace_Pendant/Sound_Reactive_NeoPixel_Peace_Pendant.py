@@ -62,7 +62,8 @@ while True:
     if n >= noise:  # Remove noise/hum
         n = n - noise
 
-    lvl = int(((lvl * 7) + n) / 8)  # "Dampened" reading (else looks twitchy) - divide by 8 (2^3)
+    # "Dampened" reading (else looks twitchy) - divide by 8 (2^3)
+    lvl = int(((lvl * 7) + n) / 8)
 
     # Calculate bar height based on dynamic min/max levels (fixed point):
     height = top * (lvl - min_level_avg) / (max_level_avg - min_level_avg)
@@ -112,7 +113,9 @@ while True:
     if (max_level - min_level) < top:
         max_level = min_level + top
 
-    min_level_avg = (min_level_avg * 63 + min_level) >> 6  # Dampen min/max levels - divide by 64 (2^6)
-    max_level_avg = (max_level_avg * 63 + max_level) >> 6  # fake rolling average - divide by 64 (2^6)
+    # Dampen min/max levels - divide by 64 (2^6)
+    min_level_avg = (min_level_avg * 63 + min_level) >> 6
+    # fake rolling average - divide by 64 (2^6)
+    max_level_avg = (max_level_avg * 63 + max_level) >> 6
 
     print(n)
