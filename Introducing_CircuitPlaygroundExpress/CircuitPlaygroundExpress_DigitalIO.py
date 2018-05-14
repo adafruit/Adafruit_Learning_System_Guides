@@ -13,7 +13,7 @@ button.direction = Direction.INPUT
 button.pull = Pull.DOWN
 
 while True:
-    if button.value == True:  # button is pushed
+    if button.value:  # button is pushed
         led.value = True
     else:
         led.value = False
