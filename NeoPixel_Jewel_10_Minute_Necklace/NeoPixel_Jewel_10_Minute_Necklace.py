@@ -24,14 +24,14 @@ def wheel(pos):
     # The colours are a transition r - g - b - back to r.
     if (pos < 0) or (pos > 255):
         return (0, 0, 0)
-    if (pos < 85):
+    if pos < 85:
         return (int(pos * 3), int(255 - (pos * 3)), 0)
-    elif (pos < 170):
+    elif pos < 170:
         pos -= 85
         return (int(255 - pos * 3), 0, int(pos * 3))
-    else:
-        pos -= 170
-        return (0, int(pos * 3), int(255 - pos * 3))
+
+    pos -= 170
+    return (0, int(pos * 3), int(255 - pos * 3))
 
 
 def rainbow_cycle(wait):
@@ -45,9 +45,9 @@ def rainbow_cycle(wait):
 
 def rainbow(wait):
     for j in range(255):
-        for i in range(len(pixels)):
-            idx = int(i + j)
-            pixels[i] = wheel(idx & 255)
+        for index in range(len(pixels)):
+            idx = int(index + j)
+            pixels[index] = wheel(idx & 255)
         pixels.write()
         time.sleep(wait)
 
@@ -72,26 +72,26 @@ def rainbow_hold(wait):
 
 while True:
 
-    if (mode == 0):  # rainbow hold
+    if mode == 0:  # rainbow hold
         rainbow_hold(0.02)
         time.sleep(.5)
 
-    elif (mode == 1):  # rainbow cycle slow
+    elif mode == 1:  # rainbow cycle slow
         rainbow_cycle_slow(0.02)
         time.sleep(0.05)
 
-    elif (mode == 2):  # rainbow cycle fast
+    elif mode == 2:  # rainbow cycle fast
         rainbow_cycle(0.005)
         time.sleep(0.050)
 
     t = time.monotonic()
 
-    if ((t - prevtime) > 8):  # Every 8 seconds...
+    if (t - prevtime) > 8:  # Every 8 seconds...
         mode += 1  # Next mode
-        if (mode > 2):  # End of modes?
+        if mode > 2:  # End of modes?
             mode = 0  # Start modes over
 
-        if (rgb_idx > 2):  # reset R-->G-->B rotation
+        if rgb_idx > 2:  # reset R-->G-->B rotation
             rgb_idx = 0
 
         color = rgb_colors[rgb_idx]  # next color assignment

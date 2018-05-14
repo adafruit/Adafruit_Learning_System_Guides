@@ -70,9 +70,9 @@ state = bright
 
 def set_color(index):
     index = max(min(index, index_max), index_bottom)
-    if (index >= index_min):
+    if index >= index_min:
         strip[0] = [index, int((index * 3) / 8), 0]
-    elif (index < index_min):
+    elif index < index_min:
         strip[0] = [index, int((index * 3.25) / 8), 0]
 
 
@@ -83,13 +83,13 @@ while True:
     current_time = time.monotonic()
 
     # BRIGHT
-    if (state == bright):
+    if state == bright:
         flicker_msecs = random.randint(
             0, down_max_msecs - down_min_msecs) + down_min_msecs
         flicker_start = current_time
         index_start = index_end
 
-        if ((index_start > index_bottom) and (random.randint(0, 100) < index_bottom_percent)):
+        if (index_start > index_bottom) and (random.randint(0, 100) < index_bottom_percent):
             index_end = random.randint(
                 0, index_start - index_bottom) + index_bottom
         else:
@@ -98,7 +98,7 @@ while True:
         state = down
 
     # DIM
-    elif (state == dim):
+    elif state == dim:
         flicker_msecs = random.randint(
             0, up_max_msecs - up_min_msecs) + up_min_msecs
         flicker_start = current_time
@@ -107,25 +107,25 @@ while True:
         state = down
 
     # DIM_HOLD
-    elif (state == dim_hold):
+    elif state == dim_hold:
         # dividing flicker_msecs by 1000 to convert to milliseconds
-        if (current_time >= (flicker_start + (flicker_msecs / 1000))):
-            if (state == bright_hold):
+        if current_time >= (flicker_start + (flicker_msecs / 1000)):
+            if state == bright_hold:
                 state = bright
             else:
                 state = dim
 
     # DOWN
-    elif (state == down):
+    elif state == down:
         # dividing flicker_msecs by 1000 to convert to milliseconds
-        if (current_time < (flicker_start + (flicker_msecs / 1000))):
+        if current_time < (flicker_start + (flicker_msecs / 1000)):
             set_color(index_start + int(((index_end - index_start) *
                                          (((current_time - flicker_start) * 1.0) / flicker_msecs))))
         else:
             set_color(index_end)
 
-            if (state == down):
-                if (random.randint(0, 100) < dim_hold_percent):
+            if state == down:
+                if random.randint(0, 100) < dim_hold_percent:
                     flicker_start = current_time
                     flicker_msecs = random.randint(
                         0, dim_hold_max_msecs - dim_hold_min_msecs) + dim_hold_min_msecs
@@ -133,7 +133,7 @@ while True:
                 else:
                     state = dim
             else:
-                if (random.randint(0, 100) < bright_hold_percent):
+                if random.randint(0, 100) < bright_hold_percent:
                     flicker_start = current_time
                     flicker_msecs = random.randint(
                         0, bright_hold_max_msecs - bright_hold_min_msecs) + bright_hold_min_msecs

@@ -19,14 +19,14 @@ strip = neopixel.NeoPixel(pixpin, numpix, brightness=1, auto_write=False)
 
 def lerp(x, x0, x1, y0, y1):
     # Clamp x within x0 and x1 bounds.
-    if (x > x1):
+    if x > x1:
         x = x1
 
-    if (x < x0):
+    if x < x0:
         x = x0
 
     # Calculate linear interpolation of y value.
-    return (y0 + (y1 - y0) * ((x - x0) / (x1 - x0)))
+    return y0 + (y1 - y0) * ((x - x0) / (x1 - x0))
 
 
 # Set all pixels to the specified color.
@@ -67,7 +67,7 @@ def animate_gradient_fill(start_r, start_g, start_b, end_r, end_g, end_b, durati
     # Main animation loop.
     delta = time.monotonic() - start
 
-    while (delta < duration_ms):
+    while delta < duration_ms:
         # Calculate how far along we are in the duration as a position 0...1.0
         pos = delta / duration_ms
         # Get the gradient color and fill all the pixels with it.

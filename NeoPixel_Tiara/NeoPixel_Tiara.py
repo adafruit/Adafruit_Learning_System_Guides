@@ -19,7 +19,7 @@ colors = [
 
 
 def flash_random(wait, howmany):
-    for k in range(howmany):
+    for _ in range(howmany):
 
         c = random.randint(0, len(colors) - 1)  # Choose random color index
         j = random.randint(0, numpix - 1)  # Choose random pixel

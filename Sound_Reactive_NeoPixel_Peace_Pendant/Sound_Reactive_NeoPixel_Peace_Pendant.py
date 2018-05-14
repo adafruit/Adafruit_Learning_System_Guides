@@ -37,9 +37,8 @@ def wheel(pos):
     elif pos < 170:
         pos -= 85
         return (int(255 - pos * 3), 0, int(pos * 3))
-    else:
-        pos -= 170
-        return (0, int(pos * 3), int(255 - pos * 3))
+    pos -= 170
+    return (0, int(pos * 3), int(255 - pos * 3))
 
 
 def remap_range(value, leftMin, leftMax, rightMin, rightMax):

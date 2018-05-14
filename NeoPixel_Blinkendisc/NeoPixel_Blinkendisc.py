@@ -7,7 +7,7 @@ import neopixel
 
 try:
     import urandom as random  # for v1.0 API support
-except:
+except ImportError:
     import random
 
 num_leds = 24  # 24 LED NeoPixel ring
@@ -60,7 +60,7 @@ while True:  # Loop forever...
             last_vibration = t  # Save last trigger time
 
     # Stretch out frames if nothing has happened in a couple of seconds:
-    if ((t - last_vibration) > cooldown_at):
+    if (t - last_vibration) > cooldown_at:
         frame_len += 0.001  # Add 1 ms
         if frame_len > max_frame_len:
             frame_len = min_frame_len

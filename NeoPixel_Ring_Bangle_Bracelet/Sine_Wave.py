@@ -3,11 +3,6 @@ import time
 import board
 import neopixel
 
-try:
-    import urandom as random  # for v1.0 API support
-except ImportError:
-    import random
-
 numpix = 64  # Number of NeoPixels
 pixpin = board.D1  # Pin where NeoPixels are connected
 strip = neopixel.NeoPixel(pixpin, numpix, brightness=0.15)

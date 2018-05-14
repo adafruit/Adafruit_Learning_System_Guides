@@ -16,7 +16,7 @@ while True:
     signalMin = 65535
     signalMax = 0
     startTime = time.monotonic()
-    while ((time.monotonic() - startTime) < sampleWindow):
+    while (time.monotonic() - startTime) < sampleWindow:
         signal = mic.value
         if signal < signalMin:
             signalMin = signal

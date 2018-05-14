@@ -36,27 +36,27 @@ while True:
     gcolor = 0
     bcolor = 0
 
-    if (showcolor == 0):  # Garden PINK
+    if showcolor == 0:  # Garden PINK
         rcolor = 242
         gcolor = 90
         bcolor = 255
 
-    elif (showcolor == 1):  # Pixie GOLD
+    elif showcolor == 1:  # Pixie GOLD
         rcolor = 255
         gcolor = 222
         bcolor = 30
 
-    elif (showcolor == 2):  # Alchemy BLUE
+    elif showcolor == 2:  # Alchemy BLUE
         rcolor = 50
         gcolor = 255
         bcolor = 255
 
-    elif (showcolor == 3):  # Animal ORANGE
+    elif showcolor == 3:  # Animal ORANGE
         rcolor = 255
         gcolor = 100
         bcolor = 0
 
-    elif (showcolor == 4):  # Tinker GREEN
+    elif showcolor == 4:  # Tinker GREEN
         rcolor = 0
         gcolor = 255
         bcolor = 40
@@ -84,17 +84,17 @@ while True:
     newstate = button.value
 
     # Check if state changed from high to low (button press).
-    if (newstate and not oldstate):
+    if newstate and not oldstate:
         # Short delay to debounce button.
         time.sleep(0.020)
 
         # Check if button is still low after debounce.
         newstate = button.value
 
-    if (newstate == False):
+    if not newstate:
         showcolor += 1
 
-    if (showcolor > 4):
+    if showcolor > 4:
         showcolor = 0
 
     # Set the last button state to the old state.

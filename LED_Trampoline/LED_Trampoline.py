@@ -122,8 +122,7 @@ while True:
         if mode == 1 and not vibration_switch.value:
             print("Sparkle mode activate!")
             pixels.brightness = 1
-            sparkle_color_index = (
-                                      sparkle_color_index + 1) % len(sparkle_color_list)
+            sparkle_color_index = (sparkle_color_index + 1) % len(sparkle_color_list)
             sparkle_code(sparkle_color_list[sparkle_color_index])
         if mode == 2 and not vibration_switch.value:
             print("Chase mode activate!")
