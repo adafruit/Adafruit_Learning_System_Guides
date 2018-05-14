@@ -90,5 +90,5 @@ while True:
 
     # turn lights and audio on when dark
     # (less than 50% light on analog pin)
-    if (photocell.value > darkness_min):
+    if photocell.value > darkness_min:
         alien()  # close Encounters Loop
