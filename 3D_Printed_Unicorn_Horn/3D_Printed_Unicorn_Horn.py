@@ -18,9 +18,9 @@ def wheel(pos):
     # The colours are a transition r - g - b - back to r.
     if (pos < 0) or (pos > 255):
         return (0, 0, 0)
-    if (pos < 85):
-        return (int(pos * 3), int(255 - (pos * 3)), 0)
-    elif (pos < 170):
+    if pos < 85:
+        return (int(pos * 3), int(255 - (pos*3)), 0)
+    elif pos < 170:
         pos -= 85
         return (int(255 - pos * 3), 0, int(pos * 3))
     else:
@@ -41,6 +41,7 @@ def rainbow(wait):
         for i in range(len(strip)):
             idx = int(i + j)
             strip[i] = wheel(idx & 255)
+        time.sleep(wait)
 
 
 while True:

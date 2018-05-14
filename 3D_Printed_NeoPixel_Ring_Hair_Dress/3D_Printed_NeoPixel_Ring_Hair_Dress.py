@@ -163,9 +163,9 @@ def nextspectrumcolor():
 
     # spectral wipe from green to red
     if spectrum_part == 2:
-        color = (color_idx, 0, 255 - color_idx)
+        color = (color_idx, 0, 255-color_idx)
         color_idx += curr_color_granularity
-        if (color_idx > 255):
+        if color_idx > 255:
             spectrum_part = 0
             color_idx = 0
 
