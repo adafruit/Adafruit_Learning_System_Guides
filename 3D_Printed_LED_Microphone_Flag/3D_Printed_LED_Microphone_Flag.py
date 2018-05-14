@@ -33,14 +33,15 @@ import time
 from analogio import AnalogIn
 import array
 
-n_pixels    = 16                    # Number of pixels you are using
-mic_pin     = AnalogIn(board.A1)    # Microphone is attached to this analog pin
-led_pin     = board.D1              # NeoPixel LED strand is connected to this pin
+n_pixels = 16                    # Number of pixels you are using
+mic_pin = AnalogIn(board.A1)    # Microphone is attached to this analog pin
+led_pin = board.D1              # NeoPixel LED strand is connected to this pin
 sample_window = .1                  # Sample window for average level
 peak_hang = 24                      # Time of pause before peak dot falls
 peak_fall = 4                       # Rate of falling peak dot
 input_floor = 10                    # Lower range of analogRead input
-input_ceiling = 300                 # Max range of analogRead input, the lower the value the more sensitive (1023 = max)
+# Max range of analogRead input, the lower the value the more sensitive (1023 = max)
+input_ceiling = 300
 
 peak = 16                           # Peak level of column; used for falling dots
 sample = 0
@@ -49,6 +50,7 @@ dotcount = 0                        # Frame counter for peak dot
 dothangcount = 0                    # Frame counter for holding peak dot
 
 strip = neopixel.NeoPixel(led_pin, n_pixels, brightness=1, auto_write=False)
+
 
 def wheel(pos):
     # Input a value 0 to 255 to get a color value.
@@ -64,6 +66,7 @@ def wheel(pos):
         pos -= 170
         return (0, int(pos*3), int(255 - pos*3))
 
+
 def remapRange(value, leftMin, leftMax, rightMin, rightMax):
     # this remaps a value fromhere original (left) range to new (right) range
     # Figure out how 'wide' each range is
@@ -76,6 +79,7 @@ def remapRange(value, leftMin, leftMax, rightMin, rightMax):
     # Convert the 0-1 range into a value in the right range.
     return int(rightMin + (valueScaled * rightSpan))
 
+
 def fscale(originalmin, originalmax, newbegin, newend, inputvalue, curve):
     originalrange = 0
     newrange = 0
@@ -86,16 +90,17 @@ def fscale(originalmin, originalmax, newbegin, newend, inputvalue, curve):
 
     # condition curve parameter
     # limit range
-    if (curve > 10): 
+    if (curve > 10):
         curve = 10
-    if (curve < -10): 
+    if (curve < -10):
         curve = -10
 
-    # - invert and scale - 
-    # this seems more intuitive 
+    # - invert and scale -
+    # this seems more intuitive
     # postive numbers give more weight to high end on output
-    curve = (curve * -.1) 
-    curve = pow(10, curve)  # convert linear scale into lograthimic exponent for other pow function
+    curve = (curve * -.1)
+    # convert linear scale into lograthimic exponent for other pow function
+    curve = pow(10, curve)
 
     # Check for out of range inputValues
     if (inputvalue < originalmin):
@@ -114,20 +119,21 @@ def fscale(originalmin, originalmax, newbegin, newend, inputvalue, curve):
         invflag = 1
 
     zerorefcurval = inputvalue - originalmin
-    normalizedcurval  =  zerorefcurval / originalrange # normalize to 0 - 1 float
+    normalizedcurval = zerorefcurval / originalrange  # normalize to 0 - 1 float
 
-    # Check for originalMin > originalMax  
-    # -the math for all other cases 
+    # Check for originalMin > originalMax
+    # -the math for all other cases
     # i.e. negative numbers seems to work out fine
-    if (originalmin > originalmax ):
+    if (originalmin > originalmax):
         return(0)
 
     if (invflag == 0):
-        rangedvalue =  (pow(normalizedcurval, curve) * newrange) + newbegin
+        rangedvalue = (pow(normalizedcurval, curve) * newrange) + newbegin
     else:         # invert the ranges
-        rangedvalue =  newbegin - (pow(normalizedcurval, curve) * newrange);
+        rangedvalue = newbegin - (pow(normalizedcurval, curve) * newrange)
 
     return(rangedvalue)
+
 
 def drawLine(fromhere, to):
 
@@ -139,21 +145,23 @@ def drawLine(fromhere, to):
         to = fromheretemp
 
     for i in range(fromhere, to):
-        strip[i] = (0,0,0)
+        strip[i] = (0, 0, 0)
+
 
 while True:
 
     time_start = time.monotonic()   # current time used for sample window
     peaktopeak = 0                  # peak-to-peak level
     signalmax = 0
-    signalmin = 1023 
+    signalmin = 1023
     c = 0
     y = 0
 
     # collect data for length of sample window (in seconds)
-    while ( ( time.monotonic() - time_start ) < sample_window):
+    while ((time.monotonic() - time_start) < sample_window):
 
-        sample = mic_pin.value / 64 # convert to arduino 10-bit [1024] fromhere 16-bit [65536]
+        # convert to arduino 10-bit [1024] fromhere 16-bit [65536]
+        sample = mic_pin.value / 64
 
         if (sample < 1024):         # toss out spurious readings
 
@@ -171,7 +179,7 @@ while True:
     # Scale the input logarithmically instead of linearly
     c = fscale(input_floor, input_ceiling, (n_pixels - 1), 0, peaktopeak, 2)
 
-    if (c < peak): 
+    if (c < peak):
         peak = c                # keep dot on top
         dothangcount = 0        # make the dot hang before falling
 
