@@ -55,10 +55,10 @@ strip = neopixel.NeoPixel(led_pin, n_pixels, brightness=1, auto_write=False)
 def wheel(pos):
     # Input a value 0 to 255 to get a color value.
     # The colours are a transition r - g - b - back to r.
-    if (pos < 0) or (pos > 255):
+    if pos < 0 or pos > 255:
         return (0, 0, 0)
     if pos < 85:
-        return (int(pos * 3), int(255 - (pos * 3)), 0)
+        return (int(pos * 3), int(255 - (pos*3)), 0)
     elif pos < 170:
         pos -= 85
         return (int(255 - pos * 3), 0, int(pos * 3))
@@ -124,9 +124,10 @@ def fscale(originalmin, originalmax, newbegin, newend, inputvalue, curve):
 
     if invflag == 0:
         rangedvalue = (pow(normalizedcurval, curve) * newrange) + newbegin
-    else:  # invert the ranges
+    else:         # invert the ranges
         rangedvalue = newbegin - (pow(normalizedcurval, curve) * newrange)
 
+    return rangedvalue
     return rangedvalue
 
 
