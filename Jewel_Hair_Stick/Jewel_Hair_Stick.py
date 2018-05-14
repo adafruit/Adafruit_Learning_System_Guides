@@ -15,8 +15,9 @@ led.direction = Direction.OUTPUT
 
 # defaults to RGB|GRB Neopixels
 strip = neopixel.NeoPixel(pixpin, numpix, brightness=.1, auto_write=True)
-# uncomment the following line for RGBW Neopixels
-# strip = neopixel.NeoPixel(pixpin, numpix, bpp=4, brightness=.3, auto_write=True)
+# uncomment the following two lines for RGBW Neopixels
+# strip = neopixel.NeoPixel(
+#   pixpin, numpix, bpp=4, brightness=.3, auto_write=True)
 
 # You can have fun here changing the colors for the code
 color1 = (236, 79, 100)  # Salmon Pink
