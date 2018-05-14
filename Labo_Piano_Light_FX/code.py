@@ -24,9 +24,9 @@ def wheel(pos):
     # The colours are a transition r - g - b - back to r.
     if (pos < 0) or (pos > 255):
         return (0, 0, 0)
-    if (pos < 85):
+    if pos < 85:
         return (int(pos * 3), int(255 - (pos * 3)), 0)
-    elif (pos < 170):
+    elif pos < 170:
         pos -= 85
         return (int(255 - pos * 3), 0, int(pos * 3))
     else:
@@ -58,7 +58,7 @@ while True:
     n = int((mic_pin.value / 65536) * 1000)  # 10-bit ADC format
     n = abs(n - 512 - dc_offset)  # Center on zero
 
-    if (n >= noise):  # Remove noise/hum
+    if n >= noise:  # Remove noise/hum
         n = n - noise
 
     # "Dampened" reading (else looks twitchy) - divide by 8 (2^3)
