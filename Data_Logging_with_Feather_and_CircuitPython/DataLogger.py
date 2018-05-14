@@ -45,7 +45,7 @@ while True:
             sdc.write("{}, {}, {}, {:.2f}\n".format(
                 int(time_stamp), temperature,
                 humidity, battery_voltage)
-            )
+                     )
         time.sleep(3)
     except OSError:
         pass
