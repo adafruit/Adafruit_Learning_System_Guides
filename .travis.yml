@@ -11,4 +11,4 @@ install:
   - pip install pylint
 
 script:
-  - pylint --disable=missing-docstring,invalid-name,bad-whitespace,import-error **/*.py
+  - ./pylint_check
