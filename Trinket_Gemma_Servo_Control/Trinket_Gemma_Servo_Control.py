@@ -6,7 +6,7 @@ from analogio import AnalogIn
 servo = simpleio.Servo(board.A2)
 angle = 0
 
-# potentiometer 
+# potentiometer
 trimpot = AnalogIn(board.A1)  # pot pin for servo control
 
 
