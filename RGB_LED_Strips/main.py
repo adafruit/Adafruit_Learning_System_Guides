@@ -1,22 +1,27 @@
-import board
-import pulseio
 import time
 
-RED_PIN = board.D5    # Red LED pin
+import board
+import pulseio
+
+RED_PIN = board.D5  # Red LED pin
 GREEN_PIN = board.D6  # Green LED pin
-BLUE_PIN = board.D3   # Blue LED pin
+BLUE_PIN = board.D3  # Blue LED pin
 
 FADE_SLEEP = 10  # Number of milliseconds to delay between changes.
-                 # Increase to slow down, decrease to speed up.
+# Increase to slow down, decrease to speed up.
 
 # Define PWM outputs:
 red = pulseio.PWMOut(RED_PIN)
 green = pulseio.PWMOut(GREEN_PIN)
 blue = pulseio.PWMOut(BLUE_PIN)
 
+
 # Function to simplify setting duty cycle to percent value.
+
+
 def duty_cycle(percent):
     return int(percent / 100.0 * 65535.0)
+
 
 # Fade from nothing up to full red.
 for i in range(100):
