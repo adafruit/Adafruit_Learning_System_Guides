@@ -9,7 +9,7 @@ pixel_pin = board.D10  # The pin the NeoPixels are connected to
 button_switch_pin = board.D9  # Pin button is attached to
 vibration_switch_pin = board.D7  # Pin vibration switch is attached to.
 pixel_count = 40  # Number of pixels in your strip
-chase_color_duration = 3  # Time in seconds each color lasts in the color chase mode
+chase_color_duration = 3  # Seconds each color lasts in the color chase mode
 
 pixels = neopixel.NeoPixel(pixel_pin, pixel_count,
                            brightness=.4, auto_write=False)
@@ -122,7 +122,8 @@ while True:
         if mode == 1 and not vibration_switch.value:
             print("Sparkle mode activate!")
             pixels.brightness = 1
-            sparkle_color_index = (sparkle_color_index + 1) % len(sparkle_color_list)
+            sparkle_color_index = (sparkle_color_index + 1) \
+                % len(sparkle_color_list)
             sparkle_code(sparkle_color_list[sparkle_color_index])
         if mode == 2 and not vibration_switch.value:
             print("Chase mode activate!")

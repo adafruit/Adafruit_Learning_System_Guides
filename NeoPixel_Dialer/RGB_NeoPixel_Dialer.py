@@ -16,8 +16,9 @@ lcd_d4 = digitalio.DigitalInOut(board.D9)
 lcd_columns = 16
 lcd_rows = 2
 
-lcd = adafruit_character_lcd.Character_LCD(lcd_rs, lcd_en, lcd_d4, lcd_d5, lcd_d6,
-                                           lcd_d7, lcd_columns, lcd_rows)
+lcd = adafruit_character_lcd.Character_LCD(
+    lcd_rs, lcd_en, lcd_d4, lcd_d5, lcd_d6, lcd_d7, lcd_columns, lcd_rows
+)
 
 potR = AnalogIn(board.A0)  # pot pin for R val
 potG = AnalogIn(board.A1)  # pot pin for G val

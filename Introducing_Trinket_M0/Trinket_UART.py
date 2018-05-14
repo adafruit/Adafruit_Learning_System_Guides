@@ -14,7 +14,7 @@ while True:
     data = uart.read(32)  # read up to 32 bytes
     # print(data)          # this is a bytearray type
 
-    if data != None:
+    if data is not None:
         led.value = True
 
         # convert bytearray to string
