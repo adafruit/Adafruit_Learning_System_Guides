@@ -1,5 +1,11 @@
 #!/bin/bash
 
-set -x
+function find_pyfiles() {
+    for f in $(find . -type f -iname '*.py'); do
+        if [ ! -e "$(dirname $f)/.circuitpython.skip" ]; then
+            echo "$f"
+        fi
+    done
+}
 
-find . -type d '!' -exec test -e "{}/.circuitpython.skip" ';' | xargs pylint
+find_pyfiles | xargs pylint
