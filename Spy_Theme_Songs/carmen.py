@@ -1,14 +1,17 @@
-# Plays the Carmen Sandiego theme song
-# Gemma M0 with Piezo on D0 and GND
+"""
+Plays the Carmen Sandiego theme song
+Gemma M0 with Piezo on D0 and GND
+"""
 
-import pulseio
-import board
 import time
+
+import board
+import pulseio
 
 piezo = pulseio.PWMOut(board.D0, duty_cycle=0, frequency=440,
                        variable_frequency=True)
 
-tempo = 1.6  
+tempo = 1.6
 # tempo is length of whole note in seconds, e.g. 1.5
 # set up time signature
 whole_note = tempo  # adjust this to change tempo of everything
@@ -86,7 +89,7 @@ B5 = 987
 C6 = C5 * 2
 Cs6 = Cs5 * 2
 Db6 = Db5 * 2
-D6 = D5  * 2
+D6 = D5 * 2
 Ds6 = Ds5 * 2
 Eb6 = Eb5 * 2
 E6 = E5 * 2
@@ -103,93 +106,94 @@ B6 = B5 * 2
 
 rst = 24000  # rest is just a tone out of normal hearing range
 
-carmen01 =[[As4,  quarter_note],
-    [As4,  eighth_note],
-    [rst, eighth_note],
-    [rst, sixteenth_note],
-    [B4,  eighth_note],
-    [rst, sixteenth_note],
-    [B4,  eighth_note],
-    [B4,  eighth_note]]
+carmen01 = [[As4, quarter_note],
+            [As4, eighth_note],
+            [rst, eighth_note],
+            [rst, sixteenth_note],
+            [B4, eighth_note],
+            [rst, sixteenth_note],
+            [B4, eighth_note],
+            [B4, eighth_note]]
 
-carmen02 =[[Gs4,  quarter_note],
-    [Gs4,  eighth_note],
-    [rst, eighth_note],
-    [rst, sixteenth_note],
-    [Gs4,  eighth_note],
-    [rst, sixteenth_note],
-    [Gs4,  eighth_note],
-    [B4,  eighth_note]]
+carmen02 = [[Gs4, quarter_note],
+            [Gs4, eighth_note],
+            [rst, eighth_note],
+            [rst, sixteenth_note],
+            [Gs4, eighth_note],
+            [rst, sixteenth_note],
+            [Gs4, eighth_note],
+            [B4, eighth_note]]
 
-carmen03 =[[Gs4,  quarter_note],
-    [Gs4,  eighth_note],
-    [rst, eighth_note],
-    [rst, quarter_note],
-    [Cs4,  eighth_note],
-    [Cs4,  eighth_note]]
+carmen03 = [[Gs4, quarter_note],
+            [Gs4, eighth_note],
+            [rst, eighth_note],
+            [rst, quarter_note],
+            [Cs4, eighth_note],
+            [Cs4, eighth_note]]
 
-carmen04 =[[As4,  eighth_note],
-    [As4,  sixteenth_note],
-    [As4,  eighth_note],
-    [As4,  eighth_note],
-    [B4,  sixteenth_note],
-    [B4,  quarter_note],
-    [B4,  eighth_note],
-    [B4,  eighth_note]]
+carmen04 = [[As4, eighth_note],
+            [As4, sixteenth_note],
+            [As4, eighth_note],
+            [As4, eighth_note],
+            [B4, sixteenth_note],
+            [B4, quarter_note],
+            [B4, eighth_note],
+            [B4, eighth_note]]
 
-carmen05 =[[Gs4,  eighth_note],
-    [Fs4,  eighth_note],
-    [Gs4,  eighth_note],
-    [Fs4,  sixteenth_note],
-    [Cs5,  sixteenth_note],
-    [Cs5,  sixteenth_note],
-    [As4,  eighth_note],
-    [As4,  sixteenth_note],
-    [Fs4,  eighth_note],
-    [Fs4,  eighth_note]]
+carmen05 = [[Gs4, eighth_note],
+            [Fs4, eighth_note],
+            [Gs4, eighth_note],
+            [Fs4, sixteenth_note],
+            [Cs5, sixteenth_note],
+            [Cs5, sixteenth_note],
+            [As4, eighth_note],
+            [As4, sixteenth_note],
+            [Fs4, eighth_note],
+            [Fs4, eighth_note]]
 
-carmen06 =[[Gs4,  eighth_note],
-    [Fs4,  eighth_note],
-    [Gs4,  eighth_note],
-    [Fs4,  sixteenth_note],
-    [Gs4,  sixteenth_note],
-    [Gs4,  sixteenth_note],
-    [Gs4,  eighth_note],
-    [rst, eighth_note],
-    [rst, eighth_note],
-    [Fs4,  eighth_note]]
+carmen06 = [[Gs4, eighth_note],
+            [Fs4, eighth_note],
+            [Gs4, eighth_note],
+            [Fs4, sixteenth_note],
+            [Gs4, sixteenth_note],
+            [Gs4, sixteenth_note],
+            [Gs4, eighth_note],
+            [rst, eighth_note],
+            [rst, eighth_note],
+            [Fs4, eighth_note]]
 
-carmen07 =[[Gs4,  eighth_note],
-    [Fs4,  eighth_note],
-    [Gs4,  eighth_note],
-    [Fs4,  sixteenth_note],
-    [Cs5,  sixteenth_note],
-    [Cs5,  sixteenth_note],
-    [As4,  eighth_note],
-    [As4,  sixteenth_note],
-    [Gs4,  eighth_note],
-    [Fs4,  eighth_note]]
+carmen07 = [[Gs4, eighth_note],
+            [Fs4, eighth_note],
+            [Gs4, eighth_note],
+            [Fs4, sixteenth_note],
+            [Cs5, sixteenth_note],
+            [Cs5, sixteenth_note],
+            [As4, eighth_note],
+            [As4, sixteenth_note],
+            [Gs4, eighth_note],
+            [Fs4, eighth_note]]
 
-carmen08 =[[Fs4,  eighth_note],
-    [rst, eighth_note],
-    [Fs4,  eighth_note],
-    [Fs4,  eighth_note],
-    [Gs4,  eighth_note],
-    [rst, eighth_note],
-    [Gs4,  eighth_note],
-    [rst, eighth_note],
-    [E3,  eighth_note],
-    [E3,  eighth_note],
-    [E3,  eighth_note],
-    [E3,  sixteenth_note],
-    [Fs3,  eighth_note],
-    [Fs3,  eighth_note],
-    [rst, quarter_note]]
+carmen08 = [[Fs4, eighth_note],
+            [rst, eighth_note],
+            [Fs4, eighth_note],
+            [Fs4, eighth_note],
+            [Gs4, eighth_note],
+            [rst, eighth_note],
+            [Gs4, eighth_note],
+            [rst, eighth_note],
+            [E3, eighth_note],
+            [E3, eighth_note],
+            [E3, eighth_note],
+            [E3, sixteenth_note],
+            [Fs3, eighth_note],
+            [Fs3, eighth_note],
+            [rst, quarter_note]]
+
 
 def song_playback(song):
     for n in range(len(song)):
         piezo.frequency = (song[n][0])
-        piezo.duty_cycle = 65536//2  # on 50%
+        piezo.duty_cycle = 65536 // 2  # on 50%
         time.sleep(song[n][1])  # note duration
         piezo.duty_cycle = 0  # off
         time.sleep(0.01)

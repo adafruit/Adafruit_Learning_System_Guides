@@ -1,9 +1,12 @@
-# Plays the 007 theme song
-# Gemma M0 with Piezo on D0 and GND
+"""
+Plays the 007 theme song
+Gemma M0 with Piezo on D0 and GND
+"""
 
-import pulseio
-import board
 import time
+
+import board
+import pulseio
 
 piezo = pulseio.PWMOut(board.D0, duty_cycle=0, frequency=440,
                        variable_frequency=True)
@@ -87,7 +90,7 @@ B5 = 987
 C6 = C5 * 2
 Cs6 = Cs5 * 2
 Db6 = Db5 * 2
-D6 = D5  * 2
+D6 = D5 * 2
 Ds6 = Ds5 * 2
 Eb6 = Eb5 * 2
 E6 = E5 * 2
@@ -104,140 +107,141 @@ B6 = B5 * 2
 
 rst = 24000  # rest is just a tone out of normal hearing range
 
-Bond01=[[B3, half_note],
-    [C4, half_note],
-    [Cs4, half_note],
-    [C4, half_note]]
+Bond01 = [[B3, half_note],
+          [C4, half_note],
+          [Cs4, half_note],
+          [C4, half_note]]
 
-Bond02=[[E3, eighth_note],
-    [Fs3, sixteenth_note],
-    [Fs3, sixteenth_note],
-    [Fs3, eighth_note],
-    [Fs3, eighth_note],
-    [Fs3, eighth_note],
-    [E3, eighth_note],
-    [E3, eighth_note],
-    [E3, eighth_note]]
+Bond02 = [[E3, eighth_note],
+          [Fs3, sixteenth_note],
+          [Fs3, sixteenth_note],
+          [Fs3, eighth_note],
+          [Fs3, eighth_note],
+          [Fs3, eighth_note],
+          [E3, eighth_note],
+          [E3, eighth_note],
+          [E3, eighth_note]]
 
-Bond03=[[E3, eighth_note],
-    [G3, sixteenth_note],
-    [G3, sixteenth_note],
-    [G3, eighth_note],
-    [G3, eighth_note],
-    [G3, eighth_note],
-    [Fs3, eighth_note],
-    [Fs3, eighth_note],
-    [Fs3, eighth_note]]
+Bond03 = [[E3, eighth_note],
+          [G3, sixteenth_note],
+          [G3, sixteenth_note],
+          [G3, eighth_note],
+          [G3, eighth_note],
+          [G3, eighth_note],
+          [Fs3, eighth_note],
+          [Fs3, eighth_note],
+          [Fs3, eighth_note]]
 
+Bond04 = [[E3, eighth_note],
+          [G3, sixteenth_note],
+          [G3, sixteenth_note],
+          [G3, eighth_note],
+          [G3, eighth_note],
+          [G3, eighth_note],
+          [Fs3, eighth_note],
+          [Fs3, eighth_note],
+          [E3, eighth_note]]
 
-Bond04=[[E3, eighth_note],
-    [G3, sixteenth_note],
-    [G3, sixteenth_note],
-    [G3, eighth_note],
-    [G3, eighth_note],
-    [G3, eighth_note],
-    [Fs3, eighth_note],
-    [Fs3, eighth_note],
-    [E3, eighth_note]]
+Bond05 = [[Ds4, eighth_note],
+          [D4, eighth_note],
+          [D4, half_note],
+          [B3, eighth_note],
+          [A3, eighth_note],
+          [B3, whole_note]]
 
-Bond05=[[Ds4, eighth_note],
-    [D4, eighth_note],
-    [D4, half_note],
-    [B3, eighth_note],
-    [A3, eighth_note],
-    [B3, whole_note]]
+Bond06 = [[E4, eighth_note],
+          [G4, quarter_note],
+          [Ds5, eighth_note],
+          [D5, quarter_note],
+          [D5, eighth_note],
+          [G4, eighth_note],
+          [As4, eighth_note],
+          [B4, eighth_note],
+          [B4, half_note],
+          [B4, quarter_note]]
 
-Bond06=[[E4, eighth_note],
-    [G4, quarter_note],
-    [Ds5, eighth_note],
-    [D5, quarter_note],
-    [D5, eighth_note],
+Bond07 = [[G4, quarter_note],
+          [A4, sixteenth_note],
+          [G4, sixteenth_note],
+          [Fs4, quarter_note],
+          [Fs4, eighth_note],
+          [B3, eighth_note],
+          [E4, eighth_note],
+          [Cs4, eighth_note],
+          [Cs4, whole_note]]
+
+Bond08 = [[G4, quarter_note],
+          [A4, sixteenth_note],
+          [G4, sixteenth_note],
+          [Fs4, quarter_note],
+          [Fs4, eighth_note],
+          [B3, eighth_note],
+          [Ds4, eighth_note],
+          [E4, eighth_note],
+          [E4, whole_note]]
+
+Bond09 = [[E4, eighth_note],
+          [E4, quarter_note],
+          [E4, eighth_note],
+          [Fs4, eighth_note],
+          [Fs4, sixteenth_note],
+          [E4, eighth_note],
+          [Fs4, quarter_note]]
+
+Bond10 = [
     [G4, eighth_note],
-    [As4, eighth_note],
-    [B4, eighth_note],
-    [B4, half_note],
-    [B4, quarter_note]]
-
-Bond07=[[G4, quarter_note],
-    [A4, sixteenth_note],
-    [G4, sixteenth_note],
-    [Fs4, quarter_note],
-    [Fs4, eighth_note],
-    [B3, eighth_note],
-    [E4, eighth_note],
-    [Cs4, eighth_note],
-    [Cs4, whole_note]]
-
-Bond08=[[G4, quarter_note],
-    [A4, sixteenth_note],
-    [G4, sixteenth_note],
-    [Fs4, quarter_note],
-    [Fs4, eighth_note],
-    [B3, eighth_note],
-    [Ds4, eighth_note],
-    [E4, eighth_note],
-    [E4, whole_note]]
-
-Bond09=[[E4, eighth_note],
-    [E4, quarter_note],
-    [E4, eighth_note],
+    [G4, quarter_note],
+    [G4, eighth_note],
     [Fs4, eighth_note],
     [Fs4, sixteenth_note],
-    [E4, eighth_note],
-    [Fs4, quarter_note]]
-
-Bond10=[
-    [G4, eighth_note],
-    [G4, quarter_note],
-    [G4, eighth_note],
-    [Fs4, eighth_note],
-    [Fs4, sixteenth_note],
     [G4, eighth_note],
     [Fs4, quarter_note]]
 
-Bond11=[[B4, eighth_note],
-    [B4, eighth_note],
-    [rst, eighth_note],
-    [B3, eighth_note],
-    [B3, quarter_note],
-    [B4, eighth_note],
-    [B4, eighth_note],
-    [rst, eighth_note],
-    [B3, eighth_note],
-    [B3, quarter_note],
-    [B4, sixteenth_note],
-    [B4, eighth_note],
-    [B4, sixteenth_note],
-    [B4, eighth_note],
-    [B4, eighth_note]]
+Bond11 = [[B4, eighth_note],
+          [B4, eighth_note],
+          [rst, eighth_note],
+          [B3, eighth_note],
+          [B3, quarter_note],
+          [B4, eighth_note],
+          [B4, eighth_note],
+          [rst, eighth_note],
+          [B3, eighth_note],
+          [B3, quarter_note],
+          [B4, sixteenth_note],
+          [B4, eighth_note],
+          [B4, sixteenth_note],
+          [B4, eighth_note],
+          [B4, eighth_note]]
 
-Bond12=[[E3, eighth_note],
-    [G3, quarter_note],
-    [Ds4, eighth_note],
-    [D4, quarter_note],
-    [G3, eighth_note],
-    [B3, quarter_note],
-    [Fs4, eighth_note],
-    [F4, quarter_note],
-    [B3, eighth_note],
-    [D4, quarter_note],
-    [As4, eighth_note],
-    [A4, quarter_note],
-    [F4, eighth_note],
-    [A4, quarter_note],
-    [Ds5, eighth_note],
-    [D5, quarter_note],
-    [rst, eighth_note],
-    [rst, quarter_note],
-    [Fs4, whole_note]]
+Bond12 = [[E3, eighth_note],
+          [G3, quarter_note],
+          [Ds4, eighth_note],
+          [D4, quarter_note],
+          [G3, eighth_note],
+          [B3, quarter_note],
+          [Fs4, eighth_note],
+          [F4, quarter_note],
+          [B3, eighth_note],
+          [D4, quarter_note],
+          [As4, eighth_note],
+          [A4, quarter_note],
+          [F4, eighth_note],
+          [A4, quarter_note],
+          [Ds5, eighth_note],
+          [D5, quarter_note],
+          [rst, eighth_note],
+          [rst, quarter_note],
+          [Fs4, whole_note]]
+
 
 def song_playback(song):
-    for n in range(len(song)):
-        piezo.frequency = (song[n][0])
-        piezo.duty_cycle = 65536//2  # on 50%
-        time.sleep(song[n][1])  # note duration
+    for note in song:
+        piezo.frequency = (note[0])
+        piezo.duty_cycle = 65536 // 2  # on 50%
+        time.sleep(note[1])  # note duration
         piezo.duty_cycle = 0  # off
         time.sleep(0.01)
+
 
 # this plays the full song roadmap
 song_playback(Bond01)
