@@ -10,7 +10,7 @@ except ImportError:
     import random
 
 wick_pin = board.D0  # The data-in pin of the NeoPixel
-unconnected_pin = board.A0  # Any unconnected pin, to try to generate a random seed
+unconnected_pin = board.A0  # Any unconnected pin, to generate random seed
 
 # The LED can be in only one of these states at any given time
 bright = 0
@@ -28,25 +28,25 @@ index_bottom = 128
 index_min = 192
 index_max = 255  # Maximum red value
 
-# Decreasing brightness will take place over a number of milliseconds in this range
+# Decreasing brightness will take place over a number of milliseconds
 down_min_msecs = 20
 down_max_msecs = 250
 
-# Increasing brightness will take place over a number of milliseconds in this range
+# Increasing brightness will take place over a number of milliseconds
 up_min_msecs = 20
 up_max_msecs = 250
 
 # Percent chance the color will hold unchanged after brightening
 bright_hold_percent = 20
 
-# When holding after brightening, hold for a number of milliseconds in this range
+# When holding after brightening, hold for a number of milliseconds
 bright_hold_min_msecs = 0
 bright_hold_max_msecs = 100
 
 # Percent chance the color will hold unchanged after dimming
 dim_hold_percent = 5
 
-# When holding after dimming, hold for a number of milliseconds in this range
+# When holding after dimming, hold for a number of milliseconds
 dim_hold_min_msecs = 0
 dim_hold_max_msecs = 50
 
@@ -89,7 +89,9 @@ while True:
         flicker_start = current_time
         index_start = index_end
 
-        if (index_start > index_bottom) and (random.randint(0, 100) < index_bottom_percent):
+        is_index_in_range = index_start > index_bottom
+        is_random_in_range = random.randint(0, 100) < index_bottom_percent
+        if is_index_in_range and is_random_in_range:
             index_end = random.randint(
                 0, index_start - index_bottom) + index_bottom
         else:
@@ -119,24 +121,32 @@ while True:
     elif state == down:
         # dividing flicker_msecs by 1000 to convert to milliseconds
         if current_time < (flicker_start + (flicker_msecs / 1000)):
-            set_color(index_start + int(((index_end - index_start) *
-                                         (((current_time - flicker_start) * 1.0) / flicker_msecs))))
+            index_range = index_end - index_start
+            time_range = (current_time - flicker_start) * 1.0
+
+            set_color(index_start + int(
+                (index_range * (time_range / flicker_msecs))))
         else:
             set_color(index_end)
 
             if state == down:
                 if random.randint(0, 100) < dim_hold_percent:
                     flicker_start = current_time
+
+                    dim_max = dim_hold_max_msecs - dim_hold_min_msecs
                     flicker_msecs = random.randint(
-                        0, dim_hold_max_msecs - dim_hold_min_msecs) + dim_hold_min_msecs
+                        0, dim_max
+                    ) + dim_hold_min_msecs
                     state = dim_hold
                 else:
                     state = dim
             else:
                 if random.randint(0, 100) < bright_hold_percent:
                     flicker_start = current_time
+
+                    max_flicker = bright_hold_max_msecs - bright_hold_min_msecs
                     flicker_msecs = random.randint(
-                        0, bright_hold_max_msecs - bright_hold_min_msecs) + bright_hold_min_msecs
+                        0, max_flicker) + bright_hold_min_msecs
                     state = bright_hold
                 else:
                     state = bright
