@@ -49,10 +49,10 @@ class Grain:
 
     def __init__(self):
         """Initialize grain position and velocity."""
-        x = 0
-        y = 0
-        vx = 0
-        vy = 0
+        self.x = 0
+        self.y = 0
+        self.vx = 0
+        self.vy = 0
 
 
 grains = [Grain() for _ in range(N_GRAINS)]
