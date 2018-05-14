@@ -1,9 +1,9 @@
 # Motion Sensor Alarm
 # uses Gemma M0, vibration sensor on A0/GND, & piezo on D0/GND
+import time
 import pulseio
 from analogio import AnalogIn
 import board
-import time
 
 piezo = pulseio.PWMOut(board.D0, duty_cycle=0, frequency=440,
                        variable_frequency=True)
