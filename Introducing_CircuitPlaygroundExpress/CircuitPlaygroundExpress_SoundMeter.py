@@ -53,7 +53,9 @@ def constrain(value, floor, ceiling):
 def log_scale(input_value, input_min, input_max, output_min, output_max):
     normalized_input_value = (input_value - input_min) / \
                              (input_max - input_min)
-    return output_min + math.pow(normalized_input_value, SCALE_EXPONENT) * (output_max - output_min)
+    return output_min + \
+        math.pow(normalized_input_value, SCALE_EXPONENT) \
+        * (output_max - output_min)
 
 
 # Remove DC bias before computing RMS.
@@ -61,7 +63,9 @@ def log_scale(input_value, input_min, input_max, output_min, output_max):
 
 def normalized_rms(values):
     minbuf = int(mean(values))
-    return math.sqrt(sum(float(sample - minbuf) * (sample - minbuf) for sample in values) / len(values))
+    samples_sum = sum(float(sample - minbuf) * (sample - minbuf) for sample in values)
+
+    return math.sqrt(samples_sum / len(values))
 
 
 def mean(values):
