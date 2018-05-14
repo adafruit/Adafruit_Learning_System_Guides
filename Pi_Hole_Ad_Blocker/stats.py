@@ -61,7 +61,8 @@ draw.rectangle((0, 0, width, height), outline=0, fill=0)
 padding = -2
 top = padding
 bottom = height - padding
-# Move left to right keeping track of the current x position for drawing shapes.
+# Move left to right keeping track of the current x position
+# for drawing shapes.
 x = 0
 
 # Load nice silkscreen font
@@ -77,11 +78,14 @@ while True:
     IP = subprocess.check_output(cmd, shell=True)
     cmd = "hostname"
     HOST = subprocess.check_output(cmd, shell=True)
-    cmd = "top -bn1 | grep load | awk '{printf \"CPU Load: %.2f\", $(NF-2)}'"
+    cmd = "top -bn1 | grep load | awk " \
+          "'{printf \"CPU Load: %.2f\", $(NF-2)}'"
     CPU = subprocess.check_output(cmd, shell=True)
-    cmd = "free -m | awk 'NR==2{printf \"Mem: %s/%sMB %.2f%%\", $3,$2,$3*100/$2 }'"
+    cmd = "free -m | awk 'NR==2{printf " \
+          "\"Mem: %s/%sMB %.2f%%\", $3,$2,$3*100/$2 }'"
     MemUsage = subprocess.check_output(cmd, shell=True)
-    cmd = "df -h | awk '$NF==\"/\"{printf \"Disk: %d/%dGB %s\", $3,$2,$5}'"
+    cmd = "df -h | awk '$NF==\"/\"{printf " \
+          "\"Disk: %d/%dGB %s\", $3,$2,$5}'"
     Disk = subprocess.check_output(cmd, shell=True)
 
     # Pi Hole data!

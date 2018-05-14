@@ -59,16 +59,16 @@ print("Waiting for button presses")
 
 
 def pressbutton(i):
-    l = leds[i]  # find the switch LED
+    switch_led = leds[i]  # find the switch LED
     k = buttonkeys[i]  # get the corresp. keycode/str
-    l.value = True  # turn on LED
+    switch_led.value = True  # turn on LED
     kbd.press(k)  # send keycode
 
 
 def releasebutton(i):
-    l = leds[i]  # find the switch LED
+    switch_led = leds[i]  # find the switch LED
     k = buttonkeys[i]  # get the corresp. keycode/str
-    l.value = False  # turn on LED
+    switch_led.value = False  # turn on LED
     kbd.release(k)  # send keycode
 
 
@@ -98,15 +98,15 @@ while True:
     # check each button
     for button in buttons:
         i = buttons.index(button)
-        if button.value == False:  # button is pressed?
+        if button.value is False:  # button is pressed?
             buttonspressed[i] = True  # save pressed button
             # was button not pressed last time?
-            if buttonspressedlast[i] == False:
+            if buttonspressedlast[i] is False:
                 print("Pressed #%d" % i)
                 pressbutton(i)
         else:
             buttonspressed[i] = False  # button was not pressed
-            if buttonspressedlast[i] == True:  # was button pressed last time?
+            if buttonspressedlast[i] is True:  # was button pressed last time?
                 print("Released #%d" % i)
                 releasebutton(i)
     lightneopixels()
