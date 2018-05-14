@@ -18,32 +18,32 @@ pixels = neopixel.NeoPixel(pin, pixel_count, brightness=1, auto_write=False)
 
 while True:
 
-    # For the first 14 pixels, make them orange, 
+    # For the first 14 pixels, make them orange,
     # starting from pixel number 0.
-    for i in range( 0, APIXELS ):
-        # Set Pixels to Orange Color       
-        pixels[i] = ( 255, 50, 0 ) 
+    for i in range(0, APIXELS):
+        # Set Pixels to Orange Color
+        pixels[i] = (255, 50, 0)
         # This sends the updated pixel color to the hardware.
-        pixels.write()      
-        # Delay for a period of time (in milliseconds).   
-        time.sleep(delayval)   
+        pixels.write()
+        # Delay for a period of time (in milliseconds).
+        time.sleep(delayval)
 
-    # Fill up 84 pixels with blue, 
+    # Fill up 84 pixels with blue,
     # starting with pixel number 14.
-    for i in range ( 14, BPIXELS ):
-        # Set Pixels to Orange Color       
-        pixels[i] = ( 0, 250, 200 ) 
+    for i in range(14, BPIXELS):
+        # Set Pixels to Orange Color
+        pixels[i] = (0, 250, 200)
         # This sends the updated pixel color to the hardware.
-        pixels.write()      
-        # Delay for a period of time (in milliseconds).   
-        time.sleep(delayval)   
+        pixels.write()
+        # Delay for a period of time (in milliseconds).
+        time.sleep(delayval)
 
-    # Fill up 9 pixels with orange, 
+    # Fill up 9 pixels with orange,
     # starting from pixel number 84.
-    for i in range ( 84, CPIXELS ):
-        # Set Pixels to Orange Color       
-        pixels[i] =  ( 250, 50, 0 ) 
+    for i in range(84, CPIXELS):
+        # Set Pixels to Orange Color
+        pixels[i] = (250, 50, 0)
         # This sends the updated pixel color to the hardware.
-        pixels.write()      
-        # Delay for a period of time (in milliseconds).   
-        time.sleep(delayval)   
+        pixels.write()
+        # Delay for a period of time (in milliseconds).
+        time.sleep(delayval)
