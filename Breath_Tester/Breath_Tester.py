@@ -25,7 +25,7 @@ def warmup_message():
     print()
     print("Warming Up [%d seconds]..." % warmup_time)
 
-    while (warmup_counter <= 20):
+    while warmup_counter <= 20:
         print('.', end='')
         time.sleep(1)
         warmup_counter += 1
@@ -44,7 +44,7 @@ def get_breath_reading():
     input(" *** Press a key when ready. *** ")
     print()
 
-    while (breath_counter <= breath_time):
+    while breath_counter <= breath_time:
         co2eq, tvoc = sgp30.iaq_measure()
         breath_saves[breath_counter] = tvoc
         print(tvoc, ', ', end='')
@@ -54,7 +54,7 @@ def get_breath_reading():
     breath_saves = sorted(breath_saves)
     highest_breath_result = breath_saves[breath_counter - 1]
 
-    return (highest_breath_result)
+    return highest_breath_result
 
 
 # show the highest reading recorded
