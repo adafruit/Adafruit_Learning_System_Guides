@@ -42,8 +42,10 @@ while True:
             print("Humidity:", humidity)
             print("VBat voltage: {:.2f}".format(battery_voltage))
             print()
-            sdc.write("{}, {}, {}, {:.2f}\n".format(int(time_stamp), temperature,
-                                                    humidity, battery_voltage))
+            sdc.write("{}, {}, {}, {:.2f}\n".format(
+                int(time_stamp), temperature,
+                humidity, battery_voltage)
+            )
         time.sleep(3)
     except OSError:
         pass

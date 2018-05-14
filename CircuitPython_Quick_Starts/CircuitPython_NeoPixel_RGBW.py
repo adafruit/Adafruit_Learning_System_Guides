@@ -9,7 +9,8 @@ pixel_pin = board.A1
 num_pixels = 8
 
 pixels = neopixel.NeoPixel(pixel_pin, num_pixels,
-                           brightness=0.3, auto_write=False, pixel_order=(1, 0, 2, 3))
+                           brightness=0.3, auto_write=False,
+                           pixel_order=(1, 0, 2, 3))
 
 
 def wheel(pos):

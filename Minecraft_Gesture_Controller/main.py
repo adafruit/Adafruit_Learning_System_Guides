@@ -1,4 +1,3 @@
-###############################################
 # Minecraft Gesture Controller
 #
 # Written by <jenfoxbot@gmail.com>
@@ -7,11 +6,9 @@
 # Super awesome thanks to:
 # Richard Albritton, Tony DiCola, John Parker
 # All the awesome people who wrote the libraries
-################################################
 
-##########################
-##        Libraries     ##
-##########################
+# Libraries
+
 
 import time
 
@@ -27,9 +24,7 @@ from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS
 from adafruit_hid.keycode import Keycode
 from adafruit_hid.mouse import Mouse
 
-#######################
-#     CPX Setup       #
-#######################
+# CPX Setup
 touch_a1 = touchio.TouchIn(board.A1)
 touch_a1.threshold = 2000
 touch_a2 = touchio.TouchIn(board.A2)
@@ -39,9 +34,8 @@ touch_a3.threshold = 2000
 touch_a4 = touchio.TouchIn(board.A4)
 touch_a4.threshold = 2000
 
-############################
-# Keyboard & Mouse Setup   #
-############################
+# Keyboard & Mouse Setup
+
 # The keyboard object!
 kbd = Keyboard()
 # we're americans :)
@@ -49,25 +43,23 @@ layout = KeyboardLayoutUS(kbd)
 # The mouse object!
 mouse = Mouse()
 
-#######################
-# Accelerometer Setup #
-#######################
+# Accelerometer Setup
+
 # Initialize Accelerometer
 i2c = busio.I2C(board.ACCELEROMETER_SCL, board.ACCELEROMETER_SDA)
 lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c, address=25)
-# Set range of accelerometer (can be RANGE_2_G, RANGE_4_G, RANGE_8_G or RANGE_16_G).
+# Set range of accelerometer
+# (can be RANGE_2_G, RANGE_4_G, RANGE_8_G or RANGE_16_G).
 lis3dh.range = adafruit_lis3dh.RANGE_8_G
 
 
-###########################
-## Controller Functions  ##
-###########################
+# Controller Functions
 
 # A helper to 'remap' an input range to an output range
-
-
 def Map(x, in_min, in_max, out_min, out_max):
-    return int((x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min)
+    return int(
+        (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
+    )
 
 
 def Move(upDown_axis, isBackward):
@@ -158,9 +150,7 @@ def readAxes():
     return (x / 9.806, y / 9.806, z / 9.806)  # 9.806 m/s^2 per G
 
 
-###########################
-##     Main Function     ##
-###########################
+# Main Function
 while True:
     # Read accelerometer values (in G).  Returns a 3-tuple of x, y, x axis
     pos_x, pos_y, pos_z = readAxes()
@@ -184,11 +174,13 @@ while True:
     Jump(pos_y)
     Give(pos_y, pos_x)
 
-    # Small delay to keep things responsive but give time for interrupt processing.
+    # Small delay to keep things responsive but
+    # give time for interrupt processing.
     time.sleep(0.01)
 
-    ## Debugging Ahead!! ##
-    # Use the following 2 lines to figure out which axis is upDown, frontBack, or LeftRight
+    # Debugging Ahead!!
+    # Use the following 2 lines to figure out which
+    # axis is upDown, frontBack, or LeftRight
     # and also for debugging!
     # print('x = {}G, y = {}G, z = {}G'.format(x, y, z))
     # time.sleep(0.3)
