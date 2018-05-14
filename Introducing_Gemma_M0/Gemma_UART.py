@@ -1,8 +1,8 @@
 # Gemma IO demo - USB/Serial echo
 
 import busio
-from board import *
-from digitalio import *
+from board import D0, D2, D13
+from digitalio import DigitalInOut, Direction
 
 led = DigitalInOut(D13)
 led.direction = Direction.OUTPUT

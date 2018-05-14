@@ -51,7 +51,7 @@ while True:
                 pass  # wait for it to be released!
             # type the keycode or string
             k = buttonkeys[i]  # get the corresp. keycode/str
-            if type(k) is str:
+            if isinstance(k, str):
                 layout.write(k)
             else:
                 kbd.press(controlkey, k)  # press...

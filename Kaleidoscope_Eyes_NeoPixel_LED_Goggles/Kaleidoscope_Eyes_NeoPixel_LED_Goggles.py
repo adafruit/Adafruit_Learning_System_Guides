@@ -27,19 +27,14 @@ prevtime = 0
 
 pixels = neopixel.NeoPixel(pixpin, numpix, brightness=.3, auto_write=False)
 
-
-def setup():
-    prevtime = time.monotonic()
-
-
-setup()
+prevtime = time.monotonic()
 
 while True:
     i = 0
     t = 0
 
     # Random sparks - just one LED on at a time!
-    if (mode == 0):
+    if mode == 0:
         i = random.randint(0, (numpix - 1))
         pixels[i] = color
         pixels.write()
@@ -47,12 +42,12 @@ while True:
         pixels[i] = (0, 0, 0)
 
     # Spinny wheels (8 LEDs on at a time)
-    elif (mode == 1):
+    elif mode == 1:
         for i in range(0, numpix):
             c = 0
 
             # 4 pixels on...
-            if (((offset + i) & 7) < 2):
+            if ((offset + i) & 7) < 2:
                 c = color
 
             pixels[i] = c  # First eye
@@ -64,12 +59,12 @@ while True:
 
     t = time.monotonic()
 
-    if ((t - prevtime) > 8):  # Every 8 seconds...
+    if (t - prevtime) > 8:  # Every 8 seconds...
         mode += 1  # Next mode
-        if (mode > 1):  # End of modes?
+        if mode > 1:  # End of modes?
             mode = 0  # Start modes over
 
-        if (rgb_idx > 2):  # reset R-->G-->B rotation
+        if rgb_idx > 2:  # reset R-->G-->B rotation
             rgb_idx = 0
 
         color = rgb_colors[rgb_idx]  # next color assignment
