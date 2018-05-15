@@ -25,8 +25,10 @@
 # calibrated with your body touching it (making it less accurate).
 #
 # Also note this depends on two external modules to be loaded on the Gemma M0:
-#  - Adafruit CircuitPython DotStar: https://github.com/adafruit/Adafruit_CircuitPython_DotStar
-#  - Adafruit CircuitPython FancyLED: https://github.com/adafruit/Adafruit_CircuitPython_FancyLED
+#  - Adafruit CircuitPython DotStar:
+# https://github.com/adafruit/Adafruit_CircuitPython_DotStar
+#  - Adafruit CircuitPython FancyLED:
+# https://github.com/adafruit/Adafruit_CircuitPython_FancyLED
 #
 # You _must_ have both adafruit_dotstar.mpy and the adafruit_fancyled folder
 # and files within it on your board for this code to work!  If you run into
