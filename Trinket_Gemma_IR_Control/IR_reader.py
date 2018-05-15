@@ -33,8 +33,8 @@ while True:
     print("pulse count: ", len(detected))
 
     # print in list form of the pulse duration in microseconds
-    # typically starts with ~9,000 microseconds followed by a ~4,000 microseconds
-    # which is standard IR preamble
+    # typically starts with ~9,000 microseconds followed by a ~4,000
+    # microseconds which is standard IR preamble
 
     print(detected)
     print()
