@@ -38,6 +38,7 @@ def rainbow(wait):
         for i in range(len(strip)):
             idx = int(i + j)
             strip[i] = wheel(idx & 255)
+        time.sleep(wait)
 
 
 # Slightly different, this makes the rainbow equally distributed throughout
@@ -71,7 +72,7 @@ def wheel(pos):
 
 
 def flash_random(wait, howmany):
-    for k in range(howmany):
+    for _ in range(howmany):
 
         c = random.randint(0, len(colors) - 1)  # Choose random color index
         j = random.randint(0, numpix - 1)  # Choose random pixel
