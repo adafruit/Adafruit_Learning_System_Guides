@@ -3,15 +3,15 @@ import board
 import neopixel
 from digitalio import DigitalInOut, Direction, Pull
 
-led_pin = board.D1      # which pin your pixels are connected to
-num_leds = 78           # how many LEDs you have
-brightness = 1.0        # 0-1, higher number is brighter
-saturation = 255        # 0-255, 0 is pure white, 255 is fully saturated color
-steps = 0.01            # how wide the bands of color are.
-offset = 0              # cummulative steps
-fadeup = True           # start with fading up - increase steps until offset reaches 1
-index = 8               # midway color selection
-blend = True            # color blending between palette indices
+led_pin = board.D1  # which pin your pixels are connected to
+num_leds = 78  # how many LEDs you have
+brightness = 1.0  # 0-1, higher number is brighter
+saturation = 255  # 0-255, 0 is pure white, 255 is fully saturated color
+steps = 0.01  # how wide the bands of color are.
+offset = 0  # cummulative steps
+fadeup = True  # start with fading up - increase steps until offset reaches 1
+index = 8  # midway color selection
+blend = True  # color blending between palette indices
 
 # initialize list with all pixels off
 palette = [0] * num_leds
@@ -69,7 +69,7 @@ def wheel(pos):
     if (pos < 0) or (pos > 255):
         return (0, 0, 0)
     if pos < 85:
-        return (int(pos * 3), int(255 - (pos*3)), 0)
+        return (int(pos * 3), int(255 - (pos * 3)), 0)
     elif pos < 170:
         pos -= 85
         return (int(255 - pos * 3), 0, int(pos * 3))
@@ -79,10 +79,13 @@ def wheel(pos):
 
 
 def remapRange(value, leftMin, leftMax, rightMin, rightMax):
-    # this remaps a value from original (left) range to new (right) range
+    # this remaps a value fromhere original (left) range to new (right) range
     # Figure out how 'wide' each range is
     leftSpan = leftMax - leftMin
     rightSpan = rightMax - rightMin
+
+    # Convert the left range into a 0-1 range (int)
+    valueScaled = int(value - leftMin) / int(leftSpan)
 
     # Convert the 0-1 range into a value in the right range.
     return int(rightMin + (valueScaled * rightSpan))
@@ -96,13 +99,14 @@ def shortkeypress(color_palette):
 
     return color_palette
 
+
 while True:
 
     # check for button press
     currkeystate = button.value
 
     # button press, move to next pattern
-    if (prevkeystate != True) and currkeystate:
+    if (prevkeystate is not True) and currkeystate:
         ledmode = shortkeypress(ledmode)
 
     # save button press state
