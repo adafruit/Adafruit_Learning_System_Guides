@@ -21,5 +21,6 @@ while True:
     blue = int(raw_blue * (255 / 65535))
     pixels.fill((0, 0, 0))
 
-    # Printed to match the color lines on the Mu plotter! The orange line represents red.
+    # Printed to match the color lines on the Mu plotter!
+    # The orange line represents red.
     print((green, blue, red))
