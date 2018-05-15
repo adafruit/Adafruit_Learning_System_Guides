@@ -36,7 +36,7 @@ def print_directory(path, tabs=0):
             sizestr = "%0.1f MB" % (filesize / 1000000)
 
         prettyprintname = ""
-        for i in range(tabs):
+        for _ in range(tabs):
             prettyprintname += "   "
         prettyprintname += file
         if isdir:
