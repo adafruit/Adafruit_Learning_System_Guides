@@ -49,8 +49,8 @@ def spamKey(code):
 
 while True:
     knob = (getVoltage(analog2in))
-    if steps(knob) is 5:  # the center position is active
+    if steps(knob) == 5:  # the center position is active
         led.value = True
-    elif steps(knob) is not 5:
+    elif steps(knob) != 5:
         led.value = False
         spamKey(steps(knob))
