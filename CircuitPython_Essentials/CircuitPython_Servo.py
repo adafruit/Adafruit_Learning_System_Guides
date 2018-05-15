@@ -1,6 +1,7 @@
 import time
-import simpleio
+
 import board
+import simpleio
 
 # For the M0 boards:
 servo = simpleio.Servo(board.A2)

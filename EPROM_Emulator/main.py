@@ -29,18 +29,17 @@ Targeted for the SAMD51 boards.
 by Dave Astels
 """
 
-import digitalio
+import adafruit_sdcard
+import adafruit_ssd1306
 import board
 import busio
-import adafruit_ssd1306
+import digitalio
 import storage
-import adafruit_sdcard
-
+from debouncer import Debouncer
 from directory_node import DirectoryNode
 from emulator import Emulator
-from debouncer import Debouncer
 
-#--------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------
 # Initialize Rotary encoder
 
 # Encoder button is a digital input with pullup on D2
@@ -55,7 +54,7 @@ rot_b = digitalio.DigitalInOut(board.D3)
 rot_b.direction = digitalio.Direction.INPUT
 rot_b.pull = digitalio.Pull.UP
 
-#--------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------
 # Initialize I2C and OLED
 
 i2c = busio.I2C(board.SCL, board.SDA)
@@ -65,12 +64,12 @@ oled.fill(0)
 oled.text("Initializing SD", 0, 10)
 oled.show()
 
-#--------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------
 # Initialize SD card
 
-#SD_CS = board.D10
+# SD_CS = board.D10
 # Connect to the card and mount the filesystem.
-spi = busio.SPI(board.D13, board.D11, board.D12)   # SCK, MOSI, MISO
+spi = busio.SPI(board.D13, board.D11, board.D12)  # SCK, MOSI, MISO
 cs = digitalio.DigitalInOut(board.D10)
 sdcard = adafruit_sdcard.SDCard(spi, cs)
 vfs = storage.VfsFat(sdcard)
@@ -80,8 +79,7 @@ oled.fill(0)
 oled.text("Done", 0, 10)
 oled.show()
 
-
-#--------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------
 # Initialize globals
 
 encoder_counter = 0
@@ -101,7 +99,7 @@ current_mode = PROGRAM_MODE
 emulator = Emulator(i2c)
 
 
-#--------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------
 # Helper functions
 
 def is_binary_name(filename):
@@ -138,7 +136,7 @@ def program():
     current_dir.force_update()
 
 
-#--------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------
 # Main loop
 
 current_dir = DirectoryNode(oled, name="/sd")
@@ -196,7 +194,7 @@ while True:
         rotary_prev_state = rotary_curr_state
 
         # Handle encoder rotation
-    if current_mode == PROGRAM_MODE:      #Ignore rotation if in EMULATE mode
+    if current_mode == PROGRAM_MODE:  # Ignore rotation if in EMULATE mode
         if encoder_direction == -1:
             current_dir.up()
         elif encoder_direction == 1:

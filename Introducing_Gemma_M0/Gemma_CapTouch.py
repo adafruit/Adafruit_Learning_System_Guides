@@ -1,8 +1,9 @@
 # Gemma IO demo - captouch
 
-import touchio
-import board
 import time
+
+import board
+import touchio
 
 touch0 = touchio.TouchIn(board.A0)
 touch1 = touchio.TouchIn(board.A1)

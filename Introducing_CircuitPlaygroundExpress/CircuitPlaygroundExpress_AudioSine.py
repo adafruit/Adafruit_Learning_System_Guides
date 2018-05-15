@@ -1,11 +1,12 @@
-from digitalio import DigitalInOut, Direction
+import array
+import math
+import time
+
 import audioio
 import board
-import array
-import time
-import math
+from digitalio import DigitalInOut, Direction
 
-FREQUENCY = 440    # 440 Hz middle 'A'
+FREQUENCY = 440  # 440 Hz middle 'A'
 SAMPLERATE = 8000  # 8000 samples/second, recommended!
 
 # Generate one period of sine wav.
@@ -22,5 +23,5 @@ spkrenable.value = True
 sample = audioio.AudioOut(board.SPEAKER, sine_wave)
 sample.frequency = SAMPLERATE
 sample.play(loop=True)  # keep playing the sample over and over
-time.sleep(1)           # until...
-sample.stop()           # we tell the board to stop
+time.sleep(1)  # until...
+sample.stop()  # we tell the board to stop

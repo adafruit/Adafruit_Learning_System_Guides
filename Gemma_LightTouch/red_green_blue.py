@@ -1,8 +1,9 @@
 """Touch each pad to change red, green, and blue values on the LED"""
 import time
-import touchio
+
 import adafruit_dotstar
 import board
+import touchio
 
 led = adafruit_dotstar.DotStar(board.APA102_SCK, board.APA102_MOSI, 1)
 touch_A0 = touchio.TouchIn(board.A0)

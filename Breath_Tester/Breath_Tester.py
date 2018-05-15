@@ -1,7 +1,8 @@
 import time
+
+import adafruit_sgp30
 import board
 import busio
-import adafruit_sgp30
 
 i2c = busio.I2C(board.SCL, board.SDA, frequency=100000)
 
@@ -13,26 +14,29 @@ sgp30.set_iaq_baseline(0x8973, 0x8aae)
 # highest tVOC recorded in 30 seconds
 highest_breath_result = 0
 
-def warmup_message():
 
-    warmup_time = 20 
+def warmup_message():
+    warmup_time = 20
     warmup_counter = 0
 
-    co2eq, tvoc = sgp30.iaq_measure()           # initial read required to get sensor going
+    # initial read required to get sensor going
+    sgp30.iaq_measure()
 
     print()
     print("Warming Up [%d seconds]..." % warmup_time)
 
-    while ( warmup_counter <= 20 ):
+    while warmup_counter <= 20:
         print('.', end='')
         time.sleep(1)
         warmup_counter += 1
 
-def get_breath_reading():
 
-    breath_time = 30                            # seconds to record breath reading
-    breath_counter = 0                          # one second count up to breath_time value
-    breath_saves = [0] * ( breath_time + 1 )    # initialize list with empty values
+def get_breath_reading():
+    breath_time = 30  # seconds to record breath reading
+    # one second count up to breath_time value
+    breath_counter = 0
+    # initialize list with empty values
+    breath_saves = [0] * (breath_time + 1)
 
     print()
     print("We will collect breath samples for 30 seconds.")
@@ -40,26 +44,30 @@ def get_breath_reading():
     input(" *** Press a key when ready. *** ")
     print()
 
-    while ( breath_counter <= breath_time ):
-        co2eq, tvoc = sgp30.iaq_measure()
+    while breath_counter <= breath_time:
+        _, tvoc = sgp30.iaq_measure()
         breath_saves[breath_counter] = tvoc
         print(tvoc, ', ', end='')
         time.sleep(1)
         breath_counter += 1
 
     breath_saves = sorted(breath_saves)
-    highest_breath_result = breath_saves[breath_counter - 1] 
+    result = breath_saves[breath_counter - 1]
 
-    return(highest_breath_result)
+    return result
+
 
 # show the highest reading recorded
-def show_results(highest_breath_result):
+
+
+def show_results(breath_result):
     print()
     print()
-    print("peak VOC reading:", highest_breath_result)
+    print("peak VOC reading:", breath_result)
     print()
     input("Press any key to test again")
     print()
+
 
 # main
 while True:

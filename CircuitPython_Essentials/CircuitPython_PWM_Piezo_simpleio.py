@@ -1,4 +1,5 @@
 import time
+
 import board
 import simpleio
 
@@ -8,5 +9,5 @@ while True:
         simpleio.tone(board.A2, f, 0.25)  # on for 1/4 second
         # For the Metro M4 Express:
         # simpleio.tone(board.A1, f, 0.25)  # on for 1/4 second
-        time.sleep(0.05)                  # pause between notes
+        time.sleep(0.05)  # pause between notes
     time.sleep(0.5)
