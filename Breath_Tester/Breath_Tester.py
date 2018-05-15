@@ -20,7 +20,7 @@ def warmup_message():
     warmup_counter = 0
 
     # initial read required to get sensor going
-    co2eq, tvoc = sgp30.iaq_measure()
+    sgp30.iaq_measure()
 
     print()
     print("Warming Up [%d seconds]..." % warmup_time)
@@ -45,25 +45,25 @@ def get_breath_reading():
     print()
 
     while breath_counter <= breath_time:
-        co2eq, tvoc = sgp30.iaq_measure()
+        _, tvoc = sgp30.iaq_measure()
         breath_saves[breath_counter] = tvoc
         print(tvoc, ', ', end='')
         time.sleep(1)
         breath_counter += 1
 
     breath_saves = sorted(breath_saves)
-    highest_breath_result = breath_saves[breath_counter - 1]
+    result = breath_saves[breath_counter - 1]
 
-    return highest_breath_result
+    return result
 
 
 # show the highest reading recorded
 
 
-def show_results(highest_breath_result):
+def show_results(breath_result):
     print()
     print()
-    print("peak VOC reading:", highest_breath_result)
+    print("peak VOC reading:", breath_result)
     print()
     input("Press any key to test again")
     print()
