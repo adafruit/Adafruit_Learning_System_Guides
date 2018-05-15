@@ -67,7 +67,10 @@ class MorseFlasher:
     def __init__(self, color=(255, 255, 255)):
         # set the color adjusted for brightness
         self._color = (
-            int(color[0] * brightness), int(color[1] * brightness), int(color[2] * brightness))
+            int(color[0] * brightness),
+            int(color[1] * brightness),
+            int(color[2] * brightness)
+        )
 
     def light(self, on=True):
         if on:
