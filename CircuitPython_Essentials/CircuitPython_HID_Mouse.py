@@ -22,7 +22,8 @@ def get_voltage(pin):
     return (pin.value * 3.3) / 65536
 
 
-def steps(axis):  # Maps the potentiometer voltage range to 0-20 in whole numbers
+def steps(axis):
+    """ Maps the potentiometer voltage range to 0-20 """
     return round((axis - pot_min) / step)
 
 

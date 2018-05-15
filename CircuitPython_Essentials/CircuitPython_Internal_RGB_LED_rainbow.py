@@ -7,7 +7,8 @@ import board
 led = adafruit_dotstar.DotStar(board.APA102_SCK, board.APA102_MOSI, 1)
 
 
-# For Feather M0 Express, Metro M0 Express, Metro M4 Express and Circuit Playground Express
+# For Feather M0 Express, Metro M0 Express, Metro M4 Express and Circuit
+# Playground Express
 # led = neopixel.NeoPixel(board.NEOPIXEL, 1)
 
 
