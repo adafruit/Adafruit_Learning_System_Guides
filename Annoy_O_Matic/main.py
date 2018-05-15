@@ -64,12 +64,12 @@ def annoy_ringtone(ringtone, tempo, interval):
     # tempo is length of whole note in seconds, e.g. 1.5
     # set up time signature
     whole_note = tempo  # adjust this to change tempo of everything
-    dotted_whole_note = whole_note * 1.5
+    # dotted_whole_note = whole_note * 1.5
     # these notes are fractions of the whole note
-    half_note = whole_note / 2
-    dotted_half_note = half_note * 1.5
+    # half_note = whole_note / 2
+    # dotted_half_note = half_note * 1.5
     quarter_note = whole_note / 4
-    dotted_quarter_note = quarter_note * 1.5
+    # dotted_quarter_note = quarter_note * 1.5
     eighth_note = whole_note / 8
     dotted_eighth_note = eighth_note * 1.5
     sixteenth_note = whole_note / 16
@@ -116,22 +116,22 @@ def annoy_ringtone(ringtone, tempo, interval):
     # Bb4 = 466
     B4 = 494
 
-    C5 = 523
+    # C5 = 523
     Cs5 = 554
-    Db5 = 554
+    # Db5 = 554
     D5 = 587
-    Ds5 = 622
-    Eb5 = 622
+    # Ds5 = 622
+    # Eb5 = 622
     E5 = 659
-    F5 = 698
+    # F5 = 698
     Fs5 = 740
-    Gb5 = 740
-    G5 = 784
+    # Gb5 = 740
+    # G5 = 784
     Gs5 = 831
-    Ab5 = 831
+    # Ab5 = 831
     A5 = 880
-    As5 = 932
-    Bb5 = 932
+    # As5 = 932
+    # Bb5 = 932
     B5 = 987
 
     # here's another way to express the note pitch, double the previous octave
