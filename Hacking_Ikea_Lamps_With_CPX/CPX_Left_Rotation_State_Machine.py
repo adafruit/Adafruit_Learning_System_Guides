@@ -8,7 +8,7 @@ from adafruit_circuitplayground.express import cpx
 
 def upright(x, y, z):
     x_up = abs(x) < accel_threshold
-    y_up = abs(x) < accel_threshold
+    y_up = abs(y) < accel_threshold
     z_up = abs(9.8 - z) < accel_threshold
     return x_up and y_up and z_up
 
