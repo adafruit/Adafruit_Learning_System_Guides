@@ -58,16 +58,16 @@ statusled.direction = Direction.OUTPUT
 print("Waiting for button presses")
 
 
-def pressbutton(i):
-    switch_led = leds[i]  # find the switch LED
-    k = buttonkeys[i]  # get the corresp. keycode/str
+def pressbutton(index):
+    switch_led = leds[index]  # find the switch LED
+    k = buttonkeys[index]  # get the corresp. keycode/str
     switch_led.value = True  # turn on LED
     kbd.press(k)  # send keycode
 
 
-def releasebutton(i):
-    switch_led = leds[i]  # find the switch LED
-    k = buttonkeys[i]  # get the corresp. keycode/str
+def releasebutton(index):
+    switch_led = leds[index]  # find the switch LED
+    k = buttonkeys[index]  # get the corresp. keycode/str
     switch_led.value = False  # turn on LED
     kbd.release(k)  # send keycode
 
