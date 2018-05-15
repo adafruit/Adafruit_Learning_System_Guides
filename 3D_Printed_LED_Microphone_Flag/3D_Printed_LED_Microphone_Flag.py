@@ -130,7 +130,6 @@ def fscale(originalmin, originalmax, newbegin, newend, inputvalue, curve):
         rangedvalue = newbegin - (pow(normalizedcurval, curve) * newrange)
 
     return rangedvalue
-    return rangedvalue
 
 
 def drawLine(fromhere, to):
