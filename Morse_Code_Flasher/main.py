@@ -91,10 +91,10 @@ class MorseFlasher:
         self.light(False)
         time.sleep(symbol_gap)
 
-    def encode(self, str):
+    def encode(self, string):
         output = ""
         # iterate through string's characters
-        for c in str:
+        for c in string:
             # find morse code for a character
             for x in morse:
                 if x[0] == c:
