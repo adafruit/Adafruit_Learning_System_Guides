@@ -149,9 +149,6 @@ for i in range(len(gamma8)):
 
 
 def HSV_to_RGB(h, s, v):
-    r = 0
-    g = 0
-    b = 0
     if s == 0.0:
         r = v
         g = v
