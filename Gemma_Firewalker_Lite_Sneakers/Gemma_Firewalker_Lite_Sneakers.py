@@ -78,11 +78,14 @@ gammas = [
     37, 38, 39, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 50,
     51, 52, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 66, 67, 68,
     69, 70, 72, 73, 74, 75, 77, 78, 79, 81, 82, 83, 85, 86, 87, 89,
-    90, 92, 93, 95, 96, 98, 99, 101, 102, 104, 105, 107, 109, 110, 112, 114,
-    115, 117, 119, 120, 122, 124, 126, 127, 129, 131, 133, 135, 137, 138, 140, 142,
-    144, 146, 148, 150, 152, 154, 156, 158, 160, 162, 164, 167, 169, 171, 173, 175,
-    177, 180, 182, 184, 186, 189, 191, 193, 196, 198, 200, 203, 205, 208, 210, 213,
-    215, 218, 220, 223, 225, 228, 231, 233, 236, 239, 241, 244, 247, 249, 252, 255]
+    90, 92, 93, 95, 96, 98, 99, 101, 102, 104, 105, 107, 109, 110,
+    112, 114, 115, 117, 119, 120, 122, 124, 126, 127, 129, 131, 133,
+    135, 137, 138, 140, 142, 144, 146, 148, 150, 152, 154, 156, 158,
+    160, 162, 164, 167, 169, 171, 173, 175, 177, 180, 182, 184, 186,
+    189, 191, 193, 196, 198, 200, 203, 205, 208, 210, 213, 215, 218,
+    220, 223, 225, 228, 231, 233, 236, 239, 241, 244, 247, 249, 252,
+    255
+]
 
 
 def h2rgb(colour_hue):
@@ -106,10 +109,13 @@ def wave_setup():
 
     # assign random starting colors to waves
     for wave_index in range(n_waves):
-        wave[wave_index][hue] = wave[wave_index][hue_target] = 90 + random.randint(0, 90)
-        wave[wave_index][red] = h2rgb(wave[wave_index][hue] - 30)
-        wave[wave_index][green] = h2rgb(wave[wave_index][hue])
-        wave[wave_index][blue] = h2rgb(wave[wave_index][hue] + 30)
+        current_wave = wave[wave_index]
+        random_offset = random.randint(0, 90)
+
+        current_wave[hue] = current_wave[hue_target] = 90 + random_offset
+        current_wave[red] = h2rgb(current_wave[hue] - 30)
+        current_wave[green] = h2rgb(current_wave[hue])
+        current_wave[blue] = h2rgb(current_wave[hue] + 30)
 
 
 def vibration_detector():
@@ -221,7 +227,7 @@ while True:
                         g += (wave[w][green] * n) >> 8
                         b += (wave[w][blue] * n) >> 8  # >>8 is equiv to /256
                     else:  # Fade RGB color to white
-                        # In HSV colorspace, this would be tweaking 'saturation'
+                        # In HSV colorspace, this tweaks 'saturation'
                         n = int((y - 128) * 2)  # 0-255 affects white level
                         m = 256 * n
                         n = 256 - n  # 1-256 affects RGB level

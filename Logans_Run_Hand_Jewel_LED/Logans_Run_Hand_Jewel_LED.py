@@ -11,8 +11,10 @@ wait = .5  # 1/2 second color fade duration
 strip = neopixel.NeoPixel(pixpin, numpix, brightness=1, auto_write=False)
 
 
-# uncomment the following line for RGBW Neopixels
-# strip = neopixel.NeoPixel(pixpin, numpix, bpp=4, brightness=.3, auto_write=True)
+# uncomment the following 3 line for RGBW Neopixels
+# strip = neopixel.NeoPixel(
+# pixpin, numpix, bpp=4, brightness=.3, auto_write=True
+# )
 
 # Linear interpolation of y value given min/max x, min/max y, and x position.
 
@@ -58,7 +60,8 @@ def color_gradient(start_r, start_g, start_b, end_r, end_g, end_b, pos):
 # Total duration of animation, in milliseconds
 
 
-def animate_gradient_fill(start_r, start_g, start_b, end_r, end_g, end_b, duration_ms):
+def animate_gradient_fill(start_r, start_g, start_b, end_r, end_g, end_b,
+                          duration_ms):
     start = time.monotonic()
 
     # Display start color.
