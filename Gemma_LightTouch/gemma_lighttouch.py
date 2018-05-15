@@ -99,3 +99,4 @@ while True:
         touch_A2_state = "ready"
     if touch_A2.value and touch_A2_state == "ready":
         next(brightness)
+        touch_A2_state = None
