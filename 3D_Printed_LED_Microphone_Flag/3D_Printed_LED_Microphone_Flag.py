@@ -40,7 +40,8 @@ sample_window = .1  # Sample window for average level
 peak_hang = 24  # Time of pause before peak dot falls
 peak_fall = 4  # Rate of falling peak dot
 input_floor = 10  # Lower range of analogRead input
-# Max range of analogRead input, the lower the value the more sensitive (1023 = max)
+# Max range of analogRead input, the lower the value the more sensitive
+# (1023 = max)
 input_ceiling = 300
 
 peak = 16  # Peak level of column; used for falling dots
@@ -58,7 +59,7 @@ def wheel(pos):
     if pos < 0 or pos > 255:
         return (0, 0, 0)
     if pos < 85:
-        return (int(pos * 3), int(255 - (pos*3)), 0)
+        return (int(pos * 3), int(255 - (pos * 3)), 0)
     elif pos < 170:
         pos -= 85
         return (int(255 - pos * 3), 0, int(pos * 3))
@@ -114,7 +115,8 @@ def fscale(originalmin, originalmax, newbegin, newend, inputvalue, curve):
         invflag = 1
 
     zerorefcurval = inputvalue - originalmin
-    normalizedcurval = zerorefcurval / originalrange  # normalize to 0 - 1 float
+    # normalize to 0 - 1 float
+    normalizedcurval = zerorefcurval / originalrange
 
     # Check for originalMin > originalMax
     # -the math for all other cases
@@ -124,7 +126,7 @@ def fscale(originalmin, originalmax, newbegin, newend, inputvalue, curve):
 
     if invflag == 0:
         rangedvalue = (pow(normalizedcurval, curve) * newrange) + newbegin
-    else:         # invert the ranges
+    else:  # invert the ranges
         rangedvalue = newbegin - (pow(normalizedcurval, curve) * newrange)
 
     return rangedvalue
