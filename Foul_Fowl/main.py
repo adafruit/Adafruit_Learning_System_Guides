@@ -144,23 +144,33 @@ def launch_terminal():
         time.sleep(2)
 
         layout.write(
-            " _   _ _____ _     _     ___    _____ ____  ___ _____ _   _ ____")
+            " _   _ _____ _     _     ___    "
+            "_____ ____  ___ _____ _   _ ____"
+        )
         kbd.press(Keycode.ENTER)
         kbd.release_all()
         layout.write(
-            "| | | | ____| |   | |   / _ \  |  ___|  _ \|_ _| ____| \ | |  _ \ ")
+            "| | | | ____| |   | |   / _ \  | "
+            " ___|  _ \|_ _| ____| \ | |  _ \ "
+        )
         kbd.press(Keycode.ENTER)
         kbd.release_all()
         layout.write(
-            "| |_| |  _| | |   | |  | | | | | |_  | |_) || ||  _| |  \| | | | |")
+            "| |_| |  _| | |   | |  | | | | | |"
+            "_  | |_) || ||  _| |  \| | | | |"
+        )
         kbd.press(Keycode.ENTER)
         kbd.release_all()
         layout.write(
-            "|  _  | |___| |___| |__| |_| | |  _| |  _ < | || |___| |\  | |_| |")
+            "|  _  | |___| |___| |__| |_| | | "
+            " _| |  _ < | || |___| |\  | |_| |"
+        )
         kbd.press(Keycode.ENTER)
         kbd.release_all()
         layout.write(
-            "|_| |_|_____|_____|_____\___/  |_|   |_| \_\___|_____|_| \_|____/ ")
+            "|_| |_|_____|_____|_____\___/  |_"
+            "|   |_| \_\___|_____|_| \_|____/ "
+        )
         kbd.press(Keycode.ENTER)
         kbd.release_all()
 
@@ -189,8 +199,14 @@ def download_image():
 
     # this says where to save image, and where to get it
     led.value = False
+
+    url = (
+        'https://cdn-learn.adafruit.com/assets/assets/000/051/840/'
+        'original/hacks_foulFowl.jpg'
+    )
     layout.write(
-        'curl -o ~/Desktop/hackimage.jpg https://cdn-learn.adafruit.com/assets/assets/000/051/840/original/hacks_foulFowl.jpg')
+        'curl -o ~/Desktop/hackimage.jpg {}'.format(url)
+    )
     time.sleep(pause)
     kbd.press(Keycode.ENTER)
     led.value = True
@@ -213,7 +229,11 @@ def replace_background():
     # run this after download_image (which ran after launch_terminal)
     # it uses actionscript to change the background
     layout.write(
-        'osascript -e \'tell application \"System Events\" to set picture of every desktop to (POSIX path of (path to home folder) & \"/Desktop/hackimage.jpg\" as POSIX file as alias)\'')
+        'osascript -e \'tell application \"System Events\" '
+        'to set picture of every desktop to (POSIX path of '
+        '(path to home folder) & \"/Desktop/hackimage.jpg\" '
+        'as POSIX file as alias)\''
+    )
     time.sleep(pause)
     kbd.press(Keycode.ENTER)
     kbd.release_all()
