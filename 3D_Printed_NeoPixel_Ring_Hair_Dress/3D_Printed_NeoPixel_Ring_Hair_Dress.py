@@ -50,10 +50,10 @@ action_step_duration = 2
 # loop in milliseconds - thus, controls the action speed (be
 # careful not to use values > 2^16-1 - roughly one minute :-)
 
-color_granularity = 3  # controls the increment of the R, G, and B portions of the
-# rsp. color. 1 means the increment is 0,1,2,3,..., 10 means
-# the increment is 0,10,20,... don't use values > 255, and note
-# that even values > 127 wouldn't make much sense...
+color_granularity = 3  # controls the increment of the R, G, and B
+# portions of the rsp. color. 1 means the increment is 0,1,2,3,...,
+# 10 means the increment is 0,10,20,... don't use values > 255, and
+# note that even values > 127 wouldn't make much sense...
 
 # controls the speed of color changing independently from action
 color_interval = 4
@@ -80,23 +80,23 @@ spectrum_part = 0
 # this array variable must be called theactionlist !!!
 #
 # valid actions are:
-#      ACT_NOP                     simply do nothing and switch everything off
-#      ACT_SIMPLE_RING             all leds on
-#      ACT_CYCLING_RING_ACLK       anti clockwise cycling colors
-#      ACT_CYCLING_RING_CLKW       clockwise cycling colors acording
-#      ACT_WHEEL_ACLK              anti clockwise spinning wheel
-#      ACT_WHEEL_CLKW              clockwise spinning wheel
-#      ACT_SPARKLING_RING          sparkling effect
+#      ACT_NOP                  simply do nothing and switch everything off
+#      ACT_SIMPLE_RING          all leds on
+#      ACT_CYCLING_RING_ACLK    anti clockwise cycling colors
+#      ACT_CYCLING_RING_CLKW    clockwise cycling colors acording
+#      ACT_WHEEL_ACLK           anti clockwise spinning wheel
+#      ACT_WHEEL_CLKW           clockwise spinning wheel
+#      ACT_SPARKLING_RING       sparkling effect
 #
 #   valid color options are:
-#      COL_RANDOM                  colors will be selected randomly, which might
-#                                  be not very sufficient due to well known
-#                                  limitations of the random generation algorithm
-#      COL_SPECTRUM                colors will be set as cyclic spectral wipe
-#                                  R -> G -> B -> R -> G -> B -> R -> ...
+#      COL_RANDOM               colors will be selected randomly, which might
+#                               be not very sufficient due to well known
+#                               limitations of the random generation algorithm
+#      COL_SPECTRUM             colors will be set as cyclic spectral wipe
+#                               R -> G -> B -> R -> G -> B -> R -> ...
 
-# action    action name &                          action step    color        color change
-# duration  color generation method                duration       granularity  interval
+# action    action name &             action step    color        color change
+# duration  color generation method   duration       granularity  interval
 theactionlist = [
     [5, ACT_SPARKLING_RING | COL_RANDOM, 0.01, 25, 1],
     [2, ACT_CYCLING_RING_CLKW | COL_RANDOM,
@@ -229,12 +229,14 @@ while True:  # Loop forever...
 
     # do we need to load the next action?
     if (time.monotonic() - action_timer) > curr_action_duration:
-        curr_action_duration = theactionlist[curr_action_idx][action_duration]
-        curr_action = theactionlist[curr_action_idx][action_and_color_gen] & 0x3F
-        curr_action_step_duration = theactionlist[curr_action_idx][action_step_duration]
-        curr_color_gen = theactionlist[curr_action_idx][action_and_color_gen] & 0xC0
-        curr_color_granularity = theactionlist[curr_action_idx][color_granularity]
-        curr_color_interval = theactionlist[curr_action_idx][color_interval]
+        current_action = theactionlist[curr_action_idx]
+
+        curr_action_duration = current_action[action_duration]
+        curr_action = current_action[action_and_color_gen] & 0x3F
+        curr_action_step_duration = current_action[action_step_duration]
+        curr_color_gen = current_action[action_and_color_gen] & 0xC0
+        curr_color_granularity = current_action[color_granularity]
+        curr_color_interval = current_action[color_interval]
         curr_action_idx += 1
 
         # take care to rotate the action list!
@@ -251,6 +253,8 @@ while True:  # Loop forever...
 
         if curr_action:
 
+            is_act_cycling = (ACT_CYCLING_RING_ACLK or ACT_CYCLING_RING_CLKW)
+
             if curr_action == ACT_NOP:
                 # rather trivial even tho this will be repeated as long as the
                 # NOP continues - i could have prevented it from repeating
@@ -264,7 +268,7 @@ while True:  # Loop forever...
                 for i in range(0, numpix):
                     strip[i] = color
 
-            elif curr_action == (ACT_CYCLING_RING_ACLK or ACT_CYCLING_RING_CLKW):
+            elif curr_action == is_act_cycling:
                 # spin the ring clockwise or anti clockwise
                 if curr_action == ACT_CYCLING_RING_ACLK:
                     idx += 1
