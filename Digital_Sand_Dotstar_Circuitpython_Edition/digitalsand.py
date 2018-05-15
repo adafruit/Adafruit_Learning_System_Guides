@@ -45,7 +45,8 @@ MAX_Y = HEIGHT * 256 - 1
 
 
 class Grain:
-    """A simple struct to hold position and velocity information for a single grain."""
+    """A simple struct to hold position and velocity information
+    for a single grain."""
 
     def __init__(self):
         """Initialize grain position and velocity."""
@@ -71,7 +72,8 @@ occupied_bits = [False for _ in range(WIDTH * HEIGHT)]
 
 
 def index_of_xy(x, y):
-    """Convert an x/column and y/row into an index into a linear pixel array.
+    """Convert an x/column and y/row into an index into
+    a linear pixel array.
 
     :param int x: column value
     :param int y: row value
@@ -82,8 +84,9 @@ def index_of_xy(x, y):
 def already_present(limit, x, y):
     """Check if a pixel is already used.
 
-    :param int limit: the index into the grain array of the grain being assigned a pixel
-                      Only grains already allocated need to be checks against.
+    :param int limit: the index into the grain array of
+    the grain being assigned a pixel Only grains already
+    allocated need to be checks against.
     :param int x: proposed clumn value for the new grain
     :param int y: proposed row valuse for the new grain
     """
@@ -185,10 +188,12 @@ while True:
                 g.vy //= -2
                 newidx = oldidx  # no pixel change
             else:  # Diagonal intersection is more tricky...
-                # Try skidding along just one axis of motion if possible (start w/
-                # faster axis).  Because we've already established that diagonal
-                # (both-axis) motion is occurring, moving on either axis alone WILL
-                # change the pixel index, no need to check that again.
+                # Try skidding along just one axis of motion if
+                # possible (start w/ faster axis). Because we've
+                # already established that diagonal (both-axis)
+                # motion is occurring, moving on either axis alone
+                # WILL change the pixel index, no need to check
+                # that again.
                 if abs(g.vx) > abs(g.vy):  # x axis is faster
                     newidx = index_of_xy(newx, g.y)
                     # that pixel is free, take it! But...
