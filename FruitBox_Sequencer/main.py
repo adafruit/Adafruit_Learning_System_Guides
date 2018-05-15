@@ -42,11 +42,11 @@ step_pixel = [9, 8, 7, 6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
 step_col = [WHITE, RED, YELLOW, GREEN, AQUA, BLUE, PURPLE, BLACK]
 
 
-def prog_mode(i):
-    cpx.play_file(audio_files[i])
-    step_note[step] = i
+def prog_mode(index):
+    cpx.play_file(audio_files[index])
+    step_note[step] = index
     cpx.pixels[step_pixel[step]] = step_col[step_note[step]]
-    print("playing file " + audio_files[i])
+    print("playing file " + audio_files[index])
 
 
 while True:

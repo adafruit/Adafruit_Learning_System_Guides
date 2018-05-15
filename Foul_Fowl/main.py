@@ -135,7 +135,7 @@ def launch_terminal():
         time.sleep(pause)
 
         # type a message a few times
-        for i in range(3):
+        for _ in range(3):
             layout.write("HELLO FRIEND")
             # time.sleep(pause)
             kbd.press(Keycode.ENTER)
