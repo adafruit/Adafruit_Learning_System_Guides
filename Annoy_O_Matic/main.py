@@ -34,7 +34,7 @@ ringtone_tempo = 1.6  # suggested Nokia 0.9 , iPhone 1.3 , Rickroll 2.0
 
 
 def annoy_beep(frequency, length, repeat, rest, interval):
-    for r in range(repeat):
+    for _ in range(repeat):
         piezo.frequency = frequency  # 2600 is a nice choice
         piezo.duty_cycle = 65536 // 2  # on 50%
         time.sleep(length)  # sound on
@@ -211,8 +211,8 @@ def annoy_ringtone(ringtone, tempo, interval):
 
 
 def annoy_crickets(repeat, interval):
-    for i in range(repeat):
-        for r in range(6):
+    for _ in range(repeat):
+        for _ in range(6):
             piezo.frequency = 8000  # 2600 is a nice choice
             piezo.duty_cycle = 65536 // 2  # on 50%
             time.sleep(0.02)  # sound on
@@ -231,17 +231,17 @@ def annoy_teen_tone(interval):
 
 
 while True:
-    if annoy_mode is 1:
+    if annoy_mode == 1:
         annoy_beep(frequency, length, repeat, rest, interval)
-    elif annoy_mode is 2:
+    elif annoy_mode == 2:
         annoy_doorbell(interval)
-    elif annoy_mode is 3:
+    elif annoy_mode == 3:
         annoy_ringtone(ringtone, ringtone_tempo, interval)
-    elif annoy_mode is 4:
+    elif annoy_mode == 4:
         annoy_crickets(repeat, interval)
-    elif annoy_mode is 5:
+    elif annoy_mode == 5:
         annoy_teen_tone(interval)
-    elif annoy_mode is 6:
+    elif annoy_mode == 6:
         annoy_beep(5000, 0.2, 2, 0.05, 3)
         annoy_doorbell(3)
         annoy_ringtone(1, 0.9, 3)
