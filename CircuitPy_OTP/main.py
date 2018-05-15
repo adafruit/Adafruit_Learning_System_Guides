@@ -120,11 +120,13 @@ def int_to_bytestring(i, padding=8):
 # https://github.com/pyotp/pyotp/blob/master/src/pyotp/otp.py
 
 
-def generate_otp(input, secret, digits=6):
-    if input < 0:
+def generate_otp(int_input, secret_key, digits=6):
+    if int_input < 0:
         raise ValueError('input must be positive integer')
     hmac_hash = bytearray(
-        HMAC(bytes(base32_decode(secret)), int_to_bytestring(input)).digest())
+        HMAC(bytes(base32_decode(secret_key)),
+             int_to_bytestring(int_input)).digest()
+    )
     offset = hmac_hash[-1] & 0xf
     code = ((hmac_hash[offset] & 0x7f) << 24 |
             (hmac_hash[offset + 1] & 0xff) << 16 |
