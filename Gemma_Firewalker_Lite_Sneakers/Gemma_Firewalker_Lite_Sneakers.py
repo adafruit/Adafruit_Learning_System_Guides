@@ -191,12 +191,12 @@ while True:
             r = g = b = 0
 
             # For each item in wave[] array...
-            for w in range(n_waves):
+            for w_index in range(n_waves):
                 # Calculate distance from pixel center to wave
                 # center point, using both signed and unsigned
                 # 8-bit integers...
-                d1 = int(abs(x - wave[w][center]))
-                d2 = int(abs(x - wave[w][center]))
+                d1 = int(abs(x - wave[w_index][center]))
+                d2 = int(abs(x - wave[w_index][center]))
 
                 # Then take the lesser of the two, resulting in
                 # a distance (0-128)
@@ -211,9 +211,9 @@ while True:
                 # pixel (basic linear y=mx+b stuff).
                 # Is distance within wave's influence?
                 # d2 is opposite; distance to wave's end
-                if d1 < wave[w][width]:
-                    d2 = wave[w][width] - d1
-                    y = int(brightness * d2 / wave[w][width])  # 0 to 200
+                if d1 < wave[w_index][width]:
+                    d2 = wave[w_index][width] - d1
+                    y = int(brightness * d2 / wave[w_index][width])  # 0 to 200
 
                     # y is a brightness scale value --
                     # proportional to, but not exactly equal
@@ -222,18 +222,18 @@ while True:
                         # In HSV colorspace, this would be
                         # tweaking 'value'
                         n = int(y * 2 + 1)  # 1-256
-                        r += (wave[w][red] * n) >> 8  # More fixed-point math
+                        r += (wave[w_index][red] * n) >> 8  # More fixed-point math
                         # Wave color is scaled by 'n'
-                        g += (wave[w][green] * n) >> 8
-                        b += (wave[w][blue] * n) >> 8  # >>8 is equiv to /256
+                        g += (wave[w_index][green] * n) >> 8
+                        b += (wave[w_index][blue] * n) >> 8  # >>8 is equiv to /256
                     else:  # Fade RGB color to white
                         # In HSV colorspace, this tweaks 'saturation'
                         n = int((y - 128) * 2)  # 0-255 affects white level
                         m = 256 * n
                         n = 256 - n  # 1-256 affects RGB level
-                        r += (m + wave[w][red] * n) >> 8
-                        g += (m + wave[w][green] * n) >> 8
-                        b += (m + wave[w][blue] * n) >> 8
+                        r += (m + wave[w_index][red] * n) >> 8
+                        g += (m + wave[w_index][green] * n) >> 8
+                        b += (m + wave[w_index][blue] * n) >> 8
 
             # r,g,b are 16-bit types that accumulate brightness
             # from all waves that affect this pixel; may exceed
