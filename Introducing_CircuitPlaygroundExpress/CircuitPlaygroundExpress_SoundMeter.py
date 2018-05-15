@@ -47,7 +47,7 @@ def constrain(value, floor, ceiling):
     return max(floor, min(value, ceiling))
 
 
-# Scale input_value to be between output_min and output_max, in an exponential way.
+# Scale input_value between output_min and output_max, exponentially.
 
 
 def log_scale(input_value, input_min, input_max, output_min, output_max):
@@ -63,7 +63,10 @@ def log_scale(input_value, input_min, input_max, output_min, output_max):
 
 def normalized_rms(values):
     minbuf = int(mean(values))
-    samples_sum = sum(float(sample - minbuf) * (sample - minbuf) for sample in values)
+    samples_sum = sum(
+        float(sample - minbuf) * (sample - minbuf)
+        for sample in values
+    )
 
     return math.sqrt(samples_sum / len(values))
 

@@ -7,7 +7,7 @@ import board
 import touchio
 from digitalio import DigitalInOut, Direction
 
-bpm = 120  # beats per minute for sustained hold, change this to suit your tempo
+bpm = 120  # beats per minute, change this to suit your tempo
 
 # enable the speaker
 spkrenable = DigitalInOut(board.SPEAKER_ENABLE)
