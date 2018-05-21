@@ -59,7 +59,7 @@ counting = [
     [0, 1],
     [0, 3, 1],
     [0, 2, 1],
-    [3, 3, 2, 1]
+    [0, 3, 2, 1]
 ]
 
 play_file(introfile)
@@ -74,7 +74,7 @@ while True:
         print("Servo %s angle = 0" % i )
         time.sleep(.2)
 
-    time.sleep(3)  # pause a moment
+    time.sleep(1)  # pause a moment
 
     for i in range(len(counting)):
         # close all the counting fingers between numbers
@@ -93,5 +93,5 @@ while True:
         # say it!
         play_file(wavfiles[i])
         # hold for a bit of time
-        time.sleep(2)
+        time.sleep(0.3)
         print("...")
