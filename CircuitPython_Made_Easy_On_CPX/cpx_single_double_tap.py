@@ -17,6 +17,6 @@ cpx.detect_taps = 2
 # We're looking for 2 double-taps before moving on.
 while tap_count < 2:
     if cpx.tapped:
-       tap_count += 1
+        tap_count += 1
 print("Reached 2 double-taps!")
 print("Done.")

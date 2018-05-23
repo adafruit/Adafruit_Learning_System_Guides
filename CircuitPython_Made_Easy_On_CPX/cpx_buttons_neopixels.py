@@ -1,4 +1,4 @@
-﻿﻿from adafruit_circuitplayground.express import cpx
+﻿from adafruit_circuitplayground.express import cpx
 
 cpx.pixels.brightness = 0.3
 

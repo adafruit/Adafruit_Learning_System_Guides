@@ -1,5 +1,5 @@
-from adafruit_circuitplayground.express import cpx
 import time
+from adafruit_circuitplayground.express import cpx
 
 # Main loop gets x, y and z axis acceleration, prints the values, and turns on
 # red, green and blue, at levels related to the x, y and z values.

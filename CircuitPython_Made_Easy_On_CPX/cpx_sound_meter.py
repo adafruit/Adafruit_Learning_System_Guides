@@ -1,6 +1,8 @@
-from express import cpx
 import array
 import math
+import audiobusio
+import board
+from adafruit_circuitplayground.express import cpx
 
 
 def constrain(value, floor, ceiling):
@@ -14,10 +16,13 @@ def log_scale(input_value, input_min, input_max, output_min, output_max):
 
 def normalized_rms(values):
     minbuf = int(sum(values) / len(values))
-    return math.sqrt(sum(float(sample - minbuf) * (sample - minbuf) for sample in values) / len(values))
+    return math.sqrt(sum(float(sample - minbuf) *
+                         (sample - minbuf) for sample in values) / len(values))
 
 
+mic = audiobusio.PDMIn(board.MICROPHONE_CLOCK, board.MICROPHONE_DATA, frequency=16000, bit_depth=16)
 samples = array.array('H', [0] * 160)
+mic.record(samples, len(samples))
 input_floor = normalized_rms(samples) + 10
 
 # Lower number means more sensitive - more LEDs will light up with less sound.
@@ -26,9 +31,11 @@ input_ceiling = input_floor + sensitivity
 
 peak = 0
 while True:
-    print(cpx.magnitude())
+    mic.record(samples, len(samples))
+    magnitude = normalized_rms(samples)
+    print((magnitude,))
 
-    c = log_scale(constrain(cpx.magnitude(), input_floor, input_ceiling),
+    c = log_scale(constrain(magnitude, input_floor, input_ceiling),
                   input_floor, input_ceiling, 0, 10)
 
     cpx.pixels.fill((0, 0, 0))
