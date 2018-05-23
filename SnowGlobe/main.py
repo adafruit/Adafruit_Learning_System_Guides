@@ -54,20 +54,20 @@ def play_song(song_number):
     eighth_note = whole_note / 8
 
     # set up note values
-    # A3 = 220
-    # Bb3 = 233
-    # B3 = 247
+    A3 = 220
+    Bb3 = 233
+    B3 = 247
     C4 = 262
-    # Db4 = 277
+    Db4 = 277
     D4 = 294
-    # Eb4 = 311
+    Eb4 = 311
     E4 = 330
     F4 = 349
-    # Gb4 = 370
+    Gb4 = 370
     G4 = 392
-    # Ab4 = 415
+    Ab4 = 415
     A4 = 440
-    # Bb4 = 466
+    Bb4 = 466
     B4 = 494
 
     if song_number == 1:
