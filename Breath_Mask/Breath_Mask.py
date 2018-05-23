@@ -26,10 +26,8 @@ temp = ccs.temperature
 ccs.temp_offset = temp - 25.0
 
 
-# clear all LEDs for breathing effect
-
-
 def clear_pix(delay):
+    # clear all LEDs for breathing effect
     for i in range(0, num_leds):
         temperature_pix[i] = (0, 0, 0)
         co2_pix[i] = (0, 0, 0, 0)
@@ -37,10 +35,8 @@ def clear_pix(delay):
         time.sleep(delay)
 
 
-# Show Carbon Dioxide on a NeoPixel Strip
-
-
 def co2_led_meter():
+    # Show Carbon Dioxide on a NeoPixel Strip
     co2_floor = 400
     co2_ceiling = 8192
 
@@ -55,10 +51,8 @@ def co2_led_meter():
         time.sleep(led_draw)
 
 
-# Show Total Volatile Organic Compounds on a NeoPixel Strip
-
-
 def tvoc_led_meter():
+    # Show Total Volatile Organic Compounds on a NeoPixel Strip
     tvoc_floor = 0
     tvoc_ceiling = 1187
 
@@ -73,10 +67,8 @@ def tvoc_led_meter():
         time.sleep(led_draw)
 
 
-# Show Temperature on Circuit Playground built-in NeoPixels
-
-
 def temp_led_meter():
+    # Show Temperature on Circuit Playground built-in NeoPixels
     temp_floor = 23
     temp_ceiling = 36
 
