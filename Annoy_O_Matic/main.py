@@ -64,38 +64,38 @@ def annoy_ringtone(ringtone, tempo, interval):
     # tempo is length of whole note in seconds, e.g. 1.5
     # set up time signature
     whole_note = tempo  # adjust this to change tempo of everything
-    # dotted_whole_note = whole_note * 1.5
+    dotted_whole_note = whole_note * 1.5
     # these notes are fractions of the whole note
-    # half_note = whole_note / 2
-    # dotted_half_note = half_note * 1.5
+    half_note = whole_note / 2
+    dotted_half_note = half_note * 1.5
     quarter_note = whole_note / 4
-    # dotted_quarter_note = quarter_note * 1.5
+    dotted_quarter_note = quarter_note * 1.5
     eighth_note = whole_note / 8
     dotted_eighth_note = eighth_note * 1.5
     sixteenth_note = whole_note / 16
 
     # set up note values
-    # A2 = 110
-    # As2 = 117  # 's' stands for sharp: A#2
-    # Bb2 = 117
-    # B2 = 123
+    A2 = 110
+    As2 = 117  # 's' stands for sharp: A#2
+    Bb2 = 117
+    B2 = 123
 
-    # C3 = 131
-    # Cs3 = 139
-    # Db3 = 139
-    # D3 = 147
-    # Ds3 = 156
-    # Eb3 = 156
-    # E3 = 165
-    # F3 = 175
-    # Fs3 = 185
-    # Gb3 = 185
-    # G3 = 196
-    # Gs3 = 208
-    # Ab3 = 208
+    C3 = 131
+    Cs3 = 139
+    Db3 = 139
+    D3 = 147
+    Ds3 = 156
+    Eb3 = 156
+    E3 = 165
+    F3 = 175
+    Fs3 = 185
+    Gb3 = 185
+    G3 = 196
+    Gs3 = 208
+    Ab3 = 208
     A3 = 220
-    # As3 = 233
-    # Bb3 = 233
+    As3 = 233
+    Bb3 = 233
     B3 = 247
 
     # C4 = 262
@@ -116,42 +116,42 @@ def annoy_ringtone(ringtone, tempo, interval):
     # Bb4 = 466
     B4 = 494
 
-    # C5 = 523
+    C5 = 523
     Cs5 = 554
-    # Db5 = 554
+    Db5 = 554
     D5 = 587
-    # Ds5 = 622
-    # Eb5 = 622
+    Ds5 = 622
+    Eb5 = 622
     E5 = 659
-    # F5 = 698
+    F5 = 698
     Fs5 = 740
-    # Gb5 = 740
-    # G5 = 784
+    Gb5 = 740
+    G5 = 784
     Gs5 = 831
-    # Ab5 = 831
+    Ab5 = 831
     A5 = 880
-    # As5 = 932
-    # Bb5 = 932
+    As5 = 932
+    Bb5 = 932
     B5 = 987
 
     # here's another way to express the note pitch, double the previous octave
-    # C6 = C5 * 2
+    C6 = C5 * 2
     Cs6 = Cs5 * 2
-    # Db6 = Db5 * 2
+    Db6 = Db5 * 2
     D6 = D5 * 2
-    # Ds6 = Ds5 * 2
-    # Eb6 = Eb5 * 2
+    Ds6 = Ds5 * 2
+    Eb6 = Eb5 * 2
     E6 = E5 * 2
-    # F6 = F5 * 2
-    # Fs6 = Fs5 * 2
-    # Gb6 = Gb5 * 2
-    # G6 = G5 * 2
-    # Gs6 = Gs5 * 2
-    # Ab6 = Ab5 * 2
-    # A6 = A5 * 2
-    # As6 = As5 * 2
-    # Bb6 = Bb5 * 2
-    # B6 = B5 * 2
+    F6 = F5 * 2
+    Fs6 = Fs5 * 2
+    Gb6 = Gb5 * 2
+    G6 = G5 * 2
+    Gs6 = Gs5 * 2
+    Ab6 = Ab5 * 2
+    A6 = A5 * 2
+    As6 = As5 * 2
+    Bb6 = Bb5 * 2
+    B6 = B5 * 2
 
     if ringtone == 1:
         # Nokia
