@@ -4,4 +4,4 @@ cpx.detect_taps = 2
 
 while True:
     if cpx.tapped:
-        print("Double tapped!")
+        print("Tapped!")
