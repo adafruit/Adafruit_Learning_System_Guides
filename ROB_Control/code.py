@@ -12,8 +12,8 @@ import gc
 
 # Commands, each 8 bit command is preceded by the 5 bit Init sequence
 Init = [0, 0, 0, 1, 0]            # This must precede any command
-Up = [1, 0, 1, 0, 1, 0, 1, 1]     # Move arms/body down
-Down = [1, 0, 1, 1, 1, 0, 1, 1]   # Move arms/body up
+Up = [1, 0, 1, 1, 1, 0, 1, 1]     # Move arms/body down
+Down = [1, 1, 1, 1, 1, 0, 1, 1]   # Move arms/body up
 Left = [1, 0, 1, 1, 1, 0, 1, 0]   # Twist body left
 Right = [1, 1, 1, 0, 1, 0, 1, 0]  # Twist body right
 Close = [1, 0, 1, 1, 1, 1, 1, 0]  # Close arms
