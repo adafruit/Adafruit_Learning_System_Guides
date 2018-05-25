@@ -2,6 +2,7 @@
 # Using an Adafruit Circuit Playground Express, Crickit, and 2 servos
 # Dano Wall, Mike Barela for Adafruit Industries, MIT License, May, 2018
 #
+import time
 from digitalio import DigitalInOut, Direction, Pull
 from adafruit_seesaw.seesaw import Seesaw
 from adafruit_seesaw.pwmout import PWMOut
@@ -9,7 +10,6 @@ from adafruit_seesaw.pwmout import PWMOut
 from adafruit_motor import servo
 from busio import I2C
 import board
-import time
 
 # Create seesaw object for Circuit Playground Express to talk to Crickit
 i2c = I2C(board.SCL, board.SDA)
