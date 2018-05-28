@@ -1,10 +1,9 @@
-# Snow Globe
-# for Adafruit Circuit Playground express
-# with CircuitPython
+"""Snow Globe for Adafruit Circuit Playground express with CircuitPython """
 
-from adafruit_circuitplayground.express import cpx
 import math
 import time
+
+from adafruit_circuitplayground.express import cpx
 
 ROLL_THRESHOLD = 30  # Total acceleration
 cpx.pixels.brightness = 0.1  # set brightness value
@@ -21,7 +20,8 @@ new_roll = False
 rolling = False
 
 
-def fade_pixels(fade_color):  # pick from colors defined above, e.g., RED, GREEN, BLUE, WHITE, etc.
+# pick from colors defined above, e.g., RED, GREEN, BLUE, WHITE, etc.
+def fade_pixels(fade_color):
     # fade up
     for j in range(25):
         pixel_brightness = (j * 0.01)
@@ -35,6 +35,7 @@ def fade_pixels(fade_color):  # pick from colors defined above, e.g., RED, GREEN
         cpx.pixels.brightness = pixel_brightness
         for i in range(10):
             cpx.pixels[i] = fade_color
+
 
 # fade in the pixels
 fade_pixels(GREEN)
@@ -71,31 +72,46 @@ def play_song(song_number):
 
     if song_number == 1:
         # jingle bells
-        jingle_bells_song = [[E4, quarter_note], [E4, quarter_note],
-        [E4, half_note], [E4, quarter_note], [E4, quarter_note],
-        [E4, half_note], [E4, quarter_note], [G4, quarter_note],
-        [C4, dotted_quarter_note], [D4, eighth_note], [E4, whole_note]]
+        jingle_bells_song = [
+            [E4, quarter_note],
+            [E4, quarter_note],
+            [E4, half_note],
+            [E4, quarter_note],
+            [E4, quarter_note],
+            [E4, half_note],
+            [E4, quarter_note],
+            [G4, quarter_note],
+            [C4, dotted_quarter_note],
+            [D4, eighth_note],
+            [E4, whole_note],
+        ]
 
         for n in range(len(jingle_bells_song)):
             cpx.start_tone(jingle_bells_song[n][0])
             time.sleep(jingle_bells_song[n][1])
             cpx.stop_tone()
 
-
     if song_number == 2:
         # Let It Snow
-        let_it_snow_song = [[B4, dotted_quarter_note], [A4, eighth_note],
-        [G4, quarter_note], [G4, dotted_quarter_note], [F4, eighth_note],
-        [E4, quarter_note], [E4, dotted_quarter_note], [D4, eighth_note],
-        [C4, whole_note]]
+        let_it_snow_song = [
+            [B4, dotted_quarter_note],
+            [A4, eighth_note],
+            [G4, quarter_note],
+            [G4, dotted_quarter_note],
+            [F4, eighth_note],
+            [E4, quarter_note],
+            [E4, dotted_quarter_note],
+            [D4, eighth_note],
+            [C4, whole_note],
+        ]
 
         for n in range(len(let_it_snow_song)):
             cpx.start_tone(let_it_snow_song[n][0])
             time.sleep(let_it_snow_song[n][1])
             cpx.stop_tone()
 
-play_song(1)  # play music on start
 
+play_song(1)  # play music on start
 
 # Loop forever
 while True:
@@ -114,7 +130,8 @@ while True:
     y_total = y_total / 10
     z_total = z_total / 10
 
-    total_accel = math.sqrt(x_total*x_total + y_total*y_total + z_total*z_total)
+    total_accel = math.sqrt(x_total * x_total + y_total *
+                            y_total + z_total * z_total)
 
     # Check for rolling
     if total_accel > ROLL_THRESHOLD:
@@ -127,7 +144,7 @@ while True:
     # Keep rolling for a period of time even after shaking stops
     if new_roll:
         if time.monotonic() - roll_start_time > 2:  # seconds to run
-                rolling = False
+            rolling = False
 
     # Light show
     if rolling:
@@ -140,7 +157,7 @@ while True:
         new_roll = False
         # play a song!
         play_song(2)
-        #return to resting color
+        # return to resting color
         fade_pixels(GREEN)
         cpx.pixels.brightness = 0.05
         cpx.pixels.fill(GREEN)

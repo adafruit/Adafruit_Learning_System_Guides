@@ -1,6 +1,6 @@
-from digitalio import DigitalInOut, Direction, Pull
 import audioio
 import board
+from digitalio import DigitalInOut, Direction, Pull
 
 # enable the speaker
 spkrenable = DigitalInOut(board.SPEAKER_ENABLE)
@@ -19,14 +19,16 @@ buttonB.pull = Pull.DOWN
 # The two files assigned to buttons A & B
 audiofiles = ["rimshot.wav", "laugh.wav"]
 
+
 def play_file(filename):
-    print("playing file "+filename)
+    print("playing file " + filename)
     f = open(filename, "rb")
     a = audioio.AudioOut(board.A0, f)
     a.play()
     while a.playing:
         pass
     print("finished")
+
 
 while True:
     if buttonA.value:

@@ -2,11 +2,12 @@
 # for fine tuning Software Defined Radio CubicSDR software
 # 10k pot hooked to 3v, A2, and D2 acting as GND
 
-from analogio import AnalogIn
-import board
 import time
+
+import board
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keycode import Keycode
+from analogio import AnalogIn
 from digitalio import DigitalInOut, Direction
 
 d2_ground = DigitalInOut(board.D2)
@@ -22,11 +23,14 @@ pot_min = 0.00
 step = (pot_max - pot_min) / 10.0
 last_knob = 0
 
+
 def steps(x):
     return round((x - pot_min) / step)
 
+
 def getVoltage(pin):
     return (pin.value * 3.3) / 65536
+
 
 def spamKey(code):
     knobkeys = [Keycode.RIGHT_BRACKET, Keycode.RIGHT_BRACKET,
@@ -35,16 +39,18 @@ def spamKey(code):
                 Keycode.LEFT_BRACKET, Keycode.LEFT_BRACKET,
                 Keycode.LEFT_BRACKET, Keycode.LEFT_BRACKET,
                 Keycode.LEFT_BRACKET]
-    spamRate = [0.01, 0.05, 0.125, 0.25, 0.5, 0.5, 0.5, 0.25, 0.125, 0.05, 0.01]
+    spamRate = [0.01, 0.05, 0.125, 0.25, 0.5,
+                0.5, 0.5, 0.25, 0.125, 0.05, 0.01]
     kbd = Keyboard()
     kbd.press(knobkeys[code])  # which keycode is entered
     kbd.release_all()
     time.sleep(spamRate[code])  # how fast the key is spammed
 
+
 while True:
     knob = (getVoltage(analog2in))
-    if steps(knob) is 5:  # the center position is active
+    if steps(knob) == 5:  # the center position is active
         led.value = True
-    elif steps(knob) is not 5:
+    elif steps(knob) != 5:
         led.value = False
         spamKey(steps(knob))

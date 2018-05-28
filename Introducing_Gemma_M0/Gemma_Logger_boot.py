@@ -1,5 +1,5 @@
-import digitalio
 import board
+import digitalio
 import storage
 
 switch = digitalio.DigitalInOut(board.D0)

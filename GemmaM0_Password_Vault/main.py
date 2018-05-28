@@ -1,13 +1,13 @@
 # Gemma M0 Password Vault
 # press cap touch pads to enter strong passwords over USB
 
-from digitalio import DigitalInOut, Direction
-import touchio
-import board
 import time
+
+import board
+import touchio
 from adafruit_hid.keyboard import Keyboard
-from adafruit_hid.keycode import Keycode
 from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS
+from digitalio import DigitalInOut, Direction
 
 led = DigitalInOut(board.D13)
 led.direction = Direction.OUTPUT

@@ -1,7 +1,7 @@
 import time
-import board
-import neopixel
+
 import adafruit_dotstar
+import board
 
 # For Trinket M0, Gemma M0, and ItsyBitsy M0 Express
 led = adafruit_dotstar.DotStar(board.APA102_SCK, board.APA102_MOSI, 1)

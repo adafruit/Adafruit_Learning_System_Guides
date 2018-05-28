@@ -1,9 +1,10 @@
 # CircuitPython Demo - I2C sensor
 
+import time
+
+import adafruit_tsl2561
 import board
 import busio
-import adafruit_tsl2561
-import time
 
 i2c = busio.I2C(board.SCL, board.SDA)
 
@@ -11,7 +12,8 @@ i2c = busio.I2C(board.SCL, board.SDA)
 while not i2c.try_lock():
     pass
 # Print the addresses found once
-print("I2C addresses found:", [hex(device_address) for device_address in i2c.scan()])
+print("I2C addresses found:", [hex(device_address)
+                               for device_address in i2c.scan()])
 
 # Unlock I2C now that we're done scanning.
 i2c.unlock()

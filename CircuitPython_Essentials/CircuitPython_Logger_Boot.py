@@ -1,5 +1,5 @@
-import digitalio
 import board
+import digitalio
 import storage
 
 # For Gemma M0, Trinket M0, Metro M0 Express, ItsyBitsy M0 Express

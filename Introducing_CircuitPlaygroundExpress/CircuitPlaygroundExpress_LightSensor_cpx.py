@@ -1,14 +1,15 @@
 # CircuitPlaygroundExpress_LightSensor
 # reads the on-board light sensor and graphs the brighness with NeoPixels
 
+import time
+
 from adafruit_circuitplayground.express import cpx
 from simpleio import map_range
-import time
 
 cpx.pixels.brightness = 0.05
 
 while True:
-    #light value remaped to pixel position
+    # light value remaped to pixel position
     peak = map_range(cpx.light, 10, 325, 0, 9)
     print(cpx.light)
     print(int(peak))
