@@ -58,6 +58,7 @@ pause = 0.25
 # The functions that follow are the various payloads to deliver
 
 
+# pylint: disable=too-many-statements
 def launch_terminal():
     if operating_system is 0:
         led.value = False

@@ -4,7 +4,7 @@ import time
 import board
 import pulseio
 from digitalio import DigitalInOut, Direction, Pull
-
+# pylint: disable=eval-used
 # Switch to select 'stealth-mode'
 switch = DigitalInOut(board.SLIDE_SWITCH)
 switch.direction = Direction.INPUT

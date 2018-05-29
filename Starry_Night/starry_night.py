@@ -1,9 +1,9 @@
+import time
 from busio import I2C
 from adafruit_seesaw.seesaw import Seesaw
 from adafruit_seesaw.pwmout import PWMOut
 from adafruit_motor import motor
 import board
-import time
 
 # Create seesaw object
 i2c = I2C(board.SCL, board.SDA)
@@ -24,5 +24,5 @@ while True:
 
     my_drive.duty_cycle = 16384  # dim
     time.sleep(0.1)
-    
+
     # and repeat!

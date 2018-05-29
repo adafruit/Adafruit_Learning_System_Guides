@@ -1,14 +1,14 @@
-# Nintendo R.O.B. control with Accelerometer, code in CircuitPython 
+# Nintendo R.O.B. control with Accelerometer, code in CircuitPython
 # Using an Adafruit Circuit Playground Express board with an IR LED
 # Mike Barela for Adafruit Industries, MIT License, May, 2018
 # Acknowledgement to info at http://atariage.com/forums/topic/177286
 # -any-interest-in-nes-rob-homebrews/ and Limor Ladyada Fried
 
+import time
+import gc
 from digitalio import DigitalInOut, Direction
 from adafruit_circuitplayground.express import cpx
 import board
-import time
-import gc
 
 # Commands, each 8 bit command is preceded by the 5 bit Init sequence
 Init = [0, 0, 0, 1, 0]            # This must precede any command
@@ -37,11 +37,11 @@ def IR_Command(cmd):
     for val in Init+cmd:             # For each value in initial+command
         if val:                      # if it's a one, flash the IR LED
             IRled.value = True       # Turn IR LED turn on for 1.5 ms
-            time.sleep(0.0015)       # 1.5 ms on 
+            time.sleep(0.0015)       # 1.5 ms on
             IRled.value = False      # Turn IR LED off for 15 ms
             time.sleep(0.0150)       # 15 ms
         else:
-            time.sleep(0.0167)       # 1 cycle turn off    
+            time.sleep(0.0167)       # 1 cycle turn off
 
 while True:                          # Main Loop poll switches, do commands
     x, y, z = cpx.acceleration       # Read accelerometer

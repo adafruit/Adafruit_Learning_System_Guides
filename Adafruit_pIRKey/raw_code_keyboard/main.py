@@ -1,3 +1,4 @@
+# pylint: disable=multiple-statements,wrong-import-position,wrong-import-order
 import gc
 from adafruit_hid.keyboard import Keyboard; gc.collect()
 from adafruit_hid.keycode import Keycode; gc.collect()
@@ -18,7 +19,7 @@ decoder = adafruit_irremote.GenericDecode()
 pulsein = pulseio.PulseIn(board.REMOTEIN, maxlen=100, idle_state=True)
 
 # Expected pulse, pasted in from previous recording REPL session:
-key1_pulses = [0
+key1_pulses = [0]
 
 key2_pulses = [1]
 
@@ -48,9 +49,9 @@ while True:
     # Got a pulse set, now compare.
     if fuzzy_pulse_compare(key1_pulses, pulses):
         print("****** KEY 1 DETECTED! ******")
-	keyboard.press(Keycode.SPACE)
-	keyboard.release_all()
+    keyboard.press(Keycode.SPACE)
+    keyboard.release_all()
 
     if fuzzy_pulse_compare(key2_pulses, pulses):
         print("****** KEY 2 DETECTED! ******")
-	keyboard_layout.write("hello!")
+    keyboard_layout.write("hello!")

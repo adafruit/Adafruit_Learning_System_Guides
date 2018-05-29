@@ -3,7 +3,6 @@
 
 import pulseio
 import board
-import time
 import adafruit_dotstar
 import adafruit_irremote
 

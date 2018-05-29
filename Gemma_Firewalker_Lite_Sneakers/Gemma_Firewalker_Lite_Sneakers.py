@@ -100,6 +100,7 @@ def h2rgb(colour_hue):
     return ret * 17
 
 
+# pylint: disable=global-statement
 def wave_setup():
     global wave
 

@@ -1,4 +1,4 @@
-# Stumble Bot, coded in CircuitPython 
+# Stumble Bot, coded in CircuitPython
 # Using an Adafruit Circuit Playground Express, Crickit, and 2 servos
 # Dano Wall, Mike Barela for Adafruit Industries, MIT License, May, 2018
 #
@@ -42,10 +42,10 @@ def servo_front(direction):
         index = 90
         while index >= 50:
             servos[1].angle = index
-            time.sleep(0.040)        
+            time.sleep(0.040)
             index = index - 1
-    time.sleep(0.002)        
-            
+    time.sleep(0.002)
+
 def servo_back(direction):
     if direction > 0:
         index = 65
@@ -57,15 +57,15 @@ def servo_back(direction):
         index = 95
         while index >= 65:
             servos[0].angle = index
-            time.sleep(0.040)        
+            time.sleep(0.040)
             index = index - 3
-    time.sleep(0.020)          
-    
+    time.sleep(0.020)
+
 print("Its Stumble Bot Time")
 
 while True:
-    if button_A.value:     # If button A is pressed, start bot
-        led.value = True   # Turn on LED 13 to show we're gone!
+    if button_A.value:  # If button A is pressed, start bot
+        led.value = True  # Turn on LED 13 to show we're gone!
         for i in range(5):
             print("back 1")
             servo_back(1)

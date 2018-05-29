@@ -1,5 +1,9 @@
+# pylint: disable=wrong-import-position
+import time
 import gc
 import pulseio
+from busio import I2C
+import board
 gc.collect()
 import adafruit_irremote
 gc.collect()
@@ -13,9 +17,6 @@ import neopixel
 gc.collect()
 import audioio
 gc.collect()
-from busio import I2C
-import board
-import time
 
 
 print("Blimp!")
@@ -39,12 +40,13 @@ pixels = neopixel.NeoPixel(board.NEOPIXEL, 10)
 
 # audio file
 a = audioio.AudioOut(board.A0)
+
 def play_audio(wavfile):
     f = open(wavfile, "rb")
     wav = audioio.WaveFile(f)
     a.play(wav)
     while a.playing:
-	pass
+        pass
     f.close()
     gc.collect()
 
@@ -54,34 +56,35 @@ t = time.monotonic()
 while True:
     command = None   # assume no remote commands came in
     if len(pulsein) > 25:  # check in any IR data came in
-	pulses = decoder.read_pulses(pulsein)
-	try:
-	    code = decoder.decode_bits(pulses, debug=False)
-	    if code in (REMOTE_FORWARD, REMOTE_BACKWARD, REMOTE_PAUSE):
-		# we only listen to a few different codes
-		command = code
-	    else:
-		continue
-	# on any failure, lets just restart
-	except:
-	    continue
+        pulses = decoder.read_pulses(pulsein)
+    try:
+        code = decoder.decode_bits(pulses, debug=False)
+        if code in (REMOTE_FORWARD, REMOTE_BACKWARD, REMOTE_PAUSE):
+            # we only listen to a few different codes
+            command = code
+        else:
+            continue
+    # on any failure, lets just restart
+    # pylint: disable=bare-except
+    except:
+        continue
 
     if command:
-	if code == REMOTE_FORWARD:
-	    play_audio("fan_forward.wav")
-	    motor_a.throttle = 1  # full speed forward
-	    pixels.fill((255,0,0))
-	elif code == REMOTE_BACKWARD:
-	    play_audio("fan_backward.wav")
-	    motor_a.throttle = -1  # full speed backward
-	    pixels.fill((0,0,255))
-	elif code == REMOTE_PAUSE:
-	    motor_a.throttle = 0  # stop motor
-	    play_audio("fan_stopped.wav")
-	    pixels.fill((0,0,0))
-	time.sleep(0.5)
+        if code == REMOTE_FORWARD:
+            play_audio("fan_forward.wav")
+            motor_a.throttle = 1  # full speed forward
+            pixels.fill((255,0,0))
+        elif code == REMOTE_BACKWARD:
+            play_audio("fan_backward.wav")
+            motor_a.throttle = -1  # full speed backward
+            pixels.fill((0,0,255))
+        elif code == REMOTE_PAUSE:
+            motor_a.throttle = 0  # stop motor
+            play_audio("fan_stopped.wav")
+            pixels.fill((0,0,0))
+        time.sleep(0.5)
 
     # play yayayay every 3 seconds
     if (time.monotonic() - t > 3) and motor_a.throttle != 0:
-	t = time.monotonic()
-	play_audio("yayyayyay.wav")
+        t = time.monotonic()
+        play_audio("yayyayyay.wav")

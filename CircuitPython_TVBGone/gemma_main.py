@@ -7,6 +7,8 @@ import board
 import pulseio
 from digitalio import DigitalInOut, Direction
 
+# pylint: disable=eval-used
+
 pixel = adafruit_dotstar.DotStar(
     board.APA102_SCK, board.APA102_MOSI, 1, brightness=0.2)
 pixel.fill((0, 0, 0))

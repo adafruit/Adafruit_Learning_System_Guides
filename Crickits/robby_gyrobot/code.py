@@ -1,3 +1,5 @@
+import time
+import gc
 from digitalio import DigitalInOut, Direction, Pull
 from busio import I2C
 from adafruit_seesaw.seesaw import Seesaw
@@ -6,8 +8,6 @@ import touchio
 import audioio
 import neopixel
 import board
-import time
-import gc
 
 pixels = neopixel.NeoPixel(board.NEOPIXEL, 10, brightness=1)
 pixels.fill((0,0,0))
@@ -58,9 +58,10 @@ def IR_Command(cmd):
         if val:                      # if it's a one, flash the IR LED
             seesaw.analog_write(INFRARED_LED_SS, 65535)  # on
             seesaw.analog_write(INFRARED_LED_SS, 0)      # off 2ms later
-	    time.sleep(0.013)       # 17 ms total
-        else:
-            time.sleep(0.015)       # 17 ms total   
+        time.sleep(0.013)       # 17 ms total
+    # pylint: disable=useless-else-on-loop
+    else:
+        time.sleep(0.015)       # 17 ms total
 
 a = audioio.AudioOut(board.A0)
 startfile = "startup.wav"
@@ -69,13 +70,13 @@ with open(startfile, "rb") as f:
     wav = audioio.WaveFile(f)
     a.play(wav)
     for _ in range(3):
-	IR_Command(Calibrate)
-	time.sleep(0.5)
+        IR_Command(Calibrate)
+        time.sleep(0.5)
     while a.playing:
-	IR_Command(Open)
-	time.sleep(1)
-	IR_Command(Close)
-	time.sleep(1)
+        IR_Command(Open)
+        time.sleep(1)
+        IR_Command(Close)
+        time.sleep(1)
 f = open(loopfile, "rb")
 wav = audioio.WaveFile(f)
 a.play(wav, loop=True)
@@ -83,40 +84,41 @@ a.play(wav, loop=True)
 while True:                          # Main Loop poll switches, do commands
     led.value = switch.value         # easily tell if we're running
     if not switch.value:
-	continue
+        continue
 
-    #touch_vals = (touch2.raw_value, touch3.raw_value, seesaw.touch_read(0), seesaw.touch_read(1), seesaw.touch_read(2), seesaw.touch_read(3))
+    #touch_vals = (touch2.raw_value, touch3.raw_value, seesaw.touch_read(0), seesaw.touch_read(1),
+    #              seesaw.touch_read(2), seesaw.touch_read(3))
     #print(touch_vals)
-    
+
     if touch2.raw_value > 3000:
-	print("Open jaws")
-	pixels.fill((50,50,0))
+        print("Open jaws")
+        pixels.fill((50,50,0))
         IR_Command(Open)             # Button A opens arms
-    
+
     elif touch3.raw_value > 3000:
-	print("Close jaws")
-	pixels.fill((0,50,0))
+        print("Close jaws")
+        pixels.fill((0,50,0))
         IR_Command(Close)            # Button B closes arms
 
     elif seesaw.touch_read(0) > CAPTOUCH_THRESH:
-	print("Up")
-	pixels.fill((50,0,50))
-	IR_Command(Up)
+        print("Up")
+        pixels.fill((50,0,50))
+        IR_Command(Up)
 
     elif seesaw.touch_read(1) > CAPTOUCH_THRESH:
-	print("Down")
-	pixels.fill((50,50,50))
-	IR_Command(Down)
+        print("Down")
+        pixels.fill((50,50,50))
+        IR_Command(Down)
 
     elif seesaw.touch_read(2) > CAPTOUCH_THRESH:
-	print("Left")
-	pixels.fill((50,0,0))
-	IR_Command(Left)
+        print("Left")
+        pixels.fill((50,0,0))
+        IR_Command(Left)
 
     elif seesaw.touch_read(3) > CAPTOUCH_THRESH:
-	print("Right")
-	pixels.fill((0,0,50))
-	IR_Command(Right)
-	
+        print("Right")
+        pixels.fill((0,0,50))
+        IR_Command(Right)
+
     time.sleep(0.1)
     pixels.fill((0,0,0))

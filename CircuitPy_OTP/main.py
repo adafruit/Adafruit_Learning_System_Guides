@@ -8,6 +8,8 @@ import ntptime
 import ubinascii
 import uhashlib
 
+# pylint: disable=broad-except
+
 # https://github.com/pyotp/pyotp example
 totp = [("Discord ", 'JBSWY3DPEHPK3PXP'),
         ("Gmail   ", 'abcdefghijklmnopqrstuvwxyz234567'),

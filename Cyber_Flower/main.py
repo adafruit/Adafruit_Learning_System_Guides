@@ -122,7 +122,7 @@ beat_phase = beat_period / 5.0  # Phase controls how long in-between
 # transforming a value in one range to a value in another (like Arduino's map
 # function).
 
-
+# pylint: disable=redefined-outer-name
 def lerp(x, x0, x1, y0, y1):
     return y0 + (x - x0) * ((y1 - y0) / (x1 - x0))
 

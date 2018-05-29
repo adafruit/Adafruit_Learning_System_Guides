@@ -1,4 +1,5 @@
 # CircuitPython 3.0 CRICKIT demo
+import time
 from adafruit_seesaw.seesaw import Seesaw
 from adafruit_seesaw.pwmout import PWMOut
 from adafruit_motor import servo
@@ -6,7 +7,6 @@ from busio import I2C
 import audioio
 import microcontroller
 import board
-import time
 
 i2c = I2C(board.SCL, board.SDA)
 ss = Seesaw(i2c)
@@ -40,14 +40,16 @@ ss.digital_write(LED_2, True)
 
 #################### log files
 logfile = "/log.csv"
+# pylint: disable=pointless-statement
 # check that we could append if wanted to
 try:
     fp = open(logfile, "a")
     fp.close
+# pylint: disable=bare-except
 except:
     print("File system not writable, halting")
     while True:
-	pass
+        pass
 
 #################### Audio files
 wavfile = "yanny.wav"
@@ -78,21 +80,21 @@ ss.digital_write(LED_1, False)
 ss.digital_write(LED_2, False)
 
 selection = None
-# wait until 
+# wait until
 while not selection:
     if not ss.digital_read(BUTTON_1):
-		selection = "Yanny"
-		ss.digital_write(LED_1, True)
-		myservo.angle = LOOKLEFT
-		break
+        selection = "Yanny"
+        ss.digital_write(LED_1, True)
+        myservo.angle = LOOKLEFT
+        break
     if not ss.digital_read(BUTTON_2):
-		selection = "Laurel"
-		ss.digital_write(LED_2, True)
-		myservo.angle = LOOKRIGHT
-		break
+        selection = "Laurel"
+        ss.digital_write(LED_2, True)
+        myservo.angle = LOOKRIGHT
+        break
     # if we havent selected, wait until they do!
     if a.playing and time.monotonic() - t > 15.5:
-		a.pause()
+        a.pause()
 
 # now we have a selection!
 with open(logfile, "a") as fp:

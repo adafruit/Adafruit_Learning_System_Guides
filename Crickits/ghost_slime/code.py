@@ -1,3 +1,4 @@
+import time
 from digitalio import DigitalInOut, Direction, Pull
 from adafruit_seesaw.seesaw import Seesaw
 from adafruit_seesaw.analoginput import AnalogInput
@@ -7,7 +8,6 @@ from busio import I2C
 import neopixel
 import audioio
 import board
-import time
 
 # Create seesaw object
 i2c = I2C(board.SCL, board.SDA)
