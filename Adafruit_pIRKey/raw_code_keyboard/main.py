@@ -1,3 +1,4 @@
+# pylint: disable=multiple-statements,wrong-import-position,wrong-import-order
 import gc
 from adafruit_hid.keyboard import Keyboard; gc.collect()
 from adafruit_hid.keycode import Keycode; gc.collect()
