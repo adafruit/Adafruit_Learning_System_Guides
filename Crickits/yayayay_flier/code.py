@@ -39,6 +39,7 @@ pixels = neopixel.NeoPixel(board.NEOPIXEL, 10)
 
 # audio file
 a = audioio.AudioOut(board.A0)
+
 def play_audio(wavfile):
     f = open(wavfile, "rb")
     wav = audioio.WaveFile(f)
@@ -54,12 +55,12 @@ t = time.monotonic()
 while True:
     command = None   # assume no remote commands came in
     if len(pulsein) > 25:  # check in any IR data came in
-    pulses = decoder.read_pulses(pulsein)
+        pulses = decoder.read_pulses(pulsein)
     try:
         code = decoder.decode_bits(pulses, debug=False)
         if code in (REMOTE_FORWARD, REMOTE_BACKWARD, REMOTE_PAUSE):
             # we only listen to a few different codes
-		    command = code
+            command = code
         else:
             continue
     # on any failure, lets just restart

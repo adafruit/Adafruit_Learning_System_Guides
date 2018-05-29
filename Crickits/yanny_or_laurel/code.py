@@ -40,11 +40,12 @@ ss.digital_write(LED_2, True)
 
 #################### log files
 logfile = "/log.csv"
+# pylint: disable=pointless-statement
 # check that we could append if wanted to
 try:
     fp = open(logfile, "a")
     fp.close
-# pylint: disable=broad-except
+# pylint: disable=bare-except
 except:
     print("File system not writable, halting")
     while True:
@@ -79,7 +80,7 @@ ss.digital_write(LED_1, False)
 ss.digital_write(LED_2, False)
 
 selection = None
-# wait until 
+# wait until
 while not selection:
     if not ss.digital_read(BUTTON_1):
         selection = "Yanny"

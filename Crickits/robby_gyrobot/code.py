@@ -58,9 +58,9 @@ def IR_Command(cmd):
         if val:                      # if it's a one, flash the IR LED
             seesaw.analog_write(INFRARED_LED_SS, 65535)  # on
             seesaw.analog_write(INFRARED_LED_SS, 0)      # off 2ms later
-	    time.sleep(0.013)       # 17 ms total
+        time.sleep(0.013)       # 17 ms total
         else:
-            time.sleep(0.015)       # 17 ms total   
+            time.sleep(0.015)       # 17 ms total
 
 a = audioio.AudioOut(board.A0)
 startfile = "startup.wav"
@@ -69,13 +69,13 @@ with open(startfile, "rb") as f:
     wav = audioio.WaveFile(f)
     a.play(wav)
     for _ in range(3):
-	IR_Command(Calibrate)
-	time.sleep(0.5)
+        IR_Command(Calibrate)
+        time.sleep(0.5)
     while a.playing:
-	IR_Command(Open)
-	time.sleep(1)
-	IR_Command(Close)
-	time.sleep(1)
+        IR_Command(Open)
+        time.sleep(1)
+        IR_Command(Close)
+        time.sleep(1)
 f = open(loopfile, "rb")
 wav = audioio.WaveFile(f)
 a.play(wav, loop=True)
@@ -83,7 +83,7 @@ a.play(wav, loop=True)
 while True:                          # Main Loop poll switches, do commands
     led.value = switch.value         # easily tell if we're running
     if not switch.value:
-	continue
+        continue
 
     #touch_vals = (touch2.raw_value, touch3.raw_value, seesaw.touch_read(0), seesaw.touch_read(1), seesaw.touch_read(2), seesaw.touch_read(3))
     #print(touch_vals)
