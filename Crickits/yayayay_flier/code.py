@@ -68,19 +68,19 @@ while True:
         continue
 
     if command:
-    if code == REMOTE_FORWARD:
-        play_audio("fan_forward.wav")
-        motor_a.throttle = 1  # full speed forward
-        pixels.fill((255,0,0))
-    elif code == REMOTE_BACKWARD:
-        play_audio("fan_backward.wav")
-        motor_a.throttle = -1  # full speed backward
-        pixels.fill((0,0,255))
-    elif code == REMOTE_PAUSE:
-        motor_a.throttle = 0  # stop motor
-        play_audio("fan_stopped.wav")
-        pixels.fill((0,0,0))
-    time.sleep(0.5)
+        if code == REMOTE_FORWARD:
+            play_audio("fan_forward.wav")
+            motor_a.throttle = 1  # full speed forward
+            pixels.fill((255,0,0))
+        elif code == REMOTE_BACKWARD:
+            play_audio("fan_backward.wav")
+            motor_a.throttle = -1  # full speed backward
+            pixels.fill((0,0,255))
+        elif code == REMOTE_PAUSE:
+            motor_a.throttle = 0  # stop motor
+            play_audio("fan_stopped.wav")
+            pixels.fill((0,0,0))
+        time.sleep(0.5)
 
     # play yayayay every 3 seconds
     if (time.monotonic() - t > 3) and motor_a.throttle != 0:
