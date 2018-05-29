@@ -7,6 +7,10 @@ import neopixel
 import time
 import audioio
 
+# Create seesaw object
+i2c = I2C(board.SCL, board.SDA)
+seesaw = Seesaw(i2c)
+
 print("Adabot Tightrope Unicyclist!")
 RED = 0x100000  # (0x10, 0, 0) also works
 GREEN = (0, 0x10, 0)
@@ -15,10 +19,6 @@ BLACK = (0, 0, 0)
 pixels = neopixel.NeoPixel(board.NEOPIXEL, 10, brightness = 0.2)
 pixels.fill((0, 0, 0))
 pixels.show()
-
-# Create seesaw object
-i2c = I2C(board.SCL, board.SDA)
-seesaw = Seesaw(i2c)
 
 # Create one motor on seesaw PWM pins 22 & 23, Crickit Motor 1 port
 motor_a = motor.DCMotor(PWMOut(seesaw, 22), PWMOut(seesaw, 23))
