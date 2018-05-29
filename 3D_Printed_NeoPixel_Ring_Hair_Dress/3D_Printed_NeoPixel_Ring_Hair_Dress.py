@@ -157,7 +157,7 @@ theactionlist = [
     [5, ACT_NOP, 0, 0, 0]
 ]
 
-
+# pylint: disable=global-statement
 def nextspectrumcolor():
     global spectrum_part, color_idx, curr_color_granularity, color
 
