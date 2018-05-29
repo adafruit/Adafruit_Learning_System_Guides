@@ -5,6 +5,7 @@ import time
 import board
 import pulseio
 
+# pylint: disable=unused-variable,consider-using-enumerate,redefined-outer-name,too-many-locals
 piezo = pulseio.PWMOut(board.D0, duty_cycle=0, frequency=440,
                        variable_frequency=True)
 
@@ -56,6 +57,7 @@ def annoy_doorbell(interval):
     time.sleep(interval)
 
 
+# pylint: disable=too-many-statements
 def annoy_ringtone(ringtone, tempo, interval):
     # ringtone 1: Nokia
     # ringtone 2: Apple iPhone
