@@ -120,7 +120,7 @@ def display_emulating_screen():
     oled.show()
 
 
-#pylint disable=global-statement
+# pylint disable=global-statement
 def emulate():
     global current_mode
     data = load_file(current_dir.selected_filepath)
