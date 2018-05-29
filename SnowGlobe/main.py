@@ -41,6 +41,7 @@ def fade_pixels(fade_color):
 fade_pixels(GREEN)
 
 
+# pylint: disable=too-many-locals
 def play_song(song_number):
     # 1: Jingle bells
     # 2: Let It Snow
@@ -53,7 +54,7 @@ def play_song(song_number):
     dotted_quarter_note = quarter_note * 1.5
     eighth_note = whole_note / 8
 
-    # pylint: disable=unused-variables
+    # pylint: disable=unused-variable
     # set up note values
     A3 = 220
     Bb3 = 233
@@ -86,7 +87,7 @@ def play_song(song_number):
             [D4, eighth_note],
             [E4, whole_note],
         ]
-
+    # pylint: disable=consider-using-enumerate
         for n in range(len(jingle_bells_song)):
             cpx.start_tone(jingle_bells_song[n][0])
             time.sleep(jingle_bells_song[n][1])
