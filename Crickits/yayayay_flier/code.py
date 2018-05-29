@@ -44,7 +44,7 @@ def play_audio(wavfile):
     wav = audioio.WaveFile(f)
     a.play(wav)
     while a.playing:
-    pass
+        pass
     f.close()
     gc.collect()
 
@@ -58,11 +58,12 @@ while True:
     try:
         code = decoder.decode_bits(pulses, debug=False)
         if code in (REMOTE_FORWARD, REMOTE_BACKWARD, REMOTE_PAUSE):
-        # we only listen to a few different codes
-		command = code
+            # we only listen to a few different codes
+		    command = code
         else:
-        continue
+            continue
     # on any failure, lets just restart
+    # pylint: disable=broad-except
     except:
         continue
 
@@ -83,5 +84,5 @@ while True:
 
     # play yayayay every 3 seconds
     if (time.monotonic() - t > 3) and motor_a.throttle != 0:
-    t = time.monotonic()
-    play_audio("yayyayyay.wav")
+        t = time.monotonic()
+        play_audio("yayyayyay.wav")

@@ -44,10 +44,11 @@ logfile = "/log.csv"
 try:
     fp = open(logfile, "a")
     fp.close
+# pylint: disable=broad-except
 except:
     print("File system not writable, halting")
     while True:
-    pass
+        pass
 
 #################### Audio files
 wavfile = "yanny.wav"

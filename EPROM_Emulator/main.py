@@ -39,6 +39,7 @@ from debouncer import Debouncer
 from directory_node import DirectoryNode
 from emulator import Emulator
 
+# pylint disable=global-statement
 # --------------------------------------------------------------------------------
 # Initialize Rotary encoder
 
@@ -130,6 +131,7 @@ def emulate():
     display_emulating_screen()
 
 
+# pylint disable=global-statement
 def program():
     global current_mode
     emulator.enter_program_mode()
