@@ -18,7 +18,7 @@ decoder = adafruit_irremote.GenericDecode()
 pulsein = pulseio.PulseIn(board.REMOTEIN, maxlen=100, idle_state=True)
 
 # Expected pulse, pasted in from previous recording REPL session:
-key1_pulses = [0
+key1_pulses = [0]
 
 key2_pulses = [1]
 

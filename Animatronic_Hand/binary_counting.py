@@ -1,5 +1,6 @@
 #  Animatronic Hand
 #  Binary Counting on four fingers up to 15
+import time
 from digitalio import DigitalInOut, Direction, Pull
 import audioio
 from adafruit_seesaw.seesaw import Seesaw
@@ -7,7 +8,6 @@ from adafruit_seesaw.pwmout import PWMOut
 from adafruit_motor import servo
 from busio import I2C
 import board
-import time
 
 # Create I2C and seesaw objuect
 i2c = I2C(board.SCL, board.SDA)

@@ -31,4 +31,3 @@ while True:
         print("Failed to decode: ", e.args)
 
 print("----------------------------")
-
