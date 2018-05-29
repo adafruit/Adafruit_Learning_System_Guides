@@ -1,12 +1,12 @@
+import time
+import array
+import math
 from busio import I2C
 from adafruit_seesaw.seesaw import Seesaw
 from adafruit_seesaw.pwmout import PWMOut
 from adafruit_motor import motor
 import audiobusio
-import time
 import board
-import array
-import math
 
 print("Sound sensor motor!")
 
@@ -40,7 +40,7 @@ def normalized_rms(values):
 
 # Our microphone
 mic = audiobusio.PDMIn(board.MICROPHONE_CLOCK, board.MICROPHONE_DATA,
-		       sample_rate=16000, bit_depth = 16)
+                       sample_rate=16000, bit_depth = 16)
 samples = array.array('H', [0] * 200)
 mic.record(samples, len(samples))
 
@@ -50,4 +50,3 @@ while True:
     print(((magnitude),))
     motor_a.throttle = map_range(magnitude, 90, 200, 0, 1.0)
     time.sleep(0.1)
-
