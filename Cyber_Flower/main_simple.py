@@ -131,6 +131,7 @@ beat_phase = beat_period / 5.0  # Phase controls how long in-between
 # the two parts of the heart beat
 # (the 'ba-boom' of the beat).
 
+# pylint: disable=redefined-outer-name
 # Define a gamma correction lookup table to make colors more accurate.
 # See this guide for more background on gamma correction:
 #   https://learn.adafruit.com/led-tricks-gamma-correction/

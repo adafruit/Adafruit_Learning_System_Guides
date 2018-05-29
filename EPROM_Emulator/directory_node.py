@@ -55,7 +55,8 @@ class DirectoryNode(object):
         self.files = None
         return self
 
-    def __is_dir(self, path):
+    @staticmethod
+    def __is_dir(path):
         """Determine whether a path identifies a machine code bin file.
            :param string path: path of the file to check
         """
@@ -67,7 +68,8 @@ class DirectoryNode(object):
         except OSError:
             return False
 
-    def __sanitize(self, name):
+    @staticmethod
+    def __sanitize(name):
         """Nondestructively strip off a trailing slash, if any, and return the result.
            :param string name: the filename
         """
@@ -75,6 +77,7 @@ class DirectoryNode(object):
             return name[:-1]
         return name
 
+    # pylint: disable=protected-access
     def __path(self):
         """Return the result of recursively follow the parent links, building a full
            path to this directory."""
@@ -133,7 +136,8 @@ class DirectoryNode(object):
             self.display.show()
             self.old_selected_offset = self.selected_offset
 
-    def __is_directory_name(self, filename):
+    @staticmethod
+    def __is_directory_name(filename):
         """Is a filename the name of a directory.
            :param string filename: the name of the file
         """

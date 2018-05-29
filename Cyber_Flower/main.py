@@ -127,6 +127,7 @@ def lerp(x, x0, x1, y0, y1):
     return y0 + (x - x0) * ((y1 - y0) / (x1 - x0))
 
 
+# pylint: disable=redefined-outer-name
 # Main loop below will run forever:
 while True:
     # Get the current time at the start of the animation update.
