@@ -53,6 +53,7 @@ def play_song(song_number):
     dotted_quarter_note = quarter_note * 1.5
     eighth_note = whole_note / 8
 
+    # pylint: disable=unused-variables
     # set up note values
     A3 = 220
     Bb3 = 233
