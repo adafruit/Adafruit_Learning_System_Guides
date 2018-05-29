@@ -1,12 +1,13 @@
-# Code for the Trash Panda tutorial with Adafruit Crickit and Circuit Playground Express 5/2018 Dano Wall
+# Code for the Trash Panda tutorial with Adafruit Crickit and Circuit Playground Express
+# 5/2018 Dano Wall
 
-from digitalio import DigitalInOut, Direction, Pull
+import time
+from digitalio import DigitalInOut, Direction
 from adafruit_seesaw.seesaw import Seesaw
 from adafruit_seesaw.pwmout import PWMOut
 from adafruit_motor import servo
 from busio import I2C
 import board
-import time
 
 # Create seesaw object
 i2c = I2C(board.SCL, board.SDA)
@@ -23,7 +24,7 @@ for ss_pin in (17, 16, 15, 14):
     _servo = servo.Servo(pwm, min_pulse=600, max_pulse=2500)
     _servo.angle = 90   # starting angle, middle
     servos.append(_servo)
-    
+
 print("Its TRASH PANDA TIME!")
 
 while True:
