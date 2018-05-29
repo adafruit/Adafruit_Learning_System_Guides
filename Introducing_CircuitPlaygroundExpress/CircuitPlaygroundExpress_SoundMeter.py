@@ -88,8 +88,14 @@ pixels = neopixel.NeoPixel(board.NEOPIXEL, NUM_PIXELS,
 pixels.fill(0)
 pixels.show()
 
-mic = audiobusio.PDMIn(board.MICROPHONE_CLOCK,
-                       board.MICROPHONE_DATA, frequency=16000, bit_depth=16)
+# For CircuitPython 2.x:
+mic = audiobusio.PDMIn(board.MICROPHONE_CLOCK, board.MICROPHONE_DATA,
+                       frequency=16000, bit_depth=16)
+# For Circuitpython 3.0 and up, "frequency" is now called "sample_rate".
+# Comment the lines above and uncomment the lines below.
+#mic = audiobusio.PDMIn(board.MICROPHONE_CLOCK, board.MICROPHONE_DATA,
+#                       sample_rate=16000, bit_depth=16)
+
 # Record an initial sample to calibrate. Assume it's quiet when we start.
 samples = array.array('H', [0] * NUM_SAMPLES)
 mic.record(samples, len(samples))
