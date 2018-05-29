@@ -1,4 +1,4 @@
-# pylint: disable:wrong-import-position
+# pylint: disable=wrong-import-position
 import time
 import gc
 import pulseio

@@ -89,34 +89,34 @@ while True:                          # Main Loop poll switches, do commands
     #print(touch_vals)
     
     if touch2.raw_value > 3000:
-	print("Open jaws")
-	pixels.fill((50,50,0))
+    print("Open jaws")
+    pixels.fill((50,50,0))
         IR_Command(Open)             # Button A opens arms
     
     elif touch3.raw_value > 3000:
-	print("Close jaws")
-	pixels.fill((0,50,0))
+    print("Close jaws")
+    pixels.fill((0,50,0))
         IR_Command(Close)            # Button B closes arms
 
     elif seesaw.touch_read(0) > CAPTOUCH_THRESH:
-	print("Up")
-	pixels.fill((50,0,50))
-	IR_Command(Up)
+    print("Up")
+    pixels.fill((50,0,50))
+    IR_Command(Up)
 
     elif seesaw.touch_read(1) > CAPTOUCH_THRESH:
-	print("Down")
-	pixels.fill((50,50,50))
-	IR_Command(Down)
+    print("Down")
+    pixels.fill((50,50,50))
+    IR_Command(Down)
 
     elif seesaw.touch_read(2) > CAPTOUCH_THRESH:
-	print("Left")
-	pixels.fill((50,0,0))
-	IR_Command(Left)
+    print("Left")
+    pixels.fill((50,0,0))
+    IR_Command(Left)
 
     elif seesaw.touch_read(3) > CAPTOUCH_THRESH:
-	print("Right")
-	pixels.fill((0,0,50))
-	IR_Command(Right)
+    print("Right")
+    pixels.fill((0,0,50))
+    IR_Command(Right)
 	
     time.sleep(0.1)
     pixels.fill((0,0,0))
