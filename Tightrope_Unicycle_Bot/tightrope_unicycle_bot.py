@@ -1,10 +1,10 @@
+import time
 from busio import I2C
 from adafruit_seesaw.seesaw import Seesaw
 from adafruit_seesaw.pwmout import PWMOut
 from adafruit_motor import motor
 import board
 import neopixel
-import time
 import audioio
 
 # Create seesaw object
@@ -36,8 +36,8 @@ def play_file(wavfile):
         while cpx_audio.playing:
             pass
 
-wavfile = "circus.wav"
-play_file(wavfile)
+wav_file_name = "circus.wav"
+play_file(wav_file_name)
 
 while True:
     # set NeoPixels green in direction of movement
