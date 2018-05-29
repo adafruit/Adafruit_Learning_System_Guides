@@ -1,6 +1,9 @@
+# pylint: disable:wrong-import-position
 import time
 import gc
 import pulseio
+from busio import I2C
+import board
 gc.collect()
 import adafruit_irremote
 gc.collect()
@@ -14,8 +17,6 @@ import neopixel
 gc.collect()
 import audioio
 gc.collect()
-from busio import I2C
-import board
 
 
 print("Blimp!")
@@ -64,7 +65,7 @@ while True:
         else:
             continue
     # on any failure, lets just restart
-    # pylint: disable=broad-except
+    # pylint: disable=bare-except
     except:
         continue
 

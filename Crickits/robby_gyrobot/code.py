@@ -59,8 +59,8 @@ def IR_Command(cmd):
             seesaw.analog_write(INFRARED_LED_SS, 65535)  # on
             seesaw.analog_write(INFRARED_LED_SS, 0)      # off 2ms later
         time.sleep(0.013)       # 17 ms total
-        else:
-            time.sleep(0.015)       # 17 ms total
+    else:
+        time.sleep(0.015)       # 17 ms total
 
 a = audioio.AudioOut(board.A0)
 startfile = "startup.wav"
