@@ -1,3 +1,4 @@
+import time
 from digitalio import DigitalInOut, Direction, Pull
 import adafruit_lis3dh
 from busio import I2C
@@ -6,8 +7,6 @@ from adafruit_seesaw.pwmout import PWMOut
 from adafruit_motor import servo
 import neopixel
 import board
-import time
-import gc
 
 # create accelerometer
 i2c1 = I2C(board.ACCELEROMETER_SCL, board.ACCELEROMETER_SDA)
@@ -46,6 +45,7 @@ try:
     fp = None
     fp = open(logfile, "a")
     print("File system writable!")
+# pylint: disable=bare-except
 except:
     print("Not logging, trapeeze mode!")
 
@@ -82,7 +82,7 @@ while True:
 
         if logpoints > 25:
             led.value = True
-	        #print("Writing: "+outstr)
+            #print("Writing: "+outstr)
             fp.write(outstr+"\n")
             fp.flush()
             led.value = False

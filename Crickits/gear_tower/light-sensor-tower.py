@@ -1,14 +1,14 @@
+import time
 from busio import I2C
 import analogio
 from adafruit_seesaw.seesaw import Seesaw
 from adafruit_seesaw.pwmout import PWMOut
 from adafruit_motor import motor
 import board
-import time
 
 light = analogio.AnalogIn(board.LIGHT)
- 
-    
+
+
 print("Theramin-like turning")
 
 # Create seesaw object
@@ -30,4 +30,3 @@ while True:
     print((light.value,))
     motor_a.throttle = map_range(light.value, 500, 8000, 1.0, 0)
     time.sleep(0.1)
-    

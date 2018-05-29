@@ -22,14 +22,14 @@ while True:
     print((light.value,))
     # light value drops when a hand passes over
     if light.value < 4000:
-	if motor_a.throttle:
-	    motor_a.throttle = 0
-	else:
-	    motor_a.throttle = 1  # full speed forward
+    if motor_a.throttle:
+        motor_a.throttle = 0
+    else:
+        motor_a.throttle = 1  # full speed forward
 
-	while (light.value < 5000):
-	    # wait till hand passes over completely
-	    pass
+    while (light.value < 5000):
+        # wait till hand passes over completely
+        pass
     time.sleep(0.1)
     
     

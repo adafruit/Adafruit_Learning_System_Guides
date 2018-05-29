@@ -48,9 +48,9 @@ while True:
     # Got a pulse set, now compare.
     if fuzzy_pulse_compare(key1_pulses, pulses):
         print("****** KEY 1 DETECTED! ******")
-	keyboard.press(Keycode.SPACE)
-	keyboard.release_all()
+    keyboard.press(Keycode.SPACE)
+    keyboard.release_all()
 
     if fuzzy_pulse_compare(key2_pulses, pulses):
         print("****** KEY 2 DETECTED! ******")
-	keyboard_layout.write("hello!")
+    keyboard_layout.write("hello!")
