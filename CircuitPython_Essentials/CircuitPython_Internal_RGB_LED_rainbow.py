@@ -1,14 +1,14 @@
 import time
-
-import adafruit_dotstar
 import board
 
 # For Trinket M0, Gemma M0, and ItsyBitsy M0 Express
+import adafruit_dotstar
 led = adafruit_dotstar.DotStar(board.APA102_SCK, board.APA102_MOSI, 1)
 
 
 # For Feather M0 Express, Metro M0 Express, Metro M4 Express and Circuit
 # Playground Express
+# import neopixel
 # led = neopixel.NeoPixel(board.NEOPIXEL, 1)
 
 
