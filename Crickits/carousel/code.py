@@ -1,11 +1,11 @@
+import time
+#import math
+import array
 from digitalio import DigitalInOut, Direction, Pull
 import analogio
 import supervisor
-import array
-import math
 import audioio
 import board
-import time
 import neopixel
 
 # NeoPixels
@@ -79,7 +79,7 @@ play_file("01_approach.wav")
 
 while not button_a.value:
     pass  # wait for it to be pressed
-    
+
 if button_a.value:  # A pressed
     while button_a.value:  # wait for release
         pass
@@ -94,7 +94,7 @@ timeout = time.monotonic()
 
 while True:
     print((light.value,))
-    
+
     # determine height of pixels
     pixel_height = map_range(light.value, DARK, BRIGHT, 0, num_pixels)
     pixels.fill((0, 0, 0))
