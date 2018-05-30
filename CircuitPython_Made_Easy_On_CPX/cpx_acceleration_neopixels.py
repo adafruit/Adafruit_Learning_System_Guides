@@ -1,4 +1,3 @@
-import time
 from adafruit_circuitplayground.express import cpx
 
 # Main loop gets x, y and z axis acceleration, prints the values, and turns on
@@ -21,4 +20,3 @@ while True:
         if z:
             B = B + abs(int(z))
         cpx.pixels.fill((R, G, B))
-        time.sleep(0.2)
