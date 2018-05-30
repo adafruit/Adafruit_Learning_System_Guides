@@ -13,11 +13,11 @@ pixel_pin = board.A1
 num_pixels = 30
 pixels = neopixel.NeoPixel(pixel_pin, num_pixels,
                            brightness=1, auto_write=False)
-pixels.fill((0,0,0))
+pixels.fill((0, 0, 0))
 pixels.show()
 
 ring = neopixel.NeoPixel(board.NEOPIXEL, 10, brightness=1)
-ring.fill((255,0,0))
+ring.fill((255, 0, 0))
 
 # Light sensor
 light = analogio.AnalogIn(board.LIGHT)
@@ -44,14 +44,14 @@ length = 8000 // 440
 wave_array = array.array("H", [0] * length)
 for i in range(length):
     # Sine wave
-    #wave_array[i] = int(math.sin(math.pi * 2 * i / 18) * (2 ** 15) + 2 ** 15)
+    # wave_array[i] = int(math.sin(math.pi * 2 * i / 18) * (2 ** 15) + 2 ** 15)
     # Triangle wave
-    #wave_array[i] = int( i/length * (2 ** 16))
+    # wave_array[i] = int( i/length * (2 ** 16))
     # Saw wave
     if i < length/2:
-	wave_array[i] = int( i*2/length * (2 ** 16 - 1))
+        wave_array[i] = int(i*2/length * (2 ** 16 - 1))
     else:
-    	wave_array[i] = int((2**16 - 1) -  i*2/length * (2 ** 16))
+        wave_array[i] = int((2**16 - 1) - i*2/length * (2 ** 16))
     print((wave_array[i],))
 
 def map_range(x, in_min, in_max, out_min, out_max):
@@ -78,11 +78,11 @@ time.sleep(2)
 play_file("01_approach.wav")
 
 while not button_a.value:
-    pass # wait for it to be pressed
+    pass  # wait for it to be pressed
     
-if button_a.value: # A pressed
-    while button_a.value:	# wait for release
-	pass
+if button_a.value:  # A pressed
+    while button_a.value:  # wait for release
+        pass
 
 time.sleep(1)
 
@@ -97,10 +97,10 @@ while True:
     
     # determine height of pixels
     pixel_height = map_range(light.value, DARK, BRIGHT, 0, num_pixels)
-    pixels.fill((0,0,0))
+    pixels.fill((0, 0, 0))
     for p in range(pixel_height):
-	pixels[p] = wheel(int(p / num_pixels * 255))
-    pixels.show()
+        pixels[p] = wheel(int(p / num_pixels * 255))
+        pixels.show()
 
     # determine squeek
     freq = int(map_range(light.value, DARK, BRIGHT, 440, 8800))
@@ -110,13 +110,13 @@ while True:
 
     # check no activity
     if light.value > ACTIVITY_THRESHOLD:
-	timeout = time.monotonic()  # reset our timeout
+        timeout = time.monotonic()  # reset our timeout
 
     # 4 seconds no activity
     if time.monotonic() - timeout > 4:
-	break
+        break
 
-pixels.fill((255,0,0))
+pixels.fill((255, 0, 0))
 pixels.show()
 play_file("03_no_sanctuary.wav")
 
