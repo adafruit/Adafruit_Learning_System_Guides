@@ -19,13 +19,14 @@ def normalized_rms(values):
     return math.sqrt(sum(float(sample - minbuf) *
                          (sample - minbuf) for sample in values) / len(values))
 
+
 # For CircuitPython 2.x:
 mic = audiobusio.PDMIn(board.MICROPHONE_CLOCK, board.MICROPHONE_DATA,
                        frequency=16000, bit_depth=16)
-# For Circuitpython 3.0 and up, "frequency" is now called "sample_rate".
-# Comment the lines above and uncomment the lines below.
-#mic = audiobusio.PDMIn(board.MICROPHONE_CLOCK, board.MICROPHONE_DATA,
-#                       sample_rate=16000, bit_depth=16)
+# For CircuitPython 3.0 and up, "frequency" is now called "sample_rate".
+# Comment out the lines above and uncomment the lines below.
+# mic = audiobusio.PDMIn(board.MICROPHONE_CLOCK, board.MICROPHONE_DATA,
+#                        sample_rate=16000, bit_depth=16)
 
 
 samples = array.array('H', [0] * 160)
