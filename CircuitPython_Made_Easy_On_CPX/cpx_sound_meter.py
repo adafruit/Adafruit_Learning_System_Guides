@@ -24,7 +24,7 @@ def normalized_rms(values):
 mic = audiobusio.PDMIn(board.MICROPHONE_CLOCK, board.MICROPHONE_DATA,
                        frequency=16000, bit_depth=16)
 # For CircuitPython 3.0 and up, "frequency" is now called "sample_rate".
-# Comment out the lines above and uncomment the lines below.
+# Comment out the mic and frequency lines above and uncomment those lines below.
 # mic = audiobusio.PDMIn(board.MICROPHONE_CLOCK, board.MICROPHONE_DATA,
 #                        sample_rate=16000, bit_depth=16)
 
