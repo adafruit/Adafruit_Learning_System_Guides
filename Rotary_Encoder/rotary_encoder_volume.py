@@ -23,7 +23,7 @@ while True:
             cc.send(ConsumerControlCode.VOLUME_INCREMENT)
             print(position)
     elif diff < 0:
-        for _ in range(-diff):  # or abs(diff)
+        for _ in range(-diff):
             cc.send(ConsumerControlCode.VOLUME_DECREMENT)
             print(position)
     last_position = position
