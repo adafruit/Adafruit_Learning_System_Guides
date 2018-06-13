@@ -16,20 +16,20 @@ button_state = None
 last_position = encoder.position
 
 while True:
-    position = encoder.position
-    diff = position - last_position
-    if diff > 0:
-        for _ in range(diff):
+    current_position = encoder.position
+    position_change = current_position - last_position
+    if position_change > 0:
+        for _ in range(position_change):
             cc.send(ConsumerControlCode.VOLUME_INCREMENT)
-            print(position)
-    elif diff < 0:
-        for _ in range(-diff):
+        print(current_position)
+    elif position_change < 0:
+        for _ in range(-position_change):
             cc.send(ConsumerControlCode.VOLUME_DECREMENT)
-            print(position)
-    last_position = position
+        print(current_position)
+    last_position = current_position
     if not button.value and button_state is None:
         button_state = "pressed"
     if button.value and button_state == "pressed":
-        print("button")
+        print("Button pressed.")
         cc.send(ConsumerControlCode.PLAY_PAUSE)
         button_state = None
