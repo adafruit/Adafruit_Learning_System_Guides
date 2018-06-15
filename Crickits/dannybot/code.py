@@ -1,15 +1,15 @@
-import audioio
 import time
+import random
+import audioio
 from digitalio import DigitalInOut, Pull, Direction
 from adafruit_seesaw.seesaw import Seesaw
 from adafruit_seesaw.pwmout import PWMOut
 from adafruit_motor import servo
 from busio import I2C
-import random
 import board
 
-wavefiles = ["01.wav", "02.wav", "03.wav", "04.wav", "05.wav", "06.wav", 
-             "07.wav", "08.wav", "09.wav", "10.wav", "11.wav", "12.wav", 
+wavefiles = ["01.wav", "02.wav", "03.wav", "04.wav", "05.wav", "06.wav",
+             "07.wav", "08.wav", "09.wav", "10.wav", "11.wav", "12.wav",
              "13.wav", "14.wav"]
 
 # Create seesaw object
@@ -22,7 +22,7 @@ led.direction = Direction.OUTPUT
 buttona = DigitalInOut(board.BUTTON_A)
 buttona.direction = Direction.INPUT
 buttona.pull = Pull.DOWN
- 
+
 buttonb = DigitalInOut(board.BUTTON_B)
 buttonb.direction = Direction.INPUT
 buttonb.pull = Pull.DOWN
@@ -36,9 +36,9 @@ MOUTH_START = 95
 MOUTH_END = 90
 
 # 17 is labeled SERVO 1 on CRICKIT
-pwm = PWMOut(seesaw, 17) 
+pwm = PWMOut(seesaw, 17)
 # must be 50 cannot change
-pwm.frequency = 50 
+pwm.frequency = 50
 # microservo usually is 400/2500 (tower pro sgr2r)
 my_servo = servo.Servo(pwm, min_pulse=400, max_pulse=2500)
 # Starting servo locations
