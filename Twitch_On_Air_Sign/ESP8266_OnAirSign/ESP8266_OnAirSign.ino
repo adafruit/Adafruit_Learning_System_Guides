@@ -9,7 +9,10 @@ const char* ssid     = "ssid";
 const char* password = "password";
 
 #define HOST "api.twitch.tv"
-#define PATH "/kraken/streams/adafruit"
+
+// Get a twitch.tv API token and paste it here at the end:
+#define PATH "/kraken/streams/adafruit?oauth_token=abcdefgij1234567890"
+
 #define REFRESH 30  // seconds between refresh
 #define LED 13
 #define PIN 12
