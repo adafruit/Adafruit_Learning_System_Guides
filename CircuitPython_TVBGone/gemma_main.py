@@ -17,7 +17,7 @@ pixel.fill((0, 0, 0))
 led = DigitalInOut(board.D13)
 led.direction = Direction.OUTPUT
 
-pwm = pulseio.PWMOut(board.A1, frequency=38000,
+pwm = pulseio.PWMOut(board.A2, frequency=38000,
                      duty_cycle=2 ** 15, variable_frequency=True)
 pulse = pulseio.PulseOut(pwm)
 
