@@ -2,14 +2,15 @@ import os
 import time
 import random
 import audioio
-from digitalio import DigitalInOut, Pull, Direction
+from digitalio import DigitalInOut, Direction
 from adafruit_seesaw.seesaw import Seesaw
 from adafruit_seesaw.pwmout import PWMOut
 from adafruit_motor import servo
 from busio import I2C
 import board
 
-wavefiles = [file for file in os.listdir("/") if (file.endswith(".wav") and not file.startswith("._"))]
+wavefiles = [file for file in os.listdir("/")
+             if (file.endswith(".wav") and not file.startswith("._"))]
 print("Audio files found: ", wavefiles)
 
 # Create seesaw object
@@ -47,5 +48,4 @@ def play_file(wavfile):
 
 while True:
     play_file(random.choice(wavefiles))
-
     time.sleep(3)
