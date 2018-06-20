@@ -1,8 +1,6 @@
-# See https://en.wikipedia.org/wiki/PID_controller
-
+import time
 import busio
 import board
-import time
 from adafruit_seesaw.seesaw import Seesaw
 from adafruit_seesaw.pwmout import PWMOut
 from adafruit_motor import servo
@@ -13,7 +11,7 @@ i2c = busio.I2C(board.SCL, board.SDA)
 
 sensor = adafruit_lsm9ds0.LSM9DS0_I2C(i2c)
 seesaw = Seesaw(i2c)
- 
+
 # Create servo objects
 pwm1 = PWMOut(seesaw, 17)
 pwm1.frequency = 50
@@ -31,11 +29,10 @@ while True:
         y = -10
     if y > 10:
         y = 10
-        
+
     # print(((y / 10) + 1) * 90)
 
     # Set the angle
     servo1.angle = ((-y / 10) + 1) * 90
 
     time.sleep(0.1)
-
