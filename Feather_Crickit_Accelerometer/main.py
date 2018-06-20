@@ -18,7 +18,7 @@ pwm1.frequency = 50
 servo1 = servo.Servo(pwm1, min_pulse=500, max_pulse=2500)
 
 # Center the servo
-servo1.angle = 90 
+servo1.angle = 90
 
 while True:
     # Read the accel
