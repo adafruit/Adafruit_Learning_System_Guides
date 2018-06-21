@@ -15,12 +15,6 @@ import busio as io
 import neopixel
 import adafruit_mlx90614
 
-# use bitbangio only with ESP8266
-# * does not support hardware i2c
-# * comment out busio above
-# * express boards can use also bitbangio, but they have i2c hardware built-in
-#import bitbangio as io
-
 # the mlx90614 must be run at 100k [normal speed]
 # i2c default mode is is 400k [full speed]
 # the mlx90614 will not appear at the default 400k speed
