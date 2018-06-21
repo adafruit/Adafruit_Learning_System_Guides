@@ -9,26 +9,26 @@
 #  please support Adafruit and open-source hardware by purchasing
 #  products from Adafruit!
 
-import board
 import time
-import busio as io   
+import board
+import busio as io
 import neopixel
 import adafruit_mlx90614
 
-# use bitbangio only with ESP8266 
+# use bitbangio only with ESP8266
 # * does not support hardware i2c
 # * comment out busio above
 # * express boards can use also bitbangio, but they have i2c hardware built-in
-#import bitbangio as io 
+#import bitbangio as io
 
 # the mlx90614 must be run at 100k [normal speed]
-# i2c default mode is is 400k [full speed] 
+# i2c default mode is is 400k [full speed]
 # the mlx90614 will not appear at the default 400k speed
-i2c = io.I2C(board.SCL, board.SDA, frequency=100000) 
+i2c = io.I2C(board.SCL, board.SDA, frequency=100000)
 mlx = adafruit_mlx90614.MLX90614(i2c)
 
-# neopixel setup 
-num_leds = 24           # how many LEDs 
+# neopixel setup
+num_leds = 24           # how many LEDs
 led_pin = board.D1      # which pin the neopixel ring is connected to
 strip = neopixel.NeoPixel(led_pin, num_leds, brightness=1)
 
@@ -57,10 +57,10 @@ def colorWipe(color):
 while True:
     temp = mlx.read_object_temp_f
 
-    if (temp < cold_temp ):
+    if temp < cold_temp:
         temp = cold_temp
 
-    if (temp > hot_temp):
+    if temp > hot_temp:
         temp = hot_temp
 
     # map temperature to red/blue color
@@ -72,4 +72,4 @@ while True:
     colorWipe((red, 0, blue))
 
     # can adjust this for faster/slower updates
-    time.sleep(.05) 
+    time.sleep(.05)
