@@ -31,7 +31,7 @@ while True:
 
     # Fill up 84 pixels with blue,
     # starting with pixel number 14.
-    for i in range(14, BPIXELS):
+    for i in range(APIXELS, BPIXELS):
         # Set Pixels to Orange Color
         pixels[i] = (0, 250, 200)
         # This sends the updated pixel color to the hardware.
@@ -41,7 +41,7 @@ while True:
 
     # Fill up 9 pixels with orange,
     # starting from pixel number 84.
-    for i in range(84, CPIXELS):
+    for i in range(BPIXELS, CPIXELS):
         # Set Pixels to Orange Color
         pixels[i] = (250, 50, 0)
         # This sends the updated pixel color to the hardware.
