@@ -32,7 +32,7 @@ for pin in ledpins:
     led.direction = digitalio.Direction.OUTPUT
     leds.append(led)
 
-led = digitalio.DigitalInOut(D13)
+led = digitalio.DigitalInOut(board.D13)
 led.switch_to_output()
 
 print("Waiting for button presses")
