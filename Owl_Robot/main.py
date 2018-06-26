@@ -41,6 +41,8 @@ eye_servo.angle = EYES_START
 wing_servo.angle = WINGS_START
 # Audio playback object and helper to play a full file
 a = audioio.AudioOut(board.A0)
+
+
 def play_file(wavfile):
     print("Playing", wavfile)
     with open(wavfile, "rb") as f:
@@ -59,6 +61,7 @@ def play_file(wavfile):
             time.sleep(.25)
             eye_servo.angle = EYES_START
             time.sleep(.25)
+
 
 while True:
     for i in range(8):
