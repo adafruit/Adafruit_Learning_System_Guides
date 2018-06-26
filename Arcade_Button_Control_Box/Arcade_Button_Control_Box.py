@@ -3,13 +3,13 @@ import time
 import digitalio
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keycode import Keycode
-from board import D13, D12, D11, D10, D9, D6, D5, A0, A1, A2, A3, A4, A5
+import board
 
 # A simple neat keyboard demo in circuitpython
 
 # The button pins we'll use, each will have an internal pullup
-buttonpins = [D12, D11, D10, D9, D6, D5]
-ledpins = [A0, A1, A2, A3, A4, A5]
+buttonpins = [board.D12, board.D11, board.D10, board.D9, board.D6, board.D5]
+ledpins = [board.A0, board.A1, board.A2, board.A3, board.A4, board.A5]
 
 # The keycode sent for each button, will be paired with a control key
 buttonkeys = [Keycode.A, Keycode.B, Keycode.C, Keycode.D, Keycode.E, Keycode.F]
