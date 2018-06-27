@@ -1,7 +1,7 @@
 #  Designed specifically to work with the MLX90614 sensors in the
 #  adafruit shop
-#  ----> https://www.adafruit.com/products/1748
-#  ----> https://www.adafruit.com/products/1749
+#  ----> https://www.adafruit.com/product/1747
+#  ----> https://www.adafruit.com/product/1748
 #
 #  These sensors use I2C to communicate, 2 pins are required to
 #  interface Adafruit invests time and resources providing this open
@@ -49,7 +49,7 @@ def colorWipe(color):
         strip[j] = (color)
 
 while True:
-    temp = mlx.read_object_temp_f
+    temp = mlx.object_temp_f
 
     if temp < cold_temp:
         temp = cold_temp
