@@ -108,7 +108,7 @@ def beep(count, duration, interstitial, freq):
     :param int freq: the frequency of the beeps
     """
     pwm = pulseio.PWMOut(board.D12, duty_cycle = 0, frequency=freq)
-    for i in range(count):
+    for _ in range(count):
         pwm.duty_cycle = 0x7FFF
         time.sleep(duration)
         pwm.duty_cycle = 0
