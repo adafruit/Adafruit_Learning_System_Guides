@@ -34,7 +34,6 @@ chord_changes = [  # chord_file, beats to play, beats played
 ]
 
 print("2018-06-19 blues_pg v02.py")
-print("gc.mem_free = ", gc.mem_free())
 
 cpx.pixels.fill((0, 0, 0))  # clear all pixels
 cpx.play_file(drums[0])  # play startup
@@ -50,7 +49,7 @@ else:
     for i in range(9, 2, -1):  # fill voice range background with white
         cpx.pixels[i] = (1, 1, 1)
         time.sleep(0.05)
-        
+
     voice = 1  # first drum voice
     cpx.pixels[10 - voice] = (0, 5, 0)  # green for first voice
     cpx.play_file(drums[voice])  # play first drum voice
@@ -60,7 +59,8 @@ else:
         if cpx.button_a:  # loop through voices
             cpx.pixels[10 - voice] = (1, 1, 1)  # replace background color
             voice = voice + 1
-            if voice > 7:  voice = 1
+            if voice > 7:
+                voice = 1
             cpx.pixels[10 - voice] = (0, 5, 0)  # green for voice selection
             cpx.play_file(drums[voice])  # play current voice
         time.sleep(0.3)
@@ -86,4 +86,5 @@ while True:
             if chord_changes[c_idx][2] >= chord_changes[c_idx][1]:
                 chord_changes[c_idx][2] = 0
                 c_idx = c_idx + 1
-                if c_idx > 15:  c_idx = 0
+                if c_idx > 15:  
+                    c_idx = 0
