@@ -153,7 +153,7 @@ while True:
         break_time = set_timer(0x004000, break_time)
         strip.fill(0x000000)
         strip.show()
-        mode, dial_color, time_remaining, increment = compute_mode_settings(True)   # start in work mode
+        mode, dial_color, time_remaining, increment = compute_mode_settings(True)
 
     now = time.monotonic()
     if now >= time_to_check:          #only check each second
