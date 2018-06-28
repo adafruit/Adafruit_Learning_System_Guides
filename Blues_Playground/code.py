@@ -86,5 +86,5 @@ while True:
             if chord_changes[c_idx][2] >= chord_changes[c_idx][1]:
                 chord_changes[c_idx][2] = 0
                 c_idx = c_idx + 1
-                if c_idx > 15:  
+                if c_idx > 15:
                     c_idx = 0
