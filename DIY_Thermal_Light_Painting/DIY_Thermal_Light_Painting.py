@@ -49,7 +49,11 @@ def colorWipe(color):
         strip[j] = (color)
 
 while True:
-    temp = mlx.object_temp_f
+    # get object temperature in celsius
+    temp = mlx.object_temperature
+
+    # convert object temperature to fahrenheit
+    temp = (temp * 9/5) + 32
 
     if temp < cold_temp:
         temp = cold_temp
