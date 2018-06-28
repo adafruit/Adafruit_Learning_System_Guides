@@ -153,16 +153,16 @@ while True:
         break_time = set_timer(0x004000, break_time)
         strip.fill(0x000000)
         strip.show()
-        mode, dial_color, time_remaining, increment = compute_mode_settings(True)   # after setting, start in work mode
+        mode, dial_color, time_remaining, increment = compute_mode_settings(True)   # start in work mode
 
     now = time.monotonic()
-    if now >= time_to_check:              #only check each second
+    if now >= time_to_check:          #only check each second
         time_remaining -= 1
-        if time_remaining <= 0:           # time to switch modes?
-            strip.fill(0x000000)          # clear the dial
-            strip.show()                  # make some noise
+        if time_remaining <= 0:       # time to switch modes?
+            strip.fill(0x000000)      # clear the dial
+            strip.show()              # make some noise
             beep(2, 0.5, 0.25, 4000)
             mode, dial_color, time_remaining, increment = compute_mode_settings(not mode)
-        state = not state                 # have the top pixel toggle between the dial color and white each second
+        state = not state             # have the top pixel toggle between the dial color and white
         show_time(dial_color, ceil(time_remaining / increment), state)   #update the dial
         time_to_check = now + 1.0
