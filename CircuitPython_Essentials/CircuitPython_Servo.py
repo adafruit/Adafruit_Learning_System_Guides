@@ -1,11 +1,10 @@
 import time
-
 import board
 import simpleio
 
 # For the M0 boards:
 servo = simpleio.Servo(board.A2)
-# For Metro M4 Express:
+# For the M4 boards:
 # servo = simpleio.Servo(board.A1)
 
 while True:
