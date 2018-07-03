@@ -17,7 +17,7 @@ def get_unique_pins():
     exclude = ['NEOPIXEL', 'APA102_MOSI', 'APA102_SCK']
     pins = [pin for pin in [
         getattr(board, p) for p in dir(board) if p not in exclude]
-        if isinstance(pin, Pin)]
+            if isinstance(pin, Pin)]
     unique = []
     for p in pins:
         if p not in unique:
