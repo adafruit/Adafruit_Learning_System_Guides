@@ -33,8 +33,6 @@ chord_changes = [  # chord_file, beats to play, beats played
     [0, 2, 0], [2, 2, 0]
 ]
 
-print("2018-06-19 blues_pg v02.py")
-
 cpx.pixels.fill((0, 0, 0))  # clear all pixels
 cpx.play_file(drums[0])  # play startup
 
