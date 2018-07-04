@@ -6,7 +6,7 @@ for pin_name in dir(board):
     try:
         p = pulseio.PWMOut(pin)
         p.deinit()
-        print("PWM on:", pin_name)
+        print("PWM on:", pin_name)  # Prints the valid, PWM-capable pins!
     except ValueError:  # This is the error returned when the pin is invalid.
         print("No PWM on:", pin_name)  # Prints the invalid pins.
     except RuntimeError:  # Timer conflict error.
