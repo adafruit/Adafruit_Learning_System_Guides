@@ -1,15 +1,12 @@
 import time
-
 import board
 import pulseio
 
 # For the M0 boards:
-piezo = pulseio.PWMOut(board.A2, duty_cycle=0,
-                       frequency=440, variable_frequency=True)
-# For Metro M4 Express:
-# piezo = pulseio.PWMOut(
-# board.A1, duty_cycle=0, frequency=440, variable_frequency=True
-# )
+piezo = pulseio.PWMOut(board.A2, duty_cycle=0, frequency=440, variable_frequency=True)
+
+# For the M4 boards:
+# piezo = pulseio.PWMOut(board.A1, duty_cycle=0, frequency=440, variable_frequency=True)
 
 while True:
     for f in (262, 294, 330, 349, 392, 440, 494, 523):

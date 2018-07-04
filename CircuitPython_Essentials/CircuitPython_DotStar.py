@@ -1,13 +1,10 @@
 # CircuitPython demo - Dotstar
-
 import time
-
 import adafruit_dotstar
 import board
 
 num_pixels = 30
-pixels = adafruit_dotstar.DotStar(
-    board.A1, board.A2, num_pixels, brightness=0.1, auto_write=False)
+pixels = adafruit_dotstar.DotStar(board.A1, board.A2, num_pixels, brightness=0.1, auto_write=False)
 
 
 def wheel(pos):
