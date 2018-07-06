@@ -1,58 +1,55 @@
 import time
-
 import board
 import neopixel
 
-try:
-    import urandom as random  # for v1.0 API support
-except ImportError:
-    import random
+pixel_count = 6         # Number of NeoPixels
+pixel_pin = board.D1    # Pin where NeoPixels are connected
 
-numpix = 24  # Number of NeoPixels
-pixpin = board.D0  # Pin where NeoPixels are connected
-strip = neopixel.NeoPixel(pixpin, numpix, brightness=0.3)
+speed = .1              # Animation speed (in seconds). 
+                        # This is how long to spend in a single animation frame.  
+                        # Higher values are slower.
+                        # Good values to try are 400, 200, 100, 50, 25, etc.
 
-mode = 0  # Current animation effect
-offset = 0  # Position of spinner animation
-color = [255, 0, 0]  # RGB color - red
-prevtime = time.monotonic()  # Time of last animation mode switch
+animation = 0           # Type of animation, can be one of these values:
+                        # 0 - Solid color pulse
+                        # 1 - Moving color pulse
+
+color_steps = 8         # Number of steps in the animation.
+
+brightness = 1.0        # # 0-1, higher number is brighter
+
+# Adjacent colors (on color wheel).
+# Red-yellow
+color_animation =   ([255, 0, 0], [255, 36, 0], [255, 72, 0], [255, 109, 0],
+                    [255, 145, 0], [255, 182, 0], [255, 218, 0], [255, 255, 0])
+
+
+# Global state used by the sketch
+strip = neopixel.NeoPixel(pixpin, pixel_count, brightness=1, auto_write=False)
 
 while True:  # Loop forever...
+    for i range(pixel_count):
+    # Main loop will update all the pixels based on the animation.
 
-    if mode == 0:  # Random sparkles - lights just one LED at a time
-        i = random.randint(0, numpix - 1)  # Choose random pixel
-        strip[i] = color  # Set it to current color
-        strip.write()  # Refresh LED states
-        # Set same pixel to "off" color now but DON'T refresh...
-        # it stays on for now...bot this and the next random
-        # pixel will be refreshed on the next pass.
-        strip[i] = [0, 0, 0]
-        time.sleep(0.008)  # 8 millisecond delay
-    elif mode == 1:  # Spinny wheels
-        # A little trick here: pixels are processed in groups of 8
-        # (with 2 of 8 on at a time), NeoPixel rings are 24 pixels
-        # (8*3) and 16 pixels (8*2), so we can issue the same data
-        # to both rings and it appears correct and contiguous
-        # (also, the pixel order is different between the two ring
-        # types, so we get the reversed motion on #2 for free).
-        for i in range(numpix):  # For each LED...
-            if ((offset + i) & 7) < 2:  # 2 pixels out of 8...
-                strip[i] = color  # are set to current color
-            else:
-                strip[i] = [0, 0, 0]  # other pixels are off
-        strip.write()  # Refresh LED states
-        time.sleep(0.04)  # 40 millisecond delay
-        offset += 1  # Shift animation by 1 pixel on next frame
-        if offset >= 8:
-            offset = 0
-    # Additional animation modes could be added here!
+    # Animation 0, solid color pulse of all pixels.
+    if animation == 0:
+        current_Step = (millis() / speed)%(colorSteps*2-2);
 
-    t = time.monotonic()  # Current time in seconds
-    if (t - prevtime) >= 8:  # Every 8 seconds...
-        mode += 1  # Advance to next mode
-        if mode > 1:  # End of modes?
-            mode = 0  # Start over from beginning
-            # Rotate color R->G->B
-            color = [color[2], color[0], color[1]]
-        strip.fill([0, 0, 0])  # Turn off all pixels
-        prevtime = t  # Record time of last mode change
+    # Animation 1, moving color pulse.  Use position to change brightness.
+    elif animation == 1:
+
+    for i in range(pixel_count):
+        color = color_animation
+#        color = fancy.palette_lookup(color_animation, offset + i / pixel_count)
+#        color = fancy.gamma_adjust(color, brightness=brightness)
+        strip[i] = color.pack()
+    strip.show()
+
+    if fadeup:
+        offset += steps
+        if offset >= 1:
+            fadeup = False
+    else:
+        offset -= steps
+        if offset <= 0:
+            fadeup = True
