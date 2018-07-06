@@ -5,8 +5,8 @@ import neopixel
 pixel_count = 6         # Number of NeoPixels
 pixel_pin = board.D1    # Pin where NeoPixels are connected
 
-speed = .1              # Animation speed (in seconds). 
-                        # This is how long to spend in a single animation frame.  
+speed = .1              # Animation speed (in seconds).
+                        # This is how long to spend in a single animation frame.
                         # Higher values are slower.
                         # Good values to try are 400, 200, 100, 50, 25, etc.
 
@@ -20,8 +20,8 @@ brightness = 1.0        # # 0-1, higher number is brighter
 
 # Adjacent colors (on color wheel).
 # Red-yellow
-color_animation =   ([255, 0, 0], [255, 36, 0], [255, 72, 0], [255, 109, 0],
-                    [255, 145, 0], [255, 182, 0], [255, 218, 0], [255, 255, 0])
+color_animation = ([255, 0, 0], [255, 36, 0], [255, 72, 0], [255, 109, 0],
+                   [255, 145, 0], [255, 182, 0], [255, 218, 0], [255, 255, 0])
 
 
 # Global state used by the sketch
@@ -35,13 +35,13 @@ while True:  # Loop forever...
         # Animation 0, solid color pulse of all pixels.
         if animation == 0:
             current_step = (time.monotonic() / speed) % (color_steps * 2 - 2)
-            if (current_step >= color_steps):
+            if current_step >= color_steps:
                 current_step = color_steps - (current_step - (color_steps - 2))
 
         # Animation 1, moving color pulse.  Use position to change brightness.
         elif animation == 1:
             current_step = (time.monotonic() / speed + i) % (color_steps * 2 - 2);
-            if (current_step >= color_steps):
+            if current_step >= color_steps:
                 current_step = color_steps - (current_step - (color_steps - 2))
 
         strip[i] = color_animation[int(current_step)]
