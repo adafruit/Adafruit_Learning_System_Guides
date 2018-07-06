@@ -25,26 +25,26 @@ color_animation =   ([255, 0, 0], [255, 36, 0], [255, 72, 0], [255, 109, 0],
 
 
 # Global state used by the sketch
-strip = neopixel.NeoPixel(pixpin, pixel_count, brightness=1, auto_write=False)
+strip = neopixel.NeoPixel(pixel_pin, pixel_count, brightness=1, auto_write=False)
 
 while True:  # Loop forever...
 
     # Main loop will update all the pixels based on the animation.
-    for i range(pixel_count):
+    for i in range(pixel_count):
 
         # Animation 0, solid color pulse of all pixels.
         if animation == 0:
             current_step = (time.monotonic() / speed) % (color_steps * 2 - 2)
             if (current_step >= color_steps):
-                current_step = color_steps - (current_step - (colorSteps - 2))
+                current_step = color_steps - (current_step - (color_steps - 2))
 
         # Animation 1, moving color pulse.  Use position to change brightness.
         elif animation == 1:
             current_step = (time.monotonic() / speed + i) % (color_steps * 2 - 2);
             if (current_step >= color_steps):
-                current_step = color_steps - (current_step - (colorSteps - 2))
+                current_step = color_steps - (current_step - (color_steps - 2))
 
-        strip[i] = color_animation[current_step]
+        strip[i] = color_animation[int(current_step)]
 
     # Show the updated pixels.
     strip.show()
