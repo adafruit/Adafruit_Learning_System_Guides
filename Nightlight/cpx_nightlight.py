@@ -1,5 +1,6 @@
-from adafruit_circuitplayground.express import cpx
 import time
+
+from adafruit_circuitplayground.express import cpx
 
 # Red, green, blue, and simple mixes of 2 or 3.
 # Add your own choices here.

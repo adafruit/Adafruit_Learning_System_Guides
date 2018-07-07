@@ -1,7 +1,8 @@
+import time
+
 import board
 import touchio
 import adafruit_dotstar
-import time
 
 # Red, green, blue, and simple mixes of 2 or 3.
 # Add your own choices here.
