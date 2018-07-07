@@ -19,9 +19,9 @@ COLORS = (
 # If you don't want the nightlight to turn off at all, set this to a large number like 9999.
 TURN_OFF = 9999
 
-# The NeoPixels are -really-, so don't let them get too bright.
-# Increase MAX_BRIGHTNESS if the nightlight is not bright enough,
-# or decrease if it's too bright even at the lowest setting.
+# The NeoPixels are really bright, so limit how bright they can get with MAX_BRIGHTNESS.
+# Increase its value if the nightlight is not bright enough, or decrease if it's
+# too bright even at the lowest setting.
 # MAX_BRIGHTNESS should be <= 1.0.
 MAX_BRIGHTNESS = 0.5
 BRIGHTNESS_STEPS = 15
@@ -40,12 +40,12 @@ while True:
     else:
         cpx.red_led = False
 
-    # Lower brightness.
+    # Decrease brightness.
     if cpx.touch_A7:
         # Don't go below 1.
         brightness_step = max(1, brightness_step - 1)
 
-    # Raise brightness.
+    # Increase brightness.
     if cpx.touch_A6:
         # Don't go above BRIGHTNESS_STEPS.
         brightness_step = min(BRIGHTNESS_STEPS, brightness_step + 1)
@@ -55,12 +55,12 @@ while True:
         # Cycle through 0 to len(COLORS)-1 and then wrap around.
         color_index = (color_index + 1) % len(COLORS)
 
-    # Lower number of pixels.
+    # Increase number of pixels.
     if cpx.touch_A5:
         # Don't go below 1.
         num_pixels = max(1, num_pixels - 1)
 
-    # Raise number of pixels.
+    # Decrease number of pixels.
     if cpx.touch_A4:
         # Don't go above 10 (number on CPX).
         num_pixels = min(10, num_pixels + 1)
