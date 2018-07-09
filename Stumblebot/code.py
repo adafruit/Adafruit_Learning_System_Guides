@@ -3,17 +3,9 @@
 # Dano Wall, Mike Barela for Adafruit Industries, MIT License, May, 2018
 #
 import time
-from digitalio import DigitalInOut, Direction, Pull
-from adafruit_seesaw.seesaw import Seesaw
-from adafruit_seesaw.pwmout import PWMOut
-
-from adafruit_motor import servo
-from busio import I2C
 import board
-
-# Create seesaw object for Circuit Playground Express to talk to Crickit
-i2c = I2C(board.SCL, board.SDA)
-seesaw = Seesaw(i2c)
+from digitalio import DigitalInOut, Direction, Pull
+from adafruit_crickit import crickit
 
 led = DigitalInOut(board.D13)            # Set up Red LED
 led.direction = Direction.OUTPUT
@@ -23,13 +15,15 @@ button_A.direction = Direction.INPUT
 button_A.pull = Pull.DOWN
 
 # Create servos list
-servos = []
-for ss_pin in (17, 16):  # Only use 2 servos, append , 15, 14 if using 4
-    pwm = PWMOut(seesaw, ss_pin)
-    pwm.frequency = 50
-    _servo = servo.Servo(pwm, min_pulse=600, max_pulse=2500)
-    _servo.angle = 90   # starting angle, middle
-    servos.append(_servo)
+servos = [crickit.servo_1, crickit.servo_2]
+
+# TowerPro servos like 500/2500 pulsewidths
+servos[0].set_pulse_width_range(min_pulse=500, max_pulse=2500)
+servos[1].set_pulse_width_range(min_pulse=500, max_pulse=2500)
+
+# starting angle, middle
+servos[1].angle = 90
+servos[0].angle = 90
 
 def servo_front(direction):
     if direction > 0:
