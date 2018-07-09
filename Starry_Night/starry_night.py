@@ -1,28 +1,19 @@
 import time
-from busio import I2C
-from adafruit_seesaw.seesaw import Seesaw
-from adafruit_seesaw.pwmout import PWMOut
-from adafruit_motor import motor
-import board
+from adafruit_crickit import crickit
 
-# Create seesaw object
-i2c = I2C(board.SCL, board.SDA)
-seesaw = Seesaw(i2c)
+# Create one motor on seesaw motor port #1
+motor = crickit.dc_motor_1
+motor.throttle = 0.5  # half speed forward
 
-# Create one motor on seesaw PWM pins 22 & 23
-motor_a = motor.DCMotor(PWMOut(seesaw, 22), PWMOut(seesaw, 23))
-motor_a.throttle = 0.5  # half speed forward
-
-# Create drive (PWM) object
-my_drive = PWMOut(seesaw, 13)    # Drive 1 is on s.s. pin 13
-my_drive.frequency = 1000        # Our default frequency is 1KHz
+# Create drive (PWM) object for the lights on Drive 1
+lights = crickit.drive_1
+lights.frequency = 1000 # Our default frequency is 1KHz
 
 while True:
-
-    my_drive.duty_cycle = 32768  # half on
+    lights.fraction = 0.5  # half on
     time.sleep(0.8)
 
-    my_drive.duty_cycle = 16384  # dim
+    lights.fraction = 0.2  # dim
     time.sleep(0.1)
 
     # and repeat!
