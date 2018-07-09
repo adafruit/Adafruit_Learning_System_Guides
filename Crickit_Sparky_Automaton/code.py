@@ -1,51 +1,46 @@
 import os
 import time
 import random
-import audioio
-from digitalio import DigitalInOut, Direction
-from adafruit_seesaw.seesaw import Seesaw
-from adafruit_seesaw.pwmout import PWMOut
-from adafruit_motor import servo
-from busio import I2C
 import board
+import audioio
+from adafruit_crickit import crickit
 
+# Sparky automaton
+
+# Find all Wave files on the storage
 wavefiles = [file for file in os.listdir("/")
              if (file.endswith(".wav") and not file.startswith("._"))]
 print("Audio files found: ", wavefiles)
 
-# Create seesaw object
-i2c = I2C(board.SCL, board.SDA)
-seesaw = Seesaw(i2c)
-
-led = DigitalInOut(board.D13)
-led.direction = Direction.OUTPUT
+# mouth servo
+mouth_servo = crickit.servo_1
+# TowerPro servos like 500/2500 pulsewidths
+mouth_servo.set_pulse_width_range(min_pulse=500, max_pulse=2500)
 
 # Servo angles
 MOUTH_START = 100
 MOUTH_END = 90
 
-# 17 is labeled SERVO 1 on CRICKIT
-pwm = PWMOut(seesaw, 17)
-# must be 50 cannot change
-pwm.frequency = 50
-my_servo = servo.Servo(pwm)
-# Starting servo locations
-my_servo.angle = MOUTH_START
+# Starting servo location
+mouth_servo.angle = MOUTH_START
 
 # Audio playback object and helper to play a full file
 a = audioio.AudioOut(board.A0)
 
+# Play a wave file and move the mouth while its playing!
 def play_file(wavfile):
     print("Playing", wavfile)
     with open(wavfile, "rb") as f:
         wav = audioio.WaveFile(f)
         a.play(wav)
-        while a.playing:
-            my_servo.angle = MOUTH_END
+        while a.playing:  # turn servos, motors, etc. during playback
+            mouth_servo.angle = MOUTH_END
             time.sleep(0.15)
-            my_servo.angle = MOUTH_START
+            mouth_servo.angle = MOUTH_START
             time.sleep(0.15)
 
 while True:
+    # Play a random quip
     play_file(random.choice(wavefiles))
+    # then hang out for a few seconds
     time.sleep(3)
