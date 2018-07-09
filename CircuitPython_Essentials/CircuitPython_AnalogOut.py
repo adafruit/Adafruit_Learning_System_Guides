@@ -1,5 +1,4 @@
 # CircuitPython IO demo - analog output
-
 import board
 from analogio import AnalogOut
 
