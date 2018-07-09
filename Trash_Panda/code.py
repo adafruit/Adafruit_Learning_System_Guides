@@ -9,6 +9,7 @@ led = DigitalInOut(board.D13)
 led.direction = Direction.OUTPUT
 
 # TowerPro servos like 500/2500 pulsewidths, make the wings flap a full 180
+crickit.servo_1.set_pulse_width_range(min_pulse=500, max_pulse=2500)
 crickit.servo_2.set_pulse_width_range(min_pulse=500, max_pulse=2500)
 
 print("Its TRASH PANDA TIME!")
