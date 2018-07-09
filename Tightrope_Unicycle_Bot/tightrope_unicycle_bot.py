@@ -1,27 +1,19 @@
 import time
-from busio import I2C
-from adafruit_seesaw.seesaw import Seesaw
-from adafruit_seesaw.pwmout import PWMOut
-from adafruit_motor import motor
 import board
 import neopixel
 import audioio
-
-# Create seesaw object
-i2c = I2C(board.SCL, board.SDA)
-seesaw = Seesaw(i2c)
+from adafruit_crickit import crickit
 
 print("Adabot Tightrope Unicyclist!")
-RED = 0x100000  # (0x10, 0, 0) also works
-GREEN = (0, 0x10, 0)
+RED =   (16, 0, 0)
+GREEN = (0, 16, 0)
 BLACK = (0, 0, 0)
 
 pixels = neopixel.NeoPixel(board.NEOPIXEL, 10, brightness = 0.2)
-pixels.fill((0, 0, 0))
-pixels.show()
+pixels.fill(BLACK)
 
-# Create one motor on seesaw PWM pins 22 & 23, Crickit Motor 1 port
-motor_a = motor.DCMotor(PWMOut(seesaw, 22), PWMOut(seesaw, 23))
+# Create a motor on Crickit Motor 1 port
+motor = crickit.dc_motor_1
 
 ############### User variables
 run_time = 6
@@ -46,14 +38,12 @@ while True:
     for i in range(5):
         pixels[i+5] = BLACK
 
-    motor_a.throttle = speed  # full speed forward
+    motor.throttle = speed  # full speed forward
     time.sleep(run_time)  # motor will run for this amount of time
 
     # set NeoPixels red when stopped
-    for i in range(len(pixels)):
-        pixels[i] = RED
-
-    motor_a.throttle = 0  # stop the motor
+    pixels.fill(RED)
+    motor.throttle = 0  # stop the motor
 
     # set NeoPixels green in direction of movement
     for i in range(5):
@@ -61,10 +51,8 @@ while True:
     for i in range(5):
         pixels[i+5] = GREEN
 
-    motor_a.throttle = -1 * speed  # full speed backward
+    motor.throttle = -1 * speed  # full speed backward
     time.sleep(run_time)  # motor will run for this amount of time
 
-    for i in range(len(pixels)):
-        pixels[i] = RED
-
-    motor_a.throttle = 0  # stopped
+    pixels.fill(RED)
+    motor.throttle = 0  # stopped
