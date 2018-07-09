@@ -1,46 +1,29 @@
 # Code for the Trash Panda tutorial with Adafruit Crickit and Circuit Playground Express
-# 5/2018 Dano Wall
-
 import time
-from digitalio import DigitalInOut, Direction
-from adafruit_seesaw.seesaw import Seesaw
-from adafruit_seesaw.pwmout import PWMOut
-from adafruit_motor import servo
-from busio import I2C
 import board
+from digitalio import DigitalInOut, Direction
+from adafruit_crickit import crickit
 
-# Create seesaw object
-i2c = I2C(board.SCL, board.SDA)
-seesaw = Seesaw(i2c)
-
+# built in LED
 led = DigitalInOut(board.D13)
 led.direction = Direction.OUTPUT
 
-# Create servos list
-servos = []
-for ss_pin in (17, 16, 15, 14):
-    pwm = PWMOut(seesaw, ss_pin)
-    pwm.frequency = 50
-    _servo = servo.Servo(pwm, min_pulse=600, max_pulse=2500)
-    _servo.angle = 90   # starting angle, middle
-    servos.append(_servo)
+# TowerPro servos like 500/2500 pulsewidths, make the wings flap a full 180
+crickit.servo_2.set_pulse_width_range(min_pulse=500, max_pulse=2500)
 
 print("Its TRASH PANDA TIME!")
 
 while True:
     print("tick")
     led.value = True
-    servos[0].angle = 0
+    crickit.servo_1.angle = 0
     time.sleep(0.5)
-    servos[1].angle = 180
-    time.sleep(0.5)
-    servos[2].angle = 0
-    time.sleep(0.5)
+    crickit.servo_2.angle = 180
+    time.sleep(1.0)
+
     print("tock")
     led.value = False
-    servos[0].angle = 180
+    crickit.servo_1.angle = 180
     time.sleep(0.5)
-    servos[1].angle = 0
-    time.sleep(0.5)
-    servos[2].angle = 180
-    time.sleep(0.5)
+    crickit.servo_2.angle = 0
+    time.sleep(1.0)
