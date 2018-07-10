@@ -16,6 +16,7 @@ for i in range(length):
 
 audio = audioio.AudioOut(board.A0)
 sine_wave_sample = audioio.RawSample(sine_wave)
+
 while True:
     if not button.value:
         audio.play(sine_wave_sample, loop=True)
