@@ -1,8 +1,8 @@
 import time
-import audioio
-import board
 import array
 import math
+import audioio
+import board
 import digitalio
 
 button = digitalio.DigitalInOut(board.A1)
