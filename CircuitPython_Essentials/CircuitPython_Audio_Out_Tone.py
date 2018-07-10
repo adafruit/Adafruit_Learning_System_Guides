@@ -6,8 +6,7 @@ import board
 import digitalio
 
 button = digitalio.DigitalInOut(board.A1)
-button.direction = digitalio.Direction.INPUT
-button.pull = digitalio.Pull.UP
+button.switch_to_input(pull=digitalio.Pull.UP)
 
 length = 8000 // 440
 tone_volume = 0.1  # Increase this to increase the volume of the tone.

@@ -4,8 +4,7 @@ import board
 import digitalio
 
 button = digitalio.DigitalInOut(board.A1)
-button.direction = digitalio.Direction.INPUT
-button.pull = digitalio.Pull.UP
+button.switch_to_input(pull=digitalio.Pull.UP)
 
 wave_file = open("StreetChicken.wav", "rb")
 wave = audioio.WaveFile(wave_file)
