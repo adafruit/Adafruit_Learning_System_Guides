@@ -1,7 +1,5 @@
 # CircuitPython AnalogIn Demo
-
 import time
-
 import board
 from analogio import AnalogIn
 
