@@ -9,7 +9,8 @@ button = digitalio.DigitalInOut(board.A1)
 button.switch_to_input(pull=digitalio.Pull.UP)
 
 tone_volume = 0.1  # Increase this to increase the volume of the tone.
-length = 8000 // 440
+frequency = 440  # Set this to the Hz of the tone you want to generate.
+length = 8000 // frequency
 sine_wave = array.array("H", [0] * length)
 for i in range(length):
     sine_wave[i] = int((1 + math.sin(math.pi * 2 * i / 18)) * tone_volume * (2 ** 15))

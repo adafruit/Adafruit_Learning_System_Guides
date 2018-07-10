@@ -12,9 +12,12 @@ audio = audioio.AudioOut(board.A0)
 
 while True:
     audio.play(wave)
+
+    # This allows you to do other things while the audio plays!
     t = time.monotonic()
     while time.monotonic() - t < 6:
         pass
+
     audio.pause()
     print("Waiting for button press to continue!")
     while button.value:
