@@ -15,9 +15,9 @@ for i in range(length):
     sine_wave[i] = int((1 + math.sin(math.pi * 2 * i / 18)) * tone_volume * (2 ** 15))
 
 audio = audioio.AudioOut(board.A0)
-sine_wave = audioio.RawSample(sine_wave)
+sine_wave_sample = audioio.RawSample(sine_wave)
 while True:
     if not button.value:
-        audio.play(sine_wave, loop=True)
+        audio.play(sine_wave_sample, loop=True)
         time.sleep(1)
         audio.stop()
