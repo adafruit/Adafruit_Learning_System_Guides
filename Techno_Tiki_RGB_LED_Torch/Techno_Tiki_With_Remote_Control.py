@@ -31,12 +31,12 @@ ir_pin = board.D2
 # Adafruit IR Remote Codes:
 # Button       Code         Button  Code
 # -----------  ------       ------  -----
-# VOL-:        0x0000       0/10+:  0x000C
-# Play/Pause:  0x0001       1:      0x0010
-# VOL+:        0x0002       2:      0x0011
-# SETUP:       0x0004       3:      0x0012
-# STOP/MODE:   0x0006       4:      0x0014
-# UP:          0x0005       5:      0x0015
+# VOL-:        [255, 2, 255, 0]		0/10+:	0x000C
+# Play/Pause:  [255, 2, 127, 128]	1:	0x0010
+# VOL+:        [255, 2, 191, 64]	2:	0x0011
+# SETUP:       [255, 2, 223, 32]	3:	0x0012
+# STOP/MODE:   [255, 2, 159, 96]	4:	0x0014
+# UP:          [255, 2, 95, 160]	5:      0x0015
 # DOWN:        0x000D       6:      0x0016
 # LEFT:        0x0008       7:      0x0018
 # RIGHT:       0x000A       8:      0x0019
