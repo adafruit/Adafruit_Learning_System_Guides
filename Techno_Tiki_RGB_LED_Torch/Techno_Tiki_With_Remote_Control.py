@@ -30,6 +30,7 @@ brightness = 1.0        # 0-1, higher number is brighter
 
 pulsein = pulseio.PulseIn(board.D2, maxlen=120, idle_state=True)
 decoder = adafruit_irremote.GenericDecode()
+nec_code_length = 66
 
 # Adafruit IR Remote Codes:
 # Button       Code         Button  Code
@@ -46,11 +47,11 @@ decoder = adafruit_irremote.GenericDecode()
 # ENTER/SAVE:  111			9:		167
 # Back:        143
 
-color_change = 0x000A		# Button that cycles through color animations.
-animation_change = 0x0008	# Button that cycles through animation types (only two supported).
-speed_change = 0x0005		# Button that cycles through speed choices.
-power_off = 0x0000		# Button that turns off/sleeps the pixels.
-power_on = 0x0002		# Button that turns on the pixels.  Must be pressed twice to register!
+color_change = 175		# Button that cycles through color animations.
+animation_change = 239	# Button that cycles through animation types (only two supported).
+speed_change = 95		# Button that cycles through speed choices.
+power_off = 255			# Button that turns off/sleeps the pixels.
+power_on = 191			# Button that turns on the pixels.  Must be pressed twice to register!
 
 # Build lookup table/palette for the color animations so they aren't computed at runtime.
 # The colorPalette two-dimensional array below has a row for each color animation and a column
@@ -64,24 +65,15 @@ color_palette = [
 ([255, 0, 0], [218, 36, 36], [182, 72, 72], [145, 109, 109], [109, 145, 145], [72, 182, 182], [36, 218, 218], [0, 255, 255]), # red cyan
 ([255, 255, 0], [218, 218, 36], [182, 182, 72], [145, 145, 109], [109, 109, 145], [72, 72, 182], [36, 36, 218], [0, 0, 255]), # yellow blue
 ([0, 255, 0], [36, 218, 36], [72, 182, 72], [109, 145, 109], [145, 109, 145], [182, 72, 182], [218, 36, 218], [255, 0, 255]), # green magenta
-]
 
 # Adjacent colors (on color wheel).
-#
-# yello green
-# ([255, 255, 0], [218, 255, 0], [182, 255, 0], [145, 255, 0], [109, 255, 0], [72, 255, 0], [36, 255, 0], [0, 255, 0])
 
-# green cyan
-# ([0, 255, 0], [0, 255, 36], [0, 255, 72], [0, 255, 109], [0, 255, 145], [0, 255, 182], [0, 255, 218], [0, 255, 255])
-
-# cyan blue
-# ([0, 255, 255], [0, 218, 255], [0, 182, 255], [0, 145, 255], [0, 109, 255], [0, 72, 255], [0, 36, 255], [0, 0, 255])
-
-# blue magenta
-# ([0, 0, 255], [36, 0, 255], [72, 0, 255], [109, 0, 255], [145, 0, 255], [182, 0, 255], [218, 0, 255], [255, 0, 255])
-
-# magenta red
-# ([255, 0, 255], [255, 0, 218], [255, 0, 182], [255, 0, 145], [255, 0, 109], [255, 0, 72], [255, 0, 36], [255, 0, 0])
+([255, 255, 0], [218, 255, 0], [182, 255, 0], [145, 255, 0], [109, 255, 0], [72, 255, 0], [36, 255, 0], [0, 255, 0]), # yello green
+([0, 255, 0], [0, 255, 36], [0, 255, 72], [0, 255, 109], [0, 255, 145], [0, 255, 182], [0, 255, 218], [0, 255, 255]), # green cyan
+ ([0, 255, 255], [0, 218, 255], [0, 182, 255], [0, 145, 255], [0, 109, 255], [0, 72, 255], [0, 36, 255], [0, 0, 255]), # cyan blue
+ ([0, 0, 255], [36, 0, 255], [72, 0, 255], [109, 0, 255], [145, 0, 255], [182, 0, 255], [218, 0, 255], [255, 0, 255]), # blue magenta
+([255, 0, 255], [255, 0, 218], [255, 0, 182], [255, 0, 145], [255, 0, 109], [255, 0, 72], [255, 0, 36], [255, 0, 0]), # magenta red
+]
 
 # Other combos
 #
@@ -150,21 +142,10 @@ def read_NEC():
 # First check that a falling signal was detected and start reading pulses.
 	pulses = decoder.read_pulses(pulsein, max_pulse=5000)
 	command = None
-#	try:
-#		code = decoder.decode_bits(pulses)
-#        if len(code) > 3:
-#            command = code[2]
-#        print("Decoded:", command)
-#        print("-------------")
-#    except adafruit_irremote.IRNECRepeatException:  # Catches the repeat signal
-#        command = last_command
-#    except adafruit_irremote.IRDecodeException:  # Failed to decode
-#        pass
-
-#    if not command:
-#        continue
-#    last_command = command
-
+	if (len(pulses) == nec_code_length):
+		code = decoder.decode_bits(pulses)
+		if len(code) > 3:
+			command = code[2]
 	return(command)
 
 def handle_remote():
