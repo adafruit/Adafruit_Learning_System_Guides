@@ -142,6 +142,17 @@ animation_index = 0
 speed_index = 2
 
 def handle_remote():
+# Check if an IR remote code was received and perform the appropriate action.
+# First read a code.
+
+
+def readNEC(result) {
+# Check if a NEC IR remote command can be read and decoded from the IR receiver.
+# If the command is decoded then the result is stored in the provided pointer and
+# true is returned.  Otherwise if the command was not decoded then false is returned.
+# First check that a falling signal was detected and start reading pulses.
+ 
+ 
 
 
 while True:  # Loop forever...
