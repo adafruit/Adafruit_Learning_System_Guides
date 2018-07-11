@@ -9,6 +9,8 @@
 import time
 import board
 import neopixel
+import adafruit_irremote
+import pulseio
 
 pixel_pin = board.D1    # Pin where NeoPixels are connected
 
@@ -26,29 +28,29 @@ animation = 0           # Type of animation, can be one of these values:
 
 brightness = 1.0        # 0-1, higher number is brighter
 
-ir_pin = board.D2
+pulsein = pulseio.PulseIn(board.D2, maxlen=120, idle_state=True)
+decoder = adafruit_irremote.GenericDecode()
 
 # Adafruit IR Remote Codes:
 # Button       Code         Button  Code
 # -----------  ------       ------  -----
-# VOL-:        [255, 2, 255, 0]		0/10+:	0x000C
-# Play/Pause:  [255, 2, 127, 128]	1:	0x0010
-# VOL+:        [255, 2, 191, 64]	2:	0x0011
-# SETUP:       [255, 2, 223, 32]	3:	0x0012
-# STOP/MODE:   [255, 2, 159, 96]	4:	0x0014
-# UP:          [255, 2, 95, 160]	5:      0x0015
-# DOWN:        0x000D       6:      0x0016
-# LEFT:        0x0008       7:      0x0018
-# RIGHT:       0x000A       8:      0x0019
-# ENTER/SAVE:  0x0009       9:      0x001A
-# Back:        0x000E
+# VOL-:        255			0/10+:	207
+# Play/Pause:  127			1:		247	
+# VOL+:        191			2:		119
+# SETUP:       223			3:		183
+# STOP/MODE:   159			4:		215
+# UP:          95			5:		87
+# DOWN:        79			6:		151
+# LEFT:        239			7:		231
+# RIGHT:       175			8:		103
+# ENTER/SAVE:  111			9:		167
+# Back:        143
 
 color_change = 0x000A		# Button that cycles through color animations.
 animation_change = 0x0008	# Button that cycles through animation types (only two supported).
 speed_change = 0x0005		# Button that cycles through speed choices.
 power_off = 0x0000		# Button that turns off/sleeps the pixels.
 power_on = 0x0002		# Button that turns on the pixels.  Must be pressed twice to register!
-
 
 # Build lookup table/palette for the color animations so they aren't computed at runtime.
 # The colorPalette two-dimensional array below has a row for each color animation and a column
@@ -141,19 +143,36 @@ color_index = 0
 animation_index = 0
 speed_index = 2
 
-def handle_remote():
-# Check if an IR remote code was received and perform the appropriate action.
-# First read a code.
-
-
-def readNEC(result) {
+def read_NEC():
 # Check if a NEC IR remote command can be read and decoded from the IR receiver.
 # If the command is decoded then the result is stored in the provided pointer and
 # true is returned.  Otherwise if the command was not decoded then false is returned.
 # First check that a falling signal was detected and start reading pulses.
- 
- 
+	pulses = decoder.read_pulses(pulsein, max_pulse=5000)
+	command = None
+#	try:
+#		code = decoder.decode_bits(pulses)
+#        if len(code) > 3:
+#            command = code[2]
+#        print("Decoded:", command)
+#        print("-------------")
+#    except adafruit_irremote.IRNECRepeatException:  # Catches the repeat signal
+#        command = last_command
+#    except adafruit_irremote.IRDecodeException:  # Failed to decode
+#        pass
 
+#    if not command:
+#        continue
+#    last_command = command
+
+	return(command)
+
+def handle_remote():
+# Check if an IR remote code was received and perform the appropriate action.
+# First read a code.
+	ir_code = read_NEC()
+	if ir_code:
+		print(ir_code)
 
 while True:  # Loop forever...
 
@@ -161,7 +180,7 @@ while True:  # Loop forever...
     for i in range(pixel_count):
 
         # Animation 0, solid color pulse of all pixels.
-        if animation_index == 0:
+        if animation_index == 1:
             current_step = (time.monotonic() / speed) % (color_steps * 2 - 2)
             if current_step >= color_steps:
                 current_step = color_steps - (current_step - (color_steps - 2))
@@ -172,11 +191,11 @@ while True:  # Loop forever...
             if current_step >= color_steps:
                 current_step = color_steps - (current_step - (color_steps - 2))
 
-        strip[i] = color_animation[int(current_step)]
+		strip[i] = color_animation[int(current_step)]
 
 	# Next check for any IR remote commands.
 	handle_remote()
     # Show the updated pixels.
-    strip.show()
+	strip.show()
 	# Next check for any IR remote commands.
 	handle_remote()
