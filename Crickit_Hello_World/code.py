@@ -12,6 +12,8 @@ def play_file(wavfile):
     audio_file = open(wavfile, "rb")
     wav = audioio.WaveFile(audio_file)
     speaker.play(wav)
+    while speaker.playing:
+        pass
     
 # NeoPixels on the Circuit Playground Express Light Blue
 pixels = neopixel.NeoPixel(board.NEOPIXEL, 10, brightness=0.3)
