@@ -14,18 +14,14 @@ received_code = bytearray(4)
 print("Ready for NEC remote input!")
 
 while True:
-    led[0] = (0, 0, 0)   # LED off
     pulses = decoder.read_pulses(pulsein)
     print("\tHeard", len(pulses), "Pulses:", pulses)
     try:
         code = decoder.decode_bits(pulses, debug=False)
-        led[0] = (0, 100, 0)                         # flash green
         print("Decoded:", code)
     except adafruit_irremote.IRNECRepeatException:   # unusual short code!
-        led[0] = (100, 100, 0)                       # flash yellow
         print("NEC repeat!")
     except adafruit_irremote.IRDecodeException as e: # failed to decode
-        led[0] = (100, 0, 0)                         # flash red
         print("Failed to decode: ", e.args)
 
 print("----------------------------")
