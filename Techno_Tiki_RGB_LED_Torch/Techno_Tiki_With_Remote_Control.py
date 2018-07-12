@@ -50,7 +50,7 @@ nec_code_length = 66
 color_change = 175		# Button that cycles through color animations.
 animation_change = 239	# Button that cycles through animation types (only two supported).
 speed_change = 95		# Button that cycles through speed choices.
-power_off = 255			# Button that turns off/sleeps the pixels.
+power_off = 255			# Button that turns off the pixels.
 power_on = 191			# Button that turns on the pixels.  Must be pressed twice to register!
 
 # Build lookup table/palette for the color animations so they aren't computed at runtime.
@@ -58,7 +58,7 @@ power_on = 191			# Button that turns on the pixels.  Must be pressed twice to re
 # for each step within the animation.  Each value is a 24-bit RGB color.  By looping through
 # the columns of a row the colors of pixels will animate.
 color_steps = 8         # Number of steps in the animation.
-color_count = 25 	# number of columns/steps
+color_count = 25		# number of columns/steps
 
 color_palette = [
 # Complimentary colors
@@ -136,10 +136,8 @@ animation_index = 0
 speed_index = 2
 
 def read_NEC():
-# Check if a NEC IR remote command can be read and decoded from the IR receiver.
-# If the command is decoded then the result is stored in the provided pointer and
-# true is returned.  Otherwise if the command was not decoded then false is returned.
-# First check that a falling signal was detected and start reading pulses.
+# Check if a NEC IR remote command is the correct length.
+# Save the third decoded value as our unique identifier.
 	pulses = decoder.read_pulses(pulsein, max_pulse=5000)
 	command = None
 	if (len(pulses) == nec_code_length):
@@ -152,8 +150,15 @@ def handle_remote():
 # Check if an IR remote code was received and perform the appropriate action.
 # First read a code.
 	ir_code = read_NEC()
-	if ir_code:
+	if ir_code == color_change:
+		color_index = (color_index + 1) % color_count
+	elif ir_code == animation_change:
 		print(ir_code)
+	elif ir_code == speed_change:
+		print(ir_code)
+	elif ir_code == power_off:
+		print(ir_code)
+	delay(1)
 
 while True:  # Loop forever...
 
