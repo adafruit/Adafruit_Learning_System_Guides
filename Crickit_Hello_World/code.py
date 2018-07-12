@@ -14,12 +14,12 @@ def play_file(wavfile):
     speaker.play(wav)
     while speaker.playing:
         pass
-    
+
 # NeoPixels on the Circuit Playground Express Light Blue
 pixels = neopixel.NeoPixel(board.NEOPIXEL, 10, brightness=0.3)
 # Fill them with our favorite color "#0099FF light blue" -> 0x0099FF
 # (see http://www.color-hex.com/ for more colors and find your fav!)
-pixels.fill(0x0099FF) 
+pixels.fill(0x0099FF)
 
 while True:
     print("Hello world!")
