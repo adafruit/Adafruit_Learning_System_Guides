@@ -37,7 +37,7 @@ class Debouncer(object):
 
 
     def __init__(self, pin, mode=None, interval=0.010):
-        """Make am instance.
+        """Make an instance.
            :param int pin: the pin (from board) to debounce
            :param int mode: digitalio.Pull.UP or .DOWN (default is no pull up/down)
            :param int interval: bounce threshold in seconds (default is 0.010, i.e. 10 milliseconds)
