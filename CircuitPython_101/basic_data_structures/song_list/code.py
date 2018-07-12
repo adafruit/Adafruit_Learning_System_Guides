@@ -22,7 +22,7 @@ def play_note(note):
     if note[0] != 0:
         pwm = pulseio.PWMOut(board.D12, duty_cycle = 0, frequency=note[0])
         # Hex 7FFF (binary 0111111111111111) is half of the largest value for a 16-bit int,
-        # i.e. 50%                         
+        # i.e. 50%
         pwm.duty_cycle = 0x7FFF
     time.sleep(note[1])
     if note[0] != 0:
