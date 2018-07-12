@@ -24,7 +24,7 @@ pixels.fill(0x0099FF)
 while True:
     print("Hello world!")
     play_file("hello.wav")       # play Hello World WAV file
-    crickit.servo_1.angle = 75   # Set servo angle to 45 degrees
+    crickit.servo_1.angle = 75   # Set servo angle to 75 degrees
     time.sleep(1.0)              # do nothing for a 1 second
     crickit.servo_1.angle = 135  # Set servo angle to 135 degrees
     time.sleep(1.0)              # do nothing for a 1 second
