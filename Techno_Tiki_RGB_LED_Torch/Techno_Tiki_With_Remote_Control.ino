@@ -85,7 +85,7 @@ const uint32_t colorPalette[colorCount][colorSteps] PROGMEM = {
   { 0xFF0000, 0xFF9900, 0xFFFF00, 0x00FF00, 0x0000FF, 0x4B0082, 0x8B00FF, 0xFFFFFF }
 };
 
-// List of animations speeds (in milliseconds).  This is how long an animation spends before
+/ List of animations speeds (in milliseconds).  This is how long an animation spends before
 // changing to the next step.  Higher values are slower.
 const uint16_t speeds[5] = { 400, 200, 100, 50, 25 };
 

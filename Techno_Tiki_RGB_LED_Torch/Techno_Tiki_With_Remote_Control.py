@@ -130,7 +130,6 @@ speeds = [.4, .2, .1, .05, .025]
 
 # Global state used by the sketch
 strip = neopixel.NeoPixel(pixel_pin, pixel_count, brightness=brightness, auto_write=False)
-receiver_fell = False
 color_index = 0
 animation_index = 0
 speed_index = 2
@@ -149,8 +148,11 @@ def read_NEC():
 def handle_remote():
 # Check if an IR remote code was received and perform the appropriate action.
 # First read a code.
+	global color_index, animation_index, speed_index
+
 	ir_code = read_NEC()
 	if ir_code == color_change:
+		print(ir_code)
 		color_index = (color_index + 1) % color_count
 	elif ir_code == animation_change:
 		print(ir_code)
@@ -158,30 +160,33 @@ def handle_remote():
 		print(ir_code)
 	elif ir_code == power_off:
 		print(ir_code)
-	delay(1)
+	time.sleep(.1)	# wait for 1/10th second to avoid multiple button reads
 
 while True:  # Loop forever...
 
-    # Main loop will update all the pixels based on the animation.
-    for i in range(pixel_count):
 
-        # Animation 0, solid color pulse of all pixels.
-        if animation_index == 1:
-            current_step = (time.monotonic() / speed) % (color_steps * 2 - 2)
-            if current_step >= color_steps:
-                current_step = color_steps - (current_step - (color_steps - 2))
+	# Main loop will update all the pixels based on the animation.
+	for i in range(pixel_count):
 
-        # Animation 1, moving color pulse.  Use position to change brightness.
-        elif animation == 1:
-            current_step = (time.monotonic() / speed + i) % (color_steps * 2 - 2);
-            if current_step >= color_steps:
-                current_step = color_steps - (current_step - (color_steps - 2))
+		# Animation 0, solid color pulse of all pixels.
+		if animation_index == 0:
+			current_step = (time.monotonic() / speed) % (color_steps * 2 - 2)
+			if current_step >= color_steps:
+				current_step = color_steps - (current_step - (color_steps - 2))
 
-		strip[i] = color_animation[int(current_step)]
+		# Animation 1, moving color pulse.  Use position to change brightness.
+		elif animation == 1:
+			current_step = (time.monotonic() / speed + i) % (color_steps * 2 - 2)
+			if current_step >= color_steps:
+				current_step = color_steps - (current_step - (color_steps - 2))
+
+		strip[i] = color_palette[int(current_step)]
+		print(strip[i])
+	
 
 	# Next check for any IR remote commands.
 	handle_remote()
-    # Show the updated pixels.
+	# Show the updated pixels.
 	strip.show()
 	# Next check for any IR remote commands.
 	handle_remote()
