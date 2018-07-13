@@ -21,7 +21,7 @@ speed = .1              # Animation speed (in seconds).
                         # Higher values are slower.
                         # Good values to try are 400, 200, 100, 50, 25, etc.
 
-animation = 0           # Type of animation, can be one of these values:
+animation = 1           # Type of animation, can be one of these values:
                         # 0 - Solid color pulse
                         # 1 - Moving color pulse
 
@@ -58,7 +58,7 @@ power_on = 191			# Button that turns on the pixels.  Must be pressed twice to re
 # for each step within the animation.  Each value is a 24-bit RGB color.  By looping through
 # the columns of a row the colors of pixels will animate.
 color_steps = 8         # Number of steps in the animation.
-color_count = 25		# number of columns/steps
+color_count = 23		# number of columns/steps
 
 color_palette = [
 # Complimentary colors
@@ -67,62 +67,31 @@ color_palette = [
 ([0, 255, 0], [36, 218, 36], [72, 182, 72], [109, 145, 109], [145, 109, 145], [182, 72, 182], [218, 36, 218], [255, 0, 255]), # green magenta
 
 # Adjacent colors (on color wheel).
-
 ([255, 255, 0], [218, 255, 0], [182, 255, 0], [145, 255, 0], [109, 255, 0], [72, 255, 0], [36, 255, 0], [0, 255, 0]), # yello green
 ([0, 255, 0], [0, 255, 36], [0, 255, 72], [0, 255, 109], [0, 255, 145], [0, 255, 182], [0, 255, 218], [0, 255, 255]), # green cyan
  ([0, 255, 255], [0, 218, 255], [0, 182, 255], [0, 145, 255], [0, 109, 255], [0, 72, 255], [0, 36, 255], [0, 0, 255]), # cyan blue
  ([0, 0, 255], [36, 0, 255], [72, 0, 255], [109, 0, 255], [145, 0, 255], [182, 0, 255], [218, 0, 255], [255, 0, 255]), # blue magenta
 ([255, 0, 255], [255, 0, 218], [255, 0, 182], [255, 0, 145], [255, 0, 109], [255, 0, 72], [255, 0, 36], [255, 0, 0]), # magenta red
-]
 
 # Other combos
-#
-# red green
-# ([255, 0, 0], [218, 36, 0], [182, 72, 0], [145, 109, 0],  [109, 145, 0], [72, 182, 0], [36, 218, 0], [0, 255, 0])
-
-# yellow cyan
-# ([255, 255, 0], [218, 255, 36], [182, 255, 72], [145, 255, 109], [109, 255, 145], [72, 255, 182], [36, 255, 218], [0, 255, 255]) 
-
-# green blue
-# ([0, 255, 0], [0, 218, 36], [0, 182, 72], [0, 145, 109],  [0, 109, 145], [0, 72, 182], [0, 36, 218], [0, 0, 255])
-
-# cyan magenta
-# ([0, 255, 255], [36, 218, 255], [72, 182, 255], [109, 145, 255],  [145, 109, 255], [182, 72, 255], [218, 36, 255], [255, 0, 255])
-
-# blue red
-# ([0, 0, 255], [36, 0, 218], [72, 0, 182], [109, 0, 145], [145, 0, 109], [182, 0, 72], [218, 0, 36], [255, 0, 0])
-
-# magenta yellow
-# ([255, 0, 255], [255, 36, 218], [255, 72, 182], [255, 109, 145], [255, 145, 109], [255, 182, 72], [255, 218, 36], [255, 255, 0])
+([255, 0, 0], [218, 36, 0], [182, 72, 0], [145, 109, 0],  [109, 145, 0], [72, 182, 0], [36, 218, 0], [0, 255, 0]), # red green
+([255, 255, 0], [218, 255, 36], [182, 255, 72], [145, 255, 109], [109, 255, 145], [72, 255, 182], [36, 255, 218], [0, 255, 255]), # yellow cyan
+([0, 255, 0], [0, 218, 36], [0, 182, 72], [0, 145, 109],  [0, 109, 145], [0, 72, 182], [0, 36, 218], [0, 0, 255]), # green blue
+([0, 255, 255], [36, 218, 255], [72, 182, 255], [109, 145, 255],  [145, 109, 255], [182, 72, 255], [218, 36, 255], [255, 0, 255]), # cyan magenta
+([0, 0, 255], [36, 0, 218], [72, 0, 182], [109, 0, 145], [145, 0, 109], [182, 0, 72], [218, 0, 36], [255, 0, 0]), # blue red
+([255, 0, 255], [255, 36, 218], [255, 72, 182], [255, 109, 145], [255, 145, 109], [255, 182, 72], [255, 218, 36], [255, 255, 0]), # magenta yellow
 
 # Solid colors fading to dark.
-#
-# red
-# ([255, 0, 0], [223, 0, 0], [191, 0, 0], [159, 0, 0], [127, 0, 0], [95, 0, 0], [63, 0, 0], [31, 0, 0])
-
-# orange
-# ([255, 153, 0], [223, 133, 0], [191, 114, 0], [159, 95, 0], [127, 76, 0], [95, 57, 0], [63, 38, 0], [31, 19, 0])
-
-# yellow
-# ([255, 255, 0], [223, 223, 0], [191, 191, 0], [159, 159, 0], [127, 127, 0], [95, 95, 0], [63, 63, 0], [31, 31, 0])
-
-# green
-# ([0, 255, 0], [0, 223, 0], [0, 191, 0], [0, 159, 0], [0, 127, 0], [0, 95, 0], [0, 63, 0], [0, 31, 0])
-
-# blue
-# ([0, 0, 255], [0, 0, 223], [0, 0, 191], [0, 0, 159], [0, 0, 127], [0, 0, 95], [0, 0, 63], [0, 0, 31])
-
-# indigo
-# ([75, 0, 130], [65, 0, 113], [56, 0, 97], [46, 0, 81], [37, 0, 65], [28, 0, 48], [18, 0, 32], [9, 0, 16])
-
-# violet
-# ([139, 0, 255], [121, 0, 223], [104, 0, 191], [86, 0, 159], [69, 0, 127], [52, 0, 95], [34, 0, 63], [17, 0, 31])
-
-# white
-# ([255, 255, 255], [223, 223, 223], [191, 191, 191], [159, 159, 159], [127, 127, 127], [95, 95, 95], [63, 63, 63], [31, 31, 31])
-
-# rainbow colors
-# ([255, 0, 0], [255, 153, 0], [255, 255, 0], [0, 255, 0], [0, 0, 255], [75, 0, 130], [139, 0, 255], [255, 255, 255])
+([255, 0, 0], [223, 0, 0], [191, 0, 0], [159, 0, 0], [127, 0, 0], [95, 0, 0], [63, 0, 0], [31, 0, 0]), # red
+([255, 153, 0], [223, 133, 0], [191, 114, 0], [159, 95, 0], [127, 76, 0], [95, 57, 0], [63, 38, 0], [31, 19, 0]), # orange
+([255, 255, 0], [223, 223, 0], [191, 191, 0], [159, 159, 0], [127, 127, 0], [95, 95, 0], [63, 63, 0], [31, 31, 0]), # yellow
+([0, 255, 0], [0, 223, 0], [0, 191, 0], [0, 159, 0], [0, 127, 0], [0, 95, 0], [0, 63, 0], [0, 31, 0]), # green
+([0, 0, 255], [0, 0, 223], [0, 0, 191], [0, 0, 159], [0, 0, 127], [0, 0, 95], [0, 0, 63], [0, 0, 31]), # blue
+([75, 0, 130], [65, 0, 113], [56, 0, 97], [46, 0, 81], [37, 0, 65], [28, 0, 48], [18, 0, 32], [9, 0, 16]), # indigo
+([139, 0, 255], [121, 0, 223], [104, 0, 191], [86, 0, 159], [69, 0, 127], [52, 0, 95], [34, 0, 63], [17, 0, 31]), # violet
+([255, 255, 255], [223, 223, 223], [191, 191, 191], [159, 159, 159], [127, 127, 127], [95, 95, 95], [63, 63, 63], [31, 31, 31]), # white
+([255, 0, 0], [255, 153, 0], [255, 255, 0], [0, 255, 0], [0, 0, 255], [75, 0, 130], [139, 0, 255], [255, 255, 255]), # rainbow colors
+]
 
 # List of animations speeds (in seconds).  This is how long an animation spends before
 # changing to the next step.  Higher values are slower.
@@ -146,24 +115,22 @@ def read_NEC():
 	return(command)
 
 def handle_remote():
-# Check if an IR remote code was received and perform the appropriate action.
-# First read a code.
 	global color_index, animation_index, speed_index
 
 	ir_code = read_NEC()
+
 	if ir_code == color_change:
-		print(ir_code)
 		color_index = (color_index + 1) % color_count
 	elif ir_code == animation_change:
-		print(ir_code)
+		animation_index = (animation_index + 1) % 2
 	elif ir_code == speed_change:
-		print(ir_code)
+		speed_index = (speed_index + 1) % 2
 	elif ir_code == power_off:
-		print(ir_code)
-	time.sleep(.1)	# wait for 1/10th second to avoid multiple button reads
+		strip.fill([0, 0, 0])
+		strip.show()
+#	time.sleep(.1)	# wait for 1/10th second to avoid multiple button reads
 
 while True:  # Loop forever...
-
 
 	# Main loop will update all the pixels based on the animation.
 	for i in range(pixel_count):
@@ -176,17 +143,17 @@ while True:  # Loop forever...
 
 		# Animation 1, moving color pulse.  Use position to change brightness.
 		elif animation == 1:
-			current_step = (time.monotonic() / speed + i) % (color_steps * 2 - 2)
+	  		current_step = (time.monotonic() / speed + i) % (color_steps * 2 - 2)
 			if current_step >= color_steps:
 				current_step = color_steps - (current_step - (color_steps - 2))
 
-		strip[i] = color_palette[int(current_step)]
-		print(strip[i])
-	
+		strip[i] = color_palette[int(color_index)][int(current_step)]
 
 	# Next check for any IR remote commands.
 	handle_remote()
+
 	# Show the updated pixels.
 	strip.show()
+
 	# Next check for any IR remote commands.
 	handle_remote()
