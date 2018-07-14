@@ -115,20 +115,24 @@ def read_NEC():
 	return(command)
 
 def handle_remote():
-	global color_index, animation_index, speed_index
+	global color_index, animation_index, speed_index, last_ir_code
 
-	ir_code = read_NEC()
+	try:
+		ir_code = read_NEC()
+	except:
+		return
+
+	time.sleep(.1)
 
 	if ir_code == color_change:
 		color_index = (color_index + 1) % color_count
 	elif ir_code == animation_change:
 		animation_index = (animation_index + 1) % 2
 	elif ir_code == speed_change:
-		speed_index = (speed_index + 1) % 2
+		speed_index = (speed_index + 1) % 5
 	elif ir_code == power_off:
 		strip.fill([0, 0, 0])
 		strip.show()
-#	time.sleep(.1)	# wait for 1/10th second to avoid multiple button reads
 
 while True:  # Loop forever...
 
@@ -137,13 +141,13 @@ while True:  # Loop forever...
 
 		# Animation 0, solid color pulse of all pixels.
 		if animation_index == 0:
-			current_step = (time.monotonic() / speed) % (color_steps * 2 - 2)
+			current_step = (time.monotonic() / speeds[speed_index]) % (color_steps * 2 - 2)
 			if current_step >= color_steps:
 				current_step = color_steps - (current_step - (color_steps - 2))
 
 		# Animation 1, moving color pulse.  Use position to change brightness.
 		elif animation == 1:
-	  		current_step = (time.monotonic() / speed + i) % (color_steps * 2 - 2)
+	  		current_step = (time.monotonic() / speeds[speed_index] + i) % (color_steps * 2 - 2)
 			if current_step >= color_steps:
 				current_step = color_steps - (current_step - (color_steps - 2))
 
