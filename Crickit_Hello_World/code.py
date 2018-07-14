@@ -14,17 +14,17 @@ def play_file(wavfile):
     speaker.play(wav)
     while speaker.playing:
         pass
-    
+
 # NeoPixels on the Circuit Playground Express Light Blue
 pixels = neopixel.NeoPixel(board.NEOPIXEL, 10, brightness=0.3)
 # Fill them with our favorite color "#0099FF light blue" -> 0x0099FF
 # (see http://www.color-hex.com/ for more colors and find your fav!)
-pixels.fill(0x0099FF) 
+pixels.fill(0x0099FF)
 
 while True:
     print("Hello world!")
     play_file("hello.wav")       # play Hello World WAV file
-    crickit.servo_1.angle = 75   # Set servo angle to 45 degrees
+    crickit.servo_1.angle = 75   # Set servo angle to 75 degrees
     time.sleep(1.0)              # do nothing for a 1 second
     crickit.servo_1.angle = 135  # Set servo angle to 135 degrees
     time.sleep(1.0)              # do nothing for a 1 second
