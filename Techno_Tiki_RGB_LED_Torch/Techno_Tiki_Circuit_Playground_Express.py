@@ -6,14 +6,13 @@
 #
 # Released under a MIT license: http://opensource.org/licenses/MIT
 
-import time
+import adafruit_irremote
 import board
 import neopixel
-import adafruit_irremote
 import pulseio
-from adafruit_circuitplayground.express import cpx
+import time
 
-brightness = 1.0        # 0-1, higher number is brighter
+brightness = .1		# 0-1, higher number is brighter
 
 # Adafruit IR Remote Codes:
 # Button       Code         Button  Code
@@ -30,6 +29,7 @@ brightness = 1.0        # 0-1, higher number is brighter
 # ENTER/SAVE:  111			9:		167
 # Back:        143
 
+# Adafruit IR Remote Codes:
 volume_down = 255
 play_pause = 127
 volume_up = 191
@@ -39,7 +39,6 @@ stop_mode = 159
 left_arrow = 239
 enter_save = 111
 right_arrow = 175
-num_0_10_plus 207
 down_arrow = 79
 num_1 = 247
 num_2 = 119
@@ -51,39 +50,20 @@ num_7 = 231
 num_8 = 103
 num_9 = 167
 
-pixel_pin = board.D1    # Pin where NeoPixels are connected
+# Define which remote buttons are associated with sketch actions.
+color_change = right_arrow		# Button that cycles through color animations.
+animation_change = left_arrow	# Button that cycles through animation types (only two supported).
+speed_change = up_arrow			# Button that cycles through speed choices.
+power_off = volume_down			# Button that turns off the pixels.
+power_on = volume_up			# Button that turns on the pixels.  Must be pressed twice to register!
 
-pixel_count = 6         # Number of NeoPixels
-
-speed = .1              # Animation speed (in seconds).
-                        # This is how long to spend in a single animation frame.
-                        # Higher values are slower.
-                        # Good values to try are 400, 200, 100, 50, 25, etc.
-
-animation = 1           # Type of animation, can be one of these values:
-                        # 0 - Solid color pulse
-                        # 1 - Moving color pulse
-
-
-
-pulsein = pulseio.PulseIn(board.D2, maxlen=120, idle_state=True)
-decoder = adafruit_irremote.GenericDecode()
-nec_code_length = 66
-
-
-color_change = 175		# Button that cycles through color animations.
-animation_change = 239	# Button that cycles through animation types (only two supported).
-speed_change = 95		# Button that cycles through speed choices.
-power_off = 255			# Button that turns off the pixels.
-power_on = 191			# Button that turns on the pixels.  Must be pressed twice to register!
-
-# Build lookup table/palette for the color animations so they aren't computed at runtime.
 # The colorPalette two-dimensional array below has a row for each color animation and a column
 # for each step within the animation.  Each value is a 24-bit RGB color.  By looping through
 # the columns of a row the colors of pixels will animate.
 color_steps = 8         # Number of steps in the animation.
-color_count = 23		# number of columns/steps
+color_count = 14		# number of columns/steps
 
+# Build lookup table/palette for the color animations so they aren't computed at runtime.
 color_palette = [
 # Complimentary colors
 ([255, 0, 0], [218, 36, 36], [182, 72, 72], [145, 109, 109], [109, 145, 145], [72, 182, 182], [36, 218, 218], [0, 255, 255]), # red cyan
@@ -93,8 +73,8 @@ color_palette = [
 # Adjacent colors (on color wheel).
 ([255, 255, 0], [218, 255, 0], [182, 255, 0], [145, 255, 0], [109, 255, 0], [72, 255, 0], [36, 255, 0], [0, 255, 0]), # yello green
 ([0, 255, 0], [0, 255, 36], [0, 255, 72], [0, 255, 109], [0, 255, 145], [0, 255, 182], [0, 255, 218], [0, 255, 255]), # green cyan
- ([0, 255, 255], [0, 218, 255], [0, 182, 255], [0, 145, 255], [0, 109, 255], [0, 72, 255], [0, 36, 255], [0, 0, 255]), # cyan blue
- ([0, 0, 255], [36, 0, 255], [72, 0, 255], [109, 0, 255], [145, 0, 255], [182, 0, 255], [218, 0, 255], [255, 0, 255]), # blue magenta
+([0, 255, 255], [0, 218, 255], [0, 182, 255], [0, 145, 255], [0, 109, 255], [0, 72, 255], [0, 36, 255], [0, 0, 255]), # cyan blue
+([0, 0, 255], [36, 0, 255], [72, 0, 255], [109, 0, 255], [145, 0, 255], [182, 0, 255], [218, 0, 255], [255, 0, 255]), # blue magenta
 ([255, 0, 255], [255, 0, 218], [255, 0, 182], [255, 0, 145], [255, 0, 109], [255, 0, 72], [255, 0, 36], [255, 0, 0]), # magenta red
 
 # Other combos
@@ -104,33 +84,52 @@ color_palette = [
 ([0, 255, 255], [36, 218, 255], [72, 182, 255], [109, 145, 255],  [145, 109, 255], [182, 72, 255], [218, 36, 255], [255, 0, 255]), # cyan magenta
 ([0, 0, 255], [36, 0, 218], [72, 0, 182], [109, 0, 145], [145, 0, 109], [182, 0, 72], [218, 0, 36], [255, 0, 0]), # blue red
 ([255, 0, 255], [255, 36, 218], [255, 72, 182], [255, 109, 145], [255, 145, 109], [255, 182, 72], [255, 218, 36], [255, 255, 0]), # magenta yellow
+]
 
 # Solid colors fading to dark.
-([255, 0, 0], [223, 0, 0], [191, 0, 0], [159, 0, 0], [127, 0, 0], [95, 0, 0], [63, 0, 0], [31, 0, 0]), # red
-([255, 153, 0], [223, 133, 0], [191, 114, 0], [159, 95, 0], [127, 76, 0], [95, 57, 0], [63, 38, 0], [31, 19, 0]), # orange
-([255, 255, 0], [223, 223, 0], [191, 191, 0], [159, 159, 0], [127, 127, 0], [95, 95, 0], [63, 63, 0], [31, 31, 0]), # yellow
-([0, 255, 0], [0, 223, 0], [0, 191, 0], [0, 159, 0], [0, 127, 0], [0, 95, 0], [0, 63, 0], [0, 31, 0]), # green
-([0, 0, 255], [0, 0, 223], [0, 0, 191], [0, 0, 159], [0, 0, 127], [0, 0, 95], [0, 0, 63], [0, 0, 31]), # blue
-([75, 0, 130], [65, 0, 113], [56, 0, 97], [46, 0, 81], [37, 0, 65], [28, 0, 48], [18, 0, 32], [9, 0, 16]), # indigo
-([139, 0, 255], [121, 0, 223], [104, 0, 191], [86, 0, 159], [69, 0, 127], [52, 0, 95], [34, 0, 63], [17, 0, 31]), # violet
-([255, 255, 255], [223, 223, 223], [191, 191, 191], [159, 159, 159], [127, 127, 127], [95, 95, 95], [63, 63, 63], [31, 31, 31]), # white
-([255, 0, 0], [255, 153, 0], [255, 255, 0], [0, 255, 0], [0, 0, 255], [75, 0, 130], [139, 0, 255], [255, 255, 255]), # rainbow colors
-]
+#([255, 0, 0], [223, 0, 0], [191, 0, 0], [159, 0, 0], [127, 0, 0], [95, 0, 0], [63, 0, 0], [31, 0, 0]), # red
+#([255, 153, 0], [223, 133, 0], [191, 114, 0], [159, 95, 0], [127, 76, 0], [95, 57, 0], [63, 38, 0], [31, 19, 0]), # orange
+#([255, 255, 0], [223, 223, 0], [191, 191, 0], [159, 159, 0], [127, 127, 0], [95, 95, 0], [63, 63, 0], [31, 31, 0]), # yellow
+#([0, 255, 0], [0, 223, 0], [0, 191, 0], [0, 159, 0], [0, 127, 0], [0, 95, 0], [0, 63, 0], [0, 31, 0]), # green
+#([0, 0, 255], [0, 0, 223], [0, 0, 191], [0, 0, 159], [0, 0, 127], [0, 0, 95], [0, 0, 63], [0, 0, 31]), # blue
+#([75, 0, 130], [65, 0, 113], [56, 0, 97], [46, 0, 81], [37, 0, 65], [28, 0, 48], [18, 0, 32], [9, 0, 16]), # indigo
+#([139, 0, 255], [121, 0, 223], [104, 0, 191], [86, 0, 159], [69, 0, 127], [52, 0, 95], [34, 0, 63], [17, 0, 31]), # violet
+#([255, 255, 255], [223, 223, 223], [191, 191, 191], [159, 159, 159], [127, 127, 127], [95, 95, 95], [63, 63, 63], [31, 31, 31]), # white
+#([255, 0, 0], [255, 153, 0], [255, 255, 0], [0, 255, 0], [0, 0, 255], [75, 0, 130], [139, 0, 255], [255, 255, 255]), # rainbow colors
+#]
 
 # List of animations speeds (in seconds).  This is how long an animation spends before
 # changing to the next step.  Higher values are slower.
 speeds = [.4, .2, .1, .05, .025]
 
 # Global state used by the sketch
-strip = neopixel.NeoPixel(pixel_pin, pixel_count, brightness=brightness, auto_write=False)
 color_index = 0
 animation_index = 0
 speed_index = 2
 
+pixel_pin = board.D1    # Pin where NeoPixels are connected
+pixel_count = 10		# Number of NeoPixels
+
+speed = .1              # Animation speed (in seconds).
+                        # This is how long to spend in a single animation frame.
+                        # Higher values are slower.
+
+animation = 1           # Type of animation, can be one of these values:
+                        # 0 - Solid color pulse
+                        # 1 - Moving color pulse
+
+# initialize LEDS
+strip = neopixel.NeoPixel(board.NEOPIXEL, pixel_count, brightness=brightness, auto_write=False)
+
+# initialize Remote Control
+pulsein = pulseio.PulseIn(board.REMOTEIN, maxlen=120, idle_state=True)
+decoder = adafruit_irremote.GenericDecode()
+nec_code_length = 66
+
 def read_NEC():
 # Check if a NEC IR remote command is the correct length.
 # Save the third decoded value as our unique identifier.
-	pulses = decoder.read_pulses(pulsein, max_pulse=5000)
+	pulses = decoder.read_pulses(pulsein, max_pulse=1000)
 	command = None
 	if (len(pulses) == nec_code_length):
 		code = decoder.decode_bits(pulses)
@@ -144,9 +143,7 @@ def handle_remote():
 	try:
 		ir_code = read_NEC()
 	except:
-		return
-
-	time.sleep(.1)
+		ir_code = 175
 
 	if ir_code == color_change:
 		color_index = (color_index + 1) % color_count
@@ -159,6 +156,7 @@ def handle_remote():
 		strip.show()
 
 while True:  # Loop forever...
+	start_time = time.monotonic()
 
 	# Main loop will update all the pixels based on the animation.
 	for i in range(pixel_count):
@@ -182,6 +180,7 @@ while True:  # Loop forever...
 
 	# Show the updated pixels.
 	strip.show()
+	time.sleep(.1)
 
 	# Next check for any IR remote commands.
 	handle_remote()
