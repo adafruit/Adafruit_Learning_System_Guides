@@ -129,8 +129,13 @@ nec_code_length = 66
 def read_NEC():
 # Check if a NEC IR remote command is the correct length.
 # Save the third decoded value as our unique identifier.
-	pulses = decoder.read_pulses(pulsein, max_pulse=1000)
+	try:
+		pulses = decoder.read_pulses(pulsein) 
+	except: 
+		return(None)
+
 	command = None
+
 	if (len(pulses) == nec_code_length):
 		code = decoder.decode_bits(pulses)
 		if len(code) > 3:
@@ -140,10 +145,7 @@ def read_NEC():
 def handle_remote():
 	global color_index, animation_index, speed_index, last_ir_code
 
-	try:
-		ir_code = read_NEC()
-	except:
-		ir_code = 175
+	ir_code = read_NEC()
 
 	if ir_code == color_change:
 		color_index = (color_index + 1) % color_count
@@ -156,7 +158,6 @@ def handle_remote():
 		strip.show()
 
 while True:  # Loop forever...
-	start_time = time.monotonic()
 
 	# Main loop will update all the pixels based on the animation.
 	for i in range(pixel_count):
@@ -180,7 +181,4 @@ while True:  # Loop forever...
 
 	# Show the updated pixels.
 	strip.show()
-	time.sleep(.1)
-
-	# Next check for any IR remote commands.
-	handle_remote()
+	time.sleep(.2)
