@@ -101,7 +101,7 @@ void setup()
 
   servo1_control->get();
 
-  servo_1.attach(CRICKIT_SERVO1, 600, 2400);
+  servo_1.attach(CRICKIT_SERVO1);
 
   Serial.println("setup complete");
 }
