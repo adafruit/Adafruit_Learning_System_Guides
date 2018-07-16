@@ -122,30 +122,32 @@ animation = 1           # Type of animation, can be one of these values:
 strip = neopixel.NeoPixel(board.NEOPIXEL, pixel_count, brightness=brightness, auto_write=False)
 
 # initialize Remote Control
-pulsein = pulseio.PulseIn(board.REMOTEIN, maxlen=120, idle_state=True)
+ir_code_min = 60
+ir_code_max = 70
+pulsein = pulseio.PulseIn(board.REMOTEIN, maxlen=100, idle_state=True)
 decoder = adafruit_irremote.GenericDecode()
-nec_code_length = 66
 
-def read_NEC():
+def read_nec():
 # Check if a NEC IR remote command is the correct length.
 # Save the third decoded value as our unique identifier.
-	try:
-		pulses = decoder.read_pulses(pulsein) 
-	except: 
-		return(None)
 
+	pulses = decoder.read_pulses(pulsein, max_pulse=5000) 
 	command = None
 
-	if (len(pulses) == nec_code_length):
+	print(len(pulses))
+
+	if (len(pulses) >= ir_code_min and len(pulses) <= ir_code_max):
 		code = decoder.decode_bits(pulses)
 		if len(code) > 3:
 			command = code[2]
+
 	return(command)
 
 def handle_remote():
 	global color_index, animation_index, speed_index, last_ir_code
 
-	ir_code = read_NEC()
+	ir_code = read_nec()
+	print(ir_code)
 
 	if ir_code == color_change:
 		color_index = (color_index + 1) % color_count
@@ -181,4 +183,4 @@ while True:  # Loop forever...
 
 	# Show the updated pixels.
 	strip.show()
-	time.sleep(.2)
+	time.sleep(.25)

@@ -1,9 +1,0 @@
-#!/bin/bash
-
-for i in `cat data`
-do
-	hexcode=`echo $i | sed -e 's/0x//' | sed -e 's/,//'`
-	./hex2rgb $hexcode
-done
-
-echo ""
