@@ -6,7 +6,7 @@
 // All text above must be included in any redistribution.
 
 #include "config.h"
-#include "Adafruit_Crickit.h"
+#include <Adafruit_Crickit.h>
 
 #define CAPTOUCH_THRESH 500
 

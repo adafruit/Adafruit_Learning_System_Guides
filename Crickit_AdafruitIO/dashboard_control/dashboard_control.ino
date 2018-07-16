@@ -16,8 +16,8 @@
 // and any additional configuration needed for WiFi, cellular,
 // or ethernet clients.
 #include "config.h"
-#include "Adafruit_Crickit.h"
-#include "seesaw_servo.h"
+#include <Adafruit_Crickit.h>
+#include <seesaw_servo.h>
 #include <seesaw_neopixel.h>
 
 #define NEOPIX_PIN (20)                  /* Neopixel pin */
