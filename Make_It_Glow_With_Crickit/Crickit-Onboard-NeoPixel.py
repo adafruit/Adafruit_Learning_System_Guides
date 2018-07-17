@@ -1,4 +1,4 @@
-# Using Crickit's onboard NeoPixel 
+# Using Crickit's onboard NeoPixel
 # See http://www.color-hex.com/ for more colors and find your fav!
 from adafruit_crickit import crickit
 from adafruit_seesaw.neopixel import NeoPixel
