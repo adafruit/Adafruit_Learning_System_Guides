@@ -57,7 +57,7 @@ void setup_feeds()
   servo1_control = io.feed("crickit.servo1-control");
   neopixel_control = io.feed("crickit.neopixel-control");
   light = io.feed("crickit.light");
-  touch = io.feed("crickit.touch_0");
+  touch = io.feed("crickit.touch-0");
 }
 
 
@@ -87,8 +87,7 @@ void setup()
 
   // wait for a connection
   while(io.status() < AIO_CONNECTED) {
-    Serial.print(".");
-    //    Serial.println(io.statusText());
+    Serial.println(io.statusText());
     delay(500);
   }
 
