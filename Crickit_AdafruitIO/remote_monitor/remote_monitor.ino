@@ -27,7 +27,7 @@ Adafruit_Crickit crickit;
 void setup_feeds()
 {
   light = io.feed("crickit.light");
-  touch = io.feed("crickit.touch_0");
+  touch = io.feed("crickit.touch-0");
 }
 
 
