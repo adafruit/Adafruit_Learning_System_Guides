@@ -6,7 +6,7 @@ from adafruit_seesaw.neopixel import NeoPixel
 num_pixels = 30  # Number of pixels driven from Crickit NeoPixel terminal
 
 # The following line sets up a NeoPixel strip on Seesaw pin 20 for Feather
-pixels = NeoPixel(crickit.seesaw, 20, num_pixels)   
+pixels = NeoPixel(crickit.seesaw, 20, num_pixels)
 
 def wheel(pos):
     # Input a value 0 to 255 to get a color value.
@@ -35,7 +35,7 @@ def rainbow_cycle(wait):
             pixels[i] = wheel(rc_index & 255)
         pixels.show()
         time.sleep(wait)
-        
+
 RED = (255, 0, 0)
 YELLOW = (255, 150, 0)
 GREEN = (0, 255, 0)
@@ -55,7 +55,7 @@ while True:
     pixels.fill(BLUE)
     pixels.show()
     time.sleep(1)
- 
+
     print("chase")
     color_chase(RED, 0.1)  # Increase the number to slow down the color chase
     color_chase(YELLOW, 0.1)
@@ -63,6 +63,6 @@ while True:
     color_chase(CYAN, 0.1)
     color_chase(BLUE, 0.1)
     color_chase(PURPLE, 0.1)
- 
+
     print("rainbow")
     rainbow_cycle(0)  # Increase the number to slow down the rainbow
