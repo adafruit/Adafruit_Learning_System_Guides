@@ -6,11 +6,13 @@
 #
 # Released under a MIT license: http://opensource.org/licenses/MIT
 
+import time
 import adafruit_irremote
 import board
 import neopixel
 import pulseio
-import time
+
+# pylint: disable=global-statement
 
 brightness = 1        # 0-1, higher number is brighter
 
@@ -55,7 +57,7 @@ color_change = right_arrow      # Button that cycles through color animations.
 animation_change = left_arrow   # Button that cycles through animation types (only two supported).
 speed_change = up_arrow         # Button that cycles through speed choices.
 power_off = volume_down         # Button that turns off the pixels.
-power_on = volume_up            # Button that turns on the pixels.  Must be pressed twice to register!
+power_on = volume_up            # Button that turns on the pixels. Must be pressed twice.
 
 # The colorPalette two-dimensional array below has a row for each color animation and a column
 # for each step within the animation.  Each value is a 24-bit RGB color.  By looping through
@@ -157,7 +159,7 @@ def read_nec():
     command = None
 
     try:
-        if (len(pulses) >= ir_code_min and len(pulses) <= ir_code_max):
+        if len(pulses) >= ir_code_min and len(pulses) <= ir_code_max:
             code = decoder.decode_bits(pulses)
             if len(code) > 3:
                 command = code[2]
@@ -173,7 +175,7 @@ def handle_remote():
 
     ir_code = read_nec()
 
-    if ir_code == None:
+    if ir_code is None:
         time.sleep(.1)
         return
 

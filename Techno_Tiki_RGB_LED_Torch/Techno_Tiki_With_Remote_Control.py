@@ -11,6 +11,7 @@ import board
 import neopixel
 import adafruit_irremote
 import pulseio
+# pylint: disable=global-statement
 
 pixel_pin = board.D1    # Pin where NeoPixels are connected
 
@@ -28,9 +29,10 @@ animation = 1           # Type of animation, can be one of these values:
 
 brightness = 1.0        # 0-1, higher number is brighter
 
-pulsein = pulseio.PulseIn(board.D2, maxlen=120, idle_state=True)
+ir_code_min = 60
+ir_code_max = 70
+pulsein = pulseio.PulseIn(board.D2, maxlen=100, idle_state=True)
 decoder = adafruit_irremote.GenericDecode()
-nec_code_length = 66
 
 # Adafruit IR Remote Codes:
 # Button       Code         Button  Code
@@ -131,21 +133,27 @@ def read_NEC():
 # Save the third decoded value as our unique identifier.
     pulses = decoder.read_pulses(pulsein, max_pulse=5000)
     command = None
-    if len(pulses) == nec_code_length:
-        code = decoder.decode_bits(pulses)
-        if len(code) > 3:
-            command = code[2]
+
+    try:
+        if len(pulses) >= ir_code_min and len(pulses) <= ir_code_max:
+            code = decoder.decode_bits(pulses)
+            if len(code) > 3:
+                command = code[2]
+    except adafruit_irremote.IRNECRepeatException:  # Catches the repeat signal
+        pass
+    except adafruit_irremote.IRDecodeException:  # Failed to decode
+        pass
+
     return command
 
 def handle_remote():
     global color_index, animation_index, speed_index
 
-    try:
-        ir_code = read_NEC()
-    except:
-        return
+    ir_code = read_NEC()
 
-    time.sleep(.1)
+    if ir_code is None:
+        time.sleep(.1)
+        return
 
     if ir_code == color_change:
         color_index = (color_index + 1) % color_count
