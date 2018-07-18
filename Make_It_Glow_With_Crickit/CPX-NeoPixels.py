@@ -1,4 +1,4 @@
-# Use the 10 NeoPixels on Circuit Playground Express via the 
+# Use the 10 NeoPixels on Circuit Playground Express via the
 #   Adafruit neopixel library
 import time
 import neopixel
@@ -11,10 +11,10 @@ CPX_pixels = neopixel.NeoPixel(board.NEOPIXEL, 10, brightness=0.5)
 for i in range(50):
     CPX_pixels.fill((0, 0, i))
     time.sleep(0.05)
-    
+
 # blast off!
 CPX_pixels.fill((255, 0, 0))
-    
+
 while True:
     # pulse effect
     for i in range(255, 0, -5):
