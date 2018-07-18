@@ -6,9 +6,9 @@ python:
 
 cache:
     pip: true
-    
+
 install:
-  - pip install pylint
+  - pip install --force-reinstall pylint==1.9.2
 
 script:
   - ./pylint_check
