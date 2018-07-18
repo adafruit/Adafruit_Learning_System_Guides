@@ -52,7 +52,7 @@ ENABLE_HOST_ACCESS = False
 DISABLE_HOST_ACCESS = True
 
 
-class Emulator(object):
+class Emulator:
     """Handle all interaction with the emulator circuit."""
 
     def __init__(self, i2c):

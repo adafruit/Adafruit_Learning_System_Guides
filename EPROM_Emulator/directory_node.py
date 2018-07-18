@@ -29,7 +29,7 @@ Manage a directory in the file system.
 import os
 
 
-class DirectoryNode(object):
+class DirectoryNode:
     """Display and navigate the SD card contents"""
 
     def __init__(self, display, parent=None, name="/"):

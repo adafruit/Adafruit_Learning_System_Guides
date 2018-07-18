@@ -30,7 +30,7 @@ import time
 import digitalio
 
 
-class Debouncer(object):
+class Debouncer:
     """Debounce an input pin"""
 
     DEBOUNCED_STATE = 0x01
