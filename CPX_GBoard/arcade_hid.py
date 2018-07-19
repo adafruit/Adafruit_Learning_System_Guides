@@ -12,9 +12,7 @@ Licensed under the MIT license.
 All text above must be included in any redistribution.
 """
 
-import time
 import board
-from adafruit_circuitplayground.express import cpx
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keycode import Keycode
 from digitalio import DigitalInOut, Direction, Pull

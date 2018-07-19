@@ -11,6 +11,7 @@ Licensed under the MIT license.
 
 All text above must be included in any redistribution.
 """
+# pylint: disable=unused-import
 
 import time
 from adafruit_circuitplayground.express import cpx
