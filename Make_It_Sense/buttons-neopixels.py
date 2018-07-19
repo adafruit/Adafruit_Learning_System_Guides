@@ -19,18 +19,18 @@ switch = DigitalInOut(board.SLIDE_SWITCH)
 switch.direction = Direction.INPUT
 switch.pull = Pull.UP
 
-# main program - light NeoPixels depending on switches    
+# main program - light NeoPixels depending on switches
 while True:
     if button_a.value:
         pixels[0] = (0, 30, 0)
     else:
         pixels[0] = (0, 0, 0)
-        
+
     if button_b.value:
         pixels[9] = (0, 30, 0)
     else:
         pixels[9] = (0, 0, 0)
-        
+
     if switch.value:
         pixels[4] = (0, 0, 30)
         pixels[5] = (0, 0, 0)
