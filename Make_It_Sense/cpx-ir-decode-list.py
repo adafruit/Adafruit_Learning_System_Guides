@@ -47,7 +47,7 @@ Vol + : [255, 2, 191, 64]
 Play/Pause: [255, 2, 127, 128]
 '''
 # Use the third value in mappings above to identify each key in a list
-keys = [207, 247, 119, 183, 215, 87, 151, 231, 103, 167, 207, 95, 
+keys = [207, 247, 119, 183, 215, 87, 151, 231, 103, 167, 207, 95,
         79, 175, 239, 111, 223, 159, 143, 255, 191, 127]
 
 last_command = None
