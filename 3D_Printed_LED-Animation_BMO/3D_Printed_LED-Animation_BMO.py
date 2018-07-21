@@ -104,7 +104,7 @@ while True:
         matrix.show()
         time.sleep(.1)
 
-        # track repitions 
+        # track repitions
         rep_count -= 1
 
         # play it again
