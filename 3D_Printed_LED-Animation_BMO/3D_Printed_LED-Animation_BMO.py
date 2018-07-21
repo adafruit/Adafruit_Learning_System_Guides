@@ -25,7 +25,8 @@ frame_delay = [.25, .25, .25, .25, .25, .25, .25, .25, .25, .25]
 frame_count = 0
 
 # repeat entire animation multiple times
-rep = 255
+reps = 255
+rep_count = reps
 
 # animation bitmaps
 animation = [
@@ -83,7 +84,7 @@ animation = [
 # populate matrix
 while True:
 
-    if frame_count < len(animation):
+    if frame_count < len(animation) and rep_count >= 0:
         for x in range(x_pix):
             for y in range(y_pix):
                 matrix.pixel(x, y, animation[frame_count][x][y])
@@ -96,6 +97,8 @@ while True:
 
         # pause for effect
         time.sleep(frame_delay[frame_count])
+        
+
 
     else:
 
@@ -103,7 +106,14 @@ while True:
         matrix.show()
         time.sleep(.1)
 
+        # track repitions 
+        rep_count -= 1
+
+        # play it again 
+        frame_count = 0
+
         # A0/D1 pin has been touched
         # reset animation
         if touch.value:
             frame_count = 0
+            rep_count = reps
