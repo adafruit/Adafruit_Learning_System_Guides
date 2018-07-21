@@ -97,8 +97,6 @@ while True:
 
         # pause for effect
         time.sleep(frame_delay[frame_count])
-        
-
 
     else:
 
@@ -109,7 +107,7 @@ while True:
         # track repitions 
         rep_count -= 1
 
-        # play it again 
+        # play it again
         frame_count = 0
 
         # A0/D1 pin has been touched
