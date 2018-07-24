@@ -1,33 +1,34 @@
 import audioio
 import board
-from digitalio import DigitalInOut, Direction, Pull
+import digitalio
 
 # enable the speaker
-spkrenable = DigitalInOut(board.SPEAKER_ENABLE)
-spkrenable.direction = Direction.OUTPUT
+spkrenable = digitalio.DigitalInOut(board.SPEAKER_ENABLE)
+spkrenable.direction = digitalio.Direction.OUTPUT
 spkrenable.value = True
 
 # make the 2 input buttons
-buttonA = DigitalInOut(board.BUTTON_A)
-buttonA.direction = Direction.INPUT
-buttonA.pull = Pull.DOWN
+buttonA = digitalio.DigitalInOut(board.BUTTON_A)
+buttonA.direction = digitalio.Direction.INPUT
+buttonA.pull = digitalio.Pull.DOWN
 
-buttonB = DigitalInOut(board.BUTTON_B)
-buttonB.direction = Direction.INPUT
-buttonB.pull = Pull.DOWN
+buttonB = digitalio.DigitalInOut(board.BUTTON_B)
+buttonB.direction = digitalio.Direction.INPUT
+buttonB.pull = digitalio.Pull.DOWN
 
 # The two files assigned to buttons A & B
 audiofiles = ["rimshot.wav", "laugh.wav"]
 
 
 def play_file(filename):
-    print("playing file " + filename)
-    f = open(filename, "rb")
-    a = audioio.AudioOut(board.A0, f)
-    a.play()
-    while a.playing:
-        pass
-    print("finished")
+    print("Playing file: " + filename)
+    wave_file = open(filename, "rb")
+    with audioio.WaveFile(wave_file) as wave:
+        with audioio.AudioOut(board.SPEAKER) as audio:
+            audio.play(wave)
+            while audio.playing:
+                pass
+    print("Finished")
 
 
 while True:
