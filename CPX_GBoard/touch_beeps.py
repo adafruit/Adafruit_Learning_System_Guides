@@ -18,7 +18,8 @@ from adafruit_circuitplayground.express import cpx
 DOT_DURATION = 0.20
 DASH_DURATION = 0.5
 
-cpx.adjust_touch_threshold(600)
+# You can adjust this to get the level of sensitivity you want.
+cpx.adjust_touch_threshold(100)
 
 while True:
     if cpx.touch_A4:

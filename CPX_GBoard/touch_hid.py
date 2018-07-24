@@ -20,7 +20,9 @@ DOT_DURATION = 0.25
 DASH_DURATION = 0.5
 
 kbd = Keyboard()
-cpx.adjust_touch_threshold(600)
+
+# You can adjust this to get the level of sensitivity you want.
+cpx.adjust_touch_threshold(100)
 
 
 while True:

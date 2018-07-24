@@ -27,8 +27,9 @@ from adafruit_circuitplayground.express import cpx
 DOT_DURATION = 0.20
 DASH_DURATION = 0.5
 
+# You can adjust this to get the level of sensitivity you want.
 # Uncomment the next line if you want to use capacitive touch.
-# cpx.adjust_touch_threshold(600)
+# cpx.adjust_touch_threshold(100)
 
 # Uncomment the next 6 lines if you want to use external buttons
 # button_a = DigitalInOut(board.A4)
