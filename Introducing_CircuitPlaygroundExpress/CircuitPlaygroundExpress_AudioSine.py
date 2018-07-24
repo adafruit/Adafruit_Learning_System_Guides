@@ -19,7 +19,7 @@ speaker_enable = digitalio.DigitalInOut(board.SPEAKER_ENABLE)
 speaker_enable.direction = digitalio.Direction.OUTPUT
 speaker_enable.value = True
 
-audio = audioio.AudioOut(board.SPEAKER)
+audio = audioio.AudioOut(board.A0)
 sine_wave_sample = audioio.RawSample(sine_wave)
 
 audio.play(sine_wave_sample, loop=True)  # keep playing the sample over and over
