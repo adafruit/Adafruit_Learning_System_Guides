@@ -20,20 +20,14 @@ DASH_DURATION = 0.5
 
 cpx.adjust_touch_threshold(600)
 
-def touch_a():
-    return cpx.touch_A4
-
-def touch_b():
-    return cpx.touch_A3
-
 while True:
-    if touch_a():
+    if cpx.touch_A4:
         cpx.play_tone(4000, DOT_DURATION)
         time.sleep(0.1)
-        while touch_a():
+        while cpx.touch_A4:
             pass
-    elif touch_b():
+    elif cpx.touch_A3:
         cpx.play_tone(4000, DASH_DURATION)
         time.sleep(0.1)
-        while touch_b():
+        while cpx.touch_A3:
             pass
