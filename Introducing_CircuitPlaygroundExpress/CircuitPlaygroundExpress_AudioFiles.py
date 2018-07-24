@@ -24,7 +24,7 @@ def play_file(filename):
     print("Playing file: " + filename)
     wave_file = open(filename, "rb")
     with audioio.WaveFile(wave_file) as wave:
-        with audioio.AudioOut(board.SPEAKER) as audio:
+        with audioio.AudioOut(board.A0) as audio:
             audio.play(wave)
             while audio.playing:
                 pass
