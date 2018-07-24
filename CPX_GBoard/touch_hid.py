@@ -22,18 +22,13 @@ DASH_DURATION = 0.5
 kbd = Keyboard()
 cpx.adjust_touch_threshold(600)
 
-def touch_a():
-    return cpx.touch_A4
-
-def touch_b():
-    return cpx.touch_A3
 
 while True:
-    if touch_a():
+    if cpx.touch_A4:
         kbd.send(Keycode.PERIOD)
-        while touch_a():
+        while cpx.touch_A4:
             pass
-    elif touch_b():
+    elif cpx.touch_A3:
         kbd.send(Keycode.MINUS)
-        while touch_b():
+        while cpx.touch_A3:
             pass
