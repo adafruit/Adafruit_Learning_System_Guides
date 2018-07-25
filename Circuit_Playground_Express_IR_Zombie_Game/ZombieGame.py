@@ -5,7 +5,7 @@ import adafruit_irremote
 import digitalio
 import neopixel
 
-pixels = neopixel.NeoPixel(board.NEOPIXEL, 10, auto_write=True)
+pixels = neopixel.NeoPixel(board.NEOPIXEL, 10)
 
 button_a = digitalio.DigitalInOut(board.BUTTON_A)
 button_a.switch_to_input(pull=digitalio.Pull.DOWN)
