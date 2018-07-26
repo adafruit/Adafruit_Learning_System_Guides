@@ -3,11 +3,10 @@
 
 import time
 import board
-import pulseio
 from digitalio import DigitalInOut, Direction
 
 # vibrating disc mini motor disc connected on D2
-vibrating_disc = DigitalInOut(board.D2)
+vibrating_disc = DigitalInOut(board.D1)
 vibrating_disc.direction = Direction.OUTPUT
 
 on_time = 2     # Vibration motor run time, in seconds
