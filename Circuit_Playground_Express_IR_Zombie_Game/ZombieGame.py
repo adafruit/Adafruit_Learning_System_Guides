@@ -34,8 +34,12 @@ zombie_led_pulse = 0.07
 pixels.brightness = 0.0
 
 # Change to set number of seconds between each signal being sent.
-ZOMBIE_TIME = 3
 HEALER_TIME = 1
+ZOMBIE_TIME = 3
+
+# The Healer and Zombie IR signal codes
+HEALER_IR = [72, 69, 65, 76]
+ZOMBIE_IR = [90, 79, 77, 66]
 
 human_health_counter = 10
 human = 0
@@ -70,7 +74,7 @@ while True:
             # Something got distorted or maybe its not an NEC-type remote?
             continue
         print("NEC Infrared code received: ", received_code)
-        if received_code == [10, 10, 10, 10]:
+        if received_code == ZOMBIE_IR:
             print("Zombie code received!")
             pixels.fill(0)
             human_health_counter -= 1
@@ -80,7 +84,7 @@ while True:
                 mode = zombie
                 pixels.fill((255, 0, 0))
                 print("Zombified!")
-        if received_code == [20, 20, 20, 20]:
+        if received_code == HEALER_IR:
             print("Healer code received!")
             if human_health_counter < 10:
                 pixels.fill(0)
@@ -99,7 +103,7 @@ while True:
         if now - start > ZOMBIE_TIME:
             print("Zombie code sent! \n")
             red_led.value = True
-            encoder.transmit(pulseout, [10, 10, 10, 10])
+            encoder.transmit(pulseout, ZOMBIE_IR)
             red_led.value = False
             start = time.monotonic()
     elif mode is healer:
@@ -112,6 +116,6 @@ while True:
         if now - start > HEALER_TIME:
             print("Healer code sent! \n")
             red_led.value = True
-            encoder.transmit(pulseout, [20, 20, 20, 20])
+            encoder.transmit(pulseout, HEALER_IR)
             red_led.value = False
             start = time.monotonic()
