@@ -9,7 +9,7 @@ import neopixel
 TREASURE_INFO = { (1,)*4 : (  0  , 0xFF0000) ,
                   (2,)*4 : (  1  , 0x00FF00) ,
                   (3,)*4 : (  2  , 0x0000FF) }
-treasures_found = dict.fromkeys(TREASURE_INFO.keys(), False) 
+treasures_found = dict.fromkeys(TREASURE_INFO.keys(), False)
 
 # Create NeoPixel object to indicate status
 pixels = neopixel.NeoPixel(board.NEOPIXEL, 10)
@@ -44,9 +44,9 @@ while True:
     # See if received code matches any of the treasures
     if received_code in TREASURE_INFO.keys():
         treasures_found[received_code] = True
-        p, c = TREASURE_INFO[received_code] 
+        p, c = TREASURE_INFO[received_code]
         pixels[p] = c
-        
+
     # Check to see if all treasures have been found
     if False not in treasures_found.values():
         pixels.auto_write = False
