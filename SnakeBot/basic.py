@@ -1,5 +1,4 @@
 import time
-from adafruit_circuitplayground.express import cpx
 from adafruit_crickit import crickit
 
 ss = crickit.seesaw

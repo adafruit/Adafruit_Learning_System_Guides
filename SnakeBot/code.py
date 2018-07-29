@@ -1,6 +1,5 @@
 import time
 import random
-from adafruit_circuitplayground.express import cpx
 from adafruit_crickit import crickit
 
 LEFT = False
