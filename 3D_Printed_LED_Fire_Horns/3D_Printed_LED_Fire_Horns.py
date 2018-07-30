@@ -1,16 +1,9 @@
-# Gemma "Firewalker Lite" sneakers
-#  - Uses the following Adafruit parts (X2 for two shoes):
-#    * Gemma M0 3V microcontroller (#3501)
-#    * 150 mAh LiPoly battery (#1317) or larger
-#    * Medium vibration sensor switch (#2384)
-#    * 60/m NeoPixel RGB LED strip (#1138 or #1461)
-#    * LiPoly charger such as #1304
-#
-# - originally written by Phil Burgess for Gemma using Arduino
-#   * https://learn.adafruit.com/gemma-led-sneakers
+# Fiery demon horns (rawr!) for Adafruit Trinket/Gemma.
+# Adafruit invests time and resources providing this open source code,
+# please support Adafruit and open-source hardware by purchasing
+# products from Adafruit!
 
 import board
-import digitalio
 import neopixel
 
 try:
@@ -18,52 +11,33 @@ try:
 except ImportError:
     import random
 
-# Declare a NeoPixel object on led_pin with num_leds as pixels
-# No auto-write.
-led_pin = board.D1  # Which pin your pixels are connected to
-num_leds = 40  # How many LEDs you have
-circumference = 40  # Shoe circumference, in pixels, may be > NUM_LEDS
+# /\  ->   Fire-like effect is the sum of multiple triangle
+# ____/  \____  waves in motion, with a 'warm' color map applied.
+led_pin = board.D0      # Which pin your pixels are connected to
+num_leds = 30           # How many LEDs you have
 frames_per_second = 50  # Animation frames per second
-brightness = 0  # Current wave height
+brightness = 0          # Current wave height
 strip = neopixel.NeoPixel(led_pin, num_leds, brightness=1, auto_write=False)
 offset = 0
+fade = 0                # Decreases brightness as wave moves
 
-# vibration sensor
-motion_pin = board.D0  # Pin where vibration switch is connected
-pin = digitalio.DigitalInOut(motion_pin)
-pin.direction = digitalio.Direction.INPUT
-pin.pull = digitalio.Pull.UP
-ramping_up = False
-
-center = 0  # Center point of wave in fixed-point space (0 - 255)
-speed = 1  # Distance to move between frames (-128 - +127)
-width = 2  # Width from peak to bottom of triangle wave (0 - 128)
-hue = 3  # Current wave hue (color) see comments later
-hue_target = 4  # Final hue we're aiming for
-red = 5  # LED RGB color calculated from hue
-green = 6  # LED RGB color calculated from hue
-blue = 7  # LED RGB color calculated from hue
+# Coordinate space for waves is 16x the pixel spacing,
+# allowing fixed-point math to be used instead of floats.
+lower = 0       # Lower bound of wave
+upper = 1       # Upper bound of wave
+mid = 2         # Midpoint (peak) ((lower+upper)/2)
+vlower = 3      # Velocity of lower bound
+vupper = 4      # Velocity of upper bound
+intensity = 5   # Brightness at peak
 
 y = 0
 brightness = 0
 count = 0
 
-# Gemma can animate 3 of these on 40 LEDs at 50 FPS
-# More LEDs and/or more waves will need lower
-wave = [0] * 8, [0] * 8, [0] * 8
+wave = [0] * 6, [0] * 6, [0] * 6, [0] * 6, [0] * 6, [0] * 6
 
-# Note that the speeds of each wave are different prime numbers.
-# This avoids repetition as the waves move around the
-# perimeter...if they were even numbers or multiples of each
-# other, there'd be obvious repetition in the pattern of motion...
-# beat frequencies.
+# Number of simultaneous waves (per horn)
 n_waves = len(wave)
-
-# 90 distinct hues (0-89) around color wheel
-hue_table = [255, 255, 255, 255, 255, 255, 255, 255, 237, 203,
-             169, 135, 101, 67, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 0, 0, 0, 18, 52, 86, 120, 154, 188, 222,
-             255, 255, 255, 255, 255, 255, 255, 255]
 
 # Gamma-correction table
 gammas = [
@@ -113,16 +87,8 @@ def wave_setup():
         current_wave = wave[wave_index]
         random_offset = random.randint(0, 90)
 
-        current_wave[hue] = current_wave[hue_target] = 90 + random_offset
-        current_wave[red] = h2rgb(current_wave[hue] - 30)
-        current_wave[green] = h2rgb(current_wave[hue])
-        current_wave[blue] = h2rgb(current_wave[hue] + 30)
-
-
-def vibration_detector():
-    while True:
-        if not pin.value:
-            return True
+        current_wave[vlower] = current_wave[vupper] = 90 + random_offset
+        current_wave[intensity] = h2rgb(current_wave[vlower] - 30)
 
 
 while True:
@@ -148,33 +114,31 @@ while True:
     # Wave positions and colors are updated...
     for w in range(n_waves):
         # Move wave; wraps around ends, is OK!
-        wave[w][center] += wave[w][speed]
+        wave[w][lower] += wave[w][upper]
 
         # Hue not currently changing?
-        if wave[w][hue] == wave[w][hue_target]:
+        if wave[w][vlower] == wave[w][vupper]:
 
             # There's a tiny random chance of picking a new hue...
             if not random.randint(frames_per_second * 4, 255):
                 # Within 1/3 color wheel
-                wave[w][hue_target] = random.randint(
-                    wave[w][hue] - 30, wave[w][hue] + 30)
+                wave[w][vupper] = random.randint(
+                    wave[w][vlower] - 30, wave[w][vlower] + 30)
 
         # This wave's hue is currently shifting...
         else:
 
-            if wave[w][hue] < wave[w][hue_target]:
-                wave[w][hue] += 1  # Move up or
+            if wave[w][vlower] < wave[w][]:
+                wave[w][vlower] += 1  # Move up or
             else:
-                wave[w][hue] -= 1  # down as needed
+                wave[w][vlower] -= 1  # down as needed
 
             # Reached destination?
-            if wave[w][hue] == wave[w][hue_target]:
-                wave[w][hue] = 90 + wave[w][hue] % 90  # Clamp to 90-180 range
-                wave[w][hue_target] = wave[w][hue]  # Copy to target
+            if wave[w][vlower] == wave[w][vupper]:
+                wave[w][vlower] = 90 + wave[w][vlower] % 90  # Clamp to 90-180 range
+                wave[w][vupper] = wave[w][hue]  # Copy to target
 
-            wave[w][red] = h2rgb(wave[w][hue] - 30)
-            wave[w][green] = h2rgb(wave[w][hue])
-            wave[w][blue] = h2rgb(wave[w][hue] + 30)
+            wave[w][intensity] = h2rgb(wave[w][vlower] - 30)
 
         # Now render the LED strip using the current
         # brightness & wave states.
@@ -196,8 +160,8 @@ while True:
                 # Calculate distance from pixel center to wave
                 # center point, using both signed and unsigned
                 # 8-bit integers...
-                d1 = int(abs(x - wave[w_index][center]))
-                d2 = int(abs(x - wave[w_index][center]))
+                d1 = int(abs(x - wave[w_index][lower]))
+                d2 = int(abs(x - wave[w_index][lower]))
 
                 # Then take the lesser of the two, resulting in
                 # a distance (0-128)
@@ -212,9 +176,9 @@ while True:
                 # pixel (basic linear y=mx+b stuff).
                 # Is distance within wave's influence?
                 # d2 is opposite; distance to wave's end
-                if d1 < wave[w_index][width]:
-                    d2 = wave[w_index][width] - d1
-                    y = int(brightness * d2 / wave[w_index][width])  # 0 to 200
+                if d1 < wave[w_index][mid]:
+                    d2 = wave[w_index][mid] - d1
+                    y = int(brightness * d2 / wave[w_index][mid])  # 0 to 200
 
                     # y is a brightness scale value --
                     # proportional to, but not exactly equal
@@ -223,7 +187,7 @@ while True:
                         # In HSV colorspace, this would be
                         # tweaking 'value'
                         n = int(y * 2 + 1)  # 1-256
-                        r += (wave[w_index][red] * n) >> 8  # More fixed-point math
+                        r += (wave[w_index][intensity] * n) >> 8  # More fixed-point math
                         # Wave color is scaled by 'n'
                         g += (wave[w_index][green] * n) >> 8
                         b += (wave[w_index][blue] * n) >> 8  # >>8 is equiv to /256
@@ -232,7 +196,7 @@ while True:
                         n = int((y - 128) * 2)  # 0-255 affects white level
                         m = 256 * n
                         n = 256 - n  # 1-256 affects RGB level
-                        r += (m + wave[w_index][red] * n) >> 8
+                        r += (m + wave[w_index][intensity] * n) >> 8
                         g += (m + wave[w_index][green] * n) >> 8
                         b += (m + wave[w_index][blue] * n) >> 8
 
