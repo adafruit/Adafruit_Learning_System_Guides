@@ -21,6 +21,13 @@ strip = neopixel.NeoPixel(led_pin, num_leds, brightness=1, auto_write=False)
 offset = 0
 fade = 0                # Decreases brightness as wave moves
 
+# Random number generator is seeded from an unused 'floating'
+# analog input - this helps ensure the random color choices
+# aren't always the same order.
+pin = AnalogIn(board.A0)
+random.seed(pin.value)
+pin.deinit()
+
 # Coordinate space for waves is 16x the pixel spacing,
 # allowing fixed-point math to be used instead of floats.
 lower = 0       # Lower bound of wave
@@ -61,42 +68,15 @@ gammas = [
     255
 ]
 
-
-def h2rgb(colour_hue):
-    colour_hue %= 90
-    h = hue_table[colour_hue >> 1]
-
-    if colour_hue & 1:
-        ret = h & 15
-    else:
-        ret = (h >> 4)
-
-    return ret * 17
-
-
-# pylint: disable=global-statement
-def wave_setup():
-    global wave
-
-    wave = [[0, 3, 60, 0, 0, 0, 0, 0],
-            [0, -5, 45, 0, 0, 0, 0, 0],
-            [0, 7, 30, 0, 0, 0, 0, 0]]
-
-    # assign random starting colors to waves
-    for wave_index in range(n_waves):
-        current_wave = wave[wave_index]
-        random_offset = random.randint(0, 90)
-
-        current_wave[vlower] = current_wave[vupper] = 90 + random_offset
-        current_wave[intensity] = h2rgb(current_wave[vlower] - 30)
-
+def random_wave(h, w):
+    wave[h][w][upper]    = -1                               # Always start just below head of strip
+    wave[h][w][lower]    = -16 * (3 + random.randint(4))    # Lower end starts ~3-7 pixels back
+    wave[h][w][mid]      = (wave[h][w][lower]+ wave[h][w][upper]) / 2
+    wave[h][w][vlower]   = 3 + random.randint(4)            # Lower end moves at ~1/8 to 1/4 pixel/frame
+    wave[h][w][vupper]   = wave[h][w][vlower]+ random.randint(0,4) # Upper end moves a bit faster, spreading wave
+    wave[h][w][intensity]= 300 + random.randint(0,600)
 
 while True:
-
-    # wait for vibration sensor to trigger
-    if not ramping_up:
-        ramping_up = vibration_detector()
-        wave_setup()
 
     # But it's not just a straight shot that it ramps up.
     # This is a low-pass filter...it makes the brightness
