@@ -13,29 +13,24 @@ except ImportError:
 
 # /\  ->   Fire-like effect is the sum of multiple triangle
 # ____/  \____  waves in motion, with a 'warm' color map applied.
-led_pin = board.D0      # Which pin your pixels are connected to
-num_leds = 30           # How many LEDs you have
-frames_per_second = 50  # Animation frames per second
-brightness = 0          # Current wave height
-strip = neopixel.NeoPixel(led_pin, num_leds, brightness=1, auto_write=False)
+n_horns = 1             # number of horns
+led_pin = board.D0      # which pin your pixels are connected to
+num_leds = 30           # number of LEDs per horn
+frames_per_second = 50  # animation frames per second
+brightness = 0          # current wave height
+pixels = neopixel.NeoPixel(led_pin, num_leds, brightness=1, auto_write=False)
 offset = 0
-fade = 0                # Decreases brightness as wave moves
+fade = 0                # decreases brightness as wave moves
 
-# Random number generator is seeded from an unused 'floating'
-# analog input - this helps ensure the random color choices
-# aren't always the same order.
-pin = AnalogIn(board.A0)
-random.seed(pin.value)
-pin.deinit()
 
 # Coordinate space for waves is 16x the pixel spacing,
 # allowing fixed-point math to be used instead of floats.
-lower = 0       # Lower bound of wave
-upper = 1       # Upper bound of wave
-mid = 2         # Midpoint (peak) ((lower+upper)/2)
-vlower = 3      # Velocity of lower bound
-vupper = 4      # Velocity of upper bound
-intensity = 5   # Brightness at peak
+lower = 0       # lower bound of wave
+upper = 1       # upper bound of wave
+mid = 2         # midpoint (peak) ((lower+upper)/2)
+vlower = 3      # velocity of lower bound
+vupper = 4      # velocity of upper bound
+intensity = 5   # brightness at peak
 
 y = 0
 brightness = 0
@@ -68,15 +63,85 @@ gammas = [
     255
 ]
 
+
 def random_wave(h, w):
-    wave[h][w][upper]    = -1                               # Always start just below head of strip
-    wave[h][w][lower]    = -16 * (3 + random.randint(4))    # Lower end starts ~3-7 pixels back
-    wave[h][w][mid]      = (wave[h][w][lower]+ wave[h][w][upper]) / 2
-    wave[h][w][vlower]   = 3 + random.randint(4)            # Lower end moves at ~1/8 to 1/4 pixel/frame
-    wave[h][w][vupper]   = wave[h][w][vlower]+ random.randint(0,4) # Upper end moves a bit faster, spreading wave
-    wave[h][w][intensity]= 300 + random.randint(0,600)
+    wave[h][w][upper] = -1                              # Always start just below head of strip
+    wave[h][w][lower] = -16 * (3 + random.randint(4))   # Lower end starts ~3-7 pixels back
+    wave[h][w][mid] = (wave[h][w][lower]+ wave[h][w][upper]) / 2
+    wave[h][w][vlower] = 3 + random.randint(4)          # Lower end moves at ~1/8 to 1/4 pixel/frame
+    wave[h][w][vupper] = wave[h][w][vlower]+ random.randint(0,4) # Upper end moves a bit faster, spreading wave
+    wave[h][w][intensity] = 300 + random.randint(0,600)
+
+def setup():
+
+    # Random number generator is seeded from an unused 'floating'
+    # analog input - this helps ensure the random color choices
+    # aren't always the same order.
+    pin = AnalogIn(board.A0)
+    random.seed(pin.value)
+    pin.deinit()
+
+    for h in range(n_horns):
+        for w in range(n_waves):
+            random_wave(h, w)
+
+    fade = 234 + n_leds / 2
+
+    if fade > 255: 
+        fade = 255
+
+setup()
 
 while True:
+
+    h, w, i, r, g, b = 0
+    x = 0
+    sum = 0
+
+  for h in range(n_horns):                  # For each horn...
+    for i in range(n_leds) { // For each LED along horn...
+        x = 7
+        x += 16
+      for(sum=w=0; w<N_WAVES; w++) {      // For each wave of horn...
+        if((x < wave[h][w].lower) || (x > wave[h][w].upper)) continue; // Out of range
+        if(x <= wave[h][w].mid) { // Lower half of wave (ramping up to peak brightness)
+          sum += wave[h][w].intensity * (x - wave[h][w].lower) / (wave[h][w].mid - wave[h][w].lower);
+        } else {               // Upper half of wave (ramping down from peak)
+          sum += wave[h][w].intensity * (wave[h][w].upper - x) / (wave[h][w].upper - wave[h][w].mid);
+        }
+      }
+      // Now the magnitude (sum) is remapped to color for the LEDs.
+      // A blackbody palette is used - fades white-yellow-red-black.
+      if(sum < 255) {        // 0-254 = black to red-1
+        r = pgm_read_byte(&gamma[sum]);
+        g = b = 0;
+      } else if(sum < 510) { // 255-509 = red to yellow-1
+        r = 255;
+        g = pgm_read_byte(&gamma[sum - 255]);
+        b = 0;
+      } else if(sum < 765) { // 510-764 = yellow to white-1
+        r = g = 255;
+        b = pgm_read_byte(&gamma[sum - 510]);
+      } else {               // 765+ = white
+        r = g = b = 255;
+      }
+      pixels.setPixelColor(h * N_LEDS + i, r, g, b);
+    }
+
+    for(w=0; w<N_WAVES; w++) { // Update wave positions for each horn
+      wave[h][w].lower += wave[h][w].vlower;  // Advance lower position
+      if(wave[h][w].lower >= (N_LEDS * 16)) { // Off end of strip?
+        random_wave(h, w);                    // Yes, 'reboot' wave
+      } else {                                // No, adjust other values...
+        wave[h][w].upper    +=  wave[h][w].vupper;
+        wave[h][w].mid       = (wave[h][w].lower + wave[h][w].upper) / 2;
+        wave[h][w].intensity = (wave[h][w].intensity * fade) / 256; // Dimmer
+      }
+    }
+  }
+  pixels.show();
+}
+ 
 
     # But it's not just a straight shot that it ramps up.
     # This is a low-pass filter...it makes the brightness
@@ -100,7 +165,7 @@ while True:
         if wave[w][vlower] == wave[w][vupper]:
 
             # There's a tiny random chance of picking a new hue...
-            if not random.randint(frames_per_second * 4, 255):
+             not random.randint(frames_per_second * 4, 255):
                 # Within 1/3 color wheel
                 wave[w][vupper] = random.randint(
                     wave[w][vlower] - 30, wave[w][vlower] + 30)
@@ -192,17 +257,17 @@ while True:
 
             # Store resulting RGB value and we're done with
             # this pixel!
-            strip[i] = (r, g, b)
+            pixels[i] = (r, g, b)
 
         # Once rendering is complete, a second pass is made
         # through pixel data applying gamma correction, for
         # more perceptually linear colors.
         # https://learn.adafruit.com/led-tricks-gamma-correction
         for j in range(num_leds):
-            (red_gamma, green_gamma, blue_gamma) = strip[j]
+            (red_gamma, green_gamma, blue_gamma) = pixels[j]
             red_gamma = gammas[red_gamma]
             green_gamma = gammas[green_gamma]
             blue_gamma = gammas[blue_gamma]
-            strip[j] = (red_gamma, green_gamma, blue_gamma)
+            pixels[j] = (red_gamma, green_gamma, blue_gamma)
 
-        strip.show()
+        pixels.show()

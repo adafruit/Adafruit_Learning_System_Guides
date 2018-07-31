@@ -61,7 +61,7 @@ void setup() {
   for(h=0; h<N_HORNS; h++) {
     for(w=0; w<N_WAVES; w++) random_wave(h, w);
   }
-  fade = 234 + N_LEDS / 2;
+ fade = 234 + N_LEDS / 2;
   if(fade > 255) fade = 255;
 
   // A ~100 Hz timer interrupt on Timer/Counter1 makes everything run
