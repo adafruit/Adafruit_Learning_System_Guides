@@ -98,176 +98,43 @@ while True:
     x = 0
     sum = 0
 
-  for h in range(n_horns):                  # For each horn...
-    for i in range(n_leds) { // For each LED along horn...
+    for h in range(n_horns):            # For each horn...
         x = 7
-        x += 16
-      for(sum=w=0; w<N_WAVES; w++) {      // For each wave of horn...
-        if((x < wave[h][w].lower) || (x > wave[h][w].upper)) continue; // Out of range
-        if(x <= wave[h][w].mid) { // Lower half of wave (ramping up to peak brightness)
-          sum += wave[h][w].intensity * (x - wave[h][w].lower) / (wave[h][w].mid - wave[h][w].lower);
-        } else {               // Upper half of wave (ramping down from peak)
-          sum += wave[h][w].intensity * (wave[h][w].upper - x) / (wave[h][w].upper - wave[h][w].mid);
-        }
-      }
-      // Now the magnitude (sum) is remapped to color for the LEDs.
-      // A blackbody palette is used - fades white-yellow-red-black.
-      if(sum < 255) {        // 0-254 = black to red-1
-        r = pgm_read_byte(&gamma[sum]);
-        g = b = 0;
-      } else if(sum < 510) { // 255-509 = red to yellow-1
-        r = 255;
-        g = pgm_read_byte(&gamma[sum - 255]);
-        b = 0;
-      } else if(sum < 765) { // 510-764 = yellow to white-1
-        r = g = 255;
-        b = pgm_read_byte(&gamma[sum - 510]);
-      } else {               // 765+ = white
-        r = g = b = 255;
-      }
-      pixels.setPixelColor(h * N_LEDS + i, r, g, b);
-    }
+        for i in range(n_leds):         # For each LED along horn...
+            x += 16
+            sum = 0
+            for w in range(n_waves):        # For each wave of horn...
+                if ((x < wave[h][w][lower]) || (x > wave[h][w][upper])):
+                    continue                # Out of range
+                if (x <= wave[h][w][mid]):  # Lower half of wave (ramping up peak brightness)
+                    sum += wave[h][w][intensity] * (x - wave[h][w][lower]) / (wave[h][w][mid] - wave[h][w][lower])
+                else                        # Upper half of wave (ramping down from peak)
+                    sum += wave[h][w][intensity] * (wave[h][w][upper] - x) / (wave[h][w][upper] - wave[h][w][mid])
 
-    for(w=0; w<N_WAVES; w++) { // Update wave positions for each horn
-      wave[h][w].lower += wave[h][w].vlower;  // Advance lower position
-      if(wave[h][w].lower >= (N_LEDS * 16)) { // Off end of strip?
-        random_wave(h, w);                    // Yes, 'reboot' wave
-      } else {                                // No, adjust other values...
-        wave[h][w].upper    +=  wave[h][w].vupper;
-        wave[h][w].mid       = (wave[h][w].lower + wave[h][w].upper) / 2;
-        wave[h][w].intensity = (wave[h][w].intensity * fade) / 256; // Dimmer
-      }
-    }
-  }
-  pixels.show();
-}
- 
+                    # Now the magnitude (sum) is remapped to color for the LEDs.
+                    # A blackbody palette is used - fades white-yellow-red-black.
+                    if sum < 255:           # 0-254 = black to red-1
+                        r = gamma[sum]
+                        g = b = 0
+                    elif sum < 510:         # 255-509 = red to yellow-1
+                        r = 255
+                        g = gamma[sum - 255])
+                        b = 0
+                    else if sum < 765:      # 510-764 = yellow to white-1
+                        r = g = 255
+                        b = gamma[sum - 510]
+                    else:                   # 765+ = white
+                        r = g = b = 255
+        
+                    pixels[i] = (r, g, b)
 
-    # But it's not just a straight shot that it ramps up.
-    # This is a low-pass filter...it makes the brightness
-    # value decelerate as it approaches a target (200 in
-    # this case).  207 is used here because integers round
-    # down on division and we'd never reach the target;
-    # it's an ersatz ceil() function: ((199*7)+200+7)/8 = 200;
-    brightness = int(((brightness * 7) + 207) / 8)
-    count += 1
+    for w in range(n_waves):    # Update wave positions for each horn
+        wave[h][w][lower] += wave[h][w][vlower] # Advance lower position
+    if wave[h][w][lower] >= (n_leds * 16):  # Off end of strip?
+        random_wave(h, w)                   # Yes, 'reboot' wave
+    else                                    # No, adjust other values...
+        wave[h][w][upper] += wave[h][w][vupper]
+        wave[h][w][mid] = (wave[h][w][lower] + wave[h][w][upper]) / 2
+        wave[h][w][intensity] = (wave[h][w][intensity] * fade) / 256 # Dimmer
 
-    if count == (circumference + num_leds + 5):
-        ramping_up = False
-        count = 0
-
-    # Wave positions and colors are updated...
-    for w in range(n_waves):
-        # Move wave; wraps around ends, is OK!
-        wave[w][lower] += wave[w][upper]
-
-        # Hue not currently changing?
-        if wave[w][vlower] == wave[w][vupper]:
-
-            # There's a tiny random chance of picking a new hue...
-             not random.randint(frames_per_second * 4, 255):
-                # Within 1/3 color wheel
-                wave[w][vupper] = random.randint(
-                    wave[w][vlower] - 30, wave[w][vlower] + 30)
-
-        # This wave's hue is currently shifting...
-        else:
-
-            if wave[w][vlower] < wave[w][]:
-                wave[w][vlower] += 1  # Move up or
-            else:
-                wave[w][vlower] -= 1  # down as needed
-
-            # Reached destination?
-            if wave[w][vlower] == wave[w][vupper]:
-                wave[w][vlower] = 90 + wave[w][vlower] % 90  # Clamp to 90-180 range
-                wave[w][vupper] = wave[w][hue]  # Copy to target
-
-            wave[w][intensity] = h2rgb(wave[w][vlower] - 30)
-
-        # Now render the LED strip using the current
-        # brightness & wave states.
-        # Each LED in strip is visited just once...
-        for i in range(num_leds):
-
-            # Transform 'i' (LED number in pixel space) to the
-            # equivalent point in 8-bit fixed-point space (0-255)
-            # "* 256" because that would be
-            # the start of the (N+1)th pixel
-            # "+ 127" to get pixel center.
-            x = (i * 256 + 127) / circumference
-
-            # LED assumed off, but wave colors will add up here
-            r = g = b = 0
-
-            # For each item in wave[] array...
-            for w_index in range(n_waves):
-                # Calculate distance from pixel center to wave
-                # center point, using both signed and unsigned
-                # 8-bit integers...
-                d1 = int(abs(x - wave[w_index][lower]))
-                d2 = int(abs(x - wave[w_index][lower]))
-
-                # Then take the lesser of the two, resulting in
-                # a distance (0-128)
-                # that 'wraps around' the ends of the strip as
-                # necessary...it's a contiguous ring, and waves
-                # can move smoothly across the gap.
-                if d2 < d1:
-                    d1 = d2  # d1 is pixel-to-wave-center distance
-
-                # d2 distance, relative to wave width, is then
-                # proportional to the wave's brightness at this
-                # pixel (basic linear y=mx+b stuff).
-                # Is distance within wave's influence?
-                # d2 is opposite; distance to wave's end
-                if d1 < wave[w_index][mid]:
-                    d2 = wave[w_index][mid] - d1
-                    y = int(brightness * d2 / wave[w_index][mid])  # 0 to 200
-
-                    # y is a brightness scale value --
-                    # proportional to, but not exactly equal
-                    # to, the resulting RGB value.
-                    if y < 128:  # Fade black to RGB color
-                        # In HSV colorspace, this would be
-                        # tweaking 'value'
-                        n = int(y * 2 + 1)  # 1-256
-                        r += (wave[w_index][intensity] * n) >> 8  # More fixed-point math
-                        # Wave color is scaled by 'n'
-                        g += (wave[w_index][green] * n) >> 8
-                        b += (wave[w_index][blue] * n) >> 8  # >>8 is equiv to /256
-                    else:  # Fade RGB color to white
-                        # In HSV colorspace, this tweaks 'saturation'
-                        n = int((y - 128) * 2)  # 0-255 affects white level
-                        m = 256 * n
-                        n = 256 - n  # 1-256 affects RGB level
-                        r += (m + wave[w_index][intensity] * n) >> 8
-                        g += (m + wave[w_index][green] * n) >> 8
-                        b += (m + wave[w_index][blue] * n) >> 8
-
-            # r,g,b are 16-bit types that accumulate brightness
-            # from all waves that affect this pixel; may exceed
-            # 255.  Now clip to 0-255 range:
-            if r > 255:
-                r = 255
-            if g > 255:
-                g = 255
-            if b > 255:
-                b = 255
-
-            # Store resulting RGB value and we're done with
-            # this pixel!
-            pixels[i] = (r, g, b)
-
-        # Once rendering is complete, a second pass is made
-        # through pixel data applying gamma correction, for
-        # more perceptually linear colors.
-        # https://learn.adafruit.com/led-tricks-gamma-correction
-        for j in range(num_leds):
-            (red_gamma, green_gamma, blue_gamma) = pixels[j]
-            red_gamma = gammas[red_gamma]
-            green_gamma = gammas[green_gamma]
-            blue_gamma = gammas[blue_gamma]
-            pixels[j] = (red_gamma, green_gamma, blue_gamma)
-
-        pixels.show()
+    pixels.show()
