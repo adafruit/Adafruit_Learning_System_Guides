@@ -37,7 +37,7 @@ print("Time\tLight\tTemperature")  # Print column headers
 def slow_write(string):   # Typing should not be too fast for
     for c in string:      # the computer to be able to accept
         layout.write(c)
-        time.sleep(0.25)  # use 1/4 second pause between characters
+        time.sleep(0.2)   # use 1/5 second pause between characters
 
 while True:
     if switch.value:    # If the slide switch is on, don't log
@@ -58,10 +58,10 @@ while True:
     kbd.release_all()
     for _ in range(3):
         kbd.press(Keycode.LEFT_ARROW)
-        time.sleep(0.01)
+        time.sleep(0.015)
         kbd.release_all()
-        time.sleep(0.01)
+        time.sleep(0.025)  # Wait a bit more for Google Sheets
 
     led.value = False
-#   Add time.sleep(1.0) to wait more between samples
-#   Change 1.0 to whatever time you need
+    # Change 0.1 to whatever time you need between readings
+    time.sleep(0.1)
