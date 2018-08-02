@@ -5,6 +5,7 @@
 
 import board
 import neopixel
+from analogio import AnalogIn
 
 try:
     import urandom as random
@@ -15,10 +16,10 @@ except ImportError:
 # ____/  \____  waves in motion, with a 'warm' color map applied.
 n_horns = 1             # number of horns
 led_pin = board.D0      # which pin your pixels are connected to
-num_leds = 30           # number of LEDs per horn
+n_leds = 30           # number of LEDs per horn
 frames_per_second = 50  # animation frames per second
 brightness = 0          # current wave height
-pixels = neopixel.NeoPixel(led_pin, num_leds, brightness=1, auto_write=False)
+pixels = neopixel.NeoPixel(led_pin, n_leds, brightness=1, auto_write=False)
 offset = 0
 fade = 0                # decreases brightness as wave moves
 
@@ -36,13 +37,14 @@ y = 0
 brightness = 0
 count = 0
 
-wave = [0] * 6, [0] * 6, [0] * 6, [0] * 6, [0] * 6, [0] * 6
+# initialize 3D list
+wave = [[0] * 6] * 6, [[0] * 6] * 6, [[0] * 6] * 6, [[0] * 6] * 6, [[0] * 6] * 6, [[0] * 6] * 6
 
 # Number of simultaneous waves (per horn)
 n_waves = len(wave)
 
 # Gamma-correction table
-gammas = [
+gamma = [
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1,
     1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2,
@@ -66,9 +68,9 @@ gammas = [
 
 def random_wave(h, w):
     wave[h][w][upper] = -1                              # Always start just below head of strip
-    wave[h][w][lower] = -16 * (3 + random.randint(4))   # Lower end starts ~3-7 pixels back
+    wave[h][w][lower] = -16 * (3 + random.randint(0,4))   # Lower end starts ~3-7 pixels back
     wave[h][w][mid] = (wave[h][w][lower]+ wave[h][w][upper]) / 2
-    wave[h][w][vlower] = 3 + random.randint(4)          # Lower end moves at ~1/8 to 1/4 pixel/frame
+    wave[h][w][vlower] = 3 + random.randint(0,4)          # Lower end moves at ~1/8 to 1/4 pixel/frame
     wave[h][w][vupper] = wave[h][w][vlower]+ random.randint(0,4) # Upper end moves a bit faster, spreading wave
     wave[h][w][intensity] = 300 + random.randint(0,600)
 
@@ -94,7 +96,7 @@ setup()
 
 while True:
 
-    h, w, i, r, g, b = 0
+    h = w = i = r = g = b = 0
     x = 0
     sum = 0
 
@@ -104,23 +106,23 @@ while True:
             x += 16
             sum = 0
             for w in range(n_waves):        # For each wave of horn...
-                if ((x < wave[h][w][lower]) || (x > wave[h][w][upper])):
+                if ((x < wave[h][w][lower]) or (x > wave[h][w][upper])):
                     continue                # Out of range
                 if (x <= wave[h][w][mid]):  # Lower half of wave (ramping up peak brightness)
                     sum += wave[h][w][intensity] * (x - wave[h][w][lower]) / (wave[h][w][mid] - wave[h][w][lower])
-                else                        # Upper half of wave (ramping down from peak)
+                else:                       # Upper half of wave (ramping down from peak)
                     sum += wave[h][w][intensity] * (wave[h][w][upper] - x) / (wave[h][w][upper] - wave[h][w][mid])
 
                     # Now the magnitude (sum) is remapped to color for the LEDs.
                     # A blackbody palette is used - fades white-yellow-red-black.
                     if sum < 255:           # 0-254 = black to red-1
-                        r = gamma[sum]
+                        r = gamma[int(sum)]
                         g = b = 0
                     elif sum < 510:         # 255-509 = red to yellow-1
                         r = 255
-                        g = gamma[sum - 255])
+                        g = gamma[sum - 255]
                         b = 0
-                    else if sum < 765:      # 510-764 = yellow to white-1
+                    elif sum < 765:      # 510-764 = yellow to white-1
                         r = g = 255
                         b = gamma[sum - 510]
                     else:                   # 765+ = white
@@ -132,7 +134,7 @@ while True:
         wave[h][w][lower] += wave[h][w][vlower] # Advance lower position
     if wave[h][w][lower] >= (n_leds * 16):  # Off end of strip?
         random_wave(h, w)                   # Yes, 'reboot' wave
-    else                                    # No, adjust other values...
+    else:                                   # No, adjust other values...
         wave[h][w][upper] += wave[h][w][vupper]
         wave[h][w][mid] = (wave[h][w][lower] + wave[h][w][upper]) / 2
         wave[h][w][intensity] = (wave[h][w][intensity] * fade) / 256 # Dimmer
