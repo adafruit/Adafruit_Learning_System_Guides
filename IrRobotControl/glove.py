@@ -6,14 +6,14 @@ import adafruit_irremote
 import adafruit_lis3dh
 
 # Control codes
-STOP          = 0x01
-ROTATE_LEFT   = 0x02
-ROTATE_RIGHT  = 0x03
-FORWARD       = 0x04
-FORWARD_LEFT  = 0x05
+STOP = 0x01
+ROTATE_LEFT = 0x02
+ROTATE_RIGHT = 0x03
+FORWARD = 0x04
+FORWARD_LEFT = 0x05
 FORWARD_RIGHT = 0x06
-REVERSE       = 0x07
-REVERSE_LEFT  = 0x08
+REVERSE = 0x07
+REVERSE_LEFT = 0x08
 REVERSE_RIGHT = 0x09
 
 TRANSMIT_DELAY = 0.1
@@ -27,9 +27,15 @@ pwm = pulseio.PWMOut(board.IR_TX, frequency=38000, duty_cycle=2 ** 15)
 pulseout = pulseio.PulseOut(pwm)
 
 # Create an encoder that will take numbers and turn them into IR pulses
-encoder = adafruit_irremote.GenericTransmit(header=[9500, 4500], one=[550, 550], zero=[550, 1700], trail=0)
+encoder = adafruit_irremote.GenericTransmit(header=[9500, 4500],
+                                            one=[550, 550],
+                                            zero=[550, 1700],
+                                            trail=0)
 
 def log(s):
+    """Optionally output some text.
+    :param string s: test to output
+    """
     # swap the comments on the next two lines to enable/disable logging output
     pass
     # print(s)

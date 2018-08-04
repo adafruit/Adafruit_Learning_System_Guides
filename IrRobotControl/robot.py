@@ -1,18 +1,17 @@
-import time
 import board
 import pulseio
 import adafruit_irremote
 from adafruit_crickit import crickit
 
 # Control codes
-STOP          = 0x01
-ROTATE_LEFT   = 0x02
-ROTATE_RIGHT  = 0x03
-FORWARD       = 0x04
-FORWARD_LEFT  = 0x05
+STOP = 0x01
+ROTATE_LEFT = 0x02
+ROTATE_RIGHT = 0x03
+FORWARD = 0x04
+FORWARD_LEFT = 0x05
 FORWARD_RIGHT = 0x06
-REVERSE       = 0x07
-REVERSE_LEFT  = 0x08
+REVERSE = 0x07
+REVERSE_LEFT = 0x08
 REVERSE_RIGHT = 0x09
 
 left_wheel = crickit.dc_motor_1
@@ -20,6 +19,9 @@ right_wheel = crickit.dc_motor_2
 
 
 def log(s):
+    """Optionally output some text.
+    :param string s: test to output
+    """
     # swap the comments on the next two lines to enable/disable logging output
     pass
     # print(s)
