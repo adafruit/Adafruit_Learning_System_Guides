@@ -32,6 +32,8 @@ encoder = adafruit_irremote.GenericTransmit(header=[9500, 4500],
                                             zero=[550, 1700],
                                             trail=0)
 
+# pylint: disable=unused-argument
+# pylint: disable=pointless-statement
 def log(s):
     """Optionally output some text.
     :param string s: test to output
@@ -39,6 +41,9 @@ def log(s):
     # swap the comments on the next two lines to enable/disable logging output
     pass
     # print(s)
+# pylint: enable=pointless-statement
+# pylint: enable=unused-argument
+
 
 while True:
     x, y, z = sensor.acceleration

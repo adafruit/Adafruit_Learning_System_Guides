@@ -18,6 +18,8 @@ left_wheel = crickit.dc_motor_1
 right_wheel = crickit.dc_motor_2
 
 
+# pylint: disable=unused-argument
+# pylint: disable=pointless-statement
 def log(s):
     """Optionally output some text.
     :param string s: test to output
@@ -25,6 +27,8 @@ def log(s):
     # swap the comments on the next two lines to enable/disable logging output
     pass
     # print(s)
+# pylint: enable=pointless-statement
+# pylint: enable=unused-argument
 
 
 # These allow easy correction for motor speed variation.
