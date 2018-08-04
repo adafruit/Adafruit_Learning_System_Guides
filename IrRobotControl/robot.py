@@ -59,7 +59,6 @@ while True:
     # Listen for incoming IR pulses
     pulses = decoder.read_pulses(pulsein)
 
-    log
     # Try and decode them
     try:
         # Attempt to convert received pulses into numbers
