@@ -5,6 +5,9 @@ import pulseio
 import adafruit_irremote
 import adafruit_lis3dh
 
+# Control debug output: it takes time so don't unless you're debugging
+DEBUG_LOG = False
+
 # Control codes
 STOP = 0x01
 ROTATE_LEFT = 0x02
@@ -32,17 +35,12 @@ encoder = adafruit_irremote.GenericTransmit(header=[9500, 4500],
                                             zero=[550, 1700],
                                             trail=0)
 
-# pylint: disable=unused-argument
-# pylint: disable=pointless-statement
 def log(s):
     """Optionally output some text.
     :param string s: test to output
     """
-    # swap the comments on the next two lines to enable/disable logging output
-    pass
-    # print(s)
-# pylint: enable=pointless-statement
-# pylint: enable=unused-argument
+    if DEBUG_LOG:
+        print(s)
 
 
 while True:

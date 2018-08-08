@@ -3,6 +3,9 @@ import pulseio
 import adafruit_irremote
 from adafruit_crickit import crickit
 
+# Control debug output: it takes time so don't unless you're debugging
+DEBUG_LOG = False
+
 # Control codes
 STOP = 0x01
 ROTATE_LEFT = 0x02
@@ -18,17 +21,12 @@ left_wheel = crickit.dc_motor_1
 right_wheel = crickit.dc_motor_2
 
 
-# pylint: disable=unused-argument
-# pylint: disable=pointless-statement
 def log(s):
     """Optionally output some text.
     :param string s: test to output
     """
-    # swap the comments on the next two lines to enable/disable logging output
-    pass
-    # print(s)
-# pylint: enable=pointless-statement
-# pylint: enable=unused-argument
+    if DEBUG_LOG:
+        print(s)
 
 
 # These allow easy correction for motor speed variation.
