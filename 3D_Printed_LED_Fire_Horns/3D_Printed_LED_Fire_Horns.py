@@ -67,11 +67,11 @@ gamma = [
 
 
 def random_wave(h, w):
-    wave[h][w][upper] = -1                              # Always start just below head of strip
-    wave[h][w][lower] = -16 * (3 + random.randint(0,4))   # Lower end starts ~3-7 pixels back
+    wave[h][w][upper] = -1                                  # Always start just below head of strip
+    wave[h][w][lower] = -16 * (3 + random.randint(0,4))     # Lower end starts ~3-7 pixels back
     wave[h][w][mid] = (wave[h][w][lower]+ wave[h][w][upper]) / 2
-    wave[h][w][vlower] = 3 + random.randint(0,4)          # Lower end moves at ~1/8 to 1/4 pixel/frame
-    wave[h][w][vupper] = wave[h][w][vlower]+ random.randint(0,4) # Upper end moves a bit faster, spreading wave
+    wave[h][w][vlower] = 3 + random.randint(0,4)            #  Lower end moves at ~1/8 to 1/pixels
+    wave[h][w][vupper] = wave[h][w][vlower]+ random.randint(0,4) # Upper end moves a bit faster
     wave[h][w][intensity] = 300 + random.randint(0,600)
 
 def setup():
@@ -89,7 +89,7 @@ def setup():
 
     fade = 234 + n_leds / 2
 
-    if fade > 255: 
+    if fade > 255:
         fade = 255
 
 setup()
@@ -106,9 +106,9 @@ while True:
             x += 16
             sum = 0
             for w in range(n_waves):        # For each wave of horn...
-                if ((x < wave[h][w][lower]) or (x > wave[h][w][upper])):
+                if (x < wave[h][w][lower]) or (x > wave[h][w][upper]):
                     continue                # Out of range
-                if (x <= wave[h][w][mid]):  # Lower half of wave (ramping up peak brightness)
+                if x <= wave[h][w][mid]:    # Lower half of wave (ramping up peak brightness)
                     sum += wave[h][w][intensity] * (x - wave[h][w][lower]) / (wave[h][w][mid] - wave[h][w][lower])
                 else:                       # Upper half of wave (ramping down from peak)
                     sum += wave[h][w][intensity] * (wave[h][w][upper] - x) / (wave[h][w][upper] - wave[h][w][mid])
@@ -122,12 +122,11 @@ while True:
                         r = 255
                         g = gamma[sum - 255]
                         b = 0
-                    elif sum < 765:      # 510-764 = yellow to white-1
+                    elif sum < 765:         # 510-764 = yellow to white-1
                         r = g = 255
                         b = gamma[sum - 510]
                     else:                   # 765+ = white
                         r = g = b = 255
-        
                     pixels[i] = (r, g, b)
 
     for w in range(n_waves):    # Update wave positions for each horn
@@ -138,5 +137,5 @@ while True:
         wave[h][w][upper] += wave[h][w][vupper]
         wave[h][w][mid] = (wave[h][w][lower] + wave[h][w][upper]) / 2
         wave[h][w][intensity] = (wave[h][w][intensity] * fade) / 256 # Dimmer
-
+      
     pixels.show()
