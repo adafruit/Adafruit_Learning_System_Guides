@@ -130,11 +130,11 @@ while True:
 
     for w in range(n_waves):    # Update wave positions for each horn
         wave[h][w][lower] += wave[h][w][vlower] # Advance lower position
-    if wave[h][w][lower] >= (n_leds * 16):  # Off end of strip?
-        random_wave(h, w)                   # Yes, 'reboot' wave
-    else:                                   # No, adjust other values...
-        wave[h][w][upper] += wave[h][w][vupper]
-        wave[h][w][mid] = (wave[h][w][lower] + wave[h][w][upper]) / 2
-        wave[h][w][intensity] = (wave[h][w][intensity] * fade) / 256 # Dimmer
+        if wave[h][w][lower] >= (n_leds * 16):  # Off end of strip?
+            random_wave(h, w)                   # Yes, 'reboot' wave
+        else:                                   # No, adjust other values...
+            wave[h][w][upper] += wave[h][w][vupper]
+            wave[h][w][mid] = (wave[h][w][lower] + wave[h][w][upper]) / 2
+            wave[h][w][intensity] = (wave[h][w][intensity] * fade) / 256 # Dimmer
       
     pixels.show()
