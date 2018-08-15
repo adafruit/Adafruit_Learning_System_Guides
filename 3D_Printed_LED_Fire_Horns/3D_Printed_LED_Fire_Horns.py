@@ -102,9 +102,9 @@ while True:
 
     for h in range(n_horns):            # For each horn...
         x = 7
+        sum = 0
         for i in range(n_leds):         # For each LED along horn...
             x += 16
-            sum = 0
             for w in range(n_waves):        # For each wave of horn...
                 if (x < wave[h][w][lower]) or (x > wave[h][w][upper]):
                     continue                # Out of range
@@ -112,7 +112,6 @@ while True:
                     sum += wave[h][w][intensity] * (x - wave[h][w][lower]) / (wave[h][w][mid] - wave[h][w][lower])
                 else:                       # Upper half of wave (ramping down from peak)
                     sum += wave[h][w][intensity] * (wave[h][w][upper] - x) / (wave[h][w][upper] - wave[h][w][mid])
-
                     # Now the magnitude (sum) is remapped to color for the LEDs.
                     # A blackbody palette is used - fades white-yellow-red-black.
                     if sum < 255:           # 0-254 = black to red-1
