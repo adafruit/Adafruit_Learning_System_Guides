@@ -16,12 +16,12 @@ except ImportError:
 # ____/  \____  waves in motion, with a 'warm' color map applied.
 n_horns = 1             # number of horns
 led_pin = board.D0      # which pin your pixels are connected to
-n_leds = 30           # number of LEDs per horn
+n_leds = 30             # number of LEDs per horn
 frames_per_second = 50  # animation frames per second
 brightness = 0          # current wave height
 pixels = neopixel.NeoPixel(led_pin, n_leds, brightness=1, auto_write=False)
 offset = 0
-fade = 0                # decreases brightness as wave moves
+fade = 235                # decreases brightness as wave moves
 
 
 # Coordinate space for waves is 16x the pixel spacing,
@@ -112,10 +112,13 @@ while True:
                     sum += wave[h][w][intensity] * (x - wave[h][w][lower]) / (wave[h][w][mid] - wave[h][w][lower])
                 else:                       # Upper half of wave (ramping down from peak)
                     sum += wave[h][w][intensity] * (wave[h][w][upper] - x) / (wave[h][w][upper] - wave[h][w][mid])
+
+                    sum = int(sum)          # convert from decimal to whole number
+
                     # Now the magnitude (sum) is remapped to color for the LEDs.
                     # A blackbody palette is used - fades white-yellow-red-black.
                     if sum < 255:           # 0-254 = black to red-1
-                        r = gamma[int(sum)]
+                        r = gamma[sum]
                         g = b = 0
                     elif sum < 510:         # 255-509 = red to yellow-1
                         r = 255
