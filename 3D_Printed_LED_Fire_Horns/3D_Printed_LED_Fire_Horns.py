@@ -6,6 +6,7 @@
 import board
 import neopixel
 from analogio import AnalogIn
+# pylint: disable=global-statement
 
 try:
     import urandom as random
@@ -21,7 +22,7 @@ frames_per_second = 50  # animation frames per second
 brightness = 0          # current wave height
 pixels = neopixel.NeoPixel(led_pin, n_leds, brightness=1, auto_write=False)
 offset = 0
-fade = 235                # decreases brightness as wave moves
+#fade = 235                # decreases brightness as wave moves
 
 
 # Coordinate space for waves is 16x the pixel spacing,
@@ -75,6 +76,7 @@ def random_wave(h, w):
     wave[h][w][intensity] = 300 + random.randint(0,600)
 
 def setup():
+    global fade
 
     # Random number generator is seeded from an unused 'floating'
     # analog input - this helps ensure the random color choices
@@ -87,10 +89,10 @@ def setup():
         for w in range(n_waves):
             random_wave(h, w)
 
-    fade = 234 + n_leds / 2
+    fade = 233 + n_leds / 2
 
-    if fade > 255:
-        fade = 255
+    if fade > 233:
+        fade = 233
 
 setup()
 
