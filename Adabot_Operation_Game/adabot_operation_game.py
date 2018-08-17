@@ -26,7 +26,7 @@ WHITE = (3, 3, 3)
 
 COLORS = [MAGENTA, VIOLET, BLUE, CYAN, GREEN, YELLOW, ORANGE, RED, WHITE]
 
-cpx.pixels.fill((WHITE))
+cpx.pixels.fill(WHITE)
 
 while True:
     for i in range(7):
@@ -37,6 +37,6 @@ while True:
 
         if touch_pads[i].value:
             # print("Touched %s" % i)  # uncomment for debugging
-            cpx.pixels.fill((RED))
+            cpx.pixels.fill(RED)
             cpx.play_tone(660, 0.7)
-            cpx.pixels.fill((COLORS[i]))
+            cpx.pixels.fill(COLORS[i])
