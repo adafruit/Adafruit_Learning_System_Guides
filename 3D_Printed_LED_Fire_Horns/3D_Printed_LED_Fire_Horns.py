@@ -13,17 +13,16 @@ try:
 except ImportError:
     import random
 
-# /\  ->   Fire-like effect is the sum of multiple triangle
+# /\  ->   Fire-like effect is the sum_total of multiple triangle
 # ____/  \____  waves in motion, with a 'warm' color map applied.
 n_horns = 1             # number of horns
 led_pin = board.D0      # which pin your pixels are connected to
 n_leds = 30             # number of LEDs per horn
 frames_per_second = 50  # animation frames per second
 brightness = 0          # current wave height
+fade = 0                # Decreases brightness as wave moves
 pixels = neopixel.NeoPixel(led_pin, n_leds, brightness=1, auto_write=False)
 offset = 0
-#fade = 235                # decreases brightness as wave moves
-
 
 # Coordinate space for waves is 16x the pixel spacing,
 # allowing fixed-point math to be used instead of floats.
@@ -67,13 +66,13 @@ gamma = [
 ]
 
 
-def random_wave(h, w):
-    wave[h][w][upper] = -1                                  # Always start just below head of strip
-    wave[h][w][lower] = -16 * (3 + random.randint(0,4))     # Lower end starts ~3-7 pixels back
-    wave[h][w][mid] = (wave[h][w][lower]+ wave[h][w][upper]) / 2
-    wave[h][w][vlower] = 3 + random.randint(0,4)            #  Lower end moves at ~1/8 to 1/pixels
-    wave[h][w][vupper] = wave[h][w][vlower]+ random.randint(0,4) # Upper end moves a bit faster
-    wave[h][w][intensity] = 300 + random.randint(0,600)
+def random_wave(he, wi):
+    wave[he][wi][upper] = -1                                  # Always start below head of strip
+    wave[he][wi][lower] = -16 * (3 + random.randint(0,4))     # Lower end starts ~3-7 pixels back
+    wave[he][wi][mid] = (wave[he][wi][lower]+ wave[he][wi][upper]) / 2
+    wave[he][wi][vlower] = 3 + random.randint(0,4)            #  Lower end moves at ~1/8 to 1/pixels
+    wave[he][wi][vupper] = wave[he][wi][vlower]+ random.randint(0,4) # Upper end moves a bit faster
+    wave[he][wi][intensity] = 300 + random.randint(0,600)
 
 def setup():
     global fade
@@ -85,9 +84,9 @@ def setup():
     random.seed(pin.value)
     pin.deinit()
 
-    for h in range(n_horns):
-        for w in range(n_waves):
-            random_wave(h, w)
+    for he in range(n_horns):
+        for wi in range(n_waves):
+            random_wave(he, wi)
 
     fade = 233 + n_leds / 2
 
@@ -100,40 +99,43 @@ while True:
 
     h = w = i = r = g = b = 0
     x = 0
-    sum = 0
 
-    for h in range(n_horns):            # For each horn...
+    for h in range(n_horns):                # For each horn...
         x = 7
-        sum = 0
-        for i in range(n_leds):         # For each LED along horn...
+        sum_total = 0
+        for i in range(n_leds):             # For each LED along horn...
             x += 16
             for w in range(n_waves):        # For each wave of horn...
                 if (x < wave[h][w][lower]) or (x > wave[h][w][upper]):
                     continue                # Out of range
                 if x <= wave[h][w][mid]:    # Lower half of wave (ramping up peak brightness)
-                    sum += wave[h][w][intensity] * (x - wave[h][w][lower]) / (wave[h][w][mid] - wave[h][w][lower])
+                    sum_top = wave[h][w][intensity] * (x - wave[h][w][lower])
+                    sum_bottom = (wave[h][w][mid] - wave[h][w][lower])
+                    sum_total += sum_top /  sum_bottom
                 else:                       # Upper half of wave (ramping down from peak)
-                    sum += wave[h][w][intensity] * (wave[h][w][upper] - x) / (wave[h][w][upper] - wave[h][w][mid])
+                    sum_top = wave[h][w][intensity] * (wave[h][w][upper] - x)
+                    sum_bottom = (wave[h][w][upper] - wave[h][w][mid])
+                    sum_total += sum_top / sum_bottom
 
-                    sum = int(sum)          # convert from decimal to whole number
+            sum_total = int(sum_total)          # convert from decimal to whole number
 
-                    # Now the magnitude (sum) is remapped to color for the LEDs.
-                    # A blackbody palette is used - fades white-yellow-red-black.
-                    if sum < 255:           # 0-254 = black to red-1
-                        r = gamma[sum]
-                        g = b = 0
-                    elif sum < 510:         # 255-509 = red to yellow-1
-                        r = 255
-                        g = gamma[sum - 255]
-                        b = 0
-                    elif sum < 765:         # 510-764 = yellow to white-1
-                        r = g = 255
-                        b = gamma[sum - 510]
-                    else:                   # 765+ = white
-                        r = g = b = 255
-                    pixels[i] = (r, g, b)
+            # Now the magnitude (sum_total) is remapped to color for the LEDs.
+            # A blackbody palette is used - fades white-yellow-red-black.
+            if sum_total < 255:                 # 0-254 = black to red-1
+                r = gamma[sum_total]
+                g = b = 0
+            elif sum_total < 510:               # 255-509 = red to yellow-1
+                r = 255
+                g = gamma[sum_total - 255]
+                b = 0
+            elif sum_total < 765:               # 510-764 = yellow to white-1
+                r = g = 255
+                b = gamma[sum_total - 510]
+            else:                               # 765+ = white
+                r = g = b = 255
+            pixels[i] = (r, g, b)
 
-    for w in range(n_waves):    # Update wave positions for each horn
+    for w in range(n_waves):                    # Update wave positions for each horn
         wave[h][w][lower] += wave[h][w][vlower] # Advance lower position
         if wave[h][w][lower] >= (n_leds * 16):  # Off end of strip?
             random_wave(h, w)                   # Yes, 'reboot' wave
@@ -141,5 +143,5 @@ while True:
             wave[h][w][upper] += wave[h][w][vupper]
             wave[h][w][mid] = (wave[h][w][lower] + wave[h][w][upper]) / 2
             wave[h][w][intensity] = (wave[h][w][intensity] * fade) / 256 # Dimmer
-      
+
     pixels.show()
