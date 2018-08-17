@@ -5,11 +5,14 @@
 import time
 
 import board
-import simpleio
+import pulseio
+from adafruit_motor import servo
 from adafruit_circuitplayground.express import cpx
 
+pwm = pulseio.PWMOut(board.A3, duty_cycle=2 ** 15, frequency=50)
+
 #  plug red servo wire to VOUT, brown to GND, yellow to A3
-servo = simpleio.Servo(board.A3)
+servo = servo.Servo(pwm)
 
 cpx.pixels.brightness = 0.05  # set brightness value
 
