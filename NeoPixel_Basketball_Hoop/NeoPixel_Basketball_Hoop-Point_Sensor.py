@@ -1,15 +1,23 @@
 import time
 import board
 import neopixel
+import adafruit_irremote
 import pulseio
 
-ir_led = board.D0
 pixpin = board.D1
+ir_led = board.D0
 ir_sensor = board.D2
 numpix = 60
 
-pulsein = pulseio.PulseIn(ir_sensor, maxlen=120, idle_state=True)
+# NeoPixel LED 
 strip = neopixel.NeoPixel(pixpin, numpix, brightness=1, auto_write=True)
+
+# IR LED output for 38kHz PWM
+pwm = pulseio.PWMOut(ir_led, frequency=38000, duty_cycle=2 ** 15)
+pulseout = pulseio.PulseOut(pwm)
+
+# IR Sensor input to detect basketball
+pulses = pulseio.PulseIn(ir_sensor, maxlen=200, idle_state=True)
 
 # Fill the dots one after the other with a color
 def colorWipe(color, wait):
@@ -45,10 +53,23 @@ def rainbow(wait):
             strip[i] = wheel(idx & 255)
         time.sleep(wait)
 
-while True:
-    colorWipe((255, 0, 0), .05)  # red and delay
-    colorWipe((0, 255, 0), .05)  # green and delay
-    colorWipe((0, 0, 255), .05)  # blue and delay
 
-    rainbow(0.02)
-    rainbow_cycle(0.02)
+def is_ball_in_hoop():
+    print(len(pulses))
+    # Check if the IR sensor picked up the pulse 
+    # (i.e. output wire went to ground).
+#    if ir_sensor == 0: 
+#        return False    # Sensor can see LED, return false.
+
+#    return True     # Sensor can't see LED, return true.
+
+
+while True:
+
+    if is_ball_in_hoop():
+        colorWipe((255, 0, 0), .05)  # red and delay
+#        colorWipe((0, 255, 0), .05)  # green and delay
+#        colorWipe((0, 0, 255), .05)  # blue and delay
+#
+#        rainbow(0.02)
+#        rainbow_cycle(0.02)
