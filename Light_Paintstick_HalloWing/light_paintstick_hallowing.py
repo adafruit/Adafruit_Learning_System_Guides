@@ -13,30 +13,31 @@ from neopixel_write import neopixel_write
 
 # uncomment one line only here to select bitmap
 FILENAME = "bats.bmp" # BMP file to load from flash filesystem
-#FILENAME = "jpw01.bmp"
-#FILENAME = "digikey.bmp"
-#FILENAME = "burger.bmp"
-#FILENAME = "afbanner.bmp"
-#FILENAME = "blinka.bmp"
-#FILENAME = "ghost.bmp"
-#FILENAME = "helix-32x30.bmp"
-#FILENAME = "wales2-107x30.bmp"
-#FILENAME = "pumpkin.bmp"
-#FILENAME = "rainbow.bmp"
-#FILENAME = "rainbowRoad.bmp"
-#FILENAME = "rainbowZig.bmp"
-#FILENAME = "skull.bmp"
-#FILENAME = "adabot.bmp"
-#FILENAME = "green_stripes.bmp"
-#FILENAME = "red_blue.bmp"
-#FILENAME = "minerva.bmp"
+# FILENAME = "digikey.bmp"
+# FILENAME = "burger.bmp"
+# FILENAME = "afbanner.bmp"
+# FILENAME = "blinka.bmp"
+# FILENAME = "ghost04.bmp"
+# FILENAME = "ghost07.bmp"
+# FILENAME = "ghost02.bmp"
+# FILENAME = "helix-32x30.bmp"
+# FILENAME = "wales2-107x30.bmp"
+# FILENAME = "pumpkin.bmp"
+# FILENAME = "rainbow.bmp"
+# FILENAME = "rainbowRoad.bmp"
+# FILENAME = "rainbowZig.bmp"
+# FILENAME = "skull.bmp"
+# FILENAME = "adabot.bmp"
+# FILENAME = "green_stripes.bmp"
+# FILENAME = "red_blue.bmp"
+# FILENAME = "minerva.bmp"
 
 TOUCH = touchio.TouchIn(board.A2) # Rightmost capacitive touch pad
 ANALOG = AnalogIn(board.SENSE)    # Potentiometer on SENSE pin
 BRIGHTNESS = 1.0                  # NeoPixel brightness 0.0 (min) to 1.0 (max)
 GAMMA = 2.7                       # Adjusts perceived brighthess linearity
 NUM_PIXELS = 30                   # NeoPixel strip length (in pixels)
-LOOP = False  #set to True for looping
+LOOP = False  # set to True for looping
 # Switch off onboard NeoPixel...
 NEOPIXEL_PIN = digitalio.DigitalInOut(board.NEOPIXEL)
 NEOPIXEL_PIN.direction = digitalio.Direction.OUTPUT
@@ -66,11 +67,11 @@ def load_bmp(filename):
             if f.read(2) != b'BM':  # check signature
                 raise BMPError("Not BitMap file")
 
-            bmpFileSize = read_le(f.read(4))
+            f.read(4)  # Read & ignore file size
             f.read(4)  # Read & ignore creator bytes
 
-            bmpImageoffset = read_le(f.read(4)) # Start of image data
-            headerSize = read_le(f.read(4))
+            bmpImageoffset = read_le(f.read(4))  # Start of image data
+            f.read(4)  # Read & ignore header size
             bmpWidth = read_le(f.read(4))
             bmpHeight = read_le(f.read(4))
             # BMPs are traditionally stored bottom-to-top.
@@ -81,8 +82,6 @@ def load_bmp(filename):
                 bmpHeight = -bmpHeight
                 flip = False
 
-            # print("Size: %d\nImage offset: %d\nHeader size: %d" %
-            #       (bmpFileSize, bmpImageoffset, headerSize))
             print("WxH: (%d,%d)" % (bmpWidth, bmpHeight))
 
             if read_le(f.read(2)) != 1:
@@ -114,7 +113,7 @@ def load_bmp(filename):
                     pos = bmpImageoffset + (bmpHeight - 1 - row) * rowSize
                 else:  # Bitmap is stored top-to-bottom
                     pos = bmpImageoffset + row * rowSize
-                f.seek(pos) # Start of scanline
+                f.seek(pos)  # Start of scanline
                 for c in columns:  # For each pixel of scanline...
                     # BMP files use BGR color order
                     # blue, green, red = bytearray(f.read(3))
