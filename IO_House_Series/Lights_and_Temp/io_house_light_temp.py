@@ -89,8 +89,8 @@ while True:
     humidity_data = sensor.relative_humidity
 
     # send data to adafruit io
-    print('> Temperature: ', int(temperature_data))
-    aio.send(temperature.key, int(temperature_data))
+    print('> Temperature: ', int((temperature_data * 1.8)+32))
+    aio.send(temperature.key, int(temperature_data * 1.8)+32)
     print('> Humidity :', int(humidity_data))
     aio.send(temperature.key, int(humidity_data))
 
@@ -107,10 +107,9 @@ while True:
         strip.setPixelColorRGB(i, green, red, blue)
         strip.show()
 
-
     # get the outdoor light color picker feed
     outdoor_light_data = aio.receive(outdoor_lights.key)
-    print('< Indoor Light HEX: ', outdoor_light_data.value)
+    print('< Outdoor Light HEX: ', outdoor_light_data.value)
 
     # convert the hex values to RGB values
     red = aio.toRed(outdoor_light_data.value)
