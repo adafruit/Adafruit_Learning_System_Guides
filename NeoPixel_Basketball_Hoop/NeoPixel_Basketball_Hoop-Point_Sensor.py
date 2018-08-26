@@ -10,7 +10,7 @@ ir_sensor = board.D2
 basket_check_seconds = 0.1
 numpix = 60
 
-# NeoPixel LED 
+# NeoPixel LED
 strip = neopixel.NeoPixel(pixpin, numpix, brightness=1, auto_write=False)
 
 # IR LED output for 38kHz PWM
@@ -52,19 +52,19 @@ def timed_rainbow_cycle(seconds, wait):
 
     # Turn all the pixels off after the animation is done.
     for i in range(len(strip)):
-                strip[i] = (0,0,0)
+        strip[i] = (0,0,0)
     strip.show()
 
 def pulse_ir():
     # enable IR LED
-    pwm.duty_cycle = (2 ** 16) - 1 
-    
-def is_ball_in_hoop():
-    # Check if the IR sensor picked up the pulse 
-    pulse = decoder.read_pulses(pulses)
-    ir_sensor = (len(pulse))
+    pwm.duty_cycle = (2 ** 16) - 1
 
-    if ir_sensor == 0: 
+def is_ball_in_hoop():
+    # Check if the IR sensor picked up the pulse
+    pulse = decoder.read_pulses(pulses)
+    ir_detect = (len(pulse))
+
+    if ir_detect == 0:
         return False    # Sensor can see LED, return false.
     return True         # Sensor can't see LED, return true.
 
