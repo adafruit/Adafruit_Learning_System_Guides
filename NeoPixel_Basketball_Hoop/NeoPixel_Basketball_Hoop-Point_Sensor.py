@@ -14,7 +14,7 @@ numpix = 60
 strip = neopixel.NeoPixel(pixpin, numpix, brightness=1, auto_write=False)
 
 # IR LED output for 38kHz PWM
-pwm = pulseio.PWMOut(ir_led, frequency=38000, duty_cycle=2 ** 15)
+pwm = pulseio.PWMOut(ir_led, frequency=38000)
 
 # IR Sensor input to detect basketball
 pulses = pulseio.PulseIn(ir_sensor, maxlen=200, idle_state=True)
@@ -57,7 +57,7 @@ def timed_rainbow_cycle(seconds, wait):
 
 def pulse_ir():
     # enable IR LED
-    pwm.duty_cycle = 65535
+    pwm.duty_cycle = (2 ** 16) - 1 
     
 def is_ball_in_hoop():
     # Check if the IR sensor picked up the pulse 
@@ -66,7 +66,7 @@ def is_ball_in_hoop():
 
     if ir_sensor == 0: 
         return False    # Sensor can see LED, return false.
-    return True     # Sensor can't see LED, return true.
+    return True         # Sensor can't see LED, return true.
 
 
 while True:
