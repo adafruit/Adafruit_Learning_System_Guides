@@ -1,9 +1,9 @@
 #include <Adafruit_NeoPixel.h>
 
-#define PIN 1
-#define     IR_LED                 0         // Digital pin that is hooked up to the IR LED.
-#define     IR_SENSOR              2     
-#define     BASKET_CHECK_SECONDS   0.1  //How often it checks to see if there is a ball.
+#define     PIN                     1
+#define     IR_LED                  0           // Digital pin that is hooked up to the IR LED.
+#define     IR_SENSOR               2     
+#define     BASKET_CHECK_SECONDS   0.1          //How often it checks to see if there is a ball.
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(60, PIN, NEO_GRB + NEO_KHZ800);
 ///////////////////////////////////////////////////////
 // Setup function

@@ -7,23 +7,18 @@ import pulseio
 pixpin = board.D1
 ir_led = board.D0
 ir_sensor = board.D2
+basket_check_seconds = 0.1
 numpix = 60
 
 # NeoPixel LED 
-strip = neopixel.NeoPixel(pixpin, numpix, brightness=1, auto_write=True)
+strip = neopixel.NeoPixel(pixpin, numpix, brightness=1, auto_write=False)
 
 # IR LED output for 38kHz PWM
 pwm = pulseio.PWMOut(ir_led, frequency=38000, duty_cycle=2 ** 15)
-pulseout = pulseio.PulseOut(pwm)
 
 # IR Sensor input to detect basketball
 pulses = pulseio.PulseIn(ir_sensor, maxlen=200, idle_state=True)
-
-# Fill the dots one after the other with a color
-def colorWipe(color, wait):
-    for j in range(len(strip)):
-        strip[j] = (color)
-        time.sleep(wait)
+decoder = adafruit_irremote.GenericDecode()
 
 def wheel(pos):
     # Input a value 0 to 255 to get a color value.
@@ -39,37 +34,39 @@ def wheel(pos):
     pos -= 170
     return (0, int(pos * 3), int(255 - pos * 3))
 
-def rainbow_cycle(wait):
-    for j in range(255):
-        for i in range(len(strip)):
-            idx = int((i * 256 / len(strip)) + j)
-            strip[i] = wheel(idx & 255)
-        time.sleep(wait)
+def timed_rainbow_cycle(seconds, wait):
+    # Get the starting time in seconds.
+    start = time.monotonic()
+    # Use a counter to increment the current color position.
+    j = 0
 
-def rainbow(wait):
-    for j in range(255):
-        for i in range(len(strip)):
-            idx = int(i + j)
-            strip[i] = wheel(idx & 255)
-        time.sleep(wait)
-
+    # Loop until it's time to stop (desired number of milliseconds have elapsed).
+    while (time.monotonic() - start) < seconds:
+        for j in range(255):
+            for i in range(len(strip)):
+                idx = int((i * 256 / len(strip)) + j)
+                strip[i] = wheel(idx & 255)
+            strip.show()
+            # Wait the desired number of milliseconds.
+            time.sleep(wait)
+    # Turn all the pixels off after the animation is done.
+    for i in range(len(strip)):
+                strip[i] = (0,0,0)
+    strip.show()
 
 def is_ball_in_hoop():
-    print(len(pulses))
     # Check if the IR sensor picked up the pulse 
     # (i.e. output wire went to ground).
 #    if ir_sensor == 0: 
 #        return False    # Sensor can see LED, return false.
-
-#    return True     # Sensor can't see LED, return true.
+    return True     # Sensor can't see LED, return true.
 
 
 while True:
+    pwm.duty_cycle = 65535
+    pulse = decoder.read_pulses(pulses)
+    print(pulse)
 
-    if is_ball_in_hoop():
-        colorWipe((255, 0, 0), .05)  # red and delay
-#        colorWipe((0, 255, 0), .05)  # green and delay
-#        colorWipe((0, 0, 255), .05)  # blue and delay
-#
-#        rainbow(0.02)
-#        rainbow_cycle(0.02)
+#    if is_ball_in_hoop():
+#        timed_rainbow_cycle(2, 0.01)
+#    time.sleep(basket_check_seconds)
