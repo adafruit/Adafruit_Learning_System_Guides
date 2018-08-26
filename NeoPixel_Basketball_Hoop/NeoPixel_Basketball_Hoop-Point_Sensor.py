@@ -42,31 +42,37 @@ def timed_rainbow_cycle(seconds, wait):
 
     # Loop until it's time to stop (desired number of milliseconds have elapsed).
     while (time.monotonic() - start) < seconds:
-        for j in range(255):
-            for i in range(len(strip)):
-                idx = int((i * 256 / len(strip)) + j)
-                strip[i] = wheel(idx & 255)
-            strip.show()
-            # Wait the desired number of milliseconds.
-            time.sleep(wait)
+        for i in range(len(strip)):
+            idx = int((i * 256 / len(strip)) + j)
+            strip[i] = wheel(idx & 255)
+        strip.show()
+        # Wait the desired number of milliseconds.
+        time.sleep(wait)
+        j += 1
+
     # Turn all the pixels off after the animation is done.
     for i in range(len(strip)):
                 strip[i] = (0,0,0)
     strip.show()
 
+def pulse_ir():
+    # enable IR LED
+    pwm.duty_cycle = 65535
+    
 def is_ball_in_hoop():
     # Check if the IR sensor picked up the pulse 
-    # (i.e. output wire went to ground).
-#    if ir_sensor == 0: 
-#        return False    # Sensor can see LED, return false.
+    pulse = decoder.read_pulses(pulses)
+    ir_sensor = (len(pulse))
+
+    if ir_sensor == 0: 
+        return False    # Sensor can see LED, return false.
     return True     # Sensor can't see LED, return true.
 
 
 while True:
-    pwm.duty_cycle = 65535
-    pulse = decoder.read_pulses(pulses)
-    print(pulse)
+    pulse_ir()
+    is_ball_in_hoop()
 
-#    if is_ball_in_hoop():
-#        timed_rainbow_cycle(2, 0.01)
-#    time.sleep(basket_check_seconds)
+    if is_ball_in_hoop():
+        timed_rainbow_cycle(2, 0.01)
+    time.sleep(basket_check_seconds)
