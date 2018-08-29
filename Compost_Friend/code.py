@@ -2,11 +2,10 @@
 # Code adapted from Tony Dicola's CircuitPython code using the DS18x20 temp sensor
 # as well as John Park's CircuitPython code determining soil moisture from nails
 
+import time
 from adafruit_onewire.bus import OneWireBus
 from adafruit_ds18x20 import DS18X20
-import time
 import board
-import simpleio
 import touchio
 import neopixel
 import analogio
@@ -32,7 +31,7 @@ ds18 = DS18X20(ow_bus, ow_bus.scan()[0])
 # Initialize the light senor on board to use for neopixel brightness later
 light = analogio.AnalogIn(board.LIGHT)
 
-# Main loop 
+# Main loop
 while True:
 
     # SOIL MOISTURE READINGS
@@ -99,7 +98,7 @@ while True:
         print("Not hot enough, right moisture level")
 
     # ALL GREEN = COMPOST AT OPTIMUM TEMPERATURE & MOISTURE
-    elif(compostTemp>tempThreshhold):
+    elif compostTemp > tempThreshhold:
         pixels.fill((0,255,0))  # green
         print("Compost Ready")
 
