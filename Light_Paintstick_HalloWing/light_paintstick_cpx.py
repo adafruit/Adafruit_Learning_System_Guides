@@ -1,5 +1,8 @@
 """Circuit Playground Express Light Paintbrush"""
-# Single images only. Filename and speed are set in code,
+# Single images only. Filename is set in code,
+# CPX buttons A&B are used to increase and decrease playback speed
+# Touch pad A5 to trigger playback in one-shot mode
+# Switch on CPX goes from one-shot to looping mode, requires reset
 # images should be 30px high, up to 100px wide, 24-bit .bmp files
 
 import gc
@@ -7,6 +10,7 @@ import time
 import board
 import touchio
 import digitalio
+from digitalio import DigitalInOut, Direction, Pull
 from neopixel_write import neopixel_write
 
 # uncomment one line only here to select bitmap
@@ -30,13 +34,39 @@ FILENAME = "bats.bmp" # BMP file to load from flash filesystem
 #FILENAME = "minerva.bmp"
 
 TOUCH = touchio.TouchIn(board.A5) #  capacitive touch pad
-SPEED = 50000
+SPEED = 10000
+SPEED_ADJUST = 2500               # This value changes the increment for button speed adjustments
 BRIGHTNESS = 1.0                  # Set brightness here, NOT in NeoPixel constructor
 GAMMA = 2.7                       # Adjusts perceived brighthess linearity
 NUM_PIXELS = 30                   # NeoPixel strip length (in pixels)
 NEOPIXEL_PIN = board.A1           # Pin where NeoPixels are connected
 DELAY_TIME = 0.01                 # Timer delay before it starts
 LOOP = False                      # Set to True for looping
+
+# button setup
+button_a = DigitalInOut(board.BUTTON_A)
+button_a.direction = Direction.INPUT
+button_a.pull = Pull.DOWN
+
+button_b = DigitalInOut(board.BUTTON_B)
+button_b.direction = Direction.INPUT
+button_b.pull = Pull.DOWN
+
+# switch setup
+switch = DigitalInOut(board.SLIDE_SWITCH)
+switch.direction = Direction.INPUT
+switch.pull = Pull.UP
+
+#status led setup
+led = DigitalInOut(board.D13)
+led.direction = Direction.OUTPUT
+
+
+if switch.value:
+    LOOP = True
+else:
+    LOOP = False
+
 
 # Enable NeoPixel pin as output and clear the strip
 NEOPIXEL_PIN = digitalio.DigitalInOut(NEOPIXEL_PIN)
@@ -144,14 +174,34 @@ print("Mem free:", gc.mem_free())
 COLUMN_DELAY = SPEED / 65535.0 / 10.0  # 0.0 to 0.1 seconds
 # print(COLUMN_DELAY)
 
+led.value = True
+
 while LOOP:
     for COLUMN in COLUMNS:
         neopixel_write(NEOPIXEL_PIN, COLUMN)
         time.sleep(COLUMN_DELAY)
 
 while True:
+
     # Wait for touch pad input:
+    # buttons increase and decrease speed of playback
     while not TOUCH.value:
+        if button_a.value:
+            if SPEED >= SPEED_ADJUST:
+                led.value = False
+                SPEED = SPEED - SPEED_ADJUST
+                COLUMN_DELAY = SPEED / 65535.0 / 10.0  # 0.0 to 0.1 seconds
+                time.sleep(0.25)  #debounce
+                led.value = True
+                # print(SPEED)
+        if button_b.value:
+            if SPEED < 100000:
+                led.value = False
+                SPEED = SPEED + SPEED_ADJUST
+                COLUMN_DELAY = SPEED / 65535.0 / 10.0  # 0.0 to 0.1 seconds
+                time.sleep(0.25)  #debounce
+                led.value = True
+                # print(SPEED)
         continue
 
     time.sleep(DELAY_TIME)
