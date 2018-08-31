@@ -1,25 +1,39 @@
 import time
+import board
+from analogio import AnalogIn
 from adafruit_crickit import crickit
+import neopixel
 
 print("Heating Pad Demo")
 
-# For signal control, we'll chat directly with seesaw
-ss = crickit.seesaw
-TMP36 = crickit.SIGNAL1  # TMP36 connected to signal port 1 & ground
-POT = crickit.SIGNAL8    # potentiometer connected to signal port 8 & ground
+pixels = neopixel.NeoPixel(board.NEOPIXEL, 10, auto_write=False)
 
-heating_pad = crickit.dc_motor_2
+def show_value(heat_val):         # Show throttle on NeoPixels on CPX
+    num_pixels = int(10 * heat_val)
+    for i in range(num_pixels):
+        pixels[i] = (10*(i+1), 0, 0)
+    for i in range(num_pixels, 10):
+        pixels[i] = (0, 0, 0)
+    pixels.show()
+    return
 
-while True:
+TMP36 = AnalogIn(board.A3)  # TMP36 connected to A3, power & ground
+POT = AnalogIn(board.A7)    # potentiometer connected to A7, power & ground
+ 
+heating_pad = crickit.dc_motor_2  # Set the motor object to heating pad
+ 
+while True:   # Loop Forever
+    
+    voltage = TMP36.value * 3.3 / 65536.0  # Read temp sensor, get voltage
+    tempC = (voltage - 0.5) * 100.0        # Calculate Celsius
+    tempF = (tempC * 9.0 / 5.0) + 32.0     # Calculate Fahrenheit
+    tempF = (tempC * 9.0 / 5.0) + 32.0     # Calculate Fahrenheit
 
-    voltage = ss.analog_read(TMP36) * 3.3 / 1024.0
-    tempC = (voltage - 0.5) * 100.0
-    tempF = (tempC * 9.0 / 5.0) + 32.0
+    heat_value = POT.value / 65536.0   # Value (0.0 to 1.0) to drive pad
+    
+    print((tempF, heat_value))         # Display temperature and drive
+    show_value(heat_value)
 
-    heat_value = ss.analog_read(POT) / 1023.0
-
-    print((tempF, heat_value))
-
-    heating_pad.throttle = heat_value  # set heat value to Motor throttle value
-
-    time.sleep(0.25)
+    heating_pad.throttle = heat_value  # set Motor throttle value to heat_value
+    
+    time.sleep(0.25)                   # Wait a bit before checking all again
