@@ -163,11 +163,11 @@ while True:
 
     if TOUCH.value:                         # Capacitive pad touched?
         if MODE is 0:                       # If currently off...
-            power('on', 1.7, False)         # Power up!
+            power('on', 3.0, False)         # Power up!
             play_wav('idle', loop=True)     # Play background hum sound
             MODE = 1                        # ON (idle) mode now
         else:                               # else is currently on...
-            power('off', 1.15, True)        # Power down
+            power('off', 2.0, True)        # Power down
             MODE = 0                        # OFF mode now
         while TOUCH.value:                  # Wait for button release
             time.sleep(0.2)                 # to avoid repeated triggering
@@ -191,7 +191,7 @@ while True:
         elif MODE > 1:                      # If in SWING or HIT mode...
             if AUDIO.playing:               # And sound currently playing...
                 BLEND = time.monotonic() - TRIGGER_TIME # Time since triggered
-                BLEND *= 1.4                # 0.0 to 1.0 in ~0.7 sec
+                BLEND *= 0.7                # 0.0 to 1.0 in ~1.4 sec
                 if MODE == 2:               # If SWING,
                     BLEND = abs(0.5 - BLEND) * 2.0 # ramp up, down
                 if BLEND > 1.0:
