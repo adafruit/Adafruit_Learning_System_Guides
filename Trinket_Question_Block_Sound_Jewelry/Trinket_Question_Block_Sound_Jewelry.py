@@ -2,27 +2,41 @@ import time
 import board
 import simpleio
 import pulseio
+import digitalio
+
 
 # PWM is not available on Trinket D1 
-speaker_pin = board.D2  # PWM speaker using simpleio interface on D2 
-pwm_leds = board.D4     # PWM (fading) LEDs are connected on D0 
+vibration_pin = board.D1    # vibration switch is connected
+speaker_pin = board.D2      # PWM speaker 
+pwm_leds = board.D4         # PWM "fading" LEDs
+
+# initialize PWM for LEDs
 pwm = pulseio.PWMOut(pwm_leds, frequency=256, duty_cycle=50)
+led_fade_delay = .001       # delay in seconds makes color fade visible
+led_fade_step = 1024        # fade amount
 
-# wait for vibration sensor detect
+# initialize vibration sensor
+vpin = digitalio.DigitalInOut(vibration_pin)
+vpin.direction = digitalio.Direction.INPUT
+vpin.pull = digitalio.Pull.UP
 
-# LEDs start high and fade down
-brightness = 2 ** 15 
-fade_amount = 2 ** 13
+def led_fade(brightness):
+    pwm.duty_cycle = brightness
+    brightness_start = brightness
 
-# Super Mario Bros. Coin Sound with LED fade out
-pwm.duty_cycle = brightness
-time.sleep(.15)
-simpleio.tone(speaker_pin, 988, 0.083) # tone1 - B5
-brightness -= fade_amount
-pwm.duty_cycle = brightness 
-simpleio.tone(speaker_pin, 1319, 0.83) # tone2 - E6
-time.sleep(.15)
-brightness -= fade_amount
-pwm.duty_cycle = brightness 
-time.sleep(.15)
-pwm.duty_cycle = 0
+    while brightness >= (brightness_start / 2):
+        brightness -= led_fade_step
+        pwm.duty_cycle = brightness
+        time.sleep(led_fade_delay)
+    
+while True:
+    # wait for vibration sensor detect
+    # play Super Mario Bros. Coin Sound 
+    # fade LEDs
+    if not vpin.value:
+        led_fade((2 ** 16) - 1)                 # full brightness
+        simpleio.tone(speaker_pin, 988, 0.083)  # tone1 - B5
+        led_fade(2 ** 15)                       # half brightness
+        simpleio.tone(speaker_pin, 1319, 0.83)  # tone2 - E6
+        led_fade(2 ** 14)                       # quarter brightness 
+    pwm.duty_cycle = 0                          # turn off LEDs
