@@ -4,10 +4,9 @@ import simpleio
 import pulseio
 import digitalio
 
-
-# PWM is not available on Trinket D1 
+# PWM is not available on Trinket D1
 vibration_pin = board.D1    # vibration switch is connected
-speaker_pin = board.D2      # PWM speaker 
+speaker_pin = board.D2      # PWM speaker
 pwm_leds = board.D4         # PWM "fading" LEDs
 
 # initialize PWM for LEDs
@@ -28,15 +27,15 @@ def led_fade(brightness):
         brightness -= led_fade_step
         pwm.duty_cycle = brightness
         time.sleep(led_fade_delay)
-    
+
 while True:
-    # wait for vibration sensor detect
-    # play Super Mario Bros. Coin Sound 
+    # wait for vibration sensor detect (reverse logic)
+    # play Super Mario Bros. coin sound
     # fade LEDs
     if not vpin.value:
         led_fade((2 ** 16) - 1)                 # full brightness
         simpleio.tone(speaker_pin, 988, 0.083)  # tone1 - B5
         led_fade(2 ** 15)                       # half brightness
         simpleio.tone(speaker_pin, 1319, 0.83)  # tone2 - E6
-        led_fade(2 ** 14)                       # quarter brightness 
+        led_fade(2 ** 14)                       # quarter brightness
     pwm.duty_cycle = 0                          # turn off LEDs
