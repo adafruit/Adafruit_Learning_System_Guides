@@ -7,7 +7,6 @@ Tilt to change light color, cycle speed, tone pitch
 
 import time
 
-import board
 from adafruit_circuitplayground.express import cpx
 
 def simple_circle(wait, red, green, blue):
