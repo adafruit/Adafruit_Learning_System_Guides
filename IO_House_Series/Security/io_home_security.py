@@ -13,28 +13,32 @@ Dependencies:
         (https://github.com/adafruit/Adafruit_Blinka)
     - Adafruit_CircuitPython_SGP30
         (https://github.com/adafruit/Adafruit_CircuitPython_SGP30)
+    - Adafruit_CircuitPython_NeoPixel
+        (https://github.com/adafruit/Adafruit_CircuitPython_NeoPixel)
     - picamera
+        (https://github.com/waveform80/picamera)
 """
 # Import standard python modules
 import time
 import base64
-import os
 # import Adafruit IO REST client
-from Adafruit_IO import Client, Feed, RequestError
+from Adafruit_IO import Client, RequestError
+
+# import SGP30, NeoPixel and picam libraries
+import neopixel
+import adafruit_sgp30
+import picamera
 
 # import Adafruit Blinka
 from board import SCL, SDA, D18, D22, D24
 from busio import I2C
 import digitalio
-import neopixel_write
 
-# import Adafruit_CircuitPython_SGP30 and picam
-import adafruit_sgp30
-import picamera
-
-# NeoPixels Commands
-PIXELS_OFF = bytearray([0, 0, 0])
-PIXELS_ON = bytearray([0, 255, 0])
+# Number of NeoPixels connected to the strip
+NUM_PIXELS_STRIP = 60
+# Number of NeoPixels connected to the NeoPixel Jewel
+NUM_PIXELS_JEWEL = 6
+RED = (255, 0, 0)
 
 # Set to the hour at which to arm the alarm system, 24hr time
 ALARM_HOUR = 16
@@ -85,79 +89,78 @@ i2c_bus = I2C(SCL, SDA, frequency=100000)
 sgp30 = adafruit_sgp30.Adafruit_SGP30(i2c_bus)
 
 # set up the neopixel strip
-pixel_strip = digitalio.DigitalInOut(D18)
-pixel_strip.direction = digitalio.Direction.OUTPUT
-neopixel_write.neopixel_write(pixel_strip, PIXELS_OFF)
+pixels = neopixel.NeoPixel(D18, NUM_PIXELS_STRIP)
+pixels.fill((0, 0, 0))
+pixels.show()
+
+def alarm_trigger():
+    """Alarm is triggered by the dashboard toggle
+    and a sensor detecting movement.
+    """
+    print('* SYSTEM ALARM!')
+    for j in range(NUM_PIXELS_JEWEL):
+        pixels[j] = RED
+        pixels.show()
+    time.sleep(0.5)
+    # turn pixels off after alarm
+    pixels.fill((0, 0, 0))
+    pixels.show()
 
 print('Adafruit IO Home: Security')
 
-def alarm_trigger():
-  """Alarm is triggered by the dashboard toggle
-  and a sensor detecting movement.
-  """
-  print('* SYSTEM ALARM!')
-  for j in range(0, 5):
-    neopixel_write.neopixel_write(pixel_strip, PIXELS_ON)
-    time.sleep(0.5)
-    neopixel_write.neopixel_write(pixel_strip, PIXELS_OFF)
-  # turn pixels off after alarm animation
-  neopixel_write.neopixel_write(pixel_strip, PIXELS_OFF)
-
 while True:
-  # read SGP30
-  co2eq, tvoc = sgp30.iaq_measure()
-  print("CO2eq = %d ppm \t TVOC = %d ppb" % (co2eq, tvoc))
-  # send SGP30 values to Adafruit IO
-  aio.send(eco2_feed.key, co2eq)
-  aio.send(tvoc_feed.key, tvoc)
-  time.sleep(0.5)
+    # read SGP30
+    co2eq, tvoc = sgp30.iaq_measure()
+    print("CO2eq = %d ppm \t TVOC = %d ppb" % (co2eq, tvoc))
+    # send SGP30 values to Adafruit IO
+    aio.send(eco2_feed.key, co2eq)
+    aio.send(tvoc_feed.key, tvoc)
+    time.sleep(0.5)
 
-  # read/send door sensor
-  if door_sensor.value:
-    print('Door Open!')
-    # change indicator block to red
-    aio.send(door_feed.key, 3)
-  else:
-    print('Door Closed.')
-    # reset indicator block to green
-    aio.send(door_feed.key, 0)
+    # read/send door sensor
+    if door_sensor.value:
+        print('Door Open!')
+        # change indicator block to red
+        aio.send(door_feed.key, 3)
+    else:
+        print('Door Closed.')
+        # reset indicator block to green
+        aio.send(door_feed.key, 0)
 
-  # read/send motion sensor
-  if door_sensor.value:
-    if not prev_pir_value:
-      print('Motion detected!')
-      is_pir_activated = True
-      # change indicator block to red
-      aio.send(motion_feed.key, 3)
-  else:
-    if prev_pir_value:
-      print('Motion ended.')
-      is_pir_activated = False
-      # reset indicator block to green
-      aio.send(motion_feed.key, 0)
+    # read/send motion sensor
+    if door_sensor.value:
+        if not prev_pir_value:
+            print('Motion detected!')
+            is_pir_activated = True
+            # change indicator block to red
+            aio.send(motion_feed.key, 3)
+    else:
+        if prev_pir_value:
+            print('Motion ended.')
+            is_pir_activated = False
+            # reset indicator block to green
+            aio.send(motion_feed.key, 0)
 
-  camera.capture('picam.jpg')
-  print('snap!')
-  with open("picam.jpg", "rb") as imageFile:
-    image = base64.b64encode(imageFile.read())
-    send_str = image.decode("utf-8")
-    try:
-      aio.send(picam_feed.key, send_str)
-      print('sent to AIO!')
-    except:
-      print('Sending camera image failed...')
+    camera.capture('picam.jpg')
+    print('snap!')
+    with open("picam.jpg", "rb") as imageFile:
+        image = base64.b64encode(imageFile.read())
+        send_str = image.decode("utf-8")
+        try:
+            aio.send(picam_feed.key, send_str)
+            print('sent to AIO!')
+        except RequestError:
+            print('Sending camera image failed...')
 
-  # Alarm System 
-  is_alarm = aio.receive(alarm_feed.key)
+    # Alarm System
+    is_alarm = aio.receive(alarm_feed.key)
 
-  if (is_alarm.value == "ON"):
-    # sample the current hour
-    cur_time = time.localtime()
-    cur_hour = time.tm_hour
-    if (cur_hour > ALARM_HOUR and is_pir_activated == True):
-      alarm_trigger()
+    if is_alarm.value == "ON":
+        # sample the current hour
+        cur_time = time.localtime()
+        cur_hour = time.tm_hour
+        if (cur_hour > ALARM_HOUR and is_pir_activated is True):
+            alarm_trigger()
 
-  prev_pir_value = door_sensor.value
-  time.sleep(LOOP_INTERVAL)
-
-
+    prev_pir_value = door_sensor.value
+    time.sleep(LOOP_INTERVAL)
