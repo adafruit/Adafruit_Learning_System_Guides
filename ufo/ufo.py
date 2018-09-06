@@ -7,25 +7,19 @@ Tilt to change light color, cycle speed, tone pitch
 
 import time
 
-import board
-import neopixel
 from adafruit_circuitplayground.express import cpx
-
-# create neopixel object. set brightness lower if needed, say .2
-pixels = neopixel.NeoPixel(board.NEOPIXEL, 10, brightness=.8)
-
 
 def simple_circle(wait, red, green, blue):
     """timing, color values per channel"""
     baseFreq = int(20 + (green * 0.3))  # tone value derived from rotation
 
     for i in range(10):
-        pixels[i] = ((0, 0, 0))
+        cpx.pixels[i] = ((0, 0, 0))
         cpx.start_tone(baseFreq + i)  # increasing pitch sweep
         time.sleep(wait)
 
     for i in range(10):
-        pixels[i] = ((red, green, blue))
+        cpx.pixels[i] = ((red, green, blue))
         time.sleep(wait)
 
 
@@ -47,5 +41,5 @@ while True:
         simple_circle(speed, R, G, B)  # speed based on tilt, .01 is good start
 
     else:  # right side up means no colors or sound!
-        pixels.fill((0, 0, 0))
+        cpx.pixels.fill((0, 0, 0))
         cpx.stop_tone()
