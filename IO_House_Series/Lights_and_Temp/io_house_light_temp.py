@@ -20,7 +20,7 @@ Dependencies:
 import time
 
 # import Adafruit IO REST client
-from Adafruit_IO import Client, Feed, RequestError
+from Adafruit_IO import Client
 
 # import Adafruit Blinka
 from busio import I2C
