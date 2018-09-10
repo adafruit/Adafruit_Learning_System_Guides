@@ -30,10 +30,10 @@ void setup() {
 
 void loop() {
 
-  midiEventPacket_t rx = MidiUSB.read();
+  midiEventPacket_t rx = MidiUSB.read();  //listen for new MIDI messages
 
   switch (rx.header) {
-    case 0x9:
+    case 0x9:            //Note On message
       handleNoteOn(
         rx.byte1 & 0xF,  //channel
         rx.byte2,        //pitch
@@ -66,9 +66,9 @@ void handleNoteOn(byte channel, byte pitch, byte velocity) {
 }
 
 void hit(int drum) {
-  crickit.analogWrite(drum, CRICKIT_DUTY_CYCLE_MAX);  //turn all the way on
+  crickit.analogWrite(drum, CRICKIT_DUTY_CYCLE_MAX);  //turn solenoid all the way on
   delay(hitDur);                                      // wait
-  crickit.analogWrite(drum, CRICKIT_DUTY_CYCLE_OFF);  //turn all the way off
+  crickit.analogWrite(drum, CRICKIT_DUTY_CYCLE_OFF);  //turn solenoid all the way off
 }
 
 void test() {   //for debugging
