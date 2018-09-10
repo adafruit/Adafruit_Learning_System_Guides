@@ -1,7 +1,7 @@
 /*  MIDI Solenoid Drummer
-    for use with Adafruit Feather + Crickit Featherwing
-    assumes a 5V solenoid connected to each of Crickit's four Drive ports
-*/
+ *  for use with Adafruit Feather + Crickit Featherwing
+ *  assumes a 5V solenoid connected to each of Crickit's four Drive ports
+ */
 
 #include "Adafruit_Crickit.h"
 #include "MIDIUSB.h"
@@ -16,11 +16,6 @@ int snare = CRICKIT_DRIVE2;
 int shake = CRICKIT_DRIVE1;
 int hitDur = 8; //solenoid on duration for each hit (in milliseconds)
 
-int cymLED = CRICKIT_SIGNAL4;
-int kickLED = CRICKIT_SIGNAL3;
-int snareLED = CRICKIT_SIGNAL2;
-int shakeLED = CRICKIT_SIGNAL1;
-
 void setup() {
 
   if (!crickit.begin()) {
@@ -29,13 +24,7 @@ void setup() {
 
   for (int i = 0; i < NUM_DRIVES; i++)
     crickit.setPWMFreq(drives[i], 1000);  //default frequency is 1khz
-    
-  crickit.pinMode(cymLED, OUTPUT);
 
-  crickit.digitalWrite(cymLED, HIGH);
-  delay(5000);
-  crickit.digitalWrite(cymLED, LOW);
-  
   test(); //test solenoids at start
 }
 
@@ -60,39 +49,35 @@ void handleNoteOn(byte channel, byte pitch, byte velocity) {
 
   switch (pitch) {
     case 24:      //kick = C1/24
-      hit(kick, hitDur);
+      hit(kick);
       break;
-    case 28:      //snare = E1/28
-      hit(snare, hitDur);
+    case 25:      //snare = C#1/25
+      hit(snare);
       break;
-    case 36:      //shake = C2/36
-      hit(shake, hitDur);
+    case 26:      //shake = D1/26
+      hit(shake);
       break;
-    case 37:      //cymbal = C#2/37
-      hit(cym, hitDur);
+    case 27:      //cymbal = D#1/27
+      hit(cym);
       break;
     default:
       break;
   }
 }
 
-void hit(int drum, int dur) {
-
+void hit(int drum) {
   crickit.analogWrite(drum, CRICKIT_DUTY_CYCLE_MAX);  //turn all the way on
-  crickit.digitalWrite(cymLED, HIGH);
-  delay(dur);                                         // wait
+  delay(hitDur);                                      // wait
   crickit.analogWrite(drum, CRICKIT_DUTY_CYCLE_OFF);  //turn all the way off
-  crickit.digitalWrite(cymLED, LOW);
 }
 
 void test() {   //for debugging
-  hit(cym, hitDur);
+  hit(cym);
   delay(400);
-  hit(kick, hitDur);
+  hit(kick);
   delay(400);
-  hit(snare, hitDur);
+  hit(snare);
   delay(400);
-  hit(shake, hitDur);
+  hit(shake);
   delay(400);
 }
-
