@@ -19,8 +19,12 @@
 /* Assign a unique ID to this sensor at the same time */
 Adafruit_LSM303_Mag_Unified mag = Adafruit_LSM303_Mag_Unified(12345);
 
+// Replace these two lines with the results of calibration
+//---------------------------------------------------------------------------
+
 float raw_mins[2] = {1000.0, 1000.0};
 float raw_maxes[2] = {-1000.0, -1000.0};
+//---------------------------------------------------------------------------
 
 float mins[2];
 float maxes[2];
@@ -58,7 +62,7 @@ void fill(int red, int green, int blue) {
 void warm_up(void)
 {
   sensors_event_t event;
-  fill(0, 0, 128);
+  fill(0, 0, 64);
   for (int ignore = 0; ignore < 100; ignore++) {
     mag.getEvent(&event);
     delay(10);
@@ -70,27 +74,30 @@ void warm_up(void)
 // User needs to rotate the CPX a bunch during this.
 // Can be refined by doing more of the saem by pressing the A button.
 // Indicated to the user by green LEDs.
-void calibrate(void)
+void calibrate(bool do_the_readings)
 {
   sensors_event_t event;
   float values[2];
 
-  fill(0, 128, 0);
+  fill(0, 64, 0);
 
-  unsigned long start_time = millis();
-  while (millis() - start_time < 5000) {
+  if (do_the_readings) {
+    unsigned long start_time = millis();
+    while (millis() - start_time < 5000) {
 
-    mag.getEvent(&event);
-    values[0] = event.magnetic.x;
-    values[1] = event.magnetic.y * -1;
-    if (values[0] != 0.0 && values[1] != 0.0) { /* ignore the random zero readings... it's bogus */
-      for (int i = 0; i < 2; i++) {
-        raw_mins[i] = values[i] < raw_mins[i] ? values[i] : raw_mins[i];
-        raw_maxes[i] = values[i] > raw_maxes[i] ? values[i] : raw_maxes[i];
+      mag.getEvent(&event);
+      values[0] = event.magnetic.x;
+      values[1] = event.magnetic.y * -1;
+      if (values[0] != 0.0 && values[1] != 0.0) { /* ignore the random zero readings... it's bogus */
+        for (int i = 0; i < 2; i++) {
+          raw_mins[i] = values[i] < raw_mins[i] ? values[i] : raw_mins[i];
+          raw_maxes[i] = values[i] > raw_maxes[i] ? values[i] : raw_maxes[i];
+        }
       }
+      delay(5);
     }
-    delay(5);
   }
+
   for (int i = 0; i < 2; i++) {
     corrections[i] = (raw_maxes[i] + raw_mins[i]) / 2;
     mins[i] = raw_mins[i] - corrections[i];
@@ -119,7 +126,28 @@ void setup(void)
   }
 
   warm_up();
-  calibrate();
+
+  // If reset with button A pressed or calibration hasn't been done, run calibration and report the results
+  if (digitalRead(BUTTON_A) || (raw_mins[0] == 1000.0 && raw_mins[1] == 1000.0)) {
+    while (!Serial);
+    Serial.begin(9600);
+    Serial.println("Compass calibration\n");
+
+    raw_mins[0] = 1000.0;
+    raw_mins[1] = 1000.0;
+    raw_maxes[0] = -1000.0;
+    raw_maxes[1] = -1000.0;
+    calibrate(true);
+
+    Serial.println("Calibration results\n");
+    Serial.println("Update the corresponding lines near the top of the code\n");
+    Serial.print("float raw_mins[2] = {"); Serial.print(raw_mins[0]); Serial.print(", "); Serial.print(raw_mins[1]); Serial.println("};");
+    Serial.print("float raw_maxes[2] = {"); Serial.print(raw_maxes[0]); Serial.print(", "); Serial.print(raw_maxes[1]); Serial.println("};\n");
+
+    while(1);
+  } else {
+    calibrate(false);
+  }
 }
 
 
@@ -137,7 +165,7 @@ void loop(void)
 {
   // Pressing button A does another round of calibration.
   if (digitalRead(BUTTON_A)) {
-    calibrate();
+    calibrate(true);
   }
 
   sensors_event_t event;
@@ -169,7 +197,7 @@ void loop(void)
   leds = led_patterns[direction_index];
   for (int pixel = 0; pixel < 10; pixel++) {
     if (pixel == leds[0] || pixel == leds[1]) {
-      strip.setPixelColor(pixel, 255, 255, 255);
+      strip.setPixelColor(pixel, 4, 0, 0);
     } else {
       strip.setPixelColor(pixel, 0, 0, 0);
     }
