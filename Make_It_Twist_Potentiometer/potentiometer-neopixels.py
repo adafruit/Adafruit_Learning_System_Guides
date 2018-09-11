@@ -16,7 +16,7 @@ def show_value(val):            # Show value 0-9 on CPX NeoPixels
     return
 
 while True:
-    
+
     show_value(int(potentiometer.value / 65520 * NUMPIXELS))  # Show on NeoPixels
     print((potentiometer.value,))                             # Print value
 
