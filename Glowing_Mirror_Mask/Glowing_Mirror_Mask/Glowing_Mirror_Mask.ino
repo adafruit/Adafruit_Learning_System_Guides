@@ -6,21 +6,20 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_ST7735.h>
 #include <Adafruit_NeoPixel.h>
+#include <FastLED.h>
 
 // Enable ONE of these lines to select an animation,
 // others MUST be commented out!
 
-#include "fire.h"
-//#include "butterfly.h"
+//#include "fire.h"
+#include "butterfly.h"
 
 #define TFT_CS       39
 #define TFT_RST      37
 #define TFT_DC       38
 #define TFT_BACKLIGHT 7
 
-#include <FastLED.h>
-
-#define LED_PIN     12  // Hallowing's neopixel port is on pin 4
+#define LED_PIN     4  // Hallowing's neopixel port is on pin 4
 #define NUM_LEDS    30 // Change this to reflect how many LEDs you have
 #define LED_TYPE    WS2812 // Neopixels
 #define COLOR_ORDER GRB  
@@ -46,8 +45,8 @@ void setup(void) {
 FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS);             // WS2812B
 FastLED.setBrightness(brightness);
   
-  //currentPalette = RainbowColors_p;    //Uncomment ONE of these lines to choose your Neopixel color palette
-  currentPalette = HeatColors_p;
+  currentPalette = RainbowColors_p;    //Uncomment ONE of these lines to choose your Neopixel color palette
+  //currentPalette = HeatColors_p;
   //currentPalette = PartyColors_p;
   //currentPalette = CloudColors_p;
   //currentPalette = RainbowStripeColors_p;
