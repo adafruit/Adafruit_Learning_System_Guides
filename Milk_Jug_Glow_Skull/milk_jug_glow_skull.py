@@ -47,12 +47,12 @@ def blink(times, speed):
         time.sleep(speed)
 
 def play_waves(file_num):
-    wave_file = open(wave_files[file_num], "rb")
+    wave_file = open(wave_files[file_num], "rb")  # open a wav file
     wave = audioio.WaveFile(wave_file)
-    audio.play(wave)
-    while audio.playing:
+    audio.play(wave)  # play the wave file
+    while audio.playing:  # allow the wav to finish playing
         pass
-
+    wave_file.close()  # close the wav file
 
 wave_files = ["alex_deepgrowl1.wav", "alex-highgrowl1.wav", "alex-squeal1.wav",
               "toni-deepgrowl.wav", "toni-highgrowl2.wav","toni-pigsqueal.wav",
