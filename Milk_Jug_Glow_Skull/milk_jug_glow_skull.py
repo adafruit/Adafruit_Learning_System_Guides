@@ -29,7 +29,7 @@ BLACK = (0, 0, 0)
 
 COLORS = [ORANGE, PURPLE, RED, GREEN, ORANGE, PURPLE, RED]
 
-pixels.fill(BLACK)
+pixels.fill(ORANGE)
 pixels.show()
 
 def color_chase(color, wait):
@@ -37,10 +37,10 @@ def color_chase(color, wait):
         pixels[i] = color
         time.sleep(wait)
         pixels.show()
-    time.sleep(rest_time)
+
 
 def blink(times, speed):
-    for _j in range(times):
+    for _ in range(times):
         led.value = False
         time.sleep(speed)
         led.value = True
@@ -50,14 +50,18 @@ def play_waves(file_num):
     wave_file = open(wave_files[file_num], "rb")
     wave = audioio.WaveFile(wave_file)
     audio.play(wave)
+    while audio.playing:
+        pass
+
 
 wave_files = ["alex_deepgrowl1.wav", "alex-highgrowl1.wav", "alex-squeal1.wav",
-              "toni-deepgrowl.wav","toni-highgrowl2.wav","toni-pigsqueal.wav",
+              "toni-deepgrowl.wav", "toni-highgrowl2.wav","toni-pigsqueal.wav",
               "toni-pitchedscream2.wav"]
 audio = audioio.AudioOut(board.A0)
 
 while True:
-    for k in range(7):
+    for k in range(len(wave_files)):
         blink(blink_times, blink_speed)
-        play_waves(k)
         color_chase(COLORS[k], pix_rate)
+        play_waves(k)
+        time.sleep(rest_time)
