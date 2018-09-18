@@ -27,7 +27,6 @@ while True:   # Loop Forever
     voltage = TMP36.value * 3.3 / 65536.0  # Read temp sensor, get voltage
     tempC = (voltage - 0.5) * 100.0        # Calculate Celsius
     tempF = (tempC * 9.0 / 5.0) + 32.0     # Calculate Fahrenheit
-    tempF = (tempC * 9.0 / 5.0) + 32.0     # Calculate Fahrenheit
 
     heat_value = POT.value / 65536.0   # Value (0.0 to 1.0) to drive pad
 
