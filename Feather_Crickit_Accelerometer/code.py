@@ -22,7 +22,7 @@ servo1.angle = 90
 
 while True:
     # Read the accel
-    x, y, z = sensor.accelerometer
+    x, y, z = sensor.acceleration
 
     # Clip the value
     if y < -10:
