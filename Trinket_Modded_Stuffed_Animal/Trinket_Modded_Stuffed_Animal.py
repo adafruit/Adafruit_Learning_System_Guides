@@ -1,39 +1,45 @@
 import time
 import analogio
 import board
-import pulseio
+import simpleio
 from digitalio import DigitalInOut, Direction
 
-# initialize input/output pins
-servo_pin = board.D0            # servo motor
+# setup photocell
+photocell = analogio.AnalogIn(board.A1) # analog #1 same pin as Digital #2
+darkness_min = (2 ** 16) * .05          # light level < 5% means darkness
 
 # setup speaker 
-speaker_pin = DigitalInOut(board.D1)
-speaker_pin.direction = Direction.OUTPUT
+speaker = DigitalInOut(board.D1)
+speaker.direction = Direction.OUTPUT
 
-# setup photocell
-photocell_pin = board.A1        # cds photocell D2 == A1
-darkness_min = (2 ** 16) * .05  # light level < 5% means darkness
-photocell = analogio.AnalogIn(photocell_pin)
+# setup servo
+servo = simpleio.Servo(board.D0)        # servo motor
+angle = 0
 
 def chirp():
     for i in range(200,180,-1):
         play_tone(i,9)
 
 def play_tone(tone_value, duration):
-    microseconds = 10 ** 6      # duration divider to work in microseconds
+    microseconds = 10 ** 6              # duration divider, convert to microseconds
 
     for i in range(0, duration):
         i += tone_value * 2
-        speaker_pin.value = True 
+        speaker.value = True 
         time.sleep(tone_value / microseconds)
-        speaker_pin.value = False
+        speaker.value = False
         time.sleep(tone_value / microseconds)
 
 # loop forever...
 while True:
 
-    # turn lights and audio on when dark
-    # (less than 50% light on analog pin)
+    # when photocell goes dark (less than 5%)
+    # turn on audio 
+    # rotate stepper 
     if photocell.value < darkness_min:
-        chirp()                 # bird chirp noise
+        chirp()                         # bird chirp noise
+        if ( servo.angle == 0 ): 
+            servo.angle = 180           # rotate bird head 180 degrees
+        else:
+            servo.angle = 0 
+        time.sleep(.5)                  # leave some time to complete rotation
