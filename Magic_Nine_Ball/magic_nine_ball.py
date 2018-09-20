@@ -24,7 +24,7 @@ i = random.randint(0, 19)  # initial image is randomly selected
 # Set up accelerometer on I2C bus, 4G range:
 I2C = busio.I2C(board.SCL, board.SDA)
 
-ACCEL = adafruit_lis3dh.LIS3DH_I2C(I2C, address=0x18)  # Production board
+ACCEL = adafruit_lis3dh.LIS3DH_I2C(I2C, address=0x18)
 
 ACCEL.range = adafruit_lis3dh.RANGE_4_G
 
@@ -51,8 +51,10 @@ while True:
 
         # Wait forever
         while not shaken:
-            ACCEL_X, ACCEL_Y, ACCEL_Z = ACCEL.acceleration  # Read the accel-z
-            time.sleep(0.001)
+            try:
+                ACCEL_X, ACCEL_Y, ACCEL_Z = ACCEL.acceleration  # Read the accelerometer
+            except IOError:
+                pass
             # print(ACCEL_Z)  # uncomment to see the accelerometer z reading
             if ACCEL_Z > 5:
                 shaken = True
