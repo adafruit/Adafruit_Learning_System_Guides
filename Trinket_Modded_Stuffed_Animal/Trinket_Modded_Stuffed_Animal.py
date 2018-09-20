@@ -8,7 +8,7 @@ from digitalio import DigitalInOut, Direction
 photocell = analogio.AnalogIn(board.A1) # analog #1 same pin as Digital #2
 darkness_min = (2 ** 16) * .05          # light level < 5% means darkness
 
-# setup speaker 
+# setup speaker
 speaker = DigitalInOut(board.D1)
 speaker.direction = Direction.OUTPUT
 
@@ -25,7 +25,7 @@ def play_tone(tone_value, duration):
 
     for i in range(0, duration):
         i += tone_value * 2
-        speaker.value = True 
+        speaker.value = True
         time.sleep(tone_value / microseconds)
         speaker.value = False
         time.sleep(tone_value / microseconds)
@@ -34,12 +34,12 @@ def play_tone(tone_value, duration):
 while True:
 
     # when photocell goes dark (less than 5%)
-    # turn on audio 
-    # rotate stepper 
+    # turn on audio
+    # rotate stepper
     if photocell.value < darkness_min:
         chirp()                         # bird chirp noise
-        if ( servo.angle == 0 ): 
+        if servo.angle == 0:
             servo.angle = 180           # rotate bird head 180 degrees
         else:
-            servo.angle = 0 
+            servo.angle = 0
         time.sleep(.5)                  # leave some time to complete rotation
