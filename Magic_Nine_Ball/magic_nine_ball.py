@@ -16,6 +16,7 @@ splash = displayio.Group()
 board.DISPLAY.show(splash)
 
 max_brightness = 2 ** 15
+SENSITIVITY = 5   # reading in Z direction to trigger, adjustable
 
 images = list(filter(lambda x: x.endswith("bmp"), os.listdir("/")))
 
@@ -52,11 +53,11 @@ while True:
         # Wait forever
         while not shaken:
             try:
-                ACCEL_X, ACCEL_Y, ACCEL_Z = ACCEL.acceleration  # Read the accelerometer
+                ACCEL_Z = ACCEL.acceleration[2]  # Read Z axis acceleration
             except IOError:
                 pass
             # print(ACCEL_Z)  # uncomment to see the accelerometer z reading
-            if ACCEL_Z > 5:
+            if ACCEL_Z > SENSITIVITY:
                 shaken = True
 
         # Fade down the backlight
