@@ -19,7 +19,7 @@ max_brightness = 2 ** 15
 
 images = list(filter(lambda x: x.endswith("bmp"), os.listdir("/")))
 
-i = random.randint(0, 19)  # initial image is randomly selected
+i = random.randint(0, (len(images)-1))  # initial image is randomly selected
 
 # Set up accelerometer on I2C bus, 4G range:
 I2C = busio.I2C(board.SCL, board.SDA)
@@ -66,8 +66,7 @@ while True:
 
         splash.pop()
 
-        if ACCEL_Z > 5:
-            i = random.randint(0, 19)  # initial image is randomly selected
-            print("shaken")
-            faceup = False
+        i = random.randint(0, (len(images)-1))  # pick a new random image
+        # print("shaken")
+        faceup = False
         i %= len(images) - 1
