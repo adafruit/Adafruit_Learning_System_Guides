@@ -31,10 +31,16 @@ right_legs = [front_right, rear_right]
 left_legs = [front_left, rear_left]
 
 # The sign (+1/-1) for forward motion for each servo
-direction_values = {front_right: +1, front_left: -1, rear_right: +1, rear_left: -1}
+direction_values = {front_right: +1,
+                    front_left: -1,
+                    rear_right: +1,
+                    rear_left: -1}
 
 # Tweak the pwn ranges for each servo so that throttle of 0 stops the motor
-pwm_ranges = {front_right: (500, 2400), front_left: (500, 2400), rear_right: (500, 2400), rear_left: (500, 2400)}
+pwm_ranges = {front_right: (500, 2400),
+              front_left: (500, 2400),
+              rear_right: (500, 2400),
+              rear_left: (500, 2400)}
 
 
 def init():
@@ -60,7 +66,7 @@ def wag_for(seconds):
 
 
 def forward(servo_or_servos, speed):
-    if type(servo_or_servos) == list:
+    if isinstance(servo_or_servos, list):
         for servo in servo_or_servos:
             servo.throttle = speed * direction_values[servo]
     else:
@@ -68,7 +74,7 @@ def forward(servo_or_servos, speed):
 
 
 def reverse(servo_or_servos, speed):
-    if type(servo_or_servos) == list:
+    if isinstance(servo_or_servos, list):
         for servo in servo_or_servos:
             servo.throttle = speed * -1 * direction_values[servo]
     else:
@@ -76,7 +82,7 @@ def reverse(servo_or_servos, speed):
 
 
 def stop(servo_or_servos):
-    if type(servo_or_servos) == list:
+    if isinstance(servo_or_servos, list):
         for servo in servo_or_servos:
             servo.throttle = 0
     else:
