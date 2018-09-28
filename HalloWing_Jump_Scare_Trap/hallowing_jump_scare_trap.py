@@ -6,6 +6,7 @@ import math
 import board
 import displayio
 import pulseio
+from adafruit_motor import servo
 import digitalio
 import touchio
 import audioio
@@ -19,23 +20,18 @@ pir.direction = digitalio.Direction.INPUT
 led = digitalio.DigitalInOut(LED_PIN)
 led.direction = digitalio.Direction.OUTPUT
 # Setup servo
-servo = pulseio.PWMOut(board.D4, frequency=50)
-servo_min = 0.6
-servo_mid = 1.5
-servo_max = 2.45
-servo_time = 2.0
+# servo = pulseio.PWMOut(board.D4, frequency=50)
+pwm = pulseio.PWMOut(board.D4, duty_cycle=2 ** 15, frequency=50)
+servo = servo.Servo(pwm)
+
 # Setup cap touch button
 ready_button = touchio.TouchIn(board.TOUCH1)
-# Create a function to simplify setting PWM duty cycle for the servo:
-def servo_duty_cycle(pulse_ms, frequency=50):
-    period_ms = 1.0 / frequency * 1000.0
-    duty_cycle = int(pulse_ms / (period_ms / 65535.0))
-    return duty_cycle
-# Create functions for servo positions
+
 def servo_ready():
-    servo.duty_cycle = servo_duty_cycle(servo_min)
+    servo.angle = 0
 def servo_release():
-    servo.duty_cycle = servo_duty_cycle(servo_mid)
+    servo.angle = 90
+
 # Set servo to ready position
 servo_ready()
 # Function for playing wav file, releasing servo
