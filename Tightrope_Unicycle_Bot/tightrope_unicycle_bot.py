@@ -2,7 +2,7 @@ import time
 import board
 import neopixel
 import audioio
-import adafruit_crickit 
+import adafruit_crickit
 
 print("Adabot Tightrope Unicyclist!")
 RED =   (16, 0, 0)
