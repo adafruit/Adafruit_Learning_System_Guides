@@ -51,10 +51,10 @@ gamma = [
 wave = [[0] * 5] * 3, [[0] * 5] * 3, [[0] * 5] * 3
 
 wave_type = 0   # 0 = square wave, 1 = triangle wave
-value_sof = 1   # start-of-frame value
-value_p2p = 2   # pixel-to-pixel value
-inc_f2f = 3     # frame-to-frame increment
-inc_p2p = 4     # pixel-to-pixel inc
+value_frame = 1 # start-of-frame value
+value_pixel = 2 # pixel-to-pixel value
+inc_frame = 3   # frame-to-frame increment
+inc_pixel = 4   # pixel-to-pixel inc
 
 wave_h = 0      # hue
 wave_s = 1      # saturation
@@ -67,44 +67,104 @@ pin = AnalogIn(board.A0)
 random.seed(pin.value)
 pin.deinit()
 
-# Number of simultaneous waves (per horn)
-n_waves = len(wave)
+# generate a non-zero random number for frame and pixel increments
+def nz_random():
+    random_number = 0
 
-def random_wave(he, wi):
-    wave[he][wi][upper] = -1                                  # Always start below head of strip
-    wave[he][wi][lower] = -16 * (3 + random.randint(0,4))     # Lower end starts ~3-7 pixels back
-    wave[he][wi][mid] = (wave[he][wi][lower]+ wave[he][wi][upper]) / 2
-    wave[he][wi][vlower] = 3 + random.randint(0,4)            #  Lower end moves at ~1/8 to 1/pixels
-    wave[he][wi][vupper] = wave[he][wi][vlower]+ random.randint(0,4) # Upper end moves a bit faster
-    wave[he][wi][intensity] = 300 + random.randint(0,600)
+    while random_numer <= 0:
+        random_number = random(0,15) - 7
 
-def setup():
-    global fade
-
-    # Random number generator is seeded from an unused 'floating'
-    # analog input - this helps ensure the random color choices
-    # aren't always the same order.
-    pin = AnalogIn(board.A0)
-    random.seed(pin.value)
-    pin.deinit()
-
-    for he in range(n_horns):
-        for wi in range(n_waves):
-            random_wave(he, wi)
-
-    fade = 233 + n_leds / 2
-
-    if fade > 233:
-        fade = 233
-
-setup()
+    return random_number
 
 while True:
 
-    h = w = i = r = g = b = 0
-    x = 0
+    w = i = n = s = v = r = g = b = v1 = s1 = 0
 
-    for h in range(n_horns):                # For each horn...
+    if count <= 0:                              # time for new animation
+        count = 250 + random(0,250)             # effect run for 5-10 sec.
+
+        for w in range(3):                      # three waves (H,S,V)
+            wave[w][wave_type] = random(0,2)    # square vs triangle
+            wave[w][inc_frame] = nz_random()    # frame increment
+            wave[w][inc_pixel] = nz_random()    # pixel increment
+            wave[w][value_pixel] = wave[w][value_frame]
+
+        wave[wave_s][inc_pixel] *= 16           # make saturation & value
+        wave[wave_v][inc_pixel] *= 16           # blinkier along strip
+                
+    else:                                       # continue animation 
+        count -= 1
+        for w in range(3):
+            wave[w][value_frame] += wave[w][inc_frame]
+            wave[w][value_pixel] = wave[w][value_frame]
+
+    # Render current animation frame.  COGNITIVE HAZARD: fixed point math.
+
+    for i in range(n_leds):                     # for each LED along strip...
+        # Coarse (8-bit) HSV-to-RGB conversion, hue first:
+        n = (wave[wave_h][value_pixel] % 43) * 6    # angle within sextant
+
+        sextant = wave[wave_h][value_pixel] / 43    # sextant number 0-5
+
+        # R to Y
+        if sextant == 0:
+            r = 255
+            g = n
+            b = 0
+        # Y to G
+        elif sextant == 1:
+            r = 254 - n
+            g = 255
+            b = 0
+        # G to C
+        elif sextant == 2:
+            r = 0
+            g = 255
+            b = n
+        # C to B
+        elif sextant == 3:
+            r = 0
+            g = 254 -n
+            b = 255
+        # B to M
+        elif sextant == 4:
+            r = n
+            g = 0
+            b = 255
+        # M to R
+        else:
+            r = 255
+            g = 0
+            b = 254 - n
+            
+    # Saturation = 1-256 to allow >>8 instead of /255
+    s = wave[wave_s][value_pixel]
+
+    if wave[wave_s][wave_type]:     # triangle wave?
+        if s & 0x80:                # downslope
+            s = (s & 0x7F) << 1
+            s1 = 256 - s
+        else:
+            s <<= 1
+            s1 = 1 + s
+            s = 255 -s
+    else:
+        if s & 0x80:                # square wave
+            s1 = 256                # 100% saturation
+            s = 0
+        else:                       # 0% saturation
+            s1 = 1
+            s = 255
+
+    # Value (brightness) = 1-256 for similar reasons
+    v = wave[wave_v][value_pixel]
+    v1 = (wave[wave_v][wave_type]   # triangle wave?
+    if 
+    
+
+
+            
+
         x = 7
         sum_total = 0
         for i in range(n_leds):             # For each LED along horn...
