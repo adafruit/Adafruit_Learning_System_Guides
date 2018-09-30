@@ -13,18 +13,18 @@ Dependencies:
         (https://github.com/adafruit/Adafruit_Blinka)
     - Adafruit_CircuitPython_SI7021
         (https://github.com/adafruit/Adafruit_CircuitPython_SI7021)
-    - RPi WS281x Python
-        (https://github.com/rpi-ws281x/)
+    - Adafruit_CircuitPython_NeoPixel
+        (https://github.com/adafruit/Adafruit_CircuitPython_NeoPixel)
 """
 # Import standard python modules
 import time
 
 # import Adafruit IO REST client
-from Adafruit_IO import Client, Feed, RequestError
+from Adafruit_IO import Client
 
 # import Adafruit Blinka
 from busio import I2C
-from board import SCL, SDA
+from board import SCL, SDA, D18
 
 # import Adafruit_CircuitPython_Si7021 Library
 import adafruit_si7021
@@ -32,24 +32,13 @@ import adafruit_si7021
 # import neopixel library
 import neopixel
 
-# while True loop delay, in seconds
+# `while True` loop delay, in seconds
 DELAY_TIME = 5
 
-# LED strip configuration:
-STRIP_LED_COUNT = 34      # Number of LED pixels on the NeoPixel Strip
-JEWEL_PIXEL_COUNT = 7       # Number of LED pixels on the NeoPixel Jewel
-LED_PIN = 18      # GPIO pin connected to the pixels (18 uses PWM!).
-LED_FREQ_HZ = 800000  # LED signal frequency in hertz (usually 800khz)
-LED_DMA = 10      # DMA channel to use for generating signal (try 10)
-LED_BRIGHTNESS = 255     # Set to 0 for darkest and 255 for brightest
-LED_INVERT = False   # True to invert the signal (when using NPN transistor level shift)
-LED_CHANNEL = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
-
-# Create NeoPixel object with appropriate configuration.
-strip = neopixel.Adafruit_NeoPixel(STRIP_LED_COUNT, LED_PIN, LED_FREQ_HZ,
-                                   LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
-# Intialize the library (must be called once before other functions).
-strip.begin()
+# number of LED pixels on the NeoPixel Strip
+STRIP_LED_COUNT = 34
+# number of LED pixels on the NeoPixel Jewel
+JEWEL_PIXEL_COUNT = 7
 
 # Set to your Adafruit IO key.
 # Remember, your key is a secret,
@@ -64,22 +53,21 @@ ADAFRUIT_IO_USERNAME = 'YOUR_IO_USERNAME'
 aio = Client(ADAFRUIT_IO_USERNAME, ADAFRUIT_IO_KEY)
 
 # set up Adafruit IO feeds
-try:
-    temperature = aio.feeds('temperature')
-    humidity = aio.feeds('humidity')
-    outdoor_lights = aio.feeds('outdoor-lights')
-    indoor_lights = aio.feeds('indoor-lights')
-except RequestError:
-    temperature = aio.create_feed(Feed(name='temperature'))
-    humidity = aio.create_feed(Feed(name='humidity'))
-    outdoor_lights = aio.create_feed(Feed(name='outdoor-lights'))
-    indoor_lights = aio.create_feed(Feed(name='indoor-lights'))
+temperature = aio.feeds('temperature')
+humidity = aio.feeds('humidity')
+outdoor_lights = aio.feeds('outdoor-lights')
+indoor_lights = aio.feeds('indoor-lights')
 
 # create an i2c interface object
 i2c = I2C(SCL, SDA)
 
 # instanciate the sensor object
 sensor = adafruit_si7021.SI7021(i2c)
+
+# set up the NeoPixel strip
+pixels = neopixel.NeoPixel(D18, STRIP_LED_COUNT)
+pixels.fill((0,0,0))
+pixels.show()
 
 print('Adafruit IO Home: Lights and Climate Control')
 
@@ -104,8 +92,8 @@ while True:
 
     # set the jewel's color
     for i in range(JEWEL_PIXEL_COUNT):
-        strip.setPixelColorRGB(i, green, red, blue)
-        strip.show()
+        pixels[i] = (red, green, blue)
+        pixels.show()
 
     # get the outdoor light color picker feed
     outdoor_light_data = aio.receive(outdoor_lights.key)
@@ -118,8 +106,8 @@ while True:
 
     # set the strip color
     for j in range(JEWEL_PIXEL_COUNT, STRIP_LED_COUNT + JEWEL_PIXEL_COUNT):
-        strip.setPixelColorRGB(j, green, red, blue)
-        strip.show()
+        pixels[j] = (red, green, blue)
+        pixels.show()
 
     # delay the loop to avoid timeout from Adafruit IO.
     time.sleep(DELAY_TIME)
