@@ -158,54 +158,26 @@ while True:
 
     # Value (brightness) = 1-256 for similar reasons
     v = wave[wave_v][value_pixel]
-    v1 = (wave[wave_v][wave_type]   # triangle wave?
-    if 
-    
 
+    # value (brightness) = 1-256 for similar reasons
+    if wave[wave_v][wave_type]:     # triangle wave?
+        if v & 0x80:                # downslope
+            v1 = 64 - ((v & 0x7F) << 1)
+        else:                       # upslope
+            v1 = 1 + (v << 1)
+    else:
+        if v & 0x80:                # square wave; on/off
+            v1 = 256
+        else:
+            v1 = 1
 
-            
-
-        x = 7
-        sum_total = 0
-        for i in range(n_leds):             # For each LED along horn...
-            x += 16
-            for w in range(n_waves):        # For each wave of horn...
-                if (x < wave[h][w][lower]) or (x > wave[h][w][upper]):
-                    continue                # Out of range
-                if x <= wave[h][w][mid]:    # Lower half of wave (ramping up peak brightness)
-                    sum_top = wave[h][w][intensity] * (x - wave[h][w][lower])
-                    sum_bottom = (wave[h][w][mid] - wave[h][w][lower])
-                    sum_total += sum_top /  sum_bottom
-                else:                       # Upper half of wave (ramping down from peak)
-                    sum_top = wave[h][w][intensity] * (wave[h][w][upper] - x)
-                    sum_bottom = (wave[h][w][upper] - wave[h][w][mid])
-                    sum_total += sum_top / sum_bottom
-
-            sum_total = int(sum_total)          # convert from decimal to whole number
-
-            # Now the magnitude (sum_total) is remapped to color for the LEDs.
-            # A blackbody palette is used - fades white-yellow-red-black.
-            if sum_total < 255:                 # 0-254 = black to red-1
-                r = gamma[sum_total]
-                g = b = 0
-            elif sum_total < 510:               # 255-509 = red to yellow-1
-                r = 255
-                g = gamma[sum_total - 255]
-                b = 0
-            elif sum_total < 765:               # 510-764 = yellow to white-1
-                r = g = 255
-                b = gamma[sum_total - 510]
-            else:                               # 765+ = white
-                r = g = b = 255
-            pixels[i] = (r, g, b)
-
-    for w in range(n_waves):                    # Update wave positions for each horn
-        wave[h][w][lower] += wave[h][w][vlower] # Advance lower position
-        if wave[h][w][lower] >= (n_leds * 16):  # Off end of strip?
-            random_wave(h, w)                   # Yes, 'reboot' wave
-        else:                                   # No, adjust other values...
-            wave[h][w][upper] += wave[h][w][vupper]
-            wave[h][w][mid] = (wave[h][w][lower] + wave[h][w][upper]) / 2
-            wave[h][w][intensity] = (wave[h][w][intensity] * fade) / 256 # Dimmer
+    gamma[((((r * s1) >> 8) + s) * v1) >> 8]
+    gamma[((((g * s1) >> 8) + s) * v1) >> 8]
+    gamma[((((b * s1) >> 8) + s) * v1) >> 8]
+    pixels[i] = (r, g, b)
+        
+    # update wave values along length of strip (values may wrap, is OK!)
+    for w in range(3):
+        wave[w][value_pixel] += wave[w][inc_pixel]
 
     pixels.show()
