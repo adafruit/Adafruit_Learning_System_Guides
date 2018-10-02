@@ -21,7 +21,7 @@ led = digitalio.DigitalInOut(LED_PIN)
 led.direction = digitalio.Direction.OUTPUT
 # Setup servo
 # servo = pulseio.PWMOut(board.D4, frequency=50)
-pwm = pulseio.PWMOut(board.D4, duty_cycle=2 ** 15, frequency=50)
+pwm = pulseio.PWMOut(board.D4)
 servo = servo.Servo(pwm)
 
 # Setup cap touch button
@@ -39,10 +39,11 @@ def play_wave():
     wave_file = open("hiss01.wav", "rb")  # open a wav file
     wave = audioio.WaveFile(wave_file)
     audio.play(wave)  # play the wave file
+    led.value = True
+    servo_release()
+    print('Motion detected!')
     while audio.playing:  # turn on LED, turn servo
-        led.value = True
-        servo_release()
-        print('Motion detected!')
+        pass
     wave_file.close()  # close the wav file
 # Setup audio out pin
 audio = audioio.AudioOut(board.A0)
