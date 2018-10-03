@@ -2,7 +2,6 @@ import time
 
 import board
 import pulseio
-from digitalio import DigitalInOut, Direction
 
 # PWM (fading) LEDs are connected on D0, D2 (PWM not avail on D1)
 pwm_leds = board.D2
@@ -19,7 +18,7 @@ while True:
 
     # And send to LED as PWM level
     pwm.duty_cycle = brightness
-    pwm2.duty_cycle = brightness    
+    pwm2.duty_cycle = brightness
 
     # change the brightness for next time through the loop:
     brightness = brightness + fade_amount
