@@ -10,13 +10,9 @@
 
 import board
 import neopixel
+import random
 from analogio import AnalogIn
 # pylint: disable=global-statement
-
-try:
-    import urandom as random
-except ImportError:
-    import random
 
 n_leds = 29             # number of LEDs per horn
 led_pin = board.D0      # which pin your pixels are connected to
@@ -48,7 +44,7 @@ gamma = [
 ]
 
 # initialize 3D list
-wave = [[0] * 5] * 3, [[0] * 5] * 3, [[0] * 5] * 3
+wave = [0] * 5, [0] * 5, [0] * 5
 
 wave_type = 0   # 0 = square wave, 1 = triangle wave
 value_frame = 1 # start-of-frame value
@@ -71,8 +67,8 @@ pin.deinit()
 def nz_random():
     random_number = 0
 
-    while random_numer <= 0:
-        random_number = random(0,15) - 7
+    while random_number <= 0:
+        random_number = random.randint(0,15) - 7
 
     return random_number
 
@@ -81,10 +77,10 @@ while True:
     w = i = n = s = v = r = g = b = v1 = s1 = 0
 
     if count <= 0:                              # time for new animation
-        count = 250 + random(0,250)             # effect run for 5-10 sec.
+        count = 250 + random.randint(0,250)             # effect run for 5-10 sec.
 
         for w in range(3):                      # three waves (H,S,V)
-            wave[w][wave_type] = random(0,2)    # square vs triangle
+            wave[w][wave_type] = random.randint(0,2)    # square vs triangle
             wave[w][inc_frame] = nz_random()    # frame increment
             wave[w][inc_pixel] = nz_random()    # pixel increment
             wave[w][value_pixel] = wave[w][value_frame]
@@ -100,11 +96,11 @@ while True:
 
     # Render current animation frame.  COGNITIVE HAZARD: fixed point math.
 
-    for i in range(n_leds):                     # for each LED along strip...
+    for i in range(n_leds):                             # for each LED along strip...
         # Coarse (8-bit) HSV-to-RGB conversion, hue first:
-        n = (wave[wave_h][value_pixel] % 43) * 6    # angle within sextant
+        n = (wave[wave_h][value_pixel] % 43) * 6   # angle within sextant
 
-        sextant = wave[wave_h][value_pixel] / 43    # sextant number 0-5
+        sextant = wave[wave_h][value_pixel] / 43        # sextant number 0-5
 
         # R to Y
         if sextant == 0:
@@ -171,7 +167,9 @@ while True:
         else:
             v1 = 1
 
+    print(((((r * s1) >> 8) + s) * v1) >> 8)
     gamma[((((r * s1) >> 8) + s) * v1) >> 8]
+    print(((((g * s1) >> 8) + s) * v1) >> 8)
     gamma[((((g * s1) >> 8) + s) * v1) >> 8]
     gamma[((((b * s1) >> 8) + s) * v1) >> 8]
     pixels[i] = (r, g, b)
