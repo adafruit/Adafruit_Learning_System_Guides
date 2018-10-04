@@ -8,10 +8,9 @@
 # selected every few seconds.  Hue is always linear, but other parameters
 # are similarly randomized.
 
+import random
 import board
 import neopixel
-import random
-import time
 from analogio import AnalogIn
 
 n_leds = 29             # number of LEDs per horn
@@ -54,7 +53,7 @@ inc_pixel = 4   # pixel-to-pixel inc
 
 wave_h = 0      # hue
 wave_s = 1      # saturation
-wave_v = 2      # brightness 
+wave_v = 2      # brightness
 
 # Random number generator is seeded from an unused 'floating'
 # analog input - this helps ensure the random color choices
@@ -87,8 +86,8 @@ while True:
 
         wave[wave_s][inc_pixel] *= 16               # make saturation & value
         wave[wave_v][inc_pixel] *= 16               # blinkier along strip
-                
-    else:                                           # continue animation 
+
+    else:                                           # continue animation
         count -= 1
         for w in range(3):
             wave[w][value_frame] += wave[w][inc_frame]
@@ -131,7 +130,7 @@ while True:
             r = 255
             g = 0
             b = 254 - n
-            
+
         # Saturation = 1-256 to allow >>8 instead of /255
         s = wave[wave_s][value_pixel]
 
@@ -182,7 +181,7 @@ while True:
             b = gamma[gb]
 
         pixels[i] = (r, g, b)
-        
+
         # update wave values along length of strip (values may wrap, is OK!)
         for w in range(3):
             wave[w][value_pixel] += wave[w][inc_pixel]
