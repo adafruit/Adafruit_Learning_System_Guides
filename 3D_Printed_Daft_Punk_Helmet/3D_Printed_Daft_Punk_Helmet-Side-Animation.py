@@ -13,7 +13,6 @@ import neopixel
 import random
 import time
 from analogio import AnalogIn
-# pylint: disable=global-statement
 
 n_leds = 29             # number of LEDs per horn
 led_pin = board.D0      # which pin your pixels are connected to
@@ -77,26 +76,25 @@ while True:
 
     w = i = n = s = v = r = g = b = v1 = s1 = 0
 
-    if count <= 0:                              # time for new animation
-        count = 250 + random.randint(0,250)             # effect run for 5-10 sec.
+    if count <= 0:                                  # time for new animation
+        count = 250 + random.randint(0,250)         # effect run for 5-10 sec.
 
-        for w in range(3):                      # three waves (H,S,V)
-            wave[w][wave_type] = random.randint(0,2)    # square vs triangle
-            wave[w][inc_frame] = nz_random()    # frame increment
-            wave[w][inc_pixel] = nz_random()    # pixel increment
+        for w in range(3):                          # three waves (H,S,V)
+            wave[w][wave_type] = random.randint(0,2)# square vs triangle
+            wave[w][inc_frame] = nz_random()        # frame increment
+            wave[w][inc_pixel] = nz_random()        # pixel increment
             wave[w][value_pixel] = wave[w][value_frame]
 
-        wave[wave_s][inc_pixel] *= 16           # make saturation & value
-        wave[wave_v][inc_pixel] *= 16           # blinkier along strip
+        wave[wave_s][inc_pixel] *= 16               # make saturation & value
+        wave[wave_v][inc_pixel] *= 16               # blinkier along strip
                 
-    else:                                       # continue animation 
+    else:                                           # continue animation 
         count -= 1
         for w in range(3):
             wave[w][value_frame] += wave[w][inc_frame]
             wave[w][value_pixel] = wave[w][value_frame]
 
     # Render current animation frame.  COGNITIVE HAZARD: fixed point math.
-
     for i in range(n_leds):                             # for each LED along strip...
         # Coarse (8-bit) HSV-to-RGB conversion, hue first:
         n = (wave[wave_h][value_pixel] % 43) * 6   # angle within sextant
@@ -134,59 +132,59 @@ while True:
             g = 0
             b = 254 - n
             
-    # Saturation = 1-256 to allow >>8 instead of /255
-    s = wave[wave_s][value_pixel]
+        # Saturation = 1-256 to allow >>8 instead of /255
+        s = wave[wave_s][value_pixel]
 
-    if wave[wave_s][wave_type]:     # triangle wave?
-        if s & 0x80:                # downslope
-            s = (s & 0x7F) << 1
-            s1 = 256 - s
-        else:                       # upslope
-            s = s<<1
-            s1 = 1 + s
-            s = 255 - s
-    else:
-        if s & 0x80:                # square wave
-            s1 = 256                # 100% saturation
-            s = 0
-        else:                       # 0% saturation
-            s1 = 1
-            s = 255
-
-    # Value (brightness) = 1-256 for similar reasons
-    v = wave[wave_v][value_pixel]
-
-    # value (brightness) = 1-256 for similar reasons
-    if wave[wave_v][wave_type]:     # triangle wave?
-        if v & 0x80:                # downslope
-            v1 = 64 - ((v & 0x7F) << 1)
-        else:                       # upslope
-            v1 = 1 + (v << 1)
-    else:
-        if v & 0x80:                # square wave; on/off
-            v1 = 256
+        if wave[wave_s][wave_type]:     # triangle wave?
+            if s & 0x80:                # downslope
+                s = (s & 0x7F) << 1
+                s1 = 256 - s
+            else:                       # upslope
+                s = s<<1
+                s1 = 1 + s
+                s = 255 - s
         else:
-            v1 = 1
+            if s & 0x80:                # square wave
+                s1 = 256                # 100% saturation
+                s = 0
+            else:                       # 0% saturation
+                s1 = 1
+                s = 255
 
-    # gamma rgb values
-    gr = ((((r * s1) >> 8) + s) * v1) >> 8
-    gg = ((((g * s1) >> 8) + s) * v1) >> 8
-    gb = ((((b * s1) >> 8) + s) * v1) >> 8
+        # Value (brightness) = 1-256 for similar reasons
+        v = wave[wave_v][value_pixel]
 
-    # gamma rgb indices range check
-    if -256 < gr < 256:
-        r = gamma[gr]
+        # value (brightness) = 1-256 for similar reasons
+        if wave[wave_v][wave_type]:     # triangle wave?
+            if v & 0x80:                # downslope
+                v1 = 64 - ((v & 0x7F) << 1)
+            else:                       # upslope
+                v1 = 1 + (v << 1)
+        else:
+            if v & 0x80:                # square wave; on/off
+                v1 = 256
+            else:
+                v1 = 1
 
-    if -256 < gg < 256:
-        g = gamma[gg]
+        # gamma rgb values
+        gr = ((((r * s1) >> 8) + s) * v1) >> 8
+        gg = ((((g * s1) >> 8) + s) * v1) >> 8
+        gb = ((((b * s1) >> 8) + s) * v1) >> 8
 
-    if -256 < gb < 256:
-        b = gamma[gb]
+        # gamma rgb indices range check
+        if -256 < gr < 256:
+            r = gamma[gr]
 
-    pixels[i] = (r, g, b)
+        if -256 < gg < 256:
+            g = gamma[gg]
+
+        if -256 < gb < 256:
+            b = gamma[gb]
+
+        pixels[i] = (r, g, b)
         
-    # update wave values along length of strip (values may wrap, is OK!)
-    for w in range(3):
-        wave[w][value_pixel] += wave[w][inc_pixel]
+        # update wave values along length of strip (values may wrap, is OK!)
+        for w in range(3):
+            wave[w][value_pixel] += wave[w][inc_pixel]
 
     pixels.show()
