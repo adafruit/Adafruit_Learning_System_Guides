@@ -11,6 +11,7 @@
 import board
 import neopixel
 import random
+import time
 from analogio import AnalogIn
 # pylint: disable=global-statement
 
@@ -120,7 +121,7 @@ while True:
         # C to B
         elif sextant == 3:
             r = 0
-            g = 254 -n
+            g = 254 - n
             b = 255
         # B to M
         elif sextant == 4:
@@ -140,10 +141,10 @@ while True:
         if s & 0x80:                # downslope
             s = (s & 0x7F) << 1
             s1 = 256 - s
-        else:
-            s <<= 1
+        else:                       # upslope
+            s = s<<1
             s1 = 1 + s
-            s = 255 -s
+            s = 255 - s
     else:
         if s & 0x80:                # square wave
             s1 = 256                # 100% saturation
@@ -167,11 +168,21 @@ while True:
         else:
             v1 = 1
 
-    print(((((r * s1) >> 8) + s) * v1) >> 8)
-    gamma[((((r * s1) >> 8) + s) * v1) >> 8]
-    print(((((g * s1) >> 8) + s) * v1) >> 8)
-    gamma[((((g * s1) >> 8) + s) * v1) >> 8]
-    gamma[((((b * s1) >> 8) + s) * v1) >> 8]
+    # gamma rgb values
+    gr = ((((r * s1) >> 8) + s) * v1) >> 8
+    gg = ((((g * s1) >> 8) + s) * v1) >> 8
+    gb = ((((b * s1) >> 8) + s) * v1) >> 8
+
+    # gamma rgb indices range check
+    if -256 < gr < 256:
+        r = gamma[gr]
+
+    if -256 < gg < 256:
+        g = gamma[gg]
+
+    if -256 < gb < 256:
+        b = gamma[gb]
+
     pixels[i] = (r, g, b)
         
     # update wave values along length of strip (values may wrap, is OK!)
