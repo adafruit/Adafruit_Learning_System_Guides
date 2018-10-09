@@ -1,7 +1,8 @@
-import time, random
+import time
+import random
 import board
-import digitalio
 from board import SCL, SDA
+import digitalio
 import busio
 from adafruit_neotrellis.neotrellis import NeoTrellis
 
@@ -39,13 +40,13 @@ def blink(event):
     if event.edge == NeoTrellis.EDGE_RISING:
         if button.value:
             trellis.pixels[event.number] = WHITE
-        else:    
-            for i in range(16):
-                trellis.pixels[i] = ANIM_COLOR
+        else:
+            for j in range(16):
+                trellis.pixels[j] = ANIM_COLOR
                 time.sleep(.05)
-                trellis.pixels[i] = OFF
+                trellis.pixels[j] = OFF
                 time.sleep(.05)
-            
+
     # turn the LED off when a rising edge is detected
     elif event.edge == NeoTrellis.EDGE_FALLING:
         trellis.pixels[event.number] = random.choice([RED, YELLOW, GREEN, CYAN, BLUE, PURPLE])
