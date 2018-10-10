@@ -1,0 +1,6 @@
+# Wave shapes
+SINE = 0
+SQUARE = 1
+TRIANGLE = 2
+SAWTOOTH = 3
+NUMBER_OF_SHAPES = 4
