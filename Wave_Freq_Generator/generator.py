@@ -4,6 +4,12 @@ import board
 import audioio
 import shapes
 
+
+def length(frequency):
+    return int(64000 / frequency)
+
+
+
 class Generator:
 
     sample = None
@@ -14,10 +20,6 @@ class Generator:
 
     def __init__(self):
         self.dac = audioio.AudioOut(board.A0)
-
-
-    def length(self, frequency):
-        return int(64000 / frequency)
 
 
     def reallocate(self, frequency):
