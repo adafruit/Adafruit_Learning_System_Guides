@@ -74,8 +74,8 @@ def calibrate(do_the_readings):
     if do_the_readings:
         while time.monotonic() - start_time < 10.0:
             values[0], values[1], _ = compass.magnetic
-            values[1] *= -1                           # since the accel is mounted upside down, y is reversed
-            if values[0] != 0.0 and values[1] != 0.0:   # ignore the random 0 values
+            values[1] *= -1                           # accel is upside down, so y is reversed
+            if values[0] != 0.0 and values[1] != 0.0: # ignore the random 0 values
                 for i in range(2):
                     if values[i] < raw_mins[i]:
                         raw_mins[i] = values[i]
