@@ -17,7 +17,8 @@ import math
 import array
 import board
 import audiobusio
-import simpleio
+import pulseio
+from adafruit_motor import servo
 from adafruit_circuitplayground.express import cpx
 
 # Exponential scaling factor.
@@ -30,9 +31,11 @@ NUM_SAMPLES = 90
 
 # the trigger threshhold
 THRESHOLD = 6
+left_pwm = pulseio.PWMOut(board.A1, frequency=50)
+right_pwm = pulseio.PWMOut(board.A2, frequency=50)
 
-left_ear = simpleio.Servo(board.A1)
-right_ear = simpleio.Servo(board.A2)
+left_ear = servo.Servo(left_pwm)
+right_ear = servo.Servo(right_pwm)
 
 cpx.pixels.fill((0, 0, 0))
 left_ear.angle = 0
