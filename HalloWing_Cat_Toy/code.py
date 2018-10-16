@@ -144,7 +144,6 @@ def enter_state(state):
     global current_state, timeout_time, update_time
 #    print("Entering state {0}".format(state))
     current_state = state
-    reset_timeout()
 
     if state == ARMED_STATE:
         timeout_time = 0
