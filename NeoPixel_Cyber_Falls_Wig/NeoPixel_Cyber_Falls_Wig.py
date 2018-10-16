@@ -14,7 +14,7 @@ num_leds = 15       # number of LEDs per strip
 saturation = 255    # 0-255, 0 is pure white, 255 is fully saturated color
 blend = True        # color blending between palette indices
 brightness = 0.5    # half brightness the range is 0.0 - 1.0
-concurrent = 2      # number of LEDs on at a time
+concurrent = 3      # number of LEDs on at a time
 on_time = 0.04      # 40ms
 
 # initialize list with all pixels off
@@ -33,7 +33,7 @@ drop_list = [drop0, drop1, drop2, drop3, drop4]
 def led_drops(strip):
 
     # FancyLED allows for mixing colors with palettes
-    palette = [fancy.CRGB(150, 255, 150),       # lighter green
+    palette = [fancy.CRGB(200, 255, 200),       # lighter green
                 fancy.CRGB(0, 255, 0)]          # full green
 
     for i in range(num_leds):
