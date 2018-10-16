@@ -1,5 +1,5 @@
 """
-HallowWing Interactive Cat Toy
+HalloWing Interactive Cat Toy
 
 Adafruit invests time and resources providing this open source code.
 Please support Adafruit and open source hardware by purchasing
