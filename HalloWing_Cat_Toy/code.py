@@ -162,7 +162,6 @@ def enter_state(state):
     elif state == PLAY_STATE:
         splash.pop()
         show_image(images[2])         # good kitty
-        reset_timeout()
         set_update(2.0, solid)
 
     elif state == TOUCHED_STATE:
@@ -177,6 +176,7 @@ def enter_state(state):
         enter_state(PLAY_STATE)
 
     elif state == ROCKED_STATE:
+        reset_timeout()
         enter_state(PLAY_STATE)
 
 
