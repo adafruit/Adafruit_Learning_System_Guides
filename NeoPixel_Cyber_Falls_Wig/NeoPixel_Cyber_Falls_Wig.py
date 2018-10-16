@@ -5,10 +5,10 @@
 # written for five 15-pixel strands, which are paired up per pin
 # for ten 15-pixel strips total.
 
-import adafruit_fancyled.adafruit_fancyled as fancy
+import time
 import board
 import neopixel
-import time
+import adafruit_fancyled.adafruit_fancyled as fancy
 
 num_leds = 15       # number of LEDs per strip
 saturation = 255    # 0-255, 0 is pure white, 255 is fully saturated color
@@ -18,7 +18,7 @@ concurrent = 3      # number of LEDs on at a time
 on_time = 0.04      # 40ms
 
 # initialize list with all pixels off
-palette = [0] * num_leds
+#palette = [0] * num_leds
 
 # NeoPixel objects with led_pin and number of LEDs
 drop0 = neopixel.NeoPixel(board.D0, num_leds)
@@ -33,8 +33,8 @@ drop_list = [drop0, drop1, drop2, drop3, drop4]
 def led_drops(strip):
 
     # FancyLED allows for mixing colors with palettes
-    palette = [fancy.CRGB(200, 255, 200),       # lighter green
-                fancy.CRGB(0, 255, 0)]          # full green
+    palette = [fancy.CRGB(200, 255, 200),       # lighter (more white) green
+               fancy.CRGB(0, 255, 0)]           # full green
 
     for i in range(num_leds):
         # FancyLED can handle the gamma adjustment, brightness and RGB settings
@@ -53,9 +53,8 @@ def led_drops(strip):
 
         time.sleep(on_time)
 
-    
 while True:
 
     # loop through each neopixel strip in our list
-    for strip in drop_list:
-        led_drops(strip)
+    for drops in drop_list:
+        led_drops(drops)
