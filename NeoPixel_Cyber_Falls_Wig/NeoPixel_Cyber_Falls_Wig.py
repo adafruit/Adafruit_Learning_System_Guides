@@ -15,19 +15,16 @@ saturation = 255    # 0-255, 0 is pure white, 255 is fully saturated color
 blend = True        # color blending between palette indices
 brightness = 0.5    # half brightness the range is 0.0 - 1.0
 concurrent = 3      # number of LEDs on at a time
-on_time = 0.04      # 40ms
+on_time = 0.04      # 0.04 seconds == 40 milliseconds
 
-# initialize list with all pixels off
-#palette = [0] * num_leds
-
-# NeoPixel objects with led_pin and number of LEDs
+# NeoPixel objects using all five Trinket M0 GPIO pins 0-4
 drop0 = neopixel.NeoPixel(board.D0, num_leds)
 drop1 = neopixel.NeoPixel(board.D1, num_leds)
 drop2 = neopixel.NeoPixel(board.D2, num_leds)
 drop3 = neopixel.NeoPixel(board.D3, num_leds)
 drop4 = neopixel.NeoPixel(board.D4, num_leds)
 
-# list of strips
+# list of neopixel strips
 drop_list = [drop0, drop1, drop2, drop3, drop4]
 
 def led_drops(strip):
