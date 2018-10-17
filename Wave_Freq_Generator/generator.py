@@ -20,7 +20,7 @@ import shapes
 
 
 def length(frequency):
-    return int(64000 / frequency)
+    return int(32000 / frequency)
 
 
 
