@@ -1,14 +1,18 @@
+# Trinket Gemma Servo Control
+# for Adafruit M0 boards
+
 import board
-import simpleio
+import pulseio
+from adafruit_motor import servo
 from analogio import AnalogIn
 
 # servo pin for the M0 boards:
-servo = simpleio.Servo(board.A2)
+pwm = pulseio.PWMOut(board.A2, duty_cycle=2 ** 15, frequency=50)
+my_servo = servo.Servo(pwm)
 angle = 0
 
 # potentiometer
 trimpot = AnalogIn(board.A1)  # pot pin for servo control
-
 
 def remap_range(value, left_min, left_max, right_min, right_max):
     # this remaps a value from original (left) range to new (right) range
@@ -25,5 +29,4 @@ def remap_range(value, left_min, left_max, right_min, right_max):
 
 while True:
     angle = remap_range(trimpot.value, 0, 65535, 0, 180)
-    servo.angle = angle
-    # time.sleep(0.05)
+    my_servo.angle = angle
