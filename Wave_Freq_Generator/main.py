@@ -24,7 +24,7 @@ import shapes
 
 
 def change_frequency(frequency, delta):
-    return min(20000, max(10, frequency + delta))
+    return min(20000, max(150, frequency + delta))
 
 
 def change_shape(shape):

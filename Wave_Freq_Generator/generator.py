@@ -20,7 +20,7 @@ import shapes
 
 
 def length(frequency):
-    return int(64000 / frequency)
+    return int(32000 / frequency)
 
 
 
@@ -37,7 +37,7 @@ class Generator:
 
 
     def reallocate(self, frequency):
-        self.sample = array.array("h", [0] * self.length(frequency))
+        self.sample = array.array("h", [0] * length(frequency))
 
 
     def make_sine(self):
