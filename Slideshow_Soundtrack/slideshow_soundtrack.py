@@ -61,3 +61,4 @@ while True:
         slideshow.advance()
         wav_file = basename(slideshow.current_image_name) + ".wav"
         play_file(wav_file)
+        
