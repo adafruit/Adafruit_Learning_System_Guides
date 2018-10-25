@@ -1,7 +1,6 @@
 import time
 import board
 import adafruit_hcsr04
-import neopixel
 from adafruit_circuitplayground.express import cpx
 
 # This line creates the distance sensor as an object.
@@ -28,8 +27,8 @@ while True:
         print("Distance:", handDistance)
     except RuntimeError:
         print("retrying!")
-        pass
         time.sleep(.00001)
+        break
 
     pitch = handDistance*pitchMultiplier
 
