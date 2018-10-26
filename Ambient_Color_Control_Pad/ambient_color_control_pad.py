@@ -47,40 +47,30 @@ WHITE = (100, 100, 100)
 WHITE_WARM = (120, 100, 80)
 WHITE_COOL = (80, 100, 120)
 WHITE_GREEN = (80, 120, 100)
-# dim versions
-RED_ALT = (25, 0, 0)
-YELLOW_ALT = (15, 15, 0)
-YELLOW_GREEN_ALT = (12, 25, 0)
-GREEN_ALT = (0, 25, 0)
-CYAN_ALT = (0, 25, 25)
-LIGHT_BLUE_ALT = (0, 12, 25)
-BLUE_ALT = (0, 0, 25)
-PURPLE_ALT = (18, 0, 25)
-ORANGE_ALT = (25, 8, 0)
-PINK_ALT = (25, 0, 25)
-ROUGE_ALT = (25, 0, 13)
-WHITE_ALT = (10, 10, 10)
+
 
 COLORS = [  # normal button color states
     RED, ORANGE, YELLOW, YELLOW_GREEN,
     GREEN, CYAN, LIGHT_BLUE, BLUE,
     PURPLE, PINK, ROUGE, WHITE,
-    WHITE_WARM, WHITE_COOL, WHITE_GREEN, OFF,
-    # pressed button color states
-    RED_ALT, ORANGE_ALT, YELLOW_ALT, YELLOW_GREEN_ALT,
-    GREEN_ALT, CYAN_ALT, LIGHT_BLUE_ALT, BLUE_ALT,
-    PURPLE_ALT, PINK_ALT, ROUGE_ALT, WHITE_ALT,
-    WHITE_ALT, WHITE_ALT, WHITE_ALT, OFF]
+    WHITE_WARM, WHITE_COOL, WHITE_GREEN, OFF
+]
 
 pixels.fill(COLORS[1])  # turn on the strip
 pixels.show()
+
+
+def dimmed_colors(color_values):
+    (red_value, green_value, blue_value) = color_values
+    return (red_value // 10, green_value // 10, blue_value // 10)
+
 
 # this will be called when button events are received
 def blink(event):
     # turn the LED on when a rising edge is detected
     # do the fade for the NeoPixel strip
     if event.edge == NeoTrellis.EDGE_RISING:
-        trellis.pixels[event.number] = COLORS[event.number+16]
+        trellis.pixels[event.number] = dimmed_colors(COLORS[event.number])
         for fade_i in range(num_pixels):  # fade off
             pixels[fade_i] = (OFF)
             pixels.show()
@@ -95,6 +85,8 @@ def blink(event):
     # turn the LED off when a rising edge is detected
     elif event.edge == NeoTrellis.EDGE_FALLING:
         trellis.pixels[event.number] = COLORS[event.number]
+
+
 # boot up animation
 trellis.pixels.brightness = 0.2
 for i in range(16):
