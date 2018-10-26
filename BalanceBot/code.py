@@ -60,9 +60,9 @@ servo2.throttle = SERVO2_ZERO_ADJUST
 
 
 def adjust(original, op, value):
-    if op == b'=':
+    if op == 61:
         return value
-    elif op == b'+':
+    elif op == 43:
         return original + value
     else:
         return original - value
@@ -81,15 +81,15 @@ def process_command(cmd, kp, ki, kd):
     Returns new constant values (unchanged in the cases of an error)
     """
 
-
-    if cmd[0] == b'?':
+    print(cmd[0])
+    if cmd[0] == 63:
         report(kp, ki, kd)
-    elif cmd[0] not in [b'p', b'i', b'd']:
+    elif cmd[0] not in [112, 105, 100]:
         uart.write("Bad parameter\r\n")
     elif len(cmd) > 1:
         var = cmd[0]
         op = cmd[1]                         # =/+/-
-        if op not in [b'=', b'+', b'-']:
+        if op not in [61, 43, 45]:
             uart.write("Bad operation\r\n")
             return (kp, ki, kd)
 
@@ -100,9 +100,9 @@ def process_command(cmd, kp, ki, kd):
             uart.write("Bad value\r\n")
             return (kp, ki, kd)
 
-        if var == b'p':
+        if var == 112:
             kp = adjust(kp, op, value)
-        elif var == b'i':
+        elif var == 105:
             ki = adjust(ki, op, value)
         else:
             kd = adjust(kd, op, value)
