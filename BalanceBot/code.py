@@ -117,9 +117,9 @@ def limit(x):
     """Limit the argument to the range -1.0 to 1.0"""
     return max([-1.0, min([1.0, x])])
 
-kp = 2.000
-ki = 1.000
-kd = 0.050
+Kp = 2.000
+Ki = 1.000
+Kd = 0.050
 iterm = 0.0
 dterm = 0.0
 
@@ -144,7 +144,7 @@ while True:
             uart.write(ch)
             if ch == b'\r':
                 if cmd_buffer_index > 0:
-                    kp, ki, kd = process_command(cmd_buffer[0:cmd_buffer_index], kp, ki, kd)
+                    Kp, Ki, Kd = process_command(cmd_buffer[0:cmd_buffer_index], Kp, Ki, Kd)
                 cmd_buffer_index = 0
             else:
                 cmd_buffer[cmd_buffer_index] = ch[0]
@@ -191,7 +191,7 @@ while True:
         if delta_time > 0:
             dterm = delta_error / delta_time
 
-        output = limit((kp * error) + (ki * iterm) + (kd * dterm))
+        output = limit((Kp * error) + (Ki * iterm) + (Kd * dterm))
         servo1.throttle = limit(output + SERVO1_ZERO_ADJUST)
         servo2.throttle = limit((-1 * output) + SERVO2_ZERO_ADJUST)
 
