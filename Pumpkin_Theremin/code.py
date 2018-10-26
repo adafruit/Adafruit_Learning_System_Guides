@@ -27,8 +27,7 @@ while True:
         print("Distance:", handDistance)
     except RuntimeError:
         print("retrying!")
-        time.sleep(.00001)
-        break
+    time.sleep(.00001)
 
     pitch = handDistance*pitchMultiplier
 
