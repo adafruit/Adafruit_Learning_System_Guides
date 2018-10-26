@@ -198,4 +198,4 @@ while True:
     previous_error = error
     previous_time = loop_start_time
 
-    time.sleep(SAMPLE_INTERVAL - (time.monotonic() - loop_start_time))
+    time.sleep(max([0.0, SAMPLE_INTERVAL - (time.monotonic() - loop_start_time)]))
