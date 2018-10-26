@@ -68,6 +68,10 @@ def adjust(original, op, value):
         return original - value
 
 
+def report(kp, ki, kd):
+    """Inner function to write the constants to the UART"""
+    uart.write("KP: {0: 0.3f}  KI: {1: 0.3f}  KD: {2: 0.3f}\r\n".format(kp, ki, kd))
+
 # A line was received via the UART, process it
 
 def process_command(cmd, kp, ki, kd):
@@ -77,10 +81,6 @@ def process_command(cmd, kp, ki, kd):
     Returns new constant values (unchanged in the cases of an error)
     """
 
-
-    def report(kp, ki, kd):
-        """Inner function to write the constants to the UART"""
-        uart.write("KP: {0: 0.3f}  KI: {1: 0.3f}  KD: {2: 0.3f}\r\n".format(kp, ki, kd))
 
     if cmd[0] == b'?':
         report(kp, ki, kd)
