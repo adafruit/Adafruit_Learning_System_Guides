@@ -117,9 +117,9 @@ def limit(x):
     """Limit the argument to the range -1.0 to 1.0"""
     return max([-1.0, min([1.0, x])])
 
-Kp = 2.000
-Ki = 1.000
-Kd = 0.050
+Kp = 1.000
+Ki = 0.100
+Kd = 0.000
 iterm = 0.0
 dterm = 0.0
 
