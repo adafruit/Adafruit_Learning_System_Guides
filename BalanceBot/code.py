@@ -60,9 +60,11 @@ servo2.throttle = SERVO2_ZERO_ADJUST
 
 
 def adjust(original, op, value):
-    if op == 61:
+    """Return an adjusted value based on the original, the operation,
+       and the supplied value"""
+    if op == 61:                          # =
         return value
-    elif op == 43:
+    elif op == 43:                        # +
         return original + value
     else:
         return original - value
@@ -82,14 +84,14 @@ def process_command(cmd, kp, ki, kd):
     """
 
     print(cmd[0])
-    if cmd[0] == 63:
+    if cmd[0] == 63:                      # ?
         report(kp, ki, kd)
-    elif cmd[0] not in [112, 105, 100]:
+    elif cmd[0] not in [112, 105, 100]:   # p/i/d
         uart.write("Bad parameter\r\n")
     elif len(cmd) > 1:
         var = cmd[0]
-        op = cmd[1]                         # =/+/-
-        if op not in [61, 43, 45]:
+        op = cmd[1]
+        if op not in [61, 43, 45]:        # =/+/-
             uart.write("Bad operation\r\n")
             return (kp, ki, kd)
 
@@ -100,11 +102,11 @@ def process_command(cmd, kp, ki, kd):
             uart.write("Bad value\r\n")
             return (kp, ki, kd)
 
-        if var == 112:
+        if var == 112:                    # p
             kp = adjust(kp, op, value)
-        elif var == 105:
+        elif var == 105:                  # i
             ki = adjust(ki, op, value)
-        else:
+        else:                             # d
             kd = adjust(kd, op, value)
         report(kp, ki, kd)
     else:
@@ -120,6 +122,7 @@ def limit(x):
 Kp = 1.000
 Ki = 0.100
 Kd = 0.000
+
 iterm = 0.0
 dterm = 0.0
 
@@ -142,7 +145,7 @@ while True:
             uart.write("command too long.. ignored\r\n")
         else:
             uart.write(ch)
-            if ch == b'\r':
+            if ch == 13:                  # \r
                 if cmd_buffer_index > 0:
                     Kp, Ki, Kd = process_command(cmd_buffer[0:cmd_buffer_index], Kp, Ki, Kd)
                 cmd_buffer_index = 0
