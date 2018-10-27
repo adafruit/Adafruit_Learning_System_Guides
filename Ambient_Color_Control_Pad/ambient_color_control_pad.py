@@ -1,9 +1,9 @@
 # Ambient Color Control Pad
 # NeoTrellis to select colors of NeoPixel strip
-# NeoTrellis connected to Feather M4 (need the extra memory) SCL, SDA
+# NeoTrellis connected to Feather M4 (need the extra memory vs. M0) SCL, SDA
 # NeoPixel 120 strip connected to pin D5
 # NeoPixel strip powered over 5V 2A DC wall power supply
-# Latching on/off button RGB connects En to GND, LED to D13
+# On/off button RGB connects En to GND, LED to D13
 
 import time
 import board
@@ -17,8 +17,6 @@ button_LED = DigitalInOut(board.D13)
 button_LED.direction = Direction.OUTPUT
 button_LED.value = True
 
-print("Ambient_Color_Controller.py")
-
 pixel_pin = board.D5
 num_pixels = 120
 
@@ -27,7 +25,7 @@ pixels = neopixel.NeoPixel(pixel_pin, num_pixels, auto_write=False)
 # create the i2c object for the trellis
 i2c_bus = busio.I2C(SCL, SDA)
 
-# create the trellis
+# create the trellis object
 trellis = NeoTrellis(i2c_bus)
 
 # color definitions
@@ -49,7 +47,7 @@ WHITE_COOL = (80, 100, 120)
 WHITE_GREEN = (80, 120, 100)
 
 
-COLORS = [  # normal button color states
+COLORS = [  # pixel colors
     RED, ORANGE, YELLOW, YELLOW_GREEN,
     GREEN, CYAN, LIGHT_BLUE, BLUE,
     PURPLE, PINK, ROUGE, WHITE,
@@ -67,27 +65,26 @@ def dimmed_colors(color_values):
 
 # this will be called when button events are received
 def blink(event):
-    # turn the LED on when a rising edge is detected
-    # do the fade for the NeoPixel strip
+    # turn the trellis LED on when a rising edge is detected
+    # do the chase for the NeoPixel strip
     if event.edge == NeoTrellis.EDGE_RISING:
         trellis.pixels[event.number] = dimmed_colors(COLORS[event.number])
-        for fade_i in range(num_pixels):  # fade off
-            pixels[fade_i] = (OFF)
+        for chase_off in range(num_pixels):  # chase LEDs off
+            pixels[chase_off] = (OFF)
             pixels.show()
             time.sleep(0.005)
-        # for fade_i in range(num_pixels):  #fade up
-        reverse_fade_i = num_pixels - 1
-        while reverse_fade_i >= 0:  # fade backwards
-            pixels[reverse_fade_i] = (COLORS[event.number])
-            reverse_fade_i -= 1
+
+        for chase_on in range(num_pixels - 1, -1, -1):  # chase LEDs on
+            pixels[chase_on] = (COLORS[event.number])
             pixels.show()
             time.sleep(0.03)
-    # turn the LED off when a rising edge is detected
+
+    # turn the trellis LED back to full color when a rising edge is detected
     elif event.edge == NeoTrellis.EDGE_FALLING:
         trellis.pixels[event.number] = COLORS[event.number]
 
 
-# boot up animation
+# boot up animation on trellis
 trellis.pixels.brightness = 0.2
 for i in range(16):
     # activate rising edge events on all keys
@@ -97,15 +94,16 @@ for i in range(16):
     # set all keys to trigger the blink callback
     trellis.callbacks[i] = blink
 
-    # cycle the LEDs on startup
+    # light the trellis LEDs on startup
     trellis.pixels[i] = COLORS[i]
     time.sleep(.05)
 
 print("  Ambient Color Control Pad")
 print("    ---press a button to change the ambient color---")
+
 while True:
 
     # call the sync function call any triggered callbacks
     trellis.sync()
-    # the trellis can only be read every 17 millisecons or so
+    # the trellis can only be read every 17 milliseconds or so
     time.sleep(.02)
