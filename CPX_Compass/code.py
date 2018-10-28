@@ -14,6 +14,7 @@ All text above must be included in any redistribution.
 
 import time
 import math
+import sys
 import board
 import busio
 import adafruit_lsm303
@@ -115,8 +116,7 @@ if not calibrate_button.value or (raw_mins[0] == 1000.0 and raw_mins[1] == 1000.
     print("Update the corresponding lines near the top of the code\n")
     print("raw_mins = [{0}, {1}]".format(raw_mins[0], raw_mins[1]))
     print("raw_maxes = [{0}, {1}]".format(raw_maxes[0], raw_maxes[1]))
-    while True:
-        pass
+    sys.exit()
 else:
     calibrate(False)
 
