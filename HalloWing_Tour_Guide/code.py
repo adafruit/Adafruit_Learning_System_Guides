@@ -108,9 +108,9 @@ while True:
         with open("locations.txt", "r") as f:
             for line in f:
                 f_num, f_lat, f_lon, f_image, f_name, f_detail = line.split(',')
-                f_distance = distance_between((radians(float(f_lat)), radians(float(f_lon))), here)
-                if f_distance < distance:
-                    num, distance, image, name, detail = f_num, f_distance, f_image, f_name, f_detail
+                f_dist = distance_between((radians(float(f_lat)), radians(float(f_lon))), here)
+                if f_dist < distance:
+                    num, distance, image, name, detail = f_num, f_dist, f_image, f_name, f_detail
 
         # categorize the distance
         if distance < 0.1:
@@ -131,7 +131,6 @@ while True:
         # update the display if the location or distance category has changed
         # if it's relly close, show the image and play the details
         if num != previous_num or distance_code != previous_distance_code:
-            # print("{0} {1} {2} {3: 0.2f} {4} {5} {6}".format(num, f_lat, f_lon, distance, image, name, detail))
             play_wave("computerbeep.wav")
             previous_num = num
             previous_distance_code = distance_code
