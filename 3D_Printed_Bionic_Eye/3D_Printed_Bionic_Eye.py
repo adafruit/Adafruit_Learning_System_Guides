@@ -34,16 +34,17 @@ tilt_servo = servo.Servo(tilt_pwm)
 rotate_servo = servo.Servo(rotate_pwm)
 
 # servo timing and angle range
-speed = .04         # 40ms lower value means faster movement
 tilt_min = 120      # lower limit to tilt rotation range
 max_rotate = 180    # rotation range limited to half circle 
 
 while True:
 
     # servo tilt - on average move every 500ms
-    if random.randint(100) > 80:
-        tilt_servo = angle(random.randint(tilt_min, max_rotate))
+    if random.randint(0,100) > 80:
+        tilt_servo.angle = random.randint(tilt_min, max_rotate)
+        time.sleep(.25)
 
     # servo rotate - on average move every 500ms
-    if random.randint(100) > 90:
-        rotate_servo = (random.randint(0, max_rotate)
+    if random.randint(0,100) > 90:
+        rotate_servo.angle = random.randint(0, max_rotate)
+        time.sleep(.25)
