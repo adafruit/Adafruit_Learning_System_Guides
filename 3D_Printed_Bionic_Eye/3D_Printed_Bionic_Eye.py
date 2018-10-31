@@ -1,6 +1,6 @@
 # Bionic Eye sketch for Adafruit Trinket.
 #
-# written by Bill Earl for Arduino 
+# written by Bill Earl for Arduino
 # ported to CircuitPython by Mikey Sklar
 # for Adafruit Industries
 #
@@ -11,9 +11,9 @@
 # in available timer hardware and programming. We simply refresh
 # by piggy-backing on the timer0 millis() counter
 #
-# Trinket:        Bat+    Gnd       Pin #0  Pin #1
+# Trinket:        Bat+    Gnd       Pin #0  Pin #2
 # Connection:     Servo+  Servo-    Tilt    Rotate
-#                 (Red)   (Brown)   Servo   Servo
+#                 (Red)   (Black)   Servo   Servo
 #                                   (Orange)(Orange)
 
 import time
@@ -22,7 +22,7 @@ import board
 import pulseio
 from adafruit_motor import servo
 
-# we are intentionally avoiding Trinket Pin #1 (board.A0) 
+# we are intentionally avoiding Trinket Pin #1 (board.A0)
 # as it does not have PWM capability
 tilt_servo_pin = board.A2   # servo control line (orange) Trinket Pin #0
 rotate_servo_pin = board.A1 # servo control line (orange) Trinket Pin #2
@@ -35,7 +35,7 @@ rotate_servo = servo.Servo(rotate_pwm)
 
 # servo timing and angle range
 tilt_min = 120      # lower limit to tilt rotation range
-max_rotate = 180    # rotation range limited to half circle 
+max_rotate = 180    # rotation range limited to half circle
 
 while True:
 
