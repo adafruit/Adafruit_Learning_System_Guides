@@ -102,7 +102,7 @@ void setup(void)
   }
 
   Serial.begin(115200);
-  Serial.println(F("Adafruit Bluefruit MUNNY Neopixel Color Picker"));
+  Serial.println(F("Adafruit Bluefruit MUNNY LED Color Picker"));
   Serial.println(F("------------------------------------------------"));
 
   /* Initialise the module */
