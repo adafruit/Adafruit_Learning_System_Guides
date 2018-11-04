@@ -7,8 +7,8 @@
 #include <Adafruit_ZeroDMA.h>
 #include "graphics.h"
 
-#define G_SCALE       55.0  // Accel scale; no science, just looks good
-#define ELASTICITY     0.82 // Edge-bounce coefficient (MUST be <1.0!)
+#define G_SCALE       45.0  // Accel scale; no science, just looks good
+#define ELASTICITY     0.86  // Edge-bounce coefficient (MUST be <1.0!)
 #define DRAG           0.98 // Dampens motion slightly
 
 #define EYE_RADIUS    64.0  // Radius of eye, floating-point pixel units
@@ -220,13 +220,10 @@ void loop(void) {
     xNew = ix + rx * mag3;
     yNew = iy + ry * mag3;
 
-    // New velocity magnitude is equal to the distance between the original
-    // position and the intersection point, plus the elasticity-reduced
-    // bounce magnitude.
-    mag2 += mag3;
-    if(mag2 > 24.0) mag2 = 24.0;
-    vxNew = rx * mag2;
-    vyNew = ry * mag2;
+    // Velocity magnitude is scaled by the elasticity coefficient.
+    mag1 *= ELASTICITY;
+    vxNew = rx * mag1;
+    vyNew = ry * mag1;
   }
 
   int x1, y1, x2, y2,            // Bounding rect of screen update area
