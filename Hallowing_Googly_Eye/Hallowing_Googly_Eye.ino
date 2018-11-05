@@ -143,7 +143,7 @@ void loop(void) {
   // Limit velocity to pupil size to avoid certain overshoot situations
   float v = vxNew * vxNew + vyNew * vyNew;
   if(v > (PUPIL_SIZE * PUPIL_SIZE)) {
-    v = 24.0 / sqrt(v);
+    v = PUPIL_SIZE / sqrt(v);
     vxNew *= v;
     vyNew *= v;
   }
