@@ -7,9 +7,9 @@
 #include <Adafruit_ZeroDMA.h>
 #include "graphics.h"
 
-#define G_SCALE       45.0  // Accel scale; no science, just looks good
-#define ELASTICITY     0.86  // Edge-bounce coefficient (MUST be <1.0!)
-#define DRAG           0.98 // Dampens motion slightly
+#define G_SCALE       40.0   // Accel scale; no science, just looks good
+#define ELASTICITY     0.80  // Edge-bounce coefficient (MUST be <1.0!)
+#define DRAG           0.996 // Dampens motion slightly
 
 #define EYE_RADIUS    64.0  // Radius of eye, floating-point pixel units
 #define PUPIL_RADIUS  (PUPIL_SIZE / 2.0)  // Radius of pupil, same units
@@ -64,7 +64,7 @@ void setup(void) {
   analogWriteResolution(8);
 
   if(accel.begin(0x18) || accel.begin(0x19)) {
-    accel.setRange(LIS3DH_RANGE_4_G);
+    accel.setRange(LIS3DH_RANGE_8_G);
   }
 
   // Set up SPI DMA.  While the Hallowing has a known SPI peripheral and
@@ -139,6 +139,14 @@ void loop(void) {
   // values in vxNew, vyNew...a little friction prevents infinite bounce.
   float vxNew = (vx + ax) * DRAG,
         vyNew = (vy + ay) * DRAG;
+
+  // Limit velocity to pupil size to avoid certain overshoot situations
+  float v = vxNew * vxNew + vyNew * vyNew;
+  if(v > (PUPIL_SIZE * PUPIL_SIZE)) {
+    v = 24.0 / sqrt(v);
+    vxNew *= v;
+    vyNew *= v;
+  }
 
   // Add new velocity to prior position, store interim in xNew, yNew;
   float xNew = x + vxNew,
