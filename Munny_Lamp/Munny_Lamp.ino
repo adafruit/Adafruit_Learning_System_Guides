@@ -198,7 +198,7 @@ void accelerometer_check() {
   Serial.print(" \tZ: "); Serial.print(event.acceleration.z);
   Serial.println(" m/s^2 ");
 
-  if (event.acceleration.y >= 0) {
+  if (event.acceleration.y < 0) {
     analogWrite(RED_LED, random(0, 255));
     analogWrite(GREEN_LED, random(0, 255));
     analogWrite(BLUE_LED, random(0, 255));
