@@ -124,20 +124,22 @@ current_press = set()
 last_samplenum = None
 while True:
     pressed = set(trellis.pressed_keys)
+    if pressed:
+        print(pressed)
     for down in pressed - current_press:
         print("Pressed down", down)
         current_press = pressed
-        sample_num = down[0]*8 + down[1]
+        sample_num = down[1]*8 + down[0]
         print(sample_num)
         try:
             filename = SAMPLE_FOLDER+SAMPLES[sample_num][0]
             with open(filename, "rb") as f:
                 wav = audioio.WaveFile(f)
-                trellis.pixels[(down[1], down[0])] = WHITE
+                trellis.pixels[down] = WHITE
                 audio.play(wav)
                 while audio.playing:
                     pass
-                trellis.pixels[(down[1], down[0])] = SAMPLES[sample_num][1]
+                trellis.pixels[down] = SAMPLES[sample_num][1]
         except OSError: 
             pass # File not found! skip to next
     
