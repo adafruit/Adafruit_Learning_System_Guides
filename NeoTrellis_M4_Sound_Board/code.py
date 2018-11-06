@@ -10,38 +10,38 @@ from color_names import *
 SAMPLE_FOLDER = "/samples/"  # the name of the folder containing the samples
 # This soundboard can select up to *32* sound clips! each one has a filename
 # which will be inside the SAMPLE_FOLDER above, and a *color* in a tuple ()
-VOICES = [("01.wav", RED),
-          ("02.wav", ORANGE),
-          ("03.wav", YELLOW),
-          ("04.wav", GREEN),
-          ("05.wav", TEAL),
-          ("06.wav", BLUE),
-          ("07.wav", PURPLE),
-          ("08.wav", PINK),
-          ("09.wav", RED),
-          ("10.wav", ORANGE),
-          ("11.wav", YELLOW),
-          ("12.wav", GREEN),
-          ("13.wav", TEAL),
-          ("14.wav", BLUE),
-          ("15.wav", PURPLE),
-          ("16.wav", PINK),
-          ("17.wav", RED),
-          ("18.wav", ORANGE),
-          ("19.wav", YELLOW),
-          ("20.wav", GREEN),
-          ("21.wav", TEAL),
-          ("22.wav", BLUE),
-          ("23.wav", PURPLE),
-          ("24.wav", PINK),
-          ("25.wav", RED),
-          ("26.wav", ORANGE),
-          ("27.wav", YELLOW),
-          ("28.wav", GREEN),
-          ("29.wav", TEAL),
-          ("30.wav", BLUE),
-          ("31.wav", PURPLE),
-          ("32.wav", PINK)]
+SAMPLES = [("01.wav", RED),
+           ("02.wav", ORANGE),
+           ("03.wav", YELLOW),
+           ("04.wav", GREEN),
+           ("05.wav", TEAL),
+           ("06.wav", BLUE),
+           ("07.wav", PURPLE),
+           ("08.wav", PINK),
+           ("09.wav", RED),
+           ("10.wav", ORANGE),
+           ("11.wav", YELLOW),
+           ("12.wav", GREEN),
+           ("13.wav", TEAL),
+           ("14.wav", BLUE),
+           ("15.wav", PURPLE),
+           ("16.wav", PINK),
+           ("17.wav", RED),
+           ("18.wav", ORANGE),
+           ("19.wav", YELLOW),
+           ("20.wav", GREEN),
+           ("21.wav", TEAL),
+           ("22.wav", BLUE),
+           ("23.wav", PURPLE),
+           ("24.wav", PINK),
+           ("25.wav", RED),
+           ("26.wav", ORANGE),
+           ("27.wav", YELLOW),
+           ("28.wav", GREEN),
+           ("29.wav", TEAL),
+           ("30.wav", BLUE),
+           ("31.wav", PURPLE),
+           ("32.wav", PINK)]
 
 # For the intro, pick any number of colors to make a fancy gradient!
 INTRO_SWIRL = [PINK, TEAL, YELLOW]
@@ -49,7 +49,7 @@ INTRO_SWIRL = [PINK, TEAL, YELLOW]
 SELECTED_COLOR = WHITE
 
 # Our keypad + neopixel driver
-trellis = adafruit_trellism4.TrellisM4Express(rotation=270)
+trellis = adafruit_trellism4.TrellisM4Express(rotation=0)
 
 # Play the welcome wav (if its there)
 with audioio.AudioOut(board.A1, right_channel=board.A0) as audio:
@@ -75,9 +75,11 @@ with audioio.AudioOut(board.A1, right_channel=board.A0) as audio:
         # no biggie, they probably deleted it
         pass
 
-
 # Parse the first file to figure out what format its in
-with open(SAMPLE_FOLDER+VOICES[0][0], "rb") as f:
+channel_count = None
+bits_per_sample = None
+sample_rate = None
+with open(SAMPLE_FOLDER+SAMPLES[0][0], "rb") as f:
     wav = audioio.WaveFile(f)
     print("%d channels, %d bits per sample, %d Hz sample rate " %
           (wav.channel_count, wav.bits_per_sample, wav.sample_rate))
@@ -94,15 +96,49 @@ with open(SAMPLE_FOLDER+VOICES[0][0], "rb") as f:
 # Clear all pixels
 trellis.pixels.fill(0)
 
-current_press = set()
+# Play and turn on all of the buttons
+for i, v in enumerate(SAMPLES):
+    filename = SAMPLE_FOLDER+v[0]
+    try:
+        with open(filename, "rb") as f:
+            wav = audioio.WaveFile(f)
+            print(filename,
+                  "%d channels, %d bits per sample, %d Hz sample rate " %
+                  (wav.channel_count, wav.bits_per_sample, wav.sample_rate))
+            if wav.channel_count != channel_count:
+                pass
+            if wav.bits_per_sample != bits_per_sample:
+                pass
+            if wav.sample_rate != sample_rate:
+                pass
+            trellis.pixels[(i%8, i//8)] = v[1]
+            audio.play(wav)
+            while audio.playing:
+                pass
+    except OSError: 
+        # File not found! skip to next
+        pass
 
+
+current_press = set()
+last_samplenum = None
 while True:
     pressed = set(trellis.pressed_keys)
-    #print(pressed)
     for down in pressed - current_press:
         print("Pressed down", down)
         current_press = pressed
-        button_num = down[0]*8 + down[1] + 1
-        print(button_num)
-
+        sample_num = down[0]*8 + down[1]
+        print(sample_num)
+        try:
+            filename = SAMPLE_FOLDER+SAMPLES[sample_num][0]
+            with open(filename, "rb") as f:
+                wav = audioio.WaveFile(f)
+                trellis.pixels[(down[1], down[0])] = WHITE
+                audio.play(wav)
+                while audio.playing:
+                    pass
+                trellis.pixels[(down[1], down[0])] = SAMPLES[sample_num][1]
+        except OSError: 
+            pass # File not found! skip to next
+    
     time.sleep(0.01)  # a little delay here helps avoid debounce annoyances
