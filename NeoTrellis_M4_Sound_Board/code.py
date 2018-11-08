@@ -7,6 +7,8 @@ import adafruit_trellism4
 import adafruit_adxl34x
 from color_names import *
 
+PLAY_SAMPLES_ON_START = False
+
 SAMPLE_FOLDER = "/samples/"  # the name of the folder containing the samples
 # This soundboard can select up to *32* sound clips! each one has a filename
 # which will be inside the SAMPLE_FOLDER above, and a *color* in a tuple ()
@@ -96,7 +98,7 @@ with open(SAMPLE_FOLDER+SAMPLES[0][0], "rb") as f:
 # Clear all pixels
 trellis.pixels.fill(0)
 
-# Play and turn on all of the buttons
+# turn on maybe play all of the buttons
 for i, v in enumerate(SAMPLES):
     filename = SAMPLE_FOLDER+v[0]
     try:
@@ -112,35 +114,66 @@ for i, v in enumerate(SAMPLES):
             if wav.sample_rate != sample_rate:
                 pass
             trellis.pixels[(i%8, i//8)] = v[1]
-            audio.play(wav)
-            while audio.playing:
-                pass
+            if PLAY_SAMPLES_ON_START:
+                audio.play(wav)
+                while audio.playing:
+                    pass
     except OSError: 
         # File not found! skip to next
         pass
 
+def stop_playing_sample(playback_details):
+    print("playing: ", playback_details)
+    audio.stop()
+    trellis.pixels[playback_details['neopixel_location']] = playback_details['neopixel_color']
+    playback_details['file'].close()
+    playback_details['voice'] = None
 
 current_press = set()
+currently_playing = {'voice' : None}
 last_samplenum = None
 while True:
     pressed = set(trellis.pressed_keys)
-    if pressed:
-        print(pressed)
-    for down in pressed - current_press:
-        print("Pressed down", down)
-        current_press = pressed
+    #if pressed:
+    #    print("Pressed:", pressed)
+
+    just_pressed = pressed - current_press
+    just_released = current_press - pressed
+
+    #if just_pressed:
+    #    print("Just pressed", just_pressed)
+    for down in just_pressed:        
         sample_num = down[1]*8 + down[0]
         print(sample_num)
         try:
             filename = SAMPLE_FOLDER+SAMPLES[sample_num][0]
-            with open(filename, "rb") as f:
-                wav = audioio.WaveFile(f)
-                trellis.pixels[down] = WHITE
-                audio.play(wav)
-                while audio.playing:
-                    pass
-                trellis.pixels[down] = SAMPLES[sample_num][1]
+            f = open(filename, "rb")
+            wav = audioio.WaveFile(f)
+            trellis.pixels[down] = WHITE
+
+            # is something else playing? interrupt it!
+            if currently_playing['voice'] != None:
+                print("Interrupt")
+                stop_playing_sample(currently_playing)
+            
+            audio.play(wav)
+            # voice, neopixel tuple, color, and sample, file handle
+            currently_playing = {
+                'voice': 0,
+                'neopixel_location': down,
+                'neopixel_color': SAMPLES[sample_num][1],
+                'sample_num': sample_num,
+                'file': f}
         except OSError: 
             pass # File not found! skip to next
+
     
+    #if just_released:
+    #    print("Just released:", just_released)
+
+    # check if any samples are done
+    if not audio.playing and currently_playing['voice'] != None:
+        stop_playing_sample(currently_playing)
+
     time.sleep(0.01)  # a little delay here helps avoid debounce annoyances
+    current_press = pressed
