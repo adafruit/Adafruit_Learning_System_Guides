@@ -9,7 +9,7 @@ from color_names import *
 
 PLAY_SAMPLES_ON_START = False
 
-SAMPLE_FOLDER = "/samples/"  # the name of the folder containing the samples
+SAMPLE_FOLDER = "/startrek/"  # the name of the folder containing the samples
 # This soundboard can select up to *32* sound clips! each one has a filename
 # which will be inside the SAMPLE_FOLDER above, and a *color* in a tuple ()
 SAMPLES = [("01.wav", RED),
@@ -65,7 +65,7 @@ with audioio.AudioOut(board.A1, right_channel=board.A0) as audio:
                 palette_index = ((swirl+i) % 32) / 32
                 color = fancy.palette_lookup(INTRO_SWIRL, palette_index)
                 # display it!
-                trellis.pixels[(i//8, i%8)] = color.pack()
+                trellis.pixels[(i%8, i//8)] = color.pack()
             swirl += 1
             time.sleep(0.005)
         f.close()
@@ -149,13 +149,13 @@ while True:
             filename = SAMPLE_FOLDER+SAMPLES[sample_num][0]
             f = open(filename, "rb")
             wav = audioio.WaveFile(f)
-            trellis.pixels[down] = WHITE
-
+            
             # is something else playing? interrupt it!
             if currently_playing['voice'] != None:
                 print("Interrupt")
                 stop_playing_sample(currently_playing)
             
+            trellis.pixels[down] = WHITE
             audio.play(wav)
             # voice, neopixel tuple, color, and sample, file handle
             currently_playing = {
