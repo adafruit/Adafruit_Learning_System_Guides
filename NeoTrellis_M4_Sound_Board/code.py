@@ -1,11 +1,10 @@
 import time
 import board
-import busio
 import audioio
 import adafruit_fancyled.adafruit_fancyled as fancy
 import adafruit_trellism4
-import adafruit_adxl34x
-from color_names import *
+from color_names import * # pylint: disable=wildcard-import,unused-wildcard-import
+
 
 PLAY_SAMPLES_ON_START = False
 
@@ -118,7 +117,7 @@ for i, v in enumerate(SAMPLES):
                 audio.play(wav)
                 while audio.playing:
                     pass
-    except OSError: 
+    except OSError:
         # File not found! skip to next
         pass
 
@@ -142,19 +141,19 @@ while True:
 
     #if just_pressed:
     #    print("Just pressed", just_pressed)
-    for down in just_pressed:        
+    for down in just_pressed:
         sample_num = down[1]*8 + down[0]
         print(sample_num)
         try:
             filename = SAMPLE_FOLDER+SAMPLES[sample_num][0]
             f = open(filename, "rb")
             wav = audioio.WaveFile(f)
-            
+
             # is something else playing? interrupt it!
             if currently_playing['voice'] != None:
                 print("Interrupt")
                 stop_playing_sample(currently_playing)
-            
+
             trellis.pixels[down] = WHITE
             audio.play(wav)
             # voice, neopixel tuple, color, and sample, file handle
@@ -164,10 +163,9 @@ while True:
                 'neopixel_color': SAMPLES[sample_num][1],
                 'sample_num': sample_num,
                 'file': f}
-        except OSError: 
+        except OSError:
             pass # File not found! skip to next
 
-    
     #if just_released:
     #    print("Just released:", just_released)
 
