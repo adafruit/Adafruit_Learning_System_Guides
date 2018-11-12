@@ -14,10 +14,9 @@ All text above must be included in any redistribution.
 import time
 from math import sin, cos, radians, atan2, sqrt
 import board
-from digitalio import DigitalInOut, Direction
+from digitalio import DigitalInOut, Direction, Pull
 import displayio
 import audioio
-import touchio
 from busio import UART
 import adafruit_gps
 
@@ -32,7 +31,9 @@ gps.send_command(b'PMTK314,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0')
 # Set update rate to once a second (1hz) which is what you typically want.
 gps.send_command(b'PMTK220,1000')
 
-touch_1 = touchio.TouchIn(board.TOUCH1)
+switch = DigitalInOut(board.SENSE)
+switch.direction = Direction.INPUT
+switch.pull = Pull.UP
 
 audio = audioio.AudioOut(board.A0)
 
@@ -123,7 +124,7 @@ while True:
             distance_code = 4
 
         # play the name when asked
-        if touch_1.value:
+        if switch.value:
             play_wave(name)
             if previous_distance_code == 1 and distance_code == 1 and previous_num == num:
                 play_wave(detail)
