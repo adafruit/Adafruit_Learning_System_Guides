@@ -92,27 +92,40 @@ num = 0
 image = None
 name = None
 detail = None
+distance = 1000
 
 show_image("welcome.bmp")
 
 # File with place data
 # lat,long,image-file,spoken-name-file,detail-file
 
-while True:
-    gps.update()
-    switch.update()
+locations = []
+with open("locations.txt", "r") as f:
+    for line in f:
+        f_num, f_lat, f_lon, f_image, f_name, f_detail = line.split(',')
+        lat_lon = (radians(float(f_lat)), radians(float(f_lon)))
+        locations.append((int(f_num), lat_lon, f_image, f_name, f_detail))
 
-    if gps.has_fix:
+while True:
+    splash.pop()
+    show_image("acquiring_fix.bmp")
+
+    gps.update()
+    while not gps.has_fix:
+        gps.update()
+
+    while gps.has_fix:
+        gps.update()
+        switch.update()
 
         # find the closest listed location
-        here = (radians(gps.latitude), radians(gps.longitude))
-        distance = 10000
-        with open("locations.txt", "r") as f:
-            for line in f:
-                f_num, f_lat, f_lon, f_image, f_name, f_detail = line.split(',')
-                f_dist = distance_between((radians(float(f_lat)), radians(float(f_lon))), here)
+        if (gps.latitude is not None) and (gps.longitude is not None):
+            here = (radians(gps.latitude), radians(gps.longitude))
+            distance = 10000
+            for loc in locations:
+                f_dist = distance_between(loc[1], here)
                 if f_dist < distance:
-                    num, distance, image, name, detail = f_num, f_dist, f_image, f_name, f_detail
+                    num, distance, image, name, detail = loc[0], f_dist, loc[2], loc[3], loc[4]
 
         # categorize the distance
         if distance < 0.1:
@@ -150,8 +163,3 @@ while True:
             else:
                 splash.pop()
                 show_image("red_circle.bmp")
-    else:
-        splash.pop()
-        show_image("acquiring_fix.bmp")
-
-    time.sleep(0.1)
