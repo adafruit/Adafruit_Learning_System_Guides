@@ -45,7 +45,7 @@ SAMPLES = [("01.wav", RED),
            ("32.wav", PINK)]
 
 # For the intro, pick any number of colors to make a fancy gradient!
-INTRO_SWIRL = [PINK, TEAL, YELLOW]
+INTRO_SWIRL = [RED, GREEN, BLUE]
 # the color for the selected sample
 SELECTED_COLOR = WHITE
 
