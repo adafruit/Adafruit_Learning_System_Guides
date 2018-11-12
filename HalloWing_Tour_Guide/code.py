@@ -19,6 +19,7 @@ import displayio
 import audioio
 from busio import UART
 import adafruit_gps
+from debouncer import Debouncer
 
 uart = UART(board.TX, board.RX, baudrate=9600, timeout=3000)
 gps = adafruit_gps.GPS(uart)
@@ -31,9 +32,7 @@ gps.send_command(b'PMTK314,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0')
 # Set update rate to once a second (1hz) which is what you typically want.
 gps.send_command(b'PMTK220,1000')
 
-switch = DigitalInOut(board.SENSE)
-switch.direction = Direction.INPUT
-switch.pull = Pull.UP
+switch = Debouncer(board.SENSE, Pull.UP, 0.01)
 
 audio = audioio.AudioOut(board.A0)
 
@@ -101,6 +100,8 @@ show_image("welcome.bmp")
 
 while True:
     gps.update()
+    switch.update()
+
     if gps.has_fix:
 
         # find the closest listed location
@@ -124,7 +125,7 @@ while True:
             distance_code = 4
 
         # play the name when asked
-        if not switch.value:
+        if switch.fell:
             play_wave(name)
             if previous_distance_code == 1 and distance_code == 1 and previous_num == num:
                 play_wave(detail)
@@ -153,4 +154,4 @@ while True:
         splash.pop()
         show_image("acquiring_fix.bmp")
 
-    time.sleep(0.25)
+    time.sleep(0.1)
