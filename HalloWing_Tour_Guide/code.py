@@ -124,7 +124,7 @@ while True:
             distance_code = 4
 
         # play the name when asked
-        if switch.value:
+        if not switch.value:
             play_wave(name)
             if previous_distance_code == 1 and distance_code == 1 and previous_num == num:
                 play_wave(detail)
