@@ -154,4 +154,4 @@ while True:
         splash.pop()
         show_image("acquiring_fix.bmp")
 
-    time.sleep(0.25)
+    time.sleep(0.1)
