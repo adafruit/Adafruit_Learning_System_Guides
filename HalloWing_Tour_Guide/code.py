@@ -11,7 +11,6 @@ Licensed under the MIT license.
 
 All text above must be included in any redistribution.
 """
-import time
 from math import sin, cos, radians, atan2, sqrt
 import board
 from digitalio import DigitalInOut, Direction, Pull
