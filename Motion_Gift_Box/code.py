@@ -1,11 +1,11 @@
 import time
+import random
 import audioio
 import board
 import neopixel
-import random
 from adafruit_crickit import crickit
 
-# NeoPixels on the Circuit Playground Express 
+# NeoPixels on the Circuit Playground Express
 pixels = neopixel.NeoPixel(board.NEOPIXEL, 10, brightness=0.3)
 pixels.fill(0)                # Off to start
 
@@ -20,7 +20,7 @@ audio_files = ["evillaugh3.wav", "laugh.wav"]
 # One motor
 motor_1 = crickit.dc_motor_1
 motor_1.throttle = 0             # off to start
-    
+
 while True:
     pixels.fill(0)
     print("Waiting for trigger")
@@ -29,7 +29,7 @@ while True:
     print("PIR triggered")
     pixels.fill((100, 0, 0))    # NeoPixels red
 
-    # Start playing the file (in the background) 
+    # Start playing the file (in the background)
     audio_file = open(random.choice(audio_files), "rb")   # muahaha
     wav = audioio.WaveFile(audio_file)
     speaker.play(wav)
@@ -42,7 +42,7 @@ while True:
         motor_1.throttle = -1        # full speed backward
         time.sleep(0.25 + random.random())  # random delay from 0.25 to 1.25 seconds
     motor_1.throttle = 0        # stop!
-    
+
     # wait for audio to stop
     while speaker.playing:
         pass
