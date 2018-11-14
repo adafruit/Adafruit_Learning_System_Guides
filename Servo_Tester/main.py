@@ -107,13 +107,15 @@ while True:
                 sweep_time = min(5.0, max(1.0, sweep_time + change * 0.1))
             elif mode == 2:
                 min_pulse_index = min(10, max(min_pulse_index + change, 0))
-                test_servo = servo.Servo(pwm, min_pulse=min_pulses[min_pulse_index],
-                                              max_pulse=max_pulses[max_pulse_index])
+                test_servo = servo.Servo(pwm,
+                                         min_pulse=min_pulses[min_pulse_index],
+                                         max_pulse=max_pulses[max_pulse_index])
                 angle = 0
             elif mode == 3:
                 max_pulse_index = min(10, max(max_pulse_index + change, 0))
-                test_servo = servo.Servo(pwm, min_pulse=min_pulses[min_pulse_index],
-                                              max_pulse=max_pulses[max_pulse_index])
+                test_servo = servo.Servo(pwm,
+                                         min_pulse=min_pulses[min_pulse_index],
+                                         max_pulse=max_pulses[max_pulse_index])
                 angle = 180
 
     oled.fill(0)
