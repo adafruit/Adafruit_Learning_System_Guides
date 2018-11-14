@@ -27,7 +27,7 @@ from debouncer import Debouncer
 # Initialize Rotary encoder
 
 button = Debouncer(board.D12, digitalio.Pull.UP, 0.01)
-encoder = rotaryio.IncrementalEncoder(board.D10, board.D11)
+rotary_encoder = rotaryio.IncrementalEncoder(board.D10, board.D11)
 
 #--------------------------------------------------------------------------------
 # Initialize I2C and OLED
@@ -99,7 +99,7 @@ while True:
             angle = 0
 
     else:
-        current_position, change = get_encoder_change(encoder, current_position)
+        current_position, change = get_encoder_change(rotary_encoder, current_position)
         if change != 0:
             if mode == 0:
                 angle = min(180, max(0, angle + change * 5))
