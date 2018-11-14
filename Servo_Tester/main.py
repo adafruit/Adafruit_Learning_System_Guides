@@ -48,7 +48,7 @@ max_pulse_index = 0
 # Initialize servo
 
 pwm = pulseio.PWMOut(board.D5, frequency=50)
-test_servo = servo.Servo(pwm, min_pulse=500, max_pulse=2500)
+test_servo = servo.Servo(pwm, min_pulse=1000, max_pulse=2000)
 test_servo.angle = 0
 
 current_position = None               # current encoder position
