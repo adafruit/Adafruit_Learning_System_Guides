@@ -17,7 +17,7 @@
 
 import time
 import board
-import digitalio 
+import digitalio
 
 # setup for vibration sensor
 motion = digitalio.DigitalInOut(board.D0)
@@ -33,24 +33,24 @@ def chirp():
         play_tone(i,9)
 
 # emphasis ow "me"
-def meow(): 
+def meow():
     play_tone(5100,50)           # "m" (short)
     play_tone(394,180)           # "eee" (long)
     for i in range(990,1022,2): # vary "ooo" down
-        play_tone(i,8) 
+        play_tone(i,8)
     play_tone(5100,40)           # "w" (short)
 
 # cat meow (emphasis on "ow")
-def meow2(): 
+def meow2():
     play_tone(5100,55)          # "m" (short)
     play_tone(394,170)          # "eee" (long)
     time.sleep(0.03)            # wait a tiny bit
     for i in range(990,1022,2): # vary "ooo" down
-        play_tone(i,8) 
+        play_tone(i,8)
     play_tone(5100,40)          # "w" (short)
 
 # dog ruff
-def ruff(): 
+def ruff():
     for i in range(890,910,2):  # "rrr"  (vary down)
         play_tone(i,3)
     play_tone(1664,150)         # "uuu" (hard to do)
@@ -58,11 +58,11 @@ def ruff():
 
 # dog arf
 def arf():
-  play_tone(890,25)             # "a"    (short)
-  for i in range(890,910,2):    # "rrr"  (vary down)
-     play_tone(i,5)
-  play_tone(4545,80)            # intermediate
-  play_tone(12200,70)           # "ff"   (shorter, hard to do)
+    play_tone(890,25)             # "a"    (short)
+    for i in range(890,910,2):    # "rrr"  (vary down)
+        play_tone(i,5)
+    play_tone(4545,80)            # intermediate
+    play_tone(12200,70)           # "ff"   (shorter, hard to do)
 
 def play_tone(tone_value, duration):
     microseconds = 10 ** 6              # duration divider, convert to microseconds
@@ -77,12 +77,14 @@ def play_tone(tone_value, duration):
 # loop forever...
 while True:
 
+    # reverse logic for motion pins
     if not motion.value:
         # bird chirp noise
-        # comment out chirp and uncomment a different line below for other sounds
-        # chirp()                         
+        # comment out chirp and uncomment a different sound below
+        # for more animal noises
+        chirp()
         # meow()
         # meow2()
         # ruff()
-        arf()
+        # arf()
         time.sleep(.5)                  # leave some time to complete rotation
