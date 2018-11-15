@@ -32,6 +32,38 @@ def chirp():
     for i in range(200,180,-1):
         play_tone(i,9)
 
+# emphasis ow "me"
+def meow(): 
+    play_tone(5100,50)           # "m" (short)
+    play_tone(394,180)           # "eee" (long)
+    for i in range(990,1022,2): # vary "ooo" down
+        play_tone(i,8) 
+    play_tone(5100,40)           # "w" (short)
+
+# cat meow (emphasis on "ow")
+def meow2(): 
+    play_tone(5100,55)          # "m" (short)
+    play_tone(394,170)          # "eee" (long)
+    time.sleep(0.03)            # wait a tiny bit
+    for i in range(990,1022,2): # vary "ooo" down
+        play_tone(i,8) 
+    play_tone(5100,40)          # "w" (short)
+
+# dog ruff
+def ruff(): 
+    for i in range(890,910,2):  # "rrr"  (vary down)
+        play_tone(i,3)
+    play_tone(1664,150)         # "uuu" (hard to do)
+    play_tone(12200,70)         # "ff"  (long, hard to do)
+
+# dog arf
+def arf():
+  play_tone(890,25)             # "a"    (short)
+  for i in range(890,910,2):    # "rrr"  (vary down)
+     play_tone(i,5)
+  play_tone(4545,80)            # intermediate
+  play_tone(12200,70)           # "ff"   (shorter, hard to do)
+
 def play_tone(tone_value, duration):
     microseconds = 10 ** 6              # duration divider, convert to microseconds
 
@@ -48,9 +80,9 @@ while True:
     if not motion.value:
         # bird chirp noise
         # comment out chirp and uncomment a different line below for other sounds
-        chirp()                         
+        # chirp()                         
         # meow()
         # meow2()
         # ruff()
-        # arf()
+        arf()
         time.sleep(.5)                  # leave some time to complete rotation
