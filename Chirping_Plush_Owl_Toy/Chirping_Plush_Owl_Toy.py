@@ -10,25 +10,23 @@
 #  by Limor Fried
 #  modified 28 Dec 2012
 #  by Mike Walters
+#  CircuitPython Port 2018
+#  by Mikey Sklar
 #  This example code is in the public domain.
 #  http://www.arduino.cc/en/Tutorial/Debounce
 
 import time
-import analogio
 import board
-from digitalio import DigitalInOut, Direction
+import digitalio 
 
-# setup photocell
-photocell = analogio.AnalogIn(board.A1) # analog #1 same pin as Digital #2
-darkness_min = (2 ** 16) * .05          # light level < 5% means darkness
+# setup for vibration sensor
+motion = digitalio.DigitalInOut(board.D0)
+motion.direction = digitalio.Direction.INPUT
+motion.pull = digitalio.Pull.UP
 
-# setup speaker
-speaker = DigitalInOut(board.D1)
-speaker.direction = Direction.OUTPUT
-
-# setup servo
-servo = simpleio.Servo(board.D0)        # servo motor
-angle = 0
+# setup for speaker output
+speaker = digitalio.DigitalInOut(board.D2)
+speaker.direction = digitalio.Direction.OUTPUT
 
 def chirp():
     for i in range(200,180,-1):
@@ -47,9 +45,12 @@ def play_tone(tone_value, duration):
 # loop forever...
 while True:
 
-    # when photocell goes dark (less than 5%)
-    # turn on audio
-    # rotate stepper
-    if photocell.value < darkness_min:
-        chirp()                         # bird chirp noise
+    if not motion.value:
+        # bird chirp noise
+        # comment out chirp and uncomment a different line below for other sounds
+        chirp()                         
+        # meow()
+        # meow2()
+        # ruff()
+        # arf()
         time.sleep(.5)                  # leave some time to complete rotation
