@@ -131,8 +131,8 @@ def shaken():
     x, y, z = accelerometer.acceleration
     if previous_reading[0] is not None:
         result = (math.fabs(previous_reading[0] - x) > bound and
-                      math.fabs(previous_reading[1] - y) > bound and
-                      math.fabs(previous_reading[2] - z) > bound)
+                  math.fabs(previous_reading[1] - y) > bound and
+                  math.fabs(previous_reading[2] - z) > bound)
     previous_reading = (x, y, z)
     return result
 
