@@ -12,6 +12,8 @@ Licensed under the MIT license.
 All text above must be included in any redistribution.
 """
 
+# pylint: disable=global-statement
+
 import math
 import time
 import random
