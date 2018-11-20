@@ -6,12 +6,12 @@
 #include <Adafruit_ST7735.h>
 #include <Adafruit_ZeroDMA.h>
 #include "graphics.h"
+//#include "gritty.h"
 
 #define G_SCALE       40.0   // Accel scale; no science, just looks good
 #define ELASTICITY     0.80  // Edge-bounce coefficient (MUST be <1.0!)
 #define DRAG           0.996 // Dampens motion slightly
 
-#define EYE_RADIUS    64.0  // Radius of eye, floating-point pixel units
 #define PUPIL_RADIUS  (PUPIL_SIZE / 2.0)  // Radius of pupil, same units
 // Pupil motion is computed as a single point constrained within a circle
 // whose radius is the eye radius minus the pupil radius.
@@ -61,7 +61,6 @@ void setup(void) {
   tft.fillScreen(0);
 
   pinMode(TFT_BACKLIGHT, OUTPUT);
-  analogWriteResolution(8);
 
   if(accel.begin(0x18) || accel.begin(0x19)) {
     accel.setRange(LIS3DH_RANGE_8_G);
@@ -112,7 +111,7 @@ void setup(void) {
     false);             // increment dest addr?
   dma.setCallback(dma_callback);
 
-  analogWrite(TFT_BACKLIGHT, 255);
+  digitalWrite(TFT_BACKLIGHT, HIGH);
   lastTime = micros();
 }
 
@@ -234,11 +233,11 @@ void loop(void) {
     vyNew = ry * mag1;
   }
 
-  int x1, y1, x2, y2,            // Bounding rect of screen update area
-      px1 = 64 + (int)xNew - 24, // Bounding rect of new pupil pos. only
-      px2 = 64 + (int)xNew + 23,
-      py1 = 64 - (int)yNew - 24,
-      py2 = 64 - (int)yNew + 23;
+  int x1, y1, x2, y2,                        // Bounding rect of screen update area
+      px1 = 64 + (int)xNew - PUPIL_SIZE / 2, // Bounding rect of new pupil pos. only
+      px2 = 64 + (int)xNew + PUPIL_SIZE / 2 - 1,
+      py1 = 64 - (int)yNew - PUPIL_SIZE / 2,
+      py2 = 64 - (int)yNew + PUPIL_SIZE / 2 - 1;
 
   if(firstFrame) {
     x1 = y1 = 0;
@@ -246,18 +245,18 @@ void loop(void) {
     firstFrame = false;
   } else {
     if(xNew >= x) { // Moving right
-      x1 = 64 + (int)x    - 24;
-      x2 = 64 + (int)xNew + 23;
+      x1 = 64 + (int)x    - PUPIL_SIZE / 2;
+      x2 = 64 + (int)xNew + PUPIL_SIZE / 2 - 1;
     } else {       // Moving left
-      x1 = 64 + (int)xNew - 24;
-      x2 = 64 + (int)x    + 23;
+      x1 = 64 + (int)xNew - PUPIL_SIZE / 2;
+      x2 = 64 + (int)x    + PUPIL_SIZE / 2 - 1;
     }
     if(yNew >= y) { // Moving up (still using +Y Cartesian coords)
-      y1 = 64 - (int)yNew - 24;
-      y2 = 64 - (int)y    + 23;
+      y1 = 64 - (int)yNew - PUPIL_SIZE / 2;
+      y2 = 64 - (int)y    + PUPIL_SIZE / 2 - 1;
     } else {        // Moving down
-      y1 = 64 - (int)y    - 24;
-      y2 = 64 - (int)yNew + 23;
+      y1 = 64 - (int)y    - PUPIL_SIZE / 2;
+      y2 = 64 - (int)yNew + PUPIL_SIZE / 2 - 1;
     }
   }
 
@@ -280,14 +279,73 @@ void loop(void) {
   digitalWrite(TFT_DC, HIGH);        // Data mode...
 
   uint16_t *dmaPtr;   // Pointer into DMA output buffer (16 bits/pixel)
-  uint8_t  *srcPtr1,  // Pointer into eye background bitmap (8bpp)
-           *srcPtr2,  // Pointer into pupil bitmap (8bpp)
-            b,        // Resulting pixel brightness (0-255)
-            col, row; // X,Y pixel counters
+  uint8_t   col, row; // X,Y pixel counters
   uint16_t  result,   // Expanded 16-bit pixel color
             nBytes;   // Size of DMA transfer
 
   descriptor->BTCNT.reg = nBytes = (x2 - x1 + 1) * 2;
+
+#ifdef COLOR_EYE
+  uint16_t *srcPtr1,    // Pointer into eye background bitmap (16bpp)
+           *srcPtr2,    // Pointer into pupil bitmap (16bpp)
+            rgb1, rgb2; // Colors of above
+  uint8_t   red1, green1, blue1, // Color components
+            red2, green2, blue2;
+
+  // Process rows ABOVE pupil
+  for(row=y1; row<py1; row++) {
+    dmaPtr  = &dmaBuf[dmaIdx][0];
+    srcPtr1 = (uint16_t *)&borderData[row][x1];
+    for(col=x1; col<=x2; col++) {
+      *dmaPtr++ = __builtin_bswap16(*srcPtr1++);
+    }
+    dmaXfer(nBytes);
+  }
+
+  // Process rows WITH pupil
+  for(; row<=py2; row++) {
+    dmaPtr  = &dmaBuf[dmaIdx][0];                 // Output to start of DMA buf
+    srcPtr1 = (uint16_t *)&borderData[row][x1];   // Initial byte of eye border
+    srcPtr2 = (uint16_t *)&pupilData[row-py1][0]; // Initial byte of pupil
+    for(col=x1; col<px1; col++) {                 // LEFT of pupil
+      *dmaPtr++ = __builtin_bswap16(*srcPtr1++);
+    }
+    for(; col<=px2; col++) {      // Overlap pupil
+      rgb1   = *srcPtr1++;
+      rgb2   = *srcPtr2++;
+      red1   =  rgb1 >> 11;          // 5 bits red
+      green1 = (rgb1 >> 5) & 0x3F;   // 6 bits green
+      blue1  =  rgb1       & 0x1F;   // 5 bits blue
+      red2   =  rgb2 >> 11;
+      green2 = (rgb2 >> 5) & 0x3F;
+      blue2  =  rgb2       & 0x1F;
+      red1   = (red1   * (red2   + 1)) / 32; // Multiply each
+      green1 = (green1 * (green2 + 1)) / 64;
+      blue1  = (blue1  * (blue2  + 1)) / 32;
+      rgb1   = ((uint16_t)red1 << 11) | ((uint16_t)green1 << 5) | blue1;
+      *dmaPtr++ = __builtin_bswap16(rgb1);
+    }
+    for(; col<=x2; col++) {       // RIGHT of pupil
+      *dmaPtr++ = __builtin_bswap16(*srcPtr1++);
+    }
+    dmaXfer(nBytes);
+  }
+
+  // Process rows BELOW pupil
+  for(; row<=y2; row++) {
+    dmaPtr  = &dmaBuf[dmaIdx][0];
+    srcPtr1 = (uint16_t *)&borderData[row][x1];
+    for(col=x1; col<=x2; col++) {
+      *dmaPtr++ = __builtin_bswap16(*srcPtr1++);
+    }
+    dmaXfer(nBytes);
+  }
+
+#else // Grayscale eye
+
+  uint8_t  *srcPtr1,  // Pointer into eye background bitmap (8bpp)
+           *srcPtr2,  // Pointer into pupil bitmap (8bpp)
+            b;        // Resulting pixel brightness (0-255)
 
   // Macro converts 8-bit grayscale to 16-bit '565' RGB value
   #define STORE565(x)                                            \
@@ -297,7 +355,7 @@ void loop(void) {
   // Process rows ABOVE pupil
   for(row=y1; row<py1; row++) {
     dmaPtr  = &dmaBuf[dmaIdx][0];
-    srcPtr1 = &borderData[row][x1];
+    srcPtr1 = (uint8_t *)&borderData[row][x1];
     for(col=x1; col<=x2; col++) {
       b = *srcPtr1++;
       STORE565(b)
@@ -307,10 +365,10 @@ void loop(void) {
 
   // Process rows WITH pupil
   for(; row<=py2; row++) {
-    dmaPtr  = &dmaBuf[dmaIdx][0];     // Output to start of DMA buf
-    srcPtr1 = &borderData[row][x1];   // Initial byte of eye border
-    srcPtr2 = &pupilData[row-py1][0]; // Initial byte of pupil
-    for(col=x1; col<px1; col++) { // LEFT of pupil
+    dmaPtr  = &dmaBuf[dmaIdx][0];                // Output to start of DMA buf
+    srcPtr1 = (uint8_t *)&borderData[row][x1];   // Initial byte of eye border
+    srcPtr2 = (uint8_t *)&pupilData[row-py1][0]; // Initial byte of pupil
+    for(col=x1; col<px1; col++) {                // LEFT of pupil
       b = *srcPtr1++;
       STORE565(b)
     }
@@ -328,13 +386,15 @@ void loop(void) {
   // Process rows BELOW pupil
   for(; row<=y2; row++) {
     dmaPtr  = &dmaBuf[dmaIdx][0];
-    srcPtr1 = &borderData[row][x1];
+    srcPtr1 = (uint8_t *)&borderData[row][x1];
     for(col=x1; col<=x2; col++) {
       b = *srcPtr1++;
       STORE565(b)
     }
     dmaXfer(nBytes);
   }
+
+#endif // !COLOR_EYE
 
   while(dma_busy);            // Wait for last DMA transfer to complete
   digitalWrite(TFT_CS, HIGH); // Deselect
