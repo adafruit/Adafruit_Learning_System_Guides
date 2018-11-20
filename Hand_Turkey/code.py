@@ -12,7 +12,7 @@ i2c1 = I2C(board.ACCELEROMETER_SCL, board.ACCELEROMETER_SDA)
 lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c1, address=0x19)
 # Changing RANGE_4_G to RANGE_2_G is more sensitive, RANGE_8_G less sensitive
 
-lis3dh.range = adafruit_lis3dh.RANGE_4_G  
+lis3dh.range = adafruit_lis3dh.RANGE_4_G
 
 # Audio playback object and helper to play a full file
 a = audioio.AudioOut(board.A0)
@@ -52,4 +52,3 @@ while True:
         play_file(random.choice(wavefiles))
         # hang out for tiny bit
         time.sleep(0.05)
-    
