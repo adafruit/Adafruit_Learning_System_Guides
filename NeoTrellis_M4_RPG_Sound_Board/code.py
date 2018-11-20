@@ -17,7 +17,6 @@ All text above must be included in any redistribution.
 import time
 import board
 import audioio
-import adafruit_fancyled.adafruit_fancyled as fancy
 import adafruit_trellism4
 from color_names import *
 
