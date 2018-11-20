@@ -51,4 +51,4 @@ while True:
         print("Shake detected!")
         play_file(random.choice(wavefiles))
         # hang out for tiny bit
-        time.sleep(0.05)
+    time.sleep(0.05)
