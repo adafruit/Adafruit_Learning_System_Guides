@@ -50,5 +50,5 @@ while True:
     if lis3dh.shake(shake_threshold=10):  # can also adjust sensitivity here
         print("Shake detected!")
         play_file(random.choice(wavefiles))
-        # hang out for tiny bit
+    # hang out for tiny bit
     time.sleep(0.05)
