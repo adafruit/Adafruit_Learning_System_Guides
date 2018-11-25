@@ -1,4 +1,3 @@
-import time
 import board
 import neopixel
 import adafruit_fancyled.adafruit_fancyled as fancy
@@ -7,12 +6,12 @@ num_leds = 16       # number of LEDs per strip
 saturation = 255    # 0-255, 0 is pure white, 255 is fully saturated color
 blend = True        # color blending between palette indices
 brightness = 0.8    # brightness the range is 0.0 - 1.0
-offset = 0          # flame flicker
+flicker = 0          # flame flicker
 
-# NeoPixel objects using 
+# NeoPixel objects using
 leds = neopixel.NeoPixel(board.D0, num_leds)
 
-# Inspired by Fire2012() by Mark Kriegsman and his use of FastLED 
+# Inspired by Fire2012() by Mark Kriegsman and his use of FastLED
 # to create a one-dimensional 'fire' simulation
 # the heat colors are from the heat palette that FastLED provides
 def fire_2018(strip, offset):
@@ -28,5 +27,5 @@ def fire_2018(strip, offset):
         strip[i] = color.pack()
 
 while True:
-    fire_2018(leds, offset) 
-    offset += 0.3           # flame flicker, adjust value to control speed
+    fire_2018(leds, flicker)
+    flicker += 0.3           # flame flicker, adjust value to control speed
