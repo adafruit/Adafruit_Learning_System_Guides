@@ -47,7 +47,7 @@ class Game(object):
         """Restart the game."""
         self._bird = Bird()
         self._posts = []
-        self._interstitial_delay = 1.0
+        self._interstitial_delay = 0.5
         self._challenge = 10
 
     def _update(self):
@@ -112,22 +112,23 @@ class Game(object):
 
     def _new_post(self):
         """Return a new post based on the current challenge level"""
-        blocks = random.randint(1, 3)
+        bottom_blocks = random.randint(1, 3)
+        top_blocks = random.randint(1, 2)
         # bottom post
         if self._challenge > 6:
-            return Post(from_bottom=blocks)
+            return Post(from_bottom=bottom_blocks)
         # top possible as well
         if self._challenge > 3:
             if random.randint(1, 2) == 1:
-                return Post(from_bottom=blocks)
-            return Post(from_top=blocks)
+                return Post(from_bottom=bottom_blocks)
+            return Post(from_top=top_blocks)
         # top, bottom, and both possible
         r = random.randint(1, 3)
         if r == 1:
-            return Post(from_bottom=blocks)
+            return Post(from_bottom=bottom_blocks)
         if r == 2:
-            return Post(from_top=blocks)
-        return Post(from_bottom=blocks, from_top=random.randint(1, 4 - blocks))
+            return Post(from_top=top_blocks)
+        return Post(from_bottom=bottom_blocks, from_top=random.randint(1, 4 - bottom_blocks))
 
     def _add_post(self):
         """Add a post."""
@@ -149,7 +150,7 @@ class Game(object):
                 count += 1
                 self._update()
                 collided = self._check_for_collision()
-                if count % (self._challenge - random.randint(0, 4) + 2) == 0:
+                if count % max(1, (self._challenge - random.randint(0, 4))) == 0:
                     self._add_post()
                 self._update_display()
                 # handle collision or wait and repeat
@@ -158,7 +159,7 @@ class Game(object):
                 else:
                     # time to speed up?
                     if count % self._delay_ramp == 0:
-                        self._interstitial_delay -= 0.1
+                        self._interstitial_delay -= 0.01
                     # time to increase challenge of the posts?
                     if self._challenge > 0 and count % self._challenge_ramp == 0:
                         self._challenge -= 1
