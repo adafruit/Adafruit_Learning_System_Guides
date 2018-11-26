@@ -27,6 +27,8 @@ trellis = adafruit_trellism4.TrellisM4Express(rotation=0)
 SELECTED_COLOR = WHITE            # the color for the selected sample
 SAMPLE_FOLDER = '/samples/'       # the name of the folder containing the samples
 SAMPLES = []
+BLACK = 0x000000
+
 
 # load the sound & color specifications
 with open('soundboard.txt', 'r') as f:

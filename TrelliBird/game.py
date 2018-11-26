@@ -21,6 +21,8 @@ from bird import Bird
 from post import Post
 from color_names import *
 
+BLACK = 0x000000
+
 class Game(object):
     """Overall game control."""
 
