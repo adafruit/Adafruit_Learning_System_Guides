@@ -57,6 +57,10 @@ class Bird(object):
         """Periodic update: add the effect of gravity."""
         self._move_down(0.05 * self._weight)
 
+    def did_hit_ground(self):
+        """Return whether this bird hit the ground."""
+        return self._position == 0.0
+
     def is_colliding_with(self, post):
         """Check for a collision.
         post -- the Post instance to check for a collicion with

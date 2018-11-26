@@ -97,7 +97,7 @@ class Game(object):
 
     def _check_for_collision(self):
         """Return whether this bird has collided with a post."""
-        collided = False
+        collided = self._bird.did_hit_ground()
         for post in self._posts:
             collided |= self._bird.is_colliding_with(post)
         return collided
