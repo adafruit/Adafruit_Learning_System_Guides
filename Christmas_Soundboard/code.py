@@ -175,4 +175,3 @@ while True:
 
     time.sleep(0.01)  # a little delay here helps avoid debounce annoyances
     current_press = pressed
-    
