@@ -22,7 +22,7 @@ PINK = 0xFF66B3
 WHITE = 0xFFFFFF
 EXTRA = 0x888888
 
-# Select the folder for the ABC files, only define one, 
+# Select the folder for the ABC files, only define one,
 #   the other line should have a # to comment it out
 #SAMPLE_FOLDER = "/animals/"
 SAMPLE_FOLDER = "/electronics/"
@@ -163,12 +163,12 @@ while True:
             filename = SAMPLE_FOLDER+SAMPLES[sample_num][0]
             f = open(filename, "rb")
             wav = audioio.WaveFile(f)
- 
+
             # is something else playing? interrupt it!
             if currently_playing['voice'] != None:
                 print("Interrupt")
                 stop_playing_sample(currently_playing)
- 
+
             trellis.pixels[down] = SELECTED_COLOR
             audio.play(wav)
             # voice, neopixel tuple, color, and sample, file handle
@@ -180,10 +180,10 @@ while True:
                 'file': f}
         except OSError:
             pass # File not found! skip to next
- 
+
     # check if any samples are done
     if not audio.playing and currently_playing['voice'] != None:
         stop_playing_sample(currently_playing)
- 
+
     time.sleep(0.01)  # a little delay here helps avoid debounce annoyances
     current_press = pressed
