@@ -27,23 +27,23 @@ audio_file = ["01.wav", "02.wav", "03.wav",
 step_col = [WHITE, RED, YELLOW, GREEN, AQUA, BLUE, PURPLE, BLACK]
 
 def play_it(index):
-  cpx.play_file(audio_file[index])
-  print("playing file " + audio_file[index])
+    cpx.play_file(audio_file[index])
+    print("playing file " + audio_file[index])
 
 while True:
   # playback mode
 
-  if cpx.touch_A1:
-    play_it(0)
-  if cpx.touch_A2:
-    play_it(1)
-  if cpx.touch_A3:
-    play_it(2)
-  if cpx.touch_A4:
-    play_it(3)
-  if cpx.touch_A5:
-    play_it(4)
-  if cpx.touch_A6:
-    play_it(5)
-  if cpx.touch_A7:
-    play_it(6)
+    if cpx.touch_A1:
+        play_it(0)
+    if cpx.touch_A2:
+        play_it(1)
+    if cpx.touch_A3:
+        play_it(2)
+    if cpx.touch_A4:
+        play_it(3)
+    if cpx.touch_A5:
+        play_it(4)
+    if cpx.touch_A6:
+        play_it(5)
+    if cpx.touch_A7:
+        play_it(6)
