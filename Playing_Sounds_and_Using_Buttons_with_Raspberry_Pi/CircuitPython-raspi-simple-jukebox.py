@@ -3,10 +3,10 @@
 # release of Raspbian.
 
 import time
-import board
-import digitalio
 from os import listdir
 import subprocess
+import board
+import digitalio
 
 button1 = digitalio.DigitalInOut(board.D23)
 button1.direction = digitalio.Direction.INPUT
@@ -22,7 +22,7 @@ button3.pull = digitalio.Pull.UP
 
 mp3_files = [ f for f in listdir('.') if f[-4:] == '.mp3' ]
 
-if not (len(mp3_files) > 0):
+if not len(mp3_files) > 0:
     print("No mp3 files found!")
 
 print('--- Available mp3 files ---')
@@ -31,19 +31,19 @@ print('--- Press button #1 to select mp3, button #2 to play current. ---')
 
 index = 0
 while True:
-    if (button1.value == False):
+    if not button1.value:
         index += 1
         if index >= len(mp3_files):
             index = 0
         print("--- " + mp3_files[index] + " ---")
 
-    if (button2.value == False):
+    if not button2.value:
         subprocess.Popen(['omxplayer', mp3_files[index]])
         print('--- Playing ' + mp3_files[index] + ' ---')
         print('--- Press button #3 to clear playing mp3s. ---')
         time.sleep(0.25)
 
-    if (button3.value == False):
+    if not button3.value:
         subprocess.call(['killall', 'omxplayer'])
         print('--- Cleared all existing mp3s. ---')
 
