@@ -13,7 +13,7 @@ All text above must be included in any redistribution.
 """
 
 # Events as defined in http://www.music.mcgill.ca/~ich/classes/mumt306/StandardMIDIfileformat.html
-# pylint: disable=unused-argument
+# pylint: disable=unused-argument,no-self-use
 
 
 class Event(object):

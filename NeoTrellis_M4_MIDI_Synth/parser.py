@@ -12,7 +12,7 @@ Licensed under the MIT license.
 All text above must be included in any redistribution.
 """
 
-# pylint: disable=no-self-use,too-many-return-statements,too-man-branches
+# pylint: disable=no-self-use,too-many-return-statements,too-many-branches,inconsistent-return-statements
 
 import header
 import events
