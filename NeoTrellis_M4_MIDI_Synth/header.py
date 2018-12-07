@@ -14,7 +14,11 @@ All text above must be included in any redistribution.
 
 class MidiHeader(object):
 
-    def __init__(self, midi_format, number_of_tracks, ticks_per_frame, negative_SMPTE_format, ticks_per_quarternote):
+    def __init__(self, midi_format,
+                       number_of_tracks,
+                       ticks_per_frame,
+                       negative_SMPTE_format,
+                       ticks_per_quarternote):
         self._format = midi_format
         self._number_of_tracks = number_of_tracks
         self._ticks_per_frame = ticks_per_frame

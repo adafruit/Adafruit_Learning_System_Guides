@@ -12,6 +12,8 @@ Licensed under the MIT license.
 All text above must be included in any redistribution.
 """
 
+# pylint: disable=no-self-use,too-many-return-statements,too-man-branches
+
 import header
 import events
 
@@ -83,7 +85,11 @@ class MidiParser(object):
             ticks_per_frame = None
             negative_SMPTE_format = None
             ticks_per_quarternote = (d[0] << 8) | d[1]
-        return header.MidiHeader(midi_format, midi_number_of_tracks, ticks_per_frame, negative_SMPTE_format, ticks_per_quarternote)
+        return header.MidiHeader(midi_format,
+                                 midi_number_of_tracks,
+                                 ticks_per_frame,
+                                 negative_SMPTE_format,
+                                 ticks_per_quarternote)
 
     def _parse_variable_length_number(self, f):
         value = self._read_8(f)
@@ -144,11 +150,13 @@ class MidiParser(object):
         elif meta_event_type == 0x54:
             if length != 5:
                 return None
-            return events.SmpteOffsetMetaEvent(delta_time, data[0], data[1], data[2], data[3], data[4])
+            return events.SmpteOffsetMetaEvent(delta_time, data[0], data[1],
+                                               data[2], data[3], data[4])
         elif meta_event_type == 0x58:
             if length != 4:
                 return None
-            return events.TimeSignatureMetaEvent(delta_time, data[0], data[1], data[2], data[3])
+            return events.TimeSignatureMetaEvent(delta_time, data[0], data[1],
+                                                 data[2], data[3])
         elif meta_event_type == 0x59:
             if length != 2:
                 return None
@@ -243,7 +251,7 @@ class MidiParser(object):
     def parse(self, filename):
         with open(filename, 'rb') as f:
             tracks = []
-            header = self._parse_header(f)
-            for _ in range(header.number_of_tracks):
+            h = self._parse_header(f)
+            for _ in range(h.number_of_tracks):
                 tracks.append(self._parse_track(f))
-        return (header, tracks)
+        return (h, tracks)
