@@ -23,15 +23,17 @@ audio_file = ["01.wav", "02.wav", "03.wav",
               "04.wav", "05.wav", "06.wav",
               "07.wav"]
 
-# step colors
-step_col = [WHITE, RED, YELLOW, GREEN, AQUA, BLUE, PURPLE, BLACK]
+# NeoPixel colors
+step_col = [RED, YELLOW, GREEN, AQUA, BLUE, PURPLE, WHITE]
 
 def play_it(index):
-    cpx.play_file(audio_file[index])
+    cpx.pixels.fill(step_col[index])  # Light lights
+    cpx.play_file(audio_file[index])  # play clip
     print("playing file " + audio_file[index])
+    cpx.pixels.fill(BLACK)  # unlight lights
 
 while True:
-  # playback mode
+    # playback mode
 
     if cpx.touch_A1:
         play_it(0)
