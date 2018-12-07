@@ -13,6 +13,7 @@ All text above must be included in any redistribution.
 """
 
 # Events as defined in http://www.music.mcgill.ca/~ich/classes/mumt306/StandardMIDIfileformat.html
+# pylint: disable=unused-argument
 
 
 class Event(object):
@@ -172,7 +173,12 @@ class SmpteOffsetMetaEvent(MetaEvent):
         self._rr = rr
 
     def __str__(self):
-        return '%d : SMPTE Offset : %02d:%02d:%02d %d %d' % (self._delta_time, self._hour, self._minute, self._second, self._fr, self._rr)
+        return '%d : SMPTE Offset : %02d:%02d:%02d %d %d' % (self._delta_time,
+                                                             self._hour,
+                                                             self._minute,
+                                                             self._second,
+                                                             self._fr,
+                                                             self._rr)
 
 
 class TimeSignatureMetaEvent(MetaEvent):
@@ -185,7 +191,11 @@ class TimeSignatureMetaEvent(MetaEvent):
         self._bb = bb
 
     def __str__(self):
-        return '%d : Time Signature : %d %d %d %d' % (self._delta_time, self._numerator, self._denominator, self._cc, self._bb)
+        return '%d : Time Signature : %d %d %d %d' % (self._delta_time,
+                                                      self._numerator,
+                                                      self._denominator,
+                                                      self._cc,
+                                                      self._bb)
 
     def execute(self, sequencer):
         sequencer.set_time_signature(self._numerator, self._denominator, self._cc)
@@ -225,7 +235,9 @@ class NoteOffEvent(MidiEvent):
         self._velocity = velocity
 
     def __str__(self):
-        return '%d : Note Off : key %d, velocity %d' % (self._delta_time, self._key, self._velocity)
+        return '%d : Note Off : key %d, velocity %d' % (self._delta_time,
+                                                        self._key,
+                                                        self._velocity)
 
     def execute(self, sequencer):
         sequencer.note_off(self._key, self._velocity)
@@ -240,7 +252,9 @@ class NoteOnEvent(MidiEvent):
         self._velocity = velocity
 
     def __str__(self):
-        return '%d : Note On : key %d, velocity %d' % (self._delta_time, self._key, self._velocity)
+        return '%d : Note On : key %d, velocity %d' % (self._delta_time,
+                                                       self._key,
+                                                       self._velocity)
 
     def execute(self, sequencer):
         sequencer.note_on(self._key, self._velocity)
@@ -255,7 +269,9 @@ class PolyphonicKeyPressureEvent(MidiEvent):
         self._pressure = pressure
 
     def __str__(self):
-        return '%d : Poly Key Pressure : key %d, velocity %d' % (self._delta_time, self._key, self._pressure)
+        return '%d : Poly Key Pressure : key %d, velocity %d' % (self._delta_time,
+                                                                 self._key,
+                                                                 self._pressure)
 
 
 class ControlChangeEvent(MidiEvent):
@@ -266,7 +282,9 @@ class ControlChangeEvent(MidiEvent):
         self._value = value
 
     def __str__(self):
-        return '%d : Control Change : controller %d, value %d' % (self._delta_time, self._controller, self._value)
+        return '%d : Control Change : controller %d, value %d' % (self._delta_time,
+                                                                  self._controller,
+                                                                  self._value)
 
 
 
@@ -277,7 +295,8 @@ class ProgramChangeEvent(MidiEvent):
         self._program_number = program_number
 
     def __str__(self):
-        return '%d : Program Change : program %d' % (self._delta_time, self._program_number)
+        return '%d : Program Change : program %d' % (self._delta_time,
+                                                     self._program_number)
 
 class ChannelPressureEvent(MidiEvent):
 
@@ -312,7 +331,8 @@ class SongPositionPointerEvent(MidiEvent):
         self._beats = beats
 
     def __str__(self):
-        return '%d: SongPositionPointerEvent(beats %d)' % (self._delta_time, self._beats)
+        return '%d: SongPositionPointerEvent(beats %d)' % (self._delta_time,
+                                                           self._beats)
 
 
 class SongSelectEvent(MidiEvent):
@@ -322,7 +342,8 @@ class SongSelectEvent(MidiEvent):
         self._song = song
 
     def __str__(self):
-        return '%d: SongSelectEvent(song %d)' % (self._delta_time, self._song)
+        return '%d: SongSelectEvent(song %d)' % (self._delta_time,
+                                                 self._song)
 
 
 class TuneRequestEvent(MidiEvent):

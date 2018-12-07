@@ -12,6 +12,8 @@ Licensed under the MIT license.
 All text above must be included in any redistribution.
 """
 
+# pylint: disable=unused-argument
+
 import time
 import board
 import audioio
