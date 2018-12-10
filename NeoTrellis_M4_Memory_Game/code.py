@@ -12,7 +12,7 @@ Licensed under the MIT license.
 All text above must be included in any redistribution.
 """
 
-# pylint: disable=global-statement
+# pylint: disable=global-statement,stop-iteration-return
 
 import time
 import random
