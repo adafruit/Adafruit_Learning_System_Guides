@@ -1,3 +1,4 @@
 from adafruit_circuitplayground.express import cpx
 
-cpx.red_led = True
+while True:
+    cpx.red_led = True
