@@ -66,12 +66,12 @@ def splash():
         time.sleep(0.005)
 
 def assign_colors():
-    remaining = [(x, y) for x in range(8) for y in range(4)]
-    while remaining:
-        first_of_pair = random.choice(remaining)
-        remaining.remove(first_of_pair)
-        second_of_pair = random.choice(remaining)
-        remaining.remove(second_of_pair)
+    unassigned = [(x, y) for x in range(8) for y in range(4)]
+    while unassigned:
+        first_of_pair = random.choice(unassigned)
+        unassigned.remove(first_of_pair)
+        second_of_pair = random.choice(unassigned)
+        unassigned.remove(second_of_pair)
         random_color = random.choice(COLORS)
         pixel_colors[index_of(first_of_pair)] = random_color
         pixel_colors[index_of(second_of_pair)] = random_color
