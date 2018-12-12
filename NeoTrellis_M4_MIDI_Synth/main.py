@@ -26,8 +26,12 @@ syn = synth.Synth()
 seq = sequencer.Sequencer(syn)
 p = parser.MidiParser()
 
-voices = sorted([f.split('.')[0] for f in os.listdir('/samples') if f.endswith('.txt')])
-tunes = sorted([f for f in os.listdir('/midi') if f.endswith('.mid')])
+voices = sorted([f.split('.')[0] for f in os.listdir('/samples')
+                 if f.endswith('.txt') and not f.startswith('.')])
+print('Voices found: ', voices)
+tunes = sorted([f for f in os.listdir('/midi')
+                if f.endswith('.mid') and not f.startswith('.')])
+print('Midi files found: ', tunes)
 
 selected_voice = None
 
