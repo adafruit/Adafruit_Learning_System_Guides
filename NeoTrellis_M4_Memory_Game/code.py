@@ -12,7 +12,7 @@ Licensed under the MIT license.
 All text above must be included in any redistribution.
 """
 
-# pylint: disable=global-statement,stop-iteration-return
+# pylint: disable=stop-iteration-return
 
 import time
 import random
@@ -29,6 +29,7 @@ found_pairs = 0
 previously_pressed = set([])
 first_pixel = None
 
+key_pressed = None
 
 def index_of(coord):
     x, y = coord
@@ -65,82 +66,78 @@ def splash():
         time.sleep(0.005)
 
 def assign_colors():
-    remaining = [(x, y) for x in range(8) for y in range(4)]
-    while remaining:
-        first = random.choice(remaining)
-        remaining.remove(first)
-        second = random.choice(remaining)
-        remaining.remove(second)
-        c = random.choice(COLORS)
-        pixel_colors[index_of(first)] = c
-        pixel_colors[index_of(second)] = c
+    unassigned = [(x, y) for x in range(8) for y in range(4)]
+    while unassigned:
+        first_of_pair = random.choice(unassigned)
+        unassigned.remove(first_of_pair)
+        second_of_pair = random.choice(unassigned)
+        unassigned.remove(second_of_pair)
+        random_color = random.choice(COLORS)
+        pixel_colors[index_of(first_of_pair)] = random_color
+        pixel_colors[index_of(second_of_pair)] = random_color
 
-def handle_key(key):
+def handle_key(key, _found_pairs, _first_pixel):
     if key is None:
-        return found_pairs, first_pixel
+        return _found_pairs, _first_pixel
     key_color = pixel_colors[index_of(key)]
     if key_color is not None:
         trellis.pixels[key] = pixel_colors[index_of(key)]
         time.sleep(0.5)
-        if first_pixel:           # we're trying to match a second pixel
-            if key_color == pixel_colors[index_of(first_pixel)]:
-                pixel_colors[index_of(first_pixel)] = None
+        if _first_pixel and _first_pixel != key:
+            if key_color == pixel_colors[index_of(_first_pixel)]:
+                pixel_colors[index_of(_first_pixel)] = None
                 pixel_colors[index_of(key)] = None
                 for _ in range(5):
-                    trellis.pixels[first_pixel] = 0xFFFFFF
+                    trellis.pixels[_first_pixel] = 0xFFFFFF
                     trellis.pixels[key] = 0xFFFFFF
                     time.sleep(0.1)
-                    trellis.pixels[first_pixel] = 0x000000
+                    trellis.pixels[_first_pixel] = 0x000000
                     trellis.pixels[key] = 0x000000
                     time.sleep(0.1)
-                trellis.pixels[first_pixel] = 0x444444
+                trellis.pixels[_first_pixel] = 0x444444
                 trellis.pixels[key] = 0x444444
-                return found_pairs + 1, None
-
+                return _found_pairs + 1, None
             else:
-                trellis.pixels[first_pixel] = 0x000000
+                trellis.pixels[_first_pixel] = 0x000000
                 trellis.pixels[key] = 0x000000
-                return found_pairs, None
+                return _found_pairs, None
         else:
-            return found_pairs, key
-    return found_pairs, None
+            return _found_pairs, key
+    return _found_pairs, None
 
-def check_for_key():
-    global previously_pressed
+def check_for_key(last_pressed):
     now_pressed = set(trellis.pressed_keys)
-    new_presses = now_pressed - previously_pressed
+    new_presses = now_pressed - last_pressed
     if new_presses:
-        return list(new_presses)[0]
-    return None
+        return now_pressed, list(new_presses)[0]
+    return now_pressed, None
 
-def demo_mode():
-    global found_pairs, first_pixel
-    while True:
-        trellis.pixels.fill(0x000000)
-        assign_colors()
-        found_pairs = 0
-        remaining = [(x, y) for x in range(8) for y in range(4)]
-        while found_pairs < 16:
-            if check_for_key():
-                return
-            first = random.choice(remaining)
-            remaining.remove(first)
-            found_pairs, first_pixel = handle_key(first)
-            if check_for_key():
-                return
-            c = pixel_colors[index_of(first)]
-            match = random.choice([x for x in remaining if pixel_colors[index_of(x)] == c])
-            found_pairs, first_pixel = handle_key(match)
-            remaining.remove(match)
-        splash()
-
+demo_mode_enabled = True
 while True:
-    demo_mode()
-
     trellis.pixels.fill(0x000000)
     assign_colors()
     found_pairs = 0
     first_pixel = None
+    remaining = [(x, y) for x in range(8) for y in range(4)]
     while found_pairs < 16:
-        found_pairs, first_pixel = handle_key(check_for_key())
-    splash()
+        if demo_mode_enabled:
+            previously_pressed, key_pressed = check_for_key(previously_pressed)
+            if key_pressed:
+                demo_mode_enabled = False
+                break
+            first = random.choice(remaining)
+            remaining.remove(first)
+            found_pairs, first_pixel = handle_key(first, found_pairs, first_pixel)
+            previously_pressed, key_pressed = check_for_key(previously_pressed)
+            if key_pressed:
+                demo_mode_enabled = False
+                break
+            c = pixel_colors[index_of(first)]
+            match = random.choice([x for x in remaining if pixel_colors[index_of(x)] == c])
+            found_pairs, first_pixel = handle_key(match, found_pairs, first_pixel)
+            remaining.remove(match)
+        else:
+            previously_pressed, key_pressed = check_for_key(previously_pressed)
+            found_pairs, first_pixel = handle_key(key_pressed, found_pairs, first_pixel)
+    if found_pairs == 16:
+        splash()
