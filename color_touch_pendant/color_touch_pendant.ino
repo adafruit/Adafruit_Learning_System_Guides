@@ -22,7 +22,7 @@ int COLORCHANGE = 50;
 int BRIGHTNESS = 110;     
 
 // Calibrating your capacitive touch sensitivity: Change this variable to something between your capacitive touch serial readouts for on and off
-int touch = 850;    
+int touch = 650;    
 
 long oldState = 0;
 
@@ -71,7 +71,9 @@ void checkpress() {
     HUE=0;}
    Gradient();
     }
-
+//  if (HUE==250) {
+//    dark();
+//  }
     else {
       Gradient();
       
@@ -124,5 +126,14 @@ void FillLEDsFromPaletteColors( uint8_t colorIndex)
     leds[i] = ColorFromPalette( currentPalette, colorIndex, brightness, currentBlending);
     colorIndex += STEPS;
   }
+}
+
+void dark()
+{ 
+  for(int i = 0; i < NUM_LEDS; i++) { 
+  leds[i] = CRGB::Black; 
+  FastLED.show();
+  delay(20);
+}
 }
 
