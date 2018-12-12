@@ -19,26 +19,26 @@ def vllchksum(n):
     return 7-((n+(n>>2)+(n>>4))&7)
 
 # Lego Micro Scout commands
-MS_FWD  = const(0)
-MS_REV  = const(1)
-MS_STOP = const(2)
-MS_BEEP = const(4)
+MS_FWD  = 0
+MS_REV  = 1
+MS_STOP = 2
+MS_BEEP = 4
 
 PAUSE = 0.15
 
 ADVERT_NAME = b'BlueMicroScout'
 
 # Note: incompatibile with ZX Spectrum cursors
-BUTTON_1    = const(1)
-BUTTON_2    = const(2)
-BUTTON_3    = const(3)
-BUTTON_4    = const(4)
-BUTTON_UP    = const(5)
-BUTTON_DOWN  = const(6)
-BUTTON_LEFT  = const(7)
-BUTTON_RIGHT = const(8)
+BUTTON_1     = 1
+BUTTON_2     = 2
+BUTTON_3     = 3
+BUTTON_4     = 4
+BUTTON_UP    = 5
+BUTTON_DOWN  = 6
+BUTTON_LEFT  = 7
+BUTTON_RIGHT = 8
 
-# Borrowed from https://github.com/JorgePe/mindstorms-vll/blob/master/vll-atat.py
+# From https://github.com/JorgePe/mindstorms-vll/blob/master/vll-atat.py
 # https://github.com/JorgePe/mindstorms-vll
 def vll1():
     boardled.value =  True
