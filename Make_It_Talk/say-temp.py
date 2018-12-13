@@ -7,7 +7,7 @@ import adafruit_thermistor
 import audioio
 from digitalio import DigitalInOut, Direction, Pull
 
-D1 = board.BUTTON_A  
+D1 = board.BUTTON_A
 
 # Button A setup
 button_a = DigitalInOut(D1)
@@ -21,7 +21,7 @@ thermistor = adafruit_thermistor.Thermistor(
 # Audio playback object and helper to play a full file
 aout = audioio.AudioOut(board.A0)
 
-# Play a wave file 
+# Play a wave file
 def play_file(wavfile):
     wavfile = "/numbers/" + wavfile
     print("Playing", wavfile)
