@@ -13,7 +13,7 @@ from digitalio import DigitalInOut, Direction, Pull
 D1 = board.BUTTON_A
 D2 = board.BUTTON_B
 
-# Button A setup (Celcius)
+# Button A setup (Celsius)
 button_a = DigitalInOut(D1)
 button_a.direction = Direction.INPUT
 button_a.pull = Pull.DOWN
@@ -29,7 +29,7 @@ thermistor = adafruit_thermistor.Thermistor(
 # Audio playback object and helper to play a full file
 aout = audioio.AudioOut(board.A0)
 
-# Play a wave file 
+# Play a wave file
 def play_file(wavfile):
     wavfile = "/numbers/" + wavfile
     print("Playing", wavfile)
