@@ -27,24 +27,33 @@ lcd = characterlcd.Character_LCD_Mono(lcd_rs, lcd_en, lcd_d4, lcd_d5, lcd_d6,
 # looking for an active Ethernet or WiFi device
 find_interface = "ip addr show | grep \"state UP\" | cut -d: -f2"
 
-
-def run_cmd(cmd):
-        p = Popen(cmd, shell=True, stdout=PIPE)
-        output = p.communicate()[0]
-        return output.decode('ascii')
-
-while 1:
-        lcd.clear()
-        interface = run_cmd(find_interface)
-#        find_ip = "ip addr show + interface + | grep \"inet \" | awk '{print $2}' | cut -d/ -f1"
+# find a live IP on the first LIVE network device
+def parse_ip(device):
         find_ip = "ip addr show %s" % interface
         ip_parse = run_cmd(find_ip)
         for line in ip_parse.splitlines():
             if "inet " in line:
                 ip = line.split(' ')[5]
                 ip = ip.split('/')[0]
-                print(ip)
+                return ip
 
-        # looking for the active IP address ip = run_cmd(find_ip) lcd.message = datetime.now().strftime('%b %d  %H:%M:%S\n') #        lcd.message = "IP %s % str(ip)"
-#        lcd.message = ('IP %s' % ( ipaddr ) )
+def run_cmd(cmd):
+        p = Popen(cmd, shell=True, stdout=PIPE)
+        output = p.communicate()[0]
+        return output.decode('ascii')
+
+# wipe LCD screen before we start
+lcd.clear()
+
+while True:
+        interface = run_cmd(find_interface)
+
+        # date and time (line 1)
+        lcd_line_1 = datetime.now().strftime('%b %d  %H:%M:%S\n') 
+
+        # current ip address (line 2)
+        lcd_line_2 = "IP " + parse_ip(interface)
+
+        lcd.message = lcd_line_1 + lcd_line_2
+
         sleep(2)
