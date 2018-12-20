@@ -34,13 +34,15 @@ def mirror(values):
 def _lerp(x, x0, x1, y0, y1):
     return y0 + (x - x0) * ((y1 - y0)/(x1 - x0))
 
+
 # Animation functions:
-def blank(config, np, pixel_count):
+def blank(config, np, pixel_count):  # pylint: disable=unused-argument, redefined-outer-name
     # Turn off all the pixels.
     np.fill((0,0,0))
     np.write()
 
-def solid(config, np, pixel_count):
+
+def solid(config, np, pixel_count):  # pylint: disable=unused-argument, redefined-outer-name
     # Solid pulse of all pixels at the same color.
     colors = config['colors']
     elapsed = utime.ticks_ms() // config['period_ms']
@@ -48,7 +50,8 @@ def solid(config, np, pixel_count):
     np.fill(colors[current])
     np.write()
 
-def chase(config, np, pixel_count):
+
+def chase(config, np, pixel_count):  # pylint: disable=unused-argument, redefined-outer-name
     # Chasing animation of pixels through different colors.
     colors = config['colors']
     elapsed = utime.ticks_ms() // config['period_ms']
@@ -57,7 +60,8 @@ def chase(config, np, pixel_count):
         np[i] = colors[current]
     np.write()
 
-def smooth(config, np, pixel_count):
+
+def smooth(config, np, pixel_count):  # pylint: disable=unused-argument, redefined-outer-name
     # Smooth pulse of all pixels at the same color.  Interpolates inbetween colors
     # for smoother animation.
     colors = config['colors']
