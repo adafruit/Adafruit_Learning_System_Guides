@@ -17,11 +17,11 @@ export HOME
 case "$1" in
     start)
         echo "Starting LCD"
-        /home/pi/Adafruit-Raspberry-Pi-Python-Code/Adafruit_CharLCD/Adafruit_CharLCD_IPclock_example.py  2>&1 &
+    python3 /home/pi/Downloads/ada/Adafruit_Learning_System_Guides/Drive_a_16x2_LCD_with_the_Raspberry_Pi/Drive_a_16x2_LCD_with_the_Raspberry_Pi.py 2>&1 &
     ;;
     stop)
         echo "Stopping LCD"
-	LCD_PID=`ps auxwww | grep Adafruit_CharLCD_IPclock_example.py | head -1 | awk '{print $2}'`
+	LCD_PID=`ps auxwww | grep 16x2_LCD | head -1 | awk '{print $2}'`
 	kill -9 $LCD_PID
     ;;
     *)
