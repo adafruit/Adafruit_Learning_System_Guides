@@ -3,7 +3,7 @@
 # up LEDs.  Based on the code created by Phil Burgess and Dave Astels, see:
 #   https://learn.adafruit.com/digital-sand-dotstar-circuitpython-edition/code
 #   https://learn.adafruit.com/animated-led-sand
-# Ported (badly) to NeoTrellis M4 by John Thurmond 
+# Ported (badly) to NeoTrellis M4 by John Thurmond
 #
 # The MIT License (MIT)
 #
@@ -27,12 +27,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-import time
+import math
+import random
 import board
 import busio
 import adafruit_trellism4
-import math
-import random
 import adafruit_adxl34x
 
 N_GRAINS = 8  # Number of grains of sand
@@ -111,8 +110,6 @@ def wheel(pos):
     pos -= 170
     return int(pos * 3), 0, int(255 - (pos*3))
 
- 
-
 for g in grains:
     placed = False
     while not placed:
@@ -127,8 +124,8 @@ while True:
     # Display frame rendered on prior pass.  It's done immediately after the
     # FPS sync (rather than after rendering) for consistent animation timing.
 
+    # pylint: disable=line-too-long
     for i in range(NUMBER_PIXELS):
-        
         # Some color options:
 
         # Random color every refresh
@@ -152,7 +149,7 @@ while True:
             print("Pressed:", press)
             color = random.randint(1, 254)
             print("Color:", color)
-                
+
     # Read accelerometer...
     f_x, f_y, f_z = sensor.acceleration
 
@@ -164,7 +161,7 @@ while True:
     ax = f_x >> 3  # Transform accelerometer axes
     ay = f_y >> 3  # to grain coordinate space
     az = abs(f_z) >> 6  # Random motion factor
-    
+
     print("%6d %6d %6d"%(ax,ay,az))
     az = 1 if (az >= 3) else (4 - az)  # Clip & invert
     ax -= az  # Subtract motion factor from X, Y
@@ -175,12 +172,11 @@ while True:
     ax2 = ax
     ax = -ay
     ay = ax2
-    
+
     # ...and apply 2D accel vector to grain velocities...
     v2 = 0  # Velocity squared
     v = 0.0  # Absolute velociy
     for g in grains:
-        
         g.vx += ax + random.randint(0, az2)  # A little randomness makes
         g.vy += ay + random.randint(0, az2)  # tall stacks topple better!
 
