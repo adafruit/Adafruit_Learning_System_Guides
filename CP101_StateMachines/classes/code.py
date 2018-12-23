@@ -12,7 +12,7 @@ Licensed under the MIT license.
 All text above must be included in any redistribution.
 """
 
-# pylint: disable=global-statement,stop-iteration-return,no-self-use
+# pylint: disable=global-statement,stop-iteration-return,no-self-use,useless-super-delegation
 
 import time
 import random
@@ -303,12 +303,12 @@ class WaitingState(State):
         State.exit(self, machine)
 
     def almost_NY(self):
-        t = rtc.datetime
-        return (t.tm_mday == 31 and
-                t.tm_mon == 12 and
-                t.tm_hour == 23 and
-                t.tm_min == 59 and
-                t.tm_sec == 50)
+        now = rtc.datetime
+        return (now.tm_mday == 31 and
+                now.tm_mon == 12 and
+                now.tm_hour == 23 and
+                now.tm_min == 59 and
+                now.tm_sec == 50)
 
     def update(self, machine):
         # No super call to check for switch press to pause

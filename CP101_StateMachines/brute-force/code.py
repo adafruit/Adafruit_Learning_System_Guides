@@ -231,12 +231,12 @@ def stop_playing():
         audio.stop()
 
 def almost_NY():
-    t = rtc.datetime
-    return (t.tm_mday == 31 and
-            t.tm_mon == 12 and
-            t.tm_hour == 23 and
-            t.tm_min == 59 and
-            t.tm_sec == 50)
+    now = rtc.datetime
+    return (now.tm_mday == 31 and
+            now.tm_mon == 12 and
+            now.tm_hour == 23 and
+            now.tm_min == 59 and
+            now.tm_sec == 50)
 
 
 
