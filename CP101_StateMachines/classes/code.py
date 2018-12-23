@@ -1,4 +1,3 @@
-import time
 """
 Class based state machine implementation
 
@@ -13,6 +12,9 @@ Licensed under the MIT license.
 All text above must be included in any redistribution.
 """
 
+# pylint: disable=global-statement,stop-iteration-return,no-self-use
+
+import time
 import random
 import board
 from digitalio import DigitalInOut, Direction, Pull
@@ -105,7 +107,7 @@ def random_color():
     blue = random_color_byte()
     return (red, green, blue)
 
-# Color cycling. See https://learn.adafruit.com/hacking-ikea-lamps-with-circuit-playground-express/lamp-it-up
+# Color cycling.
 
 def wheel(pos):
     # Input a value 0 to 255 to get a color value.
@@ -287,6 +289,9 @@ class State(object):
 
 class WaitingState(State):
 
+    def __init__(self):
+        super().__init__()
+
     @property
     def name(self):
         return 'waiting'
@@ -317,6 +322,7 @@ class WaitingState(State):
 class DroppingState(State):
 
     def __init__(self):
+        super().__init__()
         self.rainbow = None
         self.rainbow_time = 0
         self.drop_finish_time = 0
@@ -336,11 +342,10 @@ class DroppingState(State):
 
     def exit(self, machine):
         State.exit(self, machine)
-        now = time.monotonic()
         servo.throttle = 0.0
         stop_playing()
         machine.reset_fireworks()
-        machine.firework_stop_time = now + FIREWORKS_DURATION
+        machine.firework_stop_time = time.monotonic() + FIREWORKS_DURATION
 
     def update(self, machine):
         if State.update(self, machine):
@@ -355,6 +360,9 @@ class DroppingState(State):
 # Show a fireworks explosion: a burst of color. Then switch to a shower of sparks.
 
 class BurstState(State):
+
+    def __init__(self):
+        super().__init__()
 
     @property
     def name(self):
@@ -377,6 +385,9 @@ class BurstState(State):
 
 class ShowerState(State):
 
+    def __init__(self):
+        super().__init__()
+
     @property
     def name(self):
         return 'shower'
@@ -391,7 +402,7 @@ class ShowerState(State):
     def update(self, machine):
         if State.update(self, machine):
             if shower(machine, time.monotonic()):
-                if now >= machine.firework_stop_time:
+                if time.monotonic() >= machine.firework_stop_time:
                     machine.go_to_state('idle')
                 else:
                     machine.go_to_state('burst')
@@ -400,6 +411,9 @@ class ShowerState(State):
 # Do nothing, wait to be reset
 
 class IdleState(State):
+
+    def __init__(self):
+        super().__init__()
 
     @property
     def name(self):
@@ -419,6 +433,9 @@ class IdleState(State):
 # When the switch is released, stop the ball and move to waiting
 
 class RaisingState(State):
+
+    def __init__(self):
+        super().__init__()
 
     @property
     def name(self):
@@ -448,11 +465,12 @@ class RaisingState(State):
 
 class PausedState(State):
 
-    @property
     def __init__(self):
+        super().__init__()
         self.switch_pressed_at = 0
         self.paused_servo = 0
 
+    @property
     def name(self):
         return 'paused'
 
@@ -481,17 +499,17 @@ class PausedState(State):
 ################################################################################
 # Create the state machine
 
-machine = StateMachine()
-machine.add_state(WaitingState())
-machine.add_state(DroppingState())
-machine.add_state(BurstState())
-machine.add_state(ShowerState())
-machine.add_state(IdleState())
-machine.add_state(RaisingState())
-machine.add_state(PausedState())
+pretty_state_machine = StateMachine()
+pretty_state_machine.add_state(WaitingState())
+pretty_state_machine.add_state(DroppingState())
+pretty_state_machine.add_state(BurstState())
+pretty_state_machine.add_state(ShowerState())
+pretty_state_machine.add_state(IdleState())
+pretty_state_machine.add_state(RaisingState())
+pretty_state_machine.add_state(PausedState())
 
-machine.go_to_state('waiting')
+pretty_state_machine.go_to_state('waiting')
 
 while True:
     switch.update()
-    machine.update()
+    pretty_state_machine.update()

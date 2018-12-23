@@ -12,7 +12,7 @@ Licensed under the MIT license.
 All text above must be included in any redistribution.
 """
 
-# pylint: disable=global-statement
+# pylint: disable=global-statement,stop-iteration-return,no-self-use
 
 import time
 import random
@@ -126,7 +126,7 @@ def random_color():
     blue = random_color_byte()
     return (red, green, blue)
 
-# Color cycling. See https://learn.adafruit.com/hacking-ikea-lamps-with-circuit-playground-express/lamp-it-up
+# Color cycling.
 
 def wheel(pos):
     # Input a value 0 to 255 to get a color value.
@@ -230,6 +230,15 @@ def stop_playing():
     if audio.playing:
         audio.stop()
 
+def almost_NY():
+    t = rtc.datetime
+    return (t.tm_mday == 31 and
+            t.tm_mon == 12 and
+            t.tm_hour == 23 and
+            t.tm_min == 59 and
+            t.tm_sec == 50)
+
+
 
 state = WAITING_STATE
 paused_state = None
@@ -284,11 +293,7 @@ while True:
                 switch.update()
             test_trigger = True
 
-        if test_trigger or (t.tm_mday == 31 and
-                            t.tm_mon == 12 and
-                            t.tm_hour == 23 and
-                            t.tm_min == 59 and
-                            t.tm_sec == 50):
+        if test_trigger or almost_NY():
             test_trigger = False
             # Play the song
             start_playing('./countdown.wav')
