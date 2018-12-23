@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>ESP8266 MicroPython Smart Holiday Lights</title>
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+</head>
+
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2">
+        <div class="jumbotron">
+          <h1>MicroPython Smart Holiday Lights</h1>
+          <p class="lead">Control your holiday lights using MicroPython and the
+          ESP8266 WiFi microcontroller.</p>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-4 col-lg-offset-4">
+        <form>
+          <div class="form-group">
+            <label for="boardURL">Board URL</label>
+            <input type="text" class="form-control" id="boardURL" value="ws://192.168.4.1:8266">
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" class="form-control" id="password" placeholder="Password">
+          </div>
+          <div class="form-group">
+            <label for="animation">Animation</label>
+            <select class="form-control" id="animation">
+              <option value="solid">Solid</option>
+              <option value="chase">Chase</option>
+              <option value="smooth">Smooth</option>
+              <option value="blank">Blank (off)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="periodMS">Animation Period (milliseconds)</label>
+            <input type="text" class="form-control" id="periodMS" value="250">
+          </div>
+          <div class="form-group">
+            <label for="colors">Colors</label>
+            <select class="form-control" id="colors">
+            </select>
+          </div>
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" id="mirror" checked>
+              Mirror Colors
+            </label>
+          </div>
+          <button class="btn btn-lg btn-primary" type="button" id="update">Update Lights</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</body>
+
+<script
+  src="https://code.jquery.com/jquery-3.1.1.min.js"
+  integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+  crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script>
+  // Global configuration:
+  var colors = [
+    { name: 'Blue - Red',   value: [[0,0,255], [16,0,128], [32,0,64], [64,0,32], [128,0,16], [255,0,0]] },
+    { name: 'Red - Green',  value: [[255,0,0], [128,16,0], [64,32,0], [32,64,0], [16,128,0], [0,255,0]] },
+    { name: 'Blue - White', value: [[0,0,255], [16,16,255], [32,32,255], [64,64,255], [128,128,255], [255,255,255]] }
+  ];
+
+  // Function to connect to the WebREPL on the specified board URL and with the
+  // specified password.  Once connected the onConnect callback will be called
+  // and a websocket object passed in.  If an error occurs the onError callback
+  // is called with the error event object as a parameter.
+  function webreplConnect(url, password, onConnect, onError) {
+    var ws = new WebSocket(url);
+    ws.onopen = function() {
+      // Print messages received from the WebREPL.  Uncomment this to help with
+      // debugging.
+      ws.onmessage = function(e) {
+        console.log(e.data);
+      }
+      // First send the password immediately since it's required to use WebREPL.
+      ws.send(password + '\r\n');  // Send password and CR LF (like pressing enter).
+      // Next send a Ctrl-C to stop any running main loop.
+      ws.send('\x03');
+      // Fire the connected callback.
+      onConnect(ws);
+    };
+    ws.onerror = function(e) {
+      // Something went wrong!  Call the user's error handler.
+      onError(e);
+    };
+  }
+
+  // Send a file to a board using the WebREPL.  WS should be a websocket connection
+  // to a board, filename is the name of the file to save on the board, and data
+  // should be a Uint8Array of data for the file.
+  function putFile(ws, fileName, data) {
+    // Construct a header to specify a file put operation.
+    var size = data.length;
+    var rec = new Uint8Array(2 + 1 + 1 + 8 + 4 + 2 + 64);
+    rec[0] = 'W'.charCodeAt(0);
+    rec[1] = 'A'.charCodeAt(0);
+    rec[2] = 1; // put
+    rec[3] = 0;
+    rec[4] = 0; rec[5] = 0; rec[6] = 0; rec[7] = 0; rec[8] = 0; rec[9] = 0; rec[10] = 0; rec[11] = 0;
+    rec[12] = size & 0xff; rec[13] = (size >> 8) & 0xff; rec[14] = (size >> 16) & 0xff; rec[15] = (size >> 24) & 0xff;
+    rec[16] = fileName.length & 0xff; rec[17] = (fileName.length >> 8) & 0xff;
+    for (var i = 0; i < 64; ++i) {
+        if (i < fileName.length) {
+            rec[18 + i] = fileName.charCodeAt(i);
+        } else {
+            rec[18 + i] = 0;
+        }
+    }
+    // Send put file request header that was constructed above.
+    ws.send(rec);
+    // Next send the file data.
+    ws.send(data);
+  }
+
+  $(document).ready(function() {
+    // Main code that runs when the page is loaded.
+    // Populate the color selection list.
+    colors.forEach(function(color, i) {
+      $('#colors').append($('<option></option>').attr('value', i).text(color.name));
+    });
+
+    // Update the board state when the update button is clicked.
+    $('#update').click(function() {
+      // Build the board's new configuration.
+      var config = {
+        colors: colors[$('#colors').val()].value,
+        period_ms: Number($('#periodMS').val()),
+        mirror_colors: $('#mirror').prop('checked'),
+        animation: $('#animation').val()
+      }
+      var boardURL = $('#boardURL').val();
+      var password = $('#password').val();
+      // Connect to the board's REPL.
+      webreplConnect(boardURL, password, function(ws) {
+        console.log('Connected!');
+        // Connected, now convert config state to JSON bytes.
+        var configJSON = JSON.stringify(config);
+        var configBytes = new Uint8Array(configJSON.length);
+        for (var i = 0; i < configJSON.length; ++i) {
+          configBytes[i] = configJSON.charCodeAt(i);
+        }
+        // Send the new configuration file.
+        putFile(ws, 'config.json', configBytes);
+        // Reset the board so the new configuration takes effect.
+        // Note that sending a Ctrl-B doesn't seem to work as the WebREPL won't
+        // restart on soft reset.
+        ws.send('import machine\r\nmachine.reset()\r\n');
+        // Close the connection.
+        ws.close();
+        console.log('Updated lights!');
+      },
+      function(e) {
+        console.log('Error connecting to MicroPython board!');
+      })
+    });
+  });
+</script>
+</html>
