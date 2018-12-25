@@ -74,9 +74,9 @@ while True:
 
     # Shell scripts for system monitoring from here :
     # https://unix.stackexchange.com/questions/119126/command-to-display-memory-usage-disk-usage-and-cpu-load
-    cmd = "hostname -I | cut -d\' \' -f1"
+    cmd = "hostname -I | cut -d\' \' -f1 | tr -d \'\\n\'"
     IP = subprocess.check_output(cmd, shell=True)
-    cmd = "hostname"
+    cmd = "hostname | tr -d \'\\n\'"
     HOST = subprocess.check_output(cmd, shell=True)
     cmd = "top -bn1 | grep load | awk " \
           "'{printf \"CPU Load: %.2f\", $(NF-2)}'"
