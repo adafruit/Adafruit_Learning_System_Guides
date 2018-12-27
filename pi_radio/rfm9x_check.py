@@ -11,7 +11,6 @@ from PIL import ImageFont
 import busio
 from digitalio import DigitalInOut, Direction, Pull
 import board
-import Adafruit_GPIO.SPI as SPI
 import Adafruit_SSD1306
 import adafruit_rfm9x
 
