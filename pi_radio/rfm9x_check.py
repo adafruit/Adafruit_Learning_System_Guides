@@ -5,13 +5,12 @@ Learn Guide: https://learn.adafruit.com/lora-and-lorawan-for-raspberry-pi
 Author: Brent Rubell for Adafruit Industries
 """
 import time
-from PIL import Image
-from PIL import ImageDraw
-from PIL import ImageFont
 import busio
 from digitalio import DigitalInOut, Direction, Pull
 import board
-import Adafruit_SSD1306
+# Import the SSD1306 module.
+import adafruit_ssd1306
+# Import the RFM9x radio module.
 import adafruit_rfm9x
 
 # Button A
@@ -29,23 +28,16 @@ btnC = DigitalInOut(board.D13)
 btnC.direction = Direction.INPUT
 btnC.pull = Pull.UP
 
+# Create the I2C interface.
+i2c = busio.I2C(board.SCL, board.SDA)
+
 # 128x32 OLED Display
-disp = Adafruit_SSD1306.SSD1306_128_32(rst=None)
-# Initialize library.
-disp.begin()
-# Clear display.
-disp.clear()
-disp.display()
-width = disp.width
-height = disp.height
-image = Image.new('1', (width, height))
-draw = ImageDraw.Draw(image)
-draw.rectangle((0,0,width,height), outline=0, fill=0)
-padding = -2
-top = padding
-bottom = height-padding
-x = 0
-font = ImageFont.load_default()
+display = adafruit_ssd1306.SSD1306_I2C(128, 32, i2c, addr=0x3c)
+# Clear the display.
+display.fill(0)
+display.show()
+width = display.width
+height = display.height
 
 # Configure RFM9x LoRa Radio
 CS = DigitalInOut(board.D18)
@@ -53,37 +45,33 @@ RESET = DigitalInOut(board.D25)
 spi = busio.SPI(board.SCK, MOSI=board.MOSI, MISO=board.MISO)
 
 while True:
-    # Draw a black filled box to clear the image.
-    draw.rectangle((0,0,width,height), outline=0, fill=0)
+    # Clear the image
+    display.fill(0)
 
     # Attempt to set up the RFM9x Module
     try:
         rfm9x = adafruit_rfm9x.RFM9x(spi, CS, RESET, 915.0)
-        draw.text((x+20, top+8), "RFM9x: Detected", font=font, fill=255)
+        display.text('RFM9x: Detected', 0, 0, 1)
     except RuntimeError:
         # Thrown on version mismatch
-        draw.text((x+20, top), "RFM9x: ERROR", font=font, fill=255)
+        display.text('RFM9x: ERROR', 0, 0, 1)
 
     # Check buttons
     if not btnA.value:
         # Button A Pressed
-        draw.text((x, top+16),'Ada', font=font, fill=255)
-        disp.image(image)
-        disp.display()
+        display.text('Ada', width-85, height-7, 1)
+        display.show()
         time.sleep(0.1)
     if not btnB.value:
         # Button B Pressed
-        draw.text((x, top+16),'Fruit', font=font, fill=255)
-        disp.image(image)
-        disp.display()
+        display.text('Fruit', width-75, height-7, 1)
+        display.show()
         time.sleep(0.1)
     if not btnC.value:
       # Button C Pressed
-        draw.text((x, top+16),'Radio', font=font, fill=255)
-        disp.image(image)
-        disp.display()
-        time.sleep(0.1)
-
-    disp.image(image)
-    disp.display()
+      display.text('Radio', width-65, height-7, 1)
+      display.show()
+      time.sleep(0.1)
+    
+    display.show()
     time.sleep(0.1)
