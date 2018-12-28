@@ -68,10 +68,10 @@ while True:
         display.show()
         time.sleep(0.1)
     if not btnC.value:
-      # Button C Pressed
-      display.text('Radio', width-65, height-7, 1)
-      display.show()
-      time.sleep(0.1)
-    
+        # Button C Pressed
+        display.text('Radio', width-65, height-7, 1)
+        display.show()
+        time.sleep(0.1)
+
     display.show()
     time.sleep(0.1)
