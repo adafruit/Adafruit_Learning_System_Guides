@@ -54,16 +54,14 @@ spi = busio.SPI(board.SCK, MOSI=board.MOSI, MISO=board.MISO)
 
 while True:
     # Draw a black filled box to clear the image.
-    packet = None
     draw.rectangle((0,0,width,height), outline=0, fill=0)
 
     # Attempt to set up the RFM69 Module
     try:
-        # Setup the RFM69
         rfm69 = adafruit_rfm69.RFM69(spi, CS, RESET, 915.0)
         draw.text((x+20, top+8), "RFM69: Detected", font=font, fill=255)
     except RuntimeError:
-      # Thrown on version mismatch
+        # Thrown on version mismatch
         draw.text((x+20, top), "RFM69: ERROR", font=font, fill=255)
 
     # Check buttons

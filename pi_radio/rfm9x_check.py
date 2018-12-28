@@ -1,5 +1,5 @@
 """
-Wiring Check, Pi Radio w/RFM69
+Wiring Check, Pi Radio w/RFM9x
 
 Learn Guide: https://learn.adafruit.com/lora-and-lorawan-for-raspberry-pi
 Author: Brent Rubell for Adafruit Industries
@@ -54,35 +54,35 @@ spi = busio.SPI(board.SCK, MOSI=board.MOSI, MISO=board.MISO)
 
 while True:
     # Draw a black filled box to clear the image.
-    packet = None
     draw.rectangle((0,0,width,height), outline=0, fill=0)
 
-    # Attempt to set up the RFM69 Module
+    # Attempt to set up the RFM9x Module
     try:
-        # Setup the RFM69
         rfm9x = adafruit_rfm9x.RFM9x(spi, CS, RESET, 915.0)
-        draw.text((x+20, top+8), "RFM69: Detected", font=font, fill=255)
+        draw.text((x+20, top+8), "RFM9x: Detected", font=font, fill=255)
     except RuntimeError:
-      # Thrown on version mismatch
-        draw.text((x+20, top), "RFM69: ERROR", font=font, fill=255)
+        # Thrown on version mismatch
+        draw.text((x+20, top), "RFM9x: ERROR", font=font, fill=255)
 
     # Check buttons
     if not btnA.value:
         # Button A Pressed
-        draw.text((x, top+16),'Radio', font=font, fill=255)
+        draw.text((x, top+16),'Ada', font=font, fill=255)
         disp.image(image)
         disp.display()
         time.sleep(0.1)
     if not btnB.value:
         # Button B Pressed
-        draw.text((x, top+16),'LoRa', font=font, fill=255)
+        draw.text((x, top+16),'Fruit', font=font, fill=255)
         disp.image(image)
         disp.display()
+        time.sleep(0.1)
     if not btnC.value:
       # Button C Pressed
-        draw.text((x, top+16),'LoRaWAN', font=font, fill=255)
+        draw.text((x, top+16),'Radio', font=font, fill=255)
         disp.image(image)
         disp.display()
+        time.sleep(0.1)
 
     disp.image(image)
     disp.display()
