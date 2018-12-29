@@ -12,7 +12,7 @@ Licensed under the MIT license.
 All text above must be included in any redistribution.
 """
 
-# pylint: disable=global-statement
+# pylint: disable=global-statement,stop-iteration-return,too-many-boolean-expressions
 
 import time
 import random
@@ -125,8 +125,6 @@ def random_color():
     green = random_color_byte()
     blue = random_color_byte()
     return (red, green, blue)
-
-# Color cycling. See https://learn.adafruit.com/hacking-ikea-lamps-with-circuit-playground-express/lamp-it-up
 
 def wheel(pos):
     # Input a value 0 to 255 to get a color value.
