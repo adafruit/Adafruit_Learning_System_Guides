@@ -1,4 +1,5 @@
-import board, busio
+import board
+import busio
 import adafruit_ssd1306
 from simpleio import map_range
 from analogio import AnalogIn
@@ -34,9 +35,9 @@ def read_knobs(reads):
         avg_y += y_knob.value
     avg_x /= reads
     avg_y /= reads
-    x = map_range(avg_x, 0, 65535, 0, WIDTH - 1)
-    y = map_range(avg_y, 0, 65535, 0, HEIGHT - 1)
-    return int(x), int(y)
+    x_screen = map_range(avg_x, 0, 65535, 0, WIDTH - 1)
+    y_screen = map_range(avg_y, 0, 65535, 0, HEIGHT - 1)
+    return int(x_screen), int(y_screen)
 
 while True:
     while clear_button.value:

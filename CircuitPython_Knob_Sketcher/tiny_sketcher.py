@@ -1,4 +1,5 @@
-import board, busio
+import board
+import busio
 import adafruit_ssd1306
 from simpleio import map_range
 from analogio import AnalogIn
