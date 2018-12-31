@@ -4,6 +4,7 @@ Example for using the RFM9x Radio with Raspberry Pi and LoRaWAN
 Learn Guide: https://learn.adafruit.com/lora-and-lorawan-for-raspberry-pi
 Author: Brent Rubell for Adafruit Industries
 """
+import threading
 import time
 import subprocess
 import busio
@@ -23,6 +24,11 @@ btnA.pull = Pull.UP
 btnB = DigitalInOut(board.D6)
 btnB.direction = Direction.INPUT
 btnB.pull = Pull.UP
+
+# Button C
+btnC = DigitalInOut(board.D12)
+btnC.direction = Direction.INPUT
+btnC.pull = Pull.UP
 
 # Create the I2C interface.
 i2c = busio.I2C(board.SCL, board.SDA)
@@ -53,6 +59,15 @@ ttn_config = TTN(devaddr, nwkey, app, country='US')
 lora = TinyLoRa(spi, cs, irq, ttn_config)
 # 2b array to store sensor data
 data_pkt = bytearray(2)
+# time to delay periodic packet sends (in seconds)
+data_pkt_delay = 5.0
+
+
+def send_pi_data_periodic():
+    threading.Timer(data_pkt_delay, send_pi_data_periodic).start()
+    print("Sending periodic data...")
+    send_pi_data(CPU)
+    print('CPU:', CPU)
 
 def send_pi_data(data):
     # Encode float as int
@@ -65,6 +80,7 @@ def send_pi_data(data):
     lora.frame_counter += 1
     display.fill(0)
     display.text('Sent Data to TTN!', 15, 15, 1)
+    print('Data sent!')
     display.show()
     time.sleep(0.5)
 
@@ -82,7 +98,6 @@ while True:
     if not btnA.value:
         # Send Packet
         send_pi_data(CPU)
-
     if not btnB.value:
         # Display CPU Load
         display.fill(0)
@@ -90,6 +105,8 @@ while True:
         display.text(str(CPU), 60, 15, 1)
         display.show()
         time.sleep(0.1)
+    if not btnC.value:
+        send_pi_data_periodic()
 
     display.show()
     time.sleep(.1)
