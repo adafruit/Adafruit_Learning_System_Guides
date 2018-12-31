@@ -106,7 +106,12 @@ while True:
         display.show()
         time.sleep(0.1)
     if not btnC.value:
+        display.fill(0)
+        display.text('* Periodic Mode *', 15, 0, 1)
+        display.show()
+        time.sleep(0.5)
         send_pi_data_periodic()
+
 
     display.show()
     time.sleep(.1)
