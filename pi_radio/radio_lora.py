@@ -49,7 +49,7 @@ rfm9x.tx_power = 23
 data_to_send = bytes("Hello LoRa!\r\n","utf-8")
 prev_packet = None
 # time to delay periodic packet sends (in seconds)
-data_pkt_delay = 5.0
+data_pkt_delay = 30.0
 
 def send_pi_data_periodic():
     threading.Timer(data_pkt_delay, send_pi_data_periodic).start()
@@ -62,7 +62,7 @@ def send_pi_data():
     display.text('Sent Packet', 35, 15, 1)
     print('Sent Packet!')
     display.show()
-    time.sleep(0.1)
+    time.sleep(0.5)
 
 while True:
     packet = None
