@@ -76,7 +76,7 @@ class Display:
             self.draw_triangle()
         elif self.shape == shapes.SAWTOOTH:
             self.draw_sawtooth()
-        self.oled.text("{0}".format(self.frequency), 40, 10)
+        self.oled.text("{0}".format(self.frequency), 40, 10, 1)
         self.oled.show()
 
 
