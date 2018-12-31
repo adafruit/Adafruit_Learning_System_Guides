@@ -5,6 +5,7 @@ Learn Guide: https://learn.adafruit.com/lora-and-lorawan-for-raspberry-pi
 Author: Brent Rubell for Adafruit Industries
 """
 import time
+import threading
 import busio
 from digitalio import DigitalInOut, Direction, Pull
 import board
@@ -22,6 +23,11 @@ btnA.pull = Pull.UP
 btnB = DigitalInOut(board.D6)
 btnB.direction = Direction.INPUT
 btnB.pull = Pull.UP
+
+# Button C
+btnC = DigitalInOut(board.D12)
+btnC.direction = Direction.INPUT
+btnC.pull = Pull.UP
 
 # Create the I2C interface.
 i2c = busio.I2C(board.SCL, board.SDA)
@@ -42,6 +48,22 @@ rfm9x = adafruit_rfm9x.RFM9x(spi, CS, RESET, 915.0)
 rfm9x.tx_power = 23
 data_to_send = bytes("Hello LoRa!\r\n","utf-8")
 prev_packet = None
+# time to delay periodic packet sends (in seconds)
+data_pkt_delay = 5.0
+
+def send_pi_data_periodic():
+    threading.Timer(data_pkt_delay, send_pi_data_periodic).start()
+    print("Sending periodic data...")
+    send_pi_data()
+
+def send_pi_data():
+    rfm9x.send(data_to_send)
+    display.fill(0)
+    display.text('Sent Packet', 35, 15, 1)
+    print('Sent Packet!')
+    display.show()
+    time.sleep(0.1)
+
 while True:
     packet = None
     # draw a box to clear the image
@@ -50,7 +72,6 @@ while True:
 
     # check for packet rx
     packet = rfm9x.receive()
-    print(packet)
     if packet is None:
         display.show()
         display.text('- Waiting for PKT -', 0, 20, 1)
@@ -65,11 +86,7 @@ while True:
 
     if not btnA.value:
         # Send Packet
-        rfm9x.send(data_to_send)
-        display.fill(0)
-        display.text('Sent Packet', 0, 25, 1)
-        display.show()
-        time.sleep(0.1)
+        send_pi_data()
     elif not btnB.value:
         # Display the previous packet text and rssi
         display.fill(0)
@@ -80,7 +97,13 @@ while True:
         else:
             display.text('No Pkt RCVd', 0, 16, 1)
         display.show()
-        time.sleep(2)
+        time.sleep(1)
+    elif not btnC.value:
+        display.fill(0)
+        display.text('* Periodic Mode *', 15, 0, 1)
+        display.show()
+        time.sleep(0.2)
+        send_pi_data_periodic()
 
 
     display.show()
