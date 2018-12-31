@@ -5,6 +5,7 @@ Learn Guide: https://learn.adafruit.com/lora-and-lorawan-for-raspberry-pi
 Author: Brent Rubell for Adafruit Industries
 """
 import time
+import subprocess
 import busio
 from digitalio import DigitalInOut, Direction, Pull
 import board
@@ -50,8 +51,22 @@ app = bytearray([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 ttn_config = TTN(devaddr, nwkey, app, country='US')
 # Initialize lora object
 lora = TinyLoRa(spi, cs, irq, ttn_config)
-# Data to send to TTN
-data = bytearray(b"\x01\x02\x03\x04")
+# 2b array to store sensor data
+data_pkt = bytearray(2)
+
+def send_pi_data(data):
+    # Encode float as int
+    data = int(data * 100)
+    # Encode payload as bytes
+    data_pkt[0] = (data >> 8) & 0xff
+    data_pkt[1] = data & 0xff
+    # Send data packet
+    lora.send_data(data_pkt, len(data_pkt), lora.frame_counter)
+    lora.frame_counter += 1
+    display.fill(0)
+    display.text('Sent Data to TTN!', 15, 15, 1)
+    display.show()
+    time.sleep(0.5)
 
 while True:
     packet = None
@@ -59,18 +74,20 @@ while True:
     display.fill(0)
     display.text('RasPi LoRaWAN', 35, 0, 1)
 
+    # read the raspberry pi cpu load
+    cmd = "top -bn1 | grep load | awk '{printf \"%.1f\", $(NF-2)}'"
+    CPU = subprocess.check_output(cmd, shell = True )
+    CPU = float(CPU)
+
     if not btnA.value:
         # Send Packet
-        lora.send_data(data, len(data), lora.frame_counter)
-        display.fill(0)
-        display.text('Sent Packet to TTN!', 0, 25, 1)
-        display.show()
-        time.sleep(0.1)
+        send_pi_data(CPU)
+
     if not btnB.value:
-        # Display pkt data
+        # Display CPU Load
         display.fill(0)
-        display.text('PKT Data:', 35, 0, 1)
-        display.text(data.decode(), 0, 25, 1)
+        display.text('CPU Load %', 45, 0, 1)
+        display.text(str(CPU), 60, 15, 1)
         display.show()
         time.sleep(0.1)
 
