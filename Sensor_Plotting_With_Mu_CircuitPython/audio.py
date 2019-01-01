@@ -23,7 +23,7 @@ def normalized_rms(values):
 mic = audiobusio.PDMIn(
     board.MICROPHONE_CLOCK,
     board.MICROPHONE_DATA,
-    frequency=16000,
+    sample_rate=16000,
     bit_depth=16
 )
 samples = array.array('H', [0] * 160)
