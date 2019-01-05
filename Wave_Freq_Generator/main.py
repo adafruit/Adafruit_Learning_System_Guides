@@ -16,7 +16,7 @@ import rotaryio
 import board
 import digitalio
 from display import Display
-from debouncer import Debouncer
+from adafruit_debouncer import Debouncer
 from generator import Generator
 import shapes
 
@@ -38,14 +38,19 @@ def get_encoder_change(encoder, pos):
     else:
         return (new_position, new_position - pos)
 
+def make_debouncable(pin):
+    switch_io = digitalio.DigitalInOut(pin)
+    switch_io.direction = digitalio.Direction.INPUT
+    switch_io.pull = digitalio.Pull.UP
+    return switch_io
 
 def run():
     display = Display()
     generator = Generator()
-    button_a = Debouncer(board.D9, digitalio.Pull.UP, 0.01)
-    button_b = Debouncer(board.D6, digitalio.Pull.UP, 0.01)
-    button_c = Debouncer(board.D5, digitalio.Pull.UP, 0.01)
-    encoder_button = Debouncer(board.D12, digitalio.Pull.UP, 0.01)
+    button_a = Debouncer(make_debouncable(board.D9))
+    button_b = Debouncer(make_debouncable(board.D6))
+    button_c = Debouncer(make_debouncable(board.D5))
+    encoder_button = Debouncer(make_debouncable(board.D12))
     encoder = rotaryio.IncrementalEncoder(board.D10, board.D11)
 
     current_position = None               # current encoder position
