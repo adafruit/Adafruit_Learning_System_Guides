@@ -20,13 +20,15 @@ import rotaryio
 import pulseio
 import adafruit_ssd1306
 from adafruit_motor import servo
-
-from debouncer import Debouncer
+from adafruit_debouncer import Debouncer
 
 #--------------------------------------------------------------------------------
 # Initialize Rotary encoder
 
-button = Debouncer(board.D12, digitalio.Pull.UP, 0.01)
+button_io = digitalio.DigitalInOut(board.D12)
+button_io.direction = digitalio.Direction.INPUT
+button_io.pull = digitalio.Pull.UP
+button = Debouncer(button_io)
 rotary_encoder = rotaryio.IncrementalEncoder(board.D10, board.D11)
 
 #--------------------------------------------------------------------------------

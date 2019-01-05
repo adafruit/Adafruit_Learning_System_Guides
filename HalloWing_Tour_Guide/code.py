@@ -18,7 +18,7 @@ import displayio
 import audioio
 from busio import UART
 import adafruit_gps
-from debouncer import Debouncer
+from adafruit_debouncer import Debouncer
 
 uart = UART(board.TX, board.RX, baudrate=9600, timeout=3000)
 gps = adafruit_gps.GPS(uart)
@@ -31,7 +31,11 @@ gps.send_command(b'PMTK314,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0')
 # Set update rate to once a second (1hz) which is what you typically want.
 gps.send_command(b'PMTK220,1000')
 
-switch = Debouncer(board.SENSE, Pull.UP, 0.01)
+switch_io = DigitalInOut(board.SENSE)
+switch_io.direction = Direction.INPUT
+switch_io.pull = Pull.UP
+
+switch = Debouncer(switch_io)
 
 audio = audioio.AudioOut(board.A0)
 

@@ -35,7 +35,7 @@ import board
 import busio
 import digitalio
 import storage
-from debouncer import Debouncer
+from adafruit_debouncer import Debouncer
 from directory_node import DirectoryNode
 from emulator import Emulator
 
@@ -44,7 +44,10 @@ from emulator import Emulator
 # Initialize Rotary encoder
 
 # Encoder button is a digital input with pullup on D2
-button = Debouncer(board.D2, digitalio.Pull.UP, 0.01)
+encoder_switch = digitalio.DigitalInOut(board.D2)
+encoder_switch.direction = digitalio.Direction.INPUT
+encoder_switch.pull = digitalio.Pull.UP
+button = Debouncer(encoder_switch)
 
 # Rotary encoder inputs with pullup on D3 & D4
 rot_a = digitalio.DigitalInOut(board.D4)

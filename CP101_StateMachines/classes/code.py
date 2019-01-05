@@ -17,14 +17,14 @@ All text above must be included in any redistribution.
 import time
 import random
 import board
-from digitalio import DigitalInOut, Direction, Pull
+import  digitalio
 import busio
 import adafruit_ds3231
 import audioio
 import pulseio
 from adafruit_motor import servo
 import neopixel
-from debouncer import Debouncer
+from adafruit_debouncer import Debouncer
 
 # Set to false to disable testing/tracing code
 TESTING = True
@@ -47,8 +47,8 @@ SERVO_PIN = board.A1
 
 # Power to the speaker and neopixels must be enabled using this pin
 
-enable = DigitalInOut(POWER_PIN)
-enable.direction = Direction.OUTPUT
+enable = digitalio.DigitalInOut(POWER_PIN)
+enable.direction = digitalio.Direction.OUTPUT
 enable.value = True
 
 i2c = busio.I2C(board.SCL, board.SDA)
@@ -60,7 +60,10 @@ strip = neopixel.NeoPixel(NEOPIXEL_PIN, NUM_PIXELS, brightness=1, auto_write=Fal
 strip.fill(0)                          # NeoPixels off ASAP on startup
 strip.show()
 
-switch = Debouncer(SWITCH_PIN, Pull.UP, 0.01)
+switch_io = digitalio.DigitalInOut(SWITCH_PIN)
+switch_io.direction = digitalio.Direction.INPUT
+switch_io.pull = digitalio.Pull.UP
+switch = Debouncer(switch_io)
 
 # create a PWMOut object on Pin A2.
 pwm = pulseio.PWMOut(SERVO_PIN, duty_cycle=2 ** 15, frequency=50)

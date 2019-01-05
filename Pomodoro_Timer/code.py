@@ -28,14 +28,17 @@ from math import ceil
 import board
 import rotaryio
 import neopixel
-import debouncer
+from adafruit_debouncer import Debouncer
 import digitalio
 import pulseio
 
 # Setup the hardware
 
 encoder = rotaryio.IncrementalEncoder(board.D9, board.D7)
-button = debouncer.Debouncer(board.D10, digitalio.Pull.UP, 0.01)
+button_io = digitalio.DigitalInOut(board.D10)
+button_io.direction = digitalio.Direction.INPUT
+button_io.pull = digitalio.Pull.UP
+button = Debouncer(button_io)
 strip = neopixel.NeoPixel(board.D11, 16, brightness=1, auto_write=False)
 
 last_position = 0
