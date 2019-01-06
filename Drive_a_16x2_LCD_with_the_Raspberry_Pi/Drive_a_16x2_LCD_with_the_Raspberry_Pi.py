@@ -9,6 +9,8 @@ import adafruit_character_lcd.character_lcd as characterlcd
 lcd_columns = 16
 lcd_rows = 2
 
+# compatible with all versions of RPI as of Jan. 2019
+# v1 - v3B+
 lcd_rs = digitalio.DigitalInOut(board.D22)
 lcd_en = digitalio.DigitalInOut(board.D17)
 lcd_d4 = digitalio.DigitalInOut(board.D25)
