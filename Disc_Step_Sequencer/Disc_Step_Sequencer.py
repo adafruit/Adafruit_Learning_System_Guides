@@ -18,7 +18,7 @@ import audioio
 import board
 from digitalio import DigitalInOut, Direction
 from adafruit_crickit import crickit
-from debouncer import Debouncer
+from adafruit_debouncer import Debouncer
 
 #  You get 4 samples, they must all have the same sample rate and must
 #  all be mono or stereo (no mix-n-match!)
