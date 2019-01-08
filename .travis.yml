@@ -5,10 +5,38 @@ python:
     - "3.6"
 
 cache:
-    pip: true
+
+cache:
+  pip: true
+  directories:
+    - ~/arduino_ide
+    - ~/.arduino15/packages/
+
+env:
+  global:
+    - ARDUINO_IDE_VERSION="1.8.7"
+    - PRETTYNAME="Adafruit Learning System Guides"
+    - PLATFORM_CHECK_ONLY_ON_FILE=true
+
+before_install:
+  - source ./travis-ci-arduino-install
 
 install:
+  - arduino --install-library "Adafruit ILI9341"
+  - arduino --install-library "Adafruit GFX Library"
+  - arduino --install-library "FastLED"
+  - arduino --install-library "Adafruit NeoTrellis M4 Library"
+  - arduino --install-library "Adafruit Keypad"
+  - arduino --install-library "Adafruit NeoPixel"
+  - arduino --install-library "Adafruit DMA neopixel library"
+  - arduino --install-library "Adafruit NeoMatrix"
+  - arduino --install-library "Adafruit Zero DMA Library"
+  - arduino --install-library "MIDIUSB"
   - pip install --force-reinstall pylint==1.9.2
 
 script:
   - ./pylint_check
+  - build_main_platforms
+  - build_cplay_platforms
+  - build_m4_platforms
+  - build_io_platforms
