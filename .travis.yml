@@ -33,6 +33,7 @@ install:
   - arduino --install-library "Adafruit Zero DMA Library"
   - arduino --install-library "MIDIUSB"
   - arduino --install-library "Adafruit SoftServo"
+  - arduino --install-library "TinyWireM"
   - pip install --force-reinstall pylint==1.9.2
 
 script:
