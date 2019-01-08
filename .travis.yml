@@ -32,11 +32,13 @@ install:
   - arduino --install-library "Adafruit NeoMatrix"
   - arduino --install-library "Adafruit Zero DMA Library"
   - arduino --install-library "MIDIUSB"
+  - arduino --install-library "Adafruit SoftServo"
   - pip install --force-reinstall pylint==1.9.2
 
 script:
   - ./pylint_check
   - build_main_platforms
+  - build_aux_platforms
   - build_cplay_platforms
   - build_m4_platforms
   - build_io_platforms
