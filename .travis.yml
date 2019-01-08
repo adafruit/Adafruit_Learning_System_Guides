@@ -19,7 +19,7 @@ env:
     - PLATFORM_CHECK_ONLY_ON_FILE=true
 
 before_install:
-  - source ./travis-ci-arduino-install
+  - source <(curl -SLs https://raw.githubusercontent.com/adafruit/travis-ci-arduino/platform_check_only_if_file/install.sh)
 
 install:
   - arduino --install-library "Adafruit ILI9341"
