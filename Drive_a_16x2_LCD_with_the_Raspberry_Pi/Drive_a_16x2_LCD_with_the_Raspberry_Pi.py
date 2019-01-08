@@ -35,6 +35,7 @@ def find_interface():
 # find an active IP on the first LIVE network device
 def parse_ip():
     find_ip = "ip addr show %s" % interface
+    find_ip = "ip addr show %s" % interface
     ip_parse = run_cmd(find_ip)
     for line in ip_parse.splitlines():
         if "inet " in line:
@@ -52,6 +53,7 @@ def run_cmd(cmd):
 lcd.clear()
 
 # before we start the main loop - detect active network device and ip address
+sleep(2)
 interface = find_interface()
 ip_address = parse_ip()
 
