@@ -1,0 +1,25 @@
+#!/bin/bash
+
+[ ! -d $HOME/Arduino/libraries/Adafruit_ILI9341 ] && arduino --install-library "Adafruit ILI9341"
+sleep 1
+[ ! -d $HOME/Arduino/libraries/Adafruit_GFX_Library ] && arduino --install-library "Adafruit GFX Library"
+sleep 1
+[ ! -d $HOME/Arduino/libraries/FastLED ] && arduino --install-library "FastLED"
+sleep 1
+[ ! -d $HOME/Arduino/libraries/Adafruit_NeoTrellis_M4_Library ] && arduino --install-library "Adafruit NeoTrellis M4 Library"
+sleep 1
+[ ! -d $HOME/Arduino/libraries/Adafruit_Keypad ] && arduino --install-library "Adafruit Keypad"
+sleep 1
+[ ! -d $HOME/Arduino/libraries/Adafruit_NeoPixel ] && arduino --install-library "Adafruit NeoPixel"
+sleep 1
+[ ! -d $HOME/Arduino/libraries/Adafruit_DMA_neopixel_library ] && arduino --install-library "Adafruit DMA neopixel library"
+sleep 1
+[ ! -d $HOME/Arduino/libraries/Adafruit_NeoMatrix ] && arduino --install-library "Adafruit NeoMatrix"
+sleep 1
+[ ! -d $HOME/Arduino/libraries/Adafruit_Zero_DMA_Library ] && arduino --install-library "Adafruit Zero DMA Library"
+sleep 1
+[ ! -d $HOME/Arduino/libraries/MIDIUSB ] && arduino --install-library "MIDIUSB"
+sleep 1
+[ ! -d $HOME/Arduino/libraries/Adafruit_SoftServo ] && arduino --install-library "Adafruit SoftServo"
+sleep 1
+[ ! -d $HOME/Arduino/libraries/TinyWireM ] && arduino --install-library "TinyWireM"

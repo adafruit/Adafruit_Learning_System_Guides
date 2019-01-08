@@ -11,6 +11,7 @@ cache:
   directories:
     - ~/arduino_ide
     - ~/.arduino15/packages/
+    - ~/Arduino
 
 env:
   global:
@@ -22,18 +23,7 @@ before_install:
   - source <(curl -SLs https://raw.githubusercontent.com/adafruit/travis-ci-arduino/platform_check_only_if_file/install.sh)
 
 install:
-  - arduino --install-library "Adafruit ILI9341"
-  - arduino --install-library "Adafruit GFX Library"
-  - arduino --install-library "FastLED"
-  - arduino --install-library "Adafruit NeoTrellis M4 Library"
-  - arduino --install-library "Adafruit Keypad"
-  - arduino --install-library "Adafruit NeoPixel"
-  - arduino --install-library "Adafruit DMA neopixel library"
-  - arduino --install-library "Adafruit NeoMatrix"
-  - arduino --install-library "Adafruit Zero DMA Library"
-  - arduino --install-library "MIDIUSB"
-  - arduino --install-library "Adafruit SoftServo"
-  - arduino --install-library "TinyWireM"
+  - ./arduino_library_install
   - pip install --force-reinstall pylint==1.9.2
 
 script:
