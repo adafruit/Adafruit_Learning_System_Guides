@@ -23,3 +23,7 @@ sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_SoftServo ] && arduino --install-library "Adafruit SoftServo"
 sleep 1
 [ ! -d $HOME/Arduino/libraries/TinyWireM ] && arduino --install-library "TinyWireM"
+sleep 1
+[ ! -d $HOME/Arduino/libraries/Adafruit_BluefruitLE_nRF51 ] && arduino --install-library "Adafruit BluefruitLE nRF51"
+sleep 1
+[ ! -d $HOME/Arduino/libraries/Adafruit_AM_radio_library ] && arduino --install-library "Adafruit AM radio library"
