@@ -1,298 +1,151 @@
 #!/bin/bash
 
 [ ! -d $HOME/Arduino/libraries/FastLED ] && arduino --install-library "FastLED"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/MIDIUSB ] && arduino --install-library "MIDIUSB"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/TinyWireM ] && arduino --install-library "TinyWireM"
-sleep 1
 
 # These are generated:
 [ ! -d $HOME/Arduino/libraries/Adafruit_ADS1X15 ] && arduino --install-library "Adafruit ADS1X15"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_ADXL345 ] && arduino --install-library "Adafruit ADXL345"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_AHRS ] && arduino --install-library "Adafruit AHRS"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_AM2315 ] && arduino --install-library "Adafruit AM2315"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_AM2320_sensor_library ] && arduino --install-library "Adafruit AM2320 sensor library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_AMG88xx_Library ] && arduino --install-library "Adafruit AMG88xx Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_AM_radio_library ] && arduino --install-library "Adafruit AM radio library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_APDS9960_Library ] && arduino --install-library "Adafruit APDS9960 Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_BLEFirmata ] && arduino --install-library "Adafruit BLEFirmata"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_BluefruitLE_nRF51 ] && arduino --install-library "Adafruit BluefruitLE nRF51"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_BME280_Library ] && arduino --install-library "Adafruit BME280 Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_BME680_Library ] && arduino --install-library "Adafruit BME680 Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_BMP085_Library ] && arduino --install-library "Adafruit BMP085 Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_BMP085_Unified ] && arduino --install-library "Adafruit BMP085 Unified"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_BMP183_Library ] && arduino --install-library "Adafruit BMP183 Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_BMP183_Unified_Library ] && arduino --install-library "Adafruit BMP183 Unified Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_BMP280_Library ] && arduino --install-library "Adafruit BMP280 Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_BMP3XX_Library ] && arduino --install-library "Adafruit BMP3XX Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_BNO055 ] && arduino --install-library "Adafruit BNO055"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_CAP1188_Library ] && arduino --install-library "Adafruit CAP1188 Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_CC3000_Library ] && arduino --install-library "Adafruit CC3000 Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_CCS811_Library ] && arduino --install-library "Adafruit CCS811 Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_Circuit_Playground ] && arduino --install-library "Adafruit Circuit Playground"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_composite_video_Library ] && arduino --install-library "Adafruit composite video Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_DAP_library ] && arduino --install-library "Adafruit DAP library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_DMA_neopixel_library ] && arduino --install-library "Adafruit DMA neopixel library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_DotStar ] && arduino --install-library "Adafruit DotStar"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_DRV2605_Library ] && arduino --install-library "Adafruit DRV2605 Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_EPD ] && arduino --install-library "Adafruit EPD"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_ESP8266 ] && arduino --install-library "Adafruit ESP8266"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_Fingerprint_Sensor_Library ] && arduino --install-library "Adafruit Fingerprint Sensor Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_Flora_Pixel_Library ] && arduino --install-library "Adafruit Flora Pixel Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_FONA_Library ] && arduino --install-library "Adafruit FONA Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_FRAM_I2C ] && arduino --install-library "Adafruit FRAM I2C"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_FRAM_SPI ] && arduino --install-library "Adafruit FRAM SPI"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_FreeTouch_Library ] && arduino --install-library "Adafruit FreeTouch Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_FT6206_Library ] && arduino --install-library "Adafruit FT6206 Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_FXAS21002C ] && arduino --install-library "Adafruit FXAS21002C"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_FXOS8700 ] && arduino --install-library "Adafruit FXOS8700"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_GFX_Library ] && arduino --install-library "Adafruit GFX Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_GPS_Library ] && arduino --install-library "Adafruit GPS Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_Graphic_VFD_Display_Library ] && arduino --install-library "Adafruit Graphic VFD Display Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_HDC1000_Library ] && arduino --install-library "Adafruit HDC1000 Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_HMC5883_Unified ] && arduino --install-library "Adafruit HMC5883 Unified"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_HTU21DF_Library ] && arduino --install-library "Adafruit HTU21DF Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_HX8340B ] && arduino --install-library "Adafruit HX8340B"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_HX8357_Library ] && arduino --install-library "Adafruit HX8357 Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_ILI9341 ] && arduino --install-library "Adafruit ILI9341"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_ImageReader_Library ] && arduino --install-library "Adafruit ImageReader Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_INA219 ] && arduino --install-library "Adafruit INA219"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_IO_Arduino ] && arduino --install-library "Adafruit IO Arduino"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_IS31FL3731_Library ] && arduino --install-library "Adafruit IS31FL3731 Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_Keypad ] && arduino --install-library "Adafruit Keypad"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_L3GD20_U ] && arduino --install-library "Adafruit L3GD20 U"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_LED_Backpack_Library ] && arduino --install-library "Adafruit LED Backpack Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_LiquidCrystal ] && arduino --install-library "Adafruit LiquidCrystal"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_LIS3DH ] && arduino --install-library "Adafruit LIS3DH"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_LSM303DLHC ] && arduino --install-library "Adafruit LSM303DLHC"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_LSM9DS0_Library ] && arduino --install-library "Adafruit LSM9DS0 Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_LSM9DS1_Library ] && arduino --install-library "Adafruit LSM9DS1 Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_MAX31855_library ] && arduino --install-library "Adafruit MAX31855 library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_MAX31856_library ] && arduino --install-library "Adafruit MAX31856 library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_MAX31865_library ] && arduino --install-library "Adafruit MAX31865 library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_MCP23008_library ] && arduino --install-library "Adafruit MCP23008 library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_MCP23017_Arduino_Library ] && arduino --install-library "Adafruit MCP23017 Arduino Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_MCP3008 ] && arduino --install-library "Adafruit MCP3008"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_MCP4725 ] && arduino --install-library "Adafruit MCP4725"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_MCP9808_Library ] && arduino --install-library "Adafruit MCP9808 Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_MFRC630_RFID ] && arduino --install-library "Adafruit MFRC630 RFID"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_microbit_Library ] && arduino --install-library "Adafruit microbit Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_MiniMLX90614 ] && arduino --install-library "Adafruit MiniMLX90614"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_MLX90614_Library ] && arduino --install-library "Adafruit MLX90614 Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_MMA8451_Library ] && arduino --install-library "Adafruit MMA8451 Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_Motor_Shield_library ] && arduino --install-library "Adafruit Motor Shield library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_Motor_Shield_V2_Library ] && arduino --install-library "Adafruit Motor Shield V2 Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_mp3 ] && arduino --install-library "Adafruit_mp3"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_MPL115A2 ] && arduino --install-library "Adafruit MPL115A2"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_MPL3115A2_Library ] && arduino --install-library "Adafruit MPL3115A2 Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_MPR121 ] && arduino --install-library "Adafruit MPR121"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_MPRLS_Library ] && arduino --install-library "Adafruit MPRLS Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_MQTT_Library ] && arduino --install-library "Adafruit MQTT Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_NeoMatrix ] && arduino --install-library "Adafruit NeoMatrix"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_NeoMatrix_ZeroDMA_library ] && arduino --install-library "Adafruit NeoMatrix ZeroDMA library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_NeoPixel ] && arduino --install-library "Adafruit NeoPixel"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_NeoPXL8 ] && arduino --install-library "Adafruit NeoPXL8"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_NeoTrellis_M4_Library ] && arduino --install-library "Adafruit NeoTrellis M4 Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_nRF8001 ] && arduino --install-library "Adafruit nRF8001"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_PCD8544_Nokia_5110_LCD_library ] && arduino --install-library "Adafruit PCD8544 Nokia 5110 LCD library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_PN532 ] && arduino --install-library "Adafruit PN532"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_PS2_Trackpad ] && arduino --install-library "Adafruit PS2 Trackpad"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_PWM_Servo_Driver_Library ] && arduino --install-library "Adafruit PWM Servo Driver Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_QSPI ] && arduino --install-library "Adafruit QSPI"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_RA8875 ] && arduino --install-library "Adafruit RA8875"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_RGB_LCD_Shield_Library ] && arduino --install-library "Adafruit RGB LCD Shield Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_seesaw_Library ] && arduino --install-library "Adafruit seesaw Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_SGP30_Sensor ] && arduino --install-library "Adafruit SGP30 Sensor"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_SHARP_Memory_Display ] && arduino --install-library "Adafruit SHARP Memory Display"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_SHT31_Library ] && arduino --install-library "Adafruit SHT31 Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_SI1145_Library ] && arduino --install-library "Adafruit SI1145 Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_Si4713_Library ] && arduino --install-library "Adafruit Si4713 Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_Si5351_Library ] && arduino --install-library "Adafruit Si5351 Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_Si7021_Library ] && arduino --install-library "Adafruit Si7021 Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_SleepyDog_Library ] && arduino --install-library "Adafruit SleepyDog Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_SoftServo ] && arduino --install-library "Adafruit SoftServo"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_Soundboard_library ] && arduino --install-library "Adafruit Soundboard library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_SPIFlash ] && arduino --install-library "Adafruit SPIFlash"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_SSD1306 ] && arduino --install-library "Adafruit SSD1306"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_SSD1306_Wemos_Mini_OLED ] && arduino --install-library "Adafruit SSD1306 Wemos Mini OLED"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_SSD1325 ] && arduino --install-library "Adafruit SSD1325"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_SSD1331_OLED_Driver_Library_for_Arduino ] && arduino --install-library "Adafruit SSD1331 OLED Driver Library for Arduino"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_SSD1351_library ] && arduino --install-library "Adafruit SSD1351 library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_ST7735_and_ST7789_Library ] && arduino --install-library "Adafruit ST7735 and ST7789 Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_STMPE610 ] && arduino --install-library "Adafruit STMPE610"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_TCS34725 ] && arduino --install-library "Adafruit TCS34725"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_Thermal_Printer_Library ] && arduino --install-library "Adafruit Thermal Printer Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_TiCoServo ] && arduino --install-library "Adafruit TiCoServo"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_TinyFlash ] && arduino --install-library "Adafruit TinyFlash"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_TinyRGBLCDShield ] && arduino --install-library "Adafruit TinyRGBLCDShield"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_TLC5947 ] && arduino --install-library "Adafruit TLC5947"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_TLC59711 ] && arduino --install-library "Adafruit TLC59711"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_TMP006 ] && arduino --install-library "Adafruit TMP006"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_TMP007_Library ] && arduino --install-library "Adafruit TMP007 Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_TouchScreen ] && arduino --install-library "Adafruit TouchScreen"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_TPA2016_Library ] && arduino --install-library "Adafruit TPA2016 Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_Trellis_Library ] && arduino --install-library "Adafruit Trellis Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_TSL2561 ] && arduino --install-library "Adafruit TSL2561"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_TSL2591_Library ] && arduino --install-library "Adafruit TSL2591 Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_Unified_Sensor ] && arduino --install-library "Adafruit Unified Sensor"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_UNTZtrument ] && arduino --install-library "Adafruit UNTZtrument"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_VC0706_Serial_Camera_Library ] && arduino --install-library "Adafruit VC0706 Serial Camera Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_VCNL4010 ] && arduino --install-library "Adafruit_VCNL4010"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_VEML6070_Library ] && arduino --install-library "Adafruit VEML6070 Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_VEML6075_Library ] && arduino --install-library "Adafruit VEML6075 Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_VL53L0X ] && arduino --install-library "Adafruit_VL53L0X"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_VL6180X ] && arduino --install-library "Adafruit_VL6180X"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_VS1053_Library ] && arduino --install-library "Adafruit VS1053 Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_WS2801_Library ] && arduino --install-library "Adafruit WS2801 Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_Zero_DMA_Library ] && arduino --install-library "Adafruit Zero DMA Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_Zero_FFT_Library ] && arduino --install-library "Adafruit Zero FFT Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_Zero_I2S_Library ] && arduino --install-library "Adafruit Zero I2S Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_Zero_PDM_Library ] && arduino --install-library "Adafruit Zero PDM Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Adafruit_ZeroTimer_Library ] && arduino --install-library "Adafruit ZeroTimer Library"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/U8g2_for_Adafruit_GFX ] && arduino --install-library "U8g2_for_Adafruit_GFX"
-sleep 1
 [ ! -d $HOME/Arduino/libraries/Wemos_Matrix_Adafruit_GFX ] && arduino --install-library "Wemos Matrix Adafruit GFX"
-sleep 1
