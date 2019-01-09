@@ -1,0 +1,15 @@
+[Unit]
+Description=LCD date|time|ip
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+ExecStart=/usr/bin/python3 Drive_a_16x2_LCD_with_the_Raspberry_Pi.py
+WorkingDirectory=/home/pi
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+User=pi
+
+[Install]
+WantedBy=network-online.target
