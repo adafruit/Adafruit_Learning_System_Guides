@@ -1,5 +1,7 @@
 # Music Box code in CircuitPython - Dano Wall and Mike Barela
 
+import os
+import random
 from busio import I2C
 from adafruit_seesaw.seesaw import Seesaw
 from adafruit_seesaw.pwmout import PWMOut
@@ -9,8 +11,6 @@ from simpleio import map_range
 import neopixel
 import audioio
 import board
-import os
-import random
 
 # Create seesaw object
 i2c = I2C(board.SCL, board.SDA)
@@ -20,7 +20,7 @@ seesaw = Seesaw(i2c)
 pwm = PWMOut(seesaw, 16)
 pwm.frequency = 50
 myservo = servo.Servo(pwm)
-myservo.angle = 0  
+myservo.angle = 0
 
 # Find all Wave files on the storage
 wavefiles = [file for file in os.listdir("/")
@@ -61,7 +61,7 @@ def wheel(pos):
         return 0, int(255 - pos * 3), int(pos * 3)
     pos -= 170
     return int(pos * 3), 0, int(255 - (pos * 3))
-    
+
 def rainbow(value):
     for i in range(10):
         pixels[i] = wheel((value * i) & 255)
@@ -79,7 +79,7 @@ while True:
         else:
             myservo.angle = 123 - int(index / 2)
         if (index % 40) == 0 and not cpx_audio.playing:
-            play_file(random.choice(wavefiles))        
+            play_file(random.choice(wavefiles))
         rainbow(index)
         index += 1
 
