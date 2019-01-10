@@ -153,3 +153,5 @@ echo "Installing libraries:"
 [ ! -d $HOME/Arduino/libraries/Adafruit_ZeroTimer_Library ] && arduino --install-library "Adafruit ZeroTimer Library"
 [ ! -d $HOME/Arduino/libraries/U8g2_for_Adafruit_GFX ] && arduino --install-library "U8g2_for_Adafruit_GFX"
 [ ! -d $HOME/Arduino/libraries/Wemos_Matrix_Adafruit_GFX ] && arduino --install-library "Wemos Matrix Adafruit GFX"
+
+exit 0
