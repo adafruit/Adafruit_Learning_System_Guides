@@ -1,5 +1,9 @@
 #!/bin/bash
 
+echo "Cached Arduino libraries:"
+ls -l "$HOME/Arduino/libraries"
+
+echo "Installing libraries:"
 [ ! -d $HOME/Arduino/libraries/FastLED ] && arduino --install-library "FastLED"
 [ ! -d $HOME/Arduino/libraries/MIDIUSB ] && arduino --install-library "MIDIUSB"
 [ ! -d $HOME/Arduino/libraries/TinyWireM ] && arduino --install-library "TinyWireM"

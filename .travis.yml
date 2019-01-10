@@ -23,7 +23,7 @@ before_install:
   - source <(curl -SLs https://raw.githubusercontent.com/adafruit/travis-ci-arduino/platform_check_only_if_file/install.sh)
 
 install:
-  - ./arduino_library_install
+  - ./arduino_libinstall
   - pip install --force-reinstall pylint==1.9.2
 
 script:
