@@ -20,7 +20,7 @@ env:
     - PLATFORM_CHECK_ONLY_ON_FILE=true
 
 before_install:
-  - source <(curl -SLs https://raw.githubusercontent.com/adafruit/travis-ci-arduino/platform_check_only_if_file/install.sh)
+  - source <(curl -SLs https://raw.githubusercontent.com/adafruit/travis-ci-arduino/master/install.sh)
 
 install:
   - ./arduino_libinstall
