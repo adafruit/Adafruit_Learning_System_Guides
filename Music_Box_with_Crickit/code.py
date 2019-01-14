@@ -1,7 +1,5 @@
 # Music Box code in CircuitPython - Dano Wall and Mike Barela
 
-import os
-import random
 from busio import I2C
 from adafruit_seesaw.seesaw import Seesaw
 from adafruit_seesaw.pwmout import PWMOut
@@ -11,6 +9,8 @@ from simpleio import map_range
 import neopixel
 import audioio
 import board
+import os
+import random
 
 # Create seesaw object
 i2c = I2C(board.SCL, board.SDA)
@@ -20,7 +20,7 @@ seesaw = Seesaw(i2c)
 pwm = PWMOut(seesaw, 16)
 pwm.frequency = 50
 myservo = servo.Servo(pwm)
-myservo.angle = 0
+myservo.angle = 0  
 
 # Find all Wave files on the storage
 wavefiles = [file for file in os.listdir("/")
@@ -70,20 +70,24 @@ index = 0
 sign = 1
 
 while True:
-    while light() > 150:
+    if light() < 130:
+        # Turn things off if light level < value
+        pixels.fill((0, 0, 0))
+        # myservo.angle = 0.0
+        cpx_audio.stop()
+    else:
+        # calculate servo rotation
         if index > 246:
             index = 0
             sign = sign * -1
+        # Move servo one slot depending on current direction
         if sign == 1:
             myservo.angle = int(index / 2)
         else:
             myservo.angle = 123 - int(index / 2)
+        # play wav file when index is a multiple of 40 (~6x per
+        # servo rotation and the sound is not already playing
         if (index % 40) == 0 and not cpx_audio.playing:
             play_file(random.choice(wavefiles))
         rainbow(index)
         index += 1
-
-    # Turn things off if light level <= value above
-    pixels.fill((0, 0, 0))
-    myservo.angle = 0.0
-    cpx_audio.stop()
