@@ -20,7 +20,7 @@ seesaw = Seesaw(i2c)
 pwm = PWMOut(seesaw, 16)
 pwm.frequency = 50
 myservo = servo.Servo(pwm)
-myservo.angle = 0  
+myservo.angle = 0 
 
 # Find all Wave files on the storage
 wavefiles = [file for file in os.listdir("/")
