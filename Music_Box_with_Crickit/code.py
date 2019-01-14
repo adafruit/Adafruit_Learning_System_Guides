@@ -1,5 +1,7 @@
 # Music Box code in CircuitPython - Dano Wall and Mike Barela
 
+import os
+import random
 from busio import I2C
 from adafruit_seesaw.seesaw import Seesaw
 from adafruit_seesaw.pwmout import PWMOut
@@ -9,8 +11,6 @@ from simpleio import map_range
 import neopixel
 import audioio
 import board
-import os
-import random
 
 # Create seesaw object
 i2c = I2C(board.SCL, board.SDA)
