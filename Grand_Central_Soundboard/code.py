@@ -19,18 +19,22 @@ keypad = adafruit_matrixkeypad.Matrix_Keypad(rows, cols, keys)
 wavefiles = [file for file in os.listdir("/sounds/")
              if (file.endswith(".wav") and not file.startswith("._"))]
 if len(wavefiles) < 1:
-    print("No wav files found in root directory")
+    print("No wav files found in sounds directory")
 else:
     print("Audio files found: ", wavefiles)
 
 # audio output
 gc_audio = audioio.AudioOut(board.A0)
+audio_file = None
 
 def play_file(filename):
+    global audio_file  # pylint: disable=global-statement
     if gc_audio.playing:
         gc_audio.stop()
-    f = open(filename, "rb")
-    wav = audioio.WaveFile(f)
+    if audio_file:
+        audio_file.close()
+    audio_file = open(filename, "rb")
+    wav = audioio.WaveFile(audio_file)
     gc_audio.play(wav)
 
 while True:
@@ -43,4 +47,6 @@ while True:
             play_file(soundfile)
         if button == 0:
             gc_audio.stop()
+            if audio_file:
+                audio_file.close()
     time.sleep(0.1)
