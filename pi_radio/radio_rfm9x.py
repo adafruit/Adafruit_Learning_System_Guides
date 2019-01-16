@@ -41,7 +41,7 @@ width = display.width
 height = display.height
 
 # Configure LoRa Radio
-CS = DigitalInOut(board.D18)
+CS = DigitalInOut(board.CE1)
 RESET = DigitalInOut(board.D25)
 spi = busio.SPI(board.SCK, MOSI=board.MOSI, MISO=board.MISO)
 rfm9x = adafruit_rfm9x.RFM9x(spi, CS, RESET, 915.0)

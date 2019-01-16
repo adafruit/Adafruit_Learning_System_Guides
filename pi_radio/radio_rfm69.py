@@ -34,7 +34,7 @@ width = display.width
 height = display.height
 
 # Configure Packet Radio
-CS = DigitalInOut(board.D18)
+CS = DigitalInOut(board.CE1)
 RESET = DigitalInOut(board.D25)
 spi = busio.SPI(board.SCK, MOSI=board.MOSI, MISO=board.MISO)
 rfm69 = adafruit_rfm69.RFM69(spi, CS, RESET, 915.0)

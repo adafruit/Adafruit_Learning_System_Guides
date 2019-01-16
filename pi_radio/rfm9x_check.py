@@ -14,17 +14,17 @@ import adafruit_ssd1306
 import adafruit_rfm9x
 
 # Button A
-btnA = DigitalInOut(board.D26)
+btnA = DigitalInOut(board.D5)
 btnA.direction = Direction.INPUT
 btnA.pull = Pull.UP
 
 # Button B
-btnB = DigitalInOut(board.D19)
+btnB = DigitalInOut(board.D6)
 btnB.direction = Direction.INPUT
 btnB.pull = Pull.UP
 
 # Button C
-btnC = DigitalInOut(board.D13)
+btnC = DigitalInOut(board.D12)
 btnC.direction = Direction.INPUT
 btnC.pull = Pull.UP
 
@@ -40,7 +40,7 @@ width = display.width
 height = display.height
 
 # Configure RFM9x LoRa Radio
-CS = DigitalInOut(board.D18)
+CS = DigitalInOut(board.CE1)
 RESET = DigitalInOut(board.D25)
 spi = busio.SPI(board.SCK, MOSI=board.MOSI, MISO=board.MISO)
 
