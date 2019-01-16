@@ -28,7 +28,7 @@ gc_audio = audioio.AudioOut(board.A0)
 audio_file = None
 
 def play_file(filename):
-    global audio_file
+    global audio_file  # pylint: disable=global-statement
     if gc_audio.playing:
         gc_audio.stop()
     if audio_file:
