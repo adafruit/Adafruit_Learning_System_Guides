@@ -1,14 +1,11 @@
 # Music Box code in CircuitPython - Dano Wall and Mike Barela
 # Revised by Ladyada 2019-01-16
 
-import os
-import random
 from adafruit_crickit import crickit
 from analogio import AnalogIn
 import neopixel
 import audioio
 import board
-import time
 
 AUDIO_FILENAME = 'fur-elise.wav'
 
@@ -71,3 +68,4 @@ while True:
         # Move servo one degree forward or backward.
         rainbow(int(dancer.angle * 255/MAX_SERVO_ANGLE))
         dancer.angle += move_direction
+        
