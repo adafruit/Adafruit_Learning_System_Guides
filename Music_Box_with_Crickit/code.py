@@ -68,4 +68,3 @@ while True:
         # Move servo one degree forward or backward.
         rainbow(int(dancer.angle * 255/MAX_SERVO_ANGLE))
         dancer.angle += move_direction
-        
