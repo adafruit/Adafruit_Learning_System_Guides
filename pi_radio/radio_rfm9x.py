@@ -6,7 +6,7 @@ Author: Brent Rubell for Adafruit Industries
 """
 # Import Python System Libraries
 import time
-# Import Blinka Libraries 
+# Import Blinka Libraries
 import busio
 from digitalio import DigitalInOut, Direction, Pull
 import board
