@@ -71,7 +71,9 @@ def sign(x):  # determine the sign of x
 while True:
     # read all the knob values
     for i in range(knob_count):
-        cc_value[i] = range_index(knob[i].value, (cc_range[i][1] - cc_range[i][0] + 1), cc_value[i][0], cc_value[i][1])
+        cc_value[i] = range_index(knob[i].value,
+                                  (cc_range[i][1] - cc_range[i][0] + 1),
+                                  cc_value[i][0], cc_value[i][1])
 
     # Form a MIDI message and send it:
     # CC is xB0, then controller number, value can be 0 to 127
