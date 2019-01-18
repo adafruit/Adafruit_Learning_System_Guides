@@ -64,7 +64,7 @@ while True:
         # Display the packet text and rssi
         display.fill(0)
         prev_packet = packet
-        packet_text = str(prev_packet, 'ascii')
+        packet_text = str(prev_packet, "utf-8")
         display.text('RX: ', 0, 0, 1)
         display.text(packet_text, 25, 0, 1)
         time.sleep(1)
