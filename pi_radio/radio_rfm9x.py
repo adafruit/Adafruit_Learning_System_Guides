@@ -4,14 +4,15 @@ Example for using the RFM9x Radio with Raspberry Pi.
 Learn Guide: https://learn.adafruit.com/lora-and-lorawan-for-raspberry-pi
 Author: Brent Rubell for Adafruit Industries
 """
+# Import Python System Libraries
 import time
-import threading
+# Import Blinka Libraries 
 import busio
 from digitalio import DigitalInOut, Direction, Pull
 import board
-# Import thte SSD1306 module.
+# Import the SSD1306 module.
 import adafruit_ssd1306
-# Import the RFM9x
+# Import RFM9x
 import adafruit_rfm9x
 
 # Button A
@@ -46,23 +47,7 @@ RESET = DigitalInOut(board.D25)
 spi = busio.SPI(board.SCK, MOSI=board.MOSI, MISO=board.MISO)
 rfm9x = adafruit_rfm9x.RFM9x(spi, CS, RESET, 915.0)
 rfm9x.tx_power = 23
-data_to_send = bytes("Hello LoRa!\r\n","utf-8")
 prev_packet = None
-# time to delay periodic packet sends (in seconds)
-data_pkt_delay = 30.0
-
-def send_pi_data_periodic():
-    threading.Timer(data_pkt_delay, send_pi_data_periodic).start()
-    print("Sending periodic data...")
-    send_pi_data()
-
-def send_pi_data():
-    rfm9x.send(data_to_send)
-    display.fill(0)
-    display.text('Sent Packet', 35, 15, 1)
-    print('Sent Packet!')
-    display.show()
-    time.sleep(0.5)
 
 while True:
     packet = None
@@ -74,7 +59,7 @@ while True:
     packet = rfm9x.receive()
     if packet is None:
         display.show()
-        display.text('- Waiting for PKT -', 0, 20, 1)
+        display.text('- Waiting for PKT -', 15, 20, 1)
     else:
         # Display the packet text and rssi
         display.fill(0)
@@ -85,26 +70,24 @@ while True:
         time.sleep(1)
 
     if not btnA.value:
-        # Send Packet
-        send_pi_data()
+        # Send Button A
+        display.fill(0)
+        button_a_data = bytes("Button A!\r\n","utf-8")
+        rfm9x.send(button_a_data)
+        display.text('Sent Button A!', 25, 15, 1)
     elif not btnB.value:
-        # Display the previous packet text and rssi
+        # Send Button B
         display.fill(0)
-        if prev_packet is not None:
-            packet_text = str(prev_packet, 'ascii')
-            display.text('RX: ', 0, 0, 1)
-            display.text(packet_text, 25, 0, 1)
-        else:
-            display.text('No Pkt RCVd', 0, 16, 1)
-        display.show()
-        time.sleep(1)
+        button_b_data = bytes("Button B!\r\n","utf-8")
+        rfm9x.send(button_b_data)
+        display.text('Sent Button B!', 25, 15, 1)
     elif not btnC.value:
+        # Send Button C
         display.fill(0)
-        display.text('* Periodic Mode *', 15, 0, 1)
-        display.show()
-        time.sleep(0.2)
-        send_pi_data_periodic()
+        button_c_data = bytes("Button C!\r\n","utf-8")
+        rfm9x.send(button_c_data)
+        display.text('Sent Button C!', 25, 15, 1)
 
 
     display.show()
-    time.sleep(.1)
+    time.sleep(0.1)
