@@ -7,9 +7,9 @@ enable = digitalio.DigitalInOut(board.D10)
 enable.direction = digitalio.Direction.OUTPUT
 enable.value = True
 
-red = pulseio.PWMOut(board.D11, duty_cycle=0)
-green = pulseio.PWMOut(board.D12, duty_cycle=0)
-blue = pulseio.PWMOut(board.D13, duty_cycle=0)
+red = pulseio.PWMOut(board.D11, duty_cycle=0, frequency=20000)
+green = pulseio.PWMOut(board.D12, duty_cycle=0, frequency=20000)
+blue = pulseio.PWMOut(board.D13, duty_cycle=0, frequency=20000)
 
 
 def wheel(pos):

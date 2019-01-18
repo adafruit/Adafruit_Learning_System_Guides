@@ -10,10 +10,10 @@ enable = digitalio.DigitalInOut(board.D10)
 enable.direction = digitalio.Direction.OUTPUT
 enable.value = True
 
-audio = audioio.AudioOut(board.A0)  # Speaker connector
-wave_file = open(WAV_FILE_NAME, "rb")
-wave = audioio.WaveFile(wave_file)
+with audioio.AudioOut(board.A0) as audio:  # Speaker connector
+    wave_file = open(WAV_FILE_NAME, "rb")
+    wave = audioio.WaveFile(wave_file)
 
-audio.play(wave)
-while audio.playing:
-    pass
+    audio.play(wave)
+    while audio.playing:
+        pass
