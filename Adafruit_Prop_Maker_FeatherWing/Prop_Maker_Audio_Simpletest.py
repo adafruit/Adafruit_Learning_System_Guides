@@ -1,4 +1,5 @@
 """Simple example to play a wave file"""
+# This example only works on Feathers that have analog audio out!
 import digitalio
 import board
 import audioio
