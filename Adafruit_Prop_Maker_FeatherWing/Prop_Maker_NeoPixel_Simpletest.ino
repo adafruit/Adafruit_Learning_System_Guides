@@ -35,7 +35,7 @@ Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUM_PIXELS, NEOPIXEL_PIN, NEO_GRB + 
 
 void setup() {
   Serial.begin(115200);
-  Serial.println("\nProp-Maker Wing: Accelerometer");
+  Serial.println("\nProp-Maker Wing: NeoPixel");
 
   // Set power pin to output
   pinMode(POWER_PIN, OUTPUT);
