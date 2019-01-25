@@ -4,13 +4,14 @@
 #  written by John Park with Kattni Rembor and Jan Goolsbey for range and hysteresis code
 
 import time
-import usb_midi
+import adafruit_midi
 import board
 from simpleio import map_range
 from analogio import AnalogIn
 print("---Grand Central MIDI Knobs---")
 
-midi_out = usb_midi.ports[1]  # Set the output MIDI channel (0-16)
+midi = adafruit_midi.MIDI(out_channel=0)  # Set the output MIDI channel (0-15)
+
 knob_count = 16  # Set the total number of potentiometers used
 
 # Create the input objects list for potentiometers
@@ -47,7 +48,7 @@ cc_range = [
 # Initialize cc_value list with current value and offset placeholders
 cc_value = []
 for c in range(knob_count):
-    cc_value.append((0,0))
+    cc_value.append((0, 0))
 
 # range_index converts an analog value (ctl) to an indexed integer
 #  Input is masked to 8 bits to reduce noise then a scaled hysteresis offset
@@ -75,9 +76,9 @@ while True:
                                   (cc_range[i][1] - cc_range[i][0] + 1),
                                   cc_value[i][0], cc_value[i][1])
 
-    # Form a MIDI message and send it:
-    # CC is xB0, then controller number, value can be 0 to 127
+    # Form a MIDI CC message and send it:
+    # controller number is 'n', value can be 0 to 127
     # add controller value minimum as specified in the knob list
-    for m in range(knob_count):
-        midi_out.write(bytearray([0xB0, m, cc_value[m][0] + cc_range[m][0]]))
+    for n in range(knob_count):
+        midi.control_change(n, cc_value[n][0] + cc_range[n][0])
     time.sleep(0.01)
