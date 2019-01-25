@@ -1,11 +1,8 @@
-#!/usr/bin/env python
-
-from imapclient import IMAPClient
 import time
+from imapclient import IMAPClient
+from digitalio import DigitalInOut, Direction
 
-import RPi.GPIO as GPIO
-
-DEBUG = True
+#DEBUG = True
 
 HOSTNAME = 'imap.gmail.com'
 USERNAME = 'your username here'
@@ -15,12 +12,11 @@ MAILBOX = 'Inbox'
 NEWMAIL_OFFSET = 1   # my unread messages never goes to zero, yours might
 MAIL_CHECK_FREQ = 60 # check mail every 60 seconds
 
-GPIO.setwarnings(False)
-GPIO.setmode(GPIO.BCM)
-GREEN_LED = 18
-RED_LED = 23
-GPIO.setup(GREEN_LED, GPIO.OUT)
-GPIO.setup(RED_LED, GPIO.OUT)
+# setup Pi pins as output for LEDs
+green_led = DigitalInOut(board.D18)
+red_led = DigitalInOut(board.D23)
+green_led.direction = Direction.OUTPUT
+red_led = Direction.OUTPUT
 
 def loop():
     server = IMAPClient(HOSTNAME, use_uid=True, ssl=True)
@@ -38,11 +34,11 @@ def loop():
         print "You have", newmails, "new emails!"
 
     if newmails > NEWMAIL_OFFSET:
-        GPIO.output(GREEN_LED, True)
-        GPIO.output(RED_LED, False)
+        green_led.value = True
+        red_led.value = False
     else:
-        GPIO.output(GREEN_LED, False)
-        GPIO.output(RED_LED, True)
+        green_led.value = False
+        red_led.value = True
 
     time.sleep(MAIL_CHECK_FREQ)
 
@@ -51,5 +47,3 @@ if __name__ == '__main__':
         print 'Press Ctrl-C to quit.'
         while True:
             loop()
-    finally:
-        GPIO.cleanup()
