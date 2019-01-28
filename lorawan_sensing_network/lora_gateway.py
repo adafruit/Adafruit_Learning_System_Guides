@@ -69,10 +69,11 @@ ADAFRUIT_IO_KEY = 'KEY'
 aio = Client(ADAFRUIT_IO_USERNAME, ADAFRUIT_IO_KEY)
 
 # Set up Adafruit IO feeds
+device_id_feed = aio.feeds('deviceid')
 temperature_feed = aio.feeds('temperature')
 humidity_feed = aio.feeds('humidity')
-pressure_feed = aio.feeds('pressure')
 altitude_feed = aio.feeds('altitude')
+pressure_feed = aio.feeds('pressure')
 
 while True:
     packet = None
@@ -87,14 +88,37 @@ while True:
         display.text('- Waiting for PKT -', 15, 20, 1)
     else:
         # Get Feather ID from packet header
-        print('New Packet!')
-        print('Device: LoRa Feather #', packet[0])
-
-        # Get temperature from packet, as a float
+        print('> New Packet!')
+        print('Device ID: LoRa Feather #', packet[0])
+        aio.send(device_id_feed.key, packet[0])
+        # Get temperature from packet
         temp_val = (packet[1] << 8) | packet[2];
         temp_val = temp_val / 100;
-        print("\nTemperature: %0.1f C" % temp_val)
         # Send temperature to Adafruit IO
+        print("Sending to IO: %0.2f C" % temp_val)
+        aio.send(temperature_feed.key, temp_val)
 
+        # Get humidity from packet
+        humid_val = (packet[3] << 8) | packet[4];
+        humid_val = humid_val / 100;
+        # Send humidity to Adafruit IO
+        print("Sending to IO: %0.2f %% " % humid_val)
+        aio.send(humidity_feed.key, humid_val)
+
+        # Get altitude from packet
+        alt_val = (packet[5] << 8) | packet[6];
+        alt_val = alt_val / 100;
+        # Send altitude to Adafruit IO
+        print("Sending to IO: %0.2f meters" % alt_val)
+        aio.send(altitude_feed.key, alt_val)
+
+        # Get pressure from packet
+        pres_val = (packet[7] << 8) | packet[8];
+        pres_val = pres_val / 100;
+        # Send altitude to Adafruit IO
+        print("Sending to IO: %0.2f hPa" % pres_val)
+        aio.send(pressure_feed.key, pres_val)
+
+        time.sleep(15)
 
     display.show()
