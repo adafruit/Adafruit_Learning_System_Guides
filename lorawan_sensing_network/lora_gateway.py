@@ -69,11 +69,14 @@ ADAFRUIT_IO_KEY = 'KEY'
 aio = Client(ADAFRUIT_IO_USERNAME, ADAFRUIT_IO_KEY)
 
 # Set up Adafruit IO feeds
-device_id_feed = aio.feeds('deviceid')
-temperature_feed = aio.feeds('temperature')
-humidity_feed = aio.feeds('humidity')
-altitude_feed = aio.feeds('altitude')
-pressure_feed = aio.feeds('pressure')
+temperature_feed = aio.feeds('feather-1-temp')
+humidity_feed = aio.feeds('feather-1-humid')
+altitude_feed = aio.feeds('feather-1-alt')
+pressure_feed = aio.feeds('feather-1-pressure')
+
+def pkt_int_to_float(pkt_val_1, pkt_val_2):
+    float_val = pkt_val_1 << 8 | pkt_val_2
+    return float_val/100
 
 while True:
     packet = None
@@ -90,31 +93,26 @@ while True:
         # Get Feather ID from packet header
         print('> New Packet!')
         print('Device ID: LoRa Feather #', packet[0])
-        aio.send(device_id_feed.key, packet[0])
         # Get temperature from packet
-        temp_val = (packet[1] << 8) | packet[2];
-        temp_val = temp_val / 100;
+        temp_val = pkt_int_to_float(packet[1], packet[2])
         # Send temperature to Adafruit IO
         print("Sending to IO: %0.2f C" % temp_val)
         aio.send(temperature_feed.key, temp_val)
 
         # Get humidity from packet
-        humid_val = (packet[3] << 8) | packet[4];
-        humid_val = humid_val / 100;
+        humid_val = pkt_int_to_float(packet[3], packet[4])
         # Send humidity to Adafruit IO
         print("Sending to IO: %0.2f %% " % humid_val)
         aio.send(humidity_feed.key, humid_val)
 
         # Get altitude from packet
-        alt_val = (packet[5] << 8) | packet[6];
-        alt_val = alt_val / 100;
+        alt_val = pkt_int_to_float(packet[5], packet[6])
         # Send altitude to Adafruit IO
         print("Sending to IO: %0.2f meters" % alt_val)
         aio.send(altitude_feed.key, alt_val)
 
         # Get pressure from packet
-        pres_val = (packet[7] << 8) | packet[8];
-        pres_val = pres_val / 100;
+        pres_val = pkt_int_to_float(packet[7], packet[8])
         # Send altitude to Adafruit IO
         print("Sending to IO: %0.2f hPa" % pres_val)
         aio.send(pressure_feed.key, pres_val)
