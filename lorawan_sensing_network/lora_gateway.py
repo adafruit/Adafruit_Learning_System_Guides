@@ -60,10 +60,10 @@ prev_packet = None
 
 # Set to your Adafruit IO username.
 # (go to https://accounts.adafruit.com to find your username)
-ADAFRUIT_IO_USERNAME = 'USER'
+ADAFRUIT_IO_USERNAME = 'IO_USER'
 
 # Set to your Adafruit IO key.
-ADAFRUIT_IO_KEY = 'KEY'
+ADAFRUIT_IO_KEY = 'IO_PASS'
 
 # Create an instance of the REST client.
 aio = Client(ADAFRUIT_IO_USERNAME, ADAFRUIT_IO_KEY)
@@ -90,33 +90,31 @@ while True:
         display.show()
         display.text('- Waiting for PKT -', 15, 20, 1)
     else:
-        # Get Feather ID from packet header
         print('> New Packet!')
-        print('Device ID: LoRa Feather #', packet[0])
         # Get temperature from packet
         temp_val = pkt_int_to_float(packet[1], packet[2])
-        # Send temperature to Adafruit IO
-        print("Sending to IO: %0.2f C" % temp_val)
-        aio.send(temperature_feed.key, temp_val)
-
         # Get humidity from packet
         humid_val = pkt_int_to_float(packet[3], packet[4])
-        # Send humidity to Adafruit IO
-        print("Sending to IO: %0.2f %% " % humid_val)
-        aio.send(humidity_feed.key, humid_val)
-
         # Get altitude from packet
         alt_val = pkt_int_to_float(packet[5], packet[6])
-        # Send altitude to Adafruit IO
-        print("Sending to IO: %0.2f meters" % alt_val)
-        aio.send(altitude_feed.key, alt_val)
-
         # Get pressure from packet
         pres_val = pkt_int_to_float(packet[7], packet[8])
-        # Send altitude to Adafruit IO
-        print("Sending to IO: %0.2f hPa" % pres_val)
-        aio.send(pressure_feed.key, pres_val)
 
+        # Get Feather ID from packet header
+        print('Device ID: LoRa Feather #', packet[0])
+        if packet[0] == 0x01: # Send to Feather 1-specific feeds
+          # Send Temperature 
+          print("Sending to IO: %0.2f C" % temp_val)
+          aio.send(temperature_feed.key, temp_val)
+          # Send Humidity 
+          print("Sending to IO: %0.2f %% " % humid_val)
+          aio.send(humidity_feed.key, humid_val)
+          # Send Altitude
+          print("Sending to IO: %0.2f meters" % alt_val)
+          aio.send(altitude_feed.key, alt_val)
+          # Send Pressure
+          print("Sending to IO: %0.2f hPa" % pres_val)
+          aio.send(pressure_feed.key, pres_val)
         time.sleep(15)
 
     display.show()
