@@ -50,7 +50,6 @@ rfm9x.tx_power = 23
 bme280_data = bytearray(7)
 
 while True:
-
     # Get sensor readings
     temp_val = int(bme280.temperature * 100)
     print("\nTemperature: %0.1f C" % bme280.temperature)

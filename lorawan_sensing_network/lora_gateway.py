@@ -91,7 +91,7 @@ while True:
 
     # check for packet rx
     packet = rfm9x.receive()
-    if packet is None:
+    if packet is None or prev_packet:
         display.show()
         display.text('- Waiting for PKT -', 10, 20, 1)
     else:
