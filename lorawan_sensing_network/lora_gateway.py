@@ -69,6 +69,10 @@ temperature_feed_1 = aio.feeds('feather-1-temp')
 humidity_feed_1 = aio.feeds('feather-1-humid')
 pressure_feed_1 = aio.feeds('feather-1-pressure')
 
+temperature_feed_2 = aio.feeds('feather-2-temp')
+humidity_feed_2 = aio.feeds('feather-2-humid')
+pressure_feed_2 = aio.feeds('feather-2-pressure')
+
 def pkt_int_to_float(pkt_val_1, pkt_val_2):
     """Converts 2 bytes of packet data to float.
     """
@@ -99,8 +103,8 @@ while True:
         print("Temp: %0.2f C" % temp_val)
         print("Humid: %0.2f %% " % humid_val)
         print("Pressure: %0.2f hPa" % pres_val)
-        # Send to Feather 1-specific feeds
-        
+
+        # Send to Feather 1 feeds
         if packet[0] == 0x01:
           display.fill(0)
           display.text('Feather #1 Data RX''d!', 15, 0, 1)
@@ -111,6 +115,18 @@ while True:
           aio.send(pressure_feed_1.key, pres_val)
           display.text('Sent!', 100, 20, 1)
           display.show()
+        # Send to Feather 2 feeds
+        if packet[0] == 0x02:
+          display.fill(0)
+          display.text('Feather #2 Data RX''d!', 15, 0, 1)
+          display.text('Sending to IO...', 0, 20, 1)
+          display.show()
+          aio.send(temperature_feed_2.key, temp_val)
+          aio.send(humidity_feed_2.key, humid_val)
+          aio.send(pressure_feed_2.key, pres_val)
+          display.text('Sent!', 100, 20, 1)
+          display.show()
+        time.sleep(1)
         time.sleep(1)
 
     display.show()
