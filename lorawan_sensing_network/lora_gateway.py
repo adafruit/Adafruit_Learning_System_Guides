@@ -22,6 +22,9 @@ import adafruit_ssd1306
 # Import RFM9x module
 import adafruit_rfm9x
 
+# Define radio frequency, must match device.
+RADIO_FREQ_MHZ = 905.5
+
 # Button A
 btnA = DigitalInOut(board.D5)
 btnA.direction = Direction.INPUT
@@ -52,7 +55,7 @@ height = display.height
 CS = DigitalInOut(board.CE1)
 RESET = DigitalInOut(board.D25)
 spi = busio.SPI(board.SCK, MOSI=board.MOSI, MISO=board.MISO)
-rfm9x = adafruit_rfm9x.RFM9x(spi, CS, RESET, 905.5)
+rfm9x = adafruit_rfm9x.RFM9x(spi, CS, RESET, RADIO_FREQ_MHZ)
 prev_packet = None
 
 # Set to your Adafruit IO username.
