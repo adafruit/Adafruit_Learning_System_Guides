@@ -2,7 +2,8 @@
 Adafruit IO LoRa Gateway
 
 Learn Guide: https://learn.adafruit.com/multi-device-lora-temperature-network
-Author: Brent Rubell for Adafruit Industries
+
+by Brent Rubell for Adafruit Industries
 """
 # Import Python System Libraries
 import time
@@ -19,11 +20,6 @@ import adafruit_ssd1306
 
 # Import RFM9x module
 import adafruit_rfm9x
-
-TEMP_DATA = 0x01
-TEMP_DATA = 0x01
-TEMP_DATA = 0x01
-TEMP_DATA = 0x01
 
 # Button A
 btnA = DigitalInOut(board.D5)
@@ -60,21 +56,22 @@ prev_packet = None
 
 # Set to your Adafruit IO username.
 # (go to https://accounts.adafruit.com to find your username)
-ADAFRUIT_IO_USERNAME = 'IO_USER'
+ADAFRUIT_IO_USERNAME = 'USER'
 
 # Set to your Adafruit IO key.
-ADAFRUIT_IO_KEY = 'IO_PASS'
+ADAFRUIT_IO_KEY = 'KEY'
 
 # Create an instance of the REST client.
 aio = Client(ADAFRUIT_IO_USERNAME, ADAFRUIT_IO_KEY)
 
 # Set up Adafruit IO feeds
-temperature_feed = aio.feeds('feather-1-temp')
-humidity_feed = aio.feeds('feather-1-humid')
-altitude_feed = aio.feeds('feather-1-alt')
-pressure_feed = aio.feeds('feather-1-pressure')
+temperature_feed_1 = aio.feeds('feather-1-temp')
+humidity_feed_1 = aio.feeds('feather-1-humid')
+pressure_feed_1 = aio.feeds('feather-1-pressure')
 
 def pkt_int_to_float(pkt_val_1, pkt_val_2):
+    """Converts 2 bytes of packet data to float.
+    """
     float_val = pkt_val_1 << 8 | pkt_val_2
     return float_val/100
 
@@ -82,39 +79,38 @@ while True:
     packet = None
     # draw a box to clear the image
     display.fill(0)
-    display.text('Adafruit IO LoRa', 10, 0, 1)
+    display.text('Adafruit.IO LoRa GTWY', 0, 0, 1)
 
     # check for packet rx
     packet = rfm9x.receive()
     if packet is None:
         display.show()
-        display.text('- Waiting for PKT -', 15, 20, 1)
+        display.text('- Waiting for PKT -', 10, 20, 1)
     else:
+        prev_packet = packet
         print('> New Packet!')
-        # Get temperature from packet
+        # Decode packet
         temp_val = pkt_int_to_float(packet[1], packet[2])
-        # Get humidity from packet
         humid_val = pkt_int_to_float(packet[3], packet[4])
-        # Get altitude from packet
-        alt_val = pkt_int_to_float(packet[5], packet[6])
-        # Get pressure from packet
-        pres_val = pkt_int_to_float(packet[7], packet[8])
+        pres_val = pkt_int_to_float(packet[5], packet[6])
 
-        # Get Feather ID from packet header
+        # Display packet information
         print('Device ID: LoRa Feather #', packet[0])
-        if packet[0] == 0x01: # Send to Feather 1-specific feeds
-          # Send Temperature 
-          print("Sending to IO: %0.2f C" % temp_val)
-          aio.send(temperature_feed.key, temp_val)
-          # Send Humidity 
-          print("Sending to IO: %0.2f %% " % humid_val)
-          aio.send(humidity_feed.key, humid_val)
-          # Send Altitude
-          print("Sending to IO: %0.2f meters" % alt_val)
-          aio.send(altitude_feed.key, alt_val)
-          # Send Pressure
-          print("Sending to IO: %0.2f hPa" % pres_val)
-          aio.send(pressure_feed.key, pres_val)
-        time.sleep(15)
+        print("Temp: %0.2f C" % temp_val)
+        print("Humid: %0.2f %% " % humid_val)
+        print("Pressure: %0.2f hPa" % pres_val)
+        # Send to Feather 1-specific feeds
+        
+        if packet[0] == 0x01:
+          display.fill(0)
+          display.text('Feather #1 Data RX''d!', 15, 0, 1)
+          display.text('Sending to IO...', 0, 20, 1)
+          display.show()
+          aio.send(temperature_feed_1.key, temp_val)
+          aio.send(humidity_feed_1.key, humid_val)
+          aio.send(pressure_feed_1.key, pres_val)
+          display.text('Sent!', 100, 20, 1)
+          display.show()
+        time.sleep(1)
 
     display.show()
