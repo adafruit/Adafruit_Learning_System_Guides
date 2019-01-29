@@ -17,6 +17,9 @@ import adafruit_bme280
 # Device ID
 FEATHER_ID = 0x01
 
+# Delay between sending radio data, in minutes.
+SENSOR_SEND_DELAY = 0.5
+
 # Create library object using our Bus I2C port
 i2c = busio.I2C(board.SCL, board.SDA)
 bme280 = adafruit_bme280.Adafruit_BME280_I2C(i2c)
@@ -25,8 +28,8 @@ bme280 = adafruit_bme280.Adafruit_BME280_I2C(i2c)
 RADIO_FREQ_MHZ = 905.5
 
 # Define pins connected to the chip, use these if wiring up the breakout according to the guide:
-CS = digitalio.DigitalInOut(board.D6)
-RESET = digitalio.DigitalInOut(board.D5)
+CS = digitalio.DigitalInOut(board.RFM9X_CS)
+RESET = digitalio.DigitalInOut(board.RFM9X_RST)
 
 # Define the onboard LED
 LED = digitalio.DigitalInOut(board.D13)
@@ -41,23 +44,18 @@ rfm9x = adafruit_rfm9x.RFM9x(spi, CS, RESET, RADIO_FREQ_MHZ)
 # Set transmit power to max
 rfm9x.tx_power = 23
 
-# change this to match the location's pressure (hPa) at sea level
-bme280.sea_level_pressure = 1013.25
-
-bme280_data = bytearray(9)
-
+# sensor data
+bme280_data = bytearray(7)
 
 while True:
-    print("\nTemperature: %0.1f C" % bme280.temperature)
-    print("Humidity: %0.1f %%" % bme280.humidity)   
-    print("Altitude = %0.2f meters" % bme280.altitude)
-    print("Pressure: %0.1f hPa" % bme280.pressure)
     
     # Get sensor readings
     temp_val = int(bme280.temperature * 100)
+    print("\nTemperature: %0.1f C" % bme280.temperature)
     humid_val = int(bme280.humidity * 100)
-    alt_val = int(bme280.altitude * 100)
+    print("Humidity: %0.1f %%" % bme280.humidity)   
     pres_val = int(bme280.pressure * 100)
+    print("Pressure: %0.1f hPa" % bme280.pressure)
 
     # Build packet with float data and headers
     
@@ -71,15 +69,15 @@ while True:
     bme280_data[3] = (humid_val >> 8) & 0xff
     bme280_data[4] = humid_val & 0xff
     
-    # Altitude data
-    bme280_data[5] = (alt_val >> 8) & 0xff
-    bme280_data[6] = alt_val & 0xff
-    
     # Pressure data
-    bme280_data[7] = (pres_val >> 8) & 0xff
-    bme280_data[8] = pres_val & 0xff
+    bme280_data[5] = (pres_val >> 8) & 0xff
+    bme280_data[6] = pres_val & 0xff
     
     # Convert bytearray to bytes 
     bme280_data_bytes = bytes(bme280_data)
+    # Send the packet data
+    led.value = True
     rfm9x.send(bme280_data)
-    time.sleep(3)
+    led.value = False
+    # Wait to send the packet again
+    time.sleep(SENSOR_SEND_DELAY * 60)
