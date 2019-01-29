@@ -28,7 +28,9 @@ bme280 = adafruit_bme280.Adafruit_BME280_I2C(i2c)
 RADIO_FREQ_MHZ = 905.5
 
 # Define pins connected to the chip, use these if wiring up the breakout according to the guide:
+# pylint: disable=c-extension-no-member
 CS = digitalio.DigitalInOut(board.RFM9X_CS)
+# pylint: disable=c-extension-no-member
 RESET = digitalio.DigitalInOut(board.RFM9X_RST)
 
 # Define the onboard LED
@@ -48,36 +50,37 @@ rfm9x.tx_power = 23
 bme280_data = bytearray(7)
 
 while True:
-    
+
     # Get sensor readings
     temp_val = int(bme280.temperature * 100)
     print("\nTemperature: %0.1f C" % bme280.temperature)
     humid_val = int(bme280.humidity * 100)
-    print("Humidity: %0.1f %%" % bme280.humidity)   
+    print("Humidity: %0.1f %%" % bme280.humidity)
     pres_val = int(bme280.pressure * 100)
     print("Pressure: %0.1f hPa" % bme280.pressure)
 
     # Build packet with float data and headers
-    
+
     # packet header with feather node ID
     bme280_data[0] = FEATHER_ID
     # Temperature data
     bme280_data[1] = (temp_val >> 8) & 0xff
     bme280_data[2] = temp_val & 0xff
-    
+
     # Humid data
     bme280_data[3] = (humid_val >> 8) & 0xff
     bme280_data[4] = humid_val & 0xff
-    
+
     # Pressure data
     bme280_data[5] = (pres_val >> 8) & 0xff
     bme280_data[6] = pres_val & 0xff
-    
-    # Convert bytearray to bytes 
+
+    # Convert bytearray to bytes
     bme280_data_bytes = bytes(bme280_data)
     # Send the packet data
-    led.value = True
+    LED.value = True
     rfm9x.send(bme280_data)
-    led.value = False
+    LED.value = False
+
     # Wait to send the packet again
     time.sleep(SENSOR_SEND_DELAY * 60)

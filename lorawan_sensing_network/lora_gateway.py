@@ -7,13 +7,14 @@ by Brent Rubell for Adafruit Industries
 """
 # Import Python System Libraries
 import time
-# Import Blinka Libraries 
+
+# Import Adafruit IO REST client.
+from Adafruit_IO import Client
+
+# Import Blinka Libraries
 import busio
 import board
 from digitalio import DigitalInOut, Direction, Pull
-
-# Import Adafruit IO REST client.
-from Adafruit_IO import Client, Feed, Data, RequestError
 
 # Import SSD1306 module.
 import adafruit_ssd1306
@@ -106,26 +107,26 @@ while True:
 
         # Send to Feather 1 feeds
         if packet[0] == 0x01:
-          display.fill(0)
-          display.text('Feather #1 Data RX''d!', 15, 0, 1)
-          display.text('Sending to IO...', 0, 20, 1)
-          display.show()
-          aio.send(temperature_feed_1.key, temp_val)
-          aio.send(humidity_feed_1.key, humid_val)
-          aio.send(pressure_feed_1.key, pres_val)
-          display.text('Sent!', 100, 20, 1)
-          display.show()
+            display.fill(0)
+            display.text('Feather #1 Data RX''d!', 15, 0, 1)
+            display.text('Sending to IO...', 0, 20, 1)
+            display.show()
+            aio.send(temperature_feed_1.key, temp_val)
+            aio.send(humidity_feed_1.key, humid_val)
+            aio.send(pressure_feed_1.key, pres_val)
+            display.text('Sent!', 100, 20, 1)
+            display.show()
         # Send to Feather 2 feeds
         if packet[0] == 0x02:
-          display.fill(0)
-          display.text('Feather #2 Data RX''d!', 15, 0, 1)
-          display.text('Sending to IO...', 0, 20, 1)
-          display.show()
-          aio.send(temperature_feed_2.key, temp_val)
-          aio.send(humidity_feed_2.key, humid_val)
-          aio.send(pressure_feed_2.key, pres_val)
-          display.text('Sent!', 100, 20, 1)
-          display.show()
+            display.fill(0)
+            display.text('Feather #2 Data RX''d!', 15, 0, 1)
+            display.text('Sending to IO...', 0, 20, 1)
+            display.show()
+            aio.send(temperature_feed_2.key, temp_val)
+            aio.send(humidity_feed_2.key, humid_val)
+            aio.send(pressure_feed_2.key, pres_val)
+            display.text('Sent!', 100, 20, 1)
+            display.show()
         time.sleep(1)
         time.sleep(1)
 
