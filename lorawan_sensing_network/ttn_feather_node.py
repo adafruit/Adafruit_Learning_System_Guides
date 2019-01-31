@@ -3,12 +3,13 @@ import board
 import busio
 from digitalio import DigitalInOut
 import adafruit_bme280
-from adafruit_bme280 import Adafruit_BME280_I2C
 from adafruit_tinylora.adafruit_tinylora import TTN, TinyLoRa
 
-# BME280
+# Unique feather identifier
+FEATHER_ID = 1
+
 i2c = busio.I2C(board.SCL, board.SDA)
-bme280 = Adafruit_BME280_I2C(i2c)
+bme280 = adafruit_bme280.Adafruit_BME280_I2C(i2c)
 
 # TinyLoRa/RFM9x Setup
 spi = busio.SPI(board.SCK, MOSI=board.MOSI, MISO=board.MISO)
@@ -34,14 +35,15 @@ lora = TinyLoRa(spi, cs, irq, ttn_config, channel = 6)
 bme_d = bytearray(7)
 
 while True:
+    # Grab sensor data
     temp_val = int(bme280.temperature * 100)
     humid_val = int(bme280.humidity * 100)
-    
-    bme_d[0] = 0x01
+
+    bme_d[0] = FEATHER_ID
     # Temperature data
     bme_d[1] = (temp_val >> 8) & 0xff
     bme_d[2] = temp_val & 0xff
-    # Humid data
+    # Humidity data
     bme_d[3] = (humid_val >> 8) & 0xff
     bme_d[4] = humid_val & 0xff
     
@@ -49,4 +51,4 @@ while True:
     lora.send_data(bme_d, len(bme_d), lora.frame_counter)
     print('Packet sent!')
     lora.frame_counter += 1
-    time.sleep(2)
+    time.sleep(1 * 60)
