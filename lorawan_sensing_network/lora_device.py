@@ -18,7 +18,7 @@ import adafruit_bme280
 FEATHER_ID = 0x01
 
 # Delay between sending radio data, in minutes.
-SENSOR_SEND_DELAY = 0.5
+SENSOR_SEND_DELAY = 1
 
 # Create library object using our Bus I2C port
 i2c = busio.I2C(board.SCL, board.SDA)
@@ -77,9 +77,12 @@ while True:
     # Convert bytearray to bytes
     bme280_data_bytes = bytes(bme280_data)
     # Send the packet data
+    print('Sending data...')
     LED.value = True
     rfm9x.send(bme280_data)
+    print('Sent data!')
     LED.value = False
 
     # Wait to send the packet again
     time.sleep(SENSOR_SEND_DELAY * 60)
+  
