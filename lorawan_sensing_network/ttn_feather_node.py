@@ -13,6 +13,7 @@ bme280 = adafruit_bme280.Adafruit_BME280_I2C(i2c)
 
 # TinyLoRa/RFM9x Setup
 spi = busio.SPI(board.SCK, MOSI=board.MOSI, MISO=board.MISO)
+# pylint: disable=c-extension-no-member
 cs = DigitalInOut(board.RFM9X_CS)
 irq = DigitalInOut(board.RFM9X_D0)
 
@@ -46,7 +47,7 @@ while True:
     # Humidity data
     bme_d[3] = (humid_val >> 8) & 0xff
     bme_d[4] = humid_val & 0xff
-    
+
     print('Sending packet...')
     lora.send_data(bme_d, len(bme_d), lora.frame_counter)
     print('Packet sent!')
