@@ -7,9 +7,11 @@ HOSTNAME = 'imap.gmail.com'
 MAILBOX = 'Inbox'
 MAIL_CHECK_FREQ = 60        # check mail every 60 seconds
 
+# The following three variables must be customized for this
+# script to work
 USERNAME = 'your username here'
 PASSWORD = 'your password here'
-NEWMAIL_OFFSET = 1          # my unread messages never goes to zero, yours might
+NEWMAIL_OFFSET = 1          # my unread messages never goes to zero, use this to override
 
 # setup Pi pins as output for LEDs
 green_led = DigitalInOut(board.D18)
@@ -23,11 +25,12 @@ def mail_check():
     server.login(USERNAME, PASSWORD)
 
     # select our MAILBOX and looked for unread messages
-    folder = server.select_folder(MAILBOX)
     unseen = server.folder_status(MAILBOX, ['UNSEEN'])
 
     # number of unread messages
+    # print to console to determine NEWMAIL_OFFSET
     newmail_count = (unseen[b'UNSEEN'])
+    print('%d unseen messages' % newmail_count)
 
     if newmail_count > NEWMAIL_OFFSET:
         green_led.value = True
