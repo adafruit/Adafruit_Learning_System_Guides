@@ -1,5 +1,5 @@
 """
-lorawan_device.py
+lora_device.py
 
 CircuitPython LoRa Device w/BME280
 """
