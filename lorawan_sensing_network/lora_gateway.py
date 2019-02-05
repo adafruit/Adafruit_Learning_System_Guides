@@ -131,6 +131,5 @@ while True:
             display.text('Sent!', 100, 20, 1)
             display.show()
         time.sleep(1)
-        time.sleep(1)
 
     display.show()
