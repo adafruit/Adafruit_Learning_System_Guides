@@ -50,13 +50,13 @@ while True:
         if isinstance(packet, ButtonPacket):
             if packet.pressed:
                 red_led.value = True
-                if packet.button == '5' and angle != UP_ANGLE:
+                if packet.button == ButtonPacket.UP and angle != UP_ANGLE:
                     # The Up button was pressed.
                     for a in range(angle, UP_ANGLE+1, 1):
                         crickit.servo_1.angle = a
                     angle = UP_ANGLE
 
-                elif packet.button == '6' and angle != DOWN_ANGLE:
+                elif packet.button == ButtonPacket.DOWN and angle != DOWN_ANGLE:
                     # The Down button was pressed.
                     for a in range(angle, DOWN_ANGLE-1, -1):
                         crickit.servo_1.angle = a
