@@ -1,0 +1,8 @@
+temperature_range:15-30
+humidity_range:60-70
+title:Jar Minder
+alarm_frequency:4000
+alarm_number_of_beeps:3
+alarm_seconds_beep_on:0.5
+alarm_seconds_between_beeps:0.5
+alarm_timeout:60.0
