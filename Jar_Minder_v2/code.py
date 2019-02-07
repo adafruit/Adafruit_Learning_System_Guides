@@ -183,7 +183,7 @@ if not silence_button.value:
 # Read settings file into setting dictionary
 with open('settings.txt', 'r') as f:
     for line in f:
-        key, value = line.strip().split(':').strip()
+        key, value = [x.strip() for x in line.strip().split(':')]
         values = value.split('-')
         if key == 'temperature_range':
             setting = to_int_tuple(values)
@@ -250,7 +250,7 @@ display.display()
 
 timeout = time.monotonic() + settings['alarm_timeout']
 
-while out_of_range(sensor.temperature, sensor.humidity) and time.monotonic() < timeout:
+while out_of_range(sensor.temperature, sensor.relative_humidity) and time.monotonic() < timeout:
     if sound_alarm():
         break
     if check_for_push(silence_button, settings['alarm_seconds_between_alarms']):
