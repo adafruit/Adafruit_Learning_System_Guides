@@ -32,10 +32,10 @@ mqtt:
   password: ${io_key}
   topic_prefix: '${io_username}/feeds'
   birth_message:
-    topic: ${io_username}/status
+    topic: ${io_username}/feeds/status
     payload: Online
   will_message:
-    topic: ${io_username}/status
+    topic: ${io_username}/feeds/status
     payload: Offline
   log_topic:
 
