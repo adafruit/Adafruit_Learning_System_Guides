@@ -15,7 +15,8 @@
  // License:
  //     Public Domain
 
- Fetched from: http://dimensionalrift.homelinux.net/combuster/mos3/?p=viewsource&file=/modules/gfx/font8_8.asm
+ Fetched from: http://dimensionalrift.homelinux.net/combuster/mos3/
+                     ?p=viewsource&file=/modules/gfx/font8_8.asm
 
  Converted to Python by Dave Astels
 """

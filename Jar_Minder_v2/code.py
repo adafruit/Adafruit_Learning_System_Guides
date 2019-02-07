@@ -5,6 +5,7 @@ done = digitalio.DigitalInOut(board.A4)
 done.direction = digitalio.Direction.OUTPUT
 done.value = False
 
+#pylint: disable=wrong-import-position,wrong-import-order
 import time
 import pulseio
 import busio
