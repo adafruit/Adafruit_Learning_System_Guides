@@ -3,7 +3,7 @@
 ==================================
 Example of sending temperature
 values to an Adafruit IO feed using
-an ADT7410
+an ADT7410 breakout.
 
 Dependencies:
     - Adafruit_Blinka
@@ -30,6 +30,9 @@ import adafruit_adt7410
 import board
 import busio
 import digitalio
+
+# Delay between sensor reads, in seconds
+DELAY_SECONDS = 30
 
 # Set to your Adafruit IO key.
 # Remember, your key is a secret,
@@ -91,5 +94,5 @@ while True:
     disp.image(image)
     disp.show()
 
-    # Delay for 5 seconds to avoid timeout from adafruit io
-    time.sleep(5)
+    # Delay for DELAY_SECONDS seconds to avoid timeout from adafruit io
+    time.sleep(DELAY_SECONDS)
