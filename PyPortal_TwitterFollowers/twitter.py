@@ -5,22 +5,13 @@ if you can find something that spits out JSON data, we can display it
 """
 import time
 import board
-from digitalio import DigitalInOut, Direction
 from adafruit_pyportal import PyPortal
-
-# Get wifi details and more from a settings.py file
-try:
-    from settings import settings
-except ImportError:
-    print("WiFi settings are kept in settings.py, please add them there!")
-    raise
-
 
 # Change this to your twitter username!
 TWITTER_NAME = "adafruit"
 
 # Set up where we'll be fetching data from
-DATA_SOURCE = "https://cdn.syndication.twimg.com/widgets/followbutton/info.json?screen_names="+TWITTER_NAME
+DATA_SOURCE = "https://cdn.syndication.twimg.com/widgets/followbutton/info.json?screen_names="+TWITTER_NAME   # pylint: disable=line-too-long
 DATA_LOCATION = [0, "followers_count"]
 
 # determine the current working directory
@@ -28,7 +19,8 @@ DATA_LOCATION = [0, "followers_count"]
 cwd = __file__.rsplit('/', 1)[0]
 # Initialize the pyportal object and let us know what data to fetch and where
 # to display it
-pyportal = PyPortal(url=DATA_SOURCE, json_path=DATA_LOCATION,
+pyportal = PyPortal(url=DATA_SOURCE,
+                    json_path=DATA_LOCATION,
                     status_neopixel=board.NEOPIXEL,
                     default_bg=cwd+"/twitter_background.bmp",
                     text_font=cwd+"/fonts/Collegiate-50.bdf",
