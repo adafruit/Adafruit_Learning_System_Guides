@@ -26,38 +26,29 @@ UP_ANGLE = 180
 NEUTRAL_ANGLE = 120
 DOWN_ANGLE = 80
 
-advertising_now = False
-angle = NEUTRAL_ANGLE
 crickit.servo_1.angle = NEUTRAL_ANGLE
 
 while True:
+    blue_led.value = False
     crickit.servo_1.angle = NEUTRAL_ANGLE
-    if not uart_server.connected:
-        if not advertising_now:
-            uart_server.start_advertising()
-            advertising_now = True
-            blue_led.value = False
-        continue
+    uart_server.start_advertising()
 
-    # Connected, so no longer advertising.
-    advertising_now = False
+    while not uart_server.connected:
+        # Wait for a connection.
+        pass
+
     blue_led.value = True
+    while uart_server.connected:
+        if uart_server.in_waiting:
+            # Packet is arriving.
+            red_led.value = False
+            packet = Packet.from_stream(uart_server)
 
-    if uart_server.in_waiting:
-        red_led.value = False
-        packet = Packet.from_stream(uart_server)
-
-        if isinstance(packet, ButtonPacket):
-            if packet.pressed:
+            if isinstance(packet, ButtonPacket) and packet.pressed:
                 red_led.value = True
-                if packet.button == ButtonPacket.UP and angle != UP_ANGLE:
+                if packet.button == ButtonPacket.UP:
                     # The Up button was pressed.
-                    for a in range(angle, UP_ANGLE+1, 1):
-                        crickit.servo_1.angle = a
-                    angle = UP_ANGLE
-
-                elif packet.button == ButtonPacket.DOWN and angle != DOWN_ANGLE:
+                    crickit.servo_1.angle = UP_ANGLE
+                elif packet.button == ButtonPacket.DOWN:
                     # The Down button was pressed.
-                    for a in range(angle, DOWN_ANGLE-1, -1):
-                        crickit.servo_1.angle = a
-                    angle = DOWN_ANGLE
+                    crickit.servo_1.angle = DOWN_ANGLE
