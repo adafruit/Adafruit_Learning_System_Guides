@@ -30,7 +30,6 @@ crickit.servo_1.angle = NEUTRAL_ANGLE
 
 while True:
     blue_led.value = False
-    crickit.servo_1.angle = NEUTRAL_ANGLE
     uart_server.start_advertising()
 
     while not uart_server.connected:
@@ -39,6 +38,7 @@ while True:
 
     blue_led.value = True
     while uart_server.connected:
+        crickit.servo_1.angle = NEUTRAL_ANGLE
         if uart_server.in_waiting:
             # Packet is arriving.
             red_led.value = False
