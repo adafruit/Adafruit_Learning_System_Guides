@@ -3,7 +3,7 @@
 # up LEDs.  Based on the code created by Phil Burgess and Dave Astels, see:
 #   https://learn.adafruit.com/digital-sand-dotstar-circuitpython-edition/code
 #   https://learn.adafruit.com/animated-led-sand
-# Ported to NeoTrellis M4 by John Thurmond
+# Ported to NeoTrellis M4 by John Thurmond.
 #
 # The MIT License (MIT)
 #
