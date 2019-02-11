@@ -4,9 +4,10 @@
 # running on an nRF52840 Feather board and Crickit FeatherWing
 # micro servo, 3D printed switch actuator
 
+import time
+
 import board
 import digitalio
-import time
 
 from adafruit_crickit import crickit
 from adafruit_ble.uart import UARTServer
