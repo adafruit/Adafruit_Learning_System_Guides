@@ -6,6 +6,7 @@
 
 import board
 import digitalio
+import time
 
 from adafruit_crickit import crickit
 from adafruit_ble.uart import UARTServer
@@ -52,3 +53,6 @@ while True:
                 elif packet.button == ButtonPacket.DOWN:
                     # The Down button was pressed.
                     crickit.servo_1.angle = DOWN_ANGLE
+
+                # Wait a bit before returning to neutral position.
+                time.sleep(0.25)
