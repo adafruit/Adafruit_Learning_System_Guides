@@ -145,13 +145,15 @@ while True:
 
         # Random color every refresh
         if color_mode == 0:
-            trellis.pixels[(i%8, i//8)] = wheel(random.randint(1, 254)) if occupied_bits[i] else (0, 0, 0)
+            trellis.pixels[(i%8, i//8)] = 
+                wheel(random.randint(1, 254)) if occupied_bits[i] else (0, 0, 0)
         # Color by pixel (meh - needs work)
         if color_mode == 1:
             trellis.pixels[(i%8, i//8)] = wheel(i*2) if occupied_bits[i] else (0, 0, 0)
 
         # Change color to random on button press, or cycle when you hold one down
-        if color_mode == 2: trellis.pixels[(i%8, i//8)] = wheel(color) if occupied_bits[i] else (0, 0, 0)
+        if color_mode == 2: 
+            trellis.pixels[(i%8, i//8)] = wheel(color) if occupied_bits[i] else (0, 0, 0)
 
     # Change color to a new random color on button press
     pressed = set(trellis.pressed_keys)
