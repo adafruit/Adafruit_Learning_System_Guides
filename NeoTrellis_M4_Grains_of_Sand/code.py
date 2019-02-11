@@ -25,13 +25,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-import time
+import math
+import random
 import board
 import audioio
 import busio
 import adafruit_trellism4
-import math
-import random
 import adafruit_adxl34x
 
 N_GRAINS = 8  # Number of grains of sand
@@ -80,7 +79,7 @@ occupied_bits = [False for _ in range(WIDTH * HEIGHT)]
 f = open("water-click.wav", "rb")
 wav = audioio.WaveFile(f)
 print("%d channels, %d bits per sample, %d Hz sample rate " %
-          (wav.channel_count, wav.bits_per_sample, wav.sample_rate))
+      (wav.channel_count, wav.bits_per_sample, wav.sample_rate))
 audio = audioio.AudioOut(board.A1)
 #audio.play(wav)
 
@@ -132,8 +131,10 @@ for g in grains:
 
 while True:
     # Check for tap and adjust color mode
-    if sensor.events['tap']: color_mode += 1
-    if color_mode > 2: color_mode = 0
+    if sensor.events['tap']:
+        color_mode += 1
+    if color_mode > 2:
+        color_mode = 0
 
     # Display frame rendered on prior pass.  It's done immediately after the
     # FPS sync (rather than after rendering) for consistent animation timing.
@@ -143,9 +144,13 @@ while True:
         # Some color options:
 
         # Random color every refresh
-        if color_mode == 0: trellis.pixels[(i%8, i//8)] = wheel(random.randint(1, 254)) if occupied_bits[i] else (0, 0, 0)
+        if color_mode == 0:
+            trellis.pixels[(i%8, i//8)] = wheel(random.randint(1, 254)) 
+                if occupied_bits[i] else (0, 0, 0)
         # Color by pixel (meh - needs work)
-        if color_mode == 1: trellis.pixels[(i%8, i//8)] = wheel(i*2) if occupied_bits[i] else (0, 0, 0)
+        if color_mode == 1:
+            trellis.pixels[(i%8, i//8)] = wheel(i*2) 
+                if occupied_bits[i] else (0, 0, 0)
 
         # Change color to random on button press, or cycle when you hold one down
         if color_mode == 2: trellis.pixels[(i%8, i//8)] = wheel(color) if occupied_bits[i] else (0, 0, 0)
@@ -290,6 +295,7 @@ while True:
                             newidx = oldidx  # Not moving
         occupied_bits[oldidx] = False
         occupied_bits[newidx] = True
-        if oldidx != newidx: audio.play(wav) # If there's an update, play the sound
+        if oldidx != newidx:
+            audio.play(wav) # If there's an update, play the sound
         g.x = newx
         g.y = newy
