@@ -26,10 +26,13 @@ uart_server = UARTServer()
 
 UP_ANGLE = 180
 NEUTRAL_ANGLE = 120
-DOWN_ANGLE = 80
-
+DOWN_ANGLE = 60
 crickit.servo_1.angle = NEUTRAL_ANGLE
 
+angle = NEUTRAL_ANGLE  # use to track state
+
+print("BLE Light Switch")
+print("Use Adafruit Bluefruit app to connect")
 while True:
     blue_led.value = False
     uart_server.start_advertising()
@@ -37,23 +40,25 @@ while True:
     while not uart_server.connected:
         # Wait for a connection.
         pass
-
-    blue_led.value = True
+    blue_led.value = True  # turn on blue LED when connected
     while uart_server.connected:
-        crickit.servo_1.angle = NEUTRAL_ANGLE
         if uart_server.in_waiting:
             # Packet is arriving.
-            red_led.value = False
+            red_led.value = False  # turn off red LED
             packet = Packet.from_stream(uart_server)
-
             if isinstance(packet, ButtonPacket) and packet.pressed:
-                red_led.value = True
-                if packet.button == ButtonPacket.UP:
-                    # The Up button was pressed.
-                    crickit.servo_1.angle = UP_ANGLE
-                elif packet.button == ButtonPacket.DOWN:
-                    # The Down button was pressed.
-                    crickit.servo_1.angle = DOWN_ANGLE
-
-                # Wait a bit before returning to neutral position.
-                time.sleep(0.25)
+                red_led.value = True  # blink to show a packet has been received
+                if packet.button == ButtonPacket.UP and angle != UP_ANGLE:  # UP button pressed
+                    angle = NEUTRAL_ANGLE - 45  # set anticipation angle, opposite of goal angle
+                    for a in range(angle, UP_ANGLE+1, 1):  # anticipation angle, ramp to goal angle
+                        crickit.servo_1.angle = a
+                    time.sleep(0.1)  # wait a moment
+                    crickit.servo_1.angle = NEUTRAL_ANGLE  # then return to neutral angle
+                    angle = UP_ANGLE  # set state to prevent redundant hits
+                elif packet.button == ButtonPacket.DOWN and angle != DOWN_ANGLE:  # DOWN button
+                    angle = NEUTRAL_ANGLE + 45
+                    for a in range(angle, DOWN_ANGLE-1, -1):
+                        crickit.servo_1.angle = a
+                    time.sleep(0.1)  # wait a moment
+                    crickit.servo_1.angle = NEUTRAL_ANGLE  # then return to neutral angle
+                    angle = DOWN_ANGLE  # set state to prevent redundant hits
