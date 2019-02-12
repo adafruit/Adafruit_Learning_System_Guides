@@ -20,7 +20,7 @@ for k in range(start_pin, solenoid_count + start_pin + 1):
 STRIKE_TIME = 0.01  # Time between initiating a strike and turning it off
 TIME_BETWEEN = 0.5  # Time between actions in seconds
 
-song = [4, 3, 2, 3, 4, 4, 4, 3, 3, 3, 4, 4, 4, 4, 3, 2, 3, 4, 4, 4, 5, 5, 4, 3, 2]
+song = [3, 4, 5, 4, 3, 3, 3, 4, 4, 4, 3, 3, 3, 3, 4, 5, 4, 3, 3, 3, 2, 2, 3, 4, 5]
 
 def play(key, time_to_strike):
     solenoid[key].value = True
