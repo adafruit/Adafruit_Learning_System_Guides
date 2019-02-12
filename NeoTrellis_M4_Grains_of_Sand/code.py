@@ -145,9 +145,11 @@ while True:
 
         # Random color every refresh
         if color_mode == 0:
-            trellis.pixels[(i%8, i//8)] = 
-                wheel(random.randint(1, 254)) if occupied_bits[i] else (0, 0, 0)
-        # Color by pixel (meh - needs work)
+            if occupied_bits[i]:
+                trellis.pixels[(i%8, i//8)] = wheel(random.randint(1, 254)) 
+            else:
+                trellis.pixels[(i%8, i//8)] = (0, 0, 0)
+        # Color by pixel 
         if color_mode == 1:
             trellis.pixels[(i%8, i//8)] = wheel(i*2) if occupied_bits[i] else (0, 0, 0)
 
