@@ -1,5 +1,5 @@
 """
-'adafruit_io_dual_steppers.py'
+'adafruit_io_stepper.py'
 ==================================
 Example of using CircuitPython and
 Adafruit IO to perform real-time
@@ -73,46 +73,48 @@ print('Step Size: ', stepper1_step_size.value)
 print('Stepper Direction: ', stepper_1_direction.value)
 
 
-def stepper_worker(stepper, numsteps, direction, stepper_name, style,):
-    # TODO: Add decrementing steps back to IO slider feed
+def stepper_worker(stepper, numsteps, direction, stepper_name, style, show_steps=False):
     print("Steppin!")
     stepper_steps = numsteps
     print(stepper_steps)
     for _ in range(numsteps):
         stepper.onestep(direction=direction, style=style)
-        stepper_steps -= 1
-        print('Steps: ', stepper_steps)
-        # Optionally send to Adafruit IO, TODO make this a kwarg to slowdown
-        aio.send(feed_step_1_steps.key, stepper_steps)
-        time.sleep(0.45)
+        if show_steps: # print out the steps and send to IO stepper slider
+            stepper_steps -= 1
+            print('Steps: ', stepper_steps)
+            aio.send(feed_step_1_steps.key, stepper_steps)
+            time.sleep(0.30)
     print("Done using ", stepper_name)
 
+while True:
+    # Stepper 1 Adafruit IO Configuration
+    if not st1.isAlive(): # if thread is killed
+        print('Retrieving Stepper 1 Config from IO...')
+        stepper1_steps = aio.receive(feed_step_1_steps.key)
+        stepper1_steps = int(stepper1_steps.value)
+        if stepper1_steps is not 0: # check against if the feed value is 0
+            stepper_1_direction = aio.receive(feed_step_1_direction.key)
+            stepper1_step_size = aio.receive(feed_step_1_step_size.key)
+            print('Stepper 1 Configuration (from IO)')
+            print("%d steps" % stepper1_steps)
+            print('Step Size: ', stepper1_step_size.value)
+            print('Stepper Direction: ', stepper_1_direction.value)
+            stepper_name = "Stepper 1"
+            # Set Stepper Direction
+            if stepper_1_direction.value == 'Forward':
+                move_dir = STEPPER.FORWARD
+                print("forward")
+            elif stepper_1_direction.value == 'Backward':
+                move_dir = STEPPER.BACKWARD
+                print("backward")
+            # Stepper 1 Thread
+            st1 = threading.Thread(target=stepper_worker, args=(kit.stepper1,
+                                                                stepper1_steps,
+                                                                move_dir,
+                                                                stepper_name,
+                                                                stepstyles[STEPPER.SINGLE],))
+            st1.start()
+    # poll for new data every 30sec to avoid Adafruit IO Timeouts
+    print('delaying...')
+    time.sleep(30)
 
-# Stepper 1 Thread Configuration
-if not st1.isAlive():
-    stepper_name = "Stepper 1"
-    # Stepper Direction
-    if stepper_1_direction.value == 'Forwards':
-        move_dir = STEPPER.FORWARD
-        print("forward")
-    elif stepper_1_direction.value == 'Backward':
-        move_dir = STEPPER.BACKWARD
-        print("backward")
-    # Stepper Style
-    if stepper1_step_size.value == 'singlestep':
-        stepper_1_step_style = STEPPER.SINGLE
-    elif stepper1_step_size.value == 'doublestep':
-        stepper_1_step_style = STEPPER.SINGLE
-    elif stepper1_step_size.value == 'interleave':
-        stepper_1_step_style = STEPPER.INTERLEAVE
-    elif stepper1_step_size.value == 'microstep':
-        stepper_1_step_style = STEPPER.MICROSTEP
-    else:
-        stepper_1_step_style = STEPPER.SINGLE # default to single-stepping
-
-    st1 = threading.Thread(target=stepper_worker, args=(kit.stepper1,
-                                                        stepper1_steps,
-                                                        move_dir,
-                                                        stepper_name,
-                                                        stepstyles[STEPPER.SINGLE],))
-    st1.start()
