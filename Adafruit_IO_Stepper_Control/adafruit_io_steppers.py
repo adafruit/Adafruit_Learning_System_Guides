@@ -17,10 +17,9 @@ Dependencies:
 import time
 import atexit
 import threading
-import random
 
 # import Adafruit IO REST client.
-from Adafruit_IO import Client, Feed, RequestError
+from Adafruit_IO import Client, RequestError
 
 # Import CircuitPython Libraries
 from adafruit_motor import stepper as STEPPER
@@ -56,6 +55,7 @@ feed_steppers_status = aio.feeds('stepperstart')
 kit = MotorKit()
 
 # create empty threads (these will hold the stepper 1 and 2 threads)
+# pylint: disable=bad-thread-instantiation
 st1 = threading.Thread()
 st2 = threading.Thread()
 
@@ -90,7 +90,7 @@ while True:
     try: # attempt to poll the stepper status feed
         print('checking for GO button press...')
         stepper_start = aio.receive(feed_steppers_status.key)
-    except ThrottlingError:
+    except RequestError.ThrottlingError:
         print('Exceeded the limit of Adafruit IO requests, delaying 30 seconds...')
         time.sleep(30)
 
@@ -106,7 +106,7 @@ while True:
             print('\t%d steps' % stepper_1_steps)
             print('\tStep Size: ', stepper_1_step_size.value)
             print('\tStepper Direction: ', stepper_1_direction.value)
-            
+
             # Set Stepper Direction
             if stepper_1_direction.value == 'Forward':
                 move_dir = STEPPER.FORWARD
