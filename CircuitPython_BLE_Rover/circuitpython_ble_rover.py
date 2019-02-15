@@ -32,15 +32,15 @@ FWD = -1.0
 REV = 0.7
 
 crickit.init_neopixel(24, brightness = 0.2)  # create Crickit neopixel object
-RED = (200, 0, 0)
-GREEN = (0, 200, 0)
-BLUE = (0, 0, 200)
-PURPLE = (120, 0, 160)
-YELLOW = (100, 100, 0)
-AQUA = (0, 100, 100)
-color = (PURPLE)  # current NeoPixel color
-prior_color = (PURPLE)  # to store state of previous color when changing them
-crickit.neopixel.fill((color))
+RED = 200, 0, 0
+GREEN = 0, 200, 0
+BLUE = 0, 0, 200
+PURPLE = 120, 0, 160
+YELLOW = 100, 100, 0
+AQUA = 0, 100, 100
+color = PURPLE  # current NeoPixel color
+prior_color = PURPLE  # to store state of previous color when changing them
+crickit.neopixel.fill(color)
 
 print("BLE Rover")
 print("Use Adafruit Bluefruit app to connect")
@@ -56,64 +56,60 @@ while True:
             # Packet is arriving.
             red_led.value = False  # turn off red LED
             packet = Packet.from_stream(uart_server)
-            one_byte = uart_server.read(1)
-            if one_byte:
-                uart_server.write(one_byte)
-                print(one_byte)
             if isinstance(packet, ColorPacket):
-                # Change the fire color.
+                # Change the color.
                 color = packet.color
-                crickit.neopixel.fill((color))
+                crickit.neopixel.fill(color)
 
             # do this when buttons are pressed
             if isinstance(packet, ButtonPacket) and packet.pressed:
                 red_led.value = True  # blink to show a packet has been received
                 if packet.button == ButtonPacket.UP:  # UP button pressed
-                    crickit.neopixel.fill((color))
+                    crickit.neopixel.fill(color)
                     motor_1.throttle = FWD
                     motor_2.throttle = FWD
                 elif packet.button == ButtonPacket.DOWN:  # DOWN button
-                    crickit.neopixel.fill((color))
+                    crickit.neopixel.fill(color)
                     motor_1.throttle = REV
                     motor_2.throttle = REV
                 elif packet.button == ButtonPacket.RIGHT:
                     prior_color = color
                     color = YELLOW
-                    crickit.neopixel.fill((color))
+                    crickit.neopixel.fill(color)
                     motor_1.throttle = FWD
                     motor_2.throttle = FWD * 0.5
                 elif packet.button == ButtonPacket.LEFT:
                     prior_color = color
                     color = YELLOW
-                    crickit.neopixel.fill((color))
+                    crickit.neopixel.fill(color)
                     motor_1.throttle = FWD * 0.5
                     motor_2.throttle = FWD
                 elif packet.button == ButtonPacket.BUTTON_1:
-                    crickit.neopixel.fill((RED))
+                    crickit.neopixel.fill(RED)
                     motor_1.throttle = 0.0
                     motor_2.throttle = 0.0
                     time.sleep(0.5)
-                    crickit.neopixel.fill((color))
+                    crickit.neopixel.fill(color)
                 elif packet.button == ButtonPacket.BUTTON_2:
                     color = GREEN
-                    crickit.neopixel.fill((color))
+                    crickit.neopixel.fill(color)
                 elif packet.button == ButtonPacket.BUTTON_3:
                     color = BLUE
-                    crickit.neopixel.fill((color))
+                    crickit.neopixel.fill(color)
                 elif packet.button == ButtonPacket.BUTTON_4:
                     color = PURPLE
-                    crickit.neopixel.fill((color))
+                    crickit.neopixel.fill(color)
             # do this when some buttons are released
             elif isinstance(packet, ButtonPacket) and not packet.pressed:
                 if packet.button == ButtonPacket.RIGHT:
                     print("released right")
                     color = prior_color
-                    crickit.neopixel.fill((color))
-                    motor_1.throttle = (FWD)
-                    motor_2.throttle = (FWD)
+                    crickit.neopixel.fill(color)
+                    motor_1.throttle = FWD
+                    motor_2.throttle = FWD
                 if packet.button == ButtonPacket.LEFT:
                     print("released left")
                     color = prior_color
-                    crickit.neopixel.fill((color))
-                    motor_1.throttle = (FWD)
-                    motor_2.throttle = (FWD)
+                    crickit.neopixel.fill(color)
+                    motor_1.throttle = FWD
+                    motor_2.throttle = FWD
