@@ -3,11 +3,9 @@
 # up LEDs.  Based on the code created by Phil Burgess and Dave Astels, see:
 #   https://learn.adafruit.com/digital-sand-dotstar-circuitpython-edition/code
 #   https://learn.adafruit.com/animated-led-sand
-# Ported (badly) to NeoTrellis M4 by John Thurmond
+# Ported to NeoTrellis M4 by John Thurmond
 #
 # The MIT License (MIT)
-#
-# Copyright (c) 2018 Tony DiCola
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -30,6 +28,7 @@
 import math
 import random
 import board
+import audioio
 import busio
 import adafruit_trellism4
 import adafruit_adxl34x
@@ -38,15 +37,12 @@ N_GRAINS = 8  # Number of grains of sand
 WIDTH = 8  # Display width in pixels
 HEIGHT = 4  # Display height in pixels
 NUMBER_PIXELS = WIDTH * HEIGHT
-MAX_FPS = 10  # Maximum redraw rate, frames/second
-
+MAX_FPS = 20  # Maximum redraw rate, frames/second
 MAX_X = WIDTH * 256 - 1
 MAX_Y = HEIGHT * 256 - 1
 
-
 class Grain:
-    """A simple struct to hold position and velocity information
-    for a single grain."""
+    """A simple struct to hold position and velocity information for a single grain."""
 
     def __init__(self):
         """Initialize grain position and velocity."""
@@ -65,6 +61,11 @@ trellis = adafruit_trellism4.TrellisM4Express(rotation=0)
 i2c = busio.I2C(board.ACCELEROMETER_SCL, board.ACCELEROMETER_SDA)
 sensor = adafruit_adxl34x.ADXL345(i2c)
 
+# Add tap detection - with a pretty hard tap
+sensor.enable_tap_detection(threshold=50)
+
+color_mode = 0
+
 oldidx = 0
 newidx = 0
 delta = 0
@@ -72,6 +73,14 @@ newx = 0
 newy = 0
 
 occupied_bits = [False for _ in range(WIDTH * HEIGHT)]
+
+# Add Audio file...
+f = open("water-click.wav", "rb")
+wav = audioio.WaveFile(f)
+print("%d channels, %d bits per sample, %d Hz sample rate " %
+      (wav.channel_count, wav.bits_per_sample, wav.sample_rate))
+audio = audioio.AudioOut(board.A1)
+#audio.play(wav)
 
 def index_of_xy(x, y):
     """Convert an x/column and y/row into an index into
@@ -81,7 +90,6 @@ def index_of_xy(x, y):
     :param int y: row value
     """
     return (y >> 8) * WIDTH + (x >> 8)
-
 
 def already_present(limit, x, y):
     """Check if a pixel is already used.
@@ -121,26 +129,28 @@ for g in grains:
     g.vy = 0
 
 while True:
+    # Check for tap and adjust color mode
+    if sensor.events['tap']:
+        color_mode += 1
+    if color_mode > 2:
+        color_mode = 0
+
     # Display frame rendered on prior pass.  It's done immediately after the
     # FPS sync (rather than after rendering) for consistent animation timing.
 
-    # pylint: disable=line-too-long
     for i in range(NUMBER_PIXELS):
+
         # Some color options:
 
         # Random color every refresh
-        #trellis.pixels[(i%8, i//8)] = wheel(random.randint(1, 254)) if occupied_bits[i] else (0, 0, 0)
-
+        if color_mode == 0:
+            trellis.pixels[(i%8, i//8)] = wheel(random.randint(1, 254)) if occupied_bits[i] else (0, 0, 0)
         # Color by pixel (meh - needs work)
-        #trellis.pixels[(i%8, i//8)] = wheel(i*2) if occupied_bits[i] else (0, 0, 0)
-
+        if color_mode == 1:
+            trellis.pixels[(i%8, i//8)] = wheel(i*2) if occupied_bits[i] else (0, 0, 0)
         # Change color to random on button press, or cycle when you hold one down
-        trellis.pixels[(i%8, i//8)] = wheel(color) if occupied_bits[i] else (0, 0, 0)
-
-        # Set as single color
-        #trellis.pixels[(i//8,i%8)] = (255, 0, 0) if occupied_bits[i] else (0, 0, 0)
-
-        # TODO: Change color depending on which button you press?
+        if color_mode == 2:
+            trellis.pixels[(i%8, i//8)] = wheel(color) if occupied_bits[i] else (0, 0, 0)
 
     # Change color to a new random color on button press
     pressed = set(trellis.pressed_keys)
@@ -162,13 +172,13 @@ while True:
     ay = f_y >> 3  # to grain coordinate space
     az = abs(f_z) >> 6  # Random motion factor
 
-    print("%6d %6d %6d"%(ax,ay,az))
+    #print("%6d %6d %6d"%(ax,ay,az))
     az = 1 if (az >= 3) else (4 - az)  # Clip & invert
     ax -= az  # Subtract motion factor from X, Y
     ay -= az
     az2 = (az << 1) + 1  # Range of random motion to add back in
 
-    # Adjust axes for the NeoTrellis M4 (probably better ways to do this)
+    # Adjust axes for the NeoTrellis M4 (reuses code above rather than fixing it - inefficient)
     ax2 = ax
     ax = -ay
     ay = ax2
@@ -177,6 +187,7 @@ while True:
     v2 = 0  # Velocity squared
     v = 0.0  # Absolute velociy
     for g in grains:
+
         g.vx += ax + random.randint(0, az2)  # A little randomness makes
         g.vy += ay + random.randint(0, az2)  # tall stacks topple better!
 
@@ -281,5 +292,7 @@ while True:
                             newidx = oldidx  # Not moving
         occupied_bits[oldidx] = False
         occupied_bits[newidx] = True
+        if oldidx != newidx:
+            audio.play(wav) # If there's an update, play the sound
         g.x = newx
         g.y = newy
