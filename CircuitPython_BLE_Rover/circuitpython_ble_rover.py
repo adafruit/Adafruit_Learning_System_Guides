@@ -32,12 +32,12 @@ FWD = -1.0
 REV = 0.7
 
 crickit.init_neopixel(24, brightness = 0.2)  # create Crickit neopixel object
-RED = 200, 0, 0
-GREEN = 0, 200, 0
-BLUE = 0, 0, 200
-PURPLE = 120, 0, 160
-YELLOW = 100, 100, 0
-AQUA = 0, 100, 100
+RED = (200, 0, 0)
+GREEN = (0, 200, 0)
+BLUE = (0, 0, 200)
+PURPLE = (120, 0, 160)
+YELLOW = (100, 100, 0)
+AQUA = (0, 100, 100)
 color = PURPLE  # current NeoPixel color
 prior_color = PURPLE  # to store state of previous color when changing them
 crickit.neopixel.fill(color)
