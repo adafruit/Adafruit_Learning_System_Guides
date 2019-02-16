@@ -58,7 +58,7 @@ def range_index(ctl, ctrl_max, old_idx, offset):
     if (ctl + offset > 65535) or (ctl + offset < 0):
         offset = 0
     idx = int(map_range((ctl + offset) & 0xFF00, 1200, 65500, 0, ctrl_max))
-    if idx != old_idx:  # if index changed, adjust hysteresis offset and set flag
+    if idx != old_idx:  # if index changed, adjust hysteresis offset
         # offset is 25% of the control slice (65536/ctrl_max)
         offset = int(0.25 * sign(idx - old_idx) * (65535 / ctrl_max))  # edit 0.25 to adjust slices
     return idx, offset
