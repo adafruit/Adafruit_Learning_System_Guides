@@ -22,6 +22,9 @@ pyportal = PyPortal(url=DATA_SOURCE,
                     text_maxlen=(180, 30), # max text size for quote & author
                    )
 
+# speed up projects with lots of text by preloading the font!
+pyportal.preload_font()
+
 while True:
     try:
         value = pyportal.fetch()
