@@ -12,9 +12,7 @@ Licensed under the MIT license.
 All text above must be included in any redistribution.
 """
 
-import time
 import os
-import sys
 from math import cos, sin, pi, floor
 import pygame
 from rplidar import RPLidar
