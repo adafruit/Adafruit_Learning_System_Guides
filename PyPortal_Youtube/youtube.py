@@ -9,11 +9,11 @@ import time
 import board
 from adafruit_pyportal import PyPortal
 
-# Get wifi details and more from a settings.py file
+# Get wifi details and more from a secrets.py file
 try:
-    from settings import settings
+    from secrets import secrets
 except ImportError:
-    print("WiFi settings are kept in settings.py, please add them there!")
+    print("WiFi secrets are kept in secrets.py, please add them there!")
     raise
 
 # Set up where we'll be fetching data from
@@ -21,12 +21,13 @@ CHANNEL_ID = "UCpOlOeQjj7EsVnDh3zuCgsA" # this isn't a secret but you have to lo
 CAPTION = "www.youtube.com/adafruit"
 
 # pylint: disable=line-too-long
-DATA_SOURCE = "https://www.googleapis.com/youtube/v3/channels/?part=statistics&id="+CHANNEL_ID+"&key="+settings['youtube_token']
+DATA_SOURCE = "https://www.googleapis.com/youtube/v3/channels/?part=statistics&id="+CHANNEL_ID+"&key="+secrets['youtube_token']
 DATA_LOCATION1 = ["items", 0, "statistics", "viewCount"]
 DATA_LOCATION2 = ["items", 0, "statistics", "subscriberCount"]
 # pylint: enable=line-too-long
 
-cwd = __file__.rsplit('/', 1)[0]
+# the current working directory (where this file is)
+cwd = ("/"+__file__).rsplit('/', 1)[0]
 pyportal = PyPortal(url=DATA_SOURCE,
                     json_path=(DATA_LOCATION1, DATA_LOCATION2),
                     status_neopixel=board.NEOPIXEL,

@@ -7,19 +7,20 @@ import time
 import board
 from adafruit_pyportal import PyPortal
 
-# Get wifi details and more from a settings.py file
+# Get wifi details and more from a secrets.py file
 try:
-    from settings import settings
+    from secrets import secrets
 except ImportError:
-    print("WiFi settings are kept in settings.py, please add them there!")
+    print("WiFi secrets are kept in secrets.py, please add them there!")
     raise
 
 # Set up where we'll be fetching data from
-DATA_SOURCE = "https://io.adafruit.com/api/v2/stats?x-aio-key="+settings['adafruitio_key']
+DATA_SOURCE = "https://io.adafruit.com/api/v2/stats?x-aio-key="+secrets['adafruitio_key']
 DATA_LOCATION1 = ["io_plus", "io_plus_subscriptions"]
 DATA_LOCATION2 = ["users", "users_active_30_days"]
 
-cwd = __file__.rsplit('/', 1)[0]
+cwd = ("/"+__file__).rsplit('/', 1)[0]
+print(cwd)
 pyportal = PyPortal(url=DATA_SOURCE,
                     json_path=(DATA_LOCATION1, DATA_LOCATION2),
                     status_neopixel=board.NEOPIXEL,

@@ -13,7 +13,7 @@ DATA_SOURCE = "https://img.shields.io/discord/327254708534116352.svg"
 # a regular expression for finding the data within the SVG xml text!
 DATA_LOCATION = [r">([0-9]+ online)<"]
 
-cwd = __file__.rsplit('/', 1)[0]
+cwd = ("/"+__file__).rsplit('/', 1)[0]
 pyportal = PyPortal(url=DATA_SOURCE, regexp_path=DATA_LOCATION,
                     status_neopixel=board.NEOPIXEL,
                     default_bg=cwd+"/discord_background.bmp",
