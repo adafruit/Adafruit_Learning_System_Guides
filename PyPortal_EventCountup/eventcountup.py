@@ -64,13 +64,16 @@ while True:
 
     # We're going to do a little cheat here, since circuitpython can't
     # track huge amounts of time, we'll calculate the delta years here
-    years_since = now[0] - EVENT_YEAR
-    # and then set the event_time to not include the year delta
-    event_time = time.struct_time((now[0], EVENT_MONTH, EVENT_DAY,
-                                   EVENT_HOUR, EVENT_MINUTE, 0,  # we don't track seconds
-                                   -1, -1, False))  # we dont know day of week/year or DST
-
-    since = time.mktime(event_time) - time.mktime(now)
+    if now[0] > (EVENT_YEAR+1):  # we add one year to avoid half-years
+        years_since = now[0] - (EVENT_YEAR+1)
+        # and then set the event_time to not include the year delta
+        event_time = time.struct_time((EVENT_YEAR+years_since, EVENT_MONTH, EVENT_DAY,
+                                       EVENT_HOUR, EVENT_MINUTE, 0,  # we don't track seconds
+                                       -1, -1, False))  # we dont know day of week/year or DST
+    else:
+        years_since = 0
+    print(event_time)
+    since = time.mktime(now) - time.mktime(event_time)
     print("Time since not including years (in sec):", since)
     sec_since = since % 60
     since //= 60
@@ -78,7 +81,9 @@ while True:
     since //= 60
     hours_since = since % 24
     since //= 24
-    days_since = since
+    days_since = since % 365
+    since //= 365
+    years_since += since
     print("%d years, %d days, %d hours, %d minutes and %s seconds" %
           (years_since, days_since, hours_since, mins_since, sec_since))
     text_areas[0].text = '{}'.format(years_since)  # set days textarea
