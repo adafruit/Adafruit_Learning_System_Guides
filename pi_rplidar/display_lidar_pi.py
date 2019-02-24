@@ -15,7 +15,7 @@ All text above must be included in any redistribution.
 import os
 from math import cos, sin, pi, floor
 import pygame
-from rplidar import RPLidar
+from adafruit_circuitpython_rplidar import CPythonRPLidar
 
 # Set up pygame and the display
 os.putenv('SDL_FBDEV', '/dev/fb1')
@@ -27,7 +27,7 @@ pygame.display.update()
 
 # Setup the RPLidar
 PORT_NAME = '/dev/ttyUSB0'
-lidar = RPLidar(PORT_NAME)
+lidar = CPythonRPLidar(PORT_NAME)
 
 # used to scale data to fit on the screen
 max_distance = 0
