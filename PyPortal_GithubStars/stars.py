@@ -7,24 +7,24 @@ import time
 import board
 from adafruit_pyportal import PyPortal
 
-# Get wifi details and more from a settings.py file
+# Get wifi details and more from a secrets.py file
 try:
-    from settings import settings
+    from secrets import secrets
 except ImportError:
-    print("WiFi settings are kept in settings.py, please add them there!")
+    print("WiFi secrets are kept in secrets.py, please add them there!")
     raise
 
 # Set up where we'll be fetching data from
 DATA_SOURCE = "https://api.github.com/repos/adafruit/circuitpython"
 CAPTION = "www.github.com/adafruit/circuitpython"
 # If we have an access token, w can query more often
-if 'github_token' in settings:
-    DATA_SOURCE += "?access_token="+settings['github_token']
+if 'github_token' in secrets:
+    DATA_SOURCE += "?access_token="+secrets['github_token']
 
 # The data we want to display
 DATA_LOCATION = ["stargazers_count"]
 
-cwd = __file__.rsplit('/', 1)[0]
+cwd = ("/"+__file__).rsplit('/', 1)[0]
 pyportal = PyPortal(url=DATA_SOURCE, json_path=DATA_LOCATION,
                     status_neopixel=board.NEOPIXEL,
                     default_bg=cwd+"/stars_background.bmp",

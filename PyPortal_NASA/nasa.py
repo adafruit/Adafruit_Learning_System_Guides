@@ -9,7 +9,8 @@ IMAGE_LOCATION = ["url"]
 TITLE_LOCATION = ["title"]
 DATE_LOCATION = ["date"]
 
-cwd = __file__.rsplit('/', 1)[0]
+# the current working directory (where this file is)
+cwd = ("/"+__file__).rsplit('/', 1)[0]
 pyportal = PyPortal(url=DATA_SOURCE,
                     json_path=(TITLE_LOCATION, DATE_LOCATION),
                     status_neopixel=board.NEOPIXEL,

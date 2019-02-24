@@ -20,8 +20,8 @@ EVENT_DURATION = 3600   # in seconds!
 # for a list of valid locations, see http://worldtimeapi.org/api/timezone
 EVENT_LOCATION = "America/New_York"  # set to None if its for your local time
 
-# determine the current working directory, needed so we know where to find files
-cwd = __file__.rsplit('/', 1)[0]
+# the current working directory (where this file is)
+cwd = ("/"+__file__).rsplit('/', 1)[0]
 event_background = cwd+"/countdown_event.bmp"
 countdown_background = cwd+"/countdown_background.bmp"
 

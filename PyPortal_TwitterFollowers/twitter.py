@@ -14,9 +14,8 @@ TWITTER_NAME = "adafruit"
 DATA_SOURCE = "https://cdn.syndication.twimg.com/widgets/followbutton/info.json?screen_names="+TWITTER_NAME   # pylint: disable=line-too-long
 DATA_LOCATION = [0, "followers_count"]
 
-# determine the current working directory
-# needed so we know where to find files
-cwd = __file__.rsplit('/', 1)[0]
+# the current working directory (where this file is)
+cwd = ("/"+__file__).rsplit('/', 1)[0]
 # Initialize the pyportal object and let us know what data to fetch and where
 # to display it
 pyportal = PyPortal(url=DATA_SOURCE,

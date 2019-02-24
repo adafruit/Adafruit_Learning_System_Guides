@@ -22,7 +22,7 @@ event_time = time.struct_time((EVENT_YEAR, EVENT_MONTH, EVENT_DAY,
 
 # determine the current working directory
 # needed so we know where to find files
-cwd = __file__.rsplit('/', 1)[0]
+cwd = ("/"+__file__).rsplit('/', 1)[0]
 # Initialize the pyportal object and let us know what data to fetch and where
 # to display it
 pyportal = PyPortal(status_neopixel=board.NEOPIXEL,

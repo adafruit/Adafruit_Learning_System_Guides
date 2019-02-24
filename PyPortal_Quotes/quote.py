@@ -7,7 +7,8 @@ DATA_SOURCE = "https://www.adafruit.com/api/quotes.php"
 QUOTE_LOCATION = [0, 'text']
 AUTHOR_LOCATION = [0, 'author']
 
-cwd = __file__.rsplit('/', 1)[0]
+# the current working directory (where this file is)
+cwd = ("/"+__file__).rsplit('/', 1)[0]
 pyportal = PyPortal(url=DATA_SOURCE,
                     json_path=(QUOTE_LOCATION, AUTHOR_LOCATION),
                     status_neopixel=board.NEOPIXEL,

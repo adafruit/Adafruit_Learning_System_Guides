@@ -15,7 +15,7 @@ DATA_LOCATION = ["data", "subscribers"]
 CAPTION="reddit.com/r/"+SUBREDDIT
 
 # the current working directory (where this file is)
-cwd = __file__.rsplit('/', 1)[0]
+cwd = ("/"+__file__).rsplit('/', 1)[0]
 pyportal = PyPortal(url=DATA_SOURCE, json_path=DATA_LOCATION,
                     status_neopixel=board.NEOPIXEL,
                     default_bg=cwd+"/reddit_background.bmp",

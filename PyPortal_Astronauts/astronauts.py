@@ -15,7 +15,7 @@ DATA_LOCATION = [["number"], ["people"]]
 
 # determine the current working directory
 # needed so we know where to find files
-cwd = __file__.rsplit('/', 1)[0]
+cwd = ("/"+__file__).rsplit('/', 1)[0]
 # Initialize the pyportal object and let us know what data to fetch and where
 # to display it
 pyportal = PyPortal(url=DATA_SOURCE,
@@ -41,7 +41,7 @@ while True:
 
     stamp = time.monotonic()
     while (time.monotonic() - stamp) < 5 *60:  # wait 5 minutes before getting again
-        if pyportal.ts.touch_point:
+        if pyportal.touchscreen.touch_point:
             names = ""
             for astro in value[1]:
                 names += "%s (%s)\n" % (astro['name'], astro['craft'])
