@@ -103,7 +103,7 @@ class OpenWeather_Graphics(displayio.Group):
         if not self.am_pm:
             time_str = "%d:%02d" % (hour, minute)
         else:
-            if hour > 12:
+            if hour >= 12:
                 hour %= 12
                 time_str = "%d:%02d PM" % (hour, minute)
             else:
