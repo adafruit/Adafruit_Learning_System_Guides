@@ -3,7 +3,7 @@
 # A fun lighting project using Circuit Playground Express and NeoPixels
 
 # Written by Archie Roques for Adafruit Industries
-# For full instructions see learn.adafruit.com/cpx-rocket-lamp ! 
+# For full instructions see learn.adafruit.com/cpx-rocket-lamp !
 
 # MIT License, see LICENSE for more info.
 
@@ -31,7 +31,7 @@ pixels.show()
 # set the rocket body LEDs to a pretty colour - we chose green!
 # Colours are expressed in RGB format
 # with each digit going up to 255.
-# In this case we've used 0 red, 255 green and 150 blue. 
+# In this case we've used 0 red, 255 green and 150 blue.
 strip.fill((0, 255, 150))
 strip.show()
 
@@ -63,8 +63,8 @@ def blue_fire(repeats):
     pixels.fill((40, 0, 200))
     pixels.show()
     # each repeat roughly corresponds to a second of running including processing time
-    for r in range(repeats):
-        for i in range(20):
+    for _ in range(repeats):
+        for _ in range(20):
             # pick a random pixel to fill
             j = random.randint(0, 9)
             # makes the pixel either lighter or darker to simulate firey goodness
@@ -86,8 +86,8 @@ def white_fire(repeats):
     pixels.fill((100, 100, 100))
     pixels.show()
     # each repeat roughly corresponds to a second of running including processing time
-    for r in range(repeats):
-        for i in range(20):
+    for _ in range(repeats):
+        for _ in range(20):
             # pick a random pixel to fill
             j = random.randint(0, 9)
             # makes the pixel either lighter or darker to simulate firey goodness
@@ -109,8 +109,8 @@ def orange_fire(repeats):
     pixels.fill((200, 50, 0))
     pixels.show()
     # each repeat roughly corresponds to a second of running including processing time
-    for r in range(repeats):
-        for i in range(10):
+    for _ in range(repeats):
+        for _ in range(10):
             # pick a random pixel to fill
             j = random.randint(0, 9)
             # makes the pixel either lighter or darker to simulate firey goodness
