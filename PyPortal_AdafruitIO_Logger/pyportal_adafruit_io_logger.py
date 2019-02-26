@@ -77,7 +77,7 @@ while True:
         print('Light Level: ', light_value)
 
         temperature = adt.temperature
-        print('Current Temperature: {0}*C'.format(temperature))
+        print('Temperature: %0.2f C'%(temperature))
 
         print('Sending to Adafruit IO...')
 
