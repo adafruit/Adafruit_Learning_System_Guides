@@ -12,11 +12,12 @@ medium_font = cwd+"/fonts/Arial-16.bdf"
 large_font = cwd+"/fonts/Arial-Bold-24.bdf"
 
 class OpenWeather_Graphics(displayio.Group):
-    def __init__(self, *, am_pm=True, celsius=True):
+    def __init__(self, root_group, *, am_pm=True, celsius=True):
         super().__init__(max_size=2)
         self.am_pm = am_pm
         self.celsius = celsius
 
+        root_group.append(self)
         self._icon_group = displayio.Group(max_size=1)
         self.append(self._icon_group)
         self._text_group = displayio.Group(max_size=5)
@@ -135,3 +136,4 @@ class OpenWeather_Graphics(displayio.Group):
 
         self._icon_group.append(self._icon_sprite)
         board.DISPLAY.refresh_soon()
+        board.DISPLAY.wait_for_frame()
