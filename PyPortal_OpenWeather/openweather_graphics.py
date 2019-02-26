@@ -100,14 +100,16 @@ class OpenWeather_Graphics(displayio.Group):
         now = time.localtime()
         hour = now[3]
         minute = now[4]
-        if not self.am_pm:
-            time_str = "%d:%02d" % (hour, minute)
-        else:
+        format_str = "%d:%02d"
+        if self.am_pm:
             if hour >= 12:
-                hour %= 12
-                time_str = "%d:%02d PM" % (hour, minute)
+                hour -= 12
+                format_str = format_str+" PM"
             else:
-                time_str = "%d:%02d AM" % (hour, minute)
+                format_str = format_str+" AM"
+            if hour == 0:
+                hour = 12
+        time_str = format_str % (hour, minute)
         print(time_str)
         self.time_text.text = time_str
 

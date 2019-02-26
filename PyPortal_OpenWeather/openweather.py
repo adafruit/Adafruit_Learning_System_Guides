@@ -20,7 +20,7 @@ except ImportError:
 
 # Use cityname, country code where countrycode is ISO3166 format.
 # E.g. "New York, US" or "London, GB"
-LOCATION = "New York, US"
+LOCATION = "Manhattan, US"
 
 # Set up where we'll be fetching data from
 DATA_SOURCE = "http://api.openweathermap.org/data/2.5/weather?q="+LOCATION
