@@ -27,7 +27,7 @@ from adafruit_io.adafruit_io import RESTClient, AdafruitIO_RequestError
 import adafruit_adt7410
 
 # Timeout between sending data to Adafruit IO, in seconds
-IO_DELAY = 15
+IO_DELAY = 30
 
 # Get wifi details and more from a secrets.py file
 try:
