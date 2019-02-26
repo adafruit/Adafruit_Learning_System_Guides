@@ -88,4 +88,5 @@ while True:
         print("Failed to get data, retrying\n", e)
         wifi.reset()
         continue
+    print('Delaying {0} seconds...'.format(IO_DELAY))
     time.sleep(IO_DELAY)
