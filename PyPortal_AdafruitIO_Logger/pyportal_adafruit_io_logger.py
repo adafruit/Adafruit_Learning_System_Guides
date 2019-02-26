@@ -1,10 +1,12 @@
 """
-IoT PyPortal
-Learn Guide: https://learn.adafruit.com/iot-pyportal-data-logger-adafruitio-circuitpython
+PyPortal IOT Data Logger for Adafruit IO
 
 Dependencies:
     * CircuitPython_ADT7410
         https://github.com/adafruit/Adafruit_CircuitPython_ADT7410
+
+    * CircuitPython_AdafruitIO
+        https://github.com/adafruit/Adafruit_CircuitPython_AdafruitIO
 """
 import time
 import board
@@ -25,7 +27,7 @@ from adafruit_io.adafruit_io import RESTClient, AdafruitIO_RequestError
 import adafruit_adt7410
 
 # Timeout between sending data to Adafruit IO, in seconds
-IO_DELAY = 30
+IO_DELAY = 15
 
 # Get wifi details and more from a secrets.py file
 try:
@@ -79,7 +81,7 @@ while True:
 
         print('Sending to Adafruit IO...')
 
-        io.send_data(light_feed['key'], temperature, precision=2)
+        io.send_data(light_feed['key'], light_value)
         io.send_data(temperature_feed['key'], temperature, precision=2)
         print('Sent to Adafruit IO!')
     except (ValueError, RuntimeError) as e:
