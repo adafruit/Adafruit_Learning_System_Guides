@@ -11,7 +11,8 @@ frequency = 440  # Set this to the Hz of the tone you want to generate.
 length = sample_rate // frequency  # One freqency period
 sine_wave = array.array("H", [0] * length)
 for i in range(length):
-    sine_wave[i] = int((math.sin(math.pi * 2 * frequency * i / sample_rate) * tone_volume + 1) * (2 ** 15 - 1))
+    sine_wave[i] = int((math.sin(math.pi * 2 * frequency * i / sample_rate) * 
+                        tone_volume + 1) * (2 ** 15 - 1))
 
 # For Feather M0 Express, ItsyBitsy M0 Express, Metro M0 Express
 audio = audiobusio.I2SOut(board.D1, board.D0, board.D9)
