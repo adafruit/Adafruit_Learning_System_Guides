@@ -12,7 +12,8 @@ except ImportError:
 
 # Set up where we'll be fetching data from
 DATA_SOURCE = "https://api.hackster.io/v2/projects?"
-DATA_SOURCE += "client_id="+secrets['hackster_clientid']+"&client_secret="+secrets['hackster_secret']
+DATA_SOURCE += "client_id="+secrets['hackster_clientid']
+DATA_SOURCE += "&client_secret="+secrets['hackster_secret']
 IMAGE_LOCATION = ['records', 0, "cover_image_url"]
 TITLE_LOCATION = ['records',0, "name"]
 HID_LOCATION = ['records', 0, "hid"]
