@@ -16,13 +16,15 @@ DATA_LOCATION = ['bpi', CURRENCY, 'rate_float']
 
 # We will convert the value from coindesk into a string that calculates our
 # total bitcoin value!
-def text_transform(value):
+def text_transform(val):
+    format_str = "{:,.2f} Bitcoins\n = {:,d}"
     if CURRENCY == 'USD':
-        return "{:,.2f} Bitcoins\n = ${:,d}".format(NUM_BITCOINS, int(value*NUM_BITCOINS))
+        format_str = "{:,.2f} Bitcoins\n = %{:,d}"
     if CURRENCY == 'EUR':
-        return "{:,.2f} Bitcoins\n = €{:,d}".format(NUM_BITCOINS, int(value*NUM_BITCOINS))
+        format_str = "{:,.2f} Bitcoins\n = €{:,d}"
     if CURRENCY == 'GBP':
-        return "{:,.2f} Bitcoins\n = £{:,d}".format(NUM_BITCOINS, int(value*NUM_BITCOINS))
+        format_str = "{:,.2f} Bitcoins\n = £{:,d}"
+    return format_str.format(NUM_BITCOINS, int(val*NUM_BITCOINS))
 
 # the current working directory (where this file is)
 cwd = ("/"+__file__).rsplit('/', 1)[0]

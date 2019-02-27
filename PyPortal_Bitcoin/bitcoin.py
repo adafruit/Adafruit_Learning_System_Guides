@@ -13,13 +13,14 @@ CURRENCY = 'USD'
 DATA_SOURCE = "https://api.coindesk.com/v1/bpi/currentprice.json"
 DATA_LOCATION = ['bpi', CURRENCY, 'rate_float']
 
-def text_transform(value):
+def text_transform(val):
     if CURRENCY == 'USD':
-        return "$%d" % value
+        return "$%d" % val
     if CURRENCY == 'EUR':
-        return "‎€%d" % value
+        return "‎€%d" % val
     if CURRENCY == 'GBP':
-        return "£%d" % value
+        return "£%d" % val
+    return "%d" % val
 
 # the current working directory (where this file is)
 cwd = ("/"+__file__).rsplit('/', 1)[0]
