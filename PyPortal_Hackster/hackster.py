@@ -1,5 +1,4 @@
 import time
-import random
 import board
 from adafruit_pyportal import PyPortal
 
@@ -14,7 +13,8 @@ PROJECT_NAME = "3c92f0"
 
 # Set up where we'll be fetching data from
 DATA_SOURCE = "https://api.hackster.io/v2/projects/"+PROJECT_NAME+"?"
-DATA_SOURCE += "client_id="+secrets['hackster_clientid']+"&client_secret="+secrets['hackster_secret']
+DATA_SOURCE += "client_id="+secrets['hackster_clientid']
+DATA_SOURCE += "&client_secret="+secrets['hackster_secret']
 VIEWS_LOCATION = ['stats', 'views']
 LIKES_LOCATION = ['stats', 'respects']
 CAPTION = "http://www.hackster.com/project/"+PROJECT_NAME
