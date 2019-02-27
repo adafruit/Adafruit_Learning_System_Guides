@@ -41,7 +41,7 @@ while True:
             print("New follower!")
             pyportal.play_file(cwd+"/coin.wav")  # uncomment make a noise!
         last_value = value
-    except RuntimeError as e:
+    except (ValueError, RuntimeError) as e:
         print("Some error occured, retrying! -", e)
 
     time.sleep(60)  # wait a minute before getting again
