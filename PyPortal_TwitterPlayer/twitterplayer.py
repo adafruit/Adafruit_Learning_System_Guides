@@ -17,7 +17,7 @@ cwd = ("/"+__file__).rsplit('/', 1)[0]
 
 # Find all image files on the storage
 imagefiles = [file for file in os.listdir(cwd+"/backgrounds/")
-             if (file.endswith(".bmp") and not file.startswith("._"))]
+              if (file.endswith(".bmp") and not file.startswith("._"))]
 for i, filename in enumerate(imagefiles):
     imagefiles[i] = cwd+"/backgrounds/"+filename
 print("Image files found: ", imagefiles)
@@ -31,7 +31,7 @@ pyportal = PyPortal(url=DATA_SOURCE,
                     text_color=0xFFFFFF,
                     text_wrap=35, # character to wrap around
                     text_maxlen=280, # cut off characters
-                    )
+                   )
 pyportal.preload_font()
 
 while True:
