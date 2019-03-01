@@ -26,7 +26,8 @@ pyportal = adafruit_pyportal.PyPortal(url=DATA_SOURCE,
                                       default_bg=cwd+"/thingiverse_background.bmp",
                                       text_font=cwd+"/fonts/Arial-12.bdf",
                                       text_position=((5, 5), (5, 200)),
-                                      text_color=(0x00FF00, 0x00FF00))
+                                      text_color=(0x00FF00, 0x00FF00),
+                                      text_transform=(None, None))
 pyportal.preload_font()
 
 while True:
@@ -36,8 +37,8 @@ while True:
         print("Response is", response)
         pyportal.set_background(None)
         image_url = response[2].replace('_thumb_medium.', '_display_large.')
-        pyportal.wget(adafruit_pyportal.IMAGE_CONVERTER_SERVICE+image_url, "/cache.bmp")
-        pyportal.set_background("/cache.bmp")
+        pyportal.wget(pyportal.image_converter_url(image_url, 320, 240), "/sd/cache.bmp")
+        pyportal.set_background("/sd/cache.bmp")
 
     except (IndexError, RuntimeError, ValueError) as e:
         print("Some error occured, retrying! -", e)
