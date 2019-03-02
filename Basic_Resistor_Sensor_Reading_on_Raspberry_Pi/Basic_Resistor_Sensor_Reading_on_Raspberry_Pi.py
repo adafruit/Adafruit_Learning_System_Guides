@@ -1,24 +1,30 @@
 # Example for RC timing reading for Raspberry Pi
-# Must be used with GPIO 0.3.1a or later - earlier verions
-# are not fast enough!
+# using CircuitPython Libraries
 
-import RPi.GPIO as GPIO, time, os      
-
-DEBUG = 1
-GPIO.setmode(GPIO.BCM)
+import os
+import time
+import board
+from digitalio import DigitalInOut, Direction
 
 def RCtime (RCpin):
         reading = 0
-        GPIO.setup(RCpin, GPIO.OUT)
-        GPIO.output(RCpin, GPIO.LOW)
+        
+        # setup pin as output and direction low value
+        rc = DigitalInOut(RCpin)
+        rc.direction = Direction.OUTPUT
+        rc.value = False
+
         time.sleep(0.1)
 
-        GPIO.setup(RCpin, GPIO.IN)
+        # setup pin as input and wait for low value
+        rc = DigitalInOut(RCpin)
+        rc.direction = Direction.INPUT
+
         # This takes about 1 millisecond per loop cycle
-        while (GPIO.input(RCpin) == GPIO.LOW):
+        while ( rc.value == False ):
                 reading += 1
         return reading
 
 while True:                                     
-        print RCtime(18)     # Read RC timing using pin #18
-
+        result = RCtime(board.D18)     # Read RC timing using pin #18
+        print(result)
