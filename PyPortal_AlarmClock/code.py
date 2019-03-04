@@ -13,7 +13,7 @@ All text above must be included in any redistribution.
 """
 
 #pylint:disable=redefined-outer-name,no-member,global-statement,no-self-use
-#pyline:disable=too-many-branches,too-many-statements,useless-super-delegation
+#pylint:disable=too-many-branches,too-many-statements,useless-super-delegation
 
 import time
 import json
