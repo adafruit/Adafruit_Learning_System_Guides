@@ -12,18 +12,19 @@ Licensed under the MIT license.
 All text above must be included in any redistribution.
 """
 
-#pylint:disable=redefined-outer-name,no-member,global-statement
+#pylint:disable=redefined-outer-name,no-member,global-statement,no-self-use
+#pyline:disable=too-many-branches,too-many-statements,useless-super-delegation
 
 import time
 import json
 import board
+from secrets import secrets
 from adafruit_pyportal import PyPortal
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text.text_area import TextArea
 from digitalio import DigitalInOut, Direction, Pull
 import analogio
 import displayio
-from secrets import secrets
 
 # Set up where we'll be fetching data from
 DATA_SOURCE = 'http://api.openweathermap.org/data/2.5/weather?q='+secrets['weather_location']
@@ -268,7 +269,7 @@ class Time_State(State):
             # Update the time
             update_time = now
             the_time = time.localtime()
-            self.text_areas[0].text = '%02d:%02d' % (the_time.tm_hour,the_time.tm_min) # set time textarea
+            self.text_areas[0].text = '%02d:%02d' % (the_time.tm_hour,the_time.tm_min)
             board.DISPLAY.refresh_soon()
             board.DISPLAY.wait_for_frame()
 
