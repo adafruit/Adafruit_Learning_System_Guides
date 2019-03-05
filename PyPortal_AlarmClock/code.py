@@ -223,7 +223,7 @@ class Time_State(State):
         # only query the online time once per hour (and on first run)
         if (not self.refresh_time) or ((now - self.refresh_time) > 3600):
             try:
-                pyportal.get_local_time(location=secrets['time_location'])
+                pyportal.get_local_time(location=secrets['timezone'])
                 self.refresh_time = now
             except RuntimeError as e:
                 print('Some error occured, retrying! -', e)
