@@ -63,9 +63,14 @@ ADAFRUIT_IO_KEY = secrets['adafruit_io_key']
 io = RESTClient(ADAFRUIT_IO_USER, ADAFRUIT_IO_KEY, wifi)
 
 # Set up Adafruit IO Feeds
-print('Grabbing Feeds from Adafruit IO (this may take a while...)')
-uv_index_feed = io.get_feed('uvindex')
-wind_speed_feed = io.get_feed('windspeed')
+print('Grabbing Group from IO')
+station_group = io.get_group('weatherstation')
+print(station_group)
+feed_list = station_group['feeds']
+humidity_feed = feed_list[0]
+temperature_feed = feed_list[1]
+uv_index_feed = feed_list[2]
+wind_speed_feed = feed_list[3]
 """
 temperature_feed = io.get_feed('temperature')
 humidity_feed = io.get_feed('humidity')
@@ -74,7 +79,7 @@ altitude_feed = io.get_feed('altitude')
 tvoc_feed = io.get_feed('tvoc')
 eco2_feed = io.get_feed('eco2')
 """
-print('Feeds found!')
+print('Group found!')
 
 # create an i2c object
 i2c = busio.I2C(board.SCL, board.SDA)
@@ -99,8 +104,10 @@ def adc_to_wind_speed(val):
 
 def send_to_io():
     # handle sending sensor data to Adafruit IO
-    io.send_data(uv_index_feed['key'], uv_index)
+    io.send_data(uv_index_feed['key'], uv_index, precision = 2)
     io.send_data(wind_speed_feed['key'], wind_speed, precision = 2)
+    io.send_data(temperature_feed['key'], bme280_data[0], precision = 2)
+    io.send_data(humidity_feed['key'], bme280_data[1], precision = 2)
 
 while True:
     print('obtaining sensor data...')
@@ -120,9 +127,13 @@ while True:
     gfx.display_data(uv_index, bme280_data, 
                         sgp_data, wind_speed)
     print('sensor data displayed!')
+
     # send sensor data to IO
     try:
+        print('Sending data to Adafruit IO...')
+        # TODO: Update the display with some text
         send_to_io()
+        print('Data sent!')
     except AdafruitIO_RequestError as e:
         raise AdafruitIO_RequestError('ERROR: ', e)
     time.sleep(PYPORTAL_REFRESH)
