@@ -34,7 +34,7 @@ PURPLE = (180, 0, 255)
 ss = crickit.seesaw
 
 # Two buttons are pullups, connect to ground to activate
-BUTTON_1 = crickit.SIGNAL1 
+BUTTON_1 = crickit.SIGNAL1
 BUTTON_2 = crickit.SIGNAL2
 
 ss.pin_mode(BUTTON_1, ss.INPUT_PULLUP)
@@ -44,10 +44,10 @@ ss.pin_mode(BUTTON_2, ss.INPUT_PULLUP)
 crickit.drive_1.frequency = 1000
 
 #electromagnet at drive spot 2
-crickit.drive_2.frequency = 1000 
+crickit.drive_2.frequency = 1000
 
 # initialize NeoPixels to num_pixels
-num_pixels = 30 
+num_pixels = 30
 
 # The following line sets up a NeoPixel strip on Crickit CPX pin A1
 pixels = neopixel.NeoPixel(board.A1, num_pixels, brightness=0.3, auto_write=False)
@@ -69,7 +69,7 @@ pot = crickit.SIGNAL8
 # initialize the light sensor on the CPX and the DC motor
 analogin = AnalogIn(board.LIGHT)
 
-# initialize motor 
+# initialize motor
 motor_1 = crickit.dc_motor_1
 
 while True:
@@ -83,7 +83,7 @@ while True:
         crickit.drive_1.fraction = 0.0  # all the way off
         time.sleep(0.5)
     else:
-        crickit.drive_1.fraction = 0.0 
+        crickit.drive_1.fraction = 0.0
 
     # button 2 electromagnet on
     if not ss.digital_read(BUTTON_2):
