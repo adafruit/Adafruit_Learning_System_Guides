@@ -17,8 +17,8 @@ All text above must be included in any redistribution.
 
 import time
 import json
-import board
 from secrets import secrets
+import board
 from adafruit_pyportal import PyPortal
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text.text_area import TextArea
