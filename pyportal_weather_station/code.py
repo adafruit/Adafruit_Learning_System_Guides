@@ -62,38 +62,37 @@ gfx = weathermeter_helper.WeatherMeter_GFX()
 PYPORTAL_REFRESH = 15
 
 # initialize the Adafruit IO helper
+print('grabbing Adafruit IO feeds...')
 io_helper = weathermeter_helper.WeatherMeter_IO(ADAFRUIT_IO_USER, ADAFRUIT_IO_KEY, wifi)
+print('io feeds found!')
 
 # init. the ADC
 adc = analogio.AnalogIn(board.D4)
 
 def adc_to_wind_speed(val):
-    # converts adc value to wind speed, in m/s 
+    # converts adc value, returns anemometer wind speed, in m/s
     voltage_val = val / 65535 * 3.3
-    return map_range(adc_value, 0.4, 2, 0, 32.4)
+    return map_range(voltage_val, 0.4, 2, 0, 32.4)
 
 while True:
-    try:
-        # Get uv index from veml6075
-        uv_index = veml.uv_index
-        uv_index = round(uv_index, 3)
-        print('UV Index: ', uv_index)
+    print('obtaining sensor data...')
+    # Get uv index from veml6075
+    uv_index = veml.uv_index
+    uv_index = round(uv_index, 3)
 
-        # Get eco2, tvoc from sgp30
-        eCO2, TVOC = sgp30.iaq_measure()
-        sgp_data = [eCO2, TVOC]
+    # Get eco2, tvoc from sgp30
+    eCO2, TVOC = sgp30.iaq_measure()
+    sgp_data = [eCO2, TVOC]
 
-        # Store bme280 data as a list
-        bme280_data = [bme280.temperature, bme280.humidity, bme280.pressure, bme280.altitude]
+    # Store bme280 data as a list
+    bme280_data = [bme280.temperature, bme280.humidity, bme280.pressure, bme280.altitude]
 
-        # Get wind speed
-        wind_speed = adc_to_wind_speed(adc.value)
-        # Perform sensor read, display data and send to IO
-        print('displaying sensor data...')
-        gfx.display_data(uv_index, bme280_data, sgp_data, io_helper)
-        print('sensor data displayed!')
-    except (ValueError, RuntimeError) as e: # ESP32SPI Failure
-        print("Failed to get data, retrying\n", e)
-        wifi.reset()
-        continue
+    # Get wind speed
+    wind_speed = adc_to_wind_speed(adc.value)
+    print(wind_speed)
+    # Perform sensor read, display data and send to IO
+    print('displaying sensor data...')
+    gfx.display_data(uv_index, bme280_data, 
+                        sgp_data, wind_speed, io_helper)
+    print('sensor data displayed!')
     time.sleep(PYPORTAL_REFRESH)

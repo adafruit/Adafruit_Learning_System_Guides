@@ -13,12 +13,11 @@ from adafruit_io.adafruit_io import RESTClient, AdafruitIO_RequestError
 
 cwd = ("/"+__file__).rsplit('/', 1)[0] # the current working directory (where this file is)
 
+# Fonts within /fonts folder
 small_font = cwd+"/fonts/Arial-12.bdf"
 medium_font = cwd+"/fonts/Arial-16.bdf"
 large_font = cwd+"/fonts/Arial-Bold-24.bdf"
 coll_font = cwd+"/fonts/Collegiate-24.bdf"
-
-# TODO: Spec out a class for the anemometer a-to-d conversion
 
 class WeatherMeter_IO():
     def __init__(self, user, key, wifi):
@@ -27,21 +26,19 @@ class WeatherMeter_IO():
         :param str key: Adafruit IO Active Key
         :param WiFiManager wifi: WiFiManager Object 
         """
+        
         self._io_client = RESTClient(user, key, wifi)
-        try: # Attempt to get feeds from IO.
-            self._temperature_feed = self._io_client.get_feed('temperature')
-            self._gas_feed = self._io_client.get_feed('gas')
-            self._humidity_feed = self._io_client.get_feed('humidity')
-            self._pressure_feed = self._io_client.get_feed('pressure')
-            self._altitude_feed = self._io_client.get_feed('altitude')
-            self._uv_index_feed = self._io_client.get_feed('uvindex')
-        except AdafruitIO_RequestError: # If feeds do not exist, create them
-            self._temperature_feed = self._io_client.create_new_feed('temperature')
-            self._gas_feed = self._io_client.create_new_feed('gas')
-            self._humidity_feed = self._io_client.create_new_feed('humidity')
-            self._pressure_feed = self._io_client.create_new_feed('pressure')
-            self._altitude_feed = self._io_client.create_new_feed('altitude')
-            self._uv_index_feed = self._io_client.create_new_feed('uvindex')
+        """
+        TODO: This is SLOOOOOOW, move into another method to speed up init. process
+        self._temperature_feed = self._io_client.get_feed('temperature')
+        self._humidity_feed = self._io_client.get_feed('humidity')
+        self._pressure_feed = self._io_client.get_feed('pressure')
+        self._altitude_feed = self._io_client.get_feed('altitude')
+        self._uv_index_feed = self._io_client.get_feed('uvindex')
+        self._eco2_feed = self._io_client.get_feed('eco2')
+        self._tvoc_feed = self._io_client.get_feed('tvoc')
+        self._wind_speed_feed = self._io_client.get_feed('windspeed')
+        """
 
     def send_data(self, uv_index, sgp_data, bme_data):
         """Send data from weathermeter sensors to adafruit io
@@ -52,16 +49,16 @@ class WeatherMeter_IO():
             self._io_client.send_data(self._humidity_feed['key'], bme_data[1])
             self._io_client.send_data(self._pressure_feed['key'], bme_data[2])
             self._io_client.send_data(self._altitude_feed['key'], bme_data[3])
-            # TODO: Add SGP30 self._io_client.send_data(self._gas_feed['key'], sgp_data[0])
+            # TODO: Add feeds for SGP30 and anemometer
         except AdafruitIO_RequestError:
             raise AdafruitIO_RequestError('Could not send data to Adafruit IO!')
 
 class WeatherMeter_GFX(displayio.Group):
     def __init__(self, celsius=True):
         # root group
-        root_group = displayio.Group(max_size=9)
+        root_group = displayio.Group(max_size=20)
         board.DISPLAY.show(root_group)
-        super().__init__(max_size=2)
+        super().__init__(max_size=20)
         self._celsius = celsius
 
         # create background icon group
@@ -70,7 +67,7 @@ class WeatherMeter_GFX(displayio.Group):
         board.DISPLAY.show(self._icon_group)
         
         # create text object group
-        self._text_group = displayio.Group(max_size=9)
+        self._text_group = displayio.Group(max_size=8)
         self.append(self._text_group)
 
         self._icon_sprite = None
@@ -78,21 +75,18 @@ class WeatherMeter_GFX(displayio.Group):
         self._cwd = cwd
         self.set_icon(self._cwd+"/pyportal_splash.bmp")
 
-        self.small_font = bitmap_font.load_font(small_font)
+        print('loading fonts...')
         self.medium_font = bitmap_font.load_font(medium_font)
-        self.large_font = bitmap_font.load_font(large_font)
         glyphs = b'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-,°.: '
-        self.small_font.load_glyphs(glyphs)
         self.medium_font.load_glyphs(glyphs)
-        self.large_font.load_glyphs(glyphs)
-        
         # experiment with Collegiate-24.bdf font!
         self.c_font = bitmap_font.load_font(coll_font)
         self.c_font.load_glyphs(glyphs)
 
+        print('fonts loaded, setting up textareas...')
         # Set up TextAreas for labels and headers
         self.title_text = TextArea(self.c_font, width=30)
-        self.title_text.x = 30
+        self.title_text.x = 45
         self.title_text.y = 0
         self.title_text.color = 0xFFFFFF
         self._text_group.append(self.title_text)
@@ -116,11 +110,11 @@ class WeatherMeter_GFX(displayio.Group):
         self.bme_temp_humid_text.color = 0xFFFFFF
         self._text_group.append(self.bme_temp_humid_text)
 
-        self.sgp_text = TextArea(self.medium_font, width=25)
-        self.sgp_text.x = 0
-        self.sgp_text.y = 80
-        self.sgp_text.color = 0xFFFFFF
-        self._text_group.append(self.sgp_text)
+        self.wind_speed_text = TextArea(self.medium_font, width=30)
+        self.wind_speed_text.x = 0
+        self.wind_speed_text.y = 80
+        self.wind_speed_text.color = 0xFFFFFF
+        self._text_group.append(self.wind_speed_text)
 
         self.bme_pres_alt_text = TextArea(self.medium_font, width=70)
         self.bme_pres_alt_text.x = 0
@@ -128,14 +122,15 @@ class WeatherMeter_GFX(displayio.Group):
         self.bme_pres_alt_text.color = 0xFFFFFF
         self._text_group.append(self.bme_pres_alt_text)
 
-        self.wind_speed_text = TextArea(self.medium_font, width=70)
-        self.wind_speed_text.x = 0
-        self.wind_speed_text.y = 100
-        self.wind_speed_text.color = 0xFFFFFF
-        self._text_group.append(self.wind_speed_text)
+        self.sgp_text = TextArea(self.medium_font, width=70)
+        self.sgp_text.x = 0
+        self.sgp_text.y = 120
+        self.sgp_text.color = 0xFFFFFF
+        self._text_group.append(self.sgp_text)
 
-        board.DISPLAY.show(self._text_group)
         self.title_text.text = "PyPortal Weather Station"
+        board.DISPLAY.show(self._text_group)
+        print("Text area setup!")
 
 
     def display_data(self, uv_index, bme_data, sgp_data, wind_speed, io_helper):
@@ -148,7 +143,10 @@ class WeatherMeter_GFX(displayio.Group):
         :param float wind_speed: Wind speed from anemometer.
         :param WeatherMeter_IO io_helper: IO Helper object.
         """
+        # VEML6075
+        print('UV Index: ', uv_index)
         self.veml_text.text = 'UV Index: ' + str(uv_index)
+
         # Parse out the BME280 data ordered list and format for display
         temperature = round(bme_data[0], 1)
         print('Temperature: {0} C'.format(temperature))
@@ -156,32 +154,35 @@ class WeatherMeter_GFX(displayio.Group):
         print('Humidity: {0}%'.format(humidity))
         if not self._celsius:
             temperature = (temperature * 9 / 5) + 32
-            self.bme_temp_humid_text.text = 'Temp.: {0}°F, Humid: {1}%'.format(str(temperature), humidity)
+            self.bme_temp_humid_text.text = 'Temp.: %0.1f°F, Humid: %0.1f%' % (str(temperature), humidity)
         else:
-            self.bme_temp_humid_text.text = 'Temp.: {0}°C, Humid: {1}%'.format(str(temperature), humidity)
+            self.bme_temp_humid_text.text = 'Temp.: {0}°C, Humid: {1}'.format(temperature, humidity)
         pressure = round(bme_data[2], 3)
         altitude = round(bme_data[3], 1)
-        print('Altitude: {0} meters, Pressure: {0} hPa'.format(altitude, pressure))
-        self.bme_pres_alt_text.text = 'Alt: {0}m\nPres: {1}hPa'.format(altitude, pressure)
+        print('Altitude: %0.3f meters, Pressure: %0.2f hPa' % (altitude, pressure))
+        self.bme_pres_alt_text.text = 'Alt: {0}m, Pres: {1}hPa'.format(altitude, pressure)
+
+        # Anemometer
+        print("Wind Speed: %f m/s" % wind_speed)
+        self.wind_speed_text.text = "Wind Speed %0.2fm/s" % wind_speed
 
         # SGP30
         print("eCO2 = %d ppm \t TVOC = %d ppb" % (sgp_data[0], sgp_data[1]))
         self.sgp_text.text = "eCO2: %d ppm, TVOC: %d ppb" %  (sgp_data[0], sgp_data[1])
 
-        # Anemometer
-        print("Wind Speed: %f m/s" % wind_speed)
-        self.wind_speed_text.text = "Wind Speed %0.2f m/s" % wind_speed
 
+        """
         # now that the data is displayed on the pyportal, let's send it to IO!
         try:
             print('Sending data to io...')
-            self.io_status_text.text = "Sending data to Adafruit IO..."
+            #self.io_status_text.text = "Sending data to Adafruit IO..."
             io_helper.send_data(uv_index, bme_data, sgp_data)
         except AdafruitIO_RequestError as E:
             raise AdafruitIO_RequestError('Error: ', e)
-        self.set_icon(self._cwd+"/io_sending.bmp")
+        #self.set_icon(self._cwd+"/io_sending.bmp")
         print('Data sent!')
-        self.io_status_text.text = "Data sent!"
+        #self.io_status_text.text = "Data sent!"
+        """
 
 
     def set_icon(self, filename):
