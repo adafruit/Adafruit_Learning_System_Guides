@@ -93,10 +93,18 @@ class WeatherMeter_GFX(displayio.Group):
         self.sgp_text.color = 0xFFFFFF
         self._text_group.append(self.sgp_text)
 
+
         self.title_text.text = "PyPortal Weather Station"
         board.DISPLAY.show(self._text_group)
         print("Text area setup!")
 
+    def display_io_status(self, status_text):
+        """Displays the current IO status
+        :param str status_text: Description of current IO status
+        """
+        self.io_status_text.text = status_text
+        board.DISPLAY.refresh_soon()
+        board.DISPLAY.wait_for_frame()
 
     def display_data(self, uv_index, bme_data, sgp_data, wind_speed):
         """Displays the data from the sensors attached

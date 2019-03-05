@@ -63,9 +63,8 @@ ADAFRUIT_IO_KEY = secrets['adafruit_io_key']
 io = RESTClient(ADAFRUIT_IO_USER, ADAFRUIT_IO_KEY, wifi)
 
 # Set up Adafruit IO Feeds
-print('Grabbing Group from IO')
+print('Getting Group data from Adafruit IO...')
 station_group = io.get_group('weatherstation')
-print(station_group)
 feed_list = station_group['feeds']
 humidity_feed = feed_list[0]
 temperature_feed = feed_list[1]
@@ -131,8 +130,9 @@ while True:
     # send sensor data to IO
     try:
         print('Sending data to Adafruit IO...')
-        # TODO: Update the display with some text
+        gfx.display_io_status('Sending data to IO...')
         send_to_io()
+        gfx.display_io_status('Data Sent! Waiting %d seconds...'%PYPORTAL_REFRESH)
         print('Data sent!')
     except AdafruitIO_RequestError as e:
         raise AdafruitIO_RequestError('ERROR: ', e)
