@@ -1,3 +1,14 @@
+"""
+PyPortal Weather Station
+==============================================
+Turn your PyPortal into a weaterstation with
+Adafruit IO
+
+Author: Brent Rubell for Adafruit Industries, 2019
+
+Dependencies:
+    TODO: List all deps!
+"""
 import time
 import board
 import neopixel
@@ -7,15 +18,18 @@ from simpleio import map_range
 from digitalio import DigitalInOut
 
 from adafruit_esp32spi import adafruit_esp32spi, adafruit_esp32spi_wifimanager
+from adafruit_io.adafruit_io import RESTClient, AdafruitIO_RequestError
 
 # sensor libs
 import adafruit_veml6075
 import adafruit_sgp30
 import adafruit_bme280
 
-# weathermeter_helper file
+# weathermeter graphics helper
 import weathermeter_helper
 
+# rate at which to refresh the pyportal and sensors, in seconds
+PYPORTAL_REFRESH = 30
 
 # anemometer defaults
 anemometer_min_volts = 0.4
@@ -45,6 +59,21 @@ wifi = adafruit_esp32spi_wifimanager.ESPSPI_WiFiManager(esp, secrets, status_lig
 ADAFRUIT_IO_USER = secrets['adafruit_io_user']
 ADAFRUIT_IO_KEY = secrets['adafruit_io_key']
 
+# Create an instance of the Adafruit IO REST client
+io = RESTClient(ADAFRUIT_IO_USER, ADAFRUIT_IO_KEY, wifi)
+
+# Set up Adafruit IO Feeds
+print('Grabbing Feeds from Adafruit IO...')
+uv_index_feed = io.get_feed('uvindex')
+wind_speed_feed = io.get_feed('windspeed')
+temperature_feed = io.get_feed('temperature')
+humidity_feed = io.get_feed('humidity')
+pressure_feed = io.get_feed('pressure')
+altitude_feed = io.get_feed('altitude')
+tvoc_feed = io.get_feed('tvoc')
+eco2_feed = io.get_feed('eco2')
+print('Feeds found!')
+
 # create an i2c object
 i2c = busio.I2C(board.SCL, board.SDA)
 
@@ -57,14 +86,6 @@ bme280.sea_level_pressure = 1013.25
 
 # init. the graphics helper
 gfx = weathermeter_helper.WeatherMeter_GFX()
-
-# rate at which to refresh the pyportal and sensors, in seconds
-PYPORTAL_REFRESH = 15
-
-# initialize the Adafruit IO helper
-print('grabbing Adafruit IO feeds...')
-io_helper = weathermeter_helper.WeatherMeter_IO(ADAFRUIT_IO_USER, ADAFRUIT_IO_KEY, wifi)
-print('io feeds found!')
 
 # init. the ADC
 adc = analogio.AnalogIn(board.D4)

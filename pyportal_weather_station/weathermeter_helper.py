@@ -9,7 +9,6 @@ import displayio
 import digitalio
 from adafruit_display_text.text_area import TextArea
 from adafruit_bitmap_font import bitmap_font
-from adafruit_io.adafruit_io import RESTClient, AdafruitIO_RequestError
 
 cwd = ("/"+__file__).rsplit('/', 1)[0] # the current working directory (where this file is)
 
@@ -18,40 +17,6 @@ small_font = cwd+"/fonts/Arial-12.bdf"
 medium_font = cwd+"/fonts/Arial-16.bdf"
 large_font = cwd+"/fonts/Arial-Bold-24.bdf"
 coll_font = cwd+"/fonts/Collegiate-24.bdf"
-
-class WeatherMeter_IO():
-    def __init__(self, user, key, wifi):
-        """Lightweight helper class for Adafruit IO CircuitPython
-        :param str user: Adafruit IO User
-        :param str key: Adafruit IO Active Key
-        :param WiFiManager wifi: WiFiManager Object 
-        """
-        
-        self._io_client = RESTClient(user, key, wifi)
-        """
-        TODO: This is SLOOOOOOW, move into another method to speed up init. process
-        self._temperature_feed = self._io_client.get_feed('temperature')
-        self._humidity_feed = self._io_client.get_feed('humidity')
-        self._pressure_feed = self._io_client.get_feed('pressure')
-        self._altitude_feed = self._io_client.get_feed('altitude')
-        self._uv_index_feed = self._io_client.get_feed('uvindex')
-        self._eco2_feed = self._io_client.get_feed('eco2')
-        self._tvoc_feed = self._io_client.get_feed('tvoc')
-        self._wind_speed_feed = self._io_client.get_feed('windspeed')
-        """
-
-    def send_data(self, uv_index, sgp_data, bme_data):
-        """Send data from weathermeter sensors to adafruit io
-        """
-        try:
-            self._io_client.send_data(self._uv_index_feed['key'], uv_index)
-            self._io_client.send_data(self._temperature_feed['key'], bme_data[0])
-            self._io_client.send_data(self._humidity_feed['key'], bme_data[1])
-            self._io_client.send_data(self._pressure_feed['key'], bme_data[2])
-            self._io_client.send_data(self._altitude_feed['key'], bme_data[3])
-            # TODO: Add feeds for SGP30 and anemometer
-        except AdafruitIO_RequestError:
-            raise AdafruitIO_RequestError('Could not send data to Adafruit IO!')
 
 class WeatherMeter_GFX(displayio.Group):
     def __init__(self, celsius=True):
@@ -99,7 +64,7 @@ class WeatherMeter_GFX(displayio.Group):
 
         # Set up TextAreas to label sensor data
         self.veml_text = TextArea(self.medium_font, width=16)
-        self.veml_text.x = 0
+        self.veml_text.x = 3
         self.veml_text.y = 40
         self.veml_text.color = 0xFFFFFF
         self._text_group.append(self.veml_text)
@@ -133,7 +98,7 @@ class WeatherMeter_GFX(displayio.Group):
         print("Text area setup!")
 
 
-    def display_data(self, uv_index, bme_data, sgp_data, wind_speed, io_helper):
+    def display_data(self, uv_index, bme_data, sgp_data, wind_speed):
         """Displays the data from the sensors attached
         to the weathermeter pyportal and sends the data to Adafruit IO.
 
@@ -141,11 +106,10 @@ class WeatherMeter_GFX(displayio.Group):
         :param list sgp_data: ECO2 and TVOC data from SGP30 sensor.
         :param list bme_data: List of env. data from the BME280 sensor.
         :param float wind_speed: Wind speed from anemometer.
-        :param WeatherMeter_IO io_helper: IO Helper object.
         """
         # VEML6075
         print('UV Index: ', uv_index)
-        self.veml_text.text = 'UV Index: ' + str(uv_index)
+        self.veml_text.text = 'UV Index: %0.1f'%uv_index
 
         # Parse out the BME280 data ordered list and format for display
         temperature = round(bme_data[0], 1)
@@ -169,21 +133,8 @@ class WeatherMeter_GFX(displayio.Group):
         # SGP30
         print("eCO2 = %d ppm \t TVOC = %d ppb" % (sgp_data[0], sgp_data[1]))
         self.sgp_text.text = "eCO2: %d ppm, TVOC: %d ppb" %  (sgp_data[0], sgp_data[1])
-
-
-        """
-        # now that the data is displayed on the pyportal, let's send it to IO!
-        try:
-            print('Sending data to io...')
-            #self.io_status_text.text = "Sending data to Adafruit IO..."
-            io_helper.send_data(uv_index, bme_data, sgp_data)
-        except AdafruitIO_RequestError as E:
-            raise AdafruitIO_RequestError('Error: ', e)
-        #self.set_icon(self._cwd+"/io_sending.bmp")
-        print('Data sent!')
-        #self.io_status_text.text = "Data sent!"
-        """
-
+        board.DISPLAY.refresh_soon()
+        board.DISPLAY.wait_for_frame()
 
     def set_icon(self, filename):
         """Sets the background image to a bitmap file.
