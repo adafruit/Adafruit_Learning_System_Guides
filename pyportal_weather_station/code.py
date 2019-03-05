@@ -63,15 +63,17 @@ ADAFRUIT_IO_KEY = secrets['adafruit_io_key']
 io = RESTClient(ADAFRUIT_IO_USER, ADAFRUIT_IO_KEY, wifi)
 
 # Set up Adafruit IO Feeds
-print('Grabbing Feeds from Adafruit IO...')
+print('Grabbing Feeds from Adafruit IO (this may take a while...)')
 uv_index_feed = io.get_feed('uvindex')
 wind_speed_feed = io.get_feed('windspeed')
+"""
 temperature_feed = io.get_feed('temperature')
 humidity_feed = io.get_feed('humidity')
 pressure_feed = io.get_feed('pressure')
 altitude_feed = io.get_feed('altitude')
 tvoc_feed = io.get_feed('tvoc')
 eco2_feed = io.get_feed('eco2')
+"""
 print('Feeds found!')
 
 # create an i2c object
@@ -95,25 +97,32 @@ def adc_to_wind_speed(val):
     voltage_val = val / 65535 * 3.3
     return map_range(voltage_val, 0.4, 2, 0, 32.4)
 
+def send_to_io():
+    # handle sending sensor data to Adafruit IO
+    io.send_data(uv_index_feed['key'], uv_index)
+    io.send_data(wind_speed_feed['key'], wind_speed, precision = 2)
+
 while True:
     print('obtaining sensor data...')
     # Get uv index from veml6075
     uv_index = veml.uv_index
-    uv_index = round(uv_index, 3)
-
     # Get eco2, tvoc from sgp30
     eCO2, TVOC = sgp30.iaq_measure()
     sgp_data = [eCO2, TVOC]
-
     # Store bme280 data as a list
-    bme280_data = [bme280.temperature, bme280.humidity, bme280.pressure, bme280.altitude]
-
+    bme280_data = [bme280.temperature, bme280.humidity,
+                    bme280.pressure, bme280.altitude]
     # Get wind speed
     wind_speed = adc_to_wind_speed(adc.value)
     print(wind_speed)
-    # Perform sensor read, display data and send to IO
+    # Display sensor data on PyPortal using the gfx helper
     print('displaying sensor data...')
     gfx.display_data(uv_index, bme280_data, 
-                        sgp_data, wind_speed, io_helper)
+                        sgp_data, wind_speed)
     print('sensor data displayed!')
+    # send sensor data to IO
+    try:
+        send_to_io()
+    except AdafruitIO_RequestError as e:
+        raise AdafruitIO_RequestError('ERROR: ', e)
     time.sleep(PYPORTAL_REFRESH)
