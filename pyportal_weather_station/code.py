@@ -126,14 +126,18 @@ while True:
     gfx.display_data(uv_index, bme280_data, 
                         sgp_data, wind_speed)
     print('sensor data displayed!')
-
-    # send sensor data to IO
     try:
-        print('Sending data to Adafruit IO...')
-        gfx.display_io_status('Sending data to IO...')
-        send_to_io()
-        gfx.display_io_status('Data Sent! Waiting %d seconds...'%PYPORTAL_REFRESH)
-        print('Data sent!')
-    except AdafruitIO_RequestError as e:
-        raise AdafruitIO_RequestError('ERROR: ', e)
+        # send sensor data to IO
+        try:
+            print('Sending data to Adafruit IO...')
+            gfx.display_io_status('Sending data to IO...')
+            send_to_io()
+            gfx.display_io_status('Data Sent!')
+            print('Data sent!')
+        except AdafruitIO_RequestError as e:
+            raise AdafruitIO_RequestError('ERROR: ', e)
+    except (ValueError, RuntimeError) as e:
+        print("Failed to get data, retrying...\n", e)
+        wifi.reset()
+        continue
     time.sleep(PYPORTAL_REFRESH)

@@ -13,10 +13,8 @@ from adafruit_bitmap_font import bitmap_font
 cwd = ("/"+__file__).rsplit('/', 1)[0] # the current working directory (where this file is)
 
 # Fonts within /fonts folder
-small_font = cwd+"/fonts/Arial-12.bdf"
 medium_font = cwd+"/fonts/Arial-16.bdf"
-large_font = cwd+"/fonts/Arial-Bold-24.bdf"
-coll_font = cwd+"/fonts/Collegiate-24.bdf"
+header_font = cwd+"/fonts/Collegiate-24.bdf"
 
 class WeatherMeter_GFX(displayio.Group):
     def __init__(self, celsius=True):
@@ -45,20 +43,20 @@ class WeatherMeter_GFX(displayio.Group):
         glyphs = b'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-,°.: '
         self.medium_font.load_glyphs(glyphs)
         # experiment with Collegiate-24.bdf font!
-        self.c_font = bitmap_font.load_font(coll_font)
+        self.c_font = bitmap_font.load_font(header_font)
         self.c_font.load_glyphs(glyphs)
 
-        print('fonts loaded, setting up textareas...')
+        print('setting up textareas...')
         # Set up TextAreas for labels and headers
         self.title_text = TextArea(self.c_font, width=30)
-        self.title_text.x = 45
+        self.title_text.x = 35
         self.title_text.y = 0
         self.title_text.color = 0xFFFFFF
         self._text_group.append(self.title_text)
 
         self.io_status_text = TextArea(self.c_font, width=30)
-        self.io_status_text.x = 0
-        self.io_status_text.y = 180
+        self.io_status_text.x = 130
+        self.io_status_text.y = 190
         self.io_status_text.color = 0xFFFFFF
         self._text_group.append(self.io_status_text)
 
@@ -71,25 +69,25 @@ class WeatherMeter_GFX(displayio.Group):
 
         self.bme_temp_humid_text = TextArea(self.medium_font, width = 70)
         self.bme_temp_humid_text.x = 0
-        self.bme_temp_humid_text.y = 60
+        self.bme_temp_humid_text.y = 70
         self.bme_temp_humid_text.color = 0xFFFFFF
         self._text_group.append(self.bme_temp_humid_text)
 
         self.wind_speed_text = TextArea(self.medium_font, width=30)
         self.wind_speed_text.x = 0
-        self.wind_speed_text.y = 80
+        self.wind_speed_text.y = 100
         self.wind_speed_text.color = 0xFFFFFF
         self._text_group.append(self.wind_speed_text)
 
         self.bme_pres_alt_text = TextArea(self.medium_font, width=70)
         self.bme_pres_alt_text.x = 0
-        self.bme_pres_alt_text.y = 100
+        self.bme_pres_alt_text.y = 130
         self.bme_pres_alt_text.color = 0xFFFFFF
         self._text_group.append(self.bme_pres_alt_text)
 
         self.sgp_text = TextArea(self.medium_font, width=70)
         self.sgp_text.x = 0
-        self.sgp_text.y = 120
+        self.sgp_text.y = 150
         self.sgp_text.color = 0xFFFFFF
         self._text_group.append(self.sgp_text)
 
