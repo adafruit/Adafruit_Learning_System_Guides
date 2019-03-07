@@ -12,8 +12,10 @@ cwd = ("/"+__file__).rsplit('/', 1)[0] # the current working directory (where th
 # Fonts within /fonts folder
 medium_font = cwd+"/fonts/Arial-16.bdf"
 header_font = cwd+"/fonts/Collegiate-24.bdf"
+glyphs = b'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-,.: '
 
 class WeatherMeter_GFX(displayio.Group):
+
     def __init__(self, celsius=True):
         # root displayio group
         root_group = displayio.Group(max_size=20)
@@ -38,7 +40,6 @@ class WeatherMeter_GFX(displayio.Group):
         print('loading fonts...')
         self.medium_font = bitmap_font.load_font(medium_font)
         self.c_font = bitmap_font.load_font(header_font)
-        glyphs = b'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-,.: '
         self.medium_font.load_glyphs(glyphs)
         self.c_font.load_glyphs(glyphs)
 
@@ -46,50 +47,42 @@ class WeatherMeter_GFX(displayio.Group):
         self.title_text = TextArea(self.c_font, width=30)
         self.title_text.x = 35
         self.title_text.y = 0
-        self.title_text.color = 0xFFFFFF
         self._text_group.append(self.title_text)
 
         self.io_status_text = TextArea(self.c_font, width=30)
-        self.io_status_text.x = 100
+        self.io_status_text.x = 95
         self.io_status_text.y = 190
-        self.io_status_text.color = 0xFFFFFF
         self._text_group.append(self.io_status_text)
 
         # Set up TextAreas to label sensor data
         self.veml_text = TextArea(self.medium_font, width=16)
         self.veml_text.x = 3
         self.veml_text.y = 40
-        self.veml_text.color = 0xFFFFFF
         self._text_group.append(self.veml_text)
 
         self.bme_temp_humid_text = TextArea(self.medium_font, width = 70)
         self.bme_temp_humid_text.x = 0
         self.bme_temp_humid_text.y = 70
-        self.bme_temp_humid_text.color = 0xFFFFFF
         self._text_group.append(self.bme_temp_humid_text)
 
         self.wind_speed_text = TextArea(self.medium_font, width=30)
         self.wind_speed_text.x = 0
         self.wind_speed_text.y = 100
-        self.wind_speed_text.color = 0xFFFFFF
         self._text_group.append(self.wind_speed_text)
 
         self.bme_pres_alt_text = TextArea(self.medium_font, width=70)
         self.bme_pres_alt_text.x = 0
         self.bme_pres_alt_text.y = 130
-        self.bme_pres_alt_text.color = 0xFFFFFF
         self._text_group.append(self.bme_pres_alt_text)
 
         self.sgp_text = TextArea(self.medium_font, width=70)
         self.sgp_text.x = 0
         self.sgp_text.y = 155
-        self.sgp_text.color = 0xFFFFFF
         self._text_group.append(self.sgp_text)
 
 
         self.title_text.text = "PyPortal Weather Station"
         board.DISPLAY.show(self._text_group)
-        print("Text area setup!")
 
     def display_io_status(self, status_text):
         """Displays the current IO status
