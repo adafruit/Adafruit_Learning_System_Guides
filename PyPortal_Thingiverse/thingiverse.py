@@ -37,7 +37,7 @@ while True:
         print("Response is", response)
         pyportal.set_background(None)
         image_url = response[2].replace('_thumb_medium.', '_display_large.')
-        pyportal.wget(pyportal.image_converter_url(image_url, 320, 240), "/sd/cache.bmp")
+        pyportal.wget(pyportal.image_converter_url(image_url, 320, 240), "/sd/cache.bmp", chunk_size=512)
         pyportal.set_background("/sd/cache.bmp")
 
     except (IndexError, RuntimeError, ValueError) as e:
