@@ -25,7 +25,7 @@ class WeatherMeter_GFX(displayio.Group):
         self._icon_group = displayio.Group(max_size=1)
         self.append(self._icon_group)
         board.DISPLAY.show(self._icon_group)
-        
+
         # create text object group
         self._text_group = displayio.Group(max_size=8)
         self.append(self._text_group)
@@ -38,7 +38,7 @@ class WeatherMeter_GFX(displayio.Group):
         print('loading fonts...')
         self.medium_font = bitmap_font.load_font(medium_font)
         self.c_font = bitmap_font.load_font(header_font)
-        glyphs = b'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-,°.: '
+        glyphs = b'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-,.: '
         self.medium_font.load_glyphs(glyphs)
         self.c_font.load_glyphs(glyphs)
 
@@ -119,12 +119,12 @@ class WeatherMeter_GFX(displayio.Group):
         print('Humidity: {0}%'.format(humidity))
         if not self._celsius:
             temperature = (temperature * 9 / 5) + 32
-            self.bme_temp_humid_text.text = 'Temp.: %0.1f°F, Humid: %0.1f%' % (str(temperature), humidity)
+            self.bme_temp_humid_text.text = 'Temp: {0}°F, Humid: {1}%'.format(temperature, humidity)
         else:
-            self.bme_temp_humid_text.text = 'Temp.: {0}°C, Humid: {1}'.format(temperature, humidity)
+            self.bme_temp_humid_text.text = 'Temp: {0}°C, Humid: {1}%'.format(temperature, humidity)
         pressure = round(bme_data[2], 3)
         altitude = round(bme_data[3], 1)
-        print('Altitude: %0.3f meters, Pressure: %0.2f hPa' % (altitude, pressure))
+        print('Altitude: %0.3f meters, Pressure: %0.2f hPa'%(altitude, pressure))
         self.bme_pres_alt_text.text = 'Alt: {0}m, Pres: {1}hPa'.format(altitude, pressure)
 
         # Anemometer
@@ -132,8 +132,8 @@ class WeatherMeter_GFX(displayio.Group):
         self.wind_speed_text.text = "Wind Speed %0.2fm/s" % wind_speed
 
         # SGP30
-        print("eCO2 = %d ppm \t TVOC = %d ppb" % (sgp_data[0], sgp_data[1]))
-        self.sgp_text.text = "eCO2: %d ppm, TVOC: %d ppb" %  (sgp_data[0], sgp_data[1])
+        print("eCO2 = %d ppm \t TVOC = %d ppb"%(sgp_data[0], sgp_data[1]))
+        self.sgp_text.text = "eCO2: %d ppm, TVOC: %d ppb"%(sgp_data[0], sgp_data[1])
         board.DISPLAY.refresh_soon()
         board.DISPLAY.wait_for_frame()
 

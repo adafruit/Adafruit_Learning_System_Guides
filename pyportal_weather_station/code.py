@@ -117,17 +117,16 @@ while True:
     sgp_data = [eCO2, TVOC]
     # Store bme280 data as a list
     bme280_data = [bme280.temperature, bme280.humidity,
-                    bme280.pressure, bme280.altitude]
+                   bme280.pressure, bme280.altitude]
     # Get wind speed
     wind_speed = adc_to_wind_speed(adc.value)
     print(wind_speed)
     # Display sensor data on PyPortal using the gfx helper
     print('displaying sensor data...')
-    gfx.display_data(uv_index, bme280_data, 
-                        sgp_data, wind_speed)
+    gfx.display_data(uv_index, bme280_data,
+                     sgp_data, wind_speed)
     print('sensor data displayed!')
     try:
-        # send sensor data to IO
         try:
             print('Sending data to Adafruit IO...')
             gfx.display_io_status('Sending data to IO...')
@@ -135,7 +134,7 @@ while True:
             gfx.display_io_status('Data Sent!')
             print('Data sent!')
         except AdafruitIO_RequestError as e:
-            raise AdafruitIO_RequestError('ERROR: ', e)
+            raise AdafruitIO_RequestError('IO Error: ', e)
     except (ValueError, RuntimeError) as e:
         print("Failed to get data, retrying...\n", e)
         wifi.reset()
