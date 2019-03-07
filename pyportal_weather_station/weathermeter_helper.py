@@ -2,11 +2,8 @@
 Helper file for
 pyportal_weathermeter.py
 """
-import time
 import board
-import audioio
 import displayio
-import digitalio
 from adafruit_display_text.text_area import TextArea
 from adafruit_bitmap_font import bitmap_font
 
@@ -18,7 +15,7 @@ header_font = cwd+"/fonts/Collegiate-24.bdf"
 
 class WeatherMeter_GFX(displayio.Group):
     def __init__(self, celsius=True):
-        # root group
+        # root displayio group
         root_group = displayio.Group(max_size=20)
         board.DISPLAY.show(root_group)
         super().__init__(max_size=20)
@@ -40,14 +37,12 @@ class WeatherMeter_GFX(displayio.Group):
 
         print('loading fonts...')
         self.medium_font = bitmap_font.load_font(medium_font)
+        self.c_font = bitmap_font.load_font(header_font)
         glyphs = b'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-,°.: '
         self.medium_font.load_glyphs(glyphs)
-        # experiment with Collegiate-24.bdf font!
-        self.c_font = bitmap_font.load_font(header_font)
         self.c_font.load_glyphs(glyphs)
 
         print('setting up textareas...')
-        # Set up TextAreas for labels and headers
         self.title_text = TextArea(self.c_font, width=30)
         self.title_text.x = 35
         self.title_text.y = 0
@@ -55,7 +50,7 @@ class WeatherMeter_GFX(displayio.Group):
         self._text_group.append(self.title_text)
 
         self.io_status_text = TextArea(self.c_font, width=30)
-        self.io_status_text.x = 130
+        self.io_status_text.x = 100
         self.io_status_text.y = 190
         self.io_status_text.color = 0xFFFFFF
         self._text_group.append(self.io_status_text)
@@ -87,7 +82,7 @@ class WeatherMeter_GFX(displayio.Group):
 
         self.sgp_text = TextArea(self.medium_font, width=70)
         self.sgp_text.x = 0
-        self.sgp_text.y = 150
+        self.sgp_text.y = 155
         self.sgp_text.color = 0xFFFFFF
         self._text_group.append(self.sgp_text)
 
