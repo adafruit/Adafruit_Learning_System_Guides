@@ -45,12 +45,12 @@ class WeatherMeter_GFX(displayio.Group):
 
         print('setting up textareas...')
         self.title_text = TextArea(self.c_font, width=30)
-        self.title_text.x = 35
+        self.title_text.x = 30
         self.title_text.y = 0
         self._text_group.append(self.title_text)
 
         self.io_status_text = TextArea(self.c_font, width=30)
-        self.io_status_text.x = 95
+        self.io_status_text.x = 90
         self.io_status_text.y = 190
         self._text_group.append(self.io_status_text)
 
@@ -60,7 +60,7 @@ class WeatherMeter_GFX(displayio.Group):
         self.veml_text.y = 40
         self._text_group.append(self.veml_text)
 
-        self.bme_temp_humid_text = TextArea(self.medium_font, width = 70)
+        self.bme_temp_humid_text = TextArea(self.medium_font, width = 50)
         self.bme_temp_humid_text.x = 0
         self.bme_temp_humid_text.y = 70
         self._text_group.append(self.bme_temp_humid_text)
@@ -70,12 +70,12 @@ class WeatherMeter_GFX(displayio.Group):
         self.wind_speed_text.y = 100
         self._text_group.append(self.wind_speed_text)
 
-        self.bme_pres_alt_text = TextArea(self.medium_font, width=70)
+        self.bme_pres_alt_text = TextArea(self.medium_font, width=50)
         self.bme_pres_alt_text.x = 0
         self.bme_pres_alt_text.y = 130
         self._text_group.append(self.bme_pres_alt_text)
 
-        self.sgp_text = TextArea(self.medium_font, width=70)
+        self.sgp_text = TextArea(self.medium_font, width=50)
         self.sgp_text.x = 0
         self.sgp_text.y = 155
         self._text_group.append(self.sgp_text)
@@ -85,8 +85,8 @@ class WeatherMeter_GFX(displayio.Group):
         board.DISPLAY.show(self._text_group)
 
     def display_io_status(self, status_text):
-        """Displays the current IO status
-        :param str status_text: Description of current IO status
+        """Displays the current IO status.
+        :param str status_text: Description of Adafruit IO status
         """
         self.io_status_text.text = status_text
         board.DISPLAY.refresh_soon()

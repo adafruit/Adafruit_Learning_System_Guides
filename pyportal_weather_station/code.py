@@ -34,6 +34,7 @@ PYPORTAL_REFRESH = 30
 # anemometer defaults
 anemometer_min_volts = 0.4
 anemometer_max_volts = 2.0
+anemometer_samples = [None] * 5
 min_wind_speed = 0.0
 max_wind_speed = 32.4
 
@@ -66,19 +67,14 @@ io = RESTClient(ADAFRUIT_IO_USER, ADAFRUIT_IO_KEY, wifi)
 print('Getting Group data from Adafruit IO...')
 station_group = io.get_group('weatherstation')
 feed_list = station_group['feeds']
-humidity_feed = feed_list[0]
-temperature_feed = feed_list[1]
-uv_index_feed = feed_list[2]
-wind_speed_feed = feed_list[3]
-"""
-temperature_feed = io.get_feed('temperature')
-humidity_feed = io.get_feed('humidity')
-pressure_feed = io.get_feed('pressure')
-altitude_feed = io.get_feed('altitude')
-tvoc_feed = io.get_feed('tvoc')
-eco2_feed = io.get_feed('eco2')
-"""
-print('Group found!')
+altitude_feed = feed_list[0]
+eco2_feed = feed_list[1]
+humidity_feed = feed_list[2]
+pressure_feed = feed_list[3]
+temperature_feed = feed_list[4]
+tvoc_feed = feed_list[5]
+uv_index_feed = feed_list[6]
+wind_speed_feed = feed_list[7]
 
 # create an i2c object
 i2c = busio.I2C(board.SCL, board.SDA)
@@ -107,6 +103,10 @@ def send_to_io():
     io.send_data(wind_speed_feed['key'], wind_speed, precision = 2)
     io.send_data(temperature_feed['key'], bme280_data[0], precision = 2)
     io.send_data(humidity_feed['key'], bme280_data[1], precision = 2)
+    io.send_data(pressure_feed['key'], bme280_data[2], precision = 2)
+    io.send_data(altitude_feed['key'], bme280_data[3], precision = 2)
+    io.send_data(eco2_feed['key'], sgp_data[0], precision = 2)
+    io.send_data(tvoc_feed['key'], sgp_data[1], precision = 2)
 
 while True:
     print('obtaining sensor data...')
@@ -120,7 +120,6 @@ while True:
                    bme280.pressure, bme280.altitude]
     # Get wind speed
     wind_speed = adc_to_wind_speed(adc.value)
-    print(wind_speed)
     # Display sensor data on PyPortal using the gfx helper
     print('displaying sensor data...')
     gfx.display_data(uv_index, bme280_data,
@@ -136,7 +135,7 @@ while True:
         except AdafruitIO_RequestError as e:
             raise AdafruitIO_RequestError('IO Error: ', e)
     except (ValueError, RuntimeError) as e:
-        print("Failed to get data, retrying...\n", e)
+        print("Failed to get data, retrying\n", e)
         wifi.reset()
         continue
     time.sleep(PYPORTAL_REFRESH)
