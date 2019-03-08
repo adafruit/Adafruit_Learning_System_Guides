@@ -35,7 +35,7 @@ class WeatherMeter_GFX(displayio.Group):
         self._icon_sprite = None
         self._icon_file = None
         self._cwd = cwd
-        self.set_icon(self._cwd+"/pyportal_splash.bmp")
+        self.set_icon(self._cwd+"/icons/pyportal_splash.bmp")
 
         print('loading fonts...')
         self.medium_font = bitmap_font.load_font(medium_font)
