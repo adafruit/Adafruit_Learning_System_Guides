@@ -14,7 +14,7 @@ medium_font = cwd+"/fonts/Arial-16.bdf"
 header_font = cwd+"/fonts/Collegiate-24.bdf"
 glyphs = b'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-,.: '
 
-class WeatherMeter_GFX(displayio.Group):
+class WeatherStation_GFX(displayio.Group):
 
     def __init__(self, celsius=True):
         # root displayio group

@@ -22,7 +22,7 @@ import adafruit_veml6075
 import adafruit_sgp30
 import adafruit_bme280
 
-# weathermeter graphics helper
+# weatherstation graphics helper
 import weatherstation_helper
 
 # rate at which to refresh the pyportal and sensors, in seconds
@@ -70,7 +70,7 @@ bme280 = adafruit_bme280.Adafruit_BME280_I2C(i2c)
 bme280.sea_level_pressure = 1013.25
 
 # init. the graphics helper
-gfx = weathermeter_helper.WeatherMeter_GFX()
+gfx = weatherstation_helper.WeatherStation_GFX()
 
 # init. the ADC
 adc = analogio.AnalogIn(board.D4)
