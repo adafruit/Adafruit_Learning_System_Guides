@@ -5,9 +5,6 @@ Turn your PyPortal into a weaterstation with
 Adafruit IO
 
 Author: Brent Rubell for Adafruit Industries, 2019
-
-Dependencies:
-    TODO: List all deps!
 """
 import time
 import board
@@ -34,7 +31,6 @@ PYPORTAL_REFRESH = 30
 # anemometer defaults
 anemometer_min_volts = 0.4
 anemometer_max_volts = 2.0
-anemometer_samples = [None] * 5
 min_wind_speed = 0.0
 max_wind_speed = 32.4
 
@@ -63,19 +59,6 @@ ADAFRUIT_IO_KEY = secrets['adafruit_io_key']
 # Create an instance of the Adafruit IO REST client
 io = RESTClient(ADAFRUIT_IO_USER, ADAFRUIT_IO_KEY, wifi)
 
-# Set up Adafruit IO Feeds
-print('Getting Group data from Adafruit IO...')
-station_group = io.get_group('weatherstation')
-feed_list = station_group['feeds']
-altitude_feed = feed_list[0]
-eco2_feed = feed_list[1]
-humidity_feed = feed_list[2]
-pressure_feed = feed_list[3]
-temperature_feed = feed_list[4]
-tvoc_feed = feed_list[5]
-uv_index_feed = feed_list[6]
-wind_speed_feed = feed_list[7]
-
 # create an i2c object
 i2c = busio.I2C(board.SCL, board.SDA)
 
@@ -92,21 +75,36 @@ gfx = weathermeter_helper.WeatherMeter_GFX()
 # init. the ADC
 adc = analogio.AnalogIn(board.D4)
 
+# Set up Adafruit IO Feeds
+print('Getting Group data from Adafruit IO...')
+station_group = io.get_group('weatherstation')
+feed_list = station_group['feeds']
+altitude_feed = feed_list[0]
+eco2_feed = feed_list[1]
+humidity_feed = feed_list[2]
+pressure_feed = feed_list[3]
+temperature_feed = feed_list[4]
+tvoc_feed = feed_list[5]
+uv_index_feed = feed_list[6]
+wind_speed_feed = feed_list[7]
+
 def adc_to_wind_speed(val):
-    # converts adc value, returns anemometer wind speed, in m/s
+    """Returns anemometer wind speed, in m/s.
+    :param int val: ADC value
+    """
     voltage_val = val / 65535 * 3.3
     return map_range(voltage_val, 0.4, 2, 0, 32.4)
 
 def send_to_io():
     # handle sending sensor data to Adafruit IO
-    io.send_data(uv_index_feed['key'], uv_index, precision = 2)
-    io.send_data(wind_speed_feed['key'], wind_speed, precision = 2)
-    io.send_data(temperature_feed['key'], bme280_data[0], precision = 2)
-    io.send_data(humidity_feed['key'], bme280_data[1], precision = 2)
-    io.send_data(pressure_feed['key'], bme280_data[2], precision = 2)
-    io.send_data(altitude_feed['key'], bme280_data[3], precision = 2)
-    io.send_data(eco2_feed['key'], sgp_data[0], precision = 2)
-    io.send_data(tvoc_feed['key'], sgp_data[1], precision = 2)
+    io.send_data(uv_index_feed['key'], uv_index)
+    io.send_data(wind_speed_feed['key'], wind_speed)
+    io.send_data(temperature_feed['key'], bme280_data[0])
+    io.send_data(humidity_feed['key'], bme280_data[1])
+    io.send_data(pressure_feed['key'], bme280_data[2])
+    io.send_data(altitude_feed['key'], bme280_data[3])
+    io.send_data(eco2_feed['key'], sgp_data[0])
+    io.send_data(tvoc_feed['key'], sgp_data[1])
 
 while True:
     print('obtaining sensor data...')

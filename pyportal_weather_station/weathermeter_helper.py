@@ -101,11 +101,9 @@ class WeatherMeter_GFX(displayio.Group):
         :param list bme_data: List of env. data from the BME280 sensor.
         :param float wind_speed: Wind speed from anemometer.
         """
-        # VEML6075
         print('UV Index: ', uv_index)
         self.veml_text.text = 'UV Index: %0.1f'%uv_index
 
-        # Parse out the BME280 data ordered list and format for display
         temperature = round(bme_data[0], 1)
         print('Temperature: {0} C'.format(temperature))
         humidity = round(bme_data[1], 1)
@@ -115,18 +113,18 @@ class WeatherMeter_GFX(displayio.Group):
             self.bme_temp_humid_text.text = 'Temp: {0}°F, Humid: {1}%'.format(temperature, humidity)
         else:
             self.bme_temp_humid_text.text = 'Temp: {0}°C, Humid: {1}%'.format(temperature, humidity)
+
+        print("Wind Speed: %f m/s" % wind_speed)
+        self.wind_speed_text.text = "Wind Speed %0.2fm/s" % wind_speed
+
         pressure = round(bme_data[2], 3)
         altitude = round(bme_data[3], 1)
         print('Altitude: %0.3f meters, Pressure: %0.2f hPa'%(altitude, pressure))
         self.bme_pres_alt_text.text = 'Alt: {0}m, Pres: {1}hPa'.format(altitude, pressure)
 
-        # Anemometer
-        print("Wind Speed: %f m/s" % wind_speed)
-        self.wind_speed_text.text = "Wind Speed %0.2fm/s" % wind_speed
-
-        # SGP30
         print("eCO2 = %d ppm \t TVOC = %d ppb"%(sgp_data[0], sgp_data[1]))
         self.sgp_text.text = "eCO2: %d ppm, TVOC: %d ppb"%(sgp_data[0], sgp_data[1])
+
         board.DISPLAY.refresh_soon()
         board.DISPLAY.wait_for_frame()
 
