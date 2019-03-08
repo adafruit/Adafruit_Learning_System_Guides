@@ -23,7 +23,7 @@ import adafruit_sgp30
 import adafruit_bme280
 
 # weathermeter graphics helper
-import weathermeter_helper
+import weatherstation_helper
 
 # rate at which to refresh the pyportal and sensors, in seconds
 PYPORTAL_REFRESH = 30

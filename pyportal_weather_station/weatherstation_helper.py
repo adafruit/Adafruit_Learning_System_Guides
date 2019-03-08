@@ -1,6 +1,6 @@
 """
 Helper file for
-pyportal_weathermeter.py
+pyportal_weatherstation.py
 """
 import board
 import displayio
