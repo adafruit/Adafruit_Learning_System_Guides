@@ -14,6 +14,14 @@ All text above must be included in any redistribution.
 
 #pylint:disable=missing-super-argument
 
+# Example:
+#
+# from file_handler import FileHandler
+# from adafruit_logger import Logger, ERROR
+# l = Logger(FileHandler('log.txt'))
+# l.level = ERROR
+# l.error("test")
+
 from adafruit_logger import LoggingHandler
 
 class FileHandler(LoggingHandler):
