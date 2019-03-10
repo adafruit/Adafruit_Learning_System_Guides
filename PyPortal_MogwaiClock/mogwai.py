@@ -19,8 +19,8 @@ print(gremlin_time, mogwai_time)
 
 # If you want to set the time for experimentation
 #                                     yr, mon, day, h, min, sec
-import rtc
-rtc.RTC().datetime = time.struct_time((2019, 1, 1, 7, 59, 30, 0, 0, -1))
+#import rtc
+#rtc.RTC().datetime = time.struct_time((2019, 1, 1, 7, 59, 30, 0, 0, -1))
 
 # determine the current working directory
 # needed so we know where to find files
@@ -55,7 +55,7 @@ mogwai_since_midnite = mogwai_hour*60+mogwai_min
 is_gremlin_time = None
 last_gremlin_time = is_gremlin_time
 
-refresh_time = time.monotonic()  # None
+refresh_time = None
 
 while True:
     # only query the online time once per hour (and on first run)
