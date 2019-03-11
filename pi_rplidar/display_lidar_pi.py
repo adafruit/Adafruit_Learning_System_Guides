@@ -15,7 +15,7 @@ All text above must be included in any redistribution.
 import os
 from math import cos, sin, pi, floor
 import pygame
-from adafruit_circuitpython_rplidar import RPLidar
+from adafruit_rplidar import RPLidar
 
 # Set up pygame and the display
 os.putenv('SDL_FBDEV', '/dev/fb1')
