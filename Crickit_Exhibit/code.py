@@ -53,7 +53,7 @@ num_pixels = 30
 pixels = neopixel.NeoPixel(board.A1, num_pixels, brightness=0.3, auto_write=False)
 
 #sleep var for pushing both buttons
-sleep_buttons = 0.1
+SLEEP_DELAY = 0.1
 
 # NeoPixel function
 def color_chase(color, wait):
@@ -130,4 +130,4 @@ while True:
         print("Buttons 1 and 2 pressed")
         for f in (262, 294, 330, 349, 392, 440, 494, 523):
             tone(board.A0, f, 0.25)
-            time.sleep(sleep_buttons)
+            time.sleep(SLEEP_DELAY)
