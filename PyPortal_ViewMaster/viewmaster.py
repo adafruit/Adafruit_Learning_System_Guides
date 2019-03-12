@@ -20,7 +20,7 @@ try:
     vfs = storage.VfsFat(sdcard)
     storage.mount(vfs, "/sd")
     IMAGE_DIRECTORY = "/sd/images"
-except OSerror:
+except OSError as error:
     print("No SD card, will only look on internal memory")
 
 def print_directory(path, tabs=0):
@@ -48,9 +48,12 @@ def print_directory(path, tabs=0):
         if isdir:
             print_directory(path + "/" + file, tabs + 1)
 
-print_directory(IMAGE_DIRECTORY)
+try:
+    print_directory(IMAGE_DIRECTORY)
+except OSError as error:
+    raise Exception("No images found on flash or SD Card")
 
-# Create the slideshow object that plays through once alphabetically
+# Create the slideshow object that plays through once alphabetically.
 slideshow = SlideShow(board.DISPLAY, None, folder=IMAGE_DIRECTORY, loop=True,
                       order=PlayBackOrder.ALPHABETICAL, dwell=0)
 while True:
