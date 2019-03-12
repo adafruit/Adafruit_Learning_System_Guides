@@ -33,8 +33,8 @@ big_font.load_glyphs(b'0123456789') # pre-load glyphs for fast printing
 event_background = cwd+"/countdown_event.bmp"
 
 days_position = (8, 207)
-hours_position = (113, 207)
-minutes_position = (225, 207)
+hours_position = (110, 207)
+minutes_position = (220, 207)
 text_color = 0xFFFFFF
 
 text_areas = []
