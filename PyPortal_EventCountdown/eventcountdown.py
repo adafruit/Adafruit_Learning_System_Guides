@@ -7,7 +7,7 @@ import time
 import board
 from adafruit_pyportal import PyPortal
 from adafruit_bitmap_font import bitmap_font
-from adafruit_display_text.text_area import TextArea
+from adafruit_display_text.label import Label
 
 # The time of the thing!
 EVENT_YEAR = 2019
@@ -32,14 +32,14 @@ big_font = bitmap_font.load_font(cwd+"/fonts/Helvetica-Bold-36.bdf")
 big_font.load_glyphs(b'0123456789') # pre-load glyphs for fast printing
 event_background = cwd+"/countdown_event.bmp"
 
-days_position = (10, 175)
-hours_position = (110, 175)
-minutes_position = (220, 175)
+days_position = (8, 207)
+hours_position = (113, 207)
+minutes_position = (225, 207)
 text_color = 0xFFFFFF
 
 text_areas = []
 for pos in (days_position, hours_position, minutes_position):
-    textarea = TextArea(big_font, text='  ')
+    textarea = Label(big_font, text='  ')
     textarea.x = pos[0]
     textarea.y = pos[1]
     textarea.color = text_color
