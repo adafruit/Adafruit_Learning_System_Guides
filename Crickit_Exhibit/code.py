@@ -52,8 +52,10 @@ num_pixels = 30
 # The following line sets up a NeoPixel strip on Crickit CPX pin A1
 pixels = neopixel.NeoPixel(board.A1, num_pixels, brightness=0.3, auto_write=False)
 
-# NeoPixel function
+#sleep var for pushing both buttons
+SLEEP_DELAY = 0.1
 
+# NeoPixel function
 def color_chase(color, wait):
     for i in range(num_pixels):
         pixels[i] = color
@@ -61,16 +63,11 @@ def color_chase(color, wait):
         pixels.show()
     time.sleep(0.5)
 
-# For signal control, we'll chat directly with seesaw, use 'ss' to shorted typing!
-ss = crickit.seesaw
 # potentiometer connected to signal #3
 pot = crickit.SIGNAL8
 
 # initialize the light sensor on the CPX and the DC motor
-analogin = AnalogIn(board.LIGHT)
-
-# initialize motor
-motor_1 = crickit.dc_motor_1
+light_in = AnalogIn(board.LIGHT)
 
 while True:
 
@@ -118,19 +115,19 @@ while True:
     # Light sensor + DC motor
 
     # uncomment to see values of light
-    # print(analogin.value)
+    # print(light_in.value)
     # time.sleep(0.5)
 
     # reads the on-board light sensor and graphs the brighness with NeoPixels
     # light value remaped to motor speed
-    peak = map_range(analogin.value, 3000, 62000, 0, 1)
+    peak = map_range(light_in.value, 3000, 62000, 0, 1)
 
     # DC motor
-    motor_1.throttle = peak  # full speed forward
+    crickit.dc_motor_1.throttle = peak  # full speed forward
 
     # hit both buttons to trigger noise
     if not ss.digital_read(BUTTON_1) and not ss.digital_read(BUTTON_2):
         print("Buttons 1 and 2 pressed")
         for f in (262, 294, 330, 349, 392, 440, 494, 523):
             tone(board.A0, f, 0.25)
-            time.sleep(0.1)
+            time.sleep(SLEEP_DELAY)
