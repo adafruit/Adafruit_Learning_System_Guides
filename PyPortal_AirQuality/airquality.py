@@ -33,11 +33,11 @@ pyportal = PyPortal(url=DATA_SOURCE,
                     status_neopixel=board.NEOPIXEL,
                     default_bg=0x000000,
                     text_font=cwd+"/fonts/Helvetica-Bold-100.bdf",
-                    text_position=(90, 0),
+                    text_position=(90, 100),
                     text_color=0x000000,
                     caption_text="Air Quality Index for "+LOCATION,
                     caption_font=cwd+"/fonts/HelveticaNeue-24.bdf",
-                    caption_position=(15, 200),
+                    caption_position=(15, 220),
                     caption_color=0x000000,)
 
 while True:
