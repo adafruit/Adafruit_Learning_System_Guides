@@ -15,7 +15,7 @@ except ImportError:
     raise
 
 # Set up where we'll be fetching data from
-DATA_SOURCE = "https://io.adafruit.com/api/v2/stats?x-aio-key="+secrets['adafruitio_key']
+DATA_SOURCE = "https://io.adafruit.com/api/v2/stats?x-aio-key="+secrets['aio_key']
 DATA_LOCATION1 = ["io_plus", "io_plus_subscriptions"]
 DATA_LOCATION2 = ["users", "users_active_30_days"]
 
@@ -26,7 +26,7 @@ pyportal = PyPortal(url=DATA_SOURCE,
                     status_neopixel=board.NEOPIXEL,
                     default_bg=cwd+"/adafruitio_background.bmp",
                     text_font=cwd+"/fonts/Collegiate-24.bdf",
-                    text_position=((165, 145), (165, 178)),
+                    text_position=((165, 170), (165, 200)),
                     text_color=(0x00FF00, 0x0000FF))
 
 while True:
