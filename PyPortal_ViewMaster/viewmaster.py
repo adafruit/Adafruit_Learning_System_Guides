@@ -1,5 +1,4 @@
 import os
-import time
 import board
 import busio
 import digitalio
@@ -21,8 +20,8 @@ try:
     vfs = storage.VfsFat(sdcard)
     storage.mount(vfs, "/sd")
     IMAGE_DIRECTORY = "/sd/images"
-except:
-    print("No SD card, will only look on internal memory")
+except Exception as e:
+    print("No SD card, will only look on internal memory, {0}.".format(e.message))
 
 def print_directory(path, tabs=0):
     for file in os.listdir(path):
@@ -52,9 +51,8 @@ def print_directory(path, tabs=0):
 print_directory(IMAGE_DIRECTORY)
 
 # Create the slideshow object that plays through once alphabetically.
-slideshow = SlideShow(board.DISPLAY, None,
-            folder=IMAGE_DIRECTORY, loop=True,
-            order=PlayBackOrder.ALPHABETICAL, dwell=0)
+slideshow = SlideShow(board.DISPLAY, None, folder=IMAGE_DIRECTORY, loop=True,
+                      order=PlayBackOrder.ALPHABETICAL, dwell=0)
 
 while True:
     if not switch.value:
