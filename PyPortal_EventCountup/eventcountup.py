@@ -7,7 +7,7 @@ import time
 import board
 from adafruit_pyportal import PyPortal
 from adafruit_bitmap_font import bitmap_font
-from adafruit_display_text.text_area import TextArea
+from adafruit_display_text.label import Label
 
 # The time of the thing!
 EVENT_YEAR = 1972
@@ -31,15 +31,15 @@ pyportal = PyPortal(status_neopixel=board.NEOPIXEL,
 big_font = bitmap_font.load_font(cwd+"/fonts/Helvetica-Bold-24.bdf")
 big_font.load_glyphs(b'0123456789') # pre-load glyphs for fast printing
 
-years_position = (130, -5)
-days_position = (5, 22)
-hours_position = (120, 22)
-minutes_position = (25, 47)
+years_position = (126, 15)
+days_position = (13, 41)
+hours_position = (118, 41)
+minutes_position = (25, 68)
 text_color = 0xFF0000
 
 text_areas = []
 for pos in (years_position, days_position, hours_position, minutes_position):
-    textarea = TextArea(big_font, width=3)
+    textarea = Label(big_font, text='  ')
     textarea.x = pos[0]
     textarea.y = pos[1]
     textarea.color = text_color
