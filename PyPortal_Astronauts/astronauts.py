@@ -7,7 +7,7 @@ import time
 import board
 from adafruit_pyportal import PyPortal
 from adafruit_bitmap_font import bitmap_font
-from adafruit_display_text.text_area import TextArea
+from adafruit_display_text.label import Label
 
 # Set up where we'll be fetching data from
 DATA_SOURCE = "http://api.open-notify.org/astros.json"
@@ -23,13 +23,13 @@ pyportal = PyPortal(url=DATA_SOURCE,
                     status_neopixel=board.NEOPIXEL,
                     default_bg=cwd+"/astronauts_background.bmp",
                     text_font=cwd+"/fonts/Helvetica-Bold-100.bdf",
-                    text_position=((180, 0), None),
+                    text_position=((180, 70), None),
                     text_color=(0xFFFFFF, None))
 
 names_font =  bitmap_font.load_font(cwd+"/fonts/Helvetica-Bold-16.bdf")
 # pre-load glyphs for fast printing
 names_font.load_glyphs(b'abcdefghjiklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ- ()')
-names_position = (100, 130)
+names_position = (100, 175)
 names_color = 0xFF00FF
 
 while True:
@@ -46,7 +46,7 @@ while True:
             for astro in value[1]:
                 names += "%s (%s)\n" % (astro['name'], astro['craft'])
             names = names[:-1] # remove final '\n'
-            names_textarea = TextArea(names_font, text=names)
+            names_textarea = Label(names_font, text=names)
             names_textarea.x = names_position[0]
             names_textarea.y = names_position[1]
             names_textarea.color = names_color
