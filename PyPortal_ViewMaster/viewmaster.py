@@ -53,7 +53,6 @@ print_directory(IMAGE_DIRECTORY)
 # Create the slideshow object that plays through once alphabetically.
 slideshow = SlideShow(board.DISPLAY, None, folder=IMAGE_DIRECTORY, loop=True,
                       order=PlayBackOrder.ALPHABETICAL, dwell=0)
-
 while True:
     if not switch.value:
         print("Click!")
