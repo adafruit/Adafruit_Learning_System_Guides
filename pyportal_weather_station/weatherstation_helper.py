@@ -4,7 +4,7 @@ pyportal_weatherstation.py
 """
 import board
 import displayio
-from adafruit_display_text.text_area import TextArea
+from adafruit_display_text.label import Label
 from adafruit_bitmap_font import bitmap_font
 
 cwd = ("/"+__file__).rsplit('/', 1)[0] # the current working directory (where this file is)
@@ -43,45 +43,43 @@ class WeatherStation_GFX(displayio.Group):
         self.medium_font.load_glyphs(glyphs)
         self.c_font.load_glyphs(glyphs)
 
-        print('setting up textareas...')
-        self.title_text = TextArea(self.c_font, width=30)
-        self.title_text.x = 30
-        self.title_text.y = 0
+        print('setting up Labels...')
+        self.title_text = Label(self.c_font, text = "PyPortal Weather Station")
+        self.title_text.x = 50
+        self.title_text.y = 10
         self._text_group.append(self.title_text)
 
-        self.io_status_text = TextArea(self.c_font, width=30)
-        self.io_status_text.x = 90
+        self.io_status_text = Label(self.c_font, max_glyphs=30)
+        self.io_status_text.x = 65
         self.io_status_text.y = 190
         self._text_group.append(self.io_status_text)
 
-        # Set up TextAreas to label sensor data
-        self.veml_text = TextArea(self.medium_font, width=16)
+        # Set up Labels to label sensor data
+        self.veml_text = Label(self.medium_font, max_glyphs=16)
         self.veml_text.x = 3
         self.veml_text.y = 40
         self._text_group.append(self.veml_text)
 
-        self.bme_temp_humid_text = TextArea(self.medium_font, width = 50)
+        self.bme_temp_humid_text = Label(self.medium_font, max_glyphs = 50)
         self.bme_temp_humid_text.x = 0
         self.bme_temp_humid_text.y = 70
         self._text_group.append(self.bme_temp_humid_text)
 
-        self.wind_speed_text = TextArea(self.medium_font, width=30)
+        self.wind_speed_text = Label(self.medium_font, max_glyphs=30)
         self.wind_speed_text.x = 0
         self.wind_speed_text.y = 100
         self._text_group.append(self.wind_speed_text)
 
-        self.bme_pres_alt_text = TextArea(self.medium_font, width=50)
+        self.bme_pres_alt_text = Label(self.medium_font, max_glyphs=50)
         self.bme_pres_alt_text.x = 0
         self.bme_pres_alt_text.y = 130
         self._text_group.append(self.bme_pres_alt_text)
 
-        self.sgp_text = TextArea(self.medium_font, width=50)
+        self.sgp_text = Label(self.medium_font, max_glyphs=50)
         self.sgp_text.x = 0
         self.sgp_text.y = 155
         self._text_group.append(self.sgp_text)
 
-
-        self.title_text.text = "PyPortal Weather Station"
         board.DISPLAY.show(self._text_group)
 
     def display_io_status(self, status_text):
