@@ -7,7 +7,7 @@ import time
 import board
 from adafruit_pyportal import PyPortal
 from adafruit_bitmap_font import bitmap_font
-from adafruit_display_text.text_area import TextArea
+from adafruit_display_text.Label import Label
 
 # Set to True for '12 hour + AM/PM' time, set to false for 24 hour time
 AM_PM = True
@@ -20,7 +20,7 @@ print(gremlin_time, mogwai_time)
 # If you want to set the time for experimentation
 #                                     yr, mon, day, h, min, sec
 #import rtc
-#rtc.RTC().datetime = time.struct_time((2019, 1, 1, 7, 59, 30, 0, 0, -1))
+#rtc.RTC().datetime = time.struct_time((2019, 1, 1, 23, 59, 00, 0, 0, -1))
 
 # determine the current working directory
 # needed so we know where to find files
@@ -37,7 +37,7 @@ pyportal = PyPortal(status_neopixel=board.NEOPIXEL,
 big_font = bitmap_font.load_font(cwd+"/fonts/DSEG14ModernMiniBI-44.bdf")
 big_font.load_glyphs(b'0123456789:AP') # pre-load glyphs for fast printing
 
-time_textarea = TextArea(big_font, max_glyphs=15)
+time_textarea = Label(big_font, max_glyphs=15)
 time_textarea.x = 0
 time_textarea.y = 130
 time_textarea.color = 0xFF0000
@@ -55,7 +55,7 @@ mogwai_since_midnite = mogwai_hour*60+mogwai_min
 is_gremlin_time = None
 last_gremlin_time = is_gremlin_time
 
-refresh_time = None
+refresh_time = time.monotonic()
 
 while True:
     # only query the online time once per hour (and on first run)
