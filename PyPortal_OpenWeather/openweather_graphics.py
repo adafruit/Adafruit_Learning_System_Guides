@@ -2,7 +2,7 @@ import time
 import json
 import board
 import displayio
-from adafruit_display_text.text_area import TextArea
+from adafruit_display_text.label import Label
 from adafruit_bitmap_font import bitmap_font
 
 cwd = ("/"+__file__).rsplit('/', 1)[0] # the current working directory (where this file is)
@@ -37,27 +37,27 @@ class OpenWeather_Graphics(displayio.Group):
         self.large_font.load_glyphs(('°',))  # a non-ascii character we need for sure
         self.city_text = None
 
-        self.time_text = TextArea(self.medium_font, width=8)
+        self.time_text = Label(self.medium_font, max_glyphs=8)
         self.time_text.x = 200
-        self.time_text.y = 0
+        self.time_text.y = 12
         self.time_text.color = 0xFFFFFF
         self._text_group.append(self.time_text)
 
-        self.temp_text = TextArea(self.large_font, width=6)
+        self.temp_text = Label(self.large_font, max_glyphs=6)
         self.temp_text.x = 200
-        self.temp_text.y = 155
+        self.temp_text.y = 195
         self.temp_text.color = 0xFFFFFF
         self._text_group.append(self.temp_text)
 
-        self.main_text = TextArea(self.large_font, width=20)
+        self.main_text = Label(self.large_font, max_glyphs=20)
         self.main_text.x = 10
-        self.main_text.y = 155
+        self.main_text.y = 195
         self.main_text.color = 0xFFFFFF
         self._text_group.append(self.main_text)
 
-        self.description_text = TextArea(self.small_font, width=60)
+        self.description_text = Label(self.small_font, max_glyphs=60)
         self.description_text.x = 10
-        self.description_text.y = 205
+        self.description_text.y = 225
         self.description_text.color = 0xFFFFFF
         self._text_group.append(self.description_text)
 
@@ -71,9 +71,9 @@ class OpenWeather_Graphics(displayio.Group):
         city_name =  weather['name'] + ", " + weather['sys']['country']
         print(city_name)
         if not self.city_text:
-            self.city_text = TextArea(self.medium_font, text=city_name)
+            self.city_text = Label(self.medium_font, text=city_name)
             self.city_text.x = 10
-            self.city_text.y = 0
+            self.city_text.y = 12
             self.city_text.color = 0xFFFFFF
             self._text_group.append(self.city_text)
 

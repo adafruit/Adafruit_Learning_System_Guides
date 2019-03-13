@@ -33,11 +33,11 @@ pyportal = PyPortal(url=DATA_SOURCE,
                     status_neopixel=board.NEOPIXEL,
                     default_bg=cwd+"/youtube_background.bmp",
                     text_font=cwd+"/fonts/Collegiate-50.bdf",
-                    text_position=((100, 85), (180, 130)),
+                    text_position=((100, 85+44), (155, 140+40)),
                     text_color=(0xFFFFFF, 0xFFFFFF),
                     caption_text=CAPTION,
                     caption_font=cwd+"/fonts/Collegiate-24.bdf",
-                    caption_position=(40, 200),
+                    caption_position=(40, 200+20),
                     caption_color=0xFFFFFF)
 
 # track the last value so we can play a sound when it updates
