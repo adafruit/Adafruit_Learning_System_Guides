@@ -26,6 +26,7 @@ from adafruit_display_text.label import Label
 from digitalio import DigitalInOut, Direction, Pull
 import analogio
 import displayio
+import adafruit_logging as logging
 
 # Set up where we'll be fetching data from
 DATA_SOURCE = 'http://api.openweathermap.org/data/2.5/weather?id='+secrets['city_id']
@@ -90,6 +91,11 @@ alarm_font.load_glyphs(b'0123456789:')
 temperature_font = bitmap_font.load_font('/fonts/Arial-16.bdf')
 temperature_font.load_glyphs(b'0123456789CF')
 
+####################
+# Set up logging
+
+logger = logging.getLogger('alarm_clock')
+logger.setLevel(logging.ERROR)            # change as desired
 
 ####################
 # Functions
@@ -228,7 +234,7 @@ class Time_State(State):
                 pyportal.get_local_time(location=secrets['timezone'])
                 self.refresh_time = now
             except RuntimeError as e:
-                print('Some error occured, retrying! -', e)
+                logger.error('Some error occured, retrying! - %s', str(e))
 
         # only query the weather every 10 minutes (and on first run)
         if (not self.weather_refresh) or (now - self.weather_refresh) > 600:
@@ -265,7 +271,7 @@ class Time_State(State):
                 board.DISPLAY.wait_for_frame()
 
             except RuntimeError as e:
-                print("Some error occured, retrying! -", e)
+                logger.error("Some error occured, retrying! - %s", str(e))
 
         if (not update_time) or ((now - update_time) > 30):
             # Update the time
@@ -288,6 +294,8 @@ class Time_State(State):
 
 
     def touch(self, t, touched):
+        if t:
+            logger.debug('touched: %d, %d', t[0], t[1])
         if t and not touched:             # only process the initial touch
             for button_index in range(len(self.buttons)):
                 b = self.buttons[button_index]
@@ -419,12 +427,16 @@ class Setting_State(State):
     def touch(self, t, touched):
         global alarm_hour, alarm_minute, alarm_enabled
         if t:
+            logger.debug('touched: %d, %d', t[0], t[1])
             if touch_in_button(t, self.buttons[0]):   # on
+                logger.debug('ON touched')
                 alarm_enabled = True
                 self.text_areas[0].text = '%02d:%02d' % (alarm_hour, alarm_minute)
             elif touch_in_button(t, self.buttons[1]):   # return
+                logger.debug('RETURN touched')
                 change_to_state('time')
             elif touch_in_button(t, self.buttons[2]): # off
+                logger.debug('OFF touched')
                 alarm_enabled = False
                 self.text_areas[0].text = '     '
             elif alarm_enabled:
@@ -432,12 +444,14 @@ class Setting_State(State):
                     self.previous_touch = t
                 else:
                     if touch_in_button(t, self.buttons[3]):   # HOURS
+                        logger.debug('HOURS touched')
                         if t[1] < (self.previous_touch[1] - 5):   # moving up
                             alarm_hour = (alarm_hour + 1) % 24
                         elif t[1] > (self.previous_touch[1] + 5): # moving down
                             alarm_hour = (alarm_hour - 1) % 24
                         self.text_areas[0].text = '%02d:%02d' % (alarm_hour, alarm_minute)
                     elif touch_in_button(t, self.buttons[4]): # MINUTES
+                        logger.debug('MINUTES touched')
                         if t[1] < (self.previous_touch[1] - 5):   # moving up
                             alarm_minute = (alarm_minute + 1) % 60
                         elif t[1] > (self.previous_touch[1] + 5): # moving down
@@ -475,8 +489,10 @@ current_state = None
 def change_to_state(state_name):
     global current_state
     if current_state:
+        logger.debug('Exiting %s', current_state.name)
         current_state.exit()
     current_state = states[state_name]
+    logger.debug('Entering %s', current_state.name)
     current_state.enter()
 
 ####################
