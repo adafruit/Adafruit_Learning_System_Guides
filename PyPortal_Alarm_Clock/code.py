@@ -22,7 +22,7 @@ from secrets import secrets
 import board
 from adafruit_pyportal import PyPortal
 from adafruit_bitmap_font import bitmap_font
-from adafruit_display_text.text_area import TextArea
+from adafruit_display_text.label import Label
 from digitalio import DigitalInOut, Direction, Pull
 import analogio
 import displayio
@@ -38,8 +38,7 @@ DATA_LOCATION = []
 
 pyportal = PyPortal(url=DATA_SOURCE,
                     json_path=DATA_LOCATION,
-                    status_neopixel=board.NEOPIXEL,
-                    splash_max=10)
+                    status_neopixel=board.NEOPIXEL)
 
 light = analogio.AnalogIn(board.LIGHT)
 
@@ -99,7 +98,7 @@ def create_text_areas(configs):
     """Given a list of area specifications, create and return test areas."""
     text_areas = []
     for cfg in configs:
-        textarea = TextArea(cfg['font'], text=' '*cfg['size'])
+        textarea = Label(cfg['font'], text=' '*cfg['size'])
         textarea.x = cfg['x']
         textarea.y = cfg['y']
         textarea.color = cfg['color']
@@ -168,9 +167,9 @@ class Time_State(State):
         self.refresh_time = None
         self.update_time = None
         self.weather_refresh = None
-        text_area_configs = [dict(x=88, y=30, size=5, color=0xFFFFFF, font=time_font),
-                             dict(x=210, y=10, size=5, color=0xFF0000, font=alarm_font),
-                             dict(x=88, y=65, size=6, color=0xFFFFFF, font=temperature_font)]
+        text_area_configs = [dict(x=88, y=170, size=5, color=0xFFFFFF, font=time_font),
+                             dict(x=210, y=50, size=5, color=0xFF0000, font=alarm_font),
+                             dict(x=88, y=90, size=6, color=0xFFFFFF, font=temperature_font)]
         self.text_areas = create_text_areas(text_area_configs)
         self.weather_icon = displayio.Group(max_size=1)
         self.weather_icon.x = 88
@@ -272,7 +271,8 @@ class Time_State(State):
             # Update the time
             update_time = now
             the_time = time.localtime()
-            self.text_areas[0].text = '%02d:%02d' % (the_time.tm_hour,the_time.tm_min) # set time textarea
+            time_string = '%02d:%02d' % (the_time.tm_hour,the_time.tm_min)
+            self.text_areas[0].text = time_string
             board.DISPLAY.refresh_soon()
             board.DISPLAY.wait_for_frame()
 
