@@ -19,15 +19,16 @@ All text above must be included in any redistribution.
 #
 # import board
 # import busio
-# from adafruit_logger.uart_handler import UartHandler
-# from adafruit_logger import *
+# from uart_handler import UartHandler
+# import adafruit_logging as logging
 #
 # uart = busio.UART(board.TX, board.RX, baudrate=115200)
-# logger = Logger(UartHandler(uart))
-# logger.level = INFO
+# logger = logging.getLogger()
+# logger.addHandler(UartHandler(uart))
+# logger.level = logging.INFO
 # logger.info('testing')
 
-from adafruit_logger import LoggingHandler
+from adafruit_logging import LoggingHandler
 
 class UartHandler(LoggingHandler):
     """Send logging output to a serial port."""
