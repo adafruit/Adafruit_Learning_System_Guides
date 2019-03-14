@@ -11,7 +11,7 @@ while True:
     if t == 1:
         l.debug("debug message: %d", random.randint(0, 1000))
     elif t == 2:
-        l.info("debug message: %d", random.randint(0, 1000))
+        l.info("info message: %d", random.randint(0, 1000))
     elif t == 3:
         l.warning("warning message: %d", random.randint(0, 1000))
     elif t == 4:
