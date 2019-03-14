@@ -14,7 +14,7 @@ All text above must be included in any redistribution.
 
 #pylint:disable=redefined-outer-name,no-member,global-statement
 #pylint:disable=no-self-use,too-many-branches,too-many-statements
-#pylint:disable=useless-super-delegation
+#pylint:disable=useless-super-delegation, too-many-locals
 
 import time
 import json
