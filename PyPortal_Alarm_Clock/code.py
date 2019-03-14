@@ -112,7 +112,7 @@ def clear_splash():
 
 
 def touch_in_button(t, b):
-    in_horizontal = b['left'] >= t[0] >= b['right']
+    in_horizontal = b['left'] <= t[0] <= b['right']
     in_vertical = b['top'] <= t[1] <= b['bottom']
     return in_horizontal and in_vertical
 
@@ -182,8 +182,8 @@ class Time_State(State):
         self.snooze_file = None
 
         # each button has it's edges as well as the state to transition to when touched
-        self.buttons = [dict(left=320, top=50, right=240, bottom=120, next_state='settings'),
-                        dict(left=320, top=155, right=240, bottom=220, next_state='mugsy')]
+        self.buttons = [dict(left=0, top=50, right=80, bottom=120, next_state='settings'),
+                        dict(left=0, top=155, right=80, bottom=220, next_state='mugsy')]
 
 
     @property
@@ -401,14 +401,14 @@ class Setting_State(State):
         super().__init__()
         self.previous_touch = None
         self.background = 'settings_background.bmp'
-        text_area_configs = [dict(x=88, y=-10, size=5, color=0xFFFFFF, font=time_font)]
+        text_area_configs = [dict(x=88, y=120, size=5, color=0xFFFFFF, font=time_font)]
 
         self.text_areas = create_text_areas(text_area_configs)
-        self.buttons = [dict(left=320, top=30, right=240, bottom=93),    # on
-                        dict(left=320, top=98, right=240, bottom=152),   # return
-                        dict(left=320, top=155, right=240, bottom=220),  # off
-                        dict(left=240, top=0, right=120, bottom = 240), # hours
-                        dict(left=120, top=0, right=0, bottom = 240)]   # minutes
+        self.buttons = [dict(left=0, top=30, right=80, bottom=93),    # on
+                        dict(left=0, top=98, right=80, bottom=152),   # return
+                        dict(left=0, top=155, right=80, bottom=220),  # off
+                        dict(left=81, top=0, right=200, bottom = 240), # hours
+                        dict(left=201, top=0, right=320, bottom = 240)]   # minutes
 
 
     @property
@@ -432,15 +432,15 @@ class Setting_State(State):
                     self.previous_touch = t
                 else:
                     if touch_in_button(t, self.buttons[3]):   # HOURS
-                        if t[1] < (self.previous_touch[1]):   # moving up
+                        if t[1] < (self.previous_touch[1] - 5):   # moving up
                             alarm_hour = (alarm_hour + 1) % 24
-                        elif t[1] > (self.previous_touch[1]): # moving down
+                        elif t[1] > (self.previous_touch[1] + 5): # moving down
                             alarm_hour = (alarm_hour - 1) % 24
                         self.text_areas[0].text = '%02d:%02d' % (alarm_hour, alarm_minute)
                     elif touch_in_button(t, self.buttons[4]): # MINUTES
-                        if t[1] < (self.previous_touch[1]):   # moving up
+                        if t[1] < (self.previous_touch[1] - 5):   # moving up
                             alarm_minute = (alarm_minute + 1) % 60
-                        elif t[1] > (self.previous_touch[1]): # moving down
+                        elif t[1] > (self.previous_touch[1] + 5): # moving down
                             alarm_minute = (alarm_minute - 1) % 60
                         self.text_areas[0].text = '%02d:%02d' % (alarm_hour, alarm_minute)
                     self.previous_touch = t
