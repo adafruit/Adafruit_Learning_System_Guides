@@ -13,9 +13,12 @@ All text above must be included in any redistribution.
 """
 
 #pylint:disable=redefined-outer-name,no-member,global-statement
+#pylint:disable=no-self-use,too-many-branches,too-many-statements
+#pylint:disable=useless-super-delegation
 
 import time
 import json
+from secrets import secrets
 import board
 from adafruit_pyportal import PyPortal
 from adafruit_bitmap_font import bitmap_font
@@ -23,7 +26,6 @@ from adafruit_display_text.text_area import TextArea
 from digitalio import DigitalInOut, Direction, Pull
 import analogio
 import displayio
-from secrets import secrets
 
 # Set up where we'll be fetching data from
 DATA_SOURCE = 'http://api.openweathermap.org/data/2.5/weather?id='+secrets['city_id']
@@ -111,7 +113,9 @@ def clear_splash():
 
 
 def touch_in_button(t, b):
-    return (b['left'] >= t[0] >= b['right']) and (b['top'] <= t[1] <= b['bottom'])
+    in_horizontal = b['left'] >= t[0] >= b['right']
+    in_vertical = b['top'] <= t[1] <= b['bottom']
+    return in_horizontal and in_vertical
 
 
 touched = False
