@@ -23,7 +23,7 @@ All text above must be included in any redistribution.
 # import adafruit_logging as logging
 #
 # uart = busio.UART(board.TX, board.RX, baudrate=115200)
-# logger = logging.getLogger()
+# logger = logging.getLogger('uart')
 # logger.addHandler(UartHandler(uart))
 # logger.level = logging.INFO
 # logger.info('testing')

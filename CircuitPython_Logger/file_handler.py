@@ -19,7 +19,7 @@ All text above must be included in any redistribution.
 #
 # from file_handler import FileHandler
 # import adafruit_logging as logging
-# l = logging.getLogger()
+# l = logging.getLogger('file')
 # l.addHandler(FileHandler('log.txt'))
 # l.level = logging.ERROR
 # l.error("test")
