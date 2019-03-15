@@ -16,13 +16,15 @@ All text above must be included in any redistribution.
 
 # Example:
 #
+#
 # from file_handler import FileHandler
-# from adafruit_logger import Logger, ERROR
-# l = Logger(FileHandler('log.txt'))
-# l.level = ERROR
+# import adafruit_logging as logging
+# l = logging.getLogger('file')
+# l.addHandler(FileHandler('log.txt'))
+# l.level = logging.ERROR
 # l.error("test")
 
-from adafruit_logger import LoggingHandler
+from adafruit_logging import LoggingHandler
 
 class FileHandler(LoggingHandler):
 
