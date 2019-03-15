@@ -130,10 +130,13 @@ class OpenWeather_Graphics(displayio.Group):
             self._icon_file.close()
         self._icon_file = open(filename, "rb")
         icon = displayio.OnDiskBitmap(self._icon_file)
-        self._icon_sprite = displayio.TileGrid(icon,
-                                               pixel_shader=displayio.ColorConverter(),
-                                               position=(0, 0))
-
+        try:
+            self._icon_sprite = displayio.TileGrid(icon,
+                                                   pixel_shader=displayio.ColorConverter())
+        except TypeError:
+            self._icon_sprite = displayio.TileGrid(icon,
+                                                   pixel_shader=displayio.ColorConverter(),
+                                                   position=(0,0))
         self._icon_group.append(self._icon_sprite)
         board.DISPLAY.refresh_soon()
         board.DISPLAY.wait_for_frame()
