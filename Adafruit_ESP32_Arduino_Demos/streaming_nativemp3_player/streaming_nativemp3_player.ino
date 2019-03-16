@@ -21,10 +21,10 @@ char pass[] = SECRET_PASS;    // your network password (use for WPA, or use as k
 //const char *stream = "http://uk7.internet-radio.com:8226/;stream.mp3";  // Box UK Radio danceradiouk
 
 // Best options:
-const char *stream = "http://amber.streamguys.com:4870/;stream.mp3";  // WZBC @ 56kbps
+//const char *stream = "http://amber.streamguys.com:4870/;stream.mp3";  // WZBC @ 56kbps
 //const char *stream = "http://wmbr.org:8000/med";                      // WMBR @ 64Kbps
-//const char *stream = "https://adafruit-podcasts.s3.amazonaws.com/media/G_br7smHsvU_NA.mp3";  // circuitpy podcast, VBR
-//const char *stream = "http://bbcmedia.ic.llnwd.net/stream/bbcmedia_radio4lw_mf_p";
+const char *stream = "https://adafruit-podcasts.s3.amazonaws.com/media/G_br7smHsvU_NA.mp3";  // circuitpy podcast, VBR
+//const char *stream = "http://bbcmedia.ic.llnwd.net/stream/bbcmedia_radio4lw_mf_p";  // Radio 4 mono 128k
 
 WiFiClient client; // Use WiFiClient class to create HTTP/TCP connection
 String host, path;
@@ -164,7 +164,9 @@ void loop() {
       buffer.push(minibuff[i]);      // push every byte we read
     }
     interrupts();
+#ifdef DEBUG_OUTPUT
     Serial.println(" OK");
+#endif
   }
 }
 
