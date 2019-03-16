@@ -21,8 +21,8 @@ char pass[] = SECRET_PASS;    // your network password (use for WPA, or use as k
 //const char *stream = "http://uk7.internet-radio.com:8226/;stream.mp3";  // Box UK Radio danceradiouk
 
 // Best options:
-//const char *stream = "http://amber.streamguys.com:4870/;stream.mp3";  // WZBC @ 56kbps
-const char *stream = "http://wmbr.org:8000/med";                      // WMBR @ 64Kbps
+const char *stream = "http://amber.streamguys.com:4870/;stream.mp3";  // WZBC @ 56kbps
+//const char *stream = "http://wmbr.org:8000/med";                      // WMBR @ 64Kbps
 //const char *stream = "https://adafruit-podcasts.s3.amazonaws.com/media/G_br7smHsvU_NA.mp3";  // circuitpy podcast, VBR
 //const char *stream = "http://bbcmedia.ic.llnwd.net/stream/bbcmedia_radio4lw_mf_p";
 
@@ -34,7 +34,7 @@ Adafruit_MP3 player;  // The MP3 player
 #define BUFFER_SIZE 8000     // we need a lot of buffer to keep from underruns! but not too big?
 CircularBuffer<uint8_t, BUFFER_SIZE> buffer;
 bool paused = true;
-float gain = 0.25;
+float gain = 1;
 
 void setup() {
   Serial.begin(115200);
@@ -155,7 +155,9 @@ void loop() {
     uint8_t minibuff[BUFFER_SIZE];
 
     int bytesread = client.read(minibuff, buffer.available());
+#ifdef DEBUG_OUTPUT
     Serial.print("Client read: "); Serial.print(bytesread);
+#endif
 
     noInterrupts();
     for (int i=0; i<bytesread; i++) {
