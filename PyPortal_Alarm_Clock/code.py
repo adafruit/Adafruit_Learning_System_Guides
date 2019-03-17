@@ -234,6 +234,7 @@ class Time_State(State):
                 pyportal.get_local_time(location=secrets['timezone'])
                 self.refresh_time = now
             except RuntimeError as e:
+                self.refresh_time = now - 3000   # delay 10 minutes before retrying
                 logger.error('Some error occured, retrying! - %s', str(e))
 
         # only query the weather every 10 minutes (and on first run)
@@ -256,12 +257,12 @@ class Time_State(State):
                     icon = displayio.OnDiskBitmap(self.icon_file)
                     try:
                         icon_sprite = displayio.TileGrid(icon,
-                                                        pixel_shader=displayio.ColorConverter(),
-                                                        x=0, y=0)
+                                                         pixel_shader=displayio.ColorConverter(),
+                                                         x=0, y=0)
                     except TypeError:
                         icon_sprite = displayio.TileGrid(icon,
-                                                        pixel_shader=displayio.ColorConverter(),
-                                                        position=(0, 0))
+                                                         pixel_shader=displayio.ColorConverter(),
+                                                         position=(0, 0))
 
 
                     self.weather_icon.append(icon_sprite)
@@ -277,6 +278,7 @@ class Time_State(State):
                 board.DISPLAY.wait_for_frame()
 
             except RuntimeError as e:
+                self.weather_refresh = now - 540   # delay a minute before retrying
                 logger.error("Some error occured, retrying! - %s", str(e))
 
         if (not update_time) or ((now - update_time) > 30):
@@ -323,12 +325,12 @@ class Time_State(State):
             icon = displayio.OnDiskBitmap(self.snooze_file)
             try:
                 icon_sprite = displayio.TileGrid(icon,
-                                                pixel_shader=displayio.ColorConverter(),
-                                                x=0, y=0)
+                                                 pixel_shader=displayio.ColorConverter(),
+                                                 x=0, y=0)
             except TypeError:
                 icon_sprite = displayio.TileGrid(icon,
-                                                pixel_shader=displayio.ColorConverter(),
-                                                position=(0, 0))
+                                                 pixel_shader=displayio.ColorConverter(),
+                                                 position=(0, 0))
             self.snooze_icon.append(icon_sprite)
 
         pyportal.splash.append(self.snooze_icon)
