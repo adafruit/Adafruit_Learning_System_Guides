@@ -12,7 +12,7 @@ cwd = ("/"+__file__).rsplit('/', 1)[0] # the current working directory (where th
 # Fonts within /fonts folder
 info_font = cwd+"/fonts/Arial-16.bdf"
 temperature_font = cwd+"/fonts/Nunito-Light-75.bdf"
-glyphs = b'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-,.:°'
+glyphs = b'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-,.:'
 
 class Thermometer_GFX(displayio.Group):
 
@@ -41,6 +41,7 @@ class Thermometer_GFX(displayio.Group):
         self.c_font = bitmap_font.load_font(temperature_font)
         self.info_font.load_glyphs(glyphs)
         self.c_font.load_glyphs(glyphs)
+        self.c_font.load_glyphs(('°',))
 
         print('setting up Labels...')
         self.temp_text = Label(self.c_font, max_glyphs=8)
@@ -48,16 +49,20 @@ class Thermometer_GFX(displayio.Group):
         self.temp_text.y = 80
         self._text_group.append(self.temp_text)
 
-        self.datetime_text = Label(self.info_font, max_glyphs=40)
-        self.datetime_text.x = 10
-        self.datetime_text.y = 150
-        self._text_group.append(self.datetime_text)
+        self.date_text = Label(self.info_font, max_glyphs=40)
+        self.date_text.x = 100
+        self.date_text.y = 150
+        self._text_group.append(self.date_text)
+
+        self.time_text = Label(self.info_font, max_glyphs=40)
+        self.time_text.x = 250
+        self.time_text.y = 150
+        self._text_group.append(self.time_text)
 
         self.io_status_text = Label(self.info_font, max_glyphs=40)
         self.io_status_text.x = 10
         self.io_status_text.y = 180
         self._text_group.append(self.io_status_text)
-
         board.DISPLAY.show(self._text_group)
 
     def display_date_time(self, io_time):
@@ -66,19 +71,15 @@ class Thermometer_GFX(displayio.Group):
         """
         print('{0}/{1}/{2}, {3}:{4}'.format(io_time[1], io_time[2],
                                             io_time[0], io_time[3], io_time[4]))
-
-        self.datetime_text.text = '{0}/{1}/{2}, {3}:{4}'.format(io_time[1], io_time[2],
-                                                            io_time[0], io_time[3], io_time[4])
-        board.DISPLAY.refresh_soon()
-        board.DISPLAY.wait_for_frame()
+        
+        self.time_text.text = '%02d:%02d'%(io_time[3],io_time[4])
+        self.date_text.text = '{0}/{1}/{2}'.format(io_time[1], io_time[2], io_time[0])
 
     def display_io_status(self, status_text):
         """Displays the current Adafruit IO status.
         :param str status_text: Description of Adafruit IO status
         """
-        io_status_text.text = status_text
-        board.DISPLAY.refresh_soon()
-        board.DISPLAY.wait_for_frame()
+        self.io_status_text.text = status_text
 
     def display_temp(self, adt_data, celsius=True):
         """Displays the data from the ADT7410 on the.
@@ -86,10 +87,8 @@ class Thermometer_GFX(displayio.Group):
         :param float adt_data: Value from the ADT7410
         :param bool celsius: Temperature displayed as F or C 
         """
-        self.set_icon(self._cwd+"/icons/pyportal_neutral.bmp")
-
         if not celsius:
-            adt_data = (adt_data * 9 / 5) + 32'
+            adt_data = (adt_data * 9 / 5) + 32
             print('Temperature: %0.2f°F'%adt_data)
             self.temp_text.text = '%0.2f°F'%adt_data
         else:
@@ -97,13 +96,6 @@ class Thermometer_GFX(displayio.Group):
             self.temp_text.text = '%0.2f°C'%adt_data
         board.DISPLAY.refresh_soon()
         board.DISPLAY.wait_for_frame()
-
-    def display_clear(self):
-        """Clears textgroups
-        """
-        self.temp_text.text = ""
-        self.datetime_text.text = ""
-        self.io_status_text.text = ""
 
     def set_icon(self, filename):
         """Sets the background image to a bitmap file.
@@ -120,10 +112,15 @@ class Thermometer_GFX(displayio.Group):
             self._icon_file.close()
         self._icon_file = open(filename, "rb")
         icon = displayio.OnDiskBitmap(self._icon_file)
-        self._icon_sprite = displayio.TileGrid(icon,
-                                               pixel_shader=displayio.ColorConverter(),
-                                               position=(0, 0))
+        try:
+            self._icon_sprite = displayio.TileGrid(icon,
+                                                   pixel_shader=displayio.ColorConverter())
+        except TypeError:
+            self._icon_sprite = displayio.TileGrid(icon,
+                                                   pixel_shader=displayio.ColorConverter(),
+                                                   position=(0,0))
 
         self._icon_group.append(self._icon_sprite)
         board.DISPLAY.refresh_soon()
         board.DISPLAY.wait_for_frame()
+  
