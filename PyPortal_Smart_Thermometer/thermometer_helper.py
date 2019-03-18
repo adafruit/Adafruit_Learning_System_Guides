@@ -1,5 +1,5 @@
 """
-Helper file for
+GFX helper file for
 pyportal_thermometer.py
 """
 import board
@@ -26,7 +26,6 @@ class Thermometer_GFX(displayio.Group):
         self._icon_group = displayio.Group(max_size=1)
         self.append(self._icon_group)
         board.DISPLAY.show(self._icon_group)
-
         # create text object group
         self._text_group = displayio.Group(max_size=4)
         self.append(self._text_group)
@@ -63,7 +62,9 @@ class Thermometer_GFX(displayio.Group):
         self.io_status_text.x = 100
         self.io_status_text.y = 220
         self._text_group.append(self.io_status_text)
+
         board.DISPLAY.show(self._text_group)
+
 
     def display_date_time(self, io_time, usa_date=True):
         """Parses and displays the time obtained from Adafruit IO, based on IP
@@ -94,8 +95,6 @@ class Thermometer_GFX(displayio.Group):
         else:
             print('Temperature: %0.2f°C'%adt_data)
             self.temp_text.text = '%0.2f°C'%adt_data
-        board.DISPLAY.refresh_soon()
-        board.DISPLAY.wait_for_frame()
 
     def set_icon(self, filename):
         """Sets the background image to a bitmap file.
