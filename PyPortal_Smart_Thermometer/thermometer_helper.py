@@ -10,24 +10,31 @@ from adafruit_bitmap_font import bitmap_font
 cwd = ("/"+__file__).rsplit('/', 1)[0] # the current working directory (where this file is)
 
 # Fonts within /fonts folder
+small_font = cwd+"/fonts/Arial-12.bdf"
 info_font = cwd+"/fonts/Arial-16.bdf"
 temperature_font = cwd+"/fonts/Nunito-Light-75.bdf"
 glyphs = b'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-,.:'
 
 class Thermometer_GFX(displayio.Group):
-
-    def __init__(self):
+    def __init__(self, celsius=True, usa_date=True):
+        """Creates a Thermometer_GFX object.
+        :param bool celsius: Temperature displayed as F or C 
+        :param bool usa_date: Use mon/day/year date-time formatting.
+        """
         # root displayio group
         root_group = displayio.Group(max_size=20)
         board.DISPLAY.show(root_group)
         super().__init__(max_size=20)
+
+        self._celsius = celsius
+        self._usa_date = usa_date
 
         # create background icon group
         self._icon_group = displayio.Group(max_size=1)
         self.append(self._icon_group)
         board.DISPLAY.show(self._icon_group)
         # create text object group
-        self._text_group = displayio.Group(max_size=4)
+        self._text_group = displayio.Group(max_size=6)
         self.append(self._text_group)
 
         self._icon_sprite = None
@@ -37,25 +44,39 @@ class Thermometer_GFX(displayio.Group):
 
         print('loading fonts...')
         self.info_font = bitmap_font.load_font(info_font)
-        self.c_font = bitmap_font.load_font(temperature_font)
         self.info_font.load_glyphs(glyphs)
-        self.c_font.load_glyphs(glyphs)
-        self.c_font.load_glyphs(('°',))
 
-        print('setting up Labels...')
+        self.small_font = bitmap_font.load_font(small_font)
+        self.small_font.load_glyphs(glyphs)
+
+        self.c_font = bitmap_font.load_font(temperature_font)
+        self.c_font.load_glyphs(glyphs)
+        self.c_font.load_glyphs(('°',)) # extra glyph for temperature font
+
+        print('setting up labels...')
+        self.title_text = Label(self.info_font, text="PyPortal Thermometer")
+        self.title_text.x = 50
+        self.title_text.y = 15
+        self._text_group.append(self.title_text)
+
+        self.subtitle_text = Label(self.small_font, text="powered by Analog Devices!")
+        self.subtitle_text.x = 80
+        self.subtitle_text.y = 30
+        self._text_group.append(self.subtitle_text)
+
         self.temp_text = Label(self.c_font, max_glyphs=8)
         self.temp_text.x = 25
-        self.temp_text.y = 80
+        self.temp_text.y = 110
         self._text_group.append(self.temp_text)
 
         self.time_text = Label(self.info_font, max_glyphs=40)
         self.time_text.x = 250
-        self.time_text.y = 190
+        self.time_text.y = 150
         self._text_group.append(self.time_text)
 
         self.date_text = Label(self.info_font, max_glyphs=40)
-        self.date_text.x = 10
-        self.date_text.y = 190
+        self.date_text.x = 30
+        self.date_text.y = 160
         self._text_group.append(self.date_text)
 
         self.io_status_text = Label(self.info_font, max_glyphs=40)
@@ -66,15 +87,15 @@ class Thermometer_GFX(displayio.Group):
         board.DISPLAY.show(self._text_group)
 
 
-    def display_date_time(self, io_time, usa_date=True):
+    def display_date_time(self, io_time):
         """Parses and displays the time obtained from Adafruit IO, based on IP
-        :param struct_time io_time: Structure used for date/time, returned from 
-        :param bool usa: Use mon/day/year or day/mon/year format
+        :param struct_time io_time: Structure used for date/time, returned from Adafruit IO.
         """
         self.time_text.text = '%02d:%02d'%(io_time[3],io_time[4])
-        if not usa_date:
+        if not self._usa_date:
             self.date_text.text = '{0}/{1}/{2}'.format(io_time[2], io_time[1], io_time[0])
-        self.date_text.text = '{0}/{1}/{2}'.format(io_time[1], io_time[2], io_time[0])
+        else:
+            self.date_text.text = '{0}/{1}/{2}'.format(io_time[1], io_time[2], io_time[0])
 
     def display_io_status(self, status_text):
         """Displays the current Adafruit IO status.
@@ -82,13 +103,12 @@ class Thermometer_GFX(displayio.Group):
         """
         self.io_status_text.text = status_text
 
-    def display_temp(self, adt_data, celsius=True):
+    def display_temp(self, adt_data):
         """Displays the data from the ADT7410 on the.
 
         :param float adt_data: Value from the ADT7410
-        :param bool celsius: Temperature displayed as F or C 
         """
-        if not celsius:
+        if not self._celsius:
             adt_data = (adt_data * 9 / 5) + 32
             print('Temperature: %0.2f°F'%adt_data)
             self.temp_text.text = '%0.2f°F'%adt_data

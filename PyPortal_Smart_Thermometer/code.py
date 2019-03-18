@@ -83,7 +83,7 @@ while True:
     temperature = adt.temperature
     print('Temp: %0.2f°C'%temperature)
     try: # WiFi Connection
-        if light_value < 1000: # turn on the backlight
+        if light_value > 1000: # turn on the backlight
             set_backlight(1)
             print('displaying temperature...')
             gfx.display_temp(temperature)
@@ -106,3 +106,4 @@ while True:
         print("Failed to get data, retrying\n", e)
         wifi.reset()
         continue
+    time.sleep(1)
