@@ -5,12 +5,16 @@
 #include <SPI.h>
 #include <WiFiNINA.h>
 #include <CircularBuffer.h>  // From Agileware
-#include "Adafruit_MP3.h"
+#include <Adafruit_MP3.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_ILI9341.h>
 #include "arduino_secrets.h" 
 
 ///////please enter your sensitive data in the Secret tab/arduino_secrets.h
 char ssid[] = SECRET_SSID;        // your network SSID (name)
 char pass[] = SECRET_PASS;    // your network password (use for WPA, or use as key for WEP)
+
+
 
 // USE ~64Kbps streams if possible, 128kb is too much data ;)
 // To convert shoutcast urls https://www.radiodj.ro/community/index.php?topic=3326.0
@@ -21,9 +25,10 @@ char pass[] = SECRET_PASS;    // your network password (use for WPA, or use as k
 //const char *stream = "http://uk7.internet-radio.com:8226/;stream.mp3";  // Box UK Radio danceradiouk
 
 // Best options:
-//const char *stream = "http://amber.streamguys.com:4870/;stream.mp3";  // WZBC @ 56kbps
+const char *stream = "https://18123.live.streamtheworld.com/CSPANRADIO.mp3"; // CSPAN radio @ 40 KBps
 //const char *stream = "http://wmbr.org:8000/med";                      // WMBR @ 64Kbps
-const char *stream = "https://adafruit-podcasts.s3.amazonaws.com/media/G_br7smHsvU_NA.mp3";  // circuitpy podcast, VBR
+//const char *stream = "http://amber.streamguys.com:4870/;stream.mp3";  // WZBC @ 56kbps
+//const char *stream = "https://adafruit-podcasts.s3.amazonaws.com/media/G_br7smHsvU_NA.mp3";  // circuitpy podcast, VBR
 //const char *stream = "http://bbcmedia.ic.llnwd.net/stream/bbcmedia_radio4lw_mf_p";  // Radio 4 mono 128k
 
 WiFiClient client; // Use WiFiClient class to create HTTP/TCP connection
