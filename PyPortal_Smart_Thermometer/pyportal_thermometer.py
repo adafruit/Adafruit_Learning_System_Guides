@@ -1,112 +1,123 @@
 """
-PyPortal Smart Thermometer
-==============================================
-Turn your PyPortal into an internet-connected
-thermometer with Adafruit IO
-
-Author: Brent Rubell for Adafruit Industries, 2019
+Helper file for
+pyportal_thermometer.py
 """
-import time
 import board
-import neopixel
-import busio
-from digitalio import DigitalInOut
-from analogio import AnalogIn
-import adafruit_adt7410
+import displayio
+from adafruit_display_text.label import Label
+from adafruit_bitmap_font import bitmap_font
 
-from adafruit_esp32spi import adafruit_esp32spi, adafruit_esp32spi_wifimanager
-from adafruit_io.adafruit_io import RESTClient, AdafruitIO_RequestError
+cwd = ("/"+__file__).rsplit('/', 1)[0] # the current working directory (where this file is)
 
-# thermometer graphics helper
-import thermometer_helper
+# Fonts within /fonts folder
+info_font = cwd+"/fonts/Arial-16.bdf"
+temperature_font = cwd+"/fonts/Nunito-Light-75.bdf"
+glyphs = b'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-,.:'
 
-# rate at which to refresh the pyportal and sensors, in seconds
-PYPORTAL_REFRESH = 5
+class Thermometer_GFX(displayio.Group):
 
-# Get wifi details and more from a secrets.py file
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
+    def __init__(self):
+        # root displayio group
+        root_group = displayio.Group(max_size=20)
+        board.DISPLAY.show(root_group)
+        super().__init__(max_size=20)
 
-# PyPortal ESP32 Setup
-esp32_cs = DigitalInOut(board.ESP_CS)
-esp32_ready = DigitalInOut(board.ESP_BUSY)
-esp32_reset = DigitalInOut(board.ESP_RESET)
-spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
-esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset)
-status_light = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.2)
-wifi = adafruit_esp32spi_wifimanager.ESPSPI_WiFiManager(esp, secrets, status_light)
+        # create background icon group
+        self._icon_group = displayio.Group(max_size=1)
+        self.append(self._icon_group)
+        board.DISPLAY.show(self._icon_group)
 
-# Set your Adafruit IO Username and Key in secrets.py
-# (visit io.adafruit.com if you need to create an account,
-# or if you need your Adafruit IO key.)
-ADAFRUIT_IO_USER = secrets['aio_username']
-ADAFRUIT_IO_KEY = secrets['aio_key']
+        # create text object group
+        self._text_group = displayio.Group(max_size=4)
+        self.append(self._text_group)
 
-# Create an instance of the Adafruit IO REST client
-io = RESTClient(ADAFRUIT_IO_USER, ADAFRUIT_IO_KEY, wifi)
+        self._icon_sprite = None
+        self._icon_file = None
+        self._cwd = cwd
+        self.set_icon(self._cwd+"/icons/pyportal_splash.bmp")
 
-# Get the temperature Adafruit IO feed
-temperature_feed = io.get_feed('temperature')
+        print('loading fonts...')
+        self.info_font = bitmap_font.load_font(info_font)
+        self.c_font = bitmap_font.load_font(temperature_font)
+        self.info_font.load_glyphs(glyphs)
+        self.c_font.load_glyphs(glyphs)
+        self.c_font.load_glyphs(('°',))
 
-# init. the graphics helper
-gfx = thermometer_helper.Thermometer_GFX()
+        print('setting up Labels...')
+        self.temp_text = Label(self.c_font, max_glyphs=8)
+        self.temp_text.x = 20
+        self.temp_text.y = 80
+        self._text_group.append(self.temp_text)
 
-# init. the adt7410
-i2c_bus = busio.I2C(board.SCL, board.SDA)
-adt = adafruit_adt7410.ADT7410(i2c_bus, address=0x48)
-adt.high_resolution = True
+        self.datetime_text = Label(self.info_font, max_glyphs=40)
+        self.datetime_text.x = 10
+        self.datetime_text.y = 150
+        self._text_group.append(self.datetime_text)
 
-# init. the light sensor
-light_sensor = AnalogIn(board.LIGHT)
+        self.io_status_text = Label(self.info_font, max_glyphs=40)
+        self.io_status_text.x = 10
+        self.io_status_text.y = 180
+        self._text_group.append(self.io_status_text)
 
-def set_backlight(self, val):
-    """Adjust the TFT backlight.
-    :param val: The backlight brightness. Use a value between ``0`` and ``1``, where ``0`` is
-                off, and ``1`` is 100% brightness.
-    """
-    val = max(0, min(1.0, val))
-    if self._backlight:
-        self._backlight.duty_cycle = int(val * 65535)
-    else:
-        board.DISPLAY.auto_brightness = False
-        board.DISPLAY.brightness = val
+        #board.DISPLAY.show(self._text_group)
 
-while True:
-    # read the light sensor
-    light_value = light_sensor.value
-    print('Light Value: ', light_value)
-    # read the temperature sensor
-    temperature = adt.temperature
-    print('Temp: %0.2f°C'%temperature)
-    try:
-        # sensor covered
-        # TODO: switchback, for testing only
-        if light_value > 1000:
-            print('Sensor covered, display ON')
-            print('displaying temperature...')
-            gfx.display_temp(temperature)
-            # display time from IO below it (rx_time function)
-            print('Getting time from Adafruit IO...')
-            datetime = io.receive_time()
-            print(datetime)
-            print('displaying time...')
-            gfx.display_date_time(datetime)
-        # turn off the gfx for now...
-        # TODO: turn off the display backlight
-        try: # send temperature data to IO
-            #gfx.display_io_status('Sending data...')
-            print('Sending data to Adafruit IO...')
-            io.send_data(temperature_feed['key'], temperature)
-            print('Data sent!')
-            #gfx.display_io_status('Data sent!')
-        except AdafruitIO_RequestError as e:
-            raise AdafruitIO_RequestError('IO Error: ', e)
-    except (ValueError, RuntimeError) as e:
-        print("Failed to get data, retrying\n", e)
-        wifi.reset()
-        continue
-    print('waiting...')
-    time.sleep(PYPORTAL_REFRESH)
+    def display_date_time(self, io_time):
+        """Parses and displays the time obtained from Adafruit IO, based on IP
+        :param struct_time io_time: Structure used for date/time, returned from 
+        """
+        print('{0}/{1}/{2}, {3}:{4}'.format(io_time[1], io_time[2],
+                                            io_time[0], io_time[3], io_time[4]))
+
+        self.datetime_text.text = '{0}/{1}/{2}, {3}:{4}'.format(io_time[1], io_time[2],
+                                                            io_time[0], io_time[3], io_time[4])
+
+    def display_io_status(self, status_text):
+        """Displays the current Adafruit IO status.
+        :param str status_text: Description of Adafruit IO status
+        """
+        self.io_status_text.text = status_text
+
+    def display_temp(self, adt_data, celsius=True):
+        """Displays the data from the ADT7410 on the.
+
+        :param float adt_data: Value from the ADT7410
+        :param bool celsius: Temperature displayed as F or C 
+        """
+
+        if not celsius:
+            adt_data = (adt_data * 9 / 5) + 32
+            print('Temperature: %0.2f°F'%adt_data)
+            self.temp_text.text = '%0.2f°F'%adt_data
+        else:
+            print('Temperature: %0.2f°C'%adt_data)
+            self.temp_text.text = '%0.2f°C'%adt_data
+        
+        #self.set_icon(self._cwd+"/icons/pyportal_neutral.bmp")
+
+    def set_icon(self, filename):
+        """Sets the background image to a bitmap file.
+
+        :param filename: The filename of the chosen icon
+        """
+        print("Set icon to ", filename)
+        if self._icon_group:
+            self._icon_group.pop()
+
+        if not filename:
+            return  # we're done, no icon desired
+        if self._icon_file:
+            self._icon_file.close()
+        self._icon_file = open(filename, "rb")
+        icon = displayio.OnDiskBitmap(self._icon_file)
+        try:
+            self._icon_sprite = displayio.TileGrid(icon,
+                                                   pixel_shader=displayio.ColorConverter())
+        except TypeError:
+            self._icon_sprite = displayio.TileGrid(icon,
+                                                   pixel_shader=displayio.ColorConverter(),
+                                                   position=(0,0))
+
+        self._icon_group.append(self._icon_sprite)
+        board.DISPLAY.refresh_soon()
+        board.DISPLAY.wait_for_frame()
+  

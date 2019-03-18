@@ -12,17 +12,15 @@ cwd = ("/"+__file__).rsplit('/', 1)[0] # the current working directory (where th
 # Fonts within /fonts folder
 info_font = cwd+"/fonts/Arial-16.bdf"
 temperature_font = cwd+"/fonts/Nunito-Light-75.bdf"
-#pylint-ignore syntax-error
 glyphs = b'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-,.:°'
 
 class Thermometer_GFX(displayio.Group):
 
-    def __init__(self, celsius=True):
+    def __init__(self):
         # root displayio group
         root_group = displayio.Group(max_size=20)
         board.DISPLAY.show(root_group)
         super().__init__(max_size=20)
-        self._celsius = celsius
 
         # create background icon group
         self._icon_group = displayio.Group(max_size=1)
@@ -55,6 +53,10 @@ class Thermometer_GFX(displayio.Group):
         self.datetime_text.y = 150
         self._text_group.append(self.datetime_text)
 
+        self.io_status_text = Label(self.info_font, max_glyphs=40)
+        self.io_status_text.x = 10
+        self.io_status_text.y = 180
+        self._text_group.append(self.io_status_text)
 
         board.DISPLAY.show(self._text_group)
 
@@ -74,25 +76,34 @@ class Thermometer_GFX(displayio.Group):
         """Displays the current Adafruit IO status.
         :param str status_text: Description of Adafruit IO status
         """
-
+        io_status_text.text = status_text
         board.DISPLAY.refresh_soon()
         board.DISPLAY.wait_for_frame()
 
-    def display_temp(self, adt_data):
+    def display_temp(self, adt_data, celsius=True):
         """Displays the data from the ADT7410 on the.
 
         :param float adt_data: Value from the ADT7410
+        :param bool celsius: Temperature displayed as F or C 
         """
         self.set_icon(self._cwd+"/icons/pyportal_neutral.bmp")
 
-        self.temp_text.text = '%0.2f°C'%adt_data
-
-        # change the background based on the temperature
-        if adt_data > 32:
-            self.set_icon(self._cwd+"/icons/pyportal_hot.bmp")
-        self.set_icon(self._cwd+"/icons/pyportal_neutral.bmp")
+        if not celsius:
+            adt_data = (adt_data * 9 / 5) + 32'
+            print('Temperature: %0.2f°F'%adt_data)
+            self.temp_text.text = '%0.2f°F'%adt_data
+        else:
+            print('Temperature: %0.2f°C'%adt_data)
+            self.temp_text.text = '%0.2f°C'%adt_data
         board.DISPLAY.refresh_soon()
         board.DISPLAY.wait_for_frame()
+
+    def display_clear(self):
+        """Clears textgroups
+        """
+        self.temp_text.text = ""
+        self.datetime_text.text = ""
+        self.io_status_text.text = ""
 
     def set_icon(self, filename):
         """Sets the background image to a bitmap file.
