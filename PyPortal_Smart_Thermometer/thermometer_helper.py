@@ -49,15 +49,15 @@ class Thermometer_GFX(displayio.Group):
         self.temp_text.y = 80
         self._text_group.append(self.temp_text)
 
-        self.date_text = Label(self.info_font, max_glyphs=40)
-        self.date_text.x = 100
-        self.date_text.y = 150
-        self._text_group.append(self.date_text)
-
         self.time_text = Label(self.info_font, max_glyphs=40)
         self.time_text.x = 250
         self.time_text.y = 150
         self._text_group.append(self.time_text)
+
+        self.date_text = Label(self.info_font, max_glyphs=40)
+        self.date_text.x = 10
+        self.date_text.y = 150
+        self._text_group.append(self.date_text)
 
         self.io_status_text = Label(self.info_font, max_glyphs=40)
         self.io_status_text.x = 10
