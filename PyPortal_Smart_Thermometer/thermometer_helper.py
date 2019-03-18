@@ -45,34 +45,34 @@ class Thermometer_GFX(displayio.Group):
 
         print('setting up Labels...')
         self.temp_text = Label(self.c_font, max_glyphs=8)
-        self.temp_text.x = 20
+        self.temp_text.x = 25
         self.temp_text.y = 80
         self._text_group.append(self.temp_text)
 
         self.time_text = Label(self.info_font, max_glyphs=40)
         self.time_text.x = 250
-        self.time_text.y = 150
+        self.time_text.y = 190
         self._text_group.append(self.time_text)
 
         self.date_text = Label(self.info_font, max_glyphs=40)
         self.date_text.x = 10
-        self.date_text.y = 150
+        self.date_text.y = 190
         self._text_group.append(self.date_text)
 
         self.io_status_text = Label(self.info_font, max_glyphs=40)
-        self.io_status_text.x = 10
-        self.io_status_text.y = 180
+        self.io_status_text.x = 100
+        self.io_status_text.y = 220
         self._text_group.append(self.io_status_text)
         board.DISPLAY.show(self._text_group)
 
-    def display_date_time(self, io_time):
+    def display_date_time(self, io_time, usa_date=True):
         """Parses and displays the time obtained from Adafruit IO, based on IP
         :param struct_time io_time: Structure used for date/time, returned from 
+        :param bool usa: Use mon/day/year or day/mon/year format
         """
-        print('{0}/{1}/{2}, {3}:{4}'.format(io_time[1], io_time[2],
-                                            io_time[0], io_time[3], io_time[4]))
-        
         self.time_text.text = '%02d:%02d'%(io_time[3],io_time[4])
+        if not usa_date:
+            self.date_text.text = '{0}/{1}/{2}'.format(io_time[2], io_time[1], io_time[0])
         self.date_text.text = '{0}/{1}/{2}'.format(io_time[1], io_time[2], io_time[0])
 
     def display_io_status(self, status_text):
