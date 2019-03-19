@@ -56,7 +56,7 @@ io = RESTClient(ADAFRUIT_IO_USER, ADAFRUIT_IO_KEY, wifi)
 temperature_feed = io.get_feed('temperature')
 
 # init. graphics helper
-gfx = thermometer_helper.Thermometer_GFX()
+gfx = thermometer_helper.Thermometer_GFX(celsius=False)
 
 # init. adt7410
 i2c_bus = busio.I2C(board.SCL, board.SDA)
@@ -81,7 +81,6 @@ while True:
     print('Light Value: ', light_value)
     # read the temperature sensor
     temperature = adt.temperature
-    print('Temp: %0.2f°C'%temperature)
     try: # WiFi Connection
         if light_value < 1000: # turn on the backlight
             set_backlight(1)

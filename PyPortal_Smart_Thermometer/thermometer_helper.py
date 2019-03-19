@@ -10,8 +10,7 @@ from adafruit_bitmap_font import bitmap_font
 cwd = ("/"+__file__).rsplit('/', 1)[0] # the current working directory (where this file is)
 
 # Fonts within /fonts folder
-small_font = cwd+"/fonts/Arial-12.bdf"
-info_font = cwd+"/fonts/Arial-16.bdf"
+info_font = cwd+"/fonts/Nunito-Black-17.bdf"
 temperature_font = cwd+"/fonts/Nunito-Light-75.bdf"
 glyphs = b'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-,.:'
 
@@ -46,23 +45,15 @@ class Thermometer_GFX(displayio.Group):
         self.info_font = bitmap_font.load_font(info_font)
         self.info_font.load_glyphs(glyphs)
 
-        self.small_font = bitmap_font.load_font(small_font)
-        self.small_font.load_glyphs(glyphs)
-
         self.c_font = bitmap_font.load_font(temperature_font)
         self.c_font.load_glyphs(glyphs)
         self.c_font.load_glyphs(('°',)) # extra glyph for temperature font
 
         print('setting up labels...')
         self.title_text = Label(self.info_font, text="PyPortal Thermometer")
-        self.title_text.x = 50
+        self.title_text.x = 55
         self.title_text.y = 15
         self._text_group.append(self.title_text)
-
-        self.subtitle_text = Label(self.small_font, text="powered by Analog Devices!")
-        self.subtitle_text.x = 80
-        self.subtitle_text.y = 30
-        self._text_group.append(self.subtitle_text)
 
         self.temp_text = Label(self.c_font, max_glyphs=8)
         self.temp_text.x = 25
@@ -70,7 +61,7 @@ class Thermometer_GFX(displayio.Group):
         self._text_group.append(self.temp_text)
 
         self.time_text = Label(self.info_font, max_glyphs=40)
-        self.time_text.x = 250
+        self.time_text.x = 240
         self.time_text.y = 150
         self._text_group.append(self.time_text)
 
@@ -105,24 +96,23 @@ class Thermometer_GFX(displayio.Group):
 
     def display_temp(self, adt_data):
         """Displays the data from the ADT7410 on the.
-
         :param float adt_data: Value from the ADT7410
         """
         if not self._celsius:
             adt_data = (adt_data * 9 / 5) + 32
             print('Temperature: %0.2f°F'%adt_data)
-            # change the font color on freezing/boiling temperatures
-            if adt_data <= 212:
+            if adt_data >= 212:
                 self.temp_text.color = 0xFD2EE
-            elif adt_data >= 32:
+            elif adt_data <= 32:
                 self.temp_text.color = 0xFF0000
+            self.temp_text.text = '%0.2f°F'%adt_data
         else: 
-            # change hte font color for freezing/boiling temperatures
+            print('Temperature: %0.2f°C'%adt_data)
             if adt_data <= 0:
                 self.temp_text.color = 0xFD2EE
             elif adt_data >= 100:
                 self.temp_text.color = 0xFF0000
-        self.temp_text.text = '%0.2f°C'%adt_data
+            self.temp_text.text = '%0.2f°C'%adt_data
 
     def set_icon(self, filename):
         """Sets the background image to a bitmap file.
