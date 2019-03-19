@@ -21,7 +21,7 @@ from adafruit_io.adafruit_io import RESTClient, AdafruitIO_RequestError
 import thermometer_helper
 
 # rate at which to refresh the pyportal screen, in seconds
-PYPORTAL_REFRESH = 1
+PYPORTAL_REFRESH = 2
 
 # Get wifi details and more from a secrets.py file
 try:

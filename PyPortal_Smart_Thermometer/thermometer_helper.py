@@ -17,7 +17,7 @@ glyphs = b'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-,.:'
 class Thermometer_GFX(displayio.Group):
     def __init__(self, celsius=True, usa_date=True):
         """Creates a Thermometer_GFX object.
-        :param bool celsius: Temperature displayed as F or C 
+        :param bool celsius: Temperature displayed as F or C
         :param bool usa_date: Use mon/day/year date-time formatting.
         """
         # root displayio group
@@ -106,7 +106,7 @@ class Thermometer_GFX(displayio.Group):
             elif adt_data <= 32:
                 self.temp_text.color = 0xFF0000
             self.temp_text.text = '%0.2f°F'%adt_data
-        else: 
+        else:
             print('Temperature: %0.2f°C'%adt_data)
             if adt_data <= 0:
                 self.temp_text.color = 0xFD2EE
