@@ -1,6 +1,6 @@
 """
 GFX helper file for
-pyportal_thermometer.py
+thermometer.py
 """
 import board
 import displayio
