@@ -111,10 +111,18 @@ class Thermometer_GFX(displayio.Group):
         if not self._celsius:
             adt_data = (adt_data * 9 / 5) + 32
             print('Temperature: %0.2f°F'%adt_data)
-            self.temp_text.text = '%0.2f°F'%adt_data
-        else:
-            print('Temperature: %0.2f°C'%adt_data)
-            self.temp_text.text = '%0.2f°C'%adt_data
+            # change the font color on freezing/boiling temperatures
+            if adt_data <= 212:
+                self.temp_text.color = 0xFD2EE
+            elif adt_data >= 32:
+                self.temp_text.color = 0xFF0000
+        else: 
+            # change hte font color for freezing/boiling temperatures
+            if adt_data <= 0:
+                self.temp_text.color = 0xFD2EE
+            elif adt_data >= 100:
+                self.temp_text.color = 0xFF0000
+        self.temp_text.text = '%0.2f°C'%adt_data
 
     def set_icon(self, filename):
         """Sets the background image to a bitmap file.

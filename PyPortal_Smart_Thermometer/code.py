@@ -20,8 +20,8 @@ from adafruit_io.adafruit_io import RESTClient, AdafruitIO_RequestError
 # thermometer graphics helper
 import thermometer_helper
 
-# rate at which to refresh the pyportal and sensors, in seconds
-PYPORTAL_REFRESH = 5
+# rate at which to refresh the pyportal screen, in seconds
+PYPORTAL_REFRESH = 1
 
 # Get wifi details and more from a secrets.py file
 try:
@@ -83,7 +83,7 @@ while True:
     temperature = adt.temperature
     print('Temp: %0.2f°C'%temperature)
     try: # WiFi Connection
-        if light_value > 1000: # turn on the backlight
+        if light_value < 1000: # turn on the backlight
             set_backlight(1)
             print('displaying temperature...')
             gfx.display_temp(temperature)
@@ -106,4 +106,4 @@ while True:
         print("Failed to get data, retrying\n", e)
         wifi.reset()
         continue
-    time.sleep(1)
+    time.sleep(PYPORTAL_REFRESH)
