@@ -55,6 +55,11 @@ class Thermometer_GFX(displayio.Group):
         self.title_text.y = 15
         self._text_group.append(self.title_text)
 
+        self.subtitle_text = Label(self.info_font, text="Analog Devices ADT7410")
+        self.subtitle_text.x = 43
+        self.subtitle_text.y = 35
+        self._text_group.append(self.subtitle_text)
+
         self.temp_text = Label(self.c_font, max_glyphs=8)
         self.temp_text.x = 25
         self.temp_text.y = 110
