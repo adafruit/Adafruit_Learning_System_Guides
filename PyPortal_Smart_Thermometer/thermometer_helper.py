@@ -12,7 +12,6 @@ cwd = ("/"+__file__).rsplit('/', 1)[0] # the current working directory (where th
 # Fonts within /fonts folder
 info_font = cwd+"/fonts/Nunito-Black-17.bdf"
 temperature_font = cwd+"/fonts/Nunito-Light-75.bdf"
-glyphs = b'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-,.:'
 
 class Thermometer_GFX(displayio.Group):
     def __init__(self, celsius=True, usa_date=True):
@@ -42,6 +41,7 @@ class Thermometer_GFX(displayio.Group):
         self.set_icon(self._cwd+"/icons/pyportal_splash.bmp")
 
         print('loading fonts...')
+        glyphs = b'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-,.:/ '
         self.info_font = bitmap_font.load_font(info_font)
         self.info_font.load_glyphs(glyphs)
 
