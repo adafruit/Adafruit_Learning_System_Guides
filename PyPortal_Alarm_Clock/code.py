@@ -62,6 +62,9 @@ alarm_minute = 45
 snooze_time = None
 snooze_interval = 600.0
 
+# mugsy support
+mugsy_background = 'mugsy_background.bmp'
+
 # weather support
 
 icon_file = None
@@ -358,6 +361,15 @@ class Mugsy_State(Time_State):
     def tick(self, now):
         # Once the job is done, go back to the main screen
         change_to_state('time')
+
+    def enter(self):
+        global low_light
+        low_light = False
+        pyportal.set_backlight(1.00)
+        pyportal.set_background(mugsy_background)
+        board.DISPLAY.refresh_soon()
+        board.DISPLAY.wait_for_frame()
+
 
 
 class Alarm_State(State):
