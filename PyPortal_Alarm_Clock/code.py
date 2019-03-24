@@ -428,8 +428,8 @@ class Setting_State(State):
         self.buttons = [dict(left=0, top=30, right=80, bottom=93),    # on
                         dict(left=0, top=98, right=80, bottom=152),   # return
                         dict(left=0, top=155, right=80, bottom=220),  # off
-                        dict(left=81, top=0, right=200, bottom = 240), # hours
-                        dict(left=201, top=0, right=320, bottom = 240)]   # minutes
+                        dict(left=100, top=0, right=200, bottom = 240), # hours
+                        dict(left=220, top=0, right=320, bottom = 240)]   # minutes
 
 
     @property
