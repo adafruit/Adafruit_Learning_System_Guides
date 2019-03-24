@@ -10,18 +10,29 @@
 char ssid[] = SECRET_SSID;        // your network SSID (name)
 char pass[] = SECRET_PASS;    // your network password (use for WPA, or use as key for WEP)
 
+//#define DEBUG 
 
-//  http://ice1.somafm.com/u80s-128-mp3
-const char *host = "ice1.somafm.com";
-const char *path = "/u80s-128-mp3";
+// SOMA FM Radio 80's http://ice1.somafm.com/u80s-128-mp3
+//const char *host = "ice1.somafm.com";
+//const char *path = "/u80s-128-mp3";
 //const char *path = "/doomed-128-mp3";
-int httpPort = 80;
+//int httpPort = 80;
+
+// WMBR radio http://wmbr.org:8000/med
+const char *host = "wmbr.org";
+const char *path = "/med";
+int httpPort = 8000;
 
 // These are the pins used
 #define VS1053_RESET   -1     // VS1053 reset pin (not used!)
 #define VS1053_CS       7     // VS1053 chip select pin (output)
 #define VS1053_DCS      6     // VS1053 Data/command select pin (output)
 #define VS1053_DREQ     3     // VS1053 Data request, ideally an Interrupt pin
+#define ESP_CS         10
+#define ESP_READY       9
+#define ESP_RESET       8
+#define ESP_GPIO0      -1
+
 
 Adafruit_VS1053 musicPlayer =  Adafruit_VS1053(VS1053_RESET, VS1053_CS, VS1053_DCS, VS1053_DREQ);
 
@@ -30,7 +41,12 @@ WiFiClient client;
 
 int lastvol = 30;
 
-#define BUFFER_SIZE 1500
+#if defined (__AVR__)
+  #define BUFFER_SIZE 128
+#else
+  #define BUFFER_SIZE 1500
+#endif
+
 CircularBuffer<uint8_t, BUFFER_SIZE> buffer;
   
 void setup() {
@@ -38,12 +54,12 @@ void setup() {
   while (!Serial);
   delay(100);
 
-  Serial.println("\n\nAdafruit VS1053 Feather WiFi Radio");
+  Serial.println(F("\n\nAdafruit VS1053 Feather WiFi Radio"));
 
   /************************* INITIALIZE MP3 Shield */
   if (! musicPlayer.begin()) { // initialise the music player
      Serial.println(F("Couldn't find VS1053, do you have the right pins defined?"));
-     while (1) delay(10);
+     //while (1) delay(10);
   }
 
   Serial.println(F("VS1053 found"));
@@ -55,26 +71,27 @@ void setup() {
   // don't use an IRQ, we'll hand-feed
 
   /************************* INITIALIZE WIFI */
-  Serial.print("Connecting to SSID "); Serial.println(ssid);
+  WiFi.setPins(ESP_CS, ESP_READY, ESP_RESET, ESP_GPIO0);
+  Serial.print(F("Connecting to SSID ")); Serial.println(ssid);
   WiFi.begin(ssid, pass);
   
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
-  Serial.println("WiFi connected");  
-  Serial.println("IP address: ");  Serial.println(WiFi.localIP());
+  Serial.println(F("WiFi connected"));  
+  Serial.println(F("IP address: "));  Serial.println(WiFi.localIP());
 
   /************************* INITIALIZE STREAM */
-  Serial.print("Connecting to ");  Serial.println(host);
+  Serial.print(F("Connecting to "));  Serial.println(host);
   
   if (!client.connect(host, httpPort)) {
-    Serial.println("Connection failed");
+    Serial.println(F("Connection failed"));
     while (1);
   }
   
   // We now create a URI for the request
-  Serial.print("Requesting URL: "); Serial.println(path);
+  Serial.print(F("Requesting URL: ")); Serial.println(path);
   
   // This will send the request to the server
   client.print(String("GET ") + path + " HTTP/1.1\r\n" +
@@ -84,16 +101,19 @@ void setup() {
 
 
 void loop() {
-  Serial.print("Client Avail: "); Serial.print(client.available());
-  Serial.print("\tBuffer Avail: "); Serial.println(buffer.available());
+#if defined(DEBUG)
+  Serial.print(F("Client Avail: ")); Serial.print(client.available());
+  Serial.print(F("\tBuffer Avail: ")); Serial.println(buffer.available());
+#endif
 
   // Prioritize reading data from the ESP32 into the buffer (it sometimes stalls)
   while (client.available() && buffer.available()) {
     uint8_t minibuff[BUFFER_SIZE];
 
     int bytesread = client.read(minibuff, buffer.available());
-    Serial.print("Client read: "); Serial.println(bytesread);
-
+#if defined(DEBUG)
+    Serial.print(F("Client read: ")); Serial.println(bytesread);
+#endif
     for (int i=0; i<bytesread; i++) {
       buffer.push(minibuff[i]);      // push every byte we read
     }
@@ -105,7 +125,9 @@ void loop() {
     uint8_t mp3buff[32];   // vs1053 likes 32 bytes at a time
 
     int byteswrite = min(32, buffer.size());
-    Serial.print("MP3 write: "); Serial.println(byteswrite);
+#if defined(DEBUG)
+    Serial.print(F("MP3 write: ")); Serial.println(byteswrite);
+#endif
 
     // push to mp3
     for (int i=0; i<byteswrite; i++) {
