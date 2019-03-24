@@ -28,7 +28,7 @@ pyportal = PyPortal(url=DATA_SOURCE, json_path=DATA_LOCATION,
                     status_neopixel=board.NEOPIXEL,
                     default_bg=cwd+"/bitcoin_background.bmp",
                     text_font=cwd+"/fonts/Arial-Bold-24-Complete.bdf",
-                    text_position=(195, 95),
+                    text_position=(195, 130),
                     text_color=0x0,
                     text_transform=text_transform)
 pyportal.preload_font(b'$012345789')  # preload numbers
