@@ -12,8 +12,9 @@ Licensed under the MIT license.
 All text above must be included in any redistribution.
 """
 
-#pylint:disable=redefined-outer-name,no-member,global-statement,no-self-use
-#pylint:disable=too-many-branches,too-many-statements,useless-super-delegation
+#pylint:disable=redefined-outer-name,no-member,global-statement
+#pylint:disable=no-self-use,too-many-branches,too-many-statements
+#pylint:disable=useless-super-delegation, too-many-locals
 
 import time
 import json
@@ -21,10 +22,11 @@ from secrets import secrets
 import board
 from adafruit_pyportal import PyPortal
 from adafruit_bitmap_font import bitmap_font
-from adafruit_display_text.text_area import TextArea
+from adafruit_display_text.label import Label
 from digitalio import DigitalInOut, Direction, Pull
 import analogio
 import displayio
+import adafruit_logging as logging
 
 # Set up where we'll be fetching data from
 DATA_SOURCE = 'http://api.openweathermap.org/data/2.5/weather?id='+secrets['city_id']
@@ -37,8 +39,7 @@ DATA_LOCATION = []
 
 pyportal = PyPortal(url=DATA_SOURCE,
                     json_path=DATA_LOCATION,
-                    status_neopixel=board.NEOPIXEL,
-                    splash_max=10)
+                    status_neopixel=board.NEOPIXEL)
 
 light = analogio.AnalogIn(board.LIGHT)
 
@@ -56,10 +57,13 @@ alarm_file = 'computer-alert20.wav'
 alarm_enabled = True
 alarm_armed = True
 alarm_interval = 5.0
-alarm_hour = 23
-alarm_minute = 20
+alarm_hour = 9
+alarm_minute = 45
 snooze_time = None
 snooze_interval = 600.0
+
+# mugsy support
+mugsy_background = 'mugsy_background.bmp'
 
 # weather support
 
@@ -81,15 +85,20 @@ low_light = False
 ####################
 # Load the fonts
 
-large_font = bitmap_font.load_font('/fonts/Anton-Regular-104.bdf')
-large_font.load_glyphs(b'0123456789:') # pre-load glyphs for fast printing
+time_font = bitmap_font.load_font('/fonts/Anton-Regular-104.bdf')
+time_font.load_glyphs(b'0123456789:') # pre-load glyphs for fast printing
 
-medium_font = bitmap_font.load_font('/fonts/Helvetica-Bold-36.bdf')
-medium_font.load_glyphs(b'0123456789:')
+alarm_font = bitmap_font.load_font('/fonts/Helvetica-Bold-36.bdf')
+alarm_font.load_glyphs(b'0123456789:')
 
-small_font = bitmap_font.load_font('/fonts/Arial-16.bdf')
-small_font.load_glyphs(b'0123456789CF')
+temperature_font = bitmap_font.load_font('/fonts/Arial-16.bdf')
+temperature_font.load_glyphs(b'0123456789CF')
 
+####################
+# Set up logging
+
+logger = logging.getLogger('alarm_clock')
+logger.setLevel(logging.ERROR)            # change as desired
 
 ####################
 # Functions
@@ -98,7 +107,7 @@ def create_text_areas(configs):
     """Given a list of area specifications, create and return test areas."""
     text_areas = []
     for cfg in configs:
-        textarea = TextArea(cfg['font'], text=' '*cfg['size'])
+        textarea = Label(cfg['font'], text=' '*cfg['size'])
         textarea.x = cfg['x']
         textarea.y = cfg['y']
         textarea.color = cfg['color']
@@ -112,7 +121,9 @@ def clear_splash():
 
 
 def touch_in_button(t, b):
-    return (b['left'] >= t[0] >= b['right']) and (b['top'] <= t[1] <= b['bottom'])
+    in_horizontal = b['left'] <= t[0] <= b['right']
+    in_vertical = b['top'] <= t[1] <= b['bottom']
+    return in_horizontal and in_vertical
 
 
 touched = False
@@ -165,9 +176,9 @@ class Time_State(State):
         self.refresh_time = None
         self.update_time = None
         self.weather_refresh = None
-        text_area_configs = [dict(x=88, y=30, size=5, color=0xFFFFFF, font=large_font),
-                             dict(x=210, y=10, size=5, color=0xFF0000, font=medium_font),
-                             dict(x=88, y=65, size=6, color=0xFFFFFF, font=small_font)]
+        text_area_configs = [dict(x=88, y=170, size=5, color=0xFFFFFF, font=time_font),
+                             dict(x=210, y=50, size=5, color=0xFF0000, font=alarm_font),
+                             dict(x=88, y=90, size=6, color=0xFFFFFF, font=temperature_font)]
         self.text_areas = create_text_areas(text_area_configs)
         self.weather_icon = displayio.Group(max_size=1)
         self.weather_icon.x = 88
@@ -180,8 +191,8 @@ class Time_State(State):
         self.snooze_file = None
 
         # each button has it's edges as well as the state to transition to when touched
-        self.buttons = [dict(left=320, top=50, right=240, bottom=120, next_state='settings'),
-                        dict(left=320, top=155, right=240, bottom=220, next_state='mugsy')]
+        self.buttons = [dict(left=0, top=50, right=80, bottom=120, next_state='settings'),
+                        dict(left=0, top=155, right=80, bottom=220, next_state='mugsy')]
 
 
     @property
@@ -218,7 +229,7 @@ class Time_State(State):
             return
 
         # check light level and adjust background & backlight
-        self.adjust_backlight_based_on_light()
+        #self.adjust_backlight_based_on_light()
 
         # only query the online time once per hour (and on first run)
         if (not self.refresh_time) or ((now - self.refresh_time) > 3600):
@@ -226,7 +237,8 @@ class Time_State(State):
                 pyportal.get_local_time(location=secrets['timezone'])
                 self.refresh_time = now
             except RuntimeError as e:
-                print('Some error occured, retrying! -', e)
+                self.refresh_time = now - 3000   # delay 10 minutes before retrying
+                logger.error('Some error occured, retrying! - %s', str(e))
 
         # only query the weather every 10 minutes (and on first run)
         if (not self.weather_refresh) or (now - self.weather_refresh) > 600:
@@ -246,9 +258,15 @@ class Time_State(State):
                         self.icon_file.close()
                     self.icon_file = open(filename, "rb")
                     icon = displayio.OnDiskBitmap(self.icon_file)
-                    icon_sprite = displayio.TileGrid(icon,
-                                                     pixel_shader=displayio.ColorConverter(),
-                                                     position=(0, 0))
+                    try:
+                        icon_sprite = displayio.TileGrid(icon,
+                                                         pixel_shader=displayio.ColorConverter(),
+                                                         x=0, y=0)
+                    except TypeError:
+                        icon_sprite = displayio.TileGrid(icon,
+                                                         pixel_shader=displayio.ColorConverter(),
+                                                         position=(0, 0))
+
 
                     self.weather_icon.append(icon_sprite)
 
@@ -263,13 +281,15 @@ class Time_State(State):
                 board.DISPLAY.wait_for_frame()
 
             except RuntimeError as e:
-                print("Some error occured, retrying! -", e)
+                self.weather_refresh = now - 540   # delay a minute before retrying
+                logger.error("Some error occured, retrying! - %s", str(e))
 
         if (not update_time) or ((now - update_time) > 30):
             # Update the time
             update_time = now
             the_time = time.localtime()
-            self.text_areas[0].text = '%02d:%02d' % (the_time.tm_hour,the_time.tm_min)
+            time_string = '%02d:%02d' % (the_time.tm_hour,the_time.tm_min)
+            self.text_areas[0].text = time_string
             board.DISPLAY.refresh_soon()
             board.DISPLAY.wait_for_frame()
 
@@ -285,6 +305,8 @@ class Time_State(State):
 
 
     def touch(self, t, touched):
+        if t:
+            logger.debug('touched: %d, %d', t[0], t[1])
         if t and not touched:             # only process the initial touch
             for button_index in range(len(self.buttons)):
                 b = self.buttons[button_index]
@@ -304,9 +326,14 @@ class Time_State(State):
                 self.snooze_file.close()
             self.snooze_file = open('/icons/zzz.bmp', "rb")
             icon = displayio.OnDiskBitmap(self.snooze_file)
-            icon_sprite = displayio.TileGrid(icon,
-                                             pixel_shader=displayio.ColorConverter(),
-                                             position=(0, 0))
+            try:
+                icon_sprite = displayio.TileGrid(icon,
+                                                 pixel_shader=displayio.ColorConverter(),
+                                                 x=0, y=0)
+            except TypeError:
+                icon_sprite = displayio.TileGrid(icon,
+                                                 pixel_shader=displayio.ColorConverter(),
+                                                 position=(0, 0))
             self.snooze_icon.append(icon_sprite)
 
         pyportal.splash.append(self.snooze_icon)
@@ -317,11 +344,6 @@ class Time_State(State):
         board.DISPLAY.refresh_soon()
         board.DISPLAY.wait_for_frame()
 
-
-    def exit(self):
-        super().exit()
-        for _ in range(len(self.snooze_icon)):
-            self.snooze_icon.pop()
 
 
 class Mugsy_State(Time_State):
@@ -339,6 +361,15 @@ class Mugsy_State(Time_State):
     def tick(self, now):
         # Once the job is done, go back to the main screen
         change_to_state('time')
+
+    def enter(self):
+        global low_light
+        low_light = False
+        pyportal.set_backlight(1.00)
+        pyportal.set_background(mugsy_background)
+        board.DISPLAY.refresh_soon()
+        board.DISPLAY.wait_for_frame()
+
 
 
 class Alarm_State(State):
@@ -403,14 +434,14 @@ class Setting_State(State):
         super().__init__()
         self.previous_touch = None
         self.background = 'settings_background.bmp'
-        text_area_configs = [dict(x=88, y=-10, size=5, color=0xFFFFFF, font=large_font)]
+        text_area_configs = [dict(x=88, y=120, size=5, color=0xFFFFFF, font=time_font)]
 
         self.text_areas = create_text_areas(text_area_configs)
-        self.buttons = [dict(left=320, top=30, right=240, bottom=93),    # on
-                        dict(left=320, top=98, right=240, bottom=152),   # return
-                        dict(left=320, top=155, right=240, bottom=220),  # off
-                        dict(left=240, top=0, right=120, bottom = 240), # hours
-                        dict(left=120, top=0, right=0, bottom = 240)]   # minutes
+        self.buttons = [dict(left=0, top=30, right=80, bottom=93),    # on
+                        dict(left=0, top=98, right=80, bottom=152),   # return
+                        dict(left=0, top=155, right=80, bottom=220),  # off
+                        dict(left=100, top=0, right=200, bottom = 240), # hours
+                        dict(left=220, top=0, right=320, bottom = 240)]   # minutes
 
 
     @property
@@ -421,12 +452,16 @@ class Setting_State(State):
     def touch(self, t, touched):
         global alarm_hour, alarm_minute, alarm_enabled
         if t:
+            logger.debug('touched: %d, %d', t[0], t[1])
             if touch_in_button(t, self.buttons[0]):   # on
+                logger.debug('ON touched')
                 alarm_enabled = True
                 self.text_areas[0].text = '%02d:%02d' % (alarm_hour, alarm_minute)
             elif touch_in_button(t, self.buttons[1]):   # return
+                logger.debug('RETURN touched')
                 change_to_state('time')
             elif touch_in_button(t, self.buttons[2]): # off
+                logger.debug('OFF touched')
                 alarm_enabled = False
                 self.text_areas[0].text = '     '
             elif alarm_enabled:
@@ -434,15 +469,17 @@ class Setting_State(State):
                     self.previous_touch = t
                 else:
                     if touch_in_button(t, self.buttons[3]):   # HOURS
-                        if t[1] < (self.previous_touch[1]):   # moving up
+                        logger.debug('HOURS touched')
+                        if t[1] < (self.previous_touch[1] - 5):   # moving up
                             alarm_hour = (alarm_hour + 1) % 24
-                        elif t[1] > (self.previous_touch[1]): # moving down
+                        elif t[1] > (self.previous_touch[1] + 5): # moving down
                             alarm_hour = (alarm_hour - 1) % 24
                         self.text_areas[0].text = '%02d:%02d' % (alarm_hour, alarm_minute)
                     elif touch_in_button(t, self.buttons[4]): # MINUTES
-                        if t[1] < (self.previous_touch[1]):   # moving up
+                        logger.debug('MINUTES touched')
+                        if t[1] < (self.previous_touch[1] - 5):   # moving up
                             alarm_minute = (alarm_minute + 1) % 60
-                        elif t[1] > (self.previous_touch[1]): # moving down
+                        elif t[1] > (self.previous_touch[1] + 5): # moving down
                             alarm_minute = (alarm_minute - 1) % 60
                         self.text_areas[0].text = '%02d:%02d' % (alarm_hour, alarm_minute)
                     self.previous_touch = t
@@ -477,8 +514,10 @@ current_state = None
 def change_to_state(state_name):
     global current_state
     if current_state:
+        logger.debug('Exiting %s', current_state.name)
         current_state.exit()
     current_state = states[state_name]
+    logger.debug('Entering %s', current_state.name)
     current_state.enter()
 
 ####################
