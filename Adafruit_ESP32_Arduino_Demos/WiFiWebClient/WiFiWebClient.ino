@@ -24,6 +24,17 @@
 #include <SPI.h>
 #include <WiFiNINA.h>
 
+// if the wifi definition isnt in the board variant
+#if !defined(SPIWIFI_SS)
+  // Don't change the names of these #define's! they match the variant ones
+  #define SPIWIFI_SS       10
+  #define SPIWIFI_ACK       7
+  #define ESP32_RESETN      5
+  #define ESP32_GPIO0      -1
+  #define SPIWIFI          SPI
+#endif
+
+
 #include "arduino_secrets.h" 
 ///////please enter your sensitive data in the Secret tab/arduino_secrets.h
 char ssid[] = SECRET_SSID;        // your network SSID (name)
@@ -51,17 +62,18 @@ void setup() {
   }
 
   // check for the WiFi module:
+  WiFi.setPins(SPIWIFI_SS, SPIWIFI_ACK, ESP32_RESETN, ESP32_GPIO0, &SPIWIFI);
   while (WiFi.status() == WL_NO_MODULE) {
     Serial.println("Communication with WiFi module failed!");
     // don't continue
     delay(1000);
-    
   }
 
   String fv = WiFi.firmwareVersion();
   if (fv < "1.0.0") {
     Serial.println("Please upgrade the firmware");
   }
+  Serial.print("Found firmware "); Serial.println(fv);
 
   // attempt to connect to Wifi network:
   Serial.print("Attempting to connect to SSID: ");
