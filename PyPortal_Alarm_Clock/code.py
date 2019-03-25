@@ -180,14 +180,14 @@ class Time_State(State):
                              dict(x=210, y=50, size=5, color=0xFF0000, font=alarm_font),
                              dict(x=88, y=90, size=6, color=0xFFFFFF, font=temperature_font)]
         self.text_areas = create_text_areas(text_area_configs)
-        self.weather_icon = displayio.Group(max_size=1)
+        self.weather_icon = displayio.Group()
         self.weather_icon.x = 88
         self.weather_icon.y = 20
         self.icon_file = None
 
-        self.snooze_icon = displayio.Group(max_size=1)
+        self.snooze_icon = displayio.Group()
         self.snooze_icon.x = 270
-        self.snooze_icon.y = 58
+        self.snooze_icon.y = 62
         self.snooze_file = None
 
         # each button has it's edges as well as the state to transition to when touched
@@ -411,7 +411,8 @@ class Alarm_State(State):
 
 
     def enter(self):
-        global low_light
+        global low_light, snooze_time
+        snooze_time = None
         self.sound_alarm_time = time.monotonic()
         pyportal.set_backlight(1.00)
         pyportal.set_background(alarm_background)
