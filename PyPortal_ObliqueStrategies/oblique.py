@@ -12,7 +12,6 @@ from adafruit_pyportal import PyPortal
 
 cwd = os.getcwd() # the current working directory (where this file is)
 wrap = 35 # text wrap value
-firstload = True
 
 # create pyportal object w no data source (we'll feed it text later)
 pyportal = PyPortal(url = None,
@@ -27,17 +26,11 @@ pyportal = PyPortal(url = None,
                    )
                    
 pyportal.set_text("loading ...") # display while user waits
-
 pyportal.preload_font() # speed things up by preloading font
+pyportal.set_text("OBLIQUE STRATEGIES\nBrian Eno / Peter Schmidt") # show title
 
 while True:
-    # show title on first load
-    if firstload:
-        pyportal.set_text("OBLIQUE STRATEGIES\nBrian Eno / Peter Schmidt")
-        firstload = False
-    touch = pyportal.touchscreen.touch_point
-    if touch:
-        print(touch)
+    if pyportal.touchscreen.touch_point:
         # get random string from array and wrap
         index = random.randint(0, len(strategies)-1)
         strat = pyportal.wrap_nicely(strategies[index], wrap)
@@ -47,4 +40,6 @@ while True:
             outstring += s + "\n"
         # load new text
         pyportal.set_text(outstring, 0)
-        time.sleep(0.5)
+        # don't repeat until a new touch is detected
+        while pyportal.touchscreen.touch_point:
+            continue
