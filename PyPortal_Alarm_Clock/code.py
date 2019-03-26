@@ -53,7 +53,7 @@ snooze_button.pull = Pull.UP
 # alarm support
 
 alarm_background = 'red_alert.bmp'
-alarm_file = 'computer-alert20.wav'
+alarm_file = 'alarm.wav'
 alarm_enabled = True
 alarm_armed = True
 alarm_interval = 5.0
