@@ -233,6 +233,7 @@ class Time_State(State):
 
         # only query the online time once per hour (and on first run)
         if (not self.refresh_time) or ((now - self.refresh_time) > 3600):
+            logger.debug('Fetching time')
             try:
                 pyportal.get_local_time(location=secrets['timezone'])
                 self.refresh_time = now
@@ -242,6 +243,7 @@ class Time_State(State):
 
         # only query the weather every 10 minutes (and on first run)
         if (not self.weather_refresh) or (now - self.weather_refresh) > 600:
+            logger.debug('Fetching weather')
             try:
                 value = pyportal.fetch()
                 weather = json.loads(value)
