@@ -83,7 +83,8 @@ strategies = [
     "Remove specifics and convert to ambiguities",
     "Repetition is a form of change",
     "Reverse",
-    "Short circuit (example: a man eating peas with the idea that they will improve his virility shovels them straight into his lap)",
+    ("Short circuit (example: a man eating peas with the idea that they will improve his virility "
+     "shovels them straight into his lap)"),
     "Shut the door and listen from outside",
     "Simple subtraction",
     "Spectrum analysis",
