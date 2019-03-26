@@ -8,10 +8,13 @@ import analogio
 # Set the background color
 BACKGROUND_COLOR = 0x443355
 
+# Set the NeoPixel brightness
+BRIGHTNESS = 0.3
+
 light_sensor = analogio.AnalogIn(board.LIGHT)
 
-strip_1 = neopixel.NeoPixel(board.D4, 30, brightness=0.3)
-strip_2 = neopixel.NeoPixel(board.D3, 30, brightness=0.3)
+strip_1 = neopixel.NeoPixel(board.D4, 30, brightness=BRIGHTNESS)
+strip_2 = neopixel.NeoPixel(board.D3, 30, brightness=BRIGHTNESS)
 
 # Turn off NeoPixels to start
 strip_1.fill(0)
