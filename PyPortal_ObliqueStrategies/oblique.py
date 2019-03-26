@@ -23,7 +23,7 @@ pyportal = PyPortal(url = None,
                     text_wrap = wrap,
                     text_maxlen = 180, # max text size for quote & author
                    )
-  
+
 pyportal.set_text("loading ...") # display while user waits
 pyportal.preload_font() # speed things up by preloading font
 pyportal.set_text("OBLIQUE STRATEGIES\nBrian Eno / Peter Schmidt") # show title
