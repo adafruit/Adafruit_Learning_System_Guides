@@ -418,7 +418,7 @@ class Alarm_State(State):
 
     def enter(self):
         global low_light
-        self.sound_alarm_time = time.monotonic()
+        self.sound_alarm_time = time.monotonic() - alarm_interval
         pyportal.set_backlight(1.00)
         pyportal.set_background(alarm_background)
         low_light = False
