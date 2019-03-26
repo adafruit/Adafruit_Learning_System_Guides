@@ -1,12 +1,11 @@
 """
 This code will display a random strategy from strategies.py when the
-PyPortal screen is pressed. See the original Oblique Strategies 
+PyPortal screen is pressed. See the original Oblique Strategies
 by Brian Eno & Peter Schmidt here: https://www.enoshop.co.uk/product/oblique-strategies
 """
-import time
-import board
 import os
 import random
+import board
 from strategies import strategies
 from adafruit_pyportal import PyPortal
 
@@ -24,7 +23,7 @@ pyportal = PyPortal(url = None,
                     text_wrap = wrap,
                     text_maxlen = 180, # max text size for quote & author
                    )
-                   
+  
 pyportal.set_text("loading ...") # display while user waits
 pyportal.preload_font() # speed things up by preloading font
 pyportal.set_text("OBLIQUE STRATEGIES\nBrian Eno / Peter Schmidt") # show title
