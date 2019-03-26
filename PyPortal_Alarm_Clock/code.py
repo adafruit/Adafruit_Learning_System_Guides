@@ -346,6 +346,11 @@ class Time_State(State):
         board.DISPLAY.wait_for_frame()
 
 
+    def exit(self):
+        super().exit()
+        for _ in range(len(self.snooze_icon)):
+            self.snooze_icon.pop()
+
 
 class Mugsy_State(Time_State):
     """This state tells Mugsey 'Make me a coffee' """
