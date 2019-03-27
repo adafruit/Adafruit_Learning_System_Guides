@@ -459,7 +459,6 @@ class Setting_State(State):
     def touch(self, t, touched):
         global alarm_hour, alarm_minute, alarm_enabled
         if t:
-            logger.debug('touched: %d, %d', t[0], t[1])
             if touch_in_button(t, self.buttons[0]):   # on
                 logger.debug('ON touched')
                 alarm_enabled = True
@@ -479,15 +478,19 @@ class Setting_State(State):
                         logger.debug('HOURS touched')
                         if t[1] < (self.previous_touch[1] - 5):   # moving up
                             alarm_hour = (alarm_hour + 1) % 24
+                            logger.debug('Alarm hour now: %d', alarm_hour)
                         elif t[1] > (self.previous_touch[1] + 5): # moving down
                             alarm_hour = (alarm_hour - 1) % 24
+                            logger.debug('Alarm hour now: %d', alarm_hour)
                         self.text_areas[0].text = '%02d:%02d' % (alarm_hour, alarm_minute)
                     elif touch_in_button(t, self.buttons[4]): # MINUTES
                         logger.debug('MINUTES touched')
                         if t[1] < (self.previous_touch[1] - 5):   # moving up
                             alarm_minute = (alarm_minute + 1) % 60
+                            logger.debug('Alarm minute now: %d', alarm_minute)
                         elif t[1] > (self.previous_touch[1] + 5): # moving down
                             alarm_minute = (alarm_minute - 1) % 60
+                            logger.debug('Alarm minute now: %d', alarm_minute)
                         self.text_areas[0].text = '%02d:%02d' % (alarm_hour, alarm_minute)
                     self.previous_touch = t
             board.DISPLAY.refresh_soon()
