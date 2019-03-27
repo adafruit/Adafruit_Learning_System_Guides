@@ -77,6 +77,9 @@ refresh_time = None
 update_time = None
 weather_refresh = None
 
+# The most recently fetched time
+current_time = None
+
 # track whether we're in low light mode
 
 low_light = False
@@ -214,7 +217,7 @@ class Time_State(State):
 
 
     def tick(self, now):
-        global alarm_armed, snooze_time, update_time
+        global alarm_armed, snooze_time, update_time, current_time
 
         # is the snooze button pushed? Cancel the snooze if so.
         if not snooze_button.value:
@@ -289,26 +292,24 @@ class Time_State(State):
         if (not update_time) or ((now - update_time) > 30):
             # Update the time
             update_time = now
-            the_time = time.localtime()
-            time_string = '%02d:%02d' % (the_time.tm_hour,the_time.tm_min)
+            current_time = time.localtime()
+            time_string = '%02d:%02d' % (current_time.tm_hour,current_time.tm_min)
             self.text_areas[0].text = time_string
             board.DISPLAY.refresh_soon()
             board.DISPLAY.wait_for_frame()
 
             # Check if alarm should sound
-            if not snooze_time:
-                minutes_now = the_time.tm_hour * 60 + the_time.tm_min
-                minutes_alarm = alarm_hour * 60 + alarm_minute
-                if minutes_now == minutes_alarm:
-                    if alarm_armed:
-                        change_to_state('alarm')
-                else:
-                    alarm_armed = alarm_enabled
+        if current_time is not None and not snooze_time:
+            minutes_now = current_time.tm_hour * 60 + current_time.tm_min
+            minutes_alarm = alarm_hour * 60 + alarm_minute
+            if minutes_now == minutes_alarm:
+                if alarm_armed:
+                    change_to_state('alarm')
+            else:
+                alarm_armed = alarm_enabled
 
 
     def touch(self, t, touched):
-        if t:
-            logger.debug('touched: %d, %d', t[0], t[1])
         if t and not touched:             # only process the initial touch
             for button_index in range(len(self.buttons)):
                 b = self.buttons[button_index]
