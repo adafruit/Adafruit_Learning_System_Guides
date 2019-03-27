@@ -53,10 +53,10 @@ snooze_button.pull = Pull.UP
 # alarm support
 
 alarm_background = 'red_alert.bmp'
-alarm_file = 'computer-alert20.wav'
+alarm_file = 'alarm.wav'
 alarm_enabled = True
 alarm_armed = True
-alarm_interval = 5.0
+alarm_interval = 10.0
 alarm_hour = 9
 alarm_minute = 45
 snooze_time = None
@@ -76,6 +76,9 @@ celcius = secrets['celcius']
 refresh_time = None
 update_time = None
 weather_refresh = None
+
+# The most recently fetched time
+current_time = None
 
 # track whether we're in low light mode
 
@@ -180,14 +183,14 @@ class Time_State(State):
                              dict(x=210, y=50, size=5, color=0xFF0000, font=alarm_font),
                              dict(x=88, y=90, size=6, color=0xFFFFFF, font=temperature_font)]
         self.text_areas = create_text_areas(text_area_configs)
-        self.weather_icon = displayio.Group(max_size=1)
+        self.weather_icon = displayio.Group()
         self.weather_icon.x = 88
         self.weather_icon.y = 20
         self.icon_file = None
 
-        self.snooze_icon = displayio.Group(max_size=1)
-        self.snooze_icon.x = 270
-        self.snooze_icon.y = 58
+        self.snooze_icon = displayio.Group()
+        self.snooze_icon.x = 260
+        self.snooze_icon.y = 70
         self.snooze_file = None
 
         # each button has it's edges as well as the state to transition to when touched
@@ -214,7 +217,7 @@ class Time_State(State):
 
 
     def tick(self, now):
-        global alarm_armed, snooze_time, update_time
+        global alarm_armed, snooze_time, update_time, current_time
 
         # is the snooze button pushed? Cancel the snooze if so.
         if not snooze_button.value:
@@ -233,6 +236,7 @@ class Time_State(State):
 
         # only query the online time once per hour (and on first run)
         if (not self.refresh_time) or ((now - self.refresh_time) > 3600):
+            logger.debug('Fetching time')
             try:
                 pyportal.get_local_time(location=secrets['timezone'])
                 self.refresh_time = now
@@ -242,6 +246,7 @@ class Time_State(State):
 
         # only query the weather every 10 minutes (and on first run)
         if (not self.weather_refresh) or (now - self.weather_refresh) > 600:
+            logger.debug('Fetching weather')
             try:
                 value = pyportal.fetch()
                 weather = json.loads(value)
@@ -287,26 +292,24 @@ class Time_State(State):
         if (not update_time) or ((now - update_time) > 30):
             # Update the time
             update_time = now
-            the_time = time.localtime()
-            time_string = '%02d:%02d' % (the_time.tm_hour,the_time.tm_min)
+            current_time = time.localtime()
+            time_string = '%02d:%02d' % (current_time.tm_hour,current_time.tm_min)
             self.text_areas[0].text = time_string
             board.DISPLAY.refresh_soon()
             board.DISPLAY.wait_for_frame()
 
             # Check if alarm should sound
-            if not snooze_time:
-                minutes_now = the_time.tm_hour * 60 + the_time.tm_min
-                minutes_alarm = alarm_hour * 60 + alarm_minute
-                if minutes_now == minutes_alarm:
-                    if alarm_armed:
-                        change_to_state('alarm')
-                else:
-                    alarm_armed = alarm_enabled
+        if current_time is not None and not snooze_time:
+            minutes_now = current_time.tm_hour * 60 + current_time.tm_min
+            minutes_alarm = alarm_hour * 60 + alarm_minute
+            if minutes_now == minutes_alarm:
+                if alarm_armed:
+                    change_to_state('alarm')
+            else:
+                alarm_armed = alarm_enabled
 
 
     def touch(self, t, touched):
-        if t:
-            logger.debug('touched: %d, %d', t[0], t[1])
         if t and not touched:             # only process the initial touch
             for button_index in range(len(self.buttons)):
                 b = self.buttons[button_index]
@@ -335,8 +338,7 @@ class Time_State(State):
                                                  pixel_shader=displayio.ColorConverter(),
                                                  position=(0, 0))
             self.snooze_icon.append(icon_sprite)
-
-        pyportal.splash.append(self.snooze_icon)
+            pyportal.splash.append(self.snooze_icon)
         if alarm_enabled:
             self.text_areas[1].text = '%2d:%02d' % (alarm_hour, alarm_minute)
         else:
@@ -344,6 +346,11 @@ class Time_State(State):
         board.DISPLAY.refresh_soon()
         board.DISPLAY.wait_for_frame()
 
+
+    def exit(self):
+        super().exit()
+        for _ in range(len(self.snooze_icon)):
+            self.snooze_icon.pop()
 
 
 class Mugsy_State(Time_State):
@@ -412,7 +419,7 @@ class Alarm_State(State):
 
     def enter(self):
         global low_light
-        self.sound_alarm_time = time.monotonic()
+        self.sound_alarm_time = time.monotonic() - alarm_interval
         pyportal.set_backlight(1.00)
         pyportal.set_background(alarm_background)
         low_light = False
@@ -452,7 +459,6 @@ class Setting_State(State):
     def touch(self, t, touched):
         global alarm_hour, alarm_minute, alarm_enabled
         if t:
-            logger.debug('touched: %d, %d', t[0], t[1])
             if touch_in_button(t, self.buttons[0]):   # on
                 logger.debug('ON touched')
                 alarm_enabled = True
@@ -472,15 +478,19 @@ class Setting_State(State):
                         logger.debug('HOURS touched')
                         if t[1] < (self.previous_touch[1] - 5):   # moving up
                             alarm_hour = (alarm_hour + 1) % 24
+                            logger.debug('Alarm hour now: %d', alarm_hour)
                         elif t[1] > (self.previous_touch[1] + 5): # moving down
                             alarm_hour = (alarm_hour - 1) % 24
+                            logger.debug('Alarm hour now: %d', alarm_hour)
                         self.text_areas[0].text = '%02d:%02d' % (alarm_hour, alarm_minute)
                     elif touch_in_button(t, self.buttons[4]): # MINUTES
                         logger.debug('MINUTES touched')
                         if t[1] < (self.previous_touch[1] - 5):   # moving up
                             alarm_minute = (alarm_minute + 1) % 60
+                            logger.debug('Alarm minute now: %d', alarm_minute)
                         elif t[1] > (self.previous_touch[1] + 5): # moving down
                             alarm_minute = (alarm_minute - 1) % 60
+                            logger.debug('Alarm minute now: %d', alarm_minute)
                         self.text_areas[0].text = '%02d:%02d' % (alarm_hour, alarm_minute)
                     self.previous_touch = t
             board.DISPLAY.refresh_soon()
@@ -491,6 +501,9 @@ class Setting_State(State):
 
 
     def enter(self):
+        global snooze_time
+        snooze_time = None
+
         pyportal.set_background(self.background)
         for ta in self.text_areas:
             pyportal.splash.append(ta)
