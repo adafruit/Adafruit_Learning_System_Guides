@@ -189,8 +189,8 @@ class Time_State(State):
         self.icon_file = None
 
         self.snooze_icon = displayio.Group()
-        self.snooze_icon.x = 270
-        self.snooze_icon.y = 63
+        self.snooze_icon.x = 260
+        self.snooze_icon.y = 70
         self.snooze_file = None
 
         # each button has it's edges as well as the state to transition to when touched
