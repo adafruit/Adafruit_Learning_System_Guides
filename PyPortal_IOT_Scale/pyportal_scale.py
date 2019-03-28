@@ -23,7 +23,8 @@ except ImportError:
     print("WiFi secrets are kept in secrets.py, please add them there!")
     raise
 
-cwd = ("/"+__file__).rsplit('/', 1)[0] # the current working directory (where this file is)
+# the current working directory (where this file is)
+cwd = ("/"+__file__).rsplit('/', 1)[0]
 large_font = cwd+"/fonts/Helvetica-Bold-36.bdf"
 small_font = cwd+"/fonts/Helvetica-Bold-16.bdf"
 
@@ -110,7 +111,7 @@ while True:
             dymo.toggle_unit_button()
             # reset the time
             time_stamp = time.monotonic()
-    except RuntimeError:
+    except RuntimeError as e:
         weight_label.text = "SCALE\nERROR"
         weight_label.color = 0xFF0000
-        print("Failed to read data, is scale on?")
+        print("Error: ", e)
