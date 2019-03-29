@@ -1,6 +1,8 @@
 """
 PyPortal Smart Scale
-an internet of things smart-scale
+an internet of things smart-scale for Adafruit IO
+
+Brent Rubell for Adafruit Industries, 2019
 """
 import time
 import board
@@ -104,7 +106,6 @@ while True:
             continue
         print('Data sent!')
         text_label.text = 'sent!'
-
         # to avoid sleep mode, toggle the units pin every 2mins.
         if (time.monotonic() - time_stamp) > 120:
             print('toggling units button')
