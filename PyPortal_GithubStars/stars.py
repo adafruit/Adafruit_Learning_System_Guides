@@ -17,7 +17,7 @@ except ImportError:
 # Set up where we'll be fetching data from
 DATA_SOURCE = "https://api.github.com/repos/adafruit/circuitpython"
 CAPTION = "www.github.com/adafruit/circuitpython"
-# If we have an access token, w can query more often
+# If we have an access token, we can query more often
 if 'github_token' in secrets:
     DATA_SOURCE += "?access_token="+secrets['github_token']
 
