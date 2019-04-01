@@ -46,27 +46,20 @@ ts = adafruit_touchscreen.Touchscreen(board.TOUCH_XL, board.TOUCH_XR,
                                       board.TOUCH_YD, board.TOUCH_YU,
                                       calibration=((5200, 59000), (5800, 57000)),
                                       size=(320, 240))
-
 # the current working directory (where this file is)
 cwd = ("/"+__file__).rsplit('/', 1)[0]
-fonts = [file for file in os.listdir(cwd+"/fonts/")
-         if (file.endswith(".bdf") and not file.startswith("._"))]
-for i, filename in enumerate(fonts):
-    fonts[i] = cwd+"/fonts/"+filename
-print(fonts)
-THE_FONT = "/fonts/Arial-12.bdf"
-DISPLAY_STRING = "Button Text"
 
 # Make the display context
 button_group = displayio.Group(max_size=20)
 board.DISPLAY.show(button_group)
-
 # button properties
 BUTTON_WIDTH = 60
 BUTTON_HEIGHT = 60
-
 # Load the font
-font = bitmap_font.load_font(THE_FONT)
+print('loading font...')
+font = bitmap_font.load_font("/fonts/Arial-12.bdf")
+glyphs = b'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-,.: '
+font.load_glyphs(glyphs)
 
 # Button Fill Colors, from https://api.developer.lifx.com/docs/colors
 button_colors = {'red':0xFF0000, 'white':0xFFFFFF,
@@ -76,7 +69,7 @@ button_colors = {'red':0xFF0000, 'white':0xFFFFFF,
                  'pink': 0xFF00FF}
 
 # list of buttons and their properties
-button_list = [
+color_button_list = [
     {'name':'btn_red', 'pos':(15, 80), 'color':button_colors['red']},
     {'name':'btn_white', 'pos':(75, 80), 'color':button_colors['white']},
     {'name':'btn_orange', 'pos':(135, 80), 'color':button_colors['orange']},
@@ -88,35 +81,42 @@ button_list = [
     {'name':'btn_pink', 'pos':(110, 110), 'color':button_colors['pink']}
 ]
 
+print('loading buttons...')
 buttons = []
 
 # color buttons
 # TODO: loop the creation of these
-btn_red = Button(x=button_list[0]['pos'][0], y=button_list[0]['pos'][1],
+btn_red = Button(x=color_button_list[0]['pos'][0], y=color_button_list[0]['pos'][1],
                   width=BUTTON_WIDTH, height=BUTTON_HEIGHT, name="red",
-                  fill_color=button_list[0]['color'], style=Button.ROUNDRECT)
+                  fill_color=color_button_list[0]['color'], style=Button.ROUNDRECT)
 buttons.append(btn_red)
 
-btn_white = Button(x=button_list[1]['pos'][0], y=button_list[1]['pos'][1],
+btn_white = Button(x=color_button_list[1]['pos'][0], y=color_button_list[1]['pos'][1],
                   width=BUTTON_WIDTH, height=BUTTON_HEIGHT, name="white",
-                  fill_color=button_list[1]['color'], style=Button.ROUNDRECT)
+                  fill_color=color_button_list[1]['color'], style=Button.ROUNDRECT)
 buttons.append(btn_white)
 
-btn_orange = Button(x=button_list[2]['pos'][0], y=button_list[2]['pos'][1],
+btn_orange = Button(x=color_button_list[2]['pos'][0], y=color_button_list[2]['pos'][1],
                   width=BUTTON_WIDTH, height=BUTTON_HEIGHT, name="orange",
-                  fill_color=button_list[2]['color'], style=Button.ROUNDRECT)
+                  fill_color=color_button_list[2]['color'], style=Button.ROUNDRECT)
 buttons.append(btn_orange)
 
-# light buttons
-btn_lamp = Button(name="lamp", x=15, y=15,
-                  width=BUTTON_WIDTH, height=BUTTON_HEIGHT,
-                  label="lamp", label_font=font, style=Button.SHADOWROUNDRECT)
-buttons.append(btn_lamp)
 
-btn_room = Button(name="room", x=85, y=15,
-                  width=BUTTON_WIDTH, height=BUTTON_HEIGHT,
-                  label="room", label_font=font, style=Button.SHADOWROUNDRECT)
-buttons.append(btn_room)
+# light property buttons
+prop_btn = [
+    {'name':'onoff', 'pos':(15, 15), 'label':'on/off'},
+    {'name':'up', 'pos':(75, 15), 'label':'+'},
+    {'name':'down', 'pos':(135, 15), 'label':'-'},
+    {'name':'lamp', 'pos':(195, 15), 'label':'lamp'},
+    {'name':'room', 'pos':(225, 15), 'label':'room'}
+]
+
+# generate property buttons from prop_btn list
+for i in prop_btn:
+    button = Button(name=i['name'], x=i['pos'][0], y=i['pos'][1],
+            width=BUTTON_WIDTH, height=BUTTON_HEIGHT, label=i['label'],
+            label_font=font, style=Button.SHADOWROUNDRECT)
+    buttons.append(button)
 
 # add buttons to the group
 for b in buttons:
@@ -139,9 +139,13 @@ while True:
                     print('switching to the room light...')
                     b.selected = True
                     current_light = lifx_lights[1]
+                elif b.name is "onoff":
+                    print('turning the light..')
+                    resp = lifx.toggle_light(current_light)
                 else:
                     print('setting light color to: ', b.name)
-                    lifx.set_light(current_light, 'on', b.name, 1.0)
+                    resp = lifx.set_light(current_light, 'on', b.name, 1.0)
+                    print(resp)
                 b.selected = False
             else:
                 b.selected = False
