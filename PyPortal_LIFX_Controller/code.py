@@ -72,14 +72,14 @@ buttons = []
 
 # list of buttons and their properties
 color_btn = [
-    {'name':'btn_red', 'pos':(15, 80), 'color':button_colors['red']},
-    {'name':'btn_white', 'pos':(75, 80), 'color':button_colors['white']},
-    {'name':'btn_orange', 'pos':(135, 80), 'color':button_colors['orange']},
-    {'name':'btn_yellow', 'pos':(195, 80), 'color':button_colors['yellow']},
-    {'name':'btn_pink', 'pos':(15, 155), 'color':button_colors['pink']},
-    {'name':'btn_green', 'pos':(75, 155), 'color':button_colors['green']},
-    {'name':'btn_blue', 'pos':(135, 155), 'color':button_colors['blue']},
-    {'name':'btn_purple', 'pos':(195, 155), 'color':button_colors['purple']}
+    {'name':'red', 'pos':(15, 80), 'color':button_colors['red']},
+    {'name':'white', 'pos':(75, 80), 'color':button_colors['white']},
+    {'name':'orange', 'pos':(135, 80), 'color':button_colors['orange']},
+    {'name':'yellow', 'pos':(195, 80), 'color':button_colors['yellow']},
+    {'name':'pink', 'pos':(15, 155), 'color':button_colors['pink']},
+    {'name':'green', 'pos':(75, 155), 'color':button_colors['green']},
+    {'name':'blue', 'pos':(135, 155), 'color':button_colors['blue']},
+    {'name':'purple', 'pos':(195, 155), 'color':button_colors['purple']}
 ]
 
 # generate buttons from color_btn list
@@ -88,7 +88,6 @@ for i in color_btn:
                   width=BUTTON_WIDTH, height=BUTTON_HEIGHT, name=i['name'],
                   fill_color=i['color'], style=Button.ROUNDRECT)
     buttons.append(button)
-
 
 # light property buttons
 prop_btn = [
@@ -110,9 +109,9 @@ for i in prop_btn:
 for b in buttons:
     button_group.append(b.group)
 
-# set the current light to a default lightlight
+# set default light properties
 current_light = lifx_lights[0]
-
+light_brightness = 1.0
 while True:
     touch = ts.touch_point
     if touch:
@@ -130,6 +129,16 @@ while True:
                 elif b.name is "onoff":
                     print('turning the light..')
                     resp = lifx.toggle_light(current_light)
+                elif b.name is "up":
+                    light_brightness += 0.25
+                    print('Setting brightness: ', light_brightness)
+                    resp = lifx.set_brightness(current_light, light_brightness)
+                    print(resp)
+                elif b.name is "down":
+                    light_brightness -= 0.25
+                    print('Setting brightness: ', light_brightness)
+                    resp = lifx.set_brightness(current_light, light_brightness)
+                    print(resp)
                 else:
                     print('setting light color to: ', b.name)
                     resp = lifx.set_light(current_light, 'on', b.name, 1.0)

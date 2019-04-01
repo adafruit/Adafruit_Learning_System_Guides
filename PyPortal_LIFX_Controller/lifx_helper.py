@@ -23,7 +23,7 @@ class LIFX_API:
     def list_lights():
         """Enumerates all the lights associated with the LIFX Cloud Account
         """
-        response = wifi.get(
+        response = self._wifi.get(
             url=LIFX_URL+'all',
             headers=self._auth_header
         )
@@ -31,7 +31,7 @@ class LIFX_API:
         return resp
         response.close()
 
-    def toggle_lights(selector, all_lights=False, duration=0):
+    def toggle_light(selector, all_lights=False, duration=0):
         """Toggles current state of LIFX light(s).
         :param dict selector: Selector to control which lights are requested.
         :param bool all: Toggle all lights at once. Defaults to false.
@@ -39,7 +39,7 @@ class LIFX_API:
         """
         if all_lights:
             selector = 'all'
-        response = wifi.post(
+        response = self._wifi.post(
             url=LIFX_URL+selector+'/toggle',
             headers = self._auth_header,
             json = {'duration':duration},
@@ -51,13 +51,29 @@ class LIFX_API:
         return resp
         response.close()
 
+    def set_brightness(self, selector, brightness):
+        """Sets the state of the lights within the selector.
+        :param dict selector: Selector to control which lights are requested.
+        :param double brightness: Brightness level of the light, from 0.0 to 1.0.
+        """
+        response = self._wifi.put(
+            url=LIFX_URL+selector+'/state',
+            headers=self._auth_header,
+            json={'brightness':brightness}
+        )
+        resp = response.json()
+        # check the response
+        if response.status_code == 422:
+            raise Exception('Error, light could not be set: '+ resp['error'])
+        return resp
+        response.close()
+
     def set_light(self, selector, power, color, brightness):
         """Sets the state of the lights within the selector.
         :param dict selector: Selector to control which lights are requested.
         :param str power: Sets the power state of the light (on/off).
         :param str color: Color to set the light to (https://api.developer.lifx.com/v1/docs/colors).
         :param double brightness: Brightness level of the light, from 0.0 to 1.0.
-        :param bool fast: Executes fast mode, no initial state check or waiting for results.
         """
         response = self._wifi.put(
             url=LIFX_URL+selector+'/state',
@@ -71,7 +87,6 @@ class LIFX_API:
         # check the response
         if response.status_code == 422:
             raise Exception('Error, light could not be set: '+ resp['error'])
-        print(resp)
         return resp
         response.close()
 
