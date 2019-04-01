@@ -68,8 +68,6 @@ BUTTON_HEIGHT = 60
 # Load the font
 font = bitmap_font.load_font(THE_FONT)
 
-buttons = []
-
 # Button Fill Colors, from https://api.developer.lifx.com/docs/colors
 button_colors = {'red':0xFF0000, 'white':0xFFFFFF,
                  'orange':0xFF9900, 'yellow':0xFFFF00,
@@ -79,23 +77,35 @@ button_colors = {'red':0xFF0000, 'white':0xFFFFFF,
 
 # list of buttons and their properties
 button_list = [
-    {'name':'btn_red', 'position':(15, 80), 'color':button_colors['red']},
-    {'name':'btn_white', 'position':(50, 50), 'color':button_colors['white']},
-    {'name':'btn_orange', 'position':(110, 50), 'color':button_colors['orange']},
-    {'name':'btn_yellow', 'position':(10, 70), 'color':button_colors['yellow']},
-    {'name':'btn_cyan', 'position':(50, 70), 'color':button_colors['cyan']},
-    {'name':'btn_green', 'position':(110, 70), 'color':button_colors['green']},
-    {'name':'btn_blue', 'position':(10, 110), 'color':button_colors['blue']},
-    {'name':'btn_purple', 'position':(50, 110), 'color':button_colors['purple']},
-    {'name':'btn_pink', 'position':(110, 110), 'color':button_colors['pink']}
+    {'name':'btn_red', 'pos':(15, 80), 'color':button_colors['red']},
+    {'name':'btn_white', 'pos':(75, 80), 'color':button_colors['white']},
+    {'name':'btn_orange', 'pos':(135, 80), 'color':button_colors['orange']},
+    {'name':'btn_yellow', 'pos':(10, 70), 'color':button_colors['yellow']},
+    {'name':'btn_cyan', 'pos':(50, 70), 'color':button_colors['cyan']},
+    {'name':'btn_green', 'pos':(110, 70), 'color':button_colors['green']},
+    {'name':'btn_blue', 'pos':(10, 110), 'color':button_colors['blue']},
+    {'name':'btn_purple', 'pos':(50, 110), 'color':button_colors['purple']},
+    {'name':'btn_pink', 'pos':(110, 110), 'color':button_colors['pink']}
 ]
 
+buttons = []
+
 # color buttons
-# todo: loop the creation of these
-btn_red = Button(x=button_list[0]['position'][0], y=button_list[0]['position'][1],
+# TODO: loop the creation of these
+btn_red = Button(x=button_list[0]['pos'][0], y=button_list[0]['pos'][1],
                   width=BUTTON_WIDTH, height=BUTTON_HEIGHT, name="red",
                   fill_color=button_list[0]['color'], style=Button.ROUNDRECT)
 buttons.append(btn_red)
+
+btn_white = Button(x=button_list[1]['pos'][0], y=button_list[1]['pos'][1],
+                  width=BUTTON_WIDTH, height=BUTTON_HEIGHT, name="white",
+                  fill_color=button_list[1]['color'], style=Button.ROUNDRECT)
+buttons.append(btn_white)
+
+btn_orange = Button(x=button_list[2]['pos'][0], y=button_list[2]['pos'][1],
+                  width=BUTTON_WIDTH, height=BUTTON_HEIGHT, name="orange",
+                  fill_color=button_list[2]['color'], style=Button.ROUNDRECT)
+buttons.append(btn_orange)
 
 # light buttons
 btn_lamp = Button(name="lamp", x=15, y=15,
@@ -112,7 +122,6 @@ buttons.append(btn_room)
 for b in buttons:
     button_group.append(b.group)
 
-
 # set the current light to a default lightlight
 current_light = lifx_lights[0]
 
@@ -121,15 +130,18 @@ while True:
     if touch:
         for i, b in enumerate(buttons):
             if b.contains(touch):
-                # check for bulb selection, first
-                print(b.name)
+                # check for light selection first
                 if b.name is "lamp":
                     print('switching to the lamp light...')
+                    b.selected = True
+                    current_light = lifx_lights[0]
+                elif b.name is "room":
+                    print('switching to the room light...')
+                    b.selected = True
                     current_light = lifx_lights[1]
-                if b.name == "red":
-                  print('setting light to red...')
-                  b.selected = True
-                  lifx.set_light(current_light, 'on', 'red', 1.0)
+                else:
+                    print('setting light color to: ', b.name)
+                    lifx.set_light(current_light, 'on', b.name, 1.0)
                 b.selected = False
             else:
                 b.selected = False
