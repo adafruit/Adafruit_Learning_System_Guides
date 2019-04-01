@@ -50,23 +50,20 @@ class LIFX_API:
         return resp
         response.close()
 
-    def set_light(selector, power, color, brightness, duration, fast_mode=False):
+    def set_light(self, selector, power, color, brightness):
         """Sets the state of the lights within the selector.
         :param dict selector: Selector to control which lights are requested.
         :param str power: Sets the power state of the light (on/off).
         :param str color: Color to set the light to (https://api.developer.lifx.com/v1/docs/colors).
         :param double brightness: Brightness level of the light, from 0.0 to 1.0.
-        :param double duration: How long (in seconds) you want the power action to take.
         :param bool fast: Executes fast mode, no initial state check or waiting for results.
         """
-        response = wifi.put(
+        response = self._wifi.put(
             url=LIFX_URL+selector+'/state',
             headers=self._auth_header,
             json={'power':power,
                 'color':color,
-                'brightness':brightness,
-                'duration':duration,
-                'fast':fast_mode
+                'brightness':brightness
                 }
         )
         resp = response.json()
@@ -76,7 +73,7 @@ class LIFX_API:
         return resp
         response.close()
 
-    def move_effect(selector, move_direction, period, cycles, power_on):
+    def move_effect(self, selector, move_direction, period, cycles, power_on):
         """Performs a linear move effect on a light, or lights.
         :param str move_direction: Move direction, forward or backward.
         :param double period: Time in second per effect cycle.
@@ -98,7 +95,7 @@ class LIFX_API:
         return resp
         response.close()
 
-    def effects_off(selector):
+    def effects_off(self, selector):
         """Turns off any running effects on the selected device.
         :param dict selector: Selector to control which lights are requested.
         """
