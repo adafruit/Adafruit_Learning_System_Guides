@@ -1,9 +1,10 @@
 """
 LIFX Smart Lighting HTTP API Helper
+-------------------------------------------------------------
+https://learn.adafruit.com/pyportal-smart-lighting-controller
 
 Brent Rubell for Adafruit Industries, 2019
 """
-# toss these into the init
 LIFX_URL = 'https://api.lifx.com/v1/lights/'
 
 class LIFX_API:
@@ -70,6 +71,7 @@ class LIFX_API:
         # check the response
         if response.status_code == 422:
             raise Exception('Error, light could not be set: '+ resp['error'])
+        print(resp)
         return resp
         response.close()
 

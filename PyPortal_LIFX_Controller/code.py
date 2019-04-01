@@ -37,9 +37,8 @@ lifx_token = secrets['lifx_token']
 # Initialize the LIFX API Helper
 lifx = lifx_helper.LIFX_API(wifi, lifx_token)
 
-# Set these to your LIFX WiFi bulb identifiers
-lifx_bulbs = { 'bedroom': 'label:Main Room',
-                'lamp': 'label:lamp'}
+# Set these to your LIFX WiFi light identifiers
+lifx_lights = ['label:lamp', 'label:Main Room']
 
 # These pins are used as both analog and digital! XL, XR and YU must be analog
 # and digital capable. YD just need to be digital
@@ -80,9 +79,9 @@ button_colors = {'red':0xFF0000, 'white':0xFFFFFF,
 
 # list of buttons and their properties
 button_list = [
-    {'name':'btn_red', 'position':(10, 30), 'color':button_colors['red']},
-    {'name':'btn_white', 'position':(50, 30), 'color':button_colors['white']},
-    {'name':'btn_orange', 'position':(110, 30), 'color':button_colors['orange']},
+    {'name':'btn_red', 'position':(15, 80), 'color':button_colors['red']},
+    {'name':'btn_white', 'position':(50, 50), 'color':button_colors['white']},
+    {'name':'btn_orange', 'position':(110, 50), 'color':button_colors['orange']},
     {'name':'btn_yellow', 'position':(10, 70), 'color':button_colors['yellow']},
     {'name':'btn_cyan', 'position':(50, 70), 'color':button_colors['cyan']},
     {'name':'btn_green', 'position':(110, 70), 'color':button_colors['green']},
@@ -92,31 +91,45 @@ button_list = [
 ]
 
 # color buttons
+# todo: loop the creation of these
 btn_red = Button(x=button_list[0]['position'][0], y=button_list[0]['position'][1],
-                  width=BUTTON_WIDTH, height=BUTTON_HEIGHT,
+                  width=BUTTON_WIDTH, height=BUTTON_HEIGHT, name="red",
                   fill_color=button_list[0]['color'], style=Button.ROUNDRECT)
 buttons.append(btn_red)
 
+# light buttons
+btn_lamp = Button(name="lamp", x=15, y=15,
+                  width=BUTTON_WIDTH, height=BUTTON_HEIGHT,
+                  label="lamp", label_font=font, style=Button.SHADOWROUNDRECT)
+buttons.append(btn_lamp)
 
-# TODO: add buttons to select a specific light
+btn_room = Button(name="room", x=85, y=15,
+                  width=BUTTON_WIDTH, height=BUTTON_HEIGHT,
+                  label="room", label_font=font, style=Button.SHADOWROUNDRECT)
+buttons.append(btn_room)
 
 # add buttons to the group
 for b in buttons:
     button_group.append(b.group)
 
 
-# set a default bulb
-# TODO: maybe make this a dict list as well...
-current_bulb = lifx_bulbs['bedroom']
+# set the current light to a default lightlight
+current_light = lifx_lights[0]
 
 while True:
     touch = ts.touch_point
     if touch:
         for i, b in enumerate(buttons):
             if b.contains(touch):
-                if i == 0:
-                  print('setting bulb to red...')
-                  lifx.set_light(lifx_bulbs['bedroom'], 'on', 'red', 1.0)
-                b.selected = True
+                # check for bulb selection, first
+                print(b.name)
+                if b.name is "lamp":
+                    print('switching to the lamp light...')
+                    current_light = lifx_lights[1]
+                if b.name == "red":
+                  print('setting light to red...')
+                  b.selected = True
+                  lifx.set_light(current_light, 'on', 'red', 1.0)
+                b.selected = False
             else:
                 b.selected = False
