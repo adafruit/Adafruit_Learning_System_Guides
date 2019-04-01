@@ -64,42 +64,30 @@ font.load_glyphs(glyphs)
 # Button Fill Colors, from https://api.developer.lifx.com/docs/colors
 button_colors = {'red':0xFF0000, 'white':0xFFFFFF,
                  'orange':0xFF9900, 'yellow':0xFFFF00,
-                 'cyan':0x00FFFF, 'green':0x00FF00,
-                 'blue':0x0000FF, 'purple':0x9900FF,
-                 'pink': 0xFF00FF}
-
-# list of buttons and their properties
-color_button_list = [
-    {'name':'btn_red', 'pos':(15, 80), 'color':button_colors['red']},
-    {'name':'btn_white', 'pos':(75, 80), 'color':button_colors['white']},
-    {'name':'btn_orange', 'pos':(135, 80), 'color':button_colors['orange']},
-    {'name':'btn_yellow', 'pos':(10, 70), 'color':button_colors['yellow']},
-    {'name':'btn_cyan', 'pos':(50, 70), 'color':button_colors['cyan']},
-    {'name':'btn_green', 'pos':(110, 70), 'color':button_colors['green']},
-    {'name':'btn_blue', 'pos':(10, 110), 'color':button_colors['blue']},
-    {'name':'btn_purple', 'pos':(50, 110), 'color':button_colors['purple']},
-    {'name':'btn_pink', 'pos':(110, 110), 'color':button_colors['pink']}
-]
+                 'green':0x00FF00, 'blue':0x0000FF,
+                 'purple':0x9900FF, 'pink': 0xFF00FF}
 
 print('loading buttons...')
 buttons = []
 
-# color buttons
-# TODO: loop the creation of these
-btn_red = Button(x=color_button_list[0]['pos'][0], y=color_button_list[0]['pos'][1],
-                  width=BUTTON_WIDTH, height=BUTTON_HEIGHT, name="red",
-                  fill_color=color_button_list[0]['color'], style=Button.ROUNDRECT)
-buttons.append(btn_red)
+# list of buttons and their properties
+color_btn = [
+    {'name':'btn_red', 'pos':(15, 80), 'color':button_colors['red']},
+    {'name':'btn_white', 'pos':(75, 80), 'color':button_colors['white']},
+    {'name':'btn_orange', 'pos':(135, 80), 'color':button_colors['orange']},
+    {'name':'btn_yellow', 'pos':(195, 80), 'color':button_colors['yellow']},
+    {'name':'btn_pink', 'pos':(15, 155), 'color':button_colors['pink']},
+    {'name':'btn_green', 'pos':(75, 155), 'color':button_colors['green']},
+    {'name':'btn_blue', 'pos':(135, 155), 'color':button_colors['blue']},
+    {'name':'btn_purple', 'pos':(195, 155), 'color':button_colors['purple']}
+]
 
-btn_white = Button(x=color_button_list[1]['pos'][0], y=color_button_list[1]['pos'][1],
-                  width=BUTTON_WIDTH, height=BUTTON_HEIGHT, name="white",
-                  fill_color=color_button_list[1]['color'], style=Button.ROUNDRECT)
-buttons.append(btn_white)
-
-btn_orange = Button(x=color_button_list[2]['pos'][0], y=color_button_list[2]['pos'][1],
-                  width=BUTTON_WIDTH, height=BUTTON_HEIGHT, name="orange",
-                  fill_color=color_button_list[2]['color'], style=Button.ROUNDRECT)
-buttons.append(btn_orange)
+# generate buttons from color_btn list
+for i in color_btn:
+    button = Button(x=i['pos'][0], y=i['pos'][1],
+                  width=BUTTON_WIDTH, height=BUTTON_HEIGHT, name=i['name'],
+                  fill_color=i['color'], style=Button.ROUNDRECT)
+    buttons.append(button)
 
 
 # light property buttons
