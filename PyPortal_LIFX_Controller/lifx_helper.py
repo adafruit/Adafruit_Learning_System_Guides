@@ -31,7 +31,7 @@ class LIFX_API:
         return resp
         response.close()
 
-    def toggle_light(selector, all_lights=False, duration=0):
+    def toggle_light(self, selector, all_lights=False, duration=0):
         """Toggles current state of LIFX light(s).
         :param dict selector: Selector to control which lights are requested.
         :param bool all: Toggle all lights at once. Defaults to false.
@@ -126,3 +126,12 @@ class LIFX_API:
             raise Exception('Error: '+ resp['error'])
         return resp
         response.close()
+    
+    def parse_resp(self, response):
+        """Parses a JSON response from the LIFX API
+        """
+        try:
+            for res in response['results']:
+                print(res['status'])
+        except KeyError as e:
+            print(response['error'])

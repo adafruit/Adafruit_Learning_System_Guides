@@ -1,3 +1,11 @@
+"""
+PyPortal Smart Lighting Controller
+-------------------------------------------------------------
+https://learn.adafruit.com/pyportal-smart-lighting-controller
+
+Brent Rubell for Adafruit Industries, 2019
+"""
+
 import os
 import board
 import displayio
@@ -112,6 +120,7 @@ for b in buttons:
 # set default light properties
 current_light = lifx_lights[0]
 light_brightness = 1.0
+
 while True:
     touch = ts.touch_point
     if touch:
@@ -129,24 +138,21 @@ while True:
                 elif b.name is "onoff":
                     print('toggling {0}...'.format(current_light))
                     resp = lifx.toggle_light(current_light)
-                    for res in resp['results']:
-                        print(res['status'])
+                    lifx.parse_resp(resp)
                 elif b.name is "up":
                     light_brightness += 0.25
                     print('Setting {0} brightness to {1}'.format(current_light, light_brightness))
                     resp = lifx.set_brightness(current_light, light_brightness)
-                    for res in resp['results']:
-                        print(res['status'])
+                    lifx.parse_resp(resp)
                 elif b.name is "down":
                     light_brightness -= 0.25
                     print('Setting {0} brightness to {1}'.format(current_light, light_brightness))
                     resp = lifx.set_brightness(current_light, light_brightness)
-                    for res in resp['results']:
-                        print(res['status'])
+                    lifx.parse_resp(resp)
                 else:
                     print('setting {0} color to {1}'.format(current_light, b.name))
                     resp = lifx.set_light(current_light, 'on', b.name, 1.0)
-                    print(resp)
+                    lifx.parse_resp(resp)
                 b.selected = False
             else:
                 b.selected = False
