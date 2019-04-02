@@ -1,4 +1,3 @@
-import os
 import board
 import displayio
 from adafruit_bitmap_font import bitmap_font
@@ -30,7 +29,7 @@ esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset)
 status_light = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.2)
 wifi = adafruit_esp32spi_wifimanager.ESPSPI_WiFiManager(esp, secrets, status_light)
 
-# Set this to your personal access token for private, use of the LIFX HTTP API to remotely control your lighting.
+# Set this to your LIFX personal access token
 # (to obtain a token, visit: https://cloud.lifx.com/settings)
 lifx_token = secrets['lifx_token']
 
@@ -85,8 +84,8 @@ color_btn = [
 # generate buttons from color_btn list
 for i in color_btn:
     button = Button(x=i['pos'][0], y=i['pos'][1],
-                  width=BUTTON_WIDTH, height=BUTTON_HEIGHT, name=i['name'],
-                  fill_color=i['color'], style=Button.ROUNDRECT)
+                    width=BUTTON_WIDTH, height=BUTTON_HEIGHT, name=i['name'],
+                    fill_color=i['color'], style=Button.ROUNDRECT)
     buttons.append(button)
 
 # light property buttons
@@ -101,8 +100,8 @@ prop_btn = [
 # generate property buttons from prop_btn list
 for i in prop_btn:
     button = Button(name=i['name'], x=i['pos'][0], y=i['pos'][1],
-            width=40, height=40, label=i['label'],
-            label_font=font, style=Button.SHADOWROUNDRECT)
+                    width=40, height=40, label=i['label'],
+                    label_font=font, style=Button.SHADOWROUNDRECT)
     buttons.append(button)
 
 # add buttons to the group
@@ -118,31 +117,30 @@ while True:
     if touch:
         for i, b in enumerate(buttons):
             if b.contains(touch):
+                b.selected = True
                 # check for light selection first
-                if b.name is "lamp":
-                    b.selected = True
+                if b.name == 'lamp':
                     current_light = lifx_lights[0]
-                    print('switching to ', current_light)
-                elif b.name is "room":
-                    b.selected = True
+                    print('Switching to ', current_light)
+                elif b.name == 'room':
                     current_light = lifx_lights[1]
-                    print('switching to ', current_light)
-                elif b.name is "onoff":
-                    print('toggling {0}...'.format(current_light))
+                    print('Switching to ', current_light)
+                elif b.name == 'onoff':
+                    print('Toggling {0}...'.format(current_light))
                     resp = lifx.toggle_light(current_light)
                     lifx.parse_resp(resp)
-                elif b.name is "up":
+                elif b.name == 'up':
                     light_brightness += 0.25
                     print('Setting {0} brightness to {1}'.format(current_light, light_brightness))
                     resp = lifx.set_brightness(current_light, light_brightness)
                     lifx.parse_resp(resp)
-                elif b.name is "down":
+                elif b.name == 'down':
                     light_brightness -= 0.25
                     print('Setting {0} brightness to {1}'.format(current_light, light_brightness))
                     resp = lifx.set_brightness(current_light, light_brightness)
                     lifx.parse_resp(resp)
                 else:
-                    print('setting {0} color to {1}'.format(current_light, b.name))
+                    print('Setting {0} color to {1}'.format(current_light, b.name))
                     resp = lifx.set_light(current_light, 'on', b.name, light_brightness)
                     lifx.parse_resp(resp)
                 b.selected = False
