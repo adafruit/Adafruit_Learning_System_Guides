@@ -38,7 +38,7 @@ lifx_token = secrets['lifx_token']
 lifx = lifx_helper.LIFX_API(wifi, lifx_token)
 
 # Set these to your LIFX WiFi light identifiers
-lifx_lights = ['label:lamp', 'label:Main Room']
+lifx_lights = ['label:Lamp', 'label:Bedroom']
 
 # These pins are used as both analog and digital! XL, XR and YU must be analog
 # and digital capable. YD just need to be digital
@@ -119,29 +119,32 @@ while True:
             if b.contains(touch):
                 # check for light selection first
                 if b.name is "lamp":
-                    print('switching to the lamp light...')
                     b.selected = True
                     current_light = lifx_lights[0]
+                    print('switching to ', current_light)
                 elif b.name is "room":
-                    print('switching to the room light...')
                     b.selected = True
                     current_light = lifx_lights[1]
+                    print('switching to ', current_light)
                 elif b.name is "onoff":
-                    print('toggling the light..')
+                    print('toggling {0}...'.format(current_light))
                     resp = lifx.toggle_light(current_light)
-                    print(resp)
+                    for res in resp['results']:
+                        print(res['status'])
                 elif b.name is "up":
                     light_brightness += 0.25
-                    print('Setting brightness to ', light_brightness)
+                    print('Setting {0} brightness to {1}'.format(current_light, light_brightness))
                     resp = lifx.set_brightness(current_light, light_brightness)
-                    print(resp)
+                    for res in resp['results']:
+                        print(res['status'])
                 elif b.name is "down":
                     light_brightness -= 0.25
-                    print('Setting brightness to ', light_brightness)
+                    print('Setting {0} brightness to {1}'.format(current_light, light_brightness))
                     resp = lifx.set_brightness(current_light, light_brightness)
-                    print(resp)
+                    for res in resp['results']:
+                        print(res['status'])
                 else:
-                    print('setting light color to: ', b.name)
+                    print('setting {0} color to {1}'.format(current_light, b.name))
                     resp = lifx.set_light(current_light, 'on', b.name, 1.0)
                     print(resp)
                 b.selected = False
