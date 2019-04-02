@@ -1,11 +1,3 @@
-"""
-PyPortal Smart Lighting Controller
--------------------------------------------------------------
-https://learn.adafruit.com/pyportal-smart-lighting-controller
-
-Brent Rubell for Adafruit Industries, 2019
-"""
-
 import os
 import board
 import displayio
@@ -45,8 +37,8 @@ lifx_token = secrets['lifx_token']
 # Initialize the LIFX API Helper
 lifx = lifx_helper.LIFX_API(wifi, lifx_token)
 
-# Set these to your LIFX WiFi light identifiers
-lifx_lights = ['label:Lamp', 'label:Bedroom']
+# Set these to your LIFX light selector (https://api.developer.lifx.com/docs/selectors)
+lifx_lights = ['label:Lamp','label:Bedroom']
 
 # These pins are used as both analog and digital! XL, XR and YU must be analog
 # and digital capable. YD just need to be digital
@@ -151,7 +143,7 @@ while True:
                     lifx.parse_resp(resp)
                 else:
                     print('setting {0} color to {1}'.format(current_light, b.name))
-                    resp = lifx.set_light(current_light, 'on', b.name, 1.0)
+                    resp = lifx.set_light(current_light, 'on', b.name, light_brightness)
                     lifx.parse_resp(resp)
                 b.selected = False
             else:
