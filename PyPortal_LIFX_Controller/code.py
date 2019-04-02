@@ -1,3 +1,10 @@
+"""
+PyPortal Smart Lighting Controller
+-------------------------------------------------------------
+https://learn.adafruit.com/pyportal-smart-lighting-controller
+
+Brent Rubell for Adafruit Industries, 2019
+"""
 import board
 import displayio
 from adafruit_bitmap_font import bitmap_font
@@ -29,7 +36,7 @@ esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset)
 status_light = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.2)
 wifi = adafruit_esp32spi_wifimanager.ESPSPI_WiFiManager(esp, secrets, status_light)
 
-# Set this to your LIFX personal access token
+# Set this to your LIFX personal access token in secrets.py
 # (to obtain a token, visit: https://cloud.lifx.com/settings)
 lifx_token = secrets['lifx_token']
 
@@ -54,13 +61,13 @@ board.DISPLAY.show(button_group)
 # button properties
 BUTTON_WIDTH = 60
 BUTTON_HEIGHT = 60
-# Load the font
+# preload the font
 print('loading font...')
 font = bitmap_font.load_font("/fonts/Arial-12.bdf")
 glyphs = b'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-,.: '
 font.load_glyphs(glyphs)
 
-# Button Fill Colors, from https://api.developer.lifx.com/docs/colors
+# button Fill Colors, from https://api.developer.lifx.com/docs/colors
 button_colors = {'red':0xFF0000, 'white':0xFFFFFF,
                  'orange':0xFF9900, 'yellow':0xFFFF00,
                  'green':0x00FF00, 'blue':0x0000FF,
@@ -81,7 +88,7 @@ color_btn = [
     {'name':'purple', 'pos':(225, 155), 'color':button_colors['purple']}
 ]
 
-# generate buttons from color_btn list
+# generate color buttons from color_btn list
 for i in color_btn:
     button = Button(x=i['pos'][0], y=i['pos'][1],
                     width=BUTTON_WIDTH, height=BUTTON_HEIGHT, name=i['name'],
@@ -115,34 +122,33 @@ light_brightness = 1.0
 while True:
     touch = ts.touch_point
     if touch:
-        for i, b in enumerate(buttons):
-            if b.contains(touch):
-                b.selected = True
-                # check for light selection first
-                if b.name == 'lamp':
+        for i, button in enumerate(buttons):
+            if button.contains(touch):
+                button.selected = True
+                if button.name == 'lamp':
                     current_light = lifx_lights[0]
                     print('Switching to ', current_light)
-                elif b.name == 'room':
+                elif button.name == 'room':
                     current_light = lifx_lights[1]
                     print('Switching to ', current_light)
-                elif b.name == 'onoff':
+                elif button.name == 'onoff':
                     print('Toggling {0}...'.format(current_light))
                     resp = lifx.toggle_light(current_light)
                     lifx.parse_resp(resp)
-                elif b.name == 'up':
+                elif button.name == 'up':
                     light_brightness += 0.25
                     print('Setting {0} brightness to {1}'.format(current_light, light_brightness))
                     resp = lifx.set_brightness(current_light, light_brightness)
                     lifx.parse_resp(resp)
-                elif b.name == 'down':
+                elif button.name == 'down':
                     light_brightness -= 0.25
                     print('Setting {0} brightness to {1}'.format(current_light, light_brightness))
                     resp = lifx.set_brightness(current_light, light_brightness)
                     lifx.parse_resp(resp)
                 else:
-                    print('Setting {0} color to {1}'.format(current_light, b.name))
-                    resp = lifx.set_light(current_light, 'on', b.name, light_brightness)
+                    print('Setting {0} color to {1}'.format(current_light, button.name))
+                    resp = lifx.set_light(current_light, 'on', button.name, light_brightness)
                     lifx.parse_resp(resp)
-                b.selected = False
+                button.selected = False
             else:
-                b.selected = False
+                button.selected = False

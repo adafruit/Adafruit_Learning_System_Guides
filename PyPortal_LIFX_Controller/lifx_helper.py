@@ -1,6 +1,7 @@
 """
-LIFX Smart Lighting HTTP API Helper
--------------------------------------------------------------
+PyPortal Smart Lighting Controller
+Note: This helper was designed for the LIFX Smart Lighting API
+--------------------------------------------------------------
 https://learn.adafruit.com/pyportal-smart-lighting-controller
 
 Brent Rubell for Adafruit Industries, 2019
@@ -14,13 +15,23 @@ class LIFX_API:
     def __init__(self, wifi, lifx_token):
         """
         :param wifi_manager wifi: WiFiManager object from ESPSPI_WiFiManager or ESPAT_WiFiManager
-        :param str lifx_token: LIFX Cloud API token (https://api.developer.lifx.com/docs/authentication)
+        :param str lifx_token: LIFX API token (https://api.developer.lifx.com/docs/authentication)
         """
         self._wifi = wifi
         self._lifx_token = lifx_token
         self._auth_header = {"Authorization": "Bearer %s" % self._lifx_token,}
 
-    def list_lights():
+    @staticmethod
+    def parse_resp(response):
+        """Parses a JSON response from the LIFX API
+        """
+        try:
+            for res in response['results']:
+                print(res['status'])
+        except KeyError:
+            print(response['error'])
+
+    def list_lights(self):
         """Enumerates all the lights associated with the LIFX Cloud Account
         """
         response = self._wifi.get(
@@ -28,8 +39,8 @@ class LIFX_API:
             headers=self._auth_header
         )
         resp = response.json()
-        return resp
         response.close()
+        return resp
 
     def toggle_light(self, selector, all_lights=False, duration=0):
         """Toggles current state of LIFX light(s).
@@ -48,8 +59,8 @@ class LIFX_API:
         # check the response
         if response.status_code == 422:
             raise Exception('Error, light(s) could not be toggled: '+ resp['error'])
-        return resp
         response.close()
+        return resp
 
     def set_brightness(self, selector, brightness):
         """Sets the state of the lights within the selector.
@@ -65,8 +76,8 @@ class LIFX_API:
         # check the response
         if response.status_code == 422:
             raise Exception('Error, light could not be set: '+ resp['error'])
-        return resp
         response.close()
+        return resp
 
     def set_light(self, selector, power, color, brightness):
         """Sets the state of the lights within the selector.
@@ -79,16 +90,16 @@ class LIFX_API:
             url=LIFX_URL+selector+'/state',
             headers=self._auth_header,
             json={'power':power,
-                'color':color,
-                'brightness':brightness
-                }
+                  'color':color,
+                  'brightness':brightness
+                  }
         )
         resp = response.json()
         # check the response
         if response.status_code == 422:
             raise Exception('Error, light could not be set: '+ resp['error'])
-        return resp
         response.close()
+        return resp
 
     def move_effect(self, selector, move_direction, period, cycles, power_on):
         """Performs a linear move effect on a light, or lights.
@@ -97,7 +108,7 @@ class LIFX_API:
         :param float cycles: Number of times to move the pattern.
         :param bool power_on: Turn on a light before performing the move.
         """
-        response = wifi.post(
+        response = self._wifi.post(
             url=LIFX_URL+selector+'/effects/move',
             headers = self._auth_header,
             json = {'direction':move_direction,
@@ -109,14 +120,14 @@ class LIFX_API:
         # check the response
         if response.status_code == 422:
             raise Exception('Error: '+ resp['error'])
-        return resp
         response.close()
+        return resp
 
     def effects_off(self, selector):
         """Turns off any running effects on the selected device.
         :param dict selector: Selector to control which lights are requested.
         """
-        response = wifi.post(
+        response = self._wifi.post(
             url=LIFX_URL+selector+'/effects/off',
             headers=self._auth_header
         )
@@ -124,14 +135,5 @@ class LIFX_API:
         # check the response
         if response.status_code == 422:
             raise Exception('Error: '+ resp['error'])
-        return resp
         response.close()
-    
-    def parse_resp(self, response):
-        """Parses a JSON response from the LIFX API
-        """
-        try:
-            for res in response['results']:
-                print(res['status'])
-        except KeyError as e:
-            print(response['error'])
+        return resp
