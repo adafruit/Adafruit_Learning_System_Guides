@@ -92,7 +92,7 @@ class LIFX_API:
             json={'power':power,
                   'color':color,
                   'brightness':brightness
-                  }
+                 }
         )
         resp = response.json()
         # check the response
