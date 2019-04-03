@@ -34,7 +34,8 @@ def read_le(s):
 class BMPError(Exception):
     pass
 
-def display_bitmap(epd, filename): # pylint: disable=too-many-locals, too-many-branches
+def display_bitmap(epd, filename):
+    # pylint: disable=too-many-locals, too-many-branches
     try:
         f = open("/" + filename, "rb")
     except OSError:
@@ -86,7 +87,7 @@ def display_bitmap(epd, filename): # pylint: disable=too-many-locals, too-many-b
                 if r < 0x80 and g < 0x80 and b < 0x80:
                     epd.pixel(col, row, Adafruit_EPD.BLACK)
                 elif r >= 0x80 and g >= 0x80 and b >= 0x80:
-                    pass #epd.pixel(row, col, Adafruit_EPD.WHITE)
+                    pass  # epd.pixel(row, col, Adafruit_EPD.WHITE)
                 elif r >= 0x80:
                     epd.pixel(col, row, Adafruit_EPD.RED)
     except OSError:
