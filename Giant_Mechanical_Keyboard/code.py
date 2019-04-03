@@ -45,7 +45,7 @@ for pin in buttonpins:
     button.pull = Pull.UP
     buttons.append(button)
 
-# make all LED objects, make them inputs w/pullups
+# make all LED objects, make them outputs
 for pin in ledpins:
     led = DigitalInOut(pin)
     led.direction = Direction.OUTPUT
