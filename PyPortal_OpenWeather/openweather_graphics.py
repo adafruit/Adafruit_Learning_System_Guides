@@ -10,6 +10,7 @@ cwd = ("/"+__file__).rsplit('/', 1)[0] # the current working directory (where th
 small_font = cwd+"/fonts/Arial-12.bdf"
 medium_font = cwd+"/fonts/Arial-16.bdf"
 large_font = cwd+"/fonts/Arial-Bold-24.bdf"
+date_font = bitmap_font.load_font(medium_font)
 
 class OpenWeather_Graphics(displayio.Group):
     def __init__(self, root_group, *, am_pm=True, celsius=True):
@@ -20,7 +21,7 @@ class OpenWeather_Graphics(displayio.Group):
         root_group.append(self)
         self._icon_group = displayio.Group(max_size=1)
         self.append(self._icon_group)
-        self._text_group = displayio.Group(max_size=5)
+        self._text_group = displayio.Group(max_size=6)
         self.append(self._text_group)
 
         self._icon_sprite = None
@@ -38,13 +39,18 @@ class OpenWeather_Graphics(displayio.Group):
         self.city_text = None
 
         self.time_text = Label(self.medium_font, max_glyphs=8)
-        self.time_text.x = 200
-        self.time_text.y = 12
+        self.time_text.x = 220
+        self.time_text.y = 15
         self.time_text.color = 0xFFFFFF
         self._text_group.append(self.time_text)
 
+        self.date_text = Label(self.medium_font, max_glyphs=20)
+        self.date_text.y = 40
+        self.date_text.color = 0xFFFFFF
+        self._text_group.append(self.date_text)
+
         self.temp_text = Label(self.large_font, max_glyphs=6)
-        self.temp_text.x = 200
+        self.temp_text.x = 220
         self.temp_text.y = 195
         self.temp_text.color = 0xFFFFFF
         self._text_group.append(self.temp_text)
@@ -68,12 +74,12 @@ class OpenWeather_Graphics(displayio.Group):
         weather_icon = weather['weather'][0]['icon']
         self.set_icon(cwd+"/icons/"+weather_icon+".bmp")
 
-        city_name =  weather['name'] + ", " + weather['sys']['country']
+        city_name = weather['name'] + ", " + weather['sys']['country']
         print(city_name)
         if not self.city_text:
             self.city_text = Label(self.medium_font, text=city_name)
             self.city_text.x = 10
-            self.city_text.y = 12
+            self.city_text.y = 15
             self.city_text.color = 0xFFFFFF
             self._text_group.append(self.city_text)
 
@@ -101,7 +107,22 @@ class OpenWeather_Graphics(displayio.Group):
         now = time.localtime()
         hour = now[3]
         minute = now[4]
+        month = now[1]
+        day = now[2]
+        year = now[0]
+        week_day = now[6]
+        date_str = self.get_weekday(week_day)
         format_str = "%d:%02d"
+        format_date_str = "%d-%02d-%d"
+        date_str += " "
+        date_str += format_date_str % (month, day, year)
+        date_font.load_glyphs(date_str.encode('utf-8'))
+        print(date_str)
+        self.date_text.text = date_str
+        text_size = self.date_text.bounding_box
+        print(text_size[2])
+        self.date_text.x = int((320 - text_size[2])/2)
+        print(self.date_text.x)
         if self.am_pm:
             if hour >= 12:
                 hour -= 12
@@ -113,6 +134,24 @@ class OpenWeather_Graphics(displayio.Group):
         time_str = format_str % (hour, minute)
         print(time_str)
         self.time_text.text = time_str
+
+
+    def get_weekday(self, weekday):
+        if weekday == 0:
+            return "Monday"
+        if weekday == 1:
+            return "Tuesday"
+        if weekday == 2:
+            return "Wednesday"
+        if weekday == 3:
+            return "Thursday"
+        if weekday == 4:
+            return "Friday"
+        if weekday == 5:
+            return "Saturday"
+        if weekday == 6:
+            return "Sunday"
+
 
     def set_icon(self, filename):
         """The background image to a bitmap file.
