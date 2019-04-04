@@ -17,8 +17,8 @@ import neopixel
 from adafruit_esp32spi import adafruit_esp32spi
 from adafruit_esp32spi import adafruit_esp32spi_wifimanager
 
-# import special lifx_helper file
-import lifx_helper
+# import lifx library
+import adafruit_lifx
 
 # Get wifi details and more from a secrets.py file
 try:
@@ -41,10 +41,10 @@ wifi = adafruit_esp32spi_wifimanager.ESPSPI_WiFiManager(esp, secrets, status_lig
 lifx_token = secrets['lifx_token']
 
 # Initialize the LIFX API Helper
-lifx = lifx_helper.LIFX_API(wifi, lifx_token)
+lifx = adafruit_lifx.LIFX(wifi, lifx_token)
 
 # Set these to your LIFX light selector (https://api.developer.lifx.com/docs/selectors)
-lifx_lights = ['label:Lamp','label:Bedroom']
+lifx_lights = ['label:Lamp', 'label:Bedroom']
 
 # These pins are used as both analog and digital! XL, XR and YU must be analog
 # and digital capable. YD just need to be digital
@@ -133,22 +133,18 @@ while True:
                     print('Switching to ', current_light)
                 elif button.name == 'onoff':
                     print('Toggling {0}...'.format(current_light))
-                    resp = lifx.toggle_light(current_light)
-                    lifx.parse_resp(resp)
+                    lifx.toggle_light(current_light)
                 elif button.name == 'up':
                     light_brightness += 0.25
                     print('Setting {0} brightness to {1}'.format(current_light, light_brightness))
-                    resp = lifx.set_brightness(current_light, light_brightness)
-                    lifx.parse_resp(resp)
+                    lifx.set_brightness(current_light, light_brightness)
                 elif button.name == 'down':
                     light_brightness -= 0.25
                     print('Setting {0} brightness to {1}'.format(current_light, light_brightness))
-                    resp = lifx.set_brightness(current_light, light_brightness)
-                    lifx.parse_resp(resp)
+                    lifx.set_brightness(current_light, light_brightness)
                 else:
                     print('Setting {0} color to {1}'.format(current_light, button.name))
-                    resp = lifx.set_light(current_light, 'on', button.name, light_brightness)
-                    lifx.parse_resp(resp)
+                    lifx.set_color(current_light, 'on', button.name, light_brightness)
                 button.selected = False
             else:
                 button.selected = False
