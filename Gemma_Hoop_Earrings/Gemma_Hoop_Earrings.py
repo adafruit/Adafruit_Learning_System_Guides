@@ -38,26 +38,27 @@ color = wheel(hue & 255)  # hue -> RGB color
 prevtime = time.monotonic()  # Time of last animation mode switch
 
 while True:  # Loop forever...
-	if mode == 0:  # Random sparkles - lights just one LED at a time
-		i = random.randint(0, numpix - 1)  # Choose random pixel
-		strip[i] = color   # Set it to current color
-		strip.show()       # Refresh LED states
-		# Set same pixel to "off" color now but DON'T refresh...
-		# it stays on for now...bot this and the next random
-		# pixel will be refreshed on the next pass.
-		strip[i] = [0,0,0]
-		time.sleep(0.008)  # 8 millisecond delay
-	elif mode == 1:  # Spinny wheel (4 LEDs on at a time)
-		for i in range(numpix):  # For each LED...
-			if ((offset + i) & 7) < 2:  # 2 pixels out of 8...
-				strip[i] = color    # are set to current color
-			else:
-				strip[i] = [0,0,0]  # other pixels are off
-		strip.show()     # Refresh LED states
-		time.sleep(0.04) # 40 millisecond delay
-		offset += 1      # Shift animation by 1 pixel on next frame
-		if offset >= 8: offset = 0
-	# Additional animation modes could be added here!
+    if mode == 0:  # Random sparkles - lights just one LED at a time
+        i = random.randint(0, numpix - 1)  # Choose random pixel
+        strip[i] = color   # Set it to current color
+        strip.show()       # Refresh LED states
+        # Set same pixel to "off" color now but DON'T refresh...
+        # it stays on for now...bot this and the next random
+        # pixel will be refreshed on the next pass.
+        strip[i] = [0,0,0]
+        time.sleep(0.008)  # 8 millisecond delay
+    elif mode == 1:  # Spinny wheel (4 LEDs on at a time)
+        for i in range(numpix):  # For each LED...
+            if ((offset + i) & 7) < 2:  # 2 pixels out of 8...
+                strip[i] = color    # are set to current color
+            else:
+                strip[i] = [0,0,0]  # other pixels are off
+        strip.show()     # Refresh LED states
+        time.sleep(0.04) # 40 millisecond delay
+        offset += 1      # Shift animation by 1 pixel on next frame
+        if offset >= 8:
+            offset = 0
+    # Additional animation modes could be added here!
 
     t = time.monotonic()  # Current time in seconds
     if (t - prevtime) >= 8:  # Every 8 seconds...
