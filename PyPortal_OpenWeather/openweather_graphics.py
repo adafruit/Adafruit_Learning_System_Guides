@@ -12,6 +12,23 @@ medium_font = cwd+"/fonts/Arial-16.bdf"
 large_font = cwd+"/fonts/Arial-Bold-24.bdf"
 date_font = bitmap_font.load_font(medium_font)
 
+def get_weekday(weekday):
+        if weekday == 0:
+            day = "Monday"
+        if weekday == 1:
+            day = "Tuesday"
+        if weekday == 2:
+            day = "Wednesday"
+        if weekday == 3:
+            day = "Thursday"
+        if weekday == 4:
+            day = "Friday"
+        if weekday == 5:
+            day = "Saturday"
+        if weekday == 6:
+            day = "Sunday"
+        return day
+
 class OpenWeather_Graphics(displayio.Group):
     def __init__(self, root_group, *, am_pm=True, celsius=True):
         super().__init__(max_size=2)
@@ -111,7 +128,7 @@ class OpenWeather_Graphics(displayio.Group):
         day = now[2]
         year = now[0]
         week_day = now[6]
-        date_str = self.get_weekday(week_day)
+        date_str = get_weekday(week_day)
         format_str = "%d:%02d"
         format_date_str = "%d-%02d-%d"
         date_str += " "
@@ -134,23 +151,6 @@ class OpenWeather_Graphics(displayio.Group):
         time_str = format_str % (hour, minute)
         print(time_str)
         self.time_text.text = time_str
-
-    def get_weekday(self, weekday):
-        if weekday == 0:
-            day = "Monday"
-        if weekday == 1:
-            day = "Tuesday"
-        if weekday == 2:
-            day = "Wednesday"
-        if weekday == 3:
-            day = "Thursday"
-        if weekday == 4:
-            day = "Friday"
-        if weekday == 5:
-            day = "Saturday"
-        if weekday == 6:
-            day = "Sunday"
-        return day
 
     def set_icon(self, filename):
         """The background image to a bitmap file.
