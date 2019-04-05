@@ -36,6 +36,13 @@ esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset)
 status_light = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.2)
 wifi = adafruit_esp32spi_wifimanager.ESPSPI_WiFiManager(esp, secrets, status_light)
 
+# These pins are used as both analog and digital! XL, XR and YU must be analog
+# and digital capable. YD just need to be digital
+ts = adafruit_touchscreen.Touchscreen(board.TOUCH_XL, board.TOUCH_XR,
+                                      board.TOUCH_YD, board.TOUCH_YU,
+                                      calibration=((5200, 59000), (5800, 57000)),
+                                      size=(320, 240))
+
 # Set this to your LIFX personal access token in secrets.py
 # (to obtain a token, visit: https://cloud.lifx.com/settings)
 lifx_token = secrets['lifx_token']
@@ -45,38 +52,32 @@ lifx = adafruit_lifx.LIFX(wifi, lifx_token)
 
 # Set these to your LIFX light selector (https://api.developer.lifx.com/docs/selectors)
 lifx_lights = ['label:Lamp', 'label:Bedroom']
-
-# These pins are used as both analog and digital! XL, XR and YU must be analog
-# and digital capable. YD just need to be digital
-ts = adafruit_touchscreen.Touchscreen(board.TOUCH_XL, board.TOUCH_XR,
-                                      board.TOUCH_YD, board.TOUCH_YU,
-                                      calibration=((5200, 59000), (5800, 57000)),
-                                      size=(320, 240))
-# the current working directory (where this file is)
-cwd = ("/"+__file__).rsplit('/', 1)[0]
+# set default light properties
+current_light = lifx_lights[0]
+light_brightness = 1.0
 
 # Make the display context
 button_group = displayio.Group(max_size=20)
 board.DISPLAY.show(button_group)
-# button properties
-BUTTON_WIDTH = 60
-BUTTON_HEIGHT = 60
 # preload the font
 print('loading font...')
 font = bitmap_font.load_font("/fonts/Arial-12.bdf")
 glyphs = b'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-,.: '
 font.load_glyphs(glyphs)
+# button properties
+BUTTON_WIDTH = 60
+BUTTON_HEIGHT = 60
+buttons = []
 
-# button Fill Colors, from https://api.developer.lifx.com/docs/colors
+# button fill colors (from https://api.developer.lifx.com/docs/colors)
 button_colors = {'red':0xFF0000, 'white':0xFFFFFF,
                  'orange':0xFF9900, 'yellow':0xFFFF00,
                  'green':0x00FF00, 'blue':0x0000FF,
                  'purple':0x9900FF, 'pink': 0xFF00FF}
 
 print('loading buttons...')
-buttons = []
 
-# list of buttons and their properties
+# list of color buttons and their properties
 color_btn = [
     {'name':'red', 'pos':(15, 80), 'color':button_colors['red']},
     {'name':'white', 'pos':(85, 80), 'color':button_colors['white']},
@@ -95,7 +96,7 @@ for i in color_btn:
                     fill_color=i['color'], style=Button.ROUNDRECT)
     buttons.append(button)
 
-# light property buttons
+# light property buttons and their properties
 prop_btn = [
     {'name':'onoff', 'pos':(15, 15), 'label':'on/off'},
     {'name':'up', 'pos':(75, 15), 'label':'+'},
@@ -114,10 +115,6 @@ for i in prop_btn:
 # add buttons to the group
 for b in buttons:
     button_group.append(b.group)
-
-# set default light properties
-current_light = lifx_lights[0]
-light_brightness = 1.0
 
 while True:
     touch = ts.touch_point
