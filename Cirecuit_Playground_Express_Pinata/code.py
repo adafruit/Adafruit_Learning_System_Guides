@@ -1,11 +1,11 @@
 # Circuit Playground Express Piñata by Dano Wall for Adafruit Industries
 # CircuitPython code by Mike Barela for Adafruit Industries, MIT License
 import time
+import gc
+import random
 import board
 import pulseio
-import random
 from adafruit_motor import servo
-import gc
 from adafruit_circuitplayground.express import cpx
 gc.collect()
 
