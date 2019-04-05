@@ -33,7 +33,7 @@
 uint16_t pulses[NUMPULSES][2];  // pair is high and low pulse 
 uint8_t currentpulse = 0; // index for pulses we're storing
 
-#include "ircommander.h" // ir codes
+#include "ircommander.h"
 
 void setup(void) {
   Serial.begin(9600);
