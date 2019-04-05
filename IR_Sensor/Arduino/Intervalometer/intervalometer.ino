@@ -1,6 +1,6 @@
 // This sketch will send out a Nikon D50 trigger signal (probably works with most Nikons)
-// See the full tutorial at http://www.ladyada.net/learn/sensors/ir.html
-// this code is public domain, please enjoy!
+// See the full tutorial at https://learn.adafruit.com/ir-sensor/making-an-intervalometer
+// MIT License, attribution appreciated    Limor Fried, Adafruit Industries
  
 int IRledPin =  13;    // LED connected to digital pin 13
  
