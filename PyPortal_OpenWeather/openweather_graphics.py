@@ -135,23 +135,22 @@ class OpenWeather_Graphics(displayio.Group):
         print(time_str)
         self.time_text.text = time_str
 
-
     def get_weekday(self, weekday):
         if weekday == 0:
-            return "Monday"
+            day = "Monday"
         if weekday == 1:
-            return "Tuesday"
+            day = "Tuesday"
         if weekday == 2:
-            return "Wednesday"
+            day = "Wednesday"
         if weekday == 3:
-            return "Thursday"
+            day = "Thursday"
         if weekday == 4:
-            return "Friday"
+            day = "Friday"
         if weekday == 5:
-            return "Saturday"
+            day = "Saturday"
         if weekday == 6:
-            return "Sunday"
-
+            day = "Sunday"
+        return day
 
     def set_icon(self, filename):
         """The background image to a bitmap file.
