@@ -13,21 +13,21 @@ large_font = cwd+"/fonts/Arial-Bold-24.bdf"
 date_font = bitmap_font.load_font(medium_font)
 
 def get_weekday(weekday):
-        if weekday == 0:
-            day = "Monday"
-        if weekday == 1:
-            day = "Tuesday"
-        if weekday == 2:
-            day = "Wednesday"
-        if weekday == 3:
-            day = "Thursday"
-        if weekday == 4:
-            day = "Friday"
-        if weekday == 5:
-            day = "Saturday"
-        if weekday == 6:
-            day = "Sunday"
-        return day
+    if weekday == 0:
+        day = "Monday"
+    if weekday == 1:
+        day = "Tuesday"
+    if weekday == 2:
+        day = "Wednesday"
+    if weekday == 3:
+        day = "Thursday"
+    if weekday == 4:
+        day = "Friday"
+    if weekday == 5:
+        day = "Saturday"
+    if weekday == 6:
+        day = "Sunday"
+    return day
 
 class OpenWeather_Graphics(displayio.Group):
     def __init__(self, root_group, *, am_pm=True, celsius=True):
