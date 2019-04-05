@@ -1,20 +1,23 @@
-from digitalio import DigitalInOut, Direction
-import board 
-import neopixel
 import time
 
-pixpin = board.D1
-numpix = 5
+import board
+import neopixel
+from digitalio import DigitalInOut, Direction
+
+pix_pin = board.D1
+num_pix = 5
 
 led = DigitalInOut(board.D13)
 led.direction = Direction.OUTPUT
 
-strip = neopixel.NeoPixel(pixpin, numpix, brightness=1, auto_write=True)
+strip = neopixel.NeoPixel(pix_pin, num_pix, brightness=1, auto_write=True)
 
-def colorWipe(color, wait):
+
+def color_wipe(color, wait):
     for j in range(len(strip)):
-	strip[j] = (color)
-	time.sleep(wait)
+        strip[j] = (color)
+        time.sleep(wait)
+
 
 while True:
-    colorWipe( (50, 0, 50), .1 ) # Purple LEDs
+    color_wipe((50, 0, 50), .1)  # Purple LEDs

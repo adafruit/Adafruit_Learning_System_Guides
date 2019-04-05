@@ -25,8 +25,10 @@
 # calibrated with your body touching it (making it less accurate).
 #
 # Also note this depends on two external modules to be loaded on the Gemma M0:
-#  - Adafruit CircuitPython DotStar: https://github.com/adafruit/Adafruit_CircuitPython_DotStar
-#  - Adafruit CircuitPython FancyLED: https://github.com/adafruit/Adafruit_CircuitPython_FancyLED
+#  - Adafruit CircuitPython DotStar:
+# https://github.com/adafruit/Adafruit_CircuitPython_DotStar
+#  - Adafruit CircuitPython FancyLED:
+# https://github.com/adafruit/Adafruit_CircuitPython_FancyLED
 #
 # You _must_ have both adafruit_dotstar.mpy and the adafruit_fancyled folder
 # and files within it on your board for this code to work!  If you run into
@@ -38,51 +40,49 @@
 import math
 import time
 
+import adafruit_dotstar
+import adafruit_fancyled.adafruit_fancyled as fancy
 import board
 import digitalio
 import touchio
 
-import adafruit_dotstar
-import adafruit_fancyled.adafruit_fancyled as fancy
-
-
 # Variables that control the code.  Try changing these to modify speed, color,
 # etc.
-START_DELAY = 5.0       # How many seconds to wait after power up before
-                        # jumping into the animation and initializing the
-                        # touch input.  This gives you time to take move your
-                        # fingers off the flower so the capacitive touch
-                        # sensing is better calibrated.  During the delay
-                        # the small red LED on the board will flash.
+START_DELAY = 5.0  # How many seconds to wait after power up before
+# jumping into the animation and initializing the
+# touch input.  This gives you time to take move your
+# fingers off the flower so the capacitive touch
+# sensing is better calibrated.  During the delay
+# the small red LED on the board will flash.
 
-TOUCH_PIN = board.D0    # The board pin to listen for touches and trigger the
-                        # heart beat animation.  You can change this to any
-                        # other pin like board.D2 or board.D1.  Make sure not
-                        # to touch this pin as the board powers on or the
-                        # capacitive sensing will get confused (just reset
-                        # the board and try again).
+TOUCH_PIN = board.D0  # The board pin to listen for touches and trigger the
+# heart beat animation.  You can change this to any
+# other pin like board.D2 or board.D1.  Make sure not
+# to touch this pin as the board powers on or the
+# capacitive sensing will get confused (just reset
+# the board and try again).
 
-BRIGHTNESS = 1.0        # The brightness of the colors.  Set this to a value
-                        # anywhere within 0 and 1.0, where 1.0 is full bright.
-                        # For example 0.5 would be half brightness.
+BRIGHTNESS = 1.0  # The brightness of the colors.  Set this to a value
+# anywhere within 0 and 1.0, where 1.0 is full bright.
+# For example 0.5 would be half brightness.
 
-RAINBOW_PERIOD_S = 18.0 # How many seconds it takes for the default rainbow
-                        # cycle animation to perform a full cycle.  Increase
-                        # this to slow down the animation or decrease to speed
-                        # it up.
+RAINBOW_PERIOD_S = 18.0  # How many seconds it takes for the default rainbow
+# cycle animation to perform a full cycle.  Increase
+# this to slow down the animation or decrease to speed
+# it up.
 
-HEARTBEAT_BPM = 60.0    # Heartbeat animation beats per minute.  Increase to
-                        # speed up the heartbeat, and decrease to slow down.
+HEARTBEAT_BPM = 60.0  # Heartbeat animation beats per minute.  Increase to
+# speed up the heartbeat, and decrease to slow down.
 
-HEARTBEAT_HUE = 300.0   # The color hue to use when animating the heartbeat
-                        # animation.  Pick a value in the range of 0 to 359
-                        # degrees, see the hue spectrum here:
-                        #   https://en.wikipedia.org/wiki/Hue
-                        # A value of 300 is a nice pink color.
+HEARTBEAT_HUE = 300.0  # The color hue to use when animating the heartbeat
+# animation.  Pick a value in the range of 0 to 359
+# degrees, see the hue spectrum here:
+#   https://en.wikipedia.org/wiki/Hue
+# A value of 300 is a nice pink color.
 
 # First initialize the DotStar LED and turn it off.
 dotstar = adafruit_dotstar.DotStar(board.APA102_SCK, board.APA102_MOSI, 1)
-dotstar[0] = (0,0,0)
+dotstar[0] = (0, 0, 0)
 
 # Also make sure the on-board red LED is turned off.
 red_led = digitalio.DigitalInOut(board.L)
@@ -103,24 +103,29 @@ while time.monotonic() - start <= START_DELAY:
 touch = touchio.TouchIn(TOUCH_PIN)
 
 # Convert periods to frequencies that are used later in animations.
-rainbow_freq = 1.0/RAINBOW_PERIOD_S
+rainbow_freq = 1.0 / RAINBOW_PERIOD_S
 
 # Calculcate periods and values used by the heartbeat animation.
-beat_period = 60.0/HEARTBEAT_BPM
-beat_quarter_period = beat_period/4.0  # Quarter period controls the speed of
-                                       # the heartbeat drop-off (using an
-                                       # exponential decay function).
-beat_phase = beat_period/5.0           # Phase controls how long in-between
-                                       # the two parts of the heart beat
-                                       # (the 'ba-boom' of the beat).
+beat_period = 60.0 / HEARTBEAT_BPM
+beat_quarter_period = beat_period / 4.0  # Quarter period controls the speed of
+# the heartbeat drop-off (using an
+# exponential decay function).
+beat_phase = beat_period / 5.0  # Phase controls how long in-between
+
+
+# the two parts of the heart beat
+# (the 'ba-boom' of the beat).
 
 # Handy function for linear interpolation of a value.  Pass in a value
 # x that's within the range x0...x1 and a range y0...y1 to get an output value
 # y that's proportionally within y0...y1 based on x within x0...x1.  Handy for
 # transforming a value in one range to a value in another (like Arduino's map
 # function).
+
+# pylint: disable=redefined-outer-name
 def lerp(x, x0, x1, y0, y1):
-    return y0+(x-x0)*((y1-y0)/(x1-x0))
+    return y0 + (x - x0) * ((y1 - y0) / (x1 - x0))
+
 
 # Main loop below will run forever:
 while True:
@@ -139,8 +144,8 @@ while True:
         # out of phase so one occurs a little bit after the other.
         t0 = current % beat_period
         t1 = (current + beat_phase) % beat_period
-        x0 = math.pow(math.e, -t0/beat_quarter_period)
-        x1 = math.pow(math.e, -t1/beat_quarter_period)
+        x0 = math.pow(math.e, -t0 / beat_quarter_period)
+        x1 = math.pow(math.e, -t1 / beat_quarter_period)
         # After calculating both exponential decay values pick the biggest one
         # as the secondary one will occur after the first.  Scale each by
         # the global brightness and then convert to RGB color using the fixed
@@ -149,14 +154,14 @@ while True:
         # like we expect for full bright to zero brightness with HSV color
         # (i.e. no interpolation is necessary).
         val = max(x0, x1) * BRIGHTNESS
-        color = fancy.gamma_adjust(fancy.CHSV(HEARTBEAT_HUE/359.0, 1.0, val))
+        color = fancy.gamma_adjust(fancy.CHSV(HEARTBEAT_HUE / 359.0, 1.0, val))
         dotstar[0] = color.pack()
     else:
         # The touch input is not being touched (touch.value is False) so
         # compute the hue with a smooth cycle over time.
         # First use the sine function to smoothly generate a value that goes
         # from -1.0 to 1.0 at a certain frequency to match the rainbow period.
-        x = math.sin(2.0*math.pi*rainbow_freq*current)
+        x = math.sin(2.0 * math.pi * rainbow_freq * current)
         # Then compute the hue by converting the sine wave value from something
         # that goes from -1.0 to 1.0 to instead go from 0 to 1.0 hue.
         hue = lerp(x, -1.0, 1.0, 0.0, 1.0)

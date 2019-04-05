@@ -1,0 +1,1 @@
+All files are the result of processing originals from the free 900+ Classic Synth Samples pack (http://cdn.mos.musicradar.com/audio/samples/musicradar-synth-samples.zip) from BassGorilla (https://bassgorilla.com/free-sample-packs).

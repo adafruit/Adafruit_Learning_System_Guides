@@ -1,8 +1,9 @@
 import board
 import busio
+from microcontroller import Pin
 
 
-def is_hardware_UART(tx, rx):
+def is_hardware_uart(tx, rx):
     try:
         p = busio.UART(tx, rx)
         p.deinit()
@@ -12,14 +13,10 @@ def is_hardware_UART(tx, rx):
 
 
 def get_unique_pins():
-    pin_names = dir(board)
-    if "NEOPIXEL" in pin_names:
-        pin_names.remove("NEOPIXEL")
-    if "APA102_MOSI" in pin_names:
-        pin_names.remove("APA102_MOSI")
-    if "APA102_SCK" in pin_names:
-        pin_names.remove("APA102_SCK")
-    pins = [getattr(board, p) for p in pin_names]
+    exclude = ['NEOPIXEL', 'APA102_MOSI', 'APA102_SCK']
+    pins = [pin for pin in [
+        getattr(board, p) for p in dir(board) if p not in exclude]
+            if isinstance(pin, Pin)]
     unique = []
     for p in pins:
         if p not in unique:
@@ -32,7 +29,7 @@ for tx_pin in get_unique_pins():
         if rx_pin is tx_pin:
             continue
         else:
-            if is_hardware_UART(tx_pin, rx_pin):
+            if is_hardware_uart(tx_pin, rx_pin):
                 print("RX pin:", rx_pin, "\t TX pin:", tx_pin)
             else:
                 pass

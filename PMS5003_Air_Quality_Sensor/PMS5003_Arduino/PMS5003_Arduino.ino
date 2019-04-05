@@ -47,7 +47,7 @@ void loop() {
     Serial.print("Particles > 1.0um / 0.1L air:"); Serial.println(data.particles_10um);
     Serial.print("Particles > 2.5um / 0.1L air:"); Serial.println(data.particles_25um);
     Serial.print("Particles > 5.0um / 0.1L air:"); Serial.println(data.particles_50um);
-    Serial.print("Particles > 50 um / 0.1L air:"); Serial.println(data.particles_100um);
+    Serial.print("Particles > 10.0 um / 0.1L air:"); Serial.println(data.particles_100um);
     Serial.println("---------------------------------------");
   }
 }

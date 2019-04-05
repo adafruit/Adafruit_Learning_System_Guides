@@ -2,21 +2,28 @@
 # for Adafruit Circuit Playground express
 # with CircuitPython
 
-from adafruit_circuitplayground.express import cpx
 import time
+
 import board
-import simpleio
+import pulseio
+from adafruit_motor import servo
+from adafruit_circuitplayground.express import cpx
+
+pwm = pulseio.PWMOut(board.A3, duty_cycle=2 ** 15, frequency=50)
 
 #  plug red servo wire to VOUT, brown to GND, yellow to A3
-servo = simpleio.Servo(board.A3)
+servo = servo.Servo(pwm)
 
 cpx.pixels.brightness = 0.05  # set brightness value
+
 
 def unlock_servo():
     servo.angle = 180
 
+
 def lock_servo():
     servo.angle = 90
+
 
 correct_combo = ['B', 'D', 'C']  # this is where to set the combo
 entered_combo = []  # this will be used to store attempts
@@ -74,7 +81,8 @@ while True:
     if cpx.button_a:  # this means the button has been pressed
         # grab the current_dial_position value and add to the list
         entered_combo.append(current_dial_position)
-        dial_msg = 'Dial Position: ' + str(entered_combo[(len(entered_combo)-1)])
+        dial_msg = 'Dial Position: ' + \
+                   str(entered_combo[(len(entered_combo) - 1)])
         print(dial_msg)
         cpx.play_tone(320, 0.3)  # beep
         time.sleep(1)  # slow down button checks

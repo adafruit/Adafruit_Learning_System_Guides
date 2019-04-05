@@ -77,7 +77,7 @@ while True:
     except adafruit_irremote.IRNECRepeatException:  # unusual short code!
         print("NEC repeat!")
         command = last_command
-    except adafruit_irremote.IRDecodeException as e:     # failed to decode
+    except adafruit_irremote.IRDecodeException as e:  # failed to decode
         print("Failed to decode:", e)
     except MemoryError as e:
         print("Memory error: ", e)

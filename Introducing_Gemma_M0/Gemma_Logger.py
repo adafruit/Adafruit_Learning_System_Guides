@@ -1,7 +1,8 @@
+import time
+
 import board
 import digitalio
 import microcontroller
-import time
 
 led = digitalio.DigitalInOut(board.D13)
 led.switch_to_output()

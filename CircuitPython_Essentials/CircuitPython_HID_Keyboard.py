@@ -1,11 +1,12 @@
 # CircuitPython demo - Keyboard emulator
 
 import time
-import digitalio
+
 import board
+import digitalio
 from adafruit_hid.keyboard import Keyboard
-from adafruit_hid.keycode import Keycode
 from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS
+from adafruit_hid.keycode import Keycode
 
 # A simple neat keyboard demo in CircuitPython
 

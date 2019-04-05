@@ -1,24 +1,28 @@
 # Gemma M0 version of TVBgone!
-import board
 import array
 import time
-from digitalio import DigitalInOut, Direction, Pull
-import pulseio
-import adafruit_dotstar
 
-pixel = adafruit_dotstar.DotStar(board.APA102_SCK, board.APA102_MOSI, 1, brightness=0.2)
+import adafruit_dotstar
+import board
+import pulseio
+from digitalio import DigitalInOut, Direction
+
+# pylint: disable=eval-used
+
+pixel = adafruit_dotstar.DotStar(
+    board.APA102_SCK, board.APA102_MOSI, 1, brightness=0.2)
 pixel.fill((0, 0, 0))
 
 # Button to see output debug
 led = DigitalInOut(board.D13)
 led.direction = Direction.OUTPUT
 
-pwm = pulseio.PWMOut(board.A1, frequency=38000, duty_cycle=2 ** 15, variable_frequency=True)
+pwm = pulseio.PWMOut(board.A2, frequency=38000,
+                     duty_cycle=2 ** 15, variable_frequency=True)
 pulse = pulseio.PulseOut(pwm)
 
-
 time.sleep(0.5)  # Give a half second before starting
-    
+
 # gooooo!
 f = open("/codes.txt", "r")
 for line in f:
@@ -30,7 +34,7 @@ for line in f:
     try:
         repeat = code['repeat']
         delay = code['repeat_delay']
-    except KeyError:   # by default, repeat once only!
+    except KeyError:  # by default, repeat once only!
         repeat = 1
         delay = 0
     # The table holds the on/off pairs
@@ -46,5 +50,5 @@ for line in f:
         time.sleep(delay)
     led.value = False
     time.sleep(code['delay'])
-    
+
 f.close()

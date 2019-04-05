@@ -1,8 +1,9 @@
 # Gemma/Trinket IO demo - I2C scan
 
+import time
+
 import board
 import busio
-import time
 
 # can also use board.SDA and board.SCL for neater looking code!
 i2c = busio.I2C(board.D2, board.D0)

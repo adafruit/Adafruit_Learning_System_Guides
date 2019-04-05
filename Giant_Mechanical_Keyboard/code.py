@@ -6,16 +6,17 @@
 # Author: Collin Cunningham
 # License: MIT License (https://opensource.org/licenses/MIT)
 
-from digitalio import DigitalInOut, Direction, Pull
-import board
 import time
+
+import board
 import neopixel
 from adafruit_hid.keyboard import Keyboard
-from adafruit_hid.keycode import Keycode
 from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS
+from adafruit_hid.keycode import Keycode
+from digitalio import DigitalInOut, Direction, Pull
 
 pixels = neopixel.NeoPixel(board.NEOPIXEL, 10, brightness=.2)
-pixels.fill((0,0,0))
+pixels.fill((0, 0, 0))
 pixels.show()
 
 # The pins connected to each switch/button
@@ -44,7 +45,7 @@ for pin in buttonpins:
     button.pull = Pull.UP
     buttons.append(button)
 
-# make all LED objects, make them inputs w/pullups
+# make all LED objects, make them outputs
 for pin in ledpins:
     led = DigitalInOut(pin)
     led.direction = Direction.OUTPUT
@@ -56,18 +57,21 @@ statusled.direction = Direction.OUTPUT
 
 print("Waiting for button presses")
 
-def pressbutton(i):
-    l = leds[i]          # find the switch LED
-    k = buttonkeys[i]    # get the corresp. keycode/str
-    l.value = True       # turn on LED
-    kbd.press(k)         # send keycode
-    
-def releasebutton(i):
-    l = leds[i]          # find the switch LED
-    k = buttonkeys[i]    # get the corresp. keycode/str
-    l.value = False      # turn on LED
-    kbd.release(k)       # send keycode
-    
+
+def pressbutton(index):
+    switch_led = leds[index]  # find the switch LED
+    k = buttonkeys[index]  # get the corresp. keycode/str
+    switch_led.value = True  # turn on LED
+    kbd.press(k)  # send keycode
+
+
+def releasebutton(index):
+    switch_led = leds[index]  # find the switch LED
+    k = buttonkeys[index]  # get the corresp. keycode/str
+    switch_led.value = False  # turn on LED
+    kbd.release(k)  # send keycode
+
+
 def lightneopixels():
     vals = [0, 0, 0]
     # if switch 0 pressed, show blue
@@ -82,30 +86,30 @@ def lightneopixels():
         vals[0] = 255
     # if all pressed, show white
     if buttonspressed[0] and buttonspressed[1] and buttonspressed[2]:
-        vals = [255,255,255]
+        vals = [255, 255, 255]
     # if 0 & 1 pressed, show green
     if buttonspressed[0] and buttonspressed[1] and not buttonspressed[2]:
-        vals = [0,255,0]
-    pixels.fill((vals[0],vals[1],vals[2]))
+        vals = [0, 255, 0]
+    pixels.fill((vals[0], vals[1], vals[2]))
     pixels.show()
-    
+
 
 while True:
     # check each button
     for button in buttons:
         i = buttons.index(button)
-        if button.value == False:    # button is pressed?
-            buttonspressed[i] = True # save pressed button
-            if buttonspressedlast[i] == False: # was button not pressed last time?
+        if button.value is False:  # button is pressed?
+            buttonspressed[i] = True  # save pressed button
+            # was button not pressed last time?
+            if buttonspressedlast[i] is False:
                 print("Pressed #%d" % i)
                 pressbutton(i)
         else:
-            buttonspressed[i] = False # button was not pressed
-            if buttonspressedlast[i] == True: # was button pressed last time?
+            buttonspressed[i] = False  # button was not pressed
+            if buttonspressedlast[i] is True:  # was button pressed last time?
                 print("Released #%d" % i)
                 releasebutton(i)
     lightneopixels()
     # save pressed buttons as pressed last
     buttonspressedlast = list(buttonspressed)
     time.sleep(0.01)
-

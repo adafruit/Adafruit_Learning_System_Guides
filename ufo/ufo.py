@@ -1,27 +1,27 @@
-#  UFO Flying Saucer with Circuit Playground Express
-#  https://learn.adafruit.com/ufo-circuit-playground-express/
-#  Plays UFO lights and sounds if the board is upside down only,
-#  Tilt to change light color, cycle speed, tone pitch
+"""
+UFO Flying Saucer with Circuit Playground Express
+https://learn.adafruit.com/ufo-circuit-playground-express/
+Plays UFO lights and sounds if the board is upside down only,
+Tilt to change light color, cycle speed, tone pitch
+"""
 
-from adafruit_circuitplayground.express import cpx
-import neopixel
-import board
 import time
 
-#create neopixel object. set brightness lower if needed, say .2
-pixels = neopixel.NeoPixel(board.NEOPIXEL, 10, brightness=.8)
+from adafruit_circuitplayground.express import cpx
 
-def simpleCircle(wait, R, G, B):  # timing, color values per channel
-    baseFreq = int(20 + (G * 0.3))  # tone value derived from rotation
+def simple_circle(wait, red, green, blue):
+    """timing, color values per channel"""
+    baseFreq = int(20 + (green * 0.3))  # tone value derived from rotation
 
     for i in range(10):
-        pixels[i] = ((0, 0, 0))
+        cpx.pixels[i] = ((0, 0, 0))
         cpx.start_tone(baseFreq + i)  # increasing pitch sweep
         time.sleep(wait)
 
     for i in range(10):
-        pixels[i] = ((R, G, B))
+        cpx.pixels[i] = ((red, green, blue))
         time.sleep(wait)
+
 
 # Main loop gets x, y and z axis acceleration, prints the values, and turns on
 # lights if the UFO is upside down, plays tones
@@ -38,8 +38,8 @@ while True:
     # check for upside down state on z axis
     if z < 0:  # any negative number on z axis means it's upside down enough
         speed = (0.01 * (B * 0.025))
-        simpleCircle(speed, R, G, B)  # speed based on tilt, .01 is good start
+        simple_circle(speed, R, G, B)  # speed based on tilt, .01 is good start
 
     else:  # right side up means no colors or sound!
-        pixels.fill((0, 0, 0))
+        cpx.pixels.fill((0, 0, 0))
         cpx.stop_tone()

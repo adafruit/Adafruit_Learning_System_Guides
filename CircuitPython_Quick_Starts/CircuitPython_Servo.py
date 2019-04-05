@@ -1,6 +1,7 @@
 import time
-import simpleio
+
 import board
+import simpleio
 
 servo = simpleio.Servo(board.A2)
 

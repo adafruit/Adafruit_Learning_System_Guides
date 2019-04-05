@@ -1,0 +1,3 @@
+1,42.985201,-81.254900,harriston.bmp,harriston_name.wav,harriston_detail.wav
+2,42.982640,-81.250504,covent_garden.bmp,covent_garden_name.wav,covent_garden_detail.wav
+3,42.988451,-81.254250,los_lobos.bmp,los_lobos_name.wav,los_lobos_detail.wav

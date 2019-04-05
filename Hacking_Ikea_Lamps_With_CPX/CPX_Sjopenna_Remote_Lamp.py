@@ -13,18 +13,18 @@ last_command = None
 brightness_up = 95  # Up arrow
 brightness_down = 79  # Down arrow
 
-command_to_color = {       # button = color
-    247: (255, 0, 0),      # 1 = red
-    119: (255, 40, 0),     # 2 = orange
-    183: (255, 150, 0),    # 3 = yellow
-    215: (0, 255, 0),      # 4 = green
-    87: (0, 255, 120),     # 5 = teal
-    151: (0, 255, 255),    # 6 = cyan
-    231: (0, 0, 255),      # 7 = blue
-    103: (180, 0, 255),    # 8 = purple
-    167: (255, 0, 20),     # 9 = magenta
+command_to_color = {  # button = color
+    247: (255, 0, 0),  # 1 = red
+    119: (255, 40, 0),  # 2 = orange
+    183: (255, 150, 0),  # 3 = yellow
+    215: (0, 255, 0),  # 4 = green
+    87: (0, 255, 120),  # 5 = teal
+    151: (0, 255, 255),  # 6 = cyan
+    231: (0, 0, 255),  # 7 = blue
+    103: (180, 0, 255),  # 8 = purple
+    167: (255, 0, 20),  # 9 = magenta
     207: (255, 255, 255),  # 0 = white
-    127: (0, 0, 0),        # Play/Pause = off
+    127: (0, 0, 0),  # Play/Pause = off
 }
 
 while True:

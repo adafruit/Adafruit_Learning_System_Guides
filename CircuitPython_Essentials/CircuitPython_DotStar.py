@@ -1,8 +1,7 @@
 # CircuitPython demo - Dotstar
-
 import time
-import board
 import adafruit_dotstar
+import board
 
 num_pixels = 30
 pixels = adafruit_dotstar.DotStar(board.A1, board.A2, num_pixels, brightness=0.1, auto_write=False)
@@ -103,7 +102,8 @@ MAGENTA = (255, 0, 20)
 WHITE = (255, 255, 255)
 
 while True:
-    color_fill(RED, 0.5)  # Change this number to change how long it stays on each solid color.
+    # Change this number to change how long it stays on each solid color.
+    color_fill(RED, 0.5)
     color_fill(YELLOW, 0.5)
     color_fill(ORANGE, 0.5)
     color_fill(GREEN, 0.5)
@@ -114,12 +114,15 @@ while True:
     color_fill(MAGENTA, 0.5)
     color_fill(WHITE, 0.5)
 
-    slice_alternating(0.1)  # Increase or decrease this to speed up or slow down the animation.
+    # Increase or decrease this to speed up or slow down the animation.
+    slice_alternating(0.1)
 
     color_fill(WHITE, 0.5)
 
-    slice_rainbow(0.1)  # Increase or decrease this to speed up or slow down the animation.
+    # Increase or decrease this to speed up or slow down the animation.
+    slice_rainbow(0.1)
 
     time.sleep(0.5)
 
-    rainbow_cycle(0)  # Increase this number to slow down the rainbow animation.
+    # Increase this number to slow down the rainbow animation.
+    rainbow_cycle(0)
