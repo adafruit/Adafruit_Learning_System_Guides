@@ -17,10 +17,23 @@
 // whose radius is the eye radius minus the pupil radius.
 #define INNER_RADIUS (EYE_RADIUS - PUPIL_RADIUS)
 
-#define TFT_CS        39    // Hallowing display control pins: chip select
-#define TFT_RST       37    // Display reset
-#define TFT_DC        38    // Display data/command select
-#define TFT_BACKLIGHT  7    // Display backlight pin
+#if defined(ADAFRUIT_HALLOWING)
+  #define TFT_CS        39    // Hallowing display control pins: chip select
+  #define TFT_RST       37    // Display reset
+  #define TFT_DC        38    // Display data/command select
+  #define TFT_BACKLIGHT  7    // Display backlight pin
+  #define TFT_SPI        SPI
+  #define TFT_PERIPH     PERIPH_SPI
+  Adafruit_LIS3DH accel  = Adafruit_LIS3DH();
+#elif defined(ARDUINO_SAMD_CIRCUITPLAYGROUND_EXPRESS)
+  #define TFT_CS         A7  // Display select
+  #define TFT_DC         A6  // Display data/command pin
+  #define TFT_RST        -1  // Display reset pin
+  #define TFT_BACKLIGHT  A3
+  #define TFT_PERIPH     PERIPH_SPI1
+  #define TFT_SPI        SPI1
+  Adafruit_LIS3DH accel(&Wire1);
+#endif
 
 // For the sake of math comprehension and simplicity, movement takes place
 // in a traditional Cartesian coordinate system (+Y is up), floating point
@@ -34,8 +47,8 @@ bool     firstFrame = true;  // Force full-screen update on initial frame
 
 // Declarations for various Hallowing hardware -- display, accelerometer
 // and SPI rate & mode.
-Adafruit_ST7735 tft    = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
-Adafruit_LIS3DH accel  = Adafruit_LIS3DH();
+Adafruit_ST7735 tft    = Adafruit_ST7735(&TFT_SPI, TFT_CS, TFT_DC, TFT_RST);
+
 SPISettings settings(12000000, MSBFIRST, SPI_MODE0);
 
 // Declarations related to DMA (direct memory access), which lets us walk
@@ -72,31 +85,31 @@ void setup(void) {
   int                dmac_id;
   volatile uint32_t *data_reg;
   dma.allocate();
-  if(&PERIPH_SPI == &sercom0) {
+  if(&TFT_PERIPH == &sercom0) {
     dma.setTrigger(SERCOM0_DMAC_ID_TX);
     data_reg = &SERCOM0->SPI.DATA.reg;
 #if defined SERCOM1
-  } else if(&PERIPH_SPI == &sercom1) {
+  } else if(&TFT_PERIPH == &sercom1) {
     dma.setTrigger(SERCOM1_DMAC_ID_TX);
     data_reg = &SERCOM1->SPI.DATA.reg;
 #endif
 #if defined SERCOM2
-  } else if(&PERIPH_SPI == &sercom2) {
+  } else if(&TFT_PERIPH == &sercom2) {
     dma.setTrigger(SERCOM2_DMAC_ID_TX);
     data_reg = &SERCOM2->SPI.DATA.reg;
 #endif
 #if defined SERCOM3
-  } else if(&PERIPH_SPI == &sercom3) {
+  } else if(&TFT_PERIPH == &sercom3) {
     dma.setTrigger(SERCOM3_DMAC_ID_TX);
     data_reg = &SERCOM3->SPI.DATA.reg;
 #endif
 #if defined SERCOM4
-  } else if(&PERIPH_SPI == &sercom4) {
+  } else if(&TFT_PERIPH == &sercom4) {
     dma.setTrigger(SERCOM4_DMAC_ID_TX);
     data_reg = &SERCOM4->SPI.DATA.reg;
 #endif
 #if defined SERCOM5
-  } else if(&PERIPH_SPI == &sercom5) {
+  } else if(&TFT_PERIPH == &sercom5) {
     dma.setTrigger(SERCOM5_DMAC_ID_TX);
     data_reg = &SERCOM5->SPI.DATA.reg;
 #endif
@@ -133,6 +146,13 @@ void loop(void) {
   float scale = G_SCALE * elapsed;
   float ax = accel.y_g * scale, // Horizontal acceleration, pixel units
         ay = accel.x_g * scale; // Vertical acceleration "
+
+#if defined(ARDUINO_SAMD_CIRCUITPLAYGROUND_EXPRESS)
+  // CPX has different accel orientations
+  float temp = ay;
+  ay = ax;
+  ax = -temp;
+#endif
 
   // Add scaled accelerometer readings to pupil velocity, store interim
   // values in vxNew, vyNew...a little friction prevents infinite bounce.
@@ -272,7 +292,7 @@ void loop(void) {
   if(x2 > 127) x2 = 127;
   if(y2 > 127) y2 = 127;
 
-  SPI.beginTransaction(settings);    // SPI init
+  TFT_SPI.beginTransaction(settings);    // SPI init
   digitalWrite(TFT_CS, LOW);         // Chip select
   tft.setAddrWindow(x1, y1, x2-x1+1, y2-y1+1);
   digitalWrite(TFT_CS, LOW);         // Re-select after addr function
@@ -398,7 +418,7 @@ void loop(void) {
 
   while(dma_busy);            // Wait for last DMA transfer to complete
   digitalWrite(TFT_CS, HIGH); // Deselect
-  SPI.endTransaction();       // SPI done
+  TFT_SPI.endTransaction();       // SPI done
 }
 
 void dmaXfer(uint16_t n) { // n = Transfer size in bytes
