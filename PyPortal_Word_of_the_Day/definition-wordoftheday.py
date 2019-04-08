@@ -14,14 +14,18 @@ DATA_SOURCE = "https://api.wordnik.com/v4/words.json/wordOfTheDay?api_key="+secr
 WORD_LOCATION = ['word']
 PART_OF_SPEECH = ['definitions', 0,'partOfSpeech']
 DEF_LOCATION = ['definitions', 0,'text']
+EXAMPLE_LOCATION = ['examples', 0, 'text']
 PUBLISH_DATE = ['publishDate']
 CAPTION = 'wordnik.com/word-of-the-day'
-
 PRONUNCIATION = [0,'raw']
+
+DEF_EX_ARR = [DEF_LOCATION, EXAMPLE_LOCATION]
+
+DEF_EX_VAL = 0
 
 cwd = ("/"+__file__).rsplit('/', 1)[0]
 pyportal = PyPortal(url=DATA_SOURCE,
-                    json_path=(WORD_LOCATION, PART_OF_SPEECH, DEF_LOCATION ),
+                    json_path=(WORD_LOCATION, PART_OF_SPEECH, DEF_EX_ARR[DEF_EX_VAL]),
                     status_neopixel=board.NEOPIXEL,
                     default_bg=cwd+"/wordoftheday_background.bmp",
                     text_font=cwd+"/fonts/Arial-ItalicMT-17.bdf",
@@ -47,10 +51,10 @@ pyportal = PyPortal(url=DATA_SOURCE,
                     caption_color=0x808080
                     )
 
+pyportal.set_text("\nloading ...") # display while user waits
+pyportal.preload_font() # speed things up by preloading font
+pyportal.set_text("\nWord of the Day") # show title
 
-
-# speed up projects with lots of text by preloading the font!
-pyportal.preload_font()
 
 while True:
     try:
@@ -59,3 +63,14 @@ while True:
     except RuntimeError as e:
         print("Some error occured, retrying! -", e)
     time.sleep(120)
+
+
+
+    """
+
+    if (DEF_EX_VAL == 0):
+        DEF_EX_VAL = 1
+    elif (DEF_EX_VAL == 1):
+        DEF_EX_VAL = 0
+
+    """
