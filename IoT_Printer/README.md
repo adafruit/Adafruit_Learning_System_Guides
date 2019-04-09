@@ -11,4 +11,5 @@ products from Adafruit!
 
 Designed by Adafruit Industries.  
 Creative Commons, Attribution & Share-Alike license
+
 All text above must be included in any redistribution
