@@ -13,7 +13,7 @@ except ImportError:
 DATA_SOURCE = "https://api.wordnik.com/v4/words.json/wordOfTheDay?api_key="+secrets['wordnik_token']
 WORD_LOCATION = ['word']
 PART_OF_SPEECH = ['definitions', 0,'partOfSpeech']
-DEF_LOCATION = ['definitions', 0,'text']
+DEF_LOCATION = ['definitions', 0, 'text']
 EXAMPLE_LOCATION = ['examples', 0, 'text']
 PUBLISH_DATE = ['publishDate']
 CAPTION = 'wordnik.com/word-of-the-day'
@@ -30,17 +30,14 @@ pyportal = PyPortal(url=DATA_SOURCE,
                     default_bg=cwd+"/wordoftheday_background.bmp",
                     text_font=cwd+"/fonts/Arial-ItalicMT-17.bdf",
                     text_position=((50, 30),  # word location
-                                   #(187, 25), #date location
                                    (50, 50), # part of speech location
                                    (50, 135), # definition location
                                    ),
                     text_color=(0x8080FF, # quote text color
-                                #0xFFFFFF,
                                 0xFF00FF,
                                 0xFFFFFF
                                 ), # author text color
                     text_wrap=(0, # characters to wrap for quote
-                             #  0,
                                0,
                                28
                                ), # no wrap for author
@@ -55,7 +52,6 @@ pyportal.set_text("\nloading ...") # display while user waits
 pyportal.preload_font() # speed things up by preloading font
 pyportal.set_text("\nWord of the Day") # show title
 
-
 while True:
     try:
         value = pyportal.fetch()
@@ -65,8 +61,8 @@ while True:
     time.sleep(120)
 
 
-
     """
+    Attempt to switch between definition and example states
 
     if (DEF_EX_VAL == 0):
         DEF_EX_VAL = 1
