@@ -1,7 +1,7 @@
 // Test code for Adafruit GPS modules using MTK driver
 // such as www.adafruit.com/products/660 (now discontinued!)
 // The suggested replacement is the Ultimate GPS Module PID:746 (code changes needed!!)
-// Shop adafruit.com and help support open source hardware & software! -adafruit
+// Shop adafruit.com and help support open source hardware & software! -adafruit 
 
   #if (ARDUINO >= 100)
 #include <SoftSerial.h>
