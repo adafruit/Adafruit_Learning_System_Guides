@@ -19,7 +19,7 @@ door_led_pin = board.D25
 
 door_led = DigitalInOut(door_led_pin)
 door_led.direction = Direction.OUTPUT
-door_led.value = False 
+door_led.value = False
 
 motion_led = DigitalInOut(motion_led_pin)
 motion_led.direction = Direction.OUTPUT
@@ -31,8 +31,8 @@ prev_door = False
 pygame.mixer.init(44100, -16, 2, 1024)
 
 # sound files expect to be in the same directory as script
-enter = pygame.mixer.Sound("./enter.wav")
-exit = pygame.mixer.Sound("./exit.wav")
+enter_sound = pygame.mixer.Sound("./enter.wav")
+exit_sound = pygame.mixer.Sound("./exit.wav")
 
 while True:
 
@@ -47,16 +47,15 @@ while True:
         motion_led.value = True
     else:
         motion_led.value = False
-    
-    # When the door is opened, if there is movement outside, 
-    # It means that someone is entering. 
+
+    # When the door is opened, if there is movement outside,
+    # It means that someone is entering.
     # If not, someone is exiting.
-    if door.value and not prev_door:      
+    if door.value and not prev_door:
         if motion.value:
-            enter.play()
+            enter_sound.play()
         else:
-            exit.play()
-            
+            exit_sound.play()
+
     prev_door = door.value
-    
     time.sleep(0.01)
