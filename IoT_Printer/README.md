@@ -5,6 +5,10 @@ but that tutorial has been archived as the printer parts package it needs has be
 
 The product page to the discontinued Adafruit IoT Printer Project Pack "Internet of Things" printer PRODUCT ID: 717 is [here](https://www.adafruit.com/product/717)
 
-All files here are under MIT License, please attribute to Adafruit Industries
+Adafruit invests time and resources providing this open source code, 
+please support Adafruit and open-source hardware by purchasing 
+products from Adafruit!
 
-Please consider buying your parts at Adafruit.com to support open source code
+Designed by Adafruit Industries.  
+Creative Commons, Attribution & Share-Alike license
+All text above must be included in any redistribution
