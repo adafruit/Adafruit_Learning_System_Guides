@@ -1,6 +1,6 @@
 ## Adafruit MTK3329 GPS Module Test Code
 
-Test File for the Discontinued Adafruit MTK3329 GPS Module Product UP501 Breadboard-friendly 66 channel GPS module w/10 Hz updates, Adafruit Product ID: 660
+Test File for the discontinued Adafruit MTK3329 GPS Module Product UP501 Breadboard-friendly 66 channel GPS module w/10 Hz updates, Adafruit Product ID: 660
 
 If you are making a new project, we highly suggest the [Adafruit Ultimate GPS Module](https://www.adafruit.com/product/746) Pruduct ID: 746
 which is still available, supported, and has examples on the [Adafruit Learning System](https://learn.adafruit.com). 
