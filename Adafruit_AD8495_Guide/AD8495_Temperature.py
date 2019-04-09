@@ -1,6 +1,6 @@
+import time
 import analogio
 import board
-import time
 
 ad8495 = analogio.AnalogIn(board.A1)
 
