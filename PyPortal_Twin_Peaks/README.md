@@ -1,4 +1,4 @@
-# PyPortalTwinPeaks
+# PyPortal_Twin_Peaks
 
 Code for the Twin Peaks PyPortal tutorial at https://learn.adafruit.com/twin-peaks-light-reactive-pyportal-picture-frame
 by Liz (BlitzCityDIY) for Adafruit Industries
