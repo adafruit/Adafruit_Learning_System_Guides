@@ -11,11 +11,9 @@ import pulseio
 import busio
 import adafruit_lis3dh
 
-backlight = pulseio.PWMOut(board.TFT_BACKLIGHT)
 splash = displayio.Group()
 board.DISPLAY.show(splash)
 
-max_brightness = 2 ** 15
 SENSITIVITY = 5   # reading in Z direction to trigger, adjustable
 
 images = list(filter(lambda x: x.endswith("bmp"), os.listdir("/")))
@@ -23,9 +21,7 @@ images = list(filter(lambda x: x.endswith("bmp"), os.listdir("/")))
 i = random.randint(0, (len(images)-1))  # initial image is randomly selected
 
 # Set up accelerometer on I2C bus, 4G range:
-I2C = busio.I2C(board.SCL, board.SDA)
-
-ACCEL = adafruit_lis3dh.LIS3DH_I2C(I2C, address=0x18)
+ACCEL = adafruit_lis3dh.LIS3DH_I2C(board.I2C(), address=0x18)
 
 ACCEL.range = adafruit_lis3dh.RANGE_4_G
 
@@ -39,30 +35,30 @@ while True:
             print("Image unsupported {}".format(images[i]))
             del images[i]
             continue
-        face = displayio.Sprite(odb, pixel_shader=displayio.ColorConverter(),
-                                position=(0, 0))
+        face = displayio.TileGrid(odb, pixel_shader=displayio.ColorConverter())
+
         splash.append(face)
         # Wait for the image to load.
         board.DISPLAY.wait_for_frame()
 
         # Fade up the backlight
-        for b in range(100):
-            backlight.duty_cycle = b * max_brightness // 100
+        for b in range(101):
+            board.DISPLAY.brightness = b / 100
             time.sleep(0.01)  # default (0.01)
 
-        # Wait forever
+        # Wait until the board gets shaken
         while not shaken:
             try:
                 ACCEL_Z = ACCEL.acceleration[2]  # Read Z axis acceleration
-            except IOError:
+            except OSError:
                 pass
             # print(ACCEL_Z)  # uncomment to see the accelerometer z reading
             if ACCEL_Z > SENSITIVITY:
                 shaken = True
 
         # Fade down the backlight
-        for b in range(50, -1, -1):
-            backlight.duty_cycle = b * max_brightness // 100
+        for b in range(100, 0, -1):
+            board.DISPLAY.brightness = b
             time.sleep(0.005)  # default (0.005)
 
         splash.pop()
