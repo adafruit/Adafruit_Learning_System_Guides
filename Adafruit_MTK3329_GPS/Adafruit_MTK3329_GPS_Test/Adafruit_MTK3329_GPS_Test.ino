@@ -1,17 +1,10 @@
 // Test code for Adafruit GPS modules using MTK driver
 // such as www.adafruit.com/products/660 (now discontinued!)
 // The suggested replacement is the Ultimate GPS Module PID:746 (code changes needed!!)
-// Shop adafruit.com and help support open source hardware & software! -adafruit
+// Shop adafruit.com and help support open source hardware & software! -adafruit 
 
-  #if (ARDUINO >= 100)
 #include <SoftSerial.h>
 SoftSerial mySerial(2, 3);
-  #else
-// If you're using Arduino IDE v23 or earlier, you'll
-// need to install NewSoftSerial
-#include <NewSoftSerial.h>
-NewSoftSerial mySerial(2, 3);
-  #endif
 
 // Connect the GPS Power pin to 3.3V
 // Connect the GPS Ground pin to ground
