@@ -7,8 +7,6 @@ import os
 import random
 import board
 import displayio
-import pulseio
-import busio
 import adafruit_lis3dh
 
 splash = displayio.Group()
