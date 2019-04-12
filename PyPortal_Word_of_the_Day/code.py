@@ -19,13 +19,9 @@ PUBLISH_DATE = ['publishDate']
 CAPTION = 'wordnik.com/word-of-the-day'
 PRONUNCIATION = [0,'raw']
 
-DEF_EX_ARR = [DEF_LOCATION, EXAMPLE_LOCATION]
-
-DEF_EX_VAL = 0
-
 cwd = ("/"+__file__).rsplit('/', 1)[0]
 pyportal = PyPortal(url=DATA_SOURCE,
-                    json_path=(WORD_LOCATION, PART_OF_SPEECH, DEF_EX_ARR[DEF_EX_VAL]),
+                    json_path=(WORD_LOCATION, PART_OF_SPEECH, DEF_LOCATION),
                     status_neopixel=board.NEOPIXEL,
                     default_bg=cwd+"/wordoftheday_background.bmp",
                     text_font=cwd+"/fonts/Arial-ItalicMT-17.bdf",
