@@ -21,7 +21,7 @@ pyportal = adafruit_pyportal.PyPortal(url=DATA_SOURCE,
                                       status_neopixel=board.NEOPIXEL,
                                       default_bg=cwd+"/new_background.bmp",
                                       text_font=cwd+"/fonts/Arial-Bold-12.bdf",
-                                      text_position=((5, 0), (5, 205)),
+                                      text_position=((5, 35), (5, 225)),
                                       text_color=(0xFFFFFF, 0xFFFFFF),
                                       text_wrap=(35, 35), # characters to wrap
                                       image_json_path=IMAGE_LOCATION,
