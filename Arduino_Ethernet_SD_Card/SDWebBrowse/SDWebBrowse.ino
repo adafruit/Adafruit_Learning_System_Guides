@@ -10,12 +10,11 @@
  *
  * Tutorial is at https://learn.adafruit.com/arduino-ethernet-sd-card/serving-files-over-ethernet
  * 
- * Please use the Adafruit Ethernet2 library https://github.com/adafruit/Ethernet2
  */
  
 #include <SPI.h>
 #include <SD.h>
-#include <Ethernet2.h>  // Using WIZ5500 Ethernet chip so Adafruit Ethernet2 library is required
+#include <Ethernet.h>
 
 /************ ETHERNET STUFF ************/
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };  // change if necessary
@@ -270,4 +269,3 @@ void printDirectory(File dir, int numTabs) {
      entry.close();
    }
 }
-

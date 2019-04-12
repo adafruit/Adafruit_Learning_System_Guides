@@ -1,6 +1,6 @@
 """
-This example will access the twitter follow button API, grab a number like
-the number of followers... and display it on a screen!
+This example queries the Open Weather Maps site API to find out the current
+weather for your location... and display it on a screen!
 if you can find something that spits out JSON data, we can display it
 """
 import sys

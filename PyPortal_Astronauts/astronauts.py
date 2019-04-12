@@ -23,13 +23,13 @@ pyportal = PyPortal(url=DATA_SOURCE,
                     status_neopixel=board.NEOPIXEL,
                     default_bg=cwd+"/astronauts_background.bmp",
                     text_font=cwd+"/fonts/Helvetica-Bold-100.bdf",
-                    text_position=((180, 70), None),
+                    text_position=((225, 50), None),
                     text_color=(0xFFFFFF, None))
 
 names_font =  bitmap_font.load_font(cwd+"/fonts/Helvetica-Bold-16.bdf")
 # pre-load glyphs for fast printing
 names_font.load_glyphs(b'abcdefghjiklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ- ()')
-names_position = (100, 175)
+names_position = (10, 135)
 names_color = 0xFF00FF
 
 while True:
