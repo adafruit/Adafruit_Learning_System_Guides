@@ -16,6 +16,7 @@ TIME_COLOR = 0xE0CD1A    # time text color
 VSCALE = 20              # vertical plot scale
 #-------------------------------------------
 
+# pylint: disable=line-too-long
 DATA_SOURCE = "https://tidesandcurrents.noaa.gov/api/datagetter?date=today&product=predictions&datum=mllw&format=json&units=metric&time_zone=lst_ldt&station="+STATION_ID
 DATA_LOCATION = ["predictions"]
 
@@ -57,8 +58,8 @@ pyportal.splash.append(time_label)
 
 # Setup current time marker
 time_marker_bitmap = displayio.Bitmap(MARK_SIZE, MARK_SIZE, 3)
-for i in range(MARK_SIZE * MARK_SIZE):
-    time_marker_bitmap[i] = 2
+for pixel in range(MARK_SIZE * MARK_SIZE):
+    time_marker_bitmap[pixel] = 2
 time_marker = displayio.TileGrid(time_marker_bitmap, pixel_shader=palette, x=-MARK_SIZE, y=-MARK_SIZE)
 pyportal.splash.append(time_marker)
 
@@ -69,20 +70,20 @@ def get_tide_data():
     raw_data = pyportal.fetch()
 
     # Results will be stored in a list that is display WIDTH long
-    tide_data = [None]*WIDTH
+    new_tide_data = [None]*WIDTH
 
     # Convert raw data to display coordinates
     for data in raw_data:
-        d, t = data["t"].split(" ") # date and time
+        _, t = data["t"].split(" ") # date and time
         h, m = t.split(":")         # hours and minutes
         v = data["v"]               # water level
         x = round( (WIDTH - 1) * (60 * float(h) + float(m)) / 1440 )
         y = (HEIGHT // 2) - round(VSCALE * float(v))
         y = 0 if y < 0 else y
         y = HEIGHT-1 if y >= HEIGHT else y
-        tide_data[x] = y
+        new_tide_data[x] = y
 
-    return tide_data
+    return new_tide_data
 
 def draw_data_point(x, y, size=PLOT_SIZE, color=1):
     """Draw data point on to the tide plot bitmap at (x,y)."""
@@ -96,10 +97,10 @@ def draw_data_point(x, y, size=PLOT_SIZE, color=1):
             except IndexError:
                 pass
 
-def draw_time_marker(current_time):
+def draw_time_marker(time_info):
     """Draw a marker on the tide plot for the current time."""
-    h = current_time.tm_hour
-    m = current_time.tm_min
+    h = time_info.tm_hour
+    m = time_info.tm_min
     x = round( (WIDTH - 1) * (60 * float(h) + float(m)) / 1440 )
     y = tide_data[x]
     if y is not None:
@@ -108,7 +109,7 @@ def draw_time_marker(current_time):
         time_marker.x = x
         time_marker.y = y
 
-def update_display(current_time, update_tides=False):
+def update_display(time_info, update_tides=False):
     """Update the display with current info."""
 
     # Tide data plot
@@ -121,15 +122,15 @@ def update_display(current_time, update_tides=False):
             draw_data_point(x, tide_data[x])
 
     # Current location marker
-    draw_time_marker(current_time)
+    draw_time_marker(time_info)
 
     # Date and time
-    date_label.text = "{:04}-{:02}-{:02}".format(current_time.tm_year,
-                                                 current_time.tm_mon,
-                                                 current_time.tm_mday)
-    time_label.text = "{:02}:{:02}:{:02}".format(current_time.tm_hour,
-                                                 current_time.tm_min,
-                                                 current_time.tm_sec)
+    date_label.text = "{:04}-{:02}-{:02}".format(time_info.tm_year,
+                                                 time_info.tm_mon,
+                                                 time_info.tm_mday)
+    time_label.text = "{:02}:{:02}:{:02}".format(time_info.tm_hour,
+                                                 time_info.tm_min,
+                                                 time_info.tm_sec)
 
     board.DISPLAY.refresh_soon()
 

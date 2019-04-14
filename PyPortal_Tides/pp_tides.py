@@ -11,6 +11,7 @@ LO_COLOR   = 0x11FFFF    # low tide times color
 DATE_COLOR = 0xFFFFFF    # date and time color
 #-------------------------------------------
 
+# pylint: disable=line-too-long
 DATA_SOURCE = "https://tidesandcurrents.noaa.gov/api/datagetter?date=today&product=predictions&datum=mllw&interval=hilo&format=json&units=metric&time_zone=lst_ldt&station="+STATION_ID
 DATA_LOCATION = ["predictions"]
 
@@ -50,24 +51,24 @@ def get_tide_info():
     raw_info = pyportal.fetch()
 
     # Return will be a dictionary of lists containing tide times
-    tide_info = {"H":[], "L":[]}
+    new_tide_info = {"H":[], "L":[]}
 
     # Parse out the tide time info
     for info in raw_info:
         tide_type = info["type"]
         tide_time = info["t"].split(" ")[1]
-        tide_info[tide_type].append(tide_time)
+        new_tide_info[tide_type].append(tide_time)
 
-    return tide_info
+    return new_tide_info
 
-def update_display(current_time, update_tides=False):
+def update_display(time_info, update_tides=False):
     """Update the display with current info."""
 
     # Tide time info
     if update_tides:
         # out with the old
-        for label in HI_LABELS + LO_LABELS:
-            label.text = ""
+        for tide_label in HI_LABELS + LO_LABELS:
+            tide_label.text = ""
         # in with the new
         for i, hi_time in enumerate(tide_info["H"]):
             HI_LABELS[i].text = hi_time
@@ -75,12 +76,12 @@ def update_display(current_time, update_tides=False):
             LO_LABELS[i].text = lo_time
 
     # Date and time
-    DATE_LABEL.text = "{:04}-{:02}-{:02} {:02}:{:02}:{:02}".format(current_time.tm_year,
-                                                                   current_time.tm_mon,
-                                                                   current_time.tm_mday,
-                                                                   current_time.tm_hour,
-                                                                   current_time.tm_min,
-                                                                   current_time.tm_sec)
+    DATE_LABEL.text = "{:04}-{:02}-{:02} {:02}:{:02}:{:02}".format(time_info.tm_year,
+                                                                   time_info.tm_mon,
+                                                                   time_info.tm_mday,
+                                                                   time_info.tm_hour,
+                                                                   time_info.tm_min,
+                                                                   time_info.tm_sec)
 
     board.DISPLAY.refresh_soon()
 
