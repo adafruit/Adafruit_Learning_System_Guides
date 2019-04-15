@@ -116,7 +116,7 @@ prop_btn = [
     {'name':'onoff', 'pos':(15, 15), 'label':'on/off'},
     {'name':'up', 'pos':(75, 15), 'label':'+'},
     {'name':'down', 'pos':(135, 15), 'label':'-'},
-    {'name':'living', 'pos':(195, 15), 'label':'living'},
+    {'name':'room', 'pos':(195, 15), 'label':'room'},
     {'name':'lamp', 'pos':(255, 15), 'label':'lamp'}
 ]
 
@@ -144,7 +144,7 @@ while True:
         for i, button in enumerate(buttons):
             if button.contains(touch):
                 button.selected = True
-                if button.name == 'living':
+                if button.name == 'room':
                     hue_selector = hue_lights['livingroom']
                     print('Switching to ', hue_selector)
                 elif button.name == 'lamp':
