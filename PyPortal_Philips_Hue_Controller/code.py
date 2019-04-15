@@ -132,13 +132,11 @@ for b in buttons:
     button_group.append(b.group)
 
 # Hue Light/Group Identifiers
-hue_lights={'lamp': 4, 'livingroom': 4}
-
+hue_lights={'lamp': 1, 'livingroom': 2}
 hue_selector = hue_lights['lamp']
 
-
-# Default to 50% brightness
-current_brightness = 50
+# Default to 25% brightness
+current_brightness = 25
 
 while True:
     touch = ts.touch_point
