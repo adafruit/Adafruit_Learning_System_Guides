@@ -29,7 +29,6 @@ PRONUNCIATION = [0, 'raw']
 # needed so we know where to find files
 cwd = ("/"+__file__).rsplit('/', 1)[0]
 
-
 # Initialize the pyportal object and let us know what data to fetch and where
 # to display it
 pyportal = PyPortal(url=DATA_SOURCE,
