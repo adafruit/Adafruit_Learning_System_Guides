@@ -117,7 +117,7 @@ prop_btn = [
     {'name':'up', 'pos':(75, 15), 'label':'+'},
     {'name':'down', 'pos':(135, 15), 'label':'-'},
     {'name':'living', 'pos':(195, 15), 'label':'living'},
-    {'name':'room', 'pos':(255, 15), 'label':'room'}
+    {'name':'lamp', 'pos':(255, 15), 'label':'lamp'}
 ]
 
 # generate property buttons from prop_btn list
@@ -147,7 +147,7 @@ while True:
                 if button.name == 'living':
                     hue_selector = hue_lights['livingroom']
                     print('Switching to ', hue_selector)
-                elif button.name == 'room':
+                elif button.name == 'lamp':
                     hue_selector = hue_lights['lamp']
                     print('Switching to ', hue_selector)
                 elif button.name == 'onoff':
