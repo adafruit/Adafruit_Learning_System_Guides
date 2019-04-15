@@ -12,7 +12,7 @@ from adafruit_pyportal import PyPortal
 try:
     from secrets import secrets
 except ImportError:
-    print("WiFi settings are kept in settings.py, please add them there!")
+    print("WiFi settings are kept in secrets.py, please add them there!")
     raise
 
 # Set up where we'll be fetching data from
