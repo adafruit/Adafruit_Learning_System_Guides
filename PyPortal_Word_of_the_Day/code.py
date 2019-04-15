@@ -18,12 +18,12 @@ except ImportError:
 # Set up where we'll be fetching data from
 DATA_SOURCE = "https://api.wordnik.com/v4/words.json/wordOfTheDay?api_key="+secrets['wordnik_token']
 WORD_LOCATION = ['word']
-PART_OF_SPEECH = ['definitions', 0,'partOfSpeech']
+PART_OF_SPEECH = ['definitions', 0, 'partOfSpeech']
 DEF_LOCATION = ['definitions', 0, 'text']
 EXAMPLE_LOCATION = ['examples', 0, 'text']
 PUBLISH_DATE = ['publishDate']
 CAPTION = 'wordnik.com/word-of-the-day'
-PRONUNCIATION = [0,'raw']
+PRONUNCIATION = [0, 'raw']
 
 # determine the current working directory
 # needed so we know where to find files
@@ -67,4 +67,3 @@ while True:
     except RuntimeError as e:
         print("Some error occured, retrying! -", e)
     time.sleep(600) # Update every 10 minutes
-
