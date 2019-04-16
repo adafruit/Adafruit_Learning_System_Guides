@@ -12,7 +12,7 @@ from adafruit_pyportal import PyPortal
 try:
     from secrets import secrets
 except ImportError:
-    print("WiFi settings are kept in secrets.py, please add them there!")
+    print("WiFi settings are kept in settings.py, please add them there!")
     raise
 
 # Set up where we'll be fetching data from
@@ -38,22 +38,18 @@ pyportal = PyPortal(url=DATA_SOURCE,
                     text_font=cwd+"/fonts/Arial-ItalicMT-17.bdf",
                     text_position=((50, 30),  # word location
                                    (50, 50), # part of speech location
-                                   (50, 135), # definition location
-                                   ),
+                                   (50, 135)), # definition location
                     text_color=(0x8080FF,
                                 0xFF00FF,
-                                0xFFFFFF
-                                ),
+                                0xFFFFFF),
                     text_wrap=(0, # characters to wrap for text
                                0,
-                               28
-                               ),
+                               28),
                     text_maxlen=(180, 30, 115), # max text size for word, part of speech and def
                     caption_text=CAPTION,
                     caption_font=cwd+"/fonts/Arial-ItalicMT-17.bdf",
                     caption_position=(50, 220),
-                    caption_color=0x808080
-                    )
+                    caption_color=0x808080)
 
 pyportal.set_text("\nloading ...") # display while user waits
 pyportal.preload_font() # speed things up by preloading font
