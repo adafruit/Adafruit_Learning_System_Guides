@@ -15,7 +15,7 @@
  modified 12 Apr 2018 by Mike Barela 
 
  This example code is in the public domain.
-
+ 
  */
 #include <SPI.h>
 #include <SD.h>
