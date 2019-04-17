@@ -20,10 +20,7 @@ DATA_SOURCE = "https://api.wordnik.com/v4/words.json/wordOfTheDay?api_key="+secr
 WORD_LOCATION = ['word']
 PART_OF_SPEECH = ['definitions', 0, 'partOfSpeech']
 DEF_LOCATION = ['definitions', 0, 'text']
-EXAMPLE_LOCATION = ['examples', 0, 'text']
-PUBLISH_DATE = ['publishDate']
 CAPTION = 'wordnik.com/word-of-the-day'
-PRONUNCIATION = [0, 'raw']
 
 # determine the current working directory
 # needed so we know where to find files
@@ -51,7 +48,7 @@ pyportal = PyPortal(url=DATA_SOURCE,
                     caption_position=(50, 220),
                     caption_color=0x808080)
 
-pyportal.set_text("\nloading ...") # display while user waits
+print("loading...") # print to repl while waiting for font to load
 pyportal.preload_font() # speed things up by preloading font
 pyportal.set_text("\nWord of the Day") # show title
 
@@ -61,4 +58,4 @@ while True:
         print("Response is", value)
     except RuntimeError as e:
         print("Some error occured, retrying! -", e)
-    time.sleep(600) # Update every 10 minutes
+    time.sleep(10*60) # Update every 10 minutes
