@@ -1,16 +1,15 @@
 import time
-import RPi.GPIO as GPIO
-GPIO.setmode(GPIO.BCM)
+import board
+from digitalio import DigitalInOut, Direction
 
-padPin = 23
-GPIO.setup(padPin, GPIO.IN)
+pad_pin = board.D23
 
+pad = DigitalInOut(pad_pin)
+pad.direction = Direction.INPUT
 
 while True:
-    padPressed =  GPIO.input(padPin)
 
-    if padPressed:
-        print "pressed"
-    
+    if pad.value:
+        print("pressed")
+
     time.sleep(0.1)
-
