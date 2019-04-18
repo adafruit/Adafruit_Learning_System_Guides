@@ -1,7 +1,7 @@
 ### Adafruit IoT Camera with EyeFi card - Adafruit-IoT-Camera-with-EyeFi-Sketch
 This is an Arduino sketch for using the Adafruit TTL Serial JPEG Cameras with an Eye-Fi card for wireless snaps.
 
-This tutorial is rather old, it is suggested that other tutorials be consulted for more modern implementations. This
+This tutorial is out of date. It is highly suggested that other tutorials be consulted for more modern implementations. This
 code is being hosted for legacy purposes.
 
 It is recommended you initialize the Eye-Fi card using the SdFormatter sketch included with the SdFat library:
