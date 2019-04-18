@@ -1,6 +1,6 @@
 # X2 Time Ball aka 2012 Disco Time Ball
 
-The files in this repository accompanied an Adafruit Project "X2 Time Ball" aka "2012 Disco Time Ball"
+The files in this repository accompany an Adafruit Project "X2 Time Ball" aka "2012 Disco Time Ball"
 
 See these Adafruit blog posts for additional details:
 
