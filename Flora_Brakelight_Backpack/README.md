@@ -5,11 +5,9 @@ The Flora Brakelight Backpack is a project created by Becky Stern and Tyler Coop
 For more details on the project, please visit http://learn.adafruit.com/flora-brakelight-backpack/.
 
 Adafruit invests time and resources providing this open source design, 
-please support Adafruit and open-source hardware by purchasing products from Adafruit!
+please support Adafruit and open-source hardware by purchasing products from [Adafruit.com](https://www.adafruit.com)!
 
 Written by Tyler Cooper for Adafruit Industries.
-
-Please consider buying your parts at [Adafruit.com](https://www.adafruit.com) to support open source code.
 
 BSD license, check LICENSE.md for more information
 
