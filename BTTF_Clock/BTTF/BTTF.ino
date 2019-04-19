@@ -40,9 +40,9 @@
 // using the same bus select bits.
 
 #include <Wire.h>
-#include "Adafruit_LEDBackpack.h"
-#include "Adafruit_GFX.h"
-#include "RTClib.h"
+#include <Adafruit_LEDBackpack.h>
+#include <Adafruit_GFX.h>
+#include <RTClib.h>
 
 Adafruit_7segment matrix[3] = {
   Adafruit_7segment(), Adafruit_7segment(), Adafruit_7segment() };
