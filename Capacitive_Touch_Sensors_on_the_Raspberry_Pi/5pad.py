@@ -1,53 +1,52 @@
-import RPi.GPIO as GPIO
 import time
+import board
+from digitalio import DigitalInOut, Direction
 
-GPIO.setmode(GPIO.BCM)
+# set the GPIO input pins
+pad0_pin = board.D22
+pad1_pin = board.D21
+pad2_pin = board.D17
+pad3_pin = board.D24
+pad4_pin = board.D23
 
-#set the GPIO input pins
-pad0 = 22
-pad1 = 27
-pad2 = 17
-pad3 = 24
-pad4 = 23
+pad0 = DigitalInOut(pad0_pin)
+pad1 = DigitalInOut(pad1_pin)
+pad2 = DigitalInOut(pad2_pin)
+pad3 = DigitalInOut(pad3_pin)
+pad4 = DigitalInOut(pad4_pin)
 
-GPIO.setup(pad0, GPIO.IN)
-GPIO.setup(pad1, GPIO.IN)
-GPIO.setup(pad2, GPIO.IN)
-GPIO.setup(pad3, GPIO.IN)
-GPIO.setup(pad4, GPIO.IN)
+pad0.direction = Direction.INPUT
+pad1.direction = Direction.INPUT
+pad2.direction = Direction.INPUT
+pad3.direction = Direction.INPUT
+pad4.direction = Direction.INPUT
 
-pad0alreadyPressed = False
-pad1alreadyPressed = False
-pad2alreadyPressed = False
-pad3alreadyPressed = False
-pad4alreadyPressed = False
-
+pad0_already_pressed = True
+pad1_already_pressed = True
+pad2_already_pressed = True
+pad3_already_pressed = True
+pad4_already_pressed = True
 
 while True:
-    pad0pressed = not GPIO.input(pad0)
-    pad1pressed = not GPIO.input(pad1)
-    pad2pressed = not GPIO.input(pad2)
-    pad3pressed = not GPIO.input(pad3)
-    pad4pressed = not GPIO.input(pad4)
-    
-    if pad0pressed and not pad0alreadyPressed:
-        print "Pad 0 pressed"
-    pad0alreadyPressed = pad0pressed
 
-    if pad1pressed and not pad1alreadyPressed:
-        print "Pad 1 pressed"
-    pad1alreadyPressed = pad1pressed
+    if pad0.value and not pad0_already_pressed:
+        print("Pad 0 pressed")
+    pad0_already_pressed = pad0.value
 
-    if pad2pressed and not pad2alreadyPressed:
-        print "Pad 2 pressed"
-    pad2alreadyPressed = pad2pressed
+    if pad1.value and not pad1_already_pressed:
+        print("Pad 1 pressed")
+    pad1_already_pressed = pad1.value
 
-    if pad3pressed and not pad3alreadyPressed:
-        print "Pad 3 pressed"
-    pad3alreadyPressed = pad3pressed
+    if pad2.value and not pad2_already_pressed:
+        print("Pad 2 pressed")
+    pad2_already_pressed = pad2.value
 
-    if pad4pressed and not pad4alreadyPressed:
-        print "Pad 4 pressed"
-    pad4alreadyPressed = pad4pressed
+    if pad3.value and not pad3_already_pressed:
+        print("Pad 3 pressed")
+    pad3_already_pressed = pad3.value
+
+    if pad4.value and not pad4_already_pressed:
+        print("Pad 4 pressed")
+    pad4_already_pressed = pad4.value
 
     time.sleep(0.1)
