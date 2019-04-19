@@ -4,7 +4,7 @@ The GPS Dog Collar is a project created by Becky Stern and Tyler Cooper.
 
 For more details on the project, please visit http://learn.adafruit.com/gps-dog-collar/.
 
-Adafruit invests time and resources providing this open source design, please support Adafruit and open-source hardware by purchasing products from Adafruit!
+Adafruit invests time and resources providing this open source design, please support Adafruit and open-source hardware by purchasing products from [Adafruit](https://www.adafruit.com)!
 
 Written by Tyler Cooper for Adafruit Industries. 
 BSD license, check LICENSE.md for more information
