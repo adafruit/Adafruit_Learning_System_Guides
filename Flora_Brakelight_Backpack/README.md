@@ -14,3 +14,7 @@ BSD license, check LICENSE.md for more information
 This code example requires the Adafruit LSM303 library which can be downloaded from https://github.com/adafruit/Adafruit_LSM303DLHC
 
 This code example also requires the Adafruit WS2801 library which can be downloaded from https://github.com/adafruit/Adafruit-WS2801-Library
+
+This code was moved from https://github.com/adafruit/Flora-Brakelight-Backpack which has been archived.
+
+If you are looking to make changes/additions, please use the GitHub Issues and Pull Request mechanisms.
