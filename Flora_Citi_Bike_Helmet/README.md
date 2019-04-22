@@ -17,6 +17,7 @@ Adafruit GPS library which can be downloaded from https://github.com/adafruit/Ad
 Adafruit NeoPixel library which can be downloaded from https://github.com/adafruit/Adafruit_NeoPixel
 
 Pololu LSM303 library which can be downloaded from https://github.com/pololu/LSM303
+
 ----------------------------------
 This code was migrated from repo https://github.com/adafruit/Citi-Bike-Helmet which was then archived.
 
