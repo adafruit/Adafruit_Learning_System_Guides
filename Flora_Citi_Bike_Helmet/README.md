@@ -21,5 +21,5 @@ Pololu LSM303 library which can be downloaded from https://github.com/pololu/LSM
 ----------------------------------
 This code was migrated from repo https://github.com/adafruit/Citi-Bike-Helmet which was then archived.
 
-If you would like this repo modified, please use the GitHub Issues and Pull Request to note changes. Adafruit 
+If you would like this repo modified, please use the GitHub Issues and Pull Request mechanisms to note changes. Adafruit 
 welcomes pull requests to fix or improve code.
