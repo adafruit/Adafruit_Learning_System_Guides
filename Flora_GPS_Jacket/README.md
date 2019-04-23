@@ -9,7 +9,7 @@ open-source hardware by purchasing products from [Adafruit](https://www.adafruit
 
 Written by Tyler Cooper for Adafruit Industries.
 
-BSD license, check license.txt for more information
+BSD license, check LICENSE.md for more information
 
 This code example requires the Adafruit GPS library which can be downloaded from https://github.com/adafruit/Adafruit-GPS-Library
 
