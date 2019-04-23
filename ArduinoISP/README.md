@@ -1,6 +1,6 @@
 ## ArduinoISP2 
 
-This code is used in the Adafruit tutorial Arduino Yips, Tricks, and Techniques to reprogram AVR chips.
+This code is used in the Adafruit tutorial "Arduino Tips, Tricks, and Techniques" to reprogram AVR chips.
 https://learn.adafruit.com/arduino-tips-tricks-and-techniques/arduinoisp
 
  March 2012 William Phelps - wm (at) usa.net 
@@ -11,7 +11,7 @@ https://learn.adafruit.com/arduino-tips-tricks-and-techniques/arduinoisp
  extra oscillator/crystal. Can also rescue some bricked chips with
  bad oscillator fuses
  
-**Modified for Arduino IDE 1.0**  
+### Modified for Arduino IDE 1.0
  shorter serial port receive buffer requires changes  
  getEOP() now gets entire request before avrisp() is called to process it  
  Serial.print((char) xxx) changed to Serial.write(xxx)  
