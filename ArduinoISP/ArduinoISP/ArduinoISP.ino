@@ -13,7 +13,7 @@
 //
 // October 2009 by David A. Mellis
 // - Added support for the read signature command
-// 
+//
 // February 2009 by Randall Bohn
 // - Added support for writing to EEPROM (what took so long?)
 // Windows users should consider WinAVR's avrdude instead of the
