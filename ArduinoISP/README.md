@@ -23,7 +23,7 @@ https://learn.adafruit.com/arduino-tips-tricks-and-techniques/arduinoisp
 - Why is it that PROG_FLASH and PROG_DATA don't actually do anything???  
 
 Tested with Arduino IDE 22 and 1.0  
- IDE 22 - 5148 bytes  
- IDE 1.0 - 5524 bytes!  
+- IDE 22 - 5148 bytes  
+- IDE 1.0 - 5524 bytes!  
  -----------------------------
  This code was previously at https://github.com/adafruit/ArduinoISP which has been archived.
