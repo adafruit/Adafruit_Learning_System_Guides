@@ -1,24 +1,23 @@
-import RPi.GPIO as GPIO
 import time
+import board
 import mcpi.minecraft as minecraft
+from digitalio import DigitalInOut, Direction
+
 mc = minecraft.Minecraft.create()
 
-GPIO.setmode(GPIO.BCM)
+pad_pin = board.D23
+pad = DigitalInOut(pad_pin)
+pad.direction = Direction.INPUT
 
-padPin = 23
-
-GPIO.setup(padPin, GPIO.IN)
-
-alreadyPressed = False
+already_pressed = False
 
 while True:
-    padPressed = GPIO.input(padPin)
 
-    if padPressed and not alreadyPressed:
+    if pad.value and not already_pressed:
         pos = mc.player.getPos()
         x = pos.x
         y = pos.y + 10
         z = pos.z
         mc.player.setPos(x, y, z)
-    alreadyPressed = padPressed
+    alreadyPressed = pad.value
     time.sleep(0.1)
