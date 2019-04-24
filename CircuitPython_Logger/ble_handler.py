@@ -1,5 +1,5 @@
 """
-UART based message handler for CircuitPython logging.
+BLE based message handler for CircuitPython logging.
 
 Adafruit invests time and resources providing this open source code.
 Please support Adafruit and open source hardware by purchasing
@@ -14,19 +14,6 @@ All text above must be included in any redistribution.
 
 
 #pylint:disable=missing-super-argument
-
-# Example:
-#
-# import board
-# import busio
-# from uart_handler import UartHandler
-# import adafruit_logging as logging
-#
-# uart = busio.UART(board.TX, board.RX, baudrate=115200)
-# logger = logging.getLogger('uart')
-# logger.addHandler(UartHandler(uart))
-# logger.level = logging.INFO
-# logger.info('testing')
 
 from adafruit_logging import LoggingHandler
 from adafruit_ble.uart import UARTServer
