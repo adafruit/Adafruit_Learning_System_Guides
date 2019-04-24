@@ -62,7 +62,5 @@ class BLEHandler(LoggingHandler):
         """
         while not self._uart.connected:
             pass
-
         data = bytes(self.format(level, msg), 'utf-8')
-        for i in range(len(data)):
-            self._uart.write(data[i:i+1])
+        self._uart.write(data)
