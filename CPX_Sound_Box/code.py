@@ -33,7 +33,7 @@ def simpleCircle(wait):
         pixels[i] = BLACK
         time.sleep(wait)
 
-# Audio Stuff
+# Audio Play File
 def play_file(filename):
     print("Playing File" + filename)
     wave_file = open(filename, "rb")
