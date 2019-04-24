@@ -1,12 +1,12 @@
+import time
 import board
 from digitalio import DigitalInOut, Direction, Pull
 import audioio
 import neopixel
-import time
 
 filename = "electrons.wav"
 
-# What pad our button is connected to:
+# The pad our button is connected to:
 button = DigitalInOut(board.A4)
 button.direction = Direction.INPUT
 button.pull = Pull.UP
@@ -34,14 +34,13 @@ def simpleCircle(wait):
         time.sleep(wait)
 
 # Audio Play File
-def play_file(filename):
-    print("Playing File" + filename)
-    wave_file = open(filename, "rb")
+def play_file(playname):
+    print("Playing File " + playname)
+    wave_file = open(playname, "rb")
     with audioio.WaveFile(wave_file) as wave:
         with audioio.AudioOut(board.A0) as audio:
             audio.play(wave)
             while audio.playing:
-                pass
                 simpleCircle(.02)
     print("finished")
 
