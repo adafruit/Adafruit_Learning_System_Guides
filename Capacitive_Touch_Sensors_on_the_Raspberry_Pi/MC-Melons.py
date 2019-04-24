@@ -1,25 +1,25 @@
-import RPi.GPIO as GPIO
 import time
+import board
 import mcpi.minecraft as minecraft
+from digitalio import DigitalInOut, Direction
+
 mc = minecraft.Minecraft.create()
 
-GPIO.setmode(GPIO.BCM)
+pad_pin = board.D23
 
-padPin = 23
-
-GPIO.setup(padPin, GPIO.IN)
+pad = DigitalInOut(pad_pin)
+pad.direction = Direction.INPUT
 
 # melon block
-blockType = 103
+block_type = 103
 
 while True:
-    padPressed = GPIO.input(padPin)
 
-    if padPressed:
+    if pad.value:
         pos = mc.player.getPos()
         x = pos.x
         y = pos.y
         z = pos.z
-        mc.setBlock(x, y, z, blockType)
+        mc.setBlock(x, y, z, block_type)
 
     time.sleep(0.1)
