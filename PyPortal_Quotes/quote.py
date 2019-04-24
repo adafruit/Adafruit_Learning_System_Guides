@@ -14,8 +14,8 @@ pyportal = PyPortal(url=DATA_SOURCE,
                     status_neopixel=board.NEOPIXEL,
                     default_bg=cwd+"/quote_background.bmp",
                     text_font=cwd+"/fonts/Arial-ItalicMT-17.bdf",
-                    text_position=((20, 40),  # quote location
-                                   (5, 190)), # author location
+                    text_position=((20, 120),  # quote location
+                                   (5, 210)), # author location
                     text_color=(0xFFFFFF,  # quote text color
                                 0x8080FF), # author text color
                     text_wrap=(35, # characters to wrap for quote
@@ -30,6 +30,6 @@ while True:
     try:
         value = pyportal.fetch()
         print("Response is", value)
-    except RuntimeError as e:
+    except (ValueError, RuntimeError) as e:
         print("Some error occured, retrying! -", e)
     time.sleep(60)

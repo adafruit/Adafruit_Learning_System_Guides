@@ -18,7 +18,7 @@ pyportal = PyPortal(url=DATA_SOURCE, regexp_path=DATA_LOCATION,
                     status_neopixel=board.NEOPIXEL,
                     default_bg=cwd+"/discord_background.bmp",
                     text_font=cwd+"/fonts/Collegiate-50.bdf",
-                    text_position=(75, 170), text_color=0x000000)
+                    text_position=(70, 216), text_color=0x000000)
 
 while True:
     try:

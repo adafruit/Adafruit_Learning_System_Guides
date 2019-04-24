@@ -19,7 +19,7 @@ DATA_LOCATION = ['bpi', CURRENCY, 'rate_float']
 def text_transform(val):
     format_str = "{:,.2f} Bitcoins\n = {:,d}"
     if CURRENCY == 'USD':
-        format_str = "{:,.2f} Bitcoins\n = %{:,d}"
+        format_str = "{:,.2f} Bitcoins\n = ${:,d}"
     if CURRENCY == 'EUR':
         format_str = "{:,.2f} Bitcoins\n = €{:,d}"
     if CURRENCY == 'GBP':
@@ -32,7 +32,7 @@ pyportal = PyPortal(url=DATA_SOURCE, json_path=DATA_LOCATION,
                     status_neopixel=board.NEOPIXEL,
                     default_bg=cwd+"/bitcoin_background.bmp",
                     text_font=cwd+"/fonts/Arial-BoldItalic-12-Complete.bdf",
-                    text_position=(195, 95),
+                    text_position=(192, 130),
                     text_color=0x0,
                     text_transform=text_transform)
 pyportal.preload_font()  # preload alphanums
