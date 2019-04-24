@@ -1,10 +1,10 @@
 // Flora GPS + LED Pixel Code
-//
+// 
 // This code shows how to listen to the GPS module in an interrupt
 // which allows the program to have more 'freedom' - just parse
 // when a new NMEA sentence is available! Then access data when
 // desired.
-//
+// 
 // Tested and works great with the Adafruit Flora GPS module
 //    ------> http://adafruit.com/products/1059
 // Pick one up today at the Adafruit electronics shop 
