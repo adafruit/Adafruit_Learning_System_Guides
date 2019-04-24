@@ -10,7 +10,7 @@
 // A0: Programming - In communication with the slave
 //  6: Heartbeat - shows the programmer is running (removed, see notes below)
 // Optional - Piezo speaker on pin A3
-//
+// 
 // October 2009 by David A. Mellis
 // - Added support for the read signature command
 //
