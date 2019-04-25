@@ -12,8 +12,8 @@ BSD license, check LICENSE.md for more information
 
 ------------------------------
 
-This code example requires:
-- the Adafruit GPS library (Arduino library manager)
+The code example requires:
+- the Adafruit GPS library (in Arduino library manager)
 - the Time library which can be downloaded from http://www.pjrc.com/teensy/td_libs_Time.html
 - the Adafruit LSM303DLHC library (in Arduino library manager)
 - the Adafruit NeoPixel library (in Arduino library manager)
