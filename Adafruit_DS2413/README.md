@@ -9,7 +9,7 @@ For more details on the project, please visit https://learn.adafruit.com/adafrui
 Adafruit invests time and resources providing this open source design, 
 please support Adafruit and open-source hardware by purchasing products from [Adafruit](https://www.adafruit.com)!
 
-MIT License, attribution appreciated
+MIT License, see LICENSE.md, attribution appreciated
 
 ----------------------------------
 This code was migrated from repo https://github.com/adafruit/Adafruit_DS2413 which was then archived.
