@@ -2,12 +2,16 @@ import random
 import time
 import board
 import math
+from random import randint
 from adafruit_pyportal import PyPortal
 
-RANDOM_ART = str(math.floor(random.uniform(0, 470000)))
-print(RANDOM_ART)
-# Set up where we'll be fetching data from
-DATA_SOURCE = "https://collectionapi.metmuseum.org/public/collection/v1/objects/"+RANDOM_ART
+def getRandArt():
+
+    random_art = str(randint(1, 470000))
+
+    return random_art
+
+
 # There's a few different places we look for data in the photo of the day
 IMAGE_LOCATION = ["primaryImage"]
 TITLE_LOCATION = ["title"]
@@ -15,8 +19,7 @@ ARTIST_LOCATION = ["artistDisplayName"]
 
 # the current working directory (where this file is)
 cwd = ("/"+__file__).rsplit('/', 1)[0]
-pyportal = PyPortal(url=DATA_SOURCE,
-                    json_path=(TITLE_LOCATION, ARTIST_LOCATION),
+pyportal = PyPortal(json_path=(TITLE_LOCATION, ARTIST_LOCATION),
                     status_neopixel=board.NEOPIXEL,
                     default_bg=cwd+"/cute_background.bmp",
                     text_font=cwd+"/fonts/Arial-12.bdf",
@@ -25,11 +28,23 @@ pyportal = PyPortal(url=DATA_SOURCE,
                     text_maxlen=(50, 50), # cut off characters
                     image_json_path=IMAGE_LOCATION,
                     image_resize=(320, 240),
-                    image_position=(0, 0))
+                    image_position=(0, 0),
+                    debug = True)
 
 while True:
+
+    newRandArt = getRandArt()
+
+    print(newRandArt)
+
+    # Set up where we'll be fetching data from
+
+    DATA_SOURCE = "https://collectionapi.metmuseum.org/public/collection/v1/objects/"+newRandArt
+
+
     response = None
     try:
+        pyportal._url = DATA_SOURCE
         response = pyportal.fetch()
         print("Response is", response)
     except RuntimeError as e:
