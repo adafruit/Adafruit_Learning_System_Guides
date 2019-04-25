@@ -7,7 +7,7 @@ For more details on the project, please visit http://learn.adafruit.com/flora-ge
 Adafruit invests time and resources providing this open source design, please support Adafruit and open-source hardware by 
 purchasing products from [Adafruit](https://www.adafruit.com/)!
 
-Written by Tyler Cooper for Adafruit Industries. 
+Code written by Tyler Cooper for Adafruit Industries. 
 BSD license, check LICENSE.md for more information
 
 ------------------------------
