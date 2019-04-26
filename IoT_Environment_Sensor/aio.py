@@ -13,9 +13,9 @@ All text above must be included in any redistribution.
 """
 
 import time
+import gc
 import board
 import busio
-import gc
 from digitalio import DigitalInOut
 from adafruit_esp32spi import adafruit_esp32spi
 import adafruit_esp32spi.adafruit_esp32spi_requests as requests
@@ -66,7 +66,7 @@ class AIO(object):
                 continue
 
     def post(self, feed, payload):
-        api_url = 'https://io.adafruit.com/api/v2/{0}/feeds/{1}/data'.format(secrets['aio_username'], feed)
+        api_url = 'https://io.adafruit.com/api/v2/{0}/feeds/{1}/data'.format(secrets['aio_username'], feed)# pylint: disable=line-too-long
         logger.info('POSTing to %s', api_url)
         logger.info('payload: %s', str(payload))
         auth_header = {'X-AIO-KEY':secrets['aio_key']}
@@ -94,6 +94,7 @@ class AIO(object):
         r.close()
         return r.status_code == 200
 
+    # pylint:disable=too-many-locals
     def refresh_local_time(self):
         # pylint: disable=line-too-long
         """Fetch and "set" the local time of this microcontroller to the local time at the location, using an internet time API.

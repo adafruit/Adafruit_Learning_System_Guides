@@ -57,7 +57,10 @@ gps_interface.read()
 
 logger.info('Starting reading loop')
 
-payload = {'value' : 0, 'lat' : gps_interface.latitude, 'lon' : gps_interface.longitude, 'created_at' : ''}
+payload = {'value' : 0,
+           'lat' : gps_interface.latitude,
+           'lon' : gps_interface.longitude,
+           'created_at' : ''}
 
 while True:
     now = time.monotonic()

@@ -67,8 +67,9 @@ class AirQualitySensor (object):
         frame = struct.unpack(">HHHHHHHHHHHHHH", bytes(self._buffer[4:32]))
 
         self._pm10_standard, self._pm25_standard, self._pm100_standard, self._pm10_env, \
-          self._pm25_env, self._pm100_env, self._particles_03um, self._particles_05um, self._particles_10um, \
-          self._particles_25um, self._particles_50um, self._particles_100um, skip, checksum = frame
+          self._pm25_env, self._pm100_env, self._particles_03um, self._particles_05um, \
+          self._particles_10um, self._particles_25um, self._particles_50um, \
+          self._particles_100um, _, checksum = frame
 
         check = sum(self._buffer[0:30])
 
