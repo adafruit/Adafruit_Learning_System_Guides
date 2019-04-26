@@ -1,10 +1,10 @@
 """
 This example uses the Wordnik API to display Wordnik's Word of the Day.
-Each day a new word, it's part of speech, and definition
-will appear automatically on the display.
+Each day a new word, its part of speech, and definition
+will appear automatically on the display. Tap the screen to start
+as well as to switch between the word's definition and an example sentence.
 """
 
-import time
 import board
 from adafruit_pyportal import PyPortal
 
@@ -20,7 +20,11 @@ DATA_SOURCE = "https://api.wordnik.com/v4/words.json/wordOfTheDay?api_key="+secr
 WORD_LOCATION = ['word']
 PART_OF_SPEECH = ['definitions', 0, 'partOfSpeech']
 DEF_LOCATION = ['definitions', 0, 'text']
+EXAMPLE_LOCATION = ['examples', 0, 'text']
 CAPTION = 'wordnik.com/word-of-the-day'
+DEFINITION_EXAMPLE_ARR = [DEF_LOCATION, EXAMPLE_LOCATION]
+#defintion and example array variable initialized at 0
+definition_example = 0
 
 # determine the current working directory
 # needed so we know where to find files
@@ -29,7 +33,6 @@ cwd = ("/"+__file__).rsplit('/', 1)[0]
 # Initialize the pyportal object and let us know what data to fetch and where
 # to display it
 pyportal = PyPortal(url=DATA_SOURCE,
-                    json_path=(WORD_LOCATION, PART_OF_SPEECH, DEF_LOCATION),
                     status_neopixel=board.NEOPIXEL,
                     default_bg=cwd+"/wordoftheday_background.bmp",
                     text_font=cwd+"/fonts/Arial-ItalicMT-17.bdf",
@@ -53,9 +56,18 @@ pyportal.preload_font() # speed things up by preloading font
 pyportal.set_text("\nWord of the Day") # show title
 
 while True:
-    try:
-        value = pyportal.fetch()
-        print("Response is", value)
-    except RuntimeError as e:
-        print("Some error occured, retrying! -", e)
-    time.sleep(10*60) # Update every 10 minutes
+    if pyportal.touchscreen.touch_point:
+        try:
+            #set the JSON path here to be able to change between definition and example
+            pyportal._json_path=(WORD_LOCATION,
+                                 PART_OF_SPEECH,
+                                 DEFINITION_EXAMPLE_ARR[definition_example])
+            value = pyportal.fetch()
+            print("Response is", value)
+        except RuntimeError as e:
+            print("Some error occured, retrying! -", e)
+        #Change between definition and example
+        if definition_example == 0:
+            definition_example = 1
+        elif definition_example == 1:
+            definition_example = 0
