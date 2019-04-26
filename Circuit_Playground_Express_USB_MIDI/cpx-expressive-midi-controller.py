@@ -51,7 +51,7 @@ from adafruit_midi.pitch_bend       import PitchBend
 
 # MIDI defines middle C as 60 and modulation wheel is cc 1 by convention
 midi_note_C4 = 60
-midi_cc_modwheel = const(1)
+midi_cc_modwheel = 1  # was const(1)
 
 # 0x19 is the i2c address of the onboard accelerometer
 acc_i2c = busio.I2C(board.ACCELEROMETER_SCL, board.ACCELEROMETER_SDA)
@@ -62,7 +62,7 @@ acc.data_rate = adafruit_lis3dh.DATARATE_10_HZ
 
 # brightness 1.0 saves memory by removing need for a second buffer
 # 10 is number of NeoPixels on CPX
-numpixels = const(10)
+numpixels = 10  # was const(10)
 pixels = neopixel.NeoPixel(board.NEOPIXEL, numpixels, brightness=1.0)
 
 # Turn NeoPixel on to represent a note using RGB x 10
