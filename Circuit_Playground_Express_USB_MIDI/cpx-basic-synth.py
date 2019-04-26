@@ -60,10 +60,10 @@ dac = audioio.AudioOut(board.SPEAKER)
 
 # 440Hz is the standard frequency for A4 (A above middle C)
 # MIDI defines middle C as 60 and modulation wheel is cc 1 by convention
-A4refhz = const(440)
+A4refhz = 440  # was const(440)
 midi_note_C4 = note_parser("C4")
 midi_note_A4 = note_parser("A4")
-midi_cc_modwheel = const(1)
+midi_cc_modwheel = 1  # was const(1)
 twopi = 2 * math.pi
 
 # A length of 12 will make the sawtooth rather steppy
@@ -104,7 +104,7 @@ waveform_sawtooth(sample_len,
 
 # brightness 1.0 saves memory by removing need for a second buffer
 # 10 is number of NeoPixels on CPX
-numpixels = const(10)
+numpixels = 10  # was const(10)
 pixels = neopixel.NeoPixel(board.NEOPIXEL, numpixels, brightness=1.0)
 
 # Turn NeoPixel on to represent a note using RGB x 10
