@@ -16,5 +16,6 @@ This code example requires the Adafruit GPS library which can be downloaded from
 This code example also requires the Adafruit Flora Pixel library which can be downloaded from https://github.com/adafruit/Adafruit-Flora-Pixel-Library
 
 Please use the GitHub Issues and Pull Request mechanisms to request changes or report issues. 
+
 ----------------------
 Code in this repo was at https://github.com/adafruit/Flora-GPS-Jacket - that repo is now archived.
