@@ -11,7 +11,7 @@
 
 ### copy this file to CPX as code.py
 
-### MIT License
+### MIT License.
 
 ### Copyright (c) 2019 Kevin J. Walters
 
