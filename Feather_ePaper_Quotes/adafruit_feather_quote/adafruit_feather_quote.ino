@@ -16,7 +16,7 @@
  */
  
 #include <Adafruit_GFX.h>    // Core graphics library
-#include <ESPHTTPClient.h>
+#include <HTTPClient.h>
 #include <ArduinoJson.h>     //https://github.com/bblanchon/ArduinoJson
 #include <Adafruit_EPD.h>
 #include "secrets.h"
@@ -60,7 +60,7 @@ const GFXfont *smallfont = NULL;
 #define EPD_BUSY    -1 // can set to -1 to not use a pin (will wait a fixed delay)
 
 /* Uncomment the following line if you are using 2.13" tricolor EPD */
-//Adafruit_IL0373 epd(212, 104 ,EPD_DC, EPD_RESET, EPD_CS, SRAM_CS, EPD_BUSY);
+// Adafruit_IL0373 epd(212, 104 ,EPD_DC, EPD_RESET, EPD_CS, SRAM_CS, EPD_BUSY);
 /* Uncomment the following line if you are using 2.13" monochrome 250*122 EPD */
 Adafruit_SSD1675 epd(250, 122, EPD_DC, EPD_RESET, EPD_CS, SRAM_CS, EPD_BUSY);
 
@@ -208,7 +208,7 @@ String getURLResponse(String url)
 
 void getQuote(String &quote, String &author)
 {
-  StaticJsonBuffer<1024> jsonBuffer;
+  StaticJsonDocument<1024> jsonDocument;
   String url = "https://www.adafruit.com/api/quotes.php";
   String jsonquote = getURLResponse(url);
   if(jsonquote.length() > 0)
@@ -216,8 +216,8 @@ void getQuote(String &quote, String &author)
     // remove start and end brackets, jsonBuffer is confused by them
     jsonquote = jsonquote.substring(1,jsonquote.length()-1);
     Serial.println("using: " + jsonquote);
-    JsonObject &jsonroot = jsonBuffer.parseObject(jsonquote);
-    if (!jsonroot.success()) 
+    auto error = deserializeJson(jsonDocument, jsonquote);
+    if (error) 
     {
       Serial.println("json parseObject() failed");
       Serial.println("bad json: " + jsonquote);
@@ -225,8 +225,8 @@ void getQuote(String &quote, String &author)
     }
     else
     {
-      String tquote = jsonroot["text"];
-      String tauthor = jsonroot["author"];
+      String tquote = jsonDocument["text"];
+      String tauthor = jsonDocument["author"];
       quote = tquote;
       author = tauthor;
     }
