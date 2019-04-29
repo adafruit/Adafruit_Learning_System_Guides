@@ -3,6 +3,7 @@ import time
 import board
 import math
 from random import randint
+from availableWorks import availableWorks
 from adafruit_pyportal import PyPortal
 
 def getRandArt():
@@ -10,7 +11,6 @@ def getRandArt():
     random_art = str(randint(1, 470000))
 
     return random_art
-
 
 # There's a few different places we look for data in the photo of the day
 IMAGE_LOCATION = ["primaryImage"]
@@ -33,14 +33,17 @@ pyportal = PyPortal(json_path=(TITLE_LOCATION, ARTIST_LOCATION),
 
 while True:
 
-    newRandArt = getRandArt()
+    work = random.choice(availableWorks)
 
-    print(newRandArt)
+    print(work)
+
+    # newRandArt = getRandArt()
+
+    # print(newRandArt)
 
     # Set up where we'll be fetching data from
 
-    DATA_SOURCE = "https://collectionapi.metmuseum.org/public/collection/v1/objects/"+newRandArt
-
+    DATA_SOURCE = "https://collectionapi.metmuseum.org/public/collection/v1/objects/"+work
 
     response = None
     try:
