@@ -30,15 +30,18 @@ gps_interface.begin()
 
 logger.debug('GPS started')
 
-air_uart = busio.UART(board.A2, board.A3, baudrate=9600)
+aio_interface = aio.AIO()
+
+if aio_interface.onboard_esp:
+    air_uart = busio.UART(board.D5, board.D7, baudrate=9600)
+else:
+    air_uart = busio.UART(board.A2, board.A3, baudrate=9600)
 air = air_quality.AirQualitySensor(air_uart)
 
-logger.debug('Ait quality sensor started')
+logger.debug('Air quality sensor started')
 
 i2c = busio.I2C(board.SCL, board.SDA)
 bme280 = adafruit_bme280.Adafruit_BME280_I2C(i2c)
-
-aio_interface = aio.AIO()
 
 reading_interval = 300.0
 reading_time = time.monotonic()

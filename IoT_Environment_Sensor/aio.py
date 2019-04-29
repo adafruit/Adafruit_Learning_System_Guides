@@ -41,12 +41,19 @@ except ImportError:
 class AIO(object):
 
     def __init__(self):
-        esp32_cs = DigitalInOut(board.D10)
-        esp32_ready = DigitalInOut(board.D9)
-        esp32_reset = DigitalInOut(board.D6)
+        try:
+            esp32_cs = DigitalInOut(board.ESP_CS)
+            esp32_busy = DigitalInOut(board.ESP_BUSY)
+            esp32_reset = DigitalInOut(board.ESP_RESET)
+            self._onboard_esp = True
+        except AttributeError:
+            esp32_cs = DigitalInOut(board.D10)
+            esp32_busy = DigitalInOut(board.D9)
+            esp32_reset = DigitalInOut(board.D6)
+            self._onboard_esp = False
 
         spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
-        self._esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset)
+        self._esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_busy, esp32_reset)
 
         if self._esp.status == adafruit_esp32spi.WL_IDLE_STATUS:
             logger.debug('ESP32 found and in idle mode')
@@ -55,6 +62,9 @@ class AIO(object):
 
         requests.set_interface(self._esp)
 
+    @property
+    def onboard_esp(self):
+        return self._onboard_esp
 
     def connect(self):
         logger.debug("Connecting...")
