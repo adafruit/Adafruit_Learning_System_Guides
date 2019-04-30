@@ -1,5 +1,4 @@
 import board
-import displayio
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text import label
 

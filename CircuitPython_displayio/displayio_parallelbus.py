@@ -55,7 +55,7 @@ palette[1] = 0xFFFFFF
 
 for x in range(10, 20):
     for y in range(10, 20):
-      bitmap[x, y] = 1
+        bitmap[x, y] = 1
 
 tile_grid = displayio.TileGrid(bitmap, pixel_shader=palette)
 

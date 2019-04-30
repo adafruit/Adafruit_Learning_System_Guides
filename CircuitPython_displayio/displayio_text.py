@@ -1,5 +1,4 @@
 import board
-import displayio
 import terminalio
 from adafruit_display_text import label
 

@@ -5,8 +5,8 @@ import adafruit_imageload
 display = board.DISPLAY
 
 bitmap, palette = adafruit_imageload.load("/purple.bmp",
-                                         bitmap=displayio.Bitmap,
-                                         palette=displayio.Palette)
+                                          bitmap=displayio.Bitmap,
+                                          palette=displayio.Palette)
 
 # Create a TileGrid to hold the bitmap
 tile_grid = displayio.TileGrid(bitmap, pixel_shader=palette)
