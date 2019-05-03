@@ -1,7 +1,7 @@
-## IMPORTANT: THIS SOFTWARE CURRENTLY DOES NOT WORK, and future
-status is uncertain.  
+## IMPORTANT: THIS SOFTWARE CURRENTLY DOES NOT WORK
+Future status is uncertain.  
 
-# Adafruit Tweet Receipt
+## Adafruit Tweet Receipt
 
 ***Twitter has changed their API to require
 SSL (Secure Sockets Layer) on -all- connections, a complex
