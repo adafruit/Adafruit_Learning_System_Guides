@@ -23,7 +23,7 @@ Written by Adafruit Industries, distributed under BSD License.
 
 ******************************************************
 Designed for the Adafruit Internet of Things printer
- http://www.adafruit.com/products/717 
+ http://www.adafruit.com/products/717 (discontinued)
 ******************************************************
 
 REQUIRES ARDUINO IDE 1.0 OR LATER -- Back-porting is not likely to
