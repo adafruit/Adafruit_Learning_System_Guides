@@ -1,7 +1,7 @@
 /********************************************************************* 
  Basic snowflake code (without Bluetooth)
  
-  Accompanies the Adafruit guide
+  Accompanies the Adafruit guide 
   https://learn.adafruit.com/neopixel-matrix-snowflake-sweater
 
  Adafruit invests time and resources providing this open source code,
