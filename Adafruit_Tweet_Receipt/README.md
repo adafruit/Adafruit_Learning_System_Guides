@@ -23,7 +23,7 @@ Written by Adafruit Industries, distributed under BSD License.
 
 ******************************************************
 Designed for the Adafruit Internet of Things printer
-Pick one up at http://www.adafruit.com/products/717 !
+ http://www.adafruit.com/products/717 
 ******************************************************
 
 REQUIRES ARDUINO IDE 1.0 OR LATER -- Back-porting is not likely to
@@ -62,7 +62,5 @@ with dummy strings.
 
 -------------------------
 This code was formerly at https://github.com/adafruit/Adafruit-Tweet-Receipt - this has now been archived.
-
-All code MIT License, please attribute to Adafruit Industries
 
 Please consider buying your parts at [Adafruit.com](https://www.adafruit.com) to support open source code
