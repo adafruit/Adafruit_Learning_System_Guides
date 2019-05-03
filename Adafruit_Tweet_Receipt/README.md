@@ -9,7 +9,7 @@ operation beyond the Arduino's ability to handle.  The code is
 being kept around on the chance that a suitable proxy service
 becomes available...but at present we have no such service, no
 code for such, nor a schedule or even a firm commitment to
-pursue it.  ***
+pursue it.***
 
 For projects requiring Twitter we now recommend
 using an SSL-capable system such as Raspberry Pi.  For example:
