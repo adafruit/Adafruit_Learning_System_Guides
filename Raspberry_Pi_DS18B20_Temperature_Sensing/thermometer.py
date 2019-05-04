@@ -1,16 +1,28 @@
-import board
+import glob
 import time
 
-from adafruit_onewire.bus import OneWireBus
-from adafruit_ds18x20 import DS18X20
+base_dir = '/sys/bus/w1/devices/'
+device_folder = glob.glob(base_dir + '28*')[0]
+device_file = device_folder + '/w1_slave'
 
-# Initialize one-wire bus on board pin D5.
-ow_bus = OneWireBus(board.D4)
+def read_temp_raw():
+    f = open(device_file, 'r')
+    lines = f.readlines()
+    f.close()
+    return lines
 
-# Scan for sensors and grab the first one found.
-ds18 = DS18X20(ow_bus, ow_bus.scan()[0])
+def read_temp():
+    lines = read_temp_raw()
+    while lines[0].strip()[-3:] != 'YES':
+        time.sleep(0.2)
+        lines = read_temp_raw()
+    equals_pos = lines[1].find('t=')
+    if equals_pos != -1:
+        temp_string = lines[1][equals_pos+2:]
+        temp_c = float(temp_string) / 1000.0
+        temp_f = temp_c * 9.0 / 5.0 + 32.0
+        return temp_c, temp_f
 
-# Main loop to print the temperature every second.
 while True:
-    print('Temperature: {0:0.3f}C'.format(ds18.temperature))
-    time.sleep(1.0)
+    print(read_temp())
+    time.sleep(1)
