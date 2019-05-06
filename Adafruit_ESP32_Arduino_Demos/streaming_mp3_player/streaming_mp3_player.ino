@@ -24,22 +24,59 @@ const char *path = "/med";
 int httpPort = 8000;
 
 // These are the pins used
-#define VS1053_RESET   -1     // VS1053 reset pin (not used!)
-#define VS1053_CS       7     // VS1053 chip select pin (output)
-#define VS1053_DCS      6     // VS1053 Data/command select pin (output)
-#define VS1053_DREQ     3     // VS1053 Data request, ideally an Interrupt pin
-#define ESP_CS         10
-#define ESP_READY       9
-#define ESP_RESET       8
-#define ESP_GPIO0      -1
-
+#if defined(ADAFRUIT_FEATHER_M4_EXPRESS) || defined(ADAFRUIT_FEATHER_M0_EXPRESS) || defined(ARDUINO_AVR_FEATHER32U4) || defined(ARDUINO_NRF52840_FEATHER) 
+  #define VS1053_RESET   -1     // VS1053 reset pin (not used!)
+  #define VS1053_CS       6     // VS1053 chip select pin (output)
+  #define VS1053_DCS     10     // VS1053 Data/command select pin (output)
+  #define VS1053_DREQ     9     // VS1053 Data request, ideally an Interrupt pin
+  #define ESP_CS         13
+  #define ESP_RESET      12
+  #define ESP_READY      11
+  #define ESP_GPIO0      -1
+#elif defined(ARDUINO_AVR_FEATHER328P) 
+  #define VS1053_RESET   -1     // VS1053 reset pin (not used!)
+  #define VS1053_CS       6     // VS1053 chip select pin (output)
+  #define VS1053_DCS     10     // VS1053 Data/command select pin (output)
+  #define VS1053_DREQ     9     // VS1053 Data request, ideally an Interrupt pin
+  #define ESP_CS          4
+  #define ESP_RESET       3
+  #define ESP_READY       2
+  #define ESP_GPIO0      -1
+#elif defined(ARDUINO_NRF52832_FEATHER )
+  #define VS1053_RESET    -1     // VS1053 reset pin (not used!)
+  #define VS1053_CS       30     // VS1053 chip select pin (output)
+  #define VS1053_DCS      11     // VS1053 Data/command select pin (output)
+  #define VS1053_DREQ     31     // VS1053 Data request, ideally an Interrupt pin
+  #define ESP_CS          16 
+  #define ESP_RESET       15
+  #define ESP_READY        7
+  #define ESP_GPIO0       -1
+#elif defined(TEENSYDUINO) 
+  #define VS1053_RESET   -1     // VS1053 reset pin (not used!)
+  #define VS1053_CS       3     // VS1053 chip select pin (output)
+  #define VS1053_DCS     10     // VS1053 Data/command select pin (output)
+  #define VS1053_DREQ     4     // VS1053 Data request, ideally an Interrupt pin
+  #define ESP_CS          5
+  #define ESP_RESET       6
+  #define ESP_READY       9
+  #define ESP_GPIO0      -1
+#else // Shield version
+  #define VS1053_RESET   -1     // VS1053 reset pin (not used!)
+  #define VS1053_CS       7     // VS1053 chip select pin (output)
+  #define VS1053_DCS      6     // VS1053 Data/command select pin (output)
+  #define VS1053_DREQ     3     // VS1053 Data request, ideally an Interrupt pin
+  #define ESP_CS         10
+  #define ESP_READY       9
+  #define ESP_RESET       8
+  #define ESP_GPIO0      -1
+#endif
 
 Adafruit_VS1053 musicPlayer =  Adafruit_VS1053(VS1053_RESET, VS1053_CS, VS1053_DCS, VS1053_DREQ);
 
 // Use WiFiClient class to create HTTP/TCP connection
 WiFiClient client;
 
-int lastvol = 30;
+int lastvol = 20;
 
 #if defined (__AVR__)
   #define BUFFER_SIZE 128
@@ -56,20 +93,6 @@ void setup() {
 
   Serial.println(F("\n\nAdafruit VS1053 Feather WiFi Radio"));
 
-  /************************* INITIALIZE MP3 Shield */
-  if (! musicPlayer.begin()) { // initialise the music player
-     Serial.println(F("Couldn't find VS1053, do you have the right pins defined?"));
-     //while (1) delay(10);
-  }
-
-  Serial.println(F("VS1053 found"));
-  //musicPlayer.sineTest(0x44, 10);    // Make a tone to indicate VS1053 is working
-  
-  // Set volume for left, right channels. lower numbers == louder volume!
-  musicPlayer.setVolume(lastvol, lastvol);
-
-  // don't use an IRQ, we'll hand-feed
-
   /************************* INITIALIZE WIFI */
   WiFi.setPins(ESP_CS, ESP_READY, ESP_RESET, ESP_GPIO0);
   Serial.print(F("Connecting to SSID ")); Serial.println(ssid);
@@ -82,6 +105,19 @@ void setup() {
   Serial.println(F("WiFi connected"));  
   Serial.println(F("IP address: "));  Serial.println(WiFi.localIP());
 
+  /************************* INITIALIZE MP3 Shield */
+  if (! musicPlayer.begin()) { // initialise the music player
+     Serial.println(F("Couldn't find VS1053, do you have the right pins defined?"));
+     while (1) delay(10);
+  }
+
+  Serial.println(F("VS1053 found"));
+  //musicPlayer.sineTest(0x44, 10);    // Make a tone to indicate VS1053 is working
+  
+  // Set volume for left, right channels. lower numbers == louder volume!
+  musicPlayer.setVolume(lastvol, lastvol);
+
+  // don't use an IRQ, we'll hand-feed
   /************************* INITIALIZE STREAM */
   Serial.print(F("Connecting to "));  Serial.println(host);
   
