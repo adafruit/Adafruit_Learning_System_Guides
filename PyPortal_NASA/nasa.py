@@ -1,9 +1,11 @@
 import time
+from secrets import secrets
 import board
 from adafruit_pyportal import PyPortal
 
+
 # Set up where we'll be fetching data from
-DATA_SOURCE = nasa_token
+DATA_SOURCE = secrets['nasa_token']
 # There's a few different places we look for data in the photo of the day
 IMAGE_LOCATION = ["url"]
 TITLE_LOCATION = ["title"]
