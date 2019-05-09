@@ -1,7 +1,6 @@
 /***************************************************
   Adafruit MQTT Library ESP8266 Example
-  Must use ESP8266 Arduino from:
-    https://github.com/esp8266/Arduino
+  Must use ESP8266 Arduino from https://github.com/esp8266/Arduino
   Written by Tony DiCola for Adafruit Industries.
   MIT license, all text above must be included in any redistribution
  ****************************************************/
