@@ -1,5 +1,7 @@
 ## GPStest_RMC
 
+Parses a RMC (Recommended Minimum) sentence from a GPS using NewSoftSerial
+
 A simple sketch to read GPS data and parse the $GPRMC string 
 see http://www.ladyada.net/make/gpsshield for more info
 
