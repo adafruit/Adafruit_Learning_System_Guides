@@ -14,7 +14,7 @@ DATE_COLOR = 0xFFFFFF    # date and time color
 #-------------------------------------------
 
 # pylint: disable=line-too-long
-DATA_SOURCE = "https://admiraltyapi.azure-api.net/uktidalapi/api/V1/Stations/" + STATION_ID + "/TidalEvents?duration=2"
+DATA_SOURCE = "https://admiraltyapi.azure-api.net/uktidalapi/api/V1/Stations/" + STATION_ID + "/TidalEvents?duration=1"
 DATA_LOCATION = []
 
 # determine the current working directory needed so we know where to find files
