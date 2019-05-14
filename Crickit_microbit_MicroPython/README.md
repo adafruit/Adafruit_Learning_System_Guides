@@ -1,3 +1,5 @@
+[![Micro:bit CRICKIT](picture.png)](https://learn.adafruit.com/using-micro-bit-and-crickit-with-micropython)
+
 ## Using micro:bit and CRICKIT with MicroPython
 
 This code accompanies the [Adafruit Learning System](https://learn.adafruit.com) tutorial ***Using micro:bit and CRICKIT with MicroPython***
