@@ -11,7 +11,7 @@ try:
     from secrets import secrets
 except ImportError:
     print("WiFi secrets are kept in secrets.py, please add them there!")
-raise
+    raise
 
 #--| USER CONFIG |--------------------------
 STATION_ID = "0245"   # tide location, find yours from admiralty website
@@ -161,4 +161,3 @@ while True:
         current_yday = current_time.tm_yday
     update_display(current_time, new_tides)
     time.sleep(0.5)
-    
