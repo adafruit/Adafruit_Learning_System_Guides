@@ -1,10 +1,16 @@
 import time
+import json
 import board
 from adafruit_pyportal import PyPortal
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text.label import Label
-import json
-from secrets import secrets
+
+# Get wifi details and more from a secrets.py file
+try:
+    from secrets import secrets
+except ImportError:
+    print("WiFi secrets are kept in secrets.py, please add them there!")
+raise
 
 #--| USER CONFIG |--------------------------
 STATION_ID = "0245"   # tide location, find yours from admiralty website/
@@ -103,3 +109,4 @@ while True:
         current_yday = current_time.tm_yday
     update_display(current_time, new_tides)
     time.sleep(0.5)
+    
