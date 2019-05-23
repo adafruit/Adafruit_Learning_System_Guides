@@ -39,11 +39,16 @@ while True:
         RANDOM_ART = str(randint(1, 470000))
 
         try:
-            #set image json path to change pictures when screen touched
-            pyportal._url=("https://collectionapi.metmuseum.org/public/collection/v1/objects/"+RANDOM_ART)
-            pyportal._image_json_path = (IMAGE_LOCATION)
-            value = pyportal.fetch()
+
+            try:
+                # set image json path to change pictures when screen touched
+                pyportal._url=("https://collectionapi.metmuseum.org/public/collection/v1/objects/"+RANDOM_ART)
+                pyportal._image_json_path = (IMAGE_LOCATION)
+                value = pyportal.fetch()
+            except KeyError:
+                continue
             print("Response is", value)
         except RuntimeError as e:
             print("Some error occured, retrying! -", e)
+
 
