@@ -17,7 +17,6 @@ except ImportError:
 
 # Set up where we'll be fetching data from
 DATA_SOURCE = "https://api.wordnik.com/v4/words.json/wordOfTheDay?api_key="+secrets['wordnik_token']
-WORD_LOCATION = ['word']
 PART_OF_SPEECH = ['definitions', 0, 'partOfSpeech']
 DEF_LOCATION = ['definitions', 0, 'text']
 EXAMPLE_LOCATION = ['examples', 0, 'text']
@@ -59,7 +58,12 @@ while True:
     if pyportal.touchscreen.touch_point:
         try:
             #set the JSON path here to be able to change between definition and example
+<<<<<<< HEAD
             pyportal._json_path=(WORD_LOCATION,
+=======
+            # pylint: disable=protected-access
+            pyportal._json_path=(['word'],
+>>>>>>> 72b41008ef39cc274b61d0807f2a94299bd073b2
                                  PART_OF_SPEECH,
                                  DEFINITION_EXAMPLE_ARR[definition_example])
             value = pyportal.fetch()
