@@ -10,14 +10,27 @@
 #include <Adafruit_ST7735.h>  // Display-specific graphics library
 #include <Adafruit_ZeroDMA.h> // Direct memory access library
 
-#define TFT_RST       37      // TFT reset pin
-#define TFT_DC        38      // TFT display/command mode pin
-#define TFT_CS        39      // TFT chip select pin
-#define TFT_BACKLIGHT  7      // TFT backlight LED pin
+#ifdef ARDUINO_SAMD_CIRCUITPLAYGROUND_EXPRESS
+  #define TFT_RST        -1
+  #define TFT_DC         A6
+  #define TFT_CS         A7
+  #define TFT_BACKLIGHT  A3 // Display backlight pin
+  #define TFT_SPI        SPI1
+  #define TFT_PERIPH     PERIPH_SPI1
+  Adafruit_LIS3DH accel(&Wire1);
+#else
+  #define TFT_RST       37      // TFT reset pin
+  #define TFT_DC        38      // TFT display/command mode pin
+  #define TFT_CS        39      // TFT chip select pin
+  #define TFT_BACKLIGHT  7      // TFT backlight LED pin
+  #define TFT_SPI        SPI
+  #define TFT_PERIPH     PERIPH_SPI
+  Adafruit_LIS3DH accel;
+#endif
+
 
 // Declarations for some Hallowing hardware -- display, accelerometer, SPI
-Adafruit_ST7735 tft(TFT_CS, TFT_DC, TFT_RST);
-Adafruit_LIS3DH accel;
+Adafruit_ST7735 tft(&TFT_SPI, TFT_CS, TFT_DC, TFT_RST);
 SPISettings     settings(12000000, MSBFIRST, SPI_MODE0);
 
 // Declarations related to DMA (direct memory access), which lets us walk
@@ -113,11 +126,13 @@ uint32_t startTime, frames = 0;     // For frames-per-second calculation
 void setup(void) {
   Serial.begin(115200);
 
+  Serial.println("Init accelerometer");
   // Initialize accelerometer, set to 2G range
   if(accel.begin(0x18) || accel.begin(0x19)) {
     accel.setRange(LIS3DH_RANGE_2_G);
   }
 
+  Serial.println("Init display");
   // Initialize and clear screen
   tft.initR(INITR_144GREENTAB);
   tft.setRotation(1);
@@ -131,16 +146,17 @@ void setup(void) {
   digitalWrite(TFT_CS, LOW);
   digitalWrite(TFT_DC, LOW);
 #ifdef ST77XX_MADCTL
-  SPI.transfer(ST77XX_MADCTL); // Current TFT lib
+  TFT_SPI.transfer(ST77XX_MADCTL); // Current TFT lib
 #else
-  SPI.transfer(ST7735_MADCTL); // Older TFT lib
+  TFT_SPI.transfer(ST7735_MADCTL); // Older TFT lib
 #endif
   digitalWrite(TFT_DC, HIGH);
-  SPI.transfer(0x28);
+  TFT_SPI.transfer(0x28);
   digitalWrite(TFT_CS, HIGH);
 
   pinMode(TFT_BACKLIGHT, OUTPUT);
   digitalWrite(TFT_BACKLIGHT, HIGH); // Main screen turn on
+  Serial.println("Init backlight");
 
   // Set up SPI DMA.  While the Hallowing has a known SPI peripheral and this
   // could be much simpler, the extra code here will help if adapting this
@@ -148,31 +164,31 @@ void setup(void) {
   int                dmac_id;
   volatile uint32_t *data_reg;
   dma.allocate();
-  if(&PERIPH_SPI == &sercom0) {
+  if(&TFT_PERIPH == &sercom0) {
     dma.setTrigger(SERCOM0_DMAC_ID_TX);
     data_reg = &SERCOM0->SPI.DATA.reg;
 #if defined SERCOM1
-  } else if(&PERIPH_SPI == &sercom1) {
+  } else if(&TFT_PERIPH == &sercom1) {
     dma.setTrigger(SERCOM1_DMAC_ID_TX);
     data_reg = &SERCOM1->SPI.DATA.reg;
 #endif
 #if defined SERCOM2
-  } else if(&PERIPH_SPI == &sercom2) {
+  } else if(&TFT_PERIPH == &sercom2) {
     dma.setTrigger(SERCOM2_DMAC_ID_TX);
     data_reg = &SERCOM2->SPI.DATA.reg;
 #endif
 #if defined SERCOM3
-  } else if(&PERIPH_SPI == &sercom3) {
+  } else if(&TFT_PERIPH == &sercom3) {
     dma.setTrigger(SERCOM3_DMAC_ID_TX);
     data_reg = &SERCOM3->SPI.DATA.reg;
 #endif
 #if defined SERCOM4
-  } else if(&PERIPH_SPI == &sercom4) {
+  } else if(&TFT_PERIPH == &sercom4) {
     dma.setTrigger(SERCOM4_DMAC_ID_TX);
     data_reg = &SERCOM4->SPI.DATA.reg;
 #endif
 #if defined SERCOM5
-  } else if(&PERIPH_SPI == &sercom5) {
+  } else if(&TFT_PERIPH == &sercom5) {
     dma.setTrigger(SERCOM5_DMAC_ID_TX);
     data_reg = &SERCOM5->SPI.DATA.reg;
 #endif
@@ -216,10 +232,17 @@ void loop() {
   uint8_t mapX = (uint8_t)posX,                  // Current square of map
           mapY = (uint8_t)posY;                  // (before changing pos.)
   accel.read();                                  // Read accelerometer
+#ifdef ARDUINO_SAMD_CIRCUITPLAYGROUND_EXPRESS
+  heading     += (float)accel.x / -20000.0;      // Update direction
+  float   v    = (abs(accel.y) < abs(accel.z)) ? // If board held flat(ish)
+                 (float)accel.y /  20000.0 :     // Use accel Y for velocity
+                 (float)accel.z / -20000.0;      // else accel Z is velocity
+#else
   heading     += (float)accel.y / -20000.0;      // Update direction
   float   v    = (abs(accel.x) < abs(accel.z)) ? // If board held flat(ish)
                  (float)accel.x /  20000.0 :     // Use accel X for velocity
                  (float)accel.z / -20000.0;      // else accel Z is velocity
+#endif
   if(v > 0.19)       v =  0.19;                  // Keep speed under 0.2
   else if(v < -0.19) v = -0.19;
   float   vx   = cos(heading) * v,               // Direction vector X, Y
@@ -242,7 +265,7 @@ void loop() {
   posX = newX;
   posY = newY;
 
-  SPI.beginTransaction(settings);    // SPI init
+  TFT_SPI.beginTransaction(settings);    // SPI init
   digitalWrite(TFT_CS, LOW);         // Chip select
   tft.setAddrWindow(0, 0, 128, 128); // Set address window to full screen
   digitalWrite(TFT_CS, LOW);         // Re-select after addr function
@@ -350,7 +373,7 @@ void loop() {
   }
   while(dma_busy);            // Wait for last DMA transfer to complete
   digitalWrite(TFT_CS, HIGH); // Deselect
-  SPI.endTransaction();       // SPI done
+  TFT_SPI.endTransaction();       // SPI done
 
   if(!(++frames & 255)) {     // Every 256th frame, show frame rate
     uint32_t elapsed = (millis() - startTime) / 1000;
