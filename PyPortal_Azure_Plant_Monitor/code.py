@@ -6,9 +6,9 @@ your PyPortal
 
 Author: Brent Rubell for Adafruit Industries, 2019
 """
+import time
 import board
 import busio
-import time
 from digitalio import DigitalInOut
 from adafruit_esp32spi import adafruit_esp32spi, adafruit_esp32spi_wifimanager
 import neopixel
@@ -42,7 +42,7 @@ ss = Seesaw(i2c_bus, addr=0x36)
 hub = IOT_Hub(wifi, secrets['azure_iot_hub'], secrets['azure_iot_sas'], secrets['azure_device_id'])
 
 # init. graphics helper
-gfx = azure_gfx_helper.Azure_GFX(is_celsius=False)
+gfx = azure_gfx_helper.Azure_GFX(False)
 
 while True:
     try:
