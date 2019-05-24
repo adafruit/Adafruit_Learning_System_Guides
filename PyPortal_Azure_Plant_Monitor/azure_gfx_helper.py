@@ -13,10 +13,9 @@ main_font = cwd+"/fonts/EarthHeart-26.bdf"
 data_font = cwd+"/fonts/Collegiate-50.bdf"
 
 class Azure_GFX(displayio.Group):
-    def __init__(self, is_celsius=True, device_id="Azure"):
+    def __init__(self, is_celsius=True):
         """Creates an Azure_GFX object.
         :param bool is_celsius: Temperature displayed in Celsius.
-        :param str device_id: Unique device identifier from secrets.py file.
         """
         # root displayio group
         root_group = displayio.Group(max_size=23)
@@ -41,11 +40,12 @@ class Azure_GFX(displayio.Group):
 
         print('loading fonts...')
         glyphs = b'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-,.: '
-        data_glyphs = b'012345678-,.:/FC°'
+        data_glyphs = b'012345678-,.:/FC'
         self.main_font = bitmap_font.load_font(main_font)
         self.main_font.load_glyphs(glyphs)
         self.data_font = bitmap_font.load_font(data_font)
         self.data_font.load_glyphs(data_glyphs)
+        self.data_font.load_glyphs(('°',)) # extra glyph for temperature font
 
         print('setting up labels...')
         self.title_text = Label(self.main_font, text="Azure Plant Monitor")
