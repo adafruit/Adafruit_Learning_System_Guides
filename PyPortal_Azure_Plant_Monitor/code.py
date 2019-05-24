@@ -1,6 +1,6 @@
 """
 PyPortal Azure IoT Plant Monitor
-===================================================
+====================================================
 Log plant vitals to Microsoft Azure IoT with
 your PyPortal
 
@@ -31,9 +31,7 @@ esp32_ready = DigitalInOut(board.ESP_BUSY)
 esp32_reset = DigitalInOut(board.ESP_RESET)
 spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
 esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset)
-status_light = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.2) # Uncomment for Most Boards
-"""Uncomment below for ItsyBitsy M4"""
-#status_light = dotstar.DotStar(board.APA102_SCK, board.APA102_MOSI, 1, brightness=0.2)
+status_light = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.2)
 wifi = adafruit_esp32spi_wifimanager.ESPSPI_WiFiManager(esp, secrets, status_light)
 
 # Soil Sensor Setup
@@ -52,11 +50,9 @@ while True:
         moisture_level = ss.moisture_read()
         # read temperature
         temperature = ss.get_temp()
-        # Todo: make this nicer looking
-        print(moisture_level, temperature)
         # display soil sensor values on pyportal
         gfx.display_moisture(moisture_level)
-        gfx.display_temp(temperature)
+        temperature = gfx.display_temp(temperature)
         print('Sending data to Azure')
         gfx.display_azure_status('Sending data...')
         hub.send_device_message(temperature)
@@ -67,4 +63,4 @@ while True:
         print("Failed to get data, retrying\n", e)
         wifi.reset()
         continue
-    time.sleep(15)
+    time.sleep(60)
