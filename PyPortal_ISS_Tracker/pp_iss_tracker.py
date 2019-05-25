@@ -96,9 +96,9 @@ def update_display(current_time, update_iss=False):
             if len(trail) >= TRAIL_LENGTH:
                 trail.pop(0)
             trail.append(displayio.TileGrid(trail_bitmap,
-                                                pixel_shader=trail_palette,
-                                                x = x - 1,
-                                                y = y - 1) )
+                                            pixel_shader=trail_palette,
+                                            x = x - 1,
+                                            y = y - 1) )
 
 
     # Date and time
@@ -117,10 +117,10 @@ last_update = time.monotonic()
 
 # Run forever
 while True:
-    current_time = time.monotonic()
-    update_iss = False
-    if current_time - last_update > UPDATE_RATE:
-        update_iss = True
-        last_update = current_time
-    update_display(time.localtime(), update_iss)
+    now = time.monotonic()
+    new_position = False
+    if now - last_update > UPDATE_RATE:
+        new_position = True
+        last_update = now
+    update_display(time.localtime(), new_position)
     time.sleep(0.5)
