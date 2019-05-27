@@ -3,12 +3,12 @@ This is a Conference Badge type Name Tag that is intended to be displayed on
 the PyBadge. Feel free to customize it to your heart's content.
 """
 
-import board
 import time
+from math import sqrt, cos, sin, radians
+import board
 from micropython import const
 import displayio
 import digitalio
-from math import sqrt, cos, sin, radians
 import neopixel
 from gamepadshift import GamePadShift
 from adafruit_display_shapes.rect import Rect
@@ -130,22 +130,6 @@ for degree in range(0, 360):
 for x in range(0, NEOPIXEL_COUNT):
     pixels.append(x * 360 // NEOPIXEL_COUNT)
 
-# Respond to the buttons
-def check_buttons(buttons):
-    global direction, speed, brightness
-    if (buttons & BUTTON_RIGHT) > 0:
-        direction = -1
-    elif (buttons & BUTTON_LEFT) > 0:
-        direction = 1
-    elif (buttons & BUTTON_UP) > 0 and speed < 10:
-        speed += 1
-    elif (buttons & BUTTON_DOWN) > 0 and speed > 1:
-        speed -= 1
-    elif (buttons & BUTTON_A) > 0 and brightness < 0.5:
-        brightness += 0.025
-    elif (buttons & BUTTON_B) > 0 and brightness > 0.025:
-        brightness -= 0.025
-
 # Main Loop
 current_buttons = pad.get_pressed()
 last_read = 0
@@ -165,5 +149,17 @@ while True:
             buttons = pad.get_pressed()
             last_read = time.monotonic()
         if current_buttons != buttons:
-            check_buttons(buttons)
+            # Respond to the buttons
+            if (buttons & BUTTON_RIGHT) > 0:
+                direction = -1
+            elif (buttons & BUTTON_LEFT) > 0:
+                direction = 1
+            elif (buttons & BUTTON_UP) > 0 and speed < 10:
+                speed += 1
+            elif (buttons & BUTTON_DOWN) > 0 and speed > 1:
+                speed -= 1
+            elif (buttons & BUTTON_A) > 0 and brightness < 0.5:
+                brightness += 0.025
+            elif (buttons & BUTTON_B) > 0 and brightness > 0.025:
+                brightness -= 0.025
             current_buttons = buttons
