@@ -53,9 +53,6 @@ while True:
         print("Some error occured, retrying! -", e)
         continue
 
-    stamp = time.monotonic()
-    # wait 5 minutes before getting again
-    while (time.monotonic() - stamp) < (5*60):
-        # or, if they touch the screen, fetch immediately!
-        if pyportal.touchscreen.touch_point:
-            break
+    # if they touch the screen, fetch immediately!
+    if pyportal.touchscreen.touch_point:
+        continue
