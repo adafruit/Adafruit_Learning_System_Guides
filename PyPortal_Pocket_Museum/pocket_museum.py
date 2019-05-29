@@ -1,8 +1,6 @@
-import random
 import time
-import board
-import math
 from random import randint
+import board
 from adafruit_pyportal import PyPortal
 
 # There's a few different places we look for data in the photo of the day
@@ -35,6 +33,7 @@ while True:
     try:
         try:
             # set image json path to change pictures when screen touched
+            # pylint: disable=protected-access
             pyportal._url=\
             ("https://collectionapi.metmuseum.org/public/collection/v1/objects/"+RANDOM_ART)
             pyportal._image_json_path = (IMAGE_LOCATION)
@@ -42,8 +41,8 @@ while True:
             # print("The image is here: ", value[0])
             # if primary image does not exist, try another work
             if value[0] == '':
-                continue
                 print("No image found")
+                continue
         # if Key error (conent-length) occurs, try another work
         except KeyError:
             print('Key Error')
