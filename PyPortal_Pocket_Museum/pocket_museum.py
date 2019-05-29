@@ -14,9 +14,9 @@ ARTIST_LOCATION = ["artistDisplayName"]
 cwd = ("/"+__file__).rsplit('/', 1)[0]
 pyportal = PyPortal(json_path=(IMAGE_LOCATION, TITLE_LOCATION),
                     status_neopixel=board.NEOPIXEL,
-                    default_bg=cwd+"/cute_background.bmp",
+                    default_bg=cwd+"/pocket_museum_background.bmp",
                     text_font=cwd+"/fonts/Arial-12.bdf",
-                    text_position=((5, 220), (5, 220)),
+                    text_position=((320, 240), (5, 220)),
                     text_color=(0xFFFFFF, 0xFFFFFF),
                     text_maxlen=(1, 50), # cut off characters
                     image_resize=(320, 240),
