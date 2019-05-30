@@ -14,7 +14,7 @@ while True:
     tempF = tempC * 9 / 5 + 32
     print('Temperature: {} C {} F '.format(tempC, tempF))
 
-    # round temperature and convert to string for speech
+    # drop decimal points and convert to string for speech
     tempC = str(int(tempC))
     tempF = str(int(tempF))
     os.system("echo 'The temperature is " + tempF + " degrees' | festival --tts")
