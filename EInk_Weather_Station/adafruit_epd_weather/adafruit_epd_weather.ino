@@ -1,4 +1,3 @@
-
 #include <time.h>
 #include <Adafruit_GFX.h>    // Core graphics library
 #include <Adafruit_EPD.h>
