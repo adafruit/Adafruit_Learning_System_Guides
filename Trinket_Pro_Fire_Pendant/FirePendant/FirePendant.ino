@@ -28,7 +28,7 @@ uint8_t        img[9 * 16]; // Buffer for rendering image
 
 // UTILITY FUNCTIONS -------------------------------------------------------
 
-// The full IS31FL3731 library is NOT used by this code.  Instead, 'raw'
+// The full IS31FL3731 library is NOT used by this code. Instead, 'raw'
 // writes are made to the matrix driver.  This is to maximize the space
 // available for animation data.  Use the Adafruit_IS31FL3731 and
 // Adafruit_GFX libraries if you need to do actual graphics stuff.
