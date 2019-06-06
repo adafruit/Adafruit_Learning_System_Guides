@@ -1,6 +1,6 @@
 ## Adafruit Kinetic_POV
 
-Software related to DotStar LED persistence-of-vision performance items -- initially just the Trinket-based "Genesis Poi" and additional POV projects.
+Software related to DotStar LED persistence-of-vision performance items -- initially the Trinket-based "Genesis Poi" and then additional POV projects.
 
 Guide: https://learn.adafruit.com/genesis-poi-dotstar-led-persistence-of-vision-poi
 
