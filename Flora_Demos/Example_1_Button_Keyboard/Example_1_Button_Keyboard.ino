@@ -1,4 +1,4 @@
-// Example of buttons generating keyboard presses.
+// Example of buttons generating keyboard presses
 // Author: Tony DiCola
 // License: Public Domain
 #include <Keyboard.h>
