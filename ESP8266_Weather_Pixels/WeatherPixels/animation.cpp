@@ -2,7 +2,7 @@
 // (time of day, cloud cover, rainfall, etc.). Most of the inputs are NOT
 // real-world units...see comments for explanation of what's needed.
 
-// NeoPixel stuff ---------------------------------------------------------
+// NeoPixel stuff --------------------------------------------------------
 
 #include <Adafruit_NeoPixel.h>
 
