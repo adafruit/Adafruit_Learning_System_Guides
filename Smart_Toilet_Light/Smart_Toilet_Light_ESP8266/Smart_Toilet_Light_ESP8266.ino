@@ -1,6 +1,6 @@
 // Smart Toilet Light with ESP8266
 //
-// Use a feed in Adafruit IO to control the color and animation of a neopixel.
+// Use a feed in Adafruit IO to control the color and animation of a neopixel
 // Attaching the neopixel to the bowl of a toilet so it shines down into it will
 // create an interesting nightlight that can display information (like from IFTTT
 // triggers).
