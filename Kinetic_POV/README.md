@@ -6,6 +6,8 @@ Guide: https://learn.adafruit.com/genesis-poi-dotstar-led-persistence-of-vision-
 
 Requires DotStar library for Arduino: https://github.com/adafruit/Adafruit_DotStar
 
+The 'convert' directory has various graphics and a python (NOT CircuitPython) script to convert the graphics to Arduino data.
+
 This code was formerly at https://github.com/adafruit/Kinetic_POV - this has now been archived.
 
 If you are looking to make changes/additions, please use the GitHub Issues and Pull Request mechanisms.
