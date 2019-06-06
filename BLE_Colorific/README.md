@@ -5,4 +5,4 @@ This code was formerly at https://github.com/adafruit/BLE_Colorific - this has n
 
 If you are looking to make changes/additions, please use the GitHub Issues and Pull Request mechanisms.
 
-See LINCENSE for licensing information.
+See LICENSE for licensing information.
