@@ -3,7 +3,7 @@ ADAVOICE is an Arduino-based voice pitch changer plus WAV playback.
 Fun for Halloween costumes, comic convention getups and other shenanigans!
 
 Hardware requirements:
- - Arduino Uno, Duemilanove or Diecimila (not Mega or Leonardo compatible).
+ - Arduino Uno, Duemilanove or Diecimila (not Mega or Leonardo compatible)
  - Adafruit Wave Shield
  - Speaker attached to Wave Shield output
  - Battery for portable use
