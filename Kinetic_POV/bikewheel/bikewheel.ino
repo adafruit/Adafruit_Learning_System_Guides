@@ -1,4 +1,4 @@
-/*------------------------------------------------------------------------
+/*-----------------------------------------------------------------------
   POV LED bike wheel sketch.  Uses the following Adafruit parts:
 
   - Pro Trinket 5V (www.adafruit.com/product/2000)
