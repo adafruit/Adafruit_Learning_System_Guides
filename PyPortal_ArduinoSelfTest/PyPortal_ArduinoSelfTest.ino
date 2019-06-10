@@ -46,7 +46,7 @@ Adafruit_GFX_Button coin = Adafruit_GFX_Button();
 
 void setup() {
   Serial.begin(115200);
-  while (!Serial);
+  //while (!Serial);
 
   Serial.println("All Test!");
 
