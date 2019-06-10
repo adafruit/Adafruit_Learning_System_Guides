@@ -77,8 +77,7 @@ void setup() {
     tft.println("FAILED");
     while (1);
   }
-  uint8_t manid[512];
-  uint8_t devid[512];
+  uint8_t manid[512], devid[512];
   Serial.println("Reading Manuf iD");
   flash.GetManufacturerInfo(manid, devid);
   Serial.print("Manuf: "); 
