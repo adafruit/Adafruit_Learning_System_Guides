@@ -1,7 +1,7 @@
 ## Adafruit BLE_Colorific
 Simple Python script to control a Smart Bulb Colorific! Bluetooth Low Energy light bulb.
 
-This code accompanies the Adafruit Learning System guide at https://learn.adafruit.com/reverse-engineering-a-bluetooth-low-energy-light-bulb/
+This code accompanies the Adafruit Learning System guide Reverse Engineering a Bluetooth Low Energy Light Bulb at https://learn.adafruit.com/reverse-engineering-a-bluetooth-low-energy-light-bulb/
 
 NOTE: This is Python, not CircuitPython code - CircuitPython pylint checks are skipped.
 
