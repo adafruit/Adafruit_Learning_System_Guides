@@ -4,7 +4,7 @@
 #include "SPI.h"
 #include "Adafruit_GFX.h"
 #include "Adafruit_ILI9341.h"
-#include "Adafruit_QSPI_GD25Q.h"
+#include "Adafruit_QSPI_Flash.h"
 #include "Adafruit_ADT7410.h"
 #include "TouchScreen.h"
 #include <SD.h>
@@ -28,7 +28,8 @@
 // ILI9341 with 8-bit parallel interface:
 Adafruit_ILI9341 tft = Adafruit_ILI9341(tft8bitbus, TFT_D0, TFT_WR, TFT_DC, TFT_CS, TFT_RST, TFT_RD);
 
-Adafruit_QSPI_GD25Q flash;
+Adafruit_QSPI_Flash flash;
+
 Adafruit_ADT7410 tempsensor = Adafruit_ADT7410();
 
 #define YP A4  // must be an analog pin, use "An" notation!
@@ -76,20 +77,22 @@ void setup() {
     tft.println("FAILED");
     while (1);
   }
-  uint8_t manid, devid;
+  uint8_t manid[512];
+  uint8_t devid[512];
   Serial.println("Reading Manuf iD");
-  devid = flash.readDeviceID();
-  manid = flash.readManufacturerID();
-  Serial.print("Manuf: "); Serial.println(manid, HEX);
-  Serial.print("Device: "); Serial.println(devid, HEX);
-  if (devid != 0x16) {
+  flash.GetManufacturerInfo(manid, devid);
+  Serial.print("Manuf: "); 
+  Serial.println(*manid, HEX);
+  Serial.print("Device: "); 
+  Serial.println(*devid, HEX);
+  if (*devid != 0x16) {
     tft.setTextColor(ILI9341_RED);
     tft.println("FAILED");
     Serial.println("QSPI Flash not found!");
     while (1);
   }
-  tft.print("OK\n\tManuf: 0x"); tft.println(manid, HEX);
-  tft.print("\tDev: 0x"); tft.println(devid, HEX);
+  tft.print("OK\n\tManuf: 0x"); tft.println(*manid, HEX);
+  tft.print("\tDev: 0x"); tft.println(*devid, HEX);
 
   /*************** SD CARD */
   tft.setCursor(0, 48);
