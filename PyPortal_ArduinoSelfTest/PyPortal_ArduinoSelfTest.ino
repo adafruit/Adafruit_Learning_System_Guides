@@ -46,7 +46,7 @@ Adafruit_GFX_Button coin = Adafruit_GFX_Button();
 
 void setup() {
   Serial.begin(115200);
-  //while (!Serial);
+  while (!Serial);
 
   Serial.println("All Test!");
 
@@ -77,21 +77,21 @@ void setup() {
     tft.println("FAILED");
     while (1);
   }
-  uint8_t manid[512], devid[512];
+  uint8_t manid, devid;
   Serial.println("Reading Manuf iD");
-  flash.GetManufacturerInfo(manid, devid);
+  flash.GetManufacturerInfo(&manid, &devid);
   Serial.print("Manuf: "); 
-  Serial.println(*manid, HEX);
+  Serial.println(manid, HEX);
   Serial.print("Device: "); 
-  Serial.println(*devid, HEX);
-  if (*devid != 0x16) {
+  Serial.println(devid, HEX);
+  if (devid != 0x17) {
     tft.setTextColor(ILI9341_RED);
     tft.println("FAILED");
     Serial.println("QSPI Flash not found!");
     while (1);
   }
-  tft.print("OK\n\tManuf: 0x"); tft.println(*manid, HEX);
-  tft.print("\tDev: 0x"); tft.println(*devid, HEX);
+  tft.print("OK\n\tManuf: 0x"); tft.println(manid, HEX);
+  tft.print("\tDev: 0x"); tft.println(devid, HEX);
 
   /*************** SD CARD */
   tft.setCursor(0, 48);
