@@ -5,7 +5,7 @@ Uses a ItsyBitsy M0 + Rotary Encoder -> HID keyboard out with neopixel ring
 
 import time
 import board
-from digitalio import DigitalInOut
+from digitalio import DigitalInOut, Direction, Pull
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keycode import Keycode
 from adafruit_hid.consumer_control import ConsumerControl
@@ -18,19 +18,19 @@ LIT_TIMEOUT = 15                  # after n seconds, turn off ring
 
 # NeoPixel LED ring on pin D1
 # Ring code will auto-adjust if not 16 so change to any value!
-ring = neopixel.NeoPixel(D5, 16, brightness=0.2)
+ring = neopixel.NeoPixel(board.D5, 16, brightness=0.2)
 dot_location = 0  # what dot is currently lit
 
 # Encoder button is a digital input with pullup on D9
-button = DigitalInOut(D9)
+button = DigitalInOut(board.D9)
 button.direction = Direction.INPUT
 button.pull = Pull.UP
 
 # Rotary encoder inputs with pullup on D10 & D11
-rot_a = DigitalInOut(D10)
+rot_a = DigitalInOut(board.D10)
 rot_a.direction = Direction.INPUT
 rot_a.pull = Pull.UP
-rot_b = DigitalInOut(D11)
+rot_b = DigitalInOut(board.D11)
 rot_b.direction = Direction.INPUT
 rot_b.pull = Pull.UP
 
