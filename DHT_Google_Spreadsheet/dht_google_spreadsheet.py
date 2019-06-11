@@ -32,7 +32,8 @@ import adafruit_dht
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
-# Type of sensor, can be adafruit_dht.DHT11 or adafruit_dht.DHT22
+# Type of sensor, can be `adafruit_dht.DHT11` or `adafruit_dht.DHT22`.
+# For the AM2302, use the `adafruit_dht.DHT22` class.
 DHT_TYPE = adafruit_dht.DHT22
 
 # Example of sensor connected to Raspberry Pi Pin 23
@@ -62,7 +63,7 @@ dhtDevice = DHT_TYPE(DHT_PIN)
 # Then use the File -> Share... command in the spreadsheet to share it with read
 # and write acess to the email address above.  If you don't do this step then the
 # updates to the sheet will fail!
-GDOCS_OAUTH_JSON       = 'spreadapi.json'
+GDOCS_OAUTH_JSON       = 'your SpreadsheetData-*.json file name'
 
 # Google Docs spreadsheet name.
 GDOCS_SPREADSHEET_NAME = 'DHT'
@@ -86,8 +87,8 @@ def login_open_sheet(oauth_key_file, spreadsheet):
         sys.exit(1)
 
 
-print('Logging sensor measurements to \
-      {0} every {1} seconds.'.format(GDOCS_SPREADSHEET_NAME, FREQUENCY_SECONDS))
+print('Logging sensor measurements to\
+ {0} every {1} seconds.'.format(GDOCS_SPREADSHEET_NAME, FREQUENCY_SECONDS))
 print('Press Ctrl-C to quit.')
 worksheet = None
 while True:
