@@ -4,8 +4,8 @@ Uses a ItsyBitsy M0 + Rotary Encoder -> HID keyboard out with neopixel ring
 """
 
 import time
-from digitalio import *
-from board import *
+import board
+from digitalio import DigitalInOut
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keycode import Keycode
 from adafruit_hid.consumer_control import ConsumerControl
