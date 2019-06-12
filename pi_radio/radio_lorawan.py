@@ -44,7 +44,7 @@ height = display.height
 # TinyLoRa Configuration
 spi = busio.SPI(board.SCK, MOSI=board.MOSI, MISO=board.MISO)
 cs = DigitalInOut(board.CE1)
-irq = DigitalInOut(board.D25)
+irq = DigitalInOut(board.D22)
 # TTN Device Address, 4 Bytes, MSB
 devaddr = bytearray([0x00, 0x00, 0x00, 0x00])
 # TTN Network Key, 16 Bytes, MSB

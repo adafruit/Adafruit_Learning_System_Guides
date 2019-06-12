@@ -4,6 +4,8 @@
 # running on an nRF52840 Feather board and Crickit FeatherWing
 # micro servo, 3D printed switch actuator
 
+import time
+
 import board
 import digitalio
 
@@ -24,40 +26,39 @@ uart_server = UARTServer()
 
 UP_ANGLE = 180
 NEUTRAL_ANGLE = 120
-DOWN_ANGLE = 80
-
-advertising_now = False
-angle = NEUTRAL_ANGLE
+DOWN_ANGLE = 60
 crickit.servo_1.angle = NEUTRAL_ANGLE
 
+angle = NEUTRAL_ANGLE  # use to track state
+
+print("BLE Light Switch")
+print("Use Adafruit Bluefruit app to connect")
 while True:
-    crickit.servo_1.angle = NEUTRAL_ANGLE
-    if not uart_server.connected:
-        if not advertising_now:
-            uart_server.start_advertising()
-            advertising_now = True
-            blue_led.value = False
-        continue
+    blue_led.value = False
+    uart_server.start_advertising()
 
-    # Connected, so no longer advertising.
-    advertising_now = False
-    blue_led.value = True
-
-    if uart_server.in_waiting:
-        red_led.value = False
-        packet = Packet.from_stream(uart_server)
-
-        if isinstance(packet, ButtonPacket):
-            if packet.pressed:
-                red_led.value = True
-                if packet.button == ButtonPacket.UP and angle != UP_ANGLE:
-                    # The Up button was pressed.
-                    for a in range(angle, UP_ANGLE+1, 1):
+    while not uart_server.connected:
+        # Wait for a connection.
+        pass
+    blue_led.value = True  # turn on blue LED when connected
+    while uart_server.connected:
+        if uart_server.in_waiting:
+            # Packet is arriving.
+            red_led.value = False  # turn off red LED
+            packet = Packet.from_stream(uart_server)
+            if isinstance(packet, ButtonPacket) and packet.pressed:
+                red_led.value = True  # blink to show a packet has been received
+                if packet.button == ButtonPacket.UP and angle != UP_ANGLE:  # UP button pressed
+                    angle = NEUTRAL_ANGLE - 45  # set anticipation angle, opposite of goal angle
+                    for a in range(angle, UP_ANGLE+1, 1):  # anticipation angle, ramp to goal angle
                         crickit.servo_1.angle = a
-                    angle = UP_ANGLE
-
-                elif packet.button == ButtonPacket.DOWN and angle != DOWN_ANGLE:
-                    # The Down button was pressed.
+                    time.sleep(0.1)  # wait a moment
+                    crickit.servo_1.angle = NEUTRAL_ANGLE  # then return to neutral angle
+                    angle = UP_ANGLE  # set state to prevent redundant hits
+                elif packet.button == ButtonPacket.DOWN and angle != DOWN_ANGLE:  # DOWN button
+                    angle = NEUTRAL_ANGLE + 45
                     for a in range(angle, DOWN_ANGLE-1, -1):
                         crickit.servo_1.angle = a
-                    angle = DOWN_ANGLE
+                    time.sleep(0.1)  # wait a moment
+                    crickit.servo_1.angle = NEUTRAL_ANGLE  # then return to neutral angle
+                    angle = DOWN_ANGLE  # set state to prevent redundant hits
