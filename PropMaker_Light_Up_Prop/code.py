@@ -26,7 +26,7 @@ HIT_THRESHOLD = 650
 SWING_THRESHOLD = 125
 
 # Set to the length in seconds of the "on.wav" file
-POWER_ON_SOUND_DURATION = 1.7
+POWER_ON_SOUND_DURATION = 1.5
 
 POWER_PIN = board.D10
 
