@@ -1,3 +1,13 @@
+"""
+Prop-Maker based Light Up Prop.
+Adafruit invests time and resources providing this open source code.
+Please support Adafruit and open source hardware by purchasing
+products from Adafruit!
+Written by Kattni Rembor for Adafruit Industries
+Copyright (c) 2019 Adafruit Industries
+Licensed under the MIT license.
+All text above must be included in any redistribution.
+"""
 import time
 import random
 import digitalio
