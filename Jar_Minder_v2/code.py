@@ -250,7 +250,7 @@ display.display()
 
 timeout = time.monotonic() + settings['alarm_timeout']
 
-while out_of_range(sensor.temperature, sensor.relative_humidity) and time.monotonic() < timeout:
+while out_of_range(temperature, humidity) and time.monotonic() < timeout:
     if sound_alarm():
         break
     if check_for_push(silence_button, settings['alarm_seconds_between_alarms']):
