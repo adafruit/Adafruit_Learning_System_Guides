@@ -43,5 +43,5 @@ while True:
     print(pitch)
 
     my_servo2.angle = pitch
- 
+
     time.sleep(0.05)
