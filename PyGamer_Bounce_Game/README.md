@@ -2,7 +2,11 @@
 
 See the full tutorial at https://learn.adafruit.com/bounce-an-accelerometer-game-in-arduino-for-pygamer-and-pybadge
 
-This file uses the Arduino IDE and the Adafruit Arcada game library (a superset of the Adafruit GFX display library)
+This file uses the Arduino IDE and the Adafruit Arcada game library (a superset of the Adafruit GFX display library). 
+All the required libraries are listed at https://learn.adafruit.com/adafruit-pybadge/arcada-libraries
+
+Two files in the bounce directory: bounce.ino (the game) and logo.h (data for the Adafruit logo used on the splash screen). 
+Load both into the Arduino IDE.
 
 Mike Barela, June 3, 2019 for Adafruit Industries
 
