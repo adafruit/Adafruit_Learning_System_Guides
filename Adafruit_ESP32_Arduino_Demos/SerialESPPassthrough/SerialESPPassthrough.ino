@@ -23,8 +23,8 @@
 
 unsigned long baud = 115200;
 
-#if defined(ADAFRUIT_FEATHER_M4_EXPRESS) 
-  // Configure the pins used for the ESP32 connection
+#if defined(ADAFRUIT_FEATHER_M4_EXPRESS) || defined(ADAFRUIT_PYBADGE_M4_EXPRESS) || defined(ADAFRUIT_PYGAMER_M4_EXPRESS)
+  // Configure the pins used for the ESP32 connection via 
   #define SerialESP32   Serial1
   #define SPIWIFI       SPI    // The SPI port
   #define SPIWIFI_SS    13   // Chip select pin
