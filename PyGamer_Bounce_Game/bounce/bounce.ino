@@ -8,7 +8,7 @@
 
 #include <Adafruit_Arcada.h>
 #include <Adafruit_Arcada_Def.h>
-#include <Adafruit_Neopixel.h>
+#include <Adafruit_NeoPixel.h>
 #include "logo.h"
 
 Adafruit_Arcada arcada; // Set up the Arcada code
