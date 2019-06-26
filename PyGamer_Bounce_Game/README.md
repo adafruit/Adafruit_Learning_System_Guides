@@ -1,4 +1,4 @@
-## Code for the Adafruit Learning System guide "Bounce - an accelerometer game in Arduino for PyGamer and PyBadge"
+### Code for the Adafruit Learning System guide "Bounce - an accelerometer game in Arduino for PyGamer and PyBadge"
 
 See the full tutorial at https://learn.adafruit.com/bounce-an-accelerometer-game-in-arduino-for-pygamer-and-pybadge
 
