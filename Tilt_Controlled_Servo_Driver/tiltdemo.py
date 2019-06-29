@@ -5,7 +5,6 @@ to drive servos on all three axis as well as use a host of other information
 including lateral acceleration.
 """
 
-import time
 import board
 import busio
 from adafruit_servokit import ServoKit
