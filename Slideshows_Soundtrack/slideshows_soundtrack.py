@@ -1,5 +1,5 @@
 import board
-from adafruit_slideshow import PlayBackOrder, SlideShow, PlayBackDirection
+from adafruit_slideshow import SlideShow, PlayBackDirection
 import audioio
 import touchio
 
