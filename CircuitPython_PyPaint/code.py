@@ -99,7 +99,10 @@ class CursorPoller(object):
 
     def __init__(self, splash, cursor_bmp):
         logging.getLogger('Paint').debug('Creating a CursorPoller')
-        self._mouse_cursor = Cursor(board.DISPLAY, display_group=splash, bmp=cursor_bmp, cursor_speed=2)
+        self._mouse_cursor = Cursor(board.DISPLAY,
+                                    display_group=splash,
+                                    bmp=cursor_bmp,
+                                    cursor_speed=2)
         self._x_offset = cursor_bmp.width // 2
         self._y_offset = cursor_bmp.height // 2
         self._cursor = DebouncedCursorManager(self._mouse_cursor)
@@ -111,13 +114,16 @@ class CursorPoller(object):
         self._cursor.update()
         button = self._cursor.held
         if button:
-            location = (self._mouse_cursor.x + self._x_offset, self._mouse_cursor.y + self._y_offset)
+            location = (self._mouse_cursor.x + self._x_offset,
+                        self._mouse_cursor.y + self._y_offset)
         return button, location
 
+    #pylint:disable=unused-argument
     def poke(self, x=None, y=None):
         """Force a bitmap refresh."""
         self._mouse_cursor.hide()
         self._mouse_cursor.show()
+    #pylint:enable=unused-argument
 
 ################################################################################
 
@@ -147,8 +153,8 @@ class Paint(object):
         for i, c in enumerate(Color.colors):
             self._palette_palette[i] = c
         self._palette_sprite = displayio.TileGrid(self._palette_bitmap,
-                                             pixel_shader=self._palette_palette,
-                                             x=0, y=0)
+                                                  pixel_shader=self._palette_palette,
+                                                  x=0, y=0)
         self._splash.append(self._palette_sprite)
 
         self._fg_bitmap = displayio.Bitmap(self._w, self._h, 5)
@@ -195,8 +201,8 @@ class Paint(object):
 
 
         return displayio.TileGrid(self._palette_bitmap,
-                                             pixel_shader=self._palette_palette,
-                                             x=0, y=0)
+                                  pixel_shader=self._palette_palette,
+                                  x=0, y=0)
 
     def _cursor_bitmap(self):
         bmp = displayio.Bitmap(9, 9, 3)
@@ -292,8 +298,10 @@ class Paint(object):
             self._plot(location[0], location[1], self._pencolor)
             self._poller.poke()
 
+    #pylint:disable=unused-argument
     def _handle_release(self, location):
         self._logger.debug('Released!')
+    #pylint:enable=unused-argument
 
     @property
     def _was_just_pressed(self):
@@ -309,6 +317,8 @@ class Paint(object):
             x_changed = self._location[0] != self._last_location[0]
             y_changed = self._location[1] != self._last_location[1]
             return x_changed or y_changed
+        else:
+            return False
 
     def _update(self):
         self._last_pressed, self._last_location = self._pressed, self._location
