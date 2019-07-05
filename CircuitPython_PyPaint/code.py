@@ -74,15 +74,17 @@ class TouchscreenPoller(object):
 
 
     def poll(self):
-        """Check for input. Returns contact (a bool) and it's location ((x,y) or None)"""
+
+        """Check for input. Returns contact (a bool), False (no button B),
+        and it's location ((x,y) or None)"""
 
         p = self._touchscreen.touch_point
         if p is not None:
             self._cursor_grp.x = p[0] - self._x_offset
             self._cursor_grp.y = p[1] - self._y_offset
-            return True, p
+            return True, False, p
         else:
-            return False, None
+            return False, False, None
 
     def poke(self, location=None):
         """Force a bitmap refresh."""
@@ -109,14 +111,16 @@ class CursorPoller(object):
         self._logger = logging.getLogger('Paint')
 
     def poll(self):
-        """Check for input. Returns press (a bool) and it's location ((x,y) or None)"""
+        """Check for input. Returns press of A (a bool), B,
+        and the cursor location ((x,y) or None)"""
         location = None
         self._cursor.update()
-        button = self._cursor.held
-        if button:
+        a_button = self._cursor.held('a')
+        b_button = self._cursor.held('b')
+        if a_button:
             location = (self._mouse_cursor.x + self._x_offset,
                         self._mouse_cursor.y + self._y_offset)
-        return button, location
+        return a_button, b_button, location
 
     #pylint:disable=unused-argument
     def poke(self, x=None, y=None):
@@ -181,8 +185,10 @@ class Paint(object):
         else:
             raise AttributeError('PYOA requires a touchscreen or cursor.')
 
-        self._pressed = False
-        self._last_pressed = False
+        self._a_pressed = False
+        self._last_a_pressed = False
+        self._b_pressed = False
+        self._last_b_pressed = False
         self._location = None
         self._last_location = None
 
@@ -220,7 +226,7 @@ class Paint(object):
 
     #pylint:disable=too-many-branches,too-many-statements
 
-    def _goto(self, start, end):
+    def _draw_line(self, start, end):
         """Draw a line from the previous position to the current one.
 
         :param start: a tuple of (x, y) coordinatess to fram from
@@ -288,10 +294,12 @@ class Paint(object):
 
     def _handle_motion(self, start, end):
         self._logger.debug('Moved: (%d, %d) -> (%d, %d)', start[0], start[1], end[0], end[1])
-        self._goto(start, end)
+        # self._plot(end[0], end[1], self._pencolor)
+        # self._poller.poke()
+        self._draw_line(start, end)
 
-    def _handle_press(self, location):
-        self._logger.debug('Pressed!')
+    def _handle_a_press(self, location):
+        self._logger.debug('A Pressed!')
         if location[0] < self._w // 10:   # in color picker
             self._pick_color(location)
         else:
@@ -299,17 +307,33 @@ class Paint(object):
             self._poller.poke()
 
     #pylint:disable=unused-argument
-    def _handle_release(self, location):
-        self._logger.debug('Released!')
+    def _handle_a_release(self, location):
+        self._logger.debug('A Released!')
+    #pylint:enable=unused-argument
+
+    def _handle_b_press(self, location):
+        self._logger.debug('B Pressed!')
+
+    #pylint:disable=unused-argument
+    def _handle_b_release(self, location):
+        self._logger.debug('B Released!')
     #pylint:enable=unused-argument
 
     @property
-    def _was_just_pressed(self):
-        return self._pressed and not self._last_pressed
+    def _was_a_just_pressed(self):
+        return self._a_pressed and not self._last_a_pressed
 
     @property
-    def _was_just_released(self):
-        return not self._pressed and self._last_pressed
+    def _was_a_just_released(self):
+        return not self._a_pressed and self._last_a_pressed
+
+    @property
+    def _was_b_just_pressed(self):
+        return self._b_pressed and not self._last_b_pressed
+
+    @property
+    def _was_b_just_released(self):
+        return not self._b_pressed and self._last_b_pressed
 
     @property
     def _did_move(self):
@@ -321,19 +345,23 @@ class Paint(object):
             return False
 
     def _update(self):
-        self._last_pressed, self._last_location = self._pressed, self._location
-        self._pressed, self._location = self._poller.poll()
+        self._last_a_pressed, self._last_b_pressed, self._last_location = self._a_pressed, self._b_pressed, self._location
+        self._a_pressed, self._b_pressed, self._location = self._poller.poll()
 
 
     def run(self):
         """Run the painting program."""
         while True:
             self._update()
-            if self._was_just_pressed:
-                self._handle_press(self._location)
-            elif self._was_just_released:
-                self._handle_release(self._location)
-            if self._did_move and self._pressed:
+            if self._was_a_just_pressed:
+                self._handle_a_press(self._location)
+            elif self._was_a_just_released:
+                self._handle_a_release(self._location)
+            if self._was_b_just_pressed:
+                self._handle_b_press(self._location)
+            elif self._was_b_just_released:
+                self._handle_b_release(self._location)
+            if self._did_move and self._a_pressed:
                 self._handle_motion(self._last_location, self._location)
             time.sleep(0.1)
 
