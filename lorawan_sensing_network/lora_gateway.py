@@ -77,10 +77,13 @@ temperature_feed_2 = aio.feeds('feather-2-temp')
 humidity_feed_2 = aio.feeds('feather-2-humid')
 pressure_feed_2 = aio.feeds('feather-2-pressure')
 
-def pkt_int_to_float(pkt_val_1, pkt_val_2):
-    """Converts 2 bytes of packet data to float.
+def pkt_int_to_float(pkt_val_1, pkt_val_2, pkt_val_3=None):
+    """Convert packet data to float.
     """
-    float_val = pkt_val_1 << 8 | pkt_val_2
+    if pkt_val_3 is None:
+        float_val = pkt_val_1 << 8 | pkt_val_2
+    else:
+        float_val = pkt_val_1 << 16 | pkt_val_2 << 8 | pkt_val_3
     return float_val/100
 
 while True:
@@ -100,7 +103,7 @@ while True:
         # Decode packet
         temp_val = pkt_int_to_float(packet[1], packet[2])
         humid_val = pkt_int_to_float(packet[3], packet[4])
-        pres_val = pkt_int_to_float(packet[5], packet[6])
+        pres_val = pkt_int_to_float(packet[5], packet[6], packet[7])
 
         # Display packet information
         print('Device ID: LoRa Feather #', packet[0])
