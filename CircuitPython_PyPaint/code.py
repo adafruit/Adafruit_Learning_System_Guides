@@ -72,9 +72,7 @@ class TouchscreenPoller(object):
         self._y_offset = cursor_bmp.height // 2
 
 
-
     def poll(self):
-
         """Check for input. Returns contact (a bool), False (no button B),
         and it's location ((x,y) or None)"""
 
@@ -93,6 +91,17 @@ class TouchscreenPoller(object):
             self._cursor_grp.x = location[0] - self._x_offset
             self._cursor_grp.y = location[1] - self._y_offset
         self._display_grp.append(self._cursor_grp)
+
+    def set_cursor_bitmap(self, bmp):
+        """Update the cursor bitmap.
+
+        :param bmp: the new cursor bitmap
+        """
+        self._cursor_grp.remove(self._cur_sprite)
+        self._cur_sprite = displayio.TileGrid(bmp,
+                                              pixel_shader=self._cur_palette)
+        self._cursor_grp.append(self._cur_sprite)
+        self.poke()
 
 ################################################################################
 
@@ -115,12 +124,11 @@ class CursorPoller(object):
         and the cursor location ((x,y) or None)"""
         location = None
         self._cursor.update()
-        a_button = self._cursor.held('a')
-        b_button = self._cursor.held('b')
+        a_button = self._cursor.held
         if a_button:
             location = (self._mouse_cursor.x + self._x_offset,
                         self._mouse_cursor.y + self._y_offset)
-        return a_button, b_button, location
+        return a_button, location
 
     #pylint:disable=unused-argument
     def poke(self, x=None, y=None):
@@ -128,6 +136,14 @@ class CursorPoller(object):
         self._mouse_cursor.hide()
         self._mouse_cursor.show()
     #pylint:enable=unused-argument
+
+    def set_cursor_bitmap(self, bmp):
+        """Update the cursor bitmap.
+
+        :param bmp: the new cursor bitmap
+        """
+        self._mouse_cursor.cursor_bitmap = bmp
+        self.poke()
 
 ################################################################################
 
@@ -170,47 +186,73 @@ class Paint(object):
                                              x=0, y=0)
         self._splash.append(self._fg_sprite)
 
-        self._color_palette = self._make_color_palette()
-        self._splash.append(self._color_palette)
+        self._number_of_palette_options = len(Color.colors) + 2
+        self._swatch_height = self._h // self._number_of_palette_options
+        self._swatch_width = self._w // 10
+        self._logger.debug('Height: %d', self._h)
+        self._logger.debug('Swatch height: %d', self._swatch_height)
+
+        self._palette = self._make_palette()
+        self._splash.append(self._palette)
 
         self._display.show(self._splash)
         self._display.refresh_soon()
         gc.collect()
         self._display.wait_for_frame()
 
+        self._brush = 0
+        self._cursor_bitmaps = [self._cursor_bitmap_1(), self._cursor_bitmap_3()]
         if hasattr(board, 'TOUCH_XL'):
-            self._poller = TouchscreenPoller(self._splash, self._cursor_bitmap())
+            self._poller = TouchscreenPoller(self._splash, self._cursor_bitmaps[0])
         elif hasattr(board, 'BUTTON_CLOCK'):
-            self._poller = CursorPoller(self._splash, self._cursor_bitmap())
+            self._poller = CursorPoller(self._splash, self._cursor_bitmaps[0])
         else:
-            raise AttributeError('PYOA requires a touchscreen or cursor.')
+            raise AttributeError('PyPaint requires a touchscreen or cursor.')
 
         self._a_pressed = False
         self._last_a_pressed = False
-        self._b_pressed = False
-        self._last_b_pressed = False
         self._location = None
         self._last_location = None
 
         self._pencolor = 7
 
-    def _make_color_palette(self):
+    def _make_palette(self):
         self._palette_bitmap = displayio.Bitmap(self._w // 10, self._h, 5)
         self._palette_palette = displayio.Palette(len(Color.colors))
-        swatch_height = self._h // len(Color.colors)
         for i, c in enumerate(Color.colors):
             self._palette_palette[i] = c
-            for y in range(swatch_height):
-                for x in range(self._w // 10):
-                    self._palette_bitmap[x, swatch_height * i + y] = i
-                self._palette_bitmap[self._w // 10 - 1, swatch_height * i + y] = 7
+            for y in range(self._swatch_height):
+                for x in range(self._swatch_width):
+                    self._palette_bitmap[x, self._swatch_height * i + y] = i
 
+        swatch_x_offset = (self._swatch_width - 9) // 2
+        swatch_y_offset = (self._swatch_height - 9) // 2
+        swatch_y = self._swatch_height * len(Color.colors) + swatch_y_offset
+        for i in range(9):
+            self._palette_bitmap[swatch_x_offset + 4, swatch_y + i] = 1
+            self._palette_bitmap[swatch_x_offset + i, swatch_y + 4] = 1
+            self._palette_bitmap[swatch_x_offset + 4, swatch_y + 4] = 0
+
+        swatch_y += self._swatch_height
+        for i in range(9):
+            self._palette_bitmap[swatch_x_offset + 3, swatch_y + i] = 1
+            self._palette_bitmap[swatch_x_offset + 4, swatch_y + i] = 1
+            self._palette_bitmap[swatch_x_offset + 5, swatch_y + i] = 1
+            self._palette_bitmap[swatch_x_offset + i, swatch_y + 3] = 1
+            self._palette_bitmap[swatch_x_offset + i, swatch_y + 4] = 1
+            self._palette_bitmap[swatch_x_offset + i, swatch_y + 5] = 1
+        for i in range(swatch_x_offset + 3, swatch_x_offset + 6):
+            for j in range(swatch_y + 3, swatch_y + 6):
+                self._palette_bitmap[i, j] = 0
+
+        for i in range(self._h):
+            self._palette_bitmap[self._swatch_width - 1, i] = 7
 
         return displayio.TileGrid(self._palette_bitmap,
                                   pixel_shader=self._palette_palette,
                                   x=0, y=0)
 
-    def _cursor_bitmap(self):
+    def _cursor_bitmap_1(self):
         bmp = displayio.Bitmap(9, 9, 3)
         for i in range(9):
             bmp[4, i] = 1
@@ -218,11 +260,31 @@ class Paint(object):
         bmp[4, 4] = 0
         return bmp
 
+    def _cursor_bitmap_3(self):
+        bmp = displayio.Bitmap(9, 9, 3)
+        for i in range(9):
+            bmp[3, i] = 1
+            bmp[4, i] = 1
+            bmp[5, i] = 1
+            bmp[i, 3] = 1
+            bmp[i, 4] = 1
+            bmp[i, 5] = 1
+        for i in range(3, 6):
+            for j in range(3, 6):
+                bmp[i, j] = 0
+        return bmp
+
     def _plot(self, x, y, c):
-        try:
-            self._fg_bitmap[int(x), int(y)] = c
-        except IndexError:
-            pass
+        if self._brush == 0:
+            r = [0]
+        else:
+            r = [-1, 0, 1]
+        for i in r:
+            for j in r:
+                try:
+                    self._fg_bitmap[int(x + i), int(y + j)] = c
+                except IndexError:
+                    pass
 
     #pylint:disable=too-many-branches,too-many-statements
 
@@ -286,22 +348,25 @@ class Paint(object):
 
     #pylint:enable=too-many-branches,too-many-statements
 
-
-    def _pick_color(self, location):
-        swatch_height = self._h // len(Color.colors)
-        picked = location[1] // swatch_height
-        self._pencolor = picked
+    def _handle_palette_selection(self, location):
+        selected = location[1] // self._swatch_height
+        if selected >= self._number_of_palette_options:
+            return
+        self._logger.debug('Palette selection: %d', selected)
+        if selected < len(Color.colors):
+            self._pencolor = selected
+        else:
+            self._brush = selected - len(Color.colors)
+            self._poller.set_cursor_bitmap(self._cursor_bitmaps[self._brush])
 
     def _handle_motion(self, start, end):
         self._logger.debug('Moved: (%d, %d) -> (%d, %d)', start[0], start[1], end[0], end[1])
-        # self._plot(end[0], end[1], self._pencolor)
-        # self._poller.poke()
         self._draw_line(start, end)
 
     def _handle_a_press(self, location):
         self._logger.debug('A Pressed!')
         if location[0] < self._w // 10:   # in color picker
-            self._pick_color(location)
+            self._handle_palette_selection(location)
         else:
             self._plot(location[0], location[1], self._pencolor)
             self._poller.poke()
@@ -309,14 +374,6 @@ class Paint(object):
     #pylint:disable=unused-argument
     def _handle_a_release(self, location):
         self._logger.debug('A Released!')
-    #pylint:enable=unused-argument
-
-    def _handle_b_press(self, location):
-        self._logger.debug('B Pressed!')
-
-    #pylint:disable=unused-argument
-    def _handle_b_release(self, location):
-        self._logger.debug('B Released!')
     #pylint:enable=unused-argument
 
     @property
@@ -328,14 +385,6 @@ class Paint(object):
         return not self._a_pressed and self._last_a_pressed
 
     @property
-    def _was_b_just_pressed(self):
-        return self._b_pressed and not self._last_b_pressed
-
-    @property
-    def _was_b_just_released(self):
-        return not self._b_pressed and self._last_b_pressed
-
-    @property
     def _did_move(self):
         if self._location is not None and self._last_location is not None:
             x_changed = self._location[0] != self._last_location[0]
@@ -345,8 +394,8 @@ class Paint(object):
             return False
 
     def _update(self):
-        self._last_a_pressed, self._last_b_pressed, self._last_location = self._a_pressed, self._b_pressed, self._location
-        self._a_pressed, self._b_pressed, self._location = self._poller.poll()
+        self._last_a_pressed, self._last_location = self._a_pressed, self._location
+        self._a_pressed, self._location = self._poller.poll()
 
 
     def run(self):
@@ -357,10 +406,6 @@ class Paint(object):
                 self._handle_a_press(self._location)
             elif self._was_a_just_released:
                 self._handle_a_release(self._location)
-            if self._was_b_just_pressed:
-                self._handle_b_press(self._location)
-            elif self._was_b_just_released:
-                self._handle_b_release(self._location)
             if self._did_move and self._a_pressed:
                 self._handle_motion(self._last_location, self._location)
             time.sleep(0.1)
