@@ -1,23 +1,66 @@
-// JOY: Adafruit PyGamer or PyBadge as a friendly USB HID game controller.
-// Requires Arcada and Audio libraries.
+/*
+   JOY: Adafruit PyGamer or PyBadge as a friendly USB HID game controller.
+   Requires Arcada, ArduinoJSON and Audio libraries.
+
+   Button-to-key mapping can be configured in the file joy.cfg in the root
+   folder of the flash filesystem, else defaults will be used. This is a
+   JSON-formatted text file and the syntax is VERY particular. Keywords
+   (corresponding to button names) MUST be lowercase, in quotes, and one
+   of the recognized strings ("a", "b", "start", "select", "up", "down",
+   "left" or "right"). Values (corresponding to HID keyboard codes) are
+   not case-sensitive, but must be one of the recognized values in keys.h.
+   The key:value list MUST be { enclosed in braces } and the last key:value
+   must NOT have a trailing comma. There are NO COMMENTS in the file.
+   Picky, yes, but less bother than recompiling all this code to change
+   the key mapping (though you can still do that if you want to change the
+   default keys when a config file is not found or has syntax trouble).
+
+   Here's an example of a valid joy.cfg file with the default key mapping:
+
+   {
+     "a":      "Z",
+     "b":      "X",
+     "start":  "1",
+     "select": "5",
+     "up":     "UP_ARROW",
+     "down":   "DOWN_ARROW",
+     "left":   "LEFT_ARROW",
+     "right":  "RIGHT_ARROW"
+   }
+
+*/
+
+#if !defined(USE_TINYUSB)
+ #error("Please select TinyUSB from the Tools->USB Stack menu!")
+#endif
 
 #include <Adafruit_Arcada.h>
 #include <Audio.h>
-#include <Keyboard.h>
 #include "graphics.h" // Face bitmaps are here
 #include "sound.h"    // "Pew" sound is here
+#include "keys.h"     // Key name-to-value table is here
+//#include "Adafruit_TinyUSB.h"
 
-// Keys corresponding to the various controller buttons.
-// If special keycodes are required (shift, arrows, etc.), docs are here:
-// https://www.arduino.cc/en/Reference/KeyboardModifiers
-#define KEY_A           'z'
-#define KEY_B           'x'
-#define KEY_START       '1'
-#define KEY_SELECT      '5'
-#define KEY_UP          KEY_UP_ARROW
-#define KEY_DOWN        KEY_DOWN_ARROW
-#define KEY_LEFT        KEY_LEFT_ARROW
-#define KEY_RIGHT       KEY_RIGHT_ARROW
+#define JOY_CONFIG_FILE "/joy.cfg"
+
+// These are the indices of each element in the keyCode[] array below,
+// so we're not using separate variables for every button.
+enum ButtonIndex { BUTTON_A = 0, BUTTON_B, BUTTON_START, BUTTON_SELECT, BUTTON_UP, BUTTON_DOWN, BUTTON_LEFT, BUTTON_RIGHT, NUM_BUTTONS };
+
+// These are default key codes for each of the buttons on the PyBadge / PyGamer.
+// Key codes are simply ASCII chars, or one of the values defined in Keyboard.h.
+// We'll try loading replacements from a configuration file, else use these fallbacks.
+// Order of items must match the ButtonIndex enum above.
+uint8_t keyCode[NUM_BUTTONS] = { HID_KEY_Z, HID_KEY_X, HID_KEY_1, HID_KEY_5, HID_KEY_ARROW_UP, HID_KEY_ARROW_DOWN, HID_KEY_ARROW_LEFT, HID_KEY_ARROW_RIGHT };
+
+// Given a key name as a string (e.g. "LEFT_CONTROL"), return the
+// corresponding key code (an 8-bit value) from the keys[] array.
+uint8_t lookupKey(char *name) {
+  for(int i=0; i<NUM_KEYS; i++) {
+    if(!strcasecmp(name, key[i].name)) return key[i].code;
+  }
+  return 0; // Not found
+}
 
 // MASK_BUTTONS is used to isolate button inputs from direction inputs
 // on PyGamer. MASK_PEW is to isolate just the A & B buttons as triggers
@@ -35,25 +78,121 @@ uint32_t                blinkStartTime, blinkDuration;
 uint8_t                 mouthState = 0, priorMouthState = 0, mouthCounter = 0;
 uint32_t                stickmask = 0;
 
+Adafruit_USBD_HID       usb_hid;
+uint8_t const           desc_hid_report[] = { TUD_HID_REPORT_DESC_KEYBOARD() };
+uint8_t                 hidcode[6]        = { 0,0,0,0,0,0 };
+
 AudioPlayMemory         sound;
 AudioOutputAnalogStereo audioOut;
 AudioConnection         c0(sound, 0, audioOut, 0);
 
-void setup() {
-  Serial.begin(9600);
-  //while(!Serial); // Wait for Serial Console before continuing
+uint32_t                keyBits = 0; // Bitmask of currently-pressed keys
+#define press(x)        { keyBits |=  (1 << x); }
+#define release(x)      { keyBits &= ~(1 << x); }
 
-  if(!arcada.begin()) {
-    Serial.println(F("Arcada failed to init"));
+// This function converts keyBits value to HID button presses.
+void sendKeys(void) {
+  static bool prevPressFlag = 0;
+
+  if(usb_hid.ready()) {
+    uint8_t count     = 0;
+    bool    pressFlag = 0;
+
+    for(int i=0; i<NUM_BUTTONS; i++) { // For each button...
+      if(keyBits & (1 << i)) {         // Pressed?
+        pressFlag = 1;                 // At least one key is pressed
+        hidcode[count++] = keyCode[i]; // Add to HID codes
+        if(count >= 6) {               // 6 codes at a time max
+          usb_hid.keyboardReport(0, 0, hidcode); // Send what we have
+          delay(2);
+          memset(hidcode, 0, sizeof(hidcode));   // Clear hidcode list
+          count = 0;                             // Reset hidcode counter
+        }
+      }
+    }
+    if(count) {                        // Any remaining hiscodes to send?
+      usb_hid.keyboardReport(0, 0, hidcode);     // Do it nao!
+      delay(2);
+      memset(hidcode, 0, sizeof(hidcode));
+      count = 0;
+    }
+
+    // If no buttons are pressed, but there were previously buttons
+    // pressed on the last call, issue a suitable HID event...
+    if(prevPressFlag & !pressFlag) {
+      usb_hid.keyboardRelease(0);
+    }
+    prevPressFlag = pressFlag;
+  }
+}
+
+// SETUP FUNCTION - RUNS ONCE AT STARTUP ***********************************
+
+void setup() {
+
+  // Some of these libraries are SUPER PERSNICKETY about the sequence
+  // in which they are initialized. HID MUST be initialized before
+  // Serial, which must be initialized before the display.
+
+  int status = arcada.begin(); // Save status for Serial print later
+
+  // HID (keyboard) initialization
+  usb_hid.setPollInterval(2);
+  usb_hid.setReportDescriptor(desc_hid_report, sizeof(desc_hid_report));
+  usb_hid.begin();
+
+  // USB filesystem initialization
+  arcada.filesysBeginMSD();
+
+  // Then Serial init, MUST happen after the filesystem init
+  Serial.begin(9600);
+  // while(!Serial);
+
+  // Now that Serial's initialized, can throw out an error if needed
+  if(!status) {
+    Serial.println("Arcada failed to init");
     for(;;);
   }
+
+  // Display initialization. This is all part of the persnickety sequence!
   arcada.displayBegin();
   arcada.setBacklight(255);
   arcada.fillScreen(ARCADA_BLACK);
-  Keyboard.begin();
+
+  // Audio initialization
   AudioMemory(10);
+  arcada.enableSpeaker(true);
+  arcada.setVolume(255);
+
+  if(arcada.filesysBegin()) {
+    // Valid filesystem found. Load configuration file (if present).
+    File file = arcada.open(JOY_CONFIG_FILE, O_READ);
+    if(file) {
+      StaticJsonDocument<512> doc;
+      char buf[40];
+      if(DeserializationError error = deserializeJson(doc, file)) {
+        arcada.warnBox("JOY.CFG syntax invalid, using default configuration.");
+      } else {
+        // Keywords in the JSON file corresponding to each button input.
+        // Order of these arrays must follow the ButtonIndex enum (but can be any order in file).
+        static const char *buttonName[]    = { "a", "b", "start", "select", "up"      , "down"      , "left"      , "right"       },
+                          *buttonDefault[] = { "z", "x", "1"    , "5"     , "UP_ARROW", "DOWN_ARROW", "LEFT_ARROW", "RIGHT_ARROW" };
+        // Look up each button in the JSON doc, assign default key value if not found.
+        for(int i=0; i<NUM_BUTTONS; i++) {
+          strlcpy(buf, doc[buttonName[i]] | buttonDefault[i], sizeof(buf));
+          keyCode[i] = lookupKey(buf);
+        }
+      }
+      file.close();
+    } else {
+      arcada.warnBox("JOY.CFG file not found, using default configuration.");
+    }
+  } else {
+    arcada.warnBox("No filesystem found! Load CircuitPython to init filesystem. Using default configuration.");
+  }
 
   // At start, draw the entire blank/neutral face centered on screen
+  arcada.fillScreen(ARCADA_BLACK); // Erase any warnBoxes first
   arcada.drawRGBBitmap(
     (arcada.width()  - FACE_WIDTH ) / 2,
     (arcada.height() - FACE_HEIGHT) / 2,
@@ -75,10 +214,10 @@ void setup() {
   // Initialize button state
   arcada.readButtons();
   uint32_t b = arcada.justPressedButtons();
-  if(b & ARCADA_BUTTONMASK_A)      Keyboard.press(KEY_A);
-  if(b & ARCADA_BUTTONMASK_B)      Keyboard.press(KEY_B);
-  if(b & ARCADA_BUTTONMASK_START)  Keyboard.press(KEY_START);
-  if(b & ARCADA_BUTTONMASK_SELECT) Keyboard.press(KEY_SELECT);
+  if(b & ARCADA_BUTTONMASK_A)      press(BUTTON_A);
+  if(b & ARCADA_BUTTONMASK_B)      press(BUTTON_B);
+  if(b & ARCADA_BUTTONMASK_START)  press(BUTTON_START);
+  if(b & ARCADA_BUTTONMASK_SELECT) press(BUTTON_SELECT);
 
 #if defined(ARCADA_JOYSTICK_X) && defined(ARCADA_JOYSTICK_Y)
   // Initialize joystick state. Although the Arcada lib has stuff for
@@ -86,32 +225,36 @@ void setup() {
   // hysteresis built in, so I'm leaving it here for now, though bulkier.
   int pos = arcada.readJoystickX() + 512;
   if(pos > (1023 * 4 / 5)) {
-    Keyboard.press(KEY_RIGHT);
+    press(BUTTON_RIGHT);
     xState =  1;
   } else if(pos < (1023 / 5)) {
-    Keyboard.press(KEY_LEFT);
+    press(BUTTON_LEFT);
     xState = -1;
   } else {
     xState =  0;
   }
   pos = arcada.readJoystickY() + 512;
   if(pos > (1023 * 4 / 5)) {
-    Keyboard.press(KEY_DOWN);
+    press(BUTTON_DOWN);
     yState =  1;
   } else if(pos < (1023 / 5)) {
-    Keyboard.press(KEY_UP);
+    press(BUTTON_UP);
     yState = -1;
   } else {
     yState =  0;
   }
 #else
-  if(b & ARCADA_BUTTONMASK_RIGHT) Keyboard.press(KEY_RIGHT);
-  if(b & ARCADA_BUTTONMASK_LEFT)  Keyboard.press(KEY_LEFT);
-  if(b & ARCADA_BUTTONMASK_DOWN)  Keyboard.press(KEY_DOWN);
-  if(b & ARCADA_BUTTONMASK_UP)    Keyboard.press(KEY_UP);
+  if(b & ARCADA_BUTTONMASK_RIGHT) press(BUTTON_RIGHT);
+  if(b & ARCADA_BUTTONMASK_LEFT)  press(BUTTON_LEFT);
+  if(b & ARCADA_BUTTONMASK_DOWN)  press(BUTTON_DOWN);
+  if(b & ARCADA_BUTTONMASK_UP)    press(BUTTON_UP);
   stickmask = b & ~MASK_BUTTONS;
 #endif
+
+  sendKeys(); // Issue initial HID key state
 }
+
+// LOOP FUNCTION - RUNS REPEATEDLY, ONCE PER FRAME *************************
 
 void loop() {
   int          dx, dy, upperLidRows=0, lowerLidRows=0, openRows=EYES_HEIGHT;
@@ -122,10 +265,10 @@ void loop() {
 
   arcada.readButtons();
   b = arcada.justPressedButtons();
-  if(b & ARCADA_BUTTONMASK_A)      Keyboard.press(KEY_A);
-  if(b & ARCADA_BUTTONMASK_B)      Keyboard.press(KEY_B);
-  if(b & ARCADA_BUTTONMASK_START)  Keyboard.press(KEY_START);
-  if(b & ARCADA_BUTTONMASK_SELECT) Keyboard.press(KEY_SELECT);
+  if(b & ARCADA_BUTTONMASK_A)      press(BUTTON_A);
+  if(b & ARCADA_BUTTONMASK_B)      press(BUTTON_B);
+  if(b & ARCADA_BUTTONMASK_START)  press(BUTTON_START);
+  if(b & ARCADA_BUTTONMASK_SELECT) press(BUTTON_SELECT);
   // If one of the pewing buttons was pressed, and mouth is not currently
   // in the "py" position (so, either idle or "oo"ing), there's a random
   // chance (1/8) of triggering a new "pew!" sound & animation...
@@ -133,64 +276,64 @@ void loop() {
     mouthState = 1; // Set flag, actual pew starts in the mouth code later
   }
   b = arcada.justReleasedButtons();
-  if(b & ARCADA_BUTTONMASK_A)      Keyboard.release(KEY_A);
-  if(b & ARCADA_BUTTONMASK_B)      Keyboard.release(KEY_B);
-  if(b & ARCADA_BUTTONMASK_START)  Keyboard.release(KEY_START);
-  if(b & ARCADA_BUTTONMASK_SELECT) Keyboard.release(KEY_SELECT);
+  if(b & ARCADA_BUTTONMASK_A)      release(BUTTON_A);
+  if(b & ARCADA_BUTTONMASK_B)      release(BUTTON_B);
+  if(b & ARCADA_BUTTONMASK_START)  release(BUTTON_START);
+  if(b & ARCADA_BUTTONMASK_SELECT) release(BUTTON_SELECT);
 
 #if defined(ARCADA_JOYSTICK_X) && defined(ARCADA_JOYSTICK_Y)
 
   // Analog joystick input with fancy hysteresis
 
-  dx = arcada.readJoystickX(),     // Joystick position relative to center
-  dy = arcada.readJoystickY();     // (+/- 512)
+  dx = arcada.readJoystickX(),    // Joystick position relative to center
+  dy = arcada.readJoystickY();    // (+/- 512)
 
   // Handle joystick X axis
   int pos = dx + 512;
-  if(xState == 1) {                // Stick to right last we checked?
-    if(pos < (1023 * 3 / 5)) {     // Moved left beyond hysteresis threshold?
-      Keyboard.release(KEY_RIGHT); // Release right arrow key
-      xState  = 0;                 // and set state to neutral center zone
+  if(xState == 1) {               // Stick to right last we checked?
+    if(pos < (1023 * 3 / 5)) {    // Moved left beyond hysteresis threshold?
+      release(BUTTON_RIGHT);      // Release right arrow key
+      xState  = 0;                // and set state to neutral center zone
     }
-  } else if(xState == -1) {        // Stick to left last we checked?
-    if(pos > (1023 * 2 / 5)) {     // Moved right beyond hysteresis threshold?
-      Keyboard.release(KEY_LEFT);  // Release left arrow key
-      xState =  0;                 // and set state to neutral center zone
+  } else if(xState == -1) {       // Stick to left last we checked?
+    if(pos > (1023 * 2 / 5)) {    // Moved right beyond hysteresis threshold?
+      release(BUTTON_LEFT);       // Release left arrow key
+      xState =  0;                // and set state to neutral center zone
     }
   }
   // This is intentionally NOT an 'else' -- state CAN change twice here!
   // First change releases left/right keys, second change presses new left/right
-  if(!xState) {                    // Stick X previously in neutral center zone?
-    if(pos > (1023 * 4 / 5)) {     // Moved right?
-      Keyboard.press(KEY_RIGHT);   // Press right arrow key
-      xState =  1;                 // and set state to right
-    } else if(pos < (1023 / 5)) {  // Else moved left?
-      Keyboard.press(KEY_LEFT);    // Press left arrow key
-      xState = -1;                 // and set state to left
+  if(!xState) {                   // Stick X previously in neutral center zone?
+    if(pos > (1023 * 4 / 5)) {    // Moved right?
+      press(BUTTON_RIGHT);        // Press right arrow key
+      xState =  1;                // and set state to right
+    } else if(pos < (1023 / 5)) { // Else moved left?
+      press(BUTTON_LEFT);         // Press left arrow key
+      xState = -1;                // and set state to left
     }
   }
 
   // Handle joystick Y axis
   pos = dy + 512;
-  if(yState == 1) {                // Stick down last we checked?
-    if(pos < (1023 * 3 / 5)) {     // Moved up beyond hysteresis threshold?
-      Keyboard.release(KEY_DOWN);  // Release down key
-      yState =  0;                 // and set state to neutral center zone
+  if(yState == 1) {               // Stick down last we checked?
+    if(pos < (1023 * 3 / 5)) {    // Moved up beyond hysteresis threshold?
+      release(BUTTON_DOWN);       // Release down key
+      yState =  0;                // and set state to neutral center zone
     }
-  } else if(yState == -1) {        // Stick up last we checked?
-    if(pos > (1023 * 2 / 5)) {     // Moved down beyond hysteresis threshold?
-      Keyboard.release(KEY_UP);    // Release up key
-      yState =  0;                 // and set state to neutral center zone
+  } else if(yState == -1) {       // Stick up last we checked?
+    if(pos > (1023 * 2 / 5)) {    // Moved down beyond hysteresis threshold?
+      release(BUTTON_UP);         // Release up key
+      yState =  0;                // and set state to neutral center zone
     }
   }
   // See note above re: not an else
-  if(!yState) {                    // Stick Y previously in neutral center zone?
-    if(pos > (1023 * 4 / 5)) {     // Moved down?
-      Keyboard.press(KEY_DOWN);    // Press down key
-      yState =  1;                 // and set state to down
-    } else if(pos < (1023 / 5)) {  // Else moved up?
-      Keyboard.press(KEY_UP);      // Press up key
-      yState = -1;                 // and set state to up
+  if(!yState) {                   // Stick Y previously in neutral center zone?
+    if(pos > (1023 * 4 / 5)) {    // Moved down?
+      press(BUTTON_DOWN);         // Press down key
+      yState =  1;                // and set state to down
+    } else if(pos < (1023 / 5)) { // Else moved up?
+      press(BUTTON_UP);           // Press up key
+      yState = -1;                // and set state to up
     }
   }
 
@@ -206,15 +349,15 @@ void loop() {
 
   b          = arcada.justPressedButtons() & ~MASK_BUTTONS;
   stickmask |= b;
-  if(b & ARCADA_BUTTONMASK_RIGHT) Keyboard.press(KEY_RIGHT);
-  if(b & ARCADA_BUTTONMASK_LEFT)  Keyboard.press(KEY_LEFT);
-  if(b & ARCADA_BUTTONMASK_DOWN)  Keyboard.press(KEY_DOWN);
-  if(b & ARCADA_BUTTONMASK_UP)    Keyboard.press(KEY_UP);
+  if(b & ARCADA_BUTTONMASK_RIGHT) press(BUTTON_RIGHT);
+  if(b & ARCADA_BUTTONMASK_LEFT)  press(BUTTON_LEFT);
+  if(b & ARCADA_BUTTONMASK_DOWN)  press(BUTTON_DOWN);
+  if(b & ARCADA_BUTTONMASK_UP)    press(BUTTON_UP);
   b          = arcada.justReleasedButtons() & ~MASK_BUTTONS;
-  if(b & ARCADA_BUTTONMASK_RIGHT) Keyboard.release(KEY_RIGHT);
-  if(b & ARCADA_BUTTONMASK_LEFT)  Keyboard.release(KEY_LEFT);
-  if(b & ARCADA_BUTTONMASK_DOWN)  Keyboard.release(KEY_DOWN);
-  if(b & ARCADA_BUTTONMASK_UP)    Keyboard.release(KEY_UP);
+  if(b & ARCADA_BUTTONMASK_RIGHT) release(BUTTON_RIGHT);
+  if(b & ARCADA_BUTTONMASK_LEFT)  release(BUTTON_LEFT);
+  if(b & ARCADA_BUTTONMASK_DOWN)  release(BUTTON_DOWN);
+  if(b & ARCADA_BUTTONMASK_UP)    release(BUTTON_UP);
   stickmask &= ~b;
   // If there's no stick input, have Joy look up, as if watching game.
   int dir = stickmask ? stickmask : ARCADA_BUTTONMASK_UP;
@@ -237,6 +380,8 @@ void loop() {
       dx =  1; dy =  1; break;
   }
 #endif
+
+  sendKeys(); // Convert button state to HID
 
   // Joy's eyes don't directly follow the joystick. They're always
   // looking in some direction, pupils are kept around the perimeter

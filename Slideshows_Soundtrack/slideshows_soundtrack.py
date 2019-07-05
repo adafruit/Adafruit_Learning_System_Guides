@@ -1,12 +1,10 @@
 import board
-from adafruit_slideshow import PlayBackOrder, SlideShow, PlayBackDirection
+from adafruit_slideshow import SlideShow, PlayBackDirection
 import audioio
-import pulseio
 import touchio
 
 # Create the slideshow object that plays through once alphabetically.
-slideshow = SlideShow(board.DISPLAY, pulseio.PWMOut(board.TFT_BACKLIGHT), folder="/",
-                      loop=True, order=PlayBackOrder.ALPHABETICAL)
+slideshow = SlideShow(board.DISPLAY)
 
 # Create the touch objects on the first and last teeth
 back_button = touchio.TouchIn(board.TOUCH1)
