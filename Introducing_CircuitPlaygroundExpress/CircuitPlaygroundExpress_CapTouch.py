@@ -5,28 +5,12 @@ import time
 import board
 import touchio
 
-touch1 = touchio.TouchIn(board.A1)
-touch2 = touchio.TouchIn(board.A2)
-touch3 = touchio.TouchIn(board.A3)
-touch4 = touchio.TouchIn(board.A4)
-touch5 = touchio.TouchIn(board.A5)
-touch6 = touchio.TouchIn(board.A6)
-touch7 = touchio.TouchIn(board.A7)
+touchIns = [touchio.TouchIn(pin) for pin in
+            (board.A1, board.A2, board.A3, board.A4, board.A5, board.A6, board.A7)]
 
 while True:
-    if touch1.value:
-        print("A1 touched!")
-    if touch2.value:
-        print("A2 touched!")
-    if touch3.value:
-        print("A3 touched!")
-    if touch4.value:
-        print("A4 touched!")
-    if touch5.value:
-        print("A5 touched!")
-    if touch6.value:
-        print("A6 touched!")
-    if touch7.value:
-        print("A7 touched!")
+    for i, touchIn in enumerate(touchIns):
+        if touchIn.value:
+            print('A%d touched!' % (i + 1))
 
-    time.sleep(0.01)
+    time.sleep(0.1)
