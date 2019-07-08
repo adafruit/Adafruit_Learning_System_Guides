@@ -1,5 +1,5 @@
 # CircuitPlaygroundExpress_LightSensor
-# reads the on-board light sensor and graphs the brighness with NeoPixels
+# reads the on-board light sensor and graphs the brightness with NeoPixels
 
 import time
 
@@ -15,7 +15,7 @@ pixels.show()
 analogin = AnalogIn(board.LIGHT)
 
 while True:
-    # light value remaped to pixel position
+    # light value remapped to pixel position
     peak = map_range(analogin.value, 2000, 62000, 0, 9)
     print(analogin.value)
     print(int(peak))
