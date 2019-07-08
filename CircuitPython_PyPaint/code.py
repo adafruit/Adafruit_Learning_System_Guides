@@ -80,9 +80,9 @@ class TouchscreenPoller(object):
         if p is not None:
             self._cursor_grp.x = p[0] - self._x_offset
             self._cursor_grp.y = p[1] - self._y_offset
-            return True, False, p
+            return True, p
         else:
-            return False, False, None
+            return False, None
 
     def poke(self, location=None):
         """Force a bitmap refresh."""
