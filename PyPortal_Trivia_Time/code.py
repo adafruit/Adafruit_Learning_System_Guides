@@ -1,10 +1,3 @@
-"""
-This example uses the Wordnik API to display Wordnik's Word of the Day.
-Each day a new word, its part of speech, and definition
-will appear automatically on the display. Tap the screen to start
-as well as to switch between the word's definition and an example sentence.
-"""
-
 import board
 import time
 import math
@@ -119,12 +112,6 @@ while True:
                                  tupleAnswerList[2],
                                  tupleAnswerList[3],)
 
-            CA = pyportal._json_path[4]
-
-            print(CA)
-
-            #pyportal.wget(pyportal._url, data_file, chunk_size=12000 )
-
 
             pyportal._text_color=(0x8080FF,
                                 0xFFFFFF,
@@ -205,4 +192,18 @@ while True:
         time.sleep(0.05)  # debounce delay
 
 
-        pyportal.set_text("Correct Answer: D")
+        # Show the correct answer
+
+        answerChoices = ("A","B","C","D")
+
+        for i in range(len(tupleAnswerList)):
+            if tupleAnswerList[i] is CA_LOCATION:
+                print(answerChoices[i])
+                correctAnswerChoice = answerChoices[i]
+                break
+
+        answerRevealText = "Correct Answer: " + str(correctAnswerChoice)
+
+        pyportal.set_text(answerRevealText)
+
+
