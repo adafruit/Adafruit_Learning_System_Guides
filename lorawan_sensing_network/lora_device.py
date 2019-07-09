@@ -47,7 +47,7 @@ rfm9x = adafruit_rfm9x.RFM9x(spi, CS, RESET, RADIO_FREQ_MHZ)
 rfm9x.tx_power = 23
 
 # sensor data
-bme280_data = bytearray(7)
+bme280_data = bytearray(8)
 
 while True:
     # Get sensor readings
@@ -71,8 +71,9 @@ while True:
     bme280_data[4] = humid_val & 0xff
 
     # Pressure data
-    bme280_data[5] = (pres_val >> 8) & 0xff
-    bme280_data[6] = pres_val & 0xff
+    bme280_data[5] = (pres_val >> 16) & 0xff
+    bme280_data[6] = (pres_val >> 8) & 0xff
+    bme280_data[7] = pres_val & 0xff
 
     # Convert bytearray to bytes
     bme280_data_bytes = bytes(bme280_data)
