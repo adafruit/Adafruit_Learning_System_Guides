@@ -122,6 +122,9 @@ while True:
             print("Response is", value)
         except RuntimeError as e:
             print("Some error occured, retrying! -", e)
+        except IndexError:
+            print("Index Error")
+            continue
 
         # 30 seconds to see question
 
@@ -202,7 +205,7 @@ while True:
                 correctAnswerChoice = answerChoices[i]
                 break
 
-        answerRevealText = "Correct Answer: " + str(correctAnswerChoice)
+        answerRevealText = "Correct Answer: " + str(correctAnswerChoice) + "\n(Tap for next question.)"
 
         pyportal.set_text(answerRevealText)
 
