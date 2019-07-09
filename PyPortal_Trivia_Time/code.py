@@ -47,9 +47,9 @@ data_file = cwd+"data_file"
 # to display it
 pyportal = PyPortal(url=DATA_SOURCE,
                     status_neopixel=board.NEOPIXEL,
-                    default_bg=cwd+"/wordoftheday_background.bmp",
+                    default_bg=cwd+"/trivia.bmp",
                     text_font=cwd+"/fonts/Arial-ItalicMT-17.bdf",
-                    text_position=((50, 70),  # question location
+                    text_position=((25, 70),  # question location
                                    (50, 130), # wrong answer location 1
                                    (50, 150), # wrong answer location 2
                                    (50, 170), # wrong answer location 3
@@ -59,15 +59,15 @@ pyportal = PyPortal(url=DATA_SOURCE,
                                 0xFFFFFF,
                                 0xFFFFFF,
                                 0xFFFFFF),
-                    text_wrap=(28, # characters to wrap for text
-                               28,
-                               28,
-                               28,
-                               28),
-                    text_maxlen=(180, 30, 115, 120, 120), # max text size for word, part of speech and def
+                    text_wrap=(35, # characters to wrap for text
+                               30,
+                               30,
+                               30,
+                               30),
+                    text_maxlen=(180, 30, 115, 120, 120), # max text size
                     caption_text=CAPTION,
                     caption_font=cwd+"/fonts/Arial-ItalicMT-17.bdf",
-                    caption_position=(50, 218),
+                    caption_position=(200, 218),
                     caption_color=0x808080)
 
 print("loading...") # print to repl while waiting for font to load
