@@ -52,27 +52,27 @@ def writetime(the_hr, the_min):
     if (the_hr == 12) and (the_min == 0):
         return NOON
     # set minute
-    if (the_min > 4) and (the_min < 10):
+    if (the_min > 4) and (the_min < 8):
         value = value | FIVEMIN
-    if (the_min > 9) and (the_min < 15):
+    if (the_min > 7) and (the_min < 13):
         value = value | TENMIN
-    if (the_min > 14) and (the_min < 20):
+    if (the_min > 14) and (the_min < 18):
         value = value | QUARTER
-    if (the_min > 19) and (the_min < 25):
+    if (the_min > 17) and (the_min < 23):
         value = value | TWENTY
-    if (the_min > 25) and (the_min < 30):
+    if (the_min > 22) and (the_min < 28):
         value = value | TWENTY | FIVEMIN
-    if (the_min > 29) and (the_min < 35):
+    if (the_min > 27) and (the_min < 33):
         value = value | HALF
-    if (the_min > 34) and (the_min < 40):
+    if (the_min > 32) and (the_min < 38):
         value = value | TWENTY | FIVEMIN
-    if (the_min > 39) and (the_min < 45):
+    if (the_min > 37) and (the_min < 43):
         value = value | TWENTY
-    if (the_min > 44) and (the_min < 50):
+    if (the_min > 42) and (the_min < 48):
         value = value | QUARTER
-    if (the_min > 49) and (the_min < 55):
+    if (the_min > 47) and (the_min <= 53):
         value = value | TENMIN
-    if the_min > 54:
+    if the_min => 54:
         value = value | FIVEMIN
     # before or after
     if the_min <= 30:
@@ -114,6 +114,7 @@ def writetime(the_hr, the_min):
 
 # Main loop
 LEDstate = 0
+FirstLoop = True
 
 while True:
     t = rtc.datetime
@@ -123,8 +124,8 @@ while True:
     hour = t.tm_hour
     minute = t.tm_min
     second = t.tm_sec
-    if second == 59:
-        print("The time is {}:{:02}".format(t.tm_hour, t.tm_min))
+    if second == 59 or FirstLoop:
+        # print("The time is {}:{:02}".format(t.tm_hour, t.tm_min))
         pixels.fill((0, 0, 0))       # blank all pixels for change
         the_time = writetime(hour, minute)
         for i in range(1, 21):       # Check all 30 bits
@@ -137,4 +138,5 @@ while True:
     else:
         LED13.value = False
         LEDstate = 0
+    Firstloop = False
     time.sleep(1)  # wait a second
