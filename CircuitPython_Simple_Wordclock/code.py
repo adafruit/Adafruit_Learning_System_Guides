@@ -132,7 +132,7 @@ while True:
         # print("The time is {}:{:02}".format(t.tm_hour, t.tm_min))
         pixels.fill((0, 0, 0))       # blank all pixels for change
         the_time = writetime(hour, minute)
-        for i in range(0, 21):       # Check all 30 bits
+        for i in range(0, 21):       # Check all bits
             if the_time & 1 << i:    # If the bit is true
                 pixels[i+1] = COLOR  # set pixel on (shift up 2 for buried one)
         pixels.show()
