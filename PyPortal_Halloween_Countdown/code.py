@@ -96,9 +96,11 @@ while True:
     print("Current time:", now)
     remaining = time.mktime(event_time) - time.mktime(now)
     print("Time remaining (s):", remaining)
-    if remaining < 0:
+    if remaining == 0:
         # oh, its event time!
         pyportal.set_background(event_background)
+        countdown_text.text = ''
+        pyportal.set_caption('', (13, 215), 0x000000)
         while True:  # that's all folks
             pass
     secs_remaining = remaining % 60
