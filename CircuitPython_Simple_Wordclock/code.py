@@ -45,6 +45,8 @@ HALF = 1<<18
 TWENTY = 1<<19
 
 # Pass in hour and minute, return LED bitmask
+# pylint: disable=too-many-branches
+# pylint: disable=too-many-statements
 def writetime(the_hr, the_min):
     value = 0  # Start with zero, which is no words
     if (the_hr == 24) and (the_min == 0):  # Special cases: Midnight and Noon
@@ -111,6 +113,8 @@ def writetime(the_hr, the_min):
         value = value | NOON
     return value
 # end def
+# pylint: enable=too-many-branches
+# pylint: enable=too-many-statements
 
 # Main loop
 LEDstate = 0
