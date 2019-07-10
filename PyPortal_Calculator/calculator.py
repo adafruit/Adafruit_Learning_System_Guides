@@ -1,6 +1,10 @@
 """
-Class that handles the input_key and calculations
+CircuitPython library to handle the input and calculations
+
+* Author(s): Melissa LeBlanc-Williams
 """
+
+# pylint: disable=eval-used
 class Calculator:
     def __init__(self, calc_display, clear_button, label_offset):
         self._calc_display = calc_display
@@ -10,21 +14,22 @@ class Calculator:
         self._operator = None
         self._equal_pressed = False
         self._operand = None
-        self.all_clear()
+        self._all_clear()
 
     def calculate(self, number_one, operator, number_two):
+
         result = eval(number_one + operator + number_two)
         if int(result) == result:
             result = int(result)
         return str(result)
 
-    def all_clear(self):
+    def _all_clear(self):
         self._accumulator = "0"
         self._operator = None
         self._equal_pressed = False
-        self.clear_entry()
+        self._clear_entry()
 
-    def clear_entry(self):
+    def _clear_entry(self):
         self._operand = None
         self._set_button_ce(False)
         self._set_text("0")
@@ -78,7 +83,7 @@ class Calculator:
         self._accumulator = self._get_text()
         self._equal_pressed = False
 
-    def _handle_equal(self, input_key):
+    def _handle_equal(self):
         if self._operator is not None:
             if self._operand is None:
                 self._operand = self._get_text()
@@ -89,9 +94,9 @@ class Calculator:
     def add_input(self, input_key):
         try:
             if input_key == "AC":
-                self.all_clear()
+                self._all_clear()
             elif input_key == "CE":
-                self.clear_entry()
+                self._clear_entry()
             elif self._operator is None and input_key == "0":
                 pass
             elif len(input_key) == 1 and 48 <= ord(input_key) <= 57:
@@ -108,7 +113,7 @@ class Calculator:
             elif input_key == "%":
                 self._set_text(self.calculate(self._get_text(), "/", "100"))
             elif input_key == "=":
-                self._handle_equal(input_key)
+                self._handle_equal()
         except (ZeroDivisionError, RuntimeError):
-            self.all_clear()
+            self._all_clear()
             self._set_text("Error")

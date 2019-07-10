@@ -54,9 +54,9 @@ def button_grid(row, col):
 def make_button(row, col, label, width=1, color=WHITE, text_color=BLACK):
     pos = button_grid(row, col)
     new_button = Button(x=pos.x, y=pos.y,
-                        width=BUTTON_WIDTH * width + BUTTON_MARGIN * (width - 1), height=BUTTON_HEIGHT,
-                        label=label, label_font=font, label_color=text_color, fill_color=color,
-                        style=Button.ROUNDRECT)
+                        width=BUTTON_WIDTH * width + BUTTON_MARGIN * (width - 1),
+                        height=BUTTON_HEIGHT, label=label, label_font=font,
+                        label_color=text_color, fill_color=color, style=Button.ROUNDRECT)
     buttons.append(new_button)
     return new_button
 
