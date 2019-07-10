@@ -47,7 +47,7 @@ data_file = cwd+"data_file"
 # to display it
 pyportal = PyPortal(url=DATA_SOURCE,
                     status_neopixel=board.NEOPIXEL,
-                    default_bg=cwd+"/trivia.bmp",
+                    default_bg=cwd+"/trivia_title.bmp",
                     text_font=cwd+"/fonts/Arial-ItalicMT-17.bdf",
                     text_position=((25, 70),  # question location
                                    (50, 130), # wrong answer location 1
@@ -65,16 +65,13 @@ pyportal = PyPortal(url=DATA_SOURCE,
                                30,
                                30),
                     text_maxlen=(180, 30, 115, 120, 120), # max text size
-                    caption_text=CAPTION,
-                    caption_font=cwd+"/fonts/Arial-ItalicMT-17.bdf",
-                    caption_position=(200, 218),
-                    caption_color=0x808080)
+                    #caption_text=CAPTION,
+                    caption_font=cwd+"/fonts/Arial-ItalicMT-17.bdf")
+                    #caption_position=(200, 218),
+                    #caption_color=0x808080)
 
 print("loading...") # print to repl while waiting for font to load
 pyportal.preload_font() # speed things up by preloading font
-pyportal.set_text("\nTrivia Time!\n(Tap to Begin!)") # show title
-
-
 
 def shuffle(aList):
     for i in range(len(aList)-1, 0, -1):
@@ -86,11 +83,6 @@ def shuffle(aList):
         aList[i], aList[j] = aList[j], aList[i]
 
         return aList
-
-
-
-
-
 
 while True:
     if pyportal.touchscreen.touch_point:
@@ -105,6 +97,10 @@ while True:
             print(tupleAnswerList)
 
 
+            pyportal.set_background(cwd+"/trivia.bmp")
+
+            pyportal.set_caption("opentdb.com",(200, 218), 0x808080)
+
             #set the JSON path here to be able to change between definition and example
             pyportal._json_path=(Q_LOCATION,
                                  tupleAnswerList[0],
@@ -118,6 +114,7 @@ while True:
                                 0xFFFFFF,
                                 0xFFFFFF,
                                 0xFFFFFF)
+
             value = pyportal.fetch()
             print("Response is", value)
         except RuntimeError as e:
