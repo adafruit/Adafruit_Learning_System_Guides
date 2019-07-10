@@ -2,17 +2,16 @@
 PyPortal Calculator Demo
 """
 import time
+from collections import namedtuple
 import board
 import displayio
-import os
-from collections import namedtuple
 from adafruit_display_text.label import Label
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_shapes.rect import Rect
 from adafruit_button import Button
 from calculator import Calculator
 import adafruit_touchscreen
-coords = namedtuple("Point", "x y")
+Coords = namedtuple("Point", "x y")
 
 ts = adafruit_touchscreen.Touchscreen(board.TOUCH_XL, board.TOUCH_XR,
                                       board.TOUCH_YD, board.TOUCH_YU,
@@ -49,17 +48,17 @@ buttons = []
 
 # Some button placement functions
 def button_grid(row, col):
-    return coords(BUTTON_MARGIN * (row + 1) + BUTTON_WIDTH * row + 20,
+    return Coords(BUTTON_MARGIN * (row + 1) + BUTTON_WIDTH * row + 20,
                   BUTTON_MARGIN * (col + 1) + BUTTON_HEIGHT * col + 40)
 
 def make_button(row, col, label, width=1, color=WHITE, text_color=BLACK):
     pos = button_grid(row, col)
-    button = Button(x=pos.x, y=pos.y,
-                    width=BUTTON_WIDTH * width + BUTTON_MARGIN * (width - 1), height=BUTTON_HEIGHT,
-                    label=label, label_font=font, label_color=text_color, fill_color=color,
-                    style=Button.ROUNDRECT)
-    buttons.append(button)
-    return button
+    new_button = Button(x=pos.x, y=pos.y,
+                        width=BUTTON_WIDTH * width + BUTTON_MARGIN * (width - 1), height=BUTTON_HEIGHT,
+                        label=label, label_font=font, label_color=text_color, fill_color=color,
+                        style=Button.ROUNDRECT)
+    buttons.append(new_button)
+    return new_button
 
 border = Rect(20, 8, 280, 35, fill=WHITE, outline=BLACK, stroke=2)
 calc_display = Label(font, text="0", color=BLACK, max_glyphs=MAX_DIGITS)

@@ -1,28 +1,26 @@
 """
 Class that handles the input and calculations
 """
-
-# Calculator Class
 class Calculator:
     def __init__(self, calc_display, clear_button, label_offset):
         self._calc_display = calc_display
         self._clear_button = clear_button
         self._label_offset = label_offset
-        self._all_clear()
+        self.all_clear()
 
-    def _calculate(self, number_one, operator, number_two):
+    def calculate(self, number_one, operator, number_two):
         result = eval(number_one + operator + number_two)
         if int(result) == result:
             result = int(result)
         return str(result)
 
-    def _all_clear(self):
+    def all_clear(self):
         self._accumulator = "0"
         self._operator = None
         self._equal_pressed = False
-        self._clear_entry()
+        self.clear_entry()
 
-    def _clear_entry(self):
+    def clear_entry(self):
         self._operand = None
         self._set_button_ce(False)
         self._set_text("0")
@@ -44,9 +42,9 @@ class Calculator:
     def add_input(self, input):
         try:
             if input == "AC":
-                self._all_clear()
+                self.all_clear()
             elif input == "CE":
-                self._clear_entry()
+                self.clear_entry()
             elif self._operator is None and input == "0":
                 pass
             elif len(input) == 1 and 48 <= ord(input) <= 57:
@@ -66,7 +64,7 @@ class Calculator:
                     self._operand = display_text
                 self._set_button_ce(True)
                 self._equal_pressed = False
-            elif input == "+" or input == "-" or input == "/" or input == "x":
+            elif input in ('+', '-', '/', 'x'):
                 if input == "x":
                     input = "*"
                 if self._equal_pressed:
@@ -76,7 +74,7 @@ class Calculator:
                 else:
                     # Perform current calculation before changing inputs
                     if self._operand is not None:
-                        self._accumulator = self._calculate(self._accumulator, self._operator, self._operand)
+                        self._accumulator = self.calculate(self._accumulator, self._operator, self._operand)
                         self._set_text(self._accumulator)
                     self._operand = None
                     self._operator = input
@@ -88,22 +86,16 @@ class Calculator:
                     self._set_button_ce(True)
                     self._equal_pressed = False
             elif input == "+/-":
-                self._set_text(self._calculate(self._get_text(), "*", "-1"))
+                self._set_text(self.calculate(self._get_text(), "*", "-1"))
             elif input == "%":
-                self._set_text(self._calculate(self._get_text(), "/", "100"))
+                self._set_text(self.calculate(self._get_text(), "/", "100"))
             elif input == "=":
                 if self._operator is not None:
                     if self._operand is None:
                         self._operand = self._get_text()
-                    self._accumulator = self._calculate(self._accumulator, self._operator, self._operand)
+                    self._accumulator = self.calculate(self._accumulator, self._operator, self._operand)
                 self._set_text(self._accumulator)
                 self._equal_pressed = True
-            # For Debugging
-            print("\n----------------")
-            print("Input: {}".format(input))
-            print("Accumulator: {}".format(self._accumulator))
-            print("Operator: {}".format(self._operator))
-            print("Operand: {}".format(self._operand))
-        except (ZeroDivisionError, RuntimeError) as error:
-            self._all_clear()
+        except (ZeroDivisionError, RuntimeError):
+            self.all_clear()
             self._set_text("Error")
