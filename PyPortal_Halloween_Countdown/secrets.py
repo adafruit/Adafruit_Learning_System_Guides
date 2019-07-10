@@ -4,6 +4,7 @@
 secrets = {
     'ssid' : 'CHANGE ME',
     'password' : 'CHANGE ME',
-    'twitter_api_key': 'CHANGE ME',
-    'twitter_secret_key': 'CHANGE ME'
+    'timezone' : 'CHANGE ME',
+    'aio_username' : 'CHANGE ME',
+    'aio_key' : 'CHANGE ME',
 }
