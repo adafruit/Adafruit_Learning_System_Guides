@@ -54,7 +54,7 @@ def writetime(the_hr, the_min):
     if (the_hr == 12) and (the_min == 0):
         return NOON
     # set minute
-    if (the_min > 4) and (the_min < 8):
+    if (the_min > 3) and (the_min < 8):
         value = value | FIVEMIN
     if (the_min > 7) and (the_min < 13):
         value = value | TENMIN
@@ -77,9 +77,9 @@ def writetime(the_hr, the_min):
     if the_min >= 54:
         value = value | FIVEMIN
     # before or after
-    if (the_min > 0) and (the_min <= 30):
+    if (the_min > 3) and (the_min <= 30):
         value = value | PAST
-    else:
+    if the_min >= 33:
         the_hr = the_hr + 1  # for the TO case
         value = value | TO
     # set hour
