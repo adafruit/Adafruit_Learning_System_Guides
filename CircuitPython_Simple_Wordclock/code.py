@@ -77,7 +77,7 @@ def writetime(the_hr, the_min):
     if the_min >= 54:
         value = value | FIVEMIN
     # before or after
-    if the_min <= 30:
+    if (the_min > 0) and (the_min <= 30):
         value = value | PAST
     else:
         the_hr = the_hr + 1  # for the TO case
@@ -132,7 +132,7 @@ while True:
         # print("The time is {}:{:02}".format(t.tm_hour, t.tm_min))
         pixels.fill((0, 0, 0))       # blank all pixels for change
         the_time = writetime(hour, minute)
-        for i in range(1, 21):       # Check all 30 bits
+        for i in range(0, 21):       # Check all 30 bits
             if the_time & 1 << i:    # If the bit is true
                 pixels[i+1] = COLOR  # set pixel on (shift up 2 for buried one)
         pixels.show()
