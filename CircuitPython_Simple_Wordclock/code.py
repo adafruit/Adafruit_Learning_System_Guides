@@ -17,7 +17,7 @@ LED13 = digitalio.DigitalInOut(board.D13)
 LED13.direction = digitalio.Direction.OUTPUT
 
 pixel_pin = board.D5
-num_pixels = 21
+num_pixels = 22
 pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=0.8)
 pixels.fill((0, 0, 0))
 COLOR = (0, 200, 0)  # Green
