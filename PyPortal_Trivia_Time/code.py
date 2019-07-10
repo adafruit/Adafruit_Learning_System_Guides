@@ -74,10 +74,10 @@ pyportal = PyPortal(url=DATA_SOURCE,
                     default_bg=cwd+"/trivia_title.bmp",
                     text_font=cwd+"/fonts/Arial-ItalicMT-17.bdf",
                     text_position=((25, 70),  # question location
-                                   (45, 135), # answer location 1
-                                   (45, 155), # answer location 2
-                                   (45, 175), # answer location 3
-                                   (45, 195)), # answer location 4
+                                   (40, 135), # answer location 1
+                                   (40, 155), # answer location 2
+                                   (40, 175), # answer location 3
+                                   (40, 195)), # answer location 4
                     text_color=(0x8080FF,
                                 0xFFFFFF,
                                 0xFFFFFF,
@@ -121,6 +121,7 @@ while True:
             print("Some error occured, retrying! -", e)
         # 30 seconds with question
         faceOff(30)
+        time.sleep(2) # pause for 2 seconds to show which player tapped first
         # 10 seconds to answer
         faceOff(10)
         # Show the correct answer
