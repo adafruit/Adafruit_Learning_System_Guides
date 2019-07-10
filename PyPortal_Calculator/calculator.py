@@ -5,6 +5,12 @@ CircuitPython library to handle the input and calculations
 """
 
 # pylint: disable=eval-used
+def calculate(number_one, operator, number_two):
+    result = eval(number_one + operator + number_two)
+    if int(result) == result:
+        result = int(result)
+    return str(result)
+
 class Calculator:
     def __init__(self, calc_display, clear_button, label_offset):
         self._calc_display = calc_display
@@ -15,13 +21,6 @@ class Calculator:
         self._equal_pressed = False
         self._operand = None
         self._all_clear()
-
-    def calculate(self, number_one, operator, number_two):
-
-        result = eval(number_one + operator + number_two)
-        if int(result) == result:
-            result = int(result)
-        return str(result)
 
     def _all_clear(self):
         self._accumulator = "0"
@@ -76,7 +75,7 @@ class Calculator:
         else:
             # Perform current calculation before changing input_keys
             if self._operand is not None:
-                self._accumulator = self.calculate(self._accumulator, self._operator, self._operand)
+                self._accumulator = calculate(self._accumulator, self._operator, self._operand)
                 self._set_text(self._accumulator)
             self._operand = None
             self._operator = input_key
@@ -87,7 +86,7 @@ class Calculator:
         if self._operator is not None:
             if self._operand is None:
                 self._operand = self._get_text()
-            self._accumulator = self.calculate(self._accumulator, self._operator, self._operand)
+            self._accumulator = calculate(self._accumulator, self._operator, self._operand)
         self._set_text(self._accumulator)
         self._equal_pressed = True
 
@@ -109,9 +108,9 @@ class Calculator:
                     self._set_button_ce(True)
                     self._equal_pressed = False
             elif input_key == "+/-":
-                self._set_text(self.calculate(self._get_text(), "*", "-1"))
+                self._set_text(calculate(self._get_text(), "*", "-1"))
             elif input_key == "%":
-                self._set_text(self.calculate(self._get_text(), "/", "100"))
+                self._set_text(calculate(self._get_text(), "/", "100"))
             elif input_key == "=":
                 self._handle_equal()
         except (ZeroDivisionError, RuntimeError):
