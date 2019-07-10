@@ -20,32 +20,33 @@ pixel_pin = board.D5
 num_pixels = 21
 pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=0.8)
 pixels.fill((0, 0, 0))
-COLOR = (0, 200, 0)  # Green 
+COLOR = (0, 200, 0)  # Green
 
 # Bitmap values for each value. These can be OR'ed together
-THREE = 0b00000000000000000001
-EIGHT = 0b00000000000000000010
-ELEVEN = 0b00000000000000000100
-TWO = 0b00000000000000001000
-SIX = 0b00000000000000010000
-FOUR = 0b00000000000000100000
-SEVEN = 0b00000000000001000000
-NOON = 0b00000000000010000000
-TEN = 0b00000000000100000000
-ONE = 0b00000000001000000000
-FIVE = 0b00000000010000000000
-MIDNIGHT = 0b00000000100000000000
-NINE = 0b00000001000000000000
-PAST = 0b00000010000000000000
-TO = 0b00000100000000000000
-FIVEMIN = 0b00001000000000000000
-QUARTER = 0b00010000000000000000
-TENMIN = 0b00100000000000000000
-HALF = 0b01000000000000000000
-TWENTY = 0b10000000000000000000
+THREE = 1
+EIGHT = 1<<1
+ELEVEN = 1<<2
+TWO = 1<<3
+SIX = 1<<4
+FOUR = 1<<5
+SEVEN = 1<<6
+NOON = 1<<7
+TEN = 1<<8
+ONE = 1<<9
+FIVE = 1<<10
+MIDNIGHT = 1<<11
+NINE = 1<<12
+PAST = 1<<13
+TO = 1<<14
+FIVEMIN = 1<<15
+QUARTER = 1<<16
+TENMIN = 1<<17
+HALF = 1<<18
+TWENTY = 1<<19
 
-def writetime(the_hr, the_min):  # Pass in hour and minute, return LED bitmask
-    value = 0b00000000000000000000
+# Pass in hour and minute, return LED bitmask
+def writetime(the_hr, the_min):
+    value = 0  # Start with zero, which is no words
     if (the_hr == 24) and (the_min == 0):  # Special cases: Midnight and Noon
         return MIDNIGHT
     if (the_hr == 12) and (the_min == 0):
