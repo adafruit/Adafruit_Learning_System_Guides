@@ -13,6 +13,7 @@ def calculate(number_one, operator, number_two):
 
 class Calculator:
     def __init__(self, calc_display, clear_button, label_offset):
+        self._error = False
         self._calc_display = calc_display
         self._clear_button = clear_button
         self._label_offset = label_offset
@@ -30,6 +31,7 @@ class Calculator:
 
     def _clear_entry(self):
         self._operand = None
+        self._error = False
         self._set_button_ce(False)
         self._set_text("0")
 
@@ -92,7 +94,9 @@ class Calculator:
 
     def add_input(self, input_key):
         try:
-            if input_key == "AC":
+            if self._error:
+                self._clear_entry()
+            elif input_key == "AC":
                 self._all_clear()
             elif input_key == "CE":
                 self._clear_entry()
@@ -115,4 +119,5 @@ class Calculator:
                 self._handle_equal()
         except (ZeroDivisionError, RuntimeError):
             self._all_clear()
+            self._error = True
             self._set_text("Error")
