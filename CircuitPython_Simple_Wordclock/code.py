@@ -58,7 +58,7 @@ def writetime(the_hr, the_min):
         value = value | FIVEMIN
     if (the_min > 7) and (the_min < 13):
         value = value | TENMIN
-    if (the_min > 14) and (the_min < 18):
+    if (the_min > 12) and (the_min < 18):
         value = value | QUARTER
     if (the_min > 17) and (the_min < 23):
         value = value | TWENTY
