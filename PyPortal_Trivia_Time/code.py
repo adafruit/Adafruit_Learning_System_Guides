@@ -6,22 +6,14 @@ Hit button again to reveal answer. Tap screen to move to next question.
 This program assumes two buttons are attached to D3 and D4 on the Adafruit PyPortal.
 """
 
-import board
 import time
-import math
 import random
+import board
 from adafruit_pyportal import PyPortal
 from digitalio import DigitalInOut, Direction, Pull
 
-# Get wifi details and more from a secrets.py file
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi settings are kept in settings.py, please add them there!")
-    raise
-
 # initialize harware
-led = DigitalInOut(board.L)
+led = DigitalInOut(board.L) # For debugging
 led.direction = Direction.OUTPUT
 button1 = DigitalInOut(board.D4)
 button2 = DigitalInOut(board.D3)
@@ -59,18 +51,18 @@ def faceOff(timerLength):
     print(time.monotonic() - timerStart)
     while time.monotonic() - timerStart < timerLength:
         if button1.value:
-            led.value = False
-        else:
+            led.value = False # For debugging
+        else: # If button 1 pressed, print player 1 on screen and exit function
             pyportal.set_text("PLAYER 1!")
+            led.value = True # For debugging
             break
-
         if button2.value:
-            led.value = False
-        else:
+            led.value = False # For debugging
+        else: # If button 2 pressed, print player 1 on screen and exit function
             pyportal.set_text("PLAYER 2!")
+            led.value = True # For debugging
             break
-
-        if time.monotonic() - timerStart > (timerLength - 0.5):
+        if time.monotonic() - timerStart > (timerLength - 0.5): # Timer runs out
             pyportal.set_text("TIME'S UP!")
     print(time.monotonic() - timerStart)
     time.sleep(0.05)  # debounce delay
@@ -82,10 +74,10 @@ pyportal = PyPortal(url=DATA_SOURCE,
                     default_bg=cwd+"/trivia_title.bmp",
                     text_font=cwd+"/fonts/Arial-ItalicMT-17.bdf",
                     text_position=((25, 70),  # question location
-                                   (50, 130), # wrong answer location 1
-                                   (50, 150), # wrong answer location 2
-                                   (50, 170), # wrong answer location 3
-                                   (50, 190)), # correct answer location
+                                   (45, 135), # answer location 1
+                                   (45, 155), # answer location 2
+                                   (45, 175), # answer location 3
+                                   (45, 195)), # answer location 4
                     text_color=(0x8080FF,
                                 0xFFFFFF,
                                 0xFFFFFF,
@@ -96,20 +88,28 @@ pyportal = PyPortal(url=DATA_SOURCE,
                                30,
                                30,
                                30),
-                    text_maxlen=(180, 30, 115, 120, 120), # max text size
+                    text_maxlen=(140, 27, 27, 27, 27), # max text size
                     caption_font=cwd+"/fonts/Arial-ItalicMT-17.bdf")
 print("loading...") # print to repl while waiting for font to load
 pyportal.preload_font() # speed things up by preloading font
 
 while True:
+    # Load new question when screen is touched
     if pyportal.touchscreen.touch_point:
         pyportal.set_background(cwd+"/trivia.bmp")
         pyportal.set_text("Loading question...")
         pyportal.set_caption(CAPTION,(200, 218), 0x808080)
         answerList = [WA_LOCATION1, WA_LOCATION2, WA_LOCATION3, CA_LOCATION]
-        shuffle(answerList)
+        # For catching potential index error when shuffling question
+        try:
+            shuffle(answerList)
+        except IndexError:
+            print("Index Error")
+            pyportal.set_text("Tap again for next question.")
+            continue
         try:
             #set the JSON path here
+            # pylint: disable=protected-access
             pyportal._json_path=(Q_LOCATION,
                                  answerList[0],
                                  answerList[1],
@@ -119,21 +119,15 @@ while True:
             print("Response is", value)
         except RuntimeError as e:
             print("Some error occured, retrying! -", e)
-        except IndexError:
-            print("Index Error")
-            continue
-
         # 30 seconds with question
         faceOff(30)
-
         # 10 seconds to answer
         faceOff(10)
-
         # Show the correct answer
-        for i in range(len(answerList)):
-            if answerList[i] is CA_LOCATION:
-                print(answerChoices[i])
-                correctAnswerChoice = answerChoices[i]
+        for k in range(len(answerList)):
+            if answerList[k] is CA_LOCATION:
+                print(answerChoices[k])
+                correctAnswerChoice = answerChoices[k]
                 break
-        answerRevealText = "Correct Answer: " + str(correctAnswerChoice) + "\n(Tap for next question.)"
+        answerRevealText="Correct Answer: "+str(correctAnswerChoice)+"\n(Tap for next question.)"
         pyportal.set_text(answerRevealText)
