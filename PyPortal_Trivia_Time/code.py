@@ -1,3 +1,11 @@
+"""
+This example uses the Open Trivia Database API to display multiple choice trivia questions.
+Tap the screen to start, then a question will appear and a 30 second timer will start.
+The first player to hit their button will get 10 seconds to answer.
+Hit button again to reveal answer. Tap screen to move to next question.
+This program assumes two buttons are attached to D3 and D4 on the Adafruit PyPortal.
+"""
+
 import board
 import time
 import math
@@ -12,10 +20,9 @@ except ImportError:
     print("WiFi settings are kept in settings.py, please add them there!")
     raise
 
-
+# initialize harware
 led = DigitalInOut(board.L)
 led.direction = Direction.OUTPUT
-
 button1 = DigitalInOut(board.D4)
 button2 = DigitalInOut(board.D3)
 button1.direction = Direction.INPUT
@@ -31,17 +38,42 @@ WA_LOCATION2 = ['results', 0, 'incorrect_answers', 1]
 WA_LOCATION3 = ['results', 0, 'incorrect_answers', 2]
 CA_LOCATION = ['results', 0, 'correct_answer']
 CAPTION = 'opentdb.com'
-PLAYER1 = 'PLAYER 1!'
-PLAYER2 = 'PLAYER 2!'
-#DEFINITION_EXAMPLE_ARR = [DEF_LOCATION, EXAMPLE_LOCATION]
-#defintion and example array variable initialized at 0
-definition_example = 0
+answerChoices = ("A","B","C","D")
 
 # determine the current working directory
 # needed so we know where to find files
 cwd = ("/"+__file__).rsplit('/', 1)[0]
 
-data_file = cwd+"data_file"
+# A function to shuffle trivia questions
+def shuffle(aList):
+    for i in range(len(aList)-1, 0, -1):
+        # Pick a random index from 0 to i
+        j = random.randint(0, i + 1)
+        # Swap arr[i] with the element at random index
+        aList[i], aList[j] = aList[j], aList[i]
+        return aList
+
+# A function to handle the timer and determine which player answers first
+def faceOff(timerLength):
+    timerStart = time.monotonic()
+    print(time.monotonic() - timerStart)
+    while time.monotonic() - timerStart < timerLength:
+        if button1.value:
+            led.value = False
+        else:
+            pyportal.set_text("PLAYER 1!")
+            break
+
+        if button2.value:
+            led.value = False
+        else:
+            pyportal.set_text("PLAYER 2!")
+            break
+
+        if time.monotonic() - timerStart > (timerLength - 0.5):
+            pyportal.set_text("TIME'S UP!")
+    print(time.monotonic() - timerStart)
+    time.sleep(0.05)  # debounce delay
 
 # Initialize the pyportal object and let us know what data to fetch and where
 # to display it
@@ -65,56 +97,24 @@ pyportal = PyPortal(url=DATA_SOURCE,
                                30,
                                30),
                     text_maxlen=(180, 30, 115, 120, 120), # max text size
-                    #caption_text=CAPTION,
                     caption_font=cwd+"/fonts/Arial-ItalicMT-17.bdf")
-                    #caption_position=(200, 218),
-                    #caption_color=0x808080)
-
 print("loading...") # print to repl while waiting for font to load
 pyportal.preload_font() # speed things up by preloading font
 
-def shuffle(aList):
-    for i in range(len(aList)-1, 0, -1):
-
-        # Pick a random index from 0 to i
-        j = random.randint(0, i + 1)
-
-        # Swap arr[i] with the element at random index
-        aList[i], aList[j] = aList[j], aList[i]
-
-        return aList
-
 while True:
     if pyportal.touchscreen.touch_point:
+        pyportal.set_background(cwd+"/trivia.bmp")
+        pyportal.set_text("Loading question...")
+        pyportal.set_caption(CAPTION,(200, 218), 0x808080)
+        answerList = [WA_LOCATION1, WA_LOCATION2, WA_LOCATION3, CA_LOCATION]
+        shuffle(answerList)
         try:
-
-            answerList = [WA_LOCATION1, WA_LOCATION2, WA_LOCATION3, CA_LOCATION]
-
-            shuffle(answerList)
-
-            tupleAnswerList = tuple(answerList)
-
-            print(tupleAnswerList)
-
-
-            pyportal.set_background(cwd+"/trivia.bmp")
-
-            pyportal.set_caption("opentdb.com",(200, 218), 0x808080)
-
-            #set the JSON path here to be able to change between definition and example
+            #set the JSON path here
             pyportal._json_path=(Q_LOCATION,
-                                 tupleAnswerList[0],
-                                 tupleAnswerList[1],
-                                 tupleAnswerList[2],
-                                 tupleAnswerList[3],)
-
-
-            pyportal._text_color=(0x8080FF,
-                                0xFFFFFF,
-                                0xFFFFFF,
-                                0xFFFFFF,
-                                0xFFFFFF)
-
+                                 answerList[0],
+                                 answerList[1],
+                                 answerList[2],
+                                 answerList[3],)
             value = pyportal.fetch()
             print("Response is", value)
         except RuntimeError as e:
@@ -123,87 +123,17 @@ while True:
             print("Index Error")
             continue
 
-        # 30 seconds to see question
-
-        timerStart = time.monotonic()
-
-        print(time.monotonic() - timerStart)
-
-        while time.monotonic() - timerStart < 30:
-
-            if button1.value:
-                led.value = False
-            else:
-                led.value = True
-
-                pyportal.set_text("PLAYER 1!")
-
-                break
-
-            if button2.value:
-                led.value = False
-            else:
-                led.value = True
-
-                pyportal.set_text("PLAYER 2!")
-
-                break
-
-            if time.monotonic() - timerStart > 29.5:
-
-                pyportal.set_text("TIME'S UP!")
-
-        print(time.monotonic() - timerStart)
-
-        time.sleep(0.05)  # debounce delay
+        # 30 seconds with question
+        faceOff(30)
 
         # 10 seconds to answer
-
-        timerStart = time.monotonic()
-
-        print(time.monotonic() - timerStart)
-
-        while time.monotonic() - timerStart < 10:
-
-            if button1.value:
-                led.value = False
-            else:
-                led.value = True
-
-                pyportal.set_text("PLAYER 1!")
-
-                break
-
-            if button2.value:
-                led.value = False
-            else:
-                led.value = True
-
-                pyportal.set_text("PLAYER 2!")
-
-                break
-
-            if time.monotonic() - timerStart > 9.5:
-
-                pyportal.set_text("TIME'S UP!")
-
-        print(time.monotonic() - timerStart)
-
-        time.sleep(0.05)  # debounce delay
-
+        faceOff(10)
 
         # Show the correct answer
-
-        answerChoices = ("A","B","C","D")
-
-        for i in range(len(tupleAnswerList)):
-            if tupleAnswerList[i] is CA_LOCATION:
+        for i in range(len(answerList)):
+            if answerList[i] is CA_LOCATION:
                 print(answerChoices[i])
                 correctAnswerChoice = answerChoices[i]
                 break
-
         answerRevealText = "Correct Answer: " + str(correctAnswerChoice) + "\n(Tap for next question.)"
-
         pyportal.set_text(answerRevealText)
-
-
