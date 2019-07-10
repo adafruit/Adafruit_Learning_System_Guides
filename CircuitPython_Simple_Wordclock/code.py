@@ -72,7 +72,7 @@ def writetime(the_hr, the_min):
         value = value | QUARTER
     if (the_min > 47) and (the_min <= 53):
         value = value | TENMIN
-    if the_min => 54:
+    if the_min >= 54:
         value = value | FIVEMIN
     # before or after
     if the_min <= 30:
