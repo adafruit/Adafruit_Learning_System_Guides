@@ -81,21 +81,21 @@ pyportal = PyPortal(url=DATA_SOURCE,
                     default_bg=cwd+"/trivia_title.bmp",
                     text_font=cwd+"/fonts/Arial-ItalicMT-17.bdf",
                     text_position=((25, 70),  # question location
-                                   (40, 135), # answer location 1
-                                   (40, 155), # answer location 2
-                                   (40, 175), # answer location 3
-                                   (40, 195)), # answer location 4
+                                   (35, 135), # answer location 1
+                                   (35, 155), # answer location 2
+                                   (35, 175), # answer location 3
+                                   (35, 195)), # answer location 4
                     text_color=(0x8080FF,
                                 0xFFFFFF,
                                 0xFFFFFF,
                                 0xFFFFFF,
                                 0xFFFFFF),
                     text_wrap=(35, # characters to wrap for text
-                               30,
-                               30,
-                               30,
-                               30),
-                    text_maxlen=(140, 27, 27, 27, 27), # max text size
+                               0,
+                               0,
+                               0,
+                               0),
+                    text_maxlen=(140, 30, 30, 30, 30), # max text size
                     caption_font=cwd+"/fonts/Arial-ItalicMT-17.bdf")
 print("loading...") # print to repl while waiting for font to load
 pyportal.preload_font() # speed things up by preloading font
