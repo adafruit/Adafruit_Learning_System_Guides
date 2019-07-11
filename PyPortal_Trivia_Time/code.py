@@ -67,6 +67,13 @@ def faceOff(timerLength):
     print(time.monotonic() - timerStart)
     time.sleep(0.05)  # debounce delay
 
+#convert html codes to normal text
+def unescape(s):
+    s = s.replace("&quot;", "''")
+    s = s.replace("&#039;", "'")
+    s = s.replace("&amp;", "&")
+    return s
+
 # Initialize the pyportal object and let us know what data to fetch and where
 # to display it
 pyportal = PyPortal(url=DATA_SOURCE,
@@ -108,13 +115,13 @@ while True:
             pyportal.set_text("Tap again for next question.")
             continue
         try:
-            #set the JSON path here
+            # set the JSON path here
             # pylint: disable=protected-access
-            pyportal._json_path=(Q_LOCATION,
-                                 answerList[0],
-                                 answerList[1],
-                                 answerList[2],
-                                 answerList[3],)
+            pyportal._json_path=(unescape(Q_LOCATION),
+                                 unescape(answerList[0]),
+                                 unescape(answerList[1]),
+                                 unescape(answerList[2]),
+                                 unescape(answerList[3]),)
             value = pyportal.fetch()
             print("Response is", value)
         except RuntimeError as e:
