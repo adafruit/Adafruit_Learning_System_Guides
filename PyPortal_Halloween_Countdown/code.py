@@ -3,6 +3,8 @@ This example will figure out the current local time using the internet, and
 then draw out a countdown clock until an event occurs!
 Once the event is happening, a new graphic is shown
 """
+
+#pylint:disable=invalid-name
 import time
 import random
 import board
@@ -90,8 +92,8 @@ while True:
 
     timestamp = time.localtime()
     now = time.struct_time((timestamp[0], timestamp[1], timestamp[2],
-                               0, 0, 0,  # we don't track seconds
-                               -1, -1, False))  # we dont know day of week/year or DST
+                            0, 0, 0,  # we don't track seconds
+                            -1, -1, False))  # we dont know day of week/year or DST
 
     print("Current time:", now)
     remaining = time.mktime(event_time) - time.mktime(now)
