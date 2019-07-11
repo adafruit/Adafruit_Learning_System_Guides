@@ -103,15 +103,8 @@ while True:
         pyportal.set_caption('', (13, 215), 0x000000)
         while True:  # that's all folks
             pass
-    secs_remaining = remaining % 60
-    remaining //= 60
-    mins_remaining = remaining % 60
-    remaining //= 60
-    hours_remaining = remaining % 24
-    remaining //= 24
-    days_remaining = remaining
-    print("%d days, %d hours, %d minutes and %s seconds" %
-          (days_remaining, hours_remaining, mins_remaining, secs_remaining))
+    days_remaining = remaining // 86400
+    print("%d days remaining" % (days_remaining))
     countdown_text.text = '{:>3}'.format(days_remaining)
     pyportal.set_background(backgrounds[random.randint(0, 17)])
 
