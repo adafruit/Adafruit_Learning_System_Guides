@@ -117,11 +117,11 @@ while True:
         try:
             # set the JSON path here
             # pylint: disable=protected-access
-            pyportal._json_path=(unescape(Q_LOCATION),
-                                 unescape(answerList[0]),
-                                 unescape(answerList[1]),
-                                 unescape(answerList[2]),
-                                 unescape(answerList[3]),)
+            pyportal._json_path=(Q_LOCATION,
+                                 answerList[0],
+                                 answerList[1],
+                                 answerList[2],
+                                 answerList[3],)
             value = pyportal.fetch()
             print("Response is", value)
         except RuntimeError as e:
