@@ -84,6 +84,13 @@ make_button(0, 4, "0", 2)
 make_button(2, 4, ".")
 make_button(3, 4, "=", 1, ORANGE, WHITE)
 
+def find_button(label):
+    result = None
+    for i, b in enumerate(buttons):
+        if b.label == label:
+            result = b
+    return result
+
 # Add the display and buttons to the main calc group
 calc_group.append(border)
 calc_group.append(calc_display)
@@ -96,15 +103,25 @@ button = ""
 while True:
     point = ts.touch_point
     if point is not None:
+        # Button Down Events
         for i, b in enumerate(buttons):
             if b.contains(point) and button == "":
                 b.selected = True
                 button = b.label
-                time.sleep(0.1)
+    elif button != "":
+        # Button Up Events
+        last_op = calculator.get_current_operator()
+        op_button = find_button(last_op)
+        # Deselect the last operation when certain buttons are pressed
+        if op_button is not None:
+            if button in ('=', 'AC', 'CE'):
+                op_button.selected = False
+            elif button in ('+', '-', 'x', '/') and button != last_op:
+                op_button.selected = False
+        calculator.add_input(button)
+        b = find_button(button)
+        if b is not None:
+            if button not in ('+', '-', 'x', '/') or button != calculator.get_current_operator():
                 b.selected = False
-                break
-    else:
-        if button != "":
-            calculator.add_input(button)
-            button = ""
+        button = ""
     time.sleep(0.05)
