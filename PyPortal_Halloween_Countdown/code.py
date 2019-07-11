@@ -1,7 +1,15 @@
 """
-This example will figure out the current local time using the internet, and
-then draw out a countdown clock until an event occurs!
-Once the event is happening, a new graphic is shown
+PyPortal based countdown of days until Halloween.
+
+Adafruit invests time and resources providing this open source code.
+Please support Adafruit and open source hardware by purchasing
+products from Adafruit!
+
+Written by Dave Astels for Adafruit Industries
+Copyright (c) 2019 Adafruit Industries
+Licensed under the MIT license.
+
+All text above must be included in any redistribution.
 """
 
 #pylint:disable=invalid-name
