@@ -86,9 +86,9 @@ make_button(3, 4, "=", 1, ORANGE, WHITE)
 
 def find_button(label):
     result = None
-    for i, b in enumerate(buttons):
-        if b.label == label:
-            result = b
+    for _, btn in enumerate(buttons):
+        if btn.label == label:
+            result = btn
     return result
 
 # Add the display and buttons to the main calc group
@@ -104,7 +104,7 @@ while True:
     point = ts.touch_point
     if point is not None:
         # Button Down Events
-        for i, b in enumerate(buttons):
+        for _, b in enumerate(buttons):
             if b.contains(point) and button == "":
                 b.selected = True
                 button = b.label
