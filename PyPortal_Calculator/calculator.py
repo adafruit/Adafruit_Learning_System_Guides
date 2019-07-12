@@ -23,6 +23,12 @@ class Calculator:
         self._operand = None
         self._all_clear()
 
+    def get_current_operator(self):
+        operator = self._operator
+        if operator == "*":
+            operator = "x"
+        return operator
+
     def _all_clear(self):
         self._accumulator = "0"
         self._operator = None
@@ -36,6 +42,7 @@ class Calculator:
         self._set_text("0")
 
     def _set_button_ce(self, entry_only):
+        self._clear_button.selected = False
         if entry_only:
             self._clear_button.label = "CE"
         else:
