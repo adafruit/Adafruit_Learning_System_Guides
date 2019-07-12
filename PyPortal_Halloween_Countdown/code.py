@@ -40,7 +40,7 @@ event_time = time.struct_time((EVENT_YEAR, EVENT_MONTH, EVENT_DAY,
 # needed so we know where to find files
 cwd = ("/"+__file__).rsplit('/', 1)[0]
 
-big_font = bitmap_font.load_font(cwd+"/fonts/Helvetica-Bold-36.bdf")
+big_font = bitmap_font.load_font(cwd+"/fonts/Terror-94.bdf")
 big_font.load_glyphs(b'0123456789') # pre-load glyphs for fast printing
 
 backgrounds = ['background_1.bmp',
@@ -59,30 +59,23 @@ backgrounds = ['background_1.bmp',
                'background_14.bmp',
                'background_15.bmp',
                'background_16.bmp',
-               'background_17.bmp',
-               'background_18.bmp']
+               'background_17.bmp']
 
-background_index = -1
 event_background = cwd+"/happy_halloween.bmp"
-
-days_position = (8, 207)
-hours_position = (110, 207)
-minutes_position = (220, 207)
-text_color = 0xFFFFFF
 
 # Initialize the pyportal object and let us know what data to fetch and where
 # to display it
 pyportal = PyPortal(status_neopixel=board.NEOPIXEL,
                     default_bg=cwd + backgrounds[0],
-                    caption_text='Days Remaining',
-                    caption_font=cwd+'/fonts/Helvetica-Bold-36.bdf',
-                    caption_position=(13, 215),
+                    caption_text='DAYS  REMAINING',
+                    caption_font=cwd+'/fonts/Terror-31.bdf',
+                    caption_position=(24, 218),
                     caption_color=0x000000)
 
 countdown_text = Label(big_font, max_glyphs=3)
-countdown_text.x = 130
-countdown_text.y = 20
-countdown_text.color = 0x000000
+countdown_text.x = 25
+countdown_text.y = 120
+countdown_text.color = 0x7942a0
 pyportal.splash.append(countdown_text)
 
 refresh_time = None
@@ -116,7 +109,7 @@ while True:
     days_remaining = remaining // 86400
     print("%d days remaining" % (days_remaining))
     countdown_text.text = '{:>3}'.format(days_remaining)
-    pyportal.set_background(backgrounds[random.randint(0, 17)])
+    pyportal.set_background(backgrounds[random.randint(0, len(backgrounds) - 1)])
 
     # update every minute
     time.sleep(60)
