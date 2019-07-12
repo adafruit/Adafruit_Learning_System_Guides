@@ -13,36 +13,42 @@ i2c = io.I2C(board.SCL, board.SDA)
 # Create the RTC instance:
 rtc = adafruit_ds3231.DS3231(i2c)
 
+# Set up Feather M4 onboard LED for output
 LED13 = digitalio.DigitalInOut(board.D13)
 LED13.direction = digitalio.Direction.OUTPUT
 
+# Set digital 6 as an input for slide switch
+Slide_Switch = digitalio.DigitalInOut(board.D6)
+Slide_Switch.switch_to_input(pull=digitalio.Pull.UP)
+
 pixel_pin = board.D5
 num_pixels = 21
-pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=1.0)
-pixels.fill((0, 0, 0))
-COLOR = (0, 200, 0)  # Green
+pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=1.0,
+                           auto_write=False)
+pixels.fill((0, 0, 0))  # Blanking Display
+COLOR = (0, 200, 0)     # Green for time later in code
 
 # Bitmap values for each value. These can be OR'ed together
 THREE = 1
-EIGHT = 1<<1
-ELEVEN = 1<<2
-TWO = 1<<3
-SIX = 1<<4
-FOUR = 1<<5
-SEVEN = 1<<6
-NOON = 1<<7
-TEN = 1<<8
-ONE = 1<<9
-FIVE = 1<<10
-MIDNIGHT = 1<<11
-NINE = 1<<12
-PAST = 1<<13
-TO = 1<<14
-FIVEMIN = 1<<15
-QUARTER = 1<<16
-TENMIN = 1<<17
-HALF = 1<<18
-TWENTY = 1<<19
+EIGHT = 1 << 1
+ELEVEN = 1 << 2
+TWO = 1 << 3
+SIX = 1 << 4
+FOUR = 1 << 5
+SEVEN = 1 << 6
+NOON = 1 << 7
+TEN = 1 << 8
+ONE = 1 << 9
+FIVE = 1 << 10
+MIDNIGHT = 1 << 11
+NINE = 1 << 12
+PAST = 1 << 13
+TO = 1 << 14
+FIVEMIN = 1 << 15
+QUARTER = 1 << 16
+TENMIN = 1 << 17
+HALF = 1 << 18
+TWENTY = 1 << 19
 
 # Pass in hour and minute, return LED bitmask
 # pylint: disable=too-many-branches
@@ -118,7 +124,7 @@ def writetime(the_hr, the_min):
 
 # Main loop
 LEDstate = 0
-FirstLoop = True
+Write_Now = True
 
 while True:
     t = rtc.datetime
@@ -126,9 +132,16 @@ while True:
     #        t.tm_mday, t.tm_mon, t.tm_year))
     # print("The time is {}:{:02}:{:02}".format(t.tm_hour, t.tm_min, t.tm_sec))
     hour = t.tm_hour
+    if not Slide_Switch.value:  # Slide switch activate = Daylight savings
+        # print("Switch detected for daylight savings")
+        if hour == 24:
+            hour = 1
+        else:
+            hour += 1
+        Write_Now = True  # Trigger a write
     minute = t.tm_min
     second = t.tm_sec
-    if second == 59 or FirstLoop:
+    if second == 59 or Write_Now:
         # print("The time is {}:{:02}".format(t.tm_hour, t.tm_min))
         pixels.fill((0, 0, 0))       # blank all pixels for change
         the_time = writetime(hour, minute)
@@ -142,5 +155,5 @@ while True:
     else:
         LED13.value = False
         LEDstate = 0
-    Firstloop = False
+    Write_Now = False
     time.sleep(1)  # wait a second
