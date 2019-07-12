@@ -4,6 +4,11 @@ Make a timekeeping vertical wordclock with Adafruit Feather M4, a RTC FeatherWin
 
 Follow the Adafruit learn guide here: https://learn.adafruit.com/vertical-wordclock/ !
 
+set_clock.py is a run once program to set the time. You will need to edit the code as seen in the comments for the exact date and time (without daylight savings time, please).
+
+
+
+
 Adafruit invests time and resources providing this open source code,
 please support Adafruit and open-source hardware by purchasing
 products from [Adafruit](https://www.adafruit.com)!
