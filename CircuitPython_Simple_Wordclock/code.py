@@ -23,7 +23,7 @@ Slide_Switch.switch_to_input(pull=digitalio.Pull.UP)
 
 pixel_pin = board.D5
 num_pixels = 21
-pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=1.0, 
+pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=1.0,
                            auto_write=False)
 pixels.fill((0, 0, 0))  # Blanking Display
 COLOR = (0, 200, 0)     # Green for time later in code
