@@ -1,5 +1,4 @@
 # Example code for using analog feedback value to seek a position
-import time
 import board
 import pulseio
 from simpleio import map_range
