@@ -33,7 +33,7 @@ def _transform(n):
 table_a2b_base64 = ''.join(map(_transform, table_a2b_base64))
 assert len(table_a2b_base64) == 256
 
-def a2b_base64(ascii):
+def a2b_base64(ascii_data):
     "Decode a line of base64 data."
 
     res = []
@@ -42,7 +42,7 @@ def a2b_base64(ascii):
     leftbits = 0
     last_char_was_a_pad = False
 
-    for c in ascii:
+    for c in ascii_data:
         c = chr(c)
         if c == PAD:
             if quad_pos > 2 or (quad_pos == 2 and last_char_was_a_pad):
