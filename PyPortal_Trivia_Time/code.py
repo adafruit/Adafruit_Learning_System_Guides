@@ -128,27 +128,11 @@ def unescapeList(l):
         l[i] = l[i].replace("&amp;", "&")
     return l
 
-def bmpImageLoad():
-    with open(cwd+"/trivia.bmp", "rb") as bitmap_file:
+# Clear screen of all elements but background
+def clear_splash():
+    for _ in range(len(pyportal.splash) - 1):
+        pyportal.splash.pop()
 
-        # Setup the file as the bitmap data source
-        bitmap = displayio.OnDiskBitmap(bitmap_file)
-
-        # Create a TileGrid to hold the bitmap
-        tile_grid = displayio.TileGrid(bitmap, pixel_shader=displayio.ColorConverter())
-
-        # Create a Group to hold the TileGrid
-        group = displayio.Group()
-
-        # Add the TileGrid to the Group
-        group.append(tile_grid)
-
-        # Add the Group to the Display
-        display.show(group)
-
-    # Loop forever so you can enjoy your image
-    while True:
-        pass
 pyportal = PyPortal(url=DATA_SOURCE,
                     status_neopixel=board.NEOPIXEL,
                     default_bg=cwd+"/trivia_title.bmp")
@@ -159,10 +143,6 @@ print("loading...") # print to repl while waiting for font to load
 pyportal.preload_font() # speed things up by preloading font
 
 
-
-def clear_splash():
-    for _ in range(len(pyportal.splash) - 1):
-        pyportal.splash.pop()
 
 while True:
     # Load new question when screen is touched
@@ -209,11 +189,12 @@ while True:
 
             # "clean" results
             valueClean = unescapeList(value)
-            print("Response is", value)
+            print("Response is", valueClean)
 
             # Formatting with displayio
             q_text = unescape(value[0])
             q_text_formatted = pyportal.wrap_nicely(q_text, 35)
+            qf_text = ''
             for i in range (len(q_text_formatted)):
                 qf_text = qf_text + q_text_formatted[i] +"\n"
             q_text = qf_text
