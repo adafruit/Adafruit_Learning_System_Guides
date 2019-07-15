@@ -1,6 +1,10 @@
+"""
+Copied and tweaked from micropython-lib
+"""
 
 PAD = '='
 
+#pylint:disable=bad-whitespace,invalid-name
 table_a2b_base64 = [
     -1,-1,-1,-1, -1,-1,-1,-1, -1,-1,-1,-1, -1,-1,-1,-1,
     -1,-1,-1,-1, -1,-1,-1,-1, -1,-1,-1,-1, -1,-1,-1,-1,
@@ -19,11 +23,13 @@ table_a2b_base64 = [
     -1,-1,-1,-1, -1,-1,-1,-1, -1,-1,-1,-1, -1,-1,-1,-1,
     -1,-1,-1,-1, -1,-1,-1,-1, -1,-1,-1,-1, -1,-1,-1,-1,
 ]
+#pylint:enable=bad-whitespace
+
 def _transform(n):
     if n == -1:
         return '\xff'
-    else:
-        return chr(n)
+    return chr(n)
+
 table_a2b_base64 = ''.join(map(_transform, table_a2b_base64))
 assert len(table_a2b_base64) == 256
 
