@@ -17,52 +17,24 @@ import time
 import binascii
 import json
 import board
-import busio
 from adafruit_pyportal import PyPortal
-from digitalio import DigitalInOut
-from adafruit_esp32spi import adafruit_esp32spi
 import adafruit_esp32spi.adafruit_esp32spi_requests as requests
-import adafruit_logging as logging
 
 username = 'codewisdom'
 
-logger = logging.getLogger('main')
-logger.setLevel(logging.DEBUG)
 try:
     from secrets import secrets
 except ImportError:
-    logger.critical("""WiFi settings are kept in secrets.py, please add them there!
+    print("""WiFi settings are kept in secrets.py, please add them there!
 the secrets dictionary must contain 'ssid' and 'password' at a minimum""")
     raise
 
 def halt_and_catch_fire(message, *args):
     """Log a critical error and stall the system."""
-    logger.critical(message, *args)
+    print(message % args)
     while True:
         pass
 
-def connect_esp():
-    """Connect the ESP to the network."""
-    pyportal.neo_status((0, 0, 100))
-    while not esp.is_connected:
-        # secrets dictionary must contain 'ssid' and 'password' at a minimum
-        if secrets['ssid'] == 'CHANGE ME' or secrets['ssid'] == 'CHANGE ME':
-            change_me = "\n"+"*"*45
-            change_me += "\nPlease update the 'secrets.py' file on your\n"
-            change_me += "CIRCUITPY drive to include your local WiFi\n"
-            change_me += "access point SSID name in 'ssid' and SSID\n"
-            change_me += "password in 'password'. Then save to reload!\n"
-            change_me += "*"*45
-            raise OSError(change_me)
-        pyportal.neo_status((100, 0, 0)) # red = not connected
-        try:
-            esp.connect(secrets)
-        except RuntimeError as error:
-            logger.error("Could not connect to internet: %s", error)
-            logger.error("Retrying in 3 seconds...")
-            time.sleep(3)
-
-#pylint:disable=redefined-outer-name
 def get_bearer_token():
     """Get the bearer authentication token from twitter."""
     raw_key = secrets['twitter_api_key'] + ':' + secrets['twitter_secret_key']
@@ -77,57 +49,36 @@ def get_bearer_token():
     if response_dict['token_type'] != 'bearer':
         halt_and_catch_fire('Wrong token type from twitter: %s', response_dict['token_type'])
     return response_dict['access_token']
-#pylint:enable=redefined-outer-name
-
-#setup esp interface
-esp32_ready = DigitalInOut(board.ESP_BUSY)
-esp32_gpio0 = DigitalInOut(board.ESP_GPIO0)
-esp32_reset = DigitalInOut(board.ESP_RESET)
-esp32_cs = DigitalInOut(board.ESP_CS)
-spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
-esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready,
-                                       esp32_reset, esp32_gpio0)
 
 # determine the current working directory
 # needed so we know where to find files
 cwd = ("/"+__file__).rsplit('/', 1)[0]
+url = 'https://api.twitter.com/1.1/statuses/user_timeline.json?count=1&screen_name=' + username
 
 
 # Initialize the pyportal object and let us know what data to fetch and where
 # to display it
-pyportal = PyPortal(status_neopixel=board.NEOPIXEL,
+pyportal = PyPortal(url=url,
+                    json_path=(0, 'text'),
+                    status_neopixel=board.NEOPIXEL,
                     default_bg=cwd + '/twitter_background.bmp',
-                    external_spi=spi,
-                    esp=esp,
+                    # external_spi=spi,
+                    # esp=esp,
                     text_font=cwd+'/fonts/Helvetica-Bold-16.bdf',
                     text_position=(20, 60),
                     text_color=0xFFFFFF,
+                    text_wrap=35,
                     caption_text='@' + username,
                     caption_font=cwd+'/fonts/Helvetica-Bold-16.bdf',
                     caption_position=(5, 210),
                     caption_color=0x808080)
 
-logger.debug("Connecting to AP %s...", secrets['ssid'])
-connect_esp()
-logger.debug('Connected')
-
-logger.debug('Getting bearer token...')
 bearer_token = get_bearer_token()
-logger.debug('Got it')
 
-headers = {'Authorization': 'Bearer ' + bearer_token}
+#pylint:disable=protected-access
+pyportal._headers = {'Authorization': 'Bearer ' + bearer_token}
+#pylint:enable=protected-access
 
-url = 'https://api.twitter.com/1.1/statuses/user_timeline.json?count=1&screen_name=' + username
 while True:
-    logger.debug('fetching latest tweet from @%s', username)
-    response = requests.get(url,
-                            headers=headers)
-    if response.status_code != 200:
-        logger.error('Tweet fetch status: %d', response.status_code)
-    else:
-        tweet = json.loads(response.content)[0]['text']
-        logger.debug('Tweet: %s', tweet)
-        lines = PyPortal.wrap_nicely(tweet, 35)
-        pyportal.set_text('\n'.join(lines))
-    # check every hour
-    time.sleep(3600)
+    pyportal.fetch()
+    time.sleep(3600)       # check every hour
