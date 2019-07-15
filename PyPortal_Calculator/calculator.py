@@ -99,6 +99,10 @@ class Calculator:
         self._set_text(self._accumulator)
         self._equal_pressed = True
 
+    def _update_operand(self):
+        if self._operand is not None:
+            self._operand = self._get_text()
+
     def add_input(self, input_key):
         try:
             if self._error:
@@ -120,8 +124,10 @@ class Calculator:
                     self._equal_pressed = False
             elif input_key == "+/-":
                 self._set_text(calculate(self._get_text(), "*", "-1"))
+                self._update_operand()
             elif input_key == "%":
                 self._set_text(calculate(self._get_text(), "/", "100"))
+                self._update_operand()
             elif input_key == "=":
                 self._handle_equal()
         except (ZeroDivisionError, RuntimeError):
