@@ -90,29 +90,29 @@ def faceOff(timerLength):
         if button1.value:
             led.value = False # For debugging
         else: # If button 1 pressed, print player 1 on screen and exit function
-            pyportal.splash.pop() # Pop 5 - quesiton - to make room for player that wins
+            pyportal.splash.pop() # make room for player that wins
             player1_text_area = label.Label(trivia_font, text=player1_text, color=loading_color)
             player1_text_area.x = player_position[0]
             player1_text_area.y = player_position[1]
-            pyportal.splash.append(player1_text_area) # push 5
+            pyportal.splash.append(player1_text_area)
             led.value = True # For debugging
             break
         if button2.value:
             led.value = False # For debugging
         else: # If button 2 pressed, print player 1 on screen and exit function
             led.value = True # For debugging
-            pyportal.splash.pop() # Pop 5 - quesiton - to make room for player that wins
+            pyportal.splash.pop() # make room for player that wins
             player2_text_area = label.Label(trivia_font, text=player2_text, color=loading_color)
             player2_text_area.x = player_position[0]
             player2_text_area.y = player_position[1]
             pyportal.splash.append(player2_text_area) # push 5
             break
         if time.monotonic() - timerStart > (timerLength - 0.5): # Timer runs out
-            pyportal.splash.pop() # Pop 5 - quesiton - to make room for player that wins
+            pyportal.splash.pop() # make room for player that wins
             timesup_text_area = label.Label(trivia_font, text=timesup_text, color=loading_color)
             timesup_text_area.x = timesup_position[0]
             timesup_text_area.y = timesup_position[1]
-            pyportal.splash.append(timesup_text_area) # push 5
+            pyportal.splash.append(timesup_text_area)
     print(time.monotonic() - timerStart)
     time.sleep(0.05)  # debounce delay
 
