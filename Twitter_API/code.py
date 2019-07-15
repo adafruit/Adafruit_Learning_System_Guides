@@ -12,15 +12,13 @@ Licensed under the MIT license.
 All text above must be included in any redistribution.
 """
 
+#pylint:disable=invalid-name
 import time
-import random
-import board
-import busio
 import binascii
 import json
+import board
+import busio
 from adafruit_pyportal import PyPortal
-from adafruit_bitmap_font import bitmap_font
-from adafruit_display_text.label import Label
 from digitalio import DigitalInOut
 from adafruit_esp32spi import adafruit_esp32spi
 import adafruit_esp32spi.adafruit_esp32spi_requests as requests
@@ -70,8 +68,8 @@ def get_bearer_token():
     raw_key = secrets['twitter_api_key'] + ':' + secrets['twitter_secret_key']
     encoded_key = binascii.b2a_base64(bytes(raw_key, 'utf8'))
     string_key = bytes.decode(encoded_key)
-    headers= {'Authorization': 'Basic ' + string_key,
-              'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'}
+    headers = {'Authorization': 'Basic ' + string_key,
+               'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'}
     response = requests.post('https://api.twitter.com/oauth2/token',
                              headers=headers,
                              data='grant_type=client_credentials')
@@ -119,9 +117,10 @@ logger.debug('Got it')
 
 headers = {'Authorization': 'Bearer ' + bearer_token}
 
+url = 'https://api.twitter.com/1.1/statuses/user_timeline.json?count=1&screen_name=' + username
 while True:
     logger.debug('fetching latest tweet from @%s', username)
-    response = requests.get('https://api.twitter.com/1.1/statuses/user_timeline.json?count=1&screen_name=' + username,
+    response = requests.get(url,
                             headers=headers)
     if response.status_code != 200:
         logger.error('Tweet fetch status: %d', response.status_code)
