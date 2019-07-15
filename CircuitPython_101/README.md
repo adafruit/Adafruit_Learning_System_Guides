@@ -1,6 +1,6 @@
 ## Adafruit Learning System tutorial - CircuitPython 101
 
-Make a timekeeping vertical wordclock with Adafruit Feather M4, a RTC FeatherWing, and CircuitPython.
+Learning the basics of CircuitPython.
 
 Follow these Adafruit learn guides here: https://learn.adafruit.com/search?q=circuitpython%20101
 
