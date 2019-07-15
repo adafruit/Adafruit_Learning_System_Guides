@@ -27,6 +27,10 @@ button1.pull = Pull.UP
 button2.pull = Pull.UP
 display = board.DISPLAY
 
+# determine the current working directory
+# needed so we know where to find files
+cwd = ("/"+__file__).rsplit('/', 1)[0]
+
 # Set up where we'll be fetching data from
 DATA_SOURCE = "https://opentdb.com/api.php?amount=1&type=multiple"
 Q_LOCATION = ['results', 0, 'question']
@@ -35,14 +39,21 @@ WA_LOCATION2 = ['results', 0, 'incorrect_answers', 1]
 WA_LOCATION3 = ['results', 0, 'incorrect_answers', 2]
 CA_LOCATION = ['results', 0, 'correct_answer']
 CAPTION = 'opentdb.com'
+
+# Text info
+trivia_font = bitmap_font.load_font("/fonts/Arial-ItalicMT-17.bdf")
 answerChoices = ("A","B","C","D")
 qf_text = ''
 a1f_text = ''
 a2f_text = ''
 a3f_text = ''
 a4f_text = ''
-trivia_font = bitmap_font.load_font("/fonts/Arial-ItalicMT-17.bdf")
-# 320 x 240
+player1_text = "Player 1!"
+player2_text = "Player 2!"
+timesup_text = "TIME'S UP!"
+loading_text = "loading question..."
+tapagain_text = "Tap again for \n next question."
+# Text locations (screen is 320 x 240)
 loading_position = tapagain_position = (100,120)
 player_position = timesup_position = answerReveal_position = (120, 75)
 answerReveal_position = (25, 75)
@@ -51,22 +62,8 @@ a1_position = (25, 135)
 a2_position = (25, 155)
 a3_position = (25, 175)
 a4_position = (25, 195)
-loading_color = 0x8080FF
-q_color = 0x8080FF
+loading_color = q_color = 0x8080FF
 a_color = 0xFFFFFF
-player1_text = "Player 1!"
-player2_text = "Player 2!"
-timesup_text = "TIME'S UP!"
-loading_text = "loading question..."
-tapagain_text = "Tap again for \n next question."
-
-
-
-
-
-# determine the current working directory
-# needed so we know where to find files
-cwd = ("/"+__file__).rsplit('/', 1)[0]
 
 # A function to shuffle trivia questions
 def shuffle(aList):
@@ -121,13 +118,6 @@ def unescape(s):
     s = s.replace("&amp;", "&")
     return s
 
-def unescapeList(l):
-    for i in range(len(l)):
-        l[i] = l[i].replace("&quot;", "\"")
-        l[i] = l[i].replace("&#039;", "\'")
-        l[i] = l[i].replace("&amp;", "&")
-    return l
-
 # Clear screen of all elements but background
 def clear_splash():
     for _ in range(len(pyportal.splash) - 1):
@@ -136,38 +126,30 @@ def clear_splash():
 pyportal = PyPortal(url=DATA_SOURCE,
                     status_neopixel=board.NEOPIXEL,
                     default_bg=cwd+"/trivia_title.bmp")
-                    # caption_font=cwd+"/fonts/Arial-ItalicMT-17.bdf") # no caption?
-
 
 print("loading...") # print to repl while waiting for font to load
 pyportal.preload_font() # speed things up by preloading font
-
-
 
 while True:
     # Load new question when screen is touched
     if pyportal.touchscreen.touch_point:
         clear_splash() # clear all besides background screen
         pyportal.set_background(cwd+"/trivia.bmp")
-        #pyportal.set_text("Loading question...")
         loading_text_area = label.Label(trivia_font, text=loading_text, color=loading_color)
         loading_text_area.x = loading_position[0]
         loading_text_area.y = loading_position[1]
-        pyportal.splash.append(loading_text_area) # push 1
-
-        # pyportal.set_caption(CAPTION,(200, 218), 0x808080) # set caption location and color
+        pyportal.splash.append(loading_text_area)
         answerList = [WA_LOCATION1, WA_LOCATION2, WA_LOCATION3, CA_LOCATION]
         # For catching potential index error when shuffling question
         try:
             shuffle(answerList) # Shuffle answers
         except IndexError:
             print("Index Error")
-            #pyportal.set_text("Tap again for next question.")
-            pyportal.splash.pop() # take off loading... pop 1
             tapagain_text_area = label.Label(trivia_font, text=tapagain_text, color=loading_color)
             tapagain_text_area.x = tapagain_position[0]
             tapagain_text_area.y = tapagain_position[1]
-            pyportal.splash.append(tapagain_text_area) # push 1
+            pyportal.splash.pop() # take off loading...
+            pyportal.splash.append(tapagain_text_area)
             continue
         try:
             # set the JSON path here, now that answers are shuffled
@@ -179,17 +161,11 @@ while True:
                                  answerList[3],)
             value = pyportal.fetch()
             print("Response is", value)
-
-            #pyportal.set_text("Loading question...")
-            pyportal.splash.pop() # take off loading... pop 1
             loading_text_area = label.Label(trivia_font, text=loading_text, color=loading_color)
             loading_text_area.x = loading_position[0]
             loading_text_area.y = loading_position[1]
-            pyportal.splash.append(loading_text_area) # push 1
-
-            # "clean" results
-            valueClean = unescapeList(value)
-            print("Response is", valueClean)
+            pyportal.splash.pop() # take off loading...
+            pyportal.splash.append(loading_text_area)
 
             # Formatting with displayio
             q_text = unescape(value[0])
@@ -217,15 +193,12 @@ while True:
             a4_text_area = label.Label(trivia_font, text="D. "+a4_text, color=a_color, line_spacing = 1.5)
             a4_text_area.x = a4_position[0]
             a4_text_area.y = a4_position[1]
-
-            pyportal.splash.pop() # take off loading... pop 1
-            pyportal.splash.append(a1_text_area) # push 1
-            pyportal.splash.append(a2_text_area) # push 2
-            pyportal.splash.append(a3_text_area) # push 3
-            pyportal.splash.append(a4_text_area) # push 4
-            pyportal.splash.append(q_text_area) # push 5 push question last so it can be removed more easily later
-
-            #display.show(q_text_area)
+            pyportal.splash.pop() # take off loading...
+            pyportal.splash.append(a1_text_area)
+            pyportal.splash.append(a2_text_area)
+            pyportal.splash.append(a3_text_area)
+            pyportal.splash.append(a4_text_area)
+            pyportal.splash.append(q_text_area) # append question last so it can be removed more easily later
 
         except RuntimeError as e:
             print("Some error occured, retrying! -", e)
@@ -241,10 +214,8 @@ while True:
                 correctAnswerChoice = answerChoices[k]
                 break
         answerReveal_text="Correct Answer: "+str(correctAnswerChoice)+"\n(Tap for next question.)"
-        pyportal.splash.pop() # Pop 5
         answerReveal_text_area = label.Label(trivia_font, text=answerReveal_text, color=loading_color)
         answerReveal_text_area.x = answerReveal_position[0]
         answerReveal_text_area.y = answerReveal_position[1]
-        pyportal.splash.append(answerReveal_text_area) # push 5
-
-        #pyportal.set_text(answerRevealText)
+        pyportal.splash.pop() # Make room for answer
+        pyportal.splash.append(answerReveal_text_area)
