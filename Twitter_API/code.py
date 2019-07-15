@@ -75,9 +75,7 @@ pyportal = PyPortal(url=url,
 
 bearer_token = get_bearer_token()
 
-#pylint:disable=protected-access
-pyportal._headers = {'Authorization': 'Bearer ' + bearer_token}
-#pylint:enable=protected-access
+pyportal.set_headers({'Authorization': 'Bearer ' + bearer_token})
 
 while True:
     pyportal.fetch()
