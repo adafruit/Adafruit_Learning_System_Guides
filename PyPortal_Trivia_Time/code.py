@@ -68,7 +68,7 @@ reveal_text_area = label.Label(trivia_font, max_glyphs=120, color=loading_color,
 timer_position = (25, 215)
 timer_color = 0xFF00FF
 timer_text_area = label.Label(trivia_font, max_glyphs=20, color=timer_color,
-                               x=timer_position[0], y=timer_position[1])
+                              x=timer_position[0], y=timer_position[1])
 
 # A function to shuffle trivia questions
 def shuffle(aList):
@@ -129,7 +129,7 @@ for textarea in ans_text_areas:
 while True:
     # Load new question when screen is touched
     while not pyportal.touchscreen.touch_point:
-       pass
+        pass
 
     reveal_text_area.text = ''
     q_text_area.text = ''
@@ -159,15 +159,16 @@ while True:
     except RuntimeError as e:
         print("Group full", e)
         continue
-    for i, answer in enumerate(answers):
-        ans_text_areas[i].text = answer_choices[i]+") "+unescape(answer)
+    for k, answer in enumerate(answers):
+        ans_text_areas[k].text = answer_choices[k]+") "+unescape(answer)
 
     faceOff(10) # 10 seconds with question
     time.sleep(2) # pause for 2 seconds to show which player tapped first
     faceOff(5) # 5 seconds to answer
     timer_text_area.text = ''
     # Show the correct answer
-    i = answers.index(correct_answer)
-    reveal_text = "Correct Answer:\n"+answer_choices[i]+") "+unescape(answers[i])+"\n(Tap for next question.)"
+    k = answers.index(correct_answer)
+    reveal_text = ("Correct Answer:\n"+answer_choices[k]+") "
+                   +unescape(answers[k])+"\n(Tap for next question.)")
     print(reveal_text)
     reveal_text_area.text = reveal_text
