@@ -39,43 +39,46 @@ CA_LOCATION = ['results', 0, 'correct_answer']
 
 # Text info
 trivia_font = bitmap_font.load_font("/fonts/Arial-ItalicMT-17.bdf")
-answerChoices = ("A","B","C","D")
-a1f_text = ''
-a2f_text = ''
-a3f_text = ''
-a4f_text = ''
-player1_text = "Player 1!"
-player2_text = "Player 2!"
-timesup_text = "TIME'S UP!"
-loading_text = "loading question..."
-tapagain_text = "Tap again for \n next question."
-# Text locations (screen is 320 x 240)
-loading_position = tapagain_position = (100,120)
-player_position = timesup_position = answerReveal_position = (120, 75)
-answerReveal_position = (25, 75)
-q_position = (25, 70)
-a1_position = (25, 135)
-a2_position = (25, 155)
-a3_position = (25, 175)
-a4_position = (25, 195)
-loading_color = q_color = 0x8080FF
-a_color = 0xFFFFFF
 
-# Clear screen of all elements but background
-def clear_splash():
-    for _ in range(len(pyportal.splash) - 1):
-        pyportal.splash.pop()
+loading_color = 0x8080FF
+loading_position = (100,120)
+loading_text_area = label.Label(trivia_font, max_glyphs=30, color=loading_color,
+                                x=loading_position[0], y=loading_position[1])
+
+q_color = 0x8080FF
+q_position = (25, 70)
+q_text_area = label.Label(trivia_font, max_glyphs=120,
+                          x=q_position[0], y=q_position[1],
+                          color=q_color, line_spacing = 1)
+
+answer_choices = ("A","B","C","D")
+a_positions = ((25, 135), (25, 155), (25, 175), (25, 195))
+a_color = 0xFFFFFF
+ans_text_areas = []
+for answernum in range(4):
+    ans_text_areas.append(label.Label(trivia_font, max_glyphs=80,
+                                      color=a_color, line_spacing = 1.5,
+                                      x=a_positions[answernum][0],
+                                      y=a_positions[answernum][1]))
+
+reveal_position = (25, 75)
+reveal_text_area = label.Label(trivia_font, max_glyphs=120, color=loading_color,
+                               x=reveal_position[0], y=reveal_position[1])
+
+timer_position = (25, 215)
+timer_color = 0xFF00FF
+timer_text_area = label.Label(trivia_font, max_glyphs=20, color=timer_color,
+                               x=timer_position[0], y=timer_position[1])
 
 # A function to shuffle trivia questions
 def shuffle(aList):
-    for i in range(len(aList)-1, 0, -1):
-        # Pick a random index from 0 to i
-        j = random.randint(0, i + 1)
+    for i in range(len(aList)):
+        j = random.randint(0, len(aList)-1)
         # Swap arr[i] with the element at random index
         aList[i], aList[j] = aList[j], aList[i]
-        return aList
+    return aList
 
-#convert html codes to normal text
+# convert html codes to normal text
 def unescape(s):
     s = s.replace("&quot;", "''")
     s = s.replace("&#039;", "'")
@@ -84,135 +87,87 @@ def unescape(s):
 
 # A function to handle the timer and determine which player answers first
 def faceOff(timerLength):
+    timer_text = str(timerLength) + " seconds!"
+    timer_text_area.text = ''
+    timer_text_area.text = str(timer_text)
     timerStart = time.monotonic()
-    print(time.monotonic() - timerStart)
     while time.monotonic() - timerStart < timerLength:
         if button1.value:
             led.value = False # For debugging
         else: # If button 1 pressed, print player 1 on screen and exit function
-            pyportal.splash.pop() # make room for player that wins
-            player1_text_area = label.Label(trivia_font, text=player1_text, color=loading_color)
-            player1_text_area.x = player_position[0]
-            player1_text_area.y = player_position[1]
-            pyportal.splash.append(player1_text_area)
             led.value = True # For debugging
+            q_text_area.text = ''
+            reveal_text_area.text = "Player 1!"
             break
         if button2.value:
             led.value = False # For debugging
-        else: # If button 2 pressed, print player 1 on screen and exit function
+        else: # If button 2 pressed, print player 2 on screen and exit function
             led.value = True # For debugging
-            pyportal.splash.pop() # make room for player that wins
-            player2_text_area = label.Label(trivia_font, text=player2_text, color=loading_color)
-            player2_text_area.x = player_position[0]
-            player2_text_area.y = player_position[1]
-            pyportal.splash.append(player2_text_area) # push 5
+            q_text_area.text = ''
+            reveal_text_area.text = "Player 2!"
             break
-        if time.monotonic() - timerStart > (timerLength - 0.5): # Timer runs out
-            pyportal.splash.pop() # make room for player that wins
-            timesup_text_area = label.Label(trivia_font, text=timesup_text, color=loading_color)
-            timesup_text_area.x = timesup_position[0]
-            timesup_text_area.y = timesup_position[1]
-            pyportal.splash.append(timesup_text_area)
-    print(time.monotonic() - timerStart)
-    time.sleep(0.05)  # debounce delay
-
-#function to format trivia question content
-def format_trivia():
-    pyportal.splash.pop()
-    pyportal.splash.append(loading_text_area)
-    # Formatting with display text library
-    q_text = unescape(value[0])
-    q_text_formatted = pyportal.wrap_nicely(q_text, 35)
-    qf_text = ''
-    for wrp in range (len(q_text_formatted)):
-        qf_text = qf_text + q_text_formatted[wrp] +"\n"
-    q_text = qf_text
-    q_text_area = label.Label(trivia_font, text=q_text,
-                              color=q_color, line_spacing = 1)
-    q_text_area.x = q_position[0]
-    q_text_area.y = q_position[1]
-    a1_text = unescape(value[1])
-    a1_text_area = label.Label(trivia_font, text="A. "+a1_text,
-                               color=a_color, line_spacing = 1.5)
-    a1_text_area.x = a1_position[0]
-    a1_text_area.y = a1_position[1]
-    a2_text = unescape(value[2])
-    a2_text_area = label.Label(trivia_font, text="B. "+a2_text,
-                               color=a_color, line_spacing = 1.5)
-    a2_text_area.x = a2_position[0]
-    a2_text_area.y = a2_position[1]
-    a3_text = unescape(value[3])
-    a3_text_area = label.Label(trivia_font, text="C. "+a3_text,
-                               color=a_color, line_spacing = 1.5)
-    a3_text_area.x = a3_position[0]
-    a3_text_area.y = a3_position[1]
-    a4_text = unescape(value[4])
-    a4_text_area = label.Label(trivia_font, text="D. "+a4_text,
-                               color=a_color, line_spacing = 1.5)
-    a4_text_area.x = a4_position[0]
-    a4_text_area.y = a4_position[1]
-    pyportal.splash.pop() # take off loading...
-    pyportal.splash.append(a1_text_area)
-    pyportal.splash.append(a2_text_area)
-    pyportal.splash.append(a3_text_area)
-    pyportal.splash.append(a4_text_area)
-    # append question last so it can be removed more easily later
-    pyportal.splash.append(q_text_area)
+        time.sleep(0.05)  # debounce delay
+    else: # Timer runs out
+        q_text_area.text = ''
+        reveal_text_area.text = "Times up!"
 
 # PyPortal constructor
 pyportal = PyPortal(url=DATA_SOURCE,
+                    json_path=(Q_LOCATION, CA_LOCATION, WA_LOCATION1, WA_LOCATION2, WA_LOCATION3),
                     status_neopixel=board.NEOPIXEL,
                     default_bg=cwd+"/trivia_title.bmp")
 
 pyportal.preload_font() # speed things up by preloading font
 
+pyportal.splash.append(loading_text_area) #loading...
+pyportal.splash.append(q_text_area)
+pyportal.splash.append(reveal_text_area)
+pyportal.splash.append(timer_text_area)
+for textarea in ans_text_areas:
+    pyportal.splash.append(textarea)
+
 while True:
     # Load new question when screen is touched
-    if pyportal.touchscreen.touch_point:
-        clear_splash() # clear all besides background screen
-        pyportal.set_background(cwd+"/trivia.bmp")
-        loading_text_area = label.Label(trivia_font, text=loading_text, color=loading_color)
-        loading_text_area.x = loading_position[0]
-        loading_text_area.y = loading_position[1]
-        pyportal.splash.append(loading_text_area) #loading...
-        answerList = [WA_LOCATION1, WA_LOCATION2, WA_LOCATION3, CA_LOCATION]
-        # For catching potential index error when shuffling question
+    while not pyportal.touchscreen.touch_point:
+       pass
+
+    reveal_text_area.text = ''
+    q_text_area.text = ''
+    for textarea in ans_text_areas:
+        textarea.text = ''
+    timer_text_area.text = ''
+
+    pyportal.set_background(cwd+"/trivia.bmp")
+    loading_text_area.text ="Loading question..."
+
+    while True:
         try:
-            shuffle(answerList) # Shuffle answers
-        except IndexError:
-            print("Index Error")
-            tapagain_text_area = label.Label(trivia_font, text=tapagain_text, color=loading_color)
-            tapagain_text_area.x = tapagain_position[0]
-            tapagain_text_area.y = tapagain_position[1]
-            pyportal.splash.pop() # take off loading...
-            pyportal.splash.append(tapagain_text_area)
-            continue
-        try:
-            # set the JSON path here, now that answers are shuffled
-            # pylint: disable=protected-access
-            pyportal._json_path=(Q_LOCATION,
-                                 answerList[0],
-                                 answerList[1],
-                                 answerList[2],
-                                 answerList[3],)
             value = pyportal.fetch()
-            print("Response is", value)
-            format_trivia()
+            break
         except RuntimeError as e:
             print("Some error occured, retrying! -", e)
-        faceOff(30) # 30 seconds with question
-        time.sleep(2) # pause for 2 seconds to show which player tapped first
-        faceOff(10) # 10 seconds to answer
-        # Show the correct answer
-        for ansr in range(len(answerList)):
-            if answerList[ansr] is CA_LOCATION:
-                print(answerChoices[ansr])
-                correctAnswerChoice = answerChoices[ansr]
-                break
-        answerReveal_text="Correct Answer: "+str(correctAnswerChoice)+"\n(Tap for next question.)"
-        answerReveal_text_area = label.Label(trivia_font, text=answerReveal_text,
-                                             color=loading_color)
-        answerReveal_text_area.x = answerReveal_position[0]
-        answerReveal_text_area.y = answerReveal_position[1]
-        pyportal.splash.pop() # Make room for answer
-        pyportal.splash.append(answerReveal_text_area)
+            continue
+    print("Response is", value)
+    question = value[0]
+    correct_answer = value[1]
+    answers = shuffle(value[1:5])
+    loading_text_area.text = ''
+
+    # Format text and wrap with display text library
+    try: # sometimes gives a runtime error: Group full
+        q_text_area.text = '\n'.join(pyportal.wrap_nicely(unescape(question), 35))
+    except RuntimeError as e:
+        print("Group full", e)
+        continue
+    for i, answer in enumerate(answers):
+        ans_text_areas[i].text = answer_choices[i]+") "+unescape(answer)
+
+    faceOff(10) # 10 seconds with question
+    time.sleep(2) # pause for 2 seconds to show which player tapped first
+    faceOff(5) # 5 seconds to answer
+    timer_text_area.text = ''
+    # Show the correct answer
+    i = answers.index(correct_answer)
+    reveal_text = "Correct Answer:\n"+answer_choices[i]+") "+unescape(answers[i])+"\n(Tap for next question.)"
+    print(reveal_text)
+    reveal_text_area.text = reveal_text
