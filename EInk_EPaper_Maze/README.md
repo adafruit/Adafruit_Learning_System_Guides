@@ -1,7 +1,7 @@
 ## Adafruit eInk / ePaper Maze Maker tutorial code
 
 In this project, the Adafruit Metro M4 Express Airlift and the 2.7" Tri-Color ePaper Shield work happily together to create 
-a random maze for you to solve. The solution is also available in red if needed.
+random mazes for you to solve. The solution is also available in red if needed.
 
 The tutorial is in the Adafruit Learning System at https://learn.adafruit.com/epaper-maze-maker/
 
