@@ -20,8 +20,8 @@ from adafruit_esp32spi import adafruit_esp32spi, adafruit_esp32spi_wifimanager
 # Import NeoPixel Library
 import neopixel
 
-# Import Adafruit IO REST Client
-from adafruit_io.adafruit_io import RESTClient, AdafruitIO_RequestError
+# Import Adafruit IO HTTP Client
+from adafruit_io.adafruit_io import IO_HTTP, AdafruitIO_RequestError
 
 # Import ADT7410 Library
 import adafruit_adt7410
@@ -51,8 +51,8 @@ wifi = adafruit_esp32spi_wifimanager.ESPSPI_WiFiManager(esp, secrets, status_lig
 ADAFRUIT_IO_USER = secrets['aio_username']
 ADAFRUIT_IO_KEY = secrets['aio_key']
 
-# Create an instance of the Adafruit IO REST client
-io = RESTClient(ADAFRUIT_IO_USER, ADAFRUIT_IO_KEY, wifi)
+# Create an instance of the Adafruit IO HTTP client
+io = IO_HTTP(ADAFRUIT_IO_USER, ADAFRUIT_IO_KEY, wifi)
 
 try:
     # Get the 'temperature' feed from Adafruit IO
