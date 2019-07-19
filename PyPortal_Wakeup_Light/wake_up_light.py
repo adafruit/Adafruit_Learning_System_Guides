@@ -10,13 +10,13 @@ import neopixel
 import busio
 from digitalio import DigitalInOut
 from analogio import AnalogIn
-import adafruit_adt7410
-
+import displayio
+from adafruit_display_text.label import Label
+from adafruit_bitmap_font import bitmap_font
 from adafruit_esp32spi import adafruit_esp32spi, adafruit_esp32spi_wifimanager
 from adafruit_io.adafruit_io import RESTClient, AdafruitIO_RequestError
 
-# thermometer graphics helper
-import wakeup_helper
+cwd = ("/"+__file__).rsplit('/', 1)[0] # the current working directory (where this file is)
 
 # rate at which to refresh the pyportal screen, in seconds
 PYPORTAL_REFRESH = 15
@@ -47,25 +47,37 @@ except KeyError:
     raise KeyError('To use this code, you need to include your Adafruit IO username \
 and password in a secrets.py file on the CIRCUITPY drive.')
 
+# Fonts within /fonts folder
+info_font = cwd+"/fonts/Nunito-Black-17.bdf"
+time_font = cwd+"/fonts/Nunito-Light-75.bdf"
+
+# create text object group
+text_group = displayio.Group(max_size=6)
+text_group.append(text_group)
+
+print('loading fonts...')
+glyphs = b'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-,.:/ '
+
+time_font = bitmap_font.load_font(time_font)
+time_font.load_glyphs(glyphs)
+
+# Time
+time_text = Label( time_font, max_glyphs=40)
+time_text.x = 65
+time_text.y = 120
+text_group.append(time_text)
+board.DISPLAY.show(time_text)
+
 # Create an instance of the Adafruit IO REST client
 io = RESTClient(ADAFRUIT_IO_USER, ADAFRUIT_IO_KEY, wifi)
 
-# Get the temperature feed from Adafruit IO
-temperature_feed = io.get_feed('temperature')
-
-# init. graphics helper
-gfx = wakeup_helper.Thermometer_GFX(celsius=False)
-
-# init. adt7410
-i2c_bus = busio.I2C(board.SCL, board.SDA)
-
 while True:
     try: # WiFi Connection
-        # Get and display date and time form Adafruit IO
+        # Get and display date and time from Adafruit IO
         print('Getting time from Adafruit IO...')
         datetime = io.receive_time()
         print('displaying time...')
-        gfx.display_date_time(datetime)
+        time_text.text = '%02d:%02d'%(datetime[3],datetime[4])
     except (ValueError, RuntimeError) as e: # WiFi Connection Failure
         print("Failed to get data, retrying\n", e)
         wifi.reset()
