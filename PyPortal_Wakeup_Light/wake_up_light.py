@@ -5,9 +5,25 @@ This program assumes a neopixel strip is attached to D4 on the Adafruit PyPortal
 """
 import time
 import board
+import neopixel
 from adafruit_pyportal import PyPortal
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text.Label import Label
+
+
+# Type in time to get up
+input_wake_up_time = "8:00A"
+
+BRIGHTNESS = 0
+MIN_BRIGHTNESS = 0
+MAX_BRIGHTNESS = 0.2 # brightness above 0.2 crashes pyportal
+
+strip = neopixel.NeoPixel(board.D4, 144, brightness=BRIGHTNESS)
+
+strip.brightness = MIN_BRIGHTNESS
+
+
+light_minutes = 30
 
 # Set to True for '12 hour + AM/PM' time, set to false for 24 hour time
 AM_PM = True
@@ -27,13 +43,12 @@ print('loading fonts...')
 info_font = bitmap_font.load_font(cwd+"/fonts/Nunito-Black-17.bdf")
 info_font.load_glyphs(b'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-,.:/ ')
 
-# Type in time to get up
-input_wake_up_time = "6:30"
-input_wake_up_time_text = "Wake up at: " + input_wake_up_time + "am"
+
+input_wake_up_time_text = "Wake up 30 min after: " + input_wake_up_time
 #light_on_time_text = "Light starting at: " # - 30 minutes? how?
 
 time_color = 0xFFFFFF
-time_position = (0,130)
+time_position = (75,130)
 time_textarea = Label(big_font, max_glyphs=15, color=time_color,
                                 x=time_position[0], y=time_position[1])
 
@@ -46,19 +61,10 @@ pyportal.splash.append(time_textarea)
 wakeup_time_textarea.text = input_wake_up_time_text
 pyportal.splash.append(wakeup_time_textarea)
 
-refresh_time = None
+#def subtract30min(time_raw):
 
-while True:
-    # only query the online time once per hour (and on first run)
-    if (not refresh_time) or (time.monotonic() - refresh_time) > 3600:
-        try:
-            print("Getting time from internet!")
-            pyportal.get_local_time()
-            refresh_time = time.monotonic()
-        except RuntimeError as e:
-            print("Some error occured, retrying! -", e)
-            continue
-    print(time.monotonic())
+
+def displayTime():
     now = time.localtime()
     hour, minute = now[3:5]
     print(now)
@@ -75,9 +81,47 @@ while True:
         if hour == 0:
             hour = 12
     if hour < 10:
-        format_str = "   "+format_str
+        format_str = ""+format_str
     time_str = format_str % (hour, minute)
     time_textarea.text = time_str
+
+    return time_str
+
+
+refresh_time = None
+
+while True:
+    # only query the online time once per hour (and on first run)
+    if (not refresh_time) or (time.monotonic() - refresh_time) > 3600:
+        try:
+            print("Getting time from internet!")
+            pyportal.get_local_time()
+            refresh_time = time.monotonic()
+        except RuntimeError as e:
+            print("Some error occured, retrying! -", e)
+            continue
+
+    time_str_text = displayTime()
+
+    print(time_str_text)
+    print(input_wake_up_time)
+
+    # If wake up time - 30 minutes equals current time, start the light
+    if time_str_text is input_wake_up_time:
+        print("Starting wake up light")
+        for i in range(light_minutes - 1):
+            BRIGHTNESS = BRIGHTNESS + (MAX_BRIGHTNESS/light_minutes) # max 0.25, min 0.0
+            print(BRIGHTNESS)
+
+            strip.fill((255, 255, 255))
+            strip.brightness = BRIGHTNESS
+
+            displayTime()
+
+            time.sleep(60)
+        while not pyportal.touchscreen.touch_point:
+            pass
+        strip.brightness = MIN_BRIGHTNESS
 
     # update every 15 seconds
     time.sleep(15)
