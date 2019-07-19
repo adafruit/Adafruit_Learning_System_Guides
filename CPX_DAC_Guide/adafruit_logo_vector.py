@@ -6,7 +6,9 @@ then points extracte from SVG data.
 (Other route is to ask Adafruit for vector version!)
 """
 
-### pylint: disable=invalid-name
+### pylint 2.3.1 has some strange opinions on data structure indentation here
+### and this conflicts with version 1.9.2
+### pylint: disable=invalid-name,bad-continuation
 offset_x = -10
 offset_y = 9
 
@@ -218,4 +220,4 @@ data = [
          #(243.14004, 239.17141),
          #(243.14004, 239.17141),
         ]
-        ]  ### pylint has a strange opinion on indentation here
+       ]
