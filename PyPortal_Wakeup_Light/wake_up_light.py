@@ -14,6 +14,8 @@ from adafruit_display_text.Label import Label
 # Type in time to get up
 input_wake_up_time = "8:00A"
 
+board.DISPLAY.brightness = 0.1
+
 BRIGHTNESS = 0
 MIN_BRIGHTNESS = 0
 MAX_BRIGHTNESS = 0.2 # brightness above 0.2 crashes pyportal
