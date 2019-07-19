@@ -1,4 +1,4 @@
-### scope-xy-adafruitlogo v1.0
+### scope-xy-adafruitlogo v1.01
 
 """Output a logo to an oscilloscope in X-Y mode on an Adafruit M4
 board like Feather M4 or PyGamer (best to disconnect headphones).
