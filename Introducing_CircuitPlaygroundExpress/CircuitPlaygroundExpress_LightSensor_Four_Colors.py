@@ -33,7 +33,7 @@ while True:
     pixels.fill((0, 0, 0))
 
     for led_idx in range(int(hue_fill_fraction * NUM_LEDS) + 1):
-        pixels[led_idx] = hues[hue_idx]
+        pixels[9 - led_idx] = hues[hue_idx]
 
     pixels.show()
 
