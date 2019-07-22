@@ -12,17 +12,18 @@ from adafruit_display_text.Label import Label
 
 
 # Type in time to get up
-input_wake_up_time = "8:00A"
-
-board.DISPLAY.brightness = 0.1
+input_wake_up_time = "7:45P"
 
 BRIGHTNESS = 0
 MIN_BRIGHTNESS = 0
-MAX_BRIGHTNESS = 0.2 # brightness above 0.2 crashes pyportal
+MAX_BRIGHTNESS = 0.5 # brightness above 0.2 crashes pyportal
 
-strip = neopixel.NeoPixel(board.D4, 144, brightness=BRIGHTNESS)
+strip = neopixel.NeoPixel(board.D3, 40, brightness=BRIGHTNESS)
+
+strip.fill((0))
 
 strip.brightness = MIN_BRIGHTNESS
+strip.show()
 
 
 light_minutes = 30
@@ -46,7 +47,7 @@ info_font = bitmap_font.load_font(cwd+"/fonts/Nunito-Black-17.bdf")
 info_font.load_glyphs(b'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-,.:/ ')
 
 
-input_wake_up_time_text = "Wake up 30 min after: " + input_wake_up_time
+input_wake_up_time_text = "Wake up 30 min after " + input_wake_up_time
 #light_on_time_text = "Light starting at: " # - 30 minutes? how?
 
 time_color = 0xFFFFFF
@@ -59,12 +60,60 @@ wakeup_time_position = (15,200)
 wakeup_time_textarea = Label(info_font, max_glyphs=30, color=wakeup_time_color,
                                 x=wakeup_time_position[0], y=wakeup_time_position[1])
 
+light_on_time_color = 0xFFFFFF
+light_on_time_position = (15,220)
+light_on_time_textarea = Label(info_font, max_glyphs=30, color=light_on_time_color,
+                                x=light_on_time_position[0], y=light_on_time_position[1])
+
 pyportal.splash.append(time_textarea)
 wakeup_time_textarea.text = input_wake_up_time_text
 pyportal.splash.append(wakeup_time_textarea)
+pyportal.splash.append(light_on_time_textarea)
 
-#def subtract30min(time_raw):
 
+'''
+
+def subtract30min(time_raw):
+    now = time.localtime()
+    hour, minute = now[3:5]
+    if time_raw[4] >= 30:
+        minute = time_raw[4] - 30
+        # display the time in a nice big font
+        format_str = "%d:%02d"
+        if AM_PM:
+            if hour >= 12:
+                hour -= 12
+                format_str = format_str+"P"
+            else:
+                format_str = format_str+"A"
+            if hour == 0:
+                hour = 12
+        if hour < 10:
+            format_str = ""+format_str
+        sub30_str = format_str % (hour, minute)
+        light_on_time_textarea.text = "Light starting at: " + sub30_str
+        return sub30_str
+
+
+    elif time_raw[4] < 30:
+        minute = time_raw[4] + 30
+        hour = hour - 1
+        format_str = "%d:%02d"
+        if AM_PM:
+            if hour >= 12:
+                hour -= 12
+                format_str = format_str+"P"
+            else:
+                format_str = format_str+"A"
+            if hour == 0:
+                hour = 12
+        if hour < 10:
+            format_str = ""+format_str
+        sub30_str = format_str % (hour, minute)
+        light_on_time_textarea.text = "Light starting at: " + sub30_str
+        return sub30_str
+
+'''
 
 def displayTime():
     now = time.localtime()
@@ -89,10 +138,12 @@ def displayTime():
 
     return time_str
 
-
 refresh_time = None
 
+pyportal.set_backlight(0.1)
+
 while True:
+
     # only query the online time once per hour (and on first run)
     if (not refresh_time) or (time.monotonic() - refresh_time) > 3600:
         try:
@@ -108,20 +159,33 @@ while True:
     print(time_str_text)
     print(input_wake_up_time)
 
+
+    currentHour = time.localtime()
+
+    # if after 9am and before 9pm light is = 0.8
+    if currentHour[3] > 9 and currentHour[3] < 21:
+        pyportal.set_backlight(0.8)
+    # if after 9pm and before 9am light = 0.1
+    else:
+        pyportal.set_backlight(0.1)
+
+
+   # sub30 = subtract30min(currentHour) # input needs to be input_wake_up_time_text
+
+
     # If wake up time - 30 minutes equals current time, start the light
     if time_str_text is input_wake_up_time:
         print("Starting wake up light")
         for i in range(light_minutes - 1):
             BRIGHTNESS = BRIGHTNESS + (MAX_BRIGHTNESS/light_minutes) # max 0.25, min 0.0
             print(BRIGHTNESS)
-
             strip.fill((255, 255, 255))
             strip.brightness = BRIGHTNESS
-
             displayTime()
-
-            time.sleep(60)
+            time.sleep(1)
         while not pyportal.touchscreen.touch_point:
+            displayTime()
+            time.sleep(60) # 60 for once per min
             pass
         strip.brightness = MIN_BRIGHTNESS
 
