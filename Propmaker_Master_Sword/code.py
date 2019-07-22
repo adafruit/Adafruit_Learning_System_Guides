@@ -69,7 +69,7 @@ def play_wav(name, loop=False):
     :param loop: if True, sound will repeat indefinitely (until interrupted
                  by another sound).
     """
-    global wave_file
+    global wave_file  # pylint: disable=global-statement
     print("playing", name)
     if wave_file:
         wave_file.close()
@@ -174,7 +174,8 @@ while True:
         elif mode == 1:
             # Idle pulse
             idle_brightness += idle_increment  # Pulse up
-            if idle_brightness > IDLE_PULSE_BRIGHTNESS_MAX or idle_brightness < IDLE_PULSE_BRIGHTNESS_MIN:  # Then...
+            if idle_brightness > IDLE_PULSE_BRIGHTNESS_MAX or \
+               idle_brightness < IDLE_PULSE_BRIGHTNESS_MIN:  # Then...
                 idle_increment *= -1  # Pulse direction flip
             strip.fill([int(c*idle_brightness) for c in COLOR_IDLE])
             strip.show()
