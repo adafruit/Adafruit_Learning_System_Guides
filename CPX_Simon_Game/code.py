@@ -4,26 +4,26 @@ from adafruit_circuitplayground.express import cpx
 
 cpx.pixels.brightness = 0.1  # adjust NeoPixel brightness to your liking
 
-REGION_LEDS = [
-    [5, 6, 7],  # yellow region
-    [2, 3, 4],  # blue region
-    [7, 8, 9],  # red region
-    [0, 1, 2],  # green region
-]
+REGION_LEDS = (
+    (5, 6, 7),  # yellow region
+    (2, 3, 4),  # blue region
+    (7, 8, 9),  # red region
+    (0, 1, 2),  # green region
+)
 
-REGION_COLOR = [
+REGION_COLOR = (
     (255, 255, 0),  # yellow region
     (0, 0, 255),    # blue region
     (255, 0, 0),    # red region
     (0, 255, 0),    # green region
-]
+)
 
-REGION_TONE = [
+REGION_TONE = (
     252,  # yellow region
     209,  # blue region
     310,  # red region
     415,  # green region
-]
+)
 
 PAD_REGION = {
     'A1': 0,  # yellow region
