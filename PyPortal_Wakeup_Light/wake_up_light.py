@@ -27,7 +27,7 @@ MAX_BRIGHTNESS = 0.85
 num_pixels = 30
 ORDER = neopixel.RGBW
 strip = neopixel.NeoPixel(board.D3, num_pixels, brightness=BRIGHTNESS,
-                           pixel_order=ORDER)
+                          pixel_order=ORDER)
 strip.fill(0)
 # color of strip
 WHITE = (255, 255, 255, 255)
@@ -52,22 +52,23 @@ info_font.load_glyphs(b'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRST
 time_color = 0xFFFFFF
 time_position = (75,130)
 time_textarea = Label(big_font, max_glyphs=15, color=time_color,
-                                x=time_position[0], y=time_position[1])
+                      x=time_position[0], y=time_position[1])
 
 wakeup_time_color = 0xFFFFFF
 wakeup_time_position = (15,200)
 wakeup_time_textarea = Label(info_font, max_glyphs=30, color=wakeup_time_color,
-                                x=wakeup_time_position[0], y=wakeup_time_position[1])
+                             x=wakeup_time_position[0], y=wakeup_time_position[1])
 
 light_on_time_color = 0xFFFFFF
 light_on_time_position = (15,220)
 light_on_time_textarea = Label(info_font, max_glyphs=30, color=light_on_time_color,
-                                x=light_on_time_position[0], y=light_on_time_position[1])
+                               x=light_on_time_position[0], y=light_on_time_position[1])
 
 pyportal.splash.append(time_textarea)
 pyportal.splash.append(wakeup_time_textarea)
 pyportal.splash.append(light_on_time_textarea)
 
+# determines which day to pull wake up time from
 def whichDay():
     now = time.localtime()
     current_day = now[6]
@@ -89,6 +90,7 @@ def whichDay():
     wakeup_time_textarea.text = input_wake_up_time_text
     return input_wake_up_time
 
+# subtract 30 min from given time to tell program when to start lights
 def subtract30min(time_before):
     hours_before, minutes_before = time_before.split(":")
     AM_PM_str = minutes_before[-1:]
@@ -112,7 +114,6 @@ def subtract30min(time_before):
             hours_after = 12
         sub30_str = format_str % (hours_after, minutes_after)
         light_on_time_textarea.text = "Light starting at: " + sub30_str
-        return sub30_str
     elif minutes_before < 30:
         minutes_after = minutes_before + 30
         hours_after = hours_before - 1
@@ -128,8 +129,9 @@ def subtract30min(time_before):
             format_str = format_str[:-1]+"P"
         sub30_str = format_str % (hours_after, minutes_after)
         light_on_time_textarea.text = "Light starting at: " + sub30_str
-        return sub30_str
+    return sub30_str
 
+# display current time
 def displayTime():
     now = time.localtime()
     hour, minute = now[3:5]
@@ -161,30 +163,28 @@ while True:
             print("Some error occured, retrying! -", e)
             continue
     time_str_text = displayTime()
-    print(time_str_text)
     currentHour = time.localtime()
-    # if after 9am and before 9pm light is = 0.8
+    # if after 9am and before 9pm backlight is = 0.8
     if currentHour[3] > 9 and currentHour[3] < 21:
         pyportal.set_backlight(0.8)
-    # if after 9pm and before 9am light = 0.1
+    # if after 9pm and before 9am backlight = 0.1
     else:
         pyportal.set_backlight(0.1)
-    input_wake_up_time = whichDay()
-    start_light_time = subtract30min(input_wake_up_time)
-    print(start_light_time)
+    wake_up_time = whichDay()
+    start_light_time = subtract30min(wake_up_time)
     # If wake up time - 30 minutes equals current time, start the light
     if time_str_text == start_light_time:
         print("Starting wake up light")
         for i in range(light_minutes - 1):
-            BRIGHTNESS = BRIGHTNESS + (MAX_BRIGHTNESS/light_minutes) # max 0.25, min 0.0
+            BRIGHTNESS = BRIGHTNESS + (MAX_BRIGHTNESS/light_minutes)
             strip.fill(WHITE)
             strip.brightness = BRIGHTNESS
             displayTime()
-            time.sleep(60) # 60 for once per min
+            time.sleep(60) # increase brightness once per min
         while not pyportal.touchscreen.touch_point: # turn strip off
             displayTime()
             time.sleep(1)
-            pass
+            continue
         strip.brightness = MIN_BRIGHTNESS
     # update every 15 seconds
     time.sleep(15)
