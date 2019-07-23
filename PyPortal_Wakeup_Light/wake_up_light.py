@@ -24,8 +24,13 @@ BRIGHTNESS = 0
 MIN_BRIGHTNESS = 0
 MAX_BRIGHTNESS = 0.85
 #initialize neopixel strip
-strip = neopixel.NeoPixel(board.D3, 40, brightness=BRIGHTNESS)
+num_pixels = 30
+ORDER = neopixel.RGBW
+strip = neopixel.NeoPixel(board.D3, num_pixels, brightness=BRIGHTNESS,
+                           pixel_order=ORDER)
 strip.fill(0)
+# color of strip
+WHITE = (255, 255, 255, 255)
 # number of minutes it takes for strip to fade from min to max
 light_minutes = 30
 
@@ -172,7 +177,7 @@ while True:
         print("Starting wake up light")
         for i in range(light_minutes - 1):
             BRIGHTNESS = BRIGHTNESS + (MAX_BRIGHTNESS/light_minutes) # max 0.25, min 0.0
-            strip.fill((255, 255, 255))
+            strip.fill(WHITE)
             strip.brightness = BRIGHTNESS
             displayTime()
             time.sleep(60) # 60 for once per min
