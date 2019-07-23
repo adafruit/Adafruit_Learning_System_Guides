@@ -7,9 +7,7 @@ when you plug the CircuitPlayground Express into your computer via a known
 good USB cable. 
 
 If the only drive name you get is named **CPLAYBOOT**, CircuitPython may not be loaded 
-on the board. You can load CircuitPython  
-[per this guide](https://learn.adafruit.com/adafruit-circuit-playground-express/circuitpython-quickstart). 
-Then you should be able to see the **CIRCUITPY** drive when connected via USB.
+on the board. You can load CircuitPython [per this guide](https://learn.adafruit.com/adafruit-circuit-playground-express/circuitpython-quickstart). Then you should be able to see the **CIRCUITPY** drive when connected via USB.
 
 CircuitPython resources are at https://CircuitPython.Org/
 
