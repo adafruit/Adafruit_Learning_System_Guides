@@ -41,7 +41,7 @@ def light_region(region, duration=1):
         cpx.pixels[led] = REGION_COLOR[region]
 
     # play a tone for the selected region
-    cpx.start_tone(REGION_TONE[region]);
+    cpx.start_tone(REGION_TONE[region])
 
     # wait the requested amount of time
     time.sleep(duration)
@@ -54,22 +54,24 @@ def light_region(region, duration=1):
         cpx.pixels[led] = (0, 0, 0)
 
 def read_region(timeout=30):
+    val = 0
     start_time = time.time()
     while time.time() - start_time < timeout:
         if cpx.touch_A1:
-            return PAD_REGION['A1']
+            val = PAD_REGION['A1']
         elif cpx.touch_A2:
-            return PAD_REGION['A2']
+            val = PAD_REGION['A2']
         elif cpx.touch_A3:
-            return PAD_REGION['A3']
+            val = PAD_REGION['A3']
         elif cpx.touch_A4:
-            return PAD_REGION['A4']
+            val = PAD_REGION['A4']
         elif cpx.touch_A5:
-            return PAD_REGION['A5']
+            val = PAD_REGION['A5']
         elif cpx.touch_A6:
-            return PAD_REGION['A6']
+            val = PAD_REGION['A6']
         elif cpx.touch_A7:
-            return PAD_REGION['A7']
+            val = PAD_REGION['A7']
+    return val
 
 def play_sequence(sequence):
     duration = 1 - len(sequence) * 0.05
