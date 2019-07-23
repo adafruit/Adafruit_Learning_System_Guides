@@ -11,7 +11,6 @@ from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text.Label import Label
 
 # Type in time to get up  each day of the week
-input_wake_up_time = ""
 up_time_monday = "6:30A"
 up_time_tuesday = "6:30A"
 up_time_wednesday = "6:30A"
@@ -97,7 +96,6 @@ def subtract30min(time_before):
         hours_before = int(hours_before)
     if  minutes_before >= 30:
         minutes_after = minutes_before - 30
-        # display the time in a nice big font
         format_str = "%d:%02d"
         if hours_before >= 12:
             hours_after = hours_before - 12
@@ -115,7 +113,7 @@ def subtract30min(time_before):
         hours_after = hours_before - 1
         format_str = "%d:%02d"
         if hours_before >= 12:
-            hours_after = hours_before - 12
+            hours_after = hours_after - 12
             format_str = format_str+"P"
         else:
             hours_after = hours_before
@@ -148,7 +146,6 @@ def displayTime():
 refresh_time = None
 
 while True:
-
     # only query the online time once per hour (and on first run)
     if (not refresh_time) or (time.monotonic() - refresh_time) > 3600:
         try:
@@ -168,10 +165,10 @@ while True:
     else:
         pyportal.set_backlight(0.1)
     input_wake_up_time = whichDay()
-   # sub30 = subtract30min(currentHour) # input needs to be input_wake_up_time_text
-    subtract30min(input_wake_up_time)
+    start_light_time = subtract30min(input_wake_up_time)
+    print(start_light_time)
     # If wake up time - 30 minutes equals current time, start the light
-    if time_str_text is input_wake_up_time:
+    if time_str_text == start_light_time:
         print("Starting wake up light")
         for i in range(light_minutes - 1):
             BRIGHTNESS = BRIGHTNESS + (MAX_BRIGHTNESS/light_minutes) # max 0.25, min 0.0
@@ -179,7 +176,7 @@ while True:
             strip.brightness = BRIGHTNESS
             displayTime()
             time.sleep(60) # 60 for once per min
-        while not pyportal.touchscreen.touch_point:
+        while not pyportal.touchscreen.touch_point: # turn strip off
             displayTime()
             time.sleep(1)
             pass
