@@ -10,7 +10,7 @@ from adafruit_pyportal import PyPortal
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text.Label import Label
 
-# Type in time to get up  each day of the week
+# type in time to get up  each day of the week
 default_wake_up = "6:30A"
 up_time_monday = default_wake_up
 up_time_tuesday = default_wake_up
@@ -31,7 +31,7 @@ wake_up_times = (up_time_monday,
 BRIGHTNESS = 0
 MIN_BRIGHTNESS = 0
 MAX_BRIGHTNESS = 0.85
-#initialize neopixel strip
+# initialize neopixel strip
 num_pixels = 30
 ORDER = neopixel.RGBW
 strip = neopixel.NeoPixel(board.D3, num_pixels, brightness=BRIGHTNESS,
@@ -46,7 +46,7 @@ light_minutes = 30
 # needed so we know where to find files
 cwd = ("/"+__file__).rsplit('/', 1)[0]
 
-# Initialize the pyportal object and let us know what data to fetch and where
+# initialize the pyportal object and let us know what data to fetch and where
 # to display it
 pyportal = PyPortal(status_neopixel=board.NEOPIXEL,
                     default_bg=0x000000)
@@ -100,7 +100,30 @@ def whichDay():
     wakeup_time_textarea.text = input_wake_up_time_text
     return input_wake_up_time
 
+def displayTime():
+    now = time.localtime()
+    hour, minute = now[3:5]
+    print(now)
+    print("Current time: %02d:%02d" % (hour, minute))
+    formatTime(hour, minute)
+    time_textarea.text = formatTime(hour, minute)
+    return formatTime(hour, minute)
+
+def formatTime(raw_hours, raw_minutes):
+    # display the time in a nice big font
+    format_str = "%d:%02d"
+    if raw_hours >= 12:
+        raw_hours -= 12
+        format_str = format_str+"P"
+    else:
+        format_str = format_str+"A"
+    if raw_hours == 0:
+        raw_hours = 12
+    time_str = format_str % (raw_hours, raw_minutes)
+    return time_str
+
 def subtract30min(time_before):
+    # parse given time string into hour minute and AM_PM elements
     hours_before, minutes_before = time_before.split(":")
     AM_PM_str = minutes_before[-1:]
     minutes_before = int(minutes_before[:-1])
@@ -110,51 +133,14 @@ def subtract30min(time_before):
         hours_before = 0
     else:
         hours_before = int(hours_before)
-    if  minutes_before >= 30:
-        minutes_after = minutes_before - 30
-        format_str = "%d:%02d"
-        if hours_before >= 12:
-            hours_after = hours_before - 12
-            format_str = format_str+"P"
-        else:
-            hours_after = hours_before
-            format_str = format_str+"A"
-        if hours_before == 0:
-            hours_after = 12
-        sub30_str = format_str % (hours_after, minutes_after)
-    elif minutes_before < 30:
-        minutes_after = minutes_before + 30
-        hours_after = hours_before - 1
-        format_str = "%d:%02d"
-        if hours_before >= 12:
-            hours_after = hours_after - 12
-            format_str = format_str+"P"
-        else:
-            format_str = format_str+"A"
-        if hours_before == 0:
-            hours_after = 11
-            format_str = format_str[:-1]+"P"
-        sub30_str = format_str % (hours_after, minutes_after)
-    light_on_time_textarea.text = "Light starting at: " + sub30_str
-    return sub30_str
-
-def displayTime():
+    # subtract 30 min
     now = time.localtime()
-    hour, minute = now[3:5]
-    print(now)
-    print("Current time: %02d:%02d" % (hour, minute))
-    # display the time in a nice big font
-    format_str = "%d:%02d"
-    if hour >= 12:
-        hour -= 12
-        format_str = format_str+"P"
-    else:
-        format_str = format_str+"A"
-    if hour == 0:
-        hour = 12
-    time_str = format_str % (hour, minute)
-    time_textarea.text = time_str
-    return time_str
+    future = time.mktime((now[0], now[1], now[2], hours_before, minutes_before - 30, now[5], now[6], now[7], now[8]))
+    futureTime = time.localtime(future)
+    future_hour = futureTime[3]
+    future_minutes = futureTime[4]
+    light_on_time_textarea.text = "Light starting at: " + formatTime(future_hour, future_minutes)
+    return formatTime(future_hour, future_minutes)
 
 refresh_time = None
 
