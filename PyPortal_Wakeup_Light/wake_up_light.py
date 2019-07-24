@@ -19,6 +19,13 @@ up_time_thursday = default_wake_up
 up_time_friday = default_wake_up
 up_time_saturday = "10:00A"
 up_time_sunday = "10:00A"
+wake_up_times = (up_time_monday,
+                 up_time_tuesday,
+                 up_time_wednesday,
+                 up_time_thursday,
+                 up_time_friday,
+                 up_time_saturday,
+                 up_time_sunday)
 
 # set neopixel min and max brightness
 BRIGHTNESS = 0
@@ -78,38 +85,17 @@ def whichDay():
     wake_up_minutes = int(wake_up_minutes[:-1])
     print(wake_up_hour, ":", wake_up_minutes)
      # if it's after midnight and before the default wakeup time, display the wake up time of today
-    if current_hour < wake_up_hour and current_minutes < wake_up_minutes:
-        print("midnight")
-        if current_day == 0:
-            input_wake_up_time = up_time_monday
-        elif current_day == 1:
-            input_wake_up_time = up_time_tuesday
-        elif current_day == 2:
-            input_wake_up_time = up_time_wednesday
-        elif current_day == 3:
-            input_wake_up_time = up_time_thursday
-        elif current_day == 4:
-            input_wake_up_time = up_time_friday
-        elif current_day == 5:
-            input_wake_up_time = up_time_saturday
-        elif current_day == 6:
-            input_wake_up_time = up_time_sunday
-
-    else: # set wake up time to the next day's wake up time the night before
-        if current_day == 6:
-            input_wake_up_time = up_time_monday
-        elif current_day == 0:
-            input_wake_up_time = up_time_tuesday
-        elif current_day == 1:
-            input_wake_up_time = up_time_wednesday
-        elif current_day == 2:
-            input_wake_up_time = up_time_thursday
-        elif current_day == 3:
-            input_wake_up_time = up_time_friday
-        elif current_day == 4:
-            input_wake_up_time = up_time_saturday
-        elif current_day == 5:
-            input_wake_up_time = up_time_sunday
+    for day in range(len(wake_up_times)):
+        if current_hour < wake_up_hour and current_minutes < wake_up_minutes:
+            if current_day == day:
+                input_wake_up_time = wake_up_times[day]
+    # set wake up time to the next day's wake up time the night before
+        else:
+            if current_day == 6:
+                input_wake_up_time = wake_up_times[0]
+            else:
+                if current_day == day:
+                    input_wake_up_time = wake_up_times[day+1]
     input_wake_up_time_text = "Wake up at " + input_wake_up_time
     wakeup_time_textarea.text = input_wake_up_time_text
     return input_wake_up_time
