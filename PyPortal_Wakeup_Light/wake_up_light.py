@@ -38,7 +38,7 @@ strip = neopixel.NeoPixel(board.D3, num_pixels, brightness=BRIGHTNESS,
                           pixel_order=ORDER)
 strip.fill(0)
 # color of strip
-WHITE = (255, 255, 255, 255)
+WHITE = (0, 0, 0, 255)
 # number of minutes it takes for strip to fade from min to max
 light_minutes = 30
 
