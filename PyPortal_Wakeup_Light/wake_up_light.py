@@ -1,7 +1,7 @@
 """
 This example uses a PyPortal and rgbw leds for a simple "wake up" light.
 The strip starts to brighten 30 minutes before set wake up time.
-This program assumes a neopixel strip is attached to D3 on the Adafruit PyPortal.
+This program assumes a neopixel strip is attached to D4 on the Adafruit PyPortal.
 """
 import time
 import board
@@ -11,11 +11,12 @@ from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text.Label import Label
 
 # Type in time to get up  each day of the week
-up_time_monday = "6:30A"
-up_time_tuesday = "6:30A"
-up_time_wednesday = "6:30A"
-up_time_thursday = "6:30A"
-up_time_friday = "6:30A"
+default_wake_up = "6:30A"
+up_time_monday = default_wake_up
+up_time_tuesday = default_wake_up
+up_time_wednesday = default_wake_up
+up_time_thursday = default_wake_up
+up_time_friday = default_wake_up
 up_time_saturday = "10:00A"
 up_time_sunday = "10:00A"
 
@@ -68,29 +69,51 @@ pyportal.splash.append(time_textarea)
 pyportal.splash.append(wakeup_time_textarea)
 pyportal.splash.append(light_on_time_textarea)
 
-# determines which day to pull wake up time from
 def whichDay():
     now = time.localtime()
+    current_hour, current_minutes = now[3:5]
     current_day = now[6]
-    if current_day == 0:
-        input_wake_up_time = up_time_monday
-    elif current_day == 1:
-        input_wake_up_time = up_time_tuesday
-    elif current_day == 2:
-        input_wake_up_time = up_time_wednesday
-    elif current_day == 3:
-        input_wake_up_time = up_time_thursday
-    elif current_day == 4:
-        input_wake_up_time = up_time_friday
-    elif current_day == 5:
-        input_wake_up_time = up_time_saturday
-    elif current_day == 6:
-        input_wake_up_time = up_time_sunday
+    wake_up_hour, wake_up_minutes = default_wake_up.split(":")
+    wake_up_hour = int(wake_up_hour)
+    wake_up_minutes = int(wake_up_minutes[:-1])
+    print(wake_up_hour, ":", wake_up_minutes)
+     # if it's after midnight and before the default wakeup time, display the wake up time of today
+    if current_hour < wake_up_hour and current_minutes < wake_up_minutes:
+        print("midnight")
+        if current_day == 0:
+            input_wake_up_time = up_time_monday
+        elif current_day == 1:
+            input_wake_up_time = up_time_tuesday
+        elif current_day == 2:
+            input_wake_up_time = up_time_wednesday
+        elif current_day == 3:
+            input_wake_up_time = up_time_thursday
+        elif current_day == 4:
+            input_wake_up_time = up_time_friday
+        elif current_day == 5:
+            input_wake_up_time = up_time_saturday
+        elif current_day == 6:
+            input_wake_up_time = up_time_sunday
+
+    else: # set wake up time to the next day's wake up time the night before
+        if current_day == 6:
+            input_wake_up_time = up_time_monday
+        elif current_day == 0:
+            input_wake_up_time = up_time_tuesday
+        elif current_day == 1:
+            input_wake_up_time = up_time_wednesday
+        elif current_day == 2:
+            input_wake_up_time = up_time_thursday
+        elif current_day == 3:
+            input_wake_up_time = up_time_friday
+        elif current_day == 4:
+            input_wake_up_time = up_time_saturday
+        elif current_day == 5:
+            input_wake_up_time = up_time_sunday
     input_wake_up_time_text = "Wake up at " + input_wake_up_time
     wakeup_time_textarea.text = input_wake_up_time_text
     return input_wake_up_time
 
-# subtract 30 min from given time to tell program when to start lights
 def subtract30min(time_before):
     hours_before, minutes_before = time_before.split(":")
     AM_PM_str = minutes_before[-1:]
@@ -113,7 +136,6 @@ def subtract30min(time_before):
         if hours_before == 0:
             hours_after = 12
         sub30_str = format_str % (hours_after, minutes_after)
-        light_on_time_textarea.text = "Light starting at: " + sub30_str
     elif minutes_before < 30:
         minutes_after = minutes_before + 30
         hours_after = hours_before - 1
@@ -122,16 +144,14 @@ def subtract30min(time_before):
             hours_after = hours_after - 12
             format_str = format_str+"P"
         else:
-            hours_after = hours_before
             format_str = format_str+"A"
         if hours_before == 0:
             hours_after = 11
             format_str = format_str[:-1]+"P"
         sub30_str = format_str % (hours_after, minutes_after)
-        light_on_time_textarea.text = "Light starting at: " + sub30_str
+    light_on_time_textarea.text = "Light starting at: " + sub30_str
     return sub30_str
 
-# display current time
 def displayTime():
     now = time.localtime()
     hour, minute = now[3:5]
@@ -163,24 +183,26 @@ while True:
             print("Some error occured, retrying! -", e)
             continue
     time_str_text = displayTime()
+    print(time_str_text)
     currentHour = time.localtime()
-    # if after 9am and before 9pm backlight is = 0.8
+    # if after 9am and before 9pm light is = 0.8
     if currentHour[3] > 9 and currentHour[3] < 21:
         pyportal.set_backlight(0.8)
-    # if after 9pm and before 9am backlight = 0.1
+    # if after 9pm and before 9am light = 0.1
     else:
         pyportal.set_backlight(0.1)
     wake_up_time = whichDay()
     start_light_time = subtract30min(wake_up_time)
+    print(start_light_time)
     # If wake up time - 30 minutes equals current time, start the light
     if time_str_text == start_light_time:
         print("Starting wake up light")
         for i in range(light_minutes - 1):
-            BRIGHTNESS = BRIGHTNESS + (MAX_BRIGHTNESS/light_minutes)
+            BRIGHTNESS = BRIGHTNESS + (MAX_BRIGHTNESS/light_minutes) # max 0.25, min 0.0
             strip.fill(WHITE)
             strip.brightness = BRIGHTNESS
             displayTime()
-            time.sleep(60) # increase brightness once per min
+            time.sleep(1) # 60 for once per min
         while not pyportal.touchscreen.touch_point: # turn strip off
             displayTime()
             time.sleep(1)
