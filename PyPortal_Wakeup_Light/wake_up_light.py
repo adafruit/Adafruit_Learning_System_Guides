@@ -25,7 +25,8 @@ wake_up_times = (up_time_monday,
                  up_time_thursday,
                  up_time_friday,
                  up_time_saturday,
-                 up_time_sunday)
+                 up_time_sunday,
+                 default_wake_up)
 
 # set neopixel min and max brightness
 BRIGHTNESS = 0
@@ -36,7 +37,7 @@ num_pixels = 30
 ORDER = neopixel.RGBW
 strip = neopixel.NeoPixel(board.D3, num_pixels, brightness=BRIGHTNESS,
                           pixel_order=ORDER)
-strip.fill(0)
+strip.fill(0) # start it set to off
 # color of strip
 WHITE = (0, 0, 0, 255)
 # number of minutes it takes for strip to fade from min to max
@@ -56,6 +57,7 @@ backlight_off = 0
 backlight_on = 0.8
 pyportal.set_backlight(backlight_off)
 
+# assign fonts
 big_font = bitmap_font.load_font(cwd+"/fonts/Nunito-Light-75.bdf")
 big_font.load_glyphs(b'0123456789:AP') # pre-load glyphs for fast printing
 print('loading fonts...')
@@ -81,17 +83,43 @@ pyportal.splash.append(time_textarea)
 pyportal.splash.append(wakeup_time_textarea)
 pyportal.splash.append(light_on_time_textarea)
 
+# parse given time string into hour minute and AM_PM elements
+def parseTime(time_before):
+    hours_before, minutes_before = time_before.split(":")
+    AM_PM_str = minutes_before[-1:]
+    minutes_before = int(minutes_before[:-1])
+    if (hours_before != '12') and AM_PM_str == 'P':
+        hours_before = int(hours_before) + 12
+    elif ((hours_before == '12') and (AM_PM_str == 'P')):
+        hours_before = int(hours_before)
+    elif ((hours_before == '12') and (AM_PM_str == 'A')):
+        hours_before = 0
+    else:
+        hours_before = int(hours_before)
+    parsed_time = [hours_before, minutes_before]
+    return parsed_time
+
+# get time objects for wake up times
+val_times = []
+parsed_times = []
+for i in range(len(wake_up_times)):
+    parsed_time_day = parseTime(wake_up_times[i])
+    hours, minutes = parsed_time_day[0:2]
+    now_day = time.localtime()
+    time_obj_mk = time.mktime((now_day[0], now_day[1], now_day[2], hours,
+                               minutes, now_day[5], i, now_day[7], now_day[8]))
+    time_obj = time.localtime(time_obj_mk)
+    val_times.append(time_obj_mk)
+    parsed_times.append(time_obj)
+
+# determine which day it is and print which time waking up on screen
 def whichDay():
     now = time.localtime()
-    current_hour, current_minutes = now[3:5]
     current_day = now[6]
-    wake_up_hour, wake_up_minutes = default_wake_up.split(":")
-    wake_up_hour = int(wake_up_hour)
-    wake_up_minutes = int(wake_up_minutes[:-1])
-    print(wake_up_hour, ":", wake_up_minutes)
-     # if it's after midnight and before the default wakeup time, display the wake up time of today
+    now_mk = time.mktime((now[0], now[1], now[2], now[3], now[4], now[5], now[6], now[7], now[8]))
+    # if it's after midnight and before todays wakeup time, display the wake up time of today
     for day in range(len(wake_up_times)):
-        if current_hour < wake_up_hour and current_minutes < wake_up_minutes:
+        if now_mk < val_times[day]:
             if current_day == day:
                 input_wake_up_time = wake_up_times[day]
     # set wake up time to the next day's wake up time the night before
@@ -103,7 +131,7 @@ def whichDay():
                     input_wake_up_time = wake_up_times[day+1]
     input_wake_up_time_text = "Wake up at " + input_wake_up_time
     wakeup_time_textarea.text = input_wake_up_time_text
-    return input_wake_up_time
+    return current_day
 
 def displayTime():
     now = time.localtime()
@@ -127,49 +155,33 @@ def formatTime(raw_hours, raw_minutes):
     time_str = format_str % (raw_hours, raw_minutes)
     return time_str
 
-def parseTime(time_before):
-    # parse given time string into hour minute and AM_PM elements
-    hours_before, minutes_before = time_before.split(":")
-    AM_PM_str = minutes_before[-1:]
-    minutes_before = int(minutes_before[:-1])
-    if (hours_before != '12') and AM_PM_str == 'P':
-        hours_before = int(hours_before) + 12
-    elif ((hours_before == '12') and (AM_PM_str == 'P')):
-        hours_before = int(hours_before)
-    elif ((hours_before == '12') and (AM_PM_str == 'A')):
-        hours_before = 0
-    else:
-        hours_before = int(hours_before)
-    parsed_time = [hours_before, minutes_before]
-    return parsed_time
-
-def subtract30min(time_initial): # subtract 30 min
-    parsed_time = parseTime(time_initial)
-    hours_initial, minutes_initial = parsed_time[0:2]
-    now = time.localtime()
-    minus30 = time.mktime((now[0], now[1], now[2], hours_initial, minutes_initial - 30, now[5], now[6], now[7], now[8]))
-    time_minus30 = time.localtime(minus30)
-    hour_minus30 = time_minus30[3]
-    minutes_minus30 = time_minus30[4]
-    light_on_time_textarea.text = "Light starting at: " + formatTime(hour_minus30, minutes_minus30)
-    return formatTime(hour_minus30, minutes_minus30)
-
 # backlight function - if screen tapped, turn on back light for 30 seconds?
-def backLight(time_before):
-    parsed_time = parseTime(time_before)
-    hours_before, minutes_before = parsed_time[0:2]
+def backLight(day):
     now = time.localtime()
-    wakeUpNow = time.mktime((now[0], now[1], now[2], hours_before, minutes_before, now[5], now[6], now[7], now[8]))
-    nowVal = time.mktime((now[0], now[1], now[2], now[3], now[4], now[5], now[6], now[7], now[8]))
-    print(nowVal - wakeUpNow)
-    if (nowVal - wakeUpNow) > 32400 or (nowVal - wakeUpNow) < -1800:
-    # if time is more than 9 hours after wake up time, or before wake up time - 30 backlight off, tap to turn on
+    now_val = time.mktime((now[0], now[1], now[2], now[3], now[4], now[5], now[6], now[7], now[8]))
+    wake_up_day_val = val_times[day]
+    if (now_val - wake_up_day_val) > 32400 or (now_val - wake_up_day_val) < -1800:
+    # if time is more than 9 hours after wake up time, or time is before light start time:
+    # backlight off, tap to turn on
         if pyportal.touchscreen.touch_point:
             pyportal.set_backlight(backlight_on)
             time.sleep(5)
             pyportal.set_backlight(backlight_off)
     else:
         pyportal.set_backlight(backlight_on)
+
+def subtract30min(day): # subtract 30 min
+    # get the time object from the corresponding day
+    raw_wake_up_time = parsed_times[day]
+    now = time.localtime()
+    # new time subtracting 30 min from wake up time
+    minus30 = time.mktime((now[0], now[1], now[2], raw_wake_up_time[3],
+                           raw_wake_up_time[4] - 30, now[5], now[6], now[7], now[8]))
+    time_minus30 = time.localtime(minus30)
+    hour_minus30 = time_minus30[3]
+    minutes_minus30 = time_minus30[4]
+    light_on_time_textarea.text = "Light starting at: " + formatTime(hour_minus30, minutes_minus30)
+    return formatTime(hour_minus30, minutes_minus30)
 
 refresh_time = None
 
@@ -187,12 +199,11 @@ while True:
     print(time_str_text)
     currentHour = time.localtime()
     # determine which wake up time to choose based on the day
-    wake_up_time = whichDay()
+    wake_up_day = whichDay()
     # if time is more than 9 hours after wake up time, backlight off and can tap to turn on
-    backLight(wake_up_time)
+    backLight(wake_up_day)
     # start the light 30 min before wake up time
-    start_light_time = subtract30min(wake_up_time)
-    print(start_light_time)
+    start_light_time = subtract30min(wake_up_day)
     # If wake up time - 30 minutes equals current time, start the light
     if time_str_text == start_light_time:
         print("Starting wake up light")
@@ -209,5 +220,5 @@ while True:
             time.sleep(1)
             continue
         strip.brightness = MIN_BRIGHTNESS
-    # update every 15 seconds
-    time.sleep(15)
+    # update every second so that screen can be tapped to view time
+    time.sleep(1)
