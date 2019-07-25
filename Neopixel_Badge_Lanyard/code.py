@@ -27,3 +27,4 @@ while True:
 
     # If we got here, we lost the connection. Go up to the top and start
     # advertising again and waiting for a connection.
+
