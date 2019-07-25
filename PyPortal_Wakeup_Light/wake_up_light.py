@@ -145,7 +145,8 @@ def subtract30min(time_before): # subtract 30 min
     parsed_time = parseTime(time_before)
     hours_before, minutes_before = parsed_time[0:2]
     now = time.localtime()
-    future = time.mktime((now[0], now[1], now[2], hours_before, minutes_before - 30, now[5], now[6], now[7], now[8]))
+    future = time.mktime((now[0], now[1], now[2], hours_before,
+                          minutes_before - 30, now[5], now[6], now[7], now[8]))
     futureTime = time.localtime(future)
     future_hour = futureTime[3]
     future_minutes = futureTime[4]
@@ -157,7 +158,8 @@ def backLight(time_before):
     parsed_time = parseTime(time_before)
     hours_before, minutes_before = parsed_time[0:2]
     now = time.localtime()
-    wakeUpNow = time.mktime((now[0], now[1], now[2], hours_before, minutes_before, now[5], now[6], now[7], now[8]))
+    wakeUpNow = time.mktime((now[0], now[1], now[2], hours_before,
+                             minutes_before, now[5], now[6], now[7], now[8]))
     nowVal = time.mktime((now[0], now[1], now[2], now[3], now[4], now[5], now[6], now[7], now[8]))
     print(nowVal - wakeUpNow)
     if (nowVal - wakeUpNow) > 32400:
