@@ -190,6 +190,7 @@ def subtract30min(day): # subtract 30 min
 refresh_time = None
 
 while True:
+    time_now = time.localtime()
     # only query the online time once per hour (and on first run)
     if (not refresh_time) or (time.monotonic() - refresh_time) > 3600:
         try:
@@ -208,8 +209,9 @@ while True:
     backLight()
     # start the light 30 min before wake up time
     start_light_time = subtract30min(wake_up_day)
-    # If wake up time - 30 minutes equals current time, start the light
-    if time_str_text == start_light_time:
+    # If current day is wake up day and
+    # wake up time - 30 minutes equals current time, start the light
+    if wake_up_day == time_now[6] and time_str_text == start_light_time:
         print("Starting wake up light")
         # turn on backlight
         pyportal.set_backlight(backlight_on)
