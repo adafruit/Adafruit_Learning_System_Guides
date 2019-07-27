@@ -90,7 +90,7 @@ def writetime(the_hr, the_min):
         value = value | TO
     # set hour
     if the_hr == 24:   # special case for Midnight
-        value = value | MIDIGHT
+        value = value | MIDNIGHT
         return value
     if the_hr > 12:
         the_hr = the_hr - 12  # Convert 24 hour format to 12 hour
