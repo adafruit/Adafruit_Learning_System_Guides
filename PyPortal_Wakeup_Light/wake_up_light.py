@@ -1,7 +1,7 @@
 """
 This example uses a PyPortal and rgbw leds for a simple "wake up" light.
 The strip starts to brighten 30 minutes before set wake up time.
-This program assumes a neopixel strip is attached to D4 on the Adafruit PyPortal.
+This program assumes a neopixel strip is attached to D3 on the Adafruit PyPortal.
 """
 import time
 import board
@@ -159,7 +159,6 @@ def formatTime(raw_hours, raw_minutes):
     time_str = format_str % (raw_hours, raw_minutes)
     return time_str
 
-# backlight function - if screen tapped, turn on back light for 30 seconds?
 def backLight():
     now = time.localtime()
     now_val = time.mktime((now[0], now[1], now[2], now[3], now[4], now[5], now[6], now[7], now[8]))
@@ -167,6 +166,7 @@ def backLight():
     # if time is more than 9 hours after current day's wake up time,
     # or time is before light start time, backlight off, tap to turn on
     if (now_val - wake_up_day_val) > 32400 or (now_val - wake_up_day_val) < -1800:
+        pyportal.set_backlight(backlight_off)
         if pyportal.touchscreen.touch_point:
             pyportal.set_backlight(backlight_on)
             time.sleep(5)
@@ -209,8 +209,10 @@ while True:
     backLight()
     # start the light 30 min before wake up time
     start_light_time = subtract30min(wake_up_day)
-    # If current day is wake up day and
+    # If current day is same as wake up day and
     # wake up time - 30 minutes equals current time, start the light
+    print("Wake up day: ", wake_up_day, "Current Day: ", time_now[6])
+    print("Time: ", time_str_text, "start light time: ", start_light_time)
     if wake_up_day == time_now[6] and time_str_text == start_light_time:
         print("Starting wake up light")
         # turn on backlight
