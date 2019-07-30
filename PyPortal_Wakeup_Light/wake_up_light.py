@@ -29,6 +29,9 @@ wake_up_times = (up_time_monday,
                  default_wake_up)
 days_str = ("Mon.", "Tues.", "Wed.", "Thurs.", "Fri.", "Sat.", "Sun.")
 
+# Bool varible for handing errors when getting time from internet
+time_true = True
+
 # set neopixel min and max brightness
 BRIGHTNESS = 0
 MIN_BRIGHTNESS = 0
@@ -84,11 +87,15 @@ pyportal.splash.append(time_textarea)
 pyportal.splash.append(wakeup_time_textarea)
 pyportal.splash.append(light_on_time_textarea)
 
-try:
-    print("Getting time from internet!")
-    pyportal.get_local_time()
-except RuntimeError as e:
-    print("Some error occured, retrying! -", e)
+while time_true:
+    try:
+        print("Getting time from internet!")
+        pyportal.get_local_time()
+    except RuntimeError as e:
+        print("Some error occured, retrying! -", e)
+        time_true = True
+        continue
+    time_true = False
 
 # parse given time string into hour minute and AM_PM elements
 def parseTime(time_before):
