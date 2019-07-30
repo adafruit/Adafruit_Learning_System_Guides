@@ -1,3 +1,5 @@
 *~
 Hue_Controller/secrets.h
 .idea
+*.DS_Store
+CircuitPython_Logger/secrets\.py

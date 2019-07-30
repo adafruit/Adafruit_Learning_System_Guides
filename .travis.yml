@@ -5,10 +5,31 @@ python:
     - "3.6"
 
 cache:
-    pip: true
+
+cache:
+  pip: true
+  directories:
+    - ~/arduino_ide
+    - ~/.arduino15/packages/
+    - ~/Arduino
+
+env:
+  global:
+    - ARDUINO_IDE_VERSION="1.8.7"
+    - PRETTYNAME="Adafruit Learning System Guides"
+    - PLATFORM_CHECK_ONLY_ON_FILE=true
+
+before_install:
+  - source <(curl -SLs https://raw.githubusercontent.com/adafruit/travis-ci-arduino/master/install.sh)
 
 install:
+  - ./arduino_libinstall
   - pip install --force-reinstall pylint==1.9.2
 
 script:
   - ./pylint_check
+  - build_main_platforms
+  - build_aux_platforms
+  - build_cplay_platforms
+  - build_m4_platforms
+  - build_io_platforms

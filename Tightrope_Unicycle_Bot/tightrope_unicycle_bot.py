@@ -2,7 +2,7 @@ import time
 import board
 import neopixel
 import audioio
-from adafruit_crickit import crickit
+import adafruit_crickit
 
 print("Adabot Tightrope Unicyclist!")
 RED =   (16, 0, 0)
@@ -13,7 +13,7 @@ pixels = neopixel.NeoPixel(board.NEOPIXEL, 10, brightness = 0.2)
 pixels.fill(BLACK)
 
 # Create a motor on Crickit Motor 1 port
-motor = crickit.dc_motor_1
+motor = adafruit_crickit.crickit.dc_motor_1
 
 ############### User variables
 run_time = 6

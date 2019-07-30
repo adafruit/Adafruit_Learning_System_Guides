@@ -1,0 +1,82 @@
+# ESPHomeYAML Configuration
+# for Home Assistant and Adafruit IO
+
+substitutions:
+  device_name: feather_bme280
+  io_username: YOUR_ADAFRUIT_IO_USERNAME
+  io_key: YOUR_ADAFRUIT_IO_KEY
+  update_interval: 30s
+
+esphomeyaml:
+  name: ${device_name}
+  platform: ESP8266
+  board: huzzah
+
+# WiFi Configuration
+wifi:
+  ssid: 'YOUR_SSID'
+  password: 'YOUR_SSID_PASSWORD'
+  # Uncomment this for Static IP Configuration
+  #manual_ip:
+    # Set this to the IP of the ESP
+    #static_ip: 10.0.0.0
+    # Set this to the IP address of the router. Often ends with .1
+    #gateway: 10.0.0.1
+    # The subnet of the network. 255.255.255.0 works for most home networks.
+    #subnet: 255.255.255.0
+
+# Adafruit IO MQTT Setup
+mqtt:
+  broker: 'io.adafruit.com'
+  username: ${io_username}
+  password: ${io_key}
+  topic_prefix: '${io_username}/feeds'
+  birth_message:
+    topic: ${io_username}/feeds/status
+    payload: Online
+  will_message:
+    topic: ${io_username}/feeds/status
+    payload: Offline
+  log_topic:
+
+# Enable Home Assistant API
+api:
+
+# Enable OTA Access
+ota:
+
+# Enable verbose logging over serial
+logger:
+
+# Create BME Sensor on I2C
+i2c:
+  sda: SDA
+  scl: SCL
+  scan: False
+binary_sensor:
+    - platform: status
+      name: "BME280 Status"
+      id: status
+      internal: True
+sensor:
+  - platform: bme280
+    address: 0x77
+    temperature:
+      name: "BME280 Temperature"
+      id: temperature
+      state_topic: ${io_username}/feeds/temperature
+      discovery: False
+      filters: []
+    pressure:
+      name: "BME280 Pressure"
+      id: pressure
+      state_topic: ${io_username}/feeds/pressure
+      discovery: False
+      filters: []
+    humidity:
+      name: "BME280 Humidity"
+      id: humidity
+      state_topic: ${io_username}/feeds/humidity
+      discovery: False
+      filters: []
+    update_interval: ${update_interval}

@@ -1,6 +1,6 @@
 import time
 import board
-import debouncer
+from adafruit_debouncer import Debouncer
 import busio as io
 import digitalio
 import pulseio
@@ -9,8 +9,14 @@ import adafruit_ssd1306
 i2c = io.I2C(board.SCL, board.SDA)
 reset_pin = digitalio.DigitalInOut(board.D11)
 oled = adafruit_ssd1306.SSD1306_I2C(128, 32, i2c, reset=reset_pin)
-button_select = debouncer.Debouncer(board.D7, mode=digitalio.Pull.UP)
-button_play = debouncer.Debouncer(board.D9, mode=digitalio.Pull.UP)
+select = digitalio.DigitalInOut(board.D7)
+select.direction = digitalio.Direction.INPUT
+select.pull = digitalio.Pull.UP
+button_select = Debouncer(select)
+play = digitalio.DigitalInOut(board.D9)
+play.direction = digitalio.Direction.INPUT
+play.pull = digitalio.Pull.UP
+button_play = Debouncer(play)
 
 C4     = 261
 C_SH_4 = 277

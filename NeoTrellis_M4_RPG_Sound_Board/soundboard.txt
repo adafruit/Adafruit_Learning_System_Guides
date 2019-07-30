@@ -1,0 +1,40 @@
+# background loops
+65_Dungeon_I_1m_8000.wav, PURPLE
+37_Catacombs_1m_8000.wav, PURPLE
+pass
+pass
+pass
+pass
+pass
+pass
+
+
+# ambient sound
+drips1_lp.wav, GREEN
+stream.wav, GREEN
+bats.wav, GREEN
+flies.wav, GREEN
+unlock_door.wav, OLIVE
+secret_door.wav, OLIVE
+screams.wav, YELLOW
+rumble.wav, YELLOW
+
+# attacks
+roar.wav, PINK
+creature1.wav, PINK
+humanoid_attack.wav, RED
+goblin_attack.wav, RED
+large_beast_attack.wav, RED
+elemental_attack.wav, RED
+construct_attack.wav, RED
+dragon_attack.wav, RED
+
+# events
+door_open.wav, TEAL
+door_close.wav, TEAL
+trap_arrow.wav, BLUE
+trap_gate.wav, BLUE
+trap_magic.wav, BLUE
+trap_pit.wav, BLUE
+trap_poison.wav, BLUE
+trap_spike.wav, BLUE
