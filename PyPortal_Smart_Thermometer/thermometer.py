@@ -15,7 +15,7 @@ from analogio import AnalogIn
 import adafruit_adt7410
 
 from adafruit_esp32spi import adafruit_esp32spi, adafruit_esp32spi_wifimanager
-from adafruit_io.adafruit_io import RESTClient, AdafruitIO_RequestError
+from adafruit_io.adafruit_io import IO_HTTP, AdafruitIO_RequestError
 
 # thermometer graphics helper
 import thermometer_helper
@@ -49,8 +49,8 @@ except KeyError:
     raise KeyError('To use this code, you need to include your Adafruit IO username \
 and password in a secrets.py file on the CIRCUITPY drive.')
 
-# Create an instance of the Adafruit IO REST client
-io = RESTClient(ADAFRUIT_IO_USER, ADAFRUIT_IO_KEY, wifi)
+# Create an instance of the IO_HTTP client
+io = IO_HTTP(ADAFRUIT_IO_USER, ADAFRUIT_IO_KEY, wifi)
 
 # Get the temperature feed from Adafruit IO
 temperature_feed = io.get_feed('temperature')
