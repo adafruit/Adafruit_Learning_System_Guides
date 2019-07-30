@@ -20,10 +20,10 @@ import adafruit_lis3dh
 
 # CUSTOMISE COLORS HERE:
 COLOR = (0, 120, 120)      # Default idle is light blue
-ALT_COLOR = (255, 50, 0)  # hit color is bright white
+ALT_COLOR = (255, 50, 0)  # hit color is orange
 
 # CUSTOMISE IDLE PULSE SPEED HERE: 0 is fast, above 0 slows down
-IDLE_PULSE_SPEED = 0  # Default is 0.1 seconds
+IDLE_PULSE_SPEED = 0  # Default is 0 seconds
 SWING_BLAST_SPEED = 0.007
 
 # CUSTOMISE BRIGHTNESS HERE: must be a number between 0 and 1
