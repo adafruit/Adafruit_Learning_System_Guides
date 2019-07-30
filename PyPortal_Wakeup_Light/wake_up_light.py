@@ -84,6 +84,12 @@ pyportal.splash.append(time_textarea)
 pyportal.splash.append(wakeup_time_textarea)
 pyportal.splash.append(light_on_time_textarea)
 
+try:
+    print("Getting time from internet!")
+    pyportal.get_local_time()
+except RuntimeError as e:
+    print("Some error occured, retrying! -", e)
+
 # parse given time string into hour minute and AM_PM elements
 def parseTime(time_before):
     hours_before, minutes_before = time_before.split(":")
@@ -211,8 +217,6 @@ while True:
     start_light_time = subtract30min(wake_up_day)
     # If current day is same as wake up day and
     # wake up time - 30 minutes equals current time, start the light
-    print("Wake up day: ", wake_up_day, "Current Day: ", time_now[6])
-    print("Time: ", time_str_text, "start light time: ", start_light_time)
     if wake_up_day == time_now[6] and time_str_text == start_light_time:
         print("Starting wake up light")
         # turn on backlight
