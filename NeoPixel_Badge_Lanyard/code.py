@@ -15,13 +15,13 @@ NUM_LEDS = 60                   # change to reflect your LED strip
 NEOPIXEL_PIN = board.D13        # change to reflect your wiring
 
 # Palettes can have any number of elements in various formats
-# check https://learn.adafruit.com/fancyled-library-for-circuitpython/colors 
+# check https://learn.adafruit.com/fancyled-library-for-circuitpython/colors
 # for more info
 
 # Declare a 6-element RGB rainbow palette
 PALETTE_RAINBOW = [fancy.CRGB(1.0, 0.0, 0.0),  # Red
                    fancy.CRGB(0.5, 0.5, 0.0),  # Yellow
-                   fancy.CRGB(0.0, 1.0, 0.0),  # Green  
+                   fancy.CRGB(0.0, 1.0, 0.0),  # Green
                    fancy.CRGB(0.0, 0.5, 0.5),  # Cyan
                    fancy.CRGB(0.0, 0.0, 1.0),  # Blue
                    fancy.CRGB(0.5, 0.0, 0.5)]  # Magenta
@@ -44,7 +44,7 @@ PALETTE_WATER = [fancy.CRGB(0, 214, 214),  # blues and cyans
                  fancy.CRGB(0, 123, 255),
                  fancy.CRGB(0, 68, 214)]
 
-# Declare a NeoPixel object on NEOPIXEL_PIN with NUM_LEDS pixels, 
+# Declare a NeoPixel object on NEOPIXEL_PIN with NUM_LEDS pixels,
 # no auto-write.
 # Set brightness to max because we'll be using FancyLED's brightness control.
 pixels = neopixel.NeoPixel(NEOPIXEL_PIN, NUM_LEDS, brightness=1.0,
