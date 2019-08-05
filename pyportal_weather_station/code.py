@@ -15,7 +15,7 @@ from simpleio import map_range
 from digitalio import DigitalInOut
 
 from adafruit_esp32spi import adafruit_esp32spi, adafruit_esp32spi_wifimanager
-from adafruit_io.adafruit_io import RESTClient, AdafruitIO_RequestError
+from adafruit_io.adafruit_io import IO_HTTP, AdafruitIO_RequestError
 
 # sensor libs
 import adafruit_veml6075
@@ -56,8 +56,8 @@ wifi = adafruit_esp32spi_wifimanager.ESPSPI_WiFiManager(esp, secrets, status_lig
 ADAFRUIT_IO_USER = secrets['aio_username']
 ADAFRUIT_IO_KEY = secrets['aio_key']
 
-# Create an instance of the Adafruit IO REST client
-io = RESTClient(ADAFRUIT_IO_USER, ADAFRUIT_IO_KEY, wifi)
+# Create an instance of the Adafruit IO HTTP client
+io = IO_HTTP(ADAFRUIT_IO_USER, ADAFRUIT_IO_KEY, wifi)
 
 # create an i2c object
 i2c = busio.I2C(board.SCL, board.SDA)

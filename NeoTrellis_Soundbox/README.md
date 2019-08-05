@@ -2,7 +2,7 @@
 
 Make a sound playing, responsive NeoTrellis 16 button wav player with choice of button colors and randomization via shake.
 
-Follow the Adafruit learn guide here: https://learn.adafruit.com/neotrellis-soundbox/
+Follow the Adafruit learn guide here: https://learn.adafruit.com/neotrellis-soundboard/
 
 Adafruit invests time and resources providing this open source code,
 please support Adafruit and open-source hardware by purchasing
