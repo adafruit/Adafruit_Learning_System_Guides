@@ -200,10 +200,15 @@ def subtract30min(day): # subtract 30 min
 
 getWakeUpTimes()
 
+time_now = time.localtime()
+
+current_day = time_now[6]
+
+check_day = current_day
+
 refresh_time = None
 
 while True:
-    time_now = time.localtime()
     # only query the online time once per hour (and on first run)
     if (not refresh_time) or (time.monotonic() - refresh_time) > 3600:
         try:
@@ -213,9 +218,15 @@ while True:
         except RuntimeError as e:
             print("Some error occured, retrying! -", e)
             continue
-    # At midnight , update the wake up times for the new day
-    if ((time_now[3] == 0) and (time_now[4] == 0) and (time_now[5] == 0)):
+    # At midnight or when program detects a chenge in day, update the wake up times for the new day
+    print("Current day= ", current_day, "check day =", check_day)
+    if check_day == current_day:
+        current_day = time_now[6]
+    else:
+        print("it's a new day!")
+        check_day = current_day
         getWakeUpTimes()
+
     time_str_text = displayTime()
     print(time_str_text)
     # determine which wake up time to choose based on the day
