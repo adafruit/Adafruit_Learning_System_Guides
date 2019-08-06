@@ -136,6 +136,22 @@ def expand_uncovered(start_x, start_y):
     return number_uncovered
 
 
+def check_for_win():
+    """Check for a complete, winning game. That's one with all squares uncovered
+    and all bombs correctly flagged, with no non-bomb squares flaged.
+    """
+    for x in range(20):
+        for y in range(15):
+            visible = tilegrid[x, y]
+            under = get_data(x, y)
+            if visible == BLANK:
+                print('Found a unexplored square at (%d, %d)' % (x, y))
+                return False               #still covewred squares, not done
+            elif visible == BOMBFLAGGED and under != BOMB:
+                print('Found misflagged bomb at (%d, %d)' % (x, y))
+                return False               #misflagged bombs, not done
+        return True
+
 def play_a_game():
     number_uncovered = 0
     touch_x = -1
