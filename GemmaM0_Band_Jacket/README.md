@@ -13,7 +13,7 @@ Use Adafruit Gemma M0: 60 pixels to D0, 60 pixels to D1, & button to D2 & GND
 This sketch shows mapping pixels on an irregular matrix and provides 
 various examples from RGB Shades Demo Code & the FastLED demo library. 
 Can easily incorporate other examples or create your own!
-//    
+   
 To use:
 - Press the button to cycle through available effects shown on the functions list
 - Press and hold the button (>one second) to cycle through five brightness levels
