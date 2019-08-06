@@ -197,10 +197,10 @@ def play_lost_sound():
 
 while True:
     reset_board()
-    result = play_a_game()
-    if result is None:
-        pass
-    elif result:
+    if play_a_game():
+        print('You won')
         play_won_sound()
     else:
+        print('You lost')
         play_lost_sound()
+    time.sleep(10.0)
