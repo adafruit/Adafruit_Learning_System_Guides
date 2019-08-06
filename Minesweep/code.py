@@ -43,6 +43,7 @@ BOMBFLAGGED = 11
 BOMBMISFLAGGED = 12
 BOMBQUESTION = 13
 BOMBREVEALED = 14
+BOMB = 14
 
 snapshot = Debouncer(digitalio.DigitalInOut(board.D4))
 
