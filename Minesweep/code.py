@@ -14,6 +14,7 @@ All text above must be included in any redistribution.
 
 import time
 import board
+import digitalio
 import displayio
 import adafruit_imageload
 import adafruit_touchscreen
@@ -43,7 +44,7 @@ BOMBMISFLAGGED = 12
 BOMBQUESTION = 13
 BOMBREVEALED = 14
 
-snapshot = Debouncer(board.D4)
+snapshot = Debouncer(digitalio.DigitalInOut(board.D4))
 
 sprite_sheet, palette = adafruit_imageload.load("/SpriteSheet.bmp",
                                                 bitmap=displayio.Bitmap,
@@ -146,8 +147,9 @@ def play_a_game():
     while True:
         now = time/monotonic()
         snapshot.update()
-        if snapshot.fell:
-            save_pixels()
+        # if snapshot.fell:
+        #     save_pixels()
+        #     continue
         if now >= touch_time:
             touch_time = now + 0.1
             touch_at = touchscreen.touch_point
