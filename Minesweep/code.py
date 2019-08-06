@@ -146,7 +146,7 @@ def play_a_game():
     press = 0
     touch_time = 0
     while True:
-        now = time/monotonic()
+        now = time.monotonic()
         snapshot.update()
         # if snapshot.fell:
         #     save_pixels()
