@@ -140,11 +140,8 @@ def play_a_game():
     number_uncovered = 0
     touch_x = -1
     touch_y = -1
-    last_x = -1
-    last_y = -1
-    hold_count = 0
-    press = 0
     touch_time = 0
+    wait_for_release = False
     while True:
         now = time.monotonic()
         snapshot.update()
@@ -152,33 +149,36 @@ def play_a_game():
         #     save_pixels()
         #     continue
         if now >= touch_time:
-            touch_time = now + 0.1
+            touch_time = now + 0.2
+
+            # process touch
             touch_at = touchscreen.touch_point
-            if touch_at is not None:
+            if touch_at is None:
+                wait_for_release = False
+            else:
+                if wait_for_release:
+                    continue
+                wait_for_release = True
                 touch_x = max(min([touch_at[0] // 16, 19]), 0)
                 touch_y = max(min([touch_at[1] // 16, 14]), 0)
-                if touch_x == last_x and touch_y == last_y:
-                    hold_count += 1
-            else:
-                if hold_count > 5:
-                    press = 2
-                elif hold_count > 1:
-            elif tilegrid[touch_x, touch_y] == BLANK:
-                under_the_tile = get_data(touch_x, touch_y)
-                if under_the_tile == 14:
-                    reveal()
-                    tilegrid[touch_x, touch_y] = BOMBDEATH
-                    time.sleep(10.0)
-                    return False          #lost
-                elif under_the_tile > OPEN0 and under_the_tile <= OPEN8:
-                    tilegrid[touch_x, touch_y] = under_the_tile
-                elif under_the_tile == OPEN0:
-                    number_uncovered += expand_uncovered(touch_x, touch_y)
-                else:
-                    print('Unexpected value on board')
-                    return None           #something bad happened
-                continue
-            if number_uncovered == 300:
+                print('Touched (%d, %d)' % (touch_x, touch_y))
+                if tilegrid[touch_x, touch_y] == BLANK:
+                    tilegrid[touch_x, touch_y] = BOMBFLAGGED
+                elif tilegrid[touch_x, touch_y] == BOMBFLAGGED:
+                    under_the_tile = get_data(touch_x, touch_y)
+                    if under_the_tile == 14:
+                        reveal()
+                        tilegrid[touch_x, touch_y] = BOMBDEATH
+                        return False          #lost
+                    elif under_the_tile > OPEN0 and under_the_tile <= OPEN8:
+                        tilegrid[touch_x, touch_y] = under_the_tile
+                    elif under_the_tile == OPEN0:
+                        tilegrid[touch_x, touch_y] = BLANK
+                        number_uncovered += expand_uncovered(touch_x, touch_y)
+                    else:
+                        print('Unexpected value on board')
+                        return None           #something bad happened
+            if check_for_win():
                 return True           #won
 
 def reset_board():
