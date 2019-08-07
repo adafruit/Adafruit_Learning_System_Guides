@@ -90,6 +90,9 @@ while True:
     try:
         print("Getting time from internet!")
         pyportal.get_local_time()
+        time_now = time.localtime()
+        current_day = time_now[6]
+        check_day = current_day
     except RuntimeError as e:
         print("Some error occured, retrying! -", e)
         continue
@@ -200,25 +203,20 @@ def subtract30min(day): # subtract 30 min
 
 getWakeUpTimes()
 
-time_now = time.localtime()
-
-current_day = time_now[6]
-
-check_day = current_day
-
-refresh_time = None
+refresh_time = 0
 
 while True:
-    # only query the online time once per hour (and on first run)
-    if (not refresh_time) or (time.monotonic() - refresh_time) > 3600:
+    # only query the online time once per hour
+    if (time.monotonic() - refresh_time) > 3600:
         try:
             print("Getting time from internet!")
             pyportal.get_local_time()
             refresh_time = time.monotonic()
+            time_now = time.localtime()
         except RuntimeError as e:
             print("Some error occured, retrying! -", e)
             continue
-    # At midnight or when program detects a chenge in day, update the wake up times for the new day
+    # At midnight or when program detects a change in day, update the wake up times for the new day
     print("Current day= ", current_day, "check day =", check_day)
     if check_day == current_day:
         current_day = time_now[6]
