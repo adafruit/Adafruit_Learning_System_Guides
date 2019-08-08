@@ -16,6 +16,7 @@ import time
 import board
 import digitalio
 import displayio
+import audioio
 import adafruit_imageload
 import adafruit_touchscreen
 from random import seed, randint
@@ -23,6 +24,17 @@ from adafruit_bitmapsaver import save_pixels
 from adafruit_debouncer import Debouncer
 
 seed(int(time.monotonic()))
+
+# Set up audio
+speaker_enable = digitalio.DigitalInOut(board.SPEAKER_ENABLE)
+speaker_enable.switch_to_output(False)
+if hasattr(board, 'AUDIO_OUT'):
+    audio = audioio.AudioOut(board.AUDIO_OUT)
+elif hasattr(board, 'SPEAKER'):
+    audio = audioio.AudioOut(board.SPEAKER)
+else:
+    raise AttributeError('Board does not have a builtin speaker!')
+
 
 NUMBER_OF_BOMBS = 15
 
@@ -205,18 +217,43 @@ def reset_board():
     seed_bombs(NUMBER_OF_BOMBS)
     compute_counts()
 
-def play_won_sound():
-    pass
+def play_sound(file_name):
+    board.DISPLAY.wait_for_frame()
+    wavfile = open(file_name, "rb")
+    wavedata = audioio.WaveFile(wavfile)
+    speaker_enable.value = True
+    audio.play(wavedata)
+    return wavfile
 
-def play_lost_sound():
-    pass
+def wait_for_sound_and_cleanup(wavfile):
+    while audio.playing:
+        pass
+    wavfile.close()
+    speaker_enable.value = False
+
+def win():
+    print('You won')
+    # make_new_screenshot()
+    wait_for_sound_and_cleanup(play_sound('win.wav'))
+
+def loose():
+    print('You lost')
+    # make_new_screenshot()
+    wavfile = play_sound('loose.wav')
+    for _ in range(10):
+        tilegrid.x = randint(-2, 2)
+        tilegrid.y = randint(-2, 2)
+        display.refresh_soon()
+        display.wait_for_frame()
+    tilegrid.x = 0
+    tilegrid.y = 0
+    wait_for_sound_and_cleanup(wavfile)
 
 while True:
     reset_board()
     if play_a_game():
-        print('You won')
-        play_won_sound()
+        win()
     else:
-        print('You lost')
-        play_lost_sound()
-    time.sleep(10.0)
+        reveal()
+        loose()
+    time.sleep(5.0)
