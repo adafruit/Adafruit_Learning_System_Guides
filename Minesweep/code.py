@@ -100,7 +100,6 @@ def compute_counts():
         for x in range(20):
             if get_data(x, y) != 14:
                 continue                  # keep looking for bombs
-            print('found bomb at %d, %d' % (x, y))
             for dx in (-1, 0, 1):
                 if x + dx < 0 or x + dx >= 20:
                     continue              # off screen
@@ -158,33 +157,6 @@ def check_for_win():
                 return False               #misflagged bombs, not done
     return True               #nothing unexplored, and no misflagged bombs
 
-# comment or remove if not using screenshots ######################
-#pylint:disable=global-statement
-# from adafruit_bitmapsaver import save_pixels                    #
-# from adafruit_debouncer import Debouncer                        #
-# import busio                                                    #
-# import adafruit_sdcard                                          #
-# import storage                                                  #
-# spi = busio.SPI(board.SCK, MOSI=board.MOSI, MISO=board.MISO)    #
-# cs = digitalio.DigitalInOut(board.SD_CS)                        #
-# sdcard = adafruit_sdcard.SDCard(spi, cs)                        #
-# vfs = storage.VfsFat(sdcard)                                    #
-# storage.mount(vfs, "/sd")                                       #
-# snapshot_switch = digitalio.DigitalInOut(board.D4)              #
-# snapshot_switch.direction = digitalio.Direction.INPUT           #
-# snapshot_switch.pull= digitalio.Pull.UP                         #
-# snapshot = Debouncer(snapshot_switch)                           #
-# screenshot_number = 1                                           #
-#                                                                 #
-# def make_new_screenshot():                                      #
-#     global screenshot_number                                    #
-#     print('Taking /sd/screenshot_%d.bmp' % (screenshot_number)) #
-#     save_pixels('/sd/screenshot_%d.bmp' % (screenshot_number))  #
-#     print('Finished taking scheenshot.')                        #
-#     screenshot_number += 1                                      #
-#pylint:enable=global-statement
-###################################################################
-
 def play_a_game():
     number_uncovered = 0
     touch_x = -1
@@ -193,10 +165,6 @@ def play_a_game():
     wait_for_release = False
     while True:
         now = time.monotonic()
-        # snapshot.update()
-        # if snapshot.fell:
-        #     make_new_screenshot()
-        #     continue
         if now >= touch_time:
             touch_time = now + 0.2
             # process touch
@@ -209,7 +177,6 @@ def play_a_game():
                 wait_for_release = True
                 touch_x = max(min([touch_at[0] // 16, 19]), 0)
                 touch_y = max(min([touch_at[1] // 16, 14]), 0)
-                print('Touched (%d, %d)' % (touch_x, touch_y))
                 if tilegrid[touch_x, touch_y] == BLANK:
                     tilegrid[touch_x, touch_y] = BOMBQUESTION
                 elif tilegrid[touch_x, touch_y] == BOMBQUESTION:
@@ -217,7 +184,8 @@ def play_a_game():
                 elif tilegrid[touch_x, touch_y] == BOMBFLAGGED:
                     under_the_tile = get_data(touch_x, touch_y)
                     if under_the_tile == 14:
-                        set_data(touch_x, touch_y, BOMBDEATH)
+                        set_data(touch_x, touch_y, BOMBDEATH) #this will casue a red bomb to be revealed
+                        tilegrid[touch_x, touch_y] = BOMBDEATH
                         return False          #lost
                     elif under_the_tile > OPEN0 and under_the_tile <= OPEN8:
                         tilegrid[touch_x, touch_y] = under_the_tile
@@ -255,12 +223,10 @@ def wait_for_sound_and_cleanup(wavfile):
 
 def win():
     print('You won')
-    # make_new_screenshot()
     wait_for_sound_and_cleanup(play_sound('win.wav'))
 
 def loose():
     print('You lost')
-    # make_new_screenshot()
     wavfile = play_sound('loose.wav')
     for _ in range(10):
         tilegrid.x = randint(-2, 2)
