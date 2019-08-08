@@ -52,9 +52,7 @@ BOMBDEATH = 10
 BOMBFLAGGED = 11
 BOMBMISFLAGGED = 12
 BOMBQUESTION = 13
-BOMBREVEALED = 14
 BOMB = 14
-
 
 sprite_sheet, palette = adafruit_imageload.load("/SpriteSheet.bmp",
                                                 bitmap=displayio.Bitmap,
@@ -72,9 +70,10 @@ tilegrid = displayio.TileGrid(sprite_sheet, pixel_shader=palette,
                               tile_height=16, tile_width=16,
                               default_tile=BLANK)
 group.append(tilegrid)
-display.show(group)
 
-DATA_BOMB = -1
+
+
+display.show(group)
 
 board_data = bytearray(b'\x00' * 300)
 
@@ -86,7 +85,6 @@ def set_data(x, y, value):
     board_data[y * 20 + x] = value
 #pylint:disable=redefined-outer-name
 
-
 def seed_bombs(how_many):
     for _ in range(how_many):
         while True:
@@ -95,7 +93,6 @@ def seed_bombs(how_many):
             if get_data(bomb_x, bomb_y) == 0:
                 set_data(bomb_x, bomb_y, 14)
                 break
-
 
 def compute_counts():
     """For each bomb, increment the count in each non-bomb square around it"""
@@ -115,12 +112,13 @@ def compute_counts():
                         continue          # don't process bombs
                     set_data(x + dx, y + dy, count + 1)
 
-
 def reveal():
     for x in range(20):
         for y in range(15):
-            tilegrid[x, y] = get_data(x, y)
-
+            if tilegrid[x, y] == BOMBFLAGGED and get_data(x, y) != BOMB:
+                tilegrid[x, y] = BOMBMISFLAGGED
+            else:
+                tilegrid[x, y] = get_data(x, y)
 
 def expand_uncovered(start_x, start_y):
     number_uncovered = 1
@@ -143,7 +141,6 @@ def expand_uncovered(start_x, start_y):
                                 continue          # don't process where the bomb
                             stack.append((x + dx, y + dy))
     return number_uncovered
-
 
 def check_for_win():
     """Check for a complete, winning game. That's one with all squares uncovered
