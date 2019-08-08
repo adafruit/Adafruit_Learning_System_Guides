@@ -146,17 +146,18 @@ def check_for_win():
     """Check for a complete, winning game. That's one with all squares uncovered
     and all bombs correctly flagged, with no non-bomb squares flaged.
     """
+    # first make sure everything has been explored and decided
     for x in range(20):
         for y in range(15):
-            visible = tilegrid[x, y]
-            under = get_data(x, y)
-            if visible == BLANK:
-                print('Found a unexplored square at (%d, %d)' % (x, y))
-                return False               #still covewred squares, not done
-            elif visible == BOMBFLAGGED and under != BOMB:
-                print('Found misflagged bomb at (%d, %d)' % (x, y))
+            if tilegrid[x, y] == BLANK or tilegrid[x, y] == BOMBQUESTION:
+                return None               #still ignored or question squares
+    # then check for mistagged bombs
+    for x in range(20):
+        for y in range(15):
+            if tilegrid[x, y] == BOMBFLAGGED and get_data(x, y) != BOMB:
                 return False               #misflagged bombs, not done
-        return True
+    return True               #nothing unexplored, and no misflagged bombs
+
 # comment or remove if not using screenshots ######################
 #pylint:disable=global-statement
 # from adafruit_bitmapsaver import save_pixels                    #
@@ -210,23 +211,25 @@ def play_a_game():
                 touch_y = max(min([touch_at[1] // 16, 14]), 0)
                 print('Touched (%d, %d)' % (touch_x, touch_y))
                 if tilegrid[touch_x, touch_y] == BLANK:
+                    tilegrid[touch_x, touch_y] = BOMBQUESTION
+                elif tilegrid[touch_x, touch_y] == BOMBQUESTION:
                     tilegrid[touch_x, touch_y] = BOMBFLAGGED
                 elif tilegrid[touch_x, touch_y] == BOMBFLAGGED:
                     under_the_tile = get_data(touch_x, touch_y)
                     if under_the_tile == 14:
-                        reveal()
-                        tilegrid[touch_x, touch_y] = BOMBDEATH
+                        set_data(touch_x, touch_y, BOMBDEATH)
                         return False          #lost
                     elif under_the_tile > OPEN0 and under_the_tile <= OPEN8:
                         tilegrid[touch_x, touch_y] = under_the_tile
                     elif under_the_tile == OPEN0:
                         tilegrid[touch_x, touch_y] = BLANK
                         number_uncovered += expand_uncovered(touch_x, touch_y)
-                    else:
-                        print('Unexpected value on board')
-                        return None           #something bad happened
-            if check_for_win():
-                return True           #won
+                    else:                    #something bad happened
+                        raise ValueError('Unexpected value on board')
+            status = check_for_win()
+            if status is None:
+                continue
+            return status
 
 def reset_board():
     for x in range(20):
