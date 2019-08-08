@@ -20,8 +20,6 @@ import audioio
 import adafruit_imageload
 import adafruit_touchscreen
 from random import seed, randint
-from adafruit_bitmapsaver import save_pixels
-from adafruit_debouncer import Debouncer
 
 seed(int(time.monotonic()))
 
@@ -57,7 +55,6 @@ BOMBQUESTION = 13
 BOMBREVEALED = 14
 BOMB = 14
 
-snapshot = Debouncer(digitalio.DigitalInOut(board.D4))
 
 sprite_sheet, palette = adafruit_imageload.load("/SpriteSheet.bmp",
                                                 bitmap=displayio.Bitmap,
@@ -163,6 +160,32 @@ def check_for_win():
                 print('Found misflagged bomb at (%d, %d)' % (x, y))
                 return False               #misflagged bombs, not done
         return True
+# comment or remove if not using screenshots ######################
+#pylint:disable=global-statement
+# from adafruit_bitmapsaver import save_pixels                    #
+# from adafruit_debouncer import Debouncer                        #
+# import busio                                                    #
+# import adafruit_sdcard                                          #
+# import storage                                                  #
+# spi = busio.SPI(board.SCK, MOSI=board.MOSI, MISO=board.MISO)    #
+# cs = digitalio.DigitalInOut(board.SD_CS)                        #
+# sdcard = adafruit_sdcard.SDCard(spi, cs)                        #
+# vfs = storage.VfsFat(sdcard)                                    #
+# storage.mount(vfs, "/sd")                                       #
+# snapshot_switch = digitalio.DigitalInOut(board.D4)              #
+# snapshot_switch.direction = digitalio.Direction.INPUT           #
+# snapshot_switch.pull= digitalio.Pull.UP                         #
+# snapshot = Debouncer(snapshot_switch)                           #
+# screenshot_number = 1                                           #
+#                                                                 #
+# def make_new_screenshot():                                      #
+#     global screenshot_number                                    #
+#     print('Taking /sd/screenshot_%d.bmp' % (screenshot_number)) #
+#     save_pixels('/sd/screenshot_%d.bmp' % (screenshot_number))  #
+#     print('Finished taking scheenshot.')                        #
+#     screenshot_number += 1                                      #
+#pylint:enable=global-statement
+###################################################################
 
 def play_a_game():
     number_uncovered = 0
@@ -172,13 +195,12 @@ def play_a_game():
     wait_for_release = False
     while True:
         now = time.monotonic()
-        snapshot.update()
+        # snapshot.update()
         # if snapshot.fell:
-        #     save_pixels()
+        #     make_new_screenshot()
         #     continue
         if now >= touch_time:
             touch_time = now + 0.2
-
             # process touch
             touch_at = touchscreen.touch_point
             if touch_at is None:
