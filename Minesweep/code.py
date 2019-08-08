@@ -231,9 +231,9 @@ def win():
     print('You won')
     wait_for_sound_and_cleanup(play_sound('win.wav'))
 
-def loose():
+def lose():
     print('You lost')
-    wavfile = play_sound('loose.wav')
+    wavfile = play_sound('lose.wav')
     for _ in range(10):
         tilegrid.x = randint(-2, 2)
         tilegrid.y = randint(-2, 2)
@@ -249,5 +249,5 @@ while True:
         win()
     else:
         reveal()
-        loose()
+        lose()
     time.sleep(5.0)
