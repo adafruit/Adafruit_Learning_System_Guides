@@ -13,13 +13,13 @@ All text above must be included in any redistribution.
 """
 
 import time
+from random import seed, randint
 import board
 import digitalio
 import displayio
 import audioio
 import adafruit_imageload
 import adafruit_touchscreen
-from random import seed, randint
 
 seed(int(time.monotonic()))
 
@@ -119,6 +119,7 @@ def reveal():
             else:
                 tilegrid[x, y] = get_data(x, y)
 
+#pylint:disable=too-many-nested-blocks
 def expand_uncovered(start_x, start_y):
     number_uncovered = 1
     stack = [(start_x, start_y)]
@@ -140,6 +141,7 @@ def expand_uncovered(start_x, start_y):
                                 continue          # don't process where the bomb
                             stack.append((x + dx, y + dy))
     return number_uncovered
+#pylint:enable=too-many-nested-blocks
 
 def check_for_win():
     """Check for a complete, winning game. That's one with all squares uncovered
@@ -157,6 +159,9 @@ def check_for_win():
                 return False               #misflagged bombs, not done
     return True               #nothing unexplored, and no misflagged bombs
 
+#pylint:disable=too-many-branches
+# This could be broken apart but I think it's more understandable
+# with it all in one place
 def play_a_game():
     number_uncovered = 0
     touch_x = -1
@@ -184,7 +189,7 @@ def play_a_game():
                 elif tilegrid[touch_x, touch_y] == BOMBFLAGGED:
                     under_the_tile = get_data(touch_x, touch_y)
                     if under_the_tile == 14:
-                        set_data(touch_x, touch_y, BOMBDEATH) #this will casue a red bomb to be revealed
+                        set_data(touch_x, touch_y, BOMBDEATH) #reveal a red bomb
                         tilegrid[touch_x, touch_y] = BOMBDEATH
                         return False          #lost
                     elif under_the_tile > OPEN0 and under_the_tile <= OPEN8:
@@ -198,6 +203,7 @@ def play_a_game():
             if status is None:
                 continue
             return status
+#pylint:enable=too-many-branches
 
 def reset_board():
     for x in range(20):
