@@ -1,5 +1,5 @@
 """
-PyPortal based countdown of days until Halloween.
+PyPortal MineSweeper
 
 Adafruit invests time and resources providing this open source code.
 Please support Adafruit and open source hardware by purchasing
