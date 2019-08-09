@@ -1,19 +1,25 @@
-import os
-import board
-from digitalio import DigitalInOut, Direction
+"""
+This example runs the 'Simon' game on the PyRuler.
+Memorize each led sequence and tap the corresponding
+touch pads on the pyruler to advance to each new sequence.
+Code adapted from Miguel Grinberg's Simon game for Circuit Playground Express
+
+"""
+
 import time
 import random
+import board
+from digitalio import DigitalInOut, Direction
 import touchio
 import adafruit_dotstar
 
+# Initialize dot star led
 num_pixels = 1
-pixels = adafruit_dotstar.DotStar(board.APA102_SCK, board.APA102_MOSI, num_pixels, brightness=0.1, auto_write=False)
+pixels = adafruit_dotstar.DotStar(board.APA102_SCK, board.APA102_MOSI,
+                                  num_pixels, brightness=0.1, auto_write=False)
 red = (255,0,0)
 green = (0,255,0)
 blue = (0,0,255)
-
-pixels.fill(blue)
-pixels.show()
 
 led = DigitalInOut(board.D13)
 led.direction = Direction.OUTPUT
@@ -31,11 +37,13 @@ for p in (board.LED4, board.LED5, board.LED6, board.LED7):
 cap_touches = [False, False, False, False]
 
 def intro_game():
-    for p in range(len(leds)):
-        leds[p].value = True
+    pixels.fill(blue)
+    pixels.show()
+    for q in range(len(leds)):
+        leds[q].value = True
         time.sleep(0.25)
-    for led in range(len(leds)):
-        leds[led].value = False
+    for l in range(len(leds)):
+        leds[l].value = False
 
 def wheel(pos):
     # Input a value 0 to 255 to get a color value.
@@ -58,7 +66,7 @@ def rainbow_cycle(wait):
         pixels.show()
         time.sleep(wait)
 
-def read_caps(timeout=30):
+def read_caps():
     t0_count = 0
     t0 = touches[0]
     t0.direction = Direction.OUTPUT
@@ -75,13 +83,18 @@ def read_caps(timeout=30):
     cap_touches[3] = touches[3].raw_value > 3000
     return cap_touches
 
-def record_caps():
-    caps = read_caps()
-    val = 0
-    for i,c in enumerate(caps):
-        if c:
-            val = i
-            print("true!")
+def record_caps(timeout=3):
+    start_time = time.monotonic() # start 3 second timer waiting for user input
+    while time.monotonic() - start_time < timeout:
+        caps = read_caps()
+        val = None
+        for i,c in enumerate(caps):
+            if c:
+                val = i
+                print("true!")
+                time.sleep(0.1)
+        if val is not None: # if there's input from a pad exit the timer loop
+            break
     return val
 
 def light_cap(cap, duration=0.5):
@@ -103,7 +116,7 @@ def play_sequence(sequence):
 def read_sequence(sequence):
     pixels.fill(green)
     pixels.show()
-    time.sleep(1)
+    #time.sleep(1)
     for cap in sequence:
         if record_caps() != cap:
             # the player made a mistake!
@@ -121,12 +134,12 @@ def play_game():
     intro_game() # led light sequence at beginning of each game
     sequence = []
     while True:
-        pixels.fill(blue)
+        pixels.fill(blue) # blue for showing user sequence
         pixels.show()
         time.sleep(1)
-        sequence.append(random.randint(0, 3))
-        play_sequence(sequence)
-        if not read_sequence(sequence):
+        sequence.append(random.randint(0, 3)) # add new light to sequence each time
+        play_sequence(sequence) # show the sequence
+        if not read_sequence(sequence): # if user inputs wrong sequence, gameover
             # game over
             play_error()
             print("gameover")
