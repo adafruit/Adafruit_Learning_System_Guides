@@ -19,7 +19,7 @@ import digitalio
 import displayio
 import audioio
 try:
-    from audio import WaveFile
+    from audioio import WaveFile
 except ImportError:
     from audiocore import WaveFile
 
