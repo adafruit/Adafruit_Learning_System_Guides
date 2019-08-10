@@ -18,6 +18,11 @@ import board
 import digitalio
 import displayio
 import audioio
+try:
+    from audiocore import WaveFile
+except ImportError:
+    from audioio import WaveFile
+
 import adafruit_imageload
 import adafruit_touchscreen
 
@@ -216,7 +221,7 @@ def reset_board():
 def play_sound(file_name):
     board.DISPLAY.wait_for_frame()
     wavfile = open(file_name, "rb")
-    wavedata = audioio.WaveFile(wavfile)
+    wavedata = WaveFile(wavfile)
     speaker_enable.value = True
     audio.play(wavedata)
     return wavfile
