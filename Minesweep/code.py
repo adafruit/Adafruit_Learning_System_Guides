@@ -19,9 +19,9 @@ import digitalio
 import displayio
 import audioio
 try:
-    from audiocore import WaveFile
+    from audio import WaveFile
 except ImportError:
-    from audioio import WaveFile
+    from audiocore import WaveFile
 
 import adafruit_imageload
 import adafruit_touchscreen
