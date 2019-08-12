@@ -85,38 +85,31 @@ def read_caps():
 
 def record_caps(timeout=3):
     start_time = time.monotonic() # start 3 second timer waiting for user input
+    val = None
     while time.monotonic() - start_time < timeout:
         caps = read_caps()
-        val = None
         for i,c in enumerate(caps):
             if c:
                 val = i
-                print("true!")
                 time.sleep(0.1)
         if val is not None: # if there's input from a pad exit the timer loop
-            break
-    return val
+            return val
 
 def light_cap(cap, duration=0.5):
     # turn the LED for the selected cap on
     leds[cap].value = True
-    # wait the requested amount of time
     time.sleep(duration)
-    # turn the LED for the selected region off
     leds[cap].value = False
     time.sleep(duration)
 
 def play_sequence(sequence):
-    duration = 1 - len(sequence) * 0.05
-    if duration < 0.1:
-        duration = 0.1
+    duration = max(0.1, 1 - len(sequence) * 0.05)
     for cap in sequence:
         light_cap(cap, duration)
 
 def read_sequence(sequence):
     pixels.fill(green)
     pixels.show()
-    #time.sleep(1)
     for cap in sequence:
         if record_caps() != cap:
             # the player made a mistake!
