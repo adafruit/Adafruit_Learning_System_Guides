@@ -35,15 +35,6 @@ for p in (board.LED4, board.LED5, board.LED6, board.LED7):
 
 cap_touches = [False, False, False, False]
 
-def intro_game():
-    pixels.fill(blue)
-    time.sleep(1)
-    for led in leds:
-        led.value = True
-        time.sleep(0.25)
-    for led in leds:
-        led.value = False
-
 def wheel(pos):
     # Input a value 0 to 255 to get a color value.
     # The colours are a transition r - g - b - back to r.
@@ -111,7 +102,14 @@ def read_sequence(seq):
     return True
 
 while True:
-    intro_game() # led light sequence at beginning of each game
+    # led light sequence at beginning of each game
+    pixels.fill(blue)
+    time.sleep(1)
+    for led in leds:
+        led.value = True
+        time.sleep(0.25)
+    for led in leds:
+        led.value = False
     sequence = []
     while True:
         pixels.fill(blue) # blue for showing user sequence
