@@ -42,7 +42,7 @@ cwd = ("/"+__file__).rsplit('/', 1)[0]
 
 CAPTION_FONT_FILE = cwd+'/fonts/Helvetica-Bold-16.bdf'
 TEXT_FONT_FILE = cwd+'/fonts/Helvetica-Bold-16.bdf'
-HOUR_FONT_FILE = cwd+'/fonts/Arial-12.bdf'
+HOUR_FONT_FILE = cwd+'/fonts/Arial-Bold-12.bdf'
 
 def halt_and_catch_fire(message, *args):
     """Log a critical error and stall the system."""
