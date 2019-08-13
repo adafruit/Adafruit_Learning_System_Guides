@@ -13,8 +13,8 @@ All text above must be included in any redistribution.
 """
 
 import time
-import board
 import json
+import board
 import displayio
 from adafruit_pyportal import PyPortal
 from adafruit_display_shapes.rect import Rect
@@ -50,7 +50,9 @@ def halt_and_catch_fire(message, *args):
     while True:
         pass
 
+#pylint:disable=line-too-long
 url = 'https://enviro.epa.gov/enviro/efservice/getEnvirofactsUVHOURLY/ZIP/{0}/JSON'.format(secrets['zip'])
+#pylint:enable=line-too-long
 
 def extract_hour(date_time):
     split_date_time = date_time.split()
@@ -81,8 +83,8 @@ hour_font = bitmap_font.load_font(HOUR_FONT_FILE)
 while True:
     raw_data = json.loads(pyportal.fetch())
     data = [{'hour': extract_hour(d['DATE_TIME']), 'value': int(d['UV_VALUE'])}
-                for d in raw_data
-                if d['UV_VALUE'] > 0]
+            for d in raw_data
+            if d['UV_VALUE'] > 0]
     the_day = raw_data[0]['DATE_TIME']
     pyportal.set_caption('UV Index for {0}'.format(extract_date(the_day)),
                          (80, 20),
