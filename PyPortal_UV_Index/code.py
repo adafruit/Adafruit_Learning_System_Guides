@@ -41,20 +41,16 @@ COLORS = [0x00FF00, 0x83C602, 0xa2CF02,
 cwd = ("/"+__file__).rsplit('/', 1)[0]
 
 CAPTION_FONT_FILE = cwd+'/fonts/Helvetica-Bold-16.bdf'
-TEXT_FONT_FILE = cwd+'/fonts/Helvetica-Bold-16.bdf'
-HOUR_FONT_FILE = cwd+'/fonts/Arial-Bold-12.bdf'
-
-def halt_and_catch_fire(message, *args):
-    """Log a critical error and stall the system."""
-    print(message % args)
-    while True:
-        pass
+BAR_FONT_FILE = cwd+'/fonts/Arial-Bold-12.bdf'
 
 #pylint:disable=line-too-long
 url = 'https://enviro.epa.gov/enviro/efservice/getEnvirofactsUVHOURLY/ZIP/{0}/JSON'.format(secrets['zip'])
 #pylint:enable=line-too-long
 
 def extract_hour(date_time):
+    """Extract the hour in a format to use for display:
+    :param date_time: the timestamp from EPA UV readings
+    """
     split_date_time = date_time.split()
     hour = split_date_time[1]
     suffix = split_date_time[2]
@@ -63,25 +59,32 @@ def extract_hour(date_time):
     return '\n'.join([hour, suffix])
 
 def extract_date(date_time):
+    """Extract the date in a format to use for display:
+    :param date_time: the timestamp from EPA UV readings
+    """
     return ' '.join(date_time.split('/')[0:2])
 
-# Initialize the pyportal object and let us know what data to fetch and where
-# to display it
 pyportal = PyPortal(url=url,
                     status_neopixel=board.NEOPIXEL,
                     default_bg=0xFFFFFF,
-                    text_font=TEXT_FONT_FILE,
-                    text_position=(20, 60),
-                    text_color=0xFFFFFF,
-                    text_wrap=35,
                     caption_font=CAPTION_FONT_FILE)
 
 canvas = displayio.Group(max_size=36)
 pyportal.splash.append(canvas)
-hour_font = bitmap_font.load_font(HOUR_FONT_FILE)
+bar_font = bitmap_font.load_font(BAR_FONT_FILE)
 
 while True:
-    raw_data = json.loads(pyportal.fetch())
+    json_payload = ''
+    try:
+        json_payload = pyportal.fetch()
+        raw_data = json.loads(json_payload)
+    except (ValueError, RuntimeError) as ex:
+        print('Error: ', ex)
+        if isinstance(ex, ValueError):
+            print('JSON:', json_payload)
+        print('Retrying in 10 minutes')
+        time.sleep(600)
+        continue
     data = [{'hour': extract_hour(d['DATE_TIME']), 'value': int(d['UV_VALUE'])}
             for d in raw_data
             if d['UV_VALUE'] > 0]
@@ -103,12 +106,12 @@ while True:
         canvas.append(Rect(x, 200 - bar_height,
                            bar_width, bar_height,
                            fill=COLORS[reading['value']]))
-        canvas.append(Label(hour_font,
+        canvas.append(Label(bar_font,
                             x=x+3, y=220,
                             text=reading['hour'],
                             color=0x000000,
                             line_spacing=0.6))
-        canvas.append(Label(hour_font,
+        canvas.append(Label(bar_font,
                             x=x+(bar_width//2)-4, y=208-bar_height,
                             text=str(reading['value']),
                             color=0x000000))
