@@ -85,9 +85,13 @@ while True:
         print('Retrying in 10 minutes')
         time.sleep(600)
         continue
-    data = [{'hour': extract_hour(d['DATE_TIME']), 'value': int(d['UV_VALUE'])}
-            for d in raw_data
-            if d['UV_VALUE'] > 0]
+    data = []
+    for d in raw_data:
+        if d['UV_VALUE'] > 0:
+            entry = {}
+            entry['hour'] = extract_hour(d['DATE_TIME'])
+            entry['value'] = int(d['UV_VALUE'])
+            data.append(entry)
     the_day = raw_data[0]['DATE_TIME']
     pyportal.set_caption('UV Index for {0}'.format(extract_date(the_day)),
                          (80, 20),
