@@ -32,4 +32,3 @@ while True:
         display.print(';')                      # Turn off colon
 
     time.sleep(0.5)
-
