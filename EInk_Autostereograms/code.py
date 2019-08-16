@@ -1,11 +1,11 @@
+import os
+import time
+import json
 import digitalio
 import busio
 import board
 import displayio
 import adafruit_imageload
-import time
-import json
-import os
 
 from analogio import AnalogIn
 from adafruit_epd.epd import Adafruit_EPD
@@ -114,7 +114,7 @@ def display_bitmap(epd, filename):
                     #   epd.pixel(col*8 + b, row, Adafruit_EPD.WHITE)
     except OSError:
         display_message("Error: couldn't read file " + filename)
-    except BMPError as e:
+    except BMPError:
         display_message("Error: unsupported BMP file " + filename)
     finally:
         f.close()
@@ -133,7 +133,7 @@ class BMPError(Exception):
 
 # alternate bitmap display method using imageload library
 def display_bitmap_alternate(epd, filename):
-    image, palette = adafruit_imageload.load(filename,
+    image, _ = adafruit_imageload.load(filename,
         bitmap=displayio.Bitmap,
         palette=displayio.Palette)
     for y in range(display.height):
@@ -185,9 +185,9 @@ def show_files():
 def run_job(jobfile):
     try:
         print("running job " + jobfile)
-        fp = open(config["jobfolder"] + "/" + jobfile, mode='r')
-        job = json.load(fp)
-        fp.close()
+        fpr = open(config["jobfolder"] + "/" + jobfile, mode='r')
+        job = json.load(fpr)
+        fpr.close()
         print("image: ", job["image"])
 
         starttime = time.monotonic()
@@ -219,7 +219,7 @@ def run_job(jobfile):
         except (OSError, Exception) as e:
             # readonly filesystem, do not create file
             createfile = False
-        if createfile == True:
+        if createfile:   # == True
             # BMP files are all the same dimensions, just different bitmaps, writing hardcoded headers here
             # write file header (14 bytes)
             out.write(bytearray([0x42,0x4d,0xfe,0x18,0,0,0,0,0,0,0x3e,0,0,0]))
