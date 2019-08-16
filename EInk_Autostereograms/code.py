@@ -1,7 +1,6 @@
 import digitalio
 import busio
 import board
-#import array
 import displayio
 import adafruit_imageload
 import time
@@ -63,7 +62,7 @@ def display_bitmap(epd, filename):
         bmpHeight = read_le(f.read(4))
         # convert unsigned int to signed int in case there is a negative height
         if bmpHeight > 0x7fffffff:
-    		bmpHeight = bmpHeight - 4294967296
+            bmpHeight = bmpHeight - 4294967296
         flip = True
         if bmpHeight < 0:
             bmpHeight = abs(bmpHeight)
