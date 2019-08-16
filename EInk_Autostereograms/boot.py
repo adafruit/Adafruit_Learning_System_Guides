@@ -1,5 +1,4 @@
 import board
-import digitalio
 import storage
 from analogio import AnalogIn
 
@@ -20,7 +19,7 @@ readonly = True
 # if a button is pressed while booting up, CircuitPython can write to the drive
 button = read_buttons()
 if button != None:
-	readonly = False
+    readonly = False
 if readonly:
     print("OS has write access to CircuitPython drive")
 else:
