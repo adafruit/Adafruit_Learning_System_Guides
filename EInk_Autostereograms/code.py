@@ -34,14 +34,19 @@ def read_buttons():
     with AnalogIn(board.A3) as ain:
         reading = ain.value / 65535
         if reading > 0.75:
-            return None
+            
+ None
         if reading > 0.4:
-            return 4
+            
+ 4
         if reading > 0.25:
-            return 3
+            
+ 3
         if reading > 0.13:
-            return 2
-        return 1
+            
+ 2
+        
+ 1
 
 
 # display bitmap file
@@ -50,7 +55,8 @@ def display_bitmap(epd, filename):
         f = open("/" + filename, "rb")
     except OSError:
         display_message("Error: Couldn't open file " + filename)
-        return
+        
+
     print("File opened")
     try:
         if f.read(2) != b"BM":  # check signature
@@ -127,7 +133,8 @@ def read_le(s):
     for byte in bytearray(s):
         result += byte << shift
         shift += 8
-    return result
+    
+ result
 
 
 class BMPError(Exception):
@@ -182,7 +189,6 @@ def show_files():
     except (ValueError, Exception) as e:
         display_message("Error: " + file + " " + e.args[0])
     led.value = False
-    return
 
 # run specified job
 def run_job(jobfile):
@@ -202,7 +208,7 @@ def run_job(jobfile):
         display.fill(Adafruit_EPD.WHITE)
         print("ePaper display size:", display.width, display.height)
         print(config["imagefolder"] + "/" + job["image"])
-        image, palette = adafruit_imageload.load(
+        image, _ = adafruit_imageload.load(
             config["imagefolder"] + "/" + job["image"],
             bitmap=displayio.Bitmap,
             palette=displayio.Palette,
@@ -327,13 +333,12 @@ def run_job(jobfile):
     except (ValueError, Exception) as e:
         display_message("Error: " + e.args[0])
     led.value = False
-    return
-
+    
 # main routine
 display.fill(Adafruit_EPD.WHITE)
-with open("/config.json") as fp:
-    config = json.load(fp)
-    fp.close()
+with open("/config.json") as fpx:
+    config = json.load(fpx)
+    fpx.close()
 print("waiting for button press")
 while True:
     button = read_buttons()
