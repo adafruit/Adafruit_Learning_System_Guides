@@ -264,12 +264,6 @@ void loadConfig(char *filename) {
                   scleratv     = doc["scleraTexture"];
 
       // Convert clockwise int (0-1023) or float (0.0-1.0) values to CCW int used internally:
-      v = doc["irisAngle"];
-      if(v.is<int>())        irisAngle   = 1023 - (v.as<int>() & 1023);
-      else if(v.is<float>()) irisAngle   = 1023 - ((int)(v.as<float>() * 1024.0) & 1023);
-      v = doc["scleraAngle"];
-      if(v.is<int>())        scleraAngle = 1023 - (v.as<int>() & 1023);
-      else if(v.is<float>()) scleraAngle = 1023 - ((int)(v.as<float>() * 1024.0) & 1023);
       v = doc["irisSpin"];
       if(v.is<float>()) irisSpin   = v.as<float>() * -1024.0;
       v = doc["scleraSpin"];
@@ -283,7 +277,18 @@ void loadConfig(char *filename) {
         eye[e].backColor     = backColor;
         eye[e].iris.color    = irisColor;
         eye[e].sclera.color  = scleraColor;
+        // The globally-set irisAngle and scleraAngle are read each
+        // time through because each eye has a distinct default if
+        // not set globally. Override only if set globally at first...
+        v = doc["irisAngle"];
+        if(v.is<int>())        irisAngle   = 1023 - (v.as<int>() & 1023);
+        else if(v.is<float>()) irisAngle   = 1023 - ((int)(v.as<float>() * 1024.0) & 1023);
+        else                   irisAngle   = eye[e].iris.angle;
         eye[e].iris.angle    = eye[e].iris.startAngle   = irisAngle;
+        v = doc["scleraAngle"];
+        if(v.is<int>())        scleraAngle = 1023 - (v.as<int>() & 1023);
+        else if(v.is<float>()) scleraAngle = 1023 - ((int)(v.as<float>() * 1024.0) & 1023);
+        else                   scleraAngle = eye[e].sclera.angle;
         eye[e].sclera.angle  = eye[e].sclera.startAngle = scleraAngle;
         eye[e].iris.mirror   = irisMirror;
         eye[e].sclera.mirror = scleraMirror;
