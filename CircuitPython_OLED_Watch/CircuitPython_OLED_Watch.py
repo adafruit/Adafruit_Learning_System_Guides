@@ -5,6 +5,10 @@ import terminalio
 import adafruit_ds3231
 from adafruit_display_text import label
 
+
+font = terminalio.FONT
+
+
 displayio.release_displays()
 
 i2c = board.I2C()
@@ -28,8 +32,6 @@ rtc = adafruit_ds3231.DS3231(i2c)
 # Comment out the above four lines again after setting the time!
 
 
-font = terminalio.FONT
-
 while True:
     current = rtc.datetime
 
@@ -50,15 +52,15 @@ while True:
     text = label.Label(font, text=text_display)
 
     (_, _, width, _) = clock.bounding_box
-    clock.x = 128 // 2 - width // 2
+    clock.x = oled.width // 2 - width // 2
     clock.y = 5
 
     (_, _, width, _) = date.bounding_box
-    date.x = 128 // 2 - width // 2
+    date.x = oled.width // 2 - width // 2
     date.y = 15
 
     (_, _, width, _) = text.bounding_box
-    text.x = 128 // 2 - width // 2
+    text.x = oled.width // 2 - width // 2
     text.y = 25
 
     watch_group = displayio.Group()
