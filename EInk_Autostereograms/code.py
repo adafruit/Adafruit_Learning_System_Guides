@@ -34,20 +34,14 @@ def read_buttons():
     with AnalogIn(board.A3) as ain:
         reading = ain.value / 65535
         if reading > 0.75:
-            
- None
+            None
         if reading > 0.4:
-            
- 4
+            4
         if reading > 0.25:
-            
- 3
+            3
         if reading > 0.13:
-            
- 2
-        
- 1
-
+            2
+        1
 
 # display bitmap file
 def display_bitmap(epd, filename):
@@ -55,7 +49,6 @@ def display_bitmap(epd, filename):
         f = open("/" + filename, "rb")
     except OSError:
         display_message("Error: Couldn't open file " + filename)
-        
 
     print("File opened")
     try:
