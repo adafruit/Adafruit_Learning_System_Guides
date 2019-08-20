@@ -43,8 +43,8 @@ while True:
     if current.tm_hour / 12 >= 1:
         am_pm = "PM"
 
-    time_display = "%d:%02d:%02d %s" % (hour, current.tm_min, current.tm_sec, am_pm)
-    date_display = "%d/%d/%d" % (current.tm_mon, current.tm_mday, current.tm_year)
+    time_display = "{:d}:{:02d}:{:02d} {}".format(hour, current.tm_min, current.tm_sec, am_pm)
+    date_display = "{:d}/{:d}/{:d}".format(current.tm_mon, current.tm_mday, current.tm_year)
     text_display = "CircuitPython Time"
 
     clock = label.Label(font, text=time_display)
