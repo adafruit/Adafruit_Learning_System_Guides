@@ -126,8 +126,7 @@ def read_le(s):
     for byte in bytearray(s):
         result += byte << shift
         shift += 8
-    
- result
+    result
 
 
 class BMPError(Exception):
