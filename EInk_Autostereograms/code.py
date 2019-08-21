@@ -110,7 +110,7 @@ def display_bitmap(epd, filename):
                 for b in range(8):
                     if (rowdata[col] & (0x80 >> b) != 0 and blkpixel == 0) or (
                         rowdata[col] & (0x80 >> b) == 0 and blkpixel == 1):
-                            epd.pixel(col * 8 + b, row, Adafruit_EPD.BLACK)
+                        epd.pixel(col * 8 + b, row, Adafruit_EPD.BLACK)
     except (ValueError) as e:
         display_message("Error: " + e.args[0])
     except BMPError:
@@ -278,23 +278,23 @@ def run_job(jobfile):
                         for x2 in range(panelwidth):
                             tpanel[x2] = tcanvas[x + x2 - panelwidth]
                     offset = 0
-                    if x >= 22 and (
+                    if (x >= 22 and 
                         x < (image.width + panelwidth // 2)
-                            and y < image.height
-                                and (
-                                    (image[x - panelwidth // 2, y] != 0 and not inv
-                                    ) or (
-                                        image[x - panelwidth // 2, y] == 0 and inv)
-                                )):
+                        and y < image.height):
+                            if (
+                                (image[x - panelwidth // 2, y] != 0 and not inv
+                                ) or (
+                                image[x - panelwidth // 2, y] == 0 and inv)
+                                ):
                                     # offset = 4
-                                    if job["imagegrayscale"] == 0:
-                                        offset = job["imageheight"]
-                                    else:
-                                        offset = (
-                                            image[x - panelwidth // 2, y]
-                                            * job["grayscalecolors"]
-                                            // 255
-                                        )
+                                if job["imagegrayscale"] == 0:
+                                    offset = job["imageheight"]
+                                else:
+                                    offset = (
+                                        image[x - panelwidth // 2, y]
+                                        * job["grayscalecolors"]
+                                        // 255
+                                    )
                     if offset != 0:
                         for x2 in range(x, display.width, panelwidth):
                             tcanvas[x2] = tcanvas[x2 + offset]
