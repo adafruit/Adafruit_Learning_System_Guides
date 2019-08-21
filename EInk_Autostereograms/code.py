@@ -78,9 +78,7 @@ def display_bitmap(epd, filename):
         print("Width: %d\nHeight: %d" % (bmpWidth, bmpHeight))
         if read_le(f.read(2)) != 1:
             raise BMPError("Not singleplane")
-        bmpDepth = read_le(f.read(2))  # bits per pixel
-        print("Bit depth: %d" % (bmpDepth))
-        if bmpDepth != 1:
+        if read_le(f.read(2)) != 1: # bits per pixel
             raise BMPError("Not 1-bit")
         if read_le(f.read(4)) != 0:
             raise BMPError("Compressed file not supported")
@@ -285,7 +283,7 @@ def run_job(jobfile):
                         if (
                                 (image[x - panelwidth // 2, y] != 0 and not inv
                                 ) or (
-                                image[x - panelwidth // 2, y] == 0 and inv)
+                                    image[x - panelwidth // 2, y] == 0 and inv)
                             ):
                             # offset = 4
                             if job["imagegrayscale"] == 0:
