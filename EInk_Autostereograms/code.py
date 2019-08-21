@@ -31,18 +31,19 @@ display = Adafruit_IL91874(
 
 # read buttons from ePaper shield
 def read_buttons():
+    button = 1
     with AnalogIn(board.A3) as ain:
         reading = ain.value / 65535
         if reading > 0.75:
-            return None
+            button = None
         if reading > 0.4:
-            return 4
+            button = 4
         if reading > 0.25:
-            return 3
+            button = 3
         if reading > 0.13:
-            return 2
-        return 1
-    return None
+            button = 2
+        button = 1
+    return button
 
 # display bitmap file
 def display_bitmap(epd, filename):
@@ -101,15 +102,15 @@ def display_bitmap(epd, filename):
             else:
                 led.value = True
             if flip:  # Bitmap is stored bottom-to-top order (normal BMP)
-                pos = bmpImageoffset + (bmpHeight - 1 - row) * rowSize
+                f.seek(bmpImageoffset + (bmpHeight - 1 - row) * rowSize)
             else:  # Bitmap is stored top-to-bottom
-                pos = bmpImageoffset + row * rowSize
-            f.seek(pos)
+                f.seek(bmpImageoffset + row * rowSize)
+
             rowdata = f.read(bmpWidth)
             for col in range(bmpWidth):
                 for b in range(8):
                     if (rowdata[col] & (0x80 >> b) != 0 and blkpixel == 0) or (
-                        rowdata[col] & (0x80 >> b) == 0 and blkpixel == 1):
+                            rowdata[col] & (0x80 >> b) == 0 and blkpixel == 1):
                         epd.pixel(col * 8 + b, row, Adafruit_EPD.BLACK)
     except (ValueError) as e:
         display_message("Error: " + e.args[0])
@@ -278,13 +279,13 @@ def run_job(jobfile):
                         for x2 in range(panelwidth):
                             tpanel[x2] = tcanvas[x + x2 - panelwidth]
                     offset = 0
-                    if (x >= 22 and 
+                    if (x >= 22 and
                         x < (image.width + panelwidth // 2)
                         and y < image.height):
                         if (
-                            (image[x - panelwidth // 2, y] != 0 and not inv
+                                (image[x - panelwidth // 2, y] != 0 and not inv
                             ) or (
-                            image[x - panelwidth // 2, y] == 0 and inv)
+                                image[x - panelwidth // 2, y] == 0 and inv)
                             ):
                             # offset = 4
                             if job["imagegrayscale"] == 0:
