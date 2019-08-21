@@ -281,20 +281,20 @@ def run_job(jobfile):
                     if (x >= 22 and 
                         x < (image.width + panelwidth // 2)
                         and y < image.height):
-                            if (
-                                (image[x - panelwidth // 2, y] != 0 and not inv
-                                ) or (
-                                image[x - panelwidth // 2, y] == 0 and inv)
-                                ):
-                                    # offset = 4
-                                if job["imagegrayscale"] == 0:
-                                    offset = job["imageheight"]
-                                else:
-                                    offset = (
-                                        image[x - panelwidth // 2, y]
-                                        * job["grayscalecolors"]
-                                        // 255
-                                    )
+                        if (
+                            (image[x - panelwidth // 2, y] != 0 and not inv
+                            ) or (
+                            image[x - panelwidth // 2, y] == 0 and inv)
+                            ):
+                            # offset = 4
+                            if job["imagegrayscale"] == 0:
+                                offset = job["imageheight"]
+                            else:
+                                offset = (
+                                    image[x - panelwidth // 2, y]
+                                    * job["grayscalecolors"]
+                                    // 255
+                                )
                     if offset != 0:
                         for x2 in range(x, display.width, panelwidth):
                             tcanvas[x2] = tcanvas[x2 + offset]
