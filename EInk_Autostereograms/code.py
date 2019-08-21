@@ -110,9 +110,9 @@ def display_bitmap(epd, filename):
                 for b in range(8):
                     if (rowdata[col] & (0x80 >> b) != 0 and blkpixel == 0) or (
                         rowdata[col] & (0x80 >> b) == 0 and blkpixel == 1):
-                        epd.pixel(col * 8 + b, row, Adafruit_EPD.BLACK)
-    except OSError:
-        display_message("Error: couldn't read file " + filename)
+                            epd.pixel(col * 8 + b, row, Adafruit_EPD.BLACK)
+    except (ValueError) as e:
+        display_message("Error: " + e.args[0])
     except BMPError:
         display_message("Error: unsupported BMP file " + filename)
     finally:
@@ -181,8 +181,8 @@ def show_files():
                 display.display()
                 print("done")
                 time.sleep(5)
-    except (ValueError, Exception) as e:
-        display_message("Error: " + file + " " + e.args[0])
+    except OSError:
+        display_message("Error: Couldn't display file " + file)
     led.value = False
     return
 
@@ -219,7 +219,7 @@ def run_job(jobfile):
         try:
             out = open(config["asgfolder"] + "/asg" + job["image"], mode="wb")
             print("writing to file asg" + job["image"])
-        except (OSError, Exception):
+        except (OSError):
             # readonly filesystem, do not create file
             createfile = False
         if createfile:  # == True
@@ -286,35 +286,35 @@ def run_job(jobfile):
                             ) or (
                                 image[x - panelwidth // 2, y] == 0 and inv)
                         )):
-                            # offset = 4
-                            if job["imagegrayscale"] == 0:
-                                offset = job["imageheight"]
-                            else:
-                                offset = (
-                                    image[x - panelwidth // 2, y]
-                                    * job["grayscalecolors"]
-                                    // 255
-                                )
+                        # offset = 4
+                        if job["imagegrayscale"] == 0:
+                            offset = job["imageheight"]
+                        else:
+                            offset = (
+                                image[x - panelwidth // 2, y]
+                                * job["grayscalecolors"]
+                                // 255
+                            )
                     if offset != 0:
                         for x2 in range(x, display.width, panelwidth):
                             tcanvas[x2] = tcanvas[x2 + offset]
-                    for x in range(0, display.width):
+                    for x3 in range(0, display.width):
                         # write line to eink display
-                        if tcanvas[x] != 0:
-                            display.pixel(x, y, Adafruit_EPD.BLACK)
+                        if tcanvas[x3] != 0:
+                            display.pixel(x3, y, Adafruit_EPD.BLACK)
                         # else:
                         #    display.pixel(x,y,Adafruit_EPD.WHITE)
                     if createfile:
                         count = 0
-                        for x in range(0, display.width + 7, 8):
+                        for x4 in range(0, display.width + 7, 8):
                             value = 0
                             for b in range(8):
-                                value |= (tcanvas[x + b] << 7) >> b
+                                value |= (tcanvas[x4 + b] << 7) >> b
                             out.write(bytes([value]))
                             count += 1
                         # add padding to end of line
                         padding = (4 - (count % 4)) % 4
-                        for x in range(padding):
+                        for x4 in range(padding):
                             out.write(bytes([0]))
         if createfile:
             out.close()
@@ -325,7 +325,7 @@ def run_job(jobfile):
         print("updating display")
         display.display()
         print("done")
-    except (ValueError, Exception) as e:
+    except (ValueError) as e:
         display_message("Error: " + e.args[0])
     led.value = False
     return
