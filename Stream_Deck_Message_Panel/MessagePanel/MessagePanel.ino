@@ -30,7 +30,7 @@ RGBmatrixPanel matrix(A, B, C, D, CLK, LAT, OE, false, 64);
 
 #include "config.h"
 
-// set up the 'counter' feed
+// set up the 'messagepanel' feed
 AdafruitIO_Feed *counter = io.feed("messagepanel");
 
 void drawText(const char *text, bool resetPosition = true, uint16_t color = 0xffff, uint16_t textSize = 1) {
