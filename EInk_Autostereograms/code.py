@@ -49,11 +49,7 @@ def read_buttons():
 def display_bitmap(epd, filename):
     try:
         f = open("/" + filename, "rb")
-    except OSError:
-        display_message("Error: Couldn't open file " + filename)
-
-    print("File opened")
-    try:
+        print("File opened")
         if f.read(2) != b"BM":  # check signature
             raise BMPError("Not BitMap file")
         read_le(f.read(4)) # File size
@@ -114,6 +110,8 @@ def display_bitmap(epd, filename):
         display_message("Error: " + e.args[0])
     except BMPError:
         display_message("Error: unsupported BMP file " + filename)
+    except OSError:
+        display_message("Error: Couldn't open file " + filename)
     finally:
         f.close()
     print("Finished drawing")
