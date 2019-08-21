@@ -45,6 +45,9 @@ def read_buttons():
         btn = 1
     return btn
 
+#pylint: disable-msg=too-many-nested-blocks
+#pylint: disable-msg=too-many-branches
+#pylint: disable-msg=too-many-statements
 # display bitmap file
 def display_bitmap(epd, filename):
     try:
@@ -183,6 +186,9 @@ def show_files():
     led.value = False
     return
 
+#pylint: disable-msg=too-many-branches
+#pylint: disable-msg=too-many-statements
+#pylint: disable-msg=too-many-locals
 # run specified job
 def run_job(jobfile):
     try:
