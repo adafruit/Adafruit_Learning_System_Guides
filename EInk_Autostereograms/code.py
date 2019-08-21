@@ -56,7 +56,7 @@ def display_bitmap(epd, filename):
     try:
         if f.read(2) != b"BM":  # check signature
             raise BMPError("Not BitMap file")
-        bmpFileSize = read_le(f.read(4))
+        read_le(f.read(4)) # File size
         f.read(4)  # Read & ignore creator bytes
         bmpImageoffset = read_le(f.read(4))  # Start of image data
         headerSize = read_le(f.read(4))
@@ -72,8 +72,8 @@ def display_bitmap(epd, filename):
             bmpHeight = abs(bmpHeight)
             flip = False
         print(
-            "Size: %d\nImage offset: %d\nHeader size: %d"
-            % (bmpFileSize, bmpImageoffset, headerSize)
+            "Image offset: %d\nHeader size: %d"
+            % (bmpImageoffset, headerSize)
         )
         print("Width: %d\nHeight: %d" % (bmpWidth, bmpHeight))
         if read_le(f.read(2)) != 1:
