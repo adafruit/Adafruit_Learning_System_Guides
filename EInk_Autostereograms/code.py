@@ -219,7 +219,7 @@ def run_job(jobfile):
         try:
             out = open(config["asgfolder"] + "/asg" + job["image"], mode="wb")
             print("writing to file asg" + job["image"])
-        except (OSError):
+        except OSError:
             # readonly filesystem, do not create file
             createfile = False
         if createfile:  # == True
@@ -280,21 +280,21 @@ def run_job(jobfile):
                     offset = 0
                     if x >= 22 and (
                         x < (image.width + panelwidth // 2)
-                        and y < image.height
-                        and (
-                            (image[x - panelwidth // 2, y] != 0 and not inv
-                            ) or (
-                                image[x - panelwidth // 2, y] == 0 and inv)
-                        )):
-                        # offset = 4
-                        if job["imagegrayscale"] == 0:
-                            offset = job["imageheight"]
-                        else:
-                            offset = (
-                                image[x - panelwidth // 2, y]
-                                * job["grayscalecolors"]
-                                // 255
-                            )
+                            and y < image.height
+                                and (
+                                    (image[x - panelwidth // 2, y] != 0 and not inv
+                                    ) or (
+                                        image[x - panelwidth // 2, y] == 0 and inv)
+                                )):
+                                    # offset = 4
+                                    if job["imagegrayscale"] == 0:
+                                        offset = job["imageheight"]
+                                    else:
+                                        offset = (
+                                            image[x - panelwidth // 2, y]
+                                            * job["grayscalecolors"]
+                                            // 255
+                                        )
                     if offset != 0:
                         for x2 in range(x, display.width, panelwidth):
                             tcanvas[x2] = tcanvas[x2 + offset]
@@ -346,8 +346,8 @@ while True:
         continue
     print("Button #%d pressed" % button)
     if button == 1:
-        for job in config["jobs"]:
-            run_job(job)
+        for jobname in config["jobs"]:
+            run_job(jobname)
     if button == 2:
         show_files()
     time.sleep(0.01)
