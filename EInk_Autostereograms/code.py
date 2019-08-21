@@ -42,6 +42,7 @@ def read_buttons():
         if reading > 0.13:
             return 2
         return 1
+    return None
 
 # display bitmap file
 def display_bitmap(epd, filename):
@@ -108,9 +109,8 @@ def display_bitmap(epd, filename):
             for col in range(bmpWidth):
                 for b in range(8):
                     if (rowdata[col] & (0x80 >> b) != 0 and blkpixel == 0) or (
-                            rowdata[col] & (0x80 >> b) == 0 and blkpixel == 1
-                            ):
-                                epd.pixel(col * 8 + b, row, Adafruit_EPD.BLACK)
+                        rowdata[col] & (0x80 >> b) == 0 and blkpixel == 1):
+                            epd.pixel(col * 8 + b, row, Adafruit_EPD.BLACK)
     except OSError:
         display_message("Error: couldn't read file " + filename)
     except BMPError:
@@ -248,75 +248,74 @@ def run_job(jobfile):
             out.write(bytearray([0xFF, 0xFF, 0xFF, 0, 0, 0, 0, 0]))
         with open(
             config["bkfolder"] + "/background-" + str(whitepct)
-                + "-" + str(pixelsize) + ".dat", "rb") as fp:
-            bkdata = fp.read()
-            canvas = list(bkdata)
-            for y in range(0, display.height):
-                # blink the LED
-                if y % 2 == 0:
-                    led.value = True
-                else:
-                    led.value = False
-                tcanvas = [0 for i in range(display.width + panelwidth)]
-                tpanel = [0 for i in range(panelwidth)]
-                for x in range(panelwidth):
-                    bytepos = ((x % panelwidth) // 8) + (
-                        y // pixelsize * (panelwidth + 7) // 8
-                    )
-                    bitpos = x % 8
-                    pixel = canvas[bytepos] & 1 << (bitpos)
-                    if pixel != 0:
-                        tpanel[x] = 1
-                for x in range(display.width + panelwidth):
-                    pixel = tpanel[x % panelwidth]
-                    if pixel != 0:
-                        tcanvas[x] = 1
-                for x in range(0, display.width):
-                    if (x % panelwidth) == 0 and x > 0:
-                        for x2 in range(x, x + panelwidth):
-                            tcanvas[x2] = tcanvas[x2 - panelwidth]
-                        for x2 in range(panelwidth):
-                            tpanel[x2] = tcanvas[x + x2 - panelwidth]
-                    offset = 0
-                    print("debug")
-                    if x >= 22 and (
-                        x < (image.width + panelwidth // 2)
-                        and y < image.height
-                        and (
-                            (image[x - panelwidth // 2, y] != 0 and not inv)
-                            or (image[x - panelwidth // 2, y] == 0 and inv)
+            + "-" + str(pixelsize) + ".dat", "rb") as fp:
+                bkdata = fp.read()
+                canvas = list(bkdata)
+                for y in range(0, display.height):
+                    # blink the LED
+                    if y % 2 == 0:
+                        led.value = True
+                    else:
+                        led.value = False
+                    tcanvas = [0 for i in range(display.width + panelwidth)]
+                    tpanel = [0 for i in range(panelwidth)]
+                    for x in range(panelwidth):
+                        bytepos = ((x % panelwidth) // 8) + (
+                            y // pixelsize * (panelwidth + 7) // 8
                         )
-                    ):
-                        # offset = 4
-                        if job["imagegrayscale"] == 0:
-                            offset = job["imageheight"]
-                        else:
-                            offset = (
-                                image[x - panelwidth // 2, y]
-                                * job["grayscalecolors"]
-                                // 255
-                            )
-                    if offset != 0:
-                        for x2 in range(x, display.width, panelwidth):
-                            tcanvas[x2] = tcanvas[x2 + offset]
-                for x in range(0, display.width):
-                    # write line to eink display
-                    if tcanvas[x] != 0:
-                        display.pixel(x, y, Adafruit_EPD.BLACK)
-                    # else:
-                    #    display.pixel(x,y,Adafruit_EPD.WHITE)
-                if createfile:
-                    count = 0
-                    for x in range(0, display.width + 7, 8):
-                        value = 0
-                        for b in range(8):
-                            value |= (tcanvas[x + b] << 7) >> b
-                        out.write(bytes([value]))
-                        count += 1
-                    # add padding to end of line
-                    padding = (4 - (count % 4)) % 4
-                    for x in range(padding):
-                        out.write(bytes([0]))
+                        bitpos = x % 8
+                        pixel = canvas[bytepos] & 1 << (bitpos)
+                        if pixel != 0:
+                            tpanel[x] = 1
+                    for x in range(display.width + panelwidth):
+                        pixel = tpanel[x % panelwidth]
+                        if pixel != 0:
+                            tcanvas[x] = 1
+                    for x in range(0, display.width):
+                        if (x % panelwidth) == 0 and x > 0:
+                            for x2 in range(x, x + panelwidth):
+                                tcanvas[x2] = tcanvas[x2 - panelwidth]
+                            for x2 in range(panelwidth):
+                                tpanel[x2] = tcanvas[x + x2 - panelwidth]
+                        offset = 0
+                        if x >= 22 and (
+                            x < (image.width + panelwidth // 2)
+                            and y < image.height
+                            and (
+                                (image[x - panelwidth // 2, y] != 0 and not inv
+                                ) or (
+                                    image[x - panelwidth // 2, y] == 0 and inv)
+                            )):
+                                # offset = 4
+                                if job["imagegrayscale"] == 0:
+                                    offset = job["imageheight"]
+                                else:
+                                    offset = (
+                                        image[x - panelwidth // 2, y]
+                                        * job["grayscalecolors"]
+                                        // 255
+                                    )
+                        if offset != 0:
+                            for x2 in range(x, display.width, panelwidth):
+                                tcanvas[x2] = tcanvas[x2 + offset]
+                    for x in range(0, display.width):
+                        # write line to eink display
+                        if tcanvas[x] != 0:
+                            display.pixel(x, y, Adafruit_EPD.BLACK)
+                        # else:
+                        #    display.pixel(x,y,Adafruit_EPD.WHITE)
+                    if createfile:
+                        count = 0
+                        for x in range(0, display.width + 7, 8):
+                            value = 0
+                            for b in range(8):
+                                value |= (tcanvas[x + b] << 7) >> b
+                            out.write(bytes([value]))
+                            count += 1
+                        # add padding to end of line
+                        padding = (4 - (count % 4)) % 4
+                        for x in range(padding):
+                            out.write(bytes([0]))
         if createfile:
             out.close()
         endtime = time.monotonic()
@@ -347,8 +346,8 @@ while True:
         continue
     print("Button #%d pressed" % button)
     if button == 1:
-        for jobfile in config["jobs"]:
-            run_job(jobfile)
+        for job in config["jobs"]:
+            run_job(job)
     if button == 2:
         show_files()
     time.sleep(0.01)
