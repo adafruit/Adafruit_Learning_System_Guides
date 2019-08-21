@@ -31,19 +31,19 @@ display = Adafruit_IL91874(
 
 # read buttons from ePaper shield
 def read_buttons():
-    button = 1
+    btn = 1
     with AnalogIn(board.A3) as ain:
         reading = ain.value / 65535
         if reading > 0.75:
-            button = None
+            btn = None
         if reading > 0.4:
-            button = 4
+            btn = 4
         if reading > 0.25:
-            button = 3
+            btn = 3
         if reading > 0.13:
-            button = 2
-        button = 1
-    return button
+            btn = 2
+        btn = 1
+    return btn
 
 # display bitmap file
 def display_bitmap(epd, filename):
@@ -280,11 +280,11 @@ def run_job(jobfile):
                             tpanel[x2] = tcanvas[x + x2 - panelwidth]
                     offset = 0
                     if (x >= 22 and
-                        x < (image.width + panelwidth // 2)
-                        and y < image.height):
+                            x < (image.width + panelwidth // 2)
+                            and y < image.height):
                         if (
                                 (image[x - panelwidth // 2, y] != 0 and not inv
-                            ) or (
+                                ) or (
                                 image[x - panelwidth // 2, y] == 0 and inv)
                             ):
                             # offset = 4
