@@ -131,6 +131,7 @@ typedef struct {
   uint16_t  startAngle; // INITIAL rotation 0-1023 CCW
   uint16_t  angle;      // CURRENT rotation 0-1023 CCW
   uint16_t  mirror;     // 0 = normal, 1023 = flip X axis
+  uint16_t  iSpin;      // Per-frame fixed integer spin, overrides 'spin' value
 } texture;
 
 // Each eye then uses the following structure. Each eye must be on its own
