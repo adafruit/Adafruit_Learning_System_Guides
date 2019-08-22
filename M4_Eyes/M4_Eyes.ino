@@ -59,6 +59,7 @@ int      iPupilFactor            = 42;
 uint32_t boopSum                 = 0;
 bool     booped                  = false;
 int      fixate                  = 7;
+uint8_t  lightSensorFailCount    = 0;
 
 // For autonomous iris scaling
 #define  IRIS_LEVELS 7
@@ -191,19 +192,21 @@ void setup() {
     eye[e].iris.startAngle   = (e & 1) ? 512 : 0; // Rotate alternate eyes 180 degrees
     eye[e].iris.angle        = eye[e].iris.startAngle;
     eye[e].iris.mirror       = 0;
-    eye[e].iris.spin         = 0;
+    eye[e].iris.spin         = 0.0;
+    eye[e].iris.iSpin        = 0;
     eye[e].sclera.color      = 0xFFFF;
     eye[e].sclera.data       = NULL;
     eye[e].sclera.filename   = NULL;
     eye[e].sclera.startAngle = (e & 1) ? 512 : 0; // Rotate alternate eyes 180 degrees
     eye[e].sclera.angle      = eye[e].sclera.startAngle;
     eye[e].sclera.mirror     = 0;
-    eye[e].sclera.spin       = 0;
+    eye[e].sclera.spin       = 0.0;
+    eye[e].sclera.iSpin      = 0;
 
     // Uncanny eyes carryover stuff for now, all messy:
     eye[e].blink.state = NOBLINK;
-    eye[e].eyeX        = 512;
-    eye[e].eyeY        = 512;
+//    eye[e].eyeX        = 512;
+//    eye[e].eyeY        = 512;
     eye[e].blinkFactor = 0.0;
   }
 
@@ -328,6 +331,12 @@ void setup() {
   Serial.printf("Free RAM: %d\n", availableRAM());
 
   randomSeed(SysTick->VAL + analogRead(A2));
+  eyeOldX = eyeNewX = eyeOldY = eyeNewY = mapRadius; // Start in center
+  for(e=0; e<NUM_EYES; e++) { // For each eye...
+    eye[e].eyeX = eyeOldX;
+    eye[e].eyeY = eyeOldY;
+  }
+  lastLightReadTime = micros() + 2000000; // Delay initial light reading
 }
 
 // LOOP FUNCTION - CALLED REPEATEDLY UNTIL POWER-OFF -----------------------
@@ -429,12 +438,21 @@ void loop() {
           // both eyes. This comment has nothing to do with the code.
           uint16_t rawReading = (lightSensorPin >= 100) ?
             seesaw.analogRead(lightSensorPin - 100) : analogRead(lightSensorPin);
-          if(rawReading < lightSensorMin)      rawReading = lightSensorMin; // Clamp light sensor range
-          else if(rawReading > lightSensorMax) rawReading = lightSensorMax; // to within usable range
-          float v = (float)(rawReading - lightSensorMin) / (float)(lightSensorMax - lightSensorMin); // 0.0 to 1.0
-          v = pow(v, lightSensorCurve);
-          lastLightValue    = irisMin + v * irisRange;
-          lastLightReadTime = t;
+          if(rawReading <= 1023) {
+            if(rawReading < lightSensorMin)      rawReading = lightSensorMin; // Clamp light sensor range
+            else if(rawReading > lightSensorMax) rawReading = lightSensorMax; // to within usable range
+            float v = (float)(rawReading - lightSensorMin) / (float)(lightSensorMax - lightSensorMin); // 0.0 to 1.0
+            v = pow(v, lightSensorCurve);
+            lastLightValue    = irisMin + v * irisRange;
+            lastLightReadTime = t;
+            lightSensorFailCount = 0;
+          } else { // I2C error
+            if(++lightSensorFailCount >= 50) { // If repeated errors in succession...
+              lightSensorPin = -1; // Stop trying to use the light sensor
+            } else {
+              lastLightReadTime = t - LIGHT_INTERVAL + 40000; // Try again in 40 ms
+            }
+          }
         }
         irisValue = (irisValue * 0.97) + (lastLightValue * 0.03); // Filter response for smooth reaction
       } else {
@@ -556,8 +574,18 @@ void loop() {
       }
 
       float mins = (float)millis() / 60000.0;
-      eye[eyeNum].iris.angle   = (int)((float)eye[eyeNum].iris.startAngle   + eye[eyeNum].iris.spin   * mins + 0.5);
-      eye[eyeNum].sclera.angle = (int)((float)eye[eyeNum].sclera.startAngle + eye[eyeNum].sclera.spin * mins + 0.5);
+      if(eye[eyeNum].iris.iSpin) {
+        // Spin works in fixed amount per frame (eyes may lose sync, but "wagon wheel" tricks work)
+        eye[eyeNum].iris.angle   += eye[eyeNum].iris.iSpin;
+      } else {
+        // Keep consistent timing in spin animation (eyes stay in sync, no "wagon wheel" effects)
+        eye[eyeNum].iris.angle    = (int)((float)eye[eyeNum].iris.startAngle   + eye[eyeNum].iris.spin   * mins + 0.5);
+      }
+      if(eye[eyeNum].sclera.iSpin) {
+        eye[eyeNum].sclera.angle += eye[eyeNum].sclera.iSpin;
+      } else {
+        eye[eyeNum].sclera.angle  = (int)((float)eye[eyeNum].sclera.startAngle + eye[eyeNum].sclera.spin * mins + 0.5);
+      }
 
       // END ONCE-PER-FRAME EYE ANIMATION ----------------------------------
 
