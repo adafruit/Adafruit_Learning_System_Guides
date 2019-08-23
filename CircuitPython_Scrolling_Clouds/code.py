@@ -3,7 +3,6 @@ This test will initialize the display using displayio and draw a solid green
 background, a smaller purple rectangle, and some yellow text.
 """
 
-#pylint:disable=redefined-outer-name
 import time
 from random import seed, randint
 import board
