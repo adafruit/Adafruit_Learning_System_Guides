@@ -257,7 +257,9 @@ void loadConfig(char *filename) {
                   irisMirror   = 0,
                   scleraMirror = 0,
                   irisAngle    = 0,
-                  scleraAngle  = 0;
+                  scleraAngle  = 0,
+                  irisiSpin    = 0,
+                  scleraiSpin  = 0;
       float       irisSpin     = 0.0,
                   scleraSpin   = 0.0;
       JsonVariant iristv       = doc["irisTexture"],
@@ -268,6 +270,10 @@ void loadConfig(char *filename) {
       if(v.is<float>()) irisSpin   = v.as<float>() * -1024.0;
       v = doc["scleraSpin"];
       if(v.is<float>()) scleraSpin = v.as<float>() * -1024.0;
+      v = doc["irisiSpin"];
+      if(v.is<int>()) irisiSpin    = v.as<int>();
+      v = doc["scleraiSpin"];
+      if(v.is<int>()) scleraiSpin  = v.as<int>();
       v = doc["irisMirror"];
       if(v.is<bool>() || v.is<int>()) irisMirror   = v ? 1023 : 0;
       v = doc["scleraMirror"];
@@ -294,6 +300,8 @@ void loadConfig(char *filename) {
         eye[e].sclera.mirror = scleraMirror;
         eye[e].iris.spin     = irisSpin;
         eye[e].sclera.spin   = scleraSpin;
+        eye[e].iris.iSpin    = irisiSpin;
+        eye[e].sclera.iSpin  = scleraiSpin;
         // iris and sclera filenames are strdup'd for each eye rather than
         // sharing a common pointer, reason being that it gets really messy
         // below when overriding one or the other and trying to do the right
@@ -325,6 +333,10 @@ void loadConfig(char *filename) {
         if(v.is<float>()) eye[e].iris.spin   = v.as<float>() * -1024.0;
         v = doc[eye[e].name]["scleraSpin"];
         if(v.is<float>()) eye[e].sclera.spin = v.as<float>() * -1024.0;
+        v = doc[eye[e].name]["irisiSpin"];
+        if(v.is<int>()) eye[e].iris.iSpin   = v.as<int>();
+        v = doc[eye[e].name]["scleraiSpin"];
+        if(v.is<int>()) eye[e].sclera.iSpin = v.as<int>();
         v = doc[eye[e].name]["irisMirror"];
         if(v.is<bool>() || v.is<int>()) eye[e].iris.mirror   = v ? 1023 : 0;
         v = doc[eye[e].name]["scleraMirror"];
