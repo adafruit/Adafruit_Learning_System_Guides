@@ -1,6 +1,16 @@
 """
-This test will initialize the display using displayio and draw a solid green
-background, a smaller purple rectangle, and some yellow text.
+Continuously scroll randomly generated Mario style clouds.
+Designed fr an ItsyBitsy M4 Express and a 1.3" 240x240 TFT
+
+Adafruit invests time and resources providing this open source code.
+Please support Adafruit and open source hardware by purchasing
+products from Adafruit!
+
+Written by Dave Astels for Adafruit Industries
+Copyright (c) 2019 Adafruit Industries
+Licensed under the MIT license.
+
+All text above must be included in any redistribution.
 """
 
 import time
