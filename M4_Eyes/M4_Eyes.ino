@@ -56,7 +56,8 @@ uint32_t lastLightReadTime       = 0;
 float    lastLightValue          = 0.5;
 double   irisValue               = 0.5;
 int      iPupilFactor            = 42;
-uint32_t boopSum                 = 0;
+uint32_t boopSum                 = 0,
+         boopSumFiltered         = 0;
 bool     booped                  = false;
 int      fixate                  = 7;
 uint8_t  lightSensorFailCount    = 0;
@@ -105,6 +106,15 @@ SPISettings settings(DISPLAY_FREQ, MSBFIRST, SPI_MODE0);
 // that something is likely amiss and we take evasive maneuvers, resetting
 // the affected DMA channel (DMAbuddy::fix()).
 #define DMA_TIMEOUT ((240 * 16 * 4000) / (DISPLAY_FREQ / 1000))
+
+static inline uint16_t readBoop(void) {
+  uint16_t counter = 0;
+  pinMode(boopPin, OUTPUT);
+  digitalWrite(boopPin, HIGH);
+  pinMode(boopPin, INPUT);
+  while(digitalRead(boopPin) && (++counter < 1000));
+  return counter;
+}
 
 // Crude error handler. Prints message to Serial Monitor, blinks LED.
 void fatal(char *message, uint16_t blinkDelay) {
@@ -330,6 +340,14 @@ void setup() {
   calcDisplacement();
   Serial.printf("Free RAM: %d\n", availableRAM());
 
+  if(boopPin >= 0) {
+    boopThreshold = 0;
+    for(i=0; i<240; i++) {
+      boopThreshold += readBoop();
+    }
+    boopThreshold = boopThreshold * 110 / 100; // 10% overhead
+  }
+
   randomSeed(SysTick->VAL + analogRead(A2));
   eyeOldX = eyeNewX = eyeOldY = eyeNewY = mapRadius; // Start in center
   for(e=0; e<NUM_EYES; e++) { // For each eye...
@@ -419,7 +437,7 @@ void loop() {
       }
 
       // Eyes fixate (are slightly crossed) -- amount is filtered for boops
-      int nufix = booped ? 150 : 7;
+      int nufix = booped ? 90 : 7;
       fixate = ((fixate * 15) + nufix) / 16;
       // save eye position to this eye's struct so it's same throughout render
       if(eyeNum & 1) eyeX += fixate; // Eyes converge slightly toward center
@@ -500,37 +518,39 @@ void loop() {
       int ix = (int)map2screen(mapRadius - eye[eyeNum].eyeX) + 120, // Pupil position
           iy = (int)map2screen(mapRadius - eye[eyeNum].eyeY) + 120; // on screen
       iy += irisRadius / 2; // top edge of iris (ish) in screen pixels
-      float qqq; // So many sloppy temp vars in here for now, sorry
+      float uq, lq; // So many sloppy temp vars in here for now, sorry
       if(eyeNum & 1) ix = 239 - ix; // Flip for right eye
       if(iy > upperOpen[ix]) {
-        qqq = 1.0;
+        uq = 1.0;
       } else if(iy < upperClosed[ix]) {
-        qqq = 0.0;
+        uq = 0.0;
       } else {
-        qqq = (float)(iy - upperClosed[ix]) / (float)(upperOpen[ix] - upperClosed[ix]);
+        uq = (float)(iy - upperClosed[ix]) / (float)(upperOpen[ix] - upperClosed[ix]);
+      }
+      if(booped) {
+        uq = 0.9;
+        lq = 0.7;
+      } else {
+        lq = 1.0 - uq;
       }
       // Dampen eyelid movements slightly
       // SAVE upper & lower lid factors per eye,
       // they need to stay consistent across frame
-      eye[eyeNum].upperLidFactor = (eye[eyeNum].upperLidFactor * 0.75) + (qqq * 0.25);
-      eye[eyeNum].lowerLidFactor = 1.0 - eye[eyeNum].upperLidFactor;
+      eye[eyeNum].upperLidFactor = (eye[eyeNum].upperLidFactor * 0.6) + (uq * 0.4);
+      eye[eyeNum].lowerLidFactor = (eye[eyeNum].lowerLidFactor * 0.6) + (lq * 0.4);
+
 
       // Process blinks
       if(eye[eyeNum].blink.state) { // Eye currently blinking?
         // Check if current blink state time has elapsed
         if((t - eye[eyeNum].blink.startTime) >= eye[eyeNum].blink.duration) {
-          if((eye[eyeNum].blink.state == ENBLINK) && booped) {
-            // do nothing, don't advance blink state while booped
+          if(++eye[eyeNum].blink.state > DEBLINK) { // Deblinking finished?
+            eye[eyeNum].blink.state = NOBLINK;      // No longer blinking
+            eye[eyeNum].blinkFactor = 0.0;
+          } else { // Advancing from ENBLINK to DEBLINK mode
+            eye[eyeNum].blink.duration *= 2; // DEBLINK is 1/2 ENBLINK speed
+            eye[eyeNum].blink.startTime = t;
             eye[eyeNum].blinkFactor = 1.0;
-          } else {
-            if(++eye[eyeNum].blink.state > DEBLINK) { // Deblinking finished?
-              eye[eyeNum].blink.state = NOBLINK;      // No longer blinking
-              eye[eyeNum].blinkFactor = 0.0;
-            } else { // Advancing from ENBLINK to DEBLINK mode
-              eye[eyeNum].blink.duration *= 2; // DEBLINK is 1/2 ENBLINK speed
-              eye[eyeNum].blink.startTime = t;
-              eye[eyeNum].blinkFactor = 1.0;
-            }
           }
         } else {
           eye[eyeNum].blinkFactor = (float)(t - eye[eyeNum].blink.startTime) / (float)eye[eyeNum].blink.duration;
@@ -549,21 +569,9 @@ void loop() {
 
       // Once per frame (of eye #0), reset boopSum...
       if((eyeNum == 0) && (boopPin >= 0)) {
-        if(boopSum > boopThreshold) {
+        boopSumFiltered = ((boopSumFiltered * 3) + boopSum) / 4;
+        if(boopSumFiltered > boopThreshold) {
           if(!booped) {
-            timeOfLastBlink = t;
-            // slow, intentional blink
-            uint32_t blinkDuration = random(60000, 100000);
-            // Set up durations for both eyes (if not already winking)
-            for(uint8_t e=0; e<NUM_EYES; e++) {
-//              if(eye[e].blink.state == NOBLINK) {
-              if(1) {
-                eye[e].blink.state     = ENBLINK;
-                eye[e].blink.startTime = t;
-                eye[e].blink.duration  = blinkDuration;
-              }
-            }
-            timeToNextBlink = blinkDuration * 3 + random(4000000);
             Serial.println("BOOP!");
           }
           booped = true;
@@ -815,6 +823,11 @@ void loop() {
     digitalWrite(eye[eyeNum].dc, HIGH); // Data mode
   } // end first-column check
 
+  // MUST read the booper when there’s no SPI traffic across the nose!
+  if((eyeNum == (NUM_EYES-1)) && (boopPin >= 0)) {
+    boopSum += readBoop();
+  }
+
   memcpy(eye[eyeNum].dptr, &eye[eyeNum].column[eye[eyeNum].colIdx].descriptor[0], sizeof(DmacDescriptor));
   eye[eyeNum].dma_busy       = true;
   eye[eyeNum].dma.startJob();
@@ -824,13 +837,4 @@ void loop() {
   }
   eye[eyeNum].colIdx       ^= 1;    // Alternate 0/1 line structs
   eye[eyeNum].column_ready = false; // OK to render next line
-
-  if((eyeNum == 0) && (boopPin >= 0)) {
-    uint16_t counter = 0;
-    pinMode(boopPin, OUTPUT);
-    digitalWrite(boopPin, HIGH);
-    pinMode(boopPin, INPUT);
-    while(digitalRead(boopPin) && (++counter < 1000));
-    boopSum += counter;
-  }
 }
