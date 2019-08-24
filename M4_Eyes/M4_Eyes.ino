@@ -394,7 +394,8 @@ an independent frame rate depending on particular complexity at the moment).
 void loop() {
   if(++eyeNum >= NUM_EYES) eyeNum = 0; // Cycle through eyes...
 
-  uint8_t x = eye[eyeNum].colNum;
+  uint8_t  x = eye[eyeNum].colNum;
+  uint32_t t = micros();
 
   // If next column for this eye is not yet rendered...
   if(!eye[eyeNum].column_ready) {
@@ -402,7 +403,6 @@ void loop() {
 
       // ONCE-PER-FRAME EYE ANIMATION LOGIC HAPPENS HERE -------------------
 
-      uint32_t t = micros();
       float eyeX, eyeY;
       // Eye movement
       int32_t dt = t - eyeMoveStartTime;      // uS elapsed since last eye event
@@ -445,58 +445,11 @@ void loop() {
       eye[eyeNum].eyeX = eyeX;
       eye[eyeNum].eyeY = eyeY;
 
-      // Handle pupil scaling
-      if(lightSensorPin >= 0) {
-        // Read light sensor, but not too often (Seesaw hates that)
-        #define LIGHT_INTERVAL (1000000 / 8) // 8 Hz, don't poll Seesaw too often
-        if((t - lastLightReadTime) >= LIGHT_INTERVAL) {
-          // Fun fact: eyes have a "consensual response" to light -- both
-          // pupils will react even if the opposite eye is stimulated.
-          // Meaning we can get away with using a single light sensor for
-          // both eyes. This comment has nothing to do with the code.
-          uint16_t rawReading = (lightSensorPin >= 100) ?
-            seesaw.analogRead(lightSensorPin - 100) : analogRead(lightSensorPin);
-          if(rawReading <= 1023) {
-            if(rawReading < lightSensorMin)      rawReading = lightSensorMin; // Clamp light sensor range
-            else if(rawReading > lightSensorMax) rawReading = lightSensorMax; // to within usable range
-            float v = (float)(rawReading - lightSensorMin) / (float)(lightSensorMax - lightSensorMin); // 0.0 to 1.0
-            v = pow(v, lightSensorCurve);
-            lastLightValue    = irisMin + v * irisRange;
-            lastLightReadTime = t;
-            lightSensorFailCount = 0;
-          } else { // I2C error
-            if(++lightSensorFailCount >= 50) { // If repeated errors in succession...
-              lightSensorPin = -1; // Stop trying to use the light sensor
-            } else {
-              lastLightReadTime = t - LIGHT_INTERVAL + 40000; // Try again in 40 ms
-            }
-          }
-        }
-        irisValue = (irisValue * 0.97) + (lastLightValue * 0.03); // Filter response for smooth reaction
-      } else {
-        // Not light responsive. Use autonomous iris w/fractal subdivision
-        float n, sum = 0.5;
-        for(uint16_t i=0; i<IRIS_LEVELS; i++) { // 0,1,2,3,...
-          uint16_t iexp  = 1 << (i+1);          // 2,4,8,16,...
-          uint16_t imask = (iexp - 1);          // 2^i-1 (1,3,7,15,...)
-          uint16_t ibits = iris_frame & imask;  // 0 to mask
-          if(ibits) {
-            float weight = (float)ibits / (float)iexp; // 0.0 to <1.0
-            n            = iris_prev[i] * (1.0 - weight) + iris_next[i] * weight;
-          } else {
-            n            = iris_next[i];
-            iris_prev[i] = iris_next[i];
-            iris_next[i] = -0.5 + ((float)random(1000) / 999.0); // -0.5 to +0.5
-          }
-          iexp = 1 << (IRIS_LEVELS - i); // ...8,4,2,1
-          sum += n / (float)iexp;
-        }
-        irisValue = irisMin + (sum * irisRange); // 0.0-1.0 -> iris min/max
-        if((++iris_frame) >= (1 << IRIS_LEVELS)) iris_frame = 0;
-      }
-
       // pupilFactor? irisValue? TO DO: pick a name and stick with it
       eye[eyeNum].pupilFactor = irisValue;
+      // Also note - irisValue is calculated at the END of this function
+      // for the next frame (because the sensor must be read when there's
+      // no SPI traffic to the left eye)
 
       // Similar to the autonomous eye movement above -- blink start times
       // and durations are random (within ranges).
@@ -821,6 +774,57 @@ void loop() {
     eye[eyeNum].display->setAddrWindow(0, 0, 240, 240);
     delayMicroseconds(1);
     digitalWrite(eye[eyeNum].dc, HIGH); // Data mode
+    if(eyeNum == (NUM_EYES-1)) {
+      // Handle pupil scaling
+      if(lightSensorPin >= 0) {
+        // Read light sensor, but not too often (Seesaw hates that)
+        #define LIGHT_INTERVAL (1000000 / 10) // 10 Hz, don't poll Seesaw too often
+        if((t - lastLightReadTime) >= LIGHT_INTERVAL) {
+          // Fun fact: eyes have a "consensual response" to light -- both
+          // pupils will react even if the opposite eye is stimulated.
+          // Meaning we can get away with using a single light sensor for
+          // both eyes. This comment has nothing to do with the code.
+          uint16_t rawReading = (lightSensorPin >= 100) ?
+            seesaw.analogRead(lightSensorPin - 100) : analogRead(lightSensorPin);
+          if(rawReading <= 1023) {
+            if(rawReading < lightSensorMin)      rawReading = lightSensorMin; // Clamp light sensor range
+            else if(rawReading > lightSensorMax) rawReading = lightSensorMax; // to within usable range
+            float v = (float)(rawReading - lightSensorMin) / (float)(lightSensorMax - lightSensorMin); // 0.0 to 1.0
+            v = pow(v, lightSensorCurve);
+            lastLightValue    = irisMin + v * irisRange;
+            lastLightReadTime = t;
+            lightSensorFailCount = 0;
+          } else { // I2C error
+            if(++lightSensorFailCount >= 25) { // If repeated errors in succession...
+              lightSensorPin = -1; // Stop trying to use the light sensor
+            } else {
+              lastLightReadTime = t - LIGHT_INTERVAL + 30000; // Try again in 30 ms
+            }
+          }
+        }
+        irisValue = (irisValue * 0.97) + (lastLightValue * 0.03); // Filter response for smooth reaction
+      } else {
+        // Not light responsive. Use autonomous iris w/fractal subdivision
+        float n, sum = 0.5;
+        for(uint16_t i=0; i<IRIS_LEVELS; i++) { // 0,1,2,3,...
+          uint16_t iexp  = 1 << (i+1);          // 2,4,8,16,...
+          uint16_t imask = (iexp - 1);          // 2^i-1 (1,3,7,15,...)
+          uint16_t ibits = iris_frame & imask;  // 0 to mask
+          if(ibits) {
+            float weight = (float)ibits / (float)iexp; // 0.0 to <1.0
+            n            = iris_prev[i] * (1.0 - weight) + iris_next[i] * weight;
+          } else {
+            n            = iris_next[i];
+            iris_prev[i] = iris_next[i];
+            iris_next[i] = -0.5 + ((float)random(1000) / 999.0); // -0.5 to +0.5
+          }
+          iexp = 1 << (IRIS_LEVELS - i); // ...8,4,2,1
+          sum += n / (float)iexp;
+        }
+        irisValue = irisMin + (sum * irisRange); // 0.0-1.0 -> iris min/max
+        if((++iris_frame) >= (1 << IRIS_LEVELS)) iris_frame = 0;
+      }
+    }
   } // end first-column check
 
   // MUST read the booper when there’s no SPI traffic across the nose!
