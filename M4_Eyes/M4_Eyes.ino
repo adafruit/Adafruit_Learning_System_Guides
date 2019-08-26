@@ -36,6 +36,7 @@
 
 #define GLOBAL_VAR
 #include "globals.h"
+extern Adafruit_ImageReader reader;
 
 // Global eye state that applies to all eyes (not per-eye):
 bool     eyeInMotion = false;
@@ -117,7 +118,7 @@ static inline uint16_t readBoop(void) {
 }
 
 // Crude error handler. Prints message to Serial Monitor, blinks LED.
-void fatal(char *message, uint16_t blinkDelay) {
+void fatal(const char *message, uint16_t blinkDelay) {
   Serial.println(message);
   for(bool ledState = HIGH;; ledState = !ledState) {
     digitalWrite(LED_BUILTIN, ledState);
@@ -135,7 +136,7 @@ void setup() {
   int i = file_setup();
 
   Serial.begin(9600);
-//  while(!Serial);
+  //while(!Serial) delay(10);
 
   Serial.printf("Available RAM at start: %d\n", availableRAM());
   Serial.printf("Available flash at start: %d\n", availableNVM());
@@ -162,11 +163,43 @@ void setup() {
 #endif
 
   uint8_t e;
+  // Initialize displays
   for(e=0; e<NUM_EYES; e++) {
     eye[e].display = new Adafruit_ST7789(eye[e].spi, eye[e].cs, eye[e].dc, eye[e].rst);
     eye[e].display->init(240, 240);
-    eye[e].display->setRotation(3);
     eye[e].spi->setClockSource(DISPLAY_CLKSRC);
+    eye[e].display->fillScreen(0x1234);
+    eye[e].display->setRotation(0);
+  }
+
+  if (reader.drawBMP("/splash.bmp", *(eye[0].display), 0, 0) == IMAGE_SUCCESS) {
+    Serial.println("Splashing");
+    #if NUM_EYES > 1
+    // other eye
+    reader.drawBMP("/splash.bmp", *(eye[1].display), 0, 0);
+    #endif
+    // backlight on for a bit
+    for (int bl=0; bl<=250; bl+=10) {
+      #if NUM_EYES > 1
+      seesaw.analogWrite(SEESAW_BACKLIGHT_PIN, bl);
+      #endif
+      analogWrite(BACKLIGHT_PIN, bl);
+      delay(10);
+    }
+    delay(2000);
+    // backlight back off
+    for (int bl=250; bl>=0; bl-=10) {
+      #if NUM_EYES > 1
+      seesaw.analogWrite(SEESAW_BACKLIGHT_PIN, bl);
+      #endif
+      analogWrite(BACKLIGHT_PIN, bl);
+      delay(10);
+    }
+  }
+
+  // Initialize DMAs
+  for(e=0; e<NUM_EYES; e++) {
+    eye[e].display->setRotation(3);
     eye[e].display->fillScreen(0);
     eye[e].dma.allocate();
     eye[e].dma.setTrigger(eye[e].spi->getDMAC_ID_TX());
