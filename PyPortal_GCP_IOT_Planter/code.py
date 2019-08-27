@@ -112,22 +112,19 @@ def handle_pump(command):
     """
     pump_time = command['pump_time']
     pump_status = command['pump']
-    if pump_status == 0:
-        print("Turning pump off")
-        water_pump.value = False
-    else:
-        print("Turning pump on for {} seconds...", pump_time)
+    if pump_status == 1:
+        print("Turning pump on for {} seconds...".format(pump_time))
         start_pump = time.monotonic()
         while True:
             now = time.monotonic()
             if now - start_pump > pump_time:
-                # Turn the pump off
-                print("Turning pump off")
-                water_pump.value = False
+                # Timer expired, leave the loop
+                print("Plant watered!")
                 break
             else:
                 initial = now
-        print("pump off")
+    print("Turning pump off")
+    water_pump.value = False
 
 # Initialize Google Cloud IoT Core interface
 google_iot = Cloud_Core(esp, secrets)
