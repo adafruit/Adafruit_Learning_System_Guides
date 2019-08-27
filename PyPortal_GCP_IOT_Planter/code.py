@@ -96,13 +96,13 @@ def publish(client, userdata, topic, pid):
 
 def message(client, topic, msg):
     # This method is called when the client receives data from a topic.
+    # Check if command is about the water pump
     try:
-        # Check if command is about the water pump
         msg_dict = json.loads(msg)
-        if msg_dict['pump_time']:
-            handle_pump(msg_dict)
-    except KeyError:
+        handle_pump(msg_dict)
+    except:
         print("Message from {}: {}".format(topic, msg))
+
 
 def handle_pump(command):
     """Handles command about the planter's
@@ -110,10 +110,10 @@ def handle_pump(command):
     :param json command: Message from device/commands#
     """
     # Parse the pump command message
-    # Expected format: {"pump": 1, "pump_time":3}
+    # Expected format: {"power": true, "pump_time":3}
     pump_time = command['pump_time']
-    pump_status = command['pump']
-    if pump_status == 1:
+    pump_status = command['power']
+    if pump_status:
         print("Turning pump on for {} seconds...".format(pump_time))
         start_pump = time.monotonic()
         while True:
@@ -122,6 +122,7 @@ def handle_pump(command):
                 # Timer expired, leave the loop
                 print("Plant watered!")
                 break
+            water_pump.value=True
     print("Turning pump off")
     water_pump.value = False
 
