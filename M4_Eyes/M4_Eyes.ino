@@ -126,6 +126,14 @@ void fatal(const char *message, uint16_t blinkDelay) {
   }
 }
 
+uint16_t readLightSensor(void) {
+#if NUM_EYES > 1
+  return seesaw.analogRead(lightSensorPin - 100);
+#else
+  return analogRead(lightSensorPin);
+#endif
+}
+
 // SETUP FUNCTION - CALLED ONCE AT PROGRAM START ---------------------------
 
 void setup() {
@@ -817,8 +825,7 @@ void loop() {
           // pupils will react even if the opposite eye is stimulated.
           // Meaning we can get away with using a single light sensor for
           // both eyes. This comment has nothing to do with the code.
-          uint16_t rawReading = (lightSensorPin >= 100) ?
-            seesaw.analogRead(lightSensorPin - 100) : analogRead(lightSensorPin);
+          uint16_t rawReading = readLightSensor();
           if(rawReading <= 1023) {
             if(rawReading < lightSensorMin)      rawReading = lightSensorMin; // Clamp light sensor range
             else if(rawReading > lightSensorMax) rawReading = lightSensorMax; // to within usable range
