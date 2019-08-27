@@ -61,8 +61,6 @@ print("Connected!")
 
 # Define callback methods which are called when events occur
 # pylint: disable=unused-argument, redefined-outer-name
-
-
 def connect(client, userdata, flags, rc):
     # This function will be called when the client is connected
     # successfully to the broker.
@@ -112,21 +110,24 @@ def handle_pump(command):
     Expected command format: {"pump": 1, "pump_time":3}
     :param json command: Message from device/commands#
     """
-    print("Pump command received: {} for {} seconds".format(
-        command['pump'], command['pump_time']))
     pump_time = command['pump_time']
     pump_status = command['pump']
-    if not pump_status:
+    if pump_status == 0:
+        print("Turning pump off")
         water_pump.value = False
     else:
-        initial = time.monotonic()
+        print("Turning pump on for {} seconds...", pump_time)
+        start_pump = time.monotonic()
         while True:
-            if now - initial > pump_time:
-                print("Turning pump off...")
+            now = time.monotonic()
+            if now - start_pump > pump_time:
+                # Turn the pump off
+                print("Turning pump off")
                 water_pump.value = False
-                return
-            water_pump.value = True
-        print("Done watering!")
+                break
+            else:
+                initial = now
+        print("pump off")
 
 # Initialize Google Cloud IoT Core interface
 google_iot = Cloud_Core(esp, secrets)
