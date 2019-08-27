@@ -107,22 +107,21 @@ def message(client, topic, msg):
 def handle_pump(command):
     """Handles command about the planter's
     watering pump from Google Core IoT.
-    Expected command format: {"pump": 1, "pump_time":3}
     :param json command: Message from device/commands#
     """
+    # Parse the pump command message
+    # Expected format: {"pump": 1, "pump_time":3}
     pump_time = command['pump_time']
     pump_status = command['pump']
     if pump_status == 1:
         print("Turning pump on for {} seconds...".format(pump_time))
         start_pump = time.monotonic()
         while True:
-            now = time.monotonic()
-            if now - start_pump > pump_time:
+            cur_time = time.monotonic()
+            if cur_time - start_pump > pump_time:
                 # Timer expired, leave the loop
                 print("Plant watered!")
                 break
-            else:
-                initial = now
     print("Turning pump off")
     water_pump.value = False
 
@@ -168,9 +167,10 @@ while True:
             moisture_level = ss.moisture_read()
             # read temperature
             temperature = ss.get_temp()
-            # display soil sensor values on pyportal
-            gfx.show_water_level(moisture_level)
+            # Display Soil Sensor values on pyportal
             temperature = gfx.show_temp(temperature)
+            gfx.show_water_level(moisture_level)
+            # TODO: Add water status? 
             print('Sending data to GCP IoT Core')
             gfx.show_gcp_status('Sending data...')
             gfx.show_gcp_status('Data sent!')
