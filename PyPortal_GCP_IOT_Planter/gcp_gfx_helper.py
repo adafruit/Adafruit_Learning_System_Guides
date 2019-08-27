@@ -1,10 +1,9 @@
 """
-GFX Helper for PyPortal Azure IoT Plant Monitor
+GFX Helper for PyPortal GCP IoT Plant Monitor
 """
 import board
 import displayio
 import terminalio
-from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text.label import Label
 
  # the current working directory (where this file is)
