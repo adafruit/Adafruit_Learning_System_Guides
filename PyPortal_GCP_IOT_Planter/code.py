@@ -68,31 +68,23 @@ def connect(client, userdata, flags, rc):
     print('Flags: {0}\n RC: {1}'.format(flags, rc))
     # Subscribes to commands/# topic
     google_mqtt.subscribe_to_all_commands()
-    return
-
 
 def disconnect(client, userdata, rc):
     # This method is called when the client disconnects
     # from the broker.
     print('Disconnected from Google Cloud IoT!')
-    return
-
 
 def subscribe(client, userdata, topic, granted_qos):
     # This method is called when the client subscribes to a new topic.
     print('Subscribed to {0} with QOS level {1}'.format(topic, granted_qos))
-    return
-
 
 def unsubscribe(client, userdata, topic, pid):
     # This method is called when the client unsubscribes from a topic.
     print('Unsubscribed from {0} with PID {1}'.format(topic, pid))
 
-
 def publish(client, userdata, topic, pid):
     # This method is called when the client publishes data to a topic.
     print('Published to {0} with PID {1}'.format(topic, pid))
-
 
 def message(client, topic, msg):
     # This method is called when the client receives data from a topic.
@@ -103,12 +95,12 @@ def message(client, topic, msg):
     except:
         print("Message from {}: {}".format(topic, msg))
 
-
 def handle_pump(command):
     """Handles command about the planter's
     watering pump from Google Core IoT.
     :param json command: Message from device/commands#
     """
+    print("handling pump...")
     # Parse the pump command message
     # Expected format: {"power": true, "pump_time":3}
     pump_time = command['pump_time']
@@ -174,6 +166,8 @@ while True:
             # TODO: Add water status? 
             print('Sending data to GCP IoT Core')
             gfx.show_gcp_status('Sending data...')
+            google_mqtt.publish(temperature,'events', qos=1)
+            google_mqtt.publish(moisture_level,'events', qos=1)
             gfx.show_gcp_status('Data sent!')
             print('Data sent!')
             # Reset timer
