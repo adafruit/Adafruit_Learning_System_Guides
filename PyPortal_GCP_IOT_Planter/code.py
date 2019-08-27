@@ -61,39 +61,50 @@ print("Connected!")
 
 # Define callback methods which are called when events occur
 # pylint: disable=unused-argument, redefined-outer-name
+
+
 def connect(client, userdata, flags, rc):
     # This function will be called when the client is connected
     # successfully to the broker.
     print('Connected to Google Cloud IoT!')
-    print('Flags: {0}\n RC: {1}'.format(flags, rc))
+    print('Flags: {0}\nRC: {1}'.format(flags, rc))
     # Subscribes to commands/# topic
     google_mqtt.subscribe_to_all_commands()
+
 
 def disconnect(client, userdata, rc):
     # This method is called when the client disconnects
     # from the broker.
     print('Disconnected from Google Cloud IoT!')
 
+
 def subscribe(client, userdata, topic, granted_qos):
     # This method is called when the client subscribes to a new topic.
     print('Subscribed to {0} with QOS level {1}'.format(topic, granted_qos))
+
 
 def unsubscribe(client, userdata, topic, pid):
     # This method is called when the client unsubscribes from a topic.
     print('Unsubscribed from {0} with PID {1}'.format(topic, pid))
 
+
 def publish(client, userdata, topic, pid):
     # This method is called when the client publishes data to a topic.
     print('Published to {0} with PID {1}'.format(topic, pid))
 
+
 def message(client, topic, msg):
     # This method is called when the client receives data from a topic.
-    # Check if command is about the water pump
     try:
+        # Attempt to load a JSON command
         msg_dict = json.loads(msg)
-        handle_pump(msg_dict)
+        # Handle water-pump commands
+        if msg_dict['pump_time']:
+            handle_pump(msg_dict)
     except:
+        # Non-JSON command, print normally
         print("Message from {}: {}".format(topic, msg))
+
 
 def handle_pump(command):
     """Handles command about the planter's
@@ -109,14 +120,17 @@ def handle_pump(command):
         print("Turning pump on for {} seconds...".format(pump_time))
         start_pump = time.monotonic()
         while True:
+            gfx.show_gcp_status('Watering plant...')
             cur_time = time.monotonic()
             if cur_time - start_pump > pump_time:
                 # Timer expired, leave the loop
                 print("Plant watered!")
                 break
-            water_pump.value=True
+            water_pump.value = True
+    gfx.show_gcp_status('Plant watered!')
     print("Turning pump off")
     water_pump.value = False
+
 
 # Initialize Google Cloud IoT Core interface
 google_iot = Cloud_Core(esp, secrets)
@@ -163,12 +177,12 @@ while True:
             # Display Soil Sensor values on pyportal
             temperature = gfx.show_temp(temperature)
             gfx.show_water_level(moisture_level)
-            # TODO: Add water status? 
             print('Sending data to GCP IoT Core')
-            gfx.show_gcp_status('Sending data...')
-            google_mqtt.publish(temperature,'events', qos=1)
-            google_mqtt.publish(moisture_level,'events', qos=1)
-            gfx.show_gcp_status('Data sent!')
+            gfx.show_gcp_status('Publishing data...')
+            google_mqtt.publish(temperature, "events")
+            time.sleep(2)
+            google_mqtt.publish(moisture_level, "events")
+            gfx.show_gcp_status('Data published!')
             print('Data sent!')
             # Reset timer
             initial = now
