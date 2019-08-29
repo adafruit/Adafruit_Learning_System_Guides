@@ -390,6 +390,16 @@ void setup() {
   lastLightReadTime = micros() + 2000000; // Delay initial light reading
 }
 
+static inline uint16_t readLightSensor(void) {
+#if NUM_EYES > 1
+  if(lightSensorPin >= 100) {
+    return seesaw.analogRead(lightSensorPin - 100);
+  }
+#else
+  return analogRead(lightSensorPin);
+#endif
+}
+
 // LOOP FUNCTION - CALLED REPEATEDLY UNTIL POWER-OFF -----------------------
 
 /*
@@ -817,8 +827,7 @@ void loop() {
           // pupils will react even if the opposite eye is stimulated.
           // Meaning we can get away with using a single light sensor for
           // both eyes. This comment has nothing to do with the code.
-          uint16_t rawReading = (lightSensorPin >= 100) ?
-            seesaw.analogRead(lightSensorPin - 100) : analogRead(lightSensorPin);
+          uint16_t rawReading = readLightSensor();
           if(rawReading <= 1023) {
             if(rawReading < lightSensorMin)      rawReading = lightSensorMin; // Clamp light sensor range
             else if(rawReading > lightSensorMax) rawReading = lightSensorMax; // to within usable range
