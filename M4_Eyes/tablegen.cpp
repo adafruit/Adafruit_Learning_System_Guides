@@ -99,44 +99,38 @@ void calcMap(void) {
 
     // If slit pupil is enabled, override iris area of polarDist map.
     if(slitPupilRadius > 0) {
-      // This is a bit ugly in that it makes repeated passes over the polarDist
-      // array, drawing (and redrawing) the intersection of two overlapping
-      // circles...I wasn't able to come up with an approach that gives a
-      // single correct answer at each pixel (surely it's possible, I'm just
-      // lousy at this kind of math). Also, lots of floating-point math.
-      // This is only needed once at startup, so it's not a complete disaster.
-      int i;
-      for(i=0; i<127; i++) {
-        float ratio = i / 128.0; // 0.0 (open) to just-under-1.0 (slit) (>= 1.0 will cause trouble)
-        // Interpolate a point between top of iris and top of slit pupil, based on ratio
-        float y1 = iRad - (iRad - slitPupilRadius) * ratio;
-        // (x1 is 0 and thus dropped from equation below)
-        // And another point between right of iris and center of eye, inverse ratio
-        float x2 = iRad * (1.0 - ratio);
-        // (y2 is also zero, same deal)
-        // Find X coordinate of center of circle that crosses above two points
-        // and has Y at 0.0
-        float xc = (x2 * x2 - y1 * y1) / (2 * x2);
-        // Distance from center of circle to right edge
-        dx = x2 - xc;
-        float r2 = dx * dx; // center-to-right distance squared
-        // Iterate over each pixel in the iris section of the polar map...
-        for(y=0; y < mapRadius; y++) {
-          dy  = y + 0.5;                 // Distance to center, Y component
-          dy2 = dy * dy;
-          for(x=0; x < mapRadius; x++) {
-            dx = x + 0.5;                // Distance to center point, X component
-            d2 = dx * dx + dy2;          // Distance to center, squared
-            if(d2 <= irisRadius2) {      // If inside iris...
-              xp = x + 0.5;
-              dx = xp - xc;              // X component of...
-              d2 = dx * dx + dy2;        // Distance from pixel to left 'xc' point
-              if(d2 <= r2) {             // If point is within the first circle...
-                dx = xp + xc;            // X component of...
-                d2 = dx * dx + dy2;      // Distance from pixel to right 'xc' point
-                if(d2 <= r2) {           // If point is also within the second circle...
-                  polarDist[y * mapRadius + x] = (int8_t)(-1 - i); // Set to distance 'i'
-                }
+      // Iterate over each pixel in the iris section of the polar map...
+      for(y=0; y < mapRadius; y++) {
+        dy  = y + 0.5;            // Distance to center, Y component
+        dy2 = dy * dy;
+        for(x=0; x < mapRadius; x++) {
+          dx = x + 0.5;           // Distance to center point, X component
+          d2 = dx * dx + dy2;     // Distance to center, squared
+          if(d2 <= irisRadius2) { // If inside iris...
+            xp = x + 0.5;
+            // This is a bit ugly in that it iteratively calculates the
+            // polarDist value...trial and error. It should be possible to
+            // algebraically simplify this and find the single polarDist
+            // point for a given pixel, but I've not worked that out yet.
+            // This is only needed once at startup, not a complete disaster.
+            for(int i=126; i>=0; i--) {
+              float ratio = i / 128.0; // 0.0 (open) to just-under-1.0 (slit) (>= 1.0 will cause trouble)
+              // Interpolate a point between top of iris and top of slit pupil, based on ratio
+              float y1 = iRad - (iRad - slitPupilRadius) * ratio;
+              // (x1 is 0 and thus dropped from equation below)
+              // And another point between right of iris and center of eye, inverse ratio
+              float x2 = iRad * (1.0 - ratio);
+              // (y2 is also zero, same deal)
+              // Find X coordinate of center of circle that crosses above two points
+              // and has Y at 0.0
+              float xc = (x2 * x2 - y1 * y1) / (2 * x2);
+              dx = x2 - xc;       // Distance from center of circle to right edge
+              float r2 = dx * dx; // center-to-right distance squared
+              dx = xp - xc;       // X component of...
+              d2 = dx * dx + dy2; // Distance from pixel to left 'xc' point
+              if(d2 <= r2) {      // If point is within circle...
+                polarDist[y * mapRadius + x] = (int8_t)(-1 - i); // Set to distance 'i'
+                break;
               }
             }
           }
