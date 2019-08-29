@@ -1,7 +1,7 @@
 """
 Dashblock API Adafruit Learn Guide Count demo
-Using Dashblock to cerate a custom API,
-display the number of learn guides on learn.adafruit.com
+Use Dashblock to create a custom API for learn.adafruit.com,
+then display the number of learn guides on the site
 """
 
 import time
@@ -31,7 +31,7 @@ pyportal = PyPortal(url=DATA_SOURCE,
                     status_neopixel=board.NEOPIXEL,
                     default_bg=cwd+"/adabot_cover.bmp",
                     text_font=cwd+"/fonts/Collegiate-50.bdf",
-                    text_position=((40, 100)), # definition location
+                    text_position=((40, 100)),
                     text_color=(0x8080FF),
                     text_maxlen=(4), # max text length, only want first 4 chars for number of guides
                     caption_text=CAPTION,
