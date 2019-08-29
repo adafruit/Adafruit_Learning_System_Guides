@@ -47,9 +47,8 @@ while True:
         value = pyportal.fetch()
         print("Response is", value)
         int_value = int(value[:4]) # save only first 4 chars and cast to int
-        print(int_value)
         if last_value < int_value:  # ooh it went up!
-            print("New follower!")
+            print("New guide!")
             pyportal.play_file(cwd+"/coin.wav")  # make a noise!
         last_value = int_value
     except RuntimeError as e:
