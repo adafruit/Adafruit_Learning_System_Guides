@@ -247,7 +247,8 @@ void loadConfig(char *filename) {
 
       lightSensorPin = doc["lightSensor"]   | lightSensorPin;
       boopPin        = doc["boopSensor"]    | boopPin;
-      boopThreshold  = doc["boopThreshold"] | boopThreshold;
+// Computed at startup, NOT from file now
+//      boopThreshold  = doc["boopThreshold"] | boopThreshold;
 
       // Values that can be distinct per-eye but have a common default...
       uint16_t    pupilColor   = dwim(doc["pupilColor"] , eye[0].pupilColor),
