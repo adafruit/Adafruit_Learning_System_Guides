@@ -11,6 +11,8 @@ Copyright (c) 2019 Adafruit Industries
 Licensed under the MIT license.
 
 All text above must be included in any redistribution.
+
+Requires CircuitPython 5.0 or later.
 """
 
 import time
