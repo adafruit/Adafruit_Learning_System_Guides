@@ -1,6 +1,6 @@
 """
-Continuously scroll randomly generated Mario style toasters.
-Designed fr an ItsyBitsy M4 Express and a 1.3" 240x240 TFT
+Continuously scroll randomly generated After Dark style toasters.
+Designed for an ItsyBitsy M4 Express and a 1.3" 240x240 TFT
 
 Adafruit invests time and resources providing this open source code.
 Please support Adafruit and open source hardware by purchasing
