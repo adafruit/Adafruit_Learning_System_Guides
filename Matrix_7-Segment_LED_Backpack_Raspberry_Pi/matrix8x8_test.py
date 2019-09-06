@@ -23,7 +23,7 @@ while True:
 
     # illuminate a column one LED at a time
     while col < col_max:
-        matrix[row, col] = 1
+        matrix[row, col] = 2
         col += 1
         time.sleep(.2)
 
