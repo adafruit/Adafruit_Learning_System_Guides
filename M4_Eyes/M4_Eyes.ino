@@ -162,11 +162,12 @@ void setup() {
   delay(20);
 #endif
 
-  uint8_t e;
+  uint8_t e, rtna = 0x01; // Screen refresh rate control (datasheet 9.2.18, FRCTRL2)
   // Initialize displays
   for(e=0; e<NUM_EYES; e++) {
     eye[e].display = new Adafruit_ST7789(eye[e].spi, eye[e].cs, eye[e].dc, eye[e].rst);
     eye[e].display->init(240, 240);
+    eye[e].display->sendCommand(0xC6, &rtna, 1);
     eye[e].spi->setClockSource(DISPLAY_CLKSRC);
     eye[e].display->fillScreen(0x1234);
     eye[e].display->setRotation(0);
@@ -510,24 +511,30 @@ void loop() {
         timeToNextBlink = blinkDuration * 3 + random(4000000);
       }
 
-      // Eyelids naturally "track" the pupils (move up or down automatically)
-      int ix = (int)map2screen(mapRadius - eye[eyeNum].eyeX) + 120, // Pupil position
-          iy = (int)map2screen(mapRadius - eye[eyeNum].eyeY) + 120; // on screen
-      iy += irisRadius / 2; // top edge of iris (ish) in screen pixels
       float uq, lq; // So many sloppy temp vars in here for now, sorry
-      if(eyeNum & 1) ix = 239 - ix; // Flip for right eye
-      if(iy > upperOpen[ix]) {
+      if(tracking) {
+        // Eyelids naturally "track" the pupils (move up or down automatically)
+        int ix = (int)map2screen(mapRadius - eye[eyeNum].eyeX) + 120, // Pupil position
+            iy = (int)map2screen(mapRadius - eye[eyeNum].eyeY) + 120; // on screen
+        iy += irisRadius * trackFactor;
+        if(eyeNum & 1) ix = 239 - ix; // Flip for right eye
+        if(iy > upperOpen[ix]) {
+          uq = 1.0;
+        } else if(iy < upperClosed[ix]) {
+          uq = 0.0;
+        } else {
+          uq = (float)(iy - upperClosed[ix]) / (float)(upperOpen[ix] - upperClosed[ix]);
+        }
+        if(booped) {
+          uq = 0.9;
+          lq = 0.7;
+        } else {
+          lq = 1.0 - uq;
+        }
+      } else {
+        // If no tracking, eye is FULLY OPEN when not blinking
         uq = 1.0;
-      } else if(iy < upperClosed[ix]) {
-        uq = 0.0;
-      } else {
-        uq = (float)(iy - upperClosed[ix]) / (float)(upperOpen[ix] - upperClosed[ix]);
-      }
-      if(booped) {
-        uq = 0.9;
-        lq = 0.7;
-      } else {
-        lq = 1.0 - uq;
+        lq = 1.0;
       }
       // Dampen eyelid movements slightly
       // SAVE upper & lower lid factors per eye,
