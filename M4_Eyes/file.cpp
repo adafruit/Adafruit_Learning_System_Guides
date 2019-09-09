@@ -266,6 +266,15 @@ void loadConfig(char *filename) {
       JsonVariant iristv       = doc["irisTexture"],
                   scleratv     = doc["scleraTexture"];
 
+      v = doc["tracking"];
+      if(v.is<bool>()) tracking = v.as<bool>();
+      v = doc["squint"];
+      if(v.is<float>()) {
+        trackFactor = 1.0 - v.as<float>();
+        if(trackFactor < 0.0)      trackFactor = 0.0;
+        else if(trackFactor > 1.0) trackFactor = 1.0;
+      }
+
       // Convert clockwise int (0-1023) or float (0.0-1.0) values to CCW int used internally:
       v = doc["irisSpin"];
       if(v.is<float>()) irisSpin   = v.as<float>() * -1024.0;
