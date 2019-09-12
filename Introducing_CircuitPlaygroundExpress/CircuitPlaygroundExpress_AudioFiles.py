@@ -1,13 +1,25 @@
-import audioio
 import board
 import digitalio
 
-# enable the speaker
+try:
+    from audiocore import WaveFile
+except ImportError:
+    from audioio import WaveFile
+
+try:
+    from audioio import AudioOut
+except ImportError:
+    try:
+        from audiopwmio import PWMAudioOut as AudioOut
+    except ImportError:
+        pass  # not always supported by every board!
+
+# Enable the speaker
 spkrenable = digitalio.DigitalInOut(board.SPEAKER_ENABLE)
 spkrenable.direction = digitalio.Direction.OUTPUT
 spkrenable.value = True
 
-# make the 2 input buttons
+# Make the 2 input buttons
 buttonA = digitalio.DigitalInOut(board.BUTTON_A)
 buttonA.direction = digitalio.Direction.INPUT
 buttonA.pull = digitalio.Pull.DOWN
@@ -23,8 +35,8 @@ audiofiles = ["rimshot.wav", "laugh.wav"]
 def play_file(filename):
     print("Playing file: " + filename)
     wave_file = open(filename, "rb")
-    with audioio.WaveFile(wave_file) as wave:
-        with audioio.AudioOut(board.A0) as audio:
+    with WaveFile(wave_file) as wave:
+        with AudioOut(board.SPEAKER) as audio:
             audio.play(wave)
             while audio.playing:
                 pass
