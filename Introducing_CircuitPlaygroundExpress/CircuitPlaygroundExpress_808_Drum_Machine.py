@@ -5,17 +5,17 @@ import touchio
 import digitalio
 
 try:
+    from audiocore import WaveFile
+except ImportError:
+    from audioio import WaveFile
+
+try:
     from audioio import AudioOut
 except ImportError:
     try:
         from audiopwmio import PWMAudioOut as AudioOut
     except ImportError:
         pass  # not always supported by every board!
-
-try:
-    from audiocore import WaveFile
-except ImportError:
-    from audioio import WaveFile
 
 bpm = 120  # Beats per minute, change this to suit your tempo
 
