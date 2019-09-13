@@ -134,4 +134,3 @@ while True:
     disp.fill(0)
     disp.show()
     time.sleep(DISPLAY_OFF)
-
