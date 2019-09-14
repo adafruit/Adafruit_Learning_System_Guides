@@ -69,6 +69,8 @@ GLOBAL_VAR uint16_t  lightSensorMax      GLOBAL_INIT(1023);
 GLOBAL_VAR float     lightSensorCurve    GLOBAL_INIT(1.0);
 GLOBAL_VAR float     irisMin             GLOBAL_INIT(0.45);
 GLOBAL_VAR float     irisRange           GLOBAL_INIT(0.35);
+GLOBAL_VAR bool      tracking            GLOBAL_INIT(true);
+GLOBAL_VAR float     trackFactor         GLOBAL_INIT(0.5);
 
 // Pin definition stuff will go here
 

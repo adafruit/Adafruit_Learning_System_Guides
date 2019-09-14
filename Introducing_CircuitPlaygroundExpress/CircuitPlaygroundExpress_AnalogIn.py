@@ -1,14 +1,12 @@
-# CircuitPlaygroundExpress_AnalogIn
-# reads the analog voltage level from a 10k potentiometer
-# connected to GND, 3.3V, and pin A1
-# and prints the results to the REPL
+# Circuit Playground AnalogIn
+# Reads the analog voltage level from a 10k potentiometer connected to GND, 3.3V, and pin A1
+# and prints the results to the serial console.
 
 import time
-
 import board
-from analogio import AnalogIn
+import analogio
 
-analogin = AnalogIn(board.A1)
+analogin = analogio.AnalogIn(board.A1)
 
 
 def getVoltage(pin):  # helper
