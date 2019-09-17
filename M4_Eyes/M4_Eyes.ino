@@ -201,7 +201,6 @@ void setup() {
 
   // Initialize DMAs
   for(e=0; e<NUM_EYES; e++) {
-    eye[e].display->setRotation(3);
     eye[e].display->fillScreen(0);
     eye[e].dma.allocate();
     eye[e].dma.setTrigger(eye[e].spi->getDMAC_ID_TX());
@@ -247,6 +246,7 @@ void setup() {
     eye[e].sclera.mirror     = 0;
     eye[e].sclera.spin       = 0.0;
     eye[e].sclera.iSpin      = 0;
+    eye[e].rotation          = 3;
 
     // Uncanny eyes carryover stuff for now, all messy:
     eye[e].blink.state = NOBLINK;
@@ -400,7 +400,9 @@ void setup() {
   randomSeed(SysTick->VAL + analogRead(A2));
   eyeOldX = eyeNewX = eyeOldY = eyeNewY = mapRadius; // Start in center
   for(e=0; e<NUM_EYES; e++) { // For each eye...
-    eye[e].eyeX = eyeOldX;
+    // Set up screen rotation (MUST be done after config load!)
+    eye[e].display->setRotation(eye[e].rotation);
+    eye[e].eyeX = eyeOldX; // Set up initial position
     eye[e].eyeY = eyeOldY;
   }
   lastLightReadTime = micros() + 2000000; // Delay initial light reading

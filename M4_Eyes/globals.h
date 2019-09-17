@@ -162,6 +162,7 @@ typedef struct {
   uint16_t         backColor;    // 16-bit 565 RGB, big-endian
   texture          iris;         // iris texture map
   texture          sclera;       // sclera texture map
+  uint8_t          rotation;     // Screen rotation (GFX lib)
 
   // Stuff carried over from Uncanny Eyes code. It now needs to be
   // independent per-eye because we interleave between drawing the

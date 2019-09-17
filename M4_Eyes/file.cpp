@@ -184,7 +184,8 @@ static void getFilename(JsonVariant v, char **ptr) {
 }
 
 void loadConfig(char *filename) {
-  File file;
+  File    file;
+  uint8_t rotation = 3;
 
   if(file = filesys.open(filename, FILE_READ)) {
     StaticJsonDocument<2048> doc;
@@ -265,6 +266,9 @@ void loadConfig(char *filename) {
                   scleraSpin   = 0.0;
       JsonVariant iristv       = doc["irisTexture"],
                   scleratv     = doc["scleraTexture"];
+
+      rotation  = doc["rotate"] | rotation; // Screen rotation (GFX lib)
+      rotation &= 3;
 
       v = doc["tracking"];
       if(v.is<bool>()) tracking = v.as<bool>();
@@ -361,6 +365,8 @@ void loadConfig(char *filename) {
           if(eye[e].sclera.filename) free(eye[e].sclera.filename);
           eye[e].sclera.filename = strdup(v);
         }
+        eye[e].rotation  = doc[eye[e].name]["rotate"] | rotation;
+        eye[e].rotation &= 3;
       }
 #endif
     }

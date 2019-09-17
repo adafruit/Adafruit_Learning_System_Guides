@@ -30,7 +30,7 @@ static void fatal(const char *message, uint16_t blinkDelay) {
 
 void setup() {
   pinMode(SPEAKER_ENABLE_PIN, OUTPUT);
-  digitalWrite(SPEAKER_ENABLE_PIN, HIGH); // Speaker OFF
+  digitalWrite(SPEAKER_ENABLE_PIN, LOW); // Speaker OFF
 
   Serial.begin(115200);
   //while(!Serial);
