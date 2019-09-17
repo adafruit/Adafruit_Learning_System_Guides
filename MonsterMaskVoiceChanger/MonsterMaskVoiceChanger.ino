@@ -42,7 +42,7 @@ void setup() {
   seesaw.analogWrite(SEESAW_BACKLIGHT_PIN, 0);
 
   if(!voiceSetup()) fatal("Voice init fail", 250);
-  digitalWrite(SPEAKER_ENABLE_PIN, LOW); // Speaker on
+  digitalWrite(SPEAKER_ENABLE_PIN, HIGH); // Speaker on
 
   // Configure Seesaw pins 9,10,11 as inputs
   seesaw.pinModeBulk(0b111000000000, INPUT_PULLUP);
