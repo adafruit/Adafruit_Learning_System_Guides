@@ -190,6 +190,7 @@ void loadConfig(char *filename) {
   if(file = filesys.open(filename, FILE_READ)) {
     StaticJsonDocument<2048> doc;
 
+    delay(100); // Make sure mass storage handler has a turn first!
     DeserializationError error = deserializeJson(doc, file);
     if(error) {
       Serial.println("Config file error, using default settings");
