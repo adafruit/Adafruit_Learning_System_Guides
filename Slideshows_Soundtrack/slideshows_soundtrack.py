@@ -1,18 +1,48 @@
 import board
 from adafruit_slideshow import SlideShow, PlayBackDirection
 import audioio
+import digitalio
 import touchio
 
 # Create the slideshow object that plays through once alphabetically.
 slideshow = SlideShow(board.DISPLAY)
 
-# Create the touch objects on the first and last teeth
-back_button = touchio.TouchIn(board.TOUCH1)
-forward_button = touchio.TouchIn(board.TOUCH4)
+# Set the touch objects to the first and last teeth
+back_pin = board.TOUCH1
+forward_pin = board.TOUCH4
+
+# Detect if this is the HalloWing M4 or M0
+is_hallowing_m4 = False
+try:
+    if getattr(board, "CAP_PIN"):
+        is_hallowing_m4 = True
+except AttributeError:
+    pass
+
+# Initialize the Buttons and Speaker
+if is_hallowing_m4:
+    # Enable the Speaker
+    speaker_enable = digitalio.DigitalInOut(board.SPEAKER_ENABLE)
+    speaker_enable.direction = digitalio.Direction.OUTPUT
+    speaker_enable.value = True
+
+    # Create digitalio objects and pull low for HalloWing M4
+    back_button = digitalio.DigitalInOut(back_pin)
+    back_button.direction = digitalio.Direction.OUTPUT
+    back_button.value = False
+    back_button.direction = digitalio.Direction.INPUT
+
+    forward_button = digitalio.DigitalInOut(forward_pin)
+    forward_button.direction = digitalio.Direction.OUTPUT
+    forward_button.value = False
+    forward_button.direction = digitalio.Direction.INPUT
+else:
+    # Create the touchio objects for HalloWing M0
+    back_button = touchio.TouchIn(back_pin)
+    forward_button = touchio.TouchIn(forward_pin)
 
 # Setup the speaker output
 a = audioio.AudioOut(board.SPEAKER)
-
 
 # Helper function that takes in the file name string, splits it at the period, and keeps only the
 # beginning of the string. i.e. kitten.bmp becomes kitten.
