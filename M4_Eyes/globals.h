@@ -212,3 +212,7 @@ extern void            calcDisplacement(void);
 extern void            calcMap(void);
 extern float           screen2map(int in);
 extern float           map2screen(int in);
+
+// Functions in user.cpp
+extern void            user_setup(void);
+extern void            user_loop(void);

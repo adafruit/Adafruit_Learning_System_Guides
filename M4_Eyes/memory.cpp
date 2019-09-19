@@ -79,6 +79,7 @@ uint8_t *writeDataToFlash(uint8_t *ramAddress, uint32_t len) {
     wait_ready(); // Wait for any NVM write op in progress
 
     while(bytesToGo > 0) {
+      yield();
       // Because dst (via flashAddress) is always quadword-aligned at this
       // point, and flash blocks are known to be a quadword-multiple size,
       // this comparison is reasonable for checking for start of block...

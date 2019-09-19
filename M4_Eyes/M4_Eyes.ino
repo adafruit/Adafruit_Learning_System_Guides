@@ -140,6 +140,7 @@ void setup() {
 
   Serial.printf("Available RAM at start: %d\n", availableRAM());
   Serial.printf("Available flash at start: %d\n", availableNVM());
+  yield(); // Periodic yield() makes sure mass storage filesystem stays alive
 
   // Backlight(s) off ASAP, they'll switch on after screen(s) init & clear
   pinMode(BACKLIGHT_PIN, OUTPUT);
@@ -163,6 +164,7 @@ void setup() {
   delay(20);
 #endif
 
+  yield();
   uint8_t e, rtna = 0x01; // Screen refresh rate control (datasheet 9.2.18, FRCTRL2)
   // Initialize displays
   for(e=0; e<NUM_EYES; e++) {
@@ -174,10 +176,12 @@ void setup() {
     eye[e].display->setRotation(0);
   }
 
+  yield();
   if (reader.drawBMP("/splash.bmp", *(eye[0].display), 0, 0) == IMAGE_SUCCESS) {
     Serial.println("Splashing");
     #if NUM_EYES > 1
     // other eye
+    yield();
     reader.drawBMP("/splash.bmp", *(eye[1].display), 0, 0);
     #endif
     // backlight on for a bit
@@ -200,6 +204,7 @@ void setup() {
   }
 
   // Initialize DMAs
+  yield();
   for(e=0; e<NUM_EYES; e++) {
     eye[e].display->fillScreen(0);
     eye[e].dma.allocate();
@@ -309,6 +314,7 @@ void setup() {
   // Load texture maps for eyes
   uint8_t e2;
   for(e=0; e<NUM_EYES; e++) { // For each eye...
+    yield();
     for(e2=0; e2<e; e2++) {    // Compare against each prior eye...
       // If both eyes have the same iris filename...
       if((eye[e].iris.filename && eye[e2].iris.filename) &&
@@ -362,6 +368,7 @@ void setup() {
   }
 
   // Load eyelid graphics.
+  yield();
 
   status = loadEyelid(upperEyelidFilename ?
     upperEyelidFilename : (char *)"upper.bmp",
@@ -389,6 +396,7 @@ void setup() {
   calcDisplacement();
   Serial.printf("Free RAM: %d\n", availableRAM());
 
+  yield();
   if(boopPin >= 0) {
     boopThreshold = 0;
     for(i=0; i<240; i++) {
@@ -405,6 +413,9 @@ void setup() {
     eye[e].eyeX = eyeOldX; // Set up initial position
     eye[e].eyeY = eyeOldY;
   }
+
+  user_setup();
+
   lastLightReadTime = micros() + 2000000; // Delay initial light reading
 }
 
@@ -890,6 +901,7 @@ void loop() {
         irisValue = irisMin + (sum * irisRange); // 0.0-1.0 -> iris min/max
         if((++iris_frame) >= (1 << IRIS_LEVELS)) iris_frame = 0;
       }
+      user_loop();
     }
   } // end first-column check
 
