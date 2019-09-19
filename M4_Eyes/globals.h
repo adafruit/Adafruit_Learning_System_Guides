@@ -69,6 +69,8 @@ GLOBAL_VAR uint16_t  lightSensorMax      GLOBAL_INIT(1023);
 GLOBAL_VAR float     lightSensorCurve    GLOBAL_INIT(1.0);
 GLOBAL_VAR float     irisMin             GLOBAL_INIT(0.45);
 GLOBAL_VAR float     irisRange           GLOBAL_INIT(0.35);
+GLOBAL_VAR bool      tracking            GLOBAL_INIT(true);
+GLOBAL_VAR float     trackFactor         GLOBAL_INIT(0.5);
 
 // Pin definition stuff will go here
 
@@ -131,6 +133,7 @@ typedef struct {
   uint16_t  startAngle; // INITIAL rotation 0-1023 CCW
   uint16_t  angle;      // CURRENT rotation 0-1023 CCW
   uint16_t  mirror;     // 0 = normal, 1023 = flip X axis
+  uint16_t  iSpin;      // Per-frame fixed integer spin, overrides 'spin' value
 } texture;
 
 // Each eye then uses the following structure. Each eye must be on its own
@@ -159,6 +162,7 @@ typedef struct {
   uint16_t         backColor;    // 16-bit 565 RGB, big-endian
   texture          iris;         // iris texture map
   texture          sclera;       // sclera texture map
+  uint8_t          rotation;     // Screen rotation (GFX lib)
 
   // Stuff carried over from Uncanny Eyes code. It now needs to be
   // independent per-eye because we interleave between drawing the

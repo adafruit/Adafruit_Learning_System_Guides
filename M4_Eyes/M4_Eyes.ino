@@ -36,6 +36,7 @@
 
 #define GLOBAL_VAR
 #include "globals.h"
+extern Adafruit_ImageReader reader;
 
 // Global eye state that applies to all eyes (not per-eye):
 bool     eyeInMotion = false;
@@ -56,9 +57,11 @@ uint32_t lastLightReadTime       = 0;
 float    lastLightValue          = 0.5;
 double   irisValue               = 0.5;
 int      iPupilFactor            = 42;
-uint32_t boopSum                 = 0;
+uint32_t boopSum                 = 0,
+         boopSumFiltered         = 0;
 bool     booped                  = false;
 int      fixate                  = 7;
+uint8_t  lightSensorFailCount    = 0;
 
 // For autonomous iris scaling
 #define  IRIS_LEVELS 7
@@ -105,8 +108,17 @@ SPISettings settings(DISPLAY_FREQ, MSBFIRST, SPI_MODE0);
 // the affected DMA channel (DMAbuddy::fix()).
 #define DMA_TIMEOUT ((240 * 16 * 4000) / (DISPLAY_FREQ / 1000))
 
+static inline uint16_t readBoop(void) {
+  uint16_t counter = 0;
+  pinMode(boopPin, OUTPUT);
+  digitalWrite(boopPin, HIGH);
+  pinMode(boopPin, INPUT);
+  while(digitalRead(boopPin) && (++counter < 1000));
+  return counter;
+}
+
 // Crude error handler. Prints message to Serial Monitor, blinks LED.
-void fatal(char *message, uint16_t blinkDelay) {
+void fatal(const char *message, uint16_t blinkDelay) {
   Serial.println(message);
   for(bool ledState = HIGH;; ledState = !ledState) {
     digitalWrite(LED_BUILTIN, ledState);
@@ -124,7 +136,7 @@ void setup() {
   int i = file_setup();
 
   Serial.begin(9600);
-//  while(!Serial);
+  //while(!Serial) delay(10);
 
   Serial.printf("Available RAM at start: %d\n", availableRAM());
   Serial.printf("Available flash at start: %d\n", availableNVM());
@@ -137,6 +149,7 @@ void setup() {
   seesaw.analogWrite(SEESAW_BACKLIGHT_PIN, 0);
   // Configure Seesaw pins 9,10,11 as inputs
   seesaw.pinModeBulk(0b111000000000, INPUT_PULLUP);
+  uint32_t initialButtonState = seesaw.digitalReadBulk(0b111000000000);
 #endif
 
   if(i == 1)      fatal("Flash init fail", 100);
@@ -150,12 +163,44 @@ void setup() {
   delay(20);
 #endif
 
-  uint8_t e;
+  uint8_t e, rtna = 0x01; // Screen refresh rate control (datasheet 9.2.18, FRCTRL2)
+  // Initialize displays
   for(e=0; e<NUM_EYES; e++) {
     eye[e].display = new Adafruit_ST7789(eye[e].spi, eye[e].cs, eye[e].dc, eye[e].rst);
     eye[e].display->init(240, 240);
-    eye[e].display->setRotation(3);
+    eye[e].display->sendCommand(0xC6, &rtna, 1);
     eye[e].spi->setClockSource(DISPLAY_CLKSRC);
+    eye[e].display->fillScreen(0x1234);
+    eye[e].display->setRotation(0);
+  }
+
+  if (reader.drawBMP("/splash.bmp", *(eye[0].display), 0, 0) == IMAGE_SUCCESS) {
+    Serial.println("Splashing");
+    #if NUM_EYES > 1
+    // other eye
+    reader.drawBMP("/splash.bmp", *(eye[1].display), 0, 0);
+    #endif
+    // backlight on for a bit
+    for (int bl=0; bl<=250; bl+=10) {
+      #if NUM_EYES > 1
+      seesaw.analogWrite(SEESAW_BACKLIGHT_PIN, bl);
+      #endif
+      analogWrite(BACKLIGHT_PIN, bl);
+      delay(10);
+    }
+    delay(2000);
+    // backlight back off
+    for (int bl=250; bl>=0; bl-=10) {
+      #if NUM_EYES > 1
+      seesaw.analogWrite(SEESAW_BACKLIGHT_PIN, bl);
+      #endif
+      analogWrite(BACKLIGHT_PIN, bl);
+      delay(10);
+    }
+  }
+
+  // Initialize DMAs
+  for(e=0; e<NUM_EYES; e++) {
     eye[e].display->fillScreen(0);
     eye[e].dma.allocate();
     eye[e].dma.setTrigger(eye[e].spi->getDMAC_ID_TX());
@@ -191,19 +236,22 @@ void setup() {
     eye[e].iris.startAngle   = (e & 1) ? 512 : 0; // Rotate alternate eyes 180 degrees
     eye[e].iris.angle        = eye[e].iris.startAngle;
     eye[e].iris.mirror       = 0;
-    eye[e].iris.spin         = 0;
+    eye[e].iris.spin         = 0.0;
+    eye[e].iris.iSpin        = 0;
     eye[e].sclera.color      = 0xFFFF;
     eye[e].sclera.data       = NULL;
     eye[e].sclera.filename   = NULL;
     eye[e].sclera.startAngle = (e & 1) ? 512 : 0; // Rotate alternate eyes 180 degrees
     eye[e].sclera.angle      = eye[e].sclera.startAngle;
     eye[e].sclera.mirror     = 0;
-    eye[e].sclera.spin       = 0;
+    eye[e].sclera.spin       = 0.0;
+    eye[e].sclera.iSpin      = 0;
+    eye[e].rotation          = 3;
 
     // Uncanny eyes carryover stuff for now, all messy:
     eye[e].blink.state = NOBLINK;
-    eye[e].eyeX        = 512;
-    eye[e].eyeY        = 512;
+//    eye[e].eyeX        = 512;
+//    eye[e].eyeY        = 512;
     eye[e].blinkFactor = 0.0;
   }
 
@@ -214,7 +262,21 @@ void setup() {
 
   // LOAD CONFIGURATION FILE -----------------------------------------------
 
-  loadConfig("config.eye");
+  // No file selector yet. In the meantime, you can override the default
+  // config file by holding one of the 3 edge buttons at startup (loads
+  // config1.eye, config2.eye or config3.eye instead). Keep fingers clear
+  // of the nose booper when doing this...it self-calibrates on startup.
+  char *filename = "config.eye";
+#if NUM_EYES > 1 // Only available on MONSTER M4SK
+  if(!(initialButtonState & 0b001000000000)) {
+    filename = "config1.eye";
+  } else if(!(initialButtonState & 0b010000000000)) {
+    filename = "config2.eye";
+  } else if(!(initialButtonState & 0b100000000000)) {
+    filename = "config3.eye";
+  }
+#endif
+  loadConfig(filename);
 
   // LOAD EYELIDS AND TEXTURE MAPS -----------------------------------------
 
@@ -327,7 +389,33 @@ void setup() {
   calcDisplacement();
   Serial.printf("Free RAM: %d\n", availableRAM());
 
+  if(boopPin >= 0) {
+    boopThreshold = 0;
+    for(i=0; i<240; i++) {
+      boopThreshold += readBoop();
+    }
+    boopThreshold = boopThreshold * 110 / 100; // 10% overhead
+  }
+
   randomSeed(SysTick->VAL + analogRead(A2));
+  eyeOldX = eyeNewX = eyeOldY = eyeNewY = mapRadius; // Start in center
+  for(e=0; e<NUM_EYES; e++) { // For each eye...
+    // Set up screen rotation (MUST be done after config load!)
+    eye[e].display->setRotation(eye[e].rotation);
+    eye[e].eyeX = eyeOldX; // Set up initial position
+    eye[e].eyeY = eyeOldY;
+  }
+  lastLightReadTime = micros() + 2000000; // Delay initial light reading
+}
+
+static inline uint16_t readLightSensor(void) {
+#if NUM_EYES > 1
+  if(lightSensorPin >= 100) {
+    return seesaw.analogRead(lightSensorPin - 100);
+  }
+#else
+  return analogRead(lightSensorPin);
+#endif
 }
 
 // LOOP FUNCTION - CALLED REPEATEDLY UNTIL POWER-OFF -----------------------
@@ -367,7 +455,8 @@ an independent frame rate depending on particular complexity at the moment).
 void loop() {
   if(++eyeNum >= NUM_EYES) eyeNum = 0; // Cycle through eyes...
 
-  uint8_t x = eye[eyeNum].colNum;
+  uint8_t  x = eye[eyeNum].colNum;
+  uint32_t t = micros();
 
   // If next column for this eye is not yet rendered...
   if(!eye[eyeNum].column_ready) {
@@ -375,7 +464,6 @@ void loop() {
 
       // ONCE-PER-FRAME EYE ANIMATION LOGIC HAPPENS HERE -------------------
 
-      uint32_t t = micros();
       float eyeX, eyeY;
       // Eye movement
       int32_t dt = t - eyeMoveStartTime;      // uS elapsed since last eye event
@@ -410,7 +498,7 @@ void loop() {
       }
 
       // Eyes fixate (are slightly crossed) -- amount is filtered for boops
-      int nufix = booped ? 150 : 7;
+      int nufix = booped ? 90 : 7;
       fixate = ((fixate * 15) + nufix) / 16;
       // save eye position to this eye's struct so it's same throughout render
       if(eyeNum & 1) eyeX += fixate; // Eyes converge slightly toward center
@@ -418,49 +506,11 @@ void loop() {
       eye[eyeNum].eyeX = eyeX;
       eye[eyeNum].eyeY = eyeY;
 
-      // Handle pupil scaling
-      if(lightSensorPin >= 0) {
-        // Read light sensor, but not too often (Seesaw hates that)
-        #define LIGHT_INTERVAL (1000000 / 8) // 8 Hz, don't poll Seesaw too often
-        if((t - lastLightReadTime) >= LIGHT_INTERVAL) {
-          // Fun fact: eyes have a "consensual response" to light -- both
-          // pupils will react even if the opposite eye is stimulated.
-          // Meaning we can get away with using a single light sensor for
-          // both eyes. This comment has nothing to do with the code.
-          uint16_t rawReading = (lightSensorPin >= 100) ?
-            seesaw.analogRead(lightSensorPin - 100) : analogRead(lightSensorPin);
-          if(rawReading < lightSensorMin)      rawReading = lightSensorMin; // Clamp light sensor range
-          else if(rawReading > lightSensorMax) rawReading = lightSensorMax; // to within usable range
-          float v = (float)(rawReading - lightSensorMin) / (float)(lightSensorMax - lightSensorMin); // 0.0 to 1.0
-          v = pow(v, lightSensorCurve);
-          lastLightValue    = irisMin + v * irisRange;
-          lastLightReadTime = t;
-        }
-        irisValue = (irisValue * 0.97) + (lastLightValue * 0.03); // Filter response for smooth reaction
-      } else {
-        // Not light responsive. Use autonomous iris w/fractal subdivision
-        float n, sum = 0.5;
-        for(uint16_t i=0; i<IRIS_LEVELS; i++) { // 0,1,2,3,...
-          uint16_t iexp  = 1 << (i+1);          // 2,4,8,16,...
-          uint16_t imask = (iexp - 1);          // 2^i-1 (1,3,7,15,...)
-          uint16_t ibits = iris_frame & imask;  // 0 to mask
-          if(ibits) {
-            float weight = (float)ibits / (float)iexp; // 0.0 to <1.0
-            n            = iris_prev[i] * (1.0 - weight) + iris_next[i] * weight;
-          } else {
-            n            = iris_next[i];
-            iris_prev[i] = iris_next[i];
-            iris_next[i] = -0.5 + ((float)random(1000) / 999.0); // -0.5 to +0.5
-          }
-          iexp = 1 << (IRIS_LEVELS - i); // ...8,4,2,1
-          sum += n / (float)iexp;
-        }
-        irisValue = irisMin + (sum * irisRange); // 0.0-1.0 -> iris min/max
-        if((++iris_frame) >= (1 << IRIS_LEVELS)) iris_frame = 0;
-      }
-
       // pupilFactor? irisValue? TO DO: pick a name and stick with it
       eye[eyeNum].pupilFactor = irisValue;
+      // Also note - irisValue is calculated at the END of this function
+      // for the next frame (because the sensor must be read when there's
+      // no SPI traffic to the left eye)
 
       // Similar to the autonomous eye movement above -- blink start times
       // and durations are random (within ranges).
@@ -478,41 +528,49 @@ void loop() {
         timeToNextBlink = blinkDuration * 3 + random(4000000);
       }
 
-      // Eyelids naturally "track" the pupils (move up or down automatically)
-      int ix = (int)map2screen(mapRadius - eye[eyeNum].eyeX) + 120, // Pupil position
-          iy = (int)map2screen(mapRadius - eye[eyeNum].eyeY) + 120; // on screen
-      iy += irisRadius / 2; // top edge of iris (ish) in screen pixels
-      float qqq; // So many sloppy temp vars in here for now, sorry
-      if(eyeNum & 1) ix = 239 - ix; // Flip for right eye
-      if(iy > upperOpen[ix]) {
-        qqq = 1.0;
-      } else if(iy < upperClosed[ix]) {
-        qqq = 0.0;
+      float uq, lq; // So many sloppy temp vars in here for now, sorry
+      if(tracking) {
+        // Eyelids naturally "track" the pupils (move up or down automatically)
+        int ix = (int)map2screen(mapRadius - eye[eyeNum].eyeX) + 120, // Pupil position
+            iy = (int)map2screen(mapRadius - eye[eyeNum].eyeY) + 120; // on screen
+        iy += irisRadius * trackFactor;
+        if(eyeNum & 1) ix = 239 - ix; // Flip for right eye
+        if(iy > upperOpen[ix]) {
+          uq = 1.0;
+        } else if(iy < upperClosed[ix]) {
+          uq = 0.0;
+        } else {
+          uq = (float)(iy - upperClosed[ix]) / (float)(upperOpen[ix] - upperClosed[ix]);
+        }
+        if(booped) {
+          uq = 0.9;
+          lq = 0.7;
+        } else {
+          lq = 1.0 - uq;
+        }
       } else {
-        qqq = (float)(iy - upperClosed[ix]) / (float)(upperOpen[ix] - upperClosed[ix]);
+        // If no tracking, eye is FULLY OPEN when not blinking
+        uq = 1.0;
+        lq = 1.0;
       }
       // Dampen eyelid movements slightly
       // SAVE upper & lower lid factors per eye,
       // they need to stay consistent across frame
-      eye[eyeNum].upperLidFactor = (eye[eyeNum].upperLidFactor * 0.75) + (qqq * 0.25);
-      eye[eyeNum].lowerLidFactor = 1.0 - eye[eyeNum].upperLidFactor;
+      eye[eyeNum].upperLidFactor = (eye[eyeNum].upperLidFactor * 0.6) + (uq * 0.4);
+      eye[eyeNum].lowerLidFactor = (eye[eyeNum].lowerLidFactor * 0.6) + (lq * 0.4);
+
 
       // Process blinks
       if(eye[eyeNum].blink.state) { // Eye currently blinking?
         // Check if current blink state time has elapsed
         if((t - eye[eyeNum].blink.startTime) >= eye[eyeNum].blink.duration) {
-          if((eye[eyeNum].blink.state == ENBLINK) && booped) {
-            // do nothing, don't advance blink state while booped
+          if(++eye[eyeNum].blink.state > DEBLINK) { // Deblinking finished?
+            eye[eyeNum].blink.state = NOBLINK;      // No longer blinking
+            eye[eyeNum].blinkFactor = 0.0;
+          } else { // Advancing from ENBLINK to DEBLINK mode
+            eye[eyeNum].blink.duration *= 2; // DEBLINK is 1/2 ENBLINK speed
+            eye[eyeNum].blink.startTime = t;
             eye[eyeNum].blinkFactor = 1.0;
-          } else {
-            if(++eye[eyeNum].blink.state > DEBLINK) { // Deblinking finished?
-              eye[eyeNum].blink.state = NOBLINK;      // No longer blinking
-              eye[eyeNum].blinkFactor = 0.0;
-            } else { // Advancing from ENBLINK to DEBLINK mode
-              eye[eyeNum].blink.duration *= 2; // DEBLINK is 1/2 ENBLINK speed
-              eye[eyeNum].blink.startTime = t;
-              eye[eyeNum].blinkFactor = 1.0;
-            }
           }
         } else {
           eye[eyeNum].blinkFactor = (float)(t - eye[eyeNum].blink.startTime) / (float)eye[eyeNum].blink.duration;
@@ -531,21 +589,9 @@ void loop() {
 
       // Once per frame (of eye #0), reset boopSum...
       if((eyeNum == 0) && (boopPin >= 0)) {
-        if(boopSum > boopThreshold) {
+        boopSumFiltered = ((boopSumFiltered * 3) + boopSum) / 4;
+        if(boopSumFiltered > boopThreshold) {
           if(!booped) {
-            timeOfLastBlink = t;
-            // slow, intentional blink
-            uint32_t blinkDuration = random(60000, 100000);
-            // Set up durations for both eyes (if not already winking)
-            for(uint8_t e=0; e<NUM_EYES; e++) {
-//              if(eye[e].blink.state == NOBLINK) {
-              if(1) {
-                eye[e].blink.state     = ENBLINK;
-                eye[e].blink.startTime = t;
-                eye[e].blink.duration  = blinkDuration;
-              }
-            }
-            timeToNextBlink = blinkDuration * 3 + random(4000000);
             Serial.println("BOOP!");
           }
           booped = true;
@@ -556,8 +602,18 @@ void loop() {
       }
 
       float mins = (float)millis() / 60000.0;
-      eye[eyeNum].iris.angle   = (int)((float)eye[eyeNum].iris.startAngle   + eye[eyeNum].iris.spin   * mins + 0.5);
-      eye[eyeNum].sclera.angle = (int)((float)eye[eyeNum].sclera.startAngle + eye[eyeNum].sclera.spin * mins + 0.5);
+      if(eye[eyeNum].iris.iSpin) {
+        // Spin works in fixed amount per frame (eyes may lose sync, but "wagon wheel" tricks work)
+        eye[eyeNum].iris.angle   += eye[eyeNum].iris.iSpin;
+      } else {
+        // Keep consistent timing in spin animation (eyes stay in sync, no "wagon wheel" effects)
+        eye[eyeNum].iris.angle    = (int)((float)eye[eyeNum].iris.startAngle   + eye[eyeNum].iris.spin   * mins + 0.5);
+      }
+      if(eye[eyeNum].sclera.iSpin) {
+        eye[eyeNum].sclera.angle += eye[eyeNum].sclera.iSpin;
+      } else {
+        eye[eyeNum].sclera.angle  = (int)((float)eye[eyeNum].sclera.startAngle + eye[eyeNum].sclera.spin * mins + 0.5);
+      }
 
       // END ONCE-PER-FRAME EYE ANIMATION ----------------------------------
 
@@ -785,7 +841,62 @@ void loop() {
     eye[eyeNum].display->setAddrWindow(0, 0, 240, 240);
     delayMicroseconds(1);
     digitalWrite(eye[eyeNum].dc, HIGH); // Data mode
+    if(eyeNum == (NUM_EYES-1)) {
+      // Handle pupil scaling
+      if(lightSensorPin >= 0) {
+        // Read light sensor, but not too often (Seesaw hates that)
+        #define LIGHT_INTERVAL (1000000 / 10) // 10 Hz, don't poll Seesaw too often
+        if((t - lastLightReadTime) >= LIGHT_INTERVAL) {
+          // Fun fact: eyes have a "consensual response" to light -- both
+          // pupils will react even if the opposite eye is stimulated.
+          // Meaning we can get away with using a single light sensor for
+          // both eyes. This comment has nothing to do with the code.
+          uint16_t rawReading = readLightSensor();
+          if(rawReading <= 1023) {
+            if(rawReading < lightSensorMin)      rawReading = lightSensorMin; // Clamp light sensor range
+            else if(rawReading > lightSensorMax) rawReading = lightSensorMax; // to within usable range
+            float v = (float)(rawReading - lightSensorMin) / (float)(lightSensorMax - lightSensorMin); // 0.0 to 1.0
+            v = pow(v, lightSensorCurve);
+            lastLightValue    = irisMin + v * irisRange;
+            lastLightReadTime = t;
+            lightSensorFailCount = 0;
+          } else { // I2C error
+            if(++lightSensorFailCount >= 25) { // If repeated errors in succession...
+              lightSensorPin = -1; // Stop trying to use the light sensor
+            } else {
+              lastLightReadTime = t - LIGHT_INTERVAL + 30000; // Try again in 30 ms
+            }
+          }
+        }
+        irisValue = (irisValue * 0.97) + (lastLightValue * 0.03); // Filter response for smooth reaction
+      } else {
+        // Not light responsive. Use autonomous iris w/fractal subdivision
+        float n, sum = 0.5;
+        for(uint16_t i=0; i<IRIS_LEVELS; i++) { // 0,1,2,3,...
+          uint16_t iexp  = 1 << (i+1);          // 2,4,8,16,...
+          uint16_t imask = (iexp - 1);          // 2^i-1 (1,3,7,15,...)
+          uint16_t ibits = iris_frame & imask;  // 0 to mask
+          if(ibits) {
+            float weight = (float)ibits / (float)iexp; // 0.0 to <1.0
+            n            = iris_prev[i] * (1.0 - weight) + iris_next[i] * weight;
+          } else {
+            n            = iris_next[i];
+            iris_prev[i] = iris_next[i];
+            iris_next[i] = -0.5 + ((float)random(1000) / 999.0); // -0.5 to +0.5
+          }
+          iexp = 1 << (IRIS_LEVELS - i); // ...8,4,2,1
+          sum += n / (float)iexp;
+        }
+        irisValue = irisMin + (sum * irisRange); // 0.0-1.0 -> iris min/max
+        if((++iris_frame) >= (1 << IRIS_LEVELS)) iris_frame = 0;
+      }
+    }
   } // end first-column check
+
+  // MUST read the booper when there’s no SPI traffic across the nose!
+  if((eyeNum == (NUM_EYES-1)) && (boopPin >= 0)) {
+    boopSum += readBoop();
+  }
 
   memcpy(eye[eyeNum].dptr, &eye[eyeNum].column[eye[eyeNum].colIdx].descriptor[0], sizeof(DmacDescriptor));
   eye[eyeNum].dma_busy       = true;
@@ -796,13 +907,4 @@ void loop() {
   }
   eye[eyeNum].colIdx       ^= 1;    // Alternate 0/1 line structs
   eye[eyeNum].column_ready = false; // OK to render next line
-
-  if((eyeNum == 0) && (boopPin >= 0)) {
-    uint16_t counter = 0;
-    pinMode(boopPin, OUTPUT);
-    digitalWrite(boopPin, HIGH);
-    pinMode(boopPin, INPUT);
-    while(digitalRead(boopPin) && (++counter < 1000));
-    boopSum += counter;
-  }
 }

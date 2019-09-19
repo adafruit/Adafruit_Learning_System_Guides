@@ -184,11 +184,13 @@ static void getFilename(JsonVariant v, char **ptr) {
 }
 
 void loadConfig(char *filename) {
-  File file;
+  File    file;
+  uint8_t rotation = 3;
 
   if(file = filesys.open(filename, FILE_READ)) {
     StaticJsonDocument<2048> doc;
 
+    delay(100); // Make sure mass storage handler has a turn first!
     DeserializationError error = deserializeJson(doc, file);
     if(error) {
       Serial.println("Config file error, using default settings");
@@ -247,7 +249,8 @@ void loadConfig(char *filename) {
 
       lightSensorPin = doc["lightSensor"]   | lightSensorPin;
       boopPin        = doc["boopSensor"]    | boopPin;
-      boopThreshold  = doc["boopThreshold"] | boopThreshold;
+// Computed at startup, NOT from file now
+//      boopThreshold  = doc["boopThreshold"] | boopThreshold;
 
       // Values that can be distinct per-eye but have a common default...
       uint16_t    pupilColor   = dwim(doc["pupilColor"] , eye[0].pupilColor),
@@ -257,17 +260,35 @@ void loadConfig(char *filename) {
                   irisMirror   = 0,
                   scleraMirror = 0,
                   irisAngle    = 0,
-                  scleraAngle  = 0;
+                  scleraAngle  = 0,
+                  irisiSpin    = 0,
+                  scleraiSpin  = 0;
       float       irisSpin     = 0.0,
                   scleraSpin   = 0.0;
       JsonVariant iristv       = doc["irisTexture"],
                   scleratv     = doc["scleraTexture"];
+
+      rotation  = doc["rotate"] | rotation; // Screen rotation (GFX lib)
+      rotation &= 3;
+
+      v = doc["tracking"];
+      if(v.is<bool>()) tracking = v.as<bool>();
+      v = doc["squint"];
+      if(v.is<float>()) {
+        trackFactor = 1.0 - v.as<float>();
+        if(trackFactor < 0.0)      trackFactor = 0.0;
+        else if(trackFactor > 1.0) trackFactor = 1.0;
+      }
 
       // Convert clockwise int (0-1023) or float (0.0-1.0) values to CCW int used internally:
       v = doc["irisSpin"];
       if(v.is<float>()) irisSpin   = v.as<float>() * -1024.0;
       v = doc["scleraSpin"];
       if(v.is<float>()) scleraSpin = v.as<float>() * -1024.0;
+      v = doc["irisiSpin"];
+      if(v.is<int>()) irisiSpin    = v.as<int>();
+      v = doc["scleraiSpin"];
+      if(v.is<int>()) scleraiSpin  = v.as<int>();
       v = doc["irisMirror"];
       if(v.is<bool>() || v.is<int>()) irisMirror   = v ? 1023 : 0;
       v = doc["scleraMirror"];
@@ -294,6 +315,8 @@ void loadConfig(char *filename) {
         eye[e].sclera.mirror = scleraMirror;
         eye[e].iris.spin     = irisSpin;
         eye[e].sclera.spin   = scleraSpin;
+        eye[e].iris.iSpin    = irisiSpin;
+        eye[e].sclera.iSpin  = scleraiSpin;
         // iris and sclera filenames are strdup'd for each eye rather than
         // sharing a common pointer, reason being that it gets really messy
         // below when overriding one or the other and trying to do the right
@@ -325,6 +348,10 @@ void loadConfig(char *filename) {
         if(v.is<float>()) eye[e].iris.spin   = v.as<float>() * -1024.0;
         v = doc[eye[e].name]["scleraSpin"];
         if(v.is<float>()) eye[e].sclera.spin = v.as<float>() * -1024.0;
+        v = doc[eye[e].name]["irisiSpin"];
+        if(v.is<int>()) eye[e].iris.iSpin   = v.as<int>();
+        v = doc[eye[e].name]["scleraiSpin"];
+        if(v.is<int>()) eye[e].sclera.iSpin = v.as<int>();
         v = doc[eye[e].name]["irisMirror"];
         if(v.is<bool>() || v.is<int>()) eye[e].iris.mirror   = v ? 1023 : 0;
         v = doc[eye[e].name]["scleraMirror"];
@@ -339,6 +366,8 @@ void loadConfig(char *filename) {
           if(eye[e].sclera.filename) free(eye[e].sclera.filename);
           eye[e].sclera.filename = strdup(v);
         }
+        eye[e].rotation  = doc[eye[e].name]["rotate"] | rotation;
+        eye[e].rotation &= 3;
       }
 #endif
     }
