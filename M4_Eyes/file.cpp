@@ -190,8 +190,10 @@ void loadConfig(char *filename) {
   if(file = filesys.open(filename, FILE_READ)) {
     StaticJsonDocument<2048> doc;
 
-    delay(100); // Make sure mass storage handler has a turn first!
+    yield();
+//  delay(100); // Make sure mass storage handler has a turn first!
     DeserializationError error = deserializeJson(doc, file);
+    yield();
     if(error) {
       Serial.println("Config file error, using default settings");
       Serial.println(error.c_str());
@@ -430,6 +432,7 @@ ImageReturnCode loadEyelid(char *filename,
     // later) are easily removed.
   }
 
+  yield();
   if((status = reader.loadBMP(filename, image)) == IMAGE_SUCCESS) {
     if(image.getFormat() == IMAGE_1) { // MUST be 1-bit image
       uint16_t *palette = image.getPalette();
@@ -504,6 +507,7 @@ ImageReturnCode loadTexture(char *filename, uint16_t **data,
     // later) are easily removed.
   }
 
+  yield();
   if((status = reader.loadBMP(filename, image)) == IMAGE_SUCCESS) {
     if(image.getFormat() == IMAGE_16) { // MUST be 16-bit image
       Serial.println("Texture loaded!");
