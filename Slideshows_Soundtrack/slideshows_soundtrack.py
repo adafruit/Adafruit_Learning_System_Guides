@@ -11,35 +11,24 @@ slideshow = SlideShow(board.DISPLAY)
 back_pin = board.TOUCH1
 forward_pin = board.TOUCH4
 
-# Detect if this is the HalloWing M4 or M0
-is_hallowing_m4 = False
+# Perform a couple extra steps for the HalloWing M4
 try:
     if getattr(board, "CAP_PIN"):
-        is_hallowing_m4 = True
+        # Create digitalio objects and pull low for HalloWing M4
+        cap_pin = digitalio.DigitalInOut(board.CAP_PIN)
+        cap_pin.direction = digitalio.Direction.OUTPUT
+        cap_pin.value = False
+    if getattr(board, "SPEAKER_ENABLE"):
+        # Enable the Speaker
+        speaker_enable = digitalio.DigitalInOut(board.SPEAKER_ENABLE)
+        speaker_enable.direction = digitalio.Direction.OUTPUT
+        speaker_enable.value = True
 except AttributeError:
     pass
 
-# Initialize the Buttons and Speaker
-if is_hallowing_m4:
-    # Enable the Speaker
-    speaker_enable = digitalio.DigitalInOut(board.SPEAKER_ENABLE)
-    speaker_enable.direction = digitalio.Direction.OUTPUT
-    speaker_enable.value = True
-
-    # Create digitalio objects and pull low for HalloWing M4
-    back_button = digitalio.DigitalInOut(back_pin)
-    back_button.direction = digitalio.Direction.OUTPUT
-    back_button.value = False
-    back_button.direction = digitalio.Direction.INPUT
-
-    forward_button = digitalio.DigitalInOut(forward_pin)
-    forward_button.direction = digitalio.Direction.OUTPUT
-    forward_button.value = False
-    forward_button.direction = digitalio.Direction.INPUT
-else:
-    # Create the touchio objects for HalloWing M0
-    back_button = touchio.TouchIn(back_pin)
-    forward_button = touchio.TouchIn(forward_pin)
+# Create the touchio objects for HalloWing M0
+back_button = touchio.TouchIn(back_pin)
+forward_button = touchio.TouchIn(forward_pin)
 
 # Setup the speaker output
 a = audioio.AudioOut(board.SPEAKER)
