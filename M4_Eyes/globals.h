@@ -84,6 +84,11 @@ GLOBAL_VAR int8_t    blinkPin            GLOBAL_INIT(-1); // Manual both-eyes bl
 #endif
 GLOBAL_VAR uint32_t  boopThreshold       GLOBAL_INIT(17500);
 
+#if defined(ADAFRUIT_MONSTER_M4SK_EXPRESS)
+GLOBAL_VAR bool      voiceOn             GLOBAL_INIT(false);
+GLOBAL_VAR float     currentPitch        GLOBAL_INIT(1.0);
+GLOBAL_VAR float     defaultPitch        GLOBAL_INIT(1.0);
+#endif
 
 // EYE-RELATED STRUCTURES --------------------------------------------------
 
@@ -206,6 +211,14 @@ extern ImageReturnCode loadTexture(char *filename, uint16_t **data, uint16_t *wi
 extern uint32_t        availableRAM(void);
 extern uint32_t        availableNVM(void);
 extern uint8_t        *writeDataToFlash(uint8_t *src, uint32_t len);
+
+// Functions in pdmvoice.cpp
+#if defined(ADAFRUIT_MONSTER_M4SK_EXPRESS)
+extern bool              voiceSetup(void);
+extern float             voicePitch(float p);
+extern void              voiceGain(float g);
+extern volatile uint16_t voiceLastReading;
+#endif // ADAFRUIT_MONSTER_M4SK_EXPRESS
 
 // Functions in tablegen.cpp
 extern void            calcDisplacement(void);

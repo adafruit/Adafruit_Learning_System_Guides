@@ -69,6 +69,10 @@ float    iris_prev[IRIS_LEVELS] = { 0 };
 float    iris_next[IRIS_LEVELS] = { 0 };
 uint16_t iris_frame = 0;
 
+#if NUM_EYES > 1
+uint32_t priorButtonState;
+#endif
+
 // Callback invoked after each SPI DMA transfer - sets a flag indicating
 // the next line of graphics can be issued as soon as its ready.
 static void dma_callback(Adafruit_ZeroDMA *dma) {
@@ -150,7 +154,7 @@ void setup() {
   seesaw.analogWrite(SEESAW_BACKLIGHT_PIN, 0);
   // Configure Seesaw pins 9,10,11 as inputs
   seesaw.pinModeBulk(0b111000000000, INPUT_PULLUP);
-  uint32_t initialButtonState = seesaw.digitalReadBulk(0b111000000000);
+  priorButtonState = seesaw.digitalReadBulk(0b111000000000);
 #endif
 
   if(i == 1)      fatal("Flash init fail", 100);
@@ -273,11 +277,11 @@ void setup() {
   // of the nose booper when doing this...it self-calibrates on startup.
   char *filename = "config.eye";
 #if NUM_EYES > 1 // Only available on MONSTER M4SK
-  if(!(initialButtonState & 0b001000000000)) {
+  if(!(priorButtonState & 0b001000000000)) {
     filename = "config1.eye";
-  } else if(!(initialButtonState & 0b010000000000)) {
+  } else if(!(priorButtonState & 0b010000000000)) {
     filename = "config2.eye";
-  } else if(!(initialButtonState & 0b100000000000)) {
+  } else if(!(priorButtonState & 0b100000000000)) {
     filename = "config3.eye";
   }
 #endif
@@ -413,6 +417,18 @@ void setup() {
     eye[e].eyeX = eyeOldX; // Set up initial position
     eye[e].eyeY = eyeOldY;
   }
+
+#if defined(ADAFRUIT_MONSTER_M4SK_EXPRESS)
+  if(voiceOn) {
+    if(!voiceSetup()) {
+      Serial.println("Voice init fail, continuing without");
+      voiceOn = false;
+    } else {
+      currentPitch = voicePitch(currentPitch);
+      digitalWrite(20, HIGH); // Speaker on
+    }
+  }
+#endif
 
   user_setup();
 
@@ -901,6 +917,27 @@ void loop() {
         irisValue = irisMin + (sum * irisRange); // 0.0-1.0 -> iris min/max
         if((++iris_frame) >= (1 << IRIS_LEVELS)) iris_frame = 0;
       }
+#if defined(ADAFRUIT_MONSTER_M4SK_EXPRESS)
+      if(voiceOn) {
+        // Read buttons, change pitch
+        uint32_t buttonState  = seesaw.digitalReadBulk(0b111000000000); // Bits CLEAR if currently pressed
+        uint32_t changedState = ~(buttonState ^ priorButtonState);      // Bits CLEAR if changed from before
+        uint32_t newlyPressed = ~(buttonState | changedState);          // Bits SET if newly pressed
+        if(       newlyPressed & 0b001000000000) { // Seesaw pin 9 (inner)
+          currentPitch *= 1.05;
+        } else if(newlyPressed & 0b010000000000) { // Seesaw pin 10 (middle)
+          currentPitch = defaultPitch;
+        } else if(newlyPressed & 0b100000000000) { // Seesaw pin 11 (outer)
+          currentPitch *= 0.95;
+        }
+        if(newlyPressed) {
+          currentPitch = voicePitch(currentPitch);
+          Serial.print("Voice pitch: ");
+          Serial.println(currentPitch);
+        }
+        priorButtonState = buttonState;
+      }
+#endif // ADAFRUIT_MONSTER_M4SK_EXPRESS
       user_loop();
     }
   } // end first-column check

@@ -372,6 +372,11 @@ void loadConfig(char *filename) {
         eye[e].rotation &= 3;
       }
 #endif
+#if defined(ADAFRUIT_MONSTER_M4SK_EXPRESS)
+      v = doc["voice"];
+      if(v.is<bool>()) voiceOn = v.as<bool>();
+      currentPitch = defaultPitch = doc["pitch"] | defaultPitch;
+#endif // ADAFRUIT_MONSTER_M4SK_EXPRESS
     }
     file.close();
   } else {

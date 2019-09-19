@@ -1,6 +1,8 @@
 // Basic voice changer code. This version is specific to the Adafruit
 // MONSTER M4SK board using a PDM microphone.
 
+#if defined(ADAFRUIT_MONSTER_M4SK_EXPRESS)
+
 #include <SPI.h>
 
 #define MIN_PITCH_HZ   65
@@ -386,3 +388,5 @@ void TIMER_IRQ_HANDLER(void) {
     }
   }
 }
+
+#endif // ADAFRUIT_MONSTER_M4SK_EXPRESS
