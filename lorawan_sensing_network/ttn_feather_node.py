@@ -16,6 +16,7 @@ spi = busio.SPI(board.SCK, MOSI=board.MOSI, MISO=board.MISO)
 # pylint: disable=c-extension-no-member
 cs = DigitalInOut(board.RFM9X_CS)
 irq = DigitalInOut(board.RFM9X_D0)
+rst = DigitalInOut(board.RFM9X_RST)
 
 # TTN Device Address, 4 Bytes, MSB
 devaddr = bytearray([0x00, 0x00, 0x00, 0x00])
@@ -30,7 +31,7 @@ app = bytearray([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 
 ttn_config = TTN(devaddr, nwkey, app, country='US')
 
-lora = TinyLoRa(spi, cs, irq, ttn_config, channel = 6)
+lora = TinyLoRa(spi, cs, irq, rst, ttn_config, channel = 6)
 
 # bme data packet
 bme_d = bytearray(7)

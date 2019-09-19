@@ -49,6 +49,11 @@ i2c = busio.I2C(SCL, SDA)
 # to the right size for your display!
 disp = adafruit_ssd1306.SSD1306_I2C(128, 32, i2c)
 
+# Leaving the OLED on for a long period of time can damage it
+# Set these to prevent OLED burn in
+DISPLAY_ON  = 10 # on time in seconds
+DISPLAY_OFF = 50 # off time in seconds
+
 # Clear display.
 disp.fill(0)
 disp.show()
@@ -125,4 +130,7 @@ while True:
     # Display image.
     disp.image(image)
     disp.show()
-    time.sleep(.1)
+    time.sleep(DISPLAY_ON)
+    disp.fill(0)
+    disp.show()
+    time.sleep(DISPLAY_OFF)
