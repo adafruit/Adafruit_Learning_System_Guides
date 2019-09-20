@@ -1,7 +1,7 @@
 """
 PyPortal Weather Station
 ==============================================
-Turn your PyPortal into a weaterstation with
+Turn your PyPortal into a weatherstation with
 Adafruit IO
 
 Author: Brent Rubell for Adafruit Industries, 2019
