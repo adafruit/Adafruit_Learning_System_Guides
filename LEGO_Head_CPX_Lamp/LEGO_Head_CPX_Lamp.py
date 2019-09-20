@@ -2,10 +2,8 @@
 # for Adafruit Circuit Playground express
 # with CircuitPython
 import time
-import random
 import audioio
 import board
-from digitalio import DigitalInOut, Direction
 
 from adafruit_circuitplayground.express import cpx
 
