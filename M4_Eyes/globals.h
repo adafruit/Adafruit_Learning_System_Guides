@@ -88,6 +88,7 @@ GLOBAL_VAR uint32_t  boopThreshold       GLOBAL_INIT(17500);
 GLOBAL_VAR bool      voiceOn             GLOBAL_INIT(false);
 GLOBAL_VAR float     currentPitch        GLOBAL_INIT(1.0);
 GLOBAL_VAR float     defaultPitch        GLOBAL_INIT(1.0);
+GLOBAL_VAR float     gain                GLOBAL_INIT(1.0);
 #endif
 
 // EYE-RELATED STRUCTURES --------------------------------------------------
@@ -214,9 +215,10 @@ extern uint8_t        *writeDataToFlash(uint8_t *src, uint32_t len);
 
 // Functions in pdmvoice.cpp
 #if defined(ADAFRUIT_MONSTER_M4SK_EXPRESS)
-extern bool              voiceSetup(void);
+extern bool              voiceSetup(bool modEnable);
 extern float             voicePitch(float p);
 extern void              voiceGain(float g);
+extern void              voiceMod(uint32_t freq, uint8_t waveform);
 extern volatile uint16_t voiceLastReading;
 #endif // ADAFRUIT_MONSTER_M4SK_EXPRESS
 
