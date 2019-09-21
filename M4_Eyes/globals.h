@@ -89,6 +89,8 @@ GLOBAL_VAR bool      voiceOn             GLOBAL_INIT(false);
 GLOBAL_VAR float     currentPitch        GLOBAL_INIT(1.0);
 GLOBAL_VAR float     defaultPitch        GLOBAL_INIT(1.0);
 GLOBAL_VAR float     gain                GLOBAL_INIT(1.0);
+GLOBAL_VAR uint8_t   waveform            GLOBAL_INIT(0);
+GLOBAL_VAR uint32_t  modulate            GLOBAL_INIT(30); // Dalek pitch
 #endif
 
 // EYE-RELATED STRUCTURES --------------------------------------------------

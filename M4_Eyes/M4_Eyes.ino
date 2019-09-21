@@ -420,12 +420,13 @@ void setup() {
 
 #if defined(ADAFRUIT_MONSTER_M4SK_EXPRESS)
   if(voiceOn) {
-    if(!voiceSetup(false)) {
+    if(!voiceSetup((waveform > 0))) {
       Serial.println("Voice init fail, continuing without");
       voiceOn = false;
     } else {
       voiceGain(gain);
       currentPitch = voicePitch(currentPitch);
+      if(waveform) voiceMod(modulate, waveform);
       digitalWrite(20, HIGH); // Speaker on
     }
   }
@@ -933,6 +934,7 @@ void loop() {
         }
         if(newlyPressed) {
           currentPitch = voicePitch(currentPitch);
+          if(waveform) voiceMod(modulate, waveform);
           Serial.print("Voice pitch: ");
           Serial.println(currentPitch);
         }

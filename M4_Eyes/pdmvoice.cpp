@@ -76,7 +76,7 @@ static uint16_t       dcOffsetNext     = 32768; // between these two values
 
 static uint16_t       micGain          = 256;   // 1:1
 
-#define MOD_MIN 40 // Lowest supported modulation pitch (lower = more RAM use)
+#define MOD_MIN 20 // Lowest supported modulation frequency (lower = more RAM use)
 static uint8_t        modWave          = 0;     // Modulation wave type (none, sine, square, tri, saw)
 static uint8_t       *modBuf           = NULL;  // Modulation waveform buffer
 static uint32_t       modIndex         = 0;     // Current position in modBuf
@@ -217,20 +217,21 @@ void voiceGain(float g) {
 
 // SET MODULATION ----------------------------------------------------------
 
-// This is a work in progress and NOT FUNCTIONAL YET
+// This needs to be called after any call to voicePitch() -- the modulation
+// table is not currently auto-regenerated. Maybe that'll change.
 
 void voiceMod(uint32_t freq, uint8_t waveform) {
   if(modBuf) { // Ignore if no modulation buffer allocated
     if(freq < MOD_MIN) freq = MOD_MIN;
-    uint16_t period = TIMER->COUNT16.CC[0].reg + 1;
-    float    playbackRate = 48000000.0 / (float)period; // samples/sec
+    uint16_t period = TIMER->COUNT16.CC[0].reg + 1;     // Audio out timer ticks
+    float    playbackRate = 48000000.0 / (float)period; // Audio out samples/sec
     modLen = (int)(playbackRate / freq + 0.5);
     if(modLen < 2) modLen = 2;
     if(waveform > 4) waveform = 4;
     modWave = waveform;
-    switch(modWave) {
+    yield();
+    switch(waveform) {
      case 0: // None
-      memset(modBuf, 255, modLen);
       break;
      case 1: // Square
       memset(modBuf, 255, modLen / 2);
@@ -254,7 +255,6 @@ void voiceMod(uint32_t freq, uint8_t waveform) {
     }
   }
 }
-
 
 // INTERRUPT HANDLERS ------------------------------------------------------
 
@@ -401,6 +401,10 @@ void PDM_SERCOM_HANDLER(void) {
 void TIMER_IRQ_HANDLER(void) {
   TIMER->COUNT16.INTFLAG.reg = TC_INTFLAG_OVF;
 
+  // Modulation is done on the output (rather than the input) because
+  // pitch-shifting modulated input would cause weird waveform
+  // discontinuities. This does require recalculating the modulation table
+  // any time the pitch changes though.
   if(modWave) {
     nextOut = (((int32_t)nextOut - 2048) * (modBuf[modIndex] + 1) / 256) + 2048;
     if(++modIndex >= modLen) modIndex = 0;
