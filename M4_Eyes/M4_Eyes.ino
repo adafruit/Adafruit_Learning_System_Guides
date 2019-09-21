@@ -420,10 +420,11 @@ void setup() {
 
 #if defined(ADAFRUIT_MONSTER_M4SK_EXPRESS)
   if(voiceOn) {
-    if(!voiceSetup()) {
+    if(!voiceSetup(false)) {
       Serial.println("Voice init fail, continuing without");
       voiceOn = false;
     } else {
+      voiceGain(gain);
       currentPitch = voicePitch(currentPitch);
       digitalWrite(20, HIGH); // Speaker on
     }

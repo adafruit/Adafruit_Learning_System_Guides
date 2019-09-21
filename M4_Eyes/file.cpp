@@ -376,6 +376,7 @@ void loadConfig(char *filename) {
       v = doc["voice"];
       if(v.is<bool>()) voiceOn = v.as<bool>();
       currentPitch = defaultPitch = doc["pitch"] | defaultPitch;
+      gain = doc["gain"] | gain;
 #endif // ADAFRUIT_MONSTER_M4SK_EXPRESS
     }
     file.close();

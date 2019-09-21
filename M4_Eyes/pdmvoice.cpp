@@ -76,6 +76,12 @@ static uint16_t       dcOffsetNext     = 32768; // between these two values
 
 static uint16_t       micGain          = 256;   // 1:1
 
+#define MOD_MIN 40 // Lowest supported modulation pitch (lower = more RAM use)
+static uint8_t        modWave          = 0;     // Modulation wave type (none, sine, square, tri, saw)
+static uint8_t       *modBuf           = NULL;  // Modulation waveform buffer
+static uint32_t       modIndex         = 0;     // Current position in modBuf
+static uint32_t       modLen           = 0;     // Currently used amount of modBuf based on modFreq
+
 // Just playing back directly from the recording circular buffer produces
 // audible clicks as the waveforms rarely align at the beginning and end of
 // the buffer. So what we do is advance or push back the playback index a
@@ -100,11 +106,18 @@ float voicePitch(float p);
 
 // START PITCH SHIFT (no arguments) ----------------------------------------
 
-bool voiceSetup(void) {
+bool voiceSetup(bool modEnable) {
 
   // Allocate circular buffer for audio
   if(NULL == (recBuf = (uint16_t *)malloc(recBufSize * sizeof(uint16_t)))) {
     return false; // Fail
+  }
+
+  // Allocate buffer for voice modulation, if enabled
+  if(modEnable) {
+    // 250 comes from min period in voicePitch()
+    modBuf = (uint8_t *)malloc((int)(48000000.0 / 250.0 / MOD_MIN + 0.5));
+    // If malloc fails, program will continue without modulation
   }
 
   // Set up PDM microphone input -------------------------------------------
@@ -201,6 +214,47 @@ void voiceGain(float g) {
   else if(g < 0.0)         micGain = 0;
   else                     micGain = (uint16_t)(g * 256.0 + 0.5);
 }
+
+// SET MODULATION ----------------------------------------------------------
+
+// This is a work in progress and NOT FUNCTIONAL YET
+
+void voiceMod(uint32_t freq, uint8_t waveform) {
+  if(modBuf) { // Ignore if no modulation buffer allocated
+    if(freq < MOD_MIN) freq = MOD_MIN;
+    uint16_t period = TIMER->COUNT16.CC[0].reg + 1;
+    float    playbackRate = 48000000.0 / (float)period; // samples/sec
+    modLen = (int)(playbackRate / freq + 0.5);
+    if(modLen < 2) modLen = 2;
+    if(waveform > 4) waveform = 4;
+    modWave = waveform;
+    switch(modWave) {
+     case 0: // None
+      memset(modBuf, 255, modLen);
+      break;
+     case 1: // Square
+      memset(modBuf, 255, modLen / 2);
+      memset(&modBuf[modLen / 2], 0, modLen - modLen / 2);
+      break;
+     case 2: // Sine
+      for(int i=0; i<modLen; i++) {
+        modBuf[i] = (int)((sin(M_PI * 2.0 * (float)i / (float)modLen) + 1.0) * 0.5 * 255.0 + 0.5);
+      }
+      break;
+     case 3: // Triangle
+      for(int i=0; i<modLen; i++) {
+        modBuf[i] = (int)(fabs(0.5 - (float)i / (float)modLen) * 2.0 * 255.0 + 0.5);
+      }
+      break;
+     case 4: // Sawtooth (increasing)
+      for(int i=0; i<modLen; i++) {
+        modBuf[i] = (int)((float)i / (float)(modLen - 1) * 255.0 + 0.5);
+      }
+      break;
+    }
+  }
+}
+
 
 // INTERRUPT HANDLERS ------------------------------------------------------
 
@@ -346,6 +400,11 @@ void PDM_SERCOM_HANDLER(void) {
 // Playback timer interrupt
 void TIMER_IRQ_HANDLER(void) {
   TIMER->COUNT16.INTFLAG.reg = TC_INTFLAG_OVF;
+
+  if(modWave) {
+    nextOut = (((int32_t)nextOut - 2048) * (modBuf[modIndex] + 1) / 256) + 2048;
+    if(++modIndex >= modLen) modIndex = 0;
+  }
 
   // Do analog writes pronto so output timing is consistent
   analogWrite(A0, nextOut);
