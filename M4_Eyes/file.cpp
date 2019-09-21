@@ -377,6 +377,15 @@ void loadConfig(char *filename) {
       if(v.is<bool>()) voiceOn = v.as<bool>();
       currentPitch = defaultPitch = doc["pitch"] | defaultPitch;
       gain = doc["gain"] | gain;
+      modulate = doc["modulate"] | modulate;
+      v = doc["waveform"];
+      if(v.is<char*>()) { // If string...
+        if(!strncasecmp(     v, "sq", 2)) waveform = 1;
+        else if(!strncasecmp(v, "si", 2)) waveform = 2;
+        else if(!strncasecmp(v, "t" , 1)) waveform = 3;
+        else if(!strncasecmp(v, "sa", 2)) waveform = 4;
+        else                              waveform = 0;
+      }
 #endif // ADAFRUIT_MONSTER_M4SK_EXPRESS
     }
     file.close();
