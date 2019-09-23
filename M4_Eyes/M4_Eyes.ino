@@ -400,15 +400,6 @@ void setup() {
   calcDisplacement();
   Serial.printf("Free RAM: %d\n", availableRAM());
 
-  yield();
-  if(boopPin >= 0) {
-    boopThreshold = 0;
-    for(i=0; i<240; i++) {
-      boopThreshold += readBoop();
-    }
-    boopThreshold = boopThreshold * 110 / 100; // 10% overhead
-  }
-
   randomSeed(SysTick->VAL + analogRead(A2));
   eyeOldX = eyeNewX = eyeOldY = eyeNewY = mapRadius; // Start in center
   for(e=0; e<NUM_EYES; e++) { // For each eye...
@@ -431,6 +422,15 @@ void setup() {
     }
   }
 #endif
+
+  yield();
+  if(boopPin >= 0) {
+    boopThreshold = 0;
+    for(i=0; i<240; i++) {
+      boopThreshold += readBoop();
+    }
+    boopThreshold = boopThreshold * 110 / 100; // 10% overhead
+  }
 
   user_setup();
 
