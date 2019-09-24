@@ -174,15 +174,11 @@ void setup() {
   }
 
   yield();
-  uint8_t e, rtna = 0x01; // Screen refresh rate control (datasheet 9.2.18, FRCTRL2)
+  uint8_t e;
   // Initialize displays
-  for(e=0; e<NUM_EYES; e++) {
-    eye[e].display = new Adafruit_ST7789(eye[e].spi, eye[e].cs, eye[e].dc, eye[e].rst);
-    eye[e].display->init(240, 240);
-    eye[e].display->sendCommand(0xC6, &rtna, 1);
-    eye[e].spi->setClockSource(DISPLAY_CLKSRC);
-    eye[e].display->fillScreen(0x1234);
-    eye[e].display->setRotation(0);
+  eye[0].display = arcada._display;
+  if (NUM_EYES > 1) {
+    eye[1].display = arcada.display2;  
   }
 
   yield();
