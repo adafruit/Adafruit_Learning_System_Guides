@@ -137,12 +137,12 @@ void setup() {
   if (!arcada.arcadaBegin()) {
     while (1);
   }
+  arcada.displayBegin();
   // MUST set up flash filesystem before Serial.begin() or seesaw.begin()
-  arcada.filesysBeginMSD();
-
-  //  if(i == 1)      fatal("Flash init fail", 100);
-  //else if(i == 2) fatal("No filesys", 500);
-
+  if (!arcada.filesysBeginMSD()) {
+    arcada.setBacklight(255);
+    arcada.haltBox("No filesystem found, please load CircuitPython on in order to create one!");
+  }
     
   Serial.begin(115200);
   while(!Serial) delay(10);
@@ -259,6 +259,7 @@ void setup() {
   // of the nose booper when doing this...it self-calibrates on startup.
   char *filename = "config.eye";
 #if NUM_EYES > 1 // Only available on MONSTER M4SK
+/* MEMEFIX
   if(!(priorButtonState & 0b001000000000)) {
     filename = "config1.eye";
   } else if(!(priorButtonState & 0b010000000000)) {
@@ -266,6 +267,7 @@ void setup() {
   } else if(!(priorButtonState & 0b100000000000)) {
     filename = "config3.eye";
   }
+  */
 #endif
   loadConfig(filename);
 
@@ -909,9 +911,9 @@ void loop() {
         uint32_t newlyPressed = ~(buttonState | changedState);          // Bits SET if newly pressed
         if(       newlyPressed & 0b001000000000) { // Seesaw pin 9 (inner)
           currentPitch *= 1.05;
-        } else if(newlyPressed & 0b010000000000) { // Seesaw pin 10 (middle)
+        } else if(newlyPressed & ARCADA_BUTTONMASK_A) { // Seesaw pin 10 (middle)
           currentPitch = defaultPitch;
-        } else if(newlyPressed & 0b100000000000) { // Seesaw pin 11 (outer)
+        } else if(newlyPressed & ARCADA_BUTTONMASK_DOWN) { // Seesaw pin 11 (outer)
           currentPitch *= 0.95;
         }
         if(newlyPressed) {

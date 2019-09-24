@@ -1,9 +1,5 @@
 //34567890123456789012345678901234567890123456789012345678901234567890123456
 
-#include <Adafruit_GFX.h>         // Core graphics for Adafruit displays
-#include <Adafruit_ST7789.h>      // TFT-specific display library
-#include <Adafruit_ZeroDMA.h>     // SAMD-specific DMA library
-#include <Adafruit_ImageReader.h> // ImageReturnCode type
 #include "Adafruit_Arcada.h"
 #include "DMAbuddy.h"             // DMA-bug-workaround class
 
@@ -24,7 +20,6 @@
   // Light sensor is not active by default. Use "lightSensor : 102" in config
 #else
   #define NUM_EYES 1
-  #define BACKLIGHT_PIN       47
 #endif
 
 // GLOBAL VARIABLES --------------------------------------------------------
