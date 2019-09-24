@@ -398,7 +398,7 @@ void setup() {
       voiceGain(gain);
       currentPitch = voicePitch(currentPitch);
       if(waveform) voiceMod(modulate, waveform);
-      digitalWrite(20, HIGH); // Speaker on
+      arcada.enableSpeaker(true);
     }
   }
 #endif
@@ -417,15 +417,7 @@ void setup() {
   lastLightReadTime = micros() + 2000000; // Delay initial light reading
 }
 
-static inline uint16_t readLightSensor(void) {
-#if NUM_EYES > 1
-  if(lightSensorPin >= 100) {
-    return arcada.ss.analogRead(lightSensorPin - 100);
-  }
-#else
-  return analogRead(lightSensorPin);
-#endif
-}
+
 
 // LOOP FUNCTION - CALLED REPEATEDLY UNTIL POWER-OFF -----------------------
 
@@ -860,7 +852,7 @@ void loop() {
           // pupils will react even if the opposite eye is stimulated.
           // Meaning we can get away with using a single light sensor for
           // both eyes. This comment has nothing to do with the code.
-          uint16_t rawReading = readLightSensor();
+          uint16_t rawReading = arcada.readLightSensor();
           if(rawReading <= 1023) {
             if(rawReading < lightSensorMin)      rawReading = lightSensorMin; // Clamp light sensor range
             else if(rawReading > lightSensorMax) rawReading = lightSensorMax; // to within usable range
@@ -902,10 +894,10 @@ void loop() {
 #if defined(ADAFRUIT_MONSTER_M4SK_EXPRESS)
       if(voiceOn) {
         // Read buttons, change pitch
-        uint32_t buttonState  = arcada.ss.digitalReadBulk(0b111000000000); // Bits CLEAR if currently pressed
-        uint32_t changedState = ~(buttonState ^ priorButtonState);      // Bits CLEAR if changed from before
-        uint32_t newlyPressed = ~(buttonState | changedState);          // Bits SET if newly pressed
-        if(       newlyPressed & 0b001000000000) { // Seesaw pin 9 (inner)
+        uint32_t buttonState  = arcada.readButtons(); // Bits SET if currently pressed
+        uint32_t changedState = ~(buttonState ^ priorButtonState);   // Bits SET if changed from before
+        uint32_t newlyPressed = buttonState | changedState;          // Bits SET if newly pressed
+        if(       newlyPressed & ARCADA_BUTTONMASK_UP) { // Seesaw pin 9 (inner)
           currentPitch *= 1.05;
         } else if(newlyPressed & ARCADA_BUTTONMASK_A) { // Seesaw pin 10 (middle)
           currentPitch = defaultPitch;

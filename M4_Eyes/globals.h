@@ -13,10 +13,6 @@
 
 #if defined(ADAFRUIT_MONSTER_M4SK_EXPRESS)
   #define NUM_EYES 2
-  #define SEESAW_TFT_RESET_PIN 8     // Left eye TFT reset
-  #define SEESAW_BACKLIGHT_PIN 5     // Left eye TFT backlight
-  #define BACKLIGHT_PIN       21     // Right eye TFT backlight
-  #define LIGHTSENSOR_PIN      2
   // Light sensor is not active by default. Use "lightSensor : 102" in config
 #else
   #define NUM_EYES 1
@@ -181,12 +177,10 @@ typedef struct {
   eyeStruct eye[NUM_EYES] = {
   #if defined(ADAFRUIT_MONSTER_M4SK_EXPRESS)
     // name     spi  cs  dc rst wink
-    { "right", &SPI , 5,  6,  4, -1 },
-    { "left" , &SPI1, 9, 10, -1, -1 } };
-  #elif defined(ADAFRUIT_HALLOWING_M4_EXPRESS)
-    {  NULL  , &SPI1, 44, 45, 46, -1 } };
+    { "right", &ARCADA_TFT_SPI , ARCADA_TFT_CS,  ARCADA_TFT_DC, ARCADA_TFT_RST, -1 },
+    { "left" , &ARCADA_LEFTTFT_SPI, ARCADA_LEFTTFT_CS, ARCADA_LEFTTFT_DC, ARCADA_LEFTTFT_RST, -1 } };
   #else
-    #error "This project supports Adafruit MONSTER M4SK and HALLOWING M4 only"
+    {  NULL  , &ARCADA_TFT_SPI, ARCADA_TFT_CS, ARCADA_TFT_DC, ARCADA_TFT_RST, -1 } };
   #endif
 #else
   extern eyeStruct eye[];
