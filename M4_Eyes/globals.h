@@ -4,6 +4,7 @@
 #include <Adafruit_ST7789.h>      // TFT-specific display library
 #include <Adafruit_ZeroDMA.h>     // SAMD-specific DMA library
 #include <Adafruit_ImageReader.h> // ImageReturnCode type
+#include "Adafruit_Arcada.h"
 #include "DMAbuddy.h"             // DMA-bug-workaround class
 
 #if defined(GLOBAL_VAR) // #defined in .ino file ONLY!

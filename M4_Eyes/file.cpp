@@ -1,118 +1,9 @@
 //34567890123456789012345678901234567890123456789012345678901234567890123456
 
-#include <SdFat.h>                // SD card & FAT filesystem library
-#include <Adafruit_SPIFlash.h>    // SPI / QSPI flash library
 #include <ArduinoJson.h>          // JSON config file functions
-#include "Adafruit_TinyUSB.h"
 #include "globals.h"
 
-#if defined(__SAMD51__) || defined(NRF52840_XXAA)
-  Adafruit_FlashTransport_QSPI flashTransport(PIN_QSPI_SCK, PIN_QSPI_CS,
-    PIN_QSPI_IO0, PIN_QSPI_IO1, PIN_QSPI_IO2, PIN_QSPI_IO3);
-#else
-  #if (SPI_INTERFACES_COUNT == 1)
-    Adafruit_FlashTransport_SPI flashTransport(SS, &SPI);
-  #else
-    Adafruit_FlashTransport_SPI flashTransport(SS1, &SPI1);
-  #endif
-#endif
-Adafruit_SPIFlash    flash(&flashTransport);
-FatFileSystem        filesys;
-Adafruit_USBD_MSC    usb_msc;         // USB Mass Storage object
-Adafruit_ImageReader reader(filesys); // Image-reader for flash filesys
-
-// MASS STORAGE SETUP ------------------------------------------------------
-
-// Callback invoked when READ10 command received.
-// Copy disk's data to buffer (up to bufsize) and
-// return number of copied bytes (must be multiple of block size)
-static int32_t msc_read_cb(uint32_t lba, void* buffer, uint32_t bufsize) {
-  // Note: SPIFLash Bock API: readBlocks/writeBlocks/syncBlocks
-  // already include 4K sector caching internally, no need to cache here.
-  return flash.readBlocks(lba, (uint8_t*) buffer, bufsize / 512) ? bufsize : -1;
-}
-
-// Callback invoked when WRITE10 command received.
-// Process data in buffer to disk's storage and
-// return number of written bytes (must be multiple of block size)
-static int32_t msc_write_cb(uint32_t lba, uint8_t* buffer, uint32_t bufsize) {
-  digitalWrite(LED_BUILTIN, HIGH);
-  // Note: SPIFLash Bock API: readBlocks/writeBlocks/syncBlocks
-  // already include 4K sector caching internally, no need to cache here.
-  return flash.writeBlocks(lba, buffer, bufsize / 512) ? bufsize : -1;
-}
-
-// Callback invoked when WRITE10 command is completed (status received
-// and accepted by host). Used to flush any pending cache.
-static void msc_flush_cb(void) {
-  flash.syncBlocks();   // sync with flash
-  filesys.cacheClear(); // clear file system's cache to force refresh
-  filesystem_change_flag = true;
-  digitalWrite(LED_BUILTIN, LOW);
-}
-
-// Mass storage setup. This MUST be called before Serial.begin()!
-// Returns 0 on success. 1 = flash init failure, 2 = filesys init failure
-int file_setup(bool msc) {
-  if(flash.begin()) {
-      if(msc) { // Enable mass storage handler? (flash visible to host computer)
-      // Set disk vendor id, product id and revision --
-      // up to 8, 16, 4 characters respectively
-      usb_msc.setID("Adafruit", "External Flash", "1.0");
-  
-      // Set callbacks
-      usb_msc.setReadWriteCallback(msc_read_cb, msc_write_cb, msc_flush_cb);
-  
-      // Set disk size, block size should be 512 regardless of SPI flash page size
-      usb_msc.setCapacity(flash.pageSize() * flash.numPages() / 512, 512);
-  
-      usb_msc.setUnitReady(true); // MSC is ready for read/write
-      usb_msc.begin();
-    }
-
-    if(filesys.begin(&flash)) return 0; // Success
-    return 2;                           // Filesys init failure
-  }
-  return 1;                             // Flash init failure
-}
-
-// MASS STORAGE CHANGE HANDLER ---------------------------------------------
-
-// Not sure -- should this just do a major reboot?
-// (want to turn off initial filesystem_change_flag = true in that case)
-
-void handle_filesystem_change() {
-  filesystem_change_flag = false;
-
-  FatFile root;
-  FatFile file;
-
-  if(!root.open("/")) {
-    Serial.println("open root failed");
-    return;
-  }
-
-  Serial.println("Flash contents:");
-
-  // Open next file in root.
-  // Warning, openNext starts at the current directory position
-  // so a rewind of the directory may be required.
-  while(file.openNext(&root, O_RDONLY)) {
-    file.printFileSize(&Serial);
-    Serial.write(' ');
-    file.printName(&Serial);
-    if(file.isDir()) {
-      // Indicate a directory.
-      Serial.write('/');
-    }
-    Serial.println();
-    file.close();
-  }
-
-  root.close();
-
-  Serial.println();
-}
+extern Adafruit_Arcada arcada;
 
 // CONFIGURATION FILE HANDLING ---------------------------------------------
 
@@ -187,7 +78,7 @@ void loadConfig(char *filename) {
   File    file;
   uint8_t rotation = 3;
 
-  if(file = filesys.open(filename, FILE_READ)) {
+  if(file = arcada.open(filename, FILE_READ)) {
     StaticJsonDocument<2048> doc;
 
     yield();
@@ -431,12 +322,18 @@ ImageReturnCode loadEyelid(char *filename,
   uint32_t        tempBytes;
   uint8_t        *tempPtr = NULL;
   ImageReturnCode status;
+  Adafruit_ImageReader *reader;
+
+  reader = arcada.getImageReader();
+  if (!reader) {
+     return IMAGE_ERR_FILE_NOT_FOUND;
+  }
 
   memset(minArray, init, 240); // Fill eyelid arrays with init value to
   memset(maxArray, init, 240); // mark 'no eyelid data for this column'
 
   // This is the "booster seat" described in m4eyes.ino
-  if(reader.bmpDimensions(filename, &w, &h) == IMAGE_SUCCESS) {
+  if(reader->bmpDimensions(filename, &w, &h) == IMAGE_SUCCESS) {
     tempBytes = ((w + 7) / 8) * h; // Bitmap size in bytes
     if(tempPtr = (uint8_t *)malloc(maxRam - tempBytes)) {
       // Make SOME tempPtr reference, or optimizer removes the alloc!
@@ -448,7 +345,7 @@ ImageReturnCode loadEyelid(char *filename,
   }
 
   yield();
-  if((status = reader.loadBMP(filename, image)) == IMAGE_SUCCESS) {
+  if((status = reader->loadBMP(filename, image)) == IMAGE_SUCCESS) {
     if(image.getFormat() == IMAGE_1) { // MUST be 1-bit image
       uint16_t *palette = image.getPalette();
       uint8_t   white = (!palette || (palette[1] > palette[0]));
@@ -509,9 +406,15 @@ ImageReturnCode loadTexture(char *filename, uint16_t **data,
   uint32_t        tempBytes;
   uint8_t        *tempPtr = NULL;
   ImageReturnCode status;
+  Adafruit_ImageReader *reader;
 
+  reader = arcada.getImageReader();
+  if (!reader) {
+     return IMAGE_ERR_FILE_NOT_FOUND;
+  }
+  
   // This is the "booster seat" described in m4eyes.ino
-  if(reader.bmpDimensions(filename, &w, &h) == IMAGE_SUCCESS) {
+  if(reader->bmpDimensions(filename, &w, &h) == IMAGE_SUCCESS) {
     tempBytes = w * h * 2; // Image size in bytes (converted to 16bpp)
     if(tempPtr = (uint8_t *)malloc(maxRam - tempBytes)) {
       // Make SOME tempPtr reference, or optimizer removes the alloc!
@@ -523,7 +426,7 @@ ImageReturnCode loadTexture(char *filename, uint16_t **data,
   }
 
   yield();
-  if((status = reader.loadBMP(filename, image)) == IMAGE_SUCCESS) {
+  if((status = reader->loadBMP(filename, image)) == IMAGE_SUCCESS) {
     if(image.getFormat() == IMAGE_16) { // MUST be 16-bit image
       Serial.println("Texture loaded!");
       GFXcanvas16 *canvas = (GFXcanvas16 *)image.getCanvas();

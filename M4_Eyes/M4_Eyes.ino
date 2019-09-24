@@ -36,7 +36,8 @@
 
 #define GLOBAL_VAR
 #include "globals.h"
-extern Adafruit_ImageReader reader;
+
+Adafruit_Arcada arcada;
 
 // Global eye state that applies to all eyes (not per-eye):
 bool     eyeInMotion = false;
@@ -133,13 +134,17 @@ void fatal(const char *message, uint16_t blinkDelay) {
 // SETUP FUNCTION - CALLED ONCE AT PROGRAM START ---------------------------
 
 void setup() {
-  pinMode(LED_BUILTIN, OUTPUT);
-  digitalWrite(LED_BUILTIN, LOW);
-
+  if (!arcada.arcadaBegin()) {
+    while (1);
+  }
   // MUST set up flash filesystem before Serial.begin() or seesaw.begin()
-  int i = file_setup();
+  arcada.filesysBeginMSD();
 
-  Serial.begin(9600);
+  //  if(i == 1)      fatal("Flash init fail", 100);
+  //else if(i == 2) fatal("No filesys", 500);
+
+    
+  Serial.begin(115200);
   //while(!Serial) delay(10);
 
   Serial.printf("Available RAM at start: %d\n", availableRAM());
@@ -157,8 +162,6 @@ void setup() {
   priorButtonState = seesaw.digitalReadBulk(0b111000000000);
 #endif
 
-  if(i == 1)      fatal("Flash init fail", 100);
-  else if(i == 2) fatal("No filesys", 500);
 
 #if NUM_EYES > 1
   seesaw.pinMode(SEESAW_TFT_RESET_PIN, OUTPUT);
@@ -181,12 +184,12 @@ void setup() {
   }
 
   yield();
-  if (reader.drawBMP("/splash.bmp", *(eye[0].display), 0, 0) == IMAGE_SUCCESS) {
+  if (arcada.drawBMP("/splash.bmp", 0, 0, (eye[0].display)) == IMAGE_SUCCESS) {
     Serial.println("Splashing");
     #if NUM_EYES > 1
     // other eye
     yield();
-    reader.drawBMP("/splash.bmp", *(eye[1].display), 0, 0);
+    arcada.drawBMP("/splash.bmp", 0, 0, (eye[1].display));
     #endif
     // backlight on for a bit
     for (int bl=0; bl<=250; bl+=10) {
@@ -426,7 +429,7 @@ void setup() {
   yield();
   if(boopPin >= 0) {
     boopThreshold = 0;
-    for(i=0; i<240; i++) {
+    for(int i=0; i<240; i++) {
       boopThreshold += readBoop();
     }
     boopThreshold = boopThreshold * 110 / 100; // 10% overhead
