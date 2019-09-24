@@ -127,18 +127,26 @@ void fatal(const char *message, uint16_t blinkDelay) {
   }
 }
 
+#include <unistd.h> // sbrk() function
+
+uint32_t availableRAM(void) {
+  char top;                      // Local variable pushed on stack
+  return &top - (char *)sbrk(0); // Top of stack minus end of heap
+}
+
 // SETUP FUNCTION - CALLED ONCE AT PROGRAM START ---------------------------
 
 void setup() {
   if (!arcada.arcadaBegin()) {
     while (1);
   }
-  arcada.displayBegin();
 
   if (!arcada.filesysBeginMSD()) {
     fatal("No filesystem found!", 100);
   }
-    
+
+  arcada.displayBegin();
+
   Serial.begin(115200);
 //  while(!Serial) delay(10);
 
@@ -155,7 +163,6 @@ void setup() {
   // of the nose booper when doing this...it self-calibrates on startup.
   // DO THIS BEFORE THE SPLASH SO IT DOESN'T REQUIRE A LENGTHY HOLD.
   char *filename = "config.eye";
-#if NUM_EYES > 1 // Only available on MONSTER M4SK
   arcada.readButtons();
   uint32_t buttonState = arcada.justPressedButtons();
   if(buttonState & ARCADA_BUTTONMASK_UP) {
@@ -165,7 +172,6 @@ void setup() {
   } else if(buttonState & ARCADA_BUTTONMASK_DOWN) {
     filename = "config3.eye";
   }
-#endif
 
   yield();
   uint8_t e, rtna = 0x01; // Screen refresh rate control (datasheet 9.2.18, FRCTRL2)
@@ -886,7 +892,6 @@ void loop() {
         irisValue = irisMin + (sum * irisRange); // 0.0-1.0 -> iris min/max
         if((++iris_frame) >= (1 << IRIS_LEVELS)) iris_frame = 0;
       }
-#if defined(ADAFRUIT_MONSTER_M4SK_EXPRESS)
       if(voiceOn) {
         // Read buttons, change pitch
         arcada.readButtons();
@@ -905,7 +910,6 @@ void loop() {
           Serial.println(currentPitch);
         }
       }
-#endif // ADAFRUIT_MONSTER_M4SK_EXPRESS
       user_loop();
     }
   } // end first-column check
