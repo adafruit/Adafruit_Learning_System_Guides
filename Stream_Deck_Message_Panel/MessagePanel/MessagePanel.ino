@@ -55,6 +55,8 @@ void handleMessage(AdafruitIO_Data *data) {
   uint16_t strpos = 0;
   byte lineLengths[] = {0, 0, 0, 0};
   byte lineNum = 0;
+  byte messageHeight = 0;
+  byte lineHeight = 0;
   // Calculate line lengths
   boolean paramRead = false;
   boolean newLine = false;
@@ -83,16 +85,24 @@ void handleMessage(AdafruitIO_Data *data) {
     
     if (plainText.charAt(strpos) != '\n') {
       lineLengths[lineNum] += textSize * BASE_CHAR_WIDTH;
+      if (textSize * BASE_CHAR_HEIGHT > lineHeight) {
+        lineHeight = textSize * BASE_CHAR_HEIGHT;
+      }
     }
 
     // We want to keep adding up the characters * textSize until we hit a newline character
     // or we reach the width of the message panel. Then we go down to the next line
     if (plainText.charAt(strpos) == '\n' || lineLengths[lineNum] >= matrix.width()) {
+      messageHeight += lineHeight;
+      lineHeight = 0;
       lineNum++;
     }
     
     strpos++;
   }
+
+  // Add the last line
+  messageHeight += lineHeight;
 
   textSize = 1;
   lineNum = 0;
@@ -103,7 +113,7 @@ void handleMessage(AdafruitIO_Data *data) {
     } else if (message.charAt(i) == '}') {
       paramRead = false;
       int wheelPos = atoi(message.substring(colorStartIndex, i).c_str());
-      if (wheelPos < 25) {
+      if (wheelPos < 24) {
         color = Wheel(wheelPos);
       } else {
         color = matrix.Color333(7, 7, 7);
@@ -118,7 +128,7 @@ void handleMessage(AdafruitIO_Data *data) {
       if (paramRead) continue;
 
       if (matrix.getCursorX() == 0 && matrix.getCursorY() == 0) {
-        matrix.setCursor(floor((matrix.width() / 2) - (lineLengths[lineNum] / 2)), 0);
+        matrix.setCursor(floor((matrix.width() / 2) - (lineLengths[lineNum] / 2)), matrix.height() / 2 - messageHeight / 2);
       } else if (newLine) {
         matrix.setCursor(floor((matrix.width() / 2) - (lineLengths[++lineNum] / 2)), matrix.getCursorY());
         newLine = false;
@@ -159,16 +169,16 @@ void loop() {
   io.run();
 }
 
-// Input a value 0 to 24 to get a color value.
+// Input a value 0 to 23 to get a color value.
 // The colours are a transition r - g - b - back to r.
 uint16_t Wheel(byte WheelPos) {
   if(WheelPos < 8) {
    return matrix.Color333(7 - WheelPos, WheelPos, 0);
   } else if(WheelPos < 16) {
    WheelPos -= 8;
-   return matrix.Color333(0, 7-WheelPos, WheelPos);
+   return matrix.Color333(0, 7 - WheelPos, WheelPos);
   } else {
    WheelPos -= 16;
-   return matrix.Color333(0, WheelPos, 7 - WheelPos);
+   return matrix.Color333(WheelPos, 0, 7 - WheelPos);
   }
 }
