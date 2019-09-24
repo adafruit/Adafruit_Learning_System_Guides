@@ -3,12 +3,18 @@
 
 #if defined(ADAFRUIT_MONSTER_M4SK_EXPRESS)
 
-#include "globals.h"
 #include <SPI.h>
 
 #define MIN_PITCH_HZ   65
 #define MAX_PITCH_HZ 1600
 #define TYP_PITCH_HZ  175
+
+// Playback timer stuff - use TC3 on MONSTER M4SK (no TC4 on this board)
+#define TIMER             TC3
+#define TIMER_IRQN        TC3_IRQn
+#define TIMER_IRQ_HANDLER TC3_Handler
+#define TIMER_GCLK_ID     TC3_GCLK_ID
+#define TIMER_GCM_ID      GCM_TC2_TC3
 
 // PDM mic allows 1.0 to 3.25 MHz max clock (2.4 typical).
 // SPI native max is is 24 MHz, so available speeds are 12, 6, 3 MHz.
@@ -97,7 +103,6 @@ static int16_t        playbackIndexJumped;
 static uint16_t       nextOut   = 2048;
 
 float voicePitch(float p);
-static void playCallback(void);
 
 // START PITCH SHIFT (no arguments) ----------------------------------------
 
@@ -110,8 +115,8 @@ bool voiceSetup(bool modEnable) {
 
   // Allocate buffer for voice modulation, if enabled
   if(modEnable) {
-    // Second 16.0 comes from min period in voicePitch()
-    modBuf = (uint8_t *)malloc((int)(48000000.0 /16.0 / 16.0 / MOD_MIN + 0.5));
+    // 250 comes from min period in voicePitch()
+    modBuf = (uint8_t *)malloc((int)(48000000.0 / 250.0 / MOD_MIN + 0.5));
     // If malloc fails, program will continue without modulation
   }
 
@@ -145,7 +150,37 @@ bool voiceSetup(bool modEnable) {
 
   analogWriteResolution(12);
 
-  voicePitch(1.0); // Set timer interval & callback
+  // Feed TIMER off GCLK1 (already set to 48 MHz by Arduino core)
+  GCLK->PCHCTRL[TIMER_GCLK_ID].bit.CHEN = 0;     // Disable channel
+  while(GCLK->PCHCTRL[TIMER_GCLK_ID].bit.CHEN);  // Wait for disable
+  GCLK_PCHCTRL_Type pchctrl;
+  pchctrl.bit.GEN                       = GCLK_PCHCTRL_GEN_GCLK1_Val;
+  pchctrl.bit.CHEN                      = 1;
+  GCLK->PCHCTRL[TIMER_GCLK_ID].reg      = pchctrl.reg;
+  while(!GCLK->PCHCTRL[TIMER_GCLK_ID].bit.CHEN); // Wait for enable
+
+  // Disable timer before configuring it
+  TIMER->COUNT16.CTRLA.bit.ENABLE       = 0;
+  while(TIMER->COUNT16.SYNCBUSY.bit.ENABLE);
+
+  // 16-bit counter mode, 1:1 prescale, match-frequency generation mode
+  TIMER->COUNT16.CTRLA.bit.MODE      = TC_CTRLA_MODE_COUNT16;
+  TIMER->COUNT16.CTRLA.bit.PRESCALER = TC_CTRLA_PRESCALER_DIV1_Val;
+  TIMER->COUNT16.WAVE.bit.WAVEGEN    = TC_WAVE_WAVEGEN_MFRQ_Val;
+
+  TIMER->COUNT16.CTRLBCLR.reg        = TC_CTRLBCLR_DIR; // Count up
+  while(TIMER->COUNT16.SYNCBUSY.bit.CTRLB);
+
+  voicePitch(1.0); // Set timer interval
+
+  TIMER->COUNT16.INTENSET.reg        = TC_INTENSET_OVF; // Overflow interrupt
+  NVIC_DisableIRQ(TIMER_IRQN);
+  NVIC_ClearPendingIRQ(TIMER_IRQN);
+  NVIC_SetPriority(TIMER_IRQN, 0); // Top priority
+  NVIC_EnableIRQ(TIMER_IRQN);
+
+  TIMER->COUNT16.CTRLA.bit.ENABLE    = 1;    // Enable timer
+  while(TIMER->COUNT16.SYNCBUSY.bit.ENABLE); // Wait for it
 
   return true; // Success
 }
@@ -161,15 +196,14 @@ bool voiceSetup(bool modEnable) {
 // adjustment (after appying constraints) will be returned.
 float voicePitch(float p) {
   float   desiredPlaybackRate = sampleRate * p;
-  int32_t period = (int32_t)(48000000.0 / 16.0 / desiredPlaybackRate);
-  if(period > 160)     period = 160; // Hard limit is 65536, 160 is a practical limit
-  else if(period < 16) period =  16; // Leave some cycles for IRQ handler
-  float   actualPlaybackRate = 48000000.0 / 16.0 / (float)period;
+  int32_t period = (int32_t)(48000000.0 / desiredPlaybackRate + 0.5);
+  if(period > 2500)     period = 2500; // Hard limit is 65536, 2.5K is a practical limit
+  else if(period < 250) period =  250; // Leave some cycles for IRQ handler
+  TIMER->COUNT16.CC[0].reg = period - 1;
+  while(TIMER->COUNT16.SYNCBUSY.bit.CC0);
+  float   actualPlaybackRate = 48000000.0 / (float)period;
   p = (actualPlaybackRate / sampleRate); // New pitch
   jumpThreshold = (int)(jump * p + 0.5);
-
-  arcada.timerCallback((int)actualPlaybackRate, playCallback);
-
   return p;
 }
 
@@ -189,12 +223,9 @@ void voiceGain(float g) {
 void voiceMod(uint32_t freq, uint8_t waveform) {
   if(modBuf) { // Ignore if no modulation buffer allocated
     if(freq < MOD_MIN) freq = MOD_MIN;
-/*
-TO DO: FIX THIS NOW THAT USING ARCADA ZEROTIMER:
     uint16_t period = TIMER->COUNT16.CC[0].reg + 1;     // Audio out timer ticks
-    float    playbackRate = 48000000.0 / 16.0 / (float)period; // Audio out samples/sec
+    float    playbackRate = 48000000.0 / (float)period; // Audio out samples/sec
     modLen = (int)(playbackRate / freq + 0.5);
-*/
     if(modLen < 2) modLen = 2;
     if(waveform > 4) waveform = 4;
     modWave = waveform;
@@ -366,8 +397,10 @@ void PDM_SERCOM_HANDLER(void) {
   evenWord ^= 1;
 }
 
-// Playback timer callback
-static void playCallback(void) {
+// Playback timer interrupt
+void TIMER_IRQ_HANDLER(void) {
+  TIMER->COUNT16.INTFLAG.reg = TC_INTFLAG_OVF;
+
   // Modulation is done on the output (rather than the input) because
   // pitch-shifting modulated input would cause weird waveform
   // discontinuities. This does require recalculating the modulation table

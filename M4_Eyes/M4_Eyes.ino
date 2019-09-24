@@ -172,11 +172,13 @@ void setup() {
   }
 
   yield();
-  uint8_t e;
+  uint8_t e, rtna = 0x01; // Screen refresh rate control (datasheet 9.2.18, FRCTRL2)
   // Initialize displays
   eye[0].display = arcada._display;
+  eye[0].display->sendCommand(0xC6, &rtna, 1);
   if (NUM_EYES > 1) {
     eye[1].display = arcada.display2;  
+    eye[1].display->sendCommand(0xC6, &rtna, 1);
   }
 
   yield();
