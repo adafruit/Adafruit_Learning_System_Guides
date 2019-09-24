@@ -19,7 +19,8 @@
 #endif
 
 // GLOBAL VARIABLES --------------------------------------------------------
-
+#define MAX_DISPLAY_SIZE 240
+GLOBAL_VAR int       DISPLAY_SIZE        GLOBAL_INIT(240);    // Start with assuming a 240x240 display
 GLOBAL_VAR uint32_t  stackReserve        GLOBAL_INIT(5192);   // See image-loading code
 GLOBAL_VAR int       eyeRadius           GLOBAL_INIT(0);      // 0 = Use default in loadConfig()
 GLOBAL_VAR int       eyeDiameter;                             // Calculated from eyeRadius later
@@ -48,10 +49,10 @@ GLOBAL_VAR int       mapDiameter;        // calculated in loadConfig()
 GLOBAL_VAR uint8_t  *displace            GLOBAL_INIT(NULL);
 GLOBAL_VAR uint8_t  *polarAngle          GLOBAL_INIT(NULL);
 GLOBAL_VAR int8_t   *polarDist           GLOBAL_INIT(NULL);
-GLOBAL_VAR uint8_t   upperOpen[240];
-GLOBAL_VAR uint8_t   upperClosed[240];
-GLOBAL_VAR uint8_t   lowerOpen[240];
-GLOBAL_VAR uint8_t   lowerClosed[240];
+GLOBAL_VAR uint8_t   upperOpen[MAX_DISPLAY_SIZE];
+GLOBAL_VAR uint8_t   upperClosed[MAX_DISPLAY_SIZE];
+GLOBAL_VAR uint8_t   lowerOpen[MAX_DISPLAY_SIZE];
+GLOBAL_VAR uint8_t   lowerClosed[MAX_DISPLAY_SIZE];
 GLOBAL_VAR char     *upperEyelidFilename GLOBAL_INIT(NULL);
 GLOBAL_VAR char     *lowerEyelidFilename GLOBAL_INIT(NULL);
 GLOBAL_VAR uint16_t  lightSensorMin      GLOBAL_INIT(0);
@@ -106,7 +107,7 @@ GLOBAL_VAR uint32_t  modulate            GLOBAL_INIT(30); // Dalek pitch
   // with a single descriptor. This is NOT a problem with a single eye
   // (since only one channel) and we can still use the hack for HalloWing M4.
 typedef struct {
-  uint16_t       renderBuf[240];              // Pixel buffer
+  uint16_t       renderBuf[MAX_DISPLAY_SIZE]; // Pixel buffer
   DmacDescriptor descriptor[NUM_DESCRIPTORS]; // DMA descriptor list
 } columnStruct;
 

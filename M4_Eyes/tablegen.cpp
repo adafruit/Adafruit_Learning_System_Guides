@@ -16,7 +16,7 @@ void calcDisplacement() {
   // when rendering. Additionally, only a single axis displacement need
   // be calculated, since eye shape is X/Y symmetrical one can just swap
   // axes to look up displacement on the opposing axis.
-  if(displace = (uint8_t *)malloc(120 * 120)) {
+  if(displace = (uint8_t *)malloc((DISPLAY_SIZE/2) * (DISPLAY_SIZE/2))) {
     float    eyeRadius2 = (float)(eyeRadius * eyeRadius);
     uint8_t  x, y;
     float    dx, dy, d2, d, h, a, pa;
@@ -28,7 +28,7 @@ void calcDisplacement() {
       yield(); // Periodic yield() makes sure mass storage filesystem stays alive
       dy  = (float)y + 0.5;
       dy *= dy; // Now dy^2
-      for(x=0; x<120; x++) {
+      for(x=0; x<(DISPLAY_SIZE/2); x++) {
         // Get distance to origin point. Pixel centers are at +0.5, this is
         // normal, desirable and by design -- screen center at (120.0,120.0)
         // falls between pixels and allows numerically-correct mirroring.

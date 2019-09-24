@@ -96,7 +96,7 @@ static void dma_callback(Adafruit_ZeroDMA *dma) {
 
 SPISettings settings(DISPLAY_FREQ, MSBFIRST, SPI_MODE0);
 
-// The time required to issue one scanline (240 pixels x 16 bits) over
+// The time required to issue one scanline (DISPLAY_SIZE pixels x 16 bits) over
 // SPI is a known(ish) quantity. The DMA scheduler isn't always perfectly
 // deterministic though...especially on startup, as things make their way
 // into caches. Very occasionally, something (not known yet) is causing
@@ -107,7 +107,7 @@ SPISettings settings(DISPLAY_FREQ, MSBFIRST, SPI_MODE0);
 // below, to allow for caching/scheduling fudge). If so, that's our signal
 // that something is likely amiss and we take evasive maneuvers, resetting
 // the affected DMA channel (DMAbuddy::fix()).
-#define DMA_TIMEOUT ((240 * 16 * 4000) / (DISPLAY_FREQ / 1000))
+#define DMA_TIMEOUT ((DISPLAY_SIZE * 16 * 4000) / (DISPLAY_FREQ / 1000))
 
 static inline uint16_t readBoop(void) {
   uint16_t counter = 0;
@@ -228,7 +228,7 @@ void setup() {
         eye[e].column[i].descriptor[j].DSTADDR.reg         = spi_data_reg;
       }
     }
-    eye[e].colNum       = 240; // Force initial wraparound to first column
+    eye[e].colNum       = DISPLAY_SIZE; // Force initial wraparound to first column
     eye[e].colIdx       = 0;
     eye[e].dma_busy     = false;
     eye[e].column_ready = false;
@@ -357,7 +357,7 @@ void setup() {
 
   status = loadEyelid(upperEyelidFilename ?
     upperEyelidFilename : (char *)"upper.bmp",
-    upperClosed, upperOpen, 239, maxRam);
+    upperClosed, upperOpen, DISPLAY_SIZE-1, maxRam);
 
   status = loadEyelid(lowerEyelidFilename ?
     lowerEyelidFilename : (char *)"lower.bmp",
@@ -407,7 +407,7 @@ void setup() {
   yield();
   if(boopPin >= 0) {
     boopThreshold = 0;
-    for(int i=0; i<240; i++) {
+    for(int i=0; i<DISPLAY_SIZE; i++) {
       boopThreshold += readBoop();
     }
     boopThreshold = boopThreshold * 110 / 100; // 10% overhead
@@ -486,7 +486,7 @@ void loop() {
         eyeX = eyeOldX;
         eyeY = eyeOldY;
         if(dt > eyeMoveDuration) {            // Time up?  Begin new move.
-          float r = (float)mapDiameter - 240.0 * M_PI_2; // radius of motion
+          float r = (float)mapDiameter - (float)DISPLAY_SIZE * M_PI_2; // radius of motion
           r *= 0.6;
           eyeNewX = random(-r, r);
           float h = sqrt(r * r - x * x);
@@ -533,10 +533,10 @@ void loop() {
       float uq, lq; // So many sloppy temp vars in here for now, sorry
       if(tracking) {
         // Eyelids naturally "track" the pupils (move up or down automatically)
-        int ix = (int)map2screen(mapRadius - eye[eyeNum].eyeX) + 120, // Pupil position
-            iy = (int)map2screen(mapRadius - eye[eyeNum].eyeY) + 120; // on screen
+        int ix = (int)map2screen(mapRadius - eye[eyeNum].eyeX) + (DISPLAY_SIZE/2), // Pupil position
+            iy = (int)map2screen(mapRadius - eye[eyeNum].eyeY) + (DISPLAY_SIZE/2); // on screen
         iy += irisRadius * trackFactor;
-        if(eyeNum & 1) ix = 239 - ix; // Flip for right eye
+        if(eyeNum & 1) ix = DISPLAY_SIZE - 1 - ix; // Flip for right eye
         if(iy > upperOpen[ix]) {
           uq = 1.0;
         } else if(iy < upperClosed[ix]) {
@@ -625,8 +625,8 @@ void loop() {
 
     // Should be possible for these to be local vars,
     // but the animation becomes super chunky then, what gives?
-    xPositionOverMap = (int)(eye[eyeNum].eyeX - 120.0);
-    yPositionOverMap = (int)(eye[eyeNum].eyeY - 120.0);
+    xPositionOverMap = (int)(eye[eyeNum].eyeX - (DISPLAY_SIZE/2.0));
+    yPositionOverMap = (int)(eye[eyeNum].eyeY - (DISPLAY_SIZE/2.0));
 
     // These are constant across frame and could be stored in eye struct
     float upperLidFactor = (1.0 - eye[eyeNum].blinkFactor) * eye[eyeNum].upperLidFactor,
@@ -634,7 +634,7 @@ void loop() {
     iPupilFactor = (int)((float)eye[eyeNum].iris.height * 256 * (1.0 / eye[eyeNum].pupilFactor));
 
     int y1, y2;
-    int lidColumn = (eyeNum & 1) ? (239 - x) : x; // Reverse eyelid columns for left eye
+    int lidColumn = (eyeNum & 1) ? (DISPLAY_SIZE - 1 - x) : x; // Reverse eyelid columns for left eye
 
     DmacDescriptor *d = &eye[eyeNum].column[eye[eyeNum].colIdx].descriptor[0];
 
@@ -642,7 +642,7 @@ void loop() {
       // No eyelid data for this line; eyelid image is smaller than screen.
       // Great! Make a full scanline of nothing, no rendering needed:
       d->BTCTRL.bit.SRCINC = 0;
-      d->BTCNT.reg         = 240 * 2;
+      d->BTCNT.reg         = DISPLAY_SIZE * 2;
       d->SRCADDR.reg       = (uint32_t)&eyelidIndex;
       d->DESCADDR.reg      = 0; // No linked descriptor
     } else {
@@ -650,15 +650,15 @@ void loop() {
         (float)((int)lowerOpen[lidColumn] - (int)lowerClosed[lidColumn]));
       y2 = upperClosed[lidColumn] + (int)(0.5 + upperLidFactor *
         (float)((int)upperOpen[lidColumn] - (int)upperClosed[lidColumn]));
-      if(y1 > 239)    y1 = 239; // Clip results in case lidfactor
+      if(y1 > DISPLAY_SIZE-1)    y1 = DISPLAY_SIZE-1; // Clip results in case lidfactor
       else if(y1 < 0) y1 = 0;   // is beyond the usual 0.0 to 1.0 range
-      if(y2 > 239)    y2 = 239;
+      if(y2 > DISPLAY_SIZE-1)    y2 = DISPLAY_SIZE-1;
       else if(y2 < 0) y2 = 0;
       if(y1 >= y2) {
         // Eyelid is fully or partially closed, enough that there are no
         // pixels to be rendered for this line. Make "nothing," as above.
         d->BTCTRL.bit.SRCINC = 0;
-        d->BTCNT.reg         = 240 * 2;
+        d->BTCNT.reg         = DISPLAY_SIZE * 2;
         d->SRCADDR.reg       = (uint32_t)&eyelidIndex;
         d->DESCADDR.reg      = 0; // No linked descriptors
       } else {
@@ -681,11 +681,11 @@ void loop() {
         d->BTCNT.reg         = renderlen * 2;
         d->SRCADDR.reg       = (uint32_t)eye[eyeNum].column[eye[eyeNum].colIdx].renderBuf + renderlen * 2; // Point to END of data!
 #else
-        // Full column will be rendered; 240 pixels, point source to end of
+        // Full column will be rendered; DISPLAY_SIZE pixels, point source to end of
         // renderBuf and enable source increment.
         d->BTCTRL.bit.SRCINC = 1;
-        d->BTCNT.reg         = 240 * 2;
-        d->SRCADDR.reg       = (uint32_t)eye[eyeNum].column[eye[eyeNum].colIdx].renderBuf + 240 * 2;
+        d->BTCNT.reg         = DISPLAY_SIZE * 2;
+        d->SRCADDR.reg       = (uint32_t)eye[eyeNum].column[eye[eyeNum].colIdx].renderBuf + DISPLAY_SIZE * 2;
         d->DESCADDR.reg      = 0; // No linked descriptors
 #endif
         // Render column 'x' into eye's next available renderBuf
@@ -704,13 +704,13 @@ void loop() {
         uint8_t *displaceX, *displaceY;
         int8_t   xmul; // Sign of X displacement: +1 or -1
         int      doff; // Offset into displacement arrays
-        if(x < 120) {  // Left half of screen (quadrants 2, 3)
-          displaceX = &displace[ 119 - x       ];
-          displaceY = &displace[(119 - x) * 120];
+        if(x < (DISPLAY_SIZE/2)) {  // Left half of screen (quadrants 2, 3)
+          displaceX = &displace[ (DISPLAY_SIZE/2 - 1) - x       ];
+          displaceY = &displace[((DISPLAY_SIZE/2 - 1) - x) * (DISPLAY_SIZE/2)];
           xmul      = -1; // X displacement is always negative
         } else {       // Right half of screen( quadrants 1, 4)
-          displaceX = &displace[ x - 120       ];
-          displaceY = &displace[(x - 120) * 120];
+          displaceX = &displace[ x - (DISPLAY_SIZE/2)       ];
+          displaceY = &displace[(x - (DISPLAY_SIZE/2)) * (DISPLAY_SIZE/2)];
           xmul      =  1; // X displacement is always positive
         }
 
@@ -718,14 +718,14 @@ void loop() {
           int yy = yPositionOverMap + y;
           int dx, dy;
 
-          if(y < 120) { // Lower half of screen (quadrants 3, 4)
-            doff = 119 - y;
+          if(y < (DISPLAY_SIZE/2)) { // Lower half of screen (quadrants 3, 4)
+            doff = (DISPLAY_SIZE/2 - 1) - y;
             dy   = -displaceY[doff];
           } else {      // Upper half of screen (quadrants 1, 2)
-            doff = y - 120;
+            doff = y - (DISPLAY_SIZE/2);
             dy   =  displaceY[doff];
           }
-          dx = displaceX[doff * 120];
+          dx = displaceX[doff * (DISPLAY_SIZE/2)];
           if(dx < 255) {      // Inside eyeball area
             dx *= xmul;       // Flip sign of x offset if in quadrants 2 or 3
             int mx = xx + dx; // Polar angle/dist map coords
@@ -795,9 +795,9 @@ void loop() {
 
 #if NUM_DESCRIPTORS == 1
         // Render upper eyelid if needed
-        for(; y<240; y++) *ptr++ = eyelidColor;
+        for(; y<DISPLAY_SIZE; y++) *ptr++ = eyelidColor;
 #else
-        if(y2 >= 239) {
+        if(y2 >= (DISPLAY_SIZE-1)) {
           // No third descriptor; close it off
           d->DESCADDR.reg      = 0;
         } else {
@@ -805,7 +805,7 @@ void loop() {
           d->DESCADDR.reg      = (uint32_t)next; // link to next descriptor
           d                    = next; // Increment descriptor
           d->BTCTRL.bit.SRCINC = 0;
-          d->BTCNT.reg         = (239 - y2) * 2;
+          d->BTCNT.reg         = ((DISPLAY_SIZE-1) - y2) * 2;
           d->SRCADDR.reg       = (uint32_t)&eyelidIndex;
           d->DESCADDR.reg      = 0; // end of descriptor list
         }
@@ -840,7 +840,7 @@ void loop() {
     // Initialize new SPI transaction & address window...
     eye[eyeNum].spi->beginTransaction(settings);
     digitalWrite(eye[eyeNum].cs, LOW);  // Chip select
-    eye[eyeNum].display->setAddrWindow(0, 0, 240, 240);
+    eye[eyeNum].display->setAddrWindow(0, 0, DISPLAY_SIZE, DISPLAY_SIZE);
     delayMicroseconds(1);
     digitalWrite(eye[eyeNum].dc, HIGH); // Data mode
     if(eyeNum == (NUM_EYES-1)) {
@@ -923,7 +923,7 @@ void loop() {
   eye[eyeNum].dma_busy       = true;
   eye[eyeNum].dma.startJob();
   eye[eyeNum].dmaStartTime   = micros();
-  if(++eye[eyeNum].colNum >= 240) { // If last line sent...
+  if(++eye[eyeNum].colNum >= DISPLAY_SIZE) { // If last line sent...
     eye[eyeNum].colNum      = 0;    // Wrap to beginning
   }
   eye[eyeNum].colIdx       ^= 1;    // Alternate 0/1 line structs
