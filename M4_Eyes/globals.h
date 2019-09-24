@@ -17,8 +17,6 @@
 
 #if defined(ADAFRUIT_MONSTER_M4SK_EXPRESS)
   #define NUM_EYES 2
-  #include <Adafruit_seesaw.h>
-  GLOBAL_VAR Adafruit_seesaw seesaw; // Controls some left-eye signals
   #define SEESAW_TFT_RESET_PIN 8     // Left eye TFT reset
   #define SEESAW_BACKLIGHT_PIN 5     // Left eye TFT backlight
   #define BACKLIGHT_PIN       21     // Right eye TFT backlight

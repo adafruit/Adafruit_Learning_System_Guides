@@ -145,30 +145,16 @@ void setup() {
 
     
   Serial.begin(115200);
-  //while(!Serial) delay(10);
+  while(!Serial) delay(10);
 
   Serial.printf("Available RAM at start: %d\n", availableRAM());
   Serial.printf("Available flash at start: %d\n", availableNVM());
   yield(); // Periodic yield() makes sure mass storage filesystem stays alive
 
   // Backlight(s) off ASAP, they'll switch on after screen(s) init & clear
-  pinMode(BACKLIGHT_PIN, OUTPUT);
-  analogWrite(BACKLIGHT_PIN, 0);
+  arcada.setBacklight(0);
 #if NUM_EYES > 1
-  if(!seesaw.begin()) fatal("Seesaw init fail", 1000);
-  seesaw.analogWrite(SEESAW_BACKLIGHT_PIN, 0);
-  // Configure Seesaw pins 9,10,11 as inputs
-  seesaw.pinModeBulk(0b111000000000, INPUT_PULLUP);
-  priorButtonState = seesaw.digitalReadBulk(0b111000000000);
-#endif
-
-
-#if NUM_EYES > 1
-  seesaw.pinMode(SEESAW_TFT_RESET_PIN, OUTPUT);
-  seesaw.digitalWrite(SEESAW_TFT_RESET_PIN, LOW);
-  delay(10);
-  seesaw.digitalWrite(SEESAW_TFT_RESET_PIN, HIGH);
-  delay(20);
+  priorButtonState = 0b111000000000;
 #endif
 
   yield();
@@ -186,27 +172,20 @@ void setup() {
   yield();
   if (arcada.drawBMP("/splash.bmp", 0, 0, (eye[0].display)) == IMAGE_SUCCESS) {
     Serial.println("Splashing");
-    #if NUM_EYES > 1
-    // other eye
-    yield();
-    arcada.drawBMP("/splash.bmp", 0, 0, (eye[1].display));
-    #endif
+    if (NUM_EYES > 1) {    // other eye
+      yield();
+      arcada.drawBMP("/splash.bmp", 0, 0, (eye[1].display));
+    }
     // backlight on for a bit
-    for (int bl=0; bl<=250; bl+=10) {
-      #if NUM_EYES > 1
-      seesaw.analogWrite(SEESAW_BACKLIGHT_PIN, bl);
-      #endif
-      analogWrite(BACKLIGHT_PIN, bl);
-      delay(10);
+    for (int bl=0; bl<=250; bl+=20) {
+      arcada.setBacklight(bl);
+      delay(20);
     }
     delay(2000);
     // backlight back off
-    for (int bl=250; bl>=0; bl-=10) {
-      #if NUM_EYES > 1
-      seesaw.analogWrite(SEESAW_BACKLIGHT_PIN, bl);
-      #endif
-      analogWrite(BACKLIGHT_PIN, bl);
-      delay(10);
+    for (int bl=250; bl>=0; bl-=20) {
+      arcada.setBacklight(bl);
+      delay(20);
     }
   }
 
@@ -269,7 +248,7 @@ void setup() {
 
   analogWrite(BACKLIGHT_PIN, 255);
 #if defined(SEESAW_BACKLIGHT_PIN)
-  seesaw.analogWrite(SEESAW_BACKLIGHT_PIN, 255);
+  arcada.ss.analogWrite(SEESAW_BACKLIGHT_PIN, 255);
 #endif
 
   // LOAD CONFIGURATION FILE -----------------------------------------------
@@ -443,7 +422,7 @@ void setup() {
 static inline uint16_t readLightSensor(void) {
 #if NUM_EYES > 1
   if(lightSensorPin >= 100) {
-    return seesaw.analogRead(lightSensorPin - 100);
+    return arcada.ss.analogRead(lightSensorPin - 100);
   }
 #else
   return analogRead(lightSensorPin);
@@ -925,7 +904,7 @@ void loop() {
 #if defined(ADAFRUIT_MONSTER_M4SK_EXPRESS)
       if(voiceOn) {
         // Read buttons, change pitch
-        uint32_t buttonState  = seesaw.digitalReadBulk(0b111000000000); // Bits CLEAR if currently pressed
+        uint32_t buttonState  = arcada.ss.digitalReadBulk(0b111000000000); // Bits CLEAR if currently pressed
         uint32_t changedState = ~(buttonState ^ priorButtonState);      // Bits CLEAR if changed from before
         uint32_t newlyPressed = ~(buttonState | changedState);          // Bits SET if newly pressed
         if(       newlyPressed & 0b001000000000) { // Seesaw pin 9 (inner)
