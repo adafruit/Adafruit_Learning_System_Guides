@@ -294,13 +294,13 @@ void loadConfig(char *filename) {
   // purpose, because displacement effect looks worst at its extremes...this
   // allows the pupil to move close to the edge of the display while keeping
   // a few pixels distance from the displacement limits.
-  if(!eyeRadius) eyeRadius = 125;
+  if(!eyeRadius) eyeRadius = DISPLAY_SIZE/2 + 5;
   else           eyeRadius = abs(eyeRadius);
   eyeDiameter  = eyeRadius * 2;
   eyelidIndex &= 0xFF;      // From table: learn.adafruit.com/assets/61921
   eyelidColor  = eyelidIndex * 0x0101; // Expand eyelidIndex to 16-bit RGB
 
-  if(!irisRadius) irisRadius = 60; // Size in screen pixels
+  if(!irisRadius) irisRadius = DISPLAY_SIZE/4; // Size in screen pixels
   else            irisRadius = abs(irisRadius);
   slitPupilRadius = abs(slitPupilRadius);
   if(slitPupilRadius > irisRadius) slitPupilRadius = irisRadius;
@@ -329,8 +329,8 @@ ImageReturnCode loadEyelid(char *filename,
      return IMAGE_ERR_FILE_NOT_FOUND;
   }
 
-  memset(minArray, init, 240); // Fill eyelid arrays with init value to
-  memset(maxArray, init, 240); // mark 'no eyelid data for this column'
+  memset(minArray, init, DISPLAY_SIZE); // Fill eyelid arrays with init value to
+  memset(maxArray, init, DISPLAY_SIZE); // mark 'no eyelid data for this column'
 
   // This is the "booster seat" described in m4eyes.ino
   if(reader->bmpDimensions(filename, &w, &h) == IMAGE_SUCCESS) {
@@ -353,16 +353,16 @@ ImageReturnCode loadEyelid(char *filename,
       uint8_t   white = (!palette || (palette[1] > palette[0]));
       int       x, y, ix, iy, sx1, sx2, sy1, sy2;
       // Center/clip eyelid image with respect to screen...
-      sx1 = (240 - image.width()) / 2;  // leftmost pixel, screen space
-      sy1 = (240 - image.height()) / 2; // topmost pixel, screen space
+      sx1 = (DISPLAY_SIZE - image.width()) / 2;  // leftmost pixel, screen space
+      sy1 = (DISPLAY_SIZE - image.height()) / 2; // topmost pixel, screen space
       sx2 = sx1 + image.width() - 1;    // rightmost pixel, screen space
       sy2 = sy1 + image.height() - 1;   // lowest pixel, screen space
       ix  = -sx1;                       // leftmost pixel, image space
       iy  = -sy1;                       // topmost pixel, image space
       if(sx1 <   0) sx1 =   0;          // image wider than screen
       if(sy1 <   0) sy1 =   0;          // image taller than screen
-      if(sx2 > 239) sx2 = 239;          // image wider than screen
-      if(sy2 > 239) sy2 = 239;          // image taller than screen
+      if(sx2 > (DISPLAY_SIZE-1)) sx2 = DISPLAY_SIZE - 1; // image wider than screen
+      if(sy2 > (DISPLAY_SIZE-1)) sy2 = DISPLAY_SIZE - 1; // image taller than screen
       if(ix   <   0) ix   =   0;        // image narrower than screen
       if(iy   <   0) iy   =   0;        // image shorter than screen
 
@@ -384,8 +384,8 @@ ImageReturnCode loadEyelid(char *filename,
         if(miny != 255) {
           // Because of coordinate system used later (screen rotated),
           // min/max and Y coordinates are flipped before storing...
-          maxArray[x] = 239 - miny;
-          minArray[x] = 239 - maxy;
+          maxArray[x] = DISPLAY_SIZE - 1 - miny;
+          minArray[x] = DISPLAY_SIZE - 1 - maxy;
         }
       }
     } else {
