@@ -24,7 +24,7 @@
 
 // GLOBAL VARIABLES --------------------------------------------------------
 
-GLOBAL_VAR uint32_t  stackReserve        GLOBAL_INIT(8192);   // See image-loading code
+GLOBAL_VAR uint32_t  stackReserve        GLOBAL_INIT(5192);   // See image-loading code
 GLOBAL_VAR int       eyeRadius           GLOBAL_INIT(0);      // 0 = Use default in loadConfig()
 GLOBAL_VAR int       eyeDiameter;                             // Calculated from eyeRadius later
 GLOBAL_VAR int       irisRadius          GLOBAL_INIT(60);     // Approx size in screen pixels

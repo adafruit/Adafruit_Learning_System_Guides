@@ -335,9 +335,11 @@ ImageReturnCode loadEyelid(char *filename,
   // This is the "booster seat" described in m4eyes.ino
   if(reader->bmpDimensions(filename, &w, &h) == IMAGE_SUCCESS) {
     tempBytes = ((w + 7) / 8) * h; // Bitmap size in bytes
-    if(tempPtr = (uint8_t *)malloc(maxRam - tempBytes)) {
-      // Make SOME tempPtr reference, or optimizer removes the alloc!
-      tempPtr[0] = 0;
+    if (maxRam > tempBytes) {
+      if(tempPtr = (uint8_t *)malloc(maxRam - tempBytes)) {
+        // Make SOME tempPtr reference, or optimizer removes the alloc!
+        tempPtr[0] = 0;
+      }
     }
     // DON'T nest the image-reading case in here. If the fragmentation
     // culprit can be found, this block of code (and the free() block
@@ -416,9 +418,11 @@ ImageReturnCode loadTexture(char *filename, uint16_t **data,
   // This is the "booster seat" described in m4eyes.ino
   if(reader->bmpDimensions(filename, &w, &h) == IMAGE_SUCCESS) {
     tempBytes = w * h * 2; // Image size in bytes (converted to 16bpp)
-    if(tempPtr = (uint8_t *)malloc(maxRam - tempBytes)) {
-      // Make SOME tempPtr reference, or optimizer removes the alloc!
-      tempPtr[0] = 0;
+    if (maxRam > tempBytes) {
+      if(tempPtr = (uint8_t *)malloc(maxRam - tempBytes)) {
+        // Make SOME tempPtr reference, or optimizer removes the alloc!
+        tempPtr[0] = 0;
+      }
     }
     // DON'T nest the image-reading case in here. If the fragmentation
     // culprit can be found, this block of code (and the free() block

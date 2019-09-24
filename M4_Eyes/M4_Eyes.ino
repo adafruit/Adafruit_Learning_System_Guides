@@ -140,12 +140,11 @@ void setup() {
   arcada.displayBegin();
   // MUST set up flash filesystem before Serial.begin() or seesaw.begin()
   if (!arcada.filesysBeginMSD()) {
-    arcada.setBacklight(255);
-    arcada.haltBox("No filesystem found, please load CircuitPython on in order to create one!");
+    fatal("No filesystem found!", 100);
   }
     
   Serial.begin(115200);
-  while(!Serial) delay(10);
+  //while(!Serial) delay(10);
 
   Serial.printf("Available RAM at start: %d\n", availableRAM());
   Serial.printf("Available flash at start: %d\n", availableNVM());
@@ -246,10 +245,7 @@ void setup() {
     eye[e].blinkFactor = 0.0;
   }
 
-  analogWrite(BACKLIGHT_PIN, 255);
-#if defined(SEESAW_BACKLIGHT_PIN)
-  arcada.ss.analogWrite(SEESAW_BACKLIGHT_PIN, 255);
-#endif
+  arcada.setBacklight(255);
 
   // LOAD CONFIGURATION FILE -----------------------------------------------
 
