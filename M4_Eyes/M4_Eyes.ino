@@ -137,12 +137,12 @@ void setup() {
   if (!arcada.arcadaBegin()) {
     while (1);
   }
+  arcada.displayBegin();
   // MUST set up flash filesystem before Serial.begin() or seesaw.begin()
-  arcada.filesysBeginMSD();
-
-  //  if(i == 1)      fatal("Flash init fail", 100);
-  //else if(i == 2) fatal("No filesys", 500);
-
+  if (!arcada.filesysBeginMSD()) {
+    arcada.setBacklight(255);
+    arcada.haltBox("No filesystem found, please load CircuitPython on in order to create one!");
+  }
     
   Serial.begin(115200);
   //while(!Serial) delay(10);
@@ -152,24 +152,7 @@ void setup() {
   yield(); // Periodic yield() makes sure mass storage filesystem stays alive
 
   // Backlight(s) off ASAP, they'll switch on after screen(s) init & clear
-  pinMode(BACKLIGHT_PIN, OUTPUT);
-  analogWrite(BACKLIGHT_PIN, 0);
-#if NUM_EYES > 1
-  if(!seesaw.begin()) fatal("Seesaw init fail", 1000);
-  seesaw.analogWrite(SEESAW_BACKLIGHT_PIN, 0);
-  // Configure Seesaw pins 9,10,11 as inputs
-  seesaw.pinModeBulk(0b111000000000, INPUT_PULLUP);
-  priorButtonState = seesaw.digitalReadBulk(0b111000000000);
-#endif
-
-
-#if NUM_EYES > 1
-  seesaw.pinMode(SEESAW_TFT_RESET_PIN, OUTPUT);
-  seesaw.digitalWrite(SEESAW_TFT_RESET_PIN, LOW);
-  delay(10);
-  seesaw.digitalWrite(SEESAW_TFT_RESET_PIN, HIGH);
-  delay(20);
-#endif
+  arcada.setBacklight(0);
 
   yield();
   uint8_t e, rtna = 0x01; // Screen refresh rate control (datasheet 9.2.18, FRCTRL2)
@@ -193,19 +176,13 @@ void setup() {
     #endif
     // backlight on for a bit
     for (int bl=0; bl<=250; bl+=10) {
-      #if NUM_EYES > 1
-      seesaw.analogWrite(SEESAW_BACKLIGHT_PIN, bl);
-      #endif
-      analogWrite(BACKLIGHT_PIN, bl);
+      arcada.setBacklight(bl);
       delay(10);
     }
     delay(2000);
     // backlight back off
     for (int bl=250; bl>=0; bl-=10) {
-      #if NUM_EYES > 1
-      seesaw.analogWrite(SEESAW_BACKLIGHT_PIN, bl);
-      #endif
-      analogWrite(BACKLIGHT_PIN, bl);
+      arcada.setBacklight(bl);
       delay(10);
     }
   }
@@ -267,10 +244,7 @@ void setup() {
     eye[e].blinkFactor = 0.0;
   }
 
-  analogWrite(BACKLIGHT_PIN, 255);
-#if defined(SEESAW_BACKLIGHT_PIN)
-  seesaw.analogWrite(SEESAW_BACKLIGHT_PIN, 255);
-#endif
+  arcada.setBacklight(255);
 
   // LOAD CONFIGURATION FILE -----------------------------------------------
 
@@ -280,6 +254,7 @@ void setup() {
   // of the nose booper when doing this...it self-calibrates on startup.
   char *filename = "config.eye";
 #if NUM_EYES > 1 // Only available on MONSTER M4SK
+/* MEMEFIX
   if(!(priorButtonState & 0b001000000000)) {
     filename = "config1.eye";
   } else if(!(priorButtonState & 0b010000000000)) {
@@ -287,6 +262,7 @@ void setup() {
   } else if(!(priorButtonState & 0b100000000000)) {
     filename = "config3.eye";
   }
+  */
 #endif
   loadConfig(filename);
 
@@ -441,13 +417,7 @@ void setup() {
 }
 
 static inline uint16_t readLightSensor(void) {
-#if NUM_EYES > 1
-  if(lightSensorPin >= 100) {
-    return seesaw.analogRead(lightSensorPin - 100);
-  }
-#else
-  return analogRead(lightSensorPin);
-#endif
+  return arcada.readLightSensor();
 }
 
 // LOOP FUNCTION - CALLED REPEATEDLY UNTIL POWER-OFF -----------------------
@@ -925,14 +895,14 @@ void loop() {
 #if defined(ADAFRUIT_MONSTER_M4SK_EXPRESS)
       if(voiceOn) {
         // Read buttons, change pitch
-        uint32_t buttonState  = seesaw.digitalReadBulk(0b111000000000); // Bits CLEAR if currently pressed
-        uint32_t changedState = ~(buttonState ^ priorButtonState);      // Bits CLEAR if changed from before
-        uint32_t newlyPressed = ~(buttonState | changedState);          // Bits SET if newly pressed
-        if(       newlyPressed & 0b001000000000) { // Seesaw pin 9 (inner)
+        uint32_t buttonState  = arcada.readButtons();
+        uint32_t changedState = buttonState ^ priorButtonState;      // Bits CLEAR if changed from before
+        uint32_t newlyPressed = buttonState | changedState;          // Bits SET if newly pressed
+        if(       newlyPressed & ARCADA_BUTTONMASK_UP) { // Seesaw pin 9 (inner)
           currentPitch *= 1.05;
-        } else if(newlyPressed & 0b010000000000) { // Seesaw pin 10 (middle)
+        } else if(newlyPressed & ARCADA_BUTTONMASK_A) { // Seesaw pin 10 (middle)
           currentPitch = defaultPitch;
-        } else if(newlyPressed & 0b100000000000) { // Seesaw pin 11 (outer)
+        } else if(newlyPressed & ARCADA_BUTTONMASK_DOWN) { // Seesaw pin 11 (outer)
           currentPitch *= 0.95;
         }
         if(newlyPressed) {

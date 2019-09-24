@@ -1,9 +1,5 @@
 //34567890123456789012345678901234567890123456789012345678901234567890123456
 
-#include <Adafruit_GFX.h>         // Core graphics for Adafruit displays
-#include <Adafruit_ST7789.h>      // TFT-specific display library
-#include <Adafruit_ZeroDMA.h>     // SAMD-specific DMA library
-#include <Adafruit_ImageReader.h> // ImageReturnCode type
 #include "Adafruit_Arcada.h"
 #include "DMAbuddy.h"             // DMA-bug-workaround class
 
@@ -17,16 +13,9 @@
 
 #if defined(ADAFRUIT_MONSTER_M4SK_EXPRESS)
   #define NUM_EYES 2
-  #include <Adafruit_seesaw.h>
-  GLOBAL_VAR Adafruit_seesaw seesaw; // Controls some left-eye signals
-  #define SEESAW_TFT_RESET_PIN 8     // Left eye TFT reset
-  #define SEESAW_BACKLIGHT_PIN 5     // Left eye TFT backlight
-  #define BACKLIGHT_PIN       21     // Right eye TFT backlight
-  #define LIGHTSENSOR_PIN      2
   // Light sensor is not active by default. Use "lightSensor : 102" in config
 #else
   #define NUM_EYES 1
-  #define BACKLIGHT_PIN       47
 #endif
 
 // GLOBAL VARIABLES --------------------------------------------------------
