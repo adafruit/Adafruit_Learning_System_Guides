@@ -37,8 +37,6 @@
 #define GLOBAL_VAR
 #include "globals.h"
 
-Adafruit_Arcada arcada;
-
 // Global eye state that applies to all eyes (not per-eye):
 bool     eyeInMotion = false;
 float    eyeOldX, eyeOldY, eyeNewX, eyeNewY;

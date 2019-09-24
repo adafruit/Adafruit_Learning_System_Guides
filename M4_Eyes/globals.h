@@ -19,6 +19,9 @@
 #endif
 
 // GLOBAL VARIABLES --------------------------------------------------------
+
+GLOBAL_VAR Adafruit_Arcada arcada;
+
 #define MAX_DISPLAY_SIZE 240
 GLOBAL_VAR int       DISPLAY_SIZE        GLOBAL_INIT(240);    // Start with assuming a 240x240 display
 GLOBAL_VAR uint32_t  stackReserve        GLOBAL_INIT(5192);   // See image-loading code
