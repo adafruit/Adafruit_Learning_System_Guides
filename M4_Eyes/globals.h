@@ -1,7 +1,7 @@
 //34567890123456789012345678901234567890123456789012345678901234567890123456
 
 #include "Adafruit_Arcada.h"
-#include "DMAbuddy.h"             // DMA-bug-workaround class
+#include "DMAbuddy.h" // DMA-bug-workaround class
 
 #if defined(GLOBAL_VAR) // #defined in .ino file ONLY!
   #define GLOBAL_INIT(X) = (X)

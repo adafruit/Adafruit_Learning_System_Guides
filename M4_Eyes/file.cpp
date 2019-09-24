@@ -437,7 +437,7 @@ ImageReturnCode loadTexture(char *filename, uint16_t **data,
       canvas->byteSwap(); // Match screen endianism for direct DMA xfer
       *width  = image.width();
       *height = image.height();
-      *data = (uint16_t *)writeDataToFlash((uint8_t *)canvas->getBuffer(),
+      *data = (uint16_t *)arcada.writeDataToFlash((uint8_t *)canvas->getBuffer(),
         (int)*width * (int)*height * 2);
     } else {
       status = IMAGE_ERR_FORMAT; // Don't just return, need to dealloc...

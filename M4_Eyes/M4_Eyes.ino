@@ -70,10 +70,6 @@ float    iris_prev[IRIS_LEVELS] = { 0 };
 float    iris_next[IRIS_LEVELS] = { 0 };
 uint16_t iris_frame = 0;
 
-#if NUM_EYES > 1
-uint32_t priorButtonState;
-#endif
-
 // Callback invoked after each SPI DMA transfer - sets a flag indicating
 // the next line of graphics can be issued as soon as its ready.
 static void dma_callback(Adafruit_ZeroDMA *dma) {
@@ -138,22 +134,37 @@ void setup() {
     while (1);
   }
   arcada.displayBegin();
-  // MUST set up flash filesystem before Serial.begin() or seesaw.begin()
+
   if (!arcada.filesysBeginMSD()) {
     fatal("No filesystem found!", 100);
   }
     
   Serial.begin(115200);
-  //while(!Serial) delay(10);
+//  while(!Serial) delay(10);
 
   Serial.printf("Available RAM at start: %d\n", availableRAM());
-  Serial.printf("Available flash at start: %d\n", availableNVM());
+  Serial.printf("Available flash at start: %d\n", arcada.availableFlash());
   yield(); // Periodic yield() makes sure mass storage filesystem stays alive
 
   // Backlight(s) off ASAP, they'll switch on after screen(s) init & clear
   arcada.setBacklight(0);
-#if NUM_EYES > 1
-  priorButtonState = 0b111000000000;
+
+  // No file selector yet. In the meantime, you can override the default
+  // config file by holding one of the 3 edge buttons at startup (loads
+  // config1.eye, config2.eye or config3.eye instead). Keep fingers clear
+  // of the nose booper when doing this...it self-calibrates on startup.
+  // DO THIS BEFORE THE SPLASH SO IT DOESN'T REQUIRE A LENGTHY HOLD.
+  char *filename = "config.eye";
+#if NUM_EYES > 1 // Only available on MONSTER M4SK
+  arcada.readButtons();
+  uint32_t buttonState = arcada.justPressedButtons();
+  if(buttonState & ARCADA_BUTTONMASK_UP) {
+    filename = "config1.eye";
+  } else if(buttonState & ARCADA_BUTTONMASK_A) {
+    filename = "config2.eye";
+  } else if(buttonState & ARCADA_BUTTONMASK_DOWN) {
+    filename = "config3.eye";
+  }
 #endif
 
   yield();
@@ -249,22 +260,6 @@ void setup() {
 
   // LOAD CONFIGURATION FILE -----------------------------------------------
 
-  // No file selector yet. In the meantime, you can override the default
-  // config file by holding one of the 3 edge buttons at startup (loads
-  // config1.eye, config2.eye or config3.eye instead). Keep fingers clear
-  // of the nose booper when doing this...it self-calibrates on startup.
-  char *filename = "config.eye";
-#if NUM_EYES > 1 // Only available on MONSTER M4SK
-/* MEMEFIX
-  if(!(priorButtonState & 0b001000000000)) {
-    filename = "config1.eye";
-  } else if(!(priorButtonState & 0b010000000000)) {
-    filename = "config2.eye";
-  } else if(!(priorButtonState & 0b100000000000)) {
-    filename = "config3.eye";
-  }
-  */
-#endif
   loadConfig(filename);
 
   // LOAD EYELIDS AND TEXTURE MAPS -----------------------------------------
@@ -894,23 +889,21 @@ void loop() {
 #if defined(ADAFRUIT_MONSTER_M4SK_EXPRESS)
       if(voiceOn) {
         // Read buttons, change pitch
-        uint32_t buttonState  = arcada.readButtons(); // Bits SET if currently pressed
-        uint32_t changedState = ~(buttonState ^ priorButtonState);   // Bits SET if changed from before
-        uint32_t newlyPressed = buttonState | changedState;          // Bits SET if newly pressed
-        if(       newlyPressed & ARCADA_BUTTONMASK_UP) { // Seesaw pin 9 (inner)
+        arcada.readButtons();
+        uint32_t buttonState = arcada.justPressedButtons();
+        if(       buttonState & ARCADA_BUTTONMASK_UP) {
           currentPitch *= 1.05;
-        } else if(newlyPressed & ARCADA_BUTTONMASK_A) { // Seesaw pin 10 (middle)
+        } else if(buttonState & ARCADA_BUTTONMASK_A) {
           currentPitch = defaultPitch;
-        } else if(newlyPressed & ARCADA_BUTTONMASK_DOWN) { // Seesaw pin 11 (outer)
+        } else if(buttonState & ARCADA_BUTTONMASK_DOWN) {
           currentPitch *= 0.95;
         }
-        if(newlyPressed) {
+        if(buttonState & (ARCADA_BUTTONMASK_UP | ARCADA_BUTTONMASK_A | ARCADA_BUTTONMASK_DOWN)) {
           currentPitch = voicePitch(currentPitch);
           if(waveform) voiceMod(modulate, waveform);
           Serial.print("Voice pitch: ");
           Serial.println(currentPitch);
         }
-        priorButtonState = buttonState;
       }
 #endif // ADAFRUIT_MONSTER_M4SK_EXPRESS
       user_loop();
