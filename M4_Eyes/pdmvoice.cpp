@@ -110,8 +110,8 @@ bool voiceSetup(bool modEnable) {
 
   // Allocate buffer for voice modulation, if enabled
   if(modEnable) {
-    // 250 comes from min period in voicePitch()
-    modBuf = (uint8_t *)malloc((int)(48000000.0 / 250.0 / MOD_MIN + 0.5));
+    // Second 16.0 comes from min period in voicePitch()
+    modBuf = (uint8_t *)malloc((int)(48000000.0 /16.0 / 16.0 / MOD_MIN + 0.5));
     // If malloc fails, program will continue without modulation
   }
 
@@ -161,7 +161,7 @@ bool voiceSetup(bool modEnable) {
 // adjustment (after appying constraints) will be returned.
 float voicePitch(float p) {
   float   desiredPlaybackRate = sampleRate * p;
-  int32_t period = (int32_t)(48000000.0 / 16.0 / desiredPlaybackRate + 0.5);
+  int32_t period = (int32_t)(48000000.0 / 16.0 / desiredPlaybackRate);
   if(period > 160)     period = 160; // Hard limit is 65536, 160 is a practical limit
   else if(period < 16) period =  16; // Leave some cycles for IRQ handler
   float   actualPlaybackRate = 48000000.0 / 16.0 / (float)period;
@@ -190,6 +190,7 @@ void voiceMod(uint32_t freq, uint8_t waveform) {
   if(modBuf) { // Ignore if no modulation buffer allocated
     if(freq < MOD_MIN) freq = MOD_MIN;
 /*
+TO DO: FIX THIS NOW THAT USING ARCADA ZEROTIMER:
     uint16_t period = TIMER->COUNT16.CC[0].reg + 1;     // Audio out timer ticks
     float    playbackRate = 48000000.0 / 16.0 / (float)period; // Audio out samples/sec
     modLen = (int)(playbackRate / freq + 0.5);
