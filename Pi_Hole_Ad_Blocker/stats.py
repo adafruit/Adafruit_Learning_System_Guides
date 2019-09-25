@@ -39,6 +39,10 @@ import adafruit_ssd1306
 # Import Python Imaging Library
 from PIL import Image, ImageDraw, ImageFont
 
+# Signal/sys are used to catch SIGINT.
+import signal
+import sys
+
 # URL of Pi Hole
 api_url = 'http://localhost/admin/api.php'
 
@@ -52,6 +56,16 @@ i2c = busio.I2C(SCL, SDA)
 def blank_screen(display):
   display.fill(0)
   display.show()
+
+def SIGINT(sig, frame):
+  print('Ctrl+C detected. Quitting.')
+  # Clear display.
+  blank_screen(disp)
+  sys.exit(0)
+
+# Catch SIGINT (ctrl-c) and blank the screen.
+# This ensures that the screen will be blank when we exit.
+signal.signal(signal.SIGINT, SIGINT)
 
 # Create the SSD1306 OLED class.
 # The first two parameters are the pixel width and pixel height.  Change these
