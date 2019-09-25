@@ -152,7 +152,7 @@ typedef struct {
   int8_t           winkPin;      // Manual eye wink control (-1 = none)
   // Remaining values are initialized in code:
   columnStruct     column[2];    // Alternating column structures A/B
-  Adafruit_ST7789 *display;      // Pointer to display object
+  Adafruit_SPITFT *display;      // Pointer to display object
   DMAbuddy         dma;          // DMA channel object with fix() function
   DmacDescriptor  *dptr;         // DMA channel descriptor pointer
   uint32_t         dmaStartTime; // For DMA timeout handler

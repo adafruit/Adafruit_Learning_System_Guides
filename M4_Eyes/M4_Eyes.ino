@@ -173,10 +173,12 @@ void setup() {
 
   yield();
   // Initialize displays
-  eye[0].display = arcada._display;
-  if (NUM_EYES > 1) {
+  #if (NUM_EYES > 1)
+    eye[0].display = arcada._display;
     eye[1].display = arcada.display2;  
-  }
+  #else
+    eye[0].display = arcada.display;
+  #endif
 
   yield();
   if (arcada.drawBMP("/splash.bmp", 0, 0, (eye[0].display)) == IMAGE_SUCCESS) {
@@ -200,10 +202,9 @@ void setup() {
 
   // Initialize DMAs
   yield();
-  uint8_t e, rtna = 0x01; // Screen refresh rate control (datasheet 9.2.18, FRCTRL2)
+  uint8_t e;
   for(e=0; e<NUM_EYES; e++) {
     eye[e].spi->setClockSource(DISPLAY_CLKSRC);
-    eye[e].display->sendCommand(0xC6, &rtna, 1);
     eye[e].display->fillScreen(0);
     eye[e].dma.allocate();
     eye[e].dma.setTrigger(eye[e].spi->getDMAC_ID_TX());
@@ -888,6 +889,7 @@ void loop() {
         irisValue = irisMin + (sum * irisRange); // 0.0-1.0 -> iris min/max
         if((++iris_frame) >= (1 << IRIS_LEVELS)) iris_frame = 0;
       }
+#if defined(ADAFRUIT_MONSTER_M4SK_EXPRESS)
       if(voiceOn) {
         // Read buttons, change pitch
         arcada.readButtons();
@@ -906,6 +908,7 @@ void loop() {
           Serial.println(currentPitch);
         }
       }
+#endif
       user_loop();
     }
   } // end first-column check
