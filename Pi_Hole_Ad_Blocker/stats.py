@@ -41,6 +41,9 @@ from PIL import Image, ImageDraw, ImageFont
 
 api_url = 'http://localhost/admin/api.php'
 
+# Load nice silkscreen font
+font = ImageFont.truetype('/home/pi/slkscr.ttf', 8)
+
 # Create the I2C interface.
 i2c = busio.I2C(SCL, SDA)
 
@@ -78,9 +81,6 @@ bottom = height - padding
 # Move left to right keeping track of the current x position
 # for drawing shapes.
 x = 0
-
-# Load nice silkscreen font
-font = ImageFont.truetype('/home/pi/slkscr.ttf', 8)
 
 while True:
     # Draw a black filled box to clear the image.
