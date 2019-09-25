@@ -39,6 +39,7 @@ import adafruit_ssd1306
 # Import Python Imaging Library
 from PIL import Image, ImageDraw, ImageFont
 
+# URL of Pi Hole
 api_url = 'http://localhost/admin/api.php'
 
 # Load nice silkscreen font
