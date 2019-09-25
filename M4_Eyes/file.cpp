@@ -217,6 +217,7 @@ void loadConfig(char *filename) {
         // it's only the size of the filenames and only during init. NBD.
         if(iristv.is<char*>())   eye[e].iris.filename   = strdup(iristv);
         if(scleratv.is<char*>()) eye[e].sclera.filename = strdup(scleratv);
+        eye[e].rotation = rotation; // Might get override in per-eye code below
       }
 
 #if NUM_EYES > 1
