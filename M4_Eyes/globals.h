@@ -24,6 +24,8 @@ GLOBAL_VAR Adafruit_Arcada arcada;
 
 #define MAX_DISPLAY_SIZE 240
 GLOBAL_VAR int       DISPLAY_SIZE        GLOBAL_INIT(240);    // Start with assuming a 240x240 display
+GLOBAL_VAR int       DISPLAY_X_OFFSET    GLOBAL_INIT(0);      // Used with rectangular screens
+GLOBAL_VAR int       DISPLAY_Y_OFFSET    GLOBAL_INIT(0);      // Used with rectangular screens
 GLOBAL_VAR uint32_t  stackReserve        GLOBAL_INIT(5192);   // See image-loading code
 GLOBAL_VAR int       eyeRadius           GLOBAL_INIT(0);      // 0 = Use default in loadConfig()
 GLOBAL_VAR int       eyeDiameter;                             // Calculated from eyeRadius later
@@ -152,7 +154,7 @@ typedef struct {
   int8_t           winkPin;      // Manual eye wink control (-1 = none)
   // Remaining values are initialized in code:
   columnStruct     column[2];    // Alternating column structures A/B
-  Adafruit_ST7789 *display;      // Pointer to display object
+  Adafruit_SPITFT *display;      // Pointer to display object
   DMAbuddy         dma;          // DMA channel object with fix() function
   DmacDescriptor  *dptr;         // DMA channel descriptor pointer
   uint32_t         dmaStartTime; // For DMA timeout handler
