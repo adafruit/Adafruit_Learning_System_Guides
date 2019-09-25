@@ -145,6 +145,10 @@ void setup() {
 
   arcada.displayBegin();
 
+  DISPLAY_SIZE = min(ARCADA_TFT_WIDTH, ARCADA_TFT_HEIGHT);
+  DISPLAY_X_OFFSET = (ARCADA_TFT_WIDTH - DISPLAY_SIZE) / 2;
+  DISPLAY_Y_OFFSET = (ARCADA_TFT_HEIGHT - DISPLAY_SIZE) / 2;
+
   Serial.begin(115200);
 //  while(!Serial) delay(10);
 
@@ -161,13 +165,13 @@ void setup() {
   // of the nose booper when doing this...it self-calibrates on startup.
   // DO THIS BEFORE THE SPLASH SO IT DOESN'T REQUIRE A LENGTHY HOLD.
   char *filename = "config.eye";
-  arcada.readButtons();
-  uint32_t buttonState = arcada.justPressedButtons();
-  if(buttonState & ARCADA_BUTTONMASK_UP) {
+ 
+  uint32_t buttonState = arcada.readButtons();
+  if((buttonState & ARCADA_BUTTONMASK_UP) && arcada.exists("config1.eye")) {
     filename = "config1.eye";
-  } else if(buttonState & ARCADA_BUTTONMASK_A) {
+  } else if((buttonState & ARCADA_BUTTONMASK_A) && arcada.exists("config2.eye")) {
     filename = "config2.eye";
-  } else if(buttonState & ARCADA_BUTTONMASK_DOWN) {
+  } else if((buttonState & ARCADA_BUTTONMASK_DOWN) && arcada.exists("config3.eye")) {
     filename = "config3.eye";
   }
 
@@ -204,7 +208,9 @@ void setup() {
   yield();
   uint8_t e;
   for(e=0; e<NUM_EYES; e++) {
+#if (ARCADA_TFT_WIDTH != 160) && (ARCADA_TFT_HEIGHT != 128)   // 160x128 is ST7735 which isn't able to deal
     eye[e].spi->setClockSource(DISPLAY_CLKSRC);
+#endif
     eye[e].display->fillScreen(0);
     eye[e].dma.allocate();
     eye[e].dma.setTrigger(eye[e].spi->getDMAC_ID_TX());
@@ -837,7 +843,7 @@ void loop() {
     // Initialize new SPI transaction & address window...
     eye[eyeNum].spi->beginTransaction(settings);
     digitalWrite(eye[eyeNum].cs, LOW);  // Chip select
-    eye[eyeNum].display->setAddrWindow(0, 0, DISPLAY_SIZE, DISPLAY_SIZE);
+    eye[eyeNum].display->setAddrWindow(DISPLAY_X_OFFSET, DISPLAY_Y_OFFSET, DISPLAY_SIZE, DISPLAY_SIZE);
     delayMicroseconds(1);
     digitalWrite(eye[eyeNum].dc, HIGH); // Data mode
     if(eyeNum == (NUM_EYES-1)) {

@@ -24,6 +24,8 @@ GLOBAL_VAR Adafruit_Arcada arcada;
 
 #define MAX_DISPLAY_SIZE 240
 GLOBAL_VAR int       DISPLAY_SIZE        GLOBAL_INIT(240);    // Start with assuming a 240x240 display
+GLOBAL_VAR int       DISPLAY_X_OFFSET    GLOBAL_INIT(0);      // Used with rectangular screens
+GLOBAL_VAR int       DISPLAY_Y_OFFSET    GLOBAL_INIT(0);      // Used with rectangular screens
 GLOBAL_VAR uint32_t  stackReserve        GLOBAL_INIT(5192);   // See image-loading code
 GLOBAL_VAR int       eyeRadius           GLOBAL_INIT(0);      // 0 = Use default in loadConfig()
 GLOBAL_VAR int       eyeDiameter;                             // Calculated from eyeRadius later
