@@ -1,4 +1,4 @@
-## Adafruit-Crickit-MicroBit-Robot
+## Adafruit Crickit MicroBit Robot
 
 This is a resorce folder for a MicroBit robot using the Crickit platform from Adafruit.
 
