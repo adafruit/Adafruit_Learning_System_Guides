@@ -48,6 +48,11 @@ font = ImageFont.truetype('/home/pi/slkscr.ttf', 8)
 # Create the I2C interface.
 i2c = busio.I2C(SCL, SDA)
 
+# Blanks the Pi OLED display.
+def blank_screen(display):
+  display.fill(0)
+  display.show()
+
 # Create the SSD1306 OLED class.
 # The first two parameters are the pixel width and pixel height.  Change these
 # to the right size for your display!
@@ -59,8 +64,7 @@ DISPLAY_ON  = 10 # on time in seconds
 DISPLAY_OFF = 50 # off time in seconds
 
 # Clear display.
-disp.fill(0)
-disp.show()
+blank_screen(disp)
 
 # Create blank image for drawing.
 # Make sure to create image with mode '1' for 1-bit color.
@@ -132,6 +136,6 @@ while True:
     disp.image(image)
     disp.show()
     time.sleep(DISPLAY_ON)
-    disp.fill(0)
-    disp.show()
+    # Clear display.
+    blank_screen(disp)
     time.sleep(DISPLAY_OFF)
