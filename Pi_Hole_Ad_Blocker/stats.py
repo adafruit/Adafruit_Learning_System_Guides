@@ -47,7 +47,7 @@ import sys
 api_url = 'http://localhost/admin/api.php'
 
 # Load nice silkscreen font
-font = ImageFont.truetype('/home/pi/slkscr.ttf', 8)
+font = ImageFont.truetype('fonts/slkscr.ttf', 8)
 
 # Create the I2C interface.
 i2c = busio.I2C(SCL, SDA)
