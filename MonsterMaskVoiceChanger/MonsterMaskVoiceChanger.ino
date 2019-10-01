@@ -17,7 +17,7 @@ extern volatile uint16_t voiceLastReading;
 Adafruit_seesaw seesaw;
 #define SEESAW_BACKLIGHT_PIN 5 // Left eye TFT backlight
 #define BACKLIGHT_PIN       21 // Right eye TFT backlight
-#define SPEAKER_ENABLE_PIN  20 // Set LOW to enable speaker out
+#define SPEAKER_ENABLE_PIN  20 // Set HIGH to enable speaker out
 
 // Crude error handler. Prints message to Serial Monitor, blinks LED.
 static void fatal(const char *message, uint16_t blinkDelay) {
@@ -30,7 +30,7 @@ static void fatal(const char *message, uint16_t blinkDelay) {
 
 void setup() {
   pinMode(SPEAKER_ENABLE_PIN, OUTPUT);
-  digitalWrite(SPEAKER_ENABLE_PIN, HIGH); // Speaker OFF
+  digitalWrite(SPEAKER_ENABLE_PIN, LOW); // Speaker OFF
 
   Serial.begin(115200);
   //while(!Serial);
@@ -42,7 +42,7 @@ void setup() {
   seesaw.analogWrite(SEESAW_BACKLIGHT_PIN, 0);
 
   if(!voiceSetup()) fatal("Voice init fail", 250);
-  digitalWrite(SPEAKER_ENABLE_PIN, LOW); // Speaker on
+  digitalWrite(SPEAKER_ENABLE_PIN, HIGH); // Speaker on
 
   // Configure Seesaw pins 9,10,11 as inputs
   seesaw.pinModeBulk(0b111000000000, INPUT_PULLUP);
@@ -55,13 +55,13 @@ void loop() {
   if((buttonState & 0b111000000000) != 0b111000000000) {
     if(       !(buttonState & 0b001000000000)) { // Seesaw pin 9
       Serial.println("Higher");
-      pitch = voicePitch(pitch * 1.1);
+      pitch = voicePitch(pitch * 1.05);
     } else if(!(buttonState & 0b010000000000)) { // Seesaw pin 10
       Serial.println("1:1");
       pitch = voicePitch(1.0);
     } else if(!(buttonState & 0b100000000000)) { // Seesaw pin 11
       Serial.println("Lower");
-      pitch = voicePitch(pitch * 0.9);
+      pitch = voicePitch(pitch * 0.95);
     }
     Serial.println(pitch);
     while(seesaw.digitalReadBulk(0b111000000000) != 0b111000000000);

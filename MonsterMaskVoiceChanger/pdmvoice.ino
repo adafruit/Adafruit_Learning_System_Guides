@@ -17,7 +17,7 @@
 // PDM mic allows 1.0 to 3.25 MHz max clock (2.4 typical).
 // SPI native max is is 24 MHz, so available speeds are 12, 6, 3 MHz.
 #define SPI_BITRATE 3000000
-SPISettings settings(SPI_BITRATE, LSBFIRST, SPI_MODE0);
+static SPISettings settings(SPI_BITRATE, LSBFIRST, SPI_MODE0);
 // 3 MHz / 32 bits = 93,750 Hz interrupt frequency
 // 2 interrupts/sample = 46,875 Hz audio sample rate
 const float sampleRate = (float)SPI_BITRATE / 64.0;
@@ -93,6 +93,8 @@ static uint16_t       jumpCount = 1;
 static int16_t        jumpThreshold;
 static int16_t        playbackIndexJumped;
 static uint16_t       nextOut   = 2048;
+
+float voicePitch(float p);
 
 // START PITCH SHIFT (no arguments) ----------------------------------------
 

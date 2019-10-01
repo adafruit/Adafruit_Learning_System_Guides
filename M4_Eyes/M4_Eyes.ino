@@ -36,7 +36,6 @@
 
 #define GLOBAL_VAR
 #include "globals.h"
-extern Adafruit_ImageReader reader;
 
 // Global eye state that applies to all eyes (not per-eye):
 bool     eyeInMotion = false;
@@ -95,7 +94,7 @@ static void dma_callback(Adafruit_ZeroDMA *dma) {
 
 SPISettings settings(DISPLAY_FREQ, MSBFIRST, SPI_MODE0);
 
-// The time required to issue one scanline (240 pixels x 16 bits) over
+// The time required to issue one scanline (DISPLAY_SIZE pixels x 16 bits) over
 // SPI is a known(ish) quantity. The DMA scheduler isn't always perfectly
 // deterministic though...especially on startup, as things make their way
 // into caches. Very occasionally, something (not known yet) is causing
@@ -106,7 +105,7 @@ SPISettings settings(DISPLAY_FREQ, MSBFIRST, SPI_MODE0);
 // below, to allow for caching/scheduling fudge). If so, that's our signal
 // that something is likely amiss and we take evasive maneuvers, resetting
 // the affected DMA channel (DMAbuddy::fix()).
-#define DMA_TIMEOUT ((240 * 16 * 4000) / (DISPLAY_FREQ / 1000))
+#define DMA_TIMEOUT ((DISPLAY_SIZE * 16 * 4000) / (DISPLAY_FREQ / 1000))
 
 static inline uint16_t readBoop(void) {
   uint16_t counter = 0;
@@ -126,82 +125,92 @@ void fatal(const char *message, uint16_t blinkDelay) {
   }
 }
 
+#include <unistd.h> // sbrk() function
+
+uint32_t availableRAM(void) {
+  char top;                      // Local variable pushed on stack
+  return &top - (char *)sbrk(0); // Top of stack minus end of heap
+}
+
 // SETUP FUNCTION - CALLED ONCE AT PROGRAM START ---------------------------
 
 void setup() {
-  pinMode(LED_BUILTIN, OUTPUT);
-  digitalWrite(LED_BUILTIN, LOW);
-
-  // MUST set up flash filesystem before Serial.begin() or seesaw.begin()
-  int i = file_setup();
-
-  Serial.begin(9600);
-  //while(!Serial) delay(10);
-
-  Serial.printf("Available RAM at start: %d\n", availableRAM());
-  Serial.printf("Available flash at start: %d\n", availableNVM());
-
-  // Backlight(s) off ASAP, they'll switch on after screen(s) init & clear
-  pinMode(BACKLIGHT_PIN, OUTPUT);
-  analogWrite(BACKLIGHT_PIN, 0);
-#if NUM_EYES > 1
-  if(!seesaw.begin()) fatal("Seesaw init fail", 1000);
-  seesaw.analogWrite(SEESAW_BACKLIGHT_PIN, 0);
-  // Configure Seesaw pins 9,10,11 as inputs
-  seesaw.pinModeBulk(0b111000000000, INPUT_PULLUP);
-  uint32_t initialButtonState = seesaw.digitalReadBulk(0b111000000000);
-#endif
-
-  if(i == 1)      fatal("Flash init fail", 100);
-  else if(i == 2) fatal("No filesys", 500);
-
-#if NUM_EYES > 1
-  seesaw.pinMode(SEESAW_TFT_RESET_PIN, OUTPUT);
-  seesaw.digitalWrite(SEESAW_TFT_RESET_PIN, LOW);
-  delay(10);
-  seesaw.digitalWrite(SEESAW_TFT_RESET_PIN, HIGH);
-  delay(20);
-#endif
-
-  uint8_t e, rtna = 0x01; // Screen refresh rate control (datasheet 9.2.18, FRCTRL2)
-  // Initialize displays
-  for(e=0; e<NUM_EYES; e++) {
-    eye[e].display = new Adafruit_ST7789(eye[e].spi, eye[e].cs, eye[e].dc, eye[e].rst);
-    eye[e].display->init(240, 240);
-    eye[e].display->sendCommand(0xC6, &rtna, 1);
-    eye[e].spi->setClockSource(DISPLAY_CLKSRC);
-    eye[e].display->fillScreen(0x1234);
-    eye[e].display->setRotation(0);
+  if (!arcada.arcadaBegin()) {
+    while (1);
   }
 
-  if (reader.drawBMP("/splash.bmp", *(eye[0].display), 0, 0) == IMAGE_SUCCESS) {
+  if (!arcada.filesysBeginMSD()) {
+    fatal("No filesystem found!", 100);
+  }
+
+  arcada.displayBegin();
+
+  DISPLAY_SIZE = min(ARCADA_TFT_WIDTH, ARCADA_TFT_HEIGHT);
+  DISPLAY_X_OFFSET = (ARCADA_TFT_WIDTH - DISPLAY_SIZE) / 2;
+  DISPLAY_Y_OFFSET = (ARCADA_TFT_HEIGHT - DISPLAY_SIZE) / 2;
+
+  Serial.begin(115200);
+//  while(!Serial) delay(10);
+
+  Serial.printf("Available RAM at start: %d\n", availableRAM());
+  Serial.printf("Available flash at start: %d\n", arcada.availableFlash());
+  yield(); // Periodic yield() makes sure mass storage filesystem stays alive
+
+  // Backlight(s) off ASAP, they'll switch on after screen(s) init & clear
+  arcada.setBacklight(0);
+
+  // No file selector yet. In the meantime, you can override the default
+  // config file by holding one of the 3 edge buttons at startup (loads
+  // config1.eye, config2.eye or config3.eye instead). Keep fingers clear
+  // of the nose booper when doing this...it self-calibrates on startup.
+  // DO THIS BEFORE THE SPLASH SO IT DOESN'T REQUIRE A LENGTHY HOLD.
+  char *filename = "config.eye";
+ 
+  uint32_t buttonState = arcada.readButtons();
+  if((buttonState & ARCADA_BUTTONMASK_UP) && arcada.exists("config1.eye")) {
+    filename = "config1.eye";
+  } else if((buttonState & ARCADA_BUTTONMASK_A) && arcada.exists("config2.eye")) {
+    filename = "config2.eye";
+  } else if((buttonState & ARCADA_BUTTONMASK_DOWN) && arcada.exists("config3.eye")) {
+    filename = "config3.eye";
+  }
+
+  yield();
+  // Initialize displays
+  #if (NUM_EYES > 1)
+    eye[0].display = arcada._display;
+    eye[1].display = arcada.display2;  
+  #else
+    eye[0].display = arcada.display;
+  #endif
+
+  yield();
+  if (arcada.drawBMP("/splash.bmp", 0, 0, (eye[0].display)) == IMAGE_SUCCESS) {
     Serial.println("Splashing");
-    #if NUM_EYES > 1
-    // other eye
-    reader.drawBMP("/splash.bmp", *(eye[1].display), 0, 0);
-    #endif
+    if (NUM_EYES > 1) {    // other eye
+      yield();
+      arcada.drawBMP("/splash.bmp", 0, 0, (eye[1].display));
+    }
     // backlight on for a bit
-    for (int bl=0; bl<=250; bl+=10) {
-      #if NUM_EYES > 1
-      seesaw.analogWrite(SEESAW_BACKLIGHT_PIN, bl);
-      #endif
-      analogWrite(BACKLIGHT_PIN, bl);
-      delay(10);
+    for (int bl=0; bl<=250; bl+=20) {
+      arcada.setBacklight(bl);
+      delay(20);
     }
     delay(2000);
     // backlight back off
-    for (int bl=250; bl>=0; bl-=10) {
-      #if NUM_EYES > 1
-      seesaw.analogWrite(SEESAW_BACKLIGHT_PIN, bl);
-      #endif
-      analogWrite(BACKLIGHT_PIN, bl);
-      delay(10);
+    for (int bl=250; bl>=0; bl-=20) {
+      arcada.setBacklight(bl);
+      delay(20);
     }
   }
 
   // Initialize DMAs
+  yield();
+  uint8_t e;
   for(e=0; e<NUM_EYES; e++) {
-    eye[e].display->setRotation(3);
+#if (ARCADA_TFT_WIDTH != 160) && (ARCADA_TFT_HEIGHT != 128)   // 160x128 is ST7735 which isn't able to deal
+    eye[e].spi->setClockSource(DISPLAY_CLKSRC);
+#endif
     eye[e].display->fillScreen(0);
     eye[e].dma.allocate();
     eye[e].dma.setTrigger(eye[e].spi->getDMAC_ID_TX());
@@ -222,7 +231,7 @@ void setup() {
         eye[e].column[i].descriptor[j].DSTADDR.reg         = spi_data_reg;
       }
     }
-    eye[e].colNum       = 240; // Force initial wraparound to first column
+    eye[e].colNum       = DISPLAY_SIZE; // Force initial wraparound to first column
     eye[e].colIdx       = 0;
     eye[e].dma_busy     = false;
     eye[e].column_ready = false;
@@ -247,6 +256,7 @@ void setup() {
     eye[e].sclera.mirror     = 0;
     eye[e].sclera.spin       = 0.0;
     eye[e].sclera.iSpin      = 0;
+    eye[e].rotation          = 3;
 
     // Uncanny eyes carryover stuff for now, all messy:
     eye[e].blink.state = NOBLINK;
@@ -255,27 +265,10 @@ void setup() {
     eye[e].blinkFactor = 0.0;
   }
 
-  analogWrite(BACKLIGHT_PIN, 255);
-#if defined(SEESAW_BACKLIGHT_PIN)
-  seesaw.analogWrite(SEESAW_BACKLIGHT_PIN, 255);
-#endif
+  arcada.setBacklight(255);
 
   // LOAD CONFIGURATION FILE -----------------------------------------------
 
-  // No file selector yet. In the meantime, you can override the default
-  // config file by holding one of the 3 edge buttons at startup (loads
-  // config1.eye, config2.eye or config3.eye instead). Keep fingers clear
-  // of the nose booper when doing this...it self-calibrates on startup.
-  char *filename = "config.eye";
-#if NUM_EYES > 1 // Only available on MONSTER M4SK
-  if(!(initialButtonState & 0b001000000000)) {
-    filename = "config1.eye";
-  } else if(!(initialButtonState & 0b010000000000)) {
-    filename = "config2.eye";
-  } else if(!(initialButtonState & 0b100000000000)) {
-    filename = "config3.eye";
-  }
-#endif
   loadConfig(filename);
 
   // LOAD EYELIDS AND TEXTURE MAPS -----------------------------------------
@@ -309,6 +302,7 @@ void setup() {
   // Load texture maps for eyes
   uint8_t e2;
   for(e=0; e<NUM_EYES; e++) { // For each eye...
+    yield();
     for(e2=0; e2<e; e2++) {    // Compare against each prior eye...
       // If both eyes have the same iris filename...
       if((eye[e].iris.filename && eye[e2].iris.filename) &&
@@ -362,10 +356,11 @@ void setup() {
   }
 
   // Load eyelid graphics.
+  yield();
 
   status = loadEyelid(upperEyelidFilename ?
     upperEyelidFilename : (char *)"upper.bmp",
-    upperClosed, upperOpen, 239, maxRam);
+    upperClosed, upperOpen, DISPLAY_SIZE-1, maxRam);
 
   status = loadEyelid(lowerEyelidFilename ?
     lowerEyelidFilename : (char *)"lower.bmp",
@@ -389,32 +384,44 @@ void setup() {
   calcDisplacement();
   Serial.printf("Free RAM: %d\n", availableRAM());
 
+  randomSeed(SysTick->VAL + analogRead(A2));
+  eyeOldX = eyeNewX = eyeOldY = eyeNewY = mapRadius; // Start in center
+  for(e=0; e<NUM_EYES; e++) { // For each eye...
+    // Set up screen rotation (MUST be done after config load!)
+    eye[e].display->setRotation(eye[e].rotation);
+    eye[e].eyeX = eyeOldX; // Set up initial position
+    eye[e].eyeY = eyeOldY;
+  }
+
+#if defined(ADAFRUIT_MONSTER_M4SK_EXPRESS)
+  if(voiceOn) {
+    if(!voiceSetup((waveform > 0))) {
+      Serial.println("Voice init fail, continuing without");
+      voiceOn = false;
+    } else {
+      voiceGain(gain);
+      currentPitch = voicePitch(currentPitch);
+      if(waveform) voiceMod(modulate, waveform);
+      arcada.enableSpeaker(true);
+    }
+  }
+#endif
+
+  yield();
   if(boopPin >= 0) {
     boopThreshold = 0;
-    for(i=0; i<240; i++) {
+    for(int i=0; i<DISPLAY_SIZE; i++) {
       boopThreshold += readBoop();
     }
     boopThreshold = boopThreshold * 110 / 100; // 10% overhead
   }
 
-  randomSeed(SysTick->VAL + analogRead(A2));
-  eyeOldX = eyeNewX = eyeOldY = eyeNewY = mapRadius; // Start in center
-  for(e=0; e<NUM_EYES; e++) { // For each eye...
-    eye[e].eyeX = eyeOldX;
-    eye[e].eyeY = eyeOldY;
-  }
+  user_setup();
+
   lastLightReadTime = micros() + 2000000; // Delay initial light reading
 }
 
-static inline uint16_t readLightSensor(void) {
-#if NUM_EYES > 1
-  if(lightSensorPin >= 100) {
-    return seesaw.analogRead(lightSensorPin - 100);
-  }
-#else
-  return analogRead(lightSensorPin);
-#endif
-}
+
 
 // LOOP FUNCTION - CALLED REPEATEDLY UNTIL POWER-OFF -----------------------
 
@@ -482,7 +489,7 @@ void loop() {
         eyeX = eyeOldX;
         eyeY = eyeOldY;
         if(dt > eyeMoveDuration) {            // Time up?  Begin new move.
-          float r = (float)mapDiameter - 240.0 * M_PI_2; // radius of motion
+          float r = (float)mapDiameter - (float)DISPLAY_SIZE * M_PI_2; // radius of motion
           r *= 0.6;
           eyeNewX = random(-r, r);
           float h = sqrt(r * r - x * x);
@@ -529,10 +536,10 @@ void loop() {
       float uq, lq; // So many sloppy temp vars in here for now, sorry
       if(tracking) {
         // Eyelids naturally "track" the pupils (move up or down automatically)
-        int ix = (int)map2screen(mapRadius - eye[eyeNum].eyeX) + 120, // Pupil position
-            iy = (int)map2screen(mapRadius - eye[eyeNum].eyeY) + 120; // on screen
+        int ix = (int)map2screen(mapRadius - eye[eyeNum].eyeX) + (DISPLAY_SIZE/2), // Pupil position
+            iy = (int)map2screen(mapRadius - eye[eyeNum].eyeY) + (DISPLAY_SIZE/2); // on screen
         iy += irisRadius * trackFactor;
-        if(eyeNum & 1) ix = 239 - ix; // Flip for right eye
+        if(eyeNum & 1) ix = DISPLAY_SIZE - 1 - ix; // Flip for right eye
         if(iy > upperOpen[ix]) {
           uq = 1.0;
         } else if(iy < upperClosed[ix]) {
@@ -621,8 +628,8 @@ void loop() {
 
     // Should be possible for these to be local vars,
     // but the animation becomes super chunky then, what gives?
-    xPositionOverMap = (int)(eye[eyeNum].eyeX - 120.0);
-    yPositionOverMap = (int)(eye[eyeNum].eyeY - 120.0);
+    xPositionOverMap = (int)(eye[eyeNum].eyeX - (DISPLAY_SIZE/2.0));
+    yPositionOverMap = (int)(eye[eyeNum].eyeY - (DISPLAY_SIZE/2.0));
 
     // These are constant across frame and could be stored in eye struct
     float upperLidFactor = (1.0 - eye[eyeNum].blinkFactor) * eye[eyeNum].upperLidFactor,
@@ -630,7 +637,7 @@ void loop() {
     iPupilFactor = (int)((float)eye[eyeNum].iris.height * 256 * (1.0 / eye[eyeNum].pupilFactor));
 
     int y1, y2;
-    int lidColumn = (eyeNum & 1) ? (239 - x) : x; // Reverse eyelid columns for left eye
+    int lidColumn = (eyeNum & 1) ? (DISPLAY_SIZE - 1 - x) : x; // Reverse eyelid columns for left eye
 
     DmacDescriptor *d = &eye[eyeNum].column[eye[eyeNum].colIdx].descriptor[0];
 
@@ -638,7 +645,7 @@ void loop() {
       // No eyelid data for this line; eyelid image is smaller than screen.
       // Great! Make a full scanline of nothing, no rendering needed:
       d->BTCTRL.bit.SRCINC = 0;
-      d->BTCNT.reg         = 240 * 2;
+      d->BTCNT.reg         = DISPLAY_SIZE * 2;
       d->SRCADDR.reg       = (uint32_t)&eyelidIndex;
       d->DESCADDR.reg      = 0; // No linked descriptor
     } else {
@@ -646,15 +653,15 @@ void loop() {
         (float)((int)lowerOpen[lidColumn] - (int)lowerClosed[lidColumn]));
       y2 = upperClosed[lidColumn] + (int)(0.5 + upperLidFactor *
         (float)((int)upperOpen[lidColumn] - (int)upperClosed[lidColumn]));
-      if(y1 > 239)    y1 = 239; // Clip results in case lidfactor
+      if(y1 > DISPLAY_SIZE-1)    y1 = DISPLAY_SIZE-1; // Clip results in case lidfactor
       else if(y1 < 0) y1 = 0;   // is beyond the usual 0.0 to 1.0 range
-      if(y2 > 239)    y2 = 239;
+      if(y2 > DISPLAY_SIZE-1)    y2 = DISPLAY_SIZE-1;
       else if(y2 < 0) y2 = 0;
       if(y1 >= y2) {
         // Eyelid is fully or partially closed, enough that there are no
         // pixels to be rendered for this line. Make "nothing," as above.
         d->BTCTRL.bit.SRCINC = 0;
-        d->BTCNT.reg         = 240 * 2;
+        d->BTCNT.reg         = DISPLAY_SIZE * 2;
         d->SRCADDR.reg       = (uint32_t)&eyelidIndex;
         d->DESCADDR.reg      = 0; // No linked descriptors
       } else {
@@ -677,11 +684,11 @@ void loop() {
         d->BTCNT.reg         = renderlen * 2;
         d->SRCADDR.reg       = (uint32_t)eye[eyeNum].column[eye[eyeNum].colIdx].renderBuf + renderlen * 2; // Point to END of data!
 #else
-        // Full column will be rendered; 240 pixels, point source to end of
+        // Full column will be rendered; DISPLAY_SIZE pixels, point source to end of
         // renderBuf and enable source increment.
         d->BTCTRL.bit.SRCINC = 1;
-        d->BTCNT.reg         = 240 * 2;
-        d->SRCADDR.reg       = (uint32_t)eye[eyeNum].column[eye[eyeNum].colIdx].renderBuf + 240 * 2;
+        d->BTCNT.reg         = DISPLAY_SIZE * 2;
+        d->SRCADDR.reg       = (uint32_t)eye[eyeNum].column[eye[eyeNum].colIdx].renderBuf + DISPLAY_SIZE * 2;
         d->DESCADDR.reg      = 0; // No linked descriptors
 #endif
         // Render column 'x' into eye's next available renderBuf
@@ -700,13 +707,13 @@ void loop() {
         uint8_t *displaceX, *displaceY;
         int8_t   xmul; // Sign of X displacement: +1 or -1
         int      doff; // Offset into displacement arrays
-        if(x < 120) {  // Left half of screen (quadrants 2, 3)
-          displaceX = &displace[ 119 - x       ];
-          displaceY = &displace[(119 - x) * 120];
+        if(x < (DISPLAY_SIZE/2)) {  // Left half of screen (quadrants 2, 3)
+          displaceX = &displace[ (DISPLAY_SIZE/2 - 1) - x       ];
+          displaceY = &displace[((DISPLAY_SIZE/2 - 1) - x) * (DISPLAY_SIZE/2)];
           xmul      = -1; // X displacement is always negative
         } else {       // Right half of screen( quadrants 1, 4)
-          displaceX = &displace[ x - 120       ];
-          displaceY = &displace[(x - 120) * 120];
+          displaceX = &displace[ x - (DISPLAY_SIZE/2)       ];
+          displaceY = &displace[(x - (DISPLAY_SIZE/2)) * (DISPLAY_SIZE/2)];
           xmul      =  1; // X displacement is always positive
         }
 
@@ -714,14 +721,14 @@ void loop() {
           int yy = yPositionOverMap + y;
           int dx, dy;
 
-          if(y < 120) { // Lower half of screen (quadrants 3, 4)
-            doff = 119 - y;
+          if(y < (DISPLAY_SIZE/2)) { // Lower half of screen (quadrants 3, 4)
+            doff = (DISPLAY_SIZE/2 - 1) - y;
             dy   = -displaceY[doff];
           } else {      // Upper half of screen (quadrants 1, 2)
-            doff = y - 120;
+            doff = y - (DISPLAY_SIZE/2);
             dy   =  displaceY[doff];
           }
-          dx = displaceX[doff * 120];
+          dx = displaceX[doff * (DISPLAY_SIZE/2)];
           if(dx < 255) {      // Inside eyeball area
             dx *= xmul;       // Flip sign of x offset if in quadrants 2 or 3
             int mx = xx + dx; // Polar angle/dist map coords
@@ -791,9 +798,9 @@ void loop() {
 
 #if NUM_DESCRIPTORS == 1
         // Render upper eyelid if needed
-        for(; y<240; y++) *ptr++ = eyelidColor;
+        for(; y<DISPLAY_SIZE; y++) *ptr++ = eyelidColor;
 #else
-        if(y2 >= 239) {
+        if(y2 >= (DISPLAY_SIZE-1)) {
           // No third descriptor; close it off
           d->DESCADDR.reg      = 0;
         } else {
@@ -801,7 +808,7 @@ void loop() {
           d->DESCADDR.reg      = (uint32_t)next; // link to next descriptor
           d                    = next; // Increment descriptor
           d->BTCTRL.bit.SRCINC = 0;
-          d->BTCNT.reg         = (239 - y2) * 2;
+          d->BTCNT.reg         = ((DISPLAY_SIZE-1) - y2) * 2;
           d->SRCADDR.reg       = (uint32_t)&eyelidIndex;
           d->DESCADDR.reg      = 0; // end of descriptor list
         }
@@ -836,7 +843,7 @@ void loop() {
     // Initialize new SPI transaction & address window...
     eye[eyeNum].spi->beginTransaction(settings);
     digitalWrite(eye[eyeNum].cs, LOW);  // Chip select
-    eye[eyeNum].display->setAddrWindow(0, 0, 240, 240);
+    eye[eyeNum].display->setAddrWindow(DISPLAY_X_OFFSET, DISPLAY_Y_OFFSET, DISPLAY_SIZE, DISPLAY_SIZE);
     delayMicroseconds(1);
     digitalWrite(eye[eyeNum].dc, HIGH); // Data mode
     if(eyeNum == (NUM_EYES-1)) {
@@ -849,7 +856,7 @@ void loop() {
           // pupils will react even if the opposite eye is stimulated.
           // Meaning we can get away with using a single light sensor for
           // both eyes. This comment has nothing to do with the code.
-          uint16_t rawReading = readLightSensor();
+          uint16_t rawReading = arcada.readLightSensor();
           if(rawReading <= 1023) {
             if(rawReading < lightSensorMin)      rawReading = lightSensorMin; // Clamp light sensor range
             else if(rawReading > lightSensorMax) rawReading = lightSensorMax; // to within usable range
@@ -888,6 +895,27 @@ void loop() {
         irisValue = irisMin + (sum * irisRange); // 0.0-1.0 -> iris min/max
         if((++iris_frame) >= (1 << IRIS_LEVELS)) iris_frame = 0;
       }
+#if defined(ADAFRUIT_MONSTER_M4SK_EXPRESS)
+      if(voiceOn) {
+        // Read buttons, change pitch
+        arcada.readButtons();
+        uint32_t buttonState = arcada.justPressedButtons();
+        if(       buttonState & ARCADA_BUTTONMASK_UP) {
+          currentPitch *= 1.05;
+        } else if(buttonState & ARCADA_BUTTONMASK_A) {
+          currentPitch = defaultPitch;
+        } else if(buttonState & ARCADA_BUTTONMASK_DOWN) {
+          currentPitch *= 0.95;
+        }
+        if(buttonState & (ARCADA_BUTTONMASK_UP | ARCADA_BUTTONMASK_A | ARCADA_BUTTONMASK_DOWN)) {
+          currentPitch = voicePitch(currentPitch);
+          if(waveform) voiceMod(modulate, waveform);
+          Serial.print("Voice pitch: ");
+          Serial.println(currentPitch);
+        }
+      }
+#endif
+      user_loop();
     }
   } // end first-column check
 
@@ -900,7 +928,7 @@ void loop() {
   eye[eyeNum].dma_busy       = true;
   eye[eyeNum].dma.startJob();
   eye[eyeNum].dmaStartTime   = micros();
-  if(++eye[eyeNum].colNum >= 240) { // If last line sent...
+  if(++eye[eyeNum].colNum >= DISPLAY_SIZE) { // If last line sent...
     eye[eyeNum].colNum      = 0;    // Wrap to beginning
   }
   eye[eyeNum].colIdx       ^= 1;    // Alternate 0/1 line structs
