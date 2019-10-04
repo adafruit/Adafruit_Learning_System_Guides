@@ -2,6 +2,7 @@
 
 #include "Adafruit_Arcada.h"
 #include "DMAbuddy.h" // DMA-bug-workaround class
+#include "HeatSensor.h"
 
 #if defined(GLOBAL_VAR) // #defined in .ino file ONLY!
   #define GLOBAL_INIT(X) = (X)
