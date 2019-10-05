@@ -1,4 +1,4 @@
-#if 0 // Change to 1 to enable this code (enable only ONE user*.cpp!)
+#if 0 // Change to 1 to enable this code (must enable ONE user*.cpp only!)
 
 #include <Arduino.h>
 #include <Servo.h>
