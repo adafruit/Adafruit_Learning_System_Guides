@@ -118,6 +118,7 @@ static inline uint16_t readBoop(void) {
 
 // Crude error handler. Prints message to Serial Monitor, blinks LED.
 void fatal(const char *message, uint16_t blinkDelay) {
+  Serial.begin(9600);
   Serial.println(message);
   for(bool ledState = HIGH;; ledState = !ledState) {
     digitalWrite(LED_BUILTIN, ledState);
@@ -135,13 +136,9 @@ uint32_t availableRAM(void) {
 // SETUP FUNCTION - CALLED ONCE AT PROGRAM START ---------------------------
 
 void setup() {
-  if (!arcada.arcadaBegin()) {
-    while (1);
-  }
+  if(!arcada.arcadaBegin())     fatal("Arcada init fail!", 100);
 
-  if (!arcada.filesysBeginMSD()) {
-    fatal("No filesystem found!", 100);
-  }
+  if(!arcada.filesysBeginMSD()) fatal("No filesystem found!", 250);
 
   arcada.displayBegin();
 
