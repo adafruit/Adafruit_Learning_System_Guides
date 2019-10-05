@@ -64,6 +64,7 @@ static int32_t dwim(JsonVariant v, int32_t def = 0) { // "Do What I Mean"
   }
 }
 
+/*
 static void getFilename(JsonVariant v, char **ptr) {
   if(*ptr) {          // If string already allocated,
     free(*ptr);       // delete old value...
@@ -73,6 +74,7 @@ static void getFilename(JsonVariant v, char **ptr) {
     *ptr = strdup(v); // Make a copy of string, save that
   }
 }
+*/
 
 void loadConfig(char *filename) {
   File    file;
@@ -135,7 +137,7 @@ void loadConfig(char *filename) {
       if(pMin > pMax) {
         float temp = pMin;
         pMin = pMax;
-        pMax = pMin;
+        pMax = temp;
       }
       irisMin   = (1.0 - pMax);
       irisRange = (pMax - pMin);
@@ -337,7 +339,7 @@ ImageReturnCode loadEyelid(char *filename,
   if(reader->bmpDimensions(filename, &w, &h) == IMAGE_SUCCESS) {
     tempBytes = ((w + 7) / 8) * h; // Bitmap size in bytes
     if (maxRam > tempBytes) {
-      if(tempPtr = (uint8_t *)malloc(maxRam - tempBytes)) {
+      if((tempPtr = (uint8_t *)malloc(maxRam - tempBytes)) != NULL) {
         // Make SOME tempPtr reference, or optimizer removes the alloc!
         tempPtr[0] = 0;
       }
@@ -420,7 +422,7 @@ ImageReturnCode loadTexture(char *filename, uint16_t **data,
   if(reader->bmpDimensions(filename, &w, &h) == IMAGE_SUCCESS) {
     tempBytes = w * h * 2; // Image size in bytes (converted to 16bpp)
     if (maxRam > tempBytes) {
-      if(tempPtr = (uint8_t *)malloc(maxRam - tempBytes)) {
+      if((tempPtr = (uint8_t *)malloc(maxRam - tempBytes)) != NULL) {
         // Make SOME tempPtr reference, or optimizer removes the alloc!
         tempPtr[0] = 0;
       }
