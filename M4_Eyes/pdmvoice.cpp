@@ -191,7 +191,7 @@ void voiceGain(float g) {
 void voiceMod(uint32_t freq, uint8_t waveform) {
   if(modBuf) { // Ignore if no modulation buffer allocated
     if(freq < MOD_MIN) freq = MOD_MIN;
-    modLen = (int)(actualPlaybackRate / freq + 0.5);
+    modLen = (uint32_t)(actualPlaybackRate / freq + 0.5);
     if(modLen   < 2) modLen   = 2;
     if(waveform > 4) waveform = 4;
     modWave = waveform;
@@ -204,17 +204,17 @@ void voiceMod(uint32_t freq, uint8_t waveform) {
       memset(&modBuf[modLen / 2], 0, modLen - modLen / 2);
       break;
      case 2: // Sine
-      for(int i=0; i<modLen; i++) {
+      for(uint32_t i=0; i<modLen; i++) {
         modBuf[i] = (int)((sin(M_PI * 2.0 * (float)i / (float)modLen) + 1.0) * 0.5 * 255.0 + 0.5);
       }
       break;
      case 3: // Triangle
-      for(int i=0; i<modLen; i++) {
+      for(uint32_t i=0; i<modLen; i++) {
         modBuf[i] = (int)(fabs(0.5 - (float)i / (float)modLen) * 2.0 * 255.0 + 0.5);
       }
       break;
      case 4: // Sawtooth (increasing)
-      for(int i=0; i<modLen; i++) {
+      for(uint32_t i=0; i<modLen; i++) {
         modBuf[i] = (int)((float)i / (float)(modLen - 1) * 255.0 + 0.5);
       }
       break;

@@ -105,7 +105,7 @@ SPISettings settings(DISPLAY_FREQ, MSBFIRST, SPI_MODE0);
 // below, to allow for caching/scheduling fudge). If so, that's our signal
 // that something is likely amiss and we take evasive maneuvers, resetting
 // the affected DMA channel (DMAbuddy::fix()).
-#define DMA_TIMEOUT ((DISPLAY_SIZE * 16 * 4000) / (DISPLAY_FREQ / 1000))
+#define DMA_TIMEOUT (uint32_t)((DISPLAY_SIZE * 16 * 4000) / (DISPLAY_FREQ / 1000))
 
 static inline uint16_t readBoop(void) {
   uint16_t counter = 0;
@@ -142,6 +142,9 @@ void setup() {
 #else
   if(!arcada.filesysBegin())    fatal("No filesystem found!", 250);
 #endif
+
+  user_setup();
+
   arcada.displayBegin();
 
   DISPLAY_SIZE     = min(ARCADA_TFT_WIDTH, ARCADA_TFT_HEIGHT);
@@ -163,15 +166,15 @@ void setup() {
   // config1.eye, config2.eye or config3.eye instead). Keep fingers clear
   // of the nose booper when doing this...it self-calibrates on startup.
   // DO THIS BEFORE THE SPLASH SO IT DOESN'T REQUIRE A LENGTHY HOLD.
-  char *filename = "config.eye";
+  char *filename = (char *)"config.eye";
  
   uint32_t buttonState = arcada.readButtons();
   if((buttonState & ARCADA_BUTTONMASK_UP) && arcada.exists("config1.eye")) {
-    filename = "config1.eye";
+    filename = (char *)"config1.eye";
   } else if((buttonState & ARCADA_BUTTONMASK_A) && arcada.exists("config2.eye")) {
-    filename = "config2.eye";
+    filename = (char *)"config2.eye";
   } else if((buttonState & ARCADA_BUTTONMASK_DOWN) && arcada.exists("config3.eye")) {
-    filename = "config3.eye";
+    filename = (char *)"config3.eye";
   }
 
   yield();
@@ -184,11 +187,11 @@ void setup() {
   #endif
 
   yield();
-  if (arcada.drawBMP("/splash.bmp", 0, 0, (eye[0].display)) == IMAGE_SUCCESS) {
+  if (arcada.drawBMP((char *)"/splash.bmp", 0, 0, (eye[0].display)) == IMAGE_SUCCESS) {
     Serial.println("Splashing");
     if (NUM_EYES > 1) {    // other eye
       yield();
-      arcada.drawBMP("/splash.bmp", 0, 0, (eye[1].display));
+      arcada.drawBMP((char *)"/splash.bmp", 0, 0, (eye[1].display));
     }
     // backlight on for a bit
     for (int bl=0; bl<=250; bl+=20) {
@@ -295,7 +298,6 @@ void setup() {
   // leave some RAM for the stack to operate over the lifetime of this
   // program and to handle small heap allocations.
 
-  ImageReturnCode status;
   uint32_t        maxRam = availableRAM() - stackReserve;
 
   // Load texture maps for eyes
@@ -356,6 +358,7 @@ void setup() {
 
   // Load eyelid graphics.
   yield();
+  ImageReturnCode status;
 
   status = loadEyelid(upperEyelidFilename ?
     upperEyelidFilename : (char *)"upper.bmp",
@@ -414,8 +417,6 @@ void setup() {
     }
     boopThreshold = boopThreshold * 110 / 100; // 10% overhead
   }
-
-  user_setup();
 
   lastLightReadTime = micros() + 2000000; // Delay initial light reading
 }
