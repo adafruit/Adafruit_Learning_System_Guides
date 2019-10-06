@@ -4,7 +4,10 @@
 #include "Adafruit_TinyUSB.h"
 #include "globals.h"
 
-#define KEYCODE_TO_SEND  HID_KEY_SPACE
+#define UP_BUTTON_KEYCODE_TO_SEND    HID_KEY_U
+#define A_BUTTON_KEYCODE_TO_SEND     HID_KEY_A
+#define DOWN_BUTTON_KEYCODE_TO_SEND  HID_KEY_D
+#define SHAKE_KEYCODE_TO_SEND        HID_KEY_SPACE
 
 // HID report descriptor using TinyUSB's template
 // Single Report (no ID) descriptor
@@ -21,9 +24,10 @@ void user_setup(void) {
 
   usb_hid.begin();
 
-  pinMode(13, OUTPUT);
-  digitalWrite(13, LOW);
-
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, LOW);
+  arcada.accel.setClick(1, 50);
+  
   // wait until device mounted
   while( !USBDevice.mounted() ) delay(1);
 }
@@ -37,11 +41,38 @@ void user_loop(void) {
   uint8_t keycode[6] = { 0 };
 
   uint32_t buttonState = arcada.readButtons();
+  if (buttonState & ARCADA_BUTTONMASK_UP) {
+    Serial.println("Up");
+    keycode[0] = UP_BUTTON_KEYCODE_TO_SEND;
+  }
   if (buttonState & ARCADA_BUTTONMASK_A) {
     Serial.println("A");
-    keycode[0] = KEYCODE_TO_SEND;
+    keycode[1] = A_BUTTON_KEYCODE_TO_SEND;
+  }
+  if (buttonState & ARCADA_BUTTONMASK_DOWN) {
+    Serial.println("Down");
+    keycode[2] = DOWN_BUTTON_KEYCODE_TO_SEND;
+  }
+
+  uint8_t shake = arcada.accel.getClick();
+  if (shake & 0x30) {
+    Serial.print("shake detected (0x"); Serial.print(shake, HEX); Serial.print("): ");
+    if (shake & 0x10) Serial.println(" single shake");
+    keycode[3] = SHAKE_KEYCODE_TO_SEND;
+  }
+
+  bool anypressed = false;
+  for (int k=0; k<sizeof(keycode); k++) {
+    if (keycode[k] != 0) {
+      anypressed = true;
+      break;
+    }
+  }
+  if (anypressed) {
+    digitalWrite(LED_BUILTIN, HIGH);
     usb_hid.keyboardReport(0, 0, keycode);
   } else {
+    digitalWrite(LED_BUILTIN, LOW);   
     usb_hid.keyboardRelease(0);  
   }
 }
