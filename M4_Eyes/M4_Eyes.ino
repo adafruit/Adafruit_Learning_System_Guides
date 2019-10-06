@@ -142,6 +142,9 @@ void setup() {
 #else
   if(!arcada.filesysBegin())    fatal("No filesystem found!", 250);
 #endif
+
+  user_setup();
+
   arcada.displayBegin();
 
   DISPLAY_SIZE     = min(ARCADA_TFT_WIDTH, ARCADA_TFT_HEIGHT);
@@ -414,8 +417,6 @@ void setup() {
     }
     boopThreshold = boopThreshold * 110 / 100; // 10% overhead
   }
-
-  user_setup();
 
   lastLightReadTime = micros() + 2000000; // Delay initial light reading
 }
