@@ -137,17 +137,19 @@ uint32_t availableRAM(void) {
 
 void setup() {
   if(!arcada.arcadaBegin())     fatal("Arcada init fail!", 100);
-
+#if defined(USE_TINYUSB)
   if(!arcada.filesysBeginMSD()) fatal("No filesystem found!", 250);
-
+#else
+  if(!arcada.filesysBegin())    fatal("No filesystem found!", 250);
+#endif
   arcada.displayBegin();
 
-  DISPLAY_SIZE = min(ARCADA_TFT_WIDTH, ARCADA_TFT_HEIGHT);
-  DISPLAY_X_OFFSET = (ARCADA_TFT_WIDTH - DISPLAY_SIZE) / 2;
+  DISPLAY_SIZE     = min(ARCADA_TFT_WIDTH, ARCADA_TFT_HEIGHT);
+  DISPLAY_X_OFFSET = (ARCADA_TFT_WIDTH  - DISPLAY_SIZE) / 2;
   DISPLAY_Y_OFFSET = (ARCADA_TFT_HEIGHT - DISPLAY_SIZE) / 2;
 
   Serial.begin(115200);
-//  while(!Serial) delay(10);
+  //while(!Serial) yield();
 
   Serial.printf("Available RAM at start: %d\n", availableRAM());
   Serial.printf("Available flash at start: %d\n", arcada.availableFlash());
