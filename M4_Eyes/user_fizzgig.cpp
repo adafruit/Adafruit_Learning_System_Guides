@@ -1,7 +1,5 @@
 #if 0 // Change to 1 to enable this code (must enable ONE user*.cpp only!)
 
-// WIP DO NOT USE
-
 #include "globals.h"
 #include <Servo.h>
 
@@ -9,11 +7,12 @@
 Servo myservo;
 #define SERVO_MOUTH_OPEN     0
 #define SERVO_MOUTH_CLOSED 180
-// TO DO: move servo when sound is playing.
-// At end of WAV, move mouth to closed position.
+#define SERVO_PIN            3
+
+#define BUTTON_PIN           2
 
 // WAV player stuff
-#define WAV_BUFFER_SIZE 256
+#define WAV_BUFFER_SIZE    256
 static uint8_t     wavBuf[2][WAV_BUFFER_SIZE];
 static File        wavFile;
 static bool        playing = false;
@@ -22,6 +21,7 @@ static uint8_t     activeBuf;
 static uint16_t    bufIdx, bufEnd, nextBufEnd;
 static bool        startWav(char *filename);
 static void        wavOutCallback(void);
+static uint32_t    wavEventTime; // WAV start or end time, in ms
 static const char *wav_path = "fizzgig";
 static struct wavlist { // Linked list of WAV filenames
   char           *filename;
@@ -58,23 +58,35 @@ void user_setup(void) {
     wavListPtr->next = wavListStart; // Point last item's next to list head (list is looped)
     wavListPtr       = wavListStart; // Update list pointer to head
   }
-  myservo.attach(3);
 }
 
 void user_loop(void) {
-  if(!playing && wavListPtr) {
-    pinMode(2, INPUT_PULLUP);
+  if(playing) {
+    // While WAV is playing, wiggle servo between middle and open-mouth positions:
+    uint32_t elapsed = millis() - wavEventTime;                // Time since audio start
+    uint16_t frac    = elapsed % 500;                          // 0 to 499 = 0.5 sec
+    float    n       = 1.0 - ((float)abs(250 - frac) / 500.0); // Ramp 0.5, 1.0, 0.5 in 0.5 sec
+    myservo.write((int)((float)SERVO_MOUTH_CLOSED + (float)(SERVO_MOUTH_OPEN - SERVO_MOUTH_CLOSED) * n));
+    // BUTTON_PIN button is ignored while sound is playing.
+  } else if(wavListPtr) {
+    // Not currently playing WAV. Check for button press on pin BUTTON_PIN.
+    pinMode(BUTTON_PIN, INPUT_PULLUP);
     delayMicroseconds(20); // Avoid boop code interference
-    if(!digitalRead(2)) {
+    if(!digitalRead(BUTTON_PIN)) {
       arcada.chdir(wav_path);
       startWav(wavListPtr->filename);
       wavListPtr = wavListPtr->next; // Will loop around from end to start of list
     }
+    pinMode(BUTTON_PIN, INPUT);
+    if(myservo.attached()) { // If servo still active (from recent WAV playing)
+      myservo.write(SERVO_MOUTH_CLOSED); // Make sure it's in closed position
+      // If it's been more than 1 sec since audio stopped,
+      // deactivate the servo to reduce power, heat & noise.
+      if((millis() - wavEventTime) > 1000) {
+        myservo.detach();
+      }
+    }
   }
-
-// 'pos' will be determined periodically, maybe not every frame. TBD.
-// needs to go to a closed position when WAV is finished.
-//  myservo.write(pos);
 }
 
 static uint16_t readWaveData(uint8_t *dst) {
@@ -146,10 +158,12 @@ static bool startWav(char *filename) {
           analogWrite(A0, 128);
           analogWrite(A1, 128);
           arcada.enableSpeaker(true);
-          bufIdx   = 0;
-          playing = true;
+          wavEventTime = millis(); // WAV starting time
+          bufIdx       = 0;
+          playing      = true;
           arcada.timerCallback(buf.fmt.sampleRate, wavOutCallback);
-          nextBufEnd = readWaveData(wavBuf[1]);
+          nextBufEnd   = readWaveData(wavBuf[1]);
+          myservo.attach(SERVO_PIN);
         }
         return true;
       } else {
@@ -175,7 +189,8 @@ static void wavOutCallback(void) {
     if(nextBufEnd <= 0) {
       arcada.timerStop();
       arcada.enableSpeaker(false);
-      playing = false;
+      playing      = false;
+      wavEventTime = millis(); // Same var now holds WAV end time
       return;
     }
     bufIdx     = 0;
