@@ -61,7 +61,9 @@ static const uint16_t recBufSize       = (uint16_t)(sampleRate / (float)MIN_PITC
 static int16_t        recIndex         = 0;
 static int16_t        playbackIndex    = 0;
 
-volatile uint16_t     voiceLastReading = 0;
+volatile uint16_t     voiceLastReading = 32768;
+volatile uint16_t     voiceMin         = 32768;
+volatile uint16_t     voiceMax         = 32768;
 
 #define DC_PERIOD     4096 // Recalculate DC offset this many samplings
 // DC_PERIOD does NOT need to be a power of 2, but might save a few cycles.
@@ -359,6 +361,12 @@ void PDM_SERCOM_HANDLER(void) {
     // the last thing that was stored prior to whatever time you polled it,
     // but may still have some uses.
     voiceLastReading = adjusted;
+
+    // Similarly, user code can extern these variables and monitor the
+    // peak-to-peak range. They are never reset in the voice code itself,
+    // it's the duty of the user code to reset both to 32768 periodically.
+    if(adjusted < voiceMin)      voiceMin = adjusted;
+    else if(adjusted > voiceMax) voiceMax = adjusted;
   }
   evenWord ^= 1;
 }
