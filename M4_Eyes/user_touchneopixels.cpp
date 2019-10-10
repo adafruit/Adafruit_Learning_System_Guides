@@ -32,17 +32,12 @@ static uint16_t breathIn[] = { 7, 14, 21, 28, 35,
                             255, 255, 255, 255, 255,
                             255, 255, 255, 255, 255};
 
-const int N_BREATH_OUT_FRAMES = 50;
-static uint16_t breathOut[] = {  100, 97, 94, 91, 88,
-                                85, 82, 79, 76, 73,
-                                70, 67, 64, 61, 58,
-                                55, 52, 49, 46, 43,
-                                40, 37, 34, 31, 28,
-                                25, 22, 19, 16, 13,
-                                10, 7, 4, 1, 0, 
-                                0, 0, 0, 0, 0,
-                                0, 0, 0, 0, 0,
-                                0, 0, 0, 0, 0};
+const int N_BREATH_OUT_FRAMES = 45;
+static uint16_t breathOut[] = { 255, 255, 255, 255, 255, 255, 255, 255, 255, 
+                                255, 255, 238, 231, 224, 217, 210, 203, 196, 
+                                189, 182, 175, 168, 161, 154, 147, 140, 133, 
+                                126, 119, 112, 105, 98, 91, 84, 77, 70, 63, 
+                                56, 49, 42, 35, 28, 21, 14, 7};
 
 static int breathFrames = N_BREATH_IN_FRAMES;
 static uint16_t *breath = breathIn;
@@ -52,7 +47,7 @@ void setGradientPixelColor(uint16_t ledPosition, uint16_t step, float redRatio, 
     float green = step * greenRatio;
     float red = step * redRatio;
     float blue = step * blueRatio;
-    arcada.pixels.setPixelColor(ledPosition, green, red, blue);
+    arcada.pixels.setPixelColor(ledPosition, red, green, blue);
 }
  
 void stepOrangeBlackGradient(uint16_t ledPosition, uint16_t step) {
@@ -79,49 +74,49 @@ void stepRedOrangeGradient(uint16_t ledPosition, uint16_t step) {
     int red = 255;
     float green = step * .647;
     int blue = 0;
-    arcada.pixels.setPixelColor(ledPosition, green, red, blue);
+    arcada.pixels.setPixelColor(ledPosition, red, green, blue);
 }
  
 void stepOrangeYellowGradient(uint16_t ledPosition, uint16_t step) {
     int red = 255;
     float green = 165 + (step % 90);
     int blue = 0;
-    arcada.pixels.setPixelColor(ledPosition, green, red, blue);
+    arcada.pixels.setPixelColor(ledPosition, red, green, blue);
 }
  
 void stepYellowGreenGradient(uint16_t ledPosition, uint16_t step) {
     int red = 255 - step * 2;
     float green = 255 - (step * 1.5);
     int blue = 0;
-    arcada.pixels.setPixelColor(ledPosition, green, red, blue);
+    arcada.pixels.setPixelColor(ledPosition, red, green, blue);
 }
  
 void stepGreenBlueGradient(uint16_t ledPosition, uint16_t step) {
     int red = 0;
     float green = 128 - step;
     int blue = step;
-    arcada.pixels.setPixelColor(ledPosition, green, red, blue);
+    arcada.pixels.setPixelColor(ledPosition, red, green, blue);
 }
  
 void stepBlueIndigoGradient(uint16_t ledPosition, uint16_t step) {
     int red = step;
     float green = 0;
     int blue = 255 - step;
-    arcada.pixels.setPixelColor(ledPosition, green, red, blue);
+    arcada.pixels.setPixelColor(ledPosition, red, green, blue);
 }
  
 void stepIndigoVioletGradient(uint16_t ledPosition, uint16_t step) {
     int red = 75+step;
     float green = step;
     int blue = 130+step;
-    arcada.pixels.setPixelColor(ledPosition, green, red, blue);
+    arcada.pixels.setPixelColor(ledPosition, red, green, blue);
 }
  
 void stepVioletRedGradient(uint16_t ledPosition, uint16_t step) {
     int red = 238+(step*.17);
     float green = 130 - step;
     int blue = 238 - (step * 2);
-    arcada.pixels.setPixelColor(ledPosition, green, red, blue);
+    arcada.pixels.setPixelColor(ledPosition, red, green, blue);
 }
 
 typedef void (*StepColorGradient)(uint16_t, uint16_t);
@@ -172,7 +167,7 @@ void advanceBreath(void)
         if(breath == breathIn) {
           breath = breathOut;
           breathFrames = N_BREATH_OUT_FRAMES;
-          breathGradient = &stepPurpleBlackGradient;
+          breathGradient = &stepRedBlackGradient;
         }
         else {          
           breath = breathIn;
@@ -186,10 +181,8 @@ void advanceBreath(void)
 }
  
 void advanceHalloweenGradients(void) {
-    int i;
-    for(i = 0; i < arcada.pixels.numPixels(); i++) {
-        switch (colorIndex)
-        {
+    for(int i = 0; i < arcada.pixels.numPixels(); i++) {
+        switch (colorIndex) {
             case 0:
                 stepOrangeBlackGradient(i, currentStep);
                 break;
@@ -234,17 +227,17 @@ void advanceHeartBeat(void) {
     }
 }
 
-void user_setup(void) {
-  lastBehaviorChange, lastWave, lastColorShift, lastRainbowColorShift = micros();
-  arcada.pixels.setBrightness(255);
-  advanceHalloweenGradients();
-}
-
 void changeBehavior(int newBehavior, uint32_t timeOfChange) {  
     currentBehavior = newBehavior;
     lastBehaviorChange = timeOfChange;
 }
 
+void user_setup(void) {
+  lastBehaviorChange, lastWave, lastColorShift, lastRainbowColorShift = micros();
+  arcada.pixels.setBrightness(255);
+  advanceHalloweenGradients();
+  changeBehavior(0, micros());
+}
 
 void user_loop(void) {
   uint8_t pressed_buttons = arcada.readButtons();
@@ -279,18 +272,16 @@ void user_loop(void) {
       case 3:
         advanceRainbowWalk();
         break;
-      case 20:        
-        changeBehavior(0, elapsedSince);
-        break;
       default:        
         arcada.pixels.fill(0, 0, 0);
         arcada.pixels.show();
         break;
     }
 
-    if(elapsedSince - lastBehaviorChange > SAMPLE_TIME * 500) {
+    if ((elapsedSince - lastBehaviorChange) > (SAMPLE_TIME * 1000)) {
       lastBehaviorChange = elapsedSince;
       currentBehavior++;
+      currentBehavior %= 4;
     }
   }
 }
