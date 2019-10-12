@@ -1,5 +1,7 @@
 #if 1 // Change to 0 to disable this code (must enable ONE user*.cpp only!)
 
+#include "globals.h"
+
 // This file provides a crude way to "drop in" user code to the eyes,
 // allowing concurrent operations without having to maintain a bunch of
 // special derivatives of the eye code (which is still undergoing a lot
@@ -9,10 +11,28 @@
 // User globals can go here, recommend declaring as static, e.g.:
 // static int foo = 42;
 
+const int sampleWindow = 400; // Sample window width in mS (50 mS = 20Hz)
+
+unsigned long end_millis= 0;  // Start of sample window
+
+unsigned int left_max = 0;
+unsigned int left_min = 1024;
+
+unsigned int right_max = 0;
+unsigned int right_min = 1024;
+
+unsigned int sample_count = 0;
+unsigned int sample;
+unsigned int peakToPeak;
+double volts;
+
+
+
 // Called once near the end of the setup() function. If your code requires
 // a lot of time to initialize, make periodic calls to yield() to keep the
 // USB mass storage filesystem alive.
 void user_setup(void) {
+  end_millis = millis() + sampleWindow;
 }
 
 // Called periodically during eye animation. This is invoked in the
@@ -64,6 +84,60 @@ void user_loop(void) {
     }
   }
 */
+
+
+  if (millis() >= end_millis) {
+    // process the current sampling
+    if (left_max > left_min && right_max > right_min) {
+
+      // process left
+      peakToPeak = left_max - left_min;  // max - min = peak-peak amplitude
+      volts = (peakToPeak * 5.0) / 1024;  // convert to volts
+      Serial.print("Left: ");
+      Serial.println(volts);
+      if (volts > 1.0) {
+        Serial.println("I hear you on the left");
+      }
+      // process right
+      peakToPeak = right_max - right_min;  // max - min = peak-peak amplitude
+      volts = (peakToPeak * 5.0) / 1024;  // convert to volts
+      Serial.print("Right ");
+      Serial.println(volts);
+      if (volts > 1.0) {
+        Serial.println("I hear you on the right");
+      }
+    } else {
+      Serial.print("Not enough sampling: ");
+      Serial.println(sample_count);
+    }
+    // and reset for the next sampling
+    right_max = left_max = 0;
+    right_min = left_min = 1024;
+    end_millis = millis() + sampleWindow;
+    sample_count = 0;
+  } else {
+    for (int i = 5; i > 0; i--) {
+      sample_count++;
+      // sample left
+      sample = analogRead(2);
+      if (sample < 1024) { // toss out spurious readings
+        if (sample > left_max) {
+          left_max = sample;  // save just the max levels
+        } else if (sample < left_min) {
+          left_min = sample;  // save just the min levels
+        }
+      }
+      // sample right
+      sample = analogRead(3);
+      if (sample < 1024) { // toss out spurious readings
+        if (sample > right_max) {
+          right_max = sample;  // save just the max levels
+        } else if (sample < right_min) {
+          right_min = sample;  // save just the min levels
+        }
+      }
+    }
+  }
 }
 
 #endif // 0
