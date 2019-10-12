@@ -8,6 +8,9 @@
     Magnitude is currently the maximum temperature of any pixel, in degrees C.
 */
 
+#ifndef __HEAT_SENSOR_H
+#define __HEAT_SENSOR_H
+
 class HeatSensor {
 public:
     // The current focus position, each from -1.0 .. +1.0.
@@ -22,3 +25,5 @@ public:
     // Reads the sensor and updates x, y, and magnitude.
     void find_focus();
 };
+
+#endif

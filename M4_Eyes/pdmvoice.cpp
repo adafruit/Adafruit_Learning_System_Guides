@@ -3,18 +3,15 @@
 
 #if defined(ADAFRUIT_MONSTER_M4SK_EXPRESS)
 
+#include "globals.h"
 #include <SPI.h>
 
 #define MIN_PITCH_HZ   65
 #define MAX_PITCH_HZ 1600
 #define TYP_PITCH_HZ  175
 
-// Playback timer stuff - use TC3 on MONSTER M4SK (no TC4 on this board)
-#define TIMER             TC3
-#define TIMER_IRQN        TC3_IRQn
-#define TIMER_IRQ_HANDLER TC3_Handler
-#define TIMER_GCLK_ID     TC3_GCLK_ID
-#define TIMER_GCM_ID      GCM_TC2_TC3
+static void  voiceOutCallback(void);
+static float actualPlaybackRate;
 
 // PDM mic allows 1.0 to 3.25 MHz max clock (2.4 typical).
 // SPI native max is is 24 MHz, so available speeds are 12, 6, 3 MHz.
@@ -64,7 +61,9 @@ static const uint16_t recBufSize       = (uint16_t)(sampleRate / (float)MIN_PITC
 static int16_t        recIndex         = 0;
 static int16_t        playbackIndex    = 0;
 
-volatile uint16_t     voiceLastReading = 0;
+volatile uint16_t     voiceLastReading = 32768;
+volatile uint16_t     voiceMin         = 32768;
+volatile uint16_t     voiceMax         = 32768;
 
 #define DC_PERIOD     4096 // Recalculate DC offset this many samplings
 // DC_PERIOD does NOT need to be a power of 2, but might save a few cycles.
@@ -150,37 +149,7 @@ bool voiceSetup(bool modEnable) {
 
   analogWriteResolution(12);
 
-  // Feed TIMER off GCLK1 (already set to 48 MHz by Arduino core)
-  GCLK->PCHCTRL[TIMER_GCLK_ID].bit.CHEN = 0;     // Disable channel
-  while(GCLK->PCHCTRL[TIMER_GCLK_ID].bit.CHEN);  // Wait for disable
-  GCLK_PCHCTRL_Type pchctrl;
-  pchctrl.bit.GEN                       = GCLK_PCHCTRL_GEN_GCLK1_Val;
-  pchctrl.bit.CHEN                      = 1;
-  GCLK->PCHCTRL[TIMER_GCLK_ID].reg      = pchctrl.reg;
-  while(!GCLK->PCHCTRL[TIMER_GCLK_ID].bit.CHEN); // Wait for enable
-
-  // Disable timer before configuring it
-  TIMER->COUNT16.CTRLA.bit.ENABLE       = 0;
-  while(TIMER->COUNT16.SYNCBUSY.bit.ENABLE);
-
-  // 16-bit counter mode, 1:1 prescale, match-frequency generation mode
-  TIMER->COUNT16.CTRLA.bit.MODE      = TC_CTRLA_MODE_COUNT16;
-  TIMER->COUNT16.CTRLA.bit.PRESCALER = TC_CTRLA_PRESCALER_DIV1_Val;
-  TIMER->COUNT16.WAVE.bit.WAVEGEN    = TC_WAVE_WAVEGEN_MFRQ_Val;
-
-  TIMER->COUNT16.CTRLBCLR.reg        = TC_CTRLBCLR_DIR; // Count up
-  while(TIMER->COUNT16.SYNCBUSY.bit.CTRLB);
-
   voicePitch(1.0); // Set timer interval
-
-  TIMER->COUNT16.INTENSET.reg        = TC_INTENSET_OVF; // Overflow interrupt
-  NVIC_DisableIRQ(TIMER_IRQN);
-  NVIC_ClearPendingIRQ(TIMER_IRQN);
-  NVIC_SetPriority(TIMER_IRQN, 0); // Top priority
-  NVIC_EnableIRQ(TIMER_IRQN);
-
-  TIMER->COUNT16.CTRLA.bit.ENABLE    = 1;    // Enable timer
-  while(TIMER->COUNT16.SYNCBUSY.bit.ENABLE); // Wait for it
 
   return true; // Success
 }
@@ -196,12 +165,13 @@ bool voiceSetup(bool modEnable) {
 // adjustment (after appying constraints) will be returned.
 float voicePitch(float p) {
   float   desiredPlaybackRate = sampleRate * p;
-  int32_t period = (int32_t)(48000000.0 / desiredPlaybackRate + 0.5);
-  if(period > 2500)     period = 2500; // Hard limit is 65536, 2.5K is a practical limit
-  else if(period < 250) period =  250; // Leave some cycles for IRQ handler
-  TIMER->COUNT16.CC[0].reg = period - 1;
-  while(TIMER->COUNT16.SYNCBUSY.bit.CC0);
-  float   actualPlaybackRate = 48000000.0 / (float)period;
+  // Clip to sensible range
+  if(desiredPlaybackRate < 19200)       desiredPlaybackRate = 19200;  // ~0.41X
+  else if(desiredPlaybackRate > 192000) desiredPlaybackRate = 192000; // ~4.1X
+  arcada.timerCallback(desiredPlaybackRate, voiceOutCallback);
+  // Making this assumption here knowing Arcada will use 1:1 prescale:
+  int32_t period = (int32_t)(48000000.0 / desiredPlaybackRate);
+  actualPlaybackRate = 48000000.0 / (float)period;
   p = (actualPlaybackRate / sampleRate); // New pitch
   jumpThreshold = (int)(jump * p + 0.5);
   return p;
@@ -223,10 +193,8 @@ void voiceGain(float g) {
 void voiceMod(uint32_t freq, uint8_t waveform) {
   if(modBuf) { // Ignore if no modulation buffer allocated
     if(freq < MOD_MIN) freq = MOD_MIN;
-    uint16_t period = TIMER->COUNT16.CC[0].reg + 1;     // Audio out timer ticks
-    float    playbackRate = 48000000.0 / (float)period; // Audio out samples/sec
-    modLen = (int)(playbackRate / freq + 0.5);
-    if(modLen < 2) modLen = 2;
+    modLen = (uint32_t)(actualPlaybackRate / freq + 0.5);
+    if(modLen   < 2) modLen   = 2;
     if(waveform > 4) waveform = 4;
     modWave = waveform;
     yield();
@@ -238,17 +206,17 @@ void voiceMod(uint32_t freq, uint8_t waveform) {
       memset(&modBuf[modLen / 2], 0, modLen - modLen / 2);
       break;
      case 2: // Sine
-      for(int i=0; i<modLen; i++) {
+      for(uint32_t i=0; i<modLen; i++) {
         modBuf[i] = (int)((sin(M_PI * 2.0 * (float)i / (float)modLen) + 1.0) * 0.5 * 255.0 + 0.5);
       }
       break;
      case 3: // Triangle
-      for(int i=0; i<modLen; i++) {
+      for(uint32_t i=0; i<modLen; i++) {
         modBuf[i] = (int)(fabs(0.5 - (float)i / (float)modLen) * 2.0 * 255.0 + 0.5);
       }
       break;
      case 4: // Sawtooth (increasing)
-      for(int i=0; i<modLen; i++) {
+      for(uint32_t i=0; i<modLen; i++) {
         modBuf[i] = (int)((float)i / (float)(modLen - 1) * 255.0 + 0.5);
       }
       break;
@@ -393,13 +361,17 @@ void PDM_SERCOM_HANDLER(void) {
     // the last thing that was stored prior to whatever time you polled it,
     // but may still have some uses.
     voiceLastReading = adjusted;
+
+    // Similarly, user code can extern these variables and monitor the
+    // peak-to-peak range. They are never reset in the voice code itself,
+    // it's the duty of the user code to reset both to 32768 periodically.
+    if(adjusted < voiceMin)      voiceMin = adjusted;
+    else if(adjusted > voiceMax) voiceMax = adjusted;
   }
   evenWord ^= 1;
 }
 
-// Playback timer interrupt
-void TIMER_IRQ_HANDLER(void) {
-  TIMER->COUNT16.INTFLAG.reg = TC_INTFLAG_OVF;
+static void voiceOutCallback(void) {
 
   // Modulation is done on the output (rather than the input) because
   // pitch-shifting modulated input would cause weird waveform
@@ -443,7 +415,7 @@ void TIMER_IRQ_HANDLER(void) {
     } else { // Slowed down
       // Playback may underflow recording, need to advance periodically
       int16_t dist = (playbackIndex >= recIndex) ?
-        (playbackIndex - recIndex) : (recBufSize - (recIndex - playbackIndex));
+        (playbackIndex - recIndex) : (recBufSize - 1 - (recIndex - playbackIndex));
       if(dist <= jumpThreshold) {
         playbackIndexJumped = (playbackIndex + jump) % recBufSize;
         jumping             = true;

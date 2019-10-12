@@ -68,9 +68,6 @@ float    iris_prev[IRIS_LEVELS] = { 0 };
 float    iris_next[IRIS_LEVELS] = { 0 };
 uint16_t iris_frame = 0;
 
-// For heat sensing
-HeatSensor heatSensor;
-
 // Callback invoked after each SPI DMA transfer - sets a flag indicating
 // the next line of graphics can be issued as soon as its ready.
 static void dma_callback(Adafruit_ZeroDMA *dma) {
@@ -108,7 +105,7 @@ SPISettings settings(DISPLAY_FREQ, MSBFIRST, SPI_MODE0);
 // below, to allow for caching/scheduling fudge). If so, that's our signal
 // that something is likely amiss and we take evasive maneuvers, resetting
 // the affected DMA channel (DMAbuddy::fix()).
-#define DMA_TIMEOUT ((DISPLAY_SIZE * 16 * 4000) / (DISPLAY_FREQ / 1000))
+#define DMA_TIMEOUT (uint32_t)((DISPLAY_SIZE * 16 * 4000) / (DISPLAY_FREQ / 1000))
 
 static inline uint16_t readBoop(void) {
   uint16_t counter = 0;
@@ -121,6 +118,7 @@ static inline uint16_t readBoop(void) {
 
 // Crude error handler. Prints message to Serial Monitor, blinks LED.
 void fatal(const char *message, uint16_t blinkDelay) {
+  Serial.begin(9600);
   Serial.println(message);
   for(bool ledState = HIGH;; ledState = !ledState) {
     digitalWrite(LED_BUILTIN, ledState);
@@ -138,22 +136,23 @@ uint32_t availableRAM(void) {
 // SETUP FUNCTION - CALLED ONCE AT PROGRAM START ---------------------------
 
 void setup() {
-  if (!arcada.arcadaBegin()) {
-    while (1);
-  }
+  if(!arcada.arcadaBegin())     fatal("Arcada init fail!", 100);
+#if defined(USE_TINYUSB)
+  if(!arcada.filesysBeginMSD()) fatal("No filesystem found!", 250);
+#else
+  if(!arcada.filesysBegin())    fatal("No filesystem found!", 250);
+#endif
 
-  if (!arcada.filesysBeginMSD()) {
-    fatal("No filesystem found!", 100);
-  }
+  user_setup();
 
   arcada.displayBegin();
 
-  DISPLAY_SIZE = min(ARCADA_TFT_WIDTH, ARCADA_TFT_HEIGHT);
-  DISPLAY_X_OFFSET = (ARCADA_TFT_WIDTH - DISPLAY_SIZE) / 2;
+  DISPLAY_SIZE     = min(ARCADA_TFT_WIDTH, ARCADA_TFT_HEIGHT);
+  DISPLAY_X_OFFSET = (ARCADA_TFT_WIDTH  - DISPLAY_SIZE) / 2;
   DISPLAY_Y_OFFSET = (ARCADA_TFT_HEIGHT - DISPLAY_SIZE) / 2;
 
   Serial.begin(115200);
-//  while(!Serial) delay(10);
+  //while(!Serial) yield();
 
   Serial.printf("Available RAM at start: %d\n", availableRAM());
   Serial.printf("Available flash at start: %d\n", arcada.availableFlash());
@@ -167,15 +166,15 @@ void setup() {
   // config1.eye, config2.eye or config3.eye instead). Keep fingers clear
   // of the nose booper when doing this...it self-calibrates on startup.
   // DO THIS BEFORE THE SPLASH SO IT DOESN'T REQUIRE A LENGTHY HOLD.
-  char *filename = "config.eye";
+  char *filename = (char *)"config.eye";
  
   uint32_t buttonState = arcada.readButtons();
   if((buttonState & ARCADA_BUTTONMASK_UP) && arcada.exists("config1.eye")) {
-    filename = "config1.eye";
+    filename = (char *)"config1.eye";
   } else if((buttonState & ARCADA_BUTTONMASK_A) && arcada.exists("config2.eye")) {
-    filename = "config2.eye";
+    filename = (char *)"config2.eye";
   } else if((buttonState & ARCADA_BUTTONMASK_DOWN) && arcada.exists("config3.eye")) {
-    filename = "config3.eye";
+    filename = (char *)"config3.eye";
   }
 
   yield();
@@ -187,27 +186,27 @@ void setup() {
     eye[0].display = arcada.display;
   #endif
 
-  #ifdef DO_SPLASH_SCREEN
   yield();
-  if (arcada.drawBMP("/splash.bmp", 0, 0, (eye[0].display)) == IMAGE_SUCCESS) {
-    Serial.println("Splashing");
-    if (NUM_EYES > 1) {    // other eye
-      yield();
-      arcada.drawBMP("/splash.bmp", 0, 0, (eye[1].display));
-    }
-    // backlight on for a bit
-    for (int bl=0; bl<=250; bl+=20) {
-      arcada.setBacklight(bl);
-      delay(20);
-    }
-    delay(2000);
-    // backlight back off
-    for (int bl=250; bl>=0; bl-=20) {
-      arcada.setBacklight(bl);
-      delay(20);
+  if (showSplashScreen) {
+    if (arcada.drawBMP((char *)"/splash.bmp", 0, 0, (eye[0].display)) == IMAGE_SUCCESS) {
+      Serial.println("Splashing");
+      if (NUM_EYES > 1) {    // other eye
+        yield();
+        arcada.drawBMP((char *)"/splash.bmp", 0, 0, (eye[1].display));
+      }
+      // backlight on for a bit
+      for (int bl=0; bl<=250; bl+=20) {
+        arcada.setBacklight(bl);
+        delay(20);
+      }
+      delay(2000);
+      // backlight back off
+      for (int bl=250; bl>=0; bl-=20) {
+        arcada.setBacklight(bl);
+        delay(20);
+      }
     }
   }
-  #endif
 
   // Initialize DMAs
   yield();
@@ -301,7 +300,6 @@ void setup() {
   // leave some RAM for the stack to operate over the lifetime of this
   // program and to handle small heap allocations.
 
-  ImageReturnCode status;
   uint32_t        maxRam = availableRAM() - stackReserve;
 
   // Load texture maps for eyes
@@ -362,6 +360,7 @@ void setup() {
 
   // Load eyelid graphics.
   yield();
+  ImageReturnCode status;
 
   status = loadEyelid(upperEyelidFilename ?
     upperEyelidFilename : (char *)"upper.bmp",
@@ -420,9 +419,6 @@ void setup() {
     }
     boopThreshold = boopThreshold * 110 / 100; // 10% overhead
   }
-
-  user_setup();
-  heatSensor.setup();
 
   lastLightReadTime = micros() + 2000000; // Delay initial light reading
 }
@@ -495,18 +491,19 @@ void loop() {
         eyeX = eyeOldX;
         eyeY = eyeOldY;
         if(dt > eyeMoveDuration) {            // Time up?  Begin new move.
-          // Estimate the focus position.
-          heatSensor.find_focus();
-            
           // r is the radius in X and Y that the eye can go, from (0,0) in the center.
           float r = (float)mapDiameter - (float)DISPLAY_SIZE * M_PI_2; // radius of motion
           r *= 0.6;  // calibration constant
 
-          // Set values for the new X and Y.         
-          eyeNewX = heatSensor.x * r;
-          eyeNewY = -heatSensor.y * r;
-
-          // Adjust for the map.
+          if (moveEyesRandomly) {
+            eyeNewX = random(-r, r);
+            float h = sqrt(r * r - x * x);
+            eyeNewY = random(-h, h);
+          } else {
+            eyeNewX = eyeTargetX * r;
+            eyeNewY = eyeTargetY * r;
+          }
+    
           eyeNewX += mapRadius;
           eyeNewY += mapRadius;
 
