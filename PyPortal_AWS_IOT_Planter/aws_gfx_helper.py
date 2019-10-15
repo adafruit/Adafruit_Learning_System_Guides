@@ -1,5 +1,5 @@
 """
-GFX Helper for PyPortal GCP IoT Plant Monitor
+GFX Helper for PyPortal AWS IoT Plant Monitor
 """
 import board
 import displayio
@@ -12,10 +12,10 @@ cwd = ("/"+__file__).rsplit('/', 1)[0]
 # GFX Font
 font = terminalio.FONT
 
-class Google_GFX(displayio.Group):
+class AWS_GFX(displayio.Group):
     def __init__(self, is_celsius=False):
-        """Creates an Google_GFX object for displaying plant
-        and Google Cloud IoT Core status.
+        """Creates an AWS_GFX object for displaying plant
+        and AWS IoT status.
         :param bool is_celsius: Temperature displayed in Celsius.
         """
         # root displayio group
@@ -39,18 +39,18 @@ class Google_GFX(displayio.Group):
         self._icon_sprite = None
         self._icon_file = None
         self._cwd = cwd
-        self.set_icon(self._cwd+"/images/gcp_splash.bmp")
+        self.set_icon(self._cwd+"/images/aws_splash.bmp")
 
         print('Setting up labels...')
         header_group = displayio.Group(scale=3)
-        header_label = Label(font, text="Google Cloud IoT\n     Planter")
+        header_label = Label(font, text="AWS IoT\n     Planter")
         header_label.x = (self.display.width // 2) // 22
         header_label.y = 15
         header_group.append(header_label)
         self._text_group.append(header_group)
 
         # Temperature Display
-        temp_group = displayio.Group(scale=2, max_size=3)
+        temp_group = displayio.Group(scale=2, max_size=400)
         temp_label = Label(font, text="Temperature: ")
         temp_label.x = (self.display.width//2) // 11
         temp_label.y = 55
@@ -75,27 +75,26 @@ class Google_GFX(displayio.Group):
         temp_group.append(self.water_lvl_label)
         self._text_group.append(water_group)
 
-        # GCP Status
+        # AWS Status
         status_group = displayio.Group()
-        self.gcp_status_label = Label(font, text="Connecting to GCP IoT Core...")
-        self.gcp_status_label.x = self.display.width//4
-        self.gcp_status_label.y = 200
-        status_group.append(self.gcp_status_label)
+        self.aws_status_label = Label(font, text="Connecting to AWS IoT...")
+        self.aws_status_label.x = self.display.width//4
+        self.aws_status_label.y = 200
+        status_group.append(self.aws_status_label)
         self._text_group.append(status_group)
 
         self.display.show(self._text_group)
 
-    def show_gcp_status(self, status_text):
+    def show_aws_status(self, status_text):
         """Displays the system status on the PyPortal
-        :param str status_text: Description of current GCP IoT status
+        :param str status_text: Description of current AWS IoT status.
         """
-        self.gcp_status_label.text = status_text
+        self.aws_status_label.text = status_text
 
     def show_water_level(self, water_data):
         """Displays the water level from the Stemma Soil Sensor.
         :param int water_data: water value
         """
-        print('Water Level: ', water_data)
         self.water_lvl_label.text = str(water_data)
 
     def show_temp(self, temp_data):

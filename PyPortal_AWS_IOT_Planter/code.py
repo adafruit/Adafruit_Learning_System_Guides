@@ -6,6 +6,7 @@ notifications when it needs watering with your PyPortal.
 
 Author: Brent Rubell for Adafruit Industries, 2019
 """
+import time
 import json
 import board
 import busio
@@ -17,7 +18,10 @@ import adafruit_esp32spi.adafruit_esp32spi_socket as socket
 from adafruit_minimqtt import MQTT
 from adafruit_aws_iot import MQTT_CLIENT
 from adafruit_seesaw.seesaw import Seesaw
+import aws_gfx_helper
 
+# Time between polling the STEMMA, in minutes
+SENSOR_DELAY = 15
 
 # Get wifi details and more from a secrets.py file
 try:
@@ -26,18 +30,32 @@ except ImportError:
     print("WiFi secrets are kept in secrets.py, please add them there!")
     raise
 
-# Get device certificate and private key from a certificates.py file
+# Get device certificate
 try:
-    from certificates import DEVICE_CERT, DEVICE_KEY
+    with open("aws_cert.pem.crt", "rb") as f:
+        DEVICE_CERT = f.read()
 except ImportError:
-    print("Certificate and private key data is kept in certificates.py, \
-           please add them there!")
+    print("Certificate (aws_cert.pem.crt) not found on CIRCUITPY filesystem.")
     raise
 
-# PyPortal ESP32 Setup
-esp32_cs = digitalio.DigitalInOut(board.ESP_CS)
-esp32_ready = digitalio.DigitalInOut(board.ESP_BUSY)
-esp32_reset = digitalio.DigitalInOut(board.ESP_RESET)
+# Get device private key
+try:
+    with open("private.pem.key", "rb") as f:
+        DEVICE_KEY = f.read()
+except ImportError:
+    print("Key (private.pem.key) not found on CIRCUITPY filesystem.")
+    raise
+
+# If you are using a board with pre-defined ESP32 Pins:
+esp32_cs = DigitalInOut(board.ESP_CS)
+esp32_ready = DigitalInOut(board.ESP_BUSY)
+esp32_reset = DigitalInOut(board.ESP_RESET)
+
+# If you have an externally connected ESP32:
+# esp32_cs = DigitalInOut(board.D9)
+# esp32_ready = DigitalInOut(board.D10)
+# esp32_reset = DigitalInOut(board.D5)
+
 spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
 esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset)
 status_light = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.2)
@@ -60,8 +78,8 @@ i2c_bus = busio.I2C(board.SCL, board.SDA)
 ss = Seesaw(i2c_bus, addr=0x36)
 
 # Initialize the graphics helper
-print("Loading GCP Graphics...")
-gfx = gcp_gfx_helper.Google_GFX()
+print("Loading AWS IoT Graphics...")
+gfx = aws_gfx_helper.AWS_GFX()
 print("Graphics loaded!")
 
 
@@ -98,14 +116,14 @@ def publish(client, userdata, topic, pid):
 
 def message(client, topic, msg):
     # This method is called when the client receives data from a topic.
-    # TODO
+    print("Message from {}: {}".format(topic, msg))
+
 
 # Set up a new MiniMQTT Client
 client =  MQTT(socket,
                broker = secrets['broker'],
                client_id = secrets['client_id'],
-               network_manager = wifi,
-               log=True)
+               network_manager = wifi)
 
 # Initialize AWS IoT MQTT API Client
 aws_iot = MQTT_CLIENT(client)
@@ -126,25 +144,27 @@ initial = time.monotonic()
 
 while True:
     try:
-        gfx.show_gcp_status('Listening for new messages...')
+        gfx.show_aws_status('Listening for msgs...')
         now = time.monotonic()
-        if now - initial > (SENSOR_DELAY * 60):
+        if now - initial > (1 * 60):
             # read moisture level
             moisture = ss.moisture_read()
+            print("Moisture Level: ", moisture)
             # read temperature
             temperature = ss.get_temp()
+            print("Temperature:{}F".format(temperature))
             # Display Soil Sensor values on pyportal
             temperature = gfx.show_temp(temperature)
             gfx.show_water_level(moisture)
             print('Sending data to AWS IoT...')
-            gfx.show_gcp_status('Publishing data...')
+            gfx.show_aws_status('Publishing data...')
             # Create a json-formatted device payload
             payload = {"state":{"reported":
                         {"moisture":str(moisture),
                         "temp":str(temperature)}}}
             # Update device shadow
             aws_iot.shadow_update(json.dumps(payload))
-            gfx.show_gcp_status('Data published!')
+            gfx.show_aws_status('Data published!')
             print('Data sent!')
             # Reset timer
             initial = now
