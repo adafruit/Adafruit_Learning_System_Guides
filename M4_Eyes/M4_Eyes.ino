@@ -477,8 +477,10 @@ void loop() {
       if(eyeInMotion) {                       // Currently moving?
         if(dt >= eyeMoveDuration) {           // Time up?  Destination reached.
           eyeInMotion      = false;           // Stop moving
-          // eyeMoveDuration  = random(10000, 3000000); // 0.01-3 sec stop
-          // eyeMoveStartTime = t;               // Save initial time of stop
+          if (moveEyesRandomly) {
+            eyeMoveDuration  = random(10000, 3000000); // 0.01-3 sec stop
+            eyeMoveStartTime = t;               // Save initial time of stop
+          }
           eyeX = eyeOldX = eyeNewX;           // Save position
           eyeY = eyeOldY = eyeNewY;
         } else { // Move time's not yet fully elapsed -- interpolate position

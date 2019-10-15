@@ -34,7 +34,7 @@ void user_loop(void) {
   // Estimate the focus position.
   heatSensor.find_focus();
 
-  // Set values for the new X and Y.         
+  // Set values for the new X and Y.
   eyeTargetX = heatSensor.x;
   eyeTargetY = -heatSensor.y;
 }
