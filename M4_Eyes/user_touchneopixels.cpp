@@ -2,6 +2,7 @@
 
 #include "globals.h"
 
+static uint32_t lastTouchSample;
 static uint32_t lastBehaviorChange;
 static uint32_t lastWave;
 
@@ -10,6 +11,7 @@ static int currentBehavior = 0;
 static int colorIndex  = 0;
 
 const uint32_t SAMPLE_TIME = 50000;
+const uint32_t TOUCH_SAMPLE_TIME = SAMPLE_TIME * 15;
 static uint8_t currentStep = 100;
 static int direction = -3;
 static uint32_t lastColorShift;
@@ -48,6 +50,10 @@ void setGradientPixelColor(uint16_t ledPosition, uint16_t step, float redRatio, 
     float red = step * redRatio;
     float blue = step * blueRatio;
     arcada.pixels.setPixelColor(ledPosition, red, green, blue);
+}
+ 
+void stepGreenBlackGradient(uint16_t ledPosition, uint16_t step) {
+    setGradientPixelColor(ledPosition, step, 0, 1, 0);
 }
  
 void stepOrangeBlackGradient(uint16_t ledPosition, uint16_t step) {
@@ -233,28 +239,31 @@ void changeBehavior(int newBehavior, uint32_t timeOfChange) {
 }
 
 void user_setup(void) {
-  lastBehaviorChange, lastWave, lastColorShift, lastRainbowColorShift = micros();
+  lastBehaviorChange, lastWave, lastColorShift, lastRainbowColorShift, lastTouchSample = micros();
   arcada.pixels.setBrightness(255);
   advanceHalloweenGradients();
   changeBehavior(0, micros());
 }
 
 void user_loop(void) {
-  uint8_t pressed_buttons = arcada.readButtons();
-  uint8_t justpressed_buttons = arcada.justPressedButtons();
-  
   uint32_t elapsedSince = micros();
-  if (justpressed_buttons & ARCADA_BUTTONMASK_UP){
-    changeBehavior(0, elapsedSince);
-  }
-  else if(justpressed_buttons & ARCADA_BUTTONMASK_DOWN) {
-    changeBehavior(1, elapsedSince);
-  }
-  else if(justpressed_buttons & ARCADA_BUTTONMASK_LEFT) {
-    changeBehavior(2, elapsedSince);
-  }
-  else if(justpressed_buttons & ARCADA_BUTTONMASK_RIGHT) {
-    changeBehavior(3, elapsedSince);
+  if(elapsedSince - lastTouchSample > TOUCH_SAMPLE_TIME) {
+    lastTouchSample = elapsedSince;
+    uint8_t pressed_buttons = arcada.readButtons();
+    uint8_t justpressed_buttons = arcada.justPressedButtons();
+    
+    if (justpressed_buttons & ARCADA_BUTTONMASK_UP){
+      changeBehavior(0, elapsedSince);
+    }
+    else if(justpressed_buttons & ARCADA_BUTTONMASK_DOWN) {
+      changeBehavior(1, elapsedSince);
+    }
+    else if(justpressed_buttons & ARCADA_BUTTONMASK_LEFT) {
+      changeBehavior(2, elapsedSince);
+    }
+    else if(justpressed_buttons & ARCADA_BUTTONMASK_RIGHT) {
+      changeBehavior(3, elapsedSince);
+    }
   }
     
   if (elapsedSince - lastWave > SAMPLE_TIME) {
