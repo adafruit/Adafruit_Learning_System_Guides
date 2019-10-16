@@ -85,6 +85,8 @@ void setup(void) {
   Serial.begin(115200);
   randomSeed(analogRead(A3)); // Seed random() from floating analog input
 
+  pinMode(MOTION_SENSOR_PIN, INPUT);
+
 #ifdef DISPLAY_BACKLIGHT
   // Enable backlight pin, initially off
   pinMode(DISPLAY_BACKLIGHT, OUTPUT);

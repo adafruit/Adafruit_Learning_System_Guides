@@ -1,16 +1,14 @@
-# CircuitPlaygroundExpress_DigitalIO
+# Circuit Playground digitalio example
 
 import time
-
 import board
-from digitalio import DigitalInOut, Direction, Pull
+import digitalio
 
-led = DigitalInOut(board.D13)
-led.direction = Direction.OUTPUT
+led = digitalio.DigitalInOut(board.D13)
+led.switch_to_output()
 
-button = DigitalInOut(board.BUTTON_A)
-button.direction = Direction.INPUT
-button.pull = Pull.DOWN
+button = digitalio.DigitalInOut(board.BUTTON_A)
+button.switch_to_input(pull=digitalio.Pull.DOWN)
 
 while True:
     if button.value:  # button is pushed

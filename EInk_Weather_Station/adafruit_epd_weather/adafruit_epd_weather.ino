@@ -1,4 +1,3 @@
-
 #include <time.h>
 #include <Adafruit_GFX.h>    // Core graphics library
 #include <Adafruit_EPD.h>
@@ -41,7 +40,7 @@ OpenWeatherMapForecastData owfdata[3];
 
 Adafruit_NeoPixel neopixel = Adafruit_NeoPixel(1, NEOPIXELPIN, NEO_GRB + NEO_KHZ800);
 
-  const char *moonphasenames[28] = {
+  const char *moonphasenames[29] = {
     "New Moon",
     "Waxing Crescent",
     "Waxing Crescent",
@@ -64,6 +63,7 @@ Adafruit_NeoPixel neopixel = Adafruit_NeoPixel(1, NEOPIXELPIN, NEO_GRB + NEO_KHZ
     "Waning Gibbous",
     "Waning Gibbous",
     "Last Quarter",
+    "Waning Crescent",
     "Waning Crescent",
     "Waning Crescent",
     "Waning Crescent",

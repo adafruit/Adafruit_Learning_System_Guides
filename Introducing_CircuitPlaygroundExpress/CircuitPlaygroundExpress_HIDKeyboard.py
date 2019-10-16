@@ -1,4 +1,4 @@
-# CircuitPlaygroundExpress_HIDKeyboard
+# Circuit Playground HID Keyboard
 
 import time
 
@@ -8,7 +8,7 @@ from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS
 from adafruit_hid.keycode import Keycode
 from digitalio import DigitalInOut, Direction, Pull
 
-# A simple neat keyboard demo in circuitpython
+# A simple neat keyboard demo in CircuitPython
 
 # The button pins we'll use, each will have an internal pulldown
 buttonpins = [board.BUTTON_A, board.BUTTON_B]
@@ -25,7 +25,7 @@ kbd = Keyboard()
 # we're americans :)
 layout = KeyboardLayoutUS(kbd)
 
-# make all pin objects, make them inputs w/pulldowns
+# make all pin objects, make them inputs with pulldowns
 for pin in buttonpins:
     button = DigitalInOut(pin)
     button.direction = Direction.INPUT
@@ -53,7 +53,7 @@ while True:
             while button.value:
                 pass  # wait for it to be released!
             # type the keycode or string
-            k = buttonkeys[i]  # get the corresp. keycode/str
+            k = buttonkeys[i]  # get the corresponding keycode or string
             if isinstance(k, str):
                 layout.write(k)
             else:

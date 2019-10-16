@@ -45,6 +45,8 @@ height = display.height
 spi = busio.SPI(board.SCK, MOSI=board.MOSI, MISO=board.MISO)
 cs = DigitalInOut(board.CE1)
 irq = DigitalInOut(board.D22)
+rst = DigitalInOut(board.D25)
+
 # TTN Device Address, 4 Bytes, MSB
 devaddr = bytearray([0x00, 0x00, 0x00, 0x00])
 # TTN Network Key, 16 Bytes, MSB
@@ -56,7 +58,7 @@ app = bytearray([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 # Initialize ThingsNetwork configuration
 ttn_config = TTN(devaddr, nwkey, app, country='US')
 # Initialize lora object
-lora = TinyLoRa(spi, cs, irq, ttn_config)
+lora = TinyLoRa(spi, cs, irq, rst, ttn_config)
 # 2b array to store sensor data
 data_pkt = bytearray(2)
 # time to delay periodic packet sends (in seconds)
