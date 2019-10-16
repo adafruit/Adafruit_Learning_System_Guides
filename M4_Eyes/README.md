@@ -1,4 +1,4 @@
-# Adafruit Learning System tutorial - M4_Eyes
+# Adafruit Learning System - M4_Eyes for the MONSTER M4SK
 
 Make a person responsive set of eyes.
 
