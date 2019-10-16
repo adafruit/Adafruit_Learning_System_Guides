@@ -228,7 +228,7 @@ class Graph(object):
         self.width = WIDTH
         self.height = HEIGHT
 
-    # pylint: too-many-branches
+    # pylint: disable=too-many-branches
     def draw_line(self, x1, y1, x2, y2, size=PLOT_SIZE, color=1, style=1):
         # print("draw_line:", x1, y1, x2, y2)
         # convert graph coords to screen coords
