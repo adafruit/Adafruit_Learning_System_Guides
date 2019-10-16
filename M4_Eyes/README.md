@@ -1,4 +1,4 @@
-# Adafruit Learning System - M4_Eyes for the MONSTER M4SK
+## Adafruit Learning System - M4_Eyes for the MONSTER M4SK
 
 Make blinking, moving eyes on an Adafruit Monster M4sk microcontroller and display board.
 
