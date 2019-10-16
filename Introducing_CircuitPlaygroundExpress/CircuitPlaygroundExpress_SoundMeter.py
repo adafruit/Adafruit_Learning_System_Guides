@@ -21,35 +21,34 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+# Circuit Playground Sound Meter
+
 import array
 import math
-
 import audiobusio
 import board
 import neopixel
+
+# Color of the peak pixel.
+PEAK_COLOR = (100, 0, 255)
+# Number of total pixels - 10 build into Circuit Playground
+NUM_PIXELS = 10
 
 # Exponential scaling factor.
 # Should probably be in range -10 .. 10 to be reasonable.
 CURVE = 2
 SCALE_EXPONENT = math.pow(10, CURVE * -0.1)
 
-PEAK_COLOR = (100, 0, 255)
-NUM_PIXELS = 10
-
 # Number of samples to read at once.
 NUM_SAMPLES = 160
 
 
 # Restrict value to be between floor and ceiling.
-
-
 def constrain(value, floor, ceiling):
     return max(floor, min(value, ceiling))
 
 
 # Scale input_value between output_min and output_max, exponentially.
-
-
 def log_scale(input_value, input_min, input_max, output_min, output_max):
     normalized_input_value = (input_value - input_min) / \
                              (input_max - input_min)
@@ -59,8 +58,6 @@ def log_scale(input_value, input_min, input_max, output_min, output_max):
 
 
 # Remove DC bias before computing RMS.
-
-
 def normalized_rms(values):
     minbuf = int(mean(values))
     samples_sum = sum(
@@ -81,20 +78,13 @@ def volume_color(volume):
 
 # Main program
 
-
 # Set up NeoPixels and turn them all off.
-pixels = neopixel.NeoPixel(board.NEOPIXEL, NUM_PIXELS,
-                           brightness=0.1, auto_write=False)
+pixels = neopixel.NeoPixel(board.NEOPIXEL, NUM_PIXELS, brightness=0.1, auto_write=False)
 pixels.fill(0)
 pixels.show()
 
-# For CircuitPython 2.x:
 mic = audiobusio.PDMIn(board.MICROPHONE_CLOCK, board.MICROPHONE_DATA,
-                       frequency=16000, bit_depth=16)
-# For Circuitpython 3.0 and up, "frequency" is now called "sample_rate".
-# Comment the lines above and uncomment the lines below.
-#mic = audiobusio.PDMIn(board.MICROPHONE_CLOCK, board.MICROPHONE_DATA,
-#                       sample_rate=16000, bit_depth=16)
+                       sample_rate=16000, bit_depth=16)
 
 # Record an initial sample to calibrate. Assume it's quiet when we start.
 samples = array.array('H', [0] * NUM_SAMPLES)

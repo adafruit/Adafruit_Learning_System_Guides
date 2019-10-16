@@ -1,0 +1,41 @@
+Copyright (c) 2015 Adafruit Industries
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+----------------------------------------------------------------------------
+
+Additional notes:
+
+Since we're asked pretty often: yes, you may use this code (as well as the
+Adafruit DotStar library) in your product / Kickstarter campaign / etc.
+provided the license terms are followed.  Please understand the "fitness"
+and "as-is" aspects -- that your use of this code does not entitle a first-
+in-line response to bugs, explanations or documentation, feature requests,
+etc. before or after your product ships.
+
+We ask also that you not use the name "DotStar" (an Adafruit trademark) in
+your product name or campaign -- please use the generic name "APA102" when
+referring to the addressable LEDs.  Similarly, be mindful of Flowtoys'
+trademarks in this field (though not involved in this software, references
+to their components are made in the corresponding Adafruit Learning System
+guide).
+
+In short: include attribution/license in distributed code, test a lot, know
+enough C to solve problems, stay clear of trademarks and everything's cool.
+Enjoy!  We look forward to seeing what you make of it!

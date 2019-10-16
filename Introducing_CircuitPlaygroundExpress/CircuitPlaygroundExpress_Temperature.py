@@ -1,5 +1,5 @@
-# CircuitPlaygroundExpress_Temperature
-# reads the on-board temperature sensor and prints the value
+# Circuit Playground Temperature
+# Reads the on-board temperature sensor and prints the value
 
 import time
 
