@@ -62,6 +62,11 @@ status_light = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.2)
 wifi = adafruit_esp32spi_wifimanager.ESPSPI_WiFiManager(
     esp, secrets, status_light)
 
+# Initialize the graphics helper
+print("Loading AWS IoT Graphics...")
+gfx = aws_gfx_helper.AWS_GFX()
+print("Graphics loaded!")
+
 # Set AWS Device Certificate
 esp.set_certificate(DEVICE_CERT)
 
@@ -77,12 +82,6 @@ print("Connected!")
 i2c_bus = busio.I2C(board.SCL, board.SDA)
 ss = Seesaw(i2c_bus, addr=0x36)
 
-# Initialize the graphics helper
-print("Loading AWS IoT Graphics...")
-gfx = aws_gfx_helper.AWS_GFX()
-print("Graphics loaded!")
-
-
 # Define callback methods which are called when events occur
 # pylint: disable=unused-argument, redefined-outer-name
 def connect(client, userdata, flags, rc):
@@ -90,7 +89,10 @@ def connect(client, userdata, flags, rc):
     # successfully to the broker.
     print('Connected to AWS IoT!')
     print('Flags: {0}\nRC: {1}'.format(flags, rc))
-    # TODO: Subscribe to shadow topics!
+
+    # Subscribe client to all shadow updates
+    print("Subscribing to shadow updates...")
+    aws_iot.shadow_subscribe()
 
 
 def disconnect(client, userdata, rc):
@@ -98,26 +100,21 @@ def disconnect(client, userdata, rc):
     # from the broker.
     print('Disconnected from AWS IoT!')
 
-
 def subscribe(client, userdata, topic, granted_qos):
     # This method is called when the client subscribes to a new topic.
     print('Subscribed to {0} with QOS level {1}'.format(topic, granted_qos))
-
 
 def unsubscribe(client, userdata, topic, pid):
     # This method is called when the client unsubscribes from a topic.
     print('Unsubscribed from {0} with PID {1}'.format(topic, pid))
 
-
 def publish(client, userdata, topic, pid):
     # This method is called when the client publishes data to a topic.
     print('Published to {0} with PID {1}'.format(topic, pid))
 
-
 def message(client, topic, msg):
     # This method is called when the client receives data from a topic.
     print("Message from {}: {}".format(topic, msg))
-
 
 # Set up a new MiniMQTT Client
 client =  MQTT(socket,
@@ -146,7 +143,7 @@ while True:
     try:
         gfx.show_aws_status('Listening for msgs...')
         now = time.monotonic()
-        if now - initial > (1 * 60):
+        if now - initial > (0.5 * 60):
             # read moisture level
             moisture = ss.moisture_read()
             print("Moisture Level: ", moisture)
@@ -172,4 +169,4 @@ while True:
     except (ValueError, RuntimeError) as e:
         print("Failed to get data, retrying", e)
         wifi.reset()
-        continue
+  

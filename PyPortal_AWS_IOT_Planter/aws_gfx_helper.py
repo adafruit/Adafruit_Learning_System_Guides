@@ -43,7 +43,7 @@ class AWS_GFX(displayio.Group):
 
         print('Setting up labels...')
         header_group = displayio.Group(scale=3)
-        header_label = Label(font, text="AWS IoT\n     Planter")
+        header_label = Label(font, text="    AWS IoT\n    Planter")
         header_label.x = (self.display.width // 2) // 22
         header_label.y = 15
         header_group.append(header_label)
@@ -78,7 +78,7 @@ class AWS_GFX(displayio.Group):
         # AWS Status
         status_group = displayio.Group()
         self.aws_status_label = Label(font, text="Connecting to AWS IoT...")
-        self.aws_status_label.x = self.display.width//4
+        self.aws_status_label.x = int(self.display.width//3.5)
         self.aws_status_label.y = 200
         status_group.append(self.aws_status_label)
         self._text_group.append(status_group)
