@@ -1,3 +1,4 @@
+from time import sleep
 from adafruit_ble.uart_client import UARTClient
 from adafruit_ble.scanner import Scanner
 from adafruit_bluefruit_connect.packet import Packet
@@ -7,7 +8,6 @@ from neopixel import NeoPixel
 from board import NEOPIXEL, SWITCH
 from adafruit_debouncer import Debouncer
 from digitalio import DigitalInOut, Direction, Pull
-from time import sleep
 import adafruit_fancyled.adafruit_fancyled as fancy
 
 pin = DigitalInOut(SWITCH)  # Set up built-in pushbutton switch
@@ -17,11 +17,11 @@ switch = Debouncer(pin)
 
 pixels = NeoPixel(NEOPIXEL, 1)  # Set up built-in NeoPixel
 
-AQUA = const(0x00FFFF)    # (0, 255, 255)
-GREEN = const(0x00FF00)   # (0, 255, 0)
-ORANGE = const(0xFF8000)  # (255, 128, 0)
-RED = const(0xFF0000)     # (255, 0, 0)
-BLUE = const(0x0000FF)    # (0, 0, 255)
+AQUA = 0x00FFFF    # (0, 255, 255)
+GREEN = 0x00FF00   # (0, 255, 0)
+ORANGE = 0xFF8000  # (255, 128, 0)
+RED = 0xFF0000     # (255, 0, 0)
+BLUE = 0x0000FF    # (0, 0, 255)
 
 gradients = {'Off': [(0.0, RED), (0.75, ORANGE)],
              'On':  [(0.0, GREEN), (1.0, AQUA)]}
