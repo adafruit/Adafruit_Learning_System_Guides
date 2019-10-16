@@ -65,6 +65,7 @@ class Beep(object):
                                * tone_volume * (2 ** 15 - 1))
         self.sine_wave_sample = audioio.RawSample(sine_wave)
 
+    # pylint: disable=protected-access
     def play(self, duration=0.1):
         if not pyportal._speaker_enable.value:
             pyportal._speaker_enable.value = True
@@ -421,18 +422,18 @@ pyportal.splash.append(temp_data)
 circle = Circle(308, 12, 8, fill=0)
 pyportal.splash.append(circle)
 
-graph = Graph()
+sgraph = Graph()
 
-graph.xstart = 100
-graph.ystart = 0
-graph.width = 220
-graph.height = 160
-graph.xmin = oven.sprofile["time_range"][0]
-graph.xmax = oven.sprofile["time_range"][1]
-graph.ymin = oven.sprofile["temp_range"][0]
-graph.ymax = oven.sprofile["temp_range"][1]*1.1
-print("x range:", graph.xmin, graph.xmax)
-print("y range:", graph.ymin, graph.ymax)
+sgraph.xstart = 100
+sgraph.ystart = 0
+sgraph.width = 220
+sgraph.height = 160
+sgraph.xmin = oven.sprofile["time_range"][0]
+sgraph.xmax = oven.sprofile["time_range"][1]
+sgraph.ymin = oven.sprofile["temp_range"][0]
+sgraph.ymax = oven.sprofile["temp_range"][1]*1.1
+print("x range:", sgraph.xmin, sgraph.xmax)
+print("y range:", sgraph.ymin, sgraph.ymax)
 draw_profile(graph, oven.sprofile)
 buttons = []
 button = Button(x=0, y=200, width=80, height=40,
@@ -515,7 +516,8 @@ while True:
         timer_data.text = format_time(timediff)
         print(oven.state)
         if oven_temp >= 50:
-            graph.draw_graph_point(int(timediff), oven_temp,
+            sgraph.draw_graph_point(int(timediff), oven_temp,
                                    size=TEMP_SIZE, color=3)
 
     last_state = oven.state
+
