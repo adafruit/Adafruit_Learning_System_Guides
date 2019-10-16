@@ -59,4 +59,3 @@ print("** Calibration Results **")
 print("Modify config.json with these values for your oven:")
 print("calibrate_temp:", lag_temp)
 print("calibrate_seconds:",lag_time)
-

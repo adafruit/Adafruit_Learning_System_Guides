@@ -481,7 +481,7 @@ while True:
         status = "Ready"
         if last_state != "ready":
             oven.beep.refresh()
-            draw_profile(graph, oven.sprofile)
+            draw_profile(sgraph, oven.sprofile)
             timer_data.text = format_time(0)
         if button.label != "Start":
             button.label = "Start"
@@ -517,7 +517,6 @@ while True:
         print(oven.state)
         if oven_temp >= 50:
             sgraph.draw_graph_point(int(timediff), oven_temp,
-                                   size=TEMP_SIZE, color=3)
+                                    size=TEMP_SIZE, color=3)
 
     last_state = oven.state
-
