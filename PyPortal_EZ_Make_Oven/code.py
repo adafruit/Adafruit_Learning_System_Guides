@@ -47,8 +47,9 @@ pyportal.splash.append(displayio.TileGrid(plot, pixel_shader=palette))
 ts = adafruit_touchscreen.Touchscreen(board.TOUCH_XL, board.TOUCH_XR,
                                       board.TOUCH_YD, board.TOUCH_YU,
                                       calibration=(
-                                                   (5200, 59000), (5800, 57000)
-                                                  ),
+                                          (5200, 59000),
+                                          (5800, 57000)
+                                          ),
                                       size=(WIDTH, HEIGHT))
 
 class Beep(object):
@@ -96,7 +97,9 @@ class ReflowOvenControl(object):
         with open("/config.json", mode="r") as fpr:
             self.config = json.load(fpr)
             fpr.close()
-        self.sprofile = self.load_profile(self.config["profile"])
+        with open("/profiles/" + self.config["profile"] + ".json", mode="r") as fpr:
+            self.sprofile = json.load(fpr)
+            fpr.close()
         i2c = busio.I2C(board.SCL, board. SDA, frequency=200000)
         try:
             self.sensor = MCP9600(i2c, self.config["sensor_address"], "K")
@@ -104,6 +107,7 @@ class ReflowOvenControl(object):
             print("temperature sensor not available")
         self.ontime = 0
         self.offtime = 0
+        self.control = False
         self.reset()
         self.reflow_start = 0
         self.beep = Beep()
@@ -113,12 +117,6 @@ class ReflowOvenControl(object):
         self.ontime = 0
         self.offtime = 0
         self.enable(False)
-
-    def load_profile(self, filename):
-        with open("/profiles/" + filename + ".json", mode="r") as fpr:
-            profile = json.load(fpr)
-            fpr.close()
-            return profile
 
     def get_profile_temp(self, seconds):
         x1 = self.sprofile["profile"][0][0]
@@ -138,6 +136,7 @@ class ReflowOvenControl(object):
         self.check_state()
         self.last_state = state
 
+    # pylint: disable=too-many-branches, too-many-statements
     def check_state(self):
         try:
             temp = self.sensor.temperature
@@ -229,17 +228,18 @@ class Graph(object):
         self.width = WIDTH
         self.height = HEIGHT
 
+    # pylint: too-many-branches
     def draw_line(self, x1, y1, x2, y2, size=PLOT_SIZE, color=1, style=1):
         # print("draw_line:", x1, y1, x2, y2)
         # convert graph coords to screen coords
         x1p = (self.xstart + self.width * (x1 - self.xmin)
                // (self.xmax - self.xmin))
         y1p = (self.ystart + int(self.height * (y1 - self.ymin)
-               / (self.ymax - self.ymin)))
+                                 / (self.ymax - self.ymin)))
         x2p = (self.xstart + self.width * (x2 - self.xmin) //
                (self.xmax - self.xmin))
         y2p = (self.ystart + int(self.height * (y2 - self.ymin) /
-               (self.ymax - self.ymin)))
+                                 (self.ymax - self.ymin)))
         # print("screen coords:", x1p, y1p, x2p, y2p)
 
         if (max(x1p, x2p) - min(x1p, x2p)) > (max(y1p, y2p) - min(y1p, y2p)):
@@ -278,7 +278,7 @@ class Graph(object):
         xx = (self.xstart + self.width * (x - self.xmin)
               // (self.xmax - self.xmin))
         yy = (self.ystart + int(self.height * (y - self.ymin)
-              / (self.ymax - self.ymin)))
+                                / (self.ymax - self.ymin)))
         print("graph point:", x, y, xx, yy)
         self.draw_point(xx, max(0 + size, yy), size, color)
 
@@ -340,7 +340,7 @@ def draw_profile(graph, profile):
     xp = (graph.xstart + graph.width * (x - graph.xmin)
           // (graph.xmax - graph.xmin))
     yp = (graph.ystart + int(graph.height * (y - graph.ymin)
-          / (graph.ymax - graph.ymin)))
+                             / (graph.ymax - graph.ymin)))
 
     label_reflow.x = xp
     label_reflow.y = yp + 16  # fudge factor here to get close to line

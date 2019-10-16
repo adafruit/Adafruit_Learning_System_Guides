@@ -2,7 +2,6 @@ import time
 import board
 import busio
 import digitalio
-from adafruit_bus_device.i2c_device import I2CDevice
 from adafruit_mcp9600 import MCP9600
 
 SENSOR_ADDR = 0X60
