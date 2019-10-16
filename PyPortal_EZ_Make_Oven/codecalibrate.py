@@ -1,18 +1,7 @@
 import time
-import json
 import board
 import busio
-import array
-import math
-import audioio
-import displayio
 import digitalio
-import terminalio
-from adafruit_pyportal import PyPortal
-from adafruit_bitmap_font import bitmap_font
-from adafruit_display_text import label
-from adafruit_button import Button
-import adafruit_touchscreen
 from adafruit_bus_device.i2c_device import I2CDevice
 from adafruit_mcp9600 import MCP9600
 

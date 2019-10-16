@@ -1,9 +1,9 @@
 import time
 import json
-import board
-import busio
 import array
 import math
+import board
+import busio
 import audioio
 import displayio
 import digitalio
@@ -102,6 +102,8 @@ class ReflowOvenControl(object):
             self.sensor = MCP9600(i2c, self.config["sensor_address"], "K")
         except ValueError:
             print("temperature sensor not available")
+        self.ontime = 0
+        self.offtime = 0
         self.reset()
         self.reflow_start = 0
         self.beep = Beep()
@@ -464,7 +466,7 @@ while True:
     last_status = ""
 
     if p:
-        if 0 <= p[0] and p[0] <= 80 and 200 <= p[1] and p[1] <= 240:
+        if p[0] >= 0 and p[0] <= 80 and p[1] >= 200 and p[1] <= 240:
             print("touch!")
             if oven.state == "ready":
                 button.label = "Stop"
