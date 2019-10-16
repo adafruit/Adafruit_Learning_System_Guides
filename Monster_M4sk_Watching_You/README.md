@@ -13,7 +13,7 @@ Adafruit invests time and resources providing this open source code,
 please support Adafruit and open-source hardware by purchasing
 products from [Adafruit](https://www.adafruit.com)!
  
-MIT license, project and code by Timothy Weber
+MIT license, project and sensor code by Timothy Weber. M4_Eyes by Phil Burgess for Adafruit Industries
 
 All text above, and the splash screen below must be included in any redistribution
 
