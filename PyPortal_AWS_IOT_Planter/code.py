@@ -21,7 +21,7 @@ from adafruit_seesaw.seesaw import Seesaw
 import aws_gfx_helper
 
 # Time between polling the STEMMA, in minutes
-SENSOR_DELAY = 15
+SENSOR_DELAY = 0.2
 
 # Get wifi details and more from a secrets.py file
 try:
@@ -143,13 +143,12 @@ while True:
     try:
         gfx.show_aws_status('Listening for msgs...')
         now = time.monotonic()
-        if now - initial > (0.5 * 60):
+        if now - initial > (SENSOR_DELAY * 60):
             # read moisture level
             moisture = ss.moisture_read()
             print("Moisture Level: ", moisture)
             # read temperature
             temperature = ss.get_temp()
-            print("Temperature:{}F".format(temperature))
             # Display Soil Sensor values on pyportal
             temperature = gfx.show_temp(temperature)
             gfx.show_water_level(moisture)
@@ -169,4 +168,3 @@ while True:
     except (ValueError, RuntimeError) as e:
         print("Failed to get data, retrying", e)
         wifi.reset()
-  
