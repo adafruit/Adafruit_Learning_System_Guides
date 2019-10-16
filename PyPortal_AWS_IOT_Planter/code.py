@@ -21,7 +21,7 @@ from adafruit_seesaw.seesaw import Seesaw
 import aws_gfx_helper
 
 # Time between polling the STEMMA, in minutes
-SENSOR_DELAY = 0.2
+SENSOR_DELAY = 15
 
 # Get wifi details and more from a secrets.py file
 try:
@@ -94,7 +94,6 @@ def connect(client, userdata, flags, rc):
     print("Subscribing to shadow updates...")
     aws_iot.shadow_subscribe()
 
-
 def disconnect(client, userdata, rc):
     # This method is called when the client disconnects
     # from the broker.
@@ -155,9 +154,8 @@ while True:
             print('Sending data to AWS IoT...')
             gfx.show_aws_status('Publishing data...')
             # Create a json-formatted device payload
-            payload = {"state":{"reported":
-                        {"moisture":str(moisture),
-                        "temp":str(temperature)}}}
+            payload = {"state":{"reported":{"moisture":str(moisture),
+                                            "temp":str(temperature)}}}
             # Update device shadow
             aws_iot.shadow_update(json.dumps(payload))
             gfx.show_aws_status('Data published!')
