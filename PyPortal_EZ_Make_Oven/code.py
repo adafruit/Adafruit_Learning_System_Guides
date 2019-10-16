@@ -434,7 +434,7 @@ sgraph.ymin = oven.sprofile["temp_range"][0]
 sgraph.ymax = oven.sprofile["temp_range"][1]*1.1
 print("x range:", sgraph.xmin, sgraph.xmax)
 print("y range:", sgraph.ymin, sgraph.ymax)
-draw_profile(graph, oven.sprofile)
+draw_profile(sgraph, oven.sprofile)
 buttons = []
 button = Button(x=0, y=200, width=80, height=40,
                 label="Start", label_font=font2)
