@@ -39,33 +39,10 @@ import adafruit_ssd1306
 # Import Python Imaging Library
 from PIL import Image, ImageDraw, ImageFont
 
-# Signal/sys are used to catch SIGINT.
-import signal
-import sys
-
-# URL of Pi Hole
 api_url = 'http://localhost/admin/api.php'
-
-# Load nice silkscreen font
-font = ImageFont.truetype('fonts/slkscr.ttf', 8)
 
 # Create the I2C interface.
 i2c = busio.I2C(SCL, SDA)
-
-# Blanks the Pi OLED display.
-def blank_screen(display):
-  display.fill(0)
-  display.show()
-
-def SIGINT(sig, frame):
-  print('Ctrl+C detected. Quitting.')
-  # Clear display.
-  blank_screen(disp)
-  sys.exit(0)
-
-# Catch SIGINT (ctrl-c) and blank the screen.
-# This ensures that the screen will be blank when we exit.
-signal.signal(signal.SIGINT, SIGINT)
 
 # Create the SSD1306 OLED class.
 # The first two parameters are the pixel width and pixel height.  Change these
@@ -78,7 +55,8 @@ DISPLAY_ON  = 10 # on time in seconds
 DISPLAY_OFF = 50 # off time in seconds
 
 # Clear display.
-blank_screen(disp)
+disp.fill(0)
+disp.show()
 
 # Create blank image for drawing.
 # Make sure to create image with mode '1' for 1-bit color.
@@ -100,6 +78,9 @@ bottom = height - padding
 # Move left to right keeping track of the current x position
 # for drawing shapes.
 x = 0
+
+# Load nice silkscreen font
+font = ImageFont.truetype('/home/pi/slkscr.ttf', 8)
 
 while True:
     # Draw a black filled box to clear the image.
@@ -150,6 +131,6 @@ while True:
     disp.image(image)
     disp.show()
     time.sleep(DISPLAY_ON)
-    # Clear display.
-    blank_screen(disp)
+    disp.fill(0)
+    disp.show()
     time.sleep(DISPLAY_OFF)
