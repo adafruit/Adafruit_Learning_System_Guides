@@ -1,6 +1,6 @@
 # Adafruit Learning System - M4_Eyes for the MONSTER M4SK
 
-Make a person responsive set of eyes.
+Make blinking, moving eyes on an Adafruit Monster M4sk microcontroller and display board.
 
 This code is used for displaying realistic eyes on the Adafruit [Monster M4sk](https://www.adafruit.com/product/4343) board.
 
