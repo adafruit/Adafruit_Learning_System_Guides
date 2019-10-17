@@ -1,0 +1,23 @@
+{
+	"title": "Lead 138",
+	"alloy": "Sn42/Bi57.6/Ag0.4",
+	"melting_point": 138,
+	"temp_range": [30,165],
+	"time_range": [0,390],
+	"reference": "http://www.chipquik.com/datasheets/TS391LT50.pdf",
+	"stages": {
+		"preheat": [90,90],
+		"soak": [180,130],
+		"reflow": [210,138],
+		"cool": [270,138]
+		},
+	"profile": [
+		[0,30],
+		[90,90],
+		[180,130],
+		[210,138],
+		[240,165],
+		[270,138],
+		[390,50]
+	]
+}
