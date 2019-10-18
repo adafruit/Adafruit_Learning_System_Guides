@@ -77,7 +77,6 @@ class Beep(object):
                 # otherwise, use refresh() in loop to turn off long beep
                 time.sleep(duration)
                 self.stop()
-            print("play", duration, self.start)
 
     def stop(self):
         if pyportal._speaker_enable.value:
@@ -101,7 +100,7 @@ class ReflowOvenControl(object):
         with open("/profiles/" + self.config["profile"] + ".json", mode="r") as fpr:
             self.sprofile = json.load(fpr)
             fpr.close()
-        i2c = busio.I2C(board.SCL, board. SDA, frequency=200000)
+        i2c = busio.I2C(board.SCL, board.SDA, frequency=200000)
         try:
             self.sensor = MCP9600(i2c, self.config["sensor_address"], "K")
         except ValueError:
