@@ -20,28 +20,31 @@ VERSION = "0.1"
 display_group = displayio.Group(max_size=20)
 board.DISPLAY.show(display_group)
 
-PLOT_SIZE = 2            # plot thickness
-PLOT_COLOR = 0x00FF55    # plot color
+PROFILE_SIZE = 2            # plot thickness
+PROFILE_COLOR = 0x00FF55    # plot color
 GRID_SIZE = 2
 GRID_COLOR = 0x2020FF
 GRID_STYLE = 3
 TEMP_SIZE = 2
-TEMP_COLOR = 0xFFFF00
+TEMP_COLOR = 0xFF0000
 LABEL_COLOR = 0x8080FF
+AXIS_SIZE = 2
+AXIS_COLOR = 0xFFFF00
 
 WIDTH = board.DISPLAY.width
 HEIGHT = board.DISPLAY.height
 
 pyportal = PyPortal()
 
-palette = displayio.Palette(4)
+palette = displayio.Palette(5)
 palette[0] = 0x0
-palette[1] = PLOT_COLOR
+palette[1] = PROFILE_COLOR
 palette[2] = GRID_COLOR
 palette[3] = TEMP_COLOR
+palette[4] = AXIS_COLOR
 palette.make_transparent(0)
 
-plot = displayio.Bitmap(WIDTH, HEIGHT, 3)
+plot = displayio.Bitmap(WIDTH, HEIGHT, 8)
 pyportal.splash.append(displayio.TileGrid(plot, pixel_shader=palette))
 
 ts = adafruit_touchscreen.Touchscreen(board.TOUCH_XL, board.TOUCH_XR,
@@ -77,7 +80,6 @@ class Beep(object):
                 # otherwise, use refresh() in loop to turn off long beep
                 time.sleep(duration)
                 self.stop()
-            print("play", duration, self.start)
 
     def stop(self):
         if pyportal._speaker_enable.value:
@@ -101,7 +103,7 @@ class ReflowOvenControl(object):
         with open("/profiles/" + self.config["profile"] + ".json", mode="r") as fpr:
             self.sprofile = json.load(fpr)
             fpr.close()
-        i2c = busio.I2C(board.SCL, board. SDA, frequency=200000)
+        i2c = busio.I2C(board.SCL, board.SDA, frequency=100000)
         try:
             self.sensor = MCP9600(i2c, self.config["sensor_address"], "K")
         except ValueError:
@@ -230,7 +232,7 @@ class Graph(object):
         self.height = HEIGHT
 
     # pylint: disable=too-many-branches
-    def draw_line(self, x1, y1, x2, y2, size=PLOT_SIZE, color=1, style=1):
+    def draw_line(self, x1, y1, x2, y2, size=PROFILE_SIZE, color=1, style=1):
         # print("draw_line:", x1, y1, x2, y2)
         # convert graph coords to screen coords
         x1p = (self.xstart + self.width * (x1 - self.xmin)
@@ -274,7 +276,7 @@ class Graph(object):
                     else:
                         self.draw_point(xx, yy, size, color)
 
-    def draw_graph_point(self, x, y, size=PLOT_SIZE, color=1):
+    def draw_graph_point(self, x, y, size=PROFILE_SIZE, color=1):
         """ draw point using graph coordinates """
         xx = (self.xstart + self.width * (x - self.xmin)
               // (self.xmax - self.xmin))
@@ -283,7 +285,7 @@ class Graph(object):
         print("graph point:", x, y, xx, yy)
         self.draw_point(xx, max(0 + size, yy), size, color)
 
-    def draw_point(self, x, y, size=PLOT_SIZE, color=1):
+    def draw_point(self, x, y, size=PROFILE_SIZE, color=1):
         """Draw data point on to the plot bitmap at (x,y)."""
         if y is None:
             return
@@ -343,17 +345,41 @@ def draw_profile(graph, profile):
     yp = (graph.ystart + int(graph.height * (y - graph.ymin)
                              / (graph.ymax - graph.ymin)))
 
-    label_reflow.x = xp
-    label_reflow.y = yp + 16  # fudge factor here to get close to line
+    label_reflow.x = xp + 10
+    label_reflow.y = HEIGHT - yp
     label_reflow.text = str(profile["stages"]["reflow"][1])
     print("reflow temp:", str(profile["stages"]["reflow"][1]))
+    print("graph point: ", x, y, "->", xp, yp)
+
+    # draw time line (horizontal)
+    graph.draw_line(graph.xmin, graph.ymin, graph.xmax, graph.ymin, AXIS_SIZE, 4, 1)
+    graph.draw_line(graph.xmin, graph.ymax - AXIS_SIZE, graph.xmax, graph.ymax
+        - AXIS_SIZE, AXIS_SIZE, 4, 1)
+    # draw time ticks
+    tick = graph.xmin
+    while tick < (graph.xmax - graph.xmin):
+        graph.draw_line(tick, graph.ymin, tick, graph.ymin + 10, AXIS_SIZE, 4, 1)
+        graph.draw_line(tick, graph.ymax, tick, graph.ymax - 10 - AXIS_SIZE, AXIS_SIZE, 4, 1)
+        tick += 60
+
+    # draw temperature line (vertical)
+    graph.draw_line(graph.xmin, graph.ymin, graph.xmin, graph.ymax, AXIS_SIZE, 4, 1)
+    graph.draw_line(graph.xmax - AXIS_SIZE, graph.ymin, graph.xmax - AXIS_SIZE,
+        graph.ymax, AXIS_SIZE, 4, 1)
+    # draw temperature ticks
+    tick = graph.ymin
+    while tick < (graph.ymax - graph.ymin)*1.1:
+        graph.draw_line(graph.xmin, tick, graph.xmin + 10, tick, AXIS_SIZE, 4, 1)
+        graph.draw_line(graph.xmax, tick, graph.xmax - 10 - AXIS_SIZE, tick, AXIS_SIZE, 4, 1)
+        tick += 50
+
     # draw profile
     x1 = profile["profile"][0][0]
     y1 = profile["profile"][0][1]
     for point in profile["profile"]:
         x2 = point[0]
         y2 = point[1]
-        graph.draw_line(x1, y1, x2, y2)
+        graph.draw_line(x1, y1, x2, y2, PROFILE_SIZE, 1, 1)
         # print(point)
         x1 = x2
         y1 = y2
@@ -376,7 +402,7 @@ label_reflow.x = 0
 label_reflow.y = -20
 pyportal.splash.append(label_reflow)
 title_label = label.Label(font3, text="EZ Make Oven Controller")
-title_label.x = 10
+title_label.x = 5
 title_label.y = 14
 pyportal.splash.append(title_label)
 # version_label = label.Label(font1, text=VERSION, color=0xAAAAAA)
@@ -385,38 +411,38 @@ pyportal.splash.append(title_label)
 # pyportal.splash.append(version_label)
 message = label.Label(font2, text="Wait", max_glyphs=20)
 message.x = 100
-message.y = 50
+message.y = 40
 pyportal.splash.append(message)
-profile_label = label.Label(font1, text="Profile:", color=0xAAAAAA)
-profile_label.x = 10
-profile_label.y = 40
-pyportal.splash.append(profile_label)
-profile_data = label.Label(font1, text=oven.sprofile["title"])
-profile_data.x = 20
-profile_data.y = 60
-pyportal.splash.append(profile_data)
 alloy_label = label.Label(font1, text="Alloy: ", color=0xAAAAAA)
-alloy_label.x = 10
-alloy_label.y = 80
+alloy_label.x = 5
+alloy_label.y = 40
 pyportal.splash.append(alloy_label)
 alloy_data = label.Label(font1, text=str(oven.sprofile["alloy"]))
-alloy_data.x = 20
-alloy_data.y = 100
+alloy_data.x = 10
+alloy_data.y = 60
 pyportal.splash.append(alloy_data)
+profile_label = label.Label(font1, text="Profile:", color=0xAAAAAA)
+profile_label.x = 5
+profile_label.y = 80
+pyportal.splash.append(profile_label)
+profile_data = label.Label(font1, text=oven.sprofile["title"])
+profile_data.x = 10
+profile_data.y = 100
+pyportal.splash.append(profile_data)
 timer_label = label.Label(font1, text="Time:", color=0xAAAAAA)
-timer_label.x = 10
+timer_label.x = 5
 timer_label.y = 120
 pyportal.splash.append(timer_label)
 timer_data = label.Label(font3, text=format_time(timediff), max_glyphs=10)
-timer_data.x = 20
+timer_data.x = 10
 timer_data.y = 140
 pyportal.splash.append(timer_data)
 temp_label = label.Label(font1, text="Temp(C):", color=0xAAAAAA)
-temp_label.x = 10
+temp_label.x = 5
 temp_label.y = 160
 pyportal.splash.append(temp_label)
 temp_data = label.Label(font3, text="--", max_glyphs=10)
-temp_data.x = 20
+temp_data.x = 10
 temp_data.y = 180
 pyportal.splash.append(temp_data)
 circle = Circle(308, 12, 8, fill=0)
@@ -425,8 +451,8 @@ pyportal.splash.append(circle)
 sgraph = Graph()
 
 sgraph.xstart = 100
-sgraph.ystart = 0
-sgraph.width = 220
+sgraph.ystart = 4
+sgraph.width = 216
 sgraph.height = 160
 sgraph.xmin = oven.sprofile["time_range"][0]
 sgraph.xmax = oven.sprofile["time_range"][1]
