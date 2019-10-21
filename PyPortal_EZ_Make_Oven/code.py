@@ -221,7 +221,8 @@ class ReflowOvenControl(object):
                 checktime += 5
             if not checkoven:
                 # hold oven temperature
-                if self.state in ("start", "preheat", "soak") and self.offtemp > self.sensor.temperature:
+                if (self.state in ("start", "preheat", "soak") and 
+                        self.offtemp > self.sensor.temperature):
                     checkoven = True
             self.enable(checkoven)
 
@@ -378,7 +379,7 @@ def draw_profile(graph, profile):
     # draw time line (horizontal)
     graph.draw_line(graph.xmin, graph.ymin, graph.xmax, graph.ymin, AXIS_SIZE, 4, 1)
     graph.draw_line(graph.xmin, graph.ymax - AXIS_SIZE, graph.xmax, graph.ymax
-        - AXIS_SIZE, AXIS_SIZE, 4, 1)
+                    - AXIS_SIZE, AXIS_SIZE, 4, 1)
     # draw time ticks
     tick = graph.xmin
     while tick < (graph.xmax - graph.xmin):
@@ -389,7 +390,7 @@ def draw_profile(graph, profile):
     # draw temperature line (vertical)
     graph.draw_line(graph.xmin, graph.ymin, graph.xmin, graph.ymax, AXIS_SIZE, 4, 1)
     graph.draw_line(graph.xmax - AXIS_SIZE, graph.ymin, graph.xmax - AXIS_SIZE,
-        graph.ymax, AXIS_SIZE, 4, 1)
+                    graph.ymax, AXIS_SIZE, 4, 1)
     # draw temperature ticks
     tick = graph.ymin
     while tick < (graph.ymax - graph.ymin)*1.1:
