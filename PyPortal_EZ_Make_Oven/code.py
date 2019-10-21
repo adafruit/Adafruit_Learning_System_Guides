@@ -218,7 +218,7 @@ class ReflowOvenControl(object):
             if not checkoven:
                 # hold oven temperature
                 if (self.state in ("start", "preheat", "soak") and
-                    self.offtemp > self.sensor.temperature):
+                        self.offtemp > self.sensor.temperature):
                     checkoven = True
             self.enable(checkoven)
 
