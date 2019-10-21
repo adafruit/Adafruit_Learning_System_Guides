@@ -15,7 +15,11 @@ from adafruit_button import Button
 import adafruit_touchscreen
 from adafruit_mcp9600 import MCP9600
 
+TITLE = "EZ Make Oven Controller"
 VERSION = "0.1"
+
+print(TITLE, "version ", VERSION)
+time.sleep(2)
 
 display_group = displayio.Group(max_size=20)
 board.DISPLAY.show(display_group)
@@ -100,12 +104,16 @@ class ReflowOvenControl(object):
         with open("/config.json", mode="r") as fpr:
             self.config = json.load(fpr)
             fpr.close()
+        self.sensor_status = False
         with open("/profiles/" + self.config["profile"] + ".json", mode="r") as fpr:
             self.sprofile = json.load(fpr)
             fpr.close()
         i2c = busio.I2C(board.SCL, board.SDA, frequency=100000)
         try:
             self.sensor = MCP9600(i2c, self.config["sensor_address"], "K")
+            self.ontemp = self.sensor.temperature
+            self.offtemp = self.ontemp
+            self.sensor_status = True
         except ValueError:
             print("temperature sensor not available")
         self.ontime = 0
@@ -145,6 +153,8 @@ class ReflowOvenControl(object):
             temp = self.sensor.temperature
         except AttributeError:
             temp = 32  # sensor not available, use 32 for testing
+            self.sensor_status = False
+            # message.text = "Temperature sensor missing"
         self.beep.refresh()
         if self.state == "wait":
             self.enable(False)
@@ -205,20 +215,30 @@ class ReflowOvenControl(object):
                     checkoven = True
                     break
                 checktime += 5
+            if not checkoven:
+                # hold oven temperature
+                if self.state in ("start", "preheat", "soak") and self.offtemp > self.sensor.temperature:
+                    checkoven = True
             self.enable(checkoven)
 
     # turn oven on or off
     def enable(self, enable):
-        self.oven.value = enable
-        self.control = enable
-        if enable:
-            self.offtime = 0
-            self.ontime = time.monotonic()
-            print("oven on")
-        else:
-            self.offtime = time.monotonic()
-            self.ontime = 0
-            print("oven off")
+        try:
+            self.oven.value = enable
+            self.control = enable
+            if enable:
+                self.offtime = 0
+                self.ontime = time.monotonic()
+                self.ontemp = self.sensor.temperature
+                print("oven on")
+            else:
+                self.offtime = time.monotonic()
+                self.ontime = 0
+                self.offtemp = self.sensor.temperature
+                print("oven off")
+        except AttributeError:
+            # bad sensor
+            pass
 
 class Graph(object):
     def __init__(self):
@@ -401,7 +421,7 @@ label_reflow = label.Label(font1, text="", max_glyphs=10,
 label_reflow.x = 0
 label_reflow.y = -20
 pyportal.splash.append(label_reflow)
-title_label = label.Label(font3, text="EZ Make Oven Controller")
+title_label = label.Label(font3, text=TITLE)
 title_label.x = 5
 title_label.y = 14
 pyportal.splash.append(title_label)
@@ -409,7 +429,7 @@ pyportal.splash.append(title_label)
 # version_label.x = 300
 # version_label.y = 40
 # pyportal.splash.append(version_label)
-message = label.Label(font2, text="Wait", max_glyphs=20)
+message = label.Label(font2, text="Wait", max_glyphs=30)
 message.x = 100
 message.y = 40
 pyportal.splash.append(message)
@@ -462,9 +482,10 @@ print("x range:", sgraph.xmin, sgraph.xmax)
 print("y range:", sgraph.ymin, sgraph.ymax)
 draw_profile(sgraph, oven.sprofile)
 buttons = []
-button = Button(x=0, y=200, width=80, height=40,
-                label="Start", label_font=font2)
-buttons.append(button)
+if oven.sensor_status:
+    button = Button(x=0, y=200, width=80, height=40,
+                    label="Start", label_font=font2)
+    buttons.append(button)
 
 for b in buttons:
     pyportal.splash.append(b.group)
@@ -482,6 +503,8 @@ while True:
         oven_temp = int(oven.sensor.temperature)
     except AttributeError:
         oven_temp = 32  # testing
+        oven.sensor_status = False
+        message.text = "Bad/missing temp sensor"
     if oven.control != last_control:
         last_control = oven.control
         if oven.control:
@@ -503,46 +526,47 @@ while True:
                 message.text = "Wait"
                 button.label = "Wait"
                 oven.set_state("wait")
-    if oven.state == "ready":
-        status = "Ready"
-        if last_state != "ready":
-            oven.beep.refresh()
-            draw_profile(sgraph, oven.sprofile)
-            timer_data.text = format_time(0)
-        if button.label != "Start":
-            button.label = "Start"
-    if oven.state == "start":
-        status = "Starting"
-        if last_state != "start":
-            timer = time.monotonic()
-    if oven.state == "preheat":
-        if last_state != "preheat":
-            timer = time.monotonic()  # reset timer when preheat starts
-        status = "Preheat"
-    if oven.state == "soak":
-        status = "Soak"
-    if oven.state == "reflow":
-        status = "Reflow"
-    if oven.state == "cool" or oven.state == "wait":
-        status = "Cool Down, Open Door"
-    if last_status != status:
-        message.text = status
-        last_status = status
+    if oven.sensor_status:
+        if oven.state == "ready":
+            status = "Ready"
+            if last_state != "ready":
+                oven.beep.refresh()
+                draw_profile(sgraph, oven.sprofile)
+                timer_data.text = format_time(0)
+            if button.label != "Start":
+                button.label = "Start"
+        if oven.state == "start":
+            status = "Starting"
+            if last_state != "start":
+                timer = time.monotonic()
+        if oven.state == "preheat":
+            if last_state != "preheat":
+                timer = time.monotonic()  # reset timer when preheat starts
+            status = "Preheat"
+        if oven.state == "soak":
+            status = "Soak"
+        if oven.state == "reflow":
+            status = "Reflow"
+        if oven.state == "cool" or oven.state == "wait":
+            status = "Cool Down, Open Door"
+        if last_status != status:
+            message.text = status
+            last_status = status
 
-    if oven_temp != last_temp:
-        last_temp = oven_temp
-        temp_data.text = str(oven_temp)
-    # update once per second when oven is active
-    if oven.state != "ready" and time.monotonic() - second_timer >= 1.0:
-        second_timer = time.monotonic()
-        oven.check_state()
-        if oven.state == "preheat" and last_state != "preheat":
-            timer = time.monotonic()  # reset timer at start of preheat
-        timediff = int(time.monotonic() - timer)
-        timer_data.text = format_time(timediff)
-        print(oven.state)
-        if oven_temp >= 50:
-            sgraph.draw_graph_point(int(timediff), oven_temp,
-                                    size=TEMP_SIZE, color=3)
+        if oven_temp != last_temp and oven.sensor_status:
+            last_temp = oven_temp
+            temp_data.text = str(oven_temp)
+        # update once per second when oven is active
+        if oven.state != "ready" and time.monotonic() - second_timer >= 1.0:
+            second_timer = time.monotonic()
+            oven.check_state()
+            if oven.state == "preheat" and last_state != "preheat":
+                timer = time.monotonic()  # reset timer at start of preheat
+            timediff = int(time.monotonic() - timer)
+            timer_data.text = format_time(timediff)
+            print(oven.state)
+            if oven_temp >= 50:
+                sgraph.draw_graph_point(int(timediff), oven_temp,
+                                        size=TEMP_SIZE, color=3)
 
-    last_state = oven.state
+        last_state = oven.state
