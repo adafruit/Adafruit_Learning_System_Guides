@@ -108,7 +108,7 @@ class ReflowOvenControl(object):
         with open("/profiles/" + self.config["profile"] + ".json", mode="r") as fpr:
             self.sprofile = json.load(fpr)
             fpr.close()
-        i2c = busio.I2C(board.SCL, board.SDA, frequency=200000)
+        i2c = busio.I2C(board.SCL, board.SDA, frequency=100000)
         try:
             self.sensor = MCP9600(i2c, self.config["sensor_address"], "K")
             self.ontemp = self.sensor.temperature
@@ -123,6 +123,10 @@ class ReflowOvenControl(object):
         self.reflow_start = 0
         self.beep = Beep()
         self.set_state("ready")
+        if self.sensor_status:
+            if self.sensor.temperature >= 50:
+                self.last_state = "wait"
+                self.set_state("wait")
 
     def reset(self):
         self.ontime = 0
@@ -217,8 +221,7 @@ class ReflowOvenControl(object):
                 checktime += 5
             if not checkoven:
                 # hold oven temperature
-                if (self.state in ("start", "preheat", "soak") and
-                        self.offtemp > self.sensor.temperature):
+                if self.state in ("start", "preheat", "soak") and self.offtemp > self.sensor.temperature:
                     checkoven = True
             self.enable(checkoven)
 
@@ -375,7 +378,7 @@ def draw_profile(graph, profile):
     # draw time line (horizontal)
     graph.draw_line(graph.xmin, graph.ymin, graph.xmax, graph.ymin, AXIS_SIZE, 4, 1)
     graph.draw_line(graph.xmin, graph.ymax - AXIS_SIZE, graph.xmax, graph.ymax
-                    - AXIS_SIZE, AXIS_SIZE, 4, 1)
+        - AXIS_SIZE, AXIS_SIZE, 4, 1)
     # draw time ticks
     tick = graph.xmin
     while tick < (graph.xmax - graph.xmin):
@@ -386,7 +389,7 @@ def draw_profile(graph, profile):
     # draw temperature line (vertical)
     graph.draw_line(graph.xmin, graph.ymin, graph.xmin, graph.ymax, AXIS_SIZE, 4, 1)
     graph.draw_line(graph.xmax - AXIS_SIZE, graph.ymin, graph.xmax - AXIS_SIZE,
-                    graph.ymax, AXIS_SIZE, 4, 1)
+        graph.ymax, AXIS_SIZE, 4, 1)
     # draw temperature ticks
     tick = graph.ymin
     while tick < (graph.ymax - graph.ymin)*1.1:
@@ -497,6 +500,7 @@ last_temp = 0
 last_state = "ready"
 last_control = False
 second_timer = time.monotonic()
+timer = time.monotonic()
 while True:
     board.DISPLAY.refresh_soon()
     oven.beep.refresh()  # this allows beeps less than one second in length
