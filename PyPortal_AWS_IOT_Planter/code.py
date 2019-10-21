@@ -58,6 +58,10 @@ esp32_reset = DigitalInOut(board.ESP_RESET)
 
 spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
 esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset)
+
+# Verify nina-fw version >= 1.4.0
+assert int(bytes(esp.firmware_version).decode("utf-8")[2]) >= 4, "Please update nina-fw to >=1.4.0."
+
 status_light = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.2)
 wifi = adafruit_esp32spi_wifimanager.ESPSPI_WiFiManager(
     esp, secrets, status_light)
