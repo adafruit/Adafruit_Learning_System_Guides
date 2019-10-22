@@ -1,6 +1,5 @@
 import time
 import json
-import board
 import displayio
 from adafruit_display_text.label import Label
 from adafruit_bitmap_font import bitmap_font
