@@ -15,33 +15,40 @@ from adafruit_button import Button
 import adafruit_touchscreen
 from adafruit_mcp9600 import MCP9600
 
-VERSION = "0.1"
+TITLE = "EZ Make Oven Controller"
+VERSION = "1.0.0"
+
+print(TITLE, "version ", VERSION)
+time.sleep(2)
 
 display_group = displayio.Group(max_size=20)
 board.DISPLAY.show(display_group)
 
-PLOT_SIZE = 2            # plot thickness
-PLOT_COLOR = 0x00FF55    # plot color
+PROFILE_SIZE = 2            # plot thickness
+PROFILE_COLOR = 0x00FF55    # plot color
 GRID_SIZE = 2
 GRID_COLOR = 0x2020FF
 GRID_STYLE = 3
 TEMP_SIZE = 2
-TEMP_COLOR = 0xFFFF00
+TEMP_COLOR = 0xFF0000
 LABEL_COLOR = 0x8080FF
+AXIS_SIZE = 2
+AXIS_COLOR = 0xFFFF00
 
 WIDTH = board.DISPLAY.width
 HEIGHT = board.DISPLAY.height
 
 pyportal = PyPortal()
 
-palette = displayio.Palette(4)
+palette = displayio.Palette(5)
 palette[0] = 0x0
-palette[1] = PLOT_COLOR
+palette[1] = PROFILE_COLOR
 palette[2] = GRID_COLOR
 palette[3] = TEMP_COLOR
+palette[4] = AXIS_COLOR
 palette.make_transparent(0)
 
-plot = displayio.Bitmap(WIDTH, HEIGHT, 3)
+plot = displayio.Bitmap(WIDTH, HEIGHT, 8)
 pyportal.splash.append(displayio.TileGrid(plot, pixel_shader=palette))
 
 ts = adafruit_touchscreen.Touchscreen(board.TOUCH_XL, board.TOUCH_XR,
@@ -97,12 +104,16 @@ class ReflowOvenControl(object):
         with open("/config.json", mode="r") as fpr:
             self.config = json.load(fpr)
             fpr.close()
+        self.sensor_status = False
         with open("/profiles/" + self.config["profile"] + ".json", mode="r") as fpr:
             self.sprofile = json.load(fpr)
             fpr.close()
-        i2c = busio.I2C(board.SCL, board.SDA, frequency=200000)
+        i2c = busio.I2C(board.SCL, board.SDA, frequency=100000)
         try:
             self.sensor = MCP9600(i2c, self.config["sensor_address"], "K")
+            self.ontemp = self.sensor.temperature
+            self.offtemp = self.ontemp
+            self.sensor_status = True
         except ValueError:
             print("temperature sensor not available")
         self.ontime = 0
@@ -112,6 +123,10 @@ class ReflowOvenControl(object):
         self.reflow_start = 0
         self.beep = Beep()
         self.set_state("ready")
+        if self.sensor_status:
+            if self.sensor.temperature >= 50:
+                self.last_state = "wait"
+                self.set_state("wait")
 
     def reset(self):
         self.ontime = 0
@@ -142,6 +157,8 @@ class ReflowOvenControl(object):
             temp = self.sensor.temperature
         except AttributeError:
             temp = 32  # sensor not available, use 32 for testing
+            self.sensor_status = False
+            # message.text = "Temperature sensor missing"
         self.beep.refresh()
         if self.state == "wait":
             self.enable(False)
@@ -202,20 +219,31 @@ class ReflowOvenControl(object):
                     checkoven = True
                     break
                 checktime += 5
+            if not checkoven:
+                # hold oven temperature
+                if (self.state in ("start", "preheat", "soak") and
+                        self.offtemp > self.sensor.temperature):
+                    checkoven = True
             self.enable(checkoven)
 
     # turn oven on or off
     def enable(self, enable):
-        self.oven.value = enable
-        self.control = enable
-        if enable:
-            self.offtime = 0
-            self.ontime = time.monotonic()
-            print("oven on")
-        else:
-            self.offtime = time.monotonic()
-            self.ontime = 0
-            print("oven off")
+        try:
+            self.oven.value = enable
+            self.control = enable
+            if enable:
+                self.offtime = 0
+                self.ontime = time.monotonic()
+                self.ontemp = self.sensor.temperature
+                print("oven on")
+            else:
+                self.offtime = time.monotonic()
+                self.ontime = 0
+                self.offtemp = self.sensor.temperature
+                print("oven off")
+        except AttributeError:
+            # bad sensor
+            pass
 
 class Graph(object):
     def __init__(self):
@@ -229,7 +257,7 @@ class Graph(object):
         self.height = HEIGHT
 
     # pylint: disable=too-many-branches
-    def draw_line(self, x1, y1, x2, y2, size=PLOT_SIZE, color=1, style=1):
+    def draw_line(self, x1, y1, x2, y2, size=PROFILE_SIZE, color=1, style=1):
         # print("draw_line:", x1, y1, x2, y2)
         # convert graph coords to screen coords
         x1p = (self.xstart + self.width * (x1 - self.xmin)
@@ -273,7 +301,7 @@ class Graph(object):
                     else:
                         self.draw_point(xx, yy, size, color)
 
-    def draw_graph_point(self, x, y, size=PLOT_SIZE, color=1):
+    def draw_graph_point(self, x, y, size=PROFILE_SIZE, color=1):
         """ draw point using graph coordinates """
         xx = (self.xstart + self.width * (x - self.xmin)
               // (self.xmax - self.xmin))
@@ -282,7 +310,7 @@ class Graph(object):
         print("graph point:", x, y, xx, yy)
         self.draw_point(xx, max(0 + size, yy), size, color)
 
-    def draw_point(self, x, y, size=PLOT_SIZE, color=1):
+    def draw_point(self, x, y, size=PROFILE_SIZE, color=1):
         """Draw data point on to the plot bitmap at (x,y)."""
         if y is None:
             return
@@ -342,17 +370,41 @@ def draw_profile(graph, profile):
     yp = (graph.ystart + int(graph.height * (y - graph.ymin)
                              / (graph.ymax - graph.ymin)))
 
-    label_reflow.x = xp
-    label_reflow.y = yp + 16  # fudge factor here to get close to line
+    label_reflow.x = xp + 10
+    label_reflow.y = HEIGHT - yp
     label_reflow.text = str(profile["stages"]["reflow"][1])
     print("reflow temp:", str(profile["stages"]["reflow"][1]))
+    print("graph point: ", x, y, "->", xp, yp)
+
+    # draw time line (horizontal)
+    graph.draw_line(graph.xmin, graph.ymin, graph.xmax, graph.ymin, AXIS_SIZE, 4, 1)
+    graph.draw_line(graph.xmin, graph.ymax - AXIS_SIZE, graph.xmax, graph.ymax
+                    - AXIS_SIZE, AXIS_SIZE, 4, 1)
+    # draw time ticks
+    tick = graph.xmin
+    while tick < (graph.xmax - graph.xmin):
+        graph.draw_line(tick, graph.ymin, tick, graph.ymin + 10, AXIS_SIZE, 4, 1)
+        graph.draw_line(tick, graph.ymax, tick, graph.ymax - 10 - AXIS_SIZE, AXIS_SIZE, 4, 1)
+        tick += 60
+
+    # draw temperature line (vertical)
+    graph.draw_line(graph.xmin, graph.ymin, graph.xmin, graph.ymax, AXIS_SIZE, 4, 1)
+    graph.draw_line(graph.xmax - AXIS_SIZE, graph.ymin, graph.xmax - AXIS_SIZE,
+                    graph.ymax, AXIS_SIZE, 4, 1)
+    # draw temperature ticks
+    tick = graph.ymin
+    while tick < (graph.ymax - graph.ymin)*1.1:
+        graph.draw_line(graph.xmin, tick, graph.xmin + 10, tick, AXIS_SIZE, 4, 1)
+        graph.draw_line(graph.xmax, tick, graph.xmax - 10 - AXIS_SIZE, tick, AXIS_SIZE, 4, 1)
+        tick += 50
+
     # draw profile
     x1 = profile["profile"][0][0]
     y1 = profile["profile"][0][1]
     for point in profile["profile"]:
         x2 = point[0]
         y2 = point[1]
-        graph.draw_line(x1, y1, x2, y2)
+        graph.draw_line(x1, y1, x2, y2, PROFILE_SIZE, 1, 1)
         # print(point)
         x1 = x2
         y1 = y2
@@ -374,48 +426,48 @@ label_reflow = label.Label(font1, text="", max_glyphs=10,
 label_reflow.x = 0
 label_reflow.y = -20
 pyportal.splash.append(label_reflow)
-title_label = label.Label(font3, text="EZ Make Oven Controller")
-title_label.x = 10
+title_label = label.Label(font3, text=TITLE)
+title_label.x = 5
 title_label.y = 14
 pyportal.splash.append(title_label)
 # version_label = label.Label(font1, text=VERSION, color=0xAAAAAA)
 # version_label.x = 300
 # version_label.y = 40
 # pyportal.splash.append(version_label)
-message = label.Label(font2, text="Wait", max_glyphs=20)
+message = label.Label(font2, text="Wait", max_glyphs=30)
 message.x = 100
-message.y = 50
+message.y = 40
 pyportal.splash.append(message)
-profile_label = label.Label(font1, text="Profile:", color=0xAAAAAA)
-profile_label.x = 10
-profile_label.y = 40
-pyportal.splash.append(profile_label)
-profile_data = label.Label(font1, text=oven.sprofile["title"])
-profile_data.x = 20
-profile_data.y = 60
-pyportal.splash.append(profile_data)
 alloy_label = label.Label(font1, text="Alloy: ", color=0xAAAAAA)
-alloy_label.x = 10
-alloy_label.y = 80
+alloy_label.x = 5
+alloy_label.y = 40
 pyportal.splash.append(alloy_label)
 alloy_data = label.Label(font1, text=str(oven.sprofile["alloy"]))
-alloy_data.x = 20
-alloy_data.y = 100
+alloy_data.x = 10
+alloy_data.y = 60
 pyportal.splash.append(alloy_data)
+profile_label = label.Label(font1, text="Profile:", color=0xAAAAAA)
+profile_label.x = 5
+profile_label.y = 80
+pyportal.splash.append(profile_label)
+profile_data = label.Label(font1, text=oven.sprofile["title"])
+profile_data.x = 10
+profile_data.y = 100
+pyportal.splash.append(profile_data)
 timer_label = label.Label(font1, text="Time:", color=0xAAAAAA)
-timer_label.x = 10
+timer_label.x = 5
 timer_label.y = 120
 pyportal.splash.append(timer_label)
 timer_data = label.Label(font3, text=format_time(timediff), max_glyphs=10)
-timer_data.x = 20
+timer_data.x = 10
 timer_data.y = 140
 pyportal.splash.append(timer_data)
 temp_label = label.Label(font1, text="Temp(C):", color=0xAAAAAA)
-temp_label.x = 10
+temp_label.x = 5
 temp_label.y = 160
 pyportal.splash.append(temp_label)
 temp_data = label.Label(font3, text="--", max_glyphs=10)
-temp_data.x = 20
+temp_data.x = 10
 temp_data.y = 180
 pyportal.splash.append(temp_data)
 circle = Circle(308, 12, 8, fill=0)
@@ -424,8 +476,8 @@ pyportal.splash.append(circle)
 sgraph = Graph()
 
 sgraph.xstart = 100
-sgraph.ystart = 0
-sgraph.width = 220
+sgraph.ystart = 4
+sgraph.width = 216
 sgraph.height = 160
 sgraph.xmin = oven.sprofile["time_range"][0]
 sgraph.xmax = oven.sprofile["time_range"][1]
@@ -435,9 +487,10 @@ print("x range:", sgraph.xmin, sgraph.xmax)
 print("y range:", sgraph.ymin, sgraph.ymax)
 draw_profile(sgraph, oven.sprofile)
 buttons = []
-button = Button(x=0, y=200, width=80, height=40,
-                label="Start", label_font=font2)
-buttons.append(button)
+if oven.sensor_status:
+    button = Button(x=0, y=200, width=80, height=40,
+                    label="Start", label_font=font2)
+    buttons.append(button)
 
 for b in buttons:
     pyportal.splash.append(b.group)
@@ -448,6 +501,7 @@ last_temp = 0
 last_state = "ready"
 last_control = False
 second_timer = time.monotonic()
+timer = time.monotonic()
 while True:
     board.DISPLAY.refresh_soon()
     oven.beep.refresh()  # this allows beeps less than one second in length
@@ -455,6 +509,8 @@ while True:
         oven_temp = int(oven.sensor.temperature)
     except AttributeError:
         oven_temp = 32  # testing
+        oven.sensor_status = False
+        message.text = "Bad/missing temp sensor"
     if oven.control != last_control:
         last_control = oven.control
         if oven.control:
@@ -476,46 +532,47 @@ while True:
                 message.text = "Wait"
                 button.label = "Wait"
                 oven.set_state("wait")
-    if oven.state == "ready":
-        status = "Ready"
-        if last_state != "ready":
-            oven.beep.refresh()
-            draw_profile(sgraph, oven.sprofile)
-            timer_data.text = format_time(0)
-        if button.label != "Start":
-            button.label = "Start"
-    if oven.state == "start":
-        status = "Starting"
-        if last_state != "start":
-            timer = time.monotonic()
-    if oven.state == "preheat":
-        if last_state != "preheat":
-            timer = time.monotonic()  # reset timer when preheat starts
-        status = "Preheat"
-    if oven.state == "soak":
-        status = "Soak"
-    if oven.state == "reflow":
-        status = "Reflow"
-    if oven.state == "cool" or oven.state == "wait":
-        status = "Cool Down, Open Door"
-    if last_status != status:
-        message.text = status
-        last_status = status
+    if oven.sensor_status:
+        if oven.state == "ready":
+            status = "Ready"
+            if last_state != "ready":
+                oven.beep.refresh()
+                draw_profile(sgraph, oven.sprofile)
+                timer_data.text = format_time(0)
+            if button.label != "Start":
+                button.label = "Start"
+        if oven.state == "start":
+            status = "Starting"
+            if last_state != "start":
+                timer = time.monotonic()
+        if oven.state == "preheat":
+            if last_state != "preheat":
+                timer = time.monotonic()  # reset timer when preheat starts
+            status = "Preheat"
+        if oven.state == "soak":
+            status = "Soak"
+        if oven.state == "reflow":
+            status = "Reflow"
+        if oven.state == "cool" or oven.state == "wait":
+            status = "Cool Down, Open Door"
+        if last_status != status:
+            message.text = status
+            last_status = status
 
-    if oven_temp != last_temp:
-        last_temp = oven_temp
-        temp_data.text = str(oven_temp)
-    # update once per second when oven is active
-    if oven.state != "ready" and time.monotonic() - second_timer >= 1.0:
-        second_timer = time.monotonic()
-        oven.check_state()
-        if oven.state == "preheat" and last_state != "preheat":
-            timer = time.monotonic()  # reset timer at start of preheat
-        timediff = int(time.monotonic() - timer)
-        timer_data.text = format_time(timediff)
-        print(oven.state)
-        if oven_temp >= 50:
-            sgraph.draw_graph_point(int(timediff), oven_temp,
-                                    size=TEMP_SIZE, color=3)
+        if oven_temp != last_temp and oven.sensor_status:
+            last_temp = oven_temp
+            temp_data.text = str(oven_temp)
+        # update once per second when oven is active
+        if oven.state != "ready" and time.monotonic() - second_timer >= 1.0:
+            second_timer = time.monotonic()
+            oven.check_state()
+            if oven.state == "preheat" and last_state != "preheat":
+                timer = time.monotonic()  # reset timer at start of preheat
+            timediff = int(time.monotonic() - timer)
+            timer_data.text = format_time(timediff)
+            print(oven.state)
+            if oven_temp >= 50:
+                sgraph.draw_graph_point(int(timediff), oven_temp,
+                                        size=TEMP_SIZE, color=3)
 
-    last_state = oven.state
+        last_state = oven.state
