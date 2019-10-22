@@ -141,4 +141,3 @@ class Thermometer_GFX(displayio.Group):
                                                    position=(0,0))
 
         self._icon_group.append(self._icon_sprite)
-
