@@ -1,6 +1,6 @@
 import time
-import board
 import array
+import board
 import audiobusio
 
 #---| User Configuration |---------------------------

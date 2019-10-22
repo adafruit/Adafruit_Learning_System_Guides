@@ -1,7 +1,7 @@
 import time
+import array
 import board
 import busio
-import array
 import audiobusio
 import displayio
 from adafruit_st7789 import ST7789
@@ -15,6 +15,7 @@ THRESHOLD = 100
 MIN_DELTAS = 5
 DELAY = 0.2
 
+#        octave = 1    2    3    4    5     6     7     8
 NOTES = { "C" : (33,  65, 131, 262, 523, 1047, 2093, 4186),
           "D" : (37,  73, 147, 294, 587, 1175, 2349, 4699),
           "E" : (41,  82, 165, 330, 659, 1319, 2637, 5274),
