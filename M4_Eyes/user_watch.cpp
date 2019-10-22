@@ -1,8 +1,8 @@
-#if 0 // Change to 0 to disable this code (must enable ONE user*.cpp only!)
+#if 0 // Change to 1 to enable this code (must enable ONE user*.cpp only!)
+// CORRESPONDING LINE IN HeatSensor.cpp MUST ALSO BE ENABLED!
 
 #include "globals.h"
 #include "heatSensor.h"
-
 
 // For heat sensing
 HeatSensor heatSensor;
