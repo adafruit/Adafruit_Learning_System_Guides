@@ -1,6 +1,5 @@
 import time
 import json
-import board
 import displayio
 from adafruit_display_text.label import Label
 from adafruit_bitmap_font import bitmap_font
@@ -138,5 +137,3 @@ class OpenWeather_Graphics(displayio.Group):
                                                    pixel_shader=displayio.ColorConverter(),
                                                    position=(0,0))
         self._icon_group.append(self._icon_sprite)
-        board.DISPLAY.refresh_soon()
-        board.DISPLAY.wait_for_frame()
