@@ -29,11 +29,9 @@ class Google_GFX(displayio.Group):
 
         # create background icon group
         self._icon_group = displayio.Group(max_size=3)
-        self.append(self._icon_group)
         self.display.show(self._icon_group)
         # create text object group
         self._text_group = displayio.Group(max_size=40)
-        self.append(self._text_group)
 
         print("Displaying splash screen")
         self._icon_sprite = None
@@ -146,5 +144,3 @@ class Google_GFX(displayio.Group):
                                                    position=(0,0))
 
         self._icon_group.append(self._icon_sprite)
-        self.display.refresh_soon()
-        self.display.wait_for_frame()
