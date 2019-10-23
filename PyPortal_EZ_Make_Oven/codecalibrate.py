@@ -4,7 +4,7 @@ import busio
 import digitalio
 from adafruit_mcp9600 import MCP9600
 
-SENSOR_ADDR = 0X60
+SENSOR_ADDR = 0X67
 
 i2c = busio.I2C(board.SCL, board.SDA,frequency=200000)
 sensor = MCP9600(i2c,SENSOR_ADDR,"K")
@@ -17,8 +17,8 @@ def oven_control(enable=False):
     oven.value = enable
 
 check_temp = 100
-print("This program will determine calibration settings for your oven ")
-print("to use with the EZ Make Oven Controller.\n\n")
+print("This program will determine calibration settings ")
+print("for your oven to use with the EZ Make Oven.\n\n")
 print("Calibration will start in 10 seconds...")
 time.sleep(10)
 print("Starting...")
