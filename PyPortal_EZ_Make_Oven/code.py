@@ -16,7 +16,7 @@ import adafruit_touchscreen
 from adafruit_mcp9600 import MCP9600
 
 TITLE = "EZ Make Oven Controller"
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 
 print(TITLE, "version ", VERSION)
 time.sleep(2)
@@ -532,6 +532,7 @@ while True:
                 message.text = "Wait"
                 button.label = "Wait"
                 oven.set_state("wait")
+            time.sleep(1)  # for debounce
     if oven.sensor_status:
         if oven.state == "ready":
             status = "Ready"
