@@ -13,4 +13,3 @@ while True:
     print("Magnetometer (micro-Teslas)): X=%0.3f Y=%0.3f Z=%0.3f"%mag.magnetic)
     print("")
     sleep(0.5)
-
