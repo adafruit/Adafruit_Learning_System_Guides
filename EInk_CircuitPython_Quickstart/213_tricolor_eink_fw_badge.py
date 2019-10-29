@@ -79,10 +79,10 @@ g.append(t)
 # Draw simple text using the built-in font into a displayio group
 # For smaller text, change scale=2 to scale=1
 text_group = displayio.Group(max_size=10, scale=2,
-                             x=DISPLAY_HEIGHT + 10, 
+                             x=DISPLAY_HEIGHT + 10,
                              y=int(DISPLAY_HEIGHT/2) - 13)
 first_name = "Limor"
-text_area = label.Label(terminalio.FONT, text=first_name, 
+text_area = label.Label(terminalio.FONT, text=first_name,
                         color=TEXT_COLOR)
 text_group.append(text_area)  # Add this text to the text group
 g.append(text_group)

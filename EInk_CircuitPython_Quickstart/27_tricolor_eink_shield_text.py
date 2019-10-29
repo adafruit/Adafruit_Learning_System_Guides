@@ -3,7 +3,6 @@
   Supported products:
   * Adafruit 2.7" Tri-Color ePaper Display Shield
     https://www.adafruit.com/product/4229
-
   This program requires the adafruit_il91874 and the
   adafruit_display_text library in /lib on the CIRCUITPY drive
   for CircuitPython 5.0 and above which has displayio support.
