@@ -38,7 +38,7 @@ try:
                                                     bitmap=displayio.Bitmap,
                                                     palette=displayio.Palette)
 # Or just use solid color
-except:
+except OSError:
     bg_bitmap = displayio.Bitmap(WIDTH, HEIGHT, 1)
     bg_palette = displayio.Palette(1)
     bg_palette[0] = BACKGROUND
@@ -82,6 +82,7 @@ splash.append(snow)
 display.show(splash)
 
 def clear_the_snow():
+    #pylint: disable=global-statement, redefined-outer-name
     global flakes, flake_pos, snow_depth
     display.auto_refresh = False
     for flake in flakes:
@@ -115,7 +116,7 @@ def add_snow(index, amount, steepness=2):
             # check depth to left AND right
             if snow_depth[x-1] - snow_depth[x] < steepness and \
                snow_depth[x+1] - snow_depth[x] < steepness:
-               add = True
+                add = True
         if add:
             location.append(x)
     # add where snow is not too steep
