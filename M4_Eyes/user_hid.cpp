@@ -3,11 +3,17 @@
 #include <Arduino.h>
 #include "Adafruit_TinyUSB.h"
 #include "globals.h"
+extern volatile uint16_t voiceLastReading, voiceMin, voiceMax; // In pdmvoice.cpp
 
 #define UP_BUTTON_KEYCODE_TO_SEND    HID_KEY_U
 #define A_BUTTON_KEYCODE_TO_SEND     HID_KEY_A
 #define DOWN_BUTTON_KEYCODE_TO_SEND  HID_KEY_D
 #define SHAKE_KEYCODE_TO_SEND        HID_KEY_SPACE
+// Sound reaction REQUIRES '"voice" : true' in config.eye,
+// even if not using sound output...we're using it to steal
+// access to the mic here.
+#define SOUND_KEYCODE_TO_SEND        HID_KEY_SPACE
+#define SOUND_THRESHOLD              10000
 
 // HID report descriptor using TinyUSB's template
 // Single Report (no ID) descriptor
@@ -60,6 +66,15 @@ void user_loop(void) {
     if (shake & 0x10) Serial.println(" single shake");
     keycode[3] = SHAKE_KEYCODE_TO_SEND;
   }
+
+  uint16_t p2p = voiceMax - voiceMin; // Max peak-to-peak since last reading
+  if(p2p) { // usu. non-zero if voice changer enabled
+    if(p2p > SOUND_THRESHOLD) {
+      Serial.println("Sound");
+      keycode[4] = SOUND_KEYCODE_TO_SEND;
+    }
+  }
+  voiceMin = voiceMax = 32768; // Reset p2p range for next pass
 
   bool anypressed = false;
   for (int k=0; k<sizeof(keycode); k++) {

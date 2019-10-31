@@ -27,11 +27,9 @@ class Azure_GFX(displayio.Group):
 
         # create background icon group
         self._icon_group = displayio.Group(max_size=3)
-        self.append(self._icon_group)
         board.DISPLAY.show(self._icon_group)
         # create text object group
         self._text_group = displayio.Group(max_size=9)
-        self.append(self._text_group)
 
         self._icon_sprite = None
         self._icon_file = None
@@ -142,6 +140,3 @@ class Azure_GFX(displayio.Group):
                                                    position=(0,0))
 
         self._icon_group.append(self._icon_sprite)
-        board.DISPLAY.refresh_soon()
-        board.DISPLAY.wait_for_frame()
-  

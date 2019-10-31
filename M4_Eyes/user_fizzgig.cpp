@@ -5,11 +5,11 @@
 
 // Servo stuff
 Servo myservo;
-#define SERVO_MOUTH_OPEN     0
-#define SERVO_MOUTH_CLOSED 180
-#define SERVO_PIN            3
+#define SERVO_MOUTH_OPEN    750 // Servo pulse microseconds
+#define SERVO_MOUTH_CLOSED 1850
+#define SERVO_PIN             3
 
-#define BUTTON_PIN           2
+#define BUTTON_PIN            2
 
 // WAV player stuff
 #define WAV_BUFFER_SIZE    256
@@ -66,7 +66,7 @@ void user_loop(void) {
     uint32_t elapsed = millis() - wavEventTime;                // Time since audio start
     uint16_t frac    = elapsed % 500;                          // 0 to 499 = 0.5 sec
     float    n       = 1.0 - ((float)abs(250 - frac) / 500.0); // Ramp 0.5, 1.0, 0.5 in 0.5 sec
-    myservo.write((int)((float)SERVO_MOUTH_CLOSED + (float)(SERVO_MOUTH_OPEN - SERVO_MOUTH_CLOSED) * n));
+    myservo.writeMicroseconds((int)((float)SERVO_MOUTH_CLOSED + (float)(SERVO_MOUTH_OPEN - SERVO_MOUTH_CLOSED) * n));
     // BUTTON_PIN button is ignored while sound is playing.
   } else if(wavListPtr) {
     // Not currently playing WAV. Check for button press on pin BUTTON_PIN.
@@ -79,7 +79,7 @@ void user_loop(void) {
     }
     pinMode(BUTTON_PIN, INPUT);
     if(myservo.attached()) { // If servo still active (from recent WAV playing)
-      myservo.write(SERVO_MOUTH_CLOSED); // Make sure it's in closed position
+      myservo.writeMicroseconds(SERVO_MOUTH_CLOSED); // Make sure it's in closed position
       // If it's been more than 1 sec since audio stopped,
       // deactivate the servo to reduce power, heat & noise.
       if((millis() - wavEventTime) > 1000) {

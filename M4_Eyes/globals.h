@@ -22,6 +22,8 @@
 
 GLOBAL_VAR Adafruit_Arcada arcada;
 
+GLOBAL_VAR bool      showSplashScreen    GLOBAL_INIT(true);   // Clear to suppress the splash screen
+
 #define MAX_DISPLAY_SIZE 240
 GLOBAL_VAR int       DISPLAY_SIZE        GLOBAL_INIT(240);    // Start with assuming a 240x240 display
 GLOBAL_VAR int       DISPLAY_X_OFFSET    GLOBAL_INIT(0);      // Used with rectangular screens
@@ -67,6 +69,11 @@ GLOBAL_VAR float     irisMin             GLOBAL_INIT(0.45);
 GLOBAL_VAR float     irisRange           GLOBAL_INIT(0.35);
 GLOBAL_VAR bool      tracking            GLOBAL_INIT(true);
 GLOBAL_VAR float     trackFactor         GLOBAL_INIT(0.5);
+
+// Random eye motion: provided by the base project, but overridable by user code.
+GLOBAL_VAR bool      moveEyesRandomly    GLOBAL_INIT(true);   // Clear to suppress random eye motion and let user code control it
+GLOBAL_VAR float     eyeTargetX          GLOBAL_INIT(0.0);  // THen set these continuously in user_loop.
+GLOBAL_VAR float     eyeTargetY          GLOBAL_INIT(0.0);  // Range is from -1.0 to +1.0.
 
 // Pin definition stuff will go here
 
