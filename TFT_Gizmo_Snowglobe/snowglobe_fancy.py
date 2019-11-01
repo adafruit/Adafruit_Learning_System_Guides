@@ -46,6 +46,7 @@ try:
                                                     palette=displayio.Palette)
 # Or just use solid color
 except (OSError, TypeError):
+    BACKGROUND = BACKGROUND if isinstance(BACKGROUND, int) else 0x000000
     bg_bitmap = displayio.Bitmap(WIDTH, HEIGHT, 1)
     bg_palette = displayio.Palette(1)
     bg_palette[0] = BACKGROUND
