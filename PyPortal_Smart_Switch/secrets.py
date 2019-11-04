@@ -8,4 +8,3 @@ secrets = {
     'aio_username' : 'CHANGE ME',
     'aio_key' : 'CHANGE ME',
 }
-
