@@ -7,7 +7,6 @@ import adafruit_esp32spi.adafruit_esp32spi_socket as socket
 from adafruit_esp32spi import adafruit_esp32spi
 import adafruit_requests as requests
 import digitalio
-import displayio
 import analogio
 from adafruit_pyportal import PyPortal
 from adafruit_display_shapes.circle import Circle
@@ -62,7 +61,6 @@ if esp.status == adafruit_esp32spi.WL_IDLE_STATUS:
     print("MAC addr:", [hex(i) for i in esp.MAC_address])
 
 pyportal = PyPortal(esp=esp, external_spi=spi)
-#light = analogio.AnalogIn(board.LIGHT)
 
 for ap in esp.scan_networks():
     print("\t%s\t\tRSSI: %d" % (str(ap['ssid'], 'utf-8'), ap['rssi']))
@@ -102,15 +100,15 @@ def create_text_areas(configs):
     return text_areas
 
 class Switch(object):
-    def __init__(self, pin, pyportal):
+    def __init__(self, pin, my_pyportal):
         self.switch = digitalio.DigitalInOut(pin)
         self.switch.direction = digitalio.Direction.OUTPUT
         rect = RoundRect(SWITCHX, SWITCHY, 31, 60, 16, fill=0x0, outline=DISPLAY_COLOR, stroke=3)
-        pyportal.splash.append(rect)
+        my_pyportal.splash.append(rect)
         self.circle_on = Circle(SWITCHX + 15, SWITCHY + 16, 10, fill=0x0)
-        pyportal.splash.append(self.circle_on)
+        my_pyportal.splash.append(self.circle_on)
         self.circle_off = Circle(SWITCHX + 15, SWITCHY + 42, 10, fill=DISPLAY_COLOR)
-        pyportal.splash.append(self.circle_off)
+        my_pyportal.splash.append(self.circle_off)
 
     # turn switch on or off
     def enable(self, enable):
@@ -124,7 +122,7 @@ class Switch(object):
             self.circle_off.fill = DISPLAY_COLOR
 
     def toggle(self):
-        if self.switch.value == True:
+        if self.switch.value:
             self.enable(False)
         else:
             self.enable(True)
@@ -137,26 +135,28 @@ TIME_SERVICE = "http://io.adafruit.com/api/v2/%s/integrations/time/strftime?x-ai
 # See https://apidock.com/ruby/DateTime/strftime for full options
 TIME_SERVICE_TIMESTAMP = '&fmt=%25s+%25z'
 
-class Clock(object):
+class Clock(object, my_pyportal):
     def __init__(self):
         self.low_light = False
         self.update_time = None
         self.snapshot_time = None
+        self.pyportal = my_pyportal
+        self.current_time = 0
         self.light = analogio.AnalogIn(board.LIGHT)
         text_area_configs = [dict(x=0, y=110, size=72, color=DISPLAY_COLOR, font=time_font),
                              dict(x=260, y=165, size=18, color=DISPLAY_COLOR, font=ampm_font),
                              dict(x=10, y=40, size=18, color=DISPLAY_COLOR, font=date_font)]
         self.text_areas = create_text_areas(text_area_configs)
         for ta in self.text_areas:
-            pyportal.splash.append(ta)
+            self.pyportal.splash.append(ta)
 
     def adjust_backlight(self, force=False):
         """Check light level. Adjust the backlight and background image if it's dark."""
         if force or (self.light.value >= 1500 and self.low_light):
-            pyportal.set_backlight(1.00)
+            self.pyportal.set_backlight(1.00)
             self.low_light = False
         elif self.light.value <= 1000 and not self.low_light:
-            pyportal.set_backlight(0.1)
+            self.pyportal.set_backlight(0.1)
             self.low_light = True
 
     def tick(self, now):
@@ -228,6 +228,8 @@ class Clock(object):
         gc.collect()
         return int(seconds + tzseconds)
 
+# Define callback methods which are called when events occur
+# pylint: disable=unused-argument, redefined-outer-name
 def connected(client, userdata, flags, rc):
     # This function will be called when the client is connected
     # successfully to the broker.
@@ -263,7 +265,7 @@ mqtt_client.on_disconnect = disconnected
 mqtt_client.on_message = message
 
 mqtt_client.connect()
-clock = Clock()
+clock = Clock(pyportal)
 switch = Switch(board.D4, pyportal)
 
 second_timer = time.monotonic()
