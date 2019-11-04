@@ -105,8 +105,6 @@ def slide_tiles():
     """Move the tilegrid to the left, one pixel at a time, a full time width"""
     for _ in range(16):
         tilegrid.x -= 1
-        display.refresh_soon()
-        display.wait_for_frame()
 
 def shift_tiles():
     """Move tiles one spot to the left, and reset the tilegrid's position"""
