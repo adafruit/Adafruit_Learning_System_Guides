@@ -85,8 +85,49 @@ date_font.load_glyphs(b'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')
 time_font = bitmap_font.load_font("/fonts/RobotoMono-72.bdf")
 time_font.load_glyphs(b'0123456789:')
 
-#spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
-#_esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset)
+def get_local_timestamp(self, location=None):
+    # pylint: disable=line-too-long
+    """Fetch and "set" the local time of this microcontroller to the local time at the location, using an internet time API.
+    :param str location: Your city and country, e.g. ``"New York, US"``.
+    """
+    # pylint: enable=line-too-long
+    api_url = None
+    try:
+        aio_username = secrets['aio_username']
+        aio_key = secrets['aio_key']
+    except KeyError:
+        raise KeyError("\n\nOur time service requires a login/password to rate-limit. Please register for a free adafruit.io account and place the user/key in your secrets file under 'aio_username' and 'aio_key'")# pylint: disable=line-too-long
+
+    location = secrets.get('timezone', location)
+    if location:
+        print("Getting time for timezone", location)
+        api_url = (TIME_SERVICE + "&tz=%s") % (aio_username, aio_key, location)
+    else: # we'll try to figure it out from the IP address
+        print("Getting time from IP address")
+        api_url = TIME_SERVICE % (aio_username, aio_key)
+    api_url += TIME_SERVICE_TIMESTAMP
+    try:
+        print("api_url:",api_url)
+        response = requests.get(api_url)
+        times = response.text.split(' ')
+        seconds = int(times[0])
+        tzoffset = times[1]
+        tzhours = int(tzoffset[0:3])
+        tzminutes = int(tzoffset[3:5])
+        tzseconds = tzhours * 60 * 60
+        if tzseconds < 0:
+            tzseconds -= tzminutes * 60
+        else:
+            tzseconds += tzminutes * 60
+        print(seconds + tzseconds, tzoffset, tzhours, tzminutes)
+    except KeyError:
+        raise KeyError("Was unable to lookup the time, try setting secrets['timezone'] according to http://worldtimeapi.org/timezones")  # pylint: disable=line-too-long
+
+    # now clean up
+    response.close()
+    response = None
+    gc.collect()
+    return int(seconds + tzseconds)
 
 def create_text_areas(configs):
     """Given a list of area specifications, create and return text areas."""
@@ -135,8 +176,8 @@ TIME_SERVICE = "http://io.adafruit.com/api/v2/%s/integrations/time/strftime?x-ai
 # See https://apidock.com/ruby/DateTime/strftime for full options
 TIME_SERVICE_TIMESTAMP = '&fmt=%25s+%25z'
 
-class Clock(object, my_pyportal):
-    def __init__(self):
+class Clock(object):
+    def __init__(self, my_pyportal):
         self.low_light = False
         self.update_time = None
         self.snapshot_time = None
@@ -165,7 +206,7 @@ class Clock(object, my_pyportal):
             # Update the time
             print("update the time")
             self.update_time = int(now)
-            self.snapshot_time = self.get_local_timestamp(secrets['timezone'])
+            self.snapshot_time = get_local_timestamp(secrets['timezone'])
             self.current_time = time.localtime(self.snapshot_time)
         else:
             self.current_time = time.localtime(int(now) - self.update_time + self.snapshot_time)
@@ -180,53 +221,10 @@ class Clock(object, my_pyportal):
         if self.current_time.tm_hour >= 12:
             ampm_string = "PM"
         self.text_areas[1].text = ampm_string
-        self.text_areas[2].text = months[int(self.current_time.tm_mon - 1)] + " " + str(self.current_time.tm_mday)
+        self.text_areas[2].text = (months[int(self.current_time.tm_mon - 1)] + 
+                                   " " + str(self.current_time.tm_mday))
         board.DISPLAY.refresh_soon()
         board.DISPLAY.wait_for_frame()
-
-    def get_local_timestamp(self, location=None):
-        # pylint: disable=line-too-long
-        """Fetch and "set" the local time of this microcontroller to the local time at the location, using an internet time API.
-        :param str location: Your city and country, e.g. ``"New York, US"``.
-        """
-        # pylint: enable=line-too-long
-        api_url = None
-        try:
-            aio_username = secrets['aio_username']
-            aio_key = secrets['aio_key']
-        except KeyError:
-            raise KeyError("\n\nOur time service requires a login/password to rate-limit. Please register for a free adafruit.io account and place the user/key in your secrets file under 'aio_username' and 'aio_key'")# pylint: disable=line-too-long
-
-        location = secrets.get('timezone', location)
-        if location:
-            print("Getting time for timezone", location)
-            api_url = (TIME_SERVICE + "&tz=%s") % (aio_username, aio_key, location)
-        else: # we'll try to figure it out from the IP address
-            print("Getting time from IP address")
-            api_url = TIME_SERVICE % (aio_username, aio_key)
-        api_url += TIME_SERVICE_TIMESTAMP
-        try:
-            print("api_url:",api_url)
-            response = requests.get(api_url)
-            times = response.text.split(' ')
-            seconds = int(times[0])
-            tzoffset = times[1]
-            tzhours = int(tzoffset[0:3])
-            tzminutes = int(tzoffset[3:5])
-            tzseconds = tzhours * 60 * 60
-            if tzseconds < 0:
-                tzseconds -= tzminutes * 60
-            else:
-                tzseconds += tzminutes * 60
-            print(seconds + tzseconds, tzoffset, tzhours, tzminutes)
-        except KeyError:
-            raise KeyError("Was unable to lookup the time, try setting secrets['timezone'] according to http://worldtimeapi.org/timezones")  # pylint: disable=line-too-long
-
-        # now clean up
-        response.close()
-        response = None
-        gc.collect()
-        return int(seconds + tzseconds)
 
 # Define callback methods which are called when events occur
 # pylint: disable=unused-argument, redefined-outer-name
