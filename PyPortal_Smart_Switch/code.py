@@ -2,9 +2,9 @@ import time
 import gc
 import board
 import busio
-import adafruit_esp32spi
-import adafruit_esp32spi.adafruit_esp32spi_socket as socket
-from adafruit_esp32spi import adafruit_esp32spi
+from import adafruit_esp32spi import adafruit_esp32spi_socket as socket
+#import adafruit_esp32spi.adafruit_esp32spi_socket as socket
+from adafruit_esp32spi import adafruit_esp32spi, adafruit_esp32spi_wifimanager
 import adafruit_requests as requests
 import digitalio
 import analogio
@@ -15,7 +15,6 @@ from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text import label
 import adafruit_touchscreen
 
-from adafruit_esp32spi import adafruit_esp32spi_wifimanager
 from adafruit_minimqtt import MQTT
 
 DISPLAY_COLOR = 0x4444FF
@@ -85,7 +84,7 @@ date_font.load_glyphs(b'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')
 time_font = bitmap_font.load_font("/fonts/RobotoMono-72.bdf")
 time_font.load_glyphs(b'0123456789:')
 
-def get_local_timestamp(self, location=None):
+def get_local_timestamp(location=None):
     # pylint: disable=line-too-long
     """Fetch and "set" the local time of this microcontroller to the local time at the location, using an internet time API.
     :param str location: Your city and country, e.g. ``"New York, US"``.
@@ -221,7 +220,7 @@ class Clock(object):
         if self.current_time.tm_hour >= 12:
             ampm_string = "PM"
         self.text_areas[1].text = ampm_string
-        self.text_areas[2].text = (months[int(self.current_time.tm_mon - 1)] + 
+        self.text_areas[2].text = (months[int(self.current_time.tm_mon - 1)] +
                                    " " + str(self.current_time.tm_mday))
         board.DISPLAY.refresh_soon()
         board.DISPLAY.wait_for_frame()
