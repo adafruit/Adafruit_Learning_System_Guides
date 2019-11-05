@@ -3,7 +3,6 @@ import gc
 import board
 import busio
 from adafruit_esp32spi import adafruit_esp32spi_socket as socket
-#import adafruit_esp32spi.adafruit_esp32spi_socket as socket
 from adafruit_esp32spi import adafruit_esp32spi, adafruit_esp32spi_wifimanager
 import adafruit_requests as requests
 import digitalio
@@ -25,64 +24,9 @@ SWITCHY = 4
 
 FEED_NAME = "pyportal-switch"
 
-try:
-    from secrets import secrets
-except ImportError:
-    print("""WiFi settings are kept in secrets.py, please add them there!
-the secrets dictionary must contain 'ssid' and 'password' at a minimum""")
-    raise
-
-esp32_cs = digitalio.DigitalInOut(board.ESP_CS)
-esp32_ready = digitalio.DigitalInOut(board.ESP_BUSY)
-esp32_reset = digitalio.DigitalInOut(board.ESP_RESET)
-
-WIDTH = board.DISPLAY.width
-HEIGHT = board.DISPLAY.height
-
-ts = adafruit_touchscreen.Touchscreen(board.TOUCH_XL, board.TOUCH_XR,
-                                      board.TOUCH_YD, board.TOUCH_YU,
-                                      calibration=(
-                                          (5200, 59000),
-                                          (5800, 57000)
-                                          ),
-                                      size=(WIDTH, HEIGHT))
-
 months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN",
           "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"]
 
-spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
-esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset, debug=False)
-requests.set_socket(socket, esp)
-
-if esp.status == adafruit_esp32spi.WL_IDLE_STATUS:
-    print("ESP32 found and in idle mode")
-    print("Firmware vers.", esp.firmware_version)
-    print("MAC addr:", [hex(i) for i in esp.MAC_address])
-
-pyportal = PyPortal(esp=esp, external_spi=spi)
-
-for ap in esp.scan_networks():
-    print("\t%s\t\tRSSI: %d" % (str(ap['ssid'], 'utf-8'), ap['rssi']))
-
-    print("Connecting to AP...")
-    while not esp.is_connected:
-        try:
-            esp.connect_AP(secrets['ssid'], secrets['password'])
-        except RuntimeError as e:
-            print("could not connect to AP, retrying: ",e)
-            continue
-print("Connected to", str(esp.ssid, 'utf-8'), "\tRSSI:", esp.rssi)
-print("My IP address is", esp.pretty_ip(esp.ip_address))
-
-wifi = adafruit_esp32spi_wifimanager.ESPSPI_WiFiManager(
-    esp, secrets, debug = True)
-
-ampm_font = bitmap_font.load_font("/fonts/RobotoMono-18.bdf")
-ampm_font.load_glyphs(b'ampAMP')
-date_font = bitmap_font.load_font("/fonts/RobotoMono-18.bdf")
-date_font.load_glyphs(b'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')
-time_font = bitmap_font.load_font("/fonts/RobotoMono-72.bdf")
-time_font.load_glyphs(b'0123456789:')
 
 def get_local_timestamp(location=None):
     # pylint: disable=line-too-long
@@ -183,10 +127,11 @@ class Clock(object):
         self.pyportal = my_pyportal
         self.current_time = 0
         self.light = analogio.AnalogIn(board.LIGHT)
-        text_area_configs = [dict(x=0, y=110, size=72, color=DISPLAY_COLOR, font=time_font),
-                             dict(x=260, y=165, size=18, color=DISPLAY_COLOR, font=ampm_font),
-                             dict(x=10, y=40, size=18, color=DISPLAY_COLOR, font=date_font)]
+        text_area_configs = [dict(x=0, y=110, size=10, color=DISPLAY_COLOR, font=time_font),
+                             dict(x=260, y=165, size=3, color=DISPLAY_COLOR, font=ampm_font),
+                             dict(x=10, y=40, size=20, color=DISPLAY_COLOR, font=date_font)]
         self.text_areas = create_text_areas(text_area_configs)
+        self.text_areas[2].text = "starting ..."
         for ta in self.text_areas:
             self.pyportal.splash.append(ta)
 
@@ -250,6 +195,66 @@ def message(client, topic, message):
 
 ############################################
 
+try:
+    from secrets import secrets
+except ImportError:
+    print("""WiFi settings are kept in secrets.py, please add them there!
+the secrets dictionary must contain 'ssid' and 'password' at a minimum""")
+    raise
+
+esp32_cs = digitalio.DigitalInOut(board.ESP_CS)
+esp32_ready = digitalio.DigitalInOut(board.ESP_BUSY)
+esp32_reset = digitalio.DigitalInOut(board.ESP_RESET)
+
+WIDTH = board.DISPLAY.width
+HEIGHT = board.DISPLAY.height
+
+ts = adafruit_touchscreen.Touchscreen(board.TOUCH_XL, board.TOUCH_XR,
+                                      board.TOUCH_YD, board.TOUCH_YU,
+                                      calibration=(
+                                          (5200, 59000),
+                                          (5800, 57000)
+                                          ),
+                                      size=(WIDTH, HEIGHT))
+
+spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
+esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset, debug=False)
+requests.set_socket(socket, esp)
+
+if esp.status == adafruit_esp32spi.WL_IDLE_STATUS:
+    print("ESP32 found and in idle mode")
+    print("Firmware vers.", esp.firmware_version)
+    print("MAC addr:", [hex(i) for i in esp.MAC_address])
+
+pyportal = PyPortal(esp=esp, external_spi=spi)
+
+ampm_font = bitmap_font.load_font("/fonts/RobotoMono-18.bdf")
+ampm_font.load_glyphs(b'ampAMP')
+date_font = bitmap_font.load_font("/fonts/RobotoMono-18.bdf")
+date_font.load_glyphs(b'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789')
+time_font = bitmap_font.load_font("/fonts/RobotoMono-72.bdf")
+time_font.load_glyphs(b'0123456789:')
+
+clock = Clock(pyportal)
+
+for ap in esp.scan_networks():
+    print("\t%s\t\tRSSI: %d" % (str(ap['ssid'], 'utf-8'), ap['rssi']))
+
+    print("Connecting to AP...")
+    while not esp.is_connected:
+        try:
+            esp.connect_AP(secrets['ssid'], secrets['password'])
+        except RuntimeError as e:
+            print("could not connect to AP, retrying: ",e)
+            continue
+print("Connected to", str(esp.ssid, 'utf-8'), "\tRSSI:", esp.rssi)
+print("My IP address is", esp.pretty_ip(esp.ip_address))
+
+
+wifi = adafruit_esp32spi_wifimanager.ESPSPI_WiFiManager(
+    esp, secrets, debug = True)
+
+
 # Set up a MiniMQTT Client
 mqtt_client = MQTT(socket,
                    broker='io.adafruit.com',
@@ -262,7 +267,7 @@ mqtt_client.on_disconnect = disconnected
 mqtt_client.on_message = message
 
 mqtt_client.connect()
-clock = Clock(pyportal)
+
 switch = Switch(board.D4, pyportal)
 
 second_timer = time.monotonic()
