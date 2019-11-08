@@ -32,4 +32,3 @@ while True:
     else:
         if cpx.tapped:
             play_it(0)
-
