@@ -2,7 +2,7 @@ from random import randrange
 import board
 import busio
 import displayio
-from adafruit_st7789 import ST7789
+from adafruit_gizmo import tft_gizmo
 import adafruit_imageload
 import adafruit_lis3dh
 
@@ -24,20 +24,8 @@ SHAKE_THRESHOLD = 27               # shake sensitivity, lower=more sensitive
 accelo_i2c = busio.I2C(board.ACCELEROMETER_SCL, board.ACCELEROMETER_SDA)
 accelo = adafruit_lis3dh.LIS3DH_I2C(accelo_i2c, address=0x19)
 
-# Display setup
-WIDTH = 240
-HEIGHT = 240
-displayio.release_displays()
-
-spi = busio.SPI(board.SCL, MOSI=board.SDA)
-tft_cs = board.RX
-tft_dc = board.TX
-tft_backlight = board.A3
-
-display_bus = displayio.FourWire(spi, command=tft_dc, chip_select=tft_cs)
-
-display = ST7789(display_bus, width=WIDTH, height=HEIGHT, rowstart=80,
-                 backlight_pin=tft_backlight, rotation=180)
+# Create the TFT Gizmo display
+display = tft_gizmo.TFT_Gizmo()
 
 # Load background image
 try:
@@ -47,7 +35,7 @@ try:
 # Or just use solid color
 except (OSError, TypeError):
     BACKGROUND = BACKGROUND if isinstance(BACKGROUND, int) else 0x000000
-    bg_bitmap = displayio.Bitmap(WIDTH, HEIGHT, 1)
+    bg_bitmap = displayio.Bitmap(display.width, display.height, 1)
     bg_palette = displayio.Palette(1)
     bg_palette[0] = BACKGROUND
 background = displayio.TileGrid(bg_bitmap, pixel_shader=bg_palette)
@@ -71,16 +59,16 @@ for _ in range(NUM_FLAKES):
                                      height = 1,
                                      tile_width = FLAKE_WIDTH,
                                      tile_height = FLAKE_HEIGHT,
-                                     x = randrange(0, WIDTH),
+                                     x = randrange(0, display.width),
                                      default_tile=randrange(0, NUM_SPRITES)))
 
 # Snowfield setup
-snow_depth = [HEIGHT] * WIDTH
+snow_depth = [display.height] * display.width
 snow_palette = displayio.Palette(2)
 snow_palette[0] = 0xADAF00   # transparent color
 snow_palette[1] = SNOW_COLOR # snow color
 snow_palette.make_transparent(0)
-snow_bitmap = displayio.Bitmap(WIDTH, HEIGHT, len(snow_palette))
+snow_bitmap = displayio.Bitmap(display.width, display.height, len(snow_palette))
 snow = displayio.TileGrid(snow_bitmap, pixel_shader=snow_palette)
 
 # Add everything to display
@@ -98,13 +86,13 @@ def clear_the_snow():
         # set to a random sprite
         flake[0] = randrange(0, NUM_SPRITES)
         # set to a random x location
-        flake.x = randrange(0, WIDTH)
+        flake.x = randrange(0, display.width)
     # set random y locations, off screen to start
-    flake_pos = [-1.0*randrange(0, HEIGHT) for _ in range(NUM_FLAKES)]
+    flake_pos = [-1.0*randrange(0, display.height) for _ in range(NUM_FLAKES)]
     # reset snow level
-    snow_depth = [HEIGHT] * WIDTH
+    snow_depth = [display.height] * display.width
     # and snow bitmap
-    for i in range(WIDTH*HEIGHT):
+    for i in range(display.width*display.height):
         snow_bitmap[i] = 0
     display.auto_refresh = True
 
@@ -117,11 +105,11 @@ def add_snow(index, amount, steepness=2):
             # check depth to right
             if snow_depth[x+1] - snow_depth[x] < steepness:
                 add = True
-        elif x == WIDTH - 1:
+        elif x == display.width - 1:
             # check depth to left
             if snow_depth[x-1] - snow_depth[x] < steepness:
                 add = True
-        elif 0 < x < WIDTH - 1:
+        elif 0 < x < display.width - 1:
             # check depth to left AND right
             if snow_depth[x-1] - snow_depth[x] < steepness and \
                snow_depth[x+1] - snow_depth[x] < steepness:
@@ -138,7 +126,7 @@ def add_snow(index, amount, steepness=2):
 while True:
     clear_the_snow()
     # loop until globe is full of snow
-    while snow_depth.count(0) < WIDTH:
+    while snow_depth.count(0) < display.width:
         # check for shake
         if accelo.shake(SHAKE_THRESHOLD, 5, 0):
             break
@@ -153,6 +141,6 @@ while True:
                 # reset flake to top
                 flake_pos[i] = 0
                 # at a new x location
-                flake.x = randrange(0, WIDTH)
+                flake.x = randrange(0, display.width)
             flake.y = int(flake_pos[i])
         display.refresh()
