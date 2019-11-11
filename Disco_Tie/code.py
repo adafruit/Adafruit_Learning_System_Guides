@@ -147,7 +147,7 @@ def larsen(wait):
     color_dark = (int(user_color[0]/8), int(user_color[1]/8),
                   int(user_color[2]/8))
     color_med = (int(user_color[0]/2), int(user_color[1]/2),
-                int(user_color[2]/2))
+                  int(user_color[2]/2))
 
     larsen_set(pos - 2, color_dark)
     larsen_set(pos - 1, color_med)
