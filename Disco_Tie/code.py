@@ -25,7 +25,7 @@ uart_server = UARTServer()
 # User input vars
 mode = 0 # 0=audio, 1=rainbow, 2=larsen_scanner, 3=solid
 user_color= (127,0,0)
-speed = 5.0 # for larsen scanner
+speed = 6.0 # for larsen scanner
 
 # Audio meter vars
 PEAK_COLOR = (100, 0, 255)
@@ -147,7 +147,7 @@ def larsen(wait):
     color_dark = (int(user_color[0]/8), int(user_color[1]/8),
                   int(user_color[2]/8))
     color_med = (int(user_color[0]/2), int(user_color[1]/2),
-                  int(user_color[2]/2))
+                 int(user_color[2]/2))
 
     larsen_set(pos - 2, color_dark)
     larsen_set(pos - 1, color_med)
@@ -194,7 +194,6 @@ def change_speed(val):
     elif new_speed < 1.0:
         new_speed = 1.0
     speed = new_speed
-    print("set speed " + str(speed))
 
 while True:
     # While BLE is *not* connected
@@ -209,7 +208,6 @@ while True:
 
             # Received ColorPacket
             if isinstance(packet, ColorPacket):
-                print("color received: " + str(packet.color))
                 user_color = packet.color
 
             # Received ButtonPacket
