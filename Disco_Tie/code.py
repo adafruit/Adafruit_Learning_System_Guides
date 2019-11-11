@@ -4,9 +4,10 @@ LED Disco Tie with Bluetooth
 Give your suit an sound-reactive upgrade with Circuit
 Playground Bluefruit & Neopixels. Set color and animation
 mode using the Bluefruit LE Connect app.
- 
+
 Author: Collin Cunningham for Adafruit Industries, 2019
 """
+# pylint: disable=global-statement
 
 import time
 import array
@@ -78,25 +79,25 @@ input_floor = normalized_rms(samples) + 10
 input_ceiling = input_floor + 500
 peak = 0
 
-def wheel(pos):
+def wheel(wheel_pos):
     # Input a value 0 to 255 to get a color value.
     # The colours are a transition r - g - b - back to r.
-    if pos < 0 or pos > 255:
+    if wheel_pos < 0 or wheel_pos > 255:
         r = g = b = 0
-    elif pos < 85:
-        r = int(pos * 3)
-        g = int(255 - pos*3)
+    elif wheel_pos < 85:
+        r = int(wheel_pos * 3)
+        g = int(255 - wheel_pos*3)
         b = 0
-    elif pos < 170:
-        pos -= 85
-        r = int(255 - pos*3)
+    elif wheel_pos < 170:
+        wheel_pos -= 85
+        r = int(255 - wheel_pos*3)
         g = 0
-        b = int(pos*3)
+        b = int(wheel_pos*3)
     else:
-        pos -= 170
+        wheel_pos -= 170
         r = 0
-        g = int(pos*3)
-        b = int(255 - pos*3)
+        g = int(wheel_pos*3)
+        b = int(255 - wheel_pos*3)
     return (r, g, b)
 
 def rainbow_cycle(wait):
@@ -114,7 +115,7 @@ def audio_meter():
 
     # Compute scaled logarithmic reading in the range 0 to NUM_PIXELS
     c = log_scale(constrain(magnitude, input_floor, input_ceiling),
-                    input_floor, input_ceiling, 0, NUM_PIXELS)
+                  input_floor, input_ceiling, 0, NUM_PIXELS)
 
     # Light up pixels that are below the scaled and interpolated magnitude.
     pixels.fill(0)
@@ -135,7 +136,7 @@ direction = 1  # direction of "eye"
 
 def larsen_set(index, color):
     if index < 0:
-       return
+        return
     else:
         pixels[index] = color
 
@@ -144,9 +145,9 @@ def larsen(wait):
     global direction
 
     color_dark = (int(user_color[0]/8), int(user_color[1]/8),
-                    int(user_color[2]/8))
+                  int(user_color[2]/8))
     color_med = (int(user_color[0]/2), int(user_color[1]/2),
-                    int(user_color[2]/2))
+                  int(user_color[2]/2))
 
     larsen_set(pos - 2, color_dark)
     larsen_set(pos - 1, color_med)
@@ -182,7 +183,7 @@ def solid():
 
 def map_value(value, in_min, in_max, out_min, out_max):
     return out_min + (out_max - out_min) * ((value - in_min)
-                    / (in_max - in_min))
+                  / (in_max - in_min))
 
 def change_speed(val):
     global speed
