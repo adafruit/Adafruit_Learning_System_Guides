@@ -147,7 +147,7 @@ def larsen(wait):
     color_dark = (int(user_color[0]/8), int(user_color[1]/8),
                   int(user_color[2]/8))
     color_med = (int(user_color[0]/2), int(user_color[1]/2),
-                 int(user_color[2]/2))
+                int(user_color[2]/2))
 
     larsen_set(pos - 2, color_dark)
     larsen_set(pos - 1, color_med)
@@ -182,8 +182,9 @@ def solid():
     pixels.show()
 
 def map_value(value, in_min, in_max, out_min, out_max):
-    return out_min + (out_max - out_min) * ((value - in_min)
-                                            / (in_max - in_min))
+    out_range = out_max - out_min
+    in_range = in_max - in_min
+    return out_min + out_range * ((value - in_min) / in_range)
 
 def change_speed(val):
     global speed
