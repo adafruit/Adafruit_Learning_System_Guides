@@ -25,7 +25,6 @@ uart_server = UARTServer()
 # User input vars
 mode = 0 # 0=audio, 1=rainbow, 2=larsen_scanner, 3=solid
 user_color= (127,0,0)
-speed = 6.0 # for larsen scanner
 
 # Audio meter vars
 PEAK_COLOR = (100, 0, 255)
@@ -100,18 +99,17 @@ def wheel(wheel_pos):
         b = int(255 - wheel_pos*3)
     return (r, g, b)
 
-def rainbow_cycle(wait):
+def rainbow_cycle(delay):
     for j in range(255):
         for i in range(NUM_PIXELS):
             pixel_index = (i * 256 // NUM_PIXELS) + j
             pixels[i] = wheel(pixel_index & 255)
         pixels.show()
-        time.sleep(wait)
+        time.sleep(delay)
 
-def audio_meter():
+def audio_meter(new_peak):
     mic.record(samples, len(samples))
     magnitude = normalized_rms(samples)
-    global peak
 
     # Compute scaled logarithmic reading in the range 0 to NUM_PIXELS
     c = log_scale(constrain(magnitude, input_floor, input_ceiling),
@@ -123,13 +121,14 @@ def audio_meter():
         if i < c:
             pixels[i] = volume_color(i)
         # Light up the peak pixel and animate it slowly dropping.
-        if c >= peak:
-            peak = min(c, NUM_PIXELS - 1)
-        elif peak > 0:
-            peak = peak - 1
-        if peak > 0:
-            pixels[int(peak)] = PEAK_COLOR
+        if c >= new_peak:
+            new_peak = min(c, NUM_PIXELS - 1)
+        elif new_peak > 0:
+            new_peak = new_peak - 1
+        if new_peak > 0:
+            pixels[int(new_peak)] = PEAK_COLOR
     pixels.show()
+    return new_peak
 
 pos = 0  # position
 direction = 1  # direction of "eye"
@@ -140,10 +139,9 @@ def larsen_set(index, color):
     else:
         pixels[index] = color
 
-def larsen(wait):
+def larsen(delay):
     global pos
     global direction
-
     color_dark = (int(user_color[0]/8), int(user_color[1]/8),
                   int(user_color[2]/8))
     color_med = (int(user_color[0]/2), int(user_color[1]/2),
@@ -159,7 +157,7 @@ def larsen(wait):
         larsen_set(pos + 2, color_dark)
 
     pixels.write()
-    time.sleep(wait)
+    time.sleep(delay)
 
     # Erase all and draw a new one next time
     for j in range(-2, 2):
@@ -176,9 +174,8 @@ def larsen(wait):
         pos = NUM_PIXELS - 2
         direction = -direction
 
-def solid():
-    global user_color
-    pixels.fill(user_color)
+def solid(new_color):
+    pixels.fill(new_color)
     pixels.show()
 
 def map_value(value, in_min, in_max, out_min, out_max):
@@ -186,14 +183,12 @@ def map_value(value, in_min, in_max, out_min, out_max):
     in_range = in_max - in_min
     return out_min + out_range * ((value - in_min) / in_range)
 
-def change_speed(val):
-    global speed
-    new_speed = speed + val
-    if new_speed > 10.0:
-        new_speed = 10.0
-    elif new_speed < 1.0:
-        new_speed = 1.0
-    speed = new_speed
+speed = 6.0
+wait = 0.097
+
+def change_speed(mod, old_speed):
+    new_speed = constrain(old_speed + mod, 1.0, 10.0)
+    return(new_speed, map_value(new_speed, 10.0, 0.0, 0.01, 0.3))
 
 while True:
     # While BLE is *not* connected
@@ -214,9 +209,9 @@ while True:
             elif isinstance(packet, ButtonPacket):
                 if packet.pressed:
                     if packet.button == ButtonPacket.UP:
-                        change_speed(1)
+                        speed, wait = change_speed(1, speed)
                     elif packet.button == ButtonPacket.DOWN:
-                        change_speed(-1)
+                        speed, wait = change_speed(-1, speed)
                     elif packet.button == ButtonPacket.BUTTON_1:
                         mode = 0
                     elif packet.button == ButtonPacket.BUTTON_2:
@@ -228,10 +223,10 @@ while True:
 
     # Determine animation based on mode
     if mode == 0:
-        audio_meter()
+        peak = audio_meter(peak)
     elif mode == 1:
         rainbow_cycle(0.001)
     elif mode == 2:
-        larsen(map_value(speed, 10.0, 0.0, 0.01, 0.3))
+        larsen(wait)
     elif mode == 3:
-        solid()
+        solid(user_color)
