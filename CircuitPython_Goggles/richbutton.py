@@ -1,7 +1,11 @@
-from digitalio import DigitalInOut, Direction, Pull
-from time import monotonic
+# pylint: disable=import-error, too-many-instance-attributes, too-few-public-methods
 
-class RichButton(object):
+"""Glorified button class with debounced tap, double-tap, hold and release"""
+
+from time import monotonic
+from digitalio import DigitalInOut, Direction, Pull
+
+class RichButton:
     """
     A button class handling more than basic taps: adds debounced tap,
     double-tap, hold and release.
@@ -12,8 +16,8 @@ class RichButton(object):
     HOLD = 2
     RELEASE = 3
 
-    def __init__(self, pin, *, debounce_period = 0.05, hold_period = 0.75,
-                 double_tap_period = 0.3):
+    def __init__(self, pin, *, debounce_period=0.05, hold_period=0.75,
+                 double_tap_period=0.3):
         """
         Constructor for RichButton class.
 
@@ -34,16 +38,16 @@ class RichButton(object):
                                        Longer double-tap periods will make
                                        single-taps less responsive.
         """
-        self.io = DigitalInOut(pin)
-        self.io.direction = Direction.INPUT
-        self.io.pull = Pull.UP
+        self.in_out = DigitalInOut(pin)
+        self.in_out.direction = Direction.INPUT
+        self.in_out.pull = Pull.UP
         self._debounce_period = debounce_period
         self._hold_period = hold_period
         self._double_tap_period = double_tap_period
         self._holding = False
         self._tap_time = -self._double_tap_period
         self._press_time = monotonic()
-        self._prior_state = self.io.value
+        self._prior_state = self.in_out.value
 
     def action(self):
         """
@@ -52,7 +56,7 @@ class RichButton(object):
         Returns:
             None, TAP, DOUBLE_TAP, HOLD or RELEASE.
         """
-        new_state = self.io.value
+        new_state = self.in_out.value
         if new_state != self._prior_state:
             # Button state changed since last call
             self._prior_state = new_state
@@ -65,21 +69,20 @@ class RichButton(object):
                     # Button released after hold
                     self._holding = False
                     return self.RELEASE
-                elif (monotonic() - self._press_time) >= self._debounce_period:
+                if (monotonic() - self._press_time) >= self._debounce_period:
                     # Button released after valid debounce time
                     if monotonic() - self._tap_time < self._double_tap_period:
                         # Followed another recent tap, reset double timer
                         self._tap_time = 0
                         return self.DOUBLE_TAP
-                    else:
-                      # Regular debounced release, maybe 1st tap, keep time
-                      self._tap_time = monotonic()
+                    # Else regular debounced release, maybe 1st tap, keep time
+                    self._tap_time = monotonic()
         else:
             # Button is in same state as last call
             if self._prior_state:
                 # Is not pressed
                 if (self._tap_time > 0 and
-                    (monotonic() - self._tap_time) > self._double_tap_period):
+                        (monotonic() - self._tap_time) > self._double_tap_period):
                     # Enough time since last tap that it's not a double
                     self._tap_time = 0
                     return self.TAP
