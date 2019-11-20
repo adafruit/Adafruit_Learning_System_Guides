@@ -56,7 +56,7 @@ PALETTE_FIRE = [fancy.CRGB(160, 30, 0),  # Reds and Yellows
                 fancy.CRGB(0, 0, 0),
                 fancy.CRGB(200, 40, 0)]
 
-# Declare a NeoPixel object on NEOPIXEL_PIN with NUM_LEDS pixels, 
+# Declare a NeoPixel object on NEOPIXEL_PIN with NUM_LEDS pixels,
 # no auto-write.
 # Set brightness to max because we'll be using FancyLED's brightness control.
 ring = neopixel.NeoPixel(RING_PIN, NUM_LEDS, brightness=1.0, auto_write=False)
@@ -139,7 +139,7 @@ while True:
                     elif packet.button == ButtonPacket.DOWN:
                         offset_increment -= 1
 
-    # Whether or not we're connected via Bluetooth, 
+    # Whether or not we're connected via Bluetooth,
     # we also want to handle touch inputs.
     if touch_A2.value:
         cycling = True
@@ -160,4 +160,3 @@ while True:
 #        offset_increment += 1
 #    if touch_TX.value:
 #        offset_increment -= 1
-
