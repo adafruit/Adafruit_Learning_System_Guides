@@ -1,6 +1,7 @@
 from time import sleep
-from adafruit_ble.uart_client import UARTClient
-from adafruit_ble.scanner import Scanner
+from adafruit_ble import BLERadio
+from adafruit_ble.advertising.standard import ProvideServicesAdvertisement
+from adafruit_ble.services.nordic import UARTService
 from adafruit_bluefruit_connect.packet import Packet
 from adafruit_bluefruit_connect.button_packet import ButtonPacket
 from adafruit_bluefruit_connect.color_packet import ColorPacket
@@ -35,31 +36,38 @@ TARGET = 'a0:b4:c2:d0:e7:f2'  # CHANGE TO YOUR BLE ADDRESS
 
 button_packet = ButtonPacket("1", True)  # Transmits pressed button 1
 
-scanner = Scanner()  # BLE Scanner
-uart_client = UARTClient()  # BLE Client
+ble = BLERadio()
+
+uart_connection = None
+# See if any existing connections are providing UARTService.
+if ble.connected:
+    for connection in ble.connections:
+        if UARTService in connection:
+            uart_connection = connection
+        break
 
 while True:
-    uart_addresses = []
-    pixels[0] = BLUE  # Blue LED indicates disconnected status
-    pixels.show()
+    if not uart_connection:
+        pixels[0] = BLUE  # Blue LED indicates disconnected status
+        pixels.show()
+        for adv in ble.start_scan(ProvideServicesAdvertisement, timeout=5):
+            if UARTService in adv.services:
+                uart_connection = ble.connect(adv)
+                break
+        # Stop scanning whether or not we are connected.
+        ble.stop_scan()
 
-    # Keep trying to find target UART peripheral
-    while not uart_addresses:
-        uart_addresses = uart_client.scan(scanner)
-        for address in uart_addresses:
-            if TARGET in str(address):
-                uart_client.connect(address, 5)  # Connect to target
-
-    while uart_client.connected:  # Connected
+    while uart_connection and uart_connection.connected:
         switch.update()
         if switch.fell:  # Check for button press
             try:
-                uart_client.write(button_packet.to_bytes())  # Transmit press
+                uart_connection.write(button_packet.to_bytes())  # Transmit press
             except OSError:
-                pass
+                uart_connection = None
+                continue
         # Check for LED status receipt
-        if uart_client.in_waiting:
-            packet = Packet.from_stream(uart_client)
+        if uart_connection.in_waiting:
+            packet = Packet.from_stream(uart_connection)
             if isinstance(packet, ColorPacket):
                 if fancy.CRGB(*packet.color).pack() == GREEN:  # Color match
                     # Green indicates on state
@@ -79,3 +87,5 @@ while True:
         color_index += fade_direction
 
         sleep(0.02)
+
+    uart_connection = None
