@@ -1,12 +1,14 @@
 # CircusPython!
 # For use with the Adafruit BlueFruit LE Connect app.
-# Works with CircuitPython 4.0.0-beta.1 and later running on an nRF52840 board.
+# Works with CircuitPython 5.0.0-beta.0 and later running on an nRF52840 board.
 
 import random
 import time
 
 from adafruit_crickit import crickit
-from adafruit_ble.uart import UARTServer
+from adafruit_ble import BLERadio
+from adafruit_ble.advertising.standard import ProvideServicesAdvertisement
+from adafruit_ble.services.nordic import UARTService
 
 from adafruit_bluefruit_connect.packet import Packet
 # Only the packet classes that are imported will be known to Packet.
@@ -24,7 +26,9 @@ def sparkle():
     crickit.neopixel[random.randrange(24)] = color
     crickit.neopixel[random.randrange(24)] = color
 
-uart_server = UARTServer()
+ble = BLERadio()
+uart_service = UARTService()
+advertisement = ProvideServicesAdvertisement(uart_service)
 
 # Increase this to slow down movement of the servo arm.
 DELAY = 0.0
@@ -36,41 +40,35 @@ UP_ANGLE = 50
 # slightly as necessary so you don't bump into the ring.
 DOWN_ANGLE = 2
 
-advertising_now = False
 crickit.servo_1.angle = UP_ANGLE
 angle = UP_ANGLE
 
 while True:
-    sparkle()
-    if not uart_server.connected:
-        if not advertising_now:
-            uart_server.start_advertising()
-            advertising_now = True
-        continue
-
-    # Connected, so no longer advertising.
-    advertising_now = False
-
-    if uart_server.in_waiting:
-        packet = Packet.from_stream(uart_server)
-        if isinstance(packet, ColorPacket):
-            # Change the fire color.
-            color = packet.color
-        elif isinstance(packet, ButtonPacket):
-            if packet.pressed:
-                if packet.button == '5' and angle != UP_ANGLE:
-                    # The Up button was pressed.
-                    for a in range(angle, UP_ANGLE+1, 1):
-                        crickit.servo_1.angle = a
-                        # Sparkle while moving.
-                        sparkle()
-                        time.sleep(DELAY)
-                    angle = UP_ANGLE
-                elif packet.button == '6' and angle != DOWN_ANGLE:
-                    # The Down button was pressed.
-                    for a in range(angle, DOWN_ANGLE-1, -1):
-                        crickit.servo_1.angle = a
-                        # Sparkle while moving.
-                        sparkle()
-                        time.sleep(DELAY)
-                    angle = DOWN_ANGLE
+    ble.start_advertising(advertisement)
+    while not ble.connected:
+        sparkle()
+    while ble.connected:
+        sparkle()
+        if uart_service.in_waiting:
+            packet = Packet.from_stream(uart_service)
+            if isinstance(packet, ColorPacket):
+                # Change the fire color.
+                color = packet.color
+            elif isinstance(packet, ButtonPacket):
+                if packet.pressed:
+                    if packet.button == '5' and angle != UP_ANGLE:
+                        # The Up button was pressed.
+                        for a in range(angle, UP_ANGLE+1, 1):
+                            crickit.servo_1.angle = a
+                            # Sparkle while moving.
+                            sparkle()
+                            time.sleep(DELAY)
+                        angle = UP_ANGLE
+                    elif packet.button == '6' and angle != DOWN_ANGLE:
+                        # The Down button was pressed.
+                        for a in range(angle, DOWN_ANGLE-1, -1):
+                            crickit.servo_1.angle = a
+                            # Sparkle while moving.
+                            sparkle()
+                            time.sleep(DELAY)
+                        angle = DOWN_ANGLE
