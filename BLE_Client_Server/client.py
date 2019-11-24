@@ -1,10 +1,13 @@
 from time import sleep
+
 from adafruit_ble import BLERadio
 from adafruit_ble.advertising.standard import ProvideServicesAdvertisement
 from adafruit_ble.services.nordic import UARTService
+
 from adafruit_bluefruit_connect.packet import Packet
 from adafruit_bluefruit_connect.button_packet import ButtonPacket
 from adafruit_bluefruit_connect.color_packet import ColorPacket
+
 from neopixel import NeoPixel
 from board import NEOPIXEL, SWITCH
 from adafruit_debouncer import Debouncer
@@ -61,7 +64,7 @@ while True:
         switch.update()
         if switch.fell:  # Check for button press
             try:
-                uart_connection.write(button_packet.to_bytes())  # Transmit press
+                uart_connection[UARTService].write(button_packet.to_bytes())  # Transmit press
             except OSError:
                 uart_connection = None
                 continue

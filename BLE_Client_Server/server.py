@@ -1,10 +1,13 @@
 from time import sleep
+
 from adafruit_ble import BLERadio
 from adafruit_ble.advertising.standard import ProvideServicesAdvertisement
 from adafruit_ble.services.nordic import UARTService
+
 from adafruit_bluefruit_connect.packet import Packet
 from adafruit_bluefruit_connect.button_packet import ButtonPacket
 from adafruit_bluefruit_connect.color_packet import ColorPacket
+
 from board import A0, D13
 from analogio import AnalogIn
 from digitalio import DigitalInOut, Direction
@@ -25,7 +28,7 @@ while True:
     while not ble.connected:  # Wait for connection
         pass
 
-    while uart_service.connected:  # Connected
+    while ble.connected:  # Connected
         if uart_service.in_waiting:  # Check BLE commands
             packet = Packet.from_stream(uart_service)
             if isinstance(packet, ButtonPacket):
