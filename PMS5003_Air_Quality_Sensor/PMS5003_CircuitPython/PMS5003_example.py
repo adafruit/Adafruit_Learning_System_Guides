@@ -1,17 +1,21 @@
-import board
-import busio
-from digitalio import DigitalInOut, Direction
-
 try:
     import struct
 except ImportError:
     import ustruct as struct
 
-led = DigitalInOut(board.D13)
-led.direction = Direction.OUTPUT
-
-# Connect the Sensor's TX pin to the board's RX pin
+# Connect the sensor TX pin to the board/computer RX pin
+# For use with a microcontroller board:
+import board
+import busio
 uart = busio.UART(board.TX, board.RX, baudrate=9600)
+
+# For use with Raspberry Pi/Linux:
+# import serial
+# uart = serial.Serial("/dev/ttyS0", baudrate=9600, timeout=0.25)
+
+# For use with USB-to-serial cable:
+# import serial
+# uart = serial.Serial("/dev/ttyUSB0", baudrate=9600, timeout=0.25)
 
 buffer = []
 
