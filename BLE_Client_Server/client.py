@@ -61,16 +61,17 @@ while True:
         ble.stop_scan()
 
     while uart_connection and uart_connection.connected:
+        uart_service = uart_connection[UARTService]
         switch.update()
         if switch.fell:  # Check for button press
             try:
-                uart_connection[UARTService].write(button_packet.to_bytes())  # Transmit press
+                uart_service.write(button_packet.to_bytes())  # Transmit press
             except OSError:
                 uart_connection = None
                 continue
         # Check for LED status receipt
         if uart_connection.in_waiting:
-            packet = Packet.from_stream(uart_connection)
+            packet = Packet.from_stream(uart_service)
             if isinstance(packet, ColorPacket):
                 if fancy.CRGB(*packet.color).pack() == GREEN:  # Color match
                     # Green indicates on state
