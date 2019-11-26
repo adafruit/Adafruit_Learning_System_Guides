@@ -11,7 +11,7 @@ YEAR = ["year"]
 ACCOMPLISH = ["Accomplishment"]
 WEB = ["Web Reference"]
 
-DATA = Fake_Requests(cwd+"/jan1_hist_json.py")
+DATA = Fake_Requests(cwd+"/jan1_history_json.py")
 
 # create pyportal object w no data source (we'll feed it text later)
 pyportal = PyPortal(url = DATA,
