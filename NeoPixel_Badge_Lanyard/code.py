@@ -4,9 +4,11 @@
 import board
 import neopixel
 import adafruit_fancyled.adafruit_fancyled as fancy
-from adafruit_ble.uart import UARTServer
-# for >= CPy 5.0.0
-# from adafruit_ble.uart_server import UARTServer
+
+from adafruit_ble import BLERadio
+from adafruit_ble.advertising.standard import ProvideServicesAdvertisement
+from adafruit_ble.services.nordic import UARTService
+
 from adafruit_bluefruit_connect.packet import Packet
 from adafruit_bluefruit_connect.button_packet import ButtonPacket
 from adafruit_bluefruit_connect.color_packet import ColorPacket
@@ -54,7 +56,9 @@ offset = 0  # Positional offset into color palette to get it to 'spin'
 offset_increment = 1
 OFFSET_MAX = 1000000
 
-uart_server = UARTServer()
+ble = BLERadio()
+uart_service = UARTService()
+advertisement = ProvideServicesAdvertisement(uart_service)
 
 def set_palette(palette):
     for i in range(NUM_LEDS):
@@ -72,17 +76,19 @@ palette_choice = PALETTE_RAINBOW
 cycling = True
 
 while True:
-    uart_server.start_advertising()
-    while not uart_server.connected:
+    # Advertise when not connected.
+    ble.start_advertising(advertisement)
+
+    while not ble.connected:
         if cycling:
             set_palette(palette_choice)
             offset = (offset + offset_increment) % OFFSET_MAX
 
     # Now we're connected
 
-    while uart_server.connected:
-        if uart_server.in_waiting:
-            packet = Packet.from_stream(uart_server)
+    while ble.connected:
+        if uart_service.in_waiting:
+            packet = Packet.from_stream(uart_service)
             if isinstance(packet, ColorPacket):
                 cycling = False
                 # Set all the pixels to one color and stay there.
