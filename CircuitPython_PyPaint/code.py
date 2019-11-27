@@ -12,7 +12,7 @@ Licensed under the MIT license.
 All text above must be included in any redistribution.
 """
 
-#pylint:disable=invalid-name, no-self-use, too-many-statements
+#pylint:disable=invalid-name, no-self-use
 
 import gc
 import time
@@ -146,9 +146,9 @@ class CursorPoller(object):
         self.poke()
 
 ################################################################################
-
 class Paint(object):
 
+    #pylint:disable=too-many-statements
     def __init__(self, display=board.DISPLAY):
         self._logger = logging.getLogger("Paint")
         self._logger.setLevel(logging.DEBUG)
@@ -219,6 +219,7 @@ class Paint(object):
         self._last_location = None
 
         self._pencolor = 7
+    #pylint:enable=too-many-statements
 
     def _make_palette(self):
         self._palette_bitmap = displayio.Bitmap(self._w // 10, self._h, 5)
