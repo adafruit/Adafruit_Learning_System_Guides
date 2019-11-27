@@ -119,4 +119,3 @@ class Azure_GFX(displayio.Group):
         except AttributeError:
             board.DISPLAY.refresh_soon()
             board.DISPLAY.wait_for_frame()
- 

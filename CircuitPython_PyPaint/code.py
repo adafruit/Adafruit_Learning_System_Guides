@@ -12,7 +12,7 @@ Licensed under the MIT license.
 All text above must be included in any redistribution.
 """
 
-#pylint:disable=invalid-name, no-self-use
+#pylint:disable=invalid-name, no-self-use, too-many-statements
 
 import gc
 import time
