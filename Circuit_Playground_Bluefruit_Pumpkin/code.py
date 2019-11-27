@@ -3,8 +3,13 @@
 
 import time
 import board
+import digitalio
 import neopixel
-from adafruit_ble.uart_server import UARTServer
+
+from adafruit_ble import BLERadio
+from adafruit_ble.advertising.standard import ProvideServicesAdvertisement
+from adafruit_ble.services.nordic import UARTService
+
 from audiopwmio import PWMAudioOut as AudioOut
 from audiocore import WaveFile
 
@@ -24,9 +29,15 @@ PURPLE = (100, 0, 255)
 YELLOW = (255,230, 0)
 BLUE = (0, 0, 255)
 # setup bluetooth
-uart_server = UARTServer()
+ble = BLERadio()
+uart_service = UARTService()
+advertisement = ProvideServicesAdvertisement(uart_service)
 
 # External Audio Stuff
+speaker_enable = digitalio.DigitalInOut(board.SPEAKER_ENABLE)
+speaker_enable.direction = digitalio.Direction.OUTPUT
+speaker_enable.value = True
+
 audio = AudioOut(board.SPEAKER)  # Speaker
 wave_file = None
 
@@ -51,17 +62,17 @@ def play_wav(name, loop=False):
 
 while True:
     # set CPXb up so that it can be discovered by the app
-    uart_server.start_advertising()
-    while not uart_server.connected:
+    ble.start_advertising(advertisement)
+    while not ble.connected:
         pass
 
     # Now we're connected
 
-    while uart_server.connected:
+    while ble.connected:
 
-        if uart_server.in_waiting:
+        if uart_service.in_waiting:
             try:
-                packet = Packet.from_stream(uart_server)
+                packet = Packet.from_stream(uart_service)
             except ValueError:
                 continue # or pass.
 
