@@ -87,8 +87,12 @@ class WeatherStation_GFX(displayio.Group):
         :param str status_text: Description of Adafruit IO status
         """
         self.io_status_text.text = status_text
-        board.DISPLAY.refresh_soon()
-        board.DISPLAY.wait_for_frame()
+        try:
+            board.DISPLAY.refresh(target_frames_per_second=60)
+        except AttributeError:
+            board.DISPLAY.refresh_soon()
+            board.DISPLAY.wait_for_frame()
+
 
     def display_data(self, uv_index, bme_data, sgp_data, wind_speed):
         """Displays the data from the sensors attached
@@ -123,8 +127,12 @@ class WeatherStation_GFX(displayio.Group):
         print("eCO2 = %d ppm \t TVOC = %d ppb"%(sgp_data[0], sgp_data[1]))
         self.sgp_text.text = "eCO2: %d ppm, TVOC: %d ppb"%(sgp_data[0], sgp_data[1])
 
-        board.DISPLAY.refresh_soon()
-        board.DISPLAY.wait_for_frame()
+        try:
+            board.DISPLAY.refresh(target_frames_per_second=60)
+        except AttributeError:
+            board.DISPLAY.refresh_soon()
+            board.DISPLAY.wait_for_frame()
+
 
     def set_icon(self, filename):
         """Sets the background image to a bitmap file.
@@ -150,5 +158,9 @@ class WeatherStation_GFX(displayio.Group):
                                                    position=(0,0))
 
         self._icon_group.append(self._icon_sprite)
-        board.DISPLAY.refresh_soon()
-        board.DISPLAY.wait_for_frame()
+        try:
+            board.DISPLAY.refresh(target_frames_per_second=60)
+        except AttributeError:
+            board.DISPLAY.refresh_soon()
+            board.DISPLAY.wait_for_frame()
+

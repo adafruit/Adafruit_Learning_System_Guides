@@ -196,9 +196,13 @@ class Paint(object):
         self._splash.append(self._palette)
 
         self._display.show(self._splash)
-        self._display.refresh_soon()
-        gc.collect()
-        self._display.wait_for_frame()
+        try:
+            gc.collect()
+            self._display.refresh(target_frames_per_second=60)
+        except AttributeError:
+            self._display.refresh_soon()
+            gc.collect()
+            self._display.wait_for_frame()
 
         self._brush = 0
         self._cursor_bitmaps = [self._cursor_bitmap_1(), self._cursor_bitmap_3()]

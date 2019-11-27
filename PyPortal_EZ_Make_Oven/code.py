@@ -495,7 +495,10 @@ if oven.sensor_status:
 for b in buttons:
     pyportal.splash.append(b.group)
 
-board.DISPLAY.refresh_soon()
+try:
+    board.DISPLAY.refresh(target_frames_per_second=60)
+except AttributeError:
+    board.DISPLAY.refresh_soon()
 print("display complete")
 last_temp = 0
 last_state = "ready"
@@ -503,7 +506,10 @@ last_control = False
 second_timer = time.monotonic()
 timer = time.monotonic()
 while True:
-    board.DISPLAY.refresh_soon()
+    try:
+        board.DISPLAY.refresh(target_frames_per_second=60)
+    except AttributeError:
+        board.DISPLAY.refresh_soon()
     oven.beep.refresh()  # this allows beeps less than one second in length
     try:
         oven_temp = int(oven.sensor.temperature)
