@@ -10,12 +10,11 @@ support). WILL work with earlier versions, just no image shown!
 
 import time
 import math
+import digitalio
 import board
 import busio
 import audioio
-import pulseio
 import neopixel
-import adafruit_lis3dh
 
 def load_wav(name):
     """
@@ -30,16 +29,36 @@ STOMP_WAV = load_wav('stomp') # WAV file to play with each step
 ROAR_WAV = load_wav('roar')   # WAV when jumping
 IMAGEFILE = 'reptar.bmp'      # BMP image to display
 
+IS_HALLOWING_M4 = False
+
+# Perform a couple extra steps for the HalloWing M4
+try:
+    if getattr(board, "CAP_PIN"):
+        IS_HALLOWING_M4 = True
+    if getattr(board, "SPEAKER_ENABLE"):
+        # Enable the Speaker
+        speaker_enable = digitalio.DigitalInOut(board.SPEAKER_ENABLE)
+        speaker_enable.direction = digitalio.Direction.OUTPUT
+        speaker_enable.value = True
+except AttributeError:
+    pass
+
 AUDIO = audioio.AudioOut(board.A0)              # Speaker
-BACKLIGHT = pulseio.PWMOut(board.TFT_BACKLIGHT) # Display backlight
+
+board.DISPLAY.auto_brightness = False
 
 # Set up accelerometer on I2C bus, 4G range:
 I2C = busio.I2C(board.SCL, board.SDA)
-try:
-    ACCEL = adafruit_lis3dh.LIS3DH_I2C(I2C, address=0x18) # Production board
-except ValueError:
-    ACCEL = adafruit_lis3dh.LIS3DH_I2C(I2C, address=0x19) # Beta hardware
-ACCEL.range = adafruit_lis3dh.RANGE_4_G
+if IS_HALLOWING_M4:
+    import adafruit_msa301
+    ACCEL = adafruit_msa301.MSA301(I2C)
+else:
+    import adafruit_lis3dh
+    try:
+        ACCEL = adafruit_lis3dh.LIS3DH_I2C(I2C, address=0x18) # Production board
+    except ValueError:
+        ACCEL = adafruit_lis3dh.LIS3DH_I2C(I2C, address=0x19) # Beta hardware
+    ACCEL.range = adafruit_lis3dh.RANGE_4_G
 
 STEP_INTERVAL_MIN = 0.3 # Shortest interval to walk one step (seconds)
 STEP_INTERVAL_MAX = 2.0 # Longest interval to walk one step (seconds)
@@ -57,15 +76,15 @@ FILTER_INDEX = 0        # Current position in sample-averaging buffer
 # older CircuitPython) and the code will continue with the step detection.
 try:
     import displayio
+    board.DISPLAY.brightness = 0
     SCREEN = displayio.Group()
     board.DISPLAY.show(SCREEN)
     BITMAP = displayio.OnDiskBitmap(open(IMAGEFILE, 'rb'))
     SCREEN.append(
-        displayio.Sprite(BITMAP,
-                         pixel_shader=displayio.ColorConverter(),
-                         position=(0, 0)))
-    board.DISPLAY.wait_for_frame() # Wait for the image to load.
-    BACKLIGHT.duty_cycle = 65535   # Turn on display backlight
+        displayio.TileGrid(BITMAP,
+                           pixel_shader=displayio.ColorConverter(),
+                           x=0, y=0))
+    board.DISPLAY.brightness = 1.0   # Turn on display backlight
 except (ImportError, NameError, AttributeError) as err:
     pass # Probably earlier CircuitPython; no displayio support
 

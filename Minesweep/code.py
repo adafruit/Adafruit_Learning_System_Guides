@@ -219,7 +219,10 @@ def reset_board():
     compute_counts()
 
 def play_sound(file_name):
-    board.DISPLAY.wait_for_frame()
+    try:
+        board.DISPLAY.refresh(target_frames_per_second=60)
+    except AttributeError:
+        board.DISPLAY.wait_for_frame()
     wavfile = open(file_name, "rb")
     wavedata = WaveFile(wavfile)
     speaker_enable.value = True
@@ -242,8 +245,11 @@ def lose():
     for _ in range(10):
         tilegrid.x = randint(-2, 2)
         tilegrid.y = randint(-2, 2)
-        display.refresh_soon()
-        display.wait_for_frame()
+        try:
+            board.DISPLAY.refresh(target_frames_per_second=60)
+        except AttributeError:
+            board.DISPLAY.refresh_soon()
+            board.DISPLAY.wait_for_frame()
     tilegrid.x = 0
     tilegrid.y = 0
     wait_for_sound_and_cleanup(wavfile)
