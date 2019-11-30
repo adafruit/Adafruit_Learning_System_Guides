@@ -5,12 +5,16 @@ import board
 import neopixel
 import touchio
 import adafruit_fancyled.adafruit_fancyled as fancy
-# from adafruit_ble.uart import UARTServer
-# for >= CPy 5.0.0
-from adafruit_ble.uart_server import UARTServer
 from adafruit_bluefruit_connect.packet import Packet
 from adafruit_bluefruit_connect.button_packet import ButtonPacket
 from adafruit_bluefruit_connect.color_packet import ColorPacket
+
+
+from adafruit_ble import BLERadio
+from adafruit_ble.advertising.standard import ProvideServicesAdvertisement
+from adafruit_ble.services.nordic import UARTService
+
+
 
 NUM_LEDS = 24             # change to reflect your total number of ring LEDs
 RING_PIN = board.A1       # change to reflect your wiring
@@ -66,7 +70,11 @@ offset = 0  # Positional offset into color palette to get it to 'spin'
 offset_increment = 6
 OFFSET_MAX = 1000000
 
-uart_server = UARTServer()
+# Setup BLE
+ble = BLERadio()
+uart = UARTService()
+advertisement = ProvideServicesAdvertisement(uart)
+
 
 def set_palette(palette):
     for i in range(NUM_LEDS):
@@ -101,17 +109,17 @@ while True:
         set_palette(palette_choice)
         offset = (offset + offset_increment) % OFFSET_MAX
 
-    if not uart_server.connected and not advertising:
-        uart_server.start_advertising()
+    if not ble.connected and not advertising:
+        ble.start_advertising(advertisement)
         advertising = True
 
     # Are we connected via Bluetooth now?
-    if uart_server.connected:
+    if ble.connected:
         # Once we're connected, we're not advertising any more.
         advertising = False
         # Have we started to receive a packet?
-        if uart_server.in_waiting:
-            packet = Packet.from_stream(uart_server)
+        if uart.in_waiting:
+            packet = Packet.from_stream(uart)
             if isinstance(packet, ColorPacket):
                 cycling = False
                 # Set all the pixels to one color and stay there.
@@ -160,3 +168,4 @@ while True:
 #        offset_increment += 1
 #    if touch_TX.value:
 #        offset_increment -= 1
+
