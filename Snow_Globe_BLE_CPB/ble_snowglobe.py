@@ -135,7 +135,6 @@ def indicate(event=None):
 indicate('START')
 
 
-
 # Are we already advertising?
 advertising = False
 
