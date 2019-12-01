@@ -48,7 +48,7 @@ accelo = adafruit_lis3dh.LIS3DH_I2C(accelo_i2c, address=0x19)
 ble = BLERadio()
 uart = UARTService()
 advertisement = ProvideServicesAdvertisement(uart)
-
+ble._adapter.name = SNOWGLOBE_NAME
 
 #--| ANIMATIONS |----------------------------------------------------
 def spin(config):
