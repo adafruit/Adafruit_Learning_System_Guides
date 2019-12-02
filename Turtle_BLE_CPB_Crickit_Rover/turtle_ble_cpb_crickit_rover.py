@@ -1,6 +1,6 @@
 # Circuit Playground Bluefruit Rover
 # Use with the Adafruit BlueFruit LE Connect app
-# Works with CircuitPython 4.0.0-beta.1 and later
+# Works with CircuitPython 5.0.0-beta.0 and later
 # running on an nRF52840 CPB board and Crickit
 
 import time
@@ -8,7 +8,10 @@ import board
 import digitalio
 import neopixel
 from adafruit_crickit import crickit
-from adafruit_ble.uart_server import UARTServer
+
+from adafruit_ble import BLERadio
+from adafruit_ble.advertising.standard import ProvideServicesAdvertisement
+from adafruit_ble.services.nordic import UARTService
 
 from adafruit_bluefruit_connect.packet import Packet
 # Only the packet classes that are imported will be known to Packet.
@@ -19,7 +22,9 @@ from adafruit_bluefruit_connect.color_packet import ColorPacket
 red_led = digitalio.DigitalInOut(board.D13)
 red_led.direction = digitalio.Direction.OUTPUT
 
-uart_server = UARTServer()
+ble = BLERadio()
+uart_service = UARTService()
+advertisement = ProvideServicesAdvertisement(uart_service)
 
 # motor setup
 motor_1 = crickit.dc_motor_1
@@ -42,21 +47,20 @@ neopixels.fill(color)
 print("BLE Turtle Rover")
 print("Use Adafruit Bluefruit app to connect")
 while True:
-    # blue_led.value = False
     neopixels[0] = BLACK
     neopixels.show()
-    uart_server.start_advertising()
-    while not uart_server.connected:
+    ble.start_advertising(advertisement)
+    while not ble.connected:
         # Wait for a connection.
         pass
     # set a pixel blue when connected
     neopixels[0] = BLUE
     neopixels.show()
-    while uart_server.connected:
-        if uart_server.in_waiting:
+    while ble.connected:
+        if uart_service.in_waiting:
             # Packet is arriving.
             red_led.value = False  # turn off red LED
-            packet = Packet.from_stream(uart_server)
+            packet = Packet.from_stream(uart_service)
             if isinstance(packet, ColorPacket):
                 # Change the color.
                 color = packet.color
