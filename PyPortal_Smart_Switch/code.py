@@ -167,8 +167,11 @@ class Clock(object):
         self.text_areas[1].text = ampm_string
         self.text_areas[2].text = (months[int(self.current_time.tm_mon - 1)] +
                                    " " + str(self.current_time.tm_mday))
-        board.DISPLAY.refresh_soon()
-        board.DISPLAY.wait_for_frame()
+        try:
+            board.DISPLAY.refresh(target_frames_per_second=60)
+        except AttributeError:
+            board.DISPLAY.refresh_soon()
+            board.DISPLAY.wait_for_frame()
 
 # Define callback methods which are called when events occur
 # pylint: disable=unused-argument, redefined-outer-name
