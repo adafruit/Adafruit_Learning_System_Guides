@@ -282,8 +282,12 @@ class Time_State(State):
                     temperature_text = '%3d F' % round(((temperature * 9 / 5) + 32))
                 self.text_areas[2].text = temperature_text
                 self.weather_refresh = now
-                board.DISPLAY.refresh_soon()
-                board.DISPLAY.wait_for_frame()
+                try:
+                    board.DISPLAY.refresh(target_frames_per_second=60)
+                except AttributeError:
+                    board.DISPLAY.refresh_soon()
+                    board.DISPLAY.wait_for_frame()
+
 
             except RuntimeError as e:
                 self.weather_refresh = now - 540   # delay a minute before retrying
@@ -295,8 +299,12 @@ class Time_State(State):
             current_time = time.localtime()
             time_string = '%02d:%02d' % (current_time.tm_hour,current_time.tm_min)
             self.text_areas[0].text = time_string
-            board.DISPLAY.refresh_soon()
-            board.DISPLAY.wait_for_frame()
+            try:
+                board.DISPLAY.refresh(target_frames_per_second=60)
+            except AttributeError:
+                board.DISPLAY.refresh_soon()
+                board.DISPLAY.wait_for_frame()
+
 
             # Check if alarm should sound
         if current_time is not None and not snooze_time:
@@ -343,8 +351,12 @@ class Time_State(State):
             self.text_areas[1].text = '%2d:%02d' % (alarm_hour, alarm_minute)
         else:
             self.text_areas[1].text = '     '
-        board.DISPLAY.refresh_soon()
-        board.DISPLAY.wait_for_frame()
+        try:
+            board.DISPLAY.refresh(target_frames_per_second=60)
+        except AttributeError:
+            board.DISPLAY.refresh_soon()
+            board.DISPLAY.wait_for_frame()
+
 
 
     def exit(self):
@@ -374,8 +386,12 @@ class Mugsy_State(Time_State):
         low_light = False
         pyportal.set_backlight(1.00)
         pyportal.set_background(mugsy_background)
-        board.DISPLAY.refresh_soon()
-        board.DISPLAY.wait_for_frame()
+        try:
+            board.DISPLAY.refresh(target_frames_per_second=60)
+        except AttributeError:
+            board.DISPLAY.refresh_soon()
+            board.DISPLAY.wait_for_frame()
+
 
 
 
@@ -423,8 +439,12 @@ class Alarm_State(State):
         pyportal.set_backlight(1.00)
         pyportal.set_background(alarm_background)
         low_light = False
-        board.DISPLAY.refresh_soon()
-        board.DISPLAY.wait_for_frame()
+        try:
+            board.DISPLAY.refresh(target_frames_per_second=60)
+        except AttributeError:
+            board.DISPLAY.refresh_soon()
+            board.DISPLAY.wait_for_frame()
+
 
 
     def exit(self):
@@ -493,8 +513,12 @@ class Setting_State(State):
                             logger.debug('Alarm minute now: %d', alarm_minute)
                         self.text_areas[0].text = '%02d:%02d' % (alarm_hour, alarm_minute)
                     self.previous_touch = t
-            board.DISPLAY.refresh_soon()
-            board.DISPLAY.wait_for_frame()
+            try:
+                board.DISPLAY.refresh(target_frames_per_second=60)
+            except AttributeError:
+                board.DISPLAY.refresh_soon()
+                board.DISPLAY.wait_for_frame()
+
         else:
             self.previous_touch = None
         return bool(t)
