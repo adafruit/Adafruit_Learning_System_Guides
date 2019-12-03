@@ -6,10 +6,10 @@ support). WILL work with earlier versions, just no image shown!
 """
 
 import time
-import audioio
 import busio
 import board
 import digitalio
+import audioio
 import touchio
 import neopixel
 

@@ -1,6 +1,6 @@
 # BLE Crickit Light Switch
 # Use with the Adafruit BlueFruit LE Connect app
-# Works with CircuitPython 4.0.0-beta.1 and later
+# Works with CircuitPython 5.0.0-beta.0 and later
 # running on an nRF52840 Feather board and Crickit FeatherWing
 # micro servo, 3D printed switch actuator
 
@@ -10,7 +10,10 @@ import board
 import digitalio
 
 from adafruit_crickit import crickit
-from adafruit_ble.uart import UARTServer
+
+from adafruit_ble import BLERadio
+from adafruit_ble.advertising.standard import ProvideServicesAdvertisement
+from adafruit_ble.services.nordic import UARTService
 
 from adafruit_bluefruit_connect.packet import Packet
 # Only the packet classes that are imported will be known to Packet.
@@ -22,7 +25,9 @@ red_led = digitalio.DigitalInOut(board.RED_LED)
 blue_led.direction = digitalio.Direction.OUTPUT
 red_led.direction = digitalio.Direction.OUTPUT
 
-uart_server = UARTServer()
+ble = BLERadio()
+uart_service = UARTService()
+advertisement = ProvideServicesAdvertisement(uart_service)
 
 UP_ANGLE = 180
 NEUTRAL_ANGLE = 120
@@ -35,17 +40,17 @@ print("BLE Light Switch")
 print("Use Adafruit Bluefruit app to connect")
 while True:
     blue_led.value = False
-    uart_server.start_advertising()
+    ble.start_advertising(advertisement)
 
-    while not uart_server.connected:
+    while not ble.connected:
         # Wait for a connection.
         pass
     blue_led.value = True  # turn on blue LED when connected
-    while uart_server.connected:
-        if uart_server.in_waiting:
+    while ble.connected:
+        if uart_service.in_waiting:
             # Packet is arriving.
             red_led.value = False  # turn off red LED
-            packet = Packet.from_stream(uart_server)
+            packet = Packet.from_stream(uart_service)
             if isinstance(packet, ButtonPacket) and packet.pressed:
                 red_led.value = True  # blink to show a packet has been received
                 if packet.button == ButtonPacket.UP and angle != UP_ANGLE:  # UP button pressed
