@@ -5,10 +5,16 @@ import busio
 import neopixel
 import adafruit_lis3dh
 
-from adafruit_ble.uart_server import UARTServer
 from adafruit_bluefruit_connect.packet import Packet
 from adafruit_bluefruit_connect.color_packet import ColorPacket
 from adafruit_bluefruit_connect.button_packet import ButtonPacket
+
+
+from adafruit_ble import BLERadio
+from adafruit_ble.advertising.standard import ProvideServicesAdvertisement
+from adafruit_ble.services.nordic import UARTService
+
+
 
 #===| User Config |==================================================
 SNOWGLOBE_NAME = "SNOWGLOBE" # name that will show up on smart device
@@ -16,7 +22,7 @@ DEFAULT_ANIMATION = 0        # 0-3, index in ANIMATIONS list
 DEFAULT_DURATION = 5         # total seconds to play animation
 DEFAULT_SPEED = 0.1          # delay in seconds between updates
 DEFAULT_COLOR = 0xFF0000     # hex color value
-DEFAULT_SHAKE = 27           # lower number is more sensitive
+DEFAULT_SHAKE = 20           # lower number is more sensitive
 # you can define more animation functions below
 # here, specify the four to be used
 ANIMATIONS = ('spin', 'pulse', 'strobe', 'sparkle')
@@ -39,7 +45,10 @@ accelo_i2c = busio.I2C(board.ACCELEROMETER_SCL, board.ACCELEROMETER_SDA)
 accelo = adafruit_lis3dh.LIS3DH_I2C(accelo_i2c, address=0x19)
 
 # Setup BLE
-uart_server = UARTServer(name=SNOWGLOBE_NAME)
+ble = BLERadio()
+uart = UARTService()
+advertisement = ProvideServicesAdvertisement(uart)
+ble._adapter.name = SNOWGLOBE_NAME #pylint: disable=protected-access
 
 #--| ANIMATIONS |----------------------------------------------------
 def spin(config):
@@ -124,26 +133,35 @@ def indicate(event=None):
             time.sleep(0.1)
 
 indicate('START')
-while True:
-    uart_server.start_advertising()
 
-    # wait for connection
-    while not uart_server.connected:
-        # check for shake while waiting
+
+# Are we already advertising?
+advertising = False
+
+
+while True:
+    # While BLE is *not* connected
+    while not ble.connected:
         if accelo.shake(snow_config['shake'], 5, 0):
             play_animation(snow_config)
+        if not advertising:
+            ble.start_advertising(advertisement)
+            advertising = True
 
     # connected
     indicate('CONNECTED')
 
-    while uart_server.connected:
+
+    while ble.connected:
+        # Once we're connected, we're not advertising any more.
+        advertising = False
 
         if accelo.shake(snow_config['shake'], 5, 0):
             play_animation(snow_config)
 
-        if uart_server.in_waiting:
+        if uart.in_waiting:
             try:
-                packet = Packet.from_stream(uart_server)
+                packet = Packet.from_stream(uart)
             except ValueError:
                 continue
 
