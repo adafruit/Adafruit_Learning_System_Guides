@@ -6,10 +6,7 @@ slide switch. The buttons change the color when advertising.
 """
 
 import time
-import board
-import digitalio
-
-import neopixel
+from adafruit_circuitplayground.bluefruit import cpb
 
 from adafruit_ble import BLERadio
 from adafruit_ble.advertising.adafruit import AdafruitColor
@@ -28,38 +25,27 @@ color_options = [0x110000,
 
 ble = BLERadio()
 
-slide_switch = digitalio.DigitalInOut(board.SLIDE_SWITCH)
-slide_switch.pull = digitalio.Pull.UP
-button_a = digitalio.DigitalInOut(board.BUTTON_A)
-button_a.pull = digitalio.Pull.DOWN
-button_b = digitalio.DigitalInOut(board.BUTTON_B)
-button_b.pull = digitalio.Pull.DOWN
-
-led = digitalio.DigitalInOut(board.D13)
-led.switch_to_output()
-
-neopixels = neopixel.NeoPixel(board.NEOPIXEL, 10, auto_write=False)
-
 i = 0
 advertisement = AdafruitColor()
 advertisement.color = color_options[i]
-neopixels.fill(color_options[i])
+cpb.pixels.auto_write = False
+cpb.pixels.fill(color_options[i])
 while True:
     # The first mode is the color selector which broadcasts it's current color to other devices.
-    if slide_switch.value:
+    if cpb.switch:
         print("Broadcasting color")
         ble.start_advertising(advertisement)
-        while slide_switch.value:
+        while cpb.switch:
             last_i = i
-            if button_a.value:
+            if cpb.button_a:
                 i += 1
-            if button_b.value:
+            if cpb.button_b:
                 i -= 1
             i %= len(color_options)
             if last_i != i:
                 color = color_options[i]
-                neopixels.fill(color)
-                neopixels.show()
+                cpb.pixels.fill(color)
+                cpb.pixels.show()
                 print("New color {:06x}".format(color))
                 advertisement.color = color
                 ble.stop_advertising()
@@ -72,9 +58,9 @@ while True:
         closest_rssi = -80
         closest_last_time = 0
         print("Scanning for colors")
-        while not slide_switch.value:
+        while not cpb.switch:
             for entry in ble.start_scan(AdafruitColor, minimum_rssi=-100, timeout=1):
-                if slide_switch.value:
+                if cpb.switch:
                     break
                 now = time.monotonic()
                 new = False
@@ -87,15 +73,14 @@ while True:
                 closest_rssi = entry.rssi
                 closest_last_time = now
                 discrete_strength = min((100 + entry.rssi) // 5, 10)
-                #print(entry.rssi, discrete_strength)
-                neopixels.fill(0x000000)
+                cpb.pixels.fill(0x000000)
                 for i in range(0, discrete_strength):
-                    neopixels[i] = entry.color
-                neopixels.show()
+                    cpb.pixels[i] = entry.color
+                cpb.pixels.show()
 
             # Clear the pixels if we haven't heard from anything recently.
             now = time.monotonic()
             if now - closest_last_time > 1:
-                neopixels.fill(0x000000)
-                neopixels.show()
+                cpb.pixels.fill(0x000000)
+                cpb.pixels.show()
         ble.stop_scan()
