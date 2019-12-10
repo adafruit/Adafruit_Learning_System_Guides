@@ -4,7 +4,8 @@
 secrets = {
     'ssid' : 'CHANGE ME',
     'password' : 'CHANGE ME',
-    'timezone' : 'CHANGE ME',
+    # leave blank or use timezone from # http://worldtimeapi.org/timezones
+    'timezone' : '',
     'aio_username' : 'CHANGE ME',
     'aio_key' : 'CHANGE ME',
 }
