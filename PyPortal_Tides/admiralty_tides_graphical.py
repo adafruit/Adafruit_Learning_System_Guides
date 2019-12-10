@@ -142,7 +142,10 @@ def update_display(time_info, update_tides=False):
                                                  time_info.tm_min,
                                                  time_info.tm_sec)
 
-    board.DISPLAY.refresh_soon()
+    try:
+        board.DISPLAY.refresh(target_frames_per_second=60)
+    except AttributeError:
+        board.DISPLAY.refresh_soon()
 
 # First run update
 tide_data = get_tide_data()

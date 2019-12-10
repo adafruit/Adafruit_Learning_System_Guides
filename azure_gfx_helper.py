@@ -114,6 +114,8 @@ class Azure_GFX(displayio.Group):
                                                    position=(0,0))
 
         self._icon_group.append(self._icon_sprite)
-        board.DISPLAY.refresh_soon()
-        board.DISPLAY.wait_for_frame()
-  
+        try:
+            board.DISPLAY.refresh(target_frames_per_second=60)
+        except AttributeError:
+            board.DISPLAY.refresh_soon()
+            board.DISPLAY.wait_for_frame()
