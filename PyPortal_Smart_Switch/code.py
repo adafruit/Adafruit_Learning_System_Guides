@@ -16,7 +16,9 @@ import adafruit_touchscreen
 
 from adafruit_minimqtt import MQTT
 
-DISPLAY_COLOR = 0x4444FF
+DISPLAY_COLOR = 0x006600
+SWITCH_COLOR = 0x008800
+SWITCH_FILL_COLOR = 0xffffff
 
 # Switch location
 SWITCHX = 260
@@ -87,9 +89,10 @@ class Switch(object):
     def __init__(self, pin, my_pyportal):
         self.switch = digitalio.DigitalInOut(pin)
         self.switch.direction = digitalio.Direction.OUTPUT
-        rect = RoundRect(SWITCHX, SWITCHY, 31, 60, 16, fill=0x0, outline=DISPLAY_COLOR, stroke=3)
+        rect = RoundRect(SWITCHX, SWITCHY, 31, 60, 16, outline=SWITCH_COLOR,
+                         fill=SWITCH_FILL_COLOR, stroke=3)
         my_pyportal.splash.append(rect)
-        self.circle_on = Circle(SWITCHX + 15, SWITCHY + 16, 10, fill=0x0)
+        self.circle_on = Circle(SWITCHX + 15, SWITCHY + 16, 10, fill=SWITCH_FILL_COLOR)
         my_pyportal.splash.append(self.circle_on)
         self.circle_off = Circle(SWITCHX + 15, SWITCHY + 42, 10, fill=DISPLAY_COLOR)
         my_pyportal.splash.append(self.circle_off)
@@ -99,10 +102,10 @@ class Switch(object):
         print("turning switch to ", enable)
         self.switch.value = enable
         if enable:
-            self.circle_off.fill = 0x0
+            self.circle_off.fill = SWITCH_FILL_COLOR
             self.circle_on.fill = DISPLAY_COLOR
         else:
-            self.circle_on.fill = 0x0
+            self.circle_on.fill = SWITCH_FILL_COLOR
             self.circle_off.fill = DISPLAY_COLOR
 
     def toggle(self):
@@ -127,11 +130,11 @@ class Clock(object):
         self.pyportal = my_pyportal
         self.current_time = 0
         self.light = analogio.AnalogIn(board.LIGHT)
-        text_area_configs = [dict(x=0, y=110, size=10, color=DISPLAY_COLOR, font=time_font),
-                             dict(x=260, y=165, size=3, color=DISPLAY_COLOR, font=ampm_font),
-                             dict(x=10, y=40, size=20, color=DISPLAY_COLOR, font=date_font)]
+        text_area_configs = [dict(x=0, y=105, size=10, color=DISPLAY_COLOR, font=time_font),
+                             dict(x=260, y=153, size=3, color=DISPLAY_COLOR, font=ampm_font),
+                             dict(x=110, y=40, size=20, color=DISPLAY_COLOR, font=date_font)]
         self.text_areas = create_text_areas(text_area_configs)
-        self.text_areas[2].text = "starting ..."
+        self.text_areas[2].text = "starting..."
         for ta in self.text_areas:
             self.pyportal.splash.append(ta)
 
@@ -229,7 +232,9 @@ if esp.status == adafruit_esp32spi.WL_IDLE_STATUS:
     print("Firmware vers.", esp.firmware_version)
     print("MAC addr:", [hex(i) for i in esp.MAC_address])
 
-pyportal = PyPortal(esp=esp, external_spi=spi)
+pyportal = PyPortal(esp=esp,
+                    external_spi=spi,
+                    default_bg="/background.bmp")
 
 ampm_font = bitmap_font.load_font("/fonts/RobotoMono-18.bdf")
 ampm_font.load_glyphs(b'ampAMP')
