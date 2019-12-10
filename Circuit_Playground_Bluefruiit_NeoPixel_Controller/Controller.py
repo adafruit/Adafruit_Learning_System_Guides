@@ -1,6 +1,6 @@
 """
 Control code for Circuit Playground Bluefruit NeoPixel Animation and Color controller. To be used
-with receiver code.
+with another Circuit Playground Bluefruit running the receiver code.
 """
 
 import time
@@ -25,7 +25,7 @@ def send_packet(uart_connection_name, packet):
     """Returns False if no longer connected."""
     try:
         uart_connection_name[UARTService].write(packet.to_bytes())
-    except (OSError, KeyError):
+    except:  # pylint: disable=bare-except
         try:
             uart_connection_name.disconnect()
         except:  # pylint: disable=bare-except
@@ -36,6 +36,7 @@ def send_packet(uart_connection_name, packet):
 
 ble = BLERadio()
 
+# Setup for preventing repeated button presses and tracking switch state
 button_a_pressed = False
 button_b_pressed = False
 last_switch_state = None
@@ -50,53 +51,56 @@ if ble.connected:
 
 while True:
     last_switch_state = None
-    if not uart_connection or not uart_connection.connected:
+    if not uart_connection or not uart_connection.connected:  # If not connected...
         print("Scanning...")
-        for adv in ble.start_scan(ProvideServicesAdvertisement, timeout=5):
-            if UARTService in adv.services:
+        for adv in ble.start_scan(ProvideServicesAdvertisement, timeout=5):  # Scan...
+            if UARTService in adv.services:  # If UARTService found...
                 print("Found a UARTService advertisement.")
-                uart_connection = ble.connect(adv)
+                uart_connection = ble.connect(adv)  # Create a UART connection...
                 break
         # Stop scanning whether or not we are connected.
-        ble.stop_scan()
-    while uart_connection and uart_connection.connected:
-        if cpb.button_a and not button_a_pressed:
+        ble.stop_scan()  # And stop scanning.
+    while uart_connection and uart_connection.connected:  # If connected...
+        if cpb.button_a and not button_a_pressed:  # If button A pressed...
             print("Button A pressed.")
+            # Send a LEFT button packet.
             if not send_packet(uart_connection,
                                ButtonPacket(ButtonPacket.LEFT, pressed=True)):
                 uart_connection = None
                 continue
-            button_a_pressed = True
-            time.sleep(0.05)
-        if not cpb.button_a and button_a_pressed:
-            button_a_pressed = False
-            time.sleep(0.05)
-        if cpb.button_b and not button_b_pressed:
+            button_a_pressed = True  # Set to True.
+            time.sleep(0.05)  # Debounce.
+        if not cpb.button_a and button_a_pressed:  # On button release...
+            button_a_pressed = False  # Set to False.
+            time.sleep(0.05)  # Debounce.
+        if cpb.button_b and not button_b_pressed:  # If button B pressed...
             print("Button B pressed.")
+            # Send a RIGHT button packet.
             if not send_packet(uart_connection,
                                ButtonPacket(ButtonPacket.RIGHT, pressed=True)):
                 uart_connection = None
                 continue
-            button_b_pressed = True
-            time.sleep(0.05)
-        if not cpb.button_b and button_b_pressed:
-            button_b_pressed = False
-            time.sleep(0.05)
-        if cpb.switch is not last_switch_state:
-            last_switch_state = cpb.switch
+            button_b_pressed = True  # Set to True.
+            time.sleep(0.05)  # Debounce.
+        if not cpb.button_b and button_b_pressed:  # On button release...
+            button_b_pressed = False  # Set to False.
+            time.sleep(0.05)  # Debounce.
+        if cpb.switch is not last_switch_state:  # If the switch state is changed...
+            last_switch_state = cpb.switch  # Set state to current switch state.
             print("Switch is to the", "left: LEDs off!" if cpb.switch else "right: LEDs on!")
+            # Send a BUTTON_1 button packet.
             if not send_packet(uart_connection,
                                ButtonPacket(ButtonPacket.BUTTON_1, pressed=cpb.switch)):
                 uart_connection = None
                 continue
-        if cpb.switch:
-            cpb.pixels.fill(0)
-        else:
-            r, g, b = map(scale, cpb.acceleration)
-            color = (r, g, b)
-            print(color)
-            cpb.pixels.fill(color)
-            if not send_packet(uart_connection, ColorPacket(color)):
+        if cpb.switch:  # If switch is to the left...
+            cpb.pixels.fill((0, 0, 0))  # Turn off the LEDs.
+        else:  # Otherwise...
+            r, g, b = map(scale, cpb.acceleration)  # Map acceleration values to RGB values...
+            color = (r, g, b)  # Set color to current mapped RGB value...
+            print("Color:", color)
+            cpb.pixels.fill(color)  # Fill controller LEDs with current color...
+            if not send_packet(uart_connection, ColorPacket(color)):  # And send a color packet.
                 uart_connection = None
                 continue
-        time.sleep(0.1)
+        time.sleep(0.1)  # Delay to prevent sending packets too quickly.
