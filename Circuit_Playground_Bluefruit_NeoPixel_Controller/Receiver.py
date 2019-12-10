@@ -28,7 +28,6 @@ BLINK_INITIAL_COLOR = color.RED  # Color before controller is connected
 
 # Setup for comet animation
 COMET_SPEED = 0.03  # Lower numbers increase the animation speed
-COMET_INITIAL_COLOR = color.MAGENTA  # Color before controller is connected
 CPB_COMET_TAIL_LENGTH = 5  # The length of the comet on the Circuit Playground Bluefruit
 STRIP_COMET_TAIL_LENGTH = 15  # The length of the comet on the NeoPixel strip
 CPB_COMET_BOUNCE = False  # Set to True to make the comet "bounce" the opposite direction on CPB
@@ -36,7 +35,6 @@ STRIP_COMET_BOUNCE = True  # Set to False to stop comet from "bouncing" on NeoPi
 
 # Setup for sparkle animation
 SPARKLE_SPEED = 0.03  # Lower numbers increase the animation speed
-SPARKLE_INITIAL_COLOR = color.PURPLE  # Color before controller is connected
 
 # Create the NeoPixel strip
 strip_pixels = neopixel.NeoPixel(board.A1, STRIP_PIXEL_NUMBER, auto_write=False)
