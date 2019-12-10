@@ -87,7 +87,10 @@ while True:
             time.sleep(0.05)  # Debounce.
         if cpb.switch is not last_switch_state:  # If the switch state is changed...
             last_switch_state = cpb.switch  # Set state to current switch state.
-            print("Switch is to the", "left: LEDs off!" if cpb.switch else "right: LEDs on!")
+            if cpb.switch:
+                print("Switch is to the left: LEDs off!")
+            else:
+                print("Switch is to the right: LEDs on!")
             # Send a BUTTON_1 button packet.
             if not send_packet(uart_connection,
                                ButtonPacket(ButtonPacket.BUTTON_1, pressed=cpb.switch)):
