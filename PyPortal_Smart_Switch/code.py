@@ -89,7 +89,8 @@ class Switch(object):
     def __init__(self, pin, my_pyportal):
         self.switch = digitalio.DigitalInOut(pin)
         self.switch.direction = digitalio.Direction.OUTPUT
-        rect = RoundRect(SWITCHX, SWITCHY, 31, 60, 16, outline=SWITCH_COLOR, fill=SWITCH_FILL_COLOR, stroke=3)
+        rect = RoundRect(SWITCHX, SWITCHY, 31, 60, 16, outline=SWITCH_COLOR,
+                         fill=SWITCH_FILL_COLOR, stroke=3)
         my_pyportal.splash.append(rect)
         self.circle_on = Circle(SWITCHX + 15, SWITCHY + 16, 10, fill=SWITCH_FILL_COLOR)
         my_pyportal.splash.append(self.circle_on)
