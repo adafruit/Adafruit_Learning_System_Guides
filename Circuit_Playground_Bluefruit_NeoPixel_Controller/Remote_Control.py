@@ -1,6 +1,6 @@
 """
-Control code for Circuit Playground Bluefruit NeoPixel Animation and Color controller. To be used
-with another Circuit Playground Bluefruit running the receiver code.
+Remote Control code for Circuit Playground Bluefruit NeoPixel Animation and Color Remote Control.
+To be used with another Circuit Playground Bluefruit running the NeoPixel Animator code.
 """
 
 import time
