@@ -52,14 +52,14 @@ animations = AnimationSequence(
         sync=True
     ),
     AnimationGroup(
-        Comet(cpb.pixels, COMET_SPEED, COMET_INITIAL_COLOR, tail_length=CPB_COMET_TAIL_LENGTH,
+        Comet(cpb.pixels, COMET_SPEED, color.MAGENTA, tail_length=CPB_COMET_TAIL_LENGTH,
               bounce=CPB_COMET_BOUNCE),
-        Comet(strip_pixels, COMET_SPEED, COMET_INITIAL_COLOR, tail_length=STRIP_COMET_TAIL_LENGTH,
+        Comet(strip_pixels, COMET_SPEED, color.MAGENTA, tail_length=STRIP_COMET_TAIL_LENGTH,
               bounce=STRIP_COMET_BOUNCE)
     ),
     AnimationGroup(
-        Sparkle(cpb.pixels, SPARKLE_SPEED, SPARKLE_INITIAL_COLOR),
-        Sparkle(strip_pixels, SPARKLE_SPEED, SPARKLE_INITIAL_COLOR)
+        Sparkle(cpb.pixels, SPARKLE_SPEED, color.PURPLE),
+        Sparkle(strip_pixels, SPARKLE_SPEED, color.PURPLE)
     ),
 )
 
