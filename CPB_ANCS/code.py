@@ -48,8 +48,6 @@ b.switch_to_input(pull=digitalio.Pull.DOWN)
 file = open("/triode_rise.wav", "rb")
 wave = WaveFile(file)
 
-update_time = time.monotonic()
-
 def play_sound():
     audio.play(wave)
     time.sleep(1)
@@ -63,17 +61,26 @@ def find_connection():
         return connection, connection[AppleNotificationService]
     return None, None
 
-def check_dim_timeout():
-    global update_time
-    if a.value or b.value:
-        update_time = time.monotonic()
-    if time.monotonic() - update_time > DIM_TIMEOUT:
-        if display.brightness > DIM_LEVEL:
-            display.brightness = DIM_LEVEL
-    else:
-        if display.brightness == DIM_LEVEL:
-            display.brightness = 1.0
+class Dimmer:
+    def __init__(self):
+        self._update_time = time.monotonic()
+        self._level = DIM_LEVEL
+        self._timeout = DIM_TIMEOUT
 
+    def update(self):
+        self._update_time = time.monotonic()
+
+    def check_timeout(self):
+        if a.value or b.value:
+            self._update_time = time.monotonic()
+        if time.monotonic() - self._update_time > self._timeout:
+            if display.brightness > self._level:
+                display.brightness = self._level
+        else:
+            if display.brightness == self._level:
+                display.brightness = 1.0
+
+dimmer = Dimmer()
 
 # Start advertising before messing with the display so that we can connect immediately.
 radio = adafruit_ble.BLERadio()
@@ -103,10 +110,10 @@ while True:
 
     while not active_connection:
         active_connection, notification_service = find_connection()
-        check_dim_timeout()
+        dimmer.check_timeout()
 
     # Connected
-    update_time = time.monotonic()
+    dimmer.update()
     play_sound()
 
     with open("/ancs_none.bmp", "rb") as no_notifications:
@@ -114,13 +121,15 @@ while True:
         while active_connection.connected:
             all_ids.clear()
             current_notifications = notification_service.active_notifications
-            for id in current_notifications:
-                notification = current_notifications[id]
+            for notif_id in current_notifications:
+                notification = current_notifications[notif_id]
                 if notification.app_id not in APP_ICONS or notification.app_id in BLACKLIST:
                     continue
-                all_ids.append(id)
+                all_ids.append(notif_id)
 
+            # pylint: disable=protected-access
             all_ids.sort(key=lambda x: current_notifications[x]._raw_date)
+            # pylint: enable=protected-access
 
             if current_notification and current_notification.removed:
                 # Stop showing the latest and show that there are no new notifications.
@@ -128,7 +137,7 @@ while True:
 
             if not current_notification and not all_ids and not cleared:
                 cleared = True
-                update_time = time.monotonic()
+                dimmer.update()
                 group[1] = wrap_in_tilegrid(no_notifications)
             elif all_ids:
                 cleared = False
@@ -145,18 +154,20 @@ while True:
                     if a.value and index < len(all_ids) - 1:
                         last_press = now
                         index += 1
-                id = all_ids[index]
-                if not current_notification or current_notification.id != id:
-                    update_time = now
-                    current_notification = current_notifications[id]
+                notif_id = all_ids[index]
+                if not current_notification or current_notification.id != notif_id:
+                    dimmer.update()
+                    current_notification = current_notifications[notif_id]
+                    # pylint: disable=protected-access
                     print(current_notification._raw_date, current_notification)
-
+                    # pylint: enable=protected-access
                     app_icon_file = open(APP_ICONS[current_notification.app_id], "rb")
                     group[1] = wrap_in_tilegrid(app_icon_file)
 
-            check_dim_timeout()
+            dimmer.check_timeout()
 
+        # Bluetooth Disconnected
         group.pop()
-        update_time = time.monotonic()
+        dimmer.update()
         active_connection = None
         notification_service = None
