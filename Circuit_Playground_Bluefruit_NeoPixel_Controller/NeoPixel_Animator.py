@@ -24,7 +24,7 @@ STRIP_PIXEL_NUMBER = 30
 
 # Setup for blink animation
 BLINK_SPEED = 0.5  # Lower numbers increase the animation speed
-BLINK_INITIAL_COLOR = color.RED  # Color before controller is connected
+BLINK_INITIAL_COLOR = color.RED  # Color before Remote Control is connected
 
 # Setup for comet animation
 COMET_SPEED = 0.03  # Lower numbers increase the animation speed
@@ -75,7 +75,7 @@ while True:
             animations.animate()  # Run the animations.
         if ble.connected:  # If BLE is connected...
             was_connected = True
-            if uart.in_waiting:  # Check to see if any data is available from the controller.
+            if uart.in_waiting:  # Check to see if any data is available from the Remote Control.
                 try:
                     packet = Packet.from_stream(uart)  # Create the packet object.
                 except ValueError:
@@ -91,15 +91,15 @@ while True:
                 elif isinstance(packet, ButtonPacket):  # If the packet is a button packet...
                     # Check to see if it's BUTTON_1 (which is being sent by the slide switch)
                     if packet.button == ButtonPacket.BUTTON_1:
-                        if packet.pressed:  # If controller switch is to the left...
-                            print("Controller switch is to the left: LEDs off!")
-                        else:  # If the controller switch is to the right...
-                            print("Controller switch is to the right: LEDs on!")
-                        # If the controller switch is moved from right to left...
+                        if packet.pressed:  # If Remote Control switch is to the left...
+                            print("Remote Control switch is to the left: LEDs off!")
+                        else:  # If the Remote Control switch is to the right...
+                            print("Remote Control switch is to the right: LEDs on!")
+                        # If the Remote Control switch is moved from right to left...
                         if packet.pressed and not blanked:
                             animations.fill(color.BLACK)  # Turn off the LEDs.
                         blanked = packet.pressed  # Track the state of the slide switch.
-                    if packet.pressed:  # If the buttons on the controller are pressed...
+                    if packet.pressed:  # If the buttons on the Remote Control are pressed...
                         if packet.button == ButtonPacket.LEFT:  # If button A is pressed...
                             print("A pressed: animation mode changed.")
                             animations.next()  # Change to the next animation.
