@@ -1,6 +1,6 @@
 """
-Receiver code for Circuit Playground Bluefruit NeoPixel Animation and Color controller. To be used
-with another Circuit Playground Bluefruit running the controller code.
+NeoPixel Animator code for Circuit Playground Bluefruit NeoPixel Animation and Color Remote Control.
+To be used with another Circuit Playground Bluefruit running the Remote Control code.
 """
 
 import board
