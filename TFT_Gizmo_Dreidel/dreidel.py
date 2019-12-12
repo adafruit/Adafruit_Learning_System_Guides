@@ -5,6 +5,8 @@ import adafruit_imageload
 from adafruit_circuitplayground.bluefruit import cpb
 from adafruit_gizmo import tft_gizmo
 
+SHAKE_THRESHOLD = 20
+
 #pylint: disable=bad-continuation
 # define melody to play while spinning (freq, duration)
 melody = (
@@ -56,7 +58,7 @@ splash.append(symbols_group)
 tile = 0
 while True:
     # wait for shake
-    while not cpb.shake():
+    while not cpb.shake(shake_threshold=SHAKE_THRESHOLD):
         pass
     # play melody while "spinning" the symbols
     for note, duration in melody:
