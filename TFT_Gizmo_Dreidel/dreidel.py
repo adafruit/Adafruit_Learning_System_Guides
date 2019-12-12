@@ -1,11 +1,11 @@
 import time
 import random
-import board
 import displayio
 import adafruit_imageload
 from adafruit_circuitplayground.bluefruit import cpb
 from adafruit_gizmo import tft_gizmo
 
+#pylint: disable=bad-continuation
 # define melody to play while spinning (freq, duration)
 melody = (
 #      oh       drei       del      drei      del
@@ -22,6 +22,7 @@ melody = (
     (330, 8), (294, 8), (262, 16),
 )
 melody_tempo = 0.02
+#pylint: enable=bad-continuation
 
 # setup TFT Gizmo and main display group (splash)
 display = tft_gizmo.TFT_Gizmo()
