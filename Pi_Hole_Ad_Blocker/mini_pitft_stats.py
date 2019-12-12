@@ -66,9 +66,7 @@ backlight.value = True
 
 # Add buttons as inputs
 buttonA = digitalio.DigitalInOut(board.D23)
-buttonB = digitalio.DigitalInOut(board.D24)
 buttonA.switch_to_input()
-buttonB.switch_to_input()
 
 while True:
     # Draw a black filled box to clear the image.
@@ -100,7 +98,7 @@ while True:
         continue
 
     y = top
-    if buttonB.value and not buttonA.value:  # just button A pressed
+    if not buttonA.value:  # just button A pressed
         draw.text((x, y), IP, font=font, fill="#FFFF00")
         y += font.getsize(IP)[1]
         draw.text((x, y), CPU, font=font, fill="#FFFF00")
@@ -110,7 +108,7 @@ while True:
         draw.text((x, y), Disk, font=font, fill="#0000FF")
         y += font.getsize(Disk)[1]
         draw.text((x, y), "DNS Queries: {}".format(DNSQUERIES), font=font, fill="#FF00FF")
-    if buttonA.value and buttonB.value:  # none pressed
+    else:
         draw.text((x, y), IP, font=font, fill="#FFFF00")
         y += font.getsize(IP)[1]
         draw.text((x, y), HOST, font=font, fill="#FFFF00")
