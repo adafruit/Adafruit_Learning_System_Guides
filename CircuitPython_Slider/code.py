@@ -1,11 +1,8 @@
 import time
 import displayio
 import terminalio
-import board
 import adafruit_imageload
 from adafruit_display_text.label import Label
-from adafruit_seesaw.seesaw import Seesaw
-from adafruit_st7735r import ST7735R
 from adafruit_featherwing import minitft_featherwing
 from adafruit_motorkit import MotorKit
 from adafruit_motor import stepper
@@ -26,31 +23,12 @@ reverseqBMP = "/reverseQ_bmp.bmp"
 backingUpBMP = "/backingup_bmp.bmp"
 stopBMP = "/stopping_bmp.bmp"
 
-# Release any resources currently in use for the displays
-displayio.release_displays()
-
 #variables for state machines in loop
 mode = 0
 onOff = 0
 pause = 0
 stop = 0
 z = 0
-
-#seesaw setup for minitft featherwing
-reset_pin = 8
-i2c = board.I2C()
-ss = Seesaw(i2c, 0x5E)
-ss.pin_mode(reset_pin, ss.OUTPUT)
-
-#tft setup for minitft featherwing
-spi = board.SPI()
-tft_cs = board.D5
-tft_dc = board.D6
-display_bus = displayio.FourWire(spi, command=tft_dc, chip_select=tft_cs)
-ss.digital_write(reset_pin, True)
-
-#display for displayio and minitft
-display = ST7735R(display_bus, width=160, height=80, colstart=24, rotation=270, bgr=True)
 
 #image groups
 five_minGroup = displayio.Group(max_size=20)
@@ -140,208 +118,205 @@ check = 0
 begin = time.monotonic()
 print(begin)
 #when feather is powered up it shows the initial graphic splash
-display.show(graphics[mode])
+minitft.display.show(graphics[mode])
 
 while True:
-    try:
-        #setup minitft featherwing buttons
-        buttons = minitft.buttons
-        #define the buttons' state changes
-        if not buttons.down and down_state is None:
-            down_state = "pressed"
-        if not buttons.up and up_state is None:
-            up_state = "pressed"
-        if not buttons.select and select_state is None:
-            select_state = "pressed"
-        if not buttons.a and a_state is None:
-            a_state = "pressed"
-        if not buttons.b and b_state is None:
-            b_state = "pressed"
-        #scroll down to change slide duration and graphic
-        if buttons.down and down_state == "pressed":
-            #blocks the button if the slider is sliding or
-            #in an inbetween state
-            if pause == 1 or onOff == 1:
-                mode = mode
-                down_state = None
-            else:
-                mode += 1
-                down_state = None
-                if mode > 3:
-                    mode = 0
-                print("Mode:,", mode)
-                display.show(graphics[mode])
-        #scroll up to change slide duration and graphic
-        if buttons.up and up_state == "pressed":
-            #blocks the button if the slider is sliding or
-            #in an inbetween state
-            if pause == 1 or onOff == 1:
-                mode = mode
-                up_state = None
-            else:
-                mode -= 1
-                up_state = None
-                if mode < 0:
-                    mode = 3
-                print("Mode: ", mode)
-                display.show(graphics[mode])
-        #workaround so that the menu graphics show after a slide is finished
-        if mode == mode and pause == 0 and onOff == 0:
-            display.show(graphics[mode])
-        #starts slide
-        if buttons.select and select_state == "pressed" or z == 2:
-            #blocks the button if the slider is sliding or
-            #in an inbetween state
-            if pause == 1 or onOff == 1:
-                #print("null")
-                select_state = None
-            else:
-                #shows the slider is sliding graphic
-                display.show(progBarGroup)
-                #gets time of button press
-                press = time.monotonic()
-                print(press)
-                #displays initial timer
-                text_area.text = slide_begin[mode]
-                #resets button
-                select_state = None
-                #changes onOff state
-                onOff += 1
-                #changes z state
-                z = 0
-                if onOff > 1:
-                    onOff = 0
-                #number of steps for the length of the aluminum extrusions
-                for i in range(17200):
-                    #for loop start time
-                    start = time.monotonic()
-                    #gets actual duration time
-                    real_time = start - press
-                    #creates a countdown from the slide's length
-                    end = slide_duration[mode] - real_time
-                    # /60 since time is in seconds
-                    mins_remaining = end / 60
-                    if mins_remaining < 0:
-                        mins_remaining += 60
-                    #gets second(s) count
-                    total_sec_remaining = mins_remaining * 60
-                    #formats to clock time
-                    mins_remaining, total_sec_remaining = divmod(end, 60)
-                    #microstep for the stepper
-                    kit.stepper1.onestep(style=stepper.MICROSTEP)
-                    #delay determines speed of the slide
-                    time.sleep(speed[mode])
-                    if i == slide_checkin[check]:
-                        #check-in for time remaining based on motor steps
-                        print("0%d:%d" %
-                              (mins_remaining, total_sec_remaining))
-                        print(check)
-                        if total_sec_remaining < 10:
-                            text_area.text = "%d:0%d" % (mins_remaining, total_sec_remaining)
-                        else:
-                            text_area.text = "%d:%d" % (mins_remaining, total_sec_remaining)
-                        check = check + 1
-                    if check > 19:
-                        check = 0
-                    if end < 10:
-                        #displays the stopping graphic for the last 10 secs.
-                        display.show(stopGroup)
-                #changes states after slide has completed
-                kit.stepper1.release()
-                pause = 1
+    #setup minitft featherwing buttons
+    buttons = minitft.buttons
+    #define the buttons' state changes
+    if not buttons.down and down_state is None:
+        down_state = "pressed"
+    if not buttons.up and up_state is None:
+        up_state = "pressed"
+    if not buttons.select and select_state is None:
+        select_state = "pressed"
+    if not buttons.a and a_state is None:
+        a_state = "pressed"
+    if not buttons.b and b_state is None:
+        b_state = "pressed"
+    #scroll down to change slide duration and graphic
+    if buttons.down and down_state == "pressed":
+        #blocks the button if the slider is sliding or
+        #in an inbetween state
+        if pause == 1 or onOff == 1:
+            mode = mode
+            down_state = None
+        else:
+            mode += 1
+            down_state = None
+            if mode > 3:
+                mode = 0
+            print("Mode:,", mode)
+            minitft.display.show(graphics[mode])
+    #scroll up to change slide duration and graphic
+    if buttons.up and up_state == "pressed":
+        #blocks the button if the slider is sliding or
+        #in an inbetween state
+        if pause == 1 or onOff == 1:
+            mode = mode
+            up_state = None
+        else:
+            mode -= 1
+            up_state = None
+            if mode < 0:
+                mode = 3
+            print("Mode: ", mode)
+            minitft.display.show(graphics[mode])
+    #workaround so that the menu graphics show after a slide is finished
+    if mode == mode and pause == 0 and onOff == 0:
+        minitft.display.show(graphics[mode])
+    #starts slide
+    if buttons.select and select_state == "pressed" or z == 2:
+        #blocks the button if the slider is sliding or
+        #in an inbetween state
+        if pause == 1 or onOff == 1:
+            #print("null")
+            select_state = None
+        else:
+            #shows the slider is sliding graphic
+            minitft.display.show(progBarGroup)
+            #gets time of button press
+            press = time.monotonic()
+            print(press)
+            #displays initial timer
+            text_area.text = slide_begin[mode]
+            #resets button
+            select_state = None
+            #changes onOff state
+            onOff += 1
+            #changes z state
+            z = 0
+            if onOff > 1:
                 onOff = 0
-                stop = 1
-                check = 0
-                #delay for safety
-                time.sleep(2)
-                #shows choice menu
-                display.show(reverseqGroup)
-        #b is defined to stop the slider
-        #only active if the slider is in the 'stopped' state
-        if buttons.b and b_state == "pressed" and stop == 1:
-            #z defines location of the camera on the slider
-            #0 means that it is opposite the motor
-            if z == 0:
-                b_state = None
-                time.sleep(1)
-                display.show(backingUpGroup)
-                #delay for safety
-                time.sleep(2)
-                #brings camera back to 'home' at double speed
-                for i in range(1145):
-                    kit.stepper1.onestep(direction=stepper.BACKWARD, style=stepper.DOUBLE)
-                time.sleep(1)
-                kit.stepper1.release()
-                #changes states
-                pause = 0
-                stop = 0
-            #1 means that the camera is next to the motor
-            if z == 1:
-                b_state = None
-                time.sleep(2)
-                #changes states
-                pause = 0
-                stop = 0
-                z = 0
-        #a is defined to slide in reverse of the prev. slide
-        #only active if the slider is in the 'stopped' state
-        if buttons.a and a_state == "pressed" and stop == 1:
-            #z defines location of the camera on the slider
-            #1 means that the camera is next to the motor
-            if z == 1:
-                a_state = None
-                time.sleep(2)
-                stop = 0
-                pause = 0
-                #2 allows the 'regular' slide loop to run
-                #as if the 'select' button has been pressed
-                z = 2
-            #0 means that the camera is opposite the motor
-            if z == 0:
-                a_state = None
-                #same script as the 'regular' slide loop
-                time.sleep(2)
-                display.show(progBarGroup)
-                press = time.monotonic()
-                print(press)
-                text_area.text = slide_begin[mode]
-                onOff += 1
-                pause = 0
-                stop = 0
-                if onOff > 1:
-                    onOff = 0
-                for i in range(17200):
-                    start = time.monotonic()
-                    real_time = start - press
-                    end = slide_duration[mode] - real_time
-                    mins_remaining = end / 60
-                    if mins_remaining < 0:
-                        mins_remaining += 60
-                    total_sec_remaining = mins_remaining * 60
-                    mins_remaining, total_sec_remaining = divmod(end, 60)
-                    #only difference is that the motor is stepping backwards
-                    kit.stepper1.onestep(direction=stepper.BACKWARD, style=stepper.MICROSTEP)
-                    time.sleep(speed[mode])
-                    if i == slide_checkin[check]:
-                        print("0%d:%d" %
-                              (mins_remaining, total_sec_remaining))
-                        if total_sec_remaining < 10:
-                            text_area.text = "%d:0%d" % (mins_remaining, total_sec_remaining)
-                        else:
-                            text_area.text = "%d:%d" % (mins_remaining, total_sec_remaining)
-                        check = check + 1
-                    if check > 19:
-                        check = 0
-                    if end < 10:
-                        display.show(stopGroup)
-                #state changes
-                kit.stepper1.release()
-                pause = 1
+            #number of steps for the length of the aluminum extrusions
+            for i in range(17200):
+                #for loop start time
+                start = time.monotonic()
+                #gets actual duration time
+                real_time = start - press
+                #creates a countdown from the slide's length
+                end = slide_duration[mode] - real_time
+                # /60 since time is in seconds
+                mins_remaining = end / 60
+                if mins_remaining < 0:
+                    mins_remaining += 60
+                #gets second(s) count
+                total_sec_remaining = mins_remaining * 60
+                #formats to clock time
+                mins_remaining, total_sec_remaining = divmod(end, 60)
+                #microstep for the stepper
+                kit.stepper1.onestep(style=stepper.MICROSTEP)
+                #delay determines speed of the slide
+                time.sleep(speed[mode])
+                if i == slide_checkin[check]:
+                    #check-in for time remaining based on motor steps
+                    print("0%d:%d" %
+                          (mins_remaining, total_sec_remaining))
+                    print(check)
+                    if total_sec_remaining < 10:
+                        text_area.text = "%d:0%d" % (mins_remaining, total_sec_remaining)
+                    else:
+                        text_area.text = "%d:%d" % (mins_remaining, total_sec_remaining)
+                    check = check + 1
+                if check > 19:
+                    check = 0
+                if end < 10:
+                    #displays the stopping graphic for the last 10 secs.
+                    minitft.display.show(stopGroup)
+            #changes states after slide has completed
+            kit.stepper1.release()
+            pause = 1
+            onOff = 0
+            stop = 1
+            check = 0
+            #delay for safety
+            time.sleep(2)
+            #shows choice menu
+            minitft.display.show(reverseqGroup)
+    #b is defined to stop the slider
+    #only active if the slider is in the 'stopped' state
+    if buttons.b and b_state == "pressed" and stop == 1:
+        #z defines location of the camera on the slider
+        #0 means that it is opposite the motor
+        if z == 0:
+            b_state = None
+            time.sleep(1)
+            minitft.display.show(backingUpGroup)
+            #delay for safety
+            time.sleep(2)
+            #brings camera back to 'home' at double speed
+            for i in range(1145):
+                kit.stepper1.onestep(direction=stepper.BACKWARD, style=stepper.DOUBLE)
+            time.sleep(1)
+            kit.stepper1.release()
+            #changes states
+            pause = 0
+            stop = 0
+        #1 means that the camera is next to the motor
+        if z == 1:
+            b_state = None
+            time.sleep(2)
+            #changes states
+            pause = 0
+            stop = 0
+            z = 0
+    #a is defined to slide in reverse of the prev. slide
+    #only active if the slider is in the 'stopped' state
+    if buttons.a and a_state == "pressed" and stop == 1:
+        #z defines location of the camera on the slider
+        #1 means that the camera is next to the motor
+        if z == 1:
+            a_state = None
+            time.sleep(2)
+            stop = 0
+            pause = 0
+            #2 allows the 'regular' slide loop to run
+            #as if the 'select' button has been pressed
+            z = 2
+        #0 means that the camera is opposite the motor
+        if z == 0:
+            a_state = None
+            #same script as the 'regular' slide loop
+            time.sleep(2)
+            minitft.display.show(progBarGroup)
+            press = time.monotonic()
+            print(press)
+            text_area.text = slide_begin[mode]
+            onOff += 1
+            pause = 0
+            stop = 0
+            if onOff > 1:
                 onOff = 0
-                stop = 1
-                z = 1
-                check = 0
-                time.sleep(2)
-                display.show(reverseqGroup)
-    except MemoryError:
-        pass
+            for i in range(17200):
+                start = time.monotonic()
+                real_time = start - press
+                end = slide_duration[mode] - real_time
+                mins_remaining = end / 60
+                if mins_remaining < 0:
+                    mins_remaining += 60
+                total_sec_remaining = mins_remaining * 60
+                mins_remaining, total_sec_remaining = divmod(end, 60)
+                #only difference is that the motor is stepping backwards
+                kit.stepper1.onestep(direction=stepper.BACKWARD, style=stepper.MICROSTEP)
+                time.sleep(speed[mode])
+                if i == slide_checkin[check]:
+                    print("0%d:%d" %
+                          (mins_remaining, total_sec_remaining))
+                    if total_sec_remaining < 10:
+                        text_area.text = "%d:0%d" % (mins_remaining, total_sec_remaining)
+                    else:
+                        text_area.text = "%d:%d" % (mins_remaining, total_sec_remaining)
+                    check = check + 1
+                if check > 19:
+                    check = 0
+                if end < 10:
+                    minitft.display.show(stopGroup)
+            #state changes
+            kit.stepper1.release()
+            pause = 1
+            onOff = 0
+            stop = 1
+            z = 1
+            check = 0
+            time.sleep(2)
+            minitft.display.show(reverseqGroup)
