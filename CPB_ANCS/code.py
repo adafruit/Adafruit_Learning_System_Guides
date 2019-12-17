@@ -34,7 +34,7 @@ APP_ICONS = {
     "com.apple.mobilephone": "/ancs_phone.bmp"
 }
 
-BLACKLIST = []
+BLOCKLIST = []
 DELAY_AFTER_PRESS = 15
 DEBOUNCE = 0.1
 DIM_TIMEOUT = 20   # Amount of timeout to turn off backlight
@@ -123,7 +123,7 @@ while True:
             current_notifications = notification_service.active_notifications
             for notif_id in current_notifications:
                 notification = current_notifications[notif_id]
-                if notification.app_id not in APP_ICONS or notification.app_id in BLACKLIST:
+                if notification.app_id not in APP_ICONS or notification.app_id in BLOCKLIST:
                     continue
                 all_ids.append(notif_id)
 
