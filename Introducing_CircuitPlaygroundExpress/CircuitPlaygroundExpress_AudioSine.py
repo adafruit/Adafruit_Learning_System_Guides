@@ -34,6 +34,10 @@ speaker_enable.value = True
 audio = AudioOut(board.SPEAKER)
 sine_wave_sample = RawSample(sine_wave)
 
-audio.play(sine_wave_sample, loop=True)  # Keep playing the sample over and over
-time.sleep(1)  # until...
-audio.stop()  # We tell the board to stop
+# A single sine wave sample is hundredths of a second long. If you set loop=False, it will play
+# a single instance of the sample (a quick burst of sound) and then silence for the rest of the
+# duration of the time.sleep(). If loop=True, it will play the single instance of the sample
+# continuously for the duration of the time.sleep().
+audio.play(sine_wave_sample, loop=True)  # Play the single sine_wave sample continuously...
+time.sleep(1)  # for the duration of the sleep (in seconds)
+audio.stop()  # and then stop.
