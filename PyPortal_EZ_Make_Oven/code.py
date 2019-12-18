@@ -16,7 +16,7 @@ import adafruit_touchscreen
 from adafruit_mcp9600 import MCP9600
 
 TITLE = "EZ Make Oven Controller"
-VERSION = "1.0.1"
+VERSION = "1.1.0"
 
 print(TITLE, "version ", VERSION)
 time.sleep(2)
@@ -248,7 +248,7 @@ class ReflowOvenControl(object):
 class Graph(object):
     def __init__(self):
         self.xmin = 0
-        self.xmax = 360
+        self.xmax = 720  # graph up to 12 minutes
         self.ymin = 0
         self.ymax = 240
         self.xstart = 0
@@ -303,6 +303,9 @@ class Graph(object):
 
     def draw_graph_point(self, x, y, size=PROFILE_SIZE, color=1):
         """ draw point using graph coordinates """
+
+        # wrap around graph point when x goes out of bounds
+        x = (x - self.xmin) % (self.xmax - self.xmin) + self.xmin
         xx = (self.xstart + self.width * (x - self.xmin)
               // (self.xmax - self.xmin))
         yy = (self.ystart + int(self.height * (y - self.ymin)
@@ -418,8 +421,12 @@ timediff = 0
 oven = ReflowOvenControl(board.D4)
 print("melting point: ", oven.sprofile["melting_point"])
 font1 = bitmap_font.load_font("/fonts/OpenSans-9.bdf")
+font1.load_glyphs(b'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789/:')
 font2 = bitmap_font.load_font("/fonts/OpenSans-12.bdf")
+font2.load_glyphs(b'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789/:')
 font3 = bitmap_font.load_font("/fonts/OpenSans-16.bdf")
+font3.load_glyphs(b'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789/:')
+
 
 label_reflow = label.Label(font1, text="", max_glyphs=10,
                            color=LABEL_COLOR, line_spacing=0)
@@ -477,8 +484,8 @@ sgraph = Graph()
 
 sgraph.xstart = 100
 sgraph.ystart = 4
-sgraph.width = 216
-sgraph.height = 160
+sgraph.width = WIDTH - sgraph.xstart - 4  # 216 for standard PyPortal
+sgraph.height = HEIGHT - 80  # 160 for standard PyPortal
 sgraph.xmin = oven.sprofile["time_range"][0]
 sgraph.xmax = oven.sprofile["time_range"][1]
 sgraph.ymin = oven.sprofile["temp_range"][0]
@@ -488,7 +495,7 @@ print("y range:", sgraph.ymin, sgraph.ymax)
 draw_profile(sgraph, oven.sprofile)
 buttons = []
 if oven.sensor_status:
-    button = Button(x=0, y=200, width=80, height=40,
+    button = Button(x=0, y=HEIGHT-40, width=80, height=40,
                     label="Start", label_font=font2)
     buttons.append(button)
 
