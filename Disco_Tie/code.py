@@ -15,12 +15,17 @@ import math
 import audiobusio
 import board
 import neopixel
-from adafruit_ble.uart_server import UARTServer
+
+from adafruit_ble import BLERadio
+from adafruit_ble.advertising.standard import ProvideServicesAdvertisement
+from adafruit_ble.services.nordic import UARTService
 from adafruit_bluefruit_connect.packet import Packet
 from adafruit_bluefruit_connect.color_packet import ColorPacket
 from adafruit_bluefruit_connect.button_packet import ButtonPacket
 
-uart_server = UARTServer()
+ble = BLERadio()
+uart_service = UARTService()
+advertisement = ProvideServicesAdvertisement(uart_service)
 
 # User input vars
 mode = 0 # 0=audio, 1=rainbow, 2=larsen_scanner, 3=solid
@@ -29,6 +34,9 @@ user_color= (127,0,0)
 # Audio meter vars
 PEAK_COLOR = (100, 0, 255)
 NUM_PIXELS = 10
+NEOPIXEL_PIN = board.A1
+# Use this instead if you want to use the NeoPixels on the Circuit Playground Bluefruit.
+# NEOPIXEL_PIN = board.NEOPIXEL
 CURVE = 2
 SCALE_EXPONENT = math.pow(10, CURVE * -0.1)
 NUM_SAMPLES = 160
@@ -62,7 +70,7 @@ def volume_color(volume):
     return 200, volume * (255 // NUM_PIXELS), 0
 
 # Set up NeoPixels and turn them all off.
-pixels = neopixel.NeoPixel(board.A1, NUM_PIXELS, brightness=0.1, auto_write=False)
+pixels = neopixel.NeoPixel(NEOPIXEL_PIN, NUM_PIXELS, brightness=0.1, auto_write=False)
 pixels.fill(0)
 pixels.show()
 
@@ -191,15 +199,18 @@ def change_speed(mod, old_speed):
     return(new_speed, map_value(new_speed, 10.0, 0.0, 0.01, 0.3))
 
 while True:
-    # While BLE is *not* connected
-    if not uart_server.connected:
-        # OK to call again even if already advertising
-        uart_server.start_advertising()
+    ble.start_advertising(advertisement)
+    while not ble.connected:
+        pass
 
     # While BLE is connected
-    else:
-        if uart_server.in_waiting:
-            packet = Packet.from_stream(uart_server)
+    while ble.connected:
+        if uart_service.in_waiting:
+            try:
+                packet = Packet.from_stream(uart_service)
+            # Ignore malformed packets.
+            except ValueError:
+                continue
 
             # Received ColorPacket
             if isinstance(packet, ColorPacket):
@@ -221,12 +232,12 @@ while True:
                     elif packet.button == ButtonPacket.BUTTON_4:
                         mode = 3
 
-    # Determine animation based on mode
-    if mode == 0:
-        peak = audio_meter(peak)
-    elif mode == 1:
-        rainbow_cycle(0.001)
-    elif mode == 2:
-        larsen(wait)
-    elif mode == 3:
-        solid(user_color)
+        # Determine animation based on mode
+        if mode == 0:
+            peak = audio_meter(peak)
+        elif mode == 1:
+            rainbow_cycle(0.001)
+        elif mode == 2:
+            larsen(wait)
+        elif mode == 3:
+            solid(user_color)
