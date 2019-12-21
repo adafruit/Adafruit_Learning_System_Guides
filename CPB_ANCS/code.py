@@ -12,7 +12,7 @@ import digitalio
 import displayio
 import adafruit_ble
 from adafruit_ble.advertising.standard import SolicitServicesAdvertisement
-from adafruit_ble.services.apple import AppleNotificationService
+from adafruit_ble_apple_notification_center import AppleNotificationCenterService
 from adafruit_gizmo import tft_gizmo
 from audiocore import WaveFile
 from audiopwmio import PWMAudioOut as AudioOut
@@ -54,11 +54,11 @@ def play_sound():
 
 def find_connection():
     for connection in radio.connections:
-        if AppleNotificationService not in connection:
+        if AppleNotificationCenterService not in connection:
             continue
         if not connection.paired:
             connection.pair()
-        return connection, connection[AppleNotificationService]
+        return connection, connection[AppleNotificationCenterService]
     return None, None
 
 class Dimmer:
@@ -86,7 +86,7 @@ dimmer = Dimmer()
 radio = adafruit_ble.BLERadio()
 advertisement = SolicitServicesAdvertisement()
 advertisement.complete_name = "CIRCUITPY"
-advertisement.solicited_services.append(AppleNotificationService)
+advertisement.solicited_services.append(AppleNotificationCenterService)
 
 def wrap_in_tilegrid(open_file):
     odb = displayio.OnDiskBitmap(open_file)
