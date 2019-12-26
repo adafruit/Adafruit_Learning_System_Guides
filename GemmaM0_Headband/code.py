@@ -9,11 +9,12 @@ import microcontroller
 import neopixel
 import adafruit_dotstar
 
+ROOM_TEMP = 65.0  # Set this to the temp to change from blue to red (F)
+
 # Set up NeoPixel strand
 pixels = neopixel.NeoPixel(board.D1,  # NeoPixels on pin D1
                            4,         # Number of Pixels
-                           brightness=0.2,   # Change from 0.0 to 1.0
-                           auto_write=True)  # Write strand immediately
+                           brightness=0.2)   # Change from 0.0 to 1.0
 
 # For the Gemma M0 onboard DotStar LED
 dotstar = adafruit_dotstar.DotStar(board.APA102_SCK, board.APA102_MOSI, 1)
@@ -23,7 +24,7 @@ def deg_f(deg_c):  # Convert Celcius to Fahrenheit
 
 while True:
     temp = deg_f(microcontroller.cpu.temperature)
-    if temp > 65.0:
+    if temp > ROOM_TEMP:
         pixels.fill((255, 0, 0))   # (255,0,0) is red
         dotstar.fill((255, 0, 0))  # Set to red
     else:
