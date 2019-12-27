@@ -7,12 +7,16 @@ from adafruit_ntp import NTP
 import adafruit_hashlib as hashlib
 from adafruit_binascii import hexlify, unhexlify
 
+# Get wifi details and more from a secrets.py file
+try:
+    from secrets import secrets
+except ImportError:
+    print("WiFi secrets are kept in secrets.py, please add them there!")
+    raise
+
 # https://github.com/pyotp/pyotp example
-totp = [("Discord ", 'JBSWY3DPEHPK3PXP'),
-        ("Gmail   ", 'abcdefghijklmnopqrstuvwxyz234567'),
-        ("Accounts", 'asfdkwefoaiwejfa323nfjkl')]
-ssid = 'my_wifi_ssid'
-password = 'my_wifi_password'
+totp = [("Gmail   ", 'JBSWY3DPEHPK3PXP')]
+
 
 TEST = True  # if you want to print out the tests the hashers
 ALWAYS_ON = False  # Set to true if you never want to go to sleep!
@@ -23,6 +27,16 @@ SECS_DAY = 86400
 
 # Create a SHA1 Object
 SHA1 = hashlib.sha1
+
+# PyPortal ESP32 AirLift Pins
+esp32_cs = DigitalInOut(board.ESP_CS)
+esp32_ready = DigitalInOut(board.ESP_BUSY)
+esp32_reset = DigitalInOut(board.ESP_RESET)
+
+# Initialize PyPortal ESP32 AirLift
+spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
+esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset)
+
 
 if TEST:
     print("===========================================")
@@ -118,3 +132,46 @@ def generate_otp(int_input, secret_key, digits=6):
     return str_code
 
 print("===========================================")
+
+
+print("Connecting to AP...")
+while not esp.is_connected:
+    try:
+        esp.connect_AP(secrets['ssid'], secrets['password'])
+    except RuntimeError as e:
+        print("could not connect to AP, retrying: ", e)
+        continue
+
+print("Connected to SSID: ", secrets['ssid'])
+
+# Initialize the NTP object
+ntp = NTP(esp)
+
+# Fetch and set the microcontroller's current UTC time
+# keep retrying until a valid time is returned
+while not ntp.valid_time:
+    ntp.set_time()
+    print("Failed to obtain time, retrying in 15 seconds...")
+    time.sleep(15)
+
+# Get the current time in seconds since Jan 1, 1970
+t = time.time()
+print("Seconds since Jan 1, 1970: {} seconds".format(t))
+
+# Instead of using RTC which means converting back and forth
+# we'll just keep track of seconds-elapsed-since-NTP-call
+mono_time = int(time.monotonic())
+print("Monotonic time", mono_time)
+
+countdown = ON_SECONDS  # how long to stay on if not in always_on mode
+while ALWAYS_ON or (countdown > 0):
+    # Calculate current time based on NTP + monotonic
+    unix_time = t - mono_time + int(time.monotonic())
+    print("Unix time: ", unix_time)
+    # We can do up to 3 per line on the Feather OLED
+    for name, secret in totp:
+        otp = generate_otp(unix_time // 30, secret)
+        print(name + " OTP output: ", otp)  # serial debugging output
+    # We'll update every 1/4 second, we can hash very fast so its no biggie!
+    countdown -= 0.25
+    time.sleep(0.25)
