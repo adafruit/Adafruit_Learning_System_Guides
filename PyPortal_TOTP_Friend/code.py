@@ -1,11 +1,38 @@
 import time
+
 import board
 import busio
 from digitalio import DigitalInOut
+
+import adafruit_hashlib as hashlib
+import adafruit_touchscreen
+import displayio
+import neopixel
+import terminalio
+from adafruit_binascii import hexlify, unhexlify
+from adafruit_bitmap_font import bitmap_font
+from adafruit_display_shapes.circle import Circle
+from adafruit_display_shapes.roundrect import RoundRect
+from adafruit_display_text.label import Label
 from adafruit_esp32spi import adafruit_esp32spi
 from adafruit_ntp import NTP
-import adafruit_hashlib as hashlib
-from adafruit_binascii import hexlify, unhexlify
+from adafruit_pyportal import PyPortal
+
+# Initialize PyPortal Display
+display = board.DISPLAY
+
+WIDTH = board.DISPLAY.width
+HEIGHT = board.DISPLAY.height
+ 
+ts = adafruit_touchscreen.Touchscreen(board.TOUCH_XL, board.TOUCH_XR,
+                                      board.TOUCH_YD, board.TOUCH_YU,
+                                      calibration=(
+                                          (5200, 59000),
+                                          (5800, 57000)
+                                          ),
+                                      size=(WIDTH, HEIGHT))
+
+
 
 # Get wifi details and more from a secrets.py file
 try:
@@ -14,13 +41,9 @@ except ImportError:
     print("WiFi secrets are kept in secrets.py, please add them there!")
     raise
 
-
 TEST = True  # if you want to print out the tests the hashers
-ALWAYS_ON = False  # Set to true if you never want to go to sleep!
+ALWAYS_ON = True  # Set to true if you never want to go to sleep!
 ON_SECONDS = 60  # how long to stay on if not in always_on mode
-
-EPOCH_DELTA = 946684800  # seconds between year 2000 and year 1970
-SECS_DAY = 86400
 
 # Create a SHA1 Object
 SHA1 = hashlib.sha1
@@ -35,12 +58,6 @@ spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
 esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset)
 
 
-if TEST:
-    print("===========================================")
-    sha1_output = hexlify(SHA1(b'hello world').digest())
-    assert sha1_output == b"2aae6c35c94fcfb415dbe95f408b9ce91ee846ed"
-
-
 # HMAC implementation, as hashlib/hmac wouldn't fit
 # From https://en.wikipedia.org/wiki/Hash-based_message_authentication_code
 def HMAC(k, m):
@@ -51,14 +68,6 @@ def HMAC(k, m):
     inner_message = KEY_INNER + m
     outer_message = KEY_OUTER + SHA1(inner_message).digest()
     return SHA1(outer_message)
-
-
-if TEST:
-    KEY = b'abcd'
-    MESSAGE = b'efgh'
-    print("===========================================")
-    hmac_out = hexlify(HMAC(KEY, MESSAGE).digest())
-    assert hmac_out == b'e5dbcf9263188f9fce90df572afeb39b66b27198' 
 
 def base32_decode(encoded):
     missing_padding = len(encoded) % 8
@@ -93,10 +102,6 @@ def base32_decode(encoded):
                 out.append(byte)  # store what we got
     return out
 
-if TEST:
-    print("===========================================")
-    assert (bytes(base32_decode("IFSGCZTSOVUXIIJB")) == b'Adafruit!!')
-
 def int_to_bytestring(i, padding=8):
     result = []
     while i != 0:
@@ -108,7 +113,6 @@ def int_to_bytestring(i, padding=8):
 
 # HMAC -> OTP generator, pretty much same as
 # https://github.com/pyotp/pyotp/blob/master/src/pyotp/otp.py
-
 
 def generate_otp(int_input, secret_key, digits=6):
     if int_input < 0:
@@ -128,17 +132,54 @@ def generate_otp(int_input, secret_key, digits=6):
 
     return str_code
 
+
 print("===========================================")
 
+# GFX Font
+font = terminalio.FONT
+
+
+# Initialize new PyPortal object
+pyportal = PyPortal(esp=esp,
+                    external_spi=spi)
+
+# Root DisplayIO
+root_group = displayio.Group(max_size=200)
+display.show(root_group)
+
+# TODO: Add press-able icon group
+
+# Text DisplayIO
+text_group = displayio.Group(max_size=100)
+
+# TOTP Key Label, scaled 5x
+key_group = displayio.Group(scale=5)
+# We'll use a default text placeholder for this label
+label_key = Label(font, text="000 000")
+label_key.x = (display.width // 2) // 15
+label_key.y = 5
+key_group.append(label_key)
+text_group.append(key_group)
+
+# Create a label for the status
+label_status = Label(font, max_glyphs=45)
+label_status.x = (display.width // 2) - 50
+label_status.y = 75
+text_group.append(label_status)
+display.show(text_group)
 
 print("Connecting to AP...")
+label_status.text = "Connecting to AP..."
 while not esp.is_connected:
     try:
         esp.connect_AP(secrets['ssid'], secrets['password'])
     except RuntimeError as e:
         print("could not connect to AP, retrying: ", e)
+        label_status.text("Retrying...")
         continue
 
+label_status.text = "Connected! Fetching NTP..."
+#label_status.text("Connected to {}, fetching NTP...".format(secrets['ssid']))
 print("Connected to SSID: ", secrets['ssid'])
 
 # Initialize the NTP object
@@ -148,8 +189,11 @@ ntp = NTP(esp)
 # keep retrying until a valid time is returned
 while not ntp.valid_time:
     ntp.set_time()
-    print("Failed to obtain time, retrying in 15 seconds...")
-    time.sleep(15)
+    label_status.text = "NTP Fetch Failed, retrying.."
+    print("Failed to obtain time, retrying in 5 seconds...")
+    time.sleep(5)
+
+label_status.text = "NTP Set!"
 
 # Get the current time in seconds since Jan 1, 1970
 t = time.time()
@@ -167,6 +211,11 @@ while ALWAYS_ON or (countdown > 0):
     # print("Unix time: ", unix_time)
     for name, secret in secrets['totp_keys']:
         otp = generate_otp(unix_time // 30, secret)
+        # TODO: This needs to get cleaned up into a one-liner
+        otp = str(otp)
+        formatted_otp = "{} {}".format(otp[0:3],otp[3:6])
+        label_key.text = formatted_otp
+        label_status.text = name
         print(name + " OTP output: ", otp)  # serial debugging output
     # We'll update every 1/4 second, we can hash very fast so its no biggie!
     countdown -= 0.25
