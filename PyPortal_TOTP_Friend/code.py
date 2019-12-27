@@ -14,9 +14,6 @@ except ImportError:
     print("WiFi secrets are kept in secrets.py, please add them there!")
     raise
 
-# https://github.com/pyotp/pyotp example
-totp = [("Gmail   ", 'JBSWY3DPEHPK3PXP')]
-
 
 TEST = True  # if you want to print out the tests the hashers
 ALWAYS_ON = False  # Set to true if you never want to go to sleep!
@@ -167,9 +164,8 @@ countdown = ON_SECONDS  # how long to stay on if not in always_on mode
 while ALWAYS_ON or (countdown > 0):
     # Calculate current time based on NTP + monotonic
     unix_time = t - mono_time + int(time.monotonic())
-    print("Unix time: ", unix_time)
-    # We can do up to 3 per line on the Feather OLED
-    for name, secret in totp:
+    # print("Unix time: ", unix_time)
+    for name, secret in secrets['totp_keys']:
         otp = generate_otp(unix_time // 30, secret)
         print(name + " OTP output: ", otp)  # serial debugging output
     # We'll update every 1/4 second, we can hash very fast so its no biggie!
