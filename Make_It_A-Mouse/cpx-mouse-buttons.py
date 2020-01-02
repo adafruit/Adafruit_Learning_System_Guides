@@ -1,4 +1,4 @@
-import usb
+import usb_hid
 from adafruit_circuitplayground.express import cpx
 from adafruit_hid.mouse import Mouse
 
