@@ -22,21 +22,9 @@ from adafruit_pyportal import PyPortal
 # Background/Images
 BACKGROUND = 0x059ACE
 
-# Initialize PyPortal Display
-display = board.DISPLAY
-
-WIDTH = board.DISPLAY.width
-HEIGHT = board.DISPLAY.height
- 
-ts = adafruit_touchscreen.Touchscreen(board.TOUCH_XL, board.TOUCH_XR,
-                                      board.TOUCH_YD, board.TOUCH_YU,
-                                      calibration=(
-                                          (5200, 59000),
-                                          (5800, 57000)
-                                          ),
-                                      size=(WIDTH, HEIGHT))
-
-
+TEST = True  # if you want to print out the tests the hashers
+ALWAYS_ON = True  # Set to true if you never want to go to sleep!
+ON_SECONDS = 60  # how long to stay on if not in always_on mode
 
 # Get wifi details and more from a secrets.py file
 try:
@@ -45,9 +33,20 @@ except ImportError:
     print("WiFi secrets are kept in secrets.py, please add them there!")
     raise
 
-TEST = True  # if you want to print out the tests the hashers
-ALWAYS_ON = True  # Set to true if you never want to go to sleep!
-ON_SECONDS = 60  # how long to stay on if not in always_on mode
+
+# Initialize PyPortal Display
+display = board.DISPLAY
+
+WIDTH = board.DISPLAY.width
+HEIGHT = board.DISPLAY.height
+ts = adafruit_touchscreen.Touchscreen(board.TOUCH_XL, board.TOUCH_XR,
+                                      board.TOUCH_YD, board.TOUCH_YU,
+                                      calibration=(
+                                          (5200, 59000),
+                                          (5800, 57000)
+                                          ),
+                                      size=(WIDTH, HEIGHT))
+
 
 # Create a SHA1 Object
 SHA1 = hashlib.sha1
@@ -199,9 +198,8 @@ while not esp.is_connected:
         label_status.text("Retrying...")
         continue
 
-label_status.text = "Connected! Fetching NTP..."
-#label_status.text("Connected to {}, fetching NTP...".format(secrets['ssid']))
 print("Connected to SSID: ", secrets['ssid'])
+label_status.text = "Connected! Fetching NTP..."
 
 # Initialize the NTP object
 ntp = NTP(esp)
@@ -213,34 +211,6 @@ while not ntp.valid_time:
     print("Failed to obtain time, retrying in 5 seconds...")
     time.sleep(5)
 
-# Clear the status label
-label_status.text = ""
-
-# Add buttons to the interface
-# TODO: Generate them like in https://learn.adafruit.com/pyportal-philips-hue-lighting-controller/code-walkthrough
-# TODO: Make these dynamically based on what is store in secrets.py 
-# TODO: Add icons to buttons instead of text
-
-BUTTON_WIDTH = 60
-BUTTON_HEIGHT = 60
-BUTTON_MARGIN = 20
-buttons = []
-
-button_0 =  Button(name='Gmail',x=0, y=130,
-                  width=BUTTON_WIDTH, height=BUTTON_HEIGHT,
-                  label="Gmail", label_font=font, style=Button.ROUNDRECT,  fill_color=0xFF0000)
-buttons.append(button_0)
-
-
-button_1 =  Button(name='Discord',x=70, y=130,
-                  width=BUTTON_WIDTH, height=BUTTON_HEIGHT,
-                  label="Discord", label_font=font, style=Button.ROUNDRECT,  fill_color=0x9900FF)
-buttons.append(button_1)
-
-for b in buttons:
-    splash.append(b.group)
-
-
 # Get the current time in seconds since Jan 1, 1970
 t = time.time()
 print("Seconds since Jan 1, 1970: {} seconds".format(t))
@@ -250,28 +220,55 @@ print("Seconds since Jan 1, 1970: {} seconds".format(t))
 mono_time = int(time.monotonic())
 print("Monotonic time", mono_time)
 
+# Clear the status label
+label_status.text = ""
+
+# Add buttons to the interface
+# TODO: Generate them like in https://learn.adafruit.com/pyportal-philips-hue-lighting-controller/code-walkthrough
+# TODO: Make these dynamically based on what is store in secrets.py 
+# TODO: Add icons to buttons instead of text
+
+assert len(secrets['totp_keys']) < 8, "This code can only render 8 keys at a time"
+
+buttons = []
+
+# generate buttons
+btn_x = 20
+for i in secrets['totp_keys']:
+    print(i)
+    button = Button(name=i[0], x=btn_x, y=130,
+                    width=60, height=60,
+                    label=i[0], label_font=font, label_color=0x0,
+                    fill_color=None, outline_color=None)
+    buttons.append(button)
+    btn_x+=60
+
+# append buttons to splash group
+for b in buttons:
+    splash.append(b.group)
+
+
+
 countdown = ON_SECONDS  # how long to stay on if not in always_on mode
 while ALWAYS_ON or (countdown > 0):
     # Calculate current time based on NTP + monotonic
     unix_time = t - mono_time + int(time.monotonic())
     p = ts.touch_point
     if p:
-        print(p)
         for i, b in enumerate(buttons):
             if b.contains(p):
-                print("Button %d pressed" % i)
                 b.selected = True
                 for name, secret in secrets['totp_keys']:
-                    print(b.name)
                     if b.name == name:
-                        print('button selected: ', name)
+                        # generate OTP
+                        #print('Background color: ', background_color)
                         otp = generate_otp(unix_time // 30, secret)
-                        # TODO: This needs to get cleaned up into a one-liner
-                        otp = str(otp)
-                        formatted_otp = "{} {}".format(otp[0:3],otp[3:6])
-                        label_key.text = formatted_otp
+                        print('{} selected: '.format(name))
+                        print(name + " OTP output: ", otp)
+                        # display the key's name
                         label_title.text = name
-                        print(name + " OTP output: ", otp)  # serial debugging output
+                        # format and display the OTP
+                        label_key.text = "{} {}".format(str(otp)[0:3],str(otp)[3:6])
             else:
                 b.selected = False
     # We'll update every 1/4 second, we can hash very fast so its no biggie!
