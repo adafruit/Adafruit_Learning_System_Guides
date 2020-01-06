@@ -238,6 +238,7 @@ for b in buttons:
 
 # how long to stay on if not in always_on mode
 countdown = ON_SECONDS
+timer = 30
 
 # current button state, defaults to first item in totp_keys
 current_button = secrets['totp_keys'][0][0]
@@ -273,6 +274,13 @@ while ALWAYS_ON or (countdown > 0):
                 label_title.text = name
                 # format and display the OTP
                 label_secret.text = "{} {}".format(str(otp)[0:3],str(otp)[3:6])
+
+    if timer > 0:
+        timer=-0.25
+        print('Timer: ', int(timer))
+    else:
+        # reset the display timer
+        timer = 30
 
     # We'll update every 1/4 second, we can hash very fast so its no biggie!
     countdown -= 0.25
