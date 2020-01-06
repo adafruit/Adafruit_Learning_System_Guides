@@ -1,18 +1,18 @@
 import time
 
-import board
-import busio
-from digitalio import DigitalInOut
-
 import adafruit_hashlib as hashlib
 import adafruit_touchscreen
+import board
+import busio
 import displayio
 import terminalio
 from adafruit_button import Button
+from adafruit_display_shapes.rect import Rect
 from adafruit_display_text.label import Label
 from adafruit_esp32spi import adafruit_esp32spi
 from adafruit_ntp import NTP
 from adafruit_pyportal import PyPortal
+from digitalio import DigitalInOut
 
 # Background Color
 BACKGROUND = 0x059ACE
@@ -234,8 +234,12 @@ for b in buttons:
 # refrsh timer label
 label_timer = Label(font, max_glyphs=2)
 label_timer.x = (display.width // 2) // 13
-label_timer.y = 150
+label_timer.y = 15
 splash.append(label_timer)
+
+# timer bar
+rect = Rect(0, 150, 100, 20, fill=0xFF0000)
+splash.append(rect)
 
 # how long to stay on if not in always_on mode
 countdown = ON_SECONDS
@@ -249,11 +253,22 @@ while ALWAYS_ON or (countdown > 0):
     # Calculate current time based on NTP + monotonic
     unix_time = t - mono_time + int(time.monotonic())
 
+    # Update the key refresh timer
     timer = time.localtime(time.time()).tm_sec
     print('Timer:', timer)
-    timer = 30 - timer
-    print('Timer 2:', timer)
-    label_timer.text = str(timer)
+    if timer > 30:
+        countdown = 60 - timer
+    else:
+        countdown = 30 - timer
+    print('countdown:', countdown)
+
+    # "animate" the timer-bar
+    # TODO: make bar reset at :00/:30
+    # TODO: decrease the timer
+    # TODO: make bar red when it gets close to :00/:30
+    splash.remove(rect)
+    rect = Rect(0, 140, countdown, 30, fill=0xFF0000)
+    splash.append(rect)
 
     p = ts.touch_point
     if p:
