@@ -97,13 +97,15 @@ BUTTON_MARGIN = 10
 # Button Objects
 button_1 = Button(x=BUTTON_MARGIN, y=BUTTON_MARGIN,
                   width=BUTTON_WIDTH, height=BUTTON_HEIGHT,
-                  label="Button 1", label_font=font, style=Button.SHADOWROUNDRECT, label_color=0x505050,
+                  label="Button 1", label_font=font,
+                  style=Button.SHADOWROUNDRECT, label_color=0x505050,
                   fill_color=0x9e9e9e, outline_color=0x464646)
 buttons.append(button_1)
 
 button_2 = Button(x=BUTTON_MARGIN, y=BUTTON_MARGIN*2+BUTTON_HEIGHT,
                   width=BUTTON_WIDTH, height=BUTTON_HEIGHT,
-                  label="Button 2", label_font=font, style=Button.SHADOWROUNDRECT, label_color=0x505050,
+                  label="Button 2", label_font=font,
+                  style=Button.SHADOWROUNDRECT, label_color=0x505050,
                   fill_color=0x9e9e9e, outline_color=0x464646)
 buttons.append(button_2)
 
@@ -197,11 +199,11 @@ wifi.connect()
 
 # Set up a MiniMQTT Client
 client = MQTT(socket,
-            broker = secrets['broker'],
-            port = 1883,
-            username = secrets['user'],
-            password = secrets['pass'],
-            network_manager = wifi)
+              broker = secrets['broker'],
+              port = 1883,
+              username = secrets['user'],
+              password = secrets['pass'],
+              network_manager = wifi)
 
 # Connect callback handlers to client
 client.on_connect = connect
