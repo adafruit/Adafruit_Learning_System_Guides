@@ -1,18 +1,20 @@
 import time
 
-import adafruit_hashlib as hashlib
-import adafruit_touchscreen
 import board
 import busio
+from digitalio import DigitalInOut
 import displayio
 import terminalio
+
+import adafruit_hashlib as hashlib
+import adafruit_touchscreen
 from adafruit_button import Button
 from adafruit_display_shapes.rect import Rect
 from adafruit_display_text.label import Label
 from adafruit_esp32spi import adafruit_esp32spi
 from adafruit_ntp import NTP
 from adafruit_pyportal import PyPortal
-from digitalio import DigitalInOut
+
 
 # Background Color
 BACKGROUND = 0x059ACE
@@ -194,10 +196,10 @@ while not esp.is_connected:
     try:
         esp.connect_AP(secrets['ssid'], secrets['password'])
     except RuntimeError as e:
-        print("could not connect to AP, retrying: ", e)
+        print("Could not connect to AP, retrying: ", e)
         continue
 
-print("Connected to SSID: ", secrets['ssid'])
+print("Connected to ", secrets['ssid'])
 
 # Initialize the NTP object
 ntp = NTP(esp)
@@ -206,7 +208,7 @@ ntp = NTP(esp)
 # keep retrying until a valid time is returned
 while not ntp.valid_time:
     ntp.set_time()
-    print("Failed to obtain time, retrying in 5 seconds...")
+    print("Could not obtain NTP, re-fetching in 5 seconds...")
     time.sleep(5)
 
 # Get the current time in seconds since Jan 1, 1970
@@ -246,7 +248,7 @@ label_timer.y = 15
 splash.append(label_timer)
 
 # timer bar
-rect = Rect(0, 150, 0, 20, fill=0xFF0000)
+rect = Rect(0, 120, 0, 30, fill=0xFF0000)
 splash.append(rect)
 
 # how long to stay on if not in always_on mode
@@ -277,7 +279,7 @@ while ALWAYS_ON or (countdown > 0):
         fill_color = 0xFF0000
     # "animate" the timer-bar
     splash.remove(rect)
-    rect = Rect(0, 140, countdown*12, 30, fill=fill_color)
+    rect = Rect(0, 120, countdown*12, 30, fill=fill_color)
     splash.append(rect)
 
     # poll the touchscreen
@@ -310,5 +312,5 @@ while ALWAYS_ON or (countdown > 0):
                 # format and display the OTP
                 label_secret.text = "{} {}".format(str(otp)[0:3], str(otp)[3:6])
     # We'll update every 1/4 second, we can hash very fast so its no biggie!
-    countdown -= 0.1
-    time.sleep(0.1)
+    countdown -= 0.25
+    time.sleep(0.25)
