@@ -19,11 +19,11 @@ from adafruit_esp32spi import adafruit_esp32spi
 from adafruit_ntp import NTP
 from adafruit_pyportal import PyPortal
 
-# Background/Images
+# Background Color
 BACKGROUND = 0x059ACE
 
 TEST = True  # if you want to print out the tests the hashers
-ALWAYS_ON = True  # Set to true if you never want to go to sleep!
+ALWAYS_ON = False  # Set to true if you never want to go to sleep!
 ON_SECONDS = 60  # how long to stay on if not in always_on mode
 
 # Get wifi details and more from a secrets.py file
@@ -150,7 +150,6 @@ pyportal = PyPortal(esp=esp,
 root_group = displayio.Group(max_size=200)
 display.show(root_group)
 
-# TODO: Add press-able icon group
 
 BACKGROUND = BACKGROUND if isinstance(BACKGROUND, int) else 0x000000
 bg_bitmap = displayio.Bitmap(display.width, display.height, 1)
@@ -165,47 +164,22 @@ splash.append(background)
 
 key_group = displayio.Group(scale=5)
 # We'll use a default text placeholder for this label
-label_key = Label(font, text="000 000")
-label_key.x = (display.width // 2) // 13
-label_key.y = 20
-key_group.append(label_key)
+label_secret = Label(font, text="000 000")
+label_secret.x = (display.width // 2) // 13
+label_secret.y = 20
+key_group.append(label_secret)
 
 label_title = Label(font, max_glyphs=14)
 label_title.text = "loading..."
-label_title.x = (display.width // 2) // 10
+label_title.x = (display.width // 2) // 13
 label_title.y = 5
 key_group.append(label_title)
 
 # append key_group to splash
 splash.append(key_group)
+
 # Show the group
 display.show(splash)
-
-# Add buttons to the interface
-assert len(secrets['totp_keys']) < 6, "This code can only render 5 keys at a time"
-
-# generate buttons
-buttons = []
-
-btn_x = 5
-for i in secrets['totp_keys']:
-    print(i)
-    try:
-        if i[2]:
-            color = i[2]
-    except IndexError:
-        color = 0x00FF00
-    button = Button(name=i[0], x=btn_x, y=175,
-                    width=60, height=60,
-                    label=i[0], label_font=font, label_color=0xFFFFFF,
-                    fill_color=color, style=Button.ROUNDRECT)
-    buttons.append(button)
-    btn_x+=63
-
-# append buttons to splash group
-for b in buttons:
-    splash.append(b.group)
-
 
 print("Connecting to AP...")
 while not esp.is_connected:
@@ -236,11 +210,36 @@ print("Seconds since Jan 1, 1970: {} seconds".format(t))
 mono_time = int(time.monotonic())
 print("Monotonic time", mono_time)
 
+# Add buttons to the interface
+assert len(secrets['totp_keys']) < 6, "This code can only render 5 keys at a time"
 
-countdown = ON_SECONDS  # how long to stay on if not in always_on mode
+# generate buttons
+buttons = []
+
+btn_x = 5
+for i in secrets['totp_keys']:
+    button = Button(name=i[0], x=btn_x, y=175,
+                    width=60, height=60,
+                    label=i[0], label_font=font, label_color=0xFFFFFF,
+                    fill_color=0x00FF00, style=Button.ROUNDRECT)
+    buttons.append(button)
+    # add some padding btween buttons
+    btn_x+=63
+
+# append buttons to splash group
+for b in buttons:
+    splash.append(b.group)
+
+# how long to stay on if not in always_on mode
+countdown = ON_SECONDS
+
+# current button state, defaults to first item in totp_keys
+current_button = secrets['totp_keys'][0][0]
+
 while ALWAYS_ON or (countdown > 0):
     # Calculate current time based on NTP + monotonic
     unix_time = t - mono_time + int(time.monotonic())
+
     p = ts.touch_point
     if p:
         for i, b in enumerate(buttons):
@@ -248,17 +247,25 @@ while ALWAYS_ON or (countdown > 0):
                 b.selected = True
                 for name, secret in secrets['totp_keys']:
                     if b.name == name:
-                        # generate OTP
-                        #print('Background color: ', background_color)
+                        current_button = name
+                        # Generate OTP
                         otp = generate_otp(unix_time // 30, secret)
-                        print('{} selected: '.format(name))
-                        print(name + " OTP output: ", otp)
                         # display the key's name
                         label_title.text = name
                         # format and display the OTP
-                        label_key.text = "{} {}".format(str(otp)[0:3],str(otp)[3:6])
+                        label_secret.text = "{} {}".format(str(otp)[0:3],str(otp)[3:6])
             else:
                 b.selected = False
+    else:
+        for name, secret in secrets['totp_keys']:
+            if current_button == name:
+                # Generate OTP
+                otp = generate_otp(unix_time // 30, secret)
+                # display the key's name
+                label_title.text = name
+                # format and display the OTP
+                label_secret.text = "{} {}".format(str(otp)[0:3],str(otp)[3:6])
+
     # We'll update every 1/4 second, we can hash very fast so its no biggie!
     countdown -= 0.25
     time.sleep(0.25)
