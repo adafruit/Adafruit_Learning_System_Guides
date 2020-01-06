@@ -1,11 +1,11 @@
-# PyPortal TOTP Authenticator
 import time
 
-import adafruit_hashlib as hashlib
-import adafruit_imageload
-import adafruit_touchscreen
 import board
 import busio
+from digitalio import DigitalInOut
+
+import adafruit_hashlib as hashlib
+import adafruit_touchscreen
 import displayio
 import neopixel
 import terminalio
@@ -18,7 +18,6 @@ from adafruit_display_text.label import Label
 from adafruit_esp32spi import adafruit_esp32spi
 from adafruit_ntp import NTP
 from adafruit_pyportal import PyPortal
-from digitalio import DigitalInOut
 
 # Background/Images
 BACKGROUND = 0x059ACE
@@ -34,6 +33,7 @@ except ImportError:
     print("WiFi secrets are kept in secrets.py, please add them there!")
     raise
 
+
 # Initialize PyPortal Display
 display = board.DISPLAY
 
@@ -47,6 +47,7 @@ ts = adafruit_touchscreen.Touchscreen(board.TOUCH_XL, board.TOUCH_XR,
                                           ),
                                       size=(WIDTH, HEIGHT))
 
+
 # Create a SHA1 Object
 SHA1 = hashlib.sha1
 
@@ -58,6 +59,7 @@ esp32_reset = DigitalInOut(board.ESP_RESET)
 # Initialize PyPortal ESP32 AirLift
 spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
 esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset)
+
 
 # HMAC implementation, as hashlib/hmac wouldn't fit
 # From https://en.wikipedia.org/wiki/Hash-based_message_authentication_code
@@ -114,6 +116,7 @@ def int_to_bytestring(i, padding=8):
 
 # HMAC -> OTP generator, pretty much same as
 # https://github.com/pyotp/pyotp/blob/master/src/pyotp/otp.py
+
 def generate_otp(int_input, secret_key, digits=6):
     if int_input < 0:
         raise ValueError('input must be positive integer')
@@ -129,6 +132,7 @@ def generate_otp(int_input, secret_key, digits=6):
     str_code = str(code % 10 ** digits)
     while len(str_code) < digits:
         str_code = '0' + str_code
+
     return str_code
 
 
@@ -154,7 +158,7 @@ bg_palette = displayio.Palette(1)
 bg_palette[0] = BACKGROUND
 background = displayio.TileGrid(bg_bitmap, pixel_shader=bg_palette)
 
-# Text DisplayIO
+# Create a new DisplayIO group
 splash = displayio.Group(max_size=100)
 
 splash.append(background)
@@ -163,19 +167,45 @@ key_group = displayio.Group(scale=5)
 # We'll use a default text placeholder for this label
 label_key = Label(font, text="000 000")
 label_key.x = (display.width // 2) // 13
-label_key.y = 17
+label_key.y = 20
 key_group.append(label_key)
 
 label_title = Label(font, max_glyphs=14)
-label_title.text = "loading.."
-label_title.x = (display.width // 2) // 13
+label_title.text = "loading..."
+label_title.x = (display.width // 2) // 10
 label_title.y = 5
 key_group.append(label_title)
 
+# append key_group to splash
 splash.append(key_group)
-
 # Show the group
 display.show(splash)
+
+# Add buttons to the interface
+assert len(secrets['totp_keys']) < 6, "This code can only render 5 keys at a time"
+
+# generate buttons
+buttons = []
+
+btn_x = 5
+for i in secrets['totp_keys']:
+    print(i)
+    try:
+        if i[2]:
+            color = i[2]
+    except IndexError:
+        color = 0x00FF00
+    button = Button(name=i[0], x=btn_x, y=175,
+                    width=60, height=60,
+                    label=i[0], label_font=font, label_color=0xFFFFFF,
+                    fill_color=color, style=Button.ROUNDRECT)
+    buttons.append(button)
+    btn_x+=63
+
+# append buttons to splash group
+for b in buttons:
+    splash.append(b.group)
+
 
 print("Connecting to AP...")
 while not esp.is_connected:
@@ -207,45 +237,28 @@ mono_time = int(time.monotonic())
 print("Monotonic time", mono_time)
 
 
-def display_otp(unix_time, name, secret):
-    """Updates text objects to display the OTP and name.
-
-    :param int unix_time: Current unix time
-    :param str name: OTP name
-    :param str secret: OTP Secret
-    """
-    otp = generate_otp(unix_time // 30, secret)
-    print(name + " OTP output: ", otp)
-    # display the key's name
-    label_title.text = name
-    # format and display the OTP
-    label_key.text = "{} {}".format(str(otp)[0:3],str(otp)[3:6])
-
-def get_unix_time():
-    """Calculate current time based on NTP + monotonic
-
-    """
-    unix_time = t - mono_time + int(time.monotonic())
-    return unix_time
-
-# how long to stay on if not in always_on mode
-countdown = ON_SECONDS
-cur_otp = 0
-max_otp = len(secrets['totp_keys'])
-
-display_otp(get_unix_time(), secrets['totp_keys'][cur_otp][0],
-            secrets['totp_keys'][cur_otp][1])
-
+countdown = ON_SECONDS  # how long to stay on if not in always_on mode
 while ALWAYS_ON or (countdown > 0):
+    # Calculate current time based on NTP + monotonic
+    unix_time = t - mono_time + int(time.monotonic())
     p = ts.touch_point
     if p:
-        if cur_otp < max_otp:
-            display_otp(get_unix_time(), secrets['totp_keys'][cur_otp][0],
-                        secrets['totp_keys'][cur_otp][1])
-            cur_otp+=1
-        else:
-            # reset the current otp display
-            cur_otp = 0
+        for i, b in enumerate(buttons):
+            if b.contains(p):
+                b.selected = True
+                for name, secret in secrets['totp_keys']:
+                    if b.name == name:
+                        # generate OTP
+                        #print('Background color: ', background_color)
+                        otp = generate_otp(unix_time // 30, secret)
+                        print('{} selected: '.format(name))
+                        print(name + " OTP output: ", otp)
+                        # display the key's name
+                        label_title.text = name
+                        # format and display the OTP
+                        label_key.text = "{} {}".format(str(otp)[0:3],str(otp)[3:6])
+            else:
+                b.selected = False
     # We'll update every 1/4 second, we can hash very fast so its no biggie!
     countdown -= 0.25
     time.sleep(0.25)
