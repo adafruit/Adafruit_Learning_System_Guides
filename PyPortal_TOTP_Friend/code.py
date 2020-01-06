@@ -17,9 +17,17 @@ from digitalio import DigitalInOut
 # Background Color
 BACKGROUND = 0x059ACE
 
-TEST = False      # If you want to print out the tests the hashers
-ALWAYS_ON = True  # Set to true if you never want to go to sleep!
-ON_SECONDS = 60   # how long to stay on if not in always_on mode
+# Button color
+BTN_COLOR = 0xFFFFFF
+
+# Button text color
+BTN_TEXT_COLOR = 0x0
+
+# Set to true if you never want to go to sleep!
+ALWAYS_ON = True
+
+# How long to stay on if not in always_on mode
+ON_SECONDS = 60
 
 # Get wifi details and more from a secrets.py file
 try:
@@ -151,8 +159,7 @@ pyportal = PyPortal(esp=esp,
 root_group = displayio.Group(max_size=100)
 display.show(root_group)
 
-
-BACKGROUND = BACKGROUND if isinstance(BACKGROUND, int) else 0x000000
+BACKGROUND = BACKGROUND if isinstance(BACKGROUND, int) else 0x0
 bg_bitmap = displayio.Bitmap(display.width, display.height, 1)
 bg_palette = displayio.Palette(1)
 bg_palette[0] = BACKGROUND
@@ -167,7 +174,7 @@ key_group = displayio.Group(scale=5)
 # We'll use a default text placeholder for this label
 label_secret = Label(font, text="000 000")
 label_secret.x = (display.width // 2) // 13
-label_secret.y = 20
+label_secret.y = 17
 key_group.append(label_secret)
 
 label_title = Label(font, max_glyphs=14)
@@ -219,12 +226,13 @@ buttons = []
 
 btn_x = 5
 for i in secrets['totp_keys']:
-    button = Button(name=i[0], x=btn_x, y=175,
-                    width=60, height=60,
-                    label=i[0], label_font=font, label_color=0xFFFFFF,
-                    fill_color=0x00FF00, style=Button.ROUNDRECT)
+    button = Button(name=i[0], x=btn_x,
+                    y=175, width=60,
+                    height=60, label=i[0],
+                    label_font=font, label_color=BTN_TEXT_COLOR,
+                    fill_color=BTN_COLOR, style=Button.ROUNDRECT)
     buttons.append(button)
-    # add some padding btween buttons
+    # add padding btween buttons
     btn_x += 63
 
 # append buttons to splash group
@@ -238,7 +246,7 @@ label_timer.y = 15
 splash.append(label_timer)
 
 # timer bar
-rect = Rect(0, 150, 100, 20, fill=0xFF0000)
+rect = Rect(0, 150, 0, 20, fill=0xFF0000)
 splash.append(rect)
 
 # how long to stay on if not in always_on mode
@@ -256,26 +264,31 @@ while ALWAYS_ON or (countdown > 0):
     # Update the key refresh timer
     timer = time.localtime(time.time()).tm_sec
     print('Timer:', timer)
+    # timer resets on :00/:30
     if timer > 30:
         countdown = 60 - timer
     else:
         countdown = 30 - timer
     print('countdown:', countdown)
 
+    # change the timer bar's color if text is about to refresh
+    fill_color = 0xFFFFFF
+    if countdown < 5:
+        fill_color = 0xFF0000
     # "animate" the timer-bar
-    # TODO: make bar reset at :00/:30
-    # TODO: decrease the timer
-    # TODO: make bar red when it gets close to :00/:30
     splash.remove(rect)
-    rect = Rect(0, 140, countdown, 30, fill=0xFF0000)
+    rect = Rect(0, 140, countdown*12, 30, fill=fill_color)
     splash.append(rect)
 
+    # poll the touchscreen
     p = ts.touch_point
+    # if the touchscreen was pressed
     if p:
         for i, b in enumerate(buttons):
             if b.contains(p):
                 b.selected = True
                 for name, secret in secrets['totp_keys']:
+                    # check if button name is the same as a key name
                     if b.name == name:
                         current_button = name
                         # Generate OTP
@@ -297,5 +310,5 @@ while ALWAYS_ON or (countdown > 0):
                 # format and display the OTP
                 label_secret.text = "{} {}".format(str(otp)[0:3], str(otp)[3:6])
     # We'll update every 1/4 second, we can hash very fast so its no biggie!
-    countdown -= 0.25
-    time.sleep(0.25)
+    countdown -= 0.1
+    time.sleep(0.1)
