@@ -9,7 +9,6 @@ import adafruit_touchscreen
 import displayio
 import terminalio
 from adafruit_button import Button
-from adafruit_display_shapes.roundrect import RoundRect
 from adafruit_display_text.label import Label
 from adafruit_esp32spi import adafruit_esp32spi
 from adafruit_ntp import NTP
@@ -18,7 +17,7 @@ from adafruit_pyportal import PyPortal
 # Background Color
 BACKGROUND = 0x059ACE
 
-TEST = True       # if you want to print out the tests the hashers
+TEST = False      # If you want to print out the tests the hashers
 ALWAYS_ON = True  # Set to true if you never want to go to sleep!
 ON_SECONDS = 60   # how long to stay on if not in always_on mode
 
@@ -108,11 +107,11 @@ def base32_decode(encoded):
                 out.append(byte)  # store what we got
     return out
 
-def int_to_bytestring(i, padding=8):
+def int_to_bytestring(int_val, padding=8):
     result = []
-    while i != 0:
-        result.insert(0, i & 0xFF)
-        i >>= 8
+    while int_val != 0:
+        result.insert(0, int_val & 0xFF)
+        int_val >>= 8
     result = [0] * (padding - len(result)) + result
     return bytes(result)
 
@@ -149,7 +148,7 @@ pyportal = PyPortal(esp=esp,
                     external_spi=spi)
 
 # Root DisplayIO
-root_group = displayio.Group(max_size=200)
+root_group = displayio.Group(max_size=100)
 display.show(root_group)
 
 
@@ -160,7 +159,7 @@ bg_palette[0] = BACKGROUND
 background = displayio.TileGrid(bg_bitmap, pixel_shader=bg_palette)
 
 # Create a new DisplayIO group
-splash = displayio.Group(max_size=100)
+splash = displayio.Group(max_size=15)
 
 splash.append(background)
 
@@ -172,7 +171,7 @@ label_secret.y = 20
 key_group.append(label_secret)
 
 label_title = Label(font, max_glyphs=14)
-label_title.text = "loading..."
+label_title.text = "loading.."
 label_title.x = (display.width // 2) // 13
 label_title.y = 5
 key_group.append(label_title)
@@ -232,6 +231,12 @@ for i in secrets['totp_keys']:
 for b in buttons:
     splash.append(b.group)
 
+# refrsh timer label
+label_timer = Label(font, max_glyphs=2)
+label_timer.x = (display.width // 2) // 13
+label_timer.y = 150
+splash.append(label_timer)
+
 # how long to stay on if not in always_on mode
 countdown = ON_SECONDS
 
@@ -243,6 +248,12 @@ buttons[0].selected = True
 while ALWAYS_ON or (countdown > 0):
     # Calculate current time based on NTP + monotonic
     unix_time = t - mono_time + int(time.monotonic())
+
+    timer = time.localtime(time.time()).tm_sec
+    print('Timer:', timer)
+    timer = 30 - timer
+    print('Timer 2:', timer)
+    label_timer.text = str(timer)
 
     p = ts.touch_point
     if p:
@@ -265,11 +276,11 @@ while ALWAYS_ON or (countdown > 0):
             if current_button == name:
                 # Generate OTP
                 otp = generate_otp(unix_time // 30, secret)
+                #print('OTP: ', otp)
                 # display the key's name
                 label_title.text = name
                 # format and display the OTP
                 label_secret.text = "{} {}".format(str(otp)[0:3], str(otp)[3:6])
-
     # We'll update every 1/4 second, we can hash very fast so its no biggie!
     countdown -= 0.25
     time.sleep(0.25)
