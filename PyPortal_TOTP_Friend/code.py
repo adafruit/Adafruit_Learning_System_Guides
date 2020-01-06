@@ -7,12 +7,8 @@ from digitalio import DigitalInOut
 import adafruit_hashlib as hashlib
 import adafruit_touchscreen
 import displayio
-import neopixel
 import terminalio
-from adafruit_binascii import hexlify, unhexlify
-from adafruit_bitmap_font import bitmap_font
 from adafruit_button import Button
-from adafruit_display_shapes.circle import Circle
 from adafruit_display_shapes.roundrect import RoundRect
 from adafruit_display_text.label import Label
 from adafruit_esp32spi import adafruit_esp32spi
@@ -230,7 +226,7 @@ for i in secrets['totp_keys']:
                     fill_color=0x00FF00, style=Button.ROUNDRECT)
     buttons.append(button)
     # add some padding btween buttons
-    btn_x+=63
+    btn_x += 63
 
 # append buttons to splash group
 for b in buttons:
@@ -238,7 +234,6 @@ for b in buttons:
 
 # how long to stay on if not in always_on mode
 countdown = ON_SECONDS
-timer = 30
 
 # current button state, defaults to first item in totp_keys
 current_button = secrets['totp_keys'][0][0]
@@ -262,7 +257,7 @@ while ALWAYS_ON or (countdown > 0):
                         # display the key's name
                         label_title.text = name
                         # format and display the OTP
-                        label_secret.text = "{} {}".format(str(otp)[0:3],str(otp)[3:6])
+                        label_secret.text = "{} {}".format(str(otp)[0:3], str(otp)[3:6])
             else:
                 b.selected = False
     else:
@@ -273,14 +268,7 @@ while ALWAYS_ON or (countdown > 0):
                 # display the key's name
                 label_title.text = name
                 # format and display the OTP
-                label_secret.text = "{} {}".format(str(otp)[0:3],str(otp)[3:6])
-
-    if timer > 0:
-        timer=-0.25
-        print('Timer: ', int(timer))
-    else:
-        # reset the display timer
-        timer = 30
+                label_secret.text = "{} {}".format(str(otp)[0:3], str(otp)[3:6])
 
     # We'll update every 1/4 second, we can hash very fast so its no biggie!
     countdown -= 0.25
