@@ -22,9 +22,9 @@ from adafruit_pyportal import PyPortal
 # Background Color
 BACKGROUND = 0x059ACE
 
-TEST = True  # if you want to print out the tests the hashers
-ALWAYS_ON = False  # Set to true if you never want to go to sleep!
-ON_SECONDS = 60  # how long to stay on if not in always_on mode
+TEST = True       # if you want to print out the tests the hashers
+ALWAYS_ON = True  # Set to true if you never want to go to sleep!
+ON_SECONDS = 60   # how long to stay on if not in always_on mode
 
 # Get wifi details and more from a secrets.py file
 try:
@@ -32,7 +32,6 @@ try:
 except ImportError:
     print("WiFi secrets are kept in secrets.py, please add them there!")
     raise
-
 
 # Initialize PyPortal Display
 display = board.DISPLAY
@@ -47,7 +46,6 @@ ts = adafruit_touchscreen.Touchscreen(board.TOUCH_XL, board.TOUCH_XR,
                                           ),
                                       size=(WIDTH, HEIGHT))
 
-
 # Create a SHA1 Object
 SHA1 = hashlib.sha1
 
@@ -60,6 +58,15 @@ esp32_reset = DigitalInOut(board.ESP_RESET)
 spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
 esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset)
 
+
+def set_backlight(val):
+    """Adjust the TFT backlight.
+    :param val: The backlight brightness. Use a value between ``0`` and ``1``, where ``0`` is
+                off, and ``1`` is 100% brightness.
+    """
+    val = max(0, min(1.0, val))
+    board.DISPLAY.auto_brightness = False
+    board.DISPLAY.brightness = val
 
 # HMAC implementation, as hashlib/hmac wouldn't fit
 # From https://en.wikipedia.org/wiki/Hash-based_message_authentication_code
@@ -140,7 +147,6 @@ print("===========================================")
 
 # GFX Font
 font = terminalio.FONT
-
 
 # Initialize new PyPortal object
 pyportal = PyPortal(esp=esp,
@@ -235,6 +241,8 @@ countdown = ON_SECONDS
 
 # current button state, defaults to first item in totp_keys
 current_button = secrets['totp_keys'][0][0]
+# fill the first button
+buttons[0].selected = True
 
 while ALWAYS_ON or (countdown > 0):
     # Calculate current time based on NTP + monotonic
