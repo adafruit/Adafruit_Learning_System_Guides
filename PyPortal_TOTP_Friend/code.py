@@ -5,7 +5,7 @@ import busio
 from digitalio import DigitalInOut
 import displayio
 import terminalio
-
+from simpleio import map_range
 import adafruit_hashlib as hashlib
 import adafruit_touchscreen
 from adafruit_button import Button
@@ -248,7 +248,8 @@ label_timer.y = 15
 splash.append(label_timer)
 
 # create a new progress bar
-progress_bar = ProgressBar(display.width//5, 125, 200, 30)
+progress_bar = ProgressBar(display.width//5, 125,
+                           200, 30, bar_color = 0xFFFFFF)
 
 splash.append(progress_bar)
 
@@ -260,28 +261,27 @@ current_button = secrets['totp_keys'][0][0]
 # fill the first button
 buttons[0].selected = True
 
+
 while ALWAYS_ON or (countdown > 0):
     # Calculate current time based on NTP + monotonic
     unix_time = t - mono_time + int(time.monotonic())
 
     # Update the key refresh timer
     timer = time.localtime(time.time()).tm_sec
-    print('Timer:', timer)
     # timer resets on :00/:30
     if timer > 30:
         countdown = 60 - timer
     else:
         countdown = 30 - timer
-    print('countdown:', countdown)
-
+    print('NTP Countdown: {}%'.format(countdown))
     # change the timer bar's color if text is about to refresh
-    # TODO: this needs to be added to progressbar!
-    fill_color = 0xFFFFFF
+    progress_bar.fill = 0xFFFFFF
     if countdown < 5:
-        fill_color = 0xFF0000
-    # "animate" the timer-bar
-    progress_bar.progress = countdown
+        progress_bar.fill = 0xFF0000
 
+    # update the progress_bar with countdown
+    countdown = map_range(countdown, 0, 30, 0.0, 1.0)
+    progress_bar.progress = countdown
 
     # poll the touchscreen
     p = ts.touch_point
