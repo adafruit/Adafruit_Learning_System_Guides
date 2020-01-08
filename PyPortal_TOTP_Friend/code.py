@@ -9,7 +9,7 @@ import terminalio
 import adafruit_hashlib as hashlib
 import adafruit_touchscreen
 from adafruit_button import Button
-from adafruit_display_shapes.rect import Rect
+from adafruit_progressbar import ProgressBar
 from adafruit_display_text.label import Label
 from adafruit_esp32spi import adafruit_esp32spi
 from adafruit_ntp import NTP
@@ -17,7 +17,7 @@ from adafruit_pyportal import PyPortal
 
 
 # Background Color
-BACKGROUND = 0x059ACE
+BACKGROUND = 0x0
 
 # Button color
 BTN_COLOR = 0xFFFFFF
@@ -247,9 +247,10 @@ label_timer.x = (display.width // 2) // 13
 label_timer.y = 15
 splash.append(label_timer)
 
-# timer bar
-rect = Rect(0, 120, 0, 30, fill=0xFF0000)
-splash.append(rect)
+# create a new progress bar
+progress_bar = ProgressBar(display.width//5, 125, 200, 30)
+
+splash.append(progress_bar)
 
 # how long to stay on if not in always_on mode
 countdown = ON_SECONDS
@@ -274,13 +275,13 @@ while ALWAYS_ON or (countdown > 0):
     print('countdown:', countdown)
 
     # change the timer bar's color if text is about to refresh
+    # TODO: this needs to be added to progressbar!
     fill_color = 0xFFFFFF
     if countdown < 5:
         fill_color = 0xFF0000
     # "animate" the timer-bar
-    splash.remove(rect)
-    rect = Rect(0, 120, countdown*12, 30, fill=fill_color)
-    splash.append(rect)
+    progress_bar.progress = countdown
+
 
     # poll the touchscreen
     p = ts.touch_point
