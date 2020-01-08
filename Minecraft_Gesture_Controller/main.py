@@ -19,6 +19,7 @@ import busio
 # General purpose libraries
 import touchio
 # Libraries for HID Keyboard & Mouse
+import usb_hid
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS
 from adafruit_hid.keycode import Keycode
@@ -37,11 +38,11 @@ touch_a4.threshold = 2000
 # Keyboard & Mouse Setup
 
 # The keyboard object!
-kbd = Keyboard()
+kbd = Keyboard(usb_hid.devices)
 # we're americans :)
 layout = KeyboardLayoutUS(kbd)
 # The mouse object!
-mouse = Mouse()
+mouse = Mouse(usb_hid.devices)
 
 # Accelerometer Setup
 

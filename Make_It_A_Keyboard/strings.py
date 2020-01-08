@@ -1,8 +1,9 @@
+import usb_hid
 from adafruit_circuitplayground.express import cpx
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS
 
-kbd = Keyboard()
+kbd = Keyboard(usb_hid.devices)
 layout = KeyboardLayoutUS(kbd)
 
 while True:

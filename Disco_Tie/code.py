@@ -198,10 +198,23 @@ def change_speed(mod, old_speed):
     new_speed = constrain(old_speed + mod, 1.0, 10.0)
     return(new_speed, map_value(new_speed, 10.0, 0.0, 0.01, 0.3))
 
+def animate(pause, top):
+    # Determine animation based on mode
+    if mode == 0:
+        top = audio_meter(top)
+    elif mode == 1:
+        rainbow_cycle(0.001)
+    elif mode == 2:
+        larsen(pause)
+    elif mode == 3:
+        solid(user_color)
+    return top
+
 while True:
     ble.start_advertising(advertisement)
     while not ble.connected:
-        pass
+        # Animate while disconnected
+        peak = animate(wait, peak)
 
     # While BLE is connected
     while ble.connected:
@@ -232,12 +245,5 @@ while True:
                     elif packet.button == ButtonPacket.BUTTON_4:
                         mode = 3
 
-        # Determine animation based on mode
-        if mode == 0:
-            peak = audio_meter(peak)
-        elif mode == 1:
-            rainbow_cycle(0.001)
-        elif mode == 2:
-            larsen(wait)
-        elif mode == 3:
-            solid(user_color)
+        # Animate while connected
+        peak = animate(wait, peak)

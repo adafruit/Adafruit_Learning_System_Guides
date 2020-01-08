@@ -4,6 +4,7 @@ import time
 
 import board
 import digitalio
+import usb_hid
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS
 from adafruit_hid.keycode import Keycode
@@ -20,7 +21,7 @@ control_key = Keycode.SHIFT
 
 # The keyboard object!
 time.sleep(1)  # Sleep for a bit to avoid a race condition on some systems
-keyboard = Keyboard()
+keyboard = Keyboard(usb_hid.devices)
 keyboard_layout = KeyboardLayoutUS(keyboard)  # We're in the US :)
 
 # Make all pin objects inputs with pullups

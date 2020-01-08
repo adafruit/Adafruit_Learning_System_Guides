@@ -3,6 +3,7 @@
 import time
 
 import board
+import usb_hid
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS
 from adafruit_hid.keycode import Keycode
@@ -21,7 +22,7 @@ controlkey = Keycode.SHIFT
 # the keyboard object!
 # sleep for a bit to avoid a race condition on some systems
 time.sleep(1)
-kbd = Keyboard()
+kbd = Keyboard(usb_hid.devices)
 # we're americans :)
 layout = KeyboardLayoutUS(kbd)
 
