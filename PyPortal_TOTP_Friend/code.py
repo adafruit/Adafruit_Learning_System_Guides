@@ -63,19 +63,11 @@ esp32_reset = DigitalInOut(board.ESP_RESET)
 spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
 esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset)
 
-
-def set_backlight(val):
-    """Adjust the TFT backlight.
-    :param val: The backlight brightness. Use a value between ``0`` and ``1``, where ``0`` is
-                off, and ``1`` is 100% brightness.
-    """
-    val = max(0, min(1.0, val))
-    board.DISPLAY.auto_brightness = False
-    board.DISPLAY.brightness = val
-
-# HMAC implementation, as hashlib/hmac wouldn't fit
-# From https://en.wikipedia.org/wiki/Hash-based_message_authentication_code
 def HMAC(k, m):
+    """# HMAC implementation, as hashlib/hmac wouldn't fit
+    From https://en.wikipedia.org/wiki/Hash-based_message_authentication_code
+
+    """
     SHA1_BLOCK_SIZE = 64
     KEY_BLOCK = k + (b'\0' * (SHA1_BLOCK_SIZE - len(k)))
     KEY_INNER = bytes((x ^ 0x36) for x in KEY_BLOCK)
@@ -126,10 +118,11 @@ def int_to_bytestring(int_val, padding=8):
     return bytes(result)
 
 
-# HMAC -> OTP generator, pretty much same as
-# https://github.com/pyotp/pyotp/blob/master/src/pyotp/otp.py
-
 def generate_otp(int_input, secret_key, digits=6):
+    """ HMAC -> OTP generator, pretty much same as
+    https://github.com/pyotp/pyotp/blob/master/src/pyotp/otp.py
+
+    """
     if int_input < 0:
         raise ValueError('input must be positive integer')
     hmac_hash = bytearray(
@@ -147,6 +140,15 @@ def generate_otp(int_input, secret_key, digits=6):
 
     return str_code
 
+def display_otp_key(name, otp):
+    """Updates the displayio labels to display formatted OTP key and name.
+
+    """
+    # display the key's name
+    label_title.text = name
+    # format and display the OTP
+    label_secret.text = "{} {}".format(str(otp)[0:3], str(otp)[3:6])
+    print("OTP Name: {}\nOTP Key: {}".format(name, otp))
 
 print("===========================================")
 
@@ -180,8 +182,8 @@ label_secret.y = 17
 key_group.append(label_secret)
 
 label_title = Label(font, max_glyphs=14)
-label_title.text = "loading.."
-label_title.x = (display.width // 2) // 13
+label_title.text = "  Loading.."
+label_title.x = 0
 label_title.y = 5
 key_group.append(label_title)
 
@@ -221,7 +223,7 @@ mono_time = int(time.monotonic())
 print("Monotonic time", mono_time)
 
 # Add buttons to the interface
-assert len(secrets['totp_keys']) < 6, "This code can only render 5 keys at a time"
+assert len(secrets['totp_keys']) < 6, "This code can only display 5 keys at a time"
 
 # generate buttons
 buttons = []
@@ -230,7 +232,7 @@ btn_x = 5
 for i in secrets['totp_keys']:
     button = Button(name=i[0], x=btn_x,
                     y=175, width=60,
-                    height=60, label=i[0],
+                    height=60, label=i[0].strip(" "),
                     label_font=font, label_color=BTN_TEXT_COLOR,
                     fill_color=BTN_COLOR, style=Button.ROUNDRECT)
     buttons.append(button)
@@ -258,9 +260,7 @@ countdown = ON_SECONDS
 
 # current button state, defaults to first item in totp_keys
 current_button = secrets['totp_keys'][0][0]
-# fill the first button
 buttons[0].selected = True
-
 
 while ALWAYS_ON or (countdown > 0):
     # Calculate current time based on NTP + monotonic
@@ -296,10 +296,7 @@ while ALWAYS_ON or (countdown > 0):
                         current_button = name
                         # Generate OTP
                         otp = generate_otp(unix_time // 30, secret)
-                        # display the key's name
-                        label_title.text = name
-                        # format and display the OTP
-                        label_secret.text = "{} {}".format(str(otp)[0:3], str(otp)[3:6])
+                        display_otp_key(name, otp)
             else:
                 b.selected = False
     else:
@@ -307,11 +304,7 @@ while ALWAYS_ON or (countdown > 0):
             if current_button == name:
                 # Generate OTP
                 otp = generate_otp(unix_time // 30, secret)
-                #print('OTP: ', otp)
-                # display the key's name
-                label_title.text = name
-                # format and display the OTP
-                label_secret.text = "{} {}".format(str(otp)[0:3], str(otp)[3:6])
+                display_otp_key(name, otp)
     # We'll update every 1/4 second, we can hash very fast so its no biggie!
     countdown -= 0.25
     time.sleep(0.25)
