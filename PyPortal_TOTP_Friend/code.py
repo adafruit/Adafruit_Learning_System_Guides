@@ -140,15 +140,15 @@ def generate_otp(int_input, secret_key, digits=6):
 
     return str_code
 
-def display_otp_key(name, otp):
+def display_otp_key(secret_name, secret_otp):
     """Updates the displayio labels to display formatted OTP key and name.
 
     """
     # display the key's name
-    label_title.text = name
+    label_title.text = secret_name
     # format and display the OTP
-    label_secret.text = "{} {}".format(str(otp)[0:3], str(otp)[3:6])
-    print("OTP Name: {}\nOTP Key: {}".format(name, otp))
+    label_secret.text = "{} {}".format(str(secret_otp)[0:3], str(secret_otp)[3:6])
+    print("OTP Name: {}\nOTP Key: {}".format(secret_name, secret_otp))
 
 print("===========================================")
 
