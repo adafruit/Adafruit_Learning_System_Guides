@@ -11,6 +11,7 @@ from adafruit_hid.keycode import Keycode
 from adafruit_hid.consumer_control import ConsumerControl
 from adafruit_hid.consumer_control_code import ConsumerControlCode
 import neopixel
+import usb_hid
 
 DOT_COLOR = 0xFF0000              # set to your favorite webhex color
 PRESSED_DOT_COLOR = 0x008080      # set to your second-favorite color
@@ -35,7 +36,8 @@ rot_b.direction = Direction.INPUT
 rot_b.pull = Pull.UP
 
 # Used to do HID output, see below
-kbd = Keyboard()
+kbd = Keyboard(usb_hid.devices)
+consumer_control = ConsumerControl(usb_hid.devices)
 
 # time keeper, so we know when to turn off the LED
 timestamp = time.monotonic()
@@ -111,12 +113,12 @@ while True:
 
     # Check if rotary encoder went up
     if encoder_direction == 1:
-        ConsumerControl().send(ConsumerControlCode.VOLUME_DECREMENT) #Turn Down Volume
+        consumer_control.send(ConsumerControlCode.VOLUME_DECREMENT) #Turn Down Volume
     #    kbd.press(Keycode.LEFT_ARROW)
     #    kbd.release_all()
     # Check if rotary encoder went down
     if encoder_direction == -1:
-        ConsumerControl().send(ConsumerControlCode.VOLUME_INCREMENT) #Turn Up Volume
+        consumer_control.send(ConsumerControlCode.VOLUME_INCREMENT) #Turn Up Volume
     #    kbd.press(Keycode.RIGHT_ARROW)
     #    kbd.release_all()
     # Button was 'just pressed'

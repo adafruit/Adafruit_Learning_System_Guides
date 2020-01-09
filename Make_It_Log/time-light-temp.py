@@ -8,6 +8,7 @@ import time
 from digitalio import DigitalInOut, Direction, Pull
 import analogio
 import board
+import usb_hid
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keycode import Keycode
 from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS
@@ -26,7 +27,7 @@ thermistor = adafruit_thermistor.Thermistor(board.TEMPERATURE, 10000,
 # Set the keyboard object!
 # Sleep for a bit to avoid a race condition on some systems
 time.sleep(1)
-kbd = Keyboard()
+kbd = Keyboard(usb_hid.devices)
 layout = KeyboardLayoutUS(kbd)  # US is only current option...
 
 led = DigitalInOut(board.D13)   # Set up red LED "D13"

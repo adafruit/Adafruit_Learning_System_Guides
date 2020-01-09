@@ -5,6 +5,7 @@
 import time
 import random
 import adafruit_trellism4
+import usb_hid
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keycode import Keycode
 from adafruit_hid.consumer_control import ConsumerControl
@@ -80,8 +81,8 @@ SNORE_DOWN = 1
 
 TOTAL_SNORE = SNORE_PAUSE + SNORE_UP + SNORE_DOWN
 
-kbd = Keyboard()
-cc = ConsumerControl()
+kbd = Keyboard(usb_hid.devices)
+cc = ConsumerControl(usb_hid.devices)
 
 trellis = adafruit_trellism4.TrellisM4Express(rotation=ROTATION)
 for button in keymap:
