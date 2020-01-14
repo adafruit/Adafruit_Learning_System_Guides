@@ -1,12 +1,10 @@
 """
-NeoPixel Animator code for Circuit Playground Bluefruit NeoPixel Animation and Color Remote Control.
-To be used with another Circuit Playground Bluefruit running the Remote Control code.
+NeoPixel Animator code for ItsyBitsy nRF52840 NeoPixel Animation and Color Remote Control.
 """
 
 import board
 import neopixel
-from adafruit_circuitplayground.bluefruit import cpb
-from adafruit_led_animation.animation import Blink, Comet, Sparkle, AnimationGroup,\
+from adafruit_led_animation.animation import Comet, Sparkle, AnimationGroup,\
     AnimationSequence
 import adafruit_led_animation.color as color
 
@@ -20,24 +18,18 @@ from adafruit_bluefruit_connect.button_packet import ButtonPacket
 
 # The number of NeoPixels in the externally attached strip
 # If using two strips connected to the same pin, count only one strip for this number!
-STRIP_PIXEL_NUMBER = 30
-
-# Setup for blink animation
-BLINK_SPEED = 0.5  # Lower numbers increase the animation speed
-BLINK_INITIAL_COLOR = color.RED  # Color before Remote Control is connected
+STRIP_PIXEL_NUMBER = 43
 
 # Setup for comet animation
-COMET_SPEED = 0.03  # Lower numbers increase the animation speed
-CPB_COMET_TAIL_LENGTH = 5  # The length of the comet on the Circuit Playground Bluefruit
-STRIP_COMET_TAIL_LENGTH = 15  # The length of the comet on the NeoPixel strip
-CPB_COMET_BOUNCE = False  # Set to True to make the comet "bounce" the opposite direction on CPB
-STRIP_COMET_BOUNCE = True  # Set to False to stop comet from "bouncing" on NeoPixel strip
+COMET_SPEED = 0.05  # Lower numbers increase the animation speed
+STRIP_COMET_TAIL_LENGTH = 10  # The length of the comet on the NeoPixel strip
+STRIP_COMET_BOUNCE = False  # Set to False to stop comet from "bouncing" on NeoPixel strip
 
 # Setup for sparkle animation
-SPARKLE_SPEED = 0.03  # Lower numbers increase the animation speed
+SPARKLE_SPEED = 0.1  # Lower numbers increase the animation speed
 
 # Create the NeoPixel strip
-strip_pixels = neopixel.NeoPixel(board.A1, STRIP_PIXEL_NUMBER, auto_write=False)
+strip_pixels = neopixel.NeoPixel(board.D5, STRIP_PIXEL_NUMBER, auto_write=False)
 
 # Setup BLE connection
 ble = BLERadio()
@@ -47,19 +39,11 @@ advertisement = ProvideServicesAdvertisement(uart)
 # Setup animations
 animations = AnimationSequence(
     AnimationGroup(
-        Blink(cpb.pixels, BLINK_SPEED, BLINK_INITIAL_COLOR),
-        Blink(strip_pixels, BLINK_SPEED, BLINK_INITIAL_COLOR),
-        sync=True
+        Sparkle(strip_pixels, SPARKLE_SPEED, color.TEAL)
     ),
     AnimationGroup(
-        Comet(cpb.pixels, COMET_SPEED, color.MAGENTA, tail_length=CPB_COMET_TAIL_LENGTH,
-              bounce=CPB_COMET_BOUNCE),
-        Comet(strip_pixels, COMET_SPEED, color.MAGENTA, tail_length=STRIP_COMET_TAIL_LENGTH,
+        Comet(strip_pixels, COMET_SPEED, color.TEAL, tail_length=STRIP_COMET_TAIL_LENGTH,
               bounce=STRIP_COMET_BOUNCE)
-    ),
-    AnimationGroup(
-        Sparkle(cpb.pixels, SPARKLE_SPEED, color.PURPLE),
-        Sparkle(strip_pixels, SPARKLE_SPEED, color.PURPLE)
     ),
 )
 
@@ -83,24 +67,12 @@ while True:
                 if isinstance(packet, ColorPacket):  # If the packet is color packet...
                     if mode == 0:  # And mode is 0...
                         animations.color = packet.color  # Update the animation to the color.
-                        # Uncomment below to see the color tuple printed to the serial console.
-                        # print("Color:", packet.color)
+                        print("Color:", packet.color)
                         animation_color = packet.color  # Keep track of the current color...
                     elif mode == 1:  # Because if mode is 1...
                         animations.color = animation_color  # Freeze the animation color.
-                        # Uncomment below to see the color tuple printed to the serial console.
-                        # print("Color:", animation_color)
+                        print("Color:", animation_color)
                 elif isinstance(packet, ButtonPacket):  # If the packet is a button packet...
-                    # Check to see if it's BUTTON_1 (which is being sent by the slide switch)
-                    if packet.button == ButtonPacket.BUTTON_1:
-                        if packet.pressed:  # If Remote Control switch is to the left...
-                            print("Remote Control switch is to the left: LEDs off!")
-                        else:  # If the Remote Control switch is to the right...
-                            print("Remote Control switch is to the right: LEDs on!")
-                        # If the Remote Control switch is moved from right to left...
-                        if packet.pressed and not blanked:
-                            animations.fill(color.BLACK)  # Turn off the LEDs.
-                        blanked = packet.pressed  # Track the state of the slide switch.
                     if packet.pressed:  # If the buttons on the Remote Control are pressed...
                         if packet.button == ButtonPacket.LEFT:  # If button A is pressed...
                             print("A pressed: animation mode changed.")
