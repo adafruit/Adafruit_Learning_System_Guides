@@ -57,42 +57,56 @@ void setup()
   myservo.write(60);  
 }
 
-uint32_t last_valid_timestamp = 0;
 
 void loop()
 {
-  if ((millis() - last_valid_timestamp) > 200) {
-     pixels.fill(0);
-     pixels.show();
-  }
-
   if ( usb_web.available()) {
-    char val;
     digitalWrite(LED_BUILTIN, HIGH);
     Serial.print("-> ");
-    val = usb_web.read();
+    char val = usb_web.read();
     digitalWrite(LED_BUILTIN, LOW);
     Serial.print("Read value: "); Serial.println(val, DEC);
 
     if (val == 1) {    // Target bin #1
        pixels.fill(0xFFFF00);
        pixels.show();
-       last_valid_timestamp = millis();
+       Serial.println("CEREAL!");
+
+       myservo.write(0);        // push cereal to one side
+       delay(2000);             // wait
+       for (int pos = 0; pos <= 75; pos++) {  // return servo
+          myservo.write(pos);
+          delay(5);
+       }
+       delay(1000);          // another wait before we continue
+
     } else if (val == 2) {    // Target bin #2
        pixels.fill(0xFF000FF);
        pixels.show();
-       last_valid_timestamp = millis();
-    } else {
-       pixels.fill(0);
-       pixels.show();
+       Serial.println("MALLOW!");
+
+       myservo.write(180);      // push mallows to other side
+       delay(2000);             // wait
+       for (int pos = 180; pos >= 75; pos--) {  // return servo
+          myservo.write(pos);
+          delay(5);
+       }
+       delay(1000);          // another wait before we continue
+    }
+    pixels.fill(0);
+    pixels.show();
+
+    while (usb_web.available()) {
+      usb_web.read();
+      delay(10);
     }
   } else {
-    // no webserial data
-    for (int pos = 60; pos <= 90; pos += 1) { // slowly goes from 60 degrees to 90 degrees
+    // no webserial data, tick tock the servo
+    for (int pos = 60; pos <= 90; pos++) { // slowly goes from 60 degrees to 90 degrees
       myservo.write(pos);
       delay(3);
     }
-    for (int pos = 90; pos >= 60; pos -= 1) { // goes back to 60
+    for (int pos = 90; pos >= 60; pos--) { // goes back to 60
       myservo.write(pos);
       delay(3);
     }
