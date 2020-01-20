@@ -1,6 +1,6 @@
 """
-Control code for Circuit Playground Bluefruit NeoPixel Animation and Color controller. To be used
-with another Circuit Playground Bluefruit running the receiver code.
+Remote Control code for Circuit Playground Bluefruit NeoPixel Animation and Color Remote Control.
+To be used with another Circuit Playground Bluefruit running the NeoPixel Animator code.
 """
 
 import time
@@ -102,7 +102,7 @@ while True:
             r, g, b = map(scale, cpb.acceleration)  # Map acceleration values to RGB values...
             color = (r, g, b)  # Set color to current mapped RGB value...
             print("Color:", color)
-            cpb.pixels.fill(color)  # Fill controller LEDs with current color...
+            cpb.pixels.fill(color)  # Fill Remote Control LEDs with current color...
             if not send_packet(uart_connection, ColorPacket(color)):  # And send a color packet.
                 uart_connection = None
                 continue

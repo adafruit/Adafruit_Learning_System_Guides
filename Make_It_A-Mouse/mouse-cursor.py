@@ -1,7 +1,8 @@
+import usb_hid
 from adafruit_circuitplayground.express import cpx
 from adafruit_hid.mouse import Mouse
 
-m = Mouse()
+m = Mouse(usb_hid.devices)
 cpx.adjust_touch_threshold(200)
 
 while True:
