@@ -5,6 +5,7 @@
 # in response to alternate first NeoPixel and beeps from onboard speaker,
 # prints times and statistics in Mu friendly format.
 
+import os
 import time
 import math
 import random
@@ -13,7 +14,6 @@ import gc
 import board
 import digitalio
 import analogio
-import os
 
 # This code works on both CPB and CPX boards by bringing
 # in classes with same name
@@ -129,11 +129,11 @@ def update_stats(stats, test_type, test_num, duration):
             stats[test_type]["mean"], stats[test_type]["sd_sample"])
 
 run = 1
-statistics = {"visual":    {"values": [], "sum": 0.0, "mean": 0.0, 
+statistics = {"visual":    {"values": [], "sum": 0.0, "mean": 0.0,
                             "sd_sample": 0.0},
-              "auditory":  {"values": [], "sum": 0.0, "mean": 0.0, 
+              "auditory":  {"values": [], "sum": 0.0, "mean": 0.0,
                             "sd_sample": 0.0},
-              "tactile":   {"values": [], "sum": 0.0, "mean": 0.0, 
+              "tactile":   {"values": [], "sum": 0.0, "mean": 0.0,
                             "sd_sample": 0.0}}
 
 print("# Trialnumber, time, mean, standarddeviation")
