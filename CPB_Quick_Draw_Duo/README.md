@@ -4,7 +4,7 @@ The code in this repo accompanies the Adafruit tutorial
 Circuit Playground Bluefruit Quick Draw Duo
 https://learn.adafruit.com/circuit-playground-bluefruit-quick-draw-duo/
 
-The Python code file should be copied onto the **CIRCUITPY** flash drive that appears 
+The Python code file (code.py or reaction.py) should be copied onto the **CIRCUITPY** flash drive that appears 
 when you plug the CircuitPlayground Express into your computer (via a known good USB cable) as **code.py**. 
 Also copy the wav file for sound per the tutorial.
 
