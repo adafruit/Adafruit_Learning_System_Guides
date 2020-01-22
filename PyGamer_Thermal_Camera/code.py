@@ -1,8 +1,8 @@
-# Thermal_Cam_v30.py
-# 2020-01-15 v3.0
+# Thermal_Cam_v31.py
+# 2020-01-22 v3.1
 # (c) 2020 Cedar Grove Studios for Adafruit Industries
 
-print("Thermal_Cam_v30.py")
+print("Thermal_Cam_v31.py")
 
 import time
 import board
@@ -167,10 +167,7 @@ def setup_mode():  # Set alarm threshold and minimum/maximum range values
                 param_index = param_index - 1
             if down:
                 param_index = param_index + 1
-            if param_index > 2:
-                param_index = 2
-            if param_index < 0:
-                param_index = 0
+            param_index = max(0, min(2, param_index))
             status_label.text = param_list[param_index][0]
             image_group[param_index + 66].color = BLACK
             status_label.color = BLACK
@@ -192,10 +189,7 @@ def setup_mode():  # Set alarm threshold and minimum/maximum range values
                 param_value = param_value + 1
             if down:
                 param_value = param_value - 1
-            if param_value  > MAX_SENSOR_F:
-                param_value = MAX_SENSOR_F
-            if param_value  < MIN_SENSOR_F:
-                param_value = MIN_SENSOR_F
+            param_value = max(MIN_SENSOR_F, min(MAX_SENSOR_F, param_value))
             image_group[param_index + 70].text = str(param_value)
             image_group[param_index + 70].color = BLACK
             status_label.color = BLACK
