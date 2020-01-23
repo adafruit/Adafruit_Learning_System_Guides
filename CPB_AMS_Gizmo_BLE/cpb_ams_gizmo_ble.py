@@ -84,7 +84,7 @@ while True:
     print("Loading Font Glyphs...")
     title_label = make_label("None", 12, 30, TEXT_COLOR, font="/fonts/Arial-Bold-18.bdf")
     artist_label = make_label("None", 12, 70, TEXT_COLOR, font="/fonts/Arial-16.bdf")
-    album_label = make_label("None", 12, 170, TEXT_COLOR, font="/fonts/Arial-16.bdf")
+    album_label = make_label("None", 12, 184, TEXT_COLOR, font="/fonts/Arial-16.bdf")
     status_label = make_label("None", 80, 220, STATUS_COLOR, font="/fonts/Arial-16.bdf")
     group.append(make_background(240, 240, BACKGROUND_COLOR))
     border = Rect(4, 4, 232, 200, outline=BORDER_COLOR, stroke=2)
@@ -127,5 +127,5 @@ while True:
 
     print("disconnected")
     # Remove all layers
-    while group.len():
+    while len(group):
         group.pop()
