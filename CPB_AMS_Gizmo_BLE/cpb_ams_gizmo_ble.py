@@ -44,13 +44,24 @@ def load_font(fontname, text):
     font.load_glyphs(text.encode('utf-8'))
     return font
 
-def make_label(text, x, y, color, font=terminalio.FONT):
+def make_label(text, x, y, color, max_glyphs=30, font=terminalio.FONT):
     if isinstance(font, str):
-        font = load_font(font, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.,?")
-    text_area = Label(font, text=text, color=color, max_glyphs=30)
+        font = load_font(font, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.,?()")
+    text_area = Label(font, text=text, color=color, max_glyphs=max_glyphs)
     text_area.x = x
     text_area.y = y
     return text_area
+
+def set_label(label, value, max_length):
+    text = "{}".format(value)
+    if len(text) > max_length:
+        text = text[:max_length-3] + "..."
+    label.text = text
+
+def set_status(label, action_text, player):
+    label.text = "{} on {}".format(action_text, player)
+    _, _, label_width, _ = label.bounding_box
+    label.x = display.width - 10 - label_width
 
 display = tft_gizmo.TFT_Gizmo()
 group = displayio.Group(max_size=20)
@@ -70,9 +81,9 @@ while True:
 
     # Draw the text fields
     print("Loading Font Glyphs...")
-    title_label = make_label("None", 20, 20, TEXT_COLOR, font="/fonts/Arial-Bold-18.bdf")
-    artist_label = make_label("None", 20, 50, TEXT_COLOR, font="/fonts/Arial-16.bdf")
-    album_label = make_label("None", 20, 180, TEXT_COLOR, font="/fonts/Arial-16.bdf")
+    title_label = make_label("None", 18, 30, TEXT_COLOR, font="/fonts/Arial-Bold-24.bdf")
+    artist_label = make_label("None", 18, 70, TEXT_COLOR, font="/fonts/Arial-22.bdf")
+    album_label = make_label("None", 18, 170, TEXT_COLOR, font="/fonts/Arial-22.bdf")
     status_label = make_label("None", 80, 220, STATUS_COLOR, font="/fonts/Arial-16.bdf")
     group.append(make_background(240, 240, BACKGROUND_COLOR))
     border = Rect(10, 8, 200, 190, outline=BORDER_COLOR, stroke=1)
@@ -90,13 +101,15 @@ while True:
                     print("paired")
 
                 ams = connection[AppleMediaService]
-                title_label.text = "{}".format(ams.title)
-                album_label.text = "{}".format(ams.album)
-                artist_label.text = "{}".format(ams.artist)
+                set_label(title_label, ams.title, 12)
+                set_label(album_label, ams.album, 13)
+                set_label(artist_label, ams.artist, 13)
+                action = "?"
                 if ams.playing:
-                    status_label.text = "Playing on {}".format(ams.player_name)
+                    action = "Playing"
                 elif ams.paused:
-                    status_label.text = "Paused on {}".format(ams.player_name)
+                    action = "Paused"
+                set_status(status_label, action, ams.player_name)
             if cp.button_a:
                 ams.toggle_play_pause()
                 time.sleep(0.1)
