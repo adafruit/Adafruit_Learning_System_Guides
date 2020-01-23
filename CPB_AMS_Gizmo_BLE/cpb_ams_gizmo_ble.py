@@ -15,13 +15,14 @@ from adafruit_ble.advertising.standard import SolicitServicesAdvertisement
 from adafruit_ble_apple_media import AppleMediaService
 from adafruit_circuitplayground import cp
 
-BACKGROUND_COLOR = 0x444444 # Gray
+BACKGROUND_COLOR = 0x49523b # Gray
 TEXT_COLOR = 0xFF0000 # Red
 BORDER_COLOR = 0xAAAAAA # Light Gray
 STATUS_COLOR = BORDER_COLOR
 
 # PyLint can't find BLERadio for some reason so special case it here.
 radio = adafruit_ble.BLERadio() # pylint: disable=no-member
+radio.name = "Now Playing Gizmo"
 a = SolicitServicesAdvertisement()
 a.solicited_services.append(AppleMediaService)
 radio.start_advertising(a)
@@ -81,12 +82,12 @@ while True:
 
     # Draw the text fields
     print("Loading Font Glyphs...")
-    title_label = make_label("None", 18, 30, TEXT_COLOR, font="/fonts/Arial-Bold-24.bdf")
-    artist_label = make_label("None", 18, 70, TEXT_COLOR, font="/fonts/Arial-22.bdf")
-    album_label = make_label("None", 18, 170, TEXT_COLOR, font="/fonts/Arial-22.bdf")
+    title_label = make_label("None", 12, 30, TEXT_COLOR, font="/fonts/Arial-Bold-18.bdf")
+    artist_label = make_label("None", 12, 70, TEXT_COLOR, font="/fonts/Arial-16.bdf")
+    album_label = make_label("None", 12, 170, TEXT_COLOR, font="/fonts/Arial-16.bdf")
     status_label = make_label("None", 80, 220, STATUS_COLOR, font="/fonts/Arial-16.bdf")
     group.append(make_background(240, 240, BACKGROUND_COLOR))
-    border = Rect(10, 8, 200, 190, outline=BORDER_COLOR, stroke=1)
+    border = Rect(4, 4, 232, 200, outline=BORDER_COLOR, stroke=2)
     group.append(title_label)
     group.append(artist_label)
     group.append(album_label)
@@ -101,9 +102,9 @@ while True:
                     print("paired")
 
                 ams = connection[AppleMediaService]
-                set_label(title_label, ams.title, 12)
-                set_label(album_label, ams.album, 13)
-                set_label(artist_label, ams.artist, 13)
+                set_label(title_label, ams.title, 18)
+                set_label(album_label, ams.album, 21)
+                set_label(artist_label, ams.artist, 21)
                 action = "?"
                 if ams.playing:
                     action = "Playing"
@@ -126,5 +127,5 @@ while True:
 
     print("disconnected")
     # Remove all layers
-    while group.__len__():
+    while group.len():
         group.pop()
