@@ -18,7 +18,7 @@ DATA = cwd+"/local.txt"
 pyportal = PyPortal(url = DATA,
                     json_path = (DAY, PERSON, NOTABLE, YEAR, ACCOMPLISH, WEB),
                     status_neopixel = board.NEOPIXEL,
-                    default_bg = cwd + "/mary_jan1.bmp",
+                    default_bg = none,
                     text_font = cwd+"fonts/Arial-ItalicMT-17.bdf",
                     text_position=((10, 70), (10, 100), (10, 130),(60, 160), (105, 190), (10, 220)),
                     text_color=(0xFFFFFF, 0xFFFFFF, 0xFFFFFF, 0xFFFFFF, 0xFFFFFF, 0xFFFFFF),
