@@ -9,6 +9,7 @@
 import time
 
 import board
+import usb_hid
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS
 from adafruit_hid.keycode import Keycode
@@ -30,7 +31,7 @@ buttonpins = [board.D2, board.D1, board.D0]  # D1 and D0 not currently used,
 buttons = []
 
 # the keyboard object!
-kbd = Keyboard()
+kbd = Keyboard(usb_hid.devices)
 # we're americans :)
 layout = KeyboardLayoutUS(kbd)
 

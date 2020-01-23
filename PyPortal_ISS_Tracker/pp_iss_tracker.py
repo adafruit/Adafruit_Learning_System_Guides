@@ -109,7 +109,11 @@ def update_display(current_time, update_iss=False):
                                                  current_time.tm_min,
                                                  current_time.tm_sec)
 
-    board.DISPLAY.refresh_soon()
+    try:
+        board.DISPLAY.refresh(target_frames_per_second=60)
+    except AttributeError:
+        board.DISPLAY.refresh_soon()
+
 
 # Initial refresh
 update_display(time.localtime(), True)
