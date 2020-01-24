@@ -13,11 +13,12 @@ from adafruit_bitmap_font import bitmap_font
 import adafruit_ble
 from adafruit_ble.advertising.standard import SolicitServicesAdvertisement
 from adafruit_ble_apple_media import AppleMediaService
+from adafruit_ble_apple_media import UnsupportedCommand
 from adafruit_circuitplayground import cp
 
-BACKGROUND_COLOR = 0x49523b # Gray
-TEXT_COLOR = 0xFF0000 # Red
-BORDER_COLOR = 0xAAAAAA # Light Gray
+BACKGROUND_COLOR = 0x49523b  # Gray
+TEXT_COLOR = 0xFF0000  # Red
+BORDER_COLOR = 0xAAAAAA  # Light Gray
 STATUS_COLOR = BORDER_COLOR
 
 # PyLint can't find BLERadio for some reason so special case it here.
@@ -123,7 +124,7 @@ while True:
                 else:
                     ams.next_track()
                 time.sleep(0.1)
-        except RuntimeError:
+        except (RuntimeError, UnsupportedCommand):
             # Skip Bad Packets, unknown commands, etc.
             pass
 
