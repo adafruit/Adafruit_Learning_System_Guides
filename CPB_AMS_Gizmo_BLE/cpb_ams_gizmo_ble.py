@@ -82,10 +82,12 @@ while True:
 
     # Draw the text fields
     print("Loading Font Glyphs...")
+    group.append(wrap_in_tilegrid(open("/graphic_tfts_ams_loading.bmp", "rb")))
     title_label = make_label("None", 12, 30, TEXT_COLOR, font="/fonts/Arial-Bold-18.bdf")
     artist_label = make_label("None", 12, 70, TEXT_COLOR, font="/fonts/Arial-16.bdf")
     album_label = make_label("None", 12, 184, TEXT_COLOR, font="/fonts/Arial-16.bdf")
     status_label = make_label("None", 80, 220, STATUS_COLOR, font="/fonts/Arial-16.bdf")
+    group.pop()
     group.append(make_background(240, 240, BACKGROUND_COLOR))
     border = Rect(4, 4, 232, 200, outline=BORDER_COLOR, stroke=2)
     group.append(title_label)
