@@ -98,35 +98,35 @@ while True:
     group.append(border)
 
     while radio.connected:
-        try:
-            for connection in radio.connections:
+        for connection in radio.connections:
+            try:
                 if not connection.paired:
                     connection.pair()
                     print("paired")
 
                 ams = connection[AppleMediaService]
-                set_label(title_label, ams.title, 18)
-                set_label(album_label, ams.album, 21)
-                set_label(artist_label, ams.artist, 21)
-                action = "?"
-                if ams.playing:
-                    action = "Playing"
-                elif ams.paused:
-                    action = "Paused"
-                set_status(status_label, action, ams.player_name)
-            if cp.button_a:
-                ams.toggle_play_pause()
-                time.sleep(0.1)
+            except (RuntimeError, UnsupportedCommand, AttributeError):
+                # Skip Bad Packets, unknown commands, etc.
+                continue
+            set_label(title_label, ams.title, 18)
+            set_label(album_label, ams.album, 21)
+            set_label(artist_label, ams.artist, 21)
+            action = "?"
+            if ams.playing:
+                action = "Playing"
+            elif ams.paused:
+                action = "Paused"
+            set_status(status_label, action, ams.player_name)
+        if cp.button_a:
+            ams.toggle_play_pause()
+            time.sleep(0.1)
 
-            if cp.button_b:
-                if cp.switch:
-                    ams.previous_track()
-                else:
-                    ams.next_track()
-                time.sleep(0.1)
-        except (RuntimeError, UnsupportedCommand):
-            # Skip Bad Packets, unknown commands, etc.
-            pass
+        if cp.button_b:
+            if cp.switch:
+                ams.previous_track()
+            else:
+                ams.next_track()
+            time.sleep(0.1)
 
     print("disconnected")
     # Remove all layers
