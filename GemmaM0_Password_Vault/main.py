@@ -5,6 +5,7 @@ import time
 
 import board
 import touchio
+import usb_hid
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS
 from digitalio import DigitalInOut, Direction
@@ -19,7 +20,7 @@ touch2 = touchio.TouchIn(board.A2)
 # the keyboard object
 # sleep for a bit to avoid a race condition on some systems
 time.sleep(1)
-kbd = Keyboard()
+kbd = Keyboard(usb_hid.devices)
 layout = KeyboardLayoutUS(kbd)
 
 while True:
