@@ -32,7 +32,7 @@ pyportal = PyPortal(default_bg=BACKGROUND_FILE,
                     text_position=(4, HEIGHT - 9),
                     text_color=0xFFFFFF)
 
-circle = Circle(312, 233, 5, fill=0)
+circle = Circle(WIDTH - 8, HEIGHT - 7, 5, fill=0)
 pyportal.splash.append(circle)
 loopcount = 0
 errorcount = 0
