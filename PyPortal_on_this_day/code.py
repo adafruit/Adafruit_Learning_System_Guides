@@ -19,7 +19,6 @@ ACCOMPLISH = ["Accomplishment"]
 WEB = ["Web Reference"]
 
 BASE_DATA = "https://raw.githubusercontent.com/adafruit/OTD/master/electronics/"
-# https://raw.githubusercontent.com/adafruit/OTD/master/electronics/01_01.json
 
 # a function that returns whatever is passed in
 def identity(x):
