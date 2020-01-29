@@ -1,9 +1,8 @@
-# Thermal_Cam_v31.py
-# 2020-01-28 v3.1
+# Thermal_Cam_v32.py
+# 2020-01-29 v3.2
 # (c) 2020 Jan Goolsbey for Adafruit Industries
 
 import time
-from collections import namedtuple
 import board
 import displayio
 from simpleio import map_range
@@ -77,10 +76,10 @@ element_color = [GRAY, BLUE, GREEN, YELLOW, ORANGE, RED, VIOLET, WHITE]
 param_list = [("ALARM", WHITE), ("RANGE", RED), ("RANGE", CYAN)]
 
 ### Helpers ###
-Coords = namedtuple("Point", "x y")  # Used by element_grid()
-
 def element_grid(col, row):  # Determine display coordinates for column, row
-    return Coords(int(ELEMENT_SIZE * col + 30), int(ELEMENT_SIZE * row + 1))
+    x = int(ELEMENT_SIZE * col + 30)  # x coord + margin
+    y = int(ELEMENT_SIZE * row + 1)   # y coord + margin
+    return x, y  # Return display coordinates
 
 def flash_status(text="", duration=0.05):  # Flash status message once
     status_label.color = WHITE
@@ -160,7 +159,7 @@ def setup_mode():  # Set alarm threshold and minimum/maximum range values
     # Select parameter to set
     while not panel.button.start:
         while (not panel.button.a) and (not panel.button.start):
-            left, right, up, down = move_buttons(joystick=panel.has_joystick)
+            up, down = move_buttons(joystick=panel.has_joystick)
             if up:
                 param_index = param_index - 1
             if down:
@@ -182,7 +181,7 @@ def setup_mode():  # Set alarm threshold and minimum/maximum range values
         # Adjust parameter value
         param_value = int(image_group[param_index + 70].text)
         while (not panel.button.a) and (not panel.button.start):
-            left, right, up, down = move_buttons(joystick=panel.has_joystick)
+            up, down = move_buttons(joystick=panel.has_joystick)
             if up:
                 param_value = param_value + 1
             if down:
@@ -217,27 +216,18 @@ def setup_mode():  # Set alarm threshold and minimum/maximum range values
     return int(alarm_value.text), int(max_value.text), int(min_value.text)
 
 def move_buttons(joystick=False):  # Read position buttons and joystick
-    move_r = move_l = False
     move_u = move_d = False
     if joystick:  # For PyGamer: interpret joystick as buttons
-        if   panel.joystick[0] > 44000:
-            move_r = True
-        elif panel.joystick[0] < 20000:
-            move_l = True
         if   panel.joystick[1] < 20000:
             move_u = True
         elif panel.joystick[1] > 44000:
             move_d = True
     else:  # For PyBadge read the buttons
-        if panel.button.right:
-            move_r = True
-        if panel.button.left:
-            move_l = True
         if panel.button.up:
             move_u = True
         if panel.button.down:
             move_d = True
-    return move_r, move_l, move_u, move_d
+    return move_u, move_d
 
 ### Define the display group ###
 image_group = displayio.Group(max_size=77)
@@ -254,83 +244,83 @@ image_group.append(background)
 #   image_group[#]=(row * 8) + column
 for row in range(0, 8):
     for col in range(0, 8):
-        pos = element_grid(col, row)
-        element = Rect(x=pos.x, y=pos.y,
+        pos_x, pos_y = element_grid(col, row)
+        element = Rect(x=pos_x, y=pos_y,
                        width=ELEMENT_SIZE, height=ELEMENT_SIZE,
                        fill=None, outline=None, stroke=0)
         image_group.append(element)
 
 # Define labels and values using element grid coordinates
 status_label = Label(font, text="", color=BLACK, max_glyphs=6)
-pos = element_grid(2.5, 4)
-status_label.x = pos.x
-status_label.y = pos.y
+pos_x, pos_y = element_grid(2.5, 4)
+status_label.x = pos_x
+status_label.y = pos_y
 image_group.append(status_label)  # image_group[65]
 
 alarm_label = Label(font, text="alm", color=WHITE, max_glyphs=3)
-pos = element_grid(-1.8, 1.5)
-alarm_label.x = pos.x
-alarm_label.y = pos.y
+pos_x, pos_y = element_grid(-1.8, 1.5)
+alarm_label.x = pos_x
+alarm_label.y = pos_y
 image_group.append(alarm_label)  # image_group[66]
 
 max_label = Label(font, text="max", color=RED, max_glyphs=3)
-pos = element_grid(-1.8, 3.5)
-max_label.x = pos.x
-max_label.y = pos.y
+pos_x, pos_y = element_grid(-1.8, 3.5)
+max_label.x = pos_x
+max_label.y = pos_y
 image_group.append(max_label)  # image_group[67]
 
 min_label = Label(font, text="min", color=CYAN, max_glyphs=3)
-pos = element_grid(-1.8, 7.5)
-min_label.x = pos.x
-min_label.y = pos.y
+pos_x, pos_y = element_grid(-1.8, 7.5)
+min_label.x = pos_x
+min_label.y = pos_y
 image_group.append(min_label)  # image_group[68]
 
 ave_label = Label(font, text="ave", color=YELLOW, max_glyphs=3)
-pos = element_grid(-1.8, 5.5)
-ave_label.x = pos.x
-ave_label.y = pos.y
+pos_x, pos_y = element_grid(-1.8, 5.5)
+ave_label.x = pos_x
+ave_label.y = pos_y
 image_group.append(ave_label)  # image_group[69]
 
 alarm_value = Label(font, text=str(ALARM_F), color=WHITE, max_glyphs=5)
-pos = element_grid(-1.8, 0.5)
-alarm_value.x = pos.x
-alarm_value.y = pos.y
+pos_x, pos_y = element_grid(-1.8, 0.5)
+alarm_value.x = pos_x
+alarm_value.y = pos_y
 image_group.append(alarm_value)  # image_group[70]
 
 max_value = Label(font, text=str(MAX_RANGE_F), color=RED, max_glyphs=5)
-pos = element_grid(-1.8, 2.5)
-max_value.x = pos.x
-max_value.y = pos.y
+pos_x, pos_y = element_grid(-1.8, 2.5)
+max_value.x = pos_x
+max_value.y = pos_y
 image_group.append(max_value)  # image_group[71]
 
 min_value = Label(font, text=str(MIN_RANGE_F), color=CYAN, max_glyphs=5)
-pos = element_grid(-1.8, 6.5)
-min_value.x = pos.x
-min_value.y = pos.y
+pos_x, pos_y = element_grid(-1.8, 6.5)
+min_value.x = pos_x
+min_value.y = pos_y
 image_group.append(min_value)  # image_group[72]
 
 ave_value = Label(font, text="---", color=YELLOW, max_glyphs=5)
-pos = element_grid(-1.8, 4.5)
-ave_value.x = pos.x
-ave_value.y = pos.y
+pos_x, pos_y = element_grid(-1.8, 4.5)
+ave_value.x = pos_x
+ave_value.y = pos_y
 image_group.append(ave_value)  # image_group[73]
 
 min_histo = Label(font, text="", color=CYAN, max_glyphs=3)
-pos = element_grid(0.5, 7.5)
-min_histo.x = pos.x
-min_histo.y = pos.y
+pos_x, pos_y = element_grid(0.5, 7.5)
+min_histo.x = pos_x
+min_histo.y = pos_y
 image_group.append(min_histo)  # image_group[74]
 
 max_histo = Label(font, text="", color=RED, max_glyphs=3)
-pos = element_grid(6.5, 7.5)
-max_histo.x = pos.x
-max_histo.y = pos.y
+pos_x, pos_y = element_grid(6.5, 7.5)
+max_histo.x = pos_x
+max_histo.y = pos_y
 image_group.append(max_histo)  # image_group[75]
 
 range_histo = Label(font, text="", color=BLUE, max_glyphs=7)
-pos = element_grid(2.5, 7.5)
-range_histo.x = pos.x
-range_histo.y = pos.y
+pos_x, pos_y = element_grid(2.5, 7.5)
+range_histo.x = pos_x
+range_histo.y = pos_y
 image_group.append(range_histo)  # image_group[76]
 
 ###--- PRIMARY PROCESS SETUP ---###
