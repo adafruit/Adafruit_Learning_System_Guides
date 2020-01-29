@@ -46,7 +46,7 @@ MIN_SENSOR_F = celsius_to_fahrenheit(MIN_SENSOR_C)
 MAX_SENSOR_F = celsius_to_fahrenheit(MAX_SENSOR_C)
 
 # Load default alarm and min/max range values list from config file
-from thermal_cam_config import *
+from thermal_cam_config import ALARM_F, MIN_RANGE_F, MAX_RANGE_F
 
 # Convert default alarm and min/max range values from config file
 ALARM_C     = fahrenheit_to_celsius(ALARM_F)
