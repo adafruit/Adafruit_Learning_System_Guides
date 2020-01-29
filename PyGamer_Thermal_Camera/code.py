@@ -3,10 +3,10 @@
 # (c) 2020 Jan Goolsbey for Adafruit Industries
 
 import time
+from collections import namedtuple
 import board
 import displayio
 from simpleio import map_range
-from collections import namedtuple
 from adafruit_display_text.label import Label
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_shapes.rect import Rect
