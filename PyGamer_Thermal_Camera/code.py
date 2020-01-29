@@ -121,7 +121,7 @@ def update_histo_frame():
     sum_bucket = 0  # Clear bucket for building average value
 
     histo_bucket = [0, 0, 0, 0, 0, 0, 0, 0]  # Clear histogram bucket
-    for row2 in range2(7, -1, -1):  # Collect camera data and calculate spectrum
+    for row2 in range(7, -1, -1):  # Collect camera data and calculate spectrum
         for col2 in range(0, 8):
             value = map_range(image[col2][row2],
                               MIN_SENSOR_C, MAX_SENSOR_C,
