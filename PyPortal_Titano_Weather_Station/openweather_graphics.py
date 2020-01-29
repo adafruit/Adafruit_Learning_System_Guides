@@ -147,15 +147,15 @@ class OpenWeather_Graphics(displayio.Group):
         holiday_date_str = month+shortened_date_format_str % (date)
         print(date_str)
         self.date_text.text = date_str
-        if not self.holiday_text:
-            self.holiday_text = Label(self.medium_font, max_glyphs=60)
-            self.holiday_text.x = 10
-            self.holiday_text.y = 45
-            self.holiday_text.color = 0xf2f89d
-            self._text_group.append(self.holiday_text)
         for i in holiday_checks:
             h = holiday_checks.index(i)
             if holiday_date_str == holiday_checks[h]:
+                if not self.holiday_text:
+                    self.holiday_text = Label(self.medium_font, max_glyphs=60)
+                    self.holiday_text.x = 10
+                    self.holiday_text.y = 45
+                    self.holiday_text.color = 0xf2f89d
+                    self._text_group.append(self.holiday_text)
                 self.holiday_text.text = holiday_greetings[h]
 
     def set_icon(self, filename):
