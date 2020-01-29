@@ -4,9 +4,8 @@ Display notable info about famous electronics-related peoples
 Data sources: https://github.com/adafruit/OTD/tree/master/electronics
 """
 
-import random
-import board
 import time
+import board
 from adafruit_pyportal import PyPortal
 
 cwd = ("/"+__file__).rsplit('/', 1)[0] # the current working directory (where this file is)
