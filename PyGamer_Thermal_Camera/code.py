@@ -75,9 +75,9 @@ element_color = [GRAY, BLUE, GREEN, YELLOW, ORANGE, RED, VIOLET, WHITE]
 param_list = [("ALARM", WHITE), ("RANGE", RED), ("RANGE", CYAN)]
 
 ### Helpers ###
-def element_grid(col, row):  # Determine display coordinates for column, row
-    x = int(ELEMENT_SIZE * col + 30)  # x coord + margin
-    y = int(ELEMENT_SIZE * row + 1)   # y coord + margin
+def element_grid(col0, row0):  # Determine display coordinates for column, row
+    x = int(ELEMENT_SIZE * col0 + 30)  # x coord + margin
+    y = int(ELEMENT_SIZE * row0 + 1)   # y coord + margin
     return x, y  # Return display coordinates
 
 def flash_status(text="", duration=0.05):  # Flash status message once
@@ -98,13 +98,13 @@ def update_image_frame():  # Get camera data and display
 
     sum_bucket = 0  # Clear bucket for building average value
 
-    for row in range(0, 8):  # Parse camera data list and update display
-        for col in range(0, 8):
-            value = map_range(image[7 - row][7 - col],
+    for row1 in range(0, 8):  # Parse camera data list and update display
+        for col1 in range(0, 8):
+            value = map_range(image[7 - row1][7 - col1],
                               MIN_SENSOR_C, MAX_SENSOR_C,
                               MIN_SENSOR_C, MAX_SENSOR_C)
             color_index = int(map_range(value, MIN_RANGE_C, MAX_RANGE_C, 0, 7))
-            image_group[((row * 8) + col) + 1].fill = element_color[color_index]
+            image_group[((row1 * 8) + col1) + 1].fill = element_color[color_index]
             sum_bucket = sum_bucket + value  # Calculate sum for average
             minimum = min(value, minimum)
             maximum = max(value, maximum)
@@ -121,9 +121,9 @@ def update_histo_frame():
     sum_bucket = 0  # Clear bucket for building average value
 
     histo_bucket = [0, 0, 0, 0, 0, 0, 0, 0]  # Clear histogram bucket
-    for row in range(7, -1, -1):  # Collect camera data and calculate spectrum
-        for col in range(0, 8):
-            value = map_range(image[col][row],
+    for row2 in range2(7, -1, -1):  # Collect camera data and calculate spectrum
+        for col2 in range(0, 8):
+            value = map_range(image[col2][row2],
                               MIN_SENSOR_C, MAX_SENSOR_C,
                               MIN_SENSOR_C, MAX_SENSOR_C)
             histo_index = int(map_range(value, MIN_RANGE_C, MAX_RANGE_C, 0, 7))
@@ -132,14 +132,15 @@ def update_histo_frame():
             minimum = min(value, minimum)
             maximum = max(value, maximum)
 
-    for col in range(0, 8):  # Display histogram
-        for row in range(0, 8):
-            if histo_bucket[col] / 8 > 7 - row:
-                image_group[((row * 8) + col) + 1].fill = element_color[col]
+    for col2 in range(0, 8):  # Display histogram
+        for row2 in range(0, 8):
+            if histo_bucket[col2] / 8 > 7 - row2:
+                image_group[((row2 * 8) + col2) + 1].fill = element_color[col2]
             else:
-                image_group[((row * 8) + col) + 1].fill = BLACK
+                image_group[((row2 * 8) + col2) + 1].fill = BLACK
     return minimum, maximum, sum_bucket
 
+#pylint: disable=too-many-branches,too-many-statements
 def setup_mode():  # Set alarm threshold and minimum/maximum range values
     status_label.color = WHITE
     status_label.text  = "-SET-"
@@ -213,6 +214,7 @@ def setup_mode():  # Set alarm threshold and minimum/maximum range values
     ave_label.color = YELLOW
     ave_value.color = YELLOW
     return int(alarm_value.text), int(max_value.text), int(min_value.text)
+#pylint: enable=too-many-branches,too-many-statements
 
 def move_buttons(joystick=False):  # Read position buttons and joystick
     move_u = move_d = False
@@ -326,6 +328,8 @@ image_group.append(range_histo)  # image_group[76]
 display_image = True   # Image display mode; False for histogram
 display_hold  = False  # Active display mode; True to hold display
 display_focus = False  # Standard display range; True to focus display range
+orig_max_range_f = 0   # There are no initial range values
+orig_min_range_f = 0
 
 # Activate display and play welcome tone
 board.DISPLAY.show(image_group)
