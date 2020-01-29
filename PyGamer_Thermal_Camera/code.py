@@ -2,7 +2,6 @@
 # 2020-01-29 v3.2
 # (c) 2020 Jan Goolsbey for Adafruit Industries
 
-from thermal_cam_converters import celsius_to_fahrenheit, fahrenheit_to_celsius
 import time
 import board
 import displayio
@@ -12,6 +11,9 @@ from adafruit_bitmap_font import bitmap_font
 from adafruit_display_shapes.rect import Rect
 import adafruit_amg88xx
 from adafruit_pybadger import PyBadger
+from thermal_cam_converters import celsius_to_fahrenheit, fahrenheit_to_celsius
+# Load default alarm and min/max range values list from config file
+from thermal_cam_config import ALARM_F, MIN_RANGE_F, MAX_RANGE_F
 
 # Establish panel instance and check for joystick
 panel = PyBadger(pixels_brightness=0.1)  # Set NeoPixel brightness
@@ -43,9 +45,6 @@ MIN_SENSOR_C = 0
 MAX_SENSOR_C = 80
 MIN_SENSOR_F = celsius_to_fahrenheit(MIN_SENSOR_C)
 MAX_SENSOR_F = celsius_to_fahrenheit(MAX_SENSOR_C)
-
-# Load default alarm and min/max range values list from config file
-from thermal_cam_config import ALARM_F, MIN_RANGE_F, MAX_RANGE_F
 
 # Convert default alarm and min/max range values from config file
 ALARM_C     = fahrenheit_to_celsius(ALARM_F)
