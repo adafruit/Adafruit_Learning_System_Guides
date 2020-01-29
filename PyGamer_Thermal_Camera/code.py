@@ -2,6 +2,7 @@
 # 2020-01-29 v3.2
 # (c) 2020 Jan Goolsbey for Adafruit Industries
 
+from thermal_cam_converters import celsius_to_fahrenheit, fahrenheit_to_celsius
 import time
 import board
 import displayio
@@ -11,7 +12,6 @@ from adafruit_bitmap_font import bitmap_font
 from adafruit_display_shapes.rect import Rect
 import adafruit_amg88xx
 from adafruit_pybadger import PyBadger
-from thermal_cam_converters import celsius_to_fahrenheit, fahrenheit_to_celsius
 
 # Establish panel instance and check for joystick
 panel = PyBadger(pixels_brightness=0.1)  # Set NeoPixel brightness
@@ -382,16 +382,16 @@ while True:
         panel.play_tone(698, 0.030)  # F5
         if display_focus:
             display_focus = False  # restore previous (original) range values
-            MIN_RANGE_F = temp_min_range_f
-            MAX_RANGE_F = temp_max_range_f
+            MIN_RANGE_F = orig_min_range_f
+            MAX_RANGE_F = orig_max_range_f
             # update range min and max values in Celsius
             MIN_RANGE_C = fahrenheit_to_celsius(MIN_RANGE_F)
             MAX_RANGE_C = fahrenheit_to_celsius(MAX_RANGE_F)
             flash_status("ORIG", 0.2)
         else:
             display_focus = True  # set range values to image min/max
-            temp_min_range_f = MIN_RANGE_F
-            temp_max_range_f = MAX_RANGE_F
+            orig_min_range_f = MIN_RANGE_F
+            orig_max_range_f = MAX_RANGE_F
             MIN_RANGE_F = celsius_to_fahrenheit(v_min)
             MAX_RANGE_F = celsius_to_fahrenheit(v_max)
             MIN_RANGE_C = v_min  # update range temp in Celsius
