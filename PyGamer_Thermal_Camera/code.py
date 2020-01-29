@@ -374,14 +374,15 @@ while True:
         panel.play_tone(1319, 0.030)  # E6
         while panel.button.a:
             pass   # wait for button release
-        if display_hold == False:
+        if not display_hold:
             display_hold = True
         else:
             display_hold = False
 
     if panel.button.b:  # Toggle image/histogram mode (display mode = button B)
         panel.play_tone(659, 0.030)  # E5
-        while panel.button.b:  pass  # wait for button release
+        while panel.button.b:
+            pass  # wait for button release
         if display_image:
             display_image = False
         else:
@@ -420,4 +421,4 @@ while True:
         MIN_RANGE_C = fahrenheit_to_celsius(MIN_RANGE_F)
         MAX_RANGE_C = fahrenheit_to_celsius(MAX_RANGE_F)
 
-    pass  # bottom of primary loop
+    # bottom of primary loop
