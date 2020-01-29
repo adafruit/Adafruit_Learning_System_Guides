@@ -2,8 +2,6 @@
 # 2020-01-28 v3.1
 # (c) 2020 Jan Goolsbey for Adafruit Industries
 
-print("Thermal_Cam_v31.py")
-
 import time
 import board
 import displayio
@@ -35,7 +33,7 @@ with open("/thermal_cam_splash.bmp", "rb") as bitmap_file:
     bitmap = displayio.OnDiskBitmap(bitmap_file)
     splash = displayio.Group()
     splash.append(displayio.TileGrid(bitmap,
-                  pixel_shader=displayio.ColorConverter()))
+                                     pixel_shader=displayio.ColorConverter()))
     board.DISPLAY.show(splash)
     time.sleep(0.1)  # Allow the splash to display
 panel.play_tone(440, 0.1)  # A4
