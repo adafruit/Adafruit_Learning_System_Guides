@@ -2,7 +2,6 @@ import time
 import board
 import displayio
 import busio
-from digitalio import DigitalInOut
 from analogio import AnalogIn
 import neopixel
 import adafruit_adt7410
@@ -37,10 +36,10 @@ soundTab = '/sounds/tab.wav'
 
 # ------------- Other Helper Functions------------- #
 # Helper for cycling through a number set of 1 to x.
-def numberUP(i, max_val):
-    i += 1
-    if i <= max_val:
-        return i
+def numberUP(num, max_val):
+    num += 1
+    if num <= max_val:
+        return num
     else:
         return 1
 
@@ -61,10 +60,13 @@ set_backlight(0.3)
 
 # Touchscreen setup
 # ------Rotate 270:
+screen_width = 240
+screen_height = 320
 ts = adafruit_touchscreen.Touchscreen(board.TOUCH_YD, board.TOUCH_YU,
                                       board.TOUCH_XR, board.TOUCH_XL,
-                                      calibration=((5200, 59000), (5800, 57000)),
-                                      size=(240, 320))
+                                      calibration=((5200, 59000), 
+                                                   (5800, 57000)),
+                                      size=(screen_width, screen_height))
 
 
 # ------------- Display Groups ------------- #
@@ -73,17 +75,16 @@ view1 = displayio.Group(max_size=15)  # Group for View 1 objects
 view2 = displayio.Group(max_size=15)  # Group for View 2 objects
 view3 = displayio.Group(max_size=15)  # Group for View 3 objects
 
-def hideLayer(i):
+def hideLayer(hide_target):
     try:
-        splash.remove(i)
+        splash.remove(hide_target)
     except ValueError:
         pass
 
-def showLayer(i):
-    global rect
+def showLayer(show_target):
     try:
         time.sleep(0.1)
-        splash.append(i)
+        splash.append(show_target)
     except ValueError:
         pass
 
@@ -116,17 +117,14 @@ def set_image(group, filename):
 
     if not filename:
         return  # we're done, no icon desired
-    try:
-        if image_file:
-            image_file.close
-    except NameError:
-        pass
+        
     image_file = open(filename, "rb")
     image = displayio.OnDiskBitmap(image_file)
     try:
         image_sprite = displayio.TileGrid(image, pixel_shader=displayio.ColorConverter())
     except TypeError:
-        image_sprite = displayio.TileGrid(image, pixel_shader=displayio.ColorConverter(), position=(0, 0))
+        image_sprite = displayio.TileGrid(image, pixel_shader=displayio.ColorConverter(), 
+                                          position=(0, 0))
     group.append(image_sprite)
 
 set_image(bg_group, "/images/BGimage.bmp")
@@ -161,6 +159,7 @@ sensor_data.x = TABS_X+15
 sensor_data.y = 170
 view3.append(sensor_data)
 
+
 text_hight = Label(font, text="M", color=0x03AD31, max_glyphs=10)
 # return a reformatted string with word wrapping using PyPortal.wrap_nicely
 def text_box(target, top, string, max_chars):
@@ -183,48 +182,48 @@ BUTTON_WIDTH = 80
 
 # We want three buttons across the top of the screen
 TAPS_HEIGHT = 40
-TAPS_WIDTH = int(ts._size[0]/3)
+TAPS_WIDTH = int(screen_width/3)
 TAPS_Y = 0
 
 # We want two big buttons at the bottom of the screen
-BIG_BUTTON_HEIGHT = int(ts._size[1]/3.2)
-BIG_BUTTON_WIDTH = int(ts._size[0]/2)
-BIG_BUTTON_Y = int(ts._size[1]-BIG_BUTTON_HEIGHT)
+BIG_BUTTON_HEIGHT = int(screen_height/3.2)
+BIG_BUTTON_WIDTH = int(screen_width/2)
+BIG_BUTTON_Y = int(screen_height-BIG_BUTTON_HEIGHT)
 
 # This group will make it easy for us to read a button press later.
 buttons = []
 
 # Main User Interface Buttons
 button_view1 = Button(x=0, y=0,
-                    width=TAPS_WIDTH, height=TAPS_HEIGHT,
-                    label="View1", label_font=font, label_color=0xff7e00,
-                    fill_color=0x5c5b5c, outline_color=0x767676,
-                    selected_fill=0x1a1a1a, selected_outline=0x2e2e2e,
-                    selected_label=0x525252)
+                      width=TAPS_WIDTH, height=TAPS_HEIGHT,
+                      label="View1", label_font=font, label_color=0xff7e00,
+                      fill_color=0x5c5b5c, outline_color=0x767676,
+                      selected_fill=0x1a1a1a, selected_outline=0x2e2e2e,
+                      selected_label=0x525252)
 buttons.append(button_view1)  # adding this button to the buttons group
 
 button_view2 = Button(x=TAPS_WIDTH, y=0,
-                    width=TAPS_WIDTH, height=TAPS_HEIGHT,
-                    label="View2", label_font=font, label_color=0xff7e00,
-                    fill_color=0x5c5b5c, outline_color=0x767676,
-                    selected_fill=0x1a1a1a, selected_outline=0x2e2e2e,
-                    selected_label=0x525252)
+                      width=TAPS_WIDTH, height=TAPS_HEIGHT,
+                      label="View2", label_font=font, label_color=0xff7e00,
+                      fill_color=0x5c5b5c, outline_color=0x767676,
+                      selected_fill=0x1a1a1a, selected_outline=0x2e2e2e,
+                      selected_label=0x525252)
 buttons.append(button_view2)  # adding this button to the buttons group
 
 button_view3 = Button(x=TAPS_WIDTH*2, y=0,
-                    width=TAPS_WIDTH, height=TAPS_HEIGHT,
-                    label="View3", label_font=font, label_color=0xff7e00,
-                    fill_color=0x5c5b5c, outline_color=0x767676,
-                    selected_fill=0x1a1a1a, selected_outline=0x2e2e2e,
-                    selected_label=0x525252)
+                      width=TAPS_WIDTH, height=TAPS_HEIGHT,
+                      label="View3", label_font=font, label_color=0xff7e00,
+                      fill_color=0x5c5b5c, outline_color=0x767676,
+                      selected_fill=0x1a1a1a, selected_outline=0x2e2e2e,
+                      selected_label=0x525252)
 buttons.append(button_view3)  # adding this button to the buttons group
 
 button_switch = Button(x=0, y=BIG_BUTTON_Y,
-                    width=BIG_BUTTON_WIDTH, height=BIG_BUTTON_HEIGHT,
-                    label="Switch", label_font=font, label_color=0xff7e00,
-                    fill_color=0x5c5b5c, outline_color=0x767676,
-                    selected_fill=0x1a1a1a, selected_outline=0x2e2e2e,
-                    selected_label=0x525252)
+                       width=BIG_BUTTON_WIDTH, height=BIG_BUTTON_HEIGHT,
+                       label="Switch", label_font=font, label_color=0xff7e00,
+                       fill_color=0x5c5b5c, outline_color=0x767676,
+                       selected_fill=0x1a1a1a, selected_outline=0x2e2e2e,
+                       selected_label=0x525252)
 buttons.append(button_switch)  # adding this button to the buttons group
 
 button_2 = Button(x=BIG_BUTTON_WIDTH, y=BIG_BUTTON_Y,
@@ -242,11 +241,11 @@ for b in buttons:
 
 # Make a button to change the icon image on view2
 button_icon = Button(x=150, y=60,
-                    width=BUTTON_WIDTH, height=BUTTON_HEIGHT,
-                    label="Icon", label_font=font, label_color=0xffffff,
-                    fill_color=0x8900ff, outline_color=0xbc55fd,
-                    selected_fill=0x5a5a5a, selected_outline=0xff6600,
-                    selected_label=0x525252, style=Button.ROUNDRECT)
+                     width=BUTTON_WIDTH, height=BUTTON_HEIGHT,
+                     label="Icon", label_font=font, label_color=0xffffff,
+                     fill_color=0x8900ff, outline_color=0xbc55fd,
+                     selected_fill=0x5a5a5a, selected_outline=0xff6600,
+                     selected_label=0x525252, style=Button.ROUNDRECT)
 buttons.append(button_icon)  # adding this button to the buttons group
 
 # Add this button to view2 Group
@@ -254,19 +253,19 @@ view2.append(button_icon.group)
 
 # Make a button to play a sound on view2
 button_sound = Button(x=150, y=170,
-                    width=BUTTON_WIDTH, height=BUTTON_HEIGHT,
-                    label="Sound", label_font=font, label_color=0xffffff,
-                    fill_color=0x8900ff, outline_color=0xbc55fd,
-                    selected_fill=0x5a5a5a, selected_outline=0xff6600,
-                    selected_label=0x525252, style=Button.ROUNDRECT)
+                      width=BUTTON_WIDTH, height=BUTTON_HEIGHT,
+                      label="Sound", label_font=font, label_color=0xffffff,
+                      fill_color=0x8900ff, outline_color=0xbc55fd,
+                      selected_fill=0x5a5a5a, selected_outline=0xff6600,
+                      selected_label=0x525252, style=Button.ROUNDRECT)
 buttons.append(button_sound)  # adding this button to the buttons group
 
 # Add this button to view2 Group
 view3.append(button_sound.group)
 
-def switch_view(i):
+def switch_view(what_view):
     global view_live
-    if i == 1:
+    if what_view == 1:
         hideLayer(view2)
         hideLayer(view3)
         button_view1.selected = False
@@ -275,7 +274,7 @@ def switch_view(i):
         showLayer(view1)
         view_live = 1
         print("View1 On")
-    elif i == 2:
+    elif what_view == 2:
         # global icon
         hideLayer(view1)
         hideLayer(view3)
@@ -313,8 +312,10 @@ button_switch.label = "OFF"
 button_switch.selected = True
 
 # Update out Labels with display text.
-text_box(feed1_label, TABS_Y, 'The text on this screen is wrapped so that all of it fits nicely into a text box that is ### x ###.', 30)
-text_box(feed1_label, TABS_Y, 'The text on this screen is wrapped so that all of it fits nicely into a text box that is {} x {}.'.format(feed1_label.bounding_box[2], feed1_label.bounding_box[3]*2, feed1_label.line_spacing), 30)
+text_box(feed1_label, TABS_Y, "The text on this screen is wrapped so that all of it fits nicely into a text box that is ### x ###.", 30)
+text_box(feed1_label, TABS_Y, 'The text on this screen is wrapped so that all of it fits nicely into a text box that is {} x {}.'
+         .format(feed1_label.bounding_box[2], 
+                 feed1_label.bounding_box[3]*2), 30)
 
 text_box(feed2_label, TABS_Y, 'Tap on the Icon button to meet a new friend.', 18)
 
@@ -329,25 +330,25 @@ while True:
     tempC = round(adt.temperature)
     tempF = tempC * 1.8 + 32
 
-    sensor_data.text = 'Touch: {}\nLight: {}\nTemp: {}°F'.format(touch, light, tempF)
+    sensor_data.text = 'Touch: {}\nLight: {}\n Temp: {}°F'.format(touch, light, tempF)
 
     # ------------- Handle Button Press Detection  ------------- #
     if touch:  # Only do this if the screen is touched
-        # Do a for loop with buttons using enumerate() to number each button group as i
+        # loop with buttons using enumerate() to number each button group as i
         for i, b in enumerate(buttons):
             if b.contains(touch):  # Test each button to see if it was pressed
                 print('button%d pressed' % i)
-                if i == 0 and view_live != 1:  # button_view1 pressed and view1 not visable
+                if i == 0 and view_live != 1:  # only if view1 is visable
                     pyportal.play_file(soundTab)
                     switch_view(1)
                     while ts.touch_point:
                         pass
-                if i == 1 and view_live != 2:  # button_view2 pressed and view2 not visable
+                if i == 1 and view_live != 2:  # only if view2 is visable
                     pyportal.play_file(soundTab)
                     switch_view(2)
                     while ts.touch_point:
                         pass
-                if i == 2 and view_live != 3:  # button_view3 pressed and view3 not visable
+                if i == 2 and view_live != 3:  # only if view3 is visable
                     pyportal.play_file(soundTab)
                     switch_view(3)
                     while ts.touch_point:
@@ -376,7 +377,6 @@ while True:
                     # Momentary button type
                     b.selected = True
                     print('Button Pressed')
-                    button_mode
                     button_mode = numberUP(button_mode, 5)
                     if button_mode == 1:
                         pixel.fill(RED)
@@ -396,7 +396,7 @@ while True:
                         pass
                     print("Button released")
                     b.selected = False
-                if i == 5 and view_live == 2: #  button_icon pressed and view2 is visable
+                if i == 5 and view_live == 2:  # only if view2 is visable
                     pyportal.play_file(soundBeep)
                     b.selected = True
                     while ts.touch_point:
@@ -412,11 +412,10 @@ while True:
                     b.selected = False
                     text_box(feed2_label, TABS_Y, 'Every time you tap the Icon button the icon image will change. Say hi to {}!'.format(icon_name), 18)
                     set_image(icon_group, "/images/"+icon_name+".bmp")
-                if i == 6 and view_live == 3: # button_sound pressed and view3 is visable
+                if i == 6 and view_live == 3:  # only if view3 is visable
                     b.selected = True
                     while ts.touch_point:
                         pass
                     print("Sound Button Pressed")
                     pyportal.play_file(soundDemo)
                     b.selected = False
-                    
