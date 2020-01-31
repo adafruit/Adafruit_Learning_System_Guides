@@ -64,7 +64,7 @@ screen_width = 240
 screen_height = 320
 ts = adafruit_touchscreen.Touchscreen(board.TOUCH_YD, board.TOUCH_YU,
                                       board.TOUCH_XR, board.TOUCH_XL,
-                                      calibration=((5200, 59000), 
+                                      calibration=((5200, 59000),
                                                    (5800, 57000)),
                                       size=(screen_width, screen_height))
 
@@ -117,13 +117,13 @@ def set_image(group, filename):
 
     if not filename:
         return  # we're done, no icon desired
-        
+
     image_file = open(filename, "rb")
     image = displayio.OnDiskBitmap(image_file)
     try:
         image_sprite = displayio.TileGrid(image, pixel_shader=displayio.ColorConverter())
     except TypeError:
-        image_sprite = displayio.TileGrid(image, pixel_shader=displayio.ColorConverter(), 
+        image_sprite = displayio.TileGrid(image, pixel_shader=displayio.ColorConverter(),
                                           position=(0, 0))
     group.append(image_sprite)
 
@@ -263,6 +263,7 @@ buttons.append(button_sound)  # adding this button to the buttons group
 # Add this button to view2 Group
 view3.append(button_sound.group)
 
+#pylint: disable=global-statement
 def switch_view(what_view):
     global view_live
     if what_view == 1:
@@ -293,7 +294,7 @@ def switch_view(what_view):
         showLayer(view3)
         view_live = 3
         print("View3 On")
-
+#pylint: enable=global-statement
 
 # Set veriables and startup states
 button_view1.selected = False
@@ -312,14 +313,17 @@ button_switch.label = "OFF"
 button_switch.selected = True
 
 # Update out Labels with display text.
-text_box(feed1_label, TABS_Y, "The text on this screen is wrapped so that all of it fits nicely into a text box that is ### x ###.", 30)
-text_box(feed1_label, TABS_Y, 'The text on this screen is wrapped so that all of it fits nicely into a text box that is {} x {}.'
-         .format(feed1_label.bounding_box[2], 
-                 feed1_label.bounding_box[3]*2), 30)
+text_box(feed1_label, TABS_Y,
+         "The text on this screen is wrapped so that all of it fits nicely into a text box that is ### x ###.",
+         30)
+text_box(feed1_label, TABS_Y,
+         'The text on this screen is wrapped so that all of it fits nicely into a text box that is {} x {}.'
+         .format(feed1_label.bounding_box[2], feed1_label.bounding_box[3]*2), 30)
 
 text_box(feed2_label, TABS_Y, 'Tap on the Icon button to meet a new friend.', 18)
 
-text_box(sensors_label, TABS_Y, 'This screen can display sensor readings and tap Sound to play a WAV file.', 28)
+text_box(sensors_label, TABS_Y,
+         "This screen can display sensor readings and tap Sound to play a WAV file.", 28)
 
 board.DISPLAY.show(splash)
 
@@ -410,7 +414,9 @@ while True:
                     elif icon == 3:
                         icon_name = "Billie"
                     b.selected = False
-                    text_box(feed2_label, TABS_Y, 'Every time you tap the Icon button the icon image will change. Say hi to {}!'.format(icon_name), 18)
+                    text_box(feed2_label, TABS_Y, 
+                             "Every time you tap the Icon button the icon image will change. Say hi to {}!"
+                             .format(icon_name), 18)
                     set_image(icon_group, "/images/"+icon_name+".bmp")
                 if i == 6 and view_live == 3:  # only if view3 is visable
                     b.selected = True
