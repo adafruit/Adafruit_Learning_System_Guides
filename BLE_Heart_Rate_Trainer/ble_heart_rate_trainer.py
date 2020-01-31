@@ -54,7 +54,6 @@ display_B.set_digit_raw(2, 0b01011000)
 display_B.set_digit_raw(3, 0b01000110)
 time.sleep(3)
 
-# display_A "...."
 display_A.fill(0)
 for h in range(4):
     display_A.set_digit_raw(h, 0b10000000)
@@ -83,6 +82,16 @@ def display_bLE():
     display_B.set_digit_raw(2, 0b00111000)
     display_B.set_digit_raw(3, 0b01111001)
 
+def display_dots():  # "...."
+    for j in range(4):
+        display_A.set_digit_raw(j, 0b10000000)
+        display_B.set_digit_raw(j, 0b10000000)
+
+def display_dashes():  # "----"
+    for k in range(4):
+        display_A.set_digit_raw(k, 0b01000000)
+        display_B.set_digit_raw(k, 0b01000000)
+
 # Start with a fresh connection.
 if ble.connected:
     display_SCAN()
@@ -107,12 +116,7 @@ while True:
         if HeartRateService in adv.services:
             print("found a HeartRateService advertisement")
             hr_connection = ble.connect(adv)
-            # "...."
-            for j in range(4):
-                display_A.set_digit_raw(j, 0b10000000)
-                display_B.set_digit_raw(j, 0b10000000)
-
-            #display_B.fill(0)
+            display_dots()
             time.sleep(2)
             print("Connected")
             blue_led.value = True
@@ -154,9 +158,7 @@ while True:
                 display_A.fill(0)  # clear the display
                 display_B.fill(0)
                 if values.heart_rate is 0:
-                    for k in range(4):
-                        display_A.set_digit_raw(k, 0b01000000)
-                        display_B.set_digit_raw(k, 0b01000000)
+                    display_dashes()
                 else:
                     display_A.fill(0)
                     display_B.print(pct_target)
