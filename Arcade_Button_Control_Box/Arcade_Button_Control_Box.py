@@ -4,6 +4,7 @@ import digitalio
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keycode import Keycode
 import board
+import usb_hid
 
 # A simple neat keyboard demo in circuitpython
 
@@ -16,7 +17,7 @@ buttonkeys = [Keycode.A, Keycode.B, Keycode.C, Keycode.D, Keycode.E, Keycode.F]
 controlkey = Keycode.LEFT_CONTROL
 
 # the keyboard object!
-kbd = Keyboard()
+kbd = Keyboard(usb_hid.devices)
 # our array of button objects
 buttons = []
 leds = []

@@ -8,10 +8,11 @@ import pulseio
 import adafruit_dotstar
 import adafruit_irremote
 import time
+import usb_hid
 
 # The keyboard object!
 time.sleep(1)  # Sleep for a bit to avoid a race condition on some systems
-keyboard = Keyboard()
+keyboard = Keyboard(usb_hid.devices)
 keyboard_layout = KeyboardLayoutUS(keyboard)  # We're in the US :)
 
 led = adafruit_dotstar.DotStar(board.APA102_SCK, board.APA102_MOSI, 1)

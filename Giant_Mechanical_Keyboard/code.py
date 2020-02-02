@@ -10,6 +10,7 @@ import time
 
 import board
 import neopixel
+import usb_hid
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS
 from adafruit_hid.keycode import Keycode
@@ -34,7 +35,7 @@ buttonspressed = [False, False, False]
 buttonspressedlast = [False, False, False]
 
 # the keyboard object!
-kbd = Keyboard()
+kbd = Keyboard(usb_hid.devices)
 # we're americans :)
 layout = KeyboardLayoutUS(kbd)
 
