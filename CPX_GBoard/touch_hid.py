@@ -12,6 +12,7 @@ Licensed under the MIT license.
 All text above must be included in any redistribution.
 """
 
+import usb_hid
 from adafruit_circuitplayground.express import cpx
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keycode import Keycode
@@ -19,7 +20,7 @@ from adafruit_hid.keycode import Keycode
 DOT_DURATION = 0.25
 DASH_DURATION = 0.5
 
-kbd = Keyboard()
+kbd = Keyboard(usb_hid.devices)
 
 # You can adjust this to get the level of sensitivity you want.
 cpx.adjust_touch_threshold(100)

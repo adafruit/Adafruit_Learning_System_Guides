@@ -50,24 +50,22 @@ def make_display():
         pass
     spi.configure(baudrate=24000000) # Configure SPI for 24MHz
     spi.unlock()
-    tft_cs = board.D10
-    tft_dc = board.D7
 
     displayio.release_displays()
-    display_bus = displayio.FourWire(spi, command=tft_dc, chip_select=tft_cs, reset=board.D9)
+    display_bus = displayio.FourWire(spi, command=board.D7, chip_select=board.D10, reset=board.D9)
 
-    return ST7789(display_bus, width=240, height=240, rowstart=80)
+    return ST7789(display_bus, width=240, height=240, rowstart=80, auto_refresh=True)
 
 def make_tilegrid():
     """Construct and return the tilegrid."""
     group = displayio.Group(max_size=10)
 
-    sprite_sheet, palette = adafruit_imageload.load("/tilesheet.bmp",
+    sprite_sheet, palette = adafruit_imageload.load("/tilesheet-2x.bmp",
                                                     bitmap=displayio.Bitmap,
                                                     palette=displayio.Palette)
     grid = displayio.TileGrid(sprite_sheet, pixel_shader=palette,
-                              width=16, height=10,
-                              tile_height=24, tile_width=16,
+                              width=9, height=5,
+                              tile_height=48, tile_width=32,
                               default_tile=EMPTY)
     group.append(grid)
     display.show(group)
@@ -75,13 +73,13 @@ def make_tilegrid():
 
 def evaluate_position(row, col):
     """Return how long of a cloud is placable at the given location.
-    :param row: the tile row (0-9)
-    :param col: the tile column (0-14)
+    :param row: the tile row (0-4)
+    :param col: the tile column (0-8)
     """
     if tilegrid[col, row] != EMPTY or tilegrid[col + 1, row] != EMPTY:
         return 0
     end_col = col + 1
-    while end_col < 16 and tilegrid[end_col, row] == EMPTY:
+    while end_col < 9 and tilegrid[end_col, row] == EMPTY:
         end_col += 1
     return min([4, end_col - col])
 
@@ -89,8 +87,8 @@ def seed_clouds(number_of_clouds):
     """Create the initial clouds so it doesn't start empty"""
     for _ in range(number_of_clouds):
         while True:
-            row = randint(0, 9)
-            col = randint(0,14)
+            row = randint(0, 4)
+            col = randint(0, 7)
             cloud_length = evaluate_position(row, col)
             if cloud_length > 0:
                 break
@@ -103,38 +101,42 @@ def seed_clouds(number_of_clouds):
 
 def slide_tiles():
     """Move the tilegrid to the left, one pixel at a time, a full time width"""
-    for _ in range(16):
+    for _ in range(32):
         tilegrid.x -= 1
-        display.refresh_soon()
-        display.wait_for_frame()
+        display.refresh(target_frames_per_second=60)
+
 
 def shift_tiles():
     """Move tiles one spot to the left, and reset the tilegrid's position"""
-    for row in range(10):
-        for col in range(15):
+    for row in range(5):
+        for col in range(8):
             tilegrid[col, row] = tilegrid[col + 1, row]
-        tilegrid[15, row] = EMPTY
+        tilegrid[8, row] = EMPTY
     tilegrid.x = 0
 
 def extend_clouds():
     """Extend any clouds on the right edge, either finishing them with a right
     end or continuing them with a middle piece
     """
-    for row in range(10):
-        if tilegrid[14, row] == LEFT or tilegrid[14, row] == MIDDLE:
+    for row in range(5):
+        if tilegrid[7, row] == LEFT or tilegrid[7, row] == MIDDLE:
             if randint(1, 10) > CHANCE_OF_EXTENDING_A_CLOUD:
-                tilegrid[15, row] = MIDDLE
+                tilegrid[8, row] = MIDDLE
             else:
-                tilegrid[15, row] = RIGHT
+                tilegrid[8, row] = RIGHT
 
 def add_cloud():
     """Maybe add a new cloud on the right at a randon open row"""
     if randint(1, 10) > CHANCE_OF_NEW_CLOUD:
+        count = 0
         while True:
-            row = randint(0, 9)
-            if tilegrid[14, row] == EMPTY and tilegrid[15, row] == EMPTY:
+            count += 1
+            if count == 50:
+                return
+            row = randint(0, 4)
+            if tilegrid[7, row] == EMPTY and tilegrid[8, row] == EMPTY:
                 break
-        tilegrid[15, row] = LEFT
+        tilegrid[8, row] = LEFT
 
 display = make_display()
 tilegrid = make_tilegrid()

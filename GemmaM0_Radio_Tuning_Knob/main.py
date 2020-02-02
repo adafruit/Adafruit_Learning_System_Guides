@@ -5,6 +5,7 @@
 import time
 
 import board
+import usb_hid
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keycode import Keycode
 from analogio import AnalogIn
@@ -41,7 +42,7 @@ def spamKey(code):
                 Keycode.LEFT_BRACKET]
     spamRate = [0.01, 0.05, 0.125, 0.25, 0.5,
                 0.5, 0.5, 0.25, 0.125, 0.05, 0.01]
-    kbd = Keyboard()
+    kbd = Keyboard(usb_hid.devices)
     kbd.press(knobkeys[code])  # which keycode is entered
     kbd.release_all()
     time.sleep(spamRate[code])  # how fast the key is spammed

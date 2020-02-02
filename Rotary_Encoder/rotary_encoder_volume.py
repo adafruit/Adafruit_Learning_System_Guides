@@ -1,6 +1,7 @@
 import rotaryio
 import board
 import digitalio
+import usb_hid
 from adafruit_hid.consumer_control import ConsumerControl
 from adafruit_hid.consumer_control_code import ConsumerControlCode
 
@@ -10,7 +11,7 @@ button.pull = digitalio.Pull.UP
 
 encoder = rotaryio.IncrementalEncoder(board.D10, board.D9)
 
-cc = ConsumerControl()
+cc = ConsumerControl(usb_hid.devices)
 
 button_state = None
 last_position = encoder.position

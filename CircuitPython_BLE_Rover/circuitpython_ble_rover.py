@@ -9,7 +9,10 @@ import board
 import digitalio
 
 from adafruit_crickit import crickit
-from adafruit_ble.uart import UARTServer
+
+from adafruit_ble import BLERadio
+from adafruit_ble.advertising.standard import ProvideServicesAdvertisement
+from adafruit_ble.services.nordic import UARTService
 
 from adafruit_bluefruit_connect.packet import Packet
 # Only the packet classes that are imported will be known to Packet.
@@ -22,7 +25,9 @@ red_led = digitalio.DigitalInOut(board.RED_LED)
 blue_led.direction = digitalio.Direction.OUTPUT
 red_led.direction = digitalio.Direction.OUTPUT
 
-uart_server = UARTServer()
+ble = BLERadio()
+uart_service = UARTService()
+advertisement = ProvideServicesAdvertisement(uart_service)
 
 # motor setup
 motor_1 = crickit.dc_motor_1
@@ -46,16 +51,16 @@ print("BLE Rover")
 print("Use Adafruit Bluefruit app to connect")
 while True:
     blue_led.value = False
-    uart_server.start_advertising()
-    while not uart_server.connected:
+    ble.start_advertising(advertisement)
+    while not ble.connected:
         # Wait for a connection.
         pass
     blue_led.value = True  # turn on blue LED when connected
-    while uart_server.connected:
-        if uart_server.in_waiting:
+    while ble.connected:
+        if uart_service.in_waiting:
             # Packet is arriving.
             red_led.value = False  # turn off red LED
-            packet = Packet.from_stream(uart_server)
+            packet = Packet.from_stream(uart_service)
             if isinstance(packet, ColorPacket):
                 # Change the color.
                 color = packet.color

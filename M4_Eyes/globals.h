@@ -1,10 +1,7 @@
 //34567890123456789012345678901234567890123456789012345678901234567890123456
 
-#include <Adafruit_GFX.h>         // Core graphics for Adafruit displays
-#include <Adafruit_ST7789.h>      // TFT-specific display library
-#include <Adafruit_ZeroDMA.h>     // SAMD-specific DMA library
-#include <Adafruit_ImageReader.h> // ImageReturnCode type
-#include "DMAbuddy.h"             // DMA-bug-workaround class
+#include "Adafruit_Arcada.h"
+#include "DMAbuddy.h" // DMA-bug-workaround class
 
 #if defined(GLOBAL_VAR) // #defined in .ino file ONLY!
   #define GLOBAL_INIT(X) = (X)
@@ -16,21 +13,22 @@
 
 #if defined(ADAFRUIT_MONSTER_M4SK_EXPRESS)
   #define NUM_EYES 2
-  #include <Adafruit_seesaw.h>
-  GLOBAL_VAR Adafruit_seesaw seesaw; // Controls some left-eye signals
-  #define SEESAW_TFT_RESET_PIN 8     // Left eye TFT reset
-  #define SEESAW_BACKLIGHT_PIN 5     // Left eye TFT backlight
-  #define BACKLIGHT_PIN       21     // Right eye TFT backlight
-  #define LIGHTSENSOR_PIN      2
   // Light sensor is not active by default. Use "lightSensor : 102" in config
 #else
   #define NUM_EYES 1
-  #define BACKLIGHT_PIN       47
 #endif
 
 // GLOBAL VARIABLES --------------------------------------------------------
 
-GLOBAL_VAR uint32_t  stackReserve        GLOBAL_INIT(8192);   // See image-loading code
+GLOBAL_VAR Adafruit_Arcada arcada;
+
+GLOBAL_VAR bool      showSplashScreen    GLOBAL_INIT(true);   // Clear to suppress the splash screen
+
+#define MAX_DISPLAY_SIZE 240
+GLOBAL_VAR int       DISPLAY_SIZE        GLOBAL_INIT(240);    // Start with assuming a 240x240 display
+GLOBAL_VAR int       DISPLAY_X_OFFSET    GLOBAL_INIT(0);      // Used with rectangular screens
+GLOBAL_VAR int       DISPLAY_Y_OFFSET    GLOBAL_INIT(0);      // Used with rectangular screens
+GLOBAL_VAR uint32_t  stackReserve        GLOBAL_INIT(5192);   // See image-loading code
 GLOBAL_VAR int       eyeRadius           GLOBAL_INIT(0);      // 0 = Use default in loadConfig()
 GLOBAL_VAR int       eyeDiameter;                             // Calculated from eyeRadius later
 GLOBAL_VAR int       irisRadius          GLOBAL_INIT(60);     // Approx size in screen pixels
@@ -58,10 +56,10 @@ GLOBAL_VAR int       mapDiameter;        // calculated in loadConfig()
 GLOBAL_VAR uint8_t  *displace            GLOBAL_INIT(NULL);
 GLOBAL_VAR uint8_t  *polarAngle          GLOBAL_INIT(NULL);
 GLOBAL_VAR int8_t   *polarDist           GLOBAL_INIT(NULL);
-GLOBAL_VAR uint8_t   upperOpen[240];
-GLOBAL_VAR uint8_t   upperClosed[240];
-GLOBAL_VAR uint8_t   lowerOpen[240];
-GLOBAL_VAR uint8_t   lowerClosed[240];
+GLOBAL_VAR uint8_t   upperOpen[MAX_DISPLAY_SIZE];
+GLOBAL_VAR uint8_t   upperClosed[MAX_DISPLAY_SIZE];
+GLOBAL_VAR uint8_t   lowerOpen[MAX_DISPLAY_SIZE];
+GLOBAL_VAR uint8_t   lowerClosed[MAX_DISPLAY_SIZE];
 GLOBAL_VAR char     *upperEyelidFilename GLOBAL_INIT(NULL);
 GLOBAL_VAR char     *lowerEyelidFilename GLOBAL_INIT(NULL);
 GLOBAL_VAR uint16_t  lightSensorMin      GLOBAL_INIT(0);
@@ -71,6 +69,11 @@ GLOBAL_VAR float     irisMin             GLOBAL_INIT(0.45);
 GLOBAL_VAR float     irisRange           GLOBAL_INIT(0.35);
 GLOBAL_VAR bool      tracking            GLOBAL_INIT(true);
 GLOBAL_VAR float     trackFactor         GLOBAL_INIT(0.5);
+
+// Random eye motion: provided by the base project, but overridable by user code.
+GLOBAL_VAR bool      moveEyesRandomly    GLOBAL_INIT(true);   // Clear to suppress random eye motion and let user code control it
+GLOBAL_VAR float     eyeTargetX          GLOBAL_INIT(0.0);  // THen set these continuously in user_loop.
+GLOBAL_VAR float     eyeTargetY          GLOBAL_INIT(0.0);  // Range is from -1.0 to +1.0.
 
 // Pin definition stuff will go here
 
@@ -84,6 +87,14 @@ GLOBAL_VAR int8_t    blinkPin            GLOBAL_INIT(-1); // Manual both-eyes bl
 #endif
 GLOBAL_VAR uint32_t  boopThreshold       GLOBAL_INIT(17500);
 
+#if defined(ADAFRUIT_MONSTER_M4SK_EXPRESS)
+GLOBAL_VAR bool      voiceOn             GLOBAL_INIT(false);
+GLOBAL_VAR float     currentPitch        GLOBAL_INIT(1.0);
+GLOBAL_VAR float     defaultPitch        GLOBAL_INIT(1.0);
+GLOBAL_VAR float     gain                GLOBAL_INIT(1.0);
+GLOBAL_VAR uint8_t   waveform            GLOBAL_INIT(0);
+GLOBAL_VAR uint32_t  modulate            GLOBAL_INIT(30); // Dalek pitch
+#endif
 
 // EYE-RELATED STRUCTURES --------------------------------------------------
 
@@ -108,7 +119,7 @@ GLOBAL_VAR uint32_t  boopThreshold       GLOBAL_INIT(17500);
   // with a single descriptor. This is NOT a problem with a single eye
   // (since only one channel) and we can still use the hack for HalloWing M4.
 typedef struct {
-  uint16_t       renderBuf[240];              // Pixel buffer
+  uint16_t       renderBuf[MAX_DISPLAY_SIZE]; // Pixel buffer
   DmacDescriptor descriptor[NUM_DESCRIPTORS]; // DMA descriptor list
 } columnStruct;
 
@@ -150,7 +161,7 @@ typedef struct {
   int8_t           winkPin;      // Manual eye wink control (-1 = none)
   // Remaining values are initialized in code:
   columnStruct     column[2];    // Alternating column structures A/B
-  Adafruit_ST7789 *display;      // Pointer to display object
+  Adafruit_SPITFT *display;      // Pointer to display object
   DMAbuddy         dma;          // DMA channel object with fix() function
   DmacDescriptor  *dptr;         // DMA channel descriptor pointer
   uint32_t         dmaStartTime; // For DMA timeout handler
@@ -179,12 +190,10 @@ typedef struct {
   eyeStruct eye[NUM_EYES] = {
   #if defined(ADAFRUIT_MONSTER_M4SK_EXPRESS)
     // name     spi  cs  dc rst wink
-    { "right", &SPI , 5,  6,  4, -1 },
-    { "left" , &SPI1, 9, 10, -1, -1 } };
-  #elif defined(ADAFRUIT_HALLOWING_M4_EXPRESS)
-    {  NULL  , &SPI1, 44, 45, 46, -1 } };
+    { "right", &ARCADA_TFT_SPI , ARCADA_TFT_CS,  ARCADA_TFT_DC, ARCADA_TFT_RST, -1 },
+    { "left" , &ARCADA_LEFTTFT_SPI, ARCADA_LEFTTFT_CS, ARCADA_LEFTTFT_DC, ARCADA_LEFTTFT_RST, -1 } };
   #else
-    #error "This project supports Adafruit MONSTER M4SK and HALLOWING M4 only"
+    {  NULL  , &ARCADA_TFT_SPI, ARCADA_TFT_CS, ARCADA_TFT_DC, ARCADA_TFT_RST, -1 } };
   #endif
 #else
   extern eyeStruct eye[];
@@ -207,8 +216,21 @@ extern uint32_t        availableRAM(void);
 extern uint32_t        availableNVM(void);
 extern uint8_t        *writeDataToFlash(uint8_t *src, uint32_t len);
 
+// Functions in pdmvoice.cpp
+#if defined(ADAFRUIT_MONSTER_M4SK_EXPRESS)
+extern bool              voiceSetup(bool modEnable);
+extern float             voicePitch(float p);
+extern void              voiceGain(float g);
+extern void              voiceMod(uint32_t freq, uint8_t waveform);
+extern volatile uint16_t voiceLastReading;
+#endif // ADAFRUIT_MONSTER_M4SK_EXPRESS
+
 // Functions in tablegen.cpp
 extern void            calcDisplacement(void);
 extern void            calcMap(void);
 extern float           screen2map(int in);
 extern float           map2screen(int in);
+
+// Functions in user.cpp
+extern void            user_setup(void);
+extern void            user_loop(void);

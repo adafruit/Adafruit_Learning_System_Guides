@@ -20,9 +20,10 @@ from adafruit_circuitplayground.express import cpx
 # from digitalio import DigitalInOut, Direction, Pull
 # import board
 
-# Uncomment the next 2 lines if you want to use HID output
+# Uncomment the next 3 lines if you want to use HID output
 # from adafruit_hid.keyboard import Keyboard
 # from adafruit_hid.keycode import Keycode
+# import usb_hid
 
 DOT_DURATION = 0.20
 DASH_DURATION = 0.5
@@ -40,7 +41,7 @@ DASH_DURATION = 0.5
 # button_b.pull = Pull.UP
 
 # Uncomment the next  line if you want to use HID output
-# kbd = Keyboard()
+# kbd = Keyboard(usb_hid.devices)
 
 
 

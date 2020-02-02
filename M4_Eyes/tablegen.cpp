@@ -16,7 +16,7 @@ void calcDisplacement() {
   // when rendering. Additionally, only a single axis displacement need
   // be calculated, since eye shape is X/Y symmetrical one can just swap
   // axes to look up displacement on the opposing axis.
-  if(displace = (uint8_t *)malloc(120 * 120)) {
+  if(displace = (uint8_t *)malloc((DISPLAY_SIZE/2) * (DISPLAY_SIZE/2))) {
     float    eyeRadius2 = (float)(eyeRadius * eyeRadius);
     uint8_t  x, y;
     float    dx, dy, d2, d, h, a, pa;
@@ -25,9 +25,10 @@ void calcDisplacement() {
     // "+Y is up" Cartesian coordinate space; any mirroring or rotation
     // is handled in eye rendering code.
     for(y=0; y<120; y++) {
+      yield(); // Periodic yield() makes sure mass storage filesystem stays alive
       dy  = (float)y + 0.5;
       dy *= dy; // Now dy^2
-      for(x=0; x<120; x++) {
+      for(x=0; x<(DISPLAY_SIZE/2); x++) {
         // Get distance to origin point. Pixel centers are at +0.5, this is
         // normal, desirable and by design -- screen center at (120.0,120.0)
         // falls between pixels and allows numerically-correct mirroring.
@@ -68,6 +69,7 @@ void calcMap(void) {
     int   x, y;
     float dx, dy, dy2, d2, d, angle, xp;
     for(y=0; y<mapRadius; y++) {
+      yield(); // Periodic yield() makes sure mass storage filesystem stays alive
       dy  = (float)y + 0.5;        // Y distance to map center
       dy2 = dy * dy;
       for(x=0; x<mapRadius; x++) {
@@ -101,6 +103,7 @@ void calcMap(void) {
     if(slitPupilRadius > 0) {
       // Iterate over each pixel in the iris section of the polar map...
       for(y=0; y < mapRadius; y++) {
+        yield(); // Periodic yield() makes sure mass storage filesystem stays alive
         dy  = y + 0.5;            // Distance to center, Y component
         dy2 = dy * dy;
         for(x=0; x < mapRadius; x++) {
