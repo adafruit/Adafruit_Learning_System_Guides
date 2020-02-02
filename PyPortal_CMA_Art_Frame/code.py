@@ -49,7 +49,7 @@ while True:
         print("Response is", response)
         loopcount = loopcount + 1
 
-    except (RuntimeError, KeyError) as e:
+    except (RuntimeError, KeyError, TypeError) as e:
         print("An error occured, retrying! -", e)
         print("loop counter:", loopcount)
         assert errorcount < 20, "Too many errors, stopping"
