@@ -35,8 +35,8 @@ display = tft_gizmo.TFT_Gizmo()
 
 # Load the candy heart BMP
 bitmap, palette = adafruit_imageload.load("/heart_bw.bmp",
-                                         bitmap=displayio.Bitmap,
-                                         palette=displayio.Palette)
+                                          bitmap=displayio.Bitmap,
+                                          palette=displayio.Palette)
 
 heart = displayio.TileGrid(bitmap, pixel_shader=palette)
 
