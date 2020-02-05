@@ -12,25 +12,35 @@ lps.zero_pressure()
 lps.data_rate = adafruit_lps35hw.DataRate.RATE_75_HZ
 max_postive = 0
 max_negative = 0
-
+min_pressure = 8
+high_pressure = 20
 # sip/puff is "over" on keyup/pressure direction reversal
 # averaging code
 
 # find reasonable band estimatesV
-def direction_reversed(self, measurement_array):
 
+prev_direction = None
+pressure_list = []
 while True:
+    pressure_level = 0
     pressure = lps.pressure
+    if abs(pressure) > 10:
+        pressure_level = 1
+    if abs(pressure) > high_pressure:
+        pressure_level = 2
     if pressure > 0:
-        if pressure > max_postive:
-            max_postive = pressure
-            print ("new max positive pressure: %0.2f"%pressure)
-        if pressure > 10:
-            print("PUFF")
+       if pressure_level == 1:
+           print("SOFT PUFF", end="\n\n")
+       if pressure_level == 2:
+           print("HARD PUFF", end="\n\n")
+        
     else:
-        if pressure < max_negative:
-            max_negative = pressure
-            print ("new max negative pressure: %0.2f"%pressure)
-        if pressure < -10:
-            print("SIP")
+        # if pressure < max_negative:
+        #     max_negative = pressure
+        #     #print ("new max negative pressure: %0.2f"%pressure)
+        if pressure_level == 1:
+           print("SOFT SIP", end="\n\n")
+        if pressure_level == 2:
+           print("HARD SIP", end="\n\n")
+        
     time.sleep(0.01)

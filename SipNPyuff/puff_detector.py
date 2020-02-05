@@ -1,11 +1,13 @@
 class PuffDetector:
     @classmethod
     def rolling_average(self, measurements):
-        sum = 0
-        window = 3
-        for measurement in measurements[-window:]:
-            sum += measurement
-        return (sum/window)
+        measurement_sum = 0
+        window_size = 3
+        # print("measurements", measurements)
+        window = measurements[-window_size:]
+
+        return sum(window) / window_size
+
     @classmethod
     def slope(self, a, b):
 
@@ -16,9 +18,8 @@ class PuffDetector:
         else:
             return 0
 
-
     @classmethod
-    def direction(self, measurements): # requires 6 measurements
+    def direction(self, measurements):  # requires 6 measurements
         average = self.rolling_average(measurements)
         prev_average = self.rolling_average(measurements[-6:-3])
         # print()
@@ -31,6 +32,5 @@ class PuffDetector:
 
     @classmethod
     def direction_changed(self, measurements, prev_direction):
-        direction = self.rolling_average(measurements)
-        return  prev_direction != direction
-
+        direction = self.direction(measurements)
+        return prev_direction != direction
