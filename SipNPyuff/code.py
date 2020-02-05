@@ -56,12 +56,17 @@ prev_direction = None
 pressure_list = []
 pressure_type = ""
 prev_pressure_type = ""
+puff_start = 0
+puff_end = 0
 while True:
     pressure = lps.pressure
     # print((pressure,))
 
     pressure_type = pressure_str(pressure)
     if pressure_type != prev_pressure_type:
+        puff_end = time.monotonic()
+        print("duration:", puff_end-puff_start)
+        puff_start = puff_end
         print(pressure_type)
     prev_pressure_type = pressure_type
     time.sleep(0.01)
