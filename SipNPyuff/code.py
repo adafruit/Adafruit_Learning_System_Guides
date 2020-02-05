@@ -6,7 +6,7 @@ from puff_detector import PuffDetector
 
 i2c = busio.I2C(board.SCL, board.SDA)
 
-lps = adafruit_lps35hw.LPS35HW(i2c, 0x5c)
+lps = adafruit_lps35hw.LPS35HW(i2c)
 
 lps.zero_pressure()
 lps.data_rate = adafruit_lps35hw.DataRate.RATE_75_HZ
