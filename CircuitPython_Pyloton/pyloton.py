@@ -10,6 +10,22 @@ from adafruit_display_text import label
 
 
 class Pyloton:
+
+    _previous_wheel = 0
+    _previous_crank = 0
+
+    _previous_revolutions = 0
+    _previous_crank_rev = 0
+
+    _previous_speed = 0
+    _previous_cadence = 0
+
+    _previous_heart = 0
+
+    splash = displayio.Group()
+    
+    setup = False
+
     def __init__(self, ble, display, heart=True, speed=True, cadence=True, ams=True, debug=False):
         self.debug = debug
 
@@ -23,19 +39,7 @@ class Pyloton:
 
         self.display = display
 
-        self.previous_wheel = 0
-        self.previous_crank = 0
-
-        self.previous_revolutions = 0
-        self.previous_crank_rev = 0
-
-        self.previous_speed = 0
-        self.previous_cadence = 0
-
-        self.previous_heart = 0
-
         self.sprite_sheet, self.palette = adafruit_imageload.load("/sprite_sheet.bmp",
-                                                                  bitmap=displayio.Bitmap,
                                                                   palette=displayio.Palette)
         self._load_fonts()
 
@@ -154,49 +158,47 @@ class Pyloton:
         """
         Reads the speed and cadence sensor
         """
-        speed = self.previous_speed
-        cadence = self.previous_cadence
+        speed = self._previous_speed
+        cadence = self._previous_cadence
         for conn, svc in zip(self.cyc_connections, self.cyc_services):
             if conn.connected:
                 values = svc.measurement_values
                 if values is not None:
                     if values.last_wheel_event_time:
-                        wheel_diff = values.last_wheel_event_time - self.previous_wheel
-                        rev_diff = values.cumulative_wheel_revolutions - self.previous_revolutions
+                        wheel_diff = values.last_wheel_event_time - self._previous_wheel
+                        rev_diff = values.cumulative_wheel_revolutions - self._previous_revolutions
 
                         if wheel_diff != 0:
                             rps = rev_diff/(wheel_diff/1024)
                             rpm = 60*rps
                             speed = round((rpm * 84.229) * (60/63360), 1)
-                            self.previous_speed = speed
-                            self.previous_revolutions = values.cumulative_wheel_revolutions
-                        self.previous_wheel = values.last_wheel_event_time
+                            self._previous_speed = speed
+                            self._previous_revolutions = values.cumulative_wheel_revolutions
+                        self._previous_wheel = values.last_wheel_event_time
 
                     if values.last_crank_event_time:
-                        crank_diff = values.last_crank_event_time - self.previous_crank
-                        crank_rev_diff = values.cumulative_crank_revolutions - self.previous_crank_rev
+                        crank_diff = values.last_crank_event_time - self._previous_crank
+                        crank_rev_diff = values.cumulative_crank_revolutions - self._previous_crank_rev
 
                         if crank_rev_diff != 0:
                             rps = crank_rev_diff/(crank_diff/1024)
                             cadence = round(60*rps, 1)
-                            """
-                            if self.previous_cadence != 0:
-                                if (self.previous_cadence - cadence) > 20:
-                                    cadence = self.previous_cadence
-                            """
-                            self.previous_cadence = cadence
-                            self.previous_crank_rev = values.cumulative_crank_revolutions
+                            self._previous_cadence = cadence
+                            self._previous_crank_rev = values.cumulative_crank_revolutions
 
-                        self.previous_crank = values.last_crank_event_time
+                        self._previous_crank = values.last_crank_event_time
                 return speed, cadence
 
     def read_heart(self, hr_service):
+        """
+        Reads the heart rate sensor 
+        """
         measurement = hr_service.measurement_values
         if measurement is None:
-            heart = self.previous_heart
+            heart = self._previous_heart
         else:
             heart = measurement.heart_rate
-            self.previous_heart = measurement.heart_rate
+            self._previous_heart = measurement.heart_rate
         return heart
 
     def _icon_maker(self, n, icon_x, icon_y):
@@ -212,51 +214,73 @@ class Pyloton:
                                     x=icon_x, y=icon_y)
         return sprite
 
-
-    def update_display(self, hr_service):
-        heart = self.read_heart(hr_service)
-        speed, cadence = self.read_s_and_c()
-
-        splash = displayio.Group(max_size=25)
+    def _setup_display(self):
         sprites = displayio.Group()
 
         rect = Rect(0, 0, 240, 50, fill=0x64338e)
-        splash.append(rect)
+        self.splash.append(rect)
 
         heading = label.Label(font=self.arial24, x=55, y=25, text="PyLoton", color=0xFCFF00)
-        splash.append(heading)
+        self.splash.append(heading)
 
         if self.heart_enabled:
             heart_sprite = self._icon_maker(0, 2, 55)
             sprites.append(heart_sprite)
-            hr_str = '{} bpm'.format(heart)
-            hr_label = label.Label(font=self.arial24, x=50, y=75, text=hr_str, color=0xFFFFFF)
-            splash.append(hr_label)
 
         if self.speed_enabled:
             speed_sprite = self._icon_maker(1, 2, 100)
             sprites.append(speed_sprite)
 
-            sp_str = '{} mph'.format(speed)
-            sp_label = label.Label(font=self.arial24, x=50, y=120, text=sp_str, color=0xFFFFFF)
-            splash.append(sp_label)
-
         if self.cadence_enabled:
             cadence_sprite = self._icon_maker(2, 2, 145)
             sprites.append(cadence_sprite)
-            cad_str = '{} rpm'.format(cadence)
-            cad_label = label.Label(font=self.arial24, x=50, y=165, text=cad_str, color=0xFFFFFF)
-            splash.append(cad_label)
 
         if self.ams_enabled:
             ams_sprite = self._icon_maker(3, 2, 190)
             sprites.append(ams_sprite)
+
+        self.splash.append(sprites)
+
+    def update_display(self, hr_service):
+        heart = self.read_heart(hr_service)
+        speed, cadence = self.read_s_and_c()
+
+        if len(self.splash) == 0:
+            self._setup_display()
+
+        if self.heart_enabled:
+            hr_str = '{} bpm'.format(heart)
+            hr_label = label.Label(font=self.arial24, x=50, y=75, text=hr_str, color=0xFFFFFF)
+            if not self.setup:
+                self.splash.append(hr_label)
+            else:
+                self.splash[3] = hr_label
+
+        if self.speed_enabled:
+            sp_str = '{} mph'.format(speed)
+            sp_label = label.Label(font=self.arial24, x=50, y=120, text=sp_str, color=0xFFFFFF)
+            if not self.setup:
+                self.splash.append(sp_label)
+            else:
+                self.splash[4] = sp_label
+
+        if self.cadence_enabled:
+            cad_str = '{} rpm'.format(cadence)
+            cad_label = label.Label(font=self.arial24, x=50, y=165, text=cad_str, color=0xFFFFFF)
+            if not self.setup:
+                self.splash.append(cad_label)
+            else:
+                self.splash[5] = cad_label
+
+        if self.ams_enabled:
             np_str = 'None'
             now_playing = label.Label(font=self.arial24, x=50, y=210, text=np_str, color=0xFFFFFF)
-            splash.append(now_playing)
+            if not self.setup:
+                self.splash.append(now_playing)
+            else:
+                self.splash[6] = now_playing
 
-        splash.append(sprites)
+        self.setup=True
+        time.sleep(0.2)
 
-        time.sleep(0.3)
-
-        self.display.show(splash)
+        self.display.show(self.splash)
