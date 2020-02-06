@@ -16,7 +16,7 @@ ble = adafruit_ble.BLERadio()    # pylint: disable=no-member
 display = board.DISPLAY
 
 pyloton = pyloton.Pyloton(ble, display)
-#pyloton.show_splash()
+pyloton.show_splash()
 
 hr_connection = None
 # Start with a fresh connection.
@@ -25,6 +25,7 @@ if ble.connected:
         if HeartRateService in connection:
             connection.disconnect()
         break
+
 start = time.time()
 hr_connection = None
 s_and_c_connection = []
@@ -43,7 +44,6 @@ while True:
     # Stop scanning whether or not we are connected.
     ble.stop_scan()
     if hr_connection and hr_connection.connected and s_and_c_connection:
-        #pyloton.show_splash(display)
 
         print("Fetch connection")
         hr_service = hr_connection[HeartRateService]

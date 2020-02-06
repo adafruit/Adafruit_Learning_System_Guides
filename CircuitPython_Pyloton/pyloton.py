@@ -1,7 +1,7 @@
-import adafruit_imageload
-import displayio
 import time
 from adafruit_ble.advertising.standard import ProvideServicesAdvertisement
+import displayio
+import adafruit_imageload
 from adafruit_ble_cycling_speed_and_cadence import CyclingSpeedAndCadenceService
 from adafruit_ble_heart_rate import HeartRateService
 from adafruit_bitmap_font import bitmap_font
@@ -31,17 +31,19 @@ class Pyloton:
 
         self.previous_speed = 0
         self.previous_cadence = 0
-        
+
         self.previous_heart = 0
 
-        self.sprite_sheet, self.palette = adafruit_imageload.load("/sprite_sheet.bmp", bitmap=displayio.Bitmap, palette=displayio.Palette)
+        self.sprite_sheet, self.palette = adafruit_imageload.load("/sprite_sheet.bmp",
+                                                                  bitmap=displayio.Bitmap,
+                                                                  palette=displayio.Palette)
         self._load_fonts()
 
     def show_splash(self):
         """
         Shows the loading screen
         """
-        if debug:
+        if self.debug:
             return
         with open('biketrace.bmp', 'rb') as bitmap_file:
             bitmap = displayio.OnDiskBitmap(bitmap_file)
@@ -68,7 +70,7 @@ class Pyloton:
         """
         Displays status updates
         """
-        if debug:
+        if self.debug:
             print(message)
             return
         YELLOW = 0xFCFF00
