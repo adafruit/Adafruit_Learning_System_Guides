@@ -19,7 +19,6 @@ Y_OFFSET = 3
 TEXT_HEIGHT = 8
 BOTTOM_ROW = DISPLAY_HEIGHT - TEXT_HEIGHT - Y_OFFSET
 
-
 i2c = board.I2C()
 # 128x32
 # display_bus = displayio.I2CDisplay(i2c, device_address=0x3C, reset=oled_reset)
@@ -49,7 +48,7 @@ lps.filter_enabled = True
 
 lps.filter_config = True
 # if CONSOLE: print("Filter Config:", lps.low_pass_config)
-detector = PuffDetector(min_pressure=8, high_pressure=20)
+detector = PuffDetector(min_pressure=8, high_pressure=40)
 time.sleep(1)
 
 
@@ -61,38 +60,25 @@ if CONSOLE:
 if DEBUG and CONSOLE:
     print("Debug CONSOLE")
 
+color = 0xFAFAFA
 
+font = terminalio.FONT
+
+banner_string = "PUFF-O-TRON-9000"
+state_string = "  "
+pressure_string = " "
+input_type_string = " "
+
+state_display_timeout = 1.0
+state_display_start = 0
 while True:
     ######################################
     splash = displayio.Group(max_size=10)
     # Set text, font, and color
-    font = terminalio.FONT
-    color = 0xFFFFFF
-
-    # Create the tet label
-    text_area = label.Label(font, text="SIP-N-PYUFF", color=color)
-    text_area2 = label.Label(font, text="STRING TWO", color=color)
-    text_area3 = label.Label(font, text=str(time.monotonic()), color=color)
-
-    # Set the location
-    text_area.x = 0
-    text_area.y = 0 + Y_OFFSET
-    # Set the location
-
-    text_area2.x = 20
-    text_area2.y = 10 + Y_OFFSET
-    x, y, w, h = text_area3.bounding_box
-    text_area3.x = DISPLAY_WIDTH - w
-    text_area3.y = BOTTOM_ROW + Y_OFFSET
-
-    splash.append(text_area)
-    splash.append(text_area2)
-    splash.append(text_area3)
-    # Show it
-    display.show(splash)
 
     ######################################
     current_pressure = lps.pressure
+    pressure_string = "Pressure: %0.3f" % current_pressure
     if not CONSOLE:
         print((current_pressure,))
     puff_polarity, puff_peak_level, puff_duration = detector.check_for_puff(
@@ -100,23 +86,54 @@ while True:
     )
 
     if CONSOLE and puff_duration is None and puff_polarity:
-        print("START", end=" ")
         if puff_polarity == 1:
-            print("PUFF")
+            state_string = "PUFF"
         if puff_polarity == -1:
-            print("SIP")
+            state_string = "SIP"
+        state_string += " START"
+
     if CONSOLE and puff_duration:
 
-        print("END", end=" ")
+        state_string = "DETECTED:"
+        print(state_string)
         if puff_peak_level == 1:
-            print("SOFT", end=" ")
+            input_type_string = "SOFT"
         if puff_peak_level == 2:
-            print("HARD", end=" ")
+            input_type_string = "HARD"
 
         if puff_polarity == 1:
-            print("PUFF")
+            input_type_string += " PUFF"
         if puff_polarity == -1:
-            print("SIP")
+            input_type_string += " SIP"
+        print("END", end=" ")
+        print(input_type_string)
+        duration_string = "Duration: %0.2f" % puff_duration
+        print(duration_string)
+    # Create the tet label
+    if puff_polarity == 0:
+        state_string = "Waiting for Input"
+    banner = label.Label(font, text=banner_string, color=color)
+    state = label.Label(font, text=state_string, color=color)
+    detector_result = label.Label(font, text=input_type_string, color=color)
+    text_area4 = label.Label(font, text=state_string, color=color)
+    pressure_label = label.Label(font, text=pressure_string, color=color)
 
-        print("Duration:", puff_duration)
+    banner.x = 0
+    banner.y = 0 + Y_OFFSET
+
+    state.x = 20
+    state.y = 10 + Y_OFFSET
+    detector_result.x = 20
+    detector_result.y = 20 + Y_OFFSET
+
+    x, y, w, h = pressure_label.bounding_box
+    pressure_label.x = DISPLAY_WIDTH - w
+    pressure_label.y = BOTTOM_ROW + Y_OFFSET
+
+    splash.append(banner)
+    splash.append(state)
+    splash.append(detector_result)
+    splash.append(pressure_label)
+    # Show it
+    display.show(splash)
     time.sleep(0.01)
