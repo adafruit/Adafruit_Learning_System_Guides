@@ -23,7 +23,7 @@ class Pyloton:
     _previous_heart = 0
 
     splash = displayio.Group()
-    
+  
     setup = False
 
     def __init__(self, ble, display, heart=True, speed=True, cadence=True, ams=True, debug=False):
@@ -150,7 +150,7 @@ class Pyloton:
         self.cyc_services = []
         for conn in self.cyc_connections:
 
-            self.cyc_services.append(conn[CyclingSpeedAndCadenceService]) 
+            self.cyc_services.append(conn[CyclingSpeedAndCadenceService])
         print("Done")
         return self.cyc_connections
 
@@ -168,9 +168,11 @@ class Pyloton:
                         wheel_diff = values.last_wheel_event_time - self._previous_wheel
                         rev_diff = values.cumulative_wheel_revolutions - self._previous_revolutions
 
-                        if wheel_diff != 0:
-                            rps = rev_diff/(wheel_diff/1024)
-                            rpm = 60*rps
+                        if wheel_diff:
+                            #Rotations per minute is 60 times the amount of revolutions since
+                            #the last update over the time since the last update
+                            rpm = 60*(rev_diff/(wheel_diff/1024))
+                            # We then mutiply it by the wheel's circumference and convert it to mph
                             speed = round((rpm * 84.229) * (60/63360), 1)
                             self._previous_speed = speed
                             self._previous_revolutions = values.cumulative_wheel_revolutions
@@ -180,9 +182,10 @@ class Pyloton:
                         crank_diff = values.last_crank_event_time - self._previous_crank
                         crank_rev_diff = values.cumulative_crank_revolutions - self._previous_crank_rev
 
-                        if crank_rev_diff != 0:
-                            rps = crank_rev_diff/(crank_diff/1024)
-                            cadence = round(60*rps, 1)
+                        if crank_rev_diff:
+                            #Rotations per minute is 60 times the amount of revolutions since the
+                            #last update over the time since the last update
+                            cadence = round(60*(crank_rev_diff/(crank_diff/1024)), 1)
                             self._previous_cadence = cadence
                             self._previous_crank_rev = values.cumulative_crank_revolutions
 
