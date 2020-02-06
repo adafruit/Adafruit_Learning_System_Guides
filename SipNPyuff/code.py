@@ -4,29 +4,28 @@ import busio
 import adafruit_lps35hw
 from puff_detector import PuffDetector
 
-
-
-
 i2c = busio.I2C(board.SCL, board.SDA)
 # i2c = DebugI2C(i2c)
 lps = adafruit_lps35hw.LPS35HW(i2c, 0x5C)
+CONSOLE = True
+DEBUG = True
 
 lps.zero_pressure()
 lps.data_rate = adafruit_lps35hw.DataRate.RATE_75_HZ
 
 min_pressure = 8
 high_pressure = 20
-# sip/puff is "over" on keyup/pressure direction reversal
+# sip/puff is "over" on keyup/pressure polarity reversal
 # averaging code
 
 lps.filter_enabled = True
-# print("Filter enabled:", lps.low_pass_enabled)
+# if CONSOLE: print("Filter enabled:", lps.low_pass_enabled)
 
 lps.filter_config = True
-# print("Filter Config:", lps.low_pass_config)
+# if CONSOLE: print("Filter Config:", lps.low_pass_config)
 detector = PuffDetector(min_pressure=8, high_pressure=20)
 time.sleep(1)
-prev_direction = None
+prev_polarity = None
 pressure_list = []
 pressure_type = tuple()
 prev_pressure_type = tuple()
@@ -35,41 +34,48 @@ current_level = 0
 prev_level = 0
 puff_end = puff_start
 prev_duration = 0
+start_polarity = 0
+prev_pressure = 0
+PRINT_FLOOR = 5
+if CONSOLE:
+    print("CONSOLE?")
+if DEBUG and CONSOLE:
+    print("Debug Console")
+counter = 0
 while True:
     current_pressure = lps.pressure
-    # print((current_pressure,))
+    if not CONSOLE:
+        print((current_pressure,))
 
-    pressure_type = detector.catagorize_pressure(current_pressure)
+    pressure_type = detector.catagorize_pressure(current_pressure, prev_pressure)
+    polarity, level, direction = pressure_type
+    # if (polarity != 0) or (level != 0):
+    if abs(current_pressure) > PRINT_FLOOR:
+        if counter % 4 == 0:
+            if DEBUG and CONSOLE:
+                print("\t\t\tpressure:", current_pressure)
 
-    if pressure_type != prev_pressure_type:
-        puff_end = time.monotonic()
-        puff_duration = puff_end - puff_start
-        puff_start = puff_end
-        # print("\tpressure type:", pressure_type)
-        # print("duration:", puff_duration)
-        direction, level = pressure_type
-        # print("direction:", direction, "level:", level)
+    if level != 0 and start_polarity == 0:  ###
+        start_polarity = polarity
+        puff_start = time.monotonic()
+        if CONSOLE:
+            print("START", end=" ")
+            if start_polarity == 1:
+                print("PUFF")
+            if start_polarity == -1:
+                print("SIP")
 
-        if (direction == 1) and (prev_level > level):
-            print("Down")
-            puff_duration += prev_duration
-            level = prev_level
-        if (direction == -1) and (prev_level < level):
-            print("Up")
-            puff_duration += prev_duration
-            level = prev_level
-
-        # print("direction:", direction, "level:", level)
-        if puff_duration > 0.2:
-            print("direction:", direction, "level:", level)
-
-            print("\tduration:", puff_duration)
-            #   print(current_pressure)
-            label = detector.pressure_string((direction, level))
-            label = detector.pressure_string(pressure_type)
-            print("\t\t\t\t", label)
-            print("____________________")
-        prev_pressure_type = pressure_type
-        prev_duration = puff_duration
+    if (level == 0) and (start_polarity != 0):
+        duration = time.monotonic() - puff_start
+        if CONSOLE:
+            print("END", end=" ")
+            if start_polarity == 1:
+                print("PUFF", "")
+            if start_polarity == -1:
+                print("SIP", "")
+            print("Duration:", duration)
+        start_polarity = 0
     prev_level = level
+    prev_pressure = current_pressure
     time.sleep(0.01)
+    counter += 1
