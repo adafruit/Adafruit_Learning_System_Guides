@@ -37,6 +37,7 @@ prev_duration = 0
 start_polarity = 0
 prev_pressure = 0
 PRINT_FLOOR = 5
+peak_level = 0
 if CONSOLE:
     print("CONSOLE?")
 if DEBUG and CONSOLE:
@@ -64,17 +65,26 @@ while True:
                 print("PUFF")
             if start_polarity == -1:
                 print("SIP")
-
+    if start_polarity != 0:
+        if level > peak_level:
+            peak_level = level
     if (level == 0) and (start_polarity != 0):
         duration = time.monotonic() - puff_start
         if CONSOLE:
             print("END", end=" ")
+
+            if peak_level == 1:
+                print("SOFT", end=" ")
+            if peak_level == 2:
+                print("HARD", end=" ")
+
             if start_polarity == 1:
-                print("PUFF", "")
+                print("PUFF")
             if start_polarity == -1:
-                print("SIP", "")
+                print("SIP")
             print("Duration:", duration)
         start_polarity = 0
+        peak_level = 0
     prev_level = level
     prev_pressure = current_pressure
     time.sleep(0.01)
