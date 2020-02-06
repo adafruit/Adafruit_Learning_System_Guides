@@ -42,8 +42,10 @@ def catagorize_pressure(pressure):
 
 def pressure_string(pressure_type):
     dir, level =  pressure_type
-    pressure_str = ""
-    print("pressure level:", level)
+    pressure_str = "HIGH"
+    if level == 0 or dir == 0:
+        return ""
+    #print("pressure level:", level)
     if level == 1:
         pressure_str = "LOW"
     elif level == 2:
@@ -93,26 +95,29 @@ while True:
         puff_end = time.monotonic()
         puff_duration = puff_end-puff_start
         puff_start = puff_end
-        print("\tpressure type:", pressure_type)
-        print("duration:", puff_duration)
+        #print("\tpressure type:", pressure_type)
+        #print("duration:", puff_duration)
         direction, level = pressure_type
-        print("direction:", direction, "level:", level)
+        #print("direction:", direction, "level:", level)
 
         if (direction == 1) and (prev_level > level):
-            print("\tDown")
+            print("Down")
             puff_duration += prev_duration
             level = prev_level
         if (direction == -1) and (prev_level < level):
-            print("\tUp")
+            print("Up")
             puff_duration += prev_duration
             level = prev_level
         
-        print("direction:", direction, "level:", level)
+        #print("direction:", direction, "level:", level)
         if puff_duration > 0.2:
+            print("direction:", direction, "level:", level)
+
             print("\tduration:", puff_duration)
-            print(current_pressure)
+        #   print(current_pressure)
+            label = pressure_string((direction, level))
             label = pressure_string(pressure_type)
-            print(label)
+            print("\t\t\t\t", label)
             print("____________________")
         prev_pressure_type = pressure_type
         prev_duration = puff_duration
