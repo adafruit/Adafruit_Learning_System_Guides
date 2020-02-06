@@ -1,10 +1,36 @@
 import time
 import board
-import busio
 import adafruit_lps35hw
+
+import displayio
+import terminalio
+from adafruit_display_text import label
+import adafruit_displayio_ssd1306
 from puff_detector import PuffDetector
 
-i2c = busio.I2C(board.SCL, board.SDA)
+displayio.release_displays()
+oled_reset = board.D9
+
+DISPLAY_WIDTH = 128
+# DISPLAY_HEIGHT = 32
+DISPLAY_HEIGHT = 64  # Change to 64 if needed
+BORDER = 1
+Y_OFFSET = 3
+TEXT_HEIGHT = 8
+BOTTOM_ROW = DISPLAY_HEIGHT - TEXT_HEIGHT - Y_OFFSET
+
+
+i2c = board.I2C()
+# 128x32
+# display_bus = displayio.I2CDisplay(i2c, device_address=0x3C, reset=oled_reset)
+# 128x64
+display_bus = displayio.I2CDisplay(i2c, device_address=0x3D, reset=oled_reset)
+
+display = adafruit_displayio_ssd1306.SSD1306(
+    display_bus, width=DISPLAY_WIDTH, height=DISPLAY_HEIGHT
+)
+
+
 # i2c = DebugI2C(i2c)
 lps = adafruit_lps35hw.LPS35HW(i2c, 0x5C)
 CONSOLE = True
@@ -37,6 +63,35 @@ if DEBUG and CONSOLE:
 
 
 while True:
+    ######################################
+    splash = displayio.Group(max_size=10)
+    # Set text, font, and color
+    font = terminalio.FONT
+    color = 0xFFFFFF
+
+    # Create the tet label
+    text_area = label.Label(font, text="SIP-N-PYUFF", color=color)
+    text_area2 = label.Label(font, text="STRING TWO", color=color)
+    text_area3 = label.Label(font, text=str(time.monotonic()), color=color)
+
+    # Set the location
+    text_area.x = 0
+    text_area.y = 0 + Y_OFFSET
+    # Set the location
+
+    text_area2.x = 20
+    text_area2.y = 10 + Y_OFFSET
+    x, y, w, h = text_area3.bounding_box
+    text_area3.x = DISPLAY_WIDTH - w
+    text_area3.y = BOTTOM_ROW + Y_OFFSET
+
+    splash.append(text_area)
+    splash.append(text_area2)
+    splash.append(text_area3)
+    # Show it
+    display.show(splash)
+
+    ######################################
     current_pressure = lps.pressure
     if not CONSOLE:
         print((current_pressure,))
