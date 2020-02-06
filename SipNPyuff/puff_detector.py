@@ -1,7 +1,20 @@
+import time
+
+PRINT_FLOOR = 5
+CONSOLE = True
+DEBUG = True
+
+
 class PuffDetector:
     def __init__(self, min_pressure=8, high_pressure=20):
         self.high_pressure = high_pressure
         self.min_pressure = min_pressure
+
+        self.start_polarity = 0
+        self.peak_level = 0
+        self.counter = 0
+        self.duration = 0
+        self.puff_start = 0
 
     @classmethod
     def rolling_average(cls, measurements, window_size=3):
@@ -10,37 +23,9 @@ class PuffDetector:
 
         return sum(window) / window_size
 
-    @classmethod
-    def slope(cls, a, b):
-
-        if a > b:
-            return 1
-        elif a < b:
-            return -1
-        else:
-            return 0
-
-    @classmethod
-    def direction(cls, measurements):  # requires 6 measurements
-        average = cls.rolling_average(measurements)
-        prev_average = cls.rolling_average(measurements[-6:-3])
-        # print()
-        # print("measurements:", measurements)
-        # print("prev_average", prev_average)
-        # print("average:", average)
-        current_slope = cls.slope(average, prev_average)
-        # print("slope:", current_slope)
-        return current_slope
-
-    @classmethod
-    def direction_changed(cls, measurements, prev_direction):
-        direction = cls.direction(measurements)
-        return prev_direction != direction
-
-    def catagorize_pressure(self, pressure, prev_pressure):
+    def catagorize_pressure(self, pressure):
         """determine the strength and polarity of the pressure reading"""
         level = 0
-        direction = 0
         polarity = 0
         abs_pressure = abs(pressure)
 
@@ -55,16 +40,11 @@ class PuffDetector:
             else:
                 polarity = -1
 
-        if pressure > prev_pressure:
-            direction = 1
-        if pressure < prev_pressure:
-            direction = -1
-
-        return (polarity, level, direction)
+        return (polarity, level)
 
     @staticmethod
     def pressure_string(pressure_type):
-        polarity, level, direction = pressure_type  # pylint:disable=unused-variable
+        polarity, level = pressure_type  # pylint:disable=unused-variable
         pressure_str = "HIGH"
         if level == 0 or polarity == 0:
             return ""
@@ -80,9 +60,51 @@ class PuffDetector:
             pressure_str += "SIP"
         return pressure_str
 
+    def check_for_puff(self, current_pressure):
+        puff_polarity = None
+        puff_peak_level = None
+        puff_duration = None
+        #######################
+        polarity, level = self.catagorize_pressure(current_pressure)
+
+        # if (polarity != 0) or (level != 0):
+        if abs(current_pressure) > PRINT_FLOOR:
+            if self.counter % 4 == 0:
+                if DEBUG and CONSOLE:
+                    print("\t\t\tpressure:", current_pressure)
+
+        if level != 0 and self.start_polarity == 0:  ###
+            self.start_polarity = polarity
+            self.puff_start = time.monotonic()
+            puff_polarity = self.start_polarity
+
+        if self.start_polarity != 0:
+            if level > self.peak_level:
+                self.peak_level = level
+
+        if (level == 0) and (self.start_polarity != 0):
+            self.duration = time.monotonic() - self.puff_start
+
+            puff_polarity = self.start_polarity
+            puff_peak_level = self.peak_level
+            puff_duration = self.duration
+
+            self.start_polarity = 0
+            self.peak_level = 0
+            self.duration = 0
+        self.counter += 1
+        return (puff_polarity, puff_peak_level, puff_duration)
+        ##############################################
+
 
 # pylint:disable=pointless-string-statement
 """
+pressure_list = []
+    prev_pressure_type = tuple()
+prev_polarity = None
+current_level = 0
+prev_level = 0
+
     def old_detect(self):
         if pressure_type != prev_pressure_type:
         puff_end = time.monotonic()
@@ -114,4 +136,6 @@ class PuffDetector:
             if CONSOLE: print("____________________")
         prev_pressure_type = pressure_type
         prev_duration = puff_duration
+    prev_level = level
+    prev_level = level
 """
