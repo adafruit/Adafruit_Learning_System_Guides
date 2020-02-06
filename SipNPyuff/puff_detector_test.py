@@ -1,6 +1,4 @@
 import unittest
-
-import puff_detector
 from puff_detector import PuffDetector
 
 
@@ -28,7 +26,7 @@ class DirectionChangeTest(unittest.TestCase):
         self.assertEqual(PuffDetector.direction_changed(reading_list, -1), True)
 
     def test_negative_to_negative_er(self):
-        reading_list = [-1, -2, -3, -4, -5. -6, -7, -8]
+        reading_list = [-1, -2, -3, -4, -5.0 - 6, -7, -8]
         self.assertEqual(PuffDetector.direction_changed(reading_list, -1), False)
 
     def test_positive_to_negative(self):
