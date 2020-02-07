@@ -19,6 +19,10 @@ Y_OFFSET = 3
 TEXT_HEIGHT = 8
 BOTTOM_ROW = DISPLAY_HEIGHT - TEXT_HEIGHT - Y_OFFSET
 
+# States:
+WAITING = 0
+STARTED = 1
+DETECTED = 2
 i2c = board.I2C()
 # 128x32
 # display_bus = displayio.I2CDisplay(i2c, device_address=0x3C, reset=oled_reset)
@@ -48,19 +52,15 @@ lps.filter_enabled = True
 
 lps.filter_config = True
 # if CONSOLE: print("Filter Config:", lps.low_pass_config)
-detector = PuffDetector(min_pressure=8, high_pressure=40)
+detector = PuffDetector()
 time.sleep(1)
-
-
-puff_start = time.monotonic()
-
 
 if CONSOLE:
     print("CONSOLE?")
 if DEBUG and CONSOLE:
     print("Debug CONSOLE")
 
-color = 0xFAFAFA
+color = 0xFFFFFF
 
 font = terminalio.FONT
 
@@ -68,10 +68,12 @@ banner_string = "PUFF-O-TRON-9000"
 state_string = "  "
 pressure_string = " "
 input_type_string = " "
+duration_string = " "
 
 state_display_timeout = 1.0
 state_display_start = 0
 while True:
+    curr_time = time.monotonic()
     ######################################
     splash = displayio.Group(max_size=10)
     # Set text, font, and color
@@ -84,16 +86,16 @@ while True:
     puff_polarity, puff_peak_level, puff_duration = detector.check_for_puff(
         current_pressure
     )
+    if DEBUG and CONSOLE:
+        print(
+            "Pol: %s Peak: %s Dir: %s"
+            % (str(puff_polarity), str(puff_peak_level), str(puff_duration))
+        )
 
-    if CONSOLE and puff_duration is None and puff_polarity:
-        if puff_polarity == 1:
-            state_string = "PUFF"
-        if puff_polarity == -1:
-            state_string = "SIP"
-        state_string += " START"
-
-    if CONSOLE and puff_duration:
-
+    # if puff_duration:
+    if detector.state == DETECTED:
+        state = DETECTED
+        duration_string = "Duration: %0.2f" % puff_duration
         state_string = "DETECTED:"
         print(state_string)
         if puff_peak_level == 1:
@@ -105,17 +107,43 @@ while True:
             input_type_string += " PUFF"
         if puff_polarity == -1:
             input_type_string += " SIP"
-        print("END", end=" ")
-        print(input_type_string)
-        duration_string = "Duration: %0.2f" % puff_duration
-        print(duration_string)
+        state_display_start = curr_time
+
+        if CONSOLE:
+            print("END", end=" ")
+        if CONSOLE:
+            print(input_type_string)
+        if CONSOLE:
+            print(duration_string)
+
+    elif detector.state == STARTED:
+        # elif puff_duration is None and puff_polarity:
+        dir_string = ""
+        if puff_polarity == 1:
+            dir_string = "PUFF"
+        if puff_polarity == -1:
+            dir_string = "SIP"
+        state_string = "%s START" % dir_string
+        if CONSOLE:
+            print(state_string)
+    else:
+        state = WAITING
+        if (curr_time - state_display_start) > state_display_timeout:
+            state_string = "Waiting for Input"
+            detector_result_string = " "
+            duration_string = " "
+
+    if CONSOLE:
+        print("STATE:", state)
     # Create the tet label
-    if puff_polarity == 0:
-        state_string = "Waiting for Input"
+    print((curr_time - state_display_start))
+
+    # if it's been >timeout since we started displaying puff result
+
     banner = label.Label(font, text=banner_string, color=color)
     state = label.Label(font, text=state_string, color=color)
     detector_result = label.Label(font, text=input_type_string, color=color)
-    text_area4 = label.Label(font, text=state_string, color=color)
+    duration = label.Label(font, text=duration_string, color=color)
     pressure_label = label.Label(font, text=pressure_string, color=color)
 
     banner.x = 0
@@ -126,6 +154,9 @@ while True:
     detector_result.x = 20
     detector_result.y = 20 + Y_OFFSET
 
+    duration.x = 10
+    duration.y = 30 + Y_OFFSET
+
     x, y, w, h = pressure_label.bounding_box
     pressure_label.x = DISPLAY_WIDTH - w
     pressure_label.y = BOTTOM_ROW + Y_OFFSET
@@ -133,7 +164,10 @@ while True:
     splash.append(banner)
     splash.append(state)
     splash.append(detector_result)
+    splash.append(duration)
     splash.append(pressure_label)
     # Show it
     display.show(splash)
+    if CONSOLE:
+        print("----------------------------------------------")
     time.sleep(0.01)
