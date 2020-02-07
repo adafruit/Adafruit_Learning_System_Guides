@@ -72,11 +72,15 @@ class PuffDetector:
         puff_peak_level = None
         puff_duration = None
         polarity, level = self.catagorize_pressure(current_pressure)
-
+        if CONSOLE:
+            print("pol", polarity, "lev:", level)
         if self.state == DETECTED:
-            if polarity == 0 and level == 0:
-                self.state = WAITING
+            # if polarity == 0 and level == 0:
+            self.state = WAITING
 
+            self.start_polarity = 0
+            self.peak_level = 0
+            self.duration = 0
         if level != 0 and self.start_polarity == 0:
             self.state = STARTED
             self.start_polarity = polarity
@@ -95,8 +99,5 @@ class PuffDetector:
             puff_peak_level = self.peak_level
             puff_duration = self.duration
 
-            self.start_polarity = 0
-            self.peak_level = 0
-            self.duration = 0
         self.counter += 1
         return (self.start_polarity, puff_peak_level, puff_duration)

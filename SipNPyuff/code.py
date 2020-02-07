@@ -81,11 +81,16 @@ while True:
     ######################################
     current_pressure = lps.pressure
     pressure_string = "Pressure: %0.3f" % current_pressure
-    if not CONSOLE:
+    if CONSOLE:
+        print(pressure_string)
+    else:
         print((current_pressure,))
+
     puff_polarity, puff_peak_level, puff_duration = detector.check_for_puff(
         current_pressure
     )
+    if CONSOLE:
+        print("STATE:", detector.state)
     if DEBUG and CONSOLE:
         print(
             "Pol: %s Peak: %s Dir: %s"
@@ -95,7 +100,9 @@ while True:
     # if puff_duration:
     if detector.state == DETECTED:
         state = DETECTED
-        duration_string = "Duration: %0.2f" % puff_duration
+        duration_string = (
+            "Duration: %0.2f" % puff_duration
+        )  # puff duration can be none? after detect?
         state_string = "DETECTED:"
         print(state_string)
         if puff_peak_level == 1:
@@ -130,11 +137,9 @@ while True:
         state = WAITING
         if (curr_time - state_display_start) > state_display_timeout:
             state_string = "Waiting for Input"
-            detector_result_string = " "
+            input_type_string = " "
             duration_string = " "
 
-    if CONSOLE:
-        print("STATE:", state)
     # Create the tet label
     print((curr_time - state_display_start))
 
@@ -145,6 +150,12 @@ while True:
     detector_result = label.Label(font, text=input_type_string, color=color)
     duration = label.Label(font, text=duration_string, color=color)
     pressure_label = label.Label(font, text=pressure_string, color=color)
+    if CONSOLE:
+        print(banner.text)
+        print(state.text)
+        print(detector_result.text)
+        print(duration.text)
+        print(pressure_label.text)
 
     banner.x = 0
     banner.y = 0 + Y_OFFSET
