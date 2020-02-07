@@ -1,7 +1,9 @@
 import time
+import os
+import json
 
 PRINT_FLOOR = 5
-CONSOLE = True
+CONSOLE = False
 DEBUG = True
 
 MIN_PRESSURE = 8
@@ -12,7 +14,13 @@ DETECTED = 2
 
 
 class PuffDetector:
-    def __init__(self, min_pressure=MIN_PRESSURE, high_pressure=HIGH_PRESSURE):
+    def __init__(
+            self,
+            min_pressure=MIN_PRESSURE,
+            high_pressure=HIGH_PRESSURE,
+            config_filename="settings.json",
+            display_timeout=1,
+    ):
         self.high_pressure = high_pressure
         self.min_pressure = min_pressure
 
@@ -22,6 +30,30 @@ class PuffDetector:
         self.duration = 0
         self.puff_start = 0
         self.state = WAITING
+        self.settings_dict = {}
+
+        self.display_timeout = display_timeout
+
+        self._config_filename = config_filename
+        self._load_config()
+        if self.settings_dict:
+            self.min_pressure = self.settings_dict["min_pressure"]
+            self.high_pressure = self.settings_dict["high_pressure"]
+            if "display_timeout" in self.settings_dict.keys():
+                self.display_timeout = self.settings_dict["display_timeout"]
+
+    def _load_config(self):
+        if not self._config_filename in os.listdir("/"):
+            return
+        try:
+            with open(self._config_filename, "r") as file:
+                settings_dict = json.load(file)
+        except (ValueError, OSError) as error:
+            print("Error loading config file")
+            print(type(error))
+
+        print("got config file:")
+        print(settings_dict)
 
     @classmethod
     def rolling_average(cls, measurements, window_size=3):
@@ -73,7 +105,7 @@ class PuffDetector:
         puff_duration = None
         polarity, level = self.catagorize_pressure(current_pressure)
         if CONSOLE:
-            print("pol", polarity, "lev:", level)
+            print("poll", polarity, "lev:", level)
         if self.state == DETECTED:
             # if polarity == 0 and level == 0:
             self.state = WAITING

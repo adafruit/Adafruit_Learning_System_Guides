@@ -17,7 +17,10 @@ DISPLAY_HEIGHT = 64  # Change to 64 if needed
 BORDER = 1
 Y_OFFSET = 3
 TEXT_HEIGHT = 8
-BOTTOM_ROW = DISPLAY_HEIGHT - TEXT_HEIGHT - Y_OFFSET
+BOTTOM_ROW = DISPLAY_HEIGHT - TEXT_HEIGHT
+
+# Get wifi details and more from a secrets.py file
+
 
 # States:
 WAITING = 0
@@ -36,7 +39,7 @@ display = adafruit_displayio_ssd1306.SSD1306(
 
 # i2c = DebugI2C(i2c)
 lps = adafruit_lps35hw.LPS35HW(i2c, 0x5C)
-CONSOLE = True
+CONSOLE = False
 DEBUG = True
 
 lps.zero_pressure()
@@ -55,13 +58,9 @@ lps.filter_config = True
 detector = PuffDetector()
 time.sleep(1)
 
-if CONSOLE:
-    print("CONSOLE?")
-if DEBUG and CONSOLE:
-    print("Debug CONSOLE")
+print("det timeout:", detector.display_timeout)
 
 color = 0xFFFFFF
-
 font = terminalio.FONT
 
 banner_string = "PUFF-O-TRON-9000"
@@ -74,17 +73,15 @@ state_display_timeout = 1.0
 state_display_start = 0
 while True:
     curr_time = time.monotonic()
-    ######################################
-    splash = displayio.Group(max_size=10)
     # Set text, font, and color
 
-    ######################################
     current_pressure = lps.pressure
-    pressure_string = "Pressure: %0.3f" % current_pressure
+    pressure_string = "Press: %0.3f" % current_pressure
     if CONSOLE:
         print(pressure_string)
     else:
-        print((current_pressure,))
+        # print((current_pressure,))
+        pass
 
     puff_polarity, puff_peak_level, puff_duration = detector.check_for_puff(
         current_pressure
@@ -104,7 +101,6 @@ while True:
             "Duration: %0.2f" % puff_duration
         )  # puff duration can be none? after detect?
         state_string = "DETECTED:"
-        print(state_string)
         if puff_peak_level == 1:
             input_type_string = "SOFT"
         if puff_peak_level == 2:
@@ -116,13 +112,6 @@ while True:
             input_type_string += " SIP"
         state_display_start = curr_time
 
-        if CONSOLE:
-            print("END", end=" ")
-        if CONSOLE:
-            print(input_type_string)
-        if CONSOLE:
-            print(duration_string)
-
     elif detector.state == STARTED:
         # elif puff_duration is None and puff_polarity:
         dir_string = ""
@@ -131,30 +120,32 @@ while True:
         if puff_polarity == -1:
             dir_string = "SIP"
         state_string = "%s START" % dir_string
-        if CONSOLE:
-            print(state_string)
     else:
         state = WAITING
-        if (curr_time - state_display_start) > state_display_timeout:
+        if (curr_time - state_display_start) > detector.display_timeout:
             state_string = "Waiting for Input"
             input_type_string = " "
             duration_string = " "
 
-    # Create the tet label
-    print((curr_time - state_display_start))
-
     # if it's been >timeout since we started displaying puff result
+
+    min_press_str = "min: %d" % detector.min_pressure
+    high_press_str = "hi: %d" % detector.high_pressure
 
     banner = label.Label(font, text=banner_string, color=color)
     state = label.Label(font, text=state_string, color=color)
     detector_result = label.Label(font, text=input_type_string, color=color)
     duration = label.Label(font, text=duration_string, color=color)
+    min_pressure_label = label.Label(font, text=min_press_str, color=color)
+    high_pressure_label = label.Label(font, text=high_press_str, color=color)
     pressure_label = label.Label(font, text=pressure_string, color=color)
     if CONSOLE:
         print(banner.text)
         print(state.text)
         print(detector_result.text)
         print(duration.text)
+        print(min_pressure_label.text)
+        print(high_pressure_label.text)
         print(pressure_label.text)
 
     banner.x = 0
@@ -168,14 +159,23 @@ while True:
     duration.x = 10
     duration.y = 30 + Y_OFFSET
 
+    min_pressure_label.x = 0
+    min_pressure_label.y = BOTTOM_ROW - 10
+
     x, y, w, h = pressure_label.bounding_box
     pressure_label.x = DISPLAY_WIDTH - w
-    pressure_label.y = BOTTOM_ROW + Y_OFFSET
+    pressure_label.y = BOTTOM_ROW
 
+    high_pressure_label.x = 0
+    high_pressure_label.y = BOTTOM_ROW
+
+    splash = displayio.Group(max_size=10)
     splash.append(banner)
     splash.append(state)
     splash.append(detector_result)
     splash.append(duration)
+    splash.append(min_pressure_label)
+    splash.append(high_pressure_label)
     splash.append(pressure_label)
     # Show it
     display.show(splash)
