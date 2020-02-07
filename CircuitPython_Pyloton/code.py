@@ -15,7 +15,7 @@ ble = adafruit_ble.BLERadio()    # pylint: disable=no-member
 
 display = board.DISPLAY
 
-pyloton = pyloton.Pyloton(ble, display)
+pyloton = pyloton.Pyloton(ble, display, debug=True)
 pyloton.show_splash()
 
 hr_connection = None
