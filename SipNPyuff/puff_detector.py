@@ -2,7 +2,6 @@ import time
 import os
 import json
 
-PRINT_FLOOR = 5
 CONSOLE = False
 DEBUG = True
 
@@ -47,20 +46,10 @@ class PuffDetector:
             return
         try:
             with open(self._config_filename, "r") as file:
-                settings_dict = json.load(file)
+                self.settings_dict = json.load(file)
         except (ValueError, OSError) as error:
             print("Error loading config file")
             print(type(error))
-
-        print("got config file:")
-        print(settings_dict)
-
-    @classmethod
-    def rolling_average(cls, measurements, window_size=3):
-        # print("measurements", measurements)
-        window = measurements[-window_size:]
-
-        return sum(window) / window_size
 
     def catagorize_pressure(self, pressure):
         """determine the strength and polarity of the pressure reading"""
@@ -104,8 +93,7 @@ class PuffDetector:
         puff_peak_level = None
         puff_duration = None
         polarity, level = self.catagorize_pressure(current_pressure)
-        if CONSOLE:
-            print("poll", polarity, "lev:", level)
+
         if self.state == DETECTED:
             # if polarity == 0 and level == 0:
             self.state = WAITING

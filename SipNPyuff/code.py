@@ -1,65 +1,50 @@
 import time
 import board
-import adafruit_lps35hw
-
 import displayio
 import terminalio
 from adafruit_display_text import label
 import adafruit_displayio_ssd1306
-from puff_detector import PuffDetector
+import adafruit_lps35hw
+from puff_detector import PuffDetector, STARTED, DETECTED
+
+from adafruit_hid.keyboard import Keyboard
+from adafruit_hid.keycode import Keycode
+
+# The keycode sent for each button, will be paired with a control key
+buttonkeys = [Keycode.A, Keycode.B, Keycode.C, Keycode.D, Keycode.E, Keycode.F]
+controlkey = Keycode.LEFT_CONTROL
+
+# the keyboard object!
+kbd = Keyboard()
 
 displayio.release_displays()
-oled_reset = board.D9
 
 DISPLAY_WIDTH = 128
-# DISPLAY_HEIGHT = 32
-DISPLAY_HEIGHT = 64  # Change to 64 if needed
-BORDER = 1
+DISPLAY_HEIGHT = 64
 Y_OFFSET = 3
 TEXT_HEIGHT = 8
 BOTTOM_ROW = DISPLAY_HEIGHT - TEXT_HEIGHT
 
-# Get wifi details and more from a secrets.py file
-
-
-# States:
-WAITING = 0
-STARTED = 1
-DETECTED = 2
+SOFT_SIP = 0
+HARD_SIP = 1
+SOFT_PUFF = 2
+HARD_PUFF = 3
 i2c = board.I2C()
-# 128x32
-# display_bus = displayio.I2CDisplay(i2c, device_address=0x3C, reset=oled_reset)
-# 128x64
-display_bus = displayio.I2CDisplay(i2c, device_address=0x3D, reset=oled_reset)
 
+
+display_bus = displayio.I2CDisplay(i2c, device_address=0x3D)
 display = adafruit_displayio_ssd1306.SSD1306(
     display_bus, width=DISPLAY_WIDTH, height=DISPLAY_HEIGHT
 )
 
-
-# i2c = DebugI2C(i2c)
 lps = adafruit_lps35hw.LPS35HW(i2c, 0x5C)
-CONSOLE = False
-DEBUG = True
-
 lps.zero_pressure()
 lps.data_rate = adafruit_lps35hw.DataRate.RATE_75_HZ
 
-min_pressure = 8
-high_pressure = 20
-# sip/puff is "over" on keyup/pressure polarity reversal
-# averaging code
-
 lps.filter_enabled = True
-# if CONSOLE: print("Filter enabled:", lps.low_pass_enabled)
-
 lps.filter_config = True
-# if CONSOLE: print("Filter Config:", lps.low_pass_config)
 detector = PuffDetector()
 time.sleep(1)
-
-print("det timeout:", detector.display_timeout)
-
 color = 0xFFFFFF
 font = terminalio.FONT
 
@@ -72,27 +57,16 @@ duration_string = " "
 state_display_timeout = 1.0
 state_display_start = 0
 while True:
+    detected_puff = None
     curr_time = time.monotonic()
     # Set text, font, and color
 
     current_pressure = lps.pressure
     pressure_string = "Press: %0.3f" % current_pressure
-    if CONSOLE:
-        print(pressure_string)
-    else:
-        # print((current_pressure,))
-        pass
 
     puff_polarity, puff_peak_level, puff_duration = detector.check_for_puff(
         current_pressure
     )
-    if CONSOLE:
-        print("STATE:", detector.state)
-    if DEBUG and CONSOLE:
-        print(
-            "Pol: %s Peak: %s Dir: %s"
-            % (str(puff_polarity), str(puff_peak_level), str(puff_duration))
-        )
 
     # if puff_duration:
     if detector.state == DETECTED:
@@ -101,15 +75,22 @@ while True:
             "Duration: %0.2f" % puff_duration
         )  # puff duration can be none? after detect?
         state_string = "DETECTED:"
-        if puff_peak_level == 1:
-            input_type_string = "SOFT"
-        if puff_peak_level == 2:
-            input_type_string = "HARD"
 
         if puff_polarity == 1:
-            input_type_string += " PUFF"
+            if puff_peak_level == 1:
+                input_type_string = "SOFT PUFF"
+                detected_puff = SOFT_PUFF
+            if puff_peak_level == 2:
+                input_type_string = "HARD PUFF"
+                detected_puff = HARD_PUFF
+
         if puff_polarity == -1:
-            input_type_string += " SIP"
+            if puff_peak_level == 1:
+                input_type_string = "SOFT SIP"
+                detected_puff = SOFT_SIP
+            if puff_peak_level == 2:
+                input_type_string = "HARD SIP"
+                detected_puff = HARD_SIP
         state_display_start = curr_time
 
     elif detector.state == STARTED:
@@ -120,8 +101,7 @@ while True:
         if puff_polarity == -1:
             dir_string = "SIP"
         state_string = "%s START" % dir_string
-    else:
-        state = WAITING
+    else:  # WAITING
         if (curr_time - state_display_start) > detector.display_timeout:
             state_string = "Waiting for Input"
             input_type_string = " "
@@ -139,14 +119,6 @@ while True:
     min_pressure_label = label.Label(font, text=min_press_str, color=color)
     high_pressure_label = label.Label(font, text=high_press_str, color=color)
     pressure_label = label.Label(font, text=pressure_string, color=color)
-    if CONSOLE:
-        print(banner.text)
-        print(state.text)
-        print(detector_result.text)
-        print(duration.text)
-        print(min_pressure_label.text)
-        print(high_pressure_label.text)
-        print(pressure_label.text)
 
     banner.x = 0
     banner.y = 0 + Y_OFFSET
@@ -179,6 +151,17 @@ while True:
     splash.append(pressure_label)
     # Show it
     display.show(splash)
-    if CONSOLE:
-        print("----------------------------------------------")
-    time.sleep(0.01)
+
+    # press some buttons
+    if detected_puff == SOFT_PUFF:
+        kbd.press(Keycode.LEFT_ARROW)
+
+    if detected_puff == HARD_PUFF:
+        kbd.press(Keycode.DOWN_ARROW)
+
+    if detected_puff == SOFT_SIP:
+        kbd.press(Keycode.RIGHT_ARROW)
+
+    if detected_puff == HARD_SIP:
+        kbd.press(Keycode.UP_ARROW)
+    kbd.release_all()
