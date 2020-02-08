@@ -30,7 +30,7 @@ class Pyloton:
     PURPLE = 0x64337E
     WHITE = 0xFFFFFF
 
-    splash_group = displayio.Group()
+    loading_group = displayio.Group()
 
     cyc_connections = []
     cyc_services = []
@@ -66,21 +66,24 @@ class Pyloton:
         if self.debug:
             return
         with open('biketrace.bmp', 'rb') as bitmap_file:
-            bitmap = displayio.OnDiskBitmap(bitmap_file)
+            bitmap1 = displayio.OnDiskBitmap(bitmap_file)
 
-            tile_grid = displayio.TileGrid(bitmap, pixel_shader=displayio.ColorConverter())
+            tile_grid = displayio.TileGrid(bitmap1, pixel_shader=displayio.ColorConverter())
 
 
-            self.splash_group.append(tile_grid)
+            self.loading_group.append(tile_grid)
+
+            self.display.show(self.loading_group)
 
             status_heading = label.Label(font=self.arial16, x=80, y=175,
                                          text="Status", color=self.YELLOW)
+
             rect = Rect(0, 165, 240, 75, fill=self.PURPLE)
 
-            self.splash_group.append(rect)
-            self.splash_group.append(status_heading)
+            self.loading_group.append(rect)
+            self.loading_group.append(status_heading)
 
-            self.display.show(self.splash_group)
+            self.display.show(self.loading_group)
             time.sleep(.01)
 
 
@@ -115,12 +118,12 @@ class Pyloton:
             text_group.append(status)
 
 
-        if len(self.splash_group) == 3:
-            self.splash_group.append(text_group)
+        if len(self.loading_group) < 4:
+            self.loading_group.append(text_group)
         else:
-            self.splash_group[3] = text_group
+            self.loading_group[3] = text_group
 
-        self.display.show(self.splash_group)
+        self.display.show(self.loading_group)
         time.sleep(0.01)
 
     def timeout(self):
@@ -147,17 +150,17 @@ class Pyloton:
         """
         Connects to speed and cadence sensor
         """
-        print("Scanning...")
+        self._status_update("Scanning...")
         # Save advertisements, indexed by address
         advs = {}
         for adv in self.ble.start_scan(ProvideServicesAdvertisement, timeout=5):
             if CyclingSpeedAndCadenceService in adv.services:
-                print("found a CyclingSpeedAndCadenceService advertisement")
+                self._status_update("found a CyclingSpeedAndCadenceService advertisement")
                 # Save advertisement. Overwrite duplicates from same address (device).
                 advs[adv.address] = adv
 
         self.ble.stop_scan()
-        print("Stopped scanning")
+        self._status_update("Speed and Cadence: Stopped scanning")
         if not advs:
             # Nothing found. Go back and keep looking.
             return []
@@ -166,14 +169,14 @@ class Pyloton:
         self.cyc_connections = []
         for adv in advs.values():
             self.cyc_connections.append(self.ble.connect(adv))
-            print("Connected", len(self.cyc_connections))
+            self._status_update("Connected {}".format(len(self.cyc_connections)))
 
 
         self.cyc_services = []
         for conn in self.cyc_connections:
 
             self.cyc_services.append(conn[CyclingSpeedAndCadenceService])
-        print("Done")
+        self._status_update("Finishing up...")
         return self.cyc_connections
 
 
@@ -286,7 +289,7 @@ class Pyloton:
                 self.splash[3] = hr_label
 
         if self.speed_enabled:
-            sp_label = self._label_maker('{} rpm'.format(speed), 50, 120)
+            sp_label = self._label_maker('{} mph'.format(speed), 50, 120)
             if not self.setup:
                 self.splash.append(sp_label)
             else:
@@ -307,6 +310,6 @@ class Pyloton:
                 self.splash[6] = ams_label
 
         self.setup=True
-        time.sleep(0.2)
+        #time.sleep(0.2)
 
         self.display.show(self.splash)

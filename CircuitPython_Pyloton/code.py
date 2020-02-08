@@ -15,7 +15,7 @@ ble = adafruit_ble.BLERadio()    # pylint: disable=no-member
 display = board.DISPLAY
 
 # 84.229 is wheel circumference (700x23 in my case)
-pyloton = pyloton.Pyloton(ble, display, 84.229, debug=True)
+pyloton = pyloton.Pyloton(ble, display, 84.229)
 pyloton.show_splash()
 
 hr_connection = None
