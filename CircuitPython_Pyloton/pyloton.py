@@ -22,26 +22,42 @@ class Pyloton:
 
     _previous_heart = 0
 
-    splash = displayio.Group()
-  
+    splash = displayio.Group(max_size=25)
+
     setup = False
 
-    def __init__(self, ble, display, heart=True, speed=True, cadence=True, ams=True, debug=False):
+    YELLOW = 0xFCFF00
+    PURPLE = 0x64337E
+    WHITE = 0xFFFFFF
+
+    splash_group = displayio.Group()
+
+    cyc_connections = []
+    cyc_services = []
+
+    def __init__(self, ble, display, circ, heart=True, speed=True, cad=True, ams=True, debug=False):
         self.debug = debug
 
         self.ble = ble
-        self.hr_connection = None
-
-        self.heart_enabled = heart
-        self.speed_enabled = speed
-        self.cadence_enabled = cadence
-        self.ams_enabled = ams
 
         self.display = display
 
-        self.sprite_sheet, self.palette = adafruit_imageload.load("/sprite_sheet.bmp",
-                                                                  palette=displayio.Palette)
+        self.circumference = circ
+
+        self.heart_enabled = heart
+        self.speed_enabled = speed
+        self.cadence_enabled = cad
+        self.ams_enabled = ams
+
+        self.hr_connection = None
+
+
         self._load_fonts()
+
+        self.sprite_sheet, self.palette = adafruit_imageload.load("/sprite_sheet.bmp",
+                                                                  bitmap=displayio.Bitmap,
+                                                                  palette=displayio.Palette)
+
 
     def show_splash(self):
         """
@@ -54,11 +70,18 @@ class Pyloton:
 
             tile_grid = displayio.TileGrid(bitmap, pixel_shader=displayio.ColorConverter())
 
-            self.splash_group = displayio.Group()
+
             self.splash_group.append(tile_grid)
 
+            status_heading = label.Label(font=self.arial16, x=80, y=175,
+                                         text="Status", color=self.YELLOW)
+            rect = Rect(0, 165, 240, 75, fill=self.PURPLE)
+
+            self.splash_group.append(rect)
+            self.splash_group.append(status_heading)
+
             self.display.show(self.splash_group)
-            time.sleep(.05)
+            time.sleep(.01)
 
 
     def _load_fonts(self):
@@ -77,27 +100,26 @@ class Pyloton:
         if self.debug:
             print(message)
             return
-        YELLOW = 0xFCFF00
-        PURPLE = 0x64337E
+
         text_group = displayio.Group()
         if len(message) > 25:
-            status = label.Label(font=self.arial12, x=10, y=200, text=message[:25], color=YELLOW)
-            status1 = label.Label(font=self.arial12, x=10, y=220, text=message[25:], color=YELLOW)
+            status = label.Label(font=self.arial12, x=10, y=200,
+                                 text=message[:25], color=self.YELLOW)
+            status1 = label.Label(font=self.arial12, x=10, y=220,
+                                  text=message[25:], color=self.YELLOW)
+
             text_group.append(status)
             text_group.append(status1)
         else:
-            status = label.Label(font=self.arial12, x=10, y=200, text=message, color=YELLOW)
+            status = label.Label(font=self.arial12, x=10, y=200, text=message, color=self.YELLOW)
             text_group.append(status)
 
 
-        if len(self.splash_group) == 1:
-            status_heading = label.Label(font=self.arial16, x=80, y=175, text="Status", color=YELLOW)
-            rect = Rect(0, 165, 240, 75, fill=PURPLE)
-            self.splash_group.append(rect)
-            self.splash_group.append(status_heading)
+        if len(self.splash_group) == 3:
             self.splash_group.append(text_group)
         else:
             self.splash_group[3] = text_group
+
         self.display.show(self.splash_group)
         time.sleep(0.01)
 
@@ -121,7 +143,7 @@ class Pyloton:
                 break
         return self.hr_connection
 
-    def s_and_c_connect(self):
+    def speed_cad_connect(self):
         """
         Connects to speed and cadence sensor
         """
@@ -154,9 +176,10 @@ class Pyloton:
         print("Done")
         return self.cyc_connections
 
+
     def read_s_and_c(self):
         """
-        Reads the speed and cadence sensor
+        Reads data from the speed and cadence sensor
         """
         speed = self._previous_speed
         cadence = self._previous_cadence
@@ -169,32 +192,33 @@ class Pyloton:
                         rev_diff = values.cumulative_wheel_revolutions - self._previous_revolutions
 
                         if wheel_diff:
-                            #Rotations per minute is 60 times the amount of revolutions since
-                            #the last update over the time since the last update
+                            # Rotations per minute is 60 times the amount of revolutions since
+                            # the last update over the time since the last update
                             rpm = 60*(rev_diff/(wheel_diff/1024))
                             # We then mutiply it by the wheel's circumference and convert it to mph
-                            speed = round((rpm * 84.229) * (60/63360), 1)
+                            speed = round((rpm * self.circumference) * (60/63360), 1)
                             self._previous_speed = speed
                             self._previous_revolutions = values.cumulative_wheel_revolutions
                         self._previous_wheel = values.last_wheel_event_time
 
                     if values.last_crank_event_time:
                         crank_diff = values.last_crank_event_time - self._previous_crank
-                        crank_rev_diff = values.cumulative_crank_revolutions - self._previous_crank_rev
+                        crank_rev_diff =values.cumulative_crank_revolutions-self._previous_crank_rev
 
                         if crank_rev_diff:
-                            #Rotations per minute is 60 times the amount of revolutions since the
-                            #last update over the time since the last update
+                            # Rotations per minute is 60 times the amount of revolutions since the
+                            # last update over the time since the last update
                             cadence = round(60*(crank_rev_diff/(crank_diff/1024)), 1)
                             self._previous_cadence = cadence
                             self._previous_crank_rev = values.cumulative_crank_revolutions
 
                         self._previous_crank = values.last_crank_event_time
                 return speed, cadence
+            return 0, 0
 
     def read_heart(self, hr_service):
         """
-        Reads the heart rate sensor 
+        Reads date from the heart rate sensor
         """
         measurement = hr_service.measurement_values
         if measurement is None:
@@ -204,45 +228,48 @@ class Pyloton:
             self._previous_heart = measurement.heart_rate
         return heart
 
-    def _icon_maker(self, n, icon_x, icon_y):
+
+    def icon_maker(self, n, icon_x, icon_y):
         """
-        Generates sprites
+        Generates icons as sprites
         """
-        sprite = displayio.TileGrid(self.sprite_sheet, pixel_shader=self.palette,
-                                    width=1,
-                                    height=1,
-                                    tile_width=40,
-                                    tile_height=40,
-                                    default_tile=n,
-                                    x=icon_x, y=icon_y)
+
+        sprite = displayio.TileGrid(self.sprite_sheet, pixel_shader=self.palette, width=1, height=1, tile_width=40, tile_height=40, default_tile=n, x=icon_x, y=icon_y)
         return sprite
+
+    def _label_maker(self, text, x, y):
+        """
+        Generates labels
+        """
+        return label.Label(font=self.arial24, x=x, y=y, text=text, color=self.WHITE)
 
     def _setup_display(self):
         sprites = displayio.Group()
 
-        rect = Rect(0, 0, 240, 50, fill=0x64338e)
+        rect = Rect(0, 0, 240, 50, fill=self.PURPLE)
         self.splash.append(rect)
 
-        heading = label.Label(font=self.arial24, x=55, y=25, text="PyLoton", color=0xFCFF00)
+        heading = label.Label(font=self.arial24, x=55, y=25, text="PyLoton", color=self.YELLOW)
         self.splash.append(heading)
 
         if self.heart_enabled:
-            heart_sprite = self._icon_maker(0, 2, 55)
+            heart_sprite = self.icon_maker(0, 2, 55)
             sprites.append(heart_sprite)
 
         if self.speed_enabled:
-            speed_sprite = self._icon_maker(1, 2, 100)
+            speed_sprite = self.icon_maker(1, 2, 100)
             sprites.append(speed_sprite)
 
         if self.cadence_enabled:
-            cadence_sprite = self._icon_maker(2, 2, 145)
+            cadence_sprite = self.icon_maker(2, 2, 145)
             sprites.append(cadence_sprite)
 
         if self.ams_enabled:
-            ams_sprite = self._icon_maker(3, 2, 190)
+            ams_sprite = self.icon_maker(3, 2, 190)
             sprites.append(ams_sprite)
 
         self.splash.append(sprites)
+
 
     def update_display(self, hr_service):
         heart = self.read_heart(hr_service)
@@ -252,36 +279,32 @@ class Pyloton:
             self._setup_display()
 
         if self.heart_enabled:
-            hr_str = '{} bpm'.format(heart)
-            hr_label = label.Label(font=self.arial24, x=50, y=75, text=hr_str, color=0xFFFFFF)
+            hr_label = self._label_maker('{} bpm'.format(heart), 50, 75)
             if not self.setup:
                 self.splash.append(hr_label)
             else:
                 self.splash[3] = hr_label
 
         if self.speed_enabled:
-            sp_str = '{} mph'.format(speed)
-            sp_label = label.Label(font=self.arial24, x=50, y=120, text=sp_str, color=0xFFFFFF)
+            sp_label = self._label_maker('{} rpm'.format(speed), 50, 120)
             if not self.setup:
                 self.splash.append(sp_label)
             else:
                 self.splash[4] = sp_label
 
         if self.cadence_enabled:
-            cad_str = '{} rpm'.format(cadence)
-            cad_label = label.Label(font=self.arial24, x=50, y=165, text=cad_str, color=0xFFFFFF)
+            cad_label = self._label_maker('{} rpm'.format(cadence), 50, 165)
             if not self.setup:
                 self.splash.append(cad_label)
             else:
                 self.splash[5] = cad_label
 
         if self.ams_enabled:
-            np_str = 'None'
-            now_playing = label.Label(font=self.arial24, x=50, y=210, text=np_str, color=0xFFFFFF)
+            ams_label = self._label_maker('None', 50, 210)
             if not self.setup:
-                self.splash.append(now_playing)
+                self.splash.append(ams_label)
             else:
-                self.splash[6] = now_playing
+                self.splash[6] = ams_label
 
         self.setup=True
         time.sleep(0.2)
