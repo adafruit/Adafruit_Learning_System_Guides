@@ -52,7 +52,7 @@ group.append(line1)
 group.append(line2)
 display.show(group)
 
-def update_heart(message, color):
+def update_heart(message, heart_color):
     # turn off auto refresh while we change some things
     display.auto_refresh = False
     # set message text
@@ -63,7 +63,7 @@ def update_heart(message, color):
     line1.anchored_position = (120, 85)
     line2.anchored_position = (120, 175)
     # set heart color
-    palette[1] = color
+    palette[1] = heart_color
     # OK, now turn auto refresh back on to display
     display.auto_refresh = True
 
