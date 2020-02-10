@@ -40,7 +40,7 @@ while True:
         speed_cad_connection = pyloton.speed_cad_connect()
     if not radio:
         print("Running ams_connection")
-        radio = ams_connection
+        radio = pyloton.ams_connect()
 
     if time.time()-start >= 45:
         pyloton.timeout()

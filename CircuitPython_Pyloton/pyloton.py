@@ -153,22 +153,23 @@ class Pyloton:
         return self.hr_connection
 
     def ams_connect(self):
-        self.radio = adafruit_ble.BLERadio()
+        self._status_update("Connect your phone now")
+        radio = adafruit_ble.BLERadio()
         a = SolicitServicesAdvertisement()
         a.solicited_services.append(AppleMediaService)
-        self.radio.start_adversising(a)
+        radio.start_advertising(a)
 
-        while not self.radio.connected:
+        while not radio.connected:
             pass
 
-        print("connected")
+        self._status_update("Connected")
 
-        for connection in self.radio.connections:
+        for connection in radio.connections:
             if not connection.paired:
                 connection.pair()
-                print("paired")
+                self._status_update("paired")
         known_notifications = set()
-
+        self.radio = radio
         return self.radio
 
 
