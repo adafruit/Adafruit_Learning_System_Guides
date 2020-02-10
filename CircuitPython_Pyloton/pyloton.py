@@ -51,7 +51,7 @@ class Pyloton:
 
         self.hr_connection = None
 
-
+        self.num_enabled = heart + speed + cad + ams
         self._load_fonts()
 
         self.sprite_sheet, self.palette = adafruit_imageload.load("/sprite_sheet.bmp",
@@ -126,12 +126,14 @@ class Pyloton:
         self.display.show(self.loading_group)
         time.sleep(0.01)
 
+
     def timeout(self):
         """
         Displays Timeout on screen when pyloton has been searching for a sensor for too long
         """
         self._status_update("Timeout")
         time.sleep(3)
+
 
     def heart_connect(self):
         """
@@ -145,6 +147,7 @@ class Pyloton:
                 self._status_update("Connected")
                 break
         return self.hr_connection
+
 
     def speed_cad_connect(self):
         """
@@ -219,6 +222,7 @@ class Pyloton:
                 return speed, cadence
             return 0, 0
 
+
     def read_heart(self, hr_service):
         """
         Reads date from the heart rate sensor
@@ -236,9 +240,11 @@ class Pyloton:
         """
         Generates icons as sprites
         """
-
-        sprite = displayio.TileGrid(self.sprite_sheet, pixel_shader=self.palette, width=1, height=1, tile_width=40, tile_height=40, default_tile=n, x=icon_x, y=icon_y)
+        sprite = displayio.TileGrid(self.sprite_sheet, pixel_shader=self.palette, width=1,
+                                    height=1, tile_width=40, tile_height=40, default_tile=n,
+                                    x=icon_x, y=icon_y)
         return sprite
+
 
     def _label_maker(self, text, x, y):
         """
@@ -246,7 +252,35 @@ class Pyloton:
         """
         return label.Label(font=self.arial24, x=x, y=y, text=text, color=self.WHITE)
 
-    def _setup_display(self):
+
+    def _get_y(self):
+        """
+        Helper function for setup_display. Gets the y values used for sprites and labels.
+        """
+        enabled = self.num_enabled
+
+        if self.heart_enabled:
+            self.heart_y = 45*(self.num_enabled - enabled) + 75
+            enabled -= 1
+
+        if self.speed_enabled:
+            self.speed_y = 45*(self.num_enabled - enabled) + 75
+            enabled -= 1
+
+        if self.cadence_enabled:
+            self.cad_y = 45*(self.num_enabled - enabled) + 75
+            enabled -= 1
+
+        if self.ams_enabled:
+            self.ams_y = 45*(self.num_enabled - enabled) + 75
+            enabled -= 1
+
+
+    def setup_display(self):
+        """
+        Prepares the display to show sensor values: Adds a header, a heading, and various sprites.
+        """
+        self._get_y()
         sprites = displayio.Group()
 
         rect = Rect(0, 0, 240, 50, fill=self.PURPLE)
@@ -256,60 +290,61 @@ class Pyloton:
         self.splash.append(heading)
 
         if self.heart_enabled:
-            heart_sprite = self.icon_maker(0, 2, 55)
+            heart_sprite = self.icon_maker(0, 2, self.heart_y - 20)
             sprites.append(heart_sprite)
 
         if self.speed_enabled:
-            speed_sprite = self.icon_maker(1, 2, 100)
+            speed_sprite = self.icon_maker(1, 2, self.speed_y - 20)
             sprites.append(speed_sprite)
 
         if self.cadence_enabled:
-            cadence_sprite = self.icon_maker(2, 2, 145)
+            cadence_sprite = self.icon_maker(2, 2, self.cad_y - 20)
             sprites.append(cadence_sprite)
 
         if self.ams_enabled:
-            ams_sprite = self.icon_maker(3, 2, 190)
+            ams_sprite = self.icon_maker(3, 2, self.ams_y - 20)
             sprites.append(ams_sprite)
 
         self.splash.append(sprites)
 
 
     def update_display(self, hr_service):
+        """
+        Updates the display to display the most recent values
+        """
         heart = self.read_heart(hr_service)
         speed, cadence = self.read_s_and_c()
 
-        if len(self.splash) == 0:
-            self._setup_display()
-
         if self.heart_enabled:
-            hr_label = self._label_maker('{} bpm'.format(heart), 50, 75)
-            if not self.setup:
-                self.splash.append(hr_label)
-            else:
+            hr_label = self._label_maker('{} bpm'.format(heart), 50, self.heart_y) # 75
+            if self.setup:
                 self.splash[3] = hr_label
+            else:
+                self.splash.append(hr_label)
 
         if self.speed_enabled:
-            sp_label = self._label_maker('{} mph'.format(speed), 50, 120)
-            if not self.setup:
-                self.splash.append(sp_label)
-            else:
+            sp_label = self._label_maker('{} mph'.format(speed), 50, self.speed_y) # 120
+            if self.setup:
                 self.splash[4] = sp_label
+            else:
+                self.splash.append(sp_label)
+
 
         if self.cadence_enabled:
-            cad_label = self._label_maker('{} rpm'.format(cadence), 50, 165)
-            if not self.setup:
-                self.splash.append(cad_label)
-            else:
+            cad_label = self._label_maker('{} rpm'.format(cadence), 50, self.cad_y) # 165
+            if self.setup:
                 self.splash[5] = cad_label
+            else:
+                self.splash.append(cad_label)
 
         if self.ams_enabled:
-            ams_label = self._label_maker('None', 50, 210)
-            if not self.setup:
-                self.splash.append(ams_label)
-            else:
+            ams_label = self._label_maker('None', 50, self.ams_y) # 210
+            if self.setup:
                 self.splash[6] = ams_label
+            else:
+                self.splash.append(ams_label)
+
 
         self.setup=True
-        #time.sleep(0.2)
 
         self.display.show(self.splash)

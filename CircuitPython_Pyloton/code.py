@@ -47,5 +47,6 @@ while True:
         print("Fetch connection")
         hr_service = hr_connection[HeartRateService]
         print("Location:", hr_service.location)
+        pyloton.setup_display()
         while hr_connection.connected:
             pyloton.update_display(hr_service)
