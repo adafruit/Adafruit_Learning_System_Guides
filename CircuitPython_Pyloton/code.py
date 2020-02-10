@@ -29,6 +29,7 @@ if ble.connected:
 start = time.time()
 hr_connection = None
 speed_cad_connection = []
+radio = None
 while True:
     if not hr_connection:
         print("Running hr_connection")
@@ -37,13 +38,16 @@ while True:
     if not speed_cad_connection:
         print("Running speed_cad_connection")
         speed_cad_connection = pyloton.speed_cad_connect()
+    if not radio:
+        print("Running ams_connection")
+        radio = ams_connection
 
     if time.time()-start >= 45:
         pyloton.timeout()
         break
     # Stop scanning whether or not we are connected.
     ble.stop_scan()
-    if hr_connection and hr_connection.connected and speed_cad_connection:
+    if hr_connection and hr_connection.connected and speed_cad_connection and radio.connected:
         print("Fetch connection")
         hr_service = hr_connection[HeartRateService]
         print("Location:", hr_service.location)

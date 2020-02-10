@@ -1,5 +1,7 @@
 import time
+import adafruit_ble
 from adafruit_ble.advertising.standard import ProvideServicesAdvertisement
+from adafruit_ble.advertising.standard import SolicitServicesAdvertisement
 import displayio
 import adafruit_imageload
 from adafruit_ble_cycling_speed_and_cadence import CyclingSpeedAndCadenceService
@@ -7,6 +9,8 @@ from adafruit_ble_heart_rate import HeartRateService
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_shapes.rect import Rect
 from adafruit_display_text import label
+
+from adafruit_ble_apple_media import AppleMediaService 
 
 
 class Pyloton:
@@ -147,6 +151,25 @@ class Pyloton:
                 self._status_update("Connected")
                 break
         return self.hr_connection
+
+    def ams_connect(self):
+        self.radio = adafruit_ble.BLERadio()
+        a = SolicitServicesAdvertisement()
+        a.solicited_services.append(AppleMediaService)
+        self.radio.start_adversising(a)
+
+        while not self.radio.connected:
+            pass
+
+        print("connected")
+
+        for connection in self.radio.connections:
+            if not connection.paired:
+                connection.pair()
+                print("paired")
+        known_notifications = set()
+
+        return self.radio
 
 
     def speed_cad_connect(self):
