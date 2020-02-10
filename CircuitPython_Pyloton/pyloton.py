@@ -316,14 +316,14 @@ class Pyloton:
         speed, cadence = self.read_s_and_c()
 
         if self.heart_enabled:
-            hr_label = self._label_maker('{} bpm'.format(heart), 50, self.heart_y) # 75
+            hr_label = self._label_maker('{} bpm'.format(heart), 50, 75) # 75
             if self.setup:
                 self.splash[3] = hr_label
             else:
                 self.splash.append(hr_label)
 
         if self.speed_enabled:
-            sp_label = self._label_maker('{} mph'.format(speed), 50, self.speed_y) # 120
+            sp_label = self._label_maker('{} mph'.format(speed), 50, 120) # 120
             if self.setup:
                 self.splash[4] = sp_label
             else:
@@ -331,14 +331,14 @@ class Pyloton:
 
 
         if self.cadence_enabled:
-            cad_label = self._label_maker('{} rpm'.format(cadence), 50, self.cad_y) # 165
+            cad_label = self._label_maker('{} rpm'.format(cadence), 50, 165) # 165
             if self.setup:
                 self.splash[5] = cad_label
             else:
                 self.splash.append(cad_label)
 
         if self.ams_enabled:
-            ams_label = self._label_maker('None', 50, self.ams_y) # 210
+            ams_label = self._label_maker('None', 50, 210) # 210
             if self.setup:
                 self.splash[6] = ams_label
             else:
