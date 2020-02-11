@@ -1,23 +1,25 @@
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keycode import Keycode
+import puff_detector
 
+kbd = Keyboard()
 
-def log(message):
-    print("\t\tHIDDEMO::%s" % message)
+detector = puff_detector.PuffDetector()
 
+@detector.on_sip
+def on_sip(strength, duration):
+    if strength == puff_detector.STRONG:
+        kbd.send(Keycode.LEFT_ARROW)
+        kbd.send(Keycode.LEFT_ARROW)
+    if strength == puff_detector.SOFT:
+        kbd.send(Keycode.LEFT_ARROW)
 
-class SimpleHid:
-    def __init__(self):
-        self.kbd = Keyboard()
-        print("SimpleHid inited")
+@detector.on_puff
+def on_puff(strength, duration):
+    if strength == puff_detector.STRONG:
+        kbd.send(Keycode.RIGHT_ARROW)
+        kbd.send(Keycode.RIGHT_ARROW)
+    if strength == puff_detector.SOFT:
+        kbd.send(Keycode.RIGHT_ARROW)
 
-    def run(self, detector, state_map, puff_stat):  # pylint:disable=unused-argument
-
-        if state_map[detector.state]["name"] == "WAITING":
-            self.kbd.send(Keycode.ONE)
-
-        if state_map[detector.state]["name"] == "STARTED":
-            self.kbd.send(Keycode.TWO)
-
-        if state_map[detector.state]["name"] == "DETECTED":
-            self.kbd.send(Keycode.SIX)
+detector.run()
