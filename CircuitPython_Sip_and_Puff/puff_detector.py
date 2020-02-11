@@ -134,7 +134,7 @@ class PuffDetector:
         while True:
             self.check_for_events()
 
-    def _catagorize_pressure(self, pressure):
+    def _categorize_pressure(self, pressure):
         """determine the strength and polarity of the pressure reading"""
         level = 0
         polarity = 0
@@ -170,7 +170,7 @@ class PuffDetector:
     def _update_state(self):
         """Updates the internal state to detect if a sip/puff has been started or stopped"""
 
-        self.current_polarity, level = self._catagorize_pressure(self.current_pressure)
+        self.current_polarity, level = self._categorize_pressure(self.current_pressure)
 
         if self.state == DETECTED:
             self.state = WAITING
