@@ -81,8 +81,6 @@ class Pyloton:
 
             status_heading = label.Label(font=self.arial16, x=80, y=175,
                                          text="Status", color=self.YELLOW)
-            status_heading.x = 80
-            status_heading.y = 175
 
             rect = Rect(0, 165, 240, 75, fill=self.PURPLE)
 
@@ -114,19 +112,13 @@ class Pyloton:
         if len(message) > 25:
             status = label.Label(font=self.arial12, x=10, y=200,
                                  text=message[:25], color=self.YELLOW)
-            status.x = 10
-            status.y = 200
             status1 = label.Label(font=self.arial12, x=10, y=220,
                                   text=message[25:], color=self.YELLOW)
-            status1.x = 10
-            status1.y = 220
 
             text_group.append(status)
             text_group.append(status1)
         else:
             status = label.Label(font=self.arial12, x=10, y=200, text=message, color=self.YELLOW)
-            status.x = 10
-            status.y = 200
             text_group.append(status)
             
 
@@ -325,8 +317,6 @@ class Pyloton:
         self.splash.append(rect)
 
         heading = label.Label(font=self.arial24, x=55, y=25, text="PyLoton", color=self.YELLOW)
-        heading.x = 55
-        heading.y = 25
         self.splash.append(heading)
 
         if self.heart_enabled:
@@ -357,8 +347,6 @@ class Pyloton:
 
         if self.heart_enabled:
             hr_label = self._label_maker('{} bpm'.format(heart), 50, self.heart_y) # 75
-            hr_label.x = 50
-            hr_label.y = 75
             if self.setup:
                 self.splash[3] = hr_label
             else:
@@ -366,8 +354,6 @@ class Pyloton:
 
         if self.speed_enabled:
             sp_label = self._label_maker('{} mph'.format(speed), 50, self.speed_y) # 120
-            sp_label.x = 50
-            sp_label.y = 120
             if self.setup:
                 self.splash[4] = sp_label
             else:
@@ -376,8 +362,6 @@ class Pyloton:
 
         if self.cadence_enabled:
             cad_label = self._label_maker('{} rpm'.format(cadence), 50, self.cad_y) # 165
-            cad_label.x = 50
-            cad_label.y = 165
             if self.setup:
                 self.splash[5] = cad_label
             else:
@@ -385,8 +369,6 @@ class Pyloton:
 
         if self.ams_enabled:
             ams_label = self._label_maker('{}'.format(self.ams.title), 50, self.ams_y, font=self.arial16) # 210
-            ams_label.x = 50
-            ams_label.y = 210
             if self.setup:
                 self.splash[6] = ams_label
             else:
