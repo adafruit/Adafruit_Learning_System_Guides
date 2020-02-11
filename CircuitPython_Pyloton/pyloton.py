@@ -342,20 +342,21 @@ class Pyloton:
         """
         Updates the display to display the most recent values
         """
-        heart = self.read_heart(hr_service)
+        if self.heart_enabled:
+            heart = self.read_heart(hr_service)
         speed, cadence = self.read_s_and_c()
 
         if self.heart_enabled:
             hr_label = self._label_maker('{} bpm'.format(heart), 50, self.heart_y) # 75
             if self.setup:
-                self.splash[3] = hr_label
+                self.splash[3-(4-self.num_enabled)] = hr_label
             else:
                 self.splash.append(hr_label)
 
         if self.speed_enabled:
             sp_label = self._label_maker('{} mph'.format(speed), 50, self.speed_y) # 120
             if self.setup:
-                self.splash[4] = sp_label
+                self.splash[4-(4-self.num_enabled)] = sp_label
             else:
                 self.splash.append(sp_label)
 
@@ -363,14 +364,14 @@ class Pyloton:
         if self.cadence_enabled:
             cad_label = self._label_maker('{} rpm'.format(cadence), 50, self.cad_y) # 165
             if self.setup:
-                self.splash[5] = cad_label
+                self.splash[5-(4-self.num_enabled)] = cad_label
             else:
                 self.splash.append(cad_label)
 
         if self.ams_enabled:
             ams_label = self._label_maker('{}'.format(self.ams.title), 50, self.ams_y, font=self.arial16) # 210
             if self.setup:
-                self.splash[6] = ams_label
+                self.splash[6-(4-self.num_enabled)] = ams_label
             else:
                 self.splash.append(ams_label)
 
