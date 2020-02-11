@@ -247,8 +247,9 @@ class Pyloton:
                             self._previous_crank_rev = values.cumulative_crank_revolutions
 
                         self._previous_crank = values.last_crank_event_time
-                return speed, cadence
-            return 0, 0
+            else:
+                speed=cadence=0
+        return speed, cadence
 
 
     def read_heart(self, hr_service):
@@ -344,7 +345,8 @@ class Pyloton:
         """
         if self.heart_enabled:
             heart = self.read_heart(hr_service)
-        speed, cadence = self.read_s_and_c()
+        if self.speed_enabled or self.cadence_enabled:
+            speed, cadence = self.read_s_and_c()
 
         if self.heart_enabled:
             hr_label = self._label_maker('{} bpm'.format(heart), 50, self.heart_y) # 75
