@@ -10,7 +10,7 @@ from adafruit_bitmap_font import bitmap_font
 from adafruit_display_shapes.rect import Rect
 from adafruit_display_text import label
 
-from adafruit_ble_apple_media import AppleMediaService 
+from adafruit_ble_apple_media import AppleMediaService
 
 
 class Pyloton:
@@ -164,13 +164,16 @@ class Pyloton:
 
         self._status_update("Connected")
 
+        known_notifications = set()
+
         for connection in radio.connections:
             if not connection.paired:
                 connection.pair()
                 self._status_update("paired")
-        known_notifications = set()
+
+        self.ams = connection[AppleMediaService]
+
         self.radio = radio
-        return self.radio
 
 
     def speed_cad_connect(self):
@@ -270,11 +273,13 @@ class Pyloton:
         return sprite
 
 
-    def _label_maker(self, text, x, y):
+    def _label_maker(self, text, x, y, font=None):
         """
         Generates labels
         """
-        return label.Label(font=self.arial24, x=x, y=y, text=text, color=self.WHITE)
+        if not font:
+            font = self.arial24
+        return label.Label(font=font, x=x, y=y, text=text, color=self.WHITE)
 
 
     def _get_y(self):
@@ -362,7 +367,7 @@ class Pyloton:
                 self.splash.append(cad_label)
 
         if self.ams_enabled:
-            ams_label = self._label_maker('None', 50, self.ams_y) # 210
+            ams_label = self._label_maker('{}'.format(self.ams.title), 50, self.ams_y, font=self.arial16) # 210
             if self.setup:
                 self.splash[6] = ams_label
             else:
@@ -370,5 +375,6 @@ class Pyloton:
 
 
         self.setup=True
+        time.sleep(0.1)
 
         self.display.show(self.splash)
