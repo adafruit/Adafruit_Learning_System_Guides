@@ -1,5 +1,4 @@
-![build status](https://travis-ci.com/adafruit/Adafruit_Learning_System_Guides.svg?branch=master "Build Status")
-
+[![Build Status](https://travis-ci.com/adafruit/Adafruit_Learning_System_Guides.svg?branch=master)](https://travis-ci.com/adafruit/Adafruit_Learning_System_Guides)
 # Introduction
 
 This is a collection of smaller programs and scripts to display "inline" in
