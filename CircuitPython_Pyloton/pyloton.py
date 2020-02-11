@@ -1,5 +1,7 @@
 import time
+import adafruit_ble
 from adafruit_ble.advertising.standard import ProvideServicesAdvertisement
+from adafruit_ble.advertising.standard import SolicitServicesAdvertisement
 import displayio
 import adafruit_imageload
 from adafruit_ble_cycling_speed_and_cadence import CyclingSpeedAndCadenceService
@@ -7,6 +9,8 @@ from adafruit_ble_heart_rate import HeartRateService
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_shapes.rect import Rect
 from adafruit_display_text import label
+
+from adafruit_ble_apple_media import AppleMediaService
 
 
 class Pyloton:
@@ -148,6 +152,29 @@ class Pyloton:
                 break
         return self.hr_connection
 
+    def ams_connect(self):
+        self._status_update("Connect your phone now")
+        radio = adafruit_ble.BLERadio()
+        a = SolicitServicesAdvertisement()
+        a.solicited_services.append(AppleMediaService)
+        radio.start_advertising(a)
+
+        while not radio.connected:
+            pass
+
+        self._status_update("Connected")
+
+        known_notifications = set()
+
+        for connection in radio.connections:
+            if not connection.paired:
+                connection.pair()
+                self._status_update("paired")
+
+        self.ams = connection[AppleMediaService]
+
+        self.radio = radio
+
 
     def speed_cad_connect(self):
         """
@@ -246,11 +273,13 @@ class Pyloton:
         return sprite
 
 
-    def _label_maker(self, text, x, y):
+    def _label_maker(self, text, x, y, font=None):
         """
         Generates labels
         """
-        return label.Label(font=self.arial24, x=x, y=y, text=text, color=self.WHITE)
+        if not font:
+            font = self.arial24
+        return label.Label(font=font, x=x, y=y, text=text, color=self.WHITE)
 
 
     def _get_y(self):
@@ -338,7 +367,8 @@ class Pyloton:
                 self.splash.append(cad_label)
 
         if self.ams_enabled:
-            ams_label = self._label_maker('None', 50, 210) # 210
+            ams_label = self._label_maker('{}'.format(self.ams.title), 50, 210, font=self.arial16) # 210
+
             if self.setup:
                 self.splash[6] = ams_label
             else:
@@ -346,5 +376,6 @@ class Pyloton:
 
 
         self.setup=True
+        time.sleep(0.1)
 
         self.display.show(self.splash)
