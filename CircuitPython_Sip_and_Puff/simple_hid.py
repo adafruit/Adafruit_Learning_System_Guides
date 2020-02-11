@@ -7,7 +7,7 @@ kbd = Keyboard()
 detector = puff_detector.PuffDetector()
 
 @detector.on_sip
-def on_sip(strength, duration):
+def on_sip(strength, duration):#pylint:disable=unused-argument
     if strength == puff_detector.STRONG:
         kbd.send(Keycode.LEFT_ARROW)
         kbd.send(Keycode.LEFT_ARROW)
@@ -15,7 +15,7 @@ def on_sip(strength, duration):
         kbd.send(Keycode.LEFT_ARROW)
 
 @detector.on_puff
-def on_puff(strength, duration):
+def on_puff(strength, duration):#pylint:disable=unused-argument
     if strength == puff_detector.STRONG:
         kbd.send(Keycode.RIGHT_ARROW)
         kbd.send(Keycode.RIGHT_ARROW)
