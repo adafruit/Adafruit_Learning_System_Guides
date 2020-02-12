@@ -39,6 +39,13 @@ class Pyloton:
     cyc_connections = []
     cyc_services = []
 
+    start = time.time()
+
+    track_artist = True
+
+    i = 0
+    j = 0
+
     def __init__(self, ble, display, circ, heart=True, speed=True, cad=True, ams=True, debug=False):
         self.debug = debug
 
@@ -231,8 +238,15 @@ class Pyloton:
                             rpm = 60*(rev_diff/(wheel_diff/1024))
                             # We then mutiply it by the wheel's circumference and convert it to mph
                             speed = round((rpm * self.circumference) * (60/63360), 1)
+                            if speed < 0:
+                                speed = self._previous_speed
                             self._previous_speed = speed
                             self._previous_revolutions = values.cumulative_wheel_revolutions
+                            self.i = 0
+                        else:
+                            self.i += 1
+                            if self.i >= 3:
+                                speed = 0
                         self._previous_wheel = values.last_wheel_event_time
 
                     if values.last_crank_event_time:
@@ -243,10 +257,22 @@ class Pyloton:
                             # Rotations per minute is 60 times the amount of revolutions since the
                             # last update over the time since the last update
                             cadence = round(60*(crank_rev_diff/(crank_diff/1024)), 1)
+                            if cadence < 0:
+                                cadence = self._previous_cadence
                             self._previous_cadence = cadence
                             self._previous_crank_rev = values.cumulative_crank_revolutions
-
+                            self.j = 0
+                        else:
+                            self.j += 1
+                            if self.j >= 3:
+                                cadence = 0
                         self._previous_crank = values.last_crank_event_time
+
+                elif self.j >= 3 or self.i >= 3:
+                    if self.j > 3:
+                        cadence = 0
+                    if self.i > 3:
+                        speed = 0
             else:
                 speed=cadence=0
         return speed, cadence
@@ -263,6 +289,24 @@ class Pyloton:
             heart = measurement.heart_rate
             self._previous_heart = measurement.heart_rate
         return heart
+
+    def read_ams(self):
+        """
+        Reads data from AppleMediaServices
+        """
+        current = time.time()
+        if current - self.start > 3:
+            self.track_artist = not self.track_artist
+            self.start = time.time()
+
+        if self.track_artist:
+            data = self.ams.artist
+        if not self.track_artist:
+            data = self.ams.title
+
+        return data
+
+
 
 
     def icon_maker(self, n, icon_x, icon_y):
@@ -317,7 +361,7 @@ class Pyloton:
         rect = Rect(0, 0, 240, 50, fill=self.PURPLE)
         self.splash.append(rect)
 
-        heading = label.Label(font=self.arial24, x=55, y=25, text="PyLoton", color=self.YELLOW)
+        heading = label.Label(font=self.arial24, x=55, y=25, text="Pyloton", color=self.YELLOW)
         self.splash.append(heading)
 
         if self.heart_enabled:
@@ -371,7 +415,7 @@ class Pyloton:
                 self.splash.append(cad_label)
 
         if self.ams_enabled:
-            ams_label = self._label_maker('{}'.format(self.ams.title), 50, self.ams_y, font=self.arial16) # 210
+            ams_label = self._label_maker('{}'.format(self.read_ams()), 50, self.ams_y, font=self.arial16) # 210
             if self.setup:
                 self.splash[6-(4-self.num_enabled)] = ams_label
             else:
