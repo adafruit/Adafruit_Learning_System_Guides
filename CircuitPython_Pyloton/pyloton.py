@@ -11,6 +11,7 @@ from adafruit_display_shapes.rect import Rect
 from adafruit_display_text import label
 
 from adafruit_ble_apple_media import AppleMediaService
+from adafruit_clue import clue
 
 
 class Pyloton:
@@ -127,7 +128,7 @@ class Pyloton:
         else:
             status = label.Label(font=self.arial12, x=10, y=200, text=message, color=self.YELLOW)
             text_group.append(status)
-            
+
 
 
         if len(self.loading_group) < 4:
@@ -158,6 +159,8 @@ class Pyloton:
                 self.hr_connection = self.ble.connect(adv)
                 self._status_update("Connected")
                 break
+        self.ble.stop_scan()
+        self.hr_service = self.hr_connection[HeartRateService]
         return self.hr_connection
 
     def ams_connect(self):
@@ -278,17 +281,18 @@ class Pyloton:
         return speed, cadence
 
 
-    def read_heart(self, hr_service):
+    def read_heart(self):
         """
         Reads date from the heart rate sensor
         """
-        measurement = hr_service.measurement_values
+        measurement = self.hr_service.measurement_values
         if measurement is None:
             heart = self._previous_heart
         else:
             heart = measurement.heart_rate
             self._previous_heart = measurement.heart_rate
         return heart
+
 
     def read_ams(self):
         """
@@ -305,8 +309,6 @@ class Pyloton:
             data = self.ams.title
 
         return data
-
-
 
 
     def icon_maker(self, n, icon_x, icon_y):
@@ -381,18 +383,19 @@ class Pyloton:
             sprites.append(ams_sprite)
 
         self.splash.append(sprites)
+        self.display.show(self.splash)
 
 
-    def update_display(self, hr_service):
+    def update_display(self):
         """
         Updates the display to display the most recent values
         """
-        if self.heart_enabled:
-            heart = self.read_heart(hr_service)
         if self.speed_enabled or self.cadence_enabled:
             speed, cadence = self.read_s_and_c()
 
+
         if self.heart_enabled:
+            heart = self.read_heart(hr_service)
             hr_label = self._label_maker('{} bpm'.format(heart), 50, self.heart_y) # 75
             if self.setup:
                 self.splash[3-(4-self.num_enabled)] = hr_label
@@ -406,7 +409,6 @@ class Pyloton:
             else:
                 self.splash.append(sp_label)
 
-
         if self.cadence_enabled:
             cad_label = self._label_maker('{} rpm'.format(cadence), 50, self.cad_y) # 165
             if self.setup:
@@ -415,7 +417,8 @@ class Pyloton:
                 self.splash.append(cad_label)
 
         if self.ams_enabled:
-            ams_label = self._label_maker('{}'.format(self.read_ams()), 50, self.ams_y, font=self.arial16) # 210
+            ams = self.read_ams()
+            ams_label = self._label_maker('{}'.format(ams), 50, self.ams_y, font=self.arial16) # 210
             if self.setup:
                 self.splash[6-(4-self.num_enabled)] = ams_label
             else:
@@ -423,6 +426,32 @@ class Pyloton:
 
 
         self.setup=True
-        time.sleep(0.1)
 
         self.display.show(self.splash)
+
+    def ams_remote(self):
+        """
+        # Capacitive touch pad marked 0 goes to the previous track
+        if clue.touch_0:
+            self.ams.previous_track()
+            time.sleep(0.25)
+
+        # Capacitive touch pad marked 1 toggles pause/play
+        if clue.touch_1:
+            self.ams.toggle_play_pause()
+            time.sleep(0.25)
+
+        # Capacitive touch pad marked 2 advances to the next track
+        if clue.touch_2:
+            self.ams.next_track()
+            time.sleep(0.25)
+        """
+        # If button B (on the right) is pressed, it increases the volume
+        if 'B' in clue.were_pressed:
+            self.ams.volume_up()
+            time.sleep(0.1)
+
+        # If button A (on the left) is pressed, the volume decreases
+        if 'A' in clue.were_pressed:
+            self.ams.volume_down()
+            time.sleep(0.1)
