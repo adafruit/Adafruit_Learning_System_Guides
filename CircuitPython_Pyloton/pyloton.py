@@ -160,7 +160,8 @@ class Pyloton:
                 self._status_update("Connected")
                 break
         self.ble.stop_scan()
-        self.hr_service = self.hr_connection[HeartRateService]
+        if self.hr_connection:
+            self.hr_service = self.hr_connection[HeartRateService]
         return self.hr_connection
 
     def ams_connect(self):
@@ -327,7 +328,7 @@ class Pyloton:
         """
         if not font:
             font = self.arial24
-        return label.Label(font=font, x=x, y=y, text=text, color=self.WHITE)
+        return label.Label(font=font, x=x, y=y, text=text, color=self.WHITE, max_glyphs=30)
 
 
     def _get_y(self):
@@ -383,7 +384,10 @@ class Pyloton:
             sprites.append(ams_sprite)
 
         self.splash.append(sprites)
+
         self.display.show(self.splash)
+        while len(self.loading_group):
+            self.loading_group.pop()
 
 
     def update_display(self):
@@ -395,42 +399,48 @@ class Pyloton:
 
 
         if self.heart_enabled:
-            heart = self.read_heart(hr_service)
-            hr_label = self._label_maker('{} bpm'.format(heart), 50, self.heart_y) # 75
-            if self.setup:
-                self.splash[3-(4-self.num_enabled)] = hr_label
+            heart = self.read_heart()
+            if not self.setup:
+                self.hr_label = self._label_maker('{} bpm'.format(heart), 50, self.heart_y) # 75
+                self.splash.append(self.hr_label)
             else:
-                self.splash.append(hr_label)
+                self.hr_label.text = '{} bpm'.format(heart)
+                #self.splash[3-(4-self.num_enabled)] = self.hr_label
+
 
         if self.speed_enabled:
-            sp_label = self._label_maker('{} mph'.format(speed), 50, self.speed_y) # 120
-            if self.setup:
-                self.splash[4-(4-self.num_enabled)] = sp_label
+            if not self.setup:
+                self.sp_label = self._label_maker('{} mph'.format(speed), 50, self.speed_y) # 120
+                self.splash.append(self.sp_label)
             else:
-                self.splash.append(sp_label)
+                self.sp_label.text='{} mph'.format(speed)
+                #self.splash[4-(4-self.num_enabled)] = self.sp_label
+
 
         if self.cadence_enabled:
-            cad_label = self._label_maker('{} rpm'.format(cadence), 50, self.cad_y) # 165
-            if self.setup:
-                self.splash[5-(4-self.num_enabled)] = cad_label
+            if not self.setup:
+                self.cad_label = self._label_maker('{} rpm'.format(cadence), 50, self.cad_y) # 165
+                self.splash.append(self.cad_label)
             else:
-                self.splash.append(cad_label)
+                self.cad_label.text = '{} rpm'.format(cadence)
+                #self.splash[5-(4-self.num_enabled)] = self.cad_label
+
 
         if self.ams_enabled:
             ams = self.read_ams()
-            ams_label = self._label_maker('{}'.format(ams), 50, self.ams_y, font=self.arial16) # 210
-            if self.setup:
-                self.splash[6-(4-self.num_enabled)] = ams_label
+            if not self.setup:
+                self.ams_label = self._label_maker('{}'.format(ams), 50, self.ams_y, font=self.arial16) # 210
+                self.splash.append(self.ams_label)
             else:
-                self.splash.append(ams_label)
+                self.ams_label.text = '{}'.format(ams)
+                #self.splash[6-(4-self.num_enabled)] = self.ams_label
 
 
         self.setup=True
 
-        self.display.show(self.splash)
+#        self.display.show(self.splash)
 
     def ams_remote(self):
-        """
         # Capacitive touch pad marked 0 goes to the previous track
         if clue.touch_0:
             self.ams.previous_track()
@@ -445,7 +455,7 @@ class Pyloton:
         if clue.touch_2:
             self.ams.next_track()
             time.sleep(0.25)
-        """
+
         # If button B (on the right) is pressed, it increases the volume
         if 'B' in clue.were_pressed:
             self.ams.volume_up()
