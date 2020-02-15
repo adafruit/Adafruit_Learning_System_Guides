@@ -11,7 +11,53 @@ from adafruit_display_shapes.rect import Rect
 from adafruit_display_text import label
 
 from adafruit_ble_apple_media import AppleMediaService
-from adafruit_clue import clue
+import board
+import digitalio
+import gamepad
+import touchio
+
+class clue:
+    """
+    A very minimal version of the CLUE library.
+    The library requires the use of many sensor-specific
+    libraries this project doesn't use, and they were
+    taking up a lot of RAM.
+    """
+    def __init__(self):
+        self._i2c = board.I2C()
+
+        self._touches = [board.D0, board.D1, board.D2]
+        self._touch_threshold_adjustment = 0
+
+        self._a = digitalio.DigitalInOut(board.BUTTON_A)
+        self._a.switch_to_input(pull=digitalio.Pull.UP)
+        self._b=digitalio.DigitalInOut(board.BUTTON_B)
+        self._b.switch_to_input(pull=digitalio.Pull.UP)
+        self._gamepad = gamepad.GamePad(self._a, self._b)
+
+    def were_pressed(self):
+        ret = set()
+        pressed = self._gamepad.get_pressed()
+        for button, mask in (('A', 0x01), ('B', 0x02)):
+            if mask & pressed:
+                ret.add(button)
+        return ret
+
+    def _touch(self, i):
+        if not isinstance(self._touches[i], touchio.TouchIn):
+            self._touches[i] = touchio.TouchIn(self._touches[i])
+            self._touches[i].threshold += self._touch_threshold_adjustment
+        return self._touches[i].value
+
+    def touch_0(self):
+        return self._touch(0)
+
+    def touch_1(self):
+        return self._touch(1)
+
+    def touch_2(self):
+        return self._touch(2)
+
 
 
 class Pyloton:
@@ -300,14 +346,17 @@ class Pyloton:
         Reads data from AppleMediaServices
         """
         current = time.time()
-        if current - self.start > 3:
-            self.track_artist = not self.track_artist
-            self.start = time.time()
+        try:
+            if current - self.start > 3:
+                self.track_artist = not self.track_artist
+                self.start = time.time()
 
-        if self.track_artist:
-            data = self.ams.artist
-        if not self.track_artist:
-            data = self.ams.title
+            if self.track_artist:
+                data = self.ams.artist
+            if not self.track_artist:
+                data = self.ams.title
+        except RuntimeError:
+            data = None
 
         return data
 
