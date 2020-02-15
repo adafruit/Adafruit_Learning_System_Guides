@@ -95,6 +95,8 @@ class Pyloton:
 
     track_artist = True
 
+    clue = clue()
+
     i = 0
     j = 0
 
@@ -442,7 +444,7 @@ class Pyloton:
         self.display.show(self.splash)
         while len(self.loading_group):
             self.loading_group.pop()
-        self.clue = clue()
+
 
 
     def update_display(self):
