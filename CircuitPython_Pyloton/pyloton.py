@@ -11,6 +11,7 @@ from adafruit_display_shapes.rect import Rect
 from adafruit_display_text import label
 
 from adafruit_ble_apple_media import AppleMediaService
+from adafruit_ble_apple_media import UnsupportedCommand
 import board
 import digitalio
 import gamepad
@@ -35,6 +36,7 @@ class clue:
         self._b.switch_to_input(pull=digitalio.Pull.UP)
         self._gamepad = gamepad.GamePad(self._a, self._b)
 
+    @property
     def were_pressed(self):
         ret = set()
         pressed = self._gamepad.get_pressed()
@@ -49,12 +51,15 @@ class clue:
             self._touches[i].threshold += self._touch_threshold_adjustment
         return self._touches[i].value
 
+    @property
     def touch_0(self):
         return self._touch(0)
 
+    @property
     def touch_1(self):
         return self._touch(1)
 
+    @property
     def touch_2(self):
         return self._touch(2)
 
@@ -437,6 +442,7 @@ class Pyloton:
         self.display.show(self.splash)
         while len(self.loading_group):
             self.loading_group.pop()
+        self.clue = clue()
 
 
     def update_display(self):
@@ -490,27 +496,30 @@ class Pyloton:
 #        self.display.show(self.splash)
 
     def ams_remote(self):
-        # Capacitive touch pad marked 0 goes to the previous track
-        if clue.touch_0:
-            self.ams.previous_track()
-            time.sleep(0.25)
+        try: 
+            # Capacitive touch pad marked 0 goes to the previous track
+            if self.clue.touch_0:
+                self.ams.previous_track()
+                time.sleep(0.25)
 
-        # Capacitive touch pad marked 1 toggles pause/play
-        if clue.touch_1:
-            self.ams.toggle_play_pause()
-            time.sleep(0.25)
+            # Capacitive touch pad marked 1 toggles pause/play
+            if self.clue.touch_1:
+                self.ams.toggle_play_pause()
+                time.sleep(0.25)
 
-        # Capacitive touch pad marked 2 advances to the next track
-        if clue.touch_2:
-            self.ams.next_track()
-            time.sleep(0.25)
+            # Capacitive touch pad marked 2 advances to the next track
+            if self.clue.touch_2:
+                self.ams.next_track()
+                time.sleep(0.25)
 
-        # If button B (on the right) is pressed, it increases the volume
-        if 'B' in clue.were_pressed:
-            self.ams.volume_up()
-            time.sleep(0.1)
+            # If button B (on the right) is pressed, it increases the volume
+            if 'B' in self.clue.were_pressed:
+                self.ams.volume_up()
+                time.sleep(0.1)
 
-        # If button A (on the left) is pressed, the volume decreases
-        if 'A' in clue.were_pressed:
-            self.ams.volume_down()
-            time.sleep(0.1)
+            # If button A (on the left) is pressed, the volume decreases
+            if 'A' in self.clue.were_pressed:
+                self.ams.volume_down()
+                time.sleep(0.1)
+        except (RuntimeError, UnsupportedCommand, AttributeError):
+            return
