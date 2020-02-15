@@ -54,13 +54,14 @@ while True:
     # Comment out the following line and uncomment the previous line if you aren't using a
     # heart rate monitor
     if hr_connection and hr_connection.connected and speed_cad_connections:
-        print("Fetch connection")
-        hr_service = hr_connection[HeartRateService]
-        #hr_service = None
-        print("Location:", hr_service.location)
+        if heart:
+            print("Fetch connection")
+            hr_service = hr_connection[HeartRateService]
+            print("Location:", hr_service.location)
         pyloton.setup_display()
         break
 
+# Replace following line with while True if you aren't using a heart rate sensor
 while hr_connection.connected:
     pyloton.update_display()
     pyloton.ams_remote()
