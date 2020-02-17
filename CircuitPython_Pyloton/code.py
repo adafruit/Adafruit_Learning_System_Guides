@@ -44,7 +44,7 @@ while True:
     # Stop scanning whether or not we are connected.
     ble.stop_scan()
 
-    # You may need to remove some parts of the following line depending on what
+    # You may need to remove some parts of the following 2 lines depending on what
     # devices you are using.
     if hr_connection and speed_cad_connections[0] and ams:
         if hr_connection.connected and speed_cad_connections[0].connected and ams.connected:
