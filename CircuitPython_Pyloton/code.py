@@ -1,7 +1,6 @@
 from time import time
 import adafruit_ble
 import board
-from adafruit_ble_heart_rate import HeartRateService
 import pyloton
 
 # PyLint can't find BLERadio for some reason so special case it here.
@@ -10,11 +9,11 @@ ble = adafruit_ble.BLERadio()    # pylint: disable=no-member
 display = board.DISPLAY
 
 
-heart=True
-speed=True
-cad=True
-ams=True
-debug=False
+heart = True
+speed = True
+cad = True
+ams = True
+debug = False
 
 # 84.229 is wheel circumference (700x23 in my case)
 pyloton = pyloton.Pyloton(ble, display, 84.229, heart, speed, cad, ams, debug)
@@ -47,12 +46,10 @@ while True:
 
     # You may need to remove some parts of the following line depending on what
     # devices you are using.
-    print(type(hr_connection))
-    print(type(speed_cad_connections))
-    print(type(ams))
-    if hr_connection and hr_connection.connected and speed_cad_connections[0] and speed_cad_connections[0].connected and ams and ams.connected:
-        pyloton.setup_display()
-        break
+    if hr_connection and speed_cad_connections[0] and ams:
+        if hr_connection.connected and speed_cad_connections[0].connected and ams.connected:
+            pyloton.setup_display()
+            break
 
 # You may need to remove some parts of the following line depending on what devices you are using.
 while hr_connection.connected and speed_cad_connections[0].connected and ams.connected:
