@@ -472,7 +472,7 @@ class Pyloton:
 
 
 
-    def update_display(self):
+    def update_display(self): #pylint: disable=too-many-branches
         """
         Updates the display to display the most recent values
         """
