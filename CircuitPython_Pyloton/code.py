@@ -51,10 +51,6 @@ while True:
     print(type(speed_cad_connections))
     print(type(ams))
     if hr_connection and hr_connection.connected and speed_cad_connections[0] and speed_cad_connections[0].connected and ams and ams.connected:
-        if heart:
-            print("Fetch connection")
-            hr_service = hr_connection[HeartRateService]
-            print("Location:", hr_service.location)
         pyloton.setup_display()
         break
 
