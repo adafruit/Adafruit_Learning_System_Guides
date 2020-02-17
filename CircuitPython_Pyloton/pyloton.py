@@ -152,7 +152,7 @@ class Pyloton:
         """
         if self.debug:
             return
-        with open('biketrace.bmp', 'rb') as bitmap_file:
+        with open('blinka-pyloton.bmp', 'rb') as bitmap_file:
             bitmap1 = displayio.OnDiskBitmap(bitmap_file)
 
             tile_grid = displayio.TileGrid(bitmap1, pixel_shader=displayio.ColorConverter())
