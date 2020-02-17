@@ -1,7 +1,13 @@
+"""
+A library for completing the Pyloton bike computer learn guide utilizing the Adafruit CLUE.
+"""
+
 import time
 import adafruit_ble
 from adafruit_ble.advertising.standard import ProvideServicesAdvertisement
 from adafruit_ble.advertising.standard import SolicitServicesAdvertisement
+import board
+import digitalio
 import displayio
 import adafruit_imageload
 from adafruit_ble_cycling_speed_and_cadence import CyclingSpeedAndCadenceService
@@ -9,15 +15,12 @@ from adafruit_ble_heart_rate import HeartRateService
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_shapes.rect import Rect
 from adafruit_display_text import label
-
 from adafruit_ble_apple_media import AppleMediaService
 from adafruit_ble_apple_media import UnsupportedCommand
-import board
-import digitalio
 import gamepad
 import touchio
 
-class clue:
+class Clue:
     """
     A very minimal version of the CLUE library.
     The library requires the use of many sensor-specific
@@ -32,12 +35,15 @@ class clue:
 
         self._a = digitalio.DigitalInOut(board.BUTTON_A)
         self._a.switch_to_input(pull=digitalio.Pull.UP)
-        self._b=digitalio.DigitalInOut(board.BUTTON_B)
+        self._b = digitalio.DigitalInOut(board.BUTTON_B)
         self._b.switch_to_input(pull=digitalio.Pull.UP)
         self._gamepad = gamepad.GamePad(self._a, self._b)
 
     @property
     def were_pressed(self):
+        """
+        Returns a set of buttons that have been pressed since the last time were_pressed was run.
+        """
         ret = set()
         pressed = self._gamepad.get_pressed()
         for button, mask in (('A', 0x01), ('B', 0x02)):
@@ -53,52 +59,68 @@ class clue:
 
     @property
     def touch_0(self):
+        """
+        Returns True when capacitive touchpad 0 is currently being pressed.
+        """
         return self._touch(0)
 
     @property
     def touch_1(self):
+        """
+        Returns True when capacitive touchpad 1 is currently being pressed.
+        """
         return self._touch(1)
 
     @property
     def touch_2(self):
+        """
+        Returns True when capacitive touchpad 2 is currently being pressed.
+        """
         return self._touch(2)
 
 
 
 class Pyloton:
-
+    """
+    Contains the various functions necessary for doing the Pyloton learn guide.
+    """
+    # pylint: disable=too-many-instance-attributes
     _previous_wheel = 0
     _previous_crank = 0
-
     _previous_revolutions = 0
-    _previous_crank_rev = 0
-
+    _previous_rev = 0
     _previous_speed = 0
     _previous_cadence = 0
-
     _previous_heart = 0
+    _i = 0
+    _j = 0
+    _setup = 0
+    _hr_label = None
+    _sp_label = None
+    _cad_label = None
+    _ams_label = None
+    _hr_service = None
+    _heart_y = None
+    _speed_y = None
+    _cad_y = None
+    _ams_y = None
+
+    ams = None
+    cyc_connections = None
+    cyc_services = None
 
     splash = displayio.Group(max_size=25)
-
-    setup = False
+    loading_group = displayio.Group()
 
     YELLOW = 0xFCFF00
     PURPLE = 0x64337E
     WHITE = 0xFFFFFF
 
-    loading_group = displayio.Group()
-
-    cyc_connections = []
-    cyc_services = []
-
     start = time.time()
 
     track_artist = True
 
-    clue = clue()
-
-    i = 0
-    j = 0
+    clue = Clue()
 
     def __init__(self, ble, display, circ, heart=True, speed=True, cad=True, ams=True, debug=False):
         self.debug = debug
@@ -214,10 +236,13 @@ class Pyloton:
                 break
         self.ble.stop_scan()
         if self.hr_connection:
-            self.hr_service = self.hr_connection[HeartRateService]
+            self._hr_service = self.hr_connection[HeartRateService]
         return self.hr_connection
 
     def ams_connect(self):
+        """
+        Connect to an Apple device using the ble_apple_media library
+        """
         self._status_update("Connect your phone now")
         radio = adafruit_ble.BLERadio()
         a = SolicitServicesAdvertisement()
@@ -229,16 +254,16 @@ class Pyloton:
 
         self._status_update("Connected")
 
-        known_notifications = set()
+        #known_notifications = set()
 
         for connection in radio.connections:
             if not connection.paired:
                 connection.pair()
                 self._status_update("paired")
 
-        self.ams = connection[AppleMediaService]
+            self.ams = connection[AppleMediaService]
 
-        self.radio = radio
+        return radio
 
 
     def speed_cad_connect(self):
@@ -275,13 +300,13 @@ class Pyloton:
         return self.cyc_connections
 
 
-    def read_s_and_c(self):
+    def read_s_and_c(self): #pylint: disable=too-many-branches
         """
         Reads data from the speed and cadence sensor
         """
         speed = self._previous_speed
         cadence = self._previous_cadence
-        for conn, svc in zip(self.cyc_connections, self.cyc_services):
+        for conn, svc in zip(self.cyc_connections, self.cyc_services): #pylint: disable=too-many-nested-blocks
             if conn.connected:
                 values = svc.measurement_values
                 if values is not None:
@@ -299,16 +324,16 @@ class Pyloton:
                                 speed = self._previous_speed
                             self._previous_speed = speed
                             self._previous_revolutions = values.cumulative_wheel_revolutions
-                            self.i = 0
+                            self._i = 0
                         else:
-                            self.i += 1
-                            if self.i >= 3:
+                            self._i += 1
+                            if self._i >= 3:
                                 speed = 0
                         self._previous_wheel = values.last_wheel_event_time
 
                     if values.last_crank_event_time:
                         crank_diff = values.last_crank_event_time - self._previous_crank
-                        crank_rev_diff =values.cumulative_crank_revolutions-self._previous_crank_rev
+                        crank_rev_diff = values.cumulative_crank_revolutions-self._previous_rev
 
                         if crank_rev_diff:
                             # Rotations per minute is 60 times the amount of revolutions since the
@@ -317,21 +342,21 @@ class Pyloton:
                             if cadence < 0:
                                 cadence = self._previous_cadence
                             self._previous_cadence = cadence
-                            self._previous_crank_rev = values.cumulative_crank_revolutions
-                            self.j = 0
+                            self._previous_rev = values.cumulative_crank_revolutions
+                            self._j = 0
                         else:
-                            self.j += 1
-                            if self.j >= 3:
+                            self._j += 1
+                            if self._j >= 3:
                                 cadence = 0
                         self._previous_crank = values.last_crank_event_time
 
-                elif self.j >= 3 or self.i >= 3:
-                    if self.j > 3:
+                elif self._j >= 3 or self._i >= 3:
+                    if self._j > 3:
                         cadence = 0
-                    if self.i > 3:
+                    if self._i > 3:
                         speed = 0
             else:
-                speed=cadence=0
+                speed = cadence = 0
         return speed, cadence
 
 
@@ -339,7 +364,7 @@ class Pyloton:
         """
         Reads date from the heart rate sensor
         """
-        measurement = self.hr_service.measurement_values
+        measurement = self._hr_service.measurement_values
         if measurement is None:
             heart = self._previous_heart
         else:
@@ -394,19 +419,19 @@ class Pyloton:
         enabled = self.num_enabled
 
         if self.heart_enabled:
-            self.heart_y = 45*(self.num_enabled - enabled) + 75
+            self._heart_y = 45*(self.num_enabled - enabled) + 75
             enabled -= 1
 
         if self.speed_enabled:
-            self.speed_y = 45*(self.num_enabled - enabled) + 75
+            self._speed_y = 45*(self.num_enabled - enabled) + 75
             enabled -= 1
 
         if self.cadence_enabled:
-            self.cad_y = 45*(self.num_enabled - enabled) + 75
+            self._cad_y = 45*(self.num_enabled - enabled) + 75
             enabled -= 1
 
         if self.ams_enabled:
-            self.ams_y = 45*(self.num_enabled - enabled) + 75
+            self._ams_y = 45*(self.num_enabled - enabled) + 75
             enabled -= 1
 
 
@@ -424,25 +449,25 @@ class Pyloton:
         self.splash.append(heading)
 
         if self.heart_enabled:
-            heart_sprite = self.icon_maker(0, 2, self.heart_y - 20)
+            heart_sprite = self.icon_maker(0, 2, self._heart_y - 20)
             sprites.append(heart_sprite)
 
         if self.speed_enabled:
-            speed_sprite = self.icon_maker(1, 2, self.speed_y - 20)
+            speed_sprite = self.icon_maker(1, 2, self._speed_y - 20)
             sprites.append(speed_sprite)
 
         if self.cadence_enabled:
-            cadence_sprite = self.icon_maker(2, 2, self.cad_y - 20)
+            cadence_sprite = self.icon_maker(2, 2, self._cad_y - 20)
             sprites.append(cadence_sprite)
 
         if self.ams_enabled:
-            ams_sprite = self.icon_maker(3, 2, self.ams_y - 20)
+            ams_sprite = self.icon_maker(3, 2, self._ams_y - 20)
             sprites.append(ams_sprite)
 
         self.splash.append(sprites)
 
         self.display.show(self.splash)
-        while len(self.loading_group):
+        while self.loading_group:
             self.loading_group.pop()
 
 
@@ -454,51 +479,45 @@ class Pyloton:
         if self.speed_enabled or self.cadence_enabled:
             speed, cadence = self.read_s_and_c()
 
-
         if self.heart_enabled:
             heart = self.read_heart()
-            if not self.setup:
-                self.hr_label = self._label_maker('{} bpm'.format(heart), 50, self.heart_y) # 75
-                self.splash.append(self.hr_label)
+            if not self._setup:
+                self._hr_label = self._label_maker('{} bpm'.format(heart), 50, self._heart_y) # 75
+                self.splash.append(self._hr_label)
             else:
-                self.hr_label.text = '{} bpm'.format(heart)
-                #self.splash[3-(4-self.num_enabled)] = self.hr_label
-
+                self._hr_label.text = '{} bpm'.format(heart)
 
         if self.speed_enabled:
-            if not self.setup:
-                self.sp_label = self._label_maker('{} mph'.format(speed), 50, self.speed_y) # 120
-                self.splash.append(self.sp_label)
+            if not self._setup:
+                self._sp_label = self._label_maker('{} mph'.format(speed), 50, self._speed_y) # 120
+                self.splash.append(self._sp_label)
             else:
-                self.sp_label.text='{} mph'.format(speed)
-                #self.splash[4-(4-self.num_enabled)] = self.sp_label
-
+                self._sp_label.text = '{} mph'.format(speed)
 
         if self.cadence_enabled:
-            if not self.setup:
-                self.cad_label = self._label_maker('{} rpm'.format(cadence), 50, self.cad_y) # 165
-                self.splash.append(self.cad_label)
+            if not self._setup:
+                self._cad_label = self._label_maker('{} rpm'.format(cadence), 50, self._cad_y)
+                self.splash.append(self._cad_label)
             else:
-                self.cad_label.text = '{} rpm'.format(cadence)
-                #self.splash[5-(4-self.num_enabled)] = self.cad_label
-
+                self._cad_label.text = '{} rpm'.format(cadence)
 
         if self.ams_enabled:
             ams = self.read_ams()
-            if not self.setup:
-                self.ams_label = self._label_maker('{}'.format(ams), 50, self.ams_y, font=self.arial16) # 210
-                self.splash.append(self.ams_label)
+            if not self._setup:
+                self._ams_label = self._label_maker('{}'.format(ams), 50, self._ams_y,
+                                                    font=self.arial16)
+                self.splash.append(self._ams_label)
             else:
-                self.ams_label.text = '{}'.format(ams)
-                #self.splash[6-(4-self.num_enabled)] = self.ams_label
+                self._ams_label.text = '{}'.format(ams)
 
+        self._setup = True
 
-        self.setup=True
-
-#        self.display.show(self.splash)
 
     def ams_remote(self):
-        try: 
+        """
+        Allows the 2 buttons and 3 capacitive touch pads in the CLUE to function as a media remote.
+        """
+        try:
             # Capacitive touch pad marked 0 goes to the previous track
             if self.clue.touch_0:
                 self.ams.previous_track()

@@ -1,8 +1,3 @@
-"""
-Read heart rate data from a heart rate peripheral using the standard BLE
-Heart Rate service.
-"""
-
 from time import time
 import adafruit_ble
 import board
@@ -26,7 +21,7 @@ pyloton = pyloton.Pyloton(ble, display, 84.229, heart, speed, cad, ams, debug)
 
 pyloton.show_splash()
 
-pyloton.ams_connect()
+ams = pyloton.ams_connect()
 
 
 start = time()
@@ -50,10 +45,12 @@ while True:
     # Stop scanning whether or not we are connected.
     ble.stop_scan()
 
-    #if speed_cad_connections:
-    # Comment out the following line and uncomment the previous line if you aren't using a
-    # heart rate monitor
-    if hr_connection and hr_connection.connected and speed_cad_connections:
+    # You may need to remove some parts of the following line depending on what
+    # devices you are using.
+    print(type(hr_connection))
+    print(type(speed_cad_connections))
+    print(type(ams))
+    if hr_connection and hr_connection.connected and speed_cad_connections[0] and speed_cad_connections[0].connected and ams and ams.connected:
         if heart:
             print("Fetch connection")
             hr_service = hr_connection[HeartRateService]
@@ -61,7 +58,9 @@ while True:
         pyloton.setup_display()
         break
 
-# Replace following line with while True if you aren't using a heart rate sensor
-while hr_connection.connected:
+# You may need to remove some parts of the following line depending on what devices you are using.
+while hr_connection.connected and speed_cad_connections[0].connected and ams.connected:
     pyloton.update_display()
     pyloton.ams_remote()
+
+print("\n\nNot all sensors are connected. Please reset to try again\n\n")
