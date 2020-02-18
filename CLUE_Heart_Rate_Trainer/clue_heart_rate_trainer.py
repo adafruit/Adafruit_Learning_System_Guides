@@ -96,10 +96,6 @@ while True:
                     clue_data[1].text = "Target: --"
                     clue_data[1].color = ((0, 0, 80))
                 else:
-                    #print("pct target", pct_target)
-                    #time.sleep(0.1)
-                    #print("bpm", bpm)
-
                     clue_data[0].text = "BPM: {0:d}".format(bpm)
                     clue_data[0].color = clue.RED
 
@@ -115,7 +111,6 @@ while True:
                     clue_data[3].color = clue.BLUE
                     clue_data.show()
 
-
                     if alarm and alarm_enable:
                         clue.start_tone(2000)
                     else:
@@ -123,10 +118,15 @@ while True:
 
                     # Inputs
                     if clue.button_a:
-                        max_rate = max_rate - 1
+                        if clue.touch_2:  # hold cap touch 2 for bigger change rate
+                            max_rate = max_rate -10
+                        else:
+                            max_rate = max_rate - 1
                     if clue.button_b:
-                        max_rate = max_rate + 1
-
+                        if clue.touch_2:
+                            max_rate = max_rate + 10
+                        else:
+                            max_rate = max_rate + 1
 
                     if clue.touch_0:
                         alarm_enable = False
