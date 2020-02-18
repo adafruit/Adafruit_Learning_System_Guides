@@ -1,0 +1,5 @@
+{
+  "MIN_PRESSURE": 10,
+  "HIGH_PRESSURE": 60,
+  "DISPLAY_TIMEOUT": 1
+}
