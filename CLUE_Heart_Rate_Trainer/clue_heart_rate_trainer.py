@@ -12,7 +12,8 @@ from adafruit_ble.advertising.standard import ProvideServicesAdvertisement
 from adafruit_ble.services.standard.device_info import DeviceInfoService
 from adafruit_ble_heart_rate import HeartRateService
 
-clue_data = clue.simple_text_display(title="Heart Rate", title_color = clue.PINK, title_scale=1, text_scale=3)
+clue_data = clue.simple_text_display(title="Heart Rate", title_color = clue.PINK,
+                                     title_scale=1, text_scale=3)
 
 alarm_enable = True
 
