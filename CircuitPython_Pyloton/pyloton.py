@@ -219,7 +219,7 @@ class Pyloton:
         """
         Displays Timeout on screen when pyloton has been searching for a sensor for too long
         """
-        self._status_update("Timeout")
+        self._status_update("Pyloton: Timeout")
         time.sleep(3)
 
 
@@ -227,12 +227,12 @@ class Pyloton:
         """
         Connects to heart rate sensor
         """
-        self._status_update("Scanning...")
+        self._status_update("Heart Rate: Scanning...")
         for adv in self.ble.start_scan(ProvideServicesAdvertisement, timeout=5):
             if HeartRateService in adv.services:
-                self._status_update("Found a HeartRateService advertisement")
+                self._status_update("Heart Rate: Found an advertisement")
                 self.hr_connection = self.ble.connect(adv)
-                self._status_update("Connected")
+                self._status_update("Heart Rate: Connected")
                 break
         self.ble.stop_scan()
         if self.hr_connection:
@@ -243,7 +243,7 @@ class Pyloton:
         """
         Connect to an Apple device using the ble_apple_media library
         """
-        self._status_update("Connect your phone now")
+        self._status_update("AppleMediaService: Connect your phone now")
         radio = adafruit_ble.BLERadio()
         a = SolicitServicesAdvertisement()
         a.solicited_services.append(AppleMediaService)
@@ -252,14 +252,14 @@ class Pyloton:
         while not radio.connected:
             pass
 
-        self._status_update("Connected")
+        self._status_update("AppleMediaService: Connected")
 
         #known_notifications = set()
 
         for connection in radio.connections:
             if not connection.paired:
                 connection.pair()
-                self._status_update("paired")
+                self._status_update("AppleMediaService: Paired")
 
             self.ams = connection[AppleMediaService]
 
@@ -270,12 +270,12 @@ class Pyloton:
         """
         Connects to speed and cadence sensor
         """
-        self._status_update("Scanning...")
+        self._status_update("Speed and Cadence: Scanning...")
         # Save advertisements, indexed by address
         advs = {}
         for adv in self.ble.start_scan(ProvideServicesAdvertisement, timeout=5):
             if CyclingSpeedAndCadenceService in adv.services:
-                self._status_update("found a CyclingSpeedAndCadenceService advertisement")
+                self._status_update("Speed and Cadence: Found an advertisement")
                 # Save advertisement. Overwrite duplicates from same address (device).
                 advs[adv.address] = adv
 
@@ -289,14 +289,14 @@ class Pyloton:
         self.cyc_connections = []
         for adv in advs.values():
             self.cyc_connections.append(self.ble.connect(adv))
-            self._status_update("Connected {}".format(len(self.cyc_connections)))
+            self._status_update("Speed and Cadence: Connected {}".format(len(self.cyc_connections)))
 
 
         self.cyc_services = []
         for conn in self.cyc_connections:
 
             self.cyc_services.append(conn[CyclingSpeedAndCadenceService])
-        self._status_update("Finishing up...")
+        self._status_update("Pyloton: Finishing up...")
         return self.cyc_connections
 
 
