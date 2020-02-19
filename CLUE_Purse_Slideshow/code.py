@@ -9,7 +9,7 @@ from adafruit_clue import clue
 from adafruit_slideshow import SlideShow, PlayBackDirection
 import adafruit_fancyled.adafruit_fancyled as fancy
 
-slideshow = SlideShow(clue.display, None, folder="/", 
+slideshow = SlideShow(clue.display, None, folder="/",
                       auto_advance=False, dwell=0)
 
 # For the Bright Wearables DotStar LED Ring
@@ -18,8 +18,8 @@ palette = [fancy.CRGB(1.0, 0.0, 0.5),  # Pink
            fancy.CRGB(0.0, 1.0, 0.0),  # Green
            fancy.CRGB(0.0, 0.0, 1.0)]  # Blue
 pixels = dotstar.DotStar(board.P13, board.P15, num_leds, brightness=0.5,
-                         auto_write=False) 
-offset = 0  # Initialize the offset 
+                         auto_write=False)
+offset = 0  # Initialize the offset for variation (twinkle)
 
 while True:
     if clue.button_b:
