@@ -300,63 +300,80 @@ class Pyloton:
         return self.cyc_connections
 
 
-    def read_s_and_c(self): #pylint: disable=too-many-branches
+    def _speed_helper(self, values):
+        wheel_diff = values.last_wheel_event_time - self._previous_wheel
+        rev_diff = values.cumulative_wheel_revolutions - self._previous_revolutions
+
+        if wheel_diff:
+            # Rotations per minute is 60 times the amount of revolutions since
+            # the last update over the time since the last update
+            rpm = 60*(rev_diff/(wheel_diff/1024))
+            # We then mutiply it by the wheel's circumference and convert it to mph
+            speed = round((rpm * self.circumference) * (60/63360), 1)
+            if speed < 0:
+                speed = self._previous_speed
+            self._previous_speed = speed
+            self._previous_revolutions = values.cumulative_wheel_revolutions
+            self._i = 0
+        else:
+            self._i += 1
+            if self._i >= 3:
+                speed = 0
+        self._previous_wheel = values.last_wheel_event_time
+
+
+    def _cad_helper(self, values):
+        crank_diff = values.last_crank_event_time - self._previous_crank
+        crank_rev_diff = values.cumulative_crank_revolutions-self._previous_rev
+
+        if crank_rev_diff:
+            # Rotations per minute is 60 times the amount of revolutions since the
+            # last update over the time since the last update
+            cadence = round(60*(crank_rev_diff/(crank_diff/1024)), 1)
+            if cadence < 0:
+                cadence = self._previous_cadence
+            self._previous_cadence = cadence
+            self._previous_rev = values.cumulative_crank_revolutions
+            self._j = 0
+        else:
+            self._j += 1
+            if self._j >= 3:
+                cadence = 0
+        self._previous_crank = values.last_crank_event_time
+
+
+    def read_s_and_c(self):
         """
         Reads data from the speed and cadence sensor
         """
         speed = self._previous_speed
         cadence = self._previous_cadence
-        for conn, svc in zip(self.cyc_connections, self.cyc_services): #pylint: disable=too-many-nested-blocks
-            if conn.connected:
-                values = svc.measurement_values
-                if values is not None:
-                    if values.last_wheel_event_time:
-                        wheel_diff = values.last_wheel_event_time - self._previous_wheel
-                        rev_diff = values.cumulative_wheel_revolutions - self._previous_revolutions
+        for conn, svc in zip(self.cyc_connections, self.cyc_services):
+            if not conn.connected:
+                speed = cadence = 0
+                continue
 
-                        if wheel_diff:
-                            # Rotations per minute is 60 times the amount of revolutions since
-                            # the last update over the time since the last update
-                            rpm = 60*(rev_diff/(wheel_diff/1024))
-                            # We then mutiply it by the wheel's circumference and convert it to mph
-                            speed = round((rpm * self.circumference) * (60/63360), 1)
-                            if speed < 0:
-                                speed = self._previous_speed
-                            self._previous_speed = speed
-                            self._previous_revolutions = values.cumulative_wheel_revolutions
-                            self._i = 0
-                        else:
-                            self._i += 1
-                            if self._i >= 3:
-                                speed = 0
-                        self._previous_wheel = values.last_wheel_event_time
+            values = svc.measurement_values
 
-                    if values.last_crank_event_time:
-                        crank_diff = values.last_crank_event_time - self._previous_crank
-                        crank_rev_diff = values.cumulative_crank_revolutions-self._previous_rev
-
-                        if crank_rev_diff:
-                            # Rotations per minute is 60 times the amount of revolutions since the
-                            # last update over the time since the last update
-                            cadence = round(60*(crank_rev_diff/(crank_diff/1024)), 1)
-                            if cadence < 0:
-                                cadence = self._previous_cadence
-                            self._previous_cadence = cadence
-                            self._previous_rev = values.cumulative_crank_revolutions
-                            self._j = 0
-                        else:
-                            self._j += 1
-                            if self._j >= 3:
-                                cadence = 0
-                        self._previous_crank = values.last_crank_event_time
-
-                elif self._j >= 3 or self._i >= 3:
+            if not values:
+                if self._j >= 3 or self._i >= 3:
                     if self._j > 3:
                         cadence = 0
                     if self._i > 3:
                         speed = 0
-            else:
-                speed = cadence = 0
+                continue
+
+            if not values.last_wheel_event_time:
+                continue
+
+            self._speed_helper(values)
+
+
+            if not values.last_crank_event_time:
+                continue
+
+            self._cad_helper(values)
+
         return speed, cadence
 
 
