@@ -84,45 +84,15 @@ class Pyloton:
     """
     Contains the various functions necessary for doing the Pyloton learn guide.
     """
-    # pylint: disable=too-many-instance-attributes
-    _previous_wheel = 0
-    _previous_crank = 0
-    _previous_revolutions = 0
-    _previous_rev = 0
-    _previous_speed = 0
-    _previous_cadence = 0
-    _previous_heart = 0
-    _i = 0
-    _j = 0
-    _setup = 0
-    _hr_label = None
-    _sp_label = None
-    _cad_label = None
-    _ams_label = None
-    _hr_service = None
-    _heart_y = None
-    _speed_y = None
-    _cad_y = None
-    _ams_y = None
-
-    ams = None
-    cyc_connections = None
-    cyc_services = None
-
-    splash = displayio.Group(max_size=25)
-    loading_group = displayio.Group()
+    #pylint: disable=too-many-instance-attributes
 
     YELLOW = 0xFCFF00
     PURPLE = 0x64337E
     WHITE = 0xFFFFFF
 
-    start = time.time()
-
-    track_artist = True
-
     clue = Clue()
 
-    def __init__(self, ble, display, circ, heart=True, speed=True, cad=True, ams=True, debug=False):
+    def __init__(self, ble, display, circ, heart=True, speed=True, cad=True, ams=True, debug=False): #pylint: disable=too-many-arguments
         self.debug = debug
 
         self.ble = ble
@@ -139,6 +109,37 @@ class Pyloton:
         self.hr_connection = None
 
         self.num_enabled = heart + speed + cad + ams
+
+        self._previous_wheel = 0
+        self._previous_crank = 0
+        self._previous_revolutions = 0
+        self._previous_rev = 0
+        self._previous_speed = 0
+        self._previous_cadence = 0
+        self._previous_heart = 0
+        self._speed_failed = 0
+        self._cad_failed = 0
+        self._setup = 0
+        self._hr_label = None
+        self._sp_label = None
+        self._cad_label = None
+        self._ams_label = None
+        self._hr_service = None
+        self._heart_y = None
+        self._speed_y = None
+        self._cad_y = None
+        self._ams_y = None
+
+        self.ams = None
+        self.cyc_connections = None
+        self.cyc_services = None
+
+        self.start = time.time()
+        self.track_artist = True
+
+        self.splash = displayio.Group(max_size=25)
+        self.loading_group = displayio.Group()
+
         self._load_fonts()
 
         self.sprite_sheet, self.palette = adafruit_imageload.load("/sprite_sheet.bmp",
@@ -191,28 +192,29 @@ class Pyloton:
             print(message)
             return
 
-        text_group = displayio.Group()
-        if len(message) > 25:
+        if len(self.loading_group) == 3:
+            text_group = displayio.Group()
             status = label.Label(font=self.arial12, x=10, y=200,
-                                 text=message[:25], color=self.YELLOW)
+                                 text='', color=self.YELLOW, max_glyphs=30)
             status1 = label.Label(font=self.arial12, x=10, y=220,
-                                  text=message[25:], color=self.YELLOW)
+                                  text='', color=self.YELLOW, max_glyphs=30)
+
+            text_group.append(status)
+            text_group.append(status1)
+            self.loading_group.append(text_group)
+
+        if len(message) > 25:
+            status.text = message[:25]
+            status1.text = message[25:]
 
             text_group.append(status)
             text_group.append(status1)
         else:
-            status = label.Label(font=self.arial12, x=10, y=200, text=message, color=self.YELLOW)
+            status.text = message
+            status1.text = ''
             text_group.append(status)
 
-
-
-        if len(self.loading_group) < 4:
-            self.loading_group.append(text_group)
-        else:
-            self.loading_group[3] = text_group
-
-        self.display.show(self.loading_group)
-        time.sleep(0.01)
+        #self.display.show(self.loading_group)
 
 
     def timeout(self):
@@ -239,7 +241,13 @@ class Pyloton:
             self._hr_service = self.hr_connection[HeartRateService]
         return self.hr_connection
 
-    def ams_connect(self):
+    @staticmethod
+    def _has_timed_out(start, timeout):
+        if time.time() - start >= timeout:
+            return True
+        return False
+
+    def ams_connect(self, start=time.time(), timeout=30):
         """
         Connect to an Apple device using the ble_apple_media library
         """
@@ -249,7 +257,7 @@ class Pyloton:
         a.solicited_services.append(AppleMediaService)
         radio.start_advertising(a)
 
-        while not radio.connected:
+        while not radio.connected and not self._has_timed_out(start, timeout):
             pass
 
         self._status_update("AppleMediaService: Connected")
@@ -300,7 +308,7 @@ class Pyloton:
         return self.cyc_connections
 
 
-    def _speed_helper(self, values):
+    def _compute_speed(self, values):
         wheel_diff = values.last_wheel_event_time - self._previous_wheel
         rev_diff = values.cumulative_wheel_revolutions - self._previous_revolutions
 
@@ -314,15 +322,15 @@ class Pyloton:
                 speed = self._previous_speed
             self._previous_speed = speed
             self._previous_revolutions = values.cumulative_wheel_revolutions
-            self._i = 0
+            self._speed_failed = 0
         else:
-            self._i += 1
-            if self._i >= 3:
+            self._speed_failed += 1
+            if self._speed_failed >= 3:
                 speed = 0
         self._previous_wheel = values.last_wheel_event_time
 
 
-    def _cad_helper(self, values):
+    def _compute_cadence(self, values):
         crank_diff = values.last_crank_event_time - self._previous_crank
         crank_rev_diff = values.cumulative_crank_revolutions-self._previous_rev
 
@@ -334,10 +342,10 @@ class Pyloton:
                 cadence = self._previous_cadence
             self._previous_cadence = cadence
             self._previous_rev = values.cumulative_crank_revolutions
-            self._j = 0
+            self._cad_failed = 0
         else:
-            self._j += 1
-            if self._j >= 3:
+            self._cad_failed += 1
+            if self._cad_failed >= 3:
                 cadence = 0
         self._previous_crank = values.last_crank_event_time
 
@@ -356,23 +364,23 @@ class Pyloton:
             values = svc.measurement_values
 
             if not values:
-                if self._j >= 3 or self._i >= 3:
-                    if self._j > 3:
+                if self._cad_failed >= 3 or self._speed_failed >= 3:
+                    if self._cad_failed > 3:
                         cadence = 0
-                    if self._i > 3:
+                    if self._speed_failed > 3:
                         speed = 0
                 continue
 
             if not values.last_wheel_event_time:
                 continue
 
-            self._speed_helper(values)
+            self._compute_speed(values)
 
 
             if not values.last_crank_event_time:
                 continue
 
-            self._cad_helper(values)
+            self._compute_cadence(values)
 
         return speed, cadence
 
