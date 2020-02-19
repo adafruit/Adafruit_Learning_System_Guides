@@ -11,7 +11,7 @@ from adafruit_ble.advertising.standard import ProvideServicesAdvertisement
 from adafruit_ble.services.standard.device_info import DeviceInfoService
 from adafruit_ble_cycling_speed_and_cadence import CyclingSpeedAndCadenceService
 
-clue_data = clue.simple_text_display(title="Cycle Revs", title_scale=1, text_scale=3, num_lines=3)
+clue_data = clue.simple_text_display(title="Cycle Revs", title_scale=1, text_scale=3)
 
 # PyLint can't find BLERadio for some reason so special case it here.
 ble = adafruit_ble.BLERadio()    # pylint: disable=no-member
