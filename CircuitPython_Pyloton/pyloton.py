@@ -306,7 +306,7 @@ class Pyloton:
         return self.cyc_connections
 
 
-    def _compute_speed(self, values):
+    def _compute_speed(self, values, speed):
         wheel_diff = values.last_wheel_event_time - self._previous_wheel
         rev_diff = values.cumulative_wheel_revolutions - self._previous_revolutions
 
@@ -326,9 +326,10 @@ class Pyloton:
             if self._speed_failed >= 3:
                 speed = 0
         self._previous_wheel = values.last_wheel_event_time
+        return speed
 
 
-    def _compute_cadence(self, values):
+    def _compute_cadence(self, values, cadence):
         crank_diff = values.last_crank_event_time - self._previous_crank
         crank_rev_diff = values.cumulative_crank_revolutions-self._previous_rev
 
@@ -346,6 +347,7 @@ class Pyloton:
             if self._cadence_failed >= 3:
                 cadence = 0
         self._previous_crank = values.last_crank_event_time
+        return cadence
 
 
     def read_s_and_c(self):
@@ -372,13 +374,13 @@ class Pyloton:
             if not values.last_wheel_event_time:
                 continue
 
-            self._compute_speed(values)
+            speed = self._compute_speed(values, speed)
 
 
             if not values.last_crank_event_time:
                 continue
 
-            self._compute_cadence(values)
+            cadence = self._compute_cadence(values, cadence)
 
         return speed, cadence
 
