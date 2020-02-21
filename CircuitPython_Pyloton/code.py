@@ -12,12 +12,12 @@ CONNECTION_TIMEOUT = 45
 
 HEART = True
 SPEED = True
-CAD = True
+CADENCE = True
 AMS = True
 DEBUG = False
 
 # 84.229 is wheel circumference (700x23 in my case)
-pyloton = pyloton.Pyloton(ble, display, 84.229, HEART, SPEED, CAD, AMS, DEBUG)
+pyloton = pyloton.Pyloton(ble, display, 84.229, HEART, SPEED, CADENCE, AMS, DEBUG)
 
 pyloton.show_splash()
 
@@ -26,7 +26,7 @@ ams = pyloton.ams_connect()
 
 start = time()
 hr_connection = None
-speed_cad_connections = []
+speed_cadence_connections = []
 radio = None
 while True:
     if HEART:
@@ -34,10 +34,10 @@ while True:
             print("Attempting to connect to a heart rate monitor")
             hr_connection = pyloton.heart_connect()
             ble.stop_scan()
-    if SPEED or CAD:
-        if not speed_cad_connections:
+    if SPEED or CADENCE:
+        if not speed_cadence_connections:
             print("Attempting to connect to speed and cadence monitors")
-            speed_cad_connections = pyloton.speed_cad_connect()
+            speed_cadence_connections = pyloton.speed_cadence_connect()
 
     if time()-start >= CONNECTION_TIMEOUT:
         pyloton.timeout()
@@ -49,15 +49,20 @@ while True:
     # devices you are using.
     # For example, remove hr_connection and hr_connection.connected if you aren't using a heart
     # rate monitor. Do the same for other sensors you aren't using.
-    if hr_connection and speed_cad_connections and ams:
-        if hr_connection.connected and speed_cad_connections[0].connected and ams.connected:
-            pyloton.setup_display()
-            break
+    if ((not HEART or (hr_connection and hr_connection.connected)) and #pylint: disable=too-many-boolean-expressions
+            ((not SPEED and not CADENCE) or
+             (speed_cadence_connections and speed_cadence_connections[0].connected)) and
+            (not AMS or (ams and ams.connected))):
+        break
+
+pyloton.setup_display()
 
 # You may need to remove some parts of the following line depending on what devices you are using.
 # For example, remove hr_connection and hr_connection.connected if you aren't using a heart rate
 # monitor. Do the same for other sensors you aren't using.
-while hr_connection.connected and speed_cad_connections[0].connected and ams.connected:
+while ((not HEART or hr_connection.connected) and
+       ((not SPEED or not CADENCE) or speed_cadence_connections[0].connected) and
+       (not AMS or ams.connected)):
     pyloton.update_display()
     pyloton.ams_remote()
 
