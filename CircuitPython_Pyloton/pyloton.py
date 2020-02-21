@@ -118,16 +118,16 @@ class Pyloton:
         self._previous_cadence = 0
         self._previous_heart = 0
         self._speed_failed = 0
-        self._cad_failed = 0
+        self._cadence_failed = 0
         self._setup = 0
         self._hr_label = None
         self._sp_label = None
-        self._cad_label = None
+        self._cadence_label = None
         self._ams_label = None
         self._hr_service = None
         self._heart_y = None
         self._speed_y = None
-        self._cad_y = None
+        self._cadence_y = None
         self._ams_y = None
 
         self.ams = None
@@ -145,6 +145,15 @@ class Pyloton:
         self.sprite_sheet, self.palette = adafruit_imageload.load("/sprite_sheet.bmp",
                                                                   bitmap=displayio.Bitmap,
                                                                   palette=displayio.Palette)
+
+        self.text_group = displayio.Group()
+        self.status = label.Label(font=self.arial12, x=10, y=200,
+                                  text='', color=self.YELLOW, max_glyphs=30)
+        self.status1 = label.Label(font=self.arial12, x=10, y=220,
+                                   text='', color=self.YELLOW, max_glyphs=30)
+
+        self.text_group.append(self.status)
+        self.text_group.append(self.status1)
 
 
     def show_splash(self):
@@ -192,27 +201,16 @@ class Pyloton:
             print(message)
             return
 
-        if len(self.loading_group) == 3:
-            text_group = displayio.Group()
-            status = label.Label(font=self.arial12, x=10, y=200,
-                                 text='', color=self.YELLOW, max_glyphs=30)
-            status1 = label.Label(font=self.arial12, x=10, y=220,
-                                  text='', color=self.YELLOW, max_glyphs=30)
-
-            text_group.append(status)
-            text_group.append(status1)
-            self.loading_group.append(text_group)
+        if self.text_group not in self.loading_group:
+            self.loading_group.append(self.text_group)
 
         if len(message) > 25:
-            status.text = message[:25]
-            status1.text = message[25:]
+            self.status.text = message[:25]
+            self.status1.text = message[25:]
 
-            text_group.append(status)
-            text_group.append(status1)
         else:
-            status.text = message
-            status1.text = ''
-            text_group.append(status)
+            self.status.text = message
+            self.status1.text = ''
 
         #self.display.show(self.loading_group)
 
@@ -274,7 +272,7 @@ class Pyloton:
         return radio
 
 
-    def speed_cad_connect(self):
+    def speed_cadence_connect(self):
         """
         Connects to speed and cadence sensor
         """
@@ -342,10 +340,10 @@ class Pyloton:
                 cadence = self._previous_cadence
             self._previous_cadence = cadence
             self._previous_rev = values.cumulative_crank_revolutions
-            self._cad_failed = 0
+            self._cadence_failed = 0
         else:
-            self._cad_failed += 1
-            if self._cad_failed >= 3:
+            self._cadence_failed += 1
+            if self._cadence_failed >= 3:
                 cadence = 0
         self._previous_crank = values.last_crank_event_time
 
@@ -364,8 +362,8 @@ class Pyloton:
             values = svc.measurement_values
 
             if not values:
-                if self._cad_failed >= 3 or self._speed_failed >= 3:
-                    if self._cad_failed > 3:
+                if self._cadence_failed >= 3 or self._speed_failed >= 3:
+                    if self._cadence_failed > 3:
                         cadence = 0
                     if self._speed_failed > 3:
                         speed = 0
@@ -452,7 +450,7 @@ class Pyloton:
             enabled -= 1
 
         if self.cadence_enabled:
-            self._cad_y = 45*(self.num_enabled - enabled) + 75
+            self._cadence_y = 45*(self.num_enabled - enabled) + 75
             enabled -= 1
 
         if self.ams_enabled:
@@ -482,7 +480,7 @@ class Pyloton:
             sprites.append(speed_sprite)
 
         if self.cadence_enabled:
-            cadence_sprite = self.icon_maker(2, 2, self._cad_y - 20)
+            cadence_sprite = self.icon_maker(2, 2, self._cadence_y - 20)
             sprites.append(cadence_sprite)
 
         if self.ams_enabled:
@@ -521,10 +519,10 @@ class Pyloton:
 
         if self.cadence_enabled:
             if not self._setup:
-                self._cad_label = self._label_maker('{} rpm'.format(cadence), 50, self._cad_y)
-                self.splash.append(self._cad_label)
+                self._cadence_label = self._label_maker('{} rpm'.format(cadence), 50, self._cadence_y)
+                self.splash.append(self._cadence_label)
             else:
-                self._cad_label.text = '{} rpm'.format(cadence)
+                self._cadence_label.text = '{} rpm'.format(cadence)
 
         if self.ams_enabled:
             ams = self.read_ams()
