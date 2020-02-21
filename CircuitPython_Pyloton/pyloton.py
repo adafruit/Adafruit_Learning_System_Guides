@@ -521,7 +521,8 @@ class Pyloton:
 
         if self.cadence_enabled:
             if not self._setup:
-                self._cadence_label = self._label_maker('{} rpm'.format(cadence), 50, self._cadence_y)
+                self._cadence_label = self._label_maker('{} rpm'.format(cadence), 50,
+                                                        self._cadence_y)
                 self.splash.append(self._cadence_label)
             else:
                 self._cadence_label.text = '{} rpm'.format(cadence)
