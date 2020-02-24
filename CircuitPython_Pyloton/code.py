@@ -45,10 +45,6 @@ while True:
     # Stop scanning whether or not we are connected.
     ble.stop_scan()
 
-    # You may need to remove some parts of the following 2 lines depending on what
-    # devices you are using.
-    # For example, remove hr_connection and hr_connection.connected if you aren't using a heart
-    # rate monitor. Do the same for other sensors you aren't using.
     if ((not HEART or (hr_connection and hr_connection.connected)) and #pylint: disable=too-many-boolean-expressions
             ((not SPEED and not CADENCE) or
              (speed_cadence_connections and speed_cadence_connections[0].connected)) and
@@ -57,9 +53,6 @@ while True:
 
 pyloton.setup_display()
 
-# You may need to remove some parts of the following line depending on what devices you are using.
-# For example, remove hr_connection and hr_connection.connected if you aren't using a heart rate
-# monitor. Do the same for other sensors you aren't using.
 while ((not HEART or hr_connection.connected) and
        ((not SPEED or not CADENCE) or speed_cadence_connections[0].connected) and
        (not AMS or ams.connected)):
