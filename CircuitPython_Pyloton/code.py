@@ -24,7 +24,6 @@ ams = pyloton.ams_connect()
 start = time()
 hr_connection = None
 speed_cadence_connections = []
-radio = None
 while True:
     if HEART:
         if not hr_connection:
