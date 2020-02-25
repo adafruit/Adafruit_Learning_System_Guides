@@ -189,12 +189,8 @@ class Pyloton:
             return
         if self.text_group not in self.loading_group:
             self.loading_group.append(self.text_group)
-        if len(message) > 25:
-            self.status.text = message[:25]
-            self.status1.text = message[25:50]
-        else:
-            self.status.text = message
-            self.status1.text = ''
+        self.status.text = message[:25]
+        self.status1.text = message[25:50]
 
 
     def timeout(self):
