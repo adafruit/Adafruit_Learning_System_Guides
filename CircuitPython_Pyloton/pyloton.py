@@ -162,6 +162,9 @@ class Pyloton:
         """
         if self.debug:
             return
+        glyphs = b'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-!,. "\'?!'
+        self.arial16.load_glyphs(glyphs)
+        self.arial12.load_glyphs(glyphs)
         with open('blinka-pyloton.bmp', 'rb') as bitmap_file:
             bitmap1 = displayio.OnDiskBitmap(bitmap_file)
 
@@ -383,11 +386,9 @@ class Pyloton:
             cadence = self._compute_cadence(values, cadence)
 
         if speed:
-            if len(str(speed)) > 8:
-                speed = str(speed)[:8]
+            speed = str(speed)[:8]
         if cadence:
-            if len(str(cadence)) > 8:
-                cadence = str(cadence)[:8]
+            cadence = str(cadence)[:8]
         return speed, cadence
 
 
@@ -402,8 +403,7 @@ class Pyloton:
             heart = measurement.heart_rate
             self._previous_heart = measurement.heart_rate
         if heart:
-            if len(str(heart)) > 4:
-                heart = str(heart)[:4]
+            heart = str(heart)[:4]
         return heart
 
 
@@ -425,8 +425,7 @@ class Pyloton:
             data = None
 
         if data:
-            if len(data) > 20:
-                data = data[:20]
+            data = data[:16] + (data[16:] and '..')
         return data
 
 
