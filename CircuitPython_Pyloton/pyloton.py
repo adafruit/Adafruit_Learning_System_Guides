@@ -206,7 +206,7 @@ class Pyloton:
 
         if len(message) > 25:
             self.status.text = message[:25]
-            self.status1.text = message[25:]
+            self.status1.text = message[25:50]
 
         else:
             self.status.text = message
@@ -382,6 +382,12 @@ class Pyloton:
 
             cadence = self._compute_cadence(values, cadence)
 
+        if speed:
+            if len(str(speed)) > 8:
+                speed = str(speed)[:8]
+        if cadence:
+            if len(str(cadence)) > 8:
+                cadence = str(cadence)[:8]
         return speed, cadence
 
 
@@ -395,6 +401,9 @@ class Pyloton:
         else:
             heart = measurement.heart_rate
             self._previous_heart = measurement.heart_rate
+        if heart:
+            if len(str(heart)) > 4:
+                heart = str(heart)[:4]
         return heart
 
 
@@ -412,9 +421,12 @@ class Pyloton:
                 data = self.ams.artist
             if not self.track_artist:
                 data = self.ams.title
-        except RuntimeError:
+        except (RuntimeError, UnicodeError):
             data = None
 
+        if data:
+            if len(data) > 20:
+                data = data[:20]
         return data
 
 

@@ -54,7 +54,8 @@ while True:
 pyloton.setup_display()
 
 while ((not HEART or hr_connection.connected) and
-       ((not SPEED or not CADENCE) or speed_cadence_connections[0].connected) and
+       ((not SPEED or not CADENCE) or
+        (speed_cadence_connections and speed_cadence_connections[0].connected)) and
        (not AMS or ams.connected)):
     pyloton.update_display()
     pyloton.ams_remote()
