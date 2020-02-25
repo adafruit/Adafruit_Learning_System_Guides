@@ -29,10 +29,8 @@ class Clue:
     """
     def __init__(self):
         self._i2c = board.I2C()
-
         self._touches = [board.D0, board.D1, board.D2]
         self._touch_threshold_adjustment = 0
-
         self._a = digitalio.DigitalInOut(board.BUTTON_A)
         self._a.switch_to_input(pull=digitalio.Pull.UP)
         self._b = digitalio.DigitalInOut(board.BUTTON_B)
@@ -79,7 +77,6 @@ class Clue:
         return self._touch(2)
 
 
-
 class Pyloton:
     """
     Contains the various functions necessary for doing the Pyloton learn guide.
@@ -94,18 +91,14 @@ class Pyloton:
 
     def __init__(self, ble, display, circ, heart=True, speed=True, cad=True, ams=True, debug=False): #pylint: disable=too-many-arguments
         self.debug = debug
-
         self.ble = ble
-
         self.display = display
-
         self.circumference = circ
 
         self.heart_enabled = heart
         self.speed_enabled = speed
         self.cadence_enabled = cad
         self.ams_enabled = ams
-
         self.hr_connection = None
 
         self.num_enabled = heart + speed + cad + ams
@@ -129,13 +122,12 @@ class Pyloton:
         self._speed_y = None
         self._cadence_y = None
         self._ams_y = None
-
         self.ams = None
         self.cyc_connections = None
         self.cyc_services = None
+        self.track_artist = True
 
         self.start = time.time()
-        self.track_artist = True
 
         self.splash = displayio.Group(max_size=25)
         self.loading_group = displayio.Group()
@@ -164,24 +156,14 @@ class Pyloton:
             return
         with open('blinka-pyloton.bmp', 'rb') as bitmap_file:
             bitmap1 = displayio.OnDiskBitmap(bitmap_file)
-
             tile_grid = displayio.TileGrid(bitmap1, pixel_shader=displayio.ColorConverter())
-
-
             self.loading_group.append(tile_grid)
-
             self.display.show(self.loading_group)
-
             status_heading = label.Label(font=self.arial16, x=80, y=175,
                                          text="Status", color=self.YELLOW)
-
             rect = Rect(0, 165, 240, 75, fill=self.PURPLE)
-
             self.loading_group.append(rect)
             self.loading_group.append(status_heading)
-
-            self.display.show(self.loading_group)
-            time.sleep(.01)
 
 
     def _load_fonts(self):
@@ -191,6 +173,7 @@ class Pyloton:
         self.arial12 = bitmap_font.load_font("/fonts/Arial-12.bdf")
         self.arial16 = bitmap_font.load_font("/fonts/Arial-16.bdf")
         self.arial24 = bitmap_font.load_font("/fonts/Arial-Bold-24.bdf")
+
         glyphs = b'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-!,. "\'?!'
         self.arial12.load_glyphs(glyphs)
         self.arial16.load_glyphs(glyphs)
@@ -204,19 +187,14 @@ class Pyloton:
         if self.debug:
             print(message)
             return
-
         if self.text_group not in self.loading_group:
             self.loading_group.append(self.text_group)
-
         if len(message) > 25:
             self.status.text = message[:25]
             self.status1.text = message[25:50]
-
         else:
             self.status.text = message
             self.status1.text = ''
-
-        #self.display.show(self.loading_group)
 
 
     def timeout(self):
@@ -243,6 +221,7 @@ class Pyloton:
             self._hr_service = self.hr_connection[HeartRateService]
         return self.hr_connection
 
+
     @staticmethod
     def _has_timed_out(start, timeout):
         if time.time() - start >= timeout:
@@ -263,14 +242,10 @@ class Pyloton:
             pass
 
         self._status_update("AppleMediaService: Connected")
-
-        #known_notifications = set()
-
         for connection in radio.connections:
             if not connection.paired:
                 connection.pair()
                 self._status_update("AppleMediaService: Paired")
-
             self.ams = connection[AppleMediaService]
 
         return radio
@@ -301,19 +276,17 @@ class Pyloton:
             self.cyc_connections.append(self.ble.connect(adv))
             self._status_update("Speed and Cadence: Connected {}".format(len(self.cyc_connections)))
 
-
         self.cyc_services = []
         for conn in self.cyc_connections:
-
             self.cyc_services.append(conn[CyclingSpeedAndCadenceService])
         self._status_update("Pyloton: Finishing up...")
+
         return self.cyc_connections
 
 
     def _compute_speed(self, values, speed):
         wheel_diff = values.last_wheel_event_time - self._previous_wheel
         rev_diff = values.cumulative_wheel_revolutions - self._previous_revolutions
-
         if wheel_diff:
             # Rotations per minute is 60 times the amount of revolutions since
             # the last update over the time since the last update
@@ -330,6 +303,7 @@ class Pyloton:
             if self._speed_failed >= 3:
                 speed = 0
         self._previous_wheel = values.last_wheel_event_time
+
         return speed
 
 
@@ -351,6 +325,7 @@ class Pyloton:
             if self._cadence_failed >= 3:
                 cadence = 0
         self._previous_crank = values.last_crank_event_time
+
         return cadence
 
 
@@ -364,9 +339,7 @@ class Pyloton:
             if not conn.connected:
                 speed = cadence = 0
                 continue
-
             values = svc.measurement_values
-
             if not values:
                 if self._cadence_failed >= 3 or self._speed_failed >= 3:
                     if self._cadence_failed > 3:
@@ -374,22 +347,18 @@ class Pyloton:
                     if self._speed_failed > 3:
                         speed = 0
                 continue
-
             if not values.last_wheel_event_time:
                 continue
-
             speed = self._compute_speed(values, speed)
-
-
             if not values.last_crank_event_time:
                 continue
-
             cadence = self._compute_cadence(values, cadence)
 
         if speed:
             speed = str(speed)[:8]
         if cadence:
             cadence = str(cadence)[:8]
+
         return speed, cadence
 
 
@@ -403,8 +372,10 @@ class Pyloton:
         else:
             heart = measurement.heart_rate
             self._previous_heart = measurement.heart_rate
+
         if heart:
             heart = str(heart)[:4]
+
         return heart
 
 
@@ -417,7 +388,6 @@ class Pyloton:
             if current - self.start > 3:
                 self.track_artist = not self.track_artist
                 self.start = time.time()
-
             if self.track_artist:
                 data = self.ams.artist
             if not self.track_artist:
@@ -427,6 +397,7 @@ class Pyloton:
 
         if data:
             data = data[:16] + (data[16:] and '..')
+
         return data
 
 
@@ -458,15 +429,12 @@ class Pyloton:
         if self.heart_enabled:
             self._heart_y = 45*(self.num_enabled - enabled) + 75
             enabled -= 1
-
         if self.speed_enabled:
             self._speed_y = 45*(self.num_enabled - enabled) + 75
             enabled -= 1
-
         if self.cadence_enabled:
             self._cadence_y = 45*(self.num_enabled - enabled) + 75
             enabled -= 1
-
         if self.ams_enabled:
             self._ams_y = 45*(self.num_enabled - enabled) + 75
             enabled -= 1
@@ -506,7 +474,6 @@ class Pyloton:
         self.display.show(self.splash)
         while self.loading_group:
             self.loading_group.pop()
-
 
 
     def update_display(self): #pylint: disable=too-many-branches
