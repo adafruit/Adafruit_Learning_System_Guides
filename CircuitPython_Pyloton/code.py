@@ -42,7 +42,8 @@ while True:
     # Stop scanning whether or not we are connected.
     ble.stop_scan()
 
-    if ((not HEART or (hr_connection and hr_connection.connected)) and #pylint: disable=too-many-boolean-expressions
+    #pylint: disable=too-many-boolean-expressions
+    if ((not HEART or (hr_connection and hr_connection.connected)) and
             ((not SPEED and not CADENCE) or
              (speed_cadence_connections and speed_cadence_connections[0].connected)) and
             (not AMS or (ams and ams.connected))):
