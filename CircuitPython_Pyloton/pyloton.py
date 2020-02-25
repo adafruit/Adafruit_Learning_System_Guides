@@ -162,9 +162,6 @@ class Pyloton:
         """
         if self.debug:
             return
-        glyphs = b'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-!,. "\'?!'
-        self.arial16.load_glyphs(glyphs)
-        self.arial12.load_glyphs(glyphs)
         with open('blinka-pyloton.bmp', 'rb') as bitmap_file:
             bitmap1 = displayio.OnDiskBitmap(bitmap_file)
 
@@ -194,6 +191,10 @@ class Pyloton:
         self.arial12 = bitmap_font.load_font("/fonts/Arial-12.bdf")
         self.arial16 = bitmap_font.load_font("/fonts/Arial-16.bdf")
         self.arial24 = bitmap_font.load_font("/fonts/Arial-Bold-24.bdf")
+        glyphs = b'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-!,. "\'?!'
+        self.arial12.load_glyphs(glyphs)
+        self.arial16.load_glyphs(glyphs)
+        self.arial24.load_glyphs(glyphs)
 
 
     def _status_update(self, message):
