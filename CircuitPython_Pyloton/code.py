@@ -3,10 +3,7 @@ import adafruit_ble
 import board
 import pyloton
 
-# PyLint can't find BLERadio for some reason so special case it here.
 ble = adafruit_ble.BLERadio()    # pylint: disable=no-member
-
-display = board.DISPLAY
 
 CONNECTION_TIMEOUT = 45
 
@@ -17,7 +14,7 @@ AMS = True
 DEBUG = False
 
 # 84.229 is wheel circumference (700x23 in my case)
-pyloton = pyloton.Pyloton(ble, display, 84.229, HEART, SPEED, CADENCE, AMS, DEBUG)
+pyloton = pyloton.Pyloton(ble, board.DISPLAY, 84.229, HEART, SPEED, CADENCE, AMS, DEBUG)
 
 pyloton.show_splash()
 
