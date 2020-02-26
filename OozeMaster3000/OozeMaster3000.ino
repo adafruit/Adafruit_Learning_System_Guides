@@ -10,6 +10,7 @@
 
 uint8_t dripColor[] = { 0, 255, 0 }; // Bright green ectoplasm
 #define PIXEL_PITCH (1.0 / 150.0)    // 150 pixels/m
+#define ICE_BRIGHTNESS 0             // Icycle effect Brightness (0 to <100%)
 
 #define GAMMA   2.6
 #define G_CONST 9.806 // Standard acceleration due to gravity
@@ -130,14 +131,25 @@ void loop() {
     }
 
     // Render drip state to NeoPixels...
+#if ICE_BRIGHTNESS > 0
+      // Draw icycles if ICE_BRIGHTNESS is set
+      x = pow((float)ICE_BRIGHTNESS * 0.01, GAMMA);
+      for(int d=0; d<=drip[i].dribblePixel; d++) {
+        set(i, d, x);
+      }
+#endif
     switch(drip[i].mode) {
       case MODE_IDLE:
         // Do nothing
         break;
       case MODE_OOZING:
         x = dtReal / drip[i].eventDurationReal; // 0.0 to 1.0 over ooze interval
-        x  = sqrt(x); // Perceived area increases linearly
-        x  = pow(x, GAMMA);
+        x = sqrt(x); // Perceived area increases linearly
+#if ICE_BRIGHTNESS > 0
+        x = ((float)ICE_BRIGHTNESS * 0.01) +
+            x * (float)(100 - ICE_BRIGHTNESS) * 0.01;
+#endif
+        x = pow(x, GAMMA);
         set(i, 0, x);
         break;
       case MODE_DRIBBLING_1:
@@ -193,15 +205,27 @@ void dripDraw(uint8_t dNum, float a, float b, bool fade) {
   float range    = center - a + 1.0; // Distance from center to a, plus 1 pixel
   for(int i=firstPixel; i<= lastPixel; i++) {
     float x = fabs(center - (float)i); // Pixel distance from center point
-    if(x >= range) continue;           // Outside of drip, skip pixel
-    x = (range - x) / range;           // 0.0 (edge) to 1.0 (center)
-    if(fade) {
-      int dLen   = drip[dNum].length - drip[dNum].dribblePixel; // Length of drip
-      if(dLen > 0) { // Scale x by 1.0 at top to 1/3 at bottom of drip
-        int dPixel = i - drip[dNum].dribblePixel; // Pixel position along drip
-        x *= 1.0 - ((float)dPixel / (float)dLen * 0.66);
+    if(x < range) {                    // Inside drip
+      x = (range - x) / range;         // 0.0 (edge) to 1.0 (center)
+      if(fade) {
+        int dLen   = drip[dNum].length - drip[dNum].dribblePixel; // Length of drip
+        if(dLen > 0) { // Scale x by 1.0 at top to 1/3 at bottom of drip
+          int dPixel = i - drip[dNum].dribblePixel; // Pixel position along drip
+          x *= 1.0 - ((float)dPixel / (float)dLen * 0.66);
+        }
       }
+    } else {
+      x = 0.0;
     }
+#if ICE_BRIGHTNESS > 0
+    // Upper pixels may be partially lit for an icycle effect
+    if(i <= drip[dNum].dribblePixel) {
+      // Math because preprocessor doesn't allow float constant in #if.
+      // Optimizer will reduce the math to float constants, it's fine.
+      x = ((float)ICE_BRIGHTNESS * 0.01) +
+          x * (float)(100 - ICE_BRIGHTNESS) * 0.01;
+    }
+#endif
     x = pow(x, GAMMA);
     set(dNum, i, x);
   }

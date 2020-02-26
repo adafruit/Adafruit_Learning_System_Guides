@@ -13,6 +13,7 @@ All text above must be included in any redistribution.
 """
 
 import board
+import usb_hid
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keycode import Keycode
 from digitalio import DigitalInOut, Direction, Pull
@@ -28,7 +29,7 @@ button_b = DigitalInOut(board.A3)
 button_b.direction = Direction.INPUT
 button_b.pull = Pull.UP
 
-kbd = Keyboard()
+kbd = Keyboard(usb_hid.devices)
 
 
 def touch_a():

@@ -1,7 +1,8 @@
+import usb_hid
 from adafruit_circuitplayground.express import cpx
 from adafruit_hid.mouse import Mouse
 
-m = Mouse()
+m = Mouse(usb_hid.devices)
 
 while True:
     if cpx.button_a:

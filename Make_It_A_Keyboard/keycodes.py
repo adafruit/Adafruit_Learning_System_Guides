@@ -1,8 +1,9 @@
+import usb_hid
 from adafruit_circuitplayground.express import cpx
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keycode import Keycode
 
-kbd = Keyboard()
+kbd = Keyboard(usb_hid.devices)
 
 while True:
     if cpx.button_a:

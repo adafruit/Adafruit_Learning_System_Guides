@@ -14,7 +14,11 @@ All text above must be included in any redistribution.
 
 import board
 import neopixel
-from adafruit_ble.uart import UARTServer
+
+from adafruit_ble import BLERadio
+from adafruit_ble.advertising.standard import ProvideServicesAdvertisement
+from adafruit_ble.services.nordic import UARTService
+
 from adafruit_bluefruit_connect.packet import Packet
 from adafruit_bluefruit_connect.color_packet import ColorPacket
 
@@ -23,18 +27,20 @@ num_pixels = 20
 
 pixels = neopixel.NeoPixel(pixel_pin, num_pixels)
 
-uart_server = UARTServer()
+ble = BLERadio()
+uart = UARTService()
+advertisement = ProvideServicesAdvertisement(uart)
 
 while True:
-    uart_server.start_advertising()
-    while not uart_server.connected:
+    ble.start_advertising(advertisement)
+    while not ble.connected:
         pass
 
     # Now we're connected
 
-    while uart_server.connected:
-        if uart_server.in_waiting:
-            packet = Packet.from_stream(uart_server)
+    while ble.connected:
+        if uart.in_waiting:
+            packet = Packet.from_stream(uart)
             if isinstance(packet, ColorPacket):
                 # Change the NeoPixel color.
                 pixels.fill(packet.color)

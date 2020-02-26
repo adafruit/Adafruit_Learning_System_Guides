@@ -66,11 +66,8 @@ uint32_t logCounter = 0;                                      // Counter until n
 // Publishing feed setup (you don't need to change this):
 // Note that the path ends in '/csv', this means a comma separated set of values
 // can be pushed to the feed, including location data like lat, long, altitude.
-const char PATH_FEED[] PROGMEM = AIO_USERNAME "/feeds/" PATH_FEED_NAME "/csv";
-Adafruit_MQTT_Publish path = Adafruit_MQTT_Publish(&mqtt, PATH_FEED);
-const char GOOD_CANDY_FEED[] PROGMEM = AIO_USERNAME "/feeds/" GOOD_CANDY_FEED_NAME "/csv";
-Adafruit_MQTT_Publish goodCandy = Adafruit_MQTT_Publish(&mqtt, GOOD_CANDY_FEED);
-
+Adafruit_MQTT_Publish path = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "/feeds/treat-path/csv");
+Adafruit_MQTT_Publish goodCandy = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "/feeds/treat-good-candy/csv");
 
 // Halt function called when an error occurs.  Will print an error and stop execution while
 // doing a fast blink of the LED.  If the watchdog is enabled it will reset after 8 seconds.
