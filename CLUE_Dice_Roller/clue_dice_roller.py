@@ -8,13 +8,12 @@ Pressing either button returns to the dice selection mode.
 """
 
 import time
-import board
 from random import randint
+import board
 from adafruit_clue import clue
 from adafruit_debouncer import Debouncer
 import displayio
 from adafruit_bitmap_font import bitmap_font
-import terminalio
 from adafruit_display_text import label
 
 
@@ -26,7 +25,8 @@ SIDES = [4, 6, 8, 12, 20, 100]
 SELECTING = 0
 ROLL_RESULT = 1
 
-number_of_dice = 0                        # 0-relative, gets adjusted to 1-relative before display/use
+# 0-relative, gets adjusted to 1-relative before display/use
+number_of_dice = 0
 side_selection = 0
 
 button_a = Debouncer(lambda: clue.button_a)
@@ -57,8 +57,8 @@ display.show(group)
 
 def roll(count, sides):
     for i in range(15):
-        roll = sum([randint(1, sides) for d in range(count + 1)])
-        roll_label.text = str(roll)
+        roll_value = sum([randint(1, sides) for d in range(count + 1)])
+        roll_label.text = str(roll_value)
         roll_label.x = 120 - (roll_label.bounding_box[2] // 2)
         duration = (i * 0.05) / 2
         clue.play_tone(2000, duration)
