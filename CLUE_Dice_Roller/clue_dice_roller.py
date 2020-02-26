@@ -37,11 +37,11 @@ button_b = Debouncer(lambda: clue.button_b)
 
 display = board.DISPLAY
 selection_font = bitmap_font.load_font('/Helvetica-Bold-36.bdf')
-selection_font.load_glyphs(b'0123456789')
+selection_font.load_glyphs(b'0123456789XDd')
 selection_color = 0x0000FF
 
 roll_font = bitmap_font.load_font('/Anton-Regular-104.bdf')
-roll_font.load_glyphs(b'0123456789')
+roll_font.load_glyphs(b'0123456789XDd')
 roll_color = 0xFFFFFF
 
 selection_label = label.Label(selection_font, x=0, y=25, text='XdXXX', color=selection_color)
