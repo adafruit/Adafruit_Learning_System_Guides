@@ -71,15 +71,6 @@ def update_display(count, sides):
     roll_label.text = ''
 
 
-def reset_selection_screen():
-    global number_of_dice, side_selection
-    number_of_dice = 0
-    side_selection = 0
-    update_display(number_of_dice, side_selection)
-
-
-
-display
 mode = SELECTING
 update_display(number_of_dice, side_selection)
 
