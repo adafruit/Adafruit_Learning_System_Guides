@@ -7,9 +7,15 @@ Roll by shaking.
 Pressing either button returns to the dice selection mode.
 """
 
+import time
+import board
 from random import randint
 from adafruit_clue import clue
 from adafruit_debouncer import Debouncer
+import displayio
+from adafruit_bitmap_font import bitmap_font
+import terminalio
+from adafruit_display_text import label
 
 
 # input constraints
@@ -20,43 +26,83 @@ SIDES = [4, 6, 8, 12, 20, 100]
 SELECTING = 0
 ROLL_RESULT = 1
 
-number_of_dice = 1
+number_of_dice = 0                        # 0-relative, gets adjusted to 1-relative before display/use
 side_selection = 0
 
 button_a = Debouncer(lambda: clue.button_a)
 button_b = Debouncer(lambda: clue.button_b)
-shake = Debouncer(lambda: False)
 
 
-def reset_selection_screen()
-    number_of_dice = 1
+# Set up display
+
+display = board.DISPLAY
+selection_font = bitmap_font.load_font('/Helvetica-Bold-36.bdf')
+selection_font.load_glyphs(b'0123456789')
+selection_color = 0x0000FF
+
+roll_font = bitmap_font.load_font('/Anton-Regular-104.bdf')
+roll_font.load_glyphs(b'0123456789')
+roll_color = 0xFFFFFF
+
+selection_label = label.Label(selection_font, x=0, y=25, text='XdXXX', color=selection_color)
+roll_label = label.Label(roll_font, x=0, y=150, text='XXX', color=roll_color)
+
+group = displayio.Group()
+group.append(selection_label)
+group.append(roll_label)
+
+display.show(group)
+
+# Helper functions
+
+def roll(count, sides):
+    for i in range(15):
+        roll = sum([randint(1, sides) for d in range(count + 1)])
+        roll_label.text = str(roll)
+        roll_label.x = 120 - (roll_label.bounding_box[2] // 2)
+        duration = (i * 0.05) / 2
+        clue.play_tone(2000, duration)
+        time.sleep(duration)
+
+
+def update_display(count, sides):
+    selection_label.text = '{0}d{1}'.format(count + 1, SIDES[sides])
+    selection_label.x = 120 - (selection_label.bounding_box[2] // 2)
+    roll_label.text = ''
+
+
+def reset_selection_screen():
+    global number_of_dice, side_selection
+    number_of_dice = 0
     side_selection = 0
-    number_label.text = str(number_of_dice)
-    sides_label.text = str(SIDES[side_selection])
+    update_display(number_of_dice, side_selection)
 
 
-def roll(count, sides)
-    roll = sum([randint(1, sides) for d in range(count)])
 
-
+display
 mode = SELECTING
+update_display(number_of_dice, side_selection)
 
 while True:
     button_a.update()
     button_b.update()
-    shaken.update()
 
     if mode == SELECTING:
         if button_a.rose:
-            number_of_dice = (number_of_dice + 1) % MAX_NUMBER_OF_DICE
-            number_label.text = str(number_of_dice)
+            number_of_dice = ((number_of_dice + 1) % MAX_NUMBER_OF_DICE)
+            update_display(number_of_dice, side_selection)
         elif button_b.rose:
             side_selection = (side_selection + 1) % len(SIDES)
-            sides_label.text = str(SIDES[side_selection])
-        elif shaken.rose:
+            update_display(number_of_dice, side_selection)
+        elif clue.shake(shake_threshold=25):
             mode = ROLL_RESULT
+            if SIDES[side_selection] == 100:   # only roll one percentile
+                number_of_dice = 0
+                update_display(number_of_dice, side_selection)
             roll(number_of_dice, SIDES[side_selection])
     else:
-        if button_a.rose or button_b.rose:
+        if button_a.rose or button_b.rose:   # back to dice selection
             mode = SELECTING
-            reset_selection_screen()
+            update_display(number_of_dice, side_selection)
+        elif clue.shake(shake_threshold=25):   # reroll
+            roll(number_of_dice, SIDES[side_selection])
