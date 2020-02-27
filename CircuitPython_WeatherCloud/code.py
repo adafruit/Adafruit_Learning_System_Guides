@@ -1,12 +1,11 @@
 import time
+import random
 import board
 import busio
-import random
 from digitalio import DigitalInOut
 import neopixel
 from adafruit_esp32spi import adafruit_esp32spi
 from adafruit_esp32spi import adafruit_esp32spi_wifimanager
-import adafruit_requests as requests
 import adafruit_fancyled.adafruit_fancyled as fancy
 
 print("ESP32 Open Weather API demo")
@@ -101,7 +100,7 @@ while True:
 
     if raining:
         # don't have a droplet every time
-        if (random.randint(0, 25) == 0):  # 1 out of 25 times
+        if random.randint(0, 25) == 0:  # 1 out of 25 times
             pixels[random.randint(0, len(pixels)-1)] = 0xFFFFFF  # make a random pixel white
             pixels.show()
 
@@ -118,4 +117,3 @@ while True:
             time.sleep(random.uniform(0.01, 0.3)) # pause
         # pick next thunderbolt time now
         next_bolt_time = time.monotonic() + random.randint(5, 15) # between 5 and 15 s
-
