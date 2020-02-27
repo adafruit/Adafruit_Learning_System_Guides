@@ -6,6 +6,8 @@ This pack of sounds contains sounds by the following user:
 
 You can find this pack online at: https://freesound.org/people/joe93barlow/packs/5968/
 
+The file "idle.wav" was trimmed so that it was a multiple of 512 samples long.
+
 License details
 ---------------
 
