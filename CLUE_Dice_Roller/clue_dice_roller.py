@@ -19,7 +19,7 @@ from adafruit_display_text import label
 
 # input constraints
 MAX_NUMBER_OF_DICE = 6
-SIDES = [4, 6, 8, 12, 20, 100]
+SIDES = [4, 6, 8, 10, 12, 20, 100]
 
 # modes: selecting/result
 SELECTING = 0
