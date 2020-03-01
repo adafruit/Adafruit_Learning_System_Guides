@@ -1,42 +1,35 @@
-# Simple demo for controlling the plen:bit robot
-# NOTE: MUST CUT MIDDLE TRACE ON PCA9685 ADDRESS JUMPER!
-
-import time
 import busio
 import board
 from digitalio import DigitalInOut, Direction
 from adafruit_pca9685 import PCA9685
 from adafruit_motor import servo
 
+led = DigitalInOut(board.P16)
+led.direction = Direction.OUTPUT
+
 i2c = busio.I2C(board.SCL, board.SDA)
 pca = PCA9685(i2c, address=0x68)
 pca.frequency = 50
-led = DigitalInOut(board.P16)
-led.direction = Direction.OUTPUT
-led.value = True
-
-while True:
-    pass
 servoSetInit = (1000, 630, 500, 600, 240, 600, 1000, 720)
 servoAngle = [1000, 630, 500, 600, 240, 600, 1000, 720]
 motionSpeed = 15
 servos = []
-for s in range(8):
-    servos.append(servo.Servo(pca.channels[s], min_pulse=800, max_pulse=2200))
+for c in range(8):
+    servos.append(servo.Servo(pca.channels[c], min_pulse=800, max_pulse=2200))
 
 def servoInitialSet():
     print("Initialize servos")
-    for n in range(8):
-        servos[n].angle = servoSetInit[n] / 10
+    for i in range(8):
+        servos[i].angle = servoSetInit[i] / 10
 
-def servoFree(serv = None):
-    if serv:
-        print("Release servo #", serv)
-        servos[serv].angle = None
+def servoFree(n = None):
+    if n:
+        print("Release servo #", n)
+        servos[n].angle = None
     else:
         print("Release all servos")
-        for ser in servos:
-            ser.angle = None
+        for s in servos:
+            s.angle = None
 
 def servoWrite(num, degrees):
     degrees = min(max(degrees, 0), 180)
@@ -61,7 +54,8 @@ def setAngle(angle, msec):
     print(servoAngle)
 
 servoInitialSet()
-time.sleep(1)
+
+led.value = False
 setAngle([0, 0, -200, 0, 0, 0, 0, 0], 500)
 setAngle([0, 0, -1800, 0, 0, 0, 1800, 0], 500)
 setAngle([900, 0, -1800, 0, -900, 0, 1800, 0], 500)
@@ -69,4 +63,6 @@ setAngle([900, 0, -200, 0, -900, 0, 0, 0], 500)
 setAngle([900, 0, -1800, 0, -900, 0, 1800, 0], 500)
 setAngle([900, 0, -200, 0, -900, 0, 0, 0], 500)
 setAngle([0, 0, -200, 0, 0, 0, 0, 0], 500)
+led.value = True
+
 servoFree()
