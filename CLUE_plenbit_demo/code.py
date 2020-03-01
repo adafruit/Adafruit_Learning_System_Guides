@@ -4,9 +4,9 @@
 import time
 import busio
 import board
+from digitalio import DigitalInOut, Direction
 from adafruit_pca9685 import PCA9685
 from adafruit_motor import servo
-from digitalio import DigitalInOut, Direction, Pull
 
 i2c = busio.I2C(board.SCL, board.SDA)
 pca = PCA9685(i2c, address=0x68)
@@ -21,22 +21,22 @@ servoSetInit = (1000, 630, 500, 600, 240, 600, 1000, 720)
 servoAngle = [1000, 630, 500, 600, 240, 600, 1000, 720]
 motionSpeed = 15
 servos = []
-for n in range(8):
-    servos.append(servo.Servo(pca.channels[n], min_pulse=800, max_pulse=2200))
+for s in range(8):
+    servos.append(servo.Servo(pca.channels[s], min_pulse=800, max_pulse=2200))
 
 def servoInitialSet():
     print("Initialize servos")
     for n in range(8):
         servos[n].angle = servoSetInit[n] / 10
 
-def servoFree(n = None):
-    if n:
-        print("Release servo #", n)
-        servos[n].angle = None
+def servoFree(serv = None):
+    if serv:
+        print("Release servo #", serv)
+        servos[serv].angle = None
     else:
         print("Release all servos")
-        for n in range(8):
-            servos[n].angle = None
+        for ser in servos:
+            ser.angle = None
 
 def servoWrite(num, degrees):
     degrees = min(max(degrees, 0), 180)
@@ -49,10 +49,10 @@ def setAngle(angle, msec):
     for val in range(8):
         target = servoSetInit[val] - angle[val]
         target = min(max(target, 0), 1800)
-        if (target != servoAngle[val]): # Target != Present
+        if target != servoAngle[val]: # Target != Present
             step[val] = (target - servoAngle[val]) / msec
     #print(step)
-    for i in range(msec):
+    for _ in range(msec):
         for val in range(8):
             servoAngle[val] += step[val]
             #print("setting servo %d to %d" % (val, int(servoAngle[val] / 10)))
@@ -61,8 +61,7 @@ def setAngle(angle, msec):
     print(servoAngle)
 
 servoInitialSet()
-#time.sleep(1)
-#servoFree()
+time.sleep(1)
 setAngle([0, 0, -200, 0, 0, 0, 0, 0], 500)
 setAngle([0, 0, -1800, 0, 0, 0, 1800, 0], 500)
 setAngle([900, 0, -1800, 0, -900, 0, 1800, 0], 500)
