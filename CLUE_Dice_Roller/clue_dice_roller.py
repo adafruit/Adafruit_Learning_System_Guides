@@ -32,32 +32,30 @@ side_selection = 0
 button_a = Debouncer(lambda: clue.button_a)
 button_b = Debouncer(lambda: clue.button_b)
 
-
 # Set up display
 
-display = board.DISPLAY
-selection_font = bitmap_font.load_font('/Helvetica-Bold-36.bdf')
-selection_font.load_glyphs(b'0123456789XDd')
-selection_color = 0x0000FF
+select_font = bitmap_font.load_font('/Helvetica-Bold-36.bdf')
+select_font.load_glyphs(b'0123456789XDd')
+select_color = 0x0000FF
 
 roll_font = bitmap_font.load_font('/Anton-Regular-104.bdf')
-roll_font.load_glyphs(b'0123456789XDd')
+roll_font.load_glyphs(b'0123456789X')
 roll_color = 0xFFFFFF
 
-selection_label = label.Label(selection_font, x=0, y=25, text='XdXXX', color=selection_color)
+select_label = label.Label(select_font, x=0, y=25, text='XdXXX', color=select_color)
 roll_label = label.Label(roll_font, x=0, y=150, text='XXX', color=roll_color)
 
 group = displayio.Group()
-group.append(selection_label)
+group.append(select_label)
 group.append(roll_label)
 
-display.show(group)
+board.DISPLAY.show(group)
 
 # Helper functions
 
 def roll(count, sides):
     for i in range(15):
-        roll_value = sum([randint(1, sides) for d in range(count + 1)])
+        roll_value = sum([randint(1, sides) for _ in range(count + 1)])
         roll_label.text = str(roll_value)
         roll_label.x = 120 - (roll_label.bounding_box[2] // 2)
         duration = (i * 0.05) / 2
@@ -66,8 +64,8 @@ def roll(count, sides):
 
 
 def update_display(count, sides):
-    selection_label.text = '{0}d{1}'.format(count + 1, SIDES[sides])
-    selection_label.x = 120 - (selection_label.bounding_box[2] // 2)
+    select_label.text = '{0}d{1}'.format(count + 1, SIDES[sides])
+    select_label.x = 120 - (select_label.bounding_box[2] // 2)
     roll_label.text = ''
 
 
