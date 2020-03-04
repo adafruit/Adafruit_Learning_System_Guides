@@ -36,7 +36,7 @@ button_b = Debouncer(lambda: clue.button_b)
 
 select_font = bitmap_font.load_font('/Helvetica-Bold-36.bdf')
 select_font.load_glyphs(b'0123456789XDd')
-select_color = 0x0000FF
+select_color = 0xDB4379
 
 roll_font = bitmap_font.load_font('/Anton-Regular-104.bdf')
 roll_font.load_glyphs(b'0123456789X')
@@ -54,6 +54,7 @@ board.DISPLAY.show(group)
 # Helper functions
 
 def roll(count, sides):
+    select_label.text = ''
     for i in range(15):
         roll_value = sum([randint(1, sides) for _ in range(count + 1)])
         roll_label.text = str(roll_value)
