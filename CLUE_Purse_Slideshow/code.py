@@ -9,17 +9,28 @@ from adafruit_clue import clue
 from adafruit_slideshow import SlideShow, PlayBackDirection
 import adafruit_fancyled.adafruit_fancyled as fancy
 
-slideshow = SlideShow(clue.display, None, folder="/",
-                      auto_advance=False, dwell=0)
+# Set the LED ring speed and brightness
+LED_SPEED = 0.2   # pick a number from 0 (no motion) to 1.0 (fastest!)
+BRIGHTNESS = 0.2  # pick a number from 0 (dark) to 1.0 (bright!)
+
+# colors available are RED, YELLOW, ORANGE, GREEN, TEAL
+# CYAN, BLUE, PURPLE, MAGENTA, WHITE, BLACK, GOLD, PINK
+# AQUA, JADE, AMBER, VIOLET, SKY - pick any color set!
+# 3 to 5 colors looks best...
+palette = [clue.PINK, clue.GOLD, clue.JADE]
 
 # For the Bright Wearables DotStar LED Ring
 num_leds = 12
-palette = [fancy.CRGB(1.0, 0.0, 0.5),  # Pink
-           fancy.CRGB(0.0, 1.0, 0.0),  # Green
-           fancy.CRGB(0.0, 0.0, 1.0)]  # Blue
-pixels = dotstar.DotStar(board.P13, board.P15, num_leds, brightness=0.5,
-                         auto_write=False)
-offset = 0  # Initialize the offset for variation (twinkle)
+pixels = dotstar.DotStar(board.P13, board.P15, num_leds, auto_write=False)
+offset = 0
+
+# Create the BMP displayer
+slideshow = SlideShow(clue.display, None, folder="/",
+                      auto_advance=False)
+
+# turn palette to fancytype
+for i, color in enumerate(palette):
+    palette[i] = fancy.CRGB(*[x / 255 for x in color])
 
 while True:
     if clue.button_b:
@@ -28,14 +39,13 @@ while True:
     if clue.button_a:
         slideshow.direction = PlayBackDirection.BACKWARD
         slideshow.advance()
+
+    # spin the LEDs
     for i in range(num_leds):
         # Load each pixel's color from the palette using an offset, run it
         # through the gamma function, pack RGB value and assign to pixel.
         color = fancy.palette_lookup(palette, offset + i / num_leds)
-        color = fancy.gamma_adjust(color, brightness=0.25)
+        color = fancy.gamma_adjust(color, brightness=BRIGHTNESS)
         pixels[i] = color.pack()
     pixels.show()
-    offset = offset + 1
-    if offset > 12:
-        offset = 0
-    time.sleep(0.1)
+    offset += LED_SPEED / 10
