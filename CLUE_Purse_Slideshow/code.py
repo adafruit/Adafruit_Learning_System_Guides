@@ -2,7 +2,6 @@
 # Anne Barela for Adafruit Industries, February 2020
 # MIT License
 
-import time
 import board
 import adafruit_dotstar as dotstar
 from adafruit_clue import clue
