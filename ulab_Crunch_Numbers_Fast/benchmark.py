@@ -35,6 +35,6 @@ def timeit(s, f, n=100):
     r = (t1 - t0) * 1e-6 / n
     print("%-20s : %8.3fms [result=%f]" % (s, r, x))
 
-print("Computing the RMS value of 1000 numbers")
+print("Computing the RMS value of 100 numbers")
 timeit("traditional", lambda: normalized_rms(nums_list))
 timeit("ulab", lambda: normalized_rms_ulab(nums_array))
