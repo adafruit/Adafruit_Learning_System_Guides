@@ -54,7 +54,7 @@ class RollingGraph(displayio.TileGrid):
 
 group = displayio.Group(scale=3)
 graph = RollingGraph(3)
-fft_size = 128
+fft_size = 256
 
 # Add the TileGrid to the Group
 group.append(graph)
@@ -71,7 +71,7 @@ samples_bit = array.array('H', [0] * (fft_size+3))
 
 # Main Loop
 def main():
-    max_all = 1
+    max_all = 10
 
     while True:
         mic.record(samples_bit, len(samples_bit))
@@ -81,16 +81,20 @@ def main():
         # to change any zeros to nonzero numbers
         spectrogram1 = ulab.vector.log(spectrogram1 + 1e-7)
         spectrogram1 = spectrogram1[1:(fft_size//2)-1]
-        min_curr = min(spectrogram1)
-        max_curr = max(spectrogram1)
+        min_curr = ulab.numerical.min(spectrogram1)[0]
+        max_curr = ulab.numerical.max(spectrogram1)[0]
 
         if max_curr > max_all:
             max_all = max_curr
         else:
             max_curr = max_curr-1
 
+        print(min_curr, max_all)
+        min_curr = max(min_curr, 3)
         # Plot FFT
         data = (spectrogram1 - min_curr) * (51. / (max_all - min_curr))
+        # This clamps any negative numbers to zero
+        data = data * ulab.array((data > 0))
         graph.show(data)
 
 main()
