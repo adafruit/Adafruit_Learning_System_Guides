@@ -1,8 +1,9 @@
 // OOZE MASTER 3000: NeoPixel simulated liquid physics. Up to 7 NeoPixel
 // strands dribble light, while an 8th strand "catches the drips."
-// Designed for the Adafruit Feather M0 (NOT M4) with NeoPXL8 FeatherWing.
-// This can be adapted for other M0 or M4 boards but you will need to do your
-// own "pin sudoku" and level shifting (e.g. NeoPXL8 Friend breakout or similar).
+// Designed for the Adafruit Feather M0 or M4 with matching version of
+// NeoPXL8 FeatherWing. This can be adapted for other M0 or M4 boards but
+// you will need to do your own "pin sudoku" and level shifting
+// (e.g. NeoPXL8 Friend breakout or similar).
 // See here: https://learn.adafruit.com/adafruit-neopxl8-featherwing-and-library
 // Requires Adafruit_NeoPixel, Adafruit_NeoPXL8 and Adafruit_ZeroDMA libraries.
 
@@ -18,8 +19,12 @@ uint8_t dripColor[] = { 0, 255, 0 }; // Bright green ectoplasm
 // for a more theatric effect / to slow down the drips like they've still got a
 // syrupy "drool string" attached (try much lower values like 2.0 to 3.0).
 
-// NeoPXL8 pin numbers (these are default connections on NeoPXL8 FeatherWing)
+// NeoPXL8 pin numbers (these are default connections on NeoPXL8 M0 FeatherWing)
 int8_t pins[8] = { PIN_SERIAL1_RX, PIN_SERIAL1_TX, MISO, 13, 5, SDA, A4, A3 };
+
+// If using an M4 Feather & NeoPXL8 FeatherWing, use these values instead:
+//int8_t pins[8] = { 13, 12, 11, 10, SCK, 5, 9, 6 };
+
 
 typedef enum {
   MODE_IDLE,
