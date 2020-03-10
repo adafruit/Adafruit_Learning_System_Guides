@@ -4,7 +4,7 @@ Adafruit invests time and resources providing this open source code.
 Please support Adafruit and open source hardware by purchasing
 products from Adafruit!
 Written by Kattni Rembor & Limor Fried for Adafruit Industries
-Copyright (c) 2019 Adafruit Industries
+Copyright (c) 2019-2020 Adafruit Industries
 Licensed under the MIT license.
 All text above must be included in any redistribution.
 """
@@ -13,7 +13,7 @@ import time
 import random
 import digitalio
 import audioio
-import busio
+import audiocore
 import board
 import neopixel
 import adafruit_lis3dh
@@ -53,7 +53,7 @@ audio = audioio.AudioOut(board.A0)  # Speaker
 wave_file = None
 
 # Set up accelerometer on I2C bus, 4G range:
-i2c = busio.I2C(board.SCL, board.SDA)
+i2c = board.I2C()
 accel = adafruit_lis3dh.LIS3DH_I2C(i2c)
 accel.range = adafruit_lis3dh.RANGE_4_G
 
@@ -76,7 +76,7 @@ def play_wav(name, loop=False):
         wave_file.close()
     try:
         wave_file = open('sounds/' + name + '.wav', 'rb')
-        wave = audioio.WaveFile(wave_file)
+        wave = audiocore.WaveFile(wave_file)
         audio.play(wave, loop=loop)
     except OSError:
         pass # we'll just skip playing then
