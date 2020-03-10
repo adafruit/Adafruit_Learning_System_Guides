@@ -35,11 +35,9 @@ max_rate = 180
 # Seven Segment FeatherWing setup
 i2c = board.I2C()
 display_A = Seg7x4(i2c, address=0x70)  # this will be the BPM display
-display_A.brightness = 15
 display_A.fill(0)  # Clear the display
 # Second display has A0 address jumpered
 display_B = Seg7x4(i2c, address=0x71)  # this will be the % target display
-display_B.brightness = 15
 display_B.fill(0)  # Clear the display
 
 # display_A "b.P.M."
