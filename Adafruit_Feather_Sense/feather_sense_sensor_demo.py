@@ -28,7 +28,7 @@ def normalized_rms(values):
 apds9960.enable_proximity = True
 apds9960.enable_color = True
 
-# Set this equal to sea level pressure at your location for accurate altitude reading.
+# Set this to sea level pressure in hectoPascals at your location for accurate altitude reading.
 bmp280.sea_level_pressure = 1013.25
 
 while True:
