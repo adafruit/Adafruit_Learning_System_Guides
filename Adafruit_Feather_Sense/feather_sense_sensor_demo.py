@@ -44,5 +44,5 @@ while True:
     print("Acceleration: {:.2f} {:.2f} {:.2f} m/s^2".format(*lsm6ds33.acceleration))
     print("Gyro: {:.2f} {:.2f} {:.2f} dps".format(*lsm6ds33.gyro))
     print("Humidity: {:.1f} %".format(sht31d.relative_humidity))
-    print("Sound level:", normalized_rms(samples))
+    print("Sound level:", int(normalized_rms(samples)))
     time.sleep(0.3)
