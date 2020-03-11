@@ -22,11 +22,13 @@ microphone = audiobusio.PDMIn(board.MICROPHONE_CLOCK, board.MICROPHONE_DATA,
 
 def normalized_rms(values):
     minbuf = int(sum(values) / len(values))
-    return math.sqrt(sum(float(sample - minbuf) *
-                         (sample - minbuf) for sample in values) / len(values))
+    return int(math.sqrt(sum(float(sample - minbuf) *
+                             (sample - minbuf) for sample in values) / len(values)))
 
 apds9960.enable_proximity = True
 apds9960.enable_color = True
+
+# Set this to sea level pressure in hectoPascals at your location for accurate altitude reading.
 bmp280.sea_level_pressure = 1013.25
 
 while True:
