@@ -22,8 +22,8 @@ microphone = audiobusio.PDMIn(board.MICROPHONE_CLOCK, board.MICROPHONE_DATA,
 
 def normalized_rms(values):
     minbuf = int(sum(values) / len(values))
-    return math.sqrt(sum(float(sample - minbuf) *
-                         (sample - minbuf) for sample in values) / len(values))
+    return int(math.sqrt(sum(float(sample - minbuf) *
+                             (sample - minbuf) for sample in values) / len(values)))
 
 apds9960.enable_proximity = True
 apds9960.enable_color = True
@@ -44,5 +44,5 @@ while True:
     print("Acceleration: {:.2f} {:.2f} {:.2f} m/s^2".format(*lsm6ds33.acceleration))
     print("Gyro: {:.2f} {:.2f} {:.2f} dps".format(*lsm6ds33.gyro))
     print("Humidity: {:.1f} %".format(sht31d.relative_humidity))
-    print("Sound level:", int(normalized_rms(samples)))
+    print("Sound level:", normalized_rms(samples))
     time.sleep(0.3)
