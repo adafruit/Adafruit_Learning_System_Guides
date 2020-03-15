@@ -4,39 +4,40 @@ Adafruit invests time and resources providing this open source code.
 Please support Adafruit and open source hardware by purchasing
 products from Adafruit!
 Written by Kattni Rembor & Limor Fried for Adafruit Industries
-Copyright (c) 2019 Adafruit Industries
+Copyright (c) 2019-2020 Adafruit Industries
 Licensed under the MIT license.
 All text above must be included in any redistribution.
 """
 
 import time
+import random
 import digitalio
 import audioio
-import busio
+import audiocore
 import board
 import neopixel
 import adafruit_lis3dh
 
 # CUSTOMISE COLORS HERE:
 COLOR = (0, 120, 120)      # Default idle is light blue
-ALT_COLOR = (255, 255, 255)  # hit color is bright white
+ALT_COLOR = (255, 50, 0)  # hit color is orange
 
 # CUSTOMISE IDLE PULSE SPEED HERE: 0 is fast, above 0 slows down
-IDLE_PULSE_SPEED = 0.05  # Default is 0.1 seconds
-SWING_BLAST_SPEED = 0.01
+IDLE_PULSE_SPEED = 0  # Default is 0 seconds
+SWING_BLAST_SPEED = 0.007
 
 # CUSTOMISE BRIGHTNESS HERE: must be a number between 0 and 1
-IDLE_PULSE_BRIGHTNESS_MIN = 0.3  # Default minimum idle pulse brightness
-IDLE_PULSE_BRIGHTNESS_MAX = 0.6  # Default maximum idle pulse brightness
+IDLE_PULSE_BRIGHTNESS_MIN = 0.2  # Default minimum idle pulse brightness
+IDLE_PULSE_BRIGHTNESS_MAX = 1  # Default maximum idle pulse brightness
 
 # CUSTOMISE SENSITIVITY HERE: smaller numbers = more sensitive to motion
-HIT_THRESHOLD = 500
-SWING_THRESHOLD = 125
+HIT_THRESHOLD = 250
+SWING_THRESHOLD = 150
 
 # Set to the length in seconds of the "on.wav" file
 POWER_ON_SOUND_DURATION = 1.7
 
-NUM_PIXELS = 30  # Number of pixels used in project
+NUM_PIXELS = 83  # Number of pixels used in project
 NEOPIXEL_PIN = board.D5
 POWER_PIN = board.D10
 
@@ -52,7 +53,7 @@ audio = audioio.AudioOut(board.A0)  # Speaker
 wave_file = None
 
 # Set up accelerometer on I2C bus, 4G range:
-i2c = busio.I2C(board.SCL, board.SDA)
+i2c = board.I2C()
 accel = adafruit_lis3dh.LIS3DH_I2C(i2c)
 accel.range = adafruit_lis3dh.RANGE_4_G
 
@@ -75,7 +76,7 @@ def play_wav(name, loop=False):
         wave_file.close()
     try:
         wave_file = open('sounds/' + name + '.wav', 'rb')
-        wave = audioio.WaveFile(wave_file)
+        wave = audiocore.WaveFile(wave_file)
         audio.play(wave, loop=loop)
     except OSError:
         pass # we'll just skip playing then
@@ -120,6 +121,22 @@ def mix(color_1, color_2, weight_2):
             int(color_1[1] * weight_1 + color_2[1] * weight_2),
             int(color_1[2] * weight_1 + color_2[2] * weight_2))
 
+# List of swing wav files without the .wav in the name for use with play_wav()
+swing_sounds = [
+    'swing1',
+    'swing2',
+    'swing3',
+    'swing4',
+]
+
+# List of hit wav files without the .wav in the name for use with play_wav()
+hit_sounds = [
+    'hit1',
+    'hit2',
+    'hit3',
+    'hit4',
+]
+
 
 mode = 0  # Initial mode = OFF
 
@@ -150,12 +167,12 @@ while True:
         # comparing thresholds...use squared values instead.)
         if accel_total > HIT_THRESHOLD:  # Large acceleration = HIT
             TRIGGER_TIME = time.monotonic()  # Save initial time of hit
-            play_wav('hit')  # Start playing 'hit' sound
+            play_wav(random.choice(hit_sounds))  # Start playing 'hit' sound
             COLOR_ACTIVE = COLOR_HIT  # Set color to fade from
             mode = 3  # HIT mode
         elif mode == 1 and accel_total > SWING_THRESHOLD:  # Mild = SWING
             TRIGGER_TIME = time.monotonic()  # Save initial time of swing
-            play_wav('swing')  # Start playing 'swing' sound
+            play_wav(random.choice(swing_sounds))  # Randomly choose from available swing sounds
             # make a larson scanner animation_time
             strip_backup = strip[0:-1]
             for p in range(-1, len(strip)):

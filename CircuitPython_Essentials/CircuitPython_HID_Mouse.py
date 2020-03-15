@@ -3,9 +3,10 @@ import time
 import analogio
 import board
 import digitalio
+import usb_hid
 from adafruit_hid.mouse import Mouse
 
-mouse = Mouse()
+mouse = Mouse(usb_hid.devices)
 
 x_axis = analogio.AnalogIn(board.A0)
 y_axis = analogio.AnalogIn(board.A1)

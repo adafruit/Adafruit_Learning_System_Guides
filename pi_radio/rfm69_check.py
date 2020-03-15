@@ -32,7 +32,8 @@ btnC.pull = Pull.UP
 i2c = busio.I2C(board.SCL, board.SDA)
 
 # 128x32 OLED Display
-display = adafruit_ssd1306.SSD1306_I2C(128, 32, i2c, addr=0x3c)
+reset_pin = DigitalInOut(board.D4)
+display = adafruit_ssd1306.SSD1306_I2C(128, 32, i2c, reset=reset_pin)
 # Clear the display.
 display.fill(0)
 display.show()
@@ -53,9 +54,10 @@ while True:
     try:
         rfm69 = adafruit_rfm69.RFM69(spi, CS, RESET, 915.0)
         display.text('RFM69: Detected', 0, 0, 1)
-    except RuntimeError:
+    except RuntimeError as error:
         # Thrown on version mismatch
         display.text('RFM69: ERROR', 0, 0, 1)
+        print('RFM69 Error: ', error)
 
     # Check buttons
     if not btnA.value:

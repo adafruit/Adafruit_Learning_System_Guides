@@ -1,0 +1,23 @@
+{
+	"title": "Lead 217",
+	"alloy": "Sn96.5/Ag3.0/Cu0.5",
+	"melting_point": 217,
+	"temp_range": [30,249],
+	"time_range": [0,330],
+	"reference": "https://www.chipquik.com/datasheets/TS391SNL50.pdf",
+	"stages": {
+		"preheat": [90,150],
+		"soak": [180,175],
+		"reflow": [210,217],
+		"cool": [270,217]
+		},
+	"profile": [
+		[0,30],
+		[90,150],
+		[180,175],
+		[210,217],
+		[240,249],
+		[270,217],
+		[330,50]
+	]
+}

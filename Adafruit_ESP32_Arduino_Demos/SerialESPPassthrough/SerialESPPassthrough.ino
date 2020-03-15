@@ -23,19 +23,57 @@
 
 unsigned long baud = 115200;
 
-#if defined(ADAFRUIT_FEATHER_M4_EXPRESS) || defined(ADAFRUIT_PYBADGE_M4_EXPRESS) || defined(ADAFRUIT_PYGAMER_M4_EXPRESS)
-  // Configure the pins used for the ESP32 connection via 
+#if defined(ADAFRUIT_FEATHER_M4_EXPRESS) || \
+  defined(ADAFRUIT_FEATHER_M0_EXPRESS) || \
+  defined(ARDUINO_AVR_FEATHER32U4) || \
+  defined(ARDUINO_NRF52840_FEATHER) || \
+  defined(ADAFRUIT_ITSYBITSY_M0_EXPRESS) || \
+  defined(ADAFRUIT_ITSYBITSY_M4_EXPRESS) || \
+  defined(ARDUINO_AVR_ITSYBITSY32U4_3V)
+  // Configure the pins used for the ESP32 connection
   #define SerialESP32   Serial1
-  #define SPIWIFI       SPI    // The SPI port
+  #define SPIWIFI       SPI  // The SPI port
   #define SPIWIFI_SS    13   // Chip select pin
   #define ESP32_RESETN  12   // Reset pin
   #define SPIWIFI_ACK   11   // a.k.a BUSY or READY pin
   #define ESP32_GPIO0   10
   #define NEOPIXEL_PIN   8
+#elif defined(ARDUINO_AVR_FEATHER328P)
+  #define SerialESP32   Serial1
+  #define SPIWIFI       SPI  // The SPI port
+  #define SPIWIFI_SS     4   // Chip select pin
+  #define ESP32_RESETN   3   // Reset pin
+  #define SPIWIFI_ACK    2   // a.k.a BUSY or READY pin
+  #define ESP32_GPIO0   -1
+  #define NEOPIXEL_PIN   8
+#elif defined(TEENSYDUINO)
+  #define SerialESP32   Serial1
+  #define SPIWIFI       SPI  // The SPI port
+  #define SPIWIFI_SS     5   // Chip select pin
+  #define ESP32_RESETN   6   // Reset pin
+  #define SPIWIFI_ACK    9   // a.k.a BUSY or READY pin
+  #define ESP32_GPIO0   -1
+  #define NEOPIXEL_PIN   8
+#elif defined(ARDUINO_NRF52832_FEATHER )
+  #define SerialESP32   Serial1
+  #define SPIWIFI       SPI  // The SPI port
+  #define SPIWIFI_SS    16  // Chip select pin
+  #define ESP32_RESETN  15  // Reset pin
+  #define SPIWIFI_ACK    7  // a.k.a BUSY or READY pin
+  #define ESP32_GPIO0   -1
+  #define NEOPIXEL_PIN   8
+#elif !defined(SPIWIFI_SS)  // if the wifi definition isnt in the board variant
+  // Don't change the names of these #define's! they match the variant ones
+  #define SerialESP32   Serial1
+  #define SPIWIFI       SPI
+  #define SPIWIFI_SS    10   // Chip select pin
+  #define SPIWIFI_ACK    7   // a.k.a BUSY or READY pin
+  #define ESP32_RESETN   5   // Reset pin
+  #define ESP32_GPIO0   -1   // Not connected
+  #define NEOPIXEL_PIN   8
 #endif
 
 Adafruit_NeoPixel pixel = Adafruit_NeoPixel(1, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
-
 
 void setup() {
   Serial.begin(baud);

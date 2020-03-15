@@ -75,7 +75,10 @@ def show_image(filename):
     face = displayio.Sprite(odb, pixel_shader=displayio.ColorConverter(), position=(0, 0))
     backlight.value = False
     splash.append(face)
-    board.DISPLAY.wait_for_frame()
+    try:
+        board.DISPLAY.refresh(target_frames_per_second=60)
+    except AttributeError:
+        board.DISPLAY.wait_for_frame()
     backlight.value = True
 
 
