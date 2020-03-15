@@ -18,8 +18,17 @@ import board
 import neopixel
 import adafruit_lis3dh
 
+# CHANGE TO MATCH YOUR RING AND STRIP SETUP
+NUM_RING = 12   #12 pixel ring
+NUM_STRIP = 44  # 44 pixels in my NeoPixel strip
+NUM_PIXELS = NUM_STRIP + NUM_RING  #total number of pixels
+
+NEOPIXEL_PIN = board.D5  # PropMaker Wing uses D5 for NeoPixel plug
+POWER_PIN = board.D10
+
+
 # CUSTOMISE COLORS HERE:
-COLOR = (200, 50, 0)      # Default idle is orange
+COLOR = (200, 30, 0)      # Default idle is orange
 ALT_COLOR = (0, 200, 200)  # hit color is teal
 SWING_COLOR = (200, 200, 200) #swing animation color is white
 TOP_COLOR = (100, 100, 0)  #top color is yellow-green
@@ -42,11 +51,6 @@ YELL_THRESHOLD = 700
 POWER_ON_SOUND_DURATION = 3.0
 YELL_SOUND_DURATION = 1.0
 
-NUM_RING = 12   #12 pixel ring
-NUM_STRIP = 44  # 44 pixels in my NeoPixel strip
-NUM_PIXELS = NUM_STRIP + NUM_RING  #total number of pixels
-NEOPIXEL_PIN = board.D5  # PropMaker Wing uses D5 for NeoPixel plug
-POWER_PIN = board.D10
 
 enable = digitalio.DigitalInOut(POWER_PIN)
 enable.direction = digitalio.Direction.OUTPUT
