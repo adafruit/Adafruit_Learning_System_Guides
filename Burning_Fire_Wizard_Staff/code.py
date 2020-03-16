@@ -112,10 +112,10 @@ def power(sound, duration, reverse):
         elapsed = time.monotonic() - start_time  # Time spent playing sound
         if elapsed > duration:                   # Past sound duration?
             break                                # Stop animating
-        animation_time = elapsed / duration            # Animation time, 0.0 to 1.0
+        total_animation_time = elapsed / duration            # Animation time, 0.0 to 1.0
         if reverse:
-            animation_time = 1.0 - animation_time            # 1.0 to 0.0 if reverse
-        threshold = int(NUM_PIXELS * animation_time + 0.5)
+            total_animation_time = 1.0 - total_animation_time            # 1.0 to 0.0 if reverse
+        threshold = int(NUM_PIXELS * total_animation_time + 0.5)
         num = threshold - prev # Number of pixels to light on this pass
         if num != 0:
             if reverse:
@@ -183,8 +183,10 @@ while True:
         # Setup for idle pulse
         idle_brightness = IDLE_PULSE_BRIGHTNESS_MIN
         idle_increment = 0.01
-        strip[0:NUM_RING] = [([int(c*idle_brightness) for c in COLOR_TOP])] * NUM_RING #lights the ring in COLOR_TOP color
-        strip[NUM_RING:NUM_PIXELS] = [([int(c*idle_brightness) for c in COLOR_IDLE])] * NUM_STRIP #lights the strip in COLOR_IDLE color
+        # lights the ring in COLOR_TOP color:
+        strip[0:NUM_RING] = [([int(c*idle_brightness) for c in COLOR_TOP])] * NUM_RING
+        # lights the strip in COLOR_IDLE color:
+        strip[NUM_RING:NUM_PIXELS] = [([int(c*idle_brightness) for c in COLOR_IDLE])] * NUM_STRIP
         strip.show()
 
     elif mode >= 1:  # If not OFF mode...
@@ -204,7 +206,7 @@ while True:
             # make a larson scanner
             strip_backup = strip[0:-1]
             for p in range(-1, len(strip)):
-                for i in range (p-1, p+2): # shoot a 'ray' of 3 pixels
+                for i in range(p-1, p+2): # shoot a 'ray' of 3 pixels
                     if 0 <= i < len(strip):
                         strip[i] = COLOR_SWING
                 strip.show()
@@ -218,21 +220,22 @@ while True:
         elif mode == 1 and accel_yell > YELL_THRESHOLD:  # Motion on Y axis = YELL
             TRIGGER_TIME = time.monotonic()  # Save initial time of swing
             # run a color down the staff, opposite of power-up
-            prev = 0
-            start_time = time.monotonic()  # Save audio start time
+            previous = 0
+            audio_start_time = time.monotonic()  # Save audio start time
             play_wav(random.choice(yell_sounds))  # Randomly choose from available yell sounds
-            duration = YELL_SOUND_DURATION
+            sound_duration = YELL_SOUND_DURATION
             while True:
-                elapsed = time.monotonic() - start_time  # Time spent playing sound
-                if elapsed > duration:  # Past sound duration?
+                time_elapsed = time.monotonic() - audio_start_time  # Time spent playing sound
+                if time_elapsed > sound_duration:  # Past sound duration?
                     break  # Stop animating
-                animation_time = elapsed / duration  # Animation time, 0.0 to 1.0
-                threshold = int(NUM_PIXELS * animation_time + 0.5)
-                num = threshold - prev  # Number of pixels to light on this pass
-                if num != 0:
-                    strip[prev:threshold] = [YELL_COLOR] * num # light pixels in YELL_COLOR
+                animation_time = time_elapsed / sound_duration  # Animation time, 0.0 to 1.0
+                pixel_threshold = int(NUM_PIXELS * animation_time + 0.5)
+                num_pixels = pixel_threshold - previous  # Number of pixels to light on this pass
+                if num_pixels != 0:
+                    # light pixels in YELL_COLOR:
+                    strip[previous:pixel_threshold] = [YELL_COLOR] * num_pixels
                     strip.show()
-                    prev = threshold
+                    previous = pixel_threshold
             while audio.playing:
                 pass # wait till we're done
             mode = 4  # we'll go back to idle mode
@@ -242,8 +245,11 @@ while True:
             if idle_brightness > IDLE_PULSE_BRIGHTNESS_MAX or \
                idle_brightness < IDLE_PULSE_BRIGHTNESS_MIN:  # Then...
                 idle_increment *= -1  # Pulse direction flip
-            strip[0:NUM_RING] = [([int(c*idle_brightness) for c in COLOR_TOP])] * NUM_RING #light the ring
-            strip[NUM_RING:NUM_PIXELS] = [([int(c*idle_brightness) for c in COLOR_IDLE])] * NUM_STRIP  #light the strip
+            # light the ring:
+            strip[0:NUM_RING] = [([int(c*idle_brightness) for c in COLOR_TOP])] * NUM_RING
+            # light the strip:
+            strip[NUM_RING:NUM_PIXELS] = [([int(c*idle_brightness) for c in
+                                            COLOR_IDLE])] * NUM_STRIP
             strip.show()
             time.sleep(IDLE_PULSE_SPEED)  # Idle pulse speed set above
         elif mode > 1:  # If in SWING or HIT or YELL mode...
