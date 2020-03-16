@@ -111,6 +111,6 @@ while True:
                     elif packet.button == ButtonPacket.DOWN:
                         offset_increment -= 1
 
-        if cycling: 
+        if cycling:
             offset = (offset + offset_increment) % OFFSET_MAX
             set_palette(palette_choice)
