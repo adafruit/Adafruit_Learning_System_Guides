@@ -186,7 +186,6 @@ while True:
             accelerator_neg = int(acc_neg_val2)
             accWheel_neg = ControlChange(1, accelerator_neg)
             midi.send(accWheel_neg)
-            print(accelerator_neg)
             time.sleep(0.001)
 
     #  if it isn't then get modulation MIDI data from pot
@@ -269,6 +268,8 @@ while True:
                         #  send the NoteOn message that matches with the octave[i] array
                         #  along with the velocity value
                         midi.send(NoteOn(octave[i], velocity))
+                        #  note number is printed to REPL
+                        print(octave[i])
                         #  note state is updated
                         note_states[i] = True
                         #  updates strummer switch states
@@ -293,6 +294,8 @@ while True:
                         #  send the NoteOn message that matches with the octave[i] array
                         #  along with the velocity value
                         midi.send(NoteOn(octave[i], velocity))
+                        #  note number is printed to REPL
+                        print(octave[i])
                         #  note state is updated
                         note_states[i] = True
                         #  updates strummer switch states
@@ -338,6 +341,8 @@ while True:
                     #  send the NoteOn message that matches with the octave[i] array
                     #  along with the velocity value
                     midi.send(NoteOn(octave[i], velocity))
+                    #  note number is printed to REPL
+                    print(octave[i])
                     #  note state is updated
                     note_states[i] = True
                     #  delay to settle MIDI data
