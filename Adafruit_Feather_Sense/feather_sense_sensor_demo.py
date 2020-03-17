@@ -37,7 +37,7 @@ while True:
 
     print("\nFeather Sense Sensor Demo")
     print("---------------------------------------------")
-    print("Proximity:", apds9960.proximity())
+    print("Proximity:", apds9960.proximity)
     print("Red: {}, Green: {}, Blue: {}, Clear: {}".format(*apds9960.color_data))
     print("Temperature: {:.1f} C".format(bmp280.temperature))
     print("Barometric pressure:", bmp280.pressure)
