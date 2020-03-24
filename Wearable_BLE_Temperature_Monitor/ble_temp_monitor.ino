@@ -1,0 +1,187 @@
+/*********************************************************************
+ Learn Guide: BLE Temperature Monitoring Armband
+
+ Adafruit invests time and resources providing this open source code,
+ please support Adafruit and open-source hardware by purchasing
+ products from Adafruit!
+
+ MIT license, check LICENSE for more information
+ All text above, and the splash screen below must be included in
+ any redistribution
+*********************************************************************/
+#include <bluefruit.h>
+#include <Adafruit_LittleFS.h>
+#include <InternalFileSystem.h>
+#include <Wire.h>
+#include "Adafruit_MCP9808.h"
+
+// Read temperature in degrees Fahrenheit
+#define TEMPERATURE_F
+// uncomment the following line if you want to read temperature in degrees Celsius
+// #define TEMPERATURE_C
+
+// Sensor read timeout, in minutes
+// NOTE: Measuring your armpit temperature for a minimum
+// of 12 minutes is equivalent to measuring your core body temperature.
+const long interval = 60000;
+
+// last time the temperature was read
+unsigned long prv_ms = 0;
+
+// BLE Service
+BLEDfu  bledfu;  // OTA DFU service
+BLEDis  bledis;  // device information
+BLEUart bleuart; // uart over ble
+BLEBas  blebas;  // battery
+
+// Create the MCP9808 temperature sensor object
+Adafruit_MCP9808 tempsensor = Adafruit_MCP9808();
+
+
+void setup() {
+  Serial.begin(115200);
+  Serial.println("Wearable BlueFruit Temperature Sensor");
+  Serial.println("-------------------------------------\n");
+
+
+  if (!tempsensor.begin(0x18)) {
+    Serial.println("Couldn't find MCP9808! Check your connections and verify the address is correct.");
+    while (1);
+  }
+  Serial.println("Found MCP9808!");
+
+  // Sets the resolution of reading
+  tempsensor.setResolution(3);
+
+  // Configure BLE
+  // Setup the BLE LED to be enabled on CONNECT
+  // Note: This is actually the default behaviour, but provided
+  // here in case you want to control this LED manually via PIN 19
+  Bluefruit.autoConnLed(true);
+
+  // Config the peripheral connection with maximum bandwidth 
+  Bluefruit.configPrphBandwidth(BANDWIDTH_MAX);
+
+  Bluefruit.begin();
+  Bluefruit.setTxPower(4);    // Check bluefruit.h for supported values
+  Bluefruit.setName("Bluefruit52");
+  Bluefruit.Periph.setConnectCallback(connect_callback);
+  Bluefruit.Periph.setDisconnectCallback(disconnect_callback);
+
+  // To be consistent OTA DFU should be added first if it exists
+  bledfu.begin();
+
+  // Configure and Start Device Information Service
+  bledis.setManufacturer("Adafruit Industries");
+  bledis.setModel("Bluefruit Feather52");
+  bledis.begin();
+
+  // Configure and Start BLE Uart Service
+  bleuart.begin();
+
+  // Start BLE Battery Service
+  blebas.begin();
+  blebas.write(100);
+
+  // Set up and start advertising
+  startAdv();
+
+  Serial.println("Please use Adafruit's Bluefruit LE app to connect in UART mode");
+  Serial.println("Once connected, enter character(s) that you wish to send");
+
+}
+
+void loop() {
+
+  unsigned long current_ms = millis();
+
+  if (current_ms - prv_ms >= (1000*5)) {
+    prv_ms = current_ms;
+
+    // wakes up MCP9808 - power consumption ~200 mikro Ampere
+    Serial.println("Wake up MCP9808");
+    tempsensor.wake();
+
+    // read and print the temperature
+    Serial.print("Temp: "); 
+    #ifdef TEMPERATURE_F
+      float temp = tempsensor.readTempF();
+      Serial.print(temp);
+      Serial.println("*F.");
+    #endif
+
+    #ifdef TEMPERATURE_C
+      float temp = tempsensor.readTempC();
+      Serial.print(temp);
+      Serial.println("*C.");
+    #endif
+
+    char buffer [8];
+    //itoa(temp, buffer, 10);
+    snprintf(buffer, sizeof(buffer) - 1, "%0.*f", 2, temp);
+    bleuart.write(buffer);
+    bleuart.write("\n");
+
+    // shutdown MSP9808 - power consumption ~0.1 mikro Ampere
+    // stops temperature sampling
+    Serial.println("Shutting down MCP9808");
+    tempsensor.shutdown_wake(1);
+  }
+
+}
+
+
+void startAdv(void)
+{
+  // Advertising packet
+  Bluefruit.Advertising.addFlags(BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE);
+  Bluefruit.Advertising.addTxPower();
+
+  // Include bleuart 128-bit uuid
+  Bluefruit.Advertising.addService(bleuart);
+
+  // Secondary Scan Response packet (optional)
+  // Since there is no room for 'Name' in Advertising packet
+  Bluefruit.ScanResponse.addName();
+  
+  /* Start Advertising
+   * - Enable auto advertising if disconnected
+   * - Interval:  fast mode = 20 ms, slow mode = 152.5 ms
+   * - Timeout for fast mode is 30 seconds
+   * - Start(timeout) with timeout = 0 will advertise forever (until connected)
+   * 
+   * For recommended advertising interval
+   * https://developer.apple.com/library/content/qa/qa1931/_index.html   
+   */
+  Bluefruit.Advertising.restartOnDisconnect(true);
+  Bluefruit.Advertising.setInterval(32, 244);    // in unit of 0.625 ms
+  Bluefruit.Advertising.setFastTimeout(30);      // number of seconds in fast mode
+  Bluefruit.Advertising.start(0);                // 0 = Don't stop advertising after n seconds  
+}
+
+// callback invoked when central connects
+void connect_callback(uint16_t conn_handle)
+{
+  // Get the reference to current connection
+  BLEConnection* connection = Bluefruit.Connection(conn_handle);
+
+  char central_name[32] = { 0 };
+  connection->getPeerName(central_name, sizeof(central_name));
+
+  Serial.print("Connected to ");
+  Serial.println(central_name);
+}
+
+/**
+ * Callback invoked when a connection is dropped
+ * @param conn_handle connection where this event happens
+ * @param reason is a BLE_HCI_STATUS_CODE which can be found in ble_hci.h
+ */
+void disconnect_callback(uint16_t conn_handle, uint8_t reason)
+{
+  (void) conn_handle;
+  (void) reason;
+
+  Serial.println();
+  Serial.print("Disconnected, reason = 0x"); Serial.println(reason, HEX);
+}
