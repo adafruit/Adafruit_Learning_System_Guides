@@ -36,7 +36,7 @@ float temp_offset = 0.5;
 // Sensor read timeout, in minutes
 // NOTE: Measuring your armpit temperature for a minimum
 // of 12 minutes is equivalent to measuring your core body temperature.
-const long interval = 1;
+const long interval = 6;
 
 // BLE Service
 BLEDfu  bledfu;  // OTA DFU service
@@ -103,7 +103,6 @@ void setup() {
 
   // set all pixel colors to 'off'
   pixels.clear();
-
 }
 
 void loop() {
@@ -142,7 +141,6 @@ void loop() {
   bleuart.write(buffer);
 
   // shutdown MSP9808 - power consumption ~0.1 mikro Ampere
-  // stops temperature sampling
   Serial.println("Shutting down MCP9808");
   tempsensor.shutdown_wake(1);
 
