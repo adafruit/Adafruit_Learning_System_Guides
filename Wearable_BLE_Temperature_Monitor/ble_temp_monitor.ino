@@ -19,7 +19,7 @@
 // Read temperature in degrees Fahrenheit
 #define TEMPERATURE_F
 // uncomment the following line if you want to read temperature in degrees Celsius
-// #define TEMPERATURE_C
+//#define TEMPERATURE_C
 
 // Feather NRF52840 Built-in NeoPixel
 #define PIN 16
@@ -36,7 +36,7 @@ float temp_offset = 0.5;
 // Sensor read timeout, in minutes
 // NOTE: Measuring your armpit temperature for a minimum
 // of 12 minutes is equivalent to measuring your core body temperature.
-const long interval = 6;
+const long interval = 1;
 
 // BLE Service
 BLEDfu  bledfu;  // OTA DFU service
@@ -46,7 +46,6 @@ BLEBas  blebas;  // battery
 
 // Create the MCP9808 temperature sensor object
 Adafruit_MCP9808 tempsensor = Adafruit_MCP9808();
-
 
 void setup() {
   Serial.begin(115200);
@@ -113,16 +112,16 @@ void loop() {
 
   // read and print the temperature
   Serial.print("Temp: "); 
-  #ifdef TEMPERATURE_F
+  #if defined(TEMPERATURE_F)
     float temp = tempsensor.readTempF();
     Serial.print(temp);
     Serial.println("*F.");
-  #endif
-
-  #ifdef TEMPERATURE_C
+  #elif defined(TEMPERATURE_C)
     float temp = tempsensor.readTempC();
     Serial.print(temp);
     Serial.println("*C.");
+  #else
+    #warning "Must define TEMPERATURE_C or TEMPERATURE_F!"
   #endif
 
   // add temp_offset
@@ -137,7 +136,7 @@ void loop() {
   }
 
   char buffer [8];
-  snprintf(buffer, sizeof(buffer) - 1, "%0.*f", 2, temp);
+  snprintf(buffer, sizeof(buffer) - 1, "%0.*f", 1, temp);
   bleuart.write(buffer);
 
   // shutdown MSP9808 - power consumption ~0.1 mikro Ampere
@@ -145,12 +144,9 @@ void loop() {
   tempsensor.shutdown_wake(1);
 
   // sleep for interval minutes
-  // NOTE: NRF delay puts the MCU into a sleep mode:
-  // (https://www.freertos.org/low-power-tickless-rtos.html)
+  // NOTE: NRF delay() puts mcu into a low-power sleep mode
   delay(1000*60*interval);
-
 }
-
 
 void startAdv(void)
 {
