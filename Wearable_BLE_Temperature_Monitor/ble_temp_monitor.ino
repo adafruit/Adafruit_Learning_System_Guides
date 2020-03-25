@@ -13,6 +13,7 @@
 #include <Adafruit_LittleFS.h>
 #include <InternalFileSystem.h>
 #include <Wire.h>
+#include <Adafruit_NeoPixel.h>
 #include "Adafruit_MCP9808.h"
 
 // Read temperature in degrees Fahrenheit
@@ -20,13 +21,22 @@
 // uncomment the following line if you want to read temperature in degrees Celsius
 // #define TEMPERATURE_C
 
+// Feather NRF52840 Built-in NeoPixel
+#define PIN 16
+Adafruit_NeoPixel pixels(1, PIN, NEO_GRB + NEO_KHZ800);
+
+// Maximum temperature value for armband's fever indicator
+// NOTE: This is in degrees Fahrenheit, please adjust
+float fever_temp = 100.4;
+
+// offset is +0.5-1.0 degrees to make
+// axillary temperature comparible to ear or temporal.
+float temp_offset = 0.5;
+
 // Sensor read timeout, in minutes
 // NOTE: Measuring your armpit temperature for a minimum
 // of 12 minutes is equivalent to measuring your core body temperature.
-const long interval = 60000;
-
-// last time the temperature was read
-unsigned long prv_ms = 0;
+const long interval = 1;
 
 // BLE Service
 BLEDfu  bledfu;  // OTA DFU service
@@ -87,46 +97,59 @@ void setup() {
   startAdv();
 
   Serial.println("Please use Adafruit's Bluefruit LE app to connect in UART mode");
-  Serial.println("Once connected, enter character(s) that you wish to send");
+
+  // initialize neopixel object
+  pixels.begin();
+
+  // set all pixel colors to 'off'
+  pixels.clear();
 
 }
 
 void loop() {
 
-  unsigned long current_ms = millis();
+  // wakes up MCP9808 - power consumption ~200 mikro Ampere
+  Serial.println("Wake up MCP9808");
+  tempsensor.wake();
 
-  if (current_ms - prv_ms >= (1000*5)) {
-    prv_ms = current_ms;
+  // read and print the temperature
+  Serial.print("Temp: "); 
+  #ifdef TEMPERATURE_F
+    float temp = tempsensor.readTempF();
+    Serial.print(temp);
+    Serial.println("*F.");
+  #endif
 
-    // wakes up MCP9808 - power consumption ~200 mikro Ampere
-    Serial.println("Wake up MCP9808");
-    tempsensor.wake();
+  #ifdef TEMPERATURE_C
+    float temp = tempsensor.readTempC();
+    Serial.print(temp);
+    Serial.println("*C.");
+  #endif
 
-    // read and print the temperature
-    Serial.print("Temp: "); 
-    #ifdef TEMPERATURE_F
-      float temp = tempsensor.readTempF();
-      Serial.print(temp);
-      Serial.println("*F.");
-    #endif
+  // add temp_offset
+  temp += temp_offset;
 
-    #ifdef TEMPERATURE_C
-      float temp = tempsensor.readTempC();
-      Serial.print(temp);
-      Serial.println("*C.");
-    #endif
-
-    char buffer [8];
-    //itoa(temp, buffer, 10);
-    snprintf(buffer, sizeof(buffer) - 1, "%0.*f", 2, temp);
-    bleuart.write(buffer);
-    bleuart.write("\n");
-
-    // shutdown MSP9808 - power consumption ~0.1 mikro Ampere
-    // stops temperature sampling
-    Serial.println("Shutting down MCP9808");
-    tempsensor.shutdown_wake(1);
+  if (temp >= fever_temp) {
+    pixels.setPixelColor(1, pixels.Color(255, 0, 0));
+    pixels.show();
   }
+  else {
+    pixels.clear();
+  }
+
+  char buffer [8];
+  snprintf(buffer, sizeof(buffer) - 1, "%0.*f", 2, temp);
+  bleuart.write(buffer);
+
+  // shutdown MSP9808 - power consumption ~0.1 mikro Ampere
+  // stops temperature sampling
+  Serial.println("Shutting down MCP9808");
+  tempsensor.shutdown_wake(1);
+
+  // sleep for interval minutes
+  // NOTE: NRF delay puts the MCU into a sleep mode:
+  // (https://www.freertos.org/low-power-tickless-rtos.html)
+  delay(1000*60*interval);
 
 }
 
