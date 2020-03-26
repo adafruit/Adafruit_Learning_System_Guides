@@ -26,17 +26,22 @@
 Adafruit_NeoPixel pixels(1, PIN, NEO_GRB + NEO_KHZ800);
 
 // Maximum temperature value for armband's fever indicator
-// NOTE: This is in degrees Fahrenheit, please adjust
+// NOTE: This is in degrees Fahrenheit
 float fever_temp = 100.4;
 
-// offset is +0.5-1.0 degrees to make
-// axillary temperature comparible to ear or temporal.
+// temperature calibration offset is +0.5 to +1.0 degree
+// to make axillary temperature comparible to ear or temporal.
 float temp_offset = 0.5;
 
-// Sensor read timeout, in minutes
-// NOTE: Measuring your armpit temperature for a minimum
-// of 12 minutes is equivalent to measuring your core body temperature.
-const long interval = 1;
+// Sensor read delay, in minutes
+int sensor_delay = 1;
+
+// Measuring your armpit temperature for a minimum of 12 minutes
+// is equivalent to measuring your core body temperature.
+int calibration_time = 12;
+
+// BLE transmit buffer
+char temperature_buf [8];
 
 // BLE Service
 BLEDfu  bledfu;  // OTA DFU service
@@ -124,28 +129,30 @@ void loop() {
     #warning "Must define TEMPERATURE_C or TEMPERATURE_F!"
   #endif
 
-  // add temp_offset
+  // add temperature offset
   temp += temp_offset;
 
   if (temp >= fever_temp) {
     pixels.setPixelColor(1, pixels.Color(255, 0, 0));
     pixels.show();
   }
-  else {
-    pixels.clear();
-  }
 
-  char buffer [8];
-  snprintf(buffer, sizeof(buffer) - 1, "%0.*f", 1, temp);
-  bleuart.write(buffer);
+  snprintf(temperature_buf, sizeof(temperature_buf) - 1, "%0.*f", 1, temp);
+  if (calibration_time == 0) {
+      // write to UART
+      bleuart.write(temperature_buf);
+  }
+  else {
+    calibration_time-=1;
+  }
 
   // shutdown MSP9808 - power consumption ~0.1 mikro Ampere
   Serial.println("Shutting down MCP9808");
   tempsensor.shutdown_wake(1);
 
-  // sleep for interval minutes
+  // sleep for sensor_delay minutes
   // NOTE: NRF delay() puts mcu into a low-power sleep mode
-  delay(1000*60*interval);
+  delay(1000*60*sensor_delay);
 }
 
 void startAdv(void)
