@@ -34,7 +34,7 @@ float fever_temp = 100.4;
 float temp_offset = 0.5;
 
 // Sensor read delay, in minutes
-int sensor_delay = 1;
+int sensor_delay = 5;
 
 // Measuring your armpit temperature for a minimum of 12 minutes
 // is equivalent to measuring your core body temperature.
@@ -146,7 +146,7 @@ void loop() {
     calibration_time-=1;
   }
 
-  // shutdown MSP9808 - power consumption ~0.1 mikro Ampere
+  // shutdown MCP9808 - power consumption ~0.1 mikro Ampere
   Serial.println("Shutting down MCP9808");
   tempsensor.shutdown_wake(1);
 
