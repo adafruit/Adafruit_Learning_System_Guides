@@ -1,4 +1,4 @@
-# clue-plotter v1.13
+# clue-plotter v1.14
 # Sensor and input plotter for Adafruit CLUE in CircuitPython
 # This plots the sensors and three of the analogue inputs on
 # the LCD display either with scrolling or wrap mode which

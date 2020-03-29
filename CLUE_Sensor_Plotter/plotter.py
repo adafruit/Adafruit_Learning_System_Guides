@@ -445,11 +445,7 @@ class Plotter():
 
     # def _clear_plot_bitmap(self):  ### woz here
 
-    # This is almost always going to be quicker
-    # than the slow _clear_plot_bitmap implemented on 5.0.0
-    def _undraw_bitmap(self):
-        if not self._plot_dirty:
-            return
+    def _redraw_all_col_idx(self, col_idx_list):
         x_cols = min(self._data_values, self._plot_width)
         wrapMode = self._mode == "wrap"
         if wrapMode:
@@ -457,30 +453,44 @@ class Plotter():
         else:
             x_data_idx = (self._data_idx - x_cols) % self._data_size
 
-        colidx = self.TRANSPARENT_IDX
         for ch_idx in range(self._channels):
+            col_idx = col_idx_list[ch_idx]
             data_idx = x_data_idx
             for x_pos in range(x_cols):
                 # "jump" the gap in the circular buffer for wrap mode
                 if wrapMode and x_pos == self._x_pos:
                     data_idx = (data_idx + self._data_size - self._plot_width) % self._data_size
-                    # TODO - inhibit line drawing in BOTH VERSIONS
+                    # ideally this should inhibit lines between wrapped data
 
                 y_pos = self._data_y_pos[ch_idx][data_idx]
                 if self._style == "lines" and x_pos != 0:
                     # Python supports negative array index
                     prev_y_pos = self._data_y_pos[ch_idx][data_idx - 1]
-                    self._draw_vline(x_pos, prev_y_pos, y_pos, colidx)
+                    self._draw_vline(x_pos, prev_y_pos, y_pos, col_idx)
                 else:
                     if 0 <= y_pos <= self._plot_height_m1:
-                        self._displayio_plot[x_pos, y_pos] = colidx
+                        self._displayio_plot[x_pos, y_pos] = col_idx
                 data_idx += 1
                 if data_idx >= self._data_size:
                     data_idx = 0
 
+    # This is almost always going to be quicker
+    # than the slow _clear_plot_bitmap implemented on 5.0.0 displayio
+    def _undraw_bitmap(self):
+        if not self._plot_dirty:
+            return
+
+        self._redraw_all_col_idx([self.TRANSPARENT_IDX] * self._channels)
         self._plot_dirty = False
 
+
+    def _redraw_all(self):
+        self._redraw_all_col_idx(self._channel_colidx)
+        self._plot_dirty = True
+
+
     def _undraw_column(self, x_pos, data_idx):
+        """Undraw a single column at x_pos based on data from data_idx."""
         colidx = self.TRANSPARENT_IDX
         for ch_idx in range(self._channels):
             y_pos = self._data_y_pos[ch_idx][data_idx]
@@ -492,47 +502,10 @@ class Plotter():
                 if 0 <= y_pos <= self._plot_height_m1:
                     self._displayio_plot[x_pos, y_pos] = colidx
 
-    # TODO - This is a cut and paste from _undraw_bitmap()
-        # TODO - This is a cut and paste from _undraw_bitmap()
-            # TODO - This is a cut and paste from _undraw_bitmap()
-                # TODO - This is a cut and paste from _undraw_bitmap()
-
-    # TODO - time to clean this up and review _data_redraw()
-    def _data_redraw_all(self):
-        x_cols = min(self._data_values, self._plot_width)
-        wrapMode = self._mode == "wrap"
-        if wrapMode:
-            x_data_idx = (self._data_idx - self._x_pos) % self._data_size
-        else:
-            x_data_idx = (self._data_idx - x_cols) % self._data_size
-
-        for ch_idx in range(self._channels):
-            colidx = self._channel_colidx[ch_idx]
-            data_idx = x_data_idx
-            for x_pos in range(x_cols):
-                # "jump" the gap in the circular buffer for wrap mode
-                if wrapMode and x_pos == self._x_pos:
-                    data_idx = (data_idx + self._data_size - self._plot_width) % self._data_size
-                    # TODO - inhibit line drawing in BOTH VERSIONS
-
-                y_pos = self._data_y_pos[ch_idx][data_idx]
-                if self._style == "lines" and x_pos != 0:
-                    # Python supports negative array index
-                    prev_y_pos = self._data_y_pos[ch_idx][data_idx - 1]
-                    self._draw_vline(x_pos, prev_y_pos, y_pos, colidx)
-                else:
-                    if 0 <= y_pos <= self._plot_height_m1:
-                        self._displayio_plot[x_pos, y_pos] = colidx
-                data_idx += 1
-                if data_idx >= self._data_size:
-                    data_idx = 0
-
-        self._plot_dirty = True
-
-    # TODO - very similar code to _undraw_bitmap although that is now
-    # more sophisticated as it support wrap mode
-    def _data_redraw(self, x1, x2, x1_data_idx):
-        """Redraw data from x1 to x2 inclusive."""
+    # very similar code to _undraw_bitmap although that is now
+    # more sophisticated as it supports wrap mode
+    def _redraw_for_scroll(self, x1, x2, x1_data_idx):
+        """Redraw data from x1 to x2 inclusive for scroll mode only."""
         for ch_idx in range(self._channels):
             colidx = self._channel_colidx[ch_idx]
             data_idx = x1_data_idx
@@ -703,8 +676,9 @@ class Plotter():
                 sc_data_idx = ((data_idx + self._scroll_px - self._plot_width)
                                % self._data_size)
                 self._data_values -= self._scroll_px
-                self._data_redraw(0, self._plot_width - 1 - self._scroll_px,
-                                  sc_data_idx)
+                self._redraw_for_scroll(0,
+                                        self._plot_width - 1 - self._scroll_px,
+                                        sc_data_idx)
                 x_pos = self._plot_width - self._scroll_px
 
             elif self._scale_mode == "pixel":
@@ -768,7 +742,7 @@ class Plotter():
             self._undraw_bitmap()
             self._recalc_y_pos()  ## calculates new y positions
             if redraw_plot:
-                self._data_redraw_all()
+                self._redraw_all()
 
     @property
     def title(self):
