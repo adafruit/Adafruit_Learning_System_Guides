@@ -33,7 +33,7 @@ clue_display.append(wash_off_sprite)
 text_group = displayio.Group(max_size=5, scale=1)
 # Make a label
 title_font = bitmap_font.load_font("/font/RacingSansOne-Regular-38.bdf")
-title_font.load_glyphs("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".encode('utf-8'))
+title_font.load_glyphs("HandWashTimer".encode('utf-8'))
 title_label = label.Label(title_font, text="Hand Wash", color=0x001122)
 # Position the label
 title_label.x = 10
