@@ -42,24 +42,24 @@ esp32_reset = DigitalInOut(board.ESP_RESET)
 
 spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
 esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset)
-status_light = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.2) # Uncomment for Most Boards
+status_light = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.2)  # Uncomment  for Most Boards
 wifi = adafruit_esp32spi_wifimanager.ESPSPI_WiFiManager(esp, secrets, status_light)
 pixels = neopixel.NeoPixel(board.D2, 150, brightness=1.0, auto_write=False)
 pixels.fill(0x050505)
 pixels.show()
 
 # clouds palette
-cloudy_palette = [fancy.CRGB(1.0, 1.0, 1.0), # White
-                  fancy.CRGB(0.5, 0.5, 0.5), # gray
-                  fancy.CRGB(0.5, 0.5, 1.0)] # blue-gray
+cloudy_palette = [fancy.CRGB(1.0, 1.0, 1.0),  # White
+                  fancy.CRGB(0.5, 0.5, 0.5),  # gray
+                  fancy.CRGB(0.5, 0.5, 1.0)]  # blue-gray
 # sunny palette
-sunny_palette = [fancy.CRGB(1.0, 1.0, 1.0), # White
-                 fancy.CRGB(1.0, 1.0, 0.0),# Yellow
-                 fancy.CRGB(1.0, 0.5, 0.0),] # Orange
+sunny_palette = [fancy.CRGB(1.0, 1.0, 1.0),  # White
+                 fancy.CRGB(1.0, 1.0, 0.0),  # Yellow
+                 fancy.CRGB(1.0, 0.5, 0.0), ]  # Orange
 # thunderstorm palette
-thunder_palette = [fancy.CRGB(0.0, 0.0, 1.0), # blue
-                   fancy.CRGB(0.5, 0.5, 0.5), # gray
-                   fancy.CRGB(0.5, 0.5, 1.0)] # blue-gray
+thunder_palette = [fancy.CRGB(0.0, 0.0, 1.0),  # blue
+                   fancy.CRGB(0.5, 0.5, 0.5),  # gray
+                   fancy.CRGB(0.5, 0.5, 1.0)]  # blue-gray
 last_thunder_bolt = None
 
 palette = None  # current palette
@@ -87,25 +87,23 @@ while True:
         pressed_time = time.monotonic()
         button_select = True
         weather_refresh = None
-        while not button.value:
+        while not button.value:  # Debounce
             audio.stop()
-            #print("Debounce")
             if (time.monotonic() - pressed_time) > 4:
                 print("Turning OFF")
                 cloud_on = False
-                pixels.fill(0x000000) # bright white!
+                pixels.fill(0x000000)  # bright white!
                 pixels.show()
                 while not cloud_on:
-                    while not button.value:
+                    while not button.value:  # Debounce
                         pass
-                        #print("Debounce")
                     if not button.value:
                         pressed_time = time.monotonic()
                         print("Button Pressed")
                         cloud_on = True
                         button_select = False
                         weather_refresh = None
-
+                        
             if button_mode == 0:
                 weather_type = 'Sunny'
             if button_mode == 1:
@@ -124,10 +122,9 @@ while True:
                 response = wifi.get(DATA_SOURCE).json()
                 print("Response is", response)
                 weather_type = response['weather'][0]['main']
-                #weather_type = 'Rain' # manually adjust weather type for testing!
                 if weather_type == 'Clear':
                     weather_type = 'Sunny'
-                print(weather_type) # See https://openweathermap.org/weather-conditions
+                print(weather_type)  # See https://openweathermap.org/weather-conditions
             # default to no rain or thunder
             raining = snowing = thundering = has_sound = False
             if weather_type == 'Sunny':
@@ -193,12 +190,12 @@ while True:
         print("Ka Bam!")
         # fill pixels white, delay, a few times
         for i in range(random.randint(1, 3)):  # up to 3 times...
-            pixels.fill(0xFFFFFF) # bright white!
+            pixels.fill(0xFFFFFF)  # bright white!
             pixels.show()
-            time.sleep(random.uniform(0.01, 0.2)) # pause
-            pixels.fill(0x0F0F0F) # gray
+            time.sleep(random.uniform(0.01, 0.2))  # pause
+            pixels.fill(0x0F0F0F)  # gray
             pixels.show()
-            time.sleep(random.uniform(0.01, 0.3)) # pause
+            time.sleep(random.uniform(0.01, 0.3))  # pause
         # pick next thunderbolt time now
         Thunder = random.randint(0, 2)
         if Thunder == 0:
@@ -209,4 +206,4 @@ while True:
             wave_file = open("sound/Thunderstorm2.wav", "rb")
         wave = audioio.WaveFile(wave_file)
         audio.play(wave)
-        next_bolt_time = time.monotonic() + random.randint(5, 15) # between 5 and 15 s
+        next_bolt_time = time.monotonic() + random.randint(5, 15)  # between 5 and 15 s
