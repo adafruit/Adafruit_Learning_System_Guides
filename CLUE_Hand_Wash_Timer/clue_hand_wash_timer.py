@@ -12,7 +12,7 @@ from adafruit_bitmap_font import bitmap_font
 import displayio
 import pulseio
 
-board.DISPLAY.brightness = 0.8
+clue.display.brightness = 0.8
 clue_display = displayio.Group(max_size=4)
 
 # draw the background image
@@ -56,7 +56,7 @@ timer_label.y = 100
 text_group.append(timer_label)
 
 clue_display.append(text_group)
-board.DISPLAY.show(clue_display)
+clue.display.show(clue_display)
 
 def countdown(seconds):
     for i in range(seconds):
