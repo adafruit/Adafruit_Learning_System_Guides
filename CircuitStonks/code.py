@@ -1,6 +1,5 @@
 import time
 import board
-import busio
 from digitalio import DigitalInOut
 from adafruit_esp32spi import adafruit_esp32spi
 from adafruit_esp32spi import adafruit_esp32spi_wifimanager
@@ -22,7 +21,7 @@ except ImportError:
 esp32_cs = DigitalInOut(board.D13)
 esp32_ready = DigitalInOut(board.D11)
 esp32_reset = DigitalInOut(board.D12)
-spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
+spi = board.SPI()
 esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset)
 wifi = adafruit_esp32spi_wifimanager.ESPSPI_WiFiManager(esp, secrets)
 

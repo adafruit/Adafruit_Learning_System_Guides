@@ -13,8 +13,8 @@ display = segments.Seg14x4(i2c)
 # Clear the display.
 display.fill(0)
 
-# set brightness, range 1-15, 15 max brightness
-display.brightness = 15
+# set brightness, range 0-1.0, 1.0 max brightness
+display.brightness = 1.0
 
 # show phrase on alphanumeric display
 message = "THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG"
