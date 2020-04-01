@@ -1,6 +1,6 @@
 import time
-import audioio
 import random
+import audioio
 import board
 import busio
 from digitalio import DigitalInOut
@@ -103,7 +103,7 @@ while True:
                         cloud_on = True
                         button_select = False
                         weather_refresh = None
-
+                        
             if button_mode == 0:
                 weather_type = 'Sunny'
             if button_mode == 1:
