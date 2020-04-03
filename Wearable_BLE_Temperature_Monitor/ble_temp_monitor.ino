@@ -34,7 +34,7 @@ float fever_temp = 100.4;
 float temp_offset = 0.5;
 
 // Sensor read delay, in minutes
-int sensor_delay = 5;
+int sensor_delay = 1;
 
 // Measuring your armpit temperature for a minimum of 12 minutes
 // is equivalent to measuring your core body temperature.
@@ -119,34 +119,41 @@ void loop() {
   Serial.print("Temp: "); 
   #if defined(TEMPERATURE_F)
     float temp = tempsensor.readTempF();
+    // add temperature offset
+    temp += temp_offset;
     Serial.print(temp);
     Serial.println("*F.");
   #elif defined(TEMPERATURE_C)
     float temp = tempsensor.readTempC();
+    // add temperature offset
+    temp += temp_offset;
     Serial.print(temp);
     Serial.println("*C.");
   #else
     #warning "Must define TEMPERATURE_C or TEMPERATURE_F!"
   #endif
 
-  // add temperature offset
-  temp += temp_offset;
-
+  // set NeoPixels to RED if fever_temp
   if (temp >= fever_temp) {
     pixels.setPixelColor(1, pixels.Color(255, 0, 0));
     pixels.show();
   }
 
+  // float to buffer
   snprintf(temperature_buf, sizeof(temperature_buf) - 1, "%0.*f", 1, temp);
+
   if (calibration_time == 0) {
+      Serial.println("Writing to UART");
       // write to UART
       bleuart.write(temperature_buf);
   }
   else {
+    Serial.print("Calibration time:");
+    Serial.println(calibration_time);
     calibration_time-=1;
   }
 
-  // shutdown MCP9808 - power consumption ~0.1 mikro Ampere
+  // shutdown MSP9808 - power consumption ~0.1 mikro Ampere
   Serial.println("Shutting down MCP9808");
   tempsensor.shutdown_wake(1);
 
