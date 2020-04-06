@@ -37,7 +37,7 @@ while True:
         time.sleep(0.25)
     if clue.button_b:
         two_subjects = not two_subjects
-        time.sleep(0.25)
+        time.sleep(0.5)
 
     screen[1].text = activity
     screen[3].text = subject_a
