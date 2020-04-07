@@ -1,6 +1,5 @@
 # Adafruit BBQ display works with ibbq protocol-based BLE temperature probes
 
-
 import time
 
 import displayio
@@ -18,19 +17,19 @@ homescreen_screen = displayio.Group(max_size=3)
 temperatures_screen = displayio.Group(max_size=2)
 
 # define custom colors
-GREEN =   0x00d929
-BLUE =    0x0000ff
-RED =     0xff0000
-ORANGE =  0xff6a00
-YELLOW =  0xffff00
-PURPLE =  0xe400ff
-BLACK =   0x000000
-WHITE =   0xffffff
-BURNT =   0xbb4e00
+GREEN = 0x00D929
+BLUE = 0x0000FF
+RED = 0xFF0000
+ORANGE = 0xFF6A00
+YELLOW = 0xFFFF00
+PURPLE = 0xE400FF
+BLACK = 0x000000
+WHITE = 0xFFFFFF
+BURNT = 0xBB4E00
 
 unit_mode = False  # set the temperature unit_mode. True = centigrade, False = farenheit
 
-# background fill
+# Setup homescreen
 color_bitmap = displayio.Bitmap(120, 120, 1)
 color_palette = displayio.Palette(1)
 color_palette[0] = BURNT
@@ -44,7 +43,7 @@ homescreen_screen.append(outer_circle)
 
 
 title_font = bitmap_font.load_font("/font/GothamBlack-50.bdf")
-title_font.load_glyphs("BQLUE".encode('utf-8'))
+title_font.load_glyphs("BQLUE".encode("utf-8"))
 title_label = label.Label(title_font, text="BBQLUE", color=clue.ORANGE, max_glyphs=15)
 title_label.x = 12
 title_label.y = 120
@@ -52,17 +51,18 @@ homescreen_screen.append(title_label)
 
 clue.display.show(homescreen_screen)
 
-
+# Setup temperatures screen
 temp_font = bitmap_font.load_font("/font/GothamBlack-25.bdf")
-temp_font.load_glyphs("0123456789FC.-<".encode('utf-8'))
+temp_font.load_glyphs("0123456789FC.-<".encode("utf-8"))
 
-my_labels_config = [(0, "", GREEN, 2, 100),
-                    (1, "", BLUE, 2, 150),
-                    (2, "", RED, 2, 200),
-                    (3, "", ORANGE, 135, 100),
-                    (4, "", YELLOW, 135, 150),
-                    (5, "", PURPLE, 135, 200)
-                   ]
+my_labels_config = [
+    (0, "", GREEN, 2, 100),
+    (1, "", BLUE, 2, 150),
+    (2, "", RED, 2, 200),
+    (3, "", ORANGE, 135, 100),
+    (4, "", YELLOW, 135, 150),
+    (5, "", PURPLE, 135, 200),
+]
 
 my_labels = {}  # dictionary of configured my_labels
 
@@ -70,7 +70,6 @@ text_group = displayio.Group(max_size=8, scale=1)
 
 for label_config in my_labels_config:
     (name, text, color, x, y) = label_config  # unpack a tuple into five var names
-    # old way sould have been: name = label_config[0], text = label_config[1]
     templabel = label.Label(temp_font, text=text, color=color, max_glyphs=15)
     templabel.x = x
     templabel.y = y
@@ -79,7 +78,9 @@ for label_config in my_labels_config:
 
 temperatures_screen.append(text_group)
 
-temp_title_label = label.Label(title_font, text="BBQLUE", color=clue.ORANGE, max_glyphs=15)
+temp_title_label = label.Label(
+    title_font, text="BBQLUE", color=clue.ORANGE, max_glyphs=15
+)
 temp_title_label.x = 12
 temp_title_label.y = 30
 temperatures_screen.append(temp_title_label)
@@ -122,27 +123,28 @@ while True:
 
                 temps = ibbq_service.temperatures
                 batt = ibbq_service.battery_level
-                if temps is not None:
+                if temps != None:
                     probe_count = len(temps)  # check how many probes there are
                     for i in range(probe_count):
-                        if (temps[i] is not 0 and temps[i] < 1000):  # unplugged probes
+                        if temps[i] is not 0 and temps[i] < 1000:  # unplugged probes
                             if unit_mode:
                                 clue.pixel.fill((50, 0, 0))
                                 temp = temps[i]
                                 my_labels[i].text = "{} C".format(temp)
                                 clue.pixel.fill((0, 0, 0))
-                                print("Probe", i+1, "Temperature:", temp,"C",)
+                                print("Probe", i + 1, "Temperature:", temp, "C")
                             else:  # F
                                 clue.pixel.fill((50, 0, 0))
                                 temp = temps[i] * 9 / 5 + 32
                                 my_labels[i].text = "{} F".format(temp)
                                 clue.pixel.fill((0, 0, 0))
-                                print("Probe", i+1, "Temperature:", temp,"F",)
+                                print("Probe", i + 1, "Temperature:", temp, "F")
                         else:
-                            print("Probe", i+1, "is unplugged",)
-                            my_labels[i].text = ("  ---")
+                            print(
+                                "Probe", i + 1, "is unplugged",
+                            )
+                            my_labels[i].text = "  ---"
                     clue.display.show(temperatures_screen)
 
     except _bleio.ConnectionError:
-        # Redisplay splash screen here, or put it at top of while True:
         continue
