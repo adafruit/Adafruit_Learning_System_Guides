@@ -123,10 +123,10 @@ while True:
 
                 temps = ibbq_service.temperatures
                 batt = ibbq_service.battery_level
-                if temps != None:
+                if temps is not None:
                     probe_count = len(temps)  # check how many probes there are
                     for i in range(probe_count):
-                        if temps[i] is not 0 and temps[i] < 1000:  # unplugged probes
+                        if temps[i] != 0 and temps[i] < 1000:  # unplugged probes
                             if unit_mode:
                                 clue.pixel.fill((50, 0, 0))
                                 temp = temps[i]
