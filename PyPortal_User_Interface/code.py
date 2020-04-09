@@ -12,10 +12,13 @@ import adafruit_touchscreen
 from adafruit_pyportal import PyPortal
 
 # ------------- Inputs and Outputs Setup ------------- #
-# init. the temperature sensor
-i2c_bus = busio.I2C(board.SCL, board.SDA)
-adt = adafruit_adt7410.ADT7410(i2c_bus, address=0x48)
-adt.high_resolution = True
+try:  # attempt to init. the temperature sensor
+    i2c_bus = busio.I2C(board.SCL, board.SDA)
+    adt = adafruit_adt7410.ADT7410(i2c_bus, address=0x48)
+    adt.high_resolution = True
+except ValueError:
+    # Did not find ADT7410. Probably running on Titano or Pynt
+    adt = None
 
 # init. the light sensor
 light_sensor = AnalogIn(board.LIGHT)
@@ -332,10 +335,14 @@ board.DISPLAY.show(splash)
 while True:
     touch = ts.touch_point
     light = light_sensor.value
-    tempC = round(adt.temperature)
-    tempF = tempC * 1.8 + 32
 
-    sensor_data.text = 'Touch: {}\nLight: {}\n Temp: {}°F'.format(touch, light, tempF)
+    if adt:  # Only if we have the temperature sensor
+        tempC = round(adt.temperature)
+        tempF = tempC * 1.8 + 32
+        sensor_data.text = 'Touch: {}\nLight: {}\n Temp: {}°F'.format(touch, light, tempF)
+
+    else:  # No temperature sensor on Titano and Pynt
+        sensor_data.text = 'Touch: {}\nLight: {}'.format(touch, light)
 
     # ------------- Handle Button Press Detection  ------------- #
     if touch:  # Only do this if the screen is touched
