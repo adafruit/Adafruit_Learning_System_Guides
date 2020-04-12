@@ -1,5 +1,6 @@
 import time
 import board
+import microcontroller
 import displayio
 import busio
 from analogio import AnalogIn
@@ -338,11 +339,11 @@ while True:
 
     if adt:  # Only if we have the temperature sensor
         tempC = round(adt.temperature)
-        tempF = tempC * 1.8 + 32
-        sensor_data.text = 'Touch: {}\nLight: {}\n Temp: {}°F'.format(touch, light, tempF)
+    else:  # No temperature sensor
+        tempC = round(microcontroller.cpu.temperature)
 
-    else:  # No temperature sensor on Titano and Pynt
-        sensor_data.text = 'Touch: {}\nLight: {}'.format(touch, light)
+    tempF = tempC * 1.8 + 32
+    sensor_data.text = 'Touch: {}\nLight: {}\n Temp: {}°F'.format(touch, light, tempF)
 
     # ------------- Handle Button Press Detection  ------------- #
     if touch:  # Only do this if the screen is touched
