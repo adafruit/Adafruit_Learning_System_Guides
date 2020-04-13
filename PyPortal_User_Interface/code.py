@@ -315,10 +315,10 @@ button_switch.selected = True
 # Update out Labels with display text.
 text_box(feed1_label, TABS_Y,
          "The text on this screen is wrapped so that all of it fits nicely into a \
-         text box that is ### x ###.", 30)
+text box that is ### x ###.", 30)
 text_box(feed1_label, TABS_Y,
          'The text on this screen is wrapped so that all of it fits nicely into a \
-         text box that is {} x {}.'
+text box that is {} x {}.'
          .format(feed1_label.bounding_box[2], feed1_label.bounding_box[3]*2), 30)
 
 text_box(feed2_label, TABS_Y, 'Tap on the Icon button to meet a new friend.', 18)
@@ -417,7 +417,7 @@ while True:
                     b.selected = False
                     text_box(feed2_label, TABS_Y,
                              "Every time you tap the Icon button the icon image will \
-                             change. Say hi to {}!".format(icon_name), 18)
+change. Say hi to {}!".format(icon_name), 18)
                     set_image(icon_group, "/images/"+icon_name+".bmp")
                 if i == 6 and view_live == 3:  # only if view3 is visable
                     b.selected = True

@@ -33,9 +33,8 @@ def flash_random(wait, howmany):
 
         for i in range(5, 0, -1):
             strip.brightness = i / 5.0  # Ramp down brightness
-            strip[j] = [0, 0, 0]  # Set pixel to 'off'
             time.sleep(wait)
-
+        strip[j] = [0, 0, 0]  # Set pixel to 'off'
 
 while True:
     # first number is 'wait' delay, shorter num == shorter twinkle
