@@ -381,10 +381,10 @@ def draw_profile(graph, profile):
     # draw labels
     x = profile["time_range"][0]
     y = profile["stages"]["reflow"][1]
-    xp = (GXSTART + graph.width * (x - graph.xmin)
-          // (graph.xmax - graph.xmin))
+    xp = int(GXSTART + graph.width * (x - graph.xmin)
+             // (graph.xmax - graph.xmin))
     yp = int(GHEIGHT * (y - graph.ymin)
-          / (graph.ymax - graph.ymin))
+             // (graph.ymax - graph.ymin))
 
     label_reflow.x = xp + 10
     label_reflow.y = HEIGHT - yp
@@ -396,25 +396,32 @@ def draw_profile(graph, profile):
     y = profile["stages"]["reflow"][1]
 
     # draw time line (horizontal)
-    graph.draw_line(graph.xmin, graph.ymin + 1, graph.xmax, graph.ymin + 1, AXIS_SIZE, AXIS_COLOR, 1)
+    graph.draw_line(graph.xmin, graph.ymin + 1, graph.xmax,
+                    graph.ymin + 1, AXIS_SIZE, AXIS_COLOR, 1)
     graph.draw_line(graph.xmin, graph.ymax, graph.xmax, graph.ymax,
                     AXIS_SIZE, AXIS_COLOR, 1)
     # draw time ticks
     tick = graph.xmin
     while tick < (graph.xmax - graph.xmin):
-        graph.draw_line(tick, graph.ymin, tick, graph.ymin + 10, AXIS_SIZE, AXIS_COLOR, 1)
-        graph.draw_line(tick, graph.ymax, tick, graph.ymax - 10 - AXIS_SIZE, AXIS_SIZE, AXIS_COLOR, 1)
+        graph.draw_line(tick, graph.ymin, tick, graph.ymin + 10,
+                        AXIS_SIZE, AXIS_COLOR, 1)
+        graph.draw_line(tick, graph.ymax, tick, graph.ymax - 10 - AXIS_SIZE,
+                        AXIS_SIZE, AXIS_COLOR, 1)
         tick += 60
 
     # draw temperature line (vertical)
-    graph.draw_line(graph.xmin, graph.ymin, graph.xmin, graph.ymax, AXIS_SIZE, AXIS_COLOR, 1)
-    graph.draw_line(graph.xmax - AXIS_SIZE + 1, graph.ymin, graph.xmax - AXIS_SIZE + 1,
+    graph.draw_line(graph.xmin, graph.ymin, graph.xmin,
+                    graph.ymax, AXIS_SIZE, AXIS_COLOR, 1)
+    graph.draw_line(graph.xmax - AXIS_SIZE + 1, graph.ymin,
+                    graph.xmax - AXIS_SIZE + 1,
                     graph.ymax, AXIS_SIZE, AXIS_COLOR, 1)
     # draw temperature ticks
     tick = graph.ymin
     while tick < (graph.ymax - graph.ymin)*1.1:
-        graph.draw_line(graph.xmin, tick, graph.xmin + 10, tick, AXIS_SIZE, AXIS_COLOR, 1)
-        graph.draw_line(graph.xmax, tick, graph.xmax - 10 - AXIS_SIZE, tick, AXIS_SIZE, AXIS_COLOR, 1)
+        graph.draw_line(graph.xmin, tick, graph.xmin + 10, tick,
+                        AXIS_SIZE, AXIS_COLOR, 1)
+        graph.draw_line(graph.xmax, tick, graph.xmax - 10 - AXIS_SIZE,
+                        tick, AXIS_SIZE, AXIS_COLOR, 1)
         tick += 50
 
     # draw profile
