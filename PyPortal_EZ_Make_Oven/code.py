@@ -16,7 +16,7 @@ import adafruit_touchscreen
 from adafruit_mcp9600 import MCP9600
 
 TITLE = "EZ Make Oven Controller"
-VERSION = "1.1.0"
+VERSION = "1.2.0"
 
 print(TITLE, "version ", VERSION)
 time.sleep(2)
@@ -25,15 +25,16 @@ display_group = displayio.Group(max_size=20)
 board.DISPLAY.show(display_group)
 
 PROFILE_SIZE = 2            # plot thickness
-PROFILE_COLOR = 0x00FF55    # plot color
 GRID_SIZE = 2
-GRID_COLOR = 0x2020FF
 GRID_STYLE = 3
 TEMP_SIZE = 2
-TEMP_COLOR = 0xFF0000
-LABEL_COLOR = 0x8080FF
 AXIS_SIZE = 2
-AXIS_COLOR = 0xFFFF00
+
+BLACK = 0x0
+BLUE = 0x2020FF
+GREEN = 0x00FF55
+RED = 0xFF0000
+YELLOW = 0xFFFF00
 
 WIDTH = board.DISPLAY.width
 HEIGHT = board.DISPLAY.height
@@ -41,15 +42,27 @@ HEIGHT = board.DISPLAY.height
 pyportal = PyPortal()
 
 palette = displayio.Palette(5)
-palette[0] = 0x0
-palette[1] = PROFILE_COLOR
-palette[2] = GRID_COLOR
-palette[3] = TEMP_COLOR
-palette[4] = AXIS_COLOR
+palette[0] = BLACK
+palette[1] = GREEN
+palette[2] = BLUE
+palette[3] = RED
+palette[4] = YELLOW
+
 palette.make_transparent(0)
 
-plot = displayio.Bitmap(WIDTH, HEIGHT, 8)
-pyportal.splash.append(displayio.TileGrid(plot, pixel_shader=palette))
+BACKGROUND_COLOR = 0
+PROFILE_COLOR = 1
+GRID_COLOR = 2
+TEMP_COLOR = 3
+AXIS_COLOR = 2
+
+GXSTART = 100
+GYSTART = 80
+GWIDTH = WIDTH - GXSTART
+GHEIGHT = HEIGHT - GYSTART
+plot = displayio.Bitmap(GWIDTH, GHEIGHT, 4)
+
+pyportal.splash.append(displayio.TileGrid(plot, pixel_shader=palette, x=GXSTART, y=GYSTART))
 
 ts = adafruit_touchscreen.Touchscreen(board.TOUCH_XL, board.TOUCH_XR,
                                       board.TOUCH_YD, board.TOUCH_YU,
@@ -253,8 +266,8 @@ class Graph(object):
         self.ymax = 240
         self.xstart = 0
         self.ystart = 0
-        self.width = WIDTH
-        self.height = HEIGHT
+        self.width = GWIDTH
+        self.height = GHEIGHT
 
     # pylint: disable=too-many-branches
     def draw_line(self, x1, y1, x2, y2, size=PROFILE_SIZE, color=1, style=1):
@@ -323,14 +336,14 @@ class Graph(object):
                 for yy in range(y-offset, y+offset+1):
                     if yy in range(self.ystart, self.ystart + self.height):
                         try:
-                            yy = HEIGHT - yy
+                            yy = GHEIGHT - yy
                             plot[xx, yy] = color
                         except IndexError:
                             pass
 
 def draw_profile(graph, profile):
     """Update the display with current info."""
-    for i in range(WIDTH * HEIGHT):
+    for i in range(GWIDTH * GHEIGHT):
         plot[i] = 0
 
     # draw stage lines
@@ -338,40 +351,40 @@ def draw_profile(graph, profile):
     graph.draw_line(profile["stages"]["preheat"][0], profile["temp_range"][0],
                     profile["stages"]["preheat"][0], profile["temp_range"][1]
                     * 1.1,
-                    GRID_SIZE, 2, GRID_STYLE)
+                    GRID_SIZE, GRID_COLOR, GRID_STYLE)
     graph.draw_line(profile["time_range"][0], profile["stages"]["preheat"][1],
                     profile["time_range"][1], profile["stages"]["preheat"][1],
-                    GRID_SIZE, 2, GRID_STYLE)
+                    GRID_SIZE, GRID_COLOR, GRID_STYLE)
     # soak
     graph.draw_line(profile["stages"]["soak"][0], profile["temp_range"][0],
                     profile["stages"]["soak"][0], profile["temp_range"][1]*1.1,
-                    GRID_SIZE, 2, GRID_STYLE)
+                    GRID_SIZE, GRID_COLOR, GRID_STYLE)
     graph.draw_line(profile["time_range"][0], profile["stages"]["soak"][1],
                     profile["time_range"][1], profile["stages"]["soak"][1],
-                    GRID_SIZE, 2, GRID_STYLE)
+                    GRID_SIZE, GRID_COLOR, GRID_STYLE)
     # reflow
     graph.draw_line(profile["stages"]["reflow"][0], profile["temp_range"][0],
                     profile["stages"]["reflow"][0], profile["temp_range"][1]
                     * 1.1,
-                    GRID_SIZE, 2, GRID_STYLE)
+                    GRID_SIZE, GRID_COLOR, GRID_STYLE)
     graph.draw_line(profile["time_range"][0], profile["stages"]["reflow"][1],
                     profile["time_range"][1], profile["stages"]["reflow"][1],
-                    GRID_SIZE, 2, GRID_STYLE)
+                    GRID_SIZE, GRID_COLOR, GRID_STYLE)
     # cool
     graph.draw_line(profile["stages"]["cool"][0], profile["temp_range"][0],
                     profile["stages"]["cool"][0], profile["temp_range"][1]*1.1,
-                    GRID_SIZE, 2, GRID_STYLE)
+                    GRID_SIZE, GRID_COLOR, GRID_STYLE)
     graph.draw_line(profile["time_range"][0], profile["stages"]["cool"][1],
                     profile["time_range"][1], profile["stages"]["cool"][1],
-                    GRID_SIZE, 2, GRID_STYLE)
+                    GRID_SIZE, GRID_COLOR, GRID_STYLE)
 
     # draw labels
     x = profile["time_range"][0]
     y = profile["stages"]["reflow"][1]
-    xp = (graph.xstart + graph.width * (x - graph.xmin)
-          // (graph.xmax - graph.xmin))
-    yp = (graph.ystart + int(graph.height * (y - graph.ymin)
-                             / (graph.ymax - graph.ymin)))
+    xp = int(GXSTART + graph.width * (x - graph.xmin)
+             // (graph.xmax - graph.xmin))
+    yp = int(GHEIGHT * (y - graph.ymin)
+             // (graph.ymax - graph.ymin))
 
     label_reflow.x = xp + 10
     label_reflow.y = HEIGHT - yp
@@ -379,26 +392,36 @@ def draw_profile(graph, profile):
     print("reflow temp:", str(profile["stages"]["reflow"][1]))
     print("graph point: ", x, y, "->", xp, yp)
 
+    x = profile["stages"]["reflow"][0]
+    y = profile["stages"]["reflow"][1]
+
     # draw time line (horizontal)
-    graph.draw_line(graph.xmin, graph.ymin, graph.xmax, graph.ymin, AXIS_SIZE, 4, 1)
-    graph.draw_line(graph.xmin, graph.ymax - AXIS_SIZE, graph.xmax, graph.ymax
-                    - AXIS_SIZE, AXIS_SIZE, 4, 1)
+    graph.draw_line(graph.xmin, graph.ymin + 1, graph.xmax,
+                    graph.ymin + 1, AXIS_SIZE, AXIS_COLOR, 1)
+    graph.draw_line(graph.xmin, graph.ymax, graph.xmax, graph.ymax,
+                    AXIS_SIZE, AXIS_COLOR, 1)
     # draw time ticks
     tick = graph.xmin
     while tick < (graph.xmax - graph.xmin):
-        graph.draw_line(tick, graph.ymin, tick, graph.ymin + 10, AXIS_SIZE, 4, 1)
-        graph.draw_line(tick, graph.ymax, tick, graph.ymax - 10 - AXIS_SIZE, AXIS_SIZE, 4, 1)
+        graph.draw_line(tick, graph.ymin, tick, graph.ymin + 10,
+                        AXIS_SIZE, AXIS_COLOR, 1)
+        graph.draw_line(tick, graph.ymax, tick, graph.ymax - 10 - AXIS_SIZE,
+                        AXIS_SIZE, AXIS_COLOR, 1)
         tick += 60
 
     # draw temperature line (vertical)
-    graph.draw_line(graph.xmin, graph.ymin, graph.xmin, graph.ymax, AXIS_SIZE, 4, 1)
-    graph.draw_line(graph.xmax - AXIS_SIZE, graph.ymin, graph.xmax - AXIS_SIZE,
-                    graph.ymax, AXIS_SIZE, 4, 1)
+    graph.draw_line(graph.xmin, graph.ymin, graph.xmin,
+                    graph.ymax, AXIS_SIZE, AXIS_COLOR, 1)
+    graph.draw_line(graph.xmax - AXIS_SIZE + 1, graph.ymin,
+                    graph.xmax - AXIS_SIZE + 1,
+                    graph.ymax, AXIS_SIZE, AXIS_COLOR, 1)
     # draw temperature ticks
     tick = graph.ymin
     while tick < (graph.ymax - graph.ymin)*1.1:
-        graph.draw_line(graph.xmin, tick, graph.xmin + 10, tick, AXIS_SIZE, 4, 1)
-        graph.draw_line(graph.xmax, tick, graph.xmax - 10 - AXIS_SIZE, tick, AXIS_SIZE, 4, 1)
+        graph.draw_line(graph.xmin, tick, graph.xmin + 10, tick,
+                        AXIS_SIZE, AXIS_COLOR, 1)
+        graph.draw_line(graph.xmax, tick, graph.xmax - 10 - AXIS_SIZE,
+                        tick, AXIS_SIZE, AXIS_COLOR, 1)
         tick += 50
 
     # draw profile
@@ -407,7 +430,7 @@ def draw_profile(graph, profile):
     for point in profile["profile"]:
         x2 = point[0]
         y2 = point[1]
-        graph.draw_line(x1, y1, x2, y2, PROFILE_SIZE, 1, 1)
+        graph.draw_line(x1, y1, x2, y2, PROFILE_SIZE, PROFILE_COLOR, 1)
         # print(point)
         x1 = x2
         y1 = y2
@@ -429,7 +452,7 @@ font3.load_glyphs(b'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01234567
 
 
 label_reflow = label.Label(font1, text="", max_glyphs=10,
-                           color=LABEL_COLOR, line_spacing=0)
+                           color=0xFFFFFF, line_spacing=0)
 label_reflow.x = 0
 label_reflow.y = -20
 pyportal.splash.append(label_reflow)
@@ -445,7 +468,7 @@ message = label.Label(font2, text="Wait", max_glyphs=30)
 message.x = 100
 message.y = 40
 pyportal.splash.append(message)
-alloy_label = label.Label(font1, text="Alloy: ", color=0xAAAAAA)
+alloy_label = label.Label(font1, text="Alloy:", color=0xAAAAAA)
 alloy_label.x = 5
 alloy_label.y = 40
 pyportal.splash.append(alloy_label)
@@ -482,10 +505,14 @@ pyportal.splash.append(circle)
 
 sgraph = Graph()
 
-sgraph.xstart = 100
-sgraph.ystart = 4
-sgraph.width = WIDTH - sgraph.xstart - 4  # 216 for standard PyPortal
-sgraph.height = HEIGHT - 80  # 160 for standard PyPortal
+#sgraph.xstart = 100
+#sgraph.ystart = 4
+sgraph.xstart = 0
+sgraph.ystart = 0
+#sgraph.width = WIDTH - sgraph.xstart - 4  # 216 for standard PyPortal
+#sgraph.height = HEIGHT - 80  # 160 for standard PyPortal
+sgraph.width = GWIDTH  # 216 for standard PyPortal
+sgraph.height = GHEIGHT  # 160 for standard PyPortal
 sgraph.xmin = oven.sprofile["time_range"][0]
 sgraph.xmax = oven.sprofile["time_range"][1]
 sgraph.ymin = oven.sprofile["temp_range"][0]
@@ -535,7 +562,7 @@ while True:
     last_status = ""
 
     if p:
-        if p[0] >= 0 and p[0] <= 80 and p[1] >= 200 and p[1] <= 240:
+        if p[0] >= 0 and p[0] <= 80 and p[1] >= HEIGHT - 40 and p[1] <= HEIGHT:
             print("touch!")
             if oven.state == "ready":
                 button.label = "Stop"
@@ -587,6 +614,6 @@ while True:
             print(oven.state)
             if oven_temp >= 50:
                 sgraph.draw_graph_point(int(timediff), oven_temp,
-                                        size=TEMP_SIZE, color=3)
+                                        size=TEMP_SIZE, color=TEMP_COLOR)
 
         last_state = oven.state
