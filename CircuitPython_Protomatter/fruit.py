@@ -1,17 +1,16 @@
-from _pixelbuf import wheel
 import random
 import time
-import array
-import terminalio
 import Protomatter
 import displayio
-from microcontroller.pin import *
+import board
+
 displayio.release_displays()
 
-p = Protomatter.protomatter_display(width=64, bit_depth=5,
-    rgb_pins=[PA18, PA16, PA19, PA21, PA20, PA22],
-    addr_pins=[PA06, PA04, PB09, PB08],
-    clock_pin=PA23, latch_pin=PB17, output_enable_pin=PB16, auto_refresh=False)
+p = Protomatter.protomatter_display(
+    width=64, bit_depth=3,
+    rgb_pins=[board.D6, board.D5, board.D9, board.D11, board.D10, board.D12],
+    addr_pins=[board.A5, board.A4, board.A3, board.A2],
+    clock_pin=board.D13, latch_pin=board.D0, output_enable_pin=board.D1, auto_refresh=False)
 
 bitmap_file = open("emoji.bmp", 'rb')
 bitmap = displayio.OnDiskBitmap(bitmap_file)
@@ -23,10 +22,15 @@ def shuffled(seq):
 
 class Strip(displayio.TileGrid):
     def __init__(self):
-        super().__init__(bitmap=bitmap, pixel_shader=displayio.ColorConverter(), width=1, height=4, tile_width=20, tile_height=24)
+        super().__init__(bitmap=bitmap, pixel_shader=displayio.ColorConverter(),
+                         width=1, height=4, tile_width=20, tile_height=24)
         self.order = shuffled(range(20))
         self.state = STOPPED
         self.pos = 0
+        self.vel = 0
+        self.y = 0
+        self.x = 0
+        self.stop_time = time.monotonic_ns()
 
     def step(self):
         if self.state == RUNNING:
@@ -58,12 +62,12 @@ class Strip(displayio.TileGrid):
 
     def brake(self):
         self.state = BRAKING
-    
+
 g = displayio.Group(max_size=3)
 strips = []
-for i in range(3):
+for idx in range(3):
     strip = Strip()
-    strip.x = i * 22
+    strip.x = idx * 22
     strip.y = -20
     g.append(strip)
     strips.append(strip)
@@ -72,42 +76,24 @@ p.show(g)
 orders = [shuffled(range(20)), shuffled(range(20)), shuffled(range(20))]
 
 for si, oi in zip(strips, orders):
-    for j in range(4):
-        si[j] = oi[j]
-    
-def scroll(t, b):
-    sp = b' ' * linelen
-    t = sp + t + sp
-    b = sp + b + sp
-    maxlen = max(len(t), len(b))
-    
-    for i in range(maxlen-linelen):
-        for j in range(linelen):
-            sh[j][1] = wheel(3 * (2*i+j))
-            tg1[j][0] = charmap[t[i+j]]
-            tg2[j][0] = charmap[b[i+j]]
-        for j in range(7):
-            l1.x = -j
-            l2.x = -j
-            p.refresh(minimum_frames_per_second=0)
-            #p.refresh(minimum_frames_per_second=0)
+    for idx in range(4):
+        si[idx] = oi[idx]
 
 def all_stopped():
     return all(si.state == STOPPED for si in strips)
 
-for i, si in enumerate(strips):
-    si.kick(i)
+for idx, si in enumerate(strips):
+    si.kick(idx)
 
 while True:
     p.refresh(minimum_frames_per_second=0)
     if all_stopped():
-        for i, si in enumerate(strips):
+        for idx, si in enumerate(strips):
             print(si.pos, si.vel, si.y)
-        for i in range(100):
+        for idx in range(100):
             p.refresh(minimum_frames_per_second=0)
-        for i, si in enumerate(strips):
-            si.kick(i)
+        for idx, si in enumerate(strips):
+            si.kick(idx)
 
-    for i, si in enumerate(strips):
+    for idx, si in enumerate(strips):
         si.step()
-
