@@ -43,13 +43,10 @@ class Strip(displayio.TileGrid):
         yy = round(self.pos / 16)
         yyy = yy % 24
         off = yy // 24
-        if self.state == BRAKING:
-            print (self.pos, yy, off)
         if self.state == BRAKING and self.vel == 7 and yyy < 4:
             self.pos = off * 24 * 16
             self.vel = 0
             yy = 0
-            print("braking -> stopped")
             self.state = STOPPED
         self.y = yy % 24 - 20
         for i in range(4):
@@ -88,8 +85,6 @@ for idx, si in enumerate(strips):
 while True:
     p.refresh(minimum_frames_per_second=0)
     if all_stopped():
-        for idx, si in enumerate(strips):
-            print(si.pos, si.vel, si.y)
         for idx in range(100):
             p.refresh(minimum_frames_per_second=0)
         for idx, si in enumerate(strips):
