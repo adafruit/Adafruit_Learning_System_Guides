@@ -45,6 +45,7 @@ if ble.connected:
 midi = adafruit_midi.MIDI(midi_out=midi_service, out_channel=midi_channel - 1)
 
 print("advertising")
+ble.name="Power Glove MIDI"
 ble.start_advertising(advertisement)
 
 # reads an analog pin and returns value remapped to out range, e.g., 0-127
