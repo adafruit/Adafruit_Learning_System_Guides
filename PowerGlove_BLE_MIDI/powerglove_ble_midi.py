@@ -83,7 +83,6 @@ while True:
             pass
         print("Connected")
         while ble.connected:
-
             # Feather Sense accelerometer readings to CC
             accel_data = sense_accel.acceleration  # get accelerometer reading
             accel_x = accel_data[0]
