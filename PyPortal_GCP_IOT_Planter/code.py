@@ -15,7 +15,7 @@ import neopixel
 from adafruit_esp32spi import adafruit_esp32spi, adafruit_esp32spi_wifimanager
 import adafruit_esp32spi.adafruit_esp32spi_socket as socket
 from adafruit_gc_iot_core import MQTT_API, Cloud_Core
-from adafruit_minimqtt import MQTT
+import adafruit_minimqtt as MQTT
 from adafruit_seesaw.seesaw import Seesaw
 import digitalio
 
@@ -43,6 +43,9 @@ wifi = adafruit_esp32spi_wifimanager.ESPSPI_WiFiManager(
 print("Connecting to WiFi...")
 wifi.connect()
 print("Connected!")
+
+# Initialize MQTT interface with the esp interface
+MQTT.set_socket(socket, esp)
 
 # Soil Sensor Setup
 i2c_bus = busio.I2C(board.SCL, board.SDA)
@@ -138,12 +141,10 @@ jwt = google_iot.generate_jwt()
 print("Your JWT is: ", jwt)
 
 # Set up a new MiniMQTT Client
-client = MQTT(socket,
-              broker=google_iot.broker,
-              username=google_iot.username,
-              password=jwt,
-              client_id=google_iot.cid,
-              network_manager=wifi)
+client = MQTT.MQTT(broker=google_iot.broker,
+                   username=google_iot.username,
+                   password=jwt,
+                   client_id=google_iot.cid)
 
 # Initialize Google MQTT API Client
 google_mqtt = MQTT_API(client)
@@ -187,4 +188,5 @@ while True:
     except (ValueError, RuntimeError) as e:
         print("Failed to get data, retrying", e)
         wifi.reset()
+        google_mqtt.reconnect()
         continue
