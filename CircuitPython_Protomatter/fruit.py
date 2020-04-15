@@ -1,16 +1,19 @@
 import random
 import time
-import Protomatter
-import displayio
+
 import board
+import displayio
+import framebufferio
+import protomatter
 
 displayio.release_displays()
 
-p = Protomatter.protomatter_display(
-    width=64, bit_depth=3,
+proto = protomatter.Protomatter(
+    width=64, height=32, bit_depth=3,
     rgb_pins=[board.D6, board.D5, board.D9, board.D11, board.D10, board.D12],
     addr_pins=[board.A5, board.A4, board.A3, board.A2],
-    clock_pin=board.D13, latch_pin=board.D0, output_enable_pin=board.D1, auto_refresh=False)
+    clock_pin=board.D13, latch_pin=board.D0, output_enable_pin=board.D1)
+display = framebufferio.FramebufferDisplay(proto, auto_refresh=False)
 
 bitmap_file = open("emoji.bmp", 'rb')
 bitmap = displayio.OnDiskBitmap(bitmap_file)
@@ -68,7 +71,7 @@ for idx in range(3):
     strip.y = -20
     g.append(strip)
     strips.append(strip)
-p.show(g)
+display.show(g)
 
 orders = [shuffled(range(20)), shuffled(range(20)), shuffled(range(20))]
 
@@ -83,10 +86,10 @@ for idx, si in enumerate(strips):
     si.kick(idx)
 
 while True:
-    p.refresh(minimum_frames_per_second=0)
+    display.refresh(minimum_frames_per_second=0)
     if all_stopped():
         for idx in range(100):
-            p.refresh(minimum_frames_per_second=0)
+            display.refresh(minimum_frames_per_second=0)
         for idx, si in enumerate(strips):
             si.kick(idx)
 

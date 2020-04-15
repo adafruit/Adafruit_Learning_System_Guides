@@ -1,16 +1,19 @@
 import array
+
 from _pixelbuf import wheel
-import terminalio
-import Protomatter
-import displayio
 import board
+import displayio
+import framebufferio
+import protomatter
+import terminalio
 displayio.release_displays()
 
-p = Protomatter.protomatter_display(
-    width=64, bit_depth=3,
+proto = protomatter.Protomatter(
+    width=64, height=32, bit_depth=3,
     rgb_pins=[board.D6, board.D5, board.D9, board.D11, board.D10, board.D12],
     addr_pins=[board.A5, board.A4, board.A3, board.A2],
-    clock_pin=board.D13, latch_pin=board.D0, output_enable_pin=board.D1, auto_refresh=False)
+    clock_pin=board.D13, latch_pin=board.D0, output_enable_pin=board.D1)
+display = framebufferio.FramebufferDisplay(proto, auto_refresh=False)
 
 def tilegrid(palette):
     return displayio.TileGrid(
@@ -23,7 +26,7 @@ l1 = displayio.Group(max_size=linelen)
 l2 = displayio.Group(max_size=linelen)
 g.append(l1)
 g.append(l2)
-p.show(g)
+display.show(g)
 
 l1.y = 1
 l2.y = 16
@@ -71,8 +74,8 @@ def scroll(t, b):
         for j in range(7):
             l1.x = -j
             l2.x = -j
-            p.refresh(minimum_frames_per_second=0)
-            #p.refresh(minimum_frames_per_second=0)
+            display.refresh(minimum_frames_per_second=0)
+            #display.refresh(minimum_frames_per_second=0)
 
 while True:
     for e, o in zip(even_lines, odd_lines):
