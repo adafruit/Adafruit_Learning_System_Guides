@@ -1,5 +1,5 @@
 """
-Power Glove BLE MIDI with Feather Sense nRF52849
+Power Glove BLE MIDI with Feather Sense nRF52840
 Sends MIDI CC values based on finger flex sensors and accelerometer
 """
 import time
