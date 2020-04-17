@@ -20,10 +20,7 @@ import digitalio
 import storage
 import _bleio
 import adafruit_ble
-from adafruit_ble.advertising.standard import (
-    Advertisement,
-    ProvideServicesAdvertisement,
-)
+from adafruit_ble.advertising.standard import Advertisement
 from adafruit_ble.services.standard.device_info import DeviceInfoService
 from adafruit_ble_berrymed_pulse_oximeter import BerryMedPulseOximeterService
 
@@ -113,6 +110,6 @@ while True:
     except _bleio.ConnectionError:
         try:
             pulse_ox_connection.disconnect()
-        except:
+        except _bleio.ConnectionError:
             pass
         pulse_ox_connection = None
