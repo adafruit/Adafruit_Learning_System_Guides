@@ -49,7 +49,6 @@ def conway(output):
         y = output.height - len(conway_data) - 2 + i
         for j, cj in enumerate(si):
             output[(output.width - 8)//2 + j, y] = cj & 1
-    
 
 matrix = rgbmatrix.RGBMatrix(
     width=64, height=32, bit_depth=1,
@@ -76,8 +75,7 @@ time.sleep(3)
 n = 40
 
 while True:
-        
-    for i in range(n):
+    for _ in range(n):
         display.show(g1)
         apply_life_rule(b1, b2)
         display.show(g2)
