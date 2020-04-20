@@ -28,27 +28,34 @@ pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=1.0,
 pixels.fill((0, 0, 0))  # Blanking Display
 COLOR = (0, 200, 0)     # Green for time later in code
 
+
+def get_bitmap(num_slot):
+    i = 0
+    for n in range(num_slot*3,(num_slot+1)*3):
+        i = i | 1<<n
+    return i
+
 # Bitmap values for each value. These can be OR'ed together
-THREE = 1
-EIGHT = 1 << 1
-ELEVEN = 1 << 2
-TWO = 1 << 3
-SIX = 1 << 4
-FOUR = 1 << 5
-SEVEN = 1 << 6
-NOON = 1 << 7
-TEN = 1 << 8
-ONE = 1 << 9
-FIVE = 1 << 10
-MIDNIGHT = 1 << 11
-NINE = 1 << 12
-PAST = 1 << 13
-TO = 1 << 14
-FIVEMIN = 1 << 15
-QUARTER = 1 << 16
-TENMIN = 1 << 17
-HALF = 1 << 18
-TWENTY = 1 << 19
+THREE = get_bitmap(0)
+EIGHT = get_bitmap(1)
+ELEVEN = get_bitmap(2)
+TWO = get_bitmap(3)
+SIX = get_bitmap(4)
+FOUR =  get_bitmap(5)
+SEVEN = get_bitmap(6)
+NOON = get_bitmap(7)
+TEN = get_bitmap(8)
+ONE = get_bitmap(9)
+FIVE = get_bitmap(10)
+MIDNIGHT = get_bitmap(11)
+NINE = get_bitmap(12)
+PAST = get_bitmap(13)
+TO = get_bitmap(14)
+FIVEMIN = get_bitmap(15)
+QUARTER = get_bitmap(16)
+TENMIN = get_bitmap(17)
+HALF = get_bitmap(18)
+TWENTY = get_bitmap(19)
 
 # Pass in hour and minute, return LED bitmask
 # pylint: disable=too-many-branches
@@ -145,7 +152,7 @@ while True:
         # print("The time is {}:{:02}".format(t.tm_hour, t.tm_min))
         pixels.fill((0, 0, 0))       # blank all pixels for change
         the_time = writetime(hour, minute)
-        for i in range(0, 21):       # Check all bits
+        for i in range(0, 63):       # Check all bits
             if the_time & 1 << i:    # If the bit is true
                 pixels[i+1] = COLOR  # set pixel on (shift up 2 for buried one)
         pixels.show()
