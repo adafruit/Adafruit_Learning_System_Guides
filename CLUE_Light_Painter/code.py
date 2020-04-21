@@ -146,15 +146,14 @@ class ClueLightPainter:
             data (bytearray) : Pixel data in LED strip's native color order,
                                3 bytes/pixel. Also takes ulab uint8 ndarray.
         """
-        num_leds = len(data) // 3
         pixel_start = bytearray([255]) # Per-pixel marker
         data_bytes = [x for l in [pixel_start + data[i:i+3]
-                                  for i in range(num_leds)] for x in l]
+                                  for i in range(0, len(data), 3)] for x in l]
         # SPI is NOT locked or configured here -- the application performs
         # that once at startup and never relinquishes control of the port.
         # Anything to save a few cycles.
         self.spi.write(bytearray([0] * 4) + bytearray(data_bytes) +
-                       bytearray([255] * ((num_leds + 15) // 16)))
+                       bytearray([255] * (((len(data) // 3) + 15) // 16)))
 
 
     def clear_strip(self):

@@ -1,10 +1,10 @@
-# pylint: disable=import-error, too-many-instance-attributes, too-few-public-methods
-
 """Glorified button class with debounced tap, double-tap, hold and release"""
 
+# pylint: disable=import-error
 from time import monotonic
 from digitalio import DigitalInOut, Direction, Pull
 
+# pylint: disable=too-many-instance-attributes, too-few-public-methods
 class RichButton:
     """
     A button class handling more than basic taps: adds debounced tap,
