@@ -12,7 +12,6 @@ from adafruit_pyportal import PyPortal
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text import label
 import adafruit_touchscreen
-from adafruit_ntp import NTP
 
 
 try:
@@ -30,6 +29,26 @@ spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
 esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset, debug=False)
 requests.set_socket(socket, esp)
 
+
+def wday_to_weekday_name(tm_wday):
+    """Returns the name of the weekday based on tm_wday value.
+    :param int tm_wday: Days since Sunday.
+
+    """
+    switch = {
+    0: "Monday",
+    1: "Tuesday",
+    2: "Wednesday",
+    3: "Thursday",
+    4: "Friday",
+    5: "Saturday",
+    6: "Sunday",}
+    return switch.get(tm_wday, "Not found")
+
+# initialize pyportal
+pyportal = PyPortal(esp=esp,
+                    external_spi=spi)
+
 if esp.status == adafruit_esp32spi.WL_IDLE_STATUS:
     print("ESP32 found and in idle mode")
     print("Firmware vers.", esp.firmware_version)
@@ -43,79 +62,44 @@ while not esp.is_connected:
         print("could not connect to AP, retrying: ", e)
         continue
 
-pyportal = PyPortal(esp=esp,
-                    external_spi=spi)
-
 # Set the font and preload letters
-font = bitmap_font.load_font("/fonts/Helvetica-Bold-36.bdf")
-font.load_glyphs(b'abcdefghjiklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890- ()')
+font_large = bitmap_font.load_font("/fonts/Helvetica-Bold-36.bdf")
+font_small = bitmap_font.load_font("/fonts/Helvetica-Bold-24.bdf")
+font_large.load_glyphs(b'abcdefghjiklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890- ')
+font_small.load_glyphs(b'abcdefghjiklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890- ()')
+
 
 # Set up display group
 splash = displayio.Group(max_size=10) # The Main Display Group
 view = displayio.Group(max_size=15) # Group for Text objects
 splash.append(view)
 
-# Set up text labels
-label_time = label.Label(font, color=0x538ab1, max_glyphs=200)
-label_time.x = board.DISPLAY.width // 7
+# Set up label for the day
+label_day = label.Label(font_large, color=0xFFFFFF, max_glyphs=200)
+label_day.x = board.DISPLAY.width // 4
+label_day.y = 70
+view.append(label_day)
+
+# Set up label for the time
+label_time = label.Label(font_small, color=0x538ab1, max_glyphs=200)
+label_time.x = board.DISPLAY.width // 4
 label_time.y = 150
 view.append(label_time)
-
-label_day = label.Label(font, color=0xFFFFFF, max_glyphs=200)
-label_day.x = board.DISPLAY.width // 7
-label_day.y = 40
-view.append(label_day)
 
 # Show group splash
 board.DISPLAY.show(splash)
 
-# Initialize the NTP object
-ntp = NTP(esp)
+# Obtain local time from Time API
+pyportal.get_local_time(secrets['timezone'])
+the_time = time.localtime()
 
-# Fetch and set the microcontroller's current UTC time
-# keep retrying until a valid time is returned
-while not ntp.valid_time:
-    ntp.set_time()
-    print("Failed to obtain time, retrying in 15 seconds...")
-    time.sleep(15)
-
-# Get the current time in seconds since Jan 1, 1970
-current_time = time.time()
-print("Seconds since Jan 1, 1970: {} seconds".format(current_time))
-
-# Convert the current time in seconds since Jan 1, 1970 to a struct_time
-now = time.localtime(current_time)
-print(now)
-
-# Pretty-parse the struct_time
-print(
-    "It is currently {}/{}/{} at {}:{}:{} UTC".format(
-        now.tm_mon, now.tm_mday, now.tm_year, now.tm_hour, now.tm_min, now.tm_sec
-    )
-)
-
-
-def wday_to_weekday_name(tm_wday):
-    """Returns the name of the weekday based on tm_wday.
-    :param int tm_wday: Days since Sunday.
-
-    """
-    switcher = {
-    0: "Monday",
-    1: "Tuesday",
-    2: "Wednesday",
-    3: "Thursday",
-    4: "Friday",
-    5: "Saturday",
-    6: "Sunday",}
-    return switcher.get(tm_wday, "Not found")
-
-# Convert date to weekday name
-weekday = wday_to_weekday_name(now.tm_wday)
+# Convert tm_wday to name of day
+weekday = wday_to_weekday_name(the_time.tm_wday)
+# Set label_day
 label_day.text = "{}".format(weekday)
 
 
-# Time names
+# Time descriptions
 time_name = ["midnight-ish", "late night", "late", "super late",
             "super early","really early","dawn","morning",
             "morning","mid-morning","mid-morning","late morning",
@@ -123,7 +107,7 @@ time_name = ["midnight-ish", "late night", "late", "super late",
             "late afternoon","early evening","early evening","dusk-ish",
             "evening","evening","late evening","late evening"]
 
-label_time.text = "({})".format(time_name[0])
+label_time.text = "({})".format(time_name[the_time.tm_hour])
 
 
 while True:
