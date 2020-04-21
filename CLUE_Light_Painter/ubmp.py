@@ -132,7 +132,7 @@ class UBMP:
         try:
             full_list = listdir(path)
         except OSError:
-            return
+            return valid_list
         for entry in full_list:
             try:
                 with open(path + '/' + entry, "rb") as self.file:
