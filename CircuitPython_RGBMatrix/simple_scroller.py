@@ -1,5 +1,5 @@
 # This example implements a simple two line scroller using
-# Adafruit_CircuitPython_Display_Text.  Each line has its own color
+# Adafruit_CircuitPython_Display_Text. Each line has its own color
 # and it is possible to modify the example to use other fonts and non-standard
 # characters.
 
@@ -48,7 +48,7 @@ def scroll(line):
     if line.x < -line_width:
         line.x = display.width
 
-# You can add more effects in this loop.  For instance, maybe you want to set the
+# You can add more effects in this loop. For instance, maybe you want to set the
 # color of each label to a different value
 while True:
     scroll(line1)

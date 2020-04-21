@@ -23,7 +23,7 @@ displayio.release_displays()
 #
 # This function has been somewhat optimized, so that when it indexes the bitmap
 # a single number [x + width * y] is used instead of indexing with [x, y].
-# This makes the animation run faster with some loss of clarity.  More
+# This makes the animation run faster with some loss of clarity. More
 # optimizations are probably possible.
 
 def apply_life_rule(old, new):

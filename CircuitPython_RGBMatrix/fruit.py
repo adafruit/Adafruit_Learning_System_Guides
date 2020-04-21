@@ -15,8 +15,8 @@ matrix = rgbmatrix.RGBMatrix(
     clock_pin=board.D13, latch_pin=board.D0, output_enable_pin=board.D1)
 display = framebufferio.FramebufferDisplay(matrix, auto_refresh=False)
 
-# This bitmap contains the emoji we're going to use.  It is assumed
-# to contain 20 icons, each 20x24 pixels.  This fits nicely on the 64x32
+# This bitmap contains the emoji we're going to use. It is assumed
+# to contain 20 icons, each 20x24 pixels. This fits nicely on the 64x32
 # RGB matrix display.
 bitmap_file = open("emoji.bmp", 'rb')
 bitmap = displayio.OnDiskBitmap(bitmap_file)
@@ -28,9 +28,9 @@ STOPPED, RUNNING, BRAKING = range(3)
 def shuffled(seq):
     return sorted(seq, key=lambda _: random.random())
 
-# The Wheel class manages the state of one wheel.  "pos" is a position in
+# The Wheel class manages the state of one wheel. "pos" is a position in
 # scaled integer coordinates, with one revolution being 7680 positions
-# and 1 pixel being 16 positions.  The wheel also has a velocity (in positions
+# and 1 pixel being 16 positions. The wheel also has a velocity (in positions
 # per tick) and a state (one of the above constants)
 class Wheel(displayio.TileGrid):
     def __init__(self):
