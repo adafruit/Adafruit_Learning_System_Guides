@@ -13,13 +13,22 @@ from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text import label
 import adafruit_touchscreen
 
-
 try:
     from secrets import secrets
 except ImportError:
     print("""WiFi settings are kept in secrets.py, please add them there!
 the secrets dictionary must contain 'ssid' and 'password' at a minimum""")
     raise
+
+# Descriptions of each hour
+# https://github.com/mwfisher3/QuarantineClock/blob/master/today.html
+time_name = ["midnight-ish", "late night", "late", "super late",
+            "super early","really early","dawn","morning",
+            "morning","mid-morning","mid-morning","late morning",
+            "noon-ish","afternoon","afternoon","mid-afternoon",
+            "late afternoon","early evening","early evening","dusk-ish",
+            "evening","evening","late evening","late evening"]
+
 
 esp32_cs = digitalio.DigitalInOut(board.ESP_CS)
 esp32_ready = digitalio.DigitalInOut(board.ESP_BUSY)
@@ -89,26 +98,30 @@ view.append(label_time)
 # Show group splash
 board.DISPLAY.show(splash)
 
-# Obtain local time from Time API
-pyportal.get_local_time(secrets['timezone'])
-the_time = time.localtime()
-
-# Convert tm_wday to name of day
-weekday = wday_to_weekday_name(the_time.tm_wday)
-# Set label_day
-label_day.text = "{}".format(weekday)
-
-
-# Time descriptions
-time_name = ["midnight-ish", "late night", "late", "super late",
-            "super early","really early","dawn","morning",
-            "morning","mid-morning","mid-morning","late morning",
-            "noon-ish","afternoon","afternoon","mid-afternoon",
-            "late afternoon","early evening","early evening","dusk-ish",
-            "evening","evening","late evening","late evening"]
-
-label_time.text = "({})".format(time_name[the_time.tm_hour])
-
-
+refresh_time = None
 while True:
-    pass
+    # only query the network time every hour
+    if (not refresh_time) or (time.monotonic() - refresh_time) > 3600:
+        try:
+            print("Getting new time from internet...")
+            pyportal.get_local_time(secrets['timezone'])
+            refresh_time = time.monotonic()
+        except (ValueError, RuntimeError) as error:
+            print("Failed to get data, retrying\n", e)
+            wifi.reset()
+            continue
+
+    # set the_time
+    the_time = time.localtime()
+
+    # Convert tm_wday to name of day
+    weekday = wday_to_weekday_name(the_time.tm_wday)
+
+    # set the day label's text
+    label_day.text = "{}".format(weekday)
+
+    # set the time label's text
+    label_time.text = "({})".format(time_name[the_time.tm_hour])
+
+    # update every 30s.
+    time.sleep(30)
