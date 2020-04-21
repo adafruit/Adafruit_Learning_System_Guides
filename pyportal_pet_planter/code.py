@@ -11,7 +11,7 @@ import neopixel
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text.label import Label
 from adafruit_io.adafruit_io import IO_MQTT
-from adafruit_minimqtt import MQTT
+import adafruit_minimqtt as MQTT
 from adafruit_pyportal import PyPortal
 from adafruit_seesaw.seesaw import Seesaw
 from simpleio import map_range
@@ -181,14 +181,13 @@ while not esp.is_connected:
         continue
 print("Connected to WiFi!")
 
-# Initialize a new MiniMQTT Client object
-mqtt_client = MQTT(
-    socket=socket,
-    broker="io.adafruit.com",
-    username=secrets["aio_username"],
-    password=secrets["aio_key"],
-    network_manager=wifi
-)
+# Initialize MQTT interface with the esp interface
+MQTT.set_socket(socket, esp)
+
+# Initialize a new MQTT Client object
+mqtt_client = MQTT.MQTT(broker="https://io.adafruit.com",
+                        username=secrets["aio_user"],
+                        password=secrets["aio_key"])
 
 # Adafruit IO Callback Methods
 # pylint: disable=unused-argument
