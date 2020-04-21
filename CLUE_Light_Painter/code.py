@@ -8,13 +8,13 @@ and dithering, displayio for a minimal user interface.
 # pylint: disable=import-error
 import gc
 from math import modf
-from time import monotonic
+from time import monotonic, sleep
 import board
 import busio
 import digitalio
 import displayio
 import ulab
-from ubmp import UBMP
+from ubmp import UBMP, BMPError
 from neopixel_write import neopixel_write
 from richbutton import RichButton
 from adafruit_display_text import label
@@ -87,6 +87,7 @@ class ClueLightPainter:
         self.config_mode = 0  # Current setting being changed
         self.rect = None      # Multipurpose progress/setting rect
         self.speed = 0.6      # Paint speed, 0.0 (slow) to 1.0 (fast)
+        self.columns = []     # Empty image data
 
         if isinstance(pixel_pin, (tuple, list)):
             # Using DotStar LEDs. The SPI peripheral is locked and config'd
@@ -193,9 +194,15 @@ class ClueLightPainter:
         group.append(self.rect)
         board.DISPLAY.show(group)
 
-        self.columns = self.neobmp.load(self.path + '/' +
-                                        self.images[self.image_num],
-                                        self.load_progress)
+        try:
+            self.columns = self.neobmp.load(self.path + '/' +
+                                            self.images[self.image_num],
+                                            self.load_progress)
+        except (MemoryError, BMPError):
+            group = displayio.Group()
+            group.append(centered_label('TOO BIG', 40, 3))
+            board.DISPLAY.show(group)
+            sleep(4)
 
         board.DISPLAY.show(displayio.Group()) # Clear display
 
@@ -207,9 +214,12 @@ class ClueLightPainter:
         the nifty image processing.
         """
 
+        if not self.columns: # If no image loaded
+            return           # Go back to config, can try another
+
         board.DISPLAY.brightness = 0 # Screen backlight OFF
         painting = False
-        duration = 10.0 - self.speed * 9.0 # 1 to 10 seconds
+        duration = 5.0 - self.speed * 4.5 # 0.5 to 5 seconds
         err = 0 # Clear the 'error term' used for diffusion dithering
 
         gc.collect() # Helps make playback a little smoother
@@ -351,7 +361,7 @@ class ClueLightPainter:
         group = self.make_ui_group(True, strings[self.config_mode])
         board.DISPLAY.brightness = 1 # Screen on
         prev_mode = self.config_mode
-        reload_image = False
+        reload_image = not self.columns
 
         while True:
             action_left, action_right = (self.button_left.action(),
