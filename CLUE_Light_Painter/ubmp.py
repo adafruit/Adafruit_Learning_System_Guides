@@ -128,8 +128,11 @@ class UBMP:
             BMP formats (e.g. compressed or paletted) are skipped.
             List will be alphabetically sorted.
         """
-        full_list = listdir(path)
         valid_list = []
+        try:
+            full_list = listdir(path)
+        except OSError:
+            return
         for entry in full_list:
             try:
                 with open(path + '/' + entry, "rb") as self.file:

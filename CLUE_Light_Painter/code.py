@@ -25,7 +25,7 @@ FONT_WIDTH, FONT_HEIGHT = FONT.get_bounding_box()
 # These are permanent global settings, can only change by editing the code:
 
 FLIP_SCREEN = True   # If True, turn CLUE screen & buttons upside-down
-PATH = '/bmps'       # Folder containing BMP images (or '' for root path)
+PATH = '/bmps-30px'  # Folder containing BMP images (or '' for root path)
 GAMMA = 2.6          # Correction factor for perceptually linear brightness
 NUM_PIXELS = 30      # LED strip length, half-meter is usu. 30 or 72 pixels
 PIXEL_PIN = board.D0 # Output pin for NeoPixel data
