@@ -1,6 +1,7 @@
 #!/bin/bash
 
 PYLINT="`type -p pylint3 2>/dev/null || type -p pylint`"
+echo "Using pylint bin at $PYLINT"
 
 function find_pyfiles() {
     if [ $# -eq 0 ]; then set -- .; fi
