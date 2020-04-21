@@ -3,9 +3,6 @@
 # and it is possible to modify the example to use other fonts and non-standard
 # characters.
 
-import array
-
-from _pixelbuf import wheel
 import adafruit_display_text.label
 import board
 import displayio
