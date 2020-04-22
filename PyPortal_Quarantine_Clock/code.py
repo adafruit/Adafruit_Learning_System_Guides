@@ -77,26 +77,17 @@ font_small = bitmap_font.load_font("/fonts/Helvetica-Bold-24.bdf")
 font_large.load_glyphs(b'abcdefghjiklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890- ')
 font_small.load_glyphs(b'abcdefghjiklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890- ()')
 
-
-# Set up display group
-splash = displayio.Group(max_size=10) # The Main Display Group
-view = displayio.Group(max_size=15) # Group for Text objects
-splash.append(view)
-
 # Set up label for the day
 label_day = label.Label(font_large, color=0xFFFFFF, max_glyphs=200)
-label_day.x = board.DISPLAY.width // 4
+label_day.x = board.DISPLAY.width // 5
 label_day.y = 70
-view.append(label_day)
+pyportal.splash.append(label_day)
 
 # Set up label for the time
 label_time = label.Label(font_small, color=0x538ab1, max_glyphs=200)
 label_time.x = board.DISPLAY.width // 4
 label_time.y = 150
-view.append(label_time)
-
-# Show group splash
-board.DISPLAY.show(splash)
+pyportal.splash.append(label_time)
 
 refresh_time = None
 while True:
@@ -118,7 +109,7 @@ while True:
     weekday = wday_to_weekday_name(the_time.tm_wday)
 
     # set the day label's text
-    label_day.text = "{}".format(weekday)
+    label_day.text = weekday
 
     # set the time label's text
     label_time.text = "({})".format(time_name[the_time.tm_hour])
