@@ -1,11 +1,14 @@
 #!/bin/bash
 
+PYLINT="`type -p pylint3 2>/dev/null || type -p pylint`"
+
 function find_pyfiles() {
-    for f in $(find . -type f -iname '*.py'); do
+    if [ $# -eq 0 ]; then set -- .; fi
+    for f in $(find "$@" -type f -iname '*.py'); do
         if [ ! -e "$(dirname $f)/.circuitpython.skip" ]; then
             echo "$f"
         fi
     done
 }
 
-find_pyfiles | xargs pylint
+find_pyfiles "$@" | xargs "$PYLINT"
