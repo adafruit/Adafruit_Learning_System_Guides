@@ -67,9 +67,18 @@ def scroll(line):
     if line.x < -line_width:
         line.x = display.width
 
+# This function scrolls lines backwards.  Try switching which function is
+# called for line2 below!
+def reverse_scroll(line):
+    line.x = line.x + 1
+    line_width = line.bounding_box[2]
+    if line.x >= display.width:
+        line.x = -line_width
+
 # You can add more effects in this loop. For instance, maybe you want to set the
-# color of each label to a different value
+# color of each label to a different value.
 while True:
     scroll(line1)
     scroll(line2)
+    #reverse_scroll(line2)
     display.refresh(minimum_frames_per_second=0)
