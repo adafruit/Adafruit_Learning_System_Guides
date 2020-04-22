@@ -111,6 +111,8 @@ class ClueLightPainter:
             board.DISPLAY.rotation = 180
             self.button_left, self.button_right = (self.button_right,
                                                    self.button_left)
+        else:
+            board.DISPLAY.rotation = 0
         # Turn off onboard NeoPixel and LED strip
         onboard_pixel_pin = digitalio.DigitalInOut(board.NEOPIXEL)
         onboard_pixel_pin.direction = digitalio.Direction.OUTPUT
@@ -220,7 +222,6 @@ class ClueLightPainter:
         board.DISPLAY.brightness = 0 # Screen backlight OFF
         painting = False
         duration = 5.0 - self.speed * 4.5 # 0.5 to 5 seconds
-        err = 0 # Clear the 'error term' used for diffusion dithering
 
         gc.collect() # Helps make playback a little smoother
 
@@ -232,6 +233,7 @@ class ClueLightPainter:
                     self.clear_strip()  # Turn LEDs OFF
                 else:
                     start_time = monotonic()
+                    err = 0 # Clear 'error term' used for dithering
                 painting = not painting # Toggle paint mode on/off
             elif RichButton.HOLD in action_set:
                 return # Exit painting, enter config mode
@@ -301,7 +303,7 @@ class ClueLightPainter:
                 # (dithered, clipped and quantized). This will get used on
                 # the next pass through the loop. Don't keep 100% of the
                 # value, or image 'shimmers' too much...dial back slightly.
-                err = (want - got) * 0.8
+                err = (want - got) * 0.9
 
                 # Issue the resulting uint8 'got' data to the LED strip.
                 self.write_func(self.neopixel_pin, got)
