@@ -114,7 +114,7 @@ while True:
                         with open("/sd_card/log.txt", "a") as sdc:
                             t = rtc.datetime
                             sdc.write(
-                                "{} {}/{}/{} {}:{}:{} ".format(
+                                "{} {}/{}/{} {}:{}:{}, ".format(
                                     days[t.tm_wday],
                                     t.tm_mday,
                                     t.tm_mon,
