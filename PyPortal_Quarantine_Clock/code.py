@@ -36,7 +36,7 @@ time_names = ["midnight-ish", "late night", "late", "super late",
               "evening","evening","late evening","late evening"]
 
 # Days of the week
-week_days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+week_days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
 esp32_cs = digitalio.DigitalInOut(board.ESP_CS)
 esp32_ready = digitalio.DigitalInOut(board.ESP_BUSY)
