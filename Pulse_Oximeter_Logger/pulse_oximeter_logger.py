@@ -44,7 +44,7 @@ days = ("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Satur
 set_time = False
 if set_time:  # change to True if you want to write the time!
     #             year, mon, date, hour, min, sec, wday, yday, isdst
-    t = time.struct_time((2020, 4, 21, 16, 36, 0, 2, -1, -1))
+    t = time.struct_time((2020, 4, 21, 18, 13, 0, 2, -1, -1))
     # you must set year, mon, date, hour, min, sec and weekday
     # yearday  not supported, isdst can be set but we don't use it at this time
     print("Setting time to:", t)  # uncomment for debugging
@@ -55,7 +55,6 @@ if set_time:  # change to True if you want to write the time!
 ble = adafruit_ble.BLERadio()  # pylint: disable=no-member
 
 pulse_ox_connection = None
-initial_time = time.monotonic()
 
 while True:
     t = rtc.datetime
@@ -113,12 +112,7 @@ while True:
 
                     try:  # logging to SD card
                         with open("/sd_card/log.txt", "a") as sdc:
-                            current_time = time.monotonic()
-                            time_stamp = current_time - initial_time
-                            print(
-                                "Seconds since current data log started:",
-                                int(time_stamp),
-                            )
+                            t = rtc.datetime
                             sdc.write(
                                 "{} {}/{}/{} {}:{}:{} ".format(
                                     days[t.tm_wday],
@@ -127,12 +121,12 @@ while True:
                                     t.tm_year,
                                     t.tm_hour,
                                     t.tm_min,
-                                    t.tm_sec,
+                                    t.tm_sec
                                 )
                             )
                             sdc.write(
-                                "{}, {}, {}, {:.2f}\n".format(
-                                    int(time_stamp), spo2, pulse_rate, pleth
+                                "{}, {}, {:.2f}\n".format(
+                                    spo2, pulse_rate, pleth
                                 )
                             )
 
