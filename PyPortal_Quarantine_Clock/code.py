@@ -1,17 +1,13 @@
 import time
-import gc
 import board
-import displayio
 import busio
-from adafruit_esp32spi import adafruit_esp32spi_socket as socket
-from adafruit_esp32spi import adafruit_esp32spi, adafruit_esp32spi_wifimanager
-import adafruit_requests as requests
 import digitalio
-from analogio import AnalogIn
+from adafruit_esp32spi import adafruit_esp32spi_socket as socket
+from adafruit_esp32spi import adafruit_esp32spi
+import adafruit_requests as requests
 from adafruit_pyportal import PyPortal
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text import label
-import adafruit_touchscreen
 
 try:
     from secrets import secrets
@@ -20,9 +16,9 @@ except ImportError:
 the secrets dictionary must contain 'ssid' and 'password' at a minimum""")
     raise
 
-# Colors for each label
+# Label colors
 LABEL_DAY_COLOR = 0xFFFFFF
-LABEL_TIME_COLOR = 0x8f42f4
+LABEL_TIME_COLOR = 0x2a8eba
 
 # the current working directory (where this file is)
 cwd = ("/"+__file__).rsplit('/', 1)[0]
@@ -32,12 +28,12 @@ background = None
 
 # Descriptions of each hour
 # https://github.com/mwfisher3/QuarantineClock/blob/master/today.html
-time_name = ["midnight-ish", "late night", "late", "super late",
-            "super early","really early","dawn","morning",
-            "morning","mid-morning","mid-morning","late morning",
-            "noon-ish","afternoon","afternoon","mid-afternoon",
-            "late afternoon","early evening","early evening","dusk-ish",
-            "evening","evening","late evening","late evening"]
+time_names = ["midnight-ish", "late night", "late", "super late",
+              "super early","really early","dawn","morning",
+              "morning","mid-morning","mid-morning","late morning",
+              "noon-ish","afternoon","afternoon","mid-afternoon",
+              "late afternoon","early evening","early evening","dusk-ish",
+              "evening","evening","late evening","late evening"]
 
 esp32_cs = digitalio.DigitalInOut(board.ESP_CS)
 esp32_ready = digitalio.DigitalInOut(board.ESP_BUSY)
@@ -53,13 +49,13 @@ def wday_to_weekday_name(tm_wday):
 
     """
     switch = {
-    0: "Monday",
-    1: "Tuesday",
-    2: "Wednesday",
-    3: "Thursday",
-    4: "Friday",
-    5: "Saturday",
-    6: "Sunday",}
+        0: "Monday",
+        1: "Tuesday",
+        2: "Wednesday",
+        3: "Thursday",
+        4: "Friday",
+        5: "Saturday",
+        6: "Sunday",}
     return switch.get(tm_wday, "Day not found")
 
 # initialize pyportal
@@ -111,18 +107,19 @@ while True:
             refresh_time = time.monotonic()
             # set the_time
             the_time = time.localtime()
-            # Convert tm_wday to name of day
-            weekday = wday_to_weekday_name(the_time.tm_wday)
         except (ValueError, RuntimeError) as error:
             print("Failed to get data, retrying\n", e)
-            wifi.reset()
+            esp.reset()
             continue
+
+    # Convert tm_wday to name of day
+    weekday = wday_to_weekday_name(the_time.tm_wday)
 
     # set the day label's text
     label_day.text = weekday
 
     # set the time label's text
-    label_time.text = "({})".format(time_name[the_time.tm_hour])
+    label_time.text = "({})".format(time_names[the_time.tm_hour])
 
-    # update every minute.
+    # update every minute
     time.sleep(60)
