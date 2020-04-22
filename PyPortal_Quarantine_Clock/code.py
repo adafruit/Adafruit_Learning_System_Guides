@@ -35,6 +35,9 @@ time_names = ["midnight-ish", "late night", "late", "super late",
               "late afternoon","early evening","early evening","dusk-ish",
               "evening","evening","late evening","late evening"]
 
+# Days of the week
+week_days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+
 esp32_cs = digitalio.DigitalInOut(board.ESP_CS)
 esp32_ready = digitalio.DigitalInOut(board.ESP_BUSY)
 esp32_reset = digitalio.DigitalInOut(board.ESP_RESET)
@@ -42,21 +45,6 @@ esp32_reset = digitalio.DigitalInOut(board.ESP_RESET)
 spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
 esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset, debug=False)
 requests.set_socket(socket, esp)
-
-def wday_to_weekday_name(tm_wday):
-    """Returns the name of the weekday based on tm_wday value.
-    :param int tm_wday: Days since Sunday.
-
-    """
-    switch = {
-        0: "Monday",
-        1: "Tuesday",
-        2: "Wednesday",
-        3: "Thursday",
-        4: "Friday",
-        5: "Saturday",
-        6: "Sunday",}
-    return switch.get(tm_wday, "Day not found")
 
 # initialize pyportal
 pyportal = PyPortal(esp=esp,
@@ -113,7 +101,7 @@ while True:
             continue
 
     # Convert tm_wday to name of day
-    weekday = wday_to_weekday_name(the_time.tm_wday)
+    weekday = week_days[the_time.tm_wday]
 
     # set the day label's text
     label_day.text = weekday
