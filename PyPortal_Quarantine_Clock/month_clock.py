@@ -36,9 +36,27 @@ time_names = ["midnight-ish", "late night", "late", "super late",
               "evening","evening","late evening","late evening"]
 
 # Months of the year
-months = ["January", "February", "March", "April",
+months = ["January", "January", "February", "March", "April",
           "May", "June", "July", "August",
           "September", "October", "November", "December"]
+
+# Dictionary of tm_mon and month name.
+# note: tm_mon structure in CircuitPython ranges from [1,12]
+months = {
+    1: "January",
+    2: "February",
+    3: "March",
+    4: "April",
+    5: "May",
+    6: "June",
+    7: "July",
+    8: "August",
+    9: "September",
+    10: "October",
+    11: "November",
+    12: "December"
+}
+
 
 esp32_cs = digitalio.DigitalInOut(board.ESP_CS)
 esp32_ready = digitalio.DigitalInOut(board.ESP_BUSY)
@@ -75,15 +93,15 @@ font_small = bitmap_font.load_font("/fonts/Helvetica-Bold-24.bdf")
 font_large.load_glyphs(b'abcdefghjiklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890- ')
 font_small.load_glyphs(b'abcdefghjiklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890- ()')
 
-# Set up label for the day
+# Set up label for the month
 label_month = label.Label(font_large, color=LABEL_DAY_COLOR, max_glyphs=200)
-label_month.x = board.DISPLAY.width // 6
+label_month.x = board.DISPLAY.width // 10
 label_month.y = 80
 pyportal.splash.append(label_month)
 
 # Set up label for the time
 label_time = label.Label(font_small, color=LABEL_TIME_COLOR, max_glyphs=200)
-label_time.x = board.DISPLAY.width // 4
+label_time.x = board.DISPLAY.width // 3
 label_time.y = 150
 pyportal.splash.append(label_time)
 
