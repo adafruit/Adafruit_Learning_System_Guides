@@ -128,4 +128,3 @@ display.auto_refresh = True
 # hold here until reset
 while True:
     pass
-
