@@ -1,37 +1,38 @@
 """
-Light painting project for Adafruit CLUE using DotStar LED strip.
+Light painting project for Adafruit CLUE using NeoPixel or DotStar strip.
 Images should be in 24-bit BMP format, with height matching the length
 of the LED strip. The ulab module is used to assist with interpolation
 and dithering, displayio for a minimal user interface.
 """
 
 # pylint: disable=import-error
+import gc
 from math import modf
 from time import monotonic, sleep
-from os import statvfs
-import gc
 import board
 import busio
+import digitalio
 import displayio
 import ulab
-from digitalio import DigitalInOut, Direction
-from bmp2led import BMP2LED, BMPError
+from ubmp import UBMP, BMPError
+from neopixel_write import neopixel_write
 from richbutton import RichButton
 from adafruit_display_text import label
 from adafruit_display_shapes.rect import Rect
-from neopixel_write import neopixel_write
 from terminalio import FONT # terminalio font is crude but fast to display
 FONT_WIDTH, FONT_HEIGHT = FONT.get_bounding_box()
 
-
 # These are permanent global settings, can only change by editing the code:
 
-FLIP_SCREEN = False  # If True, turn CLUE screen & buttons upside-down
-PATH = '/bmps-72px'  # Folder containing BMP images (or '' for root path)
+FLIP_SCREEN = True   # If True, turn CLUE screen & buttons upside-down
+PATH = '/bmps-30px'  # Folder containing BMP images (or '' for root path)
 GAMMA = 2.6          # Correction factor for perceptually linear brightness
-NUM_PIXELS = 72      # LED strip length, half-meter is usu. 30 or 72 pixels
-PIXEL_PINS = board.SDA, board.SCL # Data, clock pins for DotStars
-PIXEL_ORDER = 'brg'               # Pixel color order
+NUM_PIXELS = 30      # LED strip length, half-meter is usu. 30 or 72 pixels
+PIXEL_PIN = board.D0 # Output pin for NeoPixel data
+PIXEL_ORDER = 'grb'  # Most NeoPixels are GRB data order, otherwise set here
+# IF USING DOTSTARS, USE THESE VALUES FOR PIXEL_PIN AND PIXEL_ORDER INSTEAD:
+#PIXEL_PIN = board.SDA, board.SCL # Data, clock pins if using DotStars
+#PIXEL_ORDER = 'brg'              # Color order for DotStars
 
 
 def centered_label(text, y_pos, scale):
@@ -56,29 +57,27 @@ class ClueLightPainter:
     """
 
     # pylint: disable=too-many-arguments
-    def __init__(self, flip, path, num_pixels, pixel_order, pixel_pins, gamma):
+    def __init__(self, flip, path, num_pixels, pixel_order, pixel_pin, gamma):
         """
         App constructor. Follow up with a call to ClueLightPainter.run().
         Arguments:
-            flip (boolean)       : If True, CLUE display and buttons are
-                                   flipped 180 degrees from normal (makes
-                                   wiring easier in some situations).
-            path (string)        : Directory containing BMP images.
-            num_pixels (int)     : LED strip length.
-            pixel_order (string) : LED data order, e.g. 'grb'.
-            pixel_pins (tuple)   : Board pin(s) for LED data output. If a
-                                   single value (int), a NeoPixel strip is
-                                   being used. If two values (tuple or
-                                   list), it's a DotStar strip (pins are
-                                   data and clock of an SPI port).
-            gamma (float)        : Correction for perceptual linearity.
+            flip (boolean)        : If True, CLUE display and buttons are
+                                    flipped 180 degrees from normal (makes
+                                    wiring easier in some situations).
+            path (string)         : Directory containing BMP images.
+            num_pixels (int)      : LED strip length.
+            pixel_order (string)  : LED data order, e.g. 'grb'.
+            pixel_pin (int/tuple) : Board pin(s) for LED data output. If a
+                                    single value (int), a NeoPixel strip is
+                                    being used. If two values (tuple or
+                                    list), it's a DotStar strip (pins are
+                                    data and clock of an SPI port).
+            gamma (float)         : Correction for perceptual linearity.
         """
-        self.bmp2led = BMP2LED(num_pixels, pixel_order, gamma)
+        self.neobmp = UBMP(num_pixels, pixel_order)
         self.path = path
-
-# Don't have these -- just pull from self.bmp2led when needed
-#        self.num_pixels = num_pixels
-#        self.gamma = gamma
+        self.num_pixels = num_pixels
+        self.gamma = gamma
 
         # Above values are permanently one-time set. The following values
         # can be reconfigured mid-run.
@@ -88,13 +87,22 @@ class ClueLightPainter:
         self.config_mode = 0  # Current setting being changed
         self.rect = None      # Multipurpose progress/setting rect
         self.speed = 0.6      # Paint speed, 0.0 (slow) to 1.0 (fast)
+        self.columns = []     # Empty image data
 
-        # Using DotStar LEDs. The SPI peripheral is locked and config'd
-        # once here and never relinquished, to save some time on every
-        # column (need them ussued as fast as possible).
-        self.spi = busio.SPI(pixel_pin[1], MOSI=pixel_pin[0])
-        self.spi.try_lock()
-        self.spi.configure(baudrate=8000000)
+        if isinstance(pixel_pin, (tuple, list)):
+            # Using DotStar LEDs. The SPI peripheral is locked and config'd
+            # once here and never relinquished, to save some time on every
+            # column (need them ussued as fast as possible).
+            self.spi = busio.SPI(pixel_pin[1], MOSI=pixel_pin[0])
+            self.spi.try_lock()
+            self.spi.configure(baudrate=16000000)
+            self.write_func = self.dotstar_write
+            self.neopixel_pin = None # Required for self.write_func() calls
+        else:
+            # Using NeoPixel LEDs
+            self.neopixel_pin = digitalio.DigitalInOut(pixel_pin)
+            self.neopixel_pin.direction = digitalio.Direction.OUTPUT
+            self.write_func = neopixel_write
 
         # Configure hardware initial state
         self.button_left = RichButton(board.BUTTON_A)
@@ -516,209 +524,4 @@ class ClueLightPainter:
 
 
 ClueLightPainter(FLIP_SCREEN, PATH,
-                 NUM_PIXELS, PIXEL_ORDER, PIXEL_PINS, GAMMA).run()
-
-
-
-
-
-
-
-
-
-# Note to future self: make program start in image-select mode,
-# then when that returns, go into settings or paint depending
-# on return status.
-
-
-
-class foobar:
-    def __init__(self, num_pixels, pins):
-        self.num_pixels = num_pixels
-        self.spi = busio.SPI(pins[1], MOSI=pins[0])
-        self.spi.try_lock()
-        self.spi.configure(baudrate=8000000)
-
-        stats = os.statvfs('/')
-        bytes_free = stats[0] * stats[4] # block size, free blocks
-        self.row_size = 4 + num_pixels * 4 + ((num_pixels + 15) // 16)
-        self.max_rows = bytes_free // self.row_size
-        self.rows_per_second = 0
-
-    def benchmark(self):
-        with open('/tempfile', 'wb') as file:
-            row_data = bytearray([0] * 4 +
-                                 [255, 0, 0, 0] * self.num_pixels +
-                                 [255] * ((self.num_pixels + 15) // 16))
-            file.write(row_data)
-
-        with open('/tempfile', 'rb') as file:
-            test_duration = 1.0
-            rows = 0
-            gc.collect()
-            start_time = monotonic()
-            while monotonic() - start_time < test_duration:
-                file.seek(0)
-                self.spi.write(file.read(self.row_size))
-                rows += 1
-            self.rows_per_second = rows / test_duration
-            print('Speed:', self.rows_per_second, 'rows/sec')
-
-foobar(NUM_PIXELS, PIXEL_PINS).benchmark()
-
-while True:
-    pass
-
-
-
-
-
-stats = os.statvfs('/')
-bytes = stats[0] * stats[4] # block size * free blocks for unprivileged users
-print(bytes, 'bytes free')
-
-spi = busio.SPI(DOTSTAR_PINS[1], MOSI=DOTSTAR_PINS[0])
-spi.try_lock()
-# 8 MHz max SPI on nRF (32 MHz reserved for screen)
-spi.configure(baudrate=8000000)
-
-# Write a single-line file.
-# also, determine max number of lines from free bytes and
-# dotstar_num_bytes
-
-#with open('/garbage', 'wb') as outfile:
-column_buf = bytearray([0] * 4 + [255, 0, 0, 0] * NUM_PIXELS + [255] * ((NUM_PIXELS + 15) // 16))
-dotstar_num_bytes = len(column_buf)
-#    for i in range(ROWS):
-#    outfile.write(column_buf)
-
-# What if, instead of fixed number of rows, if it
-# read data for one second.
-
-# rows/sec will get more accurate the longer this runs, but that
-# requires the user waiting. About 1 second gives a 'good enough' answer.
-test_time = 1
-rows = 0
-gc.collect()
-with open('/garbage', 'rb') as infile:
-    start_time = monotonic()
-    while monotonic() - start_time < test_time:
-        infile.seek(0)
-        spi.write(infile.read(dotstar_num_bytes))
-        rows += 1
-print('Speed:', rows / test_time, 'lines/sec')
-print(rows, 'rows')
-print(test_time, 'sec')
-
-while True:
-    pass
-
-
-
-
-NEOPIXEL_PIN = board.D0
-DOTSTAR_PINS = board.SDA, board.SCL
-
-FILE = 'bigfile.jpg'
-#FILE = 'Helvetica-Bold-16.bdf'
-
-neopixel_num_bytes = NUM_PIXELS * 3
-neopixel_data = bytearray(neopixel_num_bytes)
-dotstar_num_bytes = 4 + NUM_PIXELS * 4 + (NUM_PIXELS + 15) // 16
-dotstar_data = bytearray(dotstar_num_bytes)
-
-neopixel_pin = digitalio.DigitalInOut(NEOPIXEL_PIN)
-neopixel_pin.direction = digitalio.Direction.OUTPUT
-
-spi = busio.SPI(DOTSTAR_PINS[1], MOSI=DOTSTAR_PINS[0])
-spi.try_lock()
-# 8 MHz max SPI on nRF (32 MHz reserved for screen)
-spi.configure(baudrate=8000000)
-
-# Trying header/footer as distinct things (not stored with data)
-header = bytearray([0] * 4)
-footer = bytearray([255] * ((NUM_PIXELS + 15) // 16))
-dotstar_num_bytes = NUM_PIXELS * 4
-# As single write: 1037 lines/sec
-# As concatenated bytearrays: 769 lines/sec, oof.
-# Okay then, build header and footer into the tempfile data.
-# It'll produce a larger file, but it's quicker to issue.
-
-passes = 0
-with open(FILE, "rb") as file:
-    start_time = monotonic()
-    while True:
-        #data = file.read(neopixel_num_bytes)
-        data = file.read(dotstar_num_bytes)
-        if not data:
-            break
-        #neopixel_write(neopixel_pin, data)
-        spi.write(data)
-        #spi.write(header + data + footer)
-        passes += 1
-    end_time = monotonic()
-    elapsed = end_time - start_time
-    print('Speed:', passes / elapsed, 'lines/sec')
-    print(passes)
-
-while True:
-    pass
-
-# 394K file
-# Reading neopixel_num_bytes at a time: 2214 reads/sec
-# Reading dotstar_num_bytes at a time: 1470
-
-# 800K file w strip writes:
-# NeoPixel: 328 lines/sec
-# DotStar: 1087 lines/sec
-
-
-
-
-DELAY = 0.000300 # 300 uS
-DELAY = 0.003    # 3 ms (333 lines/sec)
-
-for passes in (100, 1000, 10000):
-    print(passes, 'passes')
-
-    start_time = monotonic()
-    for i in range(passes):
-        neopixel_write(neopixel_pin, neopixel_data)
-        sleep(DELAY)
-    end_time = monotonic()
-    elapsed = end_time - start_time
-    print('NeoPixel speed:', passes / elapsed, 'writes/sec')
-
-    start_time = monotonic()
-    for i in range(passes):
-        spi.write(dotstar_data)
-        sleep(DELAY)
-    end_time = monotonic()
-    elapsed = end_time - start_time
-    print('DotStar speed:', passes / elapsed, 'writes/sec')
-
-# 72 pixel strip
-
-# No delay between writes
-# Writes  NeoPixel  DotStar
-# 100     180       307 writes/sec
-# 1000    335       1549
-# 10000   367       2597
-
-# 300 uS delay between writes
-# Writes  NeoPixel  DotStar
-# 100     178       306 writes/sec
-# 1000    334       1501
-# 10000   365       2463
-
-# 3 mS delay between writes
-# Writes  NeoPixel  DotStar
-# 100     127       169 writes/sec
-# 1000    189       304
-# 10000   198       330
-
-
-
-
-while True:
-    pass
+                 NUM_PIXELS, PIXEL_ORDER, PIXEL_PIN, GAMMA).run()
