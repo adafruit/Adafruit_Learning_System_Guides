@@ -3,6 +3,7 @@ BMP-to-DotStar-ready-bytearrays.
 """
 
 import os
+import ulab
 
 class BMPError(Exception):
     """Used for raising errors in the BMP2LED Class."""
@@ -149,6 +150,24 @@ class BMP2LED:
 # self.file = None
 # Delete existing tempfile before checking free space.
 
+    def read_row(self, row):
+        """
+        Read one row of pixels from BMP file, clipped to minimum of BMP
+        image width or LED strip length.
+        Arguments:
+            row (int): index of row to read (0 to (image height - 1))
+        Returns: ulab ndarray (uint8 type) containing pixel data in
+        BMP-native order (B,G,R per pixel), no need to reorder to DotStar
+        order until later.
+        """
+        # 'flip' logic is intentionally backwards from typical BMP loader,
+        # this makes BMP image prep an easy 90 degree CCW rotation.
+        if not bmp.flip:
+            row = bmp.height - 1 - row
+        self.file.seek(bmp.image_offset + row * bmp.row_size)
+        return ulab.array(self.file.read(clipped_row_size), dtype=uint8)
+
+
     def process(self, input_filename, output_filename, rows,
              brightness=None, loop=False, callback=None):
         """
@@ -190,16 +209,31 @@ class BMP2LED:
                  number of rows requested, depending on storage space.
         """
 
-        try:
-            # Delete output file, then gauge available space on filesystem.
-            os.remove(output_filename)
-            stats = os.statvfs('/')
-            bytes_free = stats[0] * stats[4] # block size, free blocks
-            # Clip the maximum number of output rows based on free space and
-            # the size (in bytes) of each DotStar row.
-            dotstar_row_size = 4 + num_pixels * 4 + ((num_pixels + 15) // 16)
-            rows = min(rows, bytes_free // dotstar_buffer_size)
+        # Allocate a working buffer for DotStar data, sized for LED strip.
+        # It's formed just like valid strip data (with header, per-pixel
+        # start markers and footer), with colors all '0' to start...these
+        # will be filled later.
+        dotstar_buffer = bytearray([0] * 4 +
+                                   [255, 0, 0, 0] * num_pixels +
+                                   [255] * ((num_pixels + 15) // 16))
+        dotstar_row_size = len(dotstar_buffer)
 
+        # Delete old temporary file, if any
+        try:
+            os.remove(output_filename)
+        except OSError:
+            pass
+
+        # Determine free space on drive
+        stats = os.statvfs('/')
+        bytes_free = stats[0] * stats[4] # block size, free blocks
+        if not loop:                       # If not looping, leave space
+            bytes_free -= dotstar_row_size # for 'off' LED data at end.
+        # Clip the maximum number of output rows based on free space and
+        # the size (in bytes) of each DotStar row.
+        rows = min(rows, bytes_free // dotstar_row_size)
+
+        try:
             with open(input_filename, 'rb') as file_in:
                 #print("File opened")
 
@@ -211,63 +245,115 @@ class BMP2LED:
                 # Constrain row width to pixel strip length
                 clipped_width = min(bmp.width, self.num_pixels)
 
-                # Progress ratio along image ranges from 0.0 to 1.0 (if
-                # looping playback) or a bit under 1.0 (one row relative to
-                # full image height) if not looping.
-                divisor = (bmp.height - 1) if loop else bmp.height
+                # Each output row is interpolated from two BMP rows,
+                # we'll call them 'a' and 'b' here.
+                row_a_data, row_b_data = None, None
+                prev_row_a_index, prev_row_b_index = None
 
                 with open(output_filename, 'wb') as file_out:
-                    for row in range(rows): # For each row...
-                        progress = row / divisor # 0.0 to 1.0-ish
-row_1 = int((bmp.height - 1) * progress)
-row_2 = (row_1 + 1) % bmp.height
-#read row_1 and row_2 data if needed
+                    for row in range(rows): # For each output row...
+                        position = row / (rows - 1) # 0.0 to 1.0
+                        if callback:
+                            callback(position)
+                        # Scale position into pixel space...
+                        if self.loop: # 0 to image height
+                            position *= len(self.columns)
+                        else:         # 0 to last row
+                            position *= (len(self.columns) - 1)
 
+                        # Separate absolute position into several values:
+                        # integer 'a' and 'b' row indices, floating 'a' and
+                        # 'b' weights (0.0 to 1.0) for interpolation.
+                        row_b_weight, row_a_index = modf(position)
+                        row_a_index = int(row_a_index)
+                        row_b_index = (row_a_index + 1) % bmp.height
+                        row_a_weight = 1.0 - row_b_weight
 
+                        # New data ONLY needs reading if row index changed
+                        # (else do another interp/dither with existing data)
+                        if row_a_index != prev_row_a_index:
+                            # If we've advanced exactly one row, reassign
+                            # old 'b' data to 'a' row, else read new 'a'.
+                            if row_a_index == prev_row_b_index:
+                                row_a_data = row_b_data
+                            else:
+                                row_a_data = self.read(row_a_index)
+                            # Read new 'b' data on any row change
+                            row_b_data = self.read(row_b_index)
+                        prev_row_a_index = row_a_index
+                        prev_row_b_index = row_b_index
 
-# Open input and output files
-# Don't use 'with' with two files, second won't close
-# Look at ExitStack(), or use two nested with's.
+                        # Pixel values are stored as bytes from 0-255.
+                        # Gamma correction requires floats from 0.0 to 1.0.
+                        # So there's a scaling operation involved, BUT, as
+                        # configurable brightness is also a thing, we can
+                        # work that into the same operation. Rather than
+                        # dividing pixels by 255, multiply by
+                        # brightness / 255. This reduces the two row
+                        # interpolation weights from 0.0-1.0 to
+                        # 0.0-brightness/255.
+                        row_a_weight *= brightness / 255
+                        row_b_weight *= brightness / 255
 
-        try:
-            print("Loading", filename)
-            with open(filename, "rb") as self.file:
+                        # 'want' is an ndarray of the idealized (as in,
+                        # floating-point) pixel values resulting from the
+                        # interpolation, with gamma correction applied and
+                        # scaled back up to the 0-255 range.
+                        want = ((row_a_data * row_a_weight +
+                                 row_b_data * row_b_weight) **
+                                self.gamma * 255.001)
 
+                        # 'got' will be an ndarray of the values that get
+                        # issued to the LED strip, formed through several
+                        # operations. First, an 'error term' is added to
+                        # each pixel, representing how 'wrong' the prior
+                        # output was. This is used for error diffusion
+                        # dithering. 'got' is floating-point at this stage.
+                        got = ulab.array(want + err)
+                        # The error term may push some pixel values outside
+                        # the required 0-255 range, so clip the result (aka
+                        # 'saturate'). (Note to future self: requested a
+                        # clip() function in ulab, should be available for
+                        # use soon, would replace these two Python ops).
+                        got[got < 0] = 0
+                        got[got > 255] = 255
+                        # ulab.compare.clip(got, 0, 255)
+                        # Now quantize the floating-point 'got' to uint8
+                        # type. This represents the actual final byte values
+                        # that will be issued to the LED strip.
+                        got = ulab.array(got, dtype=ulab.uint8)
+                        # Make note of the difference...the 'error term'...
+                        # between what we ideally wanted (float) and what we
+                        # actually got (dithered, clipped and quantized).
+                        # This will get used on the next pass through the
+                        # loop. Don't keep 100% of the value, or image
+                        # 'shimmers' too much...dial back slightly.
+                        err = (want - got) * 0.95
 
+                        # Reorder data from BGR to DotStar color order,
+                        # allowing for header and start-of-pixel markers
+                        # in the DotStar data.
+                        for column in range(clipped_width):
+                            bmp_pos = x * 3
+                            dotstar_pos = 5 + x * 4
+                            bgr = data[bmp_pos:bmp_pos + 3]
+                            dotstar_buffer[dotstar_pos + blue_index] = bgr[0]
+                            dotstar_buffer[dotstar_pos + green_index] = bgr[1]
+                            dotstar_buffer[dotstar_pos + red_index] = bgr[2]
 
-                # Image is displayed at END (not start) of NeoPixel strip,
-                # this index works incrementally backward in column buffers...
-                idx = (self.num_pixels - 1) * self.bytes_per_pixel
-                for row in range(clipped_height): # For each scanline...
-                    # Seek to start of scanline
-                    if bmp.flip: # Bottom-to-top order (normal BMP)
-                        self.file.seek(bmp.image_offset +
-                                       (bmp.height - 1 - row) * bmp.row_size)
-                    else: # BMP is stored top-to-bottom
-                        self.file.seek(bmp.image_offset + row * bmp.row_size)
-                    for column in columns: # For each pixel of scanline...
-                        # BMP files use BGR color order
-                        bgr = self.file.read(3) # Blue, green, red
-                        # Rearrange into NeoPixel strip's color order,
-                        # while handling brightness & gamma correction:
-                        column[idx + self.blue_index] = lut[bgr[0]]
-                        column[idx + self.green_index] = lut[bgr[1]]
-                        column[idx + self.red_index] = lut[bgr[2]]
-                    idx -= self.bytes_per_pixel # Advance (back) one pixel
-                    if callback:
-                        callback((row + 1) / clipped_height)
+                        file_out.write(dotstar_buffer)
 
-                # Add one more column with no color data loaded.  This is used
-                # to turn the strip off at the end of the painting operation.
-                # It's done this way (rather than checking for last column and
-                # clearing LEDs in the painting code) so timing of the last
-                # column is consistent and looks good for photos.
-                if not loop:
-                    columns.append(bytearray(self.num_pixels *
-                                             self.bytes_per_pixel))
+                    # If not looping, add an 'all off' row of LED data
+                    # at end to ensure last row timing is consistent.
+                    if not loop:
+                        rows += 1
+                        file_out.write(bytearray([0] * 4 +
+                                                 [255, 0, 0, 0] * num_pixels +
+                                                 [255] * ((num_pixels + 15) //
+                                                          16)))
 
                 #print("Loaded OK!")
-                return columns
+                return rows
 
         except OSError as err:
             if err.args[0] == 28:

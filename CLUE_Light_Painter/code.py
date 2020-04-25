@@ -1,6 +1,6 @@
 """
 Light painting project for Adafruit CLUE using DotStar LED strip.
-Images should be in 24-bit BMP format, with height matching the length
+Images should be in 24-bit BMP format, with width matching the length
 of the LED strip. The ulab module is used to assist with interpolation
 and dithering, displayio for a minimal user interface.
 """
@@ -213,7 +213,9 @@ class ClueLightPainter:
 
         board.DISPLAY.brightness = 0 # Screen backlight OFF
         painting = False
-        duration = 5.0 - self.speed * 4.5 # 0.5 to 5 seconds
+
+        row_size = 4 + num_leds * 4 + ((num_leds + 15) // 16)
+        # num_rows = was determined during conversion
 
         gc.collect() # Helps make playback a little smoother
 
@@ -224,81 +226,20 @@ class ClueLightPainter:
                 if painting:            # If currently painting
                     self.clear_strip()  # Turn LEDs OFF
                 else:
-                    start_time = monotonic()
-                    err = 0 # Clear 'error term' used for dithering
+                    row = 0             # Start at beginning of file
                 painting = not painting # Toggle paint mode on/off
             elif RichButton.HOLD in action_set:
                 return # Exit painting, enter config mode
 
             if painting:
-                elapsed = monotonic() - start_time
-                if self.loop:
-                    elapsed %= duration
-                elif elapsed > duration:
-                    self.clear_strip()
-                    painting = False
-                    continue
-
-                # Current absolute position along image, as floating-point
-                # value from 0.0 (first column) to last column.
-                position = elapsed / duration # 0.0 to 1.0
-                if self.loop:
-                    position *= len(self.columns)       # 0 to image width
-                else:
-                    position *= (len(self.columns) - 1) # 0 to last column
-                # Separate the absolute position into three values:
-                # the relative 'weight' of the subsequent image column
-                # when interpolating between two, the integer index of the
-                # first column and integer index of second column.
-                weight_2, column_1 = modf(position)
-                column_1 = int(column_1)
-                column_2 = (column_1 + 1) % len(self.columns)
-                weight_1 = 1.0 - weight_2
-
-                # Pixel values are stored as bytes from 0-255.
-                # Gamma correction requires floats from 0.0 to 1.0.
-                # So there's going to be a scaling operation involved,
-                # BUT, as configurable LED brightness is also a thing,
-                # we can work that into the same operation. Rather than
-                # dividing pixels by 255, multiply by brightness / 255.
-                # This reduces the two column interpolation weightings
-                # from 0.0-1.0 to 0.0-brightness/255.
-                weight_1 *= self.brightness / 255
-                weight_2 *= self.brightness / 255
-
-                # 'want' is an ndarray of the idealized (as in,
-                # floating-point) pixel values resulting from the
-                # interpolation, with gamma correction applied and
-                # scaled back up to the 0-255 range.
-                want = ((self.columns[column_1] * weight_1 +
-                         self.columns[column_2] * weight_2) **
-                        self.gamma * 255.001)
-                # 'got' will be an ndarray of the values that get issued to
-                # the LED strip, formed through several operations. First,
-                # an 'error term' is added to each pixel, representing how
-                # 'wrong' the prior output was. This is used for error
-                # diffusion dithering. 'got' is floating-point at this stage.
-                got = ulab.array(want + err)
-                # The error term may push some pixel values outside the
-                # required 0-255 range, so clip the result (aka 'saturate').
-                # (Note to future self: requested a clip() function in ulab,
-                #  if that gets added in some future release, that can be
-                #  used here instead of these two Python ops.)
-                got[got < 0] = 0
-                got[got > 255] = 255
-                # Now quantize the floating-point 'got' to uint8 type.
-                # This represents the actual final byte values that will
-                # be issued to the LED strip.
-                got = ulab.array(got, dtype=ulab.uint8)
-                # Make note of the difference...the 'error term'...between
-                # what we ideally wanted (float) and what we actually got
-                # (dithered, clipped and quantized). This will get used on
-                # the next pass through the loop. Don't keep 100% of the
-                # value, or image 'shimmers' too much...dial back slightly.
-                err = (want - got) * 0.9
-
-                # Issue the resulting uint8 'got' data to the LED strip.
-                self.write_func(self.neopixel_pin, got)
+                file.seek(row * row_size)
+                self.spi.write(file.read(row_size))
+                row += 1
+                if row >= num_rows:
+                    if self.loop:
+                        row = 0
+                    else:
+                        painting = False
 
 
     # Each config screen is broken out into its own function...
