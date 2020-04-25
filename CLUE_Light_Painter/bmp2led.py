@@ -294,7 +294,6 @@ class BMP2LED:
                         # floating-point) pixel values resulting from the
                         # interpolation, with gamma correction applied and
                         # scaled back up to the 0-255 range.
-# ValueError: operands could not be broadcast together
                         want = ((((row_a_data * row_a_weight) +
                                   (row_b_data * row_b_weight)) **
                                  self.gamma) * 255.001)

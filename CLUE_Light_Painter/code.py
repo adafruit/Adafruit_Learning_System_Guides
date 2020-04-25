@@ -219,8 +219,6 @@ class ClueLightPainter:
         board.DISPLAY.brightness = 0 # Screen backlight OFF
         painting = False
 
-        # num_rows = was determined during conversion
-
         gc.collect() # Helps make playback a little smoother
 
         while True:
@@ -239,7 +237,7 @@ class ClueLightPainter:
                 file.seek(row * self.row_size)
                 self.spi.write(file.read(self.row_size))
                 row += 1
-                if row >= num_rows:
+                if row >= self.num_rows:
                     if self.loop:
                         row = 0
                     else:
