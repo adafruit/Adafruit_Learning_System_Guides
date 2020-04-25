@@ -10,12 +10,11 @@ boot.py sets up latter condition using a jumper from pin 0 to GND.
 """
 
 # pylint: disable=import-error
-import os
 import gc
+from time import monotonic, sleep
 import board
 import busio
 import displayio
-from time import monotonic, sleep
 from digitalio import DigitalInOut, Direction
 from bmp2led import BMP2LED, BMPError
 from neopixel_write import neopixel_write
@@ -34,9 +33,11 @@ PIXEL_ORDER = 'brg'               # Pixel color order
 PATH = '/bmps-72px'   # Folder containing BMP images (or '' for root path)
 TEMPFILE = '/led.dat' # Working file for LED data (will be clobbered!)
 FLIP_SCREEN = False   # If True, turn CLUE screen & buttons upside-down
-GAMMA = 2.6           # Correction factor for perceptually linear brightness
+GAMMA = 2.4           # Correction factor for perceptually linear brightness
 
-PIXEL_ORDER = 'gbr'
+# Temporary line during development, delete before use:
+PIXEL_ORDER = 'gbr' # Old DotStar strip with different color order
+
 
 def centered_label(text, y_pos, scale):
     """
@@ -73,11 +74,8 @@ class ClueLightPainter:
                                    file for LED data (will be clobbered).
             num_pixels (int)     : LED strip length.
             pixel_order (string) : LED data order, e.g. 'grb'.
-            pixel_pins (tuple)   : Board pin(s) for LED data output. If a
-                                   single value (int), a NeoPixel strip is
-                                   being used. If two values (tuple or
-                                   list), it's a DotStar strip (pins are
-                                   data and clock of an SPI port).
+            pixel_pins (tuple)   : Board pin for LED data output (SPI data
+                                   and clock pins respectively).
             gamma (float)        : Correction for perceptual linearity.
         """
         self.bmp2led = BMP2LED(num_pixels, pixel_order, gamma)
@@ -92,8 +90,7 @@ class ClueLightPainter:
         self.spi.configure(baudrate=8000000)
 
         # Determine filesystem-to-LEDs throughput (also clears LED strip)
-#        self.rows_per_second, self.row_size = self.benchmark()
-        self.rows_per_second, self.row_size = 1000, 500
+        self.rows_per_second, self.row_size = self.benchmark()
 
         # Configure hardware initial state
         self.button_left = RichButton(board.BUTTON_A)
@@ -134,25 +131,32 @@ class ClueLightPainter:
         (including DotStar header and footer) (int).
         """
         # Generate a small temporary file equal to one full LED row,
-        # all set 'off' (bonus, this turns off LED strip on startup).
+        # all set 'off'.
+        row_data = bytearray([0] * 4 +
+                             [255, 0, 0, 0] * self.bmp2led.num_pixels +
+                             [255] * ((self.bmp2led.num_pixels + 15) //
+                                      16))
+        row_size = len(row_data)
         with open(self.tempfile, 'wb') as file:
-            row_data = bytearray([0] * 4 +
-                                 [255, 0, 0, 0] * self.bmp2led.num_pixels +
-                                 [255] * ((self.bmp2led.num_pixels + 15) //
-                                          16))
             file.write(row_data)
-            row_size = len(row_data)
 
         # For a period of 1 second, repeatedly seek to start of file,
         # read row of data and write to LED strip as fast as possible.
         # Not super precise, but good-enough guess of light painting speed.
+        # (Bonus, this will turn off LED strip on startup).
         rows = 0
         with open(self.tempfile, 'rb') as file:
-            gc.collect()
             start_time = monotonic()
             while monotonic() - start_time < 1.0:
                 file.seek(0)
-                self.spi.write(file.read(row_size))
+                # using readinto() instead of read() reduces the amount
+                # of work the garbage collector needs to do each row.
+                file.readinto(row_data)
+                self.spi.write(row_data)
+                # Garbage collection is done on EVERY row...even though
+                # this slows down painting a LOT, it keeps the timing more
+                # consistent (else there would be conspicuous glitches).
+                gc.collect()
                 rows += 1
 
         return rows, row_size
@@ -180,8 +184,8 @@ class ClueLightPainter:
     def load_image(self):
         """
         Load BMP from image list, determined by variable self.image_num
-        (not a passed argument). Data is converted and placed in variable
-        self.columns[].
+        (not a passed argument). Data is converted and placed in
+        self.tempfile.
         """
         # Minimal progress display while image is loaded.
         group = displayio.Group()
@@ -191,8 +195,8 @@ class ClueLightPainter:
         group.append(self.rect)
         board.DISPLAY.show(group)
 
-        #duration = 5.0 - self.speed * 4.5
-        duration = 3.0 - self.speed * 2.75
+        # Playback time is about 1/4 to 5 seconds, non linearly spaced
+        duration = 0.25 + 4.75 * ((1.0 - self.speed) ** 2.5)
         rows = duration * self.rows_per_second
         try:
             self.num_rows = self.bmp2led.process(self.path + '/' +
@@ -214,15 +218,15 @@ class ClueLightPainter:
     def paint(self):
         """
         Paint mode. Watch for button taps to start/stop image playback,
-        or button hold to switch to config mode. During playback, do all
-        the nifty image processing.
+        or button hold to switch to config mode.
         """
 
         board.DISPLAY.brightness = 0 # Screen backlight OFF
         painting = False
 
         with open(self.tempfile, 'rb') as file:
-            gc.collect() # Helps make playback a little smoother
+            led_buffer = bytearray(self.row_size)
+            gc.collect()
 
             while True:
                 action_set = {self.button_left.action(),
@@ -238,7 +242,14 @@ class ClueLightPainter:
 
                 if painting:
                     file.seek(row * self.row_size)
-                    self.spi.write(file.read(self.row_size))
+                    # using readinto() instead of read() reduces the amount
+                    # of work the garbage collector needs to do each row.
+                    file.readinto(led_buffer)
+                    self.spi.write(led_buffer)
+                    # Garbage collection is done on EVERY row...even though
+                    # this slows down painting a LOT, it keeps the timing more
+                    # consistent (else there would be conspicuous glitches).
+                    gc.collect()
                     row += 1
                     if row >= self.num_rows:
                         if self.loop:
@@ -253,7 +264,7 @@ class ClueLightPainter:
     # function. This way definitely generates less pylint gas pains.
     # Also, creating and destroying elements (rather than creating
     # them all up-front and showing or hiding elements as needed)
-    # tends to use less RAM, leaving more for image.
+    # tends to use less RAM.
 
     def make_ui_group(self, main_config, config_label, rect_val=None):
         """
@@ -335,7 +346,6 @@ class ClueLightPainter:
                 prev_mode = self.config_mode
 
         # Before exiting to paint mode, check if new image needs loaded
-# DO IMAGE CONVERSION HERE!
         if reload_image:
             self.load_image()
 
@@ -348,7 +358,8 @@ class ClueLightPainter:
         be reloaded, second indicates if returning to paint mode vs
         more config.
         """
-        group = self.make_ui_group(False, self.images[self.image_num])
+        group = self.make_ui_group(False,
+                                   self.images[self.image_num].split('.')[0])
         orig_image, prev_image = self.image_num, self.image_num
 
         while True:
@@ -365,8 +376,8 @@ class ClueLightPainter:
 
             if self.image_num is not prev_image:
                 group.pop()
-                group.append(centered_label(self.images[self.image_num],
-                                            40, 3))
+                group.append(centered_label(
+                    self.images[self.image_num].split('.')[0], 40, 3))
                 prev_image = self.image_num
 
 
@@ -450,7 +461,8 @@ class ClueLightPainter:
 
     def run(self):
         """
-        Application loop just consists of alternating paint and
+        Post-init application loop. After a one-time visit to image select
+        (and possibly other config), just consists of alternating paint and
         config modes. Each function has its own condition for return
         (switching to the opposite mode). Repeat forever.
         """
@@ -463,13 +475,6 @@ class ClueLightPainter:
         while True:
             self.paint()
             self.config_select()
-
-
-# Note to future self: make program start in image-select mode,
-# then when that returns, go into settings or paint depending
-# on return status.
-#        # Load first image in list
-#        self.load_image()
 
 
 ClueLightPainter(FLIP_SCREEN, PATH, TEMPFILE,

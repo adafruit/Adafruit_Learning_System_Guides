@@ -2,6 +2,7 @@
 BMP-to-DotStar-ready-bytearrays.
 """
 
+# pylint: disable=import-error
 import os
 import math
 import ulab
@@ -42,7 +43,7 @@ class BMP2LED:
     Intended for light painting projects.
     """
 
-    def __init__(self, num_pixels, order='brg', gamma=2.6):
+    def __init__(self, num_pixels, order='brg', gamma=2.4):
         """
         Constructor for BMP2LED Class. Arguments are values that are not
         expected to change over the life of the object.
@@ -52,7 +53,7 @@ class BMP2LED:
                                is 'brg', used on most strips.
             gamma (float)    : Optional gamma-correction constant, for
                                more perceptually-linear output.
-                               Optional; 2.6 if unspecified.
+                               Optional; 2.4 if unspecified.
         """
         order = order.lower()
         self.red_index = order.find('r')
@@ -158,8 +159,10 @@ class BMP2LED:
         return ulab.array(self.bmp_file.read(num_bytes), dtype=ulab.uint8)
 
 
+    # pylint: disable=too-many-arguments, too-many-locals
+    # pylint: disable=too-many-branches, too-many-statements
     def process(self, input_filename, output_filename, rows,
-             brightness=None, loop=False, callback=None):
+                brightness=None, loop=False, callback=None):
         """
         Process a 24-bit uncompressed BMP file into a series of
         DotStar-ready rows of bytes (including header and footer) written
@@ -216,7 +219,7 @@ class BMP2LED:
 
         # Determine free space on drive
         stats = os.statvfs('/')
-        bytes_free = stats[0] * stats[4] # block size, free blocks
+        bytes_free = stats[0] * stats[4]   # block size, free blocks
         if not loop:                       # If not looping, leave space
             bytes_free -= dotstar_row_size # for 'off' LED data at end.
         # Clip the maximum number of output rows based on free space and
@@ -249,9 +252,9 @@ class BMP2LED:
                         if callback:
                             callback(position)
                         # Scale position into pixel space...
-                        if loop: # 0 to image height
-                            position *= self.bmp_specs.height
-                        else:    # 0 to last row
+                        if loop: # 0 to <image height
+                            position = self.bmp_specs.height * row / rows
+                        else:    # 0 to last row.0
                             position *= (self.bmp_specs.height - 1)
 
                         # Separate absolute position into several values:
@@ -320,10 +323,9 @@ class BMP2LED:
                         # Make note of the difference...the 'error term'...
                         # between what we ideally wanted (float) and what we
                         # actually got (dithered, clipped and quantized).
-                        # This will get used on the next pass through the
-                        # loop. Don't keep 100% of the value, or image
-                        # 'shimmers' too much...dial back slightly.
-                        err = (want - got) * 0.95
+                        # This gets used on the next pass through the loop.
+                        err = err + ((want - got) * 0.5)
+                        # ('+=' syntax doesn't work on ndarrays)
 
                         # Reorder data from BGR to DotStar color order,
                         # allowing for header and start-of-pixel markers
