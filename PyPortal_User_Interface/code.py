@@ -338,11 +338,11 @@ while True:
     light = light_sensor.value
 
     if adt:  # Only if we have the temperature sensor
-        tempC = round(adt.temperature)
+        tempC = adt.temperature
     else:  # No temperature sensor
-        tempC = round(microcontroller.cpu.temperature)
+        tempC = microcontroller.cpu.temperature
 
-    tempF = tempC * 1.8 + 32
+    tempF = round(tempC * 1.8 + 32)
     sensor_data.text = 'Touch: {}\nLight: {}\n Temp: {}°F'.format(touch, light, tempF)
 
     # ------------- Handle Button Press Detection  ------------- #
