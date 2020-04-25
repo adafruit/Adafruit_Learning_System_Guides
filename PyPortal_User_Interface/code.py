@@ -342,8 +342,8 @@ while True:
     else:  # No temperature sensor
         tempC = microcontroller.cpu.temperature
 
-    tempF = round(tempC * 1.8 + 32)
-    sensor_data.text = 'Touch: {}\nLight: {}\n Temp: {}°F'.format(touch, light, tempF)
+    tempF = tempC * 1.8 + 32
+    sensor_data.text = 'Touch: {}\nLight: {}\n Temp: {:.0f}°F'.format(touch, light, tempF)	    
 
     # ------------- Handle Button Press Detection  ------------- #
     if touch:  # Only do this if the screen is touched
