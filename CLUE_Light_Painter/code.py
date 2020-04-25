@@ -219,29 +219,30 @@ class ClueLightPainter:
         board.DISPLAY.brightness = 0 # Screen backlight OFF
         painting = False
 
-        gc.collect() # Helps make playback a little smoother
+        with open(self.tempfile, 'rb') as file:
+            gc.collect() # Helps make playback a little smoother
 
-        while True:
-            action_set = {self.button_left.action(),
-                          self.button_right.action()}
-            if RichButton.TAP in action_set:
-                if painting:            # If currently painting
-                    self.clear_strip()  # Turn LEDs OFF
-                else:
-                    row = 0             # Start at beginning of file
-                painting = not painting # Toggle paint mode on/off
-            elif RichButton.HOLD in action_set:
-                return # Exit painting, enter config mode
-
-            if painting:
-                file.seek(row * self.row_size)
-                self.spi.write(file.read(self.row_size))
-                row += 1
-                if row >= self.num_rows:
-                    if self.loop:
-                        row = 0
+            while True:
+                action_set = {self.button_left.action(),
+                              self.button_right.action()}
+                if RichButton.TAP in action_set:
+                    if painting:            # If currently painting
+                        self.clear_strip()  # Turn LEDs OFF
                     else:
-                        painting = False
+                        row = 0             # Start at beginning of file
+                    painting = not painting # Toggle paint mode on/off
+                elif RichButton.HOLD in action_set:
+                    return # Exit painting, enter config mode
+
+                if painting:
+                    file.seek(row * self.row_size)
+                    self.spi.write(file.read(self.row_size))
+                    row += 1
+                    if row >= self.num_rows:
+                        if self.loop:
+                            row = 0
+                        else:
+                            painting = False
 
 
     # Each config screen is broken out into its own function...
