@@ -36,6 +36,7 @@ TEMPFILE = '/led.dat' # Working file for LED data (will be clobbered!)
 FLIP_SCREEN = False   # If True, turn CLUE screen & buttons upside-down
 GAMMA = 2.6           # Correction factor for perceptually linear brightness
 
+PIXEL_ORDER = 'gbr'
 
 def centered_label(text, y_pos, scale):
     """
@@ -190,7 +191,8 @@ class ClueLightPainter:
         group.append(self.rect)
         board.DISPLAY.show(group)
 
-        duration = 5.0 - self.speed * 4.5
+        #duration = 5.0 - self.speed * 4.5
+        duration = 3.0 - self.speed * 2.75
         rows = duration * self.rows_per_second
         try:
             self.num_rows = self.bmp2led.process(self.path + '/' +

@@ -250,9 +250,9 @@ class BMP2LED:
                             callback(position)
                         # Scale position into pixel space...
                         if loop: # 0 to image height
-                            position *= rows
-                        else:         # 0 to last row
-                            position *= (rows - 1)
+                            position *= self.bmp_specs.height
+                        else:    # 0 to last row
+                            position *= (self.bmp_specs.height - 1)
 
                         # Separate absolute position into several values:
                         # integer 'a' and 'b' row indices, floating 'a' and
@@ -312,7 +312,7 @@ class BMP2LED:
                         # use soon, would replace these two Python ops).
                         got[got < 0] = 0
                         got[got > 255] = 255
-                        # ulab.compare.clip(got, 0, 255)
+                        #ulab.compare.clip(got, 0, 255)
                         # Now quantize the floating-point 'got' to uint8
                         # type. This represents the actual final byte values
                         # that will be issued to the LED strip.
