@@ -1,37 +1,40 @@
 """
 Light painting project for Adafruit CLUE using DotStar LED strip.
 Images should be in 24-bit BMP format, with width matching the length
-of the LED strip. The ulab module is used to assist with interpolation
-and dithering, displayio for a minimal user interface.
+of the LED strip. Uses ulab module to assist with interpolation and
+dithering, displayio for a minimal user interface.
+
+TO RUN, boot.py MUST CONFIGURE FILESYSTEM FOR READ-WRITE MODE.
+TO EDIT CODE, FILESYSTEM MUST BE IN READ-ONLY MODE.
+boot.py sets up latter condition using a jumper from pin 0 to GND.
 """
 
 # pylint: disable=import-error
-from math import modf
-from time import monotonic, sleep
-from os import statvfs
+import os
 import gc
 import board
 import busio
 import displayio
-import ulab
+from time import monotonic, sleep
 from digitalio import DigitalInOut, Direction
 from bmp2led import BMP2LED, BMPError
+from neopixel_write import neopixel_write
 from richbutton import RichButton
 from adafruit_display_text import label
 from adafruit_display_shapes.rect import Rect
-from neopixel_write import neopixel_write
 from terminalio import FONT # terminalio font is crude but fast to display
 FONT_WIDTH, FONT_HEIGHT = FONT.get_bounding_box()
 
 
 # These are permanent global settings, can only change by editing the code:
 
-FLIP_SCREEN = False  # If True, turn CLUE screen & buttons upside-down
-PATH = '/bmps-72px'  # Folder containing BMP images (or '' for root path)
-GAMMA = 2.6          # Correction factor for perceptually linear brightness
-NUM_PIXELS = 72      # LED strip length, half-meter is usu. 30 or 72 pixels
+NUM_PIXELS = 72                   # LED strip length
 PIXEL_PINS = board.SDA, board.SCL # Data, clock pins for DotStars
 PIXEL_ORDER = 'brg'               # Pixel color order
+PATH = '/bmps-72px'   # Folder containing BMP images (or '' for root path)
+TEMPFILE = '/led.dat' # Working file for LED data (will be clobbered!)
+FLIP_SCREEN = False   # If True, turn CLUE screen & buttons upside-down
+GAMMA = 2.6           # Correction factor for perceptually linear brightness
 
 
 def centered_label(text, y_pos, scale):
@@ -56,7 +59,8 @@ class ClueLightPainter:
     """
 
     # pylint: disable=too-many-arguments
-    def __init__(self, flip, path, num_pixels, pixel_order, pixel_pins, gamma):
+    def __init__(self, flip, path, tempfile, num_pixels, pixel_order,
+                 pixel_pins, gamma):
         """
         App constructor. Follow up with a call to ClueLightPainter.run().
         Arguments:
@@ -64,6 +68,8 @@ class ClueLightPainter:
                                    flipped 180 degrees from normal (makes
                                    wiring easier in some situations).
             path (string)        : Directory containing BMP images.
+            tempfile (string)    : Full path/filename of temporary working
+                                   file for LED data (will be clobbered).
             num_pixels (int)     : LED strip length.
             pixel_order (string) : LED data order, e.g. 'grb'.
             pixel_pins (tuple)   : Board pin(s) for LED data output. If a
@@ -75,26 +81,18 @@ class ClueLightPainter:
         """
         self.bmp2led = BMP2LED(num_pixels, pixel_order, gamma)
         self.path = path
+        self.tempfile = tempfile
 
-# Don't have these -- just pull from self.bmp2led when needed
-#        self.num_pixels = num_pixels
-#        self.gamma = gamma
-
-        # Above values are permanently one-time set. The following values
-        # can be reconfigured mid-run.
-        self.image_num = 0    # Current image index in self.path
-        self.loop = False     # Repeat image playback
-        self.brightness = 1.0 # LED brightness, 0.0 (off) to 1.0 (bright)
-        self.config_mode = 0  # Current setting being changed
-        self.rect = None      # Multipurpose progress/setting rect
-        self.speed = 0.6      # Paint speed, 0.0 (slow) to 1.0 (fast)
-
-        # Using DotStar LEDs. The SPI peripheral is locked and config'd
-        # once here and never relinquished, to save some time on every
-        # column (need them ussued as fast as possible).
-        self.spi = busio.SPI(pixel_pin[1], MOSI=pixel_pin[0])
+        # The SPI peripheral is locked and config'd once here and never
+        # relinquished, to save some time on every row (need them issued
+        # as fast as possible).
+        self.spi = busio.SPI(pixel_pins[1], MOSI=pixel_pins[0])
         self.spi.try_lock()
         self.spi.configure(baudrate=8000000)
+
+        # Determine filesystem-to-LEDs throughput (also clears LED strip)
+#        self.rows_per_second, self.row_size = self.benchmark()
+        self.rows_per_second, self.row_size = 1000, 500
 
         # Configure hardware initial state
         self.button_left = RichButton(board.BUTTON_A)
@@ -105,14 +103,13 @@ class ClueLightPainter:
                                                    self.button_left)
         else:
             board.DISPLAY.rotation = 0
-        # Turn off onboard NeoPixel and LED strip
-        onboard_pixel_pin = digitalio.DigitalInOut(board.NEOPIXEL)
-        onboard_pixel_pin.direction = digitalio.Direction.OUTPUT
+        # Turn off onboard NeoPixel
+        onboard_pixel_pin = DigitalInOut(board.NEOPIXEL)
+        onboard_pixel_pin.direction = Direction.OUTPUT
         neopixel_write(onboard_pixel_pin, bytearray(3))
-        self.clear_strip()
 
         # Get list of compatible BMP images in path
-        self.images = self.neobmp.scandir(path)
+        self.images = self.bmp2led.scandir(path)
         if not self.images:
             group = displayio.Group()
             group.append(centered_label('NO IMAGES', 40, 3))
@@ -120,49 +117,54 @@ class ClueLightPainter:
             while True:
                 pass
 
-        # Load first image in list
-        self.load_image()
+        self.image_num = 0    # Current selected image index in self.path
+        self.loop = False     # Repeat image playback
+        self.brightness = 1.0 # LED brightness, 0.0 (off) to 1.0 (bright)
+        self.config_mode = 0  # Current setting being changed
+        self.rect = None      # Multipurpose progress/setting rect
+        self.speed = 0.8      # Paint speed, 0.0 (slow) to 1.0 (fast)
+        self.num_rows = 0     # Nothing loaded yet
 
-        # Clear display
-        board.DISPLAY.show(displayio.Group())
 
-
-    def dotstar_write(self, _, data):
+    def benchmark(self):
         """
-        DotStar strip data-writing wrapper. Accepts color data packed as
-        3 bytes/pixel (a la NeoPixel), repackages it into DotStar format
-        (header, per-pixel marker, footer) and outputs to self.spi.
-        Arguments:
-            _ (None)         : Unused but required argument, for 1:1 calling
-                               parity with neopixel_write() (where the first
-                               argument is a pin number). Allows a single
-                               common function call anywhere LEDs are updated
-                               rather than if/else in every location.
-            data (bytearray) : Pixel data in LED strip's native color order,
-                               3 bytes/pixel. Also takes ulab uint8 ndarray.
+        Estimate filesystem-to-LED-strip throughput.
+        Returns: rows-per-second throughput (int), LED row size in bytes
+        (including DotStar header and footer) (int).
         """
-        pixel_start = bytearray([255]) # Per-pixel marker
-        data_bytes = [x for l in [pixel_start + data[i:i+3]
-                                  for i in range(0, len(data), 3)] for x in l]
-        # SPI is NOT locked or configured here -- the application performs
-        # that once at startup and never relinquishes control of the port.
-        # Anything to save a few cycles.
-        self.spi.write(bytearray([0] * 4) + bytearray(data_bytes) +
-                       bytearray([255] * (((len(data) // 3) + 15) // 16)))
+        # Generate a small temporary file equal to one full LED row,
+        # all set 'off' (bonus, this turns off LED strip on startup).
+        with open(self.tempfile, 'wb') as file:
+            row_data = bytearray([0] * 4 +
+                                 [255, 0, 0, 0] * self.bmp2led.num_pixels +
+                                 [255] * ((self.bmp2led.num_pixels + 15) //
+                                          16))
+            file.write(row_data)
+            row_size = len(row_data)
+
+        # For a period of 1 second, repeatedly seek to start of file,
+        # read row of data and write to LED strip as fast as possible.
+        # Not super precise, but good-enough guess of light painting speed.
+        rows = 0
+        with open(self.tempfile, 'rb') as file:
+            gc.collect()
+            start_time = monotonic()
+            while monotonic() - start_time < 1.0:
+                file.seek(0)
+                self.spi.write(file.read(row_size))
+                rows += 1
+
+        return rows, row_size
 
 
     def clear_strip(self):
         """
-        Turn off all LEDs of the NeoPixel/DotStar strip.
+        Turn off all LEDs of the DotStar strip.
         """
-        # Though most strips are 3 bytes/pixel, issue 4 bytes just in case
-        # someone's using RGBW NeoPixel strip (the painting code never
-        # uses the W byte, but handle it regardless, in case RGBW strip is
-        # all someone has). So this will issue 1/3 more data than is really
-        # needed in most cases (including DotStar), but little harm done as
-        # this is only called when clearing the strip, not when painting.
-        # The extra unused bits harmlessly fall off the end of the strip.
-        self.write_func(self.neopixel_pin, bytearray(self.num_pixels * 4))
+        self.spi.write(bytearray([0] * 4 +
+                                 [255, 0, 0, 0] * self.bmp2led.num_pixels +
+                                 [255] * ((self.bmp2led.num_pixels + 15) //
+                                          16)))
 
 
     def load_progress(self, amount):
@@ -188,10 +190,16 @@ class ClueLightPainter:
         group.append(self.rect)
         board.DISPLAY.show(group)
 
+        duration = 5.0 - self.speed * 4.5
+        rows = duration * self.rows_per_second
         try:
-            self.columns = self.neobmp.load(self.path + '/' +
-                                            self.images[self.image_num],
-                                            self.load_progress)
+            self.num_rows = self.bmp2led.process(self.path + '/' +
+                                                 self.images[self.image_num],
+                                                 self.tempfile,
+                                                 rows,
+                                                 self.brightness,
+                                                 self.loop,
+                                                 self.load_progress)
         except (MemoryError, BMPError):
             group = displayio.Group()
             group.append(centered_label('TOO BIG', 40, 3))
@@ -208,13 +216,9 @@ class ClueLightPainter:
         the nifty image processing.
         """
 
-        if not self.columns: # If no image loaded
-            return           # Go back to config, can try another
-
         board.DISPLAY.brightness = 0 # Screen backlight OFF
         painting = False
 
-        row_size = 4 + num_leds * 4 + ((num_leds + 15) // 16)
         # num_rows = was determined during conversion
 
         gc.collect() # Helps make playback a little smoother
@@ -232,8 +236,8 @@ class ClueLightPainter:
                 return # Exit painting, enter config mode
 
             if painting:
-                file.seek(row * row_size)
-                self.spi.write(file.read(row_size))
+                file.seek(row * self.row_size)
+                self.spi.write(file.read(self.row_size))
                 row += 1
                 if row >= num_rows:
                     if self.loop:
@@ -283,7 +287,7 @@ class ClueLightPainter:
         return group
 
 
-    def config_select(self):
+    def config_select(self, first_run=False):
         """
         Initial configuration screen, in which the user selects which
         setting will be changed. Tap L/R to select which setting,
@@ -296,7 +300,7 @@ class ClueLightPainter:
         group = self.make_ui_group(True, strings[self.config_mode])
         board.DISPLAY.brightness = 1 # Screen on
         prev_mode = self.config_mode
-        reload_image = not self.columns
+        reload_image = first_run
 
         while True:
             action_left, action_right = (self.button_left.action(),
@@ -330,6 +334,7 @@ class ClueLightPainter:
                 prev_mode = self.config_mode
 
         # Before exiting to paint mode, check if new image needs loaded
+# DO IMAGE CONVERSION HERE!
         if reload_image:
             self.load_image()
 
@@ -342,19 +347,16 @@ class ClueLightPainter:
         be reloaded, second indicates if returning to paint mode vs
         more config.
         """
-        orig_image = self.image_num
-        prev_image = self.image_num
         group = self.make_ui_group(False, self.images[self.image_num])
+        orig_image, prev_image = self.image_num, self.image_num
 
         while True:
             action_left, action_right = (self.button_left.action(),
                                          self.button_right.action())
             if action_left is RichButton.HOLD:
-                # Resume config
-                return self.image_num is not orig_image, False
+                return self.image_num is not orig_image, False # Resume config
             if action_right is RichButton.HOLD:
-                # Resume paint
-                return self.image_num is not orig_image, True
+                return self.image_num is not orig_image, True  # Resume paint
             if action_left is RichButton.TAP:
                 self.image_num = (self.image_num - 1) % len(self.images)
             elif action_right is RichButton.TAP:
@@ -374,16 +376,16 @@ class ClueLightPainter:
         Returns: two booleans, first is always False, second indicates
         if returning to paint mode vs more config.
         """
-        prev_speed = self.speed
         self.make_ui_group(False, 'Speed:', self.speed)
+        orig_speed, prev_speed = self.speed, self.speed
 
         while True:
             action_left, action_right = (self.button_left.action(),
                                          self.button_right.action())
             if action_left is RichButton.HOLD:
-                return False, False # Resume config
+                return self.speed is not orig_speed, False # Resume config
             if action_right is RichButton.HOLD:
-                return False, True  # Resume paint
+                return self.speed is not orig_speed, True  # Resume paint
             if action_left is RichButton.TAP:
                 self.speed = max(0, self.speed - 0.1)
             elif action_right is RichButton.TAP:
@@ -403,14 +405,15 @@ class ClueLightPainter:
         """
         loop_label = ['Loop OFF', 'Loop ON']
         group = self.make_ui_group(False, loop_label[self.loop])
+        orig_loop = self.loop
 
         while True:
             action_left, action_right = (self.button_left.action(),
                                          self.button_right.action())
             if action_left is RichButton.HOLD:
-                return False, False # Resume config
+                return self.loop is not orig_loop, False # Resume config
             if action_right is RichButton.HOLD:
-                return False, True  # Resume paint
+                return self.loop is not orig_loop, True  # Resume paint
             if RichButton.TAP in {action_left, action_right}:
                 self.loop = not self.loop
                 group.pop()
@@ -424,17 +427,16 @@ class ClueLightPainter:
         Returns: two booleans, first is always False, second indicates
         if returning to paint mode vs more config.
         """
-        prev_brightness = self.brightness
-
+        orig_brightness, prev_brightness = self.brightness, self.brightness
         self.make_ui_group(False, 'Brightness:', self.brightness)
 
         while True:
             action_left, action_right = (self.button_left.action(),
                                          self.button_right.action())
             if action_left is RichButton.HOLD:
-                return False, False # Resume config
+                return self.brightness is not orig_brightness, False # Config
             if action_right is RichButton.HOLD:
-                return False, True  # Resume paint
+                return self.brightness is not orig_brightness, True  # Paint
             if action_left is RichButton.TAP:
                 self.brightness = max(0.0, self.brightness - 0.1)
             elif action_right is RichButton.TAP:
@@ -451,215 +453,23 @@ class ClueLightPainter:
         config modes. Each function has its own condition for return
         (switching to the opposite mode). Repeat forever.
         """
+        _, paint = self.config_image()
+        if paint:
+            self.load_image()
+        else:
+            self.config_select(True)
+
         while True:
             self.paint()
             self.config_select()
 
 
-ClueLightPainter(FLIP_SCREEN, PATH,
-                 NUM_PIXELS, PIXEL_ORDER, PIXEL_PINS, GAMMA).run()
-
-
-
-
-
-
-
-
-
 # Note to future self: make program start in image-select mode,
 # then when that returns, go into settings or paint depending
 # on return status.
+#        # Load first image in list
+#        self.load_image()
 
 
-
-class foobar:
-    def __init__(self, num_pixels, pins):
-        self.num_pixels = num_pixels
-        self.spi = busio.SPI(pins[1], MOSI=pins[0])
-        self.spi.try_lock()
-        self.spi.configure(baudrate=8000000)
-
-        stats = os.statvfs('/')
-        bytes_free = stats[0] * stats[4] # block size, free blocks
-        self.row_size = 4 + num_pixels * 4 + ((num_pixels + 15) // 16)
-        self.max_rows = bytes_free // self.row_size
-        self.rows_per_second = 0
-
-    def benchmark(self):
-        with open('/tempfile', 'wb') as file:
-            row_data = bytearray([0] * 4 +
-                                 [255, 0, 0, 0] * self.num_pixels +
-                                 [255] * ((self.num_pixels + 15) // 16))
-            file.write(row_data)
-
-        with open('/tempfile', 'rb') as file:
-            test_duration = 1.0
-            rows = 0
-            gc.collect()
-            start_time = monotonic()
-            while monotonic() - start_time < test_duration:
-                file.seek(0)
-                self.spi.write(file.read(self.row_size))
-                rows += 1
-            self.rows_per_second = rows / test_duration
-            print('Speed:', self.rows_per_second, 'rows/sec')
-
-foobar(NUM_PIXELS, PIXEL_PINS).benchmark()
-
-while True:
-    pass
-
-
-
-
-
-stats = os.statvfs('/')
-bytes = stats[0] * stats[4] # block size * free blocks for unprivileged users
-print(bytes, 'bytes free')
-
-spi = busio.SPI(DOTSTAR_PINS[1], MOSI=DOTSTAR_PINS[0])
-spi.try_lock()
-# 8 MHz max SPI on nRF (32 MHz reserved for screen)
-spi.configure(baudrate=8000000)
-
-# Write a single-line file.
-# also, determine max number of lines from free bytes and
-# dotstar_num_bytes
-
-#with open('/garbage', 'wb') as outfile:
-column_buf = bytearray([0] * 4 + [255, 0, 0, 0] * NUM_PIXELS + [255] * ((NUM_PIXELS + 15) // 16))
-dotstar_num_bytes = len(column_buf)
-#    for i in range(ROWS):
-#    outfile.write(column_buf)
-
-# What if, instead of fixed number of rows, if it
-# read data for one second.
-
-# rows/sec will get more accurate the longer this runs, but that
-# requires the user waiting. About 1 second gives a 'good enough' answer.
-test_time = 1
-rows = 0
-gc.collect()
-with open('/garbage', 'rb') as infile:
-    start_time = monotonic()
-    while monotonic() - start_time < test_time:
-        infile.seek(0)
-        spi.write(infile.read(dotstar_num_bytes))
-        rows += 1
-print('Speed:', rows / test_time, 'lines/sec')
-print(rows, 'rows')
-print(test_time, 'sec')
-
-while True:
-    pass
-
-
-
-
-NEOPIXEL_PIN = board.D0
-DOTSTAR_PINS = board.SDA, board.SCL
-
-FILE = 'bigfile.jpg'
-#FILE = 'Helvetica-Bold-16.bdf'
-
-neopixel_num_bytes = NUM_PIXELS * 3
-neopixel_data = bytearray(neopixel_num_bytes)
-dotstar_num_bytes = 4 + NUM_PIXELS * 4 + (NUM_PIXELS + 15) // 16
-dotstar_data = bytearray(dotstar_num_bytes)
-
-neopixel_pin = digitalio.DigitalInOut(NEOPIXEL_PIN)
-neopixel_pin.direction = digitalio.Direction.OUTPUT
-
-spi = busio.SPI(DOTSTAR_PINS[1], MOSI=DOTSTAR_PINS[0])
-spi.try_lock()
-# 8 MHz max SPI on nRF (32 MHz reserved for screen)
-spi.configure(baudrate=8000000)
-
-# Trying header/footer as distinct things (not stored with data)
-header = bytearray([0] * 4)
-footer = bytearray([255] * ((NUM_PIXELS + 15) // 16))
-dotstar_num_bytes = NUM_PIXELS * 4
-# As single write: 1037 lines/sec
-# As concatenated bytearrays: 769 lines/sec, oof.
-# Okay then, build header and footer into the tempfile data.
-# It'll produce a larger file, but it's quicker to issue.
-
-passes = 0
-with open(FILE, "rb") as file:
-    start_time = monotonic()
-    while True:
-        #data = file.read(neopixel_num_bytes)
-        data = file.read(dotstar_num_bytes)
-        if not data:
-            break
-        #neopixel_write(neopixel_pin, data)
-        spi.write(data)
-        #spi.write(header + data + footer)
-        passes += 1
-    end_time = monotonic()
-    elapsed = end_time - start_time
-    print('Speed:', passes / elapsed, 'lines/sec')
-    print(passes)
-
-while True:
-    pass
-
-# 394K file
-# Reading neopixel_num_bytes at a time: 2214 reads/sec
-# Reading dotstar_num_bytes at a time: 1470
-
-# 800K file w strip writes:
-# NeoPixel: 328 lines/sec
-# DotStar: 1087 lines/sec
-
-
-
-
-DELAY = 0.000300 # 300 uS
-DELAY = 0.003    # 3 ms (333 lines/sec)
-
-for passes in (100, 1000, 10000):
-    print(passes, 'passes')
-
-    start_time = monotonic()
-    for i in range(passes):
-        neopixel_write(neopixel_pin, neopixel_data)
-        sleep(DELAY)
-    end_time = monotonic()
-    elapsed = end_time - start_time
-    print('NeoPixel speed:', passes / elapsed, 'writes/sec')
-
-    start_time = monotonic()
-    for i in range(passes):
-        spi.write(dotstar_data)
-        sleep(DELAY)
-    end_time = monotonic()
-    elapsed = end_time - start_time
-    print('DotStar speed:', passes / elapsed, 'writes/sec')
-
-# 72 pixel strip
-
-# No delay between writes
-# Writes  NeoPixel  DotStar
-# 100     180       307 writes/sec
-# 1000    335       1549
-# 10000   367       2597
-
-# 300 uS delay between writes
-# Writes  NeoPixel  DotStar
-# 100     178       306 writes/sec
-# 1000    334       1501
-# 10000   365       2463
-
-# 3 mS delay between writes
-# Writes  NeoPixel  DotStar
-# 100     127       169 writes/sec
-# 1000    189       304
-# 10000   198       330
-
-
-
-
-while True:
-    pass
+ClueLightPainter(FLIP_SCREEN, PATH, TEMPFILE,
+                 NUM_PIXELS, PIXEL_ORDER, PIXEL_PINS, GAMMA).run()

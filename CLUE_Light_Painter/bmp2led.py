@@ -3,6 +3,7 @@ BMP-to-DotStar-ready-bytearrays.
 """
 
 import os
+import math
 import ulab
 
 class BMPError(Exception):
@@ -59,7 +60,8 @@ class BMP2LED:
         self.blue_index = order.find('b')
         self.num_pixels = num_pixels
         self.gamma = gamma
-        self.bmpfile = None
+        self.bmp_file = None
+        self.bmp_specs = None
 
 
     def read_le(self, num_bytes):
@@ -73,7 +75,7 @@ class BMP2LED:
             Converted integer product.
         """
         result = 0
-        for byte_index, byte in enumerate(self.bmpfile.read(num_bytes)):
+        for byte_index, byte in enumerate(self.bmp_file.read(num_bytes)):
             result += byte << (byte_index * 8)
         return result
 
@@ -85,13 +87,13 @@ class BMP2LED:
         Returns:
             BMPSpecs object containing size, offset, etc.
         """
-        if self.bmpfile.read(2) != b'BM': # Check signature
+        if self.bmp_file.read(2) != b'BM': # Check signature
             raise BMPError("Not BMP file")
 
-        self.bmpfile.read(8) # Read & ignore file size & creator bytes
+        self.bmp_file.read(8) # Read & ignore file size & creator bytes
 
         image_offset = self.read_le(4) # Start of image data
-        self.bmpfile.read(4) # Read & ignore header size
+        self.bmp_file.read(4) # Read & ignore header size
         width = self.read_le(4)
         height = self.read_le(4)
         # BMPs are traditionally stored bottom-to-top.
@@ -127,7 +129,7 @@ class BMP2LED:
         valid_list = []
         for entry in full_list:
             try:
-                with open(entry, "rb") as self.file:
+                with open(path + '/' + entry, 'rb') as self.bmp_file:
                     self.read_header()
                     valid_list.append(entry)
             except (OSError, BMPError):
@@ -137,20 +139,7 @@ class BMP2LED:
         return valid_list
 
 
-# old file will be overwritten.
-# gamma is stored in self,
-# brightness and loop will be passed in.
-# Oh...also need to pass in number of rows to stretch.
-# Number of LEDs is known from constructor. These are the items:
-# self.red_index = order.find('r')
-# self.green_index = order.find('g')
-# self.blue_index = order.find('b')
-# self.num_pixels = num_pixels
-# self.gamma = gamma
-# self.file = None
-# Delete existing tempfile before checking free space.
-
-    def read_row(self, row):
+    def read_row(self, row, num_bytes):
         """
         Read one row of pixels from BMP file, clipped to minimum of BMP
         image width or LED strip length.
@@ -162,10 +151,11 @@ class BMP2LED:
         """
         # 'flip' logic is intentionally backwards from typical BMP loader,
         # this makes BMP image prep an easy 90 degree CCW rotation.
-        if not bmp.flip:
-            row = bmp.height - 1 - row
-        self.file.seek(bmp.image_offset + row * bmp.row_size)
-        return ulab.array(self.file.read(clipped_row_size), dtype=uint8)
+        if not self.bmp_specs.flip:
+            row = self.bmp_specs.height - 1 - row
+        self.bmp_file.seek(self.bmp_specs.image_offset +
+                           row * self.bmp_specs.row_size)
+        return ulab.array(self.bmp_file.read(num_bytes), dtype=ulab.uint8)
 
 
     def process(self, input_filename, output_filename, rows,
@@ -214,8 +204,8 @@ class BMP2LED:
         # start markers and footer), with colors all '0' to start...these
         # will be filled later.
         dotstar_buffer = bytearray([0] * 4 +
-                                   [255, 0, 0, 0] * num_pixels +
-                                   [255] * ((num_pixels + 15) // 16))
+                                   [255, 0, 0, 0] * self.num_pixels +
+                                   [255] * ((self.num_pixels + 15) // 16))
         dotstar_row_size = len(dotstar_buffer)
 
         # Delete old temporary file, if any
@@ -234,39 +224,42 @@ class BMP2LED:
         rows = min(rows, bytes_free // dotstar_row_size)
 
         try:
-            with open(input_filename, 'rb') as file_in:
+            with open(input_filename, 'rb') as self.bmp_file:
                 #print("File opened")
 
-                bmp = self.read_header()
+                self.bmp_specs = self.read_header()
 
-                #print("WxH: (%d,%d)" % (bmp.width, bmp.height))
+                #print("WxH: (%d,%d)" % (self.bmp_specs.width,
+                #                        self.bmp_specs.height))
                 #print("Image format OK, reading data...")
 
-                # Constrain row width to pixel strip length
-                clipped_width = min(bmp.width, self.num_pixels)
+                # Constrain bytes-to-read to pixel strip length
+                clipped_width = min(self.bmp_specs.width, self.num_pixels)
+                row_bytes = 3 * clipped_width
 
                 # Each output row is interpolated from two BMP rows,
                 # we'll call them 'a' and 'b' here.
                 row_a_data, row_b_data = None, None
-                prev_row_a_index, prev_row_b_index = None
+                prev_row_a_index, prev_row_b_index = None, None
 
-                with open(output_filename, 'wb') as file_out:
+                with open(output_filename, 'wb') as led_file:
+                    err = 0
                     for row in range(rows): # For each output row...
                         position = row / (rows - 1) # 0.0 to 1.0
                         if callback:
                             callback(position)
                         # Scale position into pixel space...
-                        if self.loop: # 0 to image height
-                            position *= len(self.columns)
+                        if loop: # 0 to image height
+                            position *= rows
                         else:         # 0 to last row
-                            position *= (len(self.columns) - 1)
+                            position *= (rows - 1)
 
                         # Separate absolute position into several values:
                         # integer 'a' and 'b' row indices, floating 'a' and
                         # 'b' weights (0.0 to 1.0) for interpolation.
-                        row_b_weight, row_a_index = modf(position)
+                        row_b_weight, row_a_index = math.modf(position)
                         row_a_index = int(row_a_index)
-                        row_b_index = (row_a_index + 1) % bmp.height
+                        row_b_index = (row_a_index + 1) % self.bmp_specs.height
                         row_a_weight = 1.0 - row_b_weight
 
                         # New data ONLY needs reading if row index changed
@@ -277,9 +270,11 @@ class BMP2LED:
                             if row_a_index == prev_row_b_index:
                                 row_a_data = row_b_data
                             else:
-                                row_a_data = self.read(row_a_index)
+                                row_a_data = self.read_row(row_a_index,
+                                                           row_bytes)
                             # Read new 'b' data on any row change
-                            row_b_data = self.read(row_b_index)
+                            row_b_data = self.read_row(row_b_index,
+                                                       row_bytes)
                         prev_row_a_index = row_a_index
                         prev_row_b_index = row_b_index
 
@@ -299,9 +294,10 @@ class BMP2LED:
                         # floating-point) pixel values resulting from the
                         # interpolation, with gamma correction applied and
                         # scaled back up to the 0-255 range.
-                        want = ((row_a_data * row_a_weight +
-                                 row_b_data * row_b_weight) **
-                                self.gamma * 255.001)
+# ValueError: operands could not be broadcast together
+                        want = ((((row_a_data * row_a_weight) +
+                                  (row_b_data * row_b_weight)) **
+                                 self.gamma) * 255.001)
 
                         # 'got' will be an ndarray of the values that get
                         # issued to the LED strip, formed through several
@@ -334,23 +330,28 @@ class BMP2LED:
                         # allowing for header and start-of-pixel markers
                         # in the DotStar data.
                         for column in range(clipped_width):
-                            bmp_pos = x * 3
-                            dotstar_pos = 5 + x * 4
-                            bgr = data[bmp_pos:bmp_pos + 3]
-                            dotstar_buffer[dotstar_pos + blue_index] = bgr[0]
-                            dotstar_buffer[dotstar_pos + green_index] = bgr[1]
-                            dotstar_buffer[dotstar_pos + red_index] = bgr[2]
+                            bmp_pos = column * 3
+                            dotstar_pos = 5 + column * 4
+                            bgr = got[bmp_pos:bmp_pos + 3]
+                            dotstar_buffer[dotstar_pos +
+                                           self.blue_index] = bgr[0]
+                            dotstar_buffer[dotstar_pos +
+                                           self.green_index] = bgr[1]
+                            dotstar_buffer[dotstar_pos +
+                                           self.red_index] = bgr[2]
 
-                        file_out.write(dotstar_buffer)
+                        led_file.write(dotstar_buffer)
 
                     # If not looping, add an 'all off' row of LED data
                     # at end to ensure last row timing is consistent.
                     if not loop:
                         rows += 1
-                        file_out.write(bytearray([0] * 4 +
-                                                 [255, 0, 0, 0] * num_pixels +
-                                                 [255] * ((num_pixels + 15) //
-                                                          16)))
+                        led_file.write(bytearray([0] * 4 +
+                                                 [255, 0, 0, 0] *
+                                                 self.num_pixels +
+                                                 [255] *
+                                                 ((self.num_pixels + 15) //
+                                                  16)))
 
                 #print("Loaded OK!")
                 return rows
