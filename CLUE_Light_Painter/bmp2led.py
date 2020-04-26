@@ -251,11 +251,12 @@ class BMP2LED:
                         position = row / (rows - 1) # 0.0 to 1.0
                         if callback:
                             callback(position)
+
                         # Scale position into pixel space...
                         if loop: # 0 to <image height
                             position = self.bmp_specs.height * row / rows
                         else:    # 0 to last row.0
-                            position *= (self.bmp_specs.height - 1)
+                            position *= self.bmp_specs.height - 1
 
                         # Separate absolute position into several values:
                         # integer 'a' and 'b' row indices, floating 'a' and
@@ -297,36 +298,39 @@ class BMP2LED:
                         # 'want' is an ndarray of the idealized (as in,
                         # floating-point) pixel values resulting from the
                         # interpolation, with gamma correction applied and
-                        # scaled back up to the 0-255 range.
+                        # scaled back up to 8-bit range. Scaling to 254.999
+                        # (not 255) lets us avoid a subsequent clip check.
                         want = ((((row_a_data * row_a_weight) +
                                   (row_b_data * row_b_weight)) **
-                                 self.gamma) * 255.001)
+                                 self.gamma) * 254.999)
 
                         # 'got' will be an ndarray of the values that get
                         # issued to the LED strip, formed through several
-                        # operations. First, an 'error term' is added to
-                        # each pixel, representing how 'wrong' the prior
-                        # output was. This is used for error diffusion
-                        # dithering. 'got' is floating-point at this stage.
-                        got = ulab.array(want + err)
-                        # The error term may push some pixel values outside
-                        # the required 0-255 range, so clip the result (aka
-                        # 'saturate'). (Note to future self: requested a
-                        # clip() function in ulab, should be available for
-                        # use soon, would replace these two Python ops).
-                        got[got < 0] = 0
-                        got[got > 255] = 255
-                        #ulab.compare.clip(got, 0, 255)
-                        # Now quantize the floating-point 'got' to uint8
-                        # type. This represents the actual final byte values
-                        # that will be issued to the LED strip.
-                        got = ulab.array(got, dtype=ulab.uint8)
-                        # Make note of the difference...the 'error term'...
-                        # between what we ideally wanted (float) and what we
-                        # actually got (dithered, clipped and quantized).
-                        # This gets used on the next pass through the loop.
-                        err = err + ((want - got) * 0.5)
-                        # ('+=' syntax doesn't work on ndarrays)
+                        # operations. First, the 'want' values are quantized
+                        # to uint8's -- so these will always be slightly
+                        # dimmer (v. occasionally equal) to the 'want' vals.
+                        got = ulab.array(want, dtype=ulab.uint8)
+                        # Note: naive 'foo = foo + bar' syntax used in this
+                        # next section is intentional. ndarrays don't seem
+                        # to always play well with '+=' syntax.
+                        # The difference between what we want and what we
+                        # got will be an ndarray of values from 0.0 to <1.0.
+                        # This is accumulated into the error ndarray to be
+                        # applied to this and subsequent rows.
+                        err = err + want - got
+                        # Accumulated error vals will all now be 0.0 to <2.0.
+                        # Quantizing err into a new uint8 ndarray, all values
+                        # will be 0 or 1.
+                        err_bits = ulab.array(err, dtype=ulab.uint8)
+                        # Add the 1's back into 'got', increasing the
+                        # brightness of certain pixels by 1. Because the max
+                        # value in 'got' is 254 (not 255), no clipping need
+                        # be performed, everything still fits in uint8.
+                        got = got + err_bits
+                        # Subtract those applied 1's from the error array,
+                        # leaving residue in the range 0.0 to <1.0 which
+                        # will be used on subsequent rows.
+                        err = err - err_bits
 
                         # Reorder data from BGR to DotStar color order,
                         # allowing for header and start-of-pixel markers

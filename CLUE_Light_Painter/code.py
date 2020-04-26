@@ -195,9 +195,9 @@ class ClueLightPainter:
         group.append(self.rect)
         board.DISPLAY.show(group)
 
-        # Playback time is about 1/4 to 5 seconds, non linearly spaced
-        duration = 0.25 + 4.75 * ((1.0 - self.speed) ** 2.5)
-        rows = duration * self.rows_per_second
+        # Playback time is about 1/2 to 6 seconds, non linearly spaced
+        duration = 0.5 + 5.5 * ((1.0 - self.speed) ** 2)
+        rows = int(duration * self.rows_per_second + 0.5)
         try:
             self.num_rows = self.bmp2led.process(self.path + '/' +
                                                  self.images[self.image_num],
