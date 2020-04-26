@@ -261,7 +261,8 @@ class BMP2LED:
                         # integer 'a' and 'b' row indices, floating 'a' and
                         # 'b' weights (0.0 to 1.0) for interpolation.
                         row_b_weight, row_a_index = math.modf(position)
-                        row_a_index = int(row_a_index)
+                        row_a_index = min(int(row_a_index),
+                                          self.bmp_specs.height - 1)
                         row_b_index = (row_a_index + 1) % self.bmp_specs.height
                         row_a_weight = 1.0 - row_b_weight
 
