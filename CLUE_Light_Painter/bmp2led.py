@@ -437,6 +437,8 @@ class BMP2LED:
                         #output_buffer[output_position:output_position +
                         #              dotstar_row_size] = bytearray(
                         #                  got[i] for i in reorder)
+                        # Initial testing (with a nonsense reorder table)
+                        # doesn't suggest it's any faster.
 
                         time3 += (monotonic() - row_start_time)
 
