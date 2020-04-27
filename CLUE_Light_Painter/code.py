@@ -201,9 +201,9 @@ class ClueLightPainter:
         # pylint: disable=eval-used
         # (It's cool, is a 'trusted string' in the code)
         duration = eval(TIMES[self.time]) # Playback time in seconds
-        # The 0.85 here is an empirical guesstimate; playback is ever-so-
+        # The 0.9 here is an empirical guesstimate; playback is ever-so-
         # slightly slower than benchmark speed due to button testing.
-        rows = int(duration * self.rows_per_second * 0.85 + 0.5)
+        rows = int(duration * self.rows_per_second * 0.9 + 0.5)
         # Remap brightness from 0.0-1.0 to 15-100%
         brightness = 0.15 + self.brightness * 0.85
         try:

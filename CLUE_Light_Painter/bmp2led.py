@@ -143,15 +143,16 @@ class BMP2LED:
         return valid_list
 
 
-    def read_row(self, row, num_bytes):
+    def read_row(self, row, dest):
         """
         Read one row of pixels from BMP file, clipped to minimum of BMP
         image width or LED strip length.
         Arguments:
-            row (int): index of row to read (0 to (image height - 1))
-        Returns: ulab ndarray (uint8 type) containing pixel data in
-        BMP-native order (B,G,R per pixel), no need to reorder to DotStar
-        order until later.
+            row (int)            : Index of row to read (0 to (img height-1)).
+            dest (uint8 ndarray) : Destination buffer. After reading, buffer
+                                   contains pixel data in BMP-native order
+                                   (B,G,R per pixel), no need to reorder to
+                                   DotStar order until later.
         """
         # 'flip' logic is intentionally backwards from typical BMP loader,
         # this makes BMP image prep an easy 90 degree CCW rotation.
@@ -159,7 +160,7 @@ class BMP2LED:
             row = self.bmp_specs.height - 1 - row
         self.bmp_file.seek(self.bmp_specs.image_offset +
                            row * self.bmp_specs.row_size)
-        return ulab.array(self.bmp_file.read(num_bytes), dtype=ulab.uint8)
+        self.bmp_file.readinto(dest)
 
 
     # pylint: disable=too-many-arguments, too-many-locals
@@ -209,14 +210,11 @@ class BMP2LED:
         # It's formed just like valid strip data (with header, per-pixel
         # start markers and footer), with colors all '0' to start...these
         # will be filled later.
-        dotstar_buffer = bytearray([0] * 4 +
-                                   [255, 0, 0, 0] * self.num_pixels +
-                                   [255] * ((self.num_pixels + 15) // 16))
+        dotstar_buffer = ulab.array([0] * 4 +
+                                    [255, 0, 0, 0] * self.num_pixels +
+                                    [255] * ((self.num_pixels + 15) // 16),
+                                    dtype=ulab.uint8)
         dotstar_row_size = len(dotstar_buffer)
-        # Operation performed later requires a list, not a bytearray.
-        # Make a copy, keeping the same values.
-#        dotstar_list = list(dotstar_buffer)
-        #reorder = [0] * dotstar_row_size
 
         # Output rows are held in RAM and periodically written,
         # marginally faster than writing each row separately.
@@ -251,46 +249,14 @@ class BMP2LED:
                 # Constrain bytes-to-read to pixel strip length
                 clipped_width = min(self.bmp_specs.width, self.num_pixels)
                 row_bytes = 3 * clipped_width
-                # Compute reorder list here (needs row bytes to work)
 
                 # Each output row is interpolated from two BMP rows,
                 # we'll call them 'a' and 'b' here.
-                row_a_data, row_b_data = None, None
+                row_a_data = ulab.zeros(row_bytes, dtype=ulab.uint8)
+                row_b_data = ulab.zeros(row_bytes, dtype=ulab.uint8)
                 prev_row_a_index, prev_row_b_index = None, None
 
                 with open(output_filename, 'wb') as led_file:
-                    # Determine remapping indices from BMP's always-BGR
-                    # pixel byte order to DotStar's variable order
-                    # (contained in self.red_index, green_index, blue_index).
-                    # I'm sure there's better ways but have a headache.
-                    # This is ONLY needed if using the first of two
-                    # benchmarked methods later (or something similar to it).
-# There's really only six possible orders, I could make a list
-#                    if self.blue_index is 0:      # BXX DotStar
-#                        offset_0 = 0     # DotStar byte 0 is BMP byte 0 (B)
-#                        if self.green_index is 1: # BGR
-#                            offset_1 = 1 # DotStar byte 1 is BMP byte 1 (G)
-#                            offset_2 = 2 # DotStar byte 2 is BMP byte 2 (R)
-#                        else:                     # BRG
-#                            offset_1 = 2 # DotStar byte 1 is BMP byte 2 (R)
-#                            offset_2 = 1 # DotStar byte 2 is BMP byte 1 (G)
-#                    elif self.green_index is 0:   # GXX DotStar
-#                        offset_0 = 1     # DotStar byte 0 is BMP byte 1 (G)
-#                        if self.blue_index is 1:  # GBR
-#                            offset_1 = 0 # DotStar byte 1 is BMP byte 0 (B)
-#                            offset_2 = 2 # DotStar byte 2 is BMP byte 2 (R)
-#                        else:                     # GRB
-#                            offset_1 = 2 # DotStar byte 1 is BMP byte 2 (R)
-#                            offset_2 = 0 # DotStar byte 2 is BMP byte 0 (B)
-#                    else:                         # RXX DotStar
-#                        offset_0 = 2     # DotStar byte 0 is BMP byte 2 (R)
-#                        if self.green_index is 1: # RGB
-#                            offset_1 = 1 # DotStar byte 1 is BMP byte 1 (G)
-#                            offset_2 = 0 # DotStar byte 2 is BMP byte 0 (R)
-#                        else:                     # RBG
-#                            offset_1 = 0 # DotStar byte 1 is BMP byte 0 (R)
-#                            offset_2 = 1 # DotStar byte 2 is BMP byte 1 (G)
-
                     # To avoid continually appending to output file (a slow
                     # operation), seek to where the end of the file would
                     # be, write a nonsense byte there, then seek back to
@@ -324,15 +290,15 @@ class BMP2LED:
                         # (else do another interp/dither with existing data)
                         if row_a_index != prev_row_a_index:
                             # If we've advanced exactly one row, reassign
-                            # old 'b' data to 'a' row, else read new 'a'.
+                            # old 'b' data to 'a' row (swap, so buffers
+                            # remain distinct), else read new 'a'.
                             if row_a_index == prev_row_b_index:
-                                row_a_data = row_b_data
+                                row_a_data, row_b_data = row_b_data, row_a_data
                             else:
-                                row_a_data = self.read_row(row_a_index,
-                                                           row_bytes)
+                                self.read_row(row_a_index, row_a_data)
                             # Read new 'b' data on any row change
-                            row_b_data = self.read_row(row_b_index,
-                                                       row_bytes)
+                            self.read_row(row_b_index, row_b_data)
+
                         prev_row_a_index = row_a_index
                         prev_row_b_index = row_b_index
                         time1 += (monotonic() - row_start_time)
@@ -390,55 +356,15 @@ class BMP2LED:
                         # Reorder data from BGR to DotStar color order,
                         # allowing for header and start-of-pixel markers
                         # in the DotStar data.
-
-                        # Benchmarking two approaches here...first uses a
-                        # zipped list working from the ndarray (because
-                        # CircuitPython bytearrays don't allow step-by-3),
-                        # converting to a bytearray before write.
-                        # This needs the 3 offset_* variables from earlier.
-
-#                        for dot_idx, color in enumerate(
-#                                list(zip(got[offset_0::3],
-#                                         got[offset_1::3],
-#                                         got[offset_2::3]))):
-#                            dot_pos = 5 + dot_idx * 4
-#                            dotstar_list[dot_pos:dot_pos + 3] = color
-#                        output_buffer[output_position:output_position +
-#                                      dotstar_row_size] = bytearray(
-#                                          dotstar_list)
-
-                        # Other approach, 'got' is converted from uint8
-                        # ndarray to bytearray (seems a bit faster) and then
-                        # a brute-force walkthrough loop...
-                        bgr = bytearray(got)
-                        for column in range(clipped_width):
-                            bmp_pos = column * 3
-                            dotstar_pos = 5 + column * 4
-                            dotstar_buffer[dotstar_pos +
-                                           self.blue_index] = bgr[bmp_pos]
-                            dotstar_buffer[dotstar_pos +
-                                           self.green_index] = bgr[bmp_pos + 1]
-                            dotstar_buffer[dotstar_pos +
-                                           self.red_index] = bgr[bmp_pos + 2]
+                        dotstar_buffer[5 + self.blue_index:
+                                       5 + 4 * clipped_width:4] = got[0::3]
+                        dotstar_buffer[5 + self.green_index:
+                                       5 + 4 * clipped_width:4] = got[1::3]
+                        dotstar_buffer[5 + self.red_index:
+                                       5 + 4 * clipped_width:4] = got[2::3]
                         output_buffer[output_position:output_position +
-                                      dotstar_row_size] = dotstar_buffer
-                        # Performance of the two is pretty similar.
-                        # Walkthrough loop seems a twee faster but then
-                        # has a negative effect on ulab performance, maybe
-                        # memory-management related?
-
-                        # And a third, using a reordering table...
-                        # This doesn't actually work yet because the
-                        # reorder table hasn't been computed.
-                        # Two extra items (0 and 255) are appended for
-                        # use by headers/footers/etc. Can't directly append
-                        # to ndarray, so we bytearray-ify it first.
-                        #got = bytearray(got) + bytearray([0, 255])
-                        #output_buffer[output_position:output_position +
-                        #              dotstar_row_size] = bytearray(
-                        #                  got[i] for i in reorder)
-                        # Initial testing (with a nonsense reorder table)
-                        # doesn't suggest it's any faster.
+                                      dotstar_row_size] = memoryview(
+                                          dotstar_buffer)
 
                         time3 += (monotonic() - row_start_time)
 
