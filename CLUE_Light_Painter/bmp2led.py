@@ -216,6 +216,7 @@ class BMP2LED:
         # Operation performed later requires a list, not a bytearray.
         # Make a copy, keeping the same values.
 #        dotstar_list = list(dotstar_buffer)
+        #reorder = [0] * dotstar_row_size
 
         # Output rows are held in RAM and periodically written,
         # marginally faster than writing each row separately.
@@ -250,6 +251,7 @@ class BMP2LED:
                 # Constrain bytes-to-read to pixel strip length
                 clipped_width = min(self.bmp_specs.width, self.num_pixels)
                 row_bytes = 3 * clipped_width
+                # Compute reorder list here (needs row bytes to work)
 
                 # Each output row is interpolated from two BMP rows,
                 # we'll call them 'a' and 'b' here.
@@ -263,6 +265,7 @@ class BMP2LED:
                     # I'm sure there's better ways but have a headache.
                     # This is ONLY needed if using the first of two
                     # benchmarked methods later (or something similar to it).
+# There's really only six possible orders, I could make a list
 #                    if self.blue_index is 0:      # BXX DotStar
 #                        offset_0 = 0     # DotStar byte 0 is BMP byte 0 (B)
 #                        if self.green_index is 1: # BGR
@@ -423,6 +426,17 @@ class BMP2LED:
                         # Walkthrough loop seems a twee faster but then
                         # has a negative effect on ulab performance, maybe
                         # memory-management related?
+
+                        # And a third, using a reordering table...
+                        # This doesn't actually work yet because the
+                        # reorder table hasn't been computed.
+                        # Two extra items (0 and 255) are appended for
+                        # use by headers/footers/etc. Can't directly append
+                        # to ndarray, so we bytearray-ify it first.
+                        #got = bytearray(got) + bytearray([0, 255])
+                        #output_buffer[output_position:output_position +
+                        #              dotstar_row_size] = bytearray(
+                        #                  got[i] for i in reorder)
 
                         time3 += (monotonic() - row_start_time)
 

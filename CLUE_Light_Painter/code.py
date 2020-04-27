@@ -174,7 +174,14 @@ class ClueLightPainter:
         Arguments:
             amount (float) : Current 'amount loaded' coefficient; 0.0 to 1.0
         """
-        self.rect.x = int(board.DISPLAY.width * (amount - 1.0))
+        #self.rect.x = int(board.DISPLAY.width * (amount - 1.0))
+        num_on = int(amount * self.bmp2led.num_pixels + 0.5)
+        num_off = self.bmp2led.num_pixels - num_on
+        on_pixel = [255, 0, 0, 0]
+        on_pixel[1 + self.bmp2led.green_index] = 10
+        self.spi.write(bytearray([0] * 4 + on_pixel * num_on +
+                                 [255, 0, 0, 0] * num_off + [255] *
+                                 ((self.bmp2led.num_pixels + 15) // 16)))
 
 
     def load_image(self):
@@ -185,10 +192,10 @@ class ClueLightPainter:
         """
         # Minimal progress display while image is loaded.
         group = displayio.Group()
-        group.append(centered_label('LOADING...', 30, 3))
-        self.rect = Rect(-board.DISPLAY.width, 120,
-                         board.DISPLAY.width, 40, fill=0x00B000)
-        group.append(self.rect)
+        group.append(centered_label('LOADING...', 40, 3))
+        #self.rect = Rect(-board.DISPLAY.width, 120,
+        #                 board.DISPLAY.width, 40, fill=0x00B000)
+        #group.append(self.rect)
         board.DISPLAY.show(group)
 
         # pylint: disable=eval-used
@@ -213,6 +220,7 @@ class ClueLightPainter:
             sleep(4)
 
         board.DISPLAY.show(displayio.Group()) # Clear display
+        self.clear_strip() # LEDs off
 
 
     def paint(self):
