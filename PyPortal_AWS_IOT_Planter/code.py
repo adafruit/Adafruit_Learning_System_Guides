@@ -15,7 +15,7 @@ import neopixel
 from adafruit_esp32spi import adafruit_esp32spi
 from adafruit_esp32spi import adafruit_esp32spi_wifimanager
 import adafruit_esp32spi.adafruit_esp32spi_socket as socket
-from adafruit_minimqtt import MQTT
+import adafruit_minimqtt as MQTT
 from adafruit_aws_iot import MQTT_CLIENT
 from adafruit_seesaw.seesaw import Seesaw
 import aws_gfx_helper
@@ -82,6 +82,9 @@ print("Connecting to WiFi...")
 wifi.connect()
 print("Connected!")
 
+# Initialize MQTT interface with the esp interface
+MQTT.set_socket(socket, esp)
+
 # Soil Sensor Setup
 i2c_bus = busio.I2C(board.SCL, board.SDA)
 ss = Seesaw(i2c_bus, addr=0x36)
@@ -120,10 +123,8 @@ def message(client, topic, msg):
     print("Message from {}: {}".format(topic, msg))
 
 # Set up a new MiniMQTT Client
-client =  MQTT(socket,
-               broker = secrets['broker'],
-               client_id = secrets['client_id'],
-               network_manager = wifi)
+client =  MQTT.MQTT(broker = secrets['broker'],
+                    client_id = secrets['client_id'])
 
 # Initialize AWS IoT MQTT API Client
 aws_iot = MQTT_CLIENT(client)
