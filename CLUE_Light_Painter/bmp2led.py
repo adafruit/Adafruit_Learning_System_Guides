@@ -2,10 +2,13 @@
 BMP-to-DotStar-ready-bytearrays.
 """
 
+from time import monotonic
 # pylint: disable=import-error
 import os
 import math
 import ulab
+
+BUFFER_ROWS = 32
 
 class BMPError(Exception):
     """Used for raising errors in the BMP2LED Class."""
@@ -210,6 +213,14 @@ class BMP2LED:
                                    [255, 0, 0, 0] * self.num_pixels +
                                    [255] * ((self.num_pixels + 15) // 16))
         dotstar_row_size = len(dotstar_buffer)
+        # Operation performed later requires a list, not a bytearray.
+        # Make a copy, keeping the same values.
+#        dotstar_list = list(dotstar_buffer)
+
+        # Output rows are held in RAM and periodically written,
+        # marginally faster than writing each row separately.
+        output_buffer = bytearray(BUFFER_ROWS * dotstar_row_size)
+        output_position = 0
 
         # Delete old temporary file, if any
         try:
@@ -246,17 +257,56 @@ class BMP2LED:
                 prev_row_a_index, prev_row_b_index = None, None
 
                 with open(output_filename, 'wb') as led_file:
+                    # Determine remapping indices from BMP's always-BGR
+                    # pixel byte order to DotStar's variable order
+                    # (contained in self.red_index, green_index, blue_index).
+                    # I'm sure there's better ways but have a headache.
+                    # This is ONLY needed if using the first of two
+                    # benchmarked methods later (or something similar to it).
+#                    if self.blue_index is 0:      # BXX DotStar
+#                        offset_0 = 0     # DotStar byte 0 is BMP byte 0 (B)
+#                        if self.green_index is 1: # BGR
+#                            offset_1 = 1 # DotStar byte 1 is BMP byte 1 (G)
+#                            offset_2 = 2 # DotStar byte 2 is BMP byte 2 (R)
+#                        else:                     # BRG
+#                            offset_1 = 2 # DotStar byte 1 is BMP byte 2 (R)
+#                            offset_2 = 1 # DotStar byte 2 is BMP byte 1 (G)
+#                    elif self.green_index is 0:   # GXX DotStar
+#                        offset_0 = 1     # DotStar byte 0 is BMP byte 1 (G)
+#                        if self.blue_index is 1:  # GBR
+#                            offset_1 = 0 # DotStar byte 1 is BMP byte 0 (B)
+#                            offset_2 = 2 # DotStar byte 2 is BMP byte 2 (R)
+#                        else:                     # GRB
+#                            offset_1 = 2 # DotStar byte 1 is BMP byte 2 (R)
+#                            offset_2 = 0 # DotStar byte 2 is BMP byte 0 (B)
+#                    else:                         # RXX DotStar
+#                        offset_0 = 2     # DotStar byte 0 is BMP byte 2 (R)
+#                        if self.green_index is 1: # RGB
+#                            offset_1 = 1 # DotStar byte 1 is BMP byte 1 (G)
+#                            offset_2 = 0 # DotStar byte 2 is BMP byte 0 (R)
+#                        else:                     # RBG
+#                            offset_1 = 0 # DotStar byte 1 is BMP byte 0 (R)
+#                            offset_2 = 1 # DotStar byte 2 is BMP byte 1 (G)
+
+                    # To avoid continually appending to output file (a slow
+                    # operation), seek to where the end of the file would
+                    # be, write a nonsense byte there, then seek back to
+                    # the beginning. Significant improvement!
+                    led_file.seek((dotstar_row_size * rows) - 1)
+                    led_file.write(b'\0')
+                    led_file.seek(0)
                     err = 0
+                    time1, time2, time3, time4 = 0, 0, 0, 0
+                    start_time = monotonic()
                     for row in range(rows): # For each output row...
-                        position = row / (rows - 1) # 0.0 to 1.0
-                        if callback:
-                            callback(position)
+                        row_start_time = monotonic()
 
                         # Scale position into pixel space...
                         if loop: # 0 to <image height
                             position = self.bmp_specs.height * row / rows
                         else:    # 0 to last row.0
-                            position *= self.bmp_specs.height - 1
+                            position = (row / (rows - 1) *
+                                        (self.bmp_specs.height - 1))
 
                         # Separate absolute position into several values:
                         # integer 'a' and 'b' row indices, floating 'a' and
@@ -282,6 +332,7 @@ class BMP2LED:
                                                        row_bytes)
                         prev_row_a_index = row_a_index
                         prev_row_b_index = row_b_index
+                        time1 += (monotonic() - row_start_time)
 
                         # Pixel values are stored as bytes from 0-255.
                         # Gamma correction requires floats from 0.0 to 1.0.
@@ -332,21 +383,65 @@ class BMP2LED:
                         # will be used on subsequent rows.
                         err = err - err_bits
 
+                        time2 += (monotonic() - row_start_time)
                         # Reorder data from BGR to DotStar color order,
                         # allowing for header and start-of-pixel markers
                         # in the DotStar data.
+
+                        # Benchmarking two approaches here...first uses a
+                        # zipped list working from the ndarray (because
+                        # CircuitPython bytearrays don't allow step-by-3),
+                        # converting to a bytearray before write.
+                        # This needs the 3 offset_* variables from earlier.
+
+#                        for dot_idx, color in enumerate(
+#                                list(zip(got[offset_0::3],
+#                                         got[offset_1::3],
+#                                         got[offset_2::3]))):
+#                            dot_pos = 5 + dot_idx * 4
+#                            dotstar_list[dot_pos:dot_pos + 3] = color
+#                        output_buffer[output_position:output_position +
+#                                      dotstar_row_size] = bytearray(
+#                                          dotstar_list)
+
+                        # Other approach, 'got' is converted from uint8
+                        # ndarray to bytearray (seems a bit faster) and then
+                        # a brute-force walkthrough loop...
+                        bgr = bytearray(got)
                         for column in range(clipped_width):
                             bmp_pos = column * 3
                             dotstar_pos = 5 + column * 4
-                            bgr = got[bmp_pos:bmp_pos + 3]
                             dotstar_buffer[dotstar_pos +
-                                           self.blue_index] = bgr[0]
+                                           self.blue_index] = bgr[bmp_pos]
                             dotstar_buffer[dotstar_pos +
-                                           self.green_index] = bgr[1]
+                                           self.green_index] = bgr[bmp_pos + 1]
                             dotstar_buffer[dotstar_pos +
-                                           self.red_index] = bgr[2]
+                                           self.red_index] = bgr[bmp_pos + 2]
+                        output_buffer[output_position:output_position +
+                                      dotstar_row_size] = dotstar_buffer
+                        # Performance of the two is pretty similar.
+                        # Walkthrough loop seems a twee faster but then
+                        # has a negative effect on ulab performance, maybe
+                        # memory-management related?
 
-                        led_file.write(dotstar_buffer)
+                        time3 += (monotonic() - row_start_time)
+
+                        # Add converted data to output buffer.
+                        # Periodically write when full.
+                        output_position += dotstar_row_size
+                        if output_position >= len(output_buffer):
+                            led_file.write(output_buffer)
+                            if callback:
+                                callback(row / (rows - 1))
+                            output_position = 0
+
+                        time4 += (monotonic() - row_start_time)
+
+                    # Write any remaining buffered data
+                    if output_position:
+                        led_file.write(output_buffer[:output_position])
+                        if callback:
+                            callback(1.0)
 
                     # If not looping, add an 'all off' row of LED data
                     # at end to ensure last row timing is consistent.
@@ -358,6 +453,15 @@ class BMP2LED:
                                                  [255] *
                                                  ((self.num_pixels + 15) //
                                                   16)))
+                    print('Total time', monotonic() - start_time)
+                    time4 -= time3
+                    time3 -= time2
+                    time2 -= time1
+                    print(rows, 'rows')
+                    print('BMP-reading time', time1)
+                    print('ulab time', time2)
+                    print('Reordering time', time3)
+                    print('File-writing time', time4)
 
                 #print("Loaded OK!")
                 return rows

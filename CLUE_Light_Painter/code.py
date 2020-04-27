@@ -24,7 +24,6 @@ from adafruit_display_shapes.rect import Rect
 from terminalio import FONT # terminalio font is crude but fast to display
 FONT_WIDTH, FONT_HEIGHT = FONT.get_bounding_box()
 
-
 # These are permanent global settings, can only change by editing the code:
 
 NUM_PIXELS = 72                   # LED strip length
@@ -34,6 +33,8 @@ PATH = '/bmps-72px'   # Folder containing BMP images (or '' for root path)
 TEMPFILE = '/led.dat' # Working file for LED data (will be clobbered!)
 FLIP_SCREEN = False   # If True, turn CLUE screen & buttons upside-down
 GAMMA = 2.4           # Correction factor for perceptually linear brightness
+TIMES = ['1/8', '1/4', '1/3', '1/2', '2/3', '1', '1.5', '2', '3', '4']
+TIMES.sort(key=eval)  # Ensure times are shortest-to-longest
 
 # Temporary line during development, delete before use:
 PIXEL_ORDER = 'gbr' # Old DotStar strip with different color order
@@ -116,12 +117,12 @@ class ClueLightPainter:
                 pass
 
         self.image_num = 0    # Current selected image index in self.path
+        self.num_rows = 0     # Nothing loaded yet
         self.loop = False     # Repeat image playback
         self.brightness = 1.0 # LED brightness, 0.0 (off) to 1.0 (bright)
         self.config_mode = 0  # Current setting being changed
         self.rect = None      # Multipurpose progress/setting rect
-        self.speed = 0.8      # Paint speed, 0.0 (slow) to 1.0 (fast)
-        self.num_rows = 0     # Nothing loaded yet
+        self.time = (len(TIMES) + 1) // 2 # Paint time index from TIMES[]
 
 
     def benchmark(self):
@@ -149,14 +150,9 @@ class ClueLightPainter:
             start_time = monotonic()
             while monotonic() - start_time < 1.0:
                 file.seek(0)
-                # using readinto() instead of read() reduces the amount
-                # of work the garbage collector needs to do each row.
                 file.readinto(row_data)
                 self.spi.write(row_data)
-                # Garbage collection is done on EVERY row...even though
-                # this slows down painting a LOT, it keeps the timing more
-                # consistent (else there would be conspicuous glitches).
-                gc.collect()
+                sleep(0.001) # See notes in paint()
                 rows += 1
 
         return rows, row_size
@@ -191,19 +187,23 @@ class ClueLightPainter:
         group = displayio.Group()
         group.append(centered_label('LOADING...', 30, 3))
         self.rect = Rect(-board.DISPLAY.width, 120,
-                         board.DISPLAY.width, 40, fill=0x00FF00)
+                         board.DISPLAY.width, 40, fill=0x00B000)
         group.append(self.rect)
         board.DISPLAY.show(group)
 
-        # Playback time is about 1/2 to 6 seconds, non linearly spaced
-        duration = 0.5 + 5.5 * ((1.0 - self.speed) ** 2)
-        rows = int(duration * self.rows_per_second + 0.5)
+        # pylint: disable=eval-used
+        # (It's cool, is a 'trusted string' in the code)
+        duration = eval(TIMES[self.time]) # Playback time in seconds
+        # The 0.85 here is an empirical guesstimate; playback is ever-so-
+        # slightly slower than benchmark speed due to button testing.
+        rows = int(duration * self.rows_per_second * 0.85 + 0.5)
+        # Remap brightness from 0.0-1.0 to 15-100%
+        brightness = 0.15 + self.brightness * 0.85
         try:
             self.num_rows = self.bmp2led.process(self.path + '/' +
                                                  self.images[self.image_num],
                                                  self.tempfile,
-                                                 rows,
-                                                 self.brightness,
+                                                 rows, brightness,
                                                  self.loop,
                                                  self.load_progress)
         except (MemoryError, BMPError):
@@ -223,39 +223,55 @@ class ClueLightPainter:
 
         board.DISPLAY.brightness = 0 # Screen backlight OFF
         painting = False
+        row = 0
+        action_list = [None, None]
 
         with open(self.tempfile, 'rb') as file:
             led_buffer = bytearray(self.row_size)
+            # During painting, automatic garbage collection is disabled
+            # so there are no pauses in the LED output (which would wreck
+            # the photo). This requires that the loop below is written in
+            # such a way to avoid ANY allocations within that scope!
             gc.collect()
+            gc.disable()
 
             while True:
-                action_set = {self.button_left.action(),
-                              self.button_right.action()}
-                if RichButton.TAP in action_set:
+                # This peculiar assignment (rather than just declaring this
+                # as a new list or set) is to avoid temporary memory allocs,
+                # since the garbage collector is disabled.
+                action_list[0] = self.button_left.action()
+                action_list[1] = self.button_right.action()
+                if RichButton.TAP in action_list:
                     if painting:            # If currently painting
                         self.clear_strip()  # Turn LEDs OFF
                     else:
                         row = 0             # Start at beginning of file
                     painting = not painting # Toggle paint mode on/off
-                elif RichButton.HOLD in action_set:
-                    return # Exit painting, enter config mode
+                elif RichButton.HOLD in action_list:
+                    break # End paint loop
 
                 if painting:
                     file.seek(row * self.row_size)
-                    # using readinto() instead of read() reduces the amount
-                    # of work the garbage collector needs to do each row.
+                    # using readinto() instead of read() is another
+                    # avoid-automatic-garbage-collection strategy.
                     file.readinto(led_buffer)
                     self.spi.write(led_buffer)
-                    # Garbage collection is done on EVERY row...even though
-                    # this slows down painting a LOT, it keeps the timing more
-                    # consistent (else there would be conspicuous glitches).
-                    gc.collect()
+                    # Strip updates are more than fast enough...
+                    # it's the file conversion that takes forever.
+                    # This small delay (also present in the benchmark()
+                    # function) reduces the output resolution slightly,
+                    # in turn reducing the preprocessing requirements.
+                    sleep(0.001)
                     row += 1
                     if row >= self.num_rows:
                         if self.loop:
                             row = 0
                         else:
                             painting = False
+
+            # Re-enable automatic garbage collection before
+            # exiting paint mode and returning to config mode.
+            gc.enable()
 
 
     # Each config screen is broken out into its own function...
@@ -280,7 +296,7 @@ class ClueLightPainter:
                                     0.0 = min, 1.0 = full display width.
         Returns: displayio group
         """
-        group = displayio.Group(max_size=6)
+        group = displayio.Group(max_size=7)
         group.append(centered_label('TAP L/R to', 3, 2))
         group.append(centered_label('select item' if main_config else
                                     'select image' if self.config_mode is 0
@@ -290,7 +306,7 @@ class ClueLightPainter:
         group.append(centered_label('HOLD R: paint', 113, 2))
         if rect_val:
             self.rect = Rect(int(board.DISPLAY.width * (rect_val - 1.0)),
-                             120, board.DISPLAY.width, 40, fill=0x00FF00)
+                             120, board.DISPLAY.width, 40, fill=0x00B000)
             group.append(self.rect)
         # Config label always appears as last item in group
         # so calling func can pop() and replace it if need be.
@@ -306,8 +322,8 @@ class ClueLightPainter:
         hold L to change that setting, or hold R to resume painting.
         """
         self.clear_strip()
-        strings = ['IMAGE', 'SPEED', 'LOOP', 'BRIGHTNESS']
-        funcs = [self.config_image, self.config_speed, self.config_loop,
+        strings = ['IMAGE', 'TIME', 'LOOP', 'BRIGHTNESS']
+        funcs = [self.config_image, self.config_time, self.config_loop,
                  self.config_brightness]
         group = self.make_ui_group(True, strings[self.config_mode])
         board.DISPLAY.brightness = 1 # Screen on
@@ -381,31 +397,36 @@ class ClueLightPainter:
                 prev_image = self.image_num
 
 
-    def config_speed(self):
+    def config_time(self):
         """
-        Speed select screen. Tap L/R to decrease/increase paint speed,
-        hold L to go back to main config menu, hold R to paint.
+        Time (paint duration) select screen. Tap L/R to decrease/increase
+        paint time, hold L to go back to main config menu, hold R to paint.
         Returns: two booleans, first is always False, second indicates
         if returning to paint mode vs more config.
         """
-        self.make_ui_group(False, 'Speed:', self.speed)
-        orig_speed, prev_speed = self.speed, self.speed
+        group = self.make_ui_group(False, 'Time:',
+                                   self.time / (len(TIMES) - 1))
+        group.append(centered_label(TIMES[self.time] + ' Sec', 70, 2))
+        orig_time, prev_time = self.time, self.time
 
         while True:
             action_left, action_right = (self.button_left.action(),
                                          self.button_right.action())
             if action_left is RichButton.HOLD:
-                return self.speed is not orig_speed, False # Resume config
+                return self.time is not orig_time, False # Resume config
             if action_right is RichButton.HOLD:
-                return self.speed is not orig_speed, True  # Resume paint
+                return self.time is not orig_time, True  # Resume paint
             if action_left is RichButton.TAP:
-                self.speed = max(0, self.speed - 0.1)
+                self.time = max(0, self.time - 1)
             elif action_right is RichButton.TAP:
-                self.speed = min(10, self.speed + 0.1)
+                self.time = min(len(TIMES) - 1, self.time + 1)
 
-            if self.speed is not prev_speed:
-                self.rect.x = int(board.DISPLAY.width * (self.speed - 1.0))
-                prev_speed = self.speed
+            if self.time is not prev_time:
+                self.rect.x = int(board.DISPLAY.width *
+                                  (self.time / (len(TIMES) - 1) - 1.0))
+                prev_time = self.time
+                group.pop()
+                group.append(centered_label(TIMES[self.time] + ' Sec', 70, 2))
 
 
     def config_loop(self):
