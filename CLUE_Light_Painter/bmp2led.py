@@ -166,7 +166,7 @@ class BMP2LED:
     # pylint: disable=too-many-arguments, too-many-locals
     # pylint: disable=too-many-branches, too-many-statements
     def process(self, input_filename, output_filename, rows,
-                brightness=None, loop=False, callback=None):
+                brightness=1.0, loop=False, callback=None):
         """
         Process a 24-bit uncompressed BMP file into a series of
         DotStar-ready rows of bytes (including header and footer) written
