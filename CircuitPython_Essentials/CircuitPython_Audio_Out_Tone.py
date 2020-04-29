@@ -1,9 +1,21 @@
 import time
 import array
 import math
-import audioio
 import board
 import digitalio
+
+try:
+    from audiocore import RawSample
+except ImportError:
+    from audioio import RawSample
+
+try:
+    from audioio import AudioOut
+except ImportError:
+    try:
+        from audiopwmio import PWMAudioOut as AudioOut
+    except ImportError:
+        pass  # not always supported by every board!
 
 button = digitalio.DigitalInOut(board.A1)
 button.switch_to_input(pull=digitalio.Pull.UP)
@@ -15,8 +27,8 @@ sine_wave = array.array("H", [0] * length)
 for i in range(length):
     sine_wave[i] = int((1 + math.sin(math.pi * 2 * i / length)) * tone_volume * (2 ** 15 - 1))
 
-audio = audioio.AudioOut(board.A0)
-sine_wave_sample = audioio.RawSample(sine_wave)
+audio = AudioOut(board.A0)
+sine_wave_sample = RawSample(sine_wave)
 
 while True:
     if not button.value:
