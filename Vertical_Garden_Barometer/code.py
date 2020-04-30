@@ -7,7 +7,6 @@ Display a "sinking" or "rising" graphic on the screen along with recent reading 
 Code by Erin St Blaine for Adafruit Industries
 """
 
-import time
 import board
 import neopixel
 from adafruit_clue import clue
