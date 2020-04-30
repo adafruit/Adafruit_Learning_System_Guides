@@ -31,7 +31,7 @@ while True:
     # Try and decode them
     try:
         # Attempt to convert received pulses into numbers
-        received_code = tuple(decoder.decode_bits(pulses, debug=False))
+        received_code = tuple(decoder.decode_bits(pulses))
     except adafruit_irremote.IRNECRepeatException:
         # We got an unusual short code, probably a 'repeat' signal
         # print("NEC repeat!")
