@@ -59,18 +59,32 @@ def read_region(timeout=30):
     while time.time() - start_time < timeout:
         if cpx.touch_A1:
             val = PAD_REGION['A1']
+            time.sleep(.3)
+            break
         elif cpx.touch_A2:
             val = PAD_REGION['A2']
+            time.sleep(.3)
+            break
         elif cpx.touch_A3:
             val = PAD_REGION['A3']
+            time.sleep(.3)
+            break
         elif cpx.touch_A4:
             val = PAD_REGION['A4']
+            time.sleep(.3)
+            break
         elif cpx.touch_A5:
             val = PAD_REGION['A5']
+            time.sleep(.3)
+            break
         elif cpx.touch_A6:
             val = PAD_REGION['A6']
+            time.sleep(.3)
+            break
         elif cpx.touch_A7:
             val = PAD_REGION['A7']
+            time.sleep(.3)
+            break
     return val
 
 def play_sequence(sequence):
