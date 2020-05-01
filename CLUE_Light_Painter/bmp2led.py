@@ -2,7 +2,6 @@
 BMP-to-DotStar-ready-bytearrays.
 """
 
-from time import monotonic
 # pylint: disable=import-error
 import os
 import math
@@ -265,11 +264,7 @@ class BMP2LED:
                     led_file.write(b'\0')
                     led_file.seek(0)
                     err = 0
-                    time1, time2, time3, time4 = 0, 0, 0, 0
-                    start_time = monotonic()
                     for row in range(rows): # For each output row...
-                        row_start_time = monotonic()
-
                         # Scale position into pixel space...
                         if loop: # 0 to <image height
                             position = self.bmp_specs.height * row / rows
@@ -301,7 +296,6 @@ class BMP2LED:
 
                         prev_row_a_index = row_a_index
                         prev_row_b_index = row_b_index
-                        time1 += (monotonic() - row_start_time)
 
                         # Pixel values are stored as bytes from 0-255.
                         # Gamma correction requires floats from 0.0 to 1.0.
@@ -352,7 +346,6 @@ class BMP2LED:
                         # will be used on subsequent rows.
                         err = err - err_bits
 
-                        time2 += (monotonic() - row_start_time)
                         # Reorder data from BGR to DotStar color order,
                         # allowing for header and start-of-pixel markers
                         # in the DotStar data.
@@ -366,8 +359,6 @@ class BMP2LED:
                                       dotstar_row_size] = memoryview(
                                           dotstar_buffer)
 
-                        time3 += (monotonic() - row_start_time)
-
                         # Add converted data to output buffer.
                         # Periodically write when full.
                         output_position += dotstar_row_size
@@ -376,8 +367,6 @@ class BMP2LED:
                             if callback:
                                 callback(row / (rows - 1))
                             output_position = 0
-
-                        time4 += (monotonic() - row_start_time)
 
                     # Write any remaining buffered data
                     if output_position:
@@ -395,15 +384,6 @@ class BMP2LED:
                                                  [255] *
                                                  ((self.num_pixels + 15) //
                                                   16)))
-                    print('Total time', monotonic() - start_time)
-                    time4 -= time3
-                    time3 -= time2
-                    time2 -= time1
-                    print(rows, 'rows')
-                    print('BMP-reading time', time1)
-                    print('ulab time', time2)
-                    print('Reordering time', time3)
-                    print('File-writing time', time4)
 
                 #print("Loaded OK!")
                 return rows

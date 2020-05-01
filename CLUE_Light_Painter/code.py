@@ -28,16 +28,17 @@ FONT_WIDTH, FONT_HEIGHT = FONT.get_bounding_box()
 
 NUM_PIXELS = 72                   # LED strip length
 PIXEL_PINS = board.SDA, board.SCL # Data, clock pins for DotStars
-PIXEL_ORDER = 'brg'               # Pixel color order
-PATH = '/bmps-72px'   # Folder containing BMP images (or '' for root path)
-TEMPFILE = '/led.dat' # Working file for LED data (will be clobbered!)
-FLIP_SCREEN = False   # If True, turn CLUE screen & buttons upside-down
-GAMMA = 2.4           # Correction factor for perceptually linear brightness
+PIXEL_ORDER = 'bgr'               # Pixel color order
+PATH = '/bmps-72px'           # Folder with BMP images (or '' for root path)
+TEMPFILE = '/led.dat'         # Working file for LED data (will be clobbered!)
+FLIP_SCREEN = False           # If True, turn CLUE screen & buttons upside-down
+GAMMA = 2.4                   # Correction for perceptually linear brightness
+BRIGHTNESS_RANGE = 0.15, 0.75 # Min, max brightness (0.0-1.0)
 TIMES = ['1/8', '1/4', '1/3', '1/2', '2/3', '1', '1.5', '2', '3', '4']
 TIMES.sort(key=eval)  # Ensure times are shortest-to-longest
 
 # Temporary line during development, delete before use:
-PIXEL_ORDER = 'gbr' # Old DotStar strip with different color order
+#PIXEL_ORDER = 'gbr' # Old DotStar strip with different color order
 
 
 def centered_label(text, y_pos, scale):
@@ -63,25 +64,33 @@ class ClueLightPainter:
 
     # pylint: disable=too-many-arguments
     def __init__(self, flip, path, tempfile, num_pixels, pixel_order,
-                 pixel_pins, gamma):
+                 pixel_pins, gamma, brightness):
         """
         App constructor. Follow up with a call to ClueLightPainter.run().
         Arguments:
-            flip (boolean)       : If True, CLUE display and buttons are
-                                   flipped 180 degrees from normal (makes
-                                   wiring easier in some situations).
-            path (string)        : Directory containing BMP images.
-            tempfile (string)    : Full path/filename of temporary working
-                                   file for LED data (will be clobbered).
-            num_pixels (int)     : LED strip length.
-            pixel_order (string) : LED data order, e.g. 'grb'.
-            pixel_pins (tuple)   : Board pin for LED data output (SPI data
-                                   and clock pins respectively).
-            gamma (float)        : Correction for perceptual linearity.
+            flip (boolean)        : If True, CLUE display and buttons are
+                                    flipped 180 degrees from normal (makes
+                                    wiring easier in some situations).
+            path (string)         : Directory containing BMP images.
+            tempfile (string)     : Full path/filename of temporary working
+                                    file for LED data (will be clobbered).
+            num_pixels (int)      : LED strip length.
+            pixel_order (string)  : LED data order, e.g. 'grb'.
+            pixel_pins (tuple)    : Board pin for LED data output (SPI data
+                                    and clock pins respectively).
+            gamma (float)         : Correction for perceptual linearity.
+            brightness (2 floats) : Minimum and maximum LED brightness
+                                    settings, each 0.0 (off) to 1.0 (full
+                                    brightness). Too-low brightness levels
+                                    just don't photograph well. Too-high
+                                    levels may draw more current than the
+                                    battery can provide, board may lock up
+                                    and may even need CircuitPython re-flash.
         """
         self.bmp2led = BMP2LED(num_pixels, pixel_order, gamma)
         self.path = path
         self.tempfile = tempfile
+        self.brightness_range = brightness
 
         # The SPI peripheral is locked and config'd once here and never
         # relinquished, to save some time on every row (need them issued
@@ -204,8 +213,9 @@ class ClueLightPainter:
         # The 0.9 here is an empirical guesstimate; playback is ever-so-
         # slightly slower than benchmark speed due to button testing.
         rows = int(duration * self.rows_per_second * 0.9 + 0.5)
-        # Remap brightness from 0.0-1.0 to 15-100%
-        brightness = 0.15 + self.brightness * 0.85
+        # Remap brightness from 0.0-1.0 to brightness_range.
+        brightness = (self.brightness_range[0] + self.brightness *
+                      (self.brightness_range[1] - self.brightness_range[0]))
         try:
             self.num_rows = self.bmp2led.process(self.path + '/' +
                                                  self.images[self.image_num],
@@ -507,4 +517,5 @@ class ClueLightPainter:
 
 
 ClueLightPainter(FLIP_SCREEN, PATH, TEMPFILE,
-                 NUM_PIXELS, PIXEL_ORDER, PIXEL_PINS, GAMMA).run()
+                 NUM_PIXELS, PIXEL_ORDER, PIXEL_PINS, GAMMA,
+                 BRIGHTNESS_RANGE).run()
