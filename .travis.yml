@@ -3,6 +3,10 @@ sudo: false
 language: python
 python:
     - "3.6"
+addons:
+  packages:
+    - python3-pip
+    - python3-wheel
 
 cache:
 
