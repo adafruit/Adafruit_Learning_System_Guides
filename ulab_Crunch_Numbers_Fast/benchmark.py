@@ -21,7 +21,7 @@ def normalized_rms_ulab(values):
     values = values - minbuf
     samples_sum = ulab.numerical.sum(values * values)
     return math.sqrt(samples_sum / len(values))
-    
+
 # Instead of using sensor data, we generate some data
 # The amplitude is 5000 so the rms should be around 5000/1.414 = 3536
 nums_list = [int(8000 + math.sin(i) * 5000) for i in range(100)]
