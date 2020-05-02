@@ -33,7 +33,7 @@ def timeit(s, f, n=100):
         x = f()
     t1 = time.monotonic_ns()
     r = (t1 - t0) * 1e-6 / n
-    print("%-20s : %8.3fms [result=%f]" % (s, r, x))
+    print("%-30s : %8.3fms [result=%f]" % (s, r, x))
 
 print("Computing the RMS value of 100 numbers")
 timeit("traditional", lambda: normalized_rms(nums_list))
