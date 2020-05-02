@@ -21,9 +21,6 @@ def normalized_rms_ulab(values):
     values = values - minbuf
     samples_sum = ulab.numerical.sum(values * values)
     return math.sqrt(samples_sum / len(values))
-
-def normalized_std_ulab(values):
-    return ulab.numerical.std(values)
     
 # Instead of using sensor data, we generate some data
 # The amplitude is 5000 so the rms should be around 5000/1.414 = 3536
@@ -41,5 +38,5 @@ def timeit(s, f, n=100):
 print("Computing the RMS value of 100 numbers")
 timeit("traditional", lambda: normalized_rms(nums_list))
 timeit("ulab, with ndarray, some implementation in python", lambda: normalized_rms_ulab(nums_array))
-timeit("ulab only, with list", lambda: normalized_std_ulab(nums_list))
-timeit("ulab only, with ndarray", lambda: normalized_std_ulab(nums_array))
+timeit("ulab only, with list", lambda: ulab.numerical.std(nums_list))
+timeit("ulab only, with ndarray", lambda: ulab.numerical.std(nums_array))
