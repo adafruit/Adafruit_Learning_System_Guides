@@ -16,7 +16,7 @@ def normalized_rms(values):
     return math.sqrt(samples_sum / len(values))
 
 def normalized_rms_ulab(values):
-	# this function works with ndarrays only
+    # this function works with ndarrays only
     minbuf = ulab.numerical.mean(values)
     values = values - minbuf
     samples_sum = ulab.numerical.sum(values * values)
