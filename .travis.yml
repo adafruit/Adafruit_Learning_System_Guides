@@ -8,15 +8,6 @@ addons:
     - python3-pip
     - python3-wheel
 
-cache:
-
-cache:
-  pip: true
-  directories:
-    - ~/arduino_ide
-    - ~/.arduino15/packages/
-    - ~/Arduino
-
 env:
   global:
     - ARDUINO_IDE_VERSION="1.8.11"
