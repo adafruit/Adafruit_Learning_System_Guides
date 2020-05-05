@@ -1,40 +1,18 @@
 import time
-import array
-import math
 import board
-from audiocore import RawSample
-import audiopwmio
 import displayio
 import terminalio
+import simpleio
 from adafruit_display_text import label
 from adafruit_display_shapes.rect import Rect
-from adafruit_display_shapes.circle import Circle
 from adafruit_clue import clue
 
-blink_dot = False  # optional blinking dot on accent
 blink_light = True  # optional flashing backlight on accent
 tempo = 120  # in bpm
 print("BPM: {}".format(tempo))
 time_signature = 4  # Beats per measure
 BEEP_DURATION = 0.05
 delay = 60 / tempo
-
-# constants for sine wave generation
-SIN_LENGTH = 100  # more is less choppy
-SIN_AMPLITUDE = 2 ** 15  # 0 (min) to 32768 (max)
-SIN_OFFSET = 32767.5  # for 16bit range, (2**16 - 1) / 2
-DELTA_PI = 2 * math.pi / SIN_LENGTH  # happy little constant
-
-sine_wave = [
-    int(SIN_OFFSET + SIN_AMPLITUDE * math.sin(DELTA_PI * i)) for i in range(SIN_LENGTH)
-]
-tones = (
-    RawSample(array.array("H", sine_wave), sample_rate=1200 * SIN_LENGTH),
-    RawSample(array.array("H", sine_wave), sample_rate=1800 * SIN_LENGTH),
-)
-
-dac = audiopwmio.PWMAudioOut(board.SPEAKER)  # CLUE onboard speaker
-# dac = audiopwmio.PWMAudioOut(board.A2)  # external amp/speaker, but can't use #0 touch pad
 
 clue.display.brightness = 1.0
 clue.pixel.brightness = 0.2
@@ -55,11 +33,6 @@ color_palette = displayio.Palette(1)
 color_palette[0] = TEAL
 bg_sprite = displayio.TileGrid(color_bitmap, x=0, y=0, pixel_shader=color_palette)
 screen.append(bg_sprite)
-
-# Downbeat indicator graphic
-flash = Circle(184, 216, 16, fill=TEAL, outline=None)
-
-screen.append(flash)
 
 # title box
 title_box = Rect(0, 0, 240, 60, fill=GRAY, outline=None)
@@ -128,19 +101,13 @@ clue.display.show(screen)
 def metronome(accent):  # Play metronome sound and flash display
     clue.display.brightness = 0.5  # Dim the display slightly
     if accent == 1:  # Put emphasis on downbeat
-        if blink_dot:
-            flash.fill = YELLOW  # Flash the indicator
         if blink_light:
             clue.pixel.fill(YELLOW)  # Flash the pixel
-        dac.play(tones[1], loop=True)
+        simpleio.tone(board.SPEAKER, 1800, BEEP_DURATION)
     else:  # All the other beats in the measure
         if blink_light:
             clue.pixel.fill(LT_TEAL)  # Flash the pixel
-        dac.play(tones[0], loop=True)
-    time.sleep(BEEP_DURATION)  # Play the sound for a while
-    dac.stop()  # Then stop the sound
-    if blink_dot:
-        flash.fill = TEAL  # Turn off the downbeat indicator
+        simpleio.tone(board.SPEAKER, 1200, BEEP_DURATION)
     if blink_light:
         clue.pixel.fill(0)  # Turn off the pixel
     clue.display.brightness = 1.0  # Restore display to normal brightness
@@ -152,7 +119,6 @@ feedback_mode = 0  # 0 is sound and visual, 1 is sound only, 2 is visual only
 running = False
 
 t0 = time.monotonic()  # set start time
-
 
 while True:
 
