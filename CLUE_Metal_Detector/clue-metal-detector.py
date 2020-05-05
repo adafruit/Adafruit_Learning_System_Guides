@@ -1,4 +1,4 @@
-# clue-metal-detector v1.4
+# clue-metal-detector v1.5
 # A simple metal detector using a minimum number of external components
 
 # Tested with an Adafruit CLUE (Alpha) and CircuitPython 5.2.0
@@ -8,7 +8,7 @@
 # CLUE: Pad P0 is an output and pad P1 is an input
 # CPB: Pad/STEMMA A1 is an output and Pad/STEMMA A2 is an input
 
-# copy this file to CLUE board as code.py
+# copy this file to CLUE/CPB board as code.py
 
 # MIT License
 
@@ -404,7 +404,7 @@ if debug >= 4:
     for idx in range(len(waveforms)):
         start_beep(440, waveforms, idx)
         time.sleep(0.1)
-    start_beep(0, waveforms, idx)  # This silences it
+    start_beep(0, waveforms, 0)  # This silences it
 
 # See https://forums.adafruit.com/viewtopic.php?f=60&t=164758 for
 # a comparison and performance analysis of alternate techniques for this
