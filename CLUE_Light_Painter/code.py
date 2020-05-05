@@ -37,9 +37,6 @@ BRIGHTNESS_RANGE = 0.15, 0.75 # Min, max brightness (0.0-1.0)
 TIMES = ['1/8', '1/4', '1/3', '1/2', '2/3', '1', '1.5', '2', '3', '4']
 TIMES.sort(key=eval)  # Ensure times are shortest-to-longest
 
-# Temporary line during development, delete before use:
-#PIXEL_ORDER = 'gbr' # Old DotStar strip with different color order
-
 
 def centered_label(text, y_pos, scale):
     """
