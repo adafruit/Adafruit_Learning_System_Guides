@@ -1,4 +1,4 @@
-# clue-metal-detector v1.5
+# clue-metal-detector v1.6
 # A simple metal detector using a minimum number of external components
 
 # Tested with an Adafruit CLUE (Alpha) and CircuitPython 5.2.0
@@ -472,7 +472,7 @@ popup_text(show_text,
            "\n".join(["Button Guide",
                       "Left: audio",
                       "  2secs: NeoPixel",
-                      "  4s: Screen",
+                      "  4s: screen",
                       "  6s: Mu output",
                       "Right: recalibrate"]), duration=10)
 
@@ -685,7 +685,8 @@ while True:
         voltage_hist_idx = 0
         voltage_hist_complete = False
         voltage_hist_median = None
-        base_mx, base_my, base_mz = mx, my, mz
+        if magnetometer is not None:
+            base_mx, base_my, base_mz = mx, my, mz
 
     display.auto_refresh = False
 
