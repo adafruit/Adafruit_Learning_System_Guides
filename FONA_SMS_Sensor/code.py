@@ -51,7 +51,7 @@ while True:
         humid = bme280.humidity
         pres = bme280.pressure
 
-        # sanitize message
+        # Sanitize message
         message = message.lower()
         message = message.strip()
 
@@ -74,9 +74,6 @@ while True:
         else:
             response = "Incorrect message format received. \
                         Text HELP to this number for a list of commands."
-
-
-        print("Sending response: ", response)
 
         # Send a response back to the sender
         print("Sending response...")
