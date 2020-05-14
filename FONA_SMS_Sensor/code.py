@@ -34,7 +34,7 @@ notification_buf = bytearray(64)
 print("FONA Ready!")
 while True:
     if fona.in_waiting: # data is available from FONA
-        notification_buf = fona._read_line()[1]
+        notification_buf = fona.read_line()[1]
         # Split out the sms notification slot num.
         notification_buf = notification_buf.decode()
         sms_slot = notification_buf.split(",")[1]
@@ -51,20 +51,30 @@ while True:
         humid = bme280.humidity
         pres = bme280.pressure
 
+        # sanitize message
         message = message.lower()
-        print('MSG: ', message)
+        message = message.strip()
 
-        if message in ['temp', 'temperature']:
+        if message in ['temp', 'temperature', 't']:
             response = "Temperature: %0.1f C" % temp
-        elif message in ['humid', 'humidity']:
+        elif message in ['humid', 'humidity', 'h']:
             response = "Humidity: %0.1f %%" % humid
-        elif message in ['pres', 'pressure']:
+        elif message in ['pres', 'pressure', 'p']:
             response = "Pressure: %0.1f hPa" % pres
-        elif message in ['state', 'status']:
+        elif message in ['status', 's']:
             response = "Temperature: {0:.2f}C\nHumidity: {1:.1f}% \
                      Pressure: {2:.1f}hPa".format(temp, humid, pres)
+        elif message in ['help']:
+            response = "I'm a SMS Sensor - txt me with a command:\
+                        TEMP - Read temperature\
+                        HUMID - Read humidity\
+                        PRES - Read pressure\
+                        STATUS - Read all sensors.\
+                        HELP - List commands"
         else:
-            response = "Incorrect message format received"
+            response = "Incorrect message format received. \
+                        Text HELP to this number for a list of commands."
+
 
         print("Sending response: ", response)
 
