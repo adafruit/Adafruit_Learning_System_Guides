@@ -1,8 +1,21 @@
 #!/bin/bash
 
+if [ -f .env/bin/activate ]; then
+    . .env/bin/activate
+fi
+
 PYLINT="`type -p pylint3 2>/dev/null || type -p pylint`"
 
-if [ -z "$PYLINT" ]; then echo "pylint not detected"; exit 1; fi
+if [ -z "$PYLINT" ]; then
+    echo "pylint not detected"
+    if python3 -c 'import venv, pip'; then
+        echo "You can install it in a virtual environment with ./pylint_install" 
+        echo "After doing that you can re-run pylint_check" 
+    else
+        echo "Python3 with pip and venv not detected, install them and run ./pylint_install"
+    fi
+    exit 1
+fi
 
 function find_pyfiles() {
     if [ $# -eq 0 ]; then set -- .; fi

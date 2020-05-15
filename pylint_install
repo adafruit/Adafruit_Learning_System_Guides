@@ -1,0 +1,5 @@
+#!/bin/sh
+
+python3 -mvenv .env
+. .env/bin/activate
+pip install pylint
