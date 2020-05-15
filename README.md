@@ -19,6 +19,14 @@ Code in directories containing a `.[platformname].test` file, such as
 
 This is a work in progress.
 
+## Locally checking pylint
+
+On a unix-style system, install python3 with pip and venv support.
+Then run `./pylint_install` to install pylint into a virtual environment
+(venv).  Once those steps are done, you can check a particular guide's code
+with `./pylint_check directory-name`.  Just running `./pylint_check` will
+check all Python code.
+
 [learn]: https://learn.adafruit.com/
 [travis]: https://travis-ci.com/adafruit/Adafruit_Learning_System_Guides/
 [travis-ci-arduino]: https://github.com/adafruit/travis-ci-arduino/
