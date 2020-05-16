@@ -83,6 +83,8 @@ class PlaybackDisplay:
         self.label.y = 6
         self._bitmap_filename = None
         self._fallback_bitmap = ["/rsrc/background.bmp"]
+        self._rms = 0.
+        self._text = ""
         self.set_bitmap([]) # Must be first!
         self.group.append(self.pbar)
         self.group.append(self.label)
