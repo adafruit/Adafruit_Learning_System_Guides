@@ -15,7 +15,7 @@ All text above must be included in any redistribution
 #include "Adafruit_MQTT.h"
 #include "Adafruit_MQTT_Client.h"
 
-#include "secrets.h"
+#include "arduino_secrets.h"
 
 #define BUTTON_A 9
 #define BUTTON_B 6
