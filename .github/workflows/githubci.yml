@@ -41,6 +41,7 @@ jobs:
     - name: test platforms
       run: python3 ci/build_platform.py ${{ matrix.arduino-platform }}
 
+
   pylint:
     runs-on: ubuntu-latest
     steps:
