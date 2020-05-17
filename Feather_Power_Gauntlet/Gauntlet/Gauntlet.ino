@@ -1,6 +1,6 @@
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
-#include <Adafruit_LSM303_U.h>
+#include <Adafruit_LSM303_Accel.h>
 #include <Adafruit_NeoPixel.h>
 
 #define LEDpin 6
@@ -19,7 +19,6 @@ Adafruit_NeoPixel strip = Adafruit_NeoPixel(19, LEDpin, NEO_GRB + NEO_KHZ800);
 
 /* Assign a unique ID to this sensor at the same time */
 Adafruit_LSM303_Accel_Unified accel = Adafruit_LSM303_Accel_Unified(54321);
-
 
 // #####Light Flicker
 int alpha; // Current value of the pixels

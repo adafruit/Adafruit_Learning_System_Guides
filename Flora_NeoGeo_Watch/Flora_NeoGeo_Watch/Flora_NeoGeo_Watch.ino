@@ -16,11 +16,12 @@
 #include <Time.h>
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
-#include <Adafruit_LSM303_U.h>
+#include <Adafruit_LSM303DLH_Mag.h>
+
 
 Adafruit_GPS GPS(&Serial1);
 /* Assign a unique ID to this sensor at the same time */
-Adafruit_LSM303_Mag_Unified mag = Adafruit_LSM303_Mag_Unified(12345);
+Adafruit_LSM303DLH_Mag_Unified mag = Adafruit_LSM303DLH_Mag_Unified(12345);
 
 // Set GPSECHO to 'false' to turn off echoing the GPS data to the Serial console
 // Set to 'true' if you want to debug and listen to the raw GPS sentences

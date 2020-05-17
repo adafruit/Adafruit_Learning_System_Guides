@@ -16,6 +16,9 @@ uint8_t scratch[TRACK1_LEN+BUFF];
 //#define _SERIAL 1
 #define _KEYBOARD 1
 
+void shifttrack(byte track[], byte shiftbuffer[], uint8_t dir);
+uint8_t verifycard(byte track[]);
+
 void beep(uint8_t pin, long freq, long dur) {
   long d = 500000/ freq;
 
