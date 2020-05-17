@@ -4,6 +4,7 @@ on: [pull_request, push, repository_dispatch]
 
 jobs:
   arduino:
+    needs: pylint
     strategy:
       fail-fast: false
       matrix:
@@ -42,7 +43,6 @@ jobs:
 
   pylint:
     runs-on: ubuntu-latest
-    needs: arduino
     steps:
     - name: Set up Python 3.6
       uses: actions/setup-python@v1
