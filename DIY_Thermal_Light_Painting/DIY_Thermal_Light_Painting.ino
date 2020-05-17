@@ -21,8 +21,7 @@ NOT FOR REGULAR ARDUINOS! Use the regular Adafruit_MLX90614 for that
   Written by Limor Fried/Ladyada for Adafruit in any redistribution
  ****************************************************/
 
-#include <TinyWireM.h>
-#include <Adafruit_MiniMLX90614.h>
+#include <Adafruit_MLX90614.h>
 #include <Adafruit_NeoPixel.h>
 
 // change these to adjust the range of temperatures you want to measure 
@@ -34,7 +33,7 @@ NOT FOR REGULAR ARDUINOS! Use the regular Adafruit_MLX90614 for that
 #define PIN 1
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(24, PIN, NEO_GRB + NEO_KHZ800);
 
-Adafruit_MiniMLX90614 mlx = Adafruit_MiniMLX90614();
+Adafruit_MLX90614 mlx = Adafruit_MLX90614();
 
 void setup() {
   mlx.begin();  

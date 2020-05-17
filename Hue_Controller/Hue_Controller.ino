@@ -15,7 +15,7 @@ All text above must be included in any redistribution
 #include "Adafruit_MQTT.h"
 #include "Adafruit_MQTT_Client.h"
 
-#include "secrets.h"
+#include "arduino_secrets.h"
 
 #define BUTTON_A 9
 #define BUTTON_B 6
@@ -44,7 +44,7 @@ Adafruit_MQTT_Publish photocell_feed(&mqtt, AIO_USER "/feeds/hue-controller.hue-
 Adafruit_MQTT_Publish motion_feed(&mqtt, AIO_USER "/feeds/hue-controller.hue-motion");
 Adafruit_MQTT_Publish control_feed(&mqtt, AIO_USER "/feeds/hue-controller.hue-control");
 
-DynamicJsonBuffer jsonBuffer(8500);
+DynamicJsonDocument jsonBuffer(8500);
 
 const char *hue_ip = NULL;
 uint8_t *light_numbers = NULL;
@@ -129,16 +129,16 @@ const char *fetch_hue_ip() {
     return NULL;
   }
 
-  JsonArray& root = jsonBuffer.parseArray(client);
+  auto error = deserializeJson(jsonBuffer, client);
   client.stop();
 
-  if (!root.success()) {
+  if (error) {
     logln("JSON PARSE ERROR");
     display.println("JSON PARSE ERROR");
     return NULL;
   }
 
-  return strdup(root[0][F("internalipaddress")]);
+  return strdup(jsonBuffer["internalipaddress"]);
 }
 
 
@@ -183,19 +183,18 @@ boolean fetch_sunrise_sunset(long *sunrise, long *sunset)
     return false;
   }
 
-  JsonObject& root = jsonBuffer.parseObject(client);
+  auto error = deserializeJson(jsonBuffer, client);
   client.stop();
 
-  if (!root.success()) {
+  if (error) {
     logln("JSON PARSE ERROR");
     display.println("JSON PARSE ERROR");
-    return false;
+    return NULL;
   }
 
-  JsonObject& data = root["daily"]["data"][0];
-  long start_of_day = data["time"];
-  long raw_sunrise_time = data["sunriseTime"];
-  long raw_sunset_time = data["sunsetTime"];
+  long start_of_day = jsonBuffer["daily"]["data"][0]["time"];
+  long raw_sunrise_time = jsonBuffer["daily"]["data"][0]["sunriseTime"];
+  long raw_sunset_time = jsonBuffer["daily"]["data"][0]["sunsetTime"];
 
   *sunrise = raw_sunrise_time - start_of_day;
   *sunset = raw_sunset_time - start_of_day;
@@ -263,18 +262,20 @@ uint8_t *lights_for_group(const char *group_number)
     return NULL;
   }
 
-  JsonObject& group = jsonBuffer.parseObject(client);
+  auto error = deserializeJson(jsonBuffer, client);
   client.stop();
 
-  if (!group.success()) {
+  if (error) {
+    logln("JSON PARSE ERROR");
     display.println("JSON PARSE ERROR");
     return NULL;
   }
 
-  JsonArray& lights = group["lights"];
+  JsonArray lights = jsonBuffer["lights"];
+
   uint8_t *light_numbers = (uint8_t*)malloc(lights.size() + 1);
   light_numbers[0] = (uint8_t)lights.size();
-  for (uint i = 0; i < lights.size(); i++) {
+  for (uint16_t i = 0; i < lights.size(); i++) {
     light_numbers[i+1] = (uint8_t)atoi((const char *)lights[i]);
   }
   return light_numbers;
