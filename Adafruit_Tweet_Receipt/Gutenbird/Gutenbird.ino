@@ -131,7 +131,7 @@ unsigned long
   currentTime = 0L;
 EthernetClient
   client;
-PROGMEM byte
+const PROGMEM byte
   sleepTab[] = { // "Sleep throb" brightness table (reverse for second half)
       0,   0,   0,   0,   0,   0,   0,   0,   0,   1,
       1,   1,   2,   3,   4,   5,   6,   8,  10,  13,

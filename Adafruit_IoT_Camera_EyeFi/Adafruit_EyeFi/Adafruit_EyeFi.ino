@@ -63,7 +63,7 @@ http://www.adafruit.com/products/14
 
 // Green LED does a "sleep throb" when camera is idle.  This table
 // contains the brightness levels over time (reverse for second half).
-PROGMEM byte sleepTab[] = {
+const PROGMEM byte sleepTab[] = {
       0,   0,   0,   0,   0,   0,   0,   0,   0,   1,
       1,   1,   2,   3,   4,   5,   6,   8,  10,  13,
      15,  19,  22,  26,  31,  36,  41,  47,  54,  61,
