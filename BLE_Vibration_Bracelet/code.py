@@ -3,11 +3,12 @@ import board
 import busio
 import neopixel
 import adafruit_drv2605
-from digitalio import DigitalInOut, Direction
+import adafruit_led_animation.color as color
 import adafruit_ble
 from adafruit_ble.advertising.standard import SolicitServicesAdvertisement
 from adafruit_ble.services.standard import CurrentTimeService
 from adafruit_ble_apple_notification_center import AppleNotificationCenterService
+from digitalio import DigitalInOut, Direction
 
 #  setup for onboard NeoPixel
 pixel_pin = board.NEOPIXEL
@@ -44,26 +45,16 @@ all_ids = [] #  array to hold all of the ids from ANCS
 hour = 0 #  used to track when it is on the hour for the mindfulness reminder
 mindful = False #  state used to track if it is time for mindfulness
 vibration = 16 #  vibration effect being used for the haptic motor
-BLUE = (0, 0, 255) #  color blue for the NeoPixel
-PURPLE = (255, 0, 255) #  color purple for the NeoPixel
-RED = (255, 0, 0) #  color red for the NeoPixel
-ORANGE = (255, 255, 0) #  color orange
-YELLOW = (255, 150, 0) #  color yellow
-GREEN = (0, 255, 0) #  color green
-CYAN = (0, 255, 255) #  color cyan
-PINK = (255, 0, 127) #  color pink
-WHITE = (255, 255, 255) #  color white
-clear = (0, 0, 0) #  allows for NeoPixel to be turned 'off'
 
 APP_COLORS = {
-    "com.basecamp.bc3-ios": YELLOW, #  Basecamp
-    "com.apple.MobileSMS": GREEN, #  Texts
-    "com.hammerandchisel.discord": PURPLE, #  Discord
-    "com.apple.mobilecal": CYAN, #  Calendar
-    "com.apple.mobilephone": GREEN, #  Phone
-    "com.google.ios.youtube": ORANGE, #  YouTube
-    "com.burbn.instagram": PINK, #  Instagram
-    "com.apple.mobilemail": CYAN #  Apple Email
+    "com.basecamp.bc3-ios": color.YELLOW, #  Basecamp
+    "com.apple.MobileSMS": color.GREEN, #  Texts
+    "com.hammerandchisel.discord": color.PURPLE, #  Discord
+    "com.apple.mobilecal": color.CYAN, #  Calendar
+    "com.apple.mobilephone": color.GREEN, #  Phone
+    "com.google.ios.youtube": color.ORANGE, #  YouTube
+    "com.burbn.instagram": color.MAGENTA, #  Instagram
+    "com.apple.mobilemail": color.CYAN #  Apple Email
 }
 
 #  function for blinking NeoPixel
@@ -102,7 +93,7 @@ while True:
     #  NeoPixel is red when not connected to BLE
     while not ble.connected:
         blue_led.value = False
-        pixel.fill(RED)
+        pixel.fill(color.RED)
         pixel.show()
     print("Connected")
 
@@ -130,14 +121,14 @@ while True:
         if current_notification and current_notification.removed:
             # Stop showing the latest and show that there are no new notifications.
             current_notification = None
-            pixel.fill(clear)
+            pixel.fill(color.BLACK)
             pixel.show()
 
         if not current_notification and not all_ids and not cleared:
             #  updates cleared state for notification
             cleared = True
             #  turns off NeoPixel when notifications are clear
-            pixel.fill(clear)
+            pixel.fill(color.BLACK)
             pixel.show()
 
         elif all_ids:
@@ -153,7 +144,7 @@ while True:
                 #  if the notification is from an app that is not
                 #  defined in APP_COLORS then the NeoPixel will be white
                 if current_notification.app_id not in APP_COLORS:
-                    notif_color = WHITE
+                    notif_color = color.WHITE
                 #  if the notification is from an app defined in
                 #  APP_COLORS then the assigned color will show
                 else:
@@ -173,7 +164,7 @@ while True:
                 if notification.message:
                     print("Message:", notification.message)
                 #  NeoPixel blinks and then stays on until cleared
-                blink_pixel(2, 0.5, notif_color, clear)
+                blink_pixel(2, 0.5, notif_color, color.BLACK)
                 pixel.fill(notif_color)
                 pixel.show()
         #  if it's on the hour:
@@ -183,16 +174,16 @@ while True:
             #  haptic motor vibrates
             vibe(5, vibration, 1)
             #  NeoPixel blinks and then stays on
-            blink_pixel(5, 1, BLUE, clear)
+            blink_pixel(5, 1, color.BLUE, color.BLACK)
             mindful = True
-            pixel.fill(BLUE)
+            pixel.fill(color.BLUE)
             pixel.show()
             print("hour = ", hour)
         #  if it's no longer on the hour:
         if cts.current_time[4] == (hour + 1) and mindful:
             #  NeoPixel turns off
             mindful = False
-            pixel.fill(clear)
+            pixel.fill(color.BLACK)
             pixel.show()
             print("mindful time over")
 
