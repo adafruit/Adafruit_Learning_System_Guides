@@ -9,10 +9,10 @@ print("FONA SMS Sensor")
 
 # Create a serial connection for the FONA connection
 uart = busio.UART(board.TX, board.RX)
-rst = digitalio.DigitalInOut(board.D5)
+rst = digitalio.DigitalInOut(board.D4)
 
 # Initialize FONA module (this may take a few seconds)
-fona = FONA(uart, rst, debug=True)
+fona = FONA(uart, rst)
 
 # Initialize BME280 Sensor
 i2c = busio.I2C(board.SCL, board.SDA)
@@ -37,6 +37,8 @@ while True:
         notification_buf = fona.read_line()[1]
         # Split out the sms notification slot num.
         notification_buf = notification_buf.decode()
+        if "+CMTI:" not in notification_buf:
+            continue
         sms_slot = notification_buf.split(",")[1]
 
         print("NEW SMS!\n\t Slot: ", sms_slot)
