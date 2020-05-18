@@ -23,6 +23,10 @@ Tetris tetris;
 Snake snake;
 Paint paint(3,3);  // initilize cursor position to (3,3)
 
+uint8_t* getMenu();
+void changeOption(int8_t i);
+void changeMode();
+
 // Mode: 0-Undecided; 1-Tetris; 2-Snake; 3-Paint
 uint8_t mode=0;
 
