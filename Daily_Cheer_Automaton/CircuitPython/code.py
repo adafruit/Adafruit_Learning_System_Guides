@@ -119,7 +119,7 @@ days = ("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Satur
 
 # selected time
 # 24 hour time
-playhour = 19 
+playhour = 19
 playmin = 0
 
 # pylint: disable-msg=bad-whitespace
