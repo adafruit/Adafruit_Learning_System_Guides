@@ -72,7 +72,7 @@ class PlaybackDisplay:
         self.group = displayio.Group(max_size=4)
         self.glyph_width, self.glyph_height = font.get_bounding_box()[:2]
         self.pbar = ProgressBar(0, 0, board.DISPLAY.width,
-                                self.glyph_height, bar_color=0x0000ff,
+                                self.glyph_height*2, bar_color=0x0000ff,
                                 outline_color=0x333333, stroke=1)
         self.iconbar = icons.IconBar()
         self.iconbar.group.y = 112
