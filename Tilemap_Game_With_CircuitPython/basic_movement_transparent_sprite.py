@@ -4,29 +4,37 @@ import adafruit_imageload
 import ugame
 
 display = board.DISPLAY
-player_loc = {"x":4, "y":3}
+player_loc = {"x": 4, "y": 3}
 
 # Load the sprite sheet (bitmap)
-sprite_sheet, palette = adafruit_imageload.load("tilegame_assets/castle_sprite_sheet_edited.bmp",
-                                                bitmap=displayio.Bitmap,
-                                                palette=displayio.Palette)
+sprite_sheet, palette = adafruit_imageload.load(
+    "tilegame_assets/castle_sprite_sheet_edited.bmp",
+    bitmap=displayio.Bitmap,
+    palette=displayio.Palette,
+)
 # make the color at 0 index transparent.
 palette.make_transparent(0)
 
 # Create the sprite TileGrid
-sprite = displayio.TileGrid(sprite_sheet, pixel_shader=palette,
-                            width=1,
-                            height=1,
-                            tile_width=16,
-                            tile_height=16,
-                            default_tile=0)
+sprite = displayio.TileGrid(
+    sprite_sheet,
+    pixel_shader=palette,
+    width=1,
+    height=1,
+    tile_width=16,
+    tile_height=16,
+    default_tile=0,
+)
 
 # Create the castle TileGrid
-castle = displayio.TileGrid(sprite_sheet, pixel_shader=palette,
-                            width=10,
-                            height=8,
-                            tile_width=16,
-                            tile_height=16)
+castle = displayio.TileGrid(
+    sprite_sheet,
+    pixel_shader=palette,
+    width=10,
+    height=8,
+    tile_width=16,
+    tile_height=16,
+)
 
 # Create a Group to hold the sprite and add it
 sprite_group = displayio.Group()
@@ -74,14 +82,14 @@ prev_btn_vals = ugame.buttons.get_pressed()
 while True:
     cur_btn_vals = ugame.buttons.get_pressed()
     if not prev_btn_vals & ugame.K_UP and cur_btn_vals & ugame.K_UP:
-        player_loc["y"] = max(1, player_loc["y"]-1)
+        player_loc["y"] = max(1, player_loc["y"] - 1)
     if not prev_btn_vals & ugame.K_DOWN and cur_btn_vals & ugame.K_DOWN:
-        player_loc["y"] = min(6, player_loc["y"]+1)
+        player_loc["y"] = min(6, player_loc["y"] + 1)
 
     if not prev_btn_vals & ugame.K_RIGHT and cur_btn_vals & ugame.K_RIGHT:
-        player_loc["x"] = min(8, player_loc["x"]+1)
+        player_loc["x"] = min(8, player_loc["x"] + 1)
     if not prev_btn_vals & ugame.K_LEFT and cur_btn_vals & ugame.K_LEFT:
-        player_loc["x"] = max(1, player_loc["x"]-1)
+        player_loc["x"] = max(1, player_loc["x"] - 1)
 
     # update the the player sprite position
     sprite.x = 16 * player_loc["x"]

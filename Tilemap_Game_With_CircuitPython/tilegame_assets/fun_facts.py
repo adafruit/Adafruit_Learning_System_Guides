@@ -9,5 +9,5 @@ FACTS = [
     "Circuitpython was initially released July 19, 2017.",
     "The displayio module was introducted in Circuipython 4.0. It simplified drawing images and text on screens.",
     "The adafruit_dotstar and neopixel libraries make it easy control dazzling addressable RGB LEDs.",
-    "You can sense human touch on an IO pin with the touchio module."
+    "You can sense human touch on an IO pin with the touchio module.",
 ]

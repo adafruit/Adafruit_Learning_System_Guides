@@ -10,7 +10,13 @@ import terminalio
 from adafruit_display_text import label
 from tilegame_assets.tiles import TILES
 from tilegame_assets.tiles import take_item
-from tilegame_assets.states import *
+from tilegame_assets.states import (
+    STATE_PLAYING,
+    STATE_MAPWIN,
+    STATE_WAITING,
+    STATE_LOST_SPARKY,
+    STATE_MINERVA,
+)
 from tilegame_assets.fun_facts import FACTS
 from tilegame_assets.text_helper import wrap_nicely
 
@@ -76,13 +82,16 @@ NEED_TO_DRAW_ENTITIES = []
 def get_tile(coords):
     return GAME_STATE["CURRENT_MAP"][coords[0], coords[1]]
 
+
 # return from TILES dict the tile object with stats and behavior for the tile at the given coords.
 def get_tile_obj(coords):
     return TILES[GAME_STATE["CURRENT_MAP"][coords[0], coords[1]]]
 
+
 # check the can_walk property of the tile at the given coordinates
 def is_tile_moveable(tile_coords):
     return TILES[GAME_STATE["CURRENT_MAP"][tile_coords[0], tile_coords[1]]]["can_walk"]
+
 
 print("after funcs {}".format(gc.mem_free()))
 

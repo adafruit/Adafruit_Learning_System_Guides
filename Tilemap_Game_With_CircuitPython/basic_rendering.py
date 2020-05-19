@@ -5,24 +5,32 @@ import adafruit_imageload
 display = board.DISPLAY
 
 # Load the sprite sheet (bitmap)
-sprite_sheet, palette = adafruit_imageload.load("tilegame_assets/castle_sprite_sheet.bmp",
-                                                bitmap=displayio.Bitmap,
-                                                palette=displayio.Palette)
+sprite_sheet, palette = adafruit_imageload.load(
+    "tilegame_assets/castle_sprite_sheet.bmp",
+    bitmap=displayio.Bitmap,
+    palette=displayio.Palette,
+)
 
 # Create the sprite TileGrid
-sprite = displayio.TileGrid(sprite_sheet, pixel_shader=palette,
-                            width=1,
-                            height=1,
-                            tile_width=16,
-                            tile_height=16,
-                            default_tile=0)
+sprite = displayio.TileGrid(
+    sprite_sheet,
+    pixel_shader=palette,
+    width=1,
+    height=1,
+    tile_width=16,
+    tile_height=16,
+    default_tile=0,
+)
 
 # Create the castle TileGrid
-castle = displayio.TileGrid(sprite_sheet, pixel_shader=palette,
-                            width=10,
-                            height=8,
-                            tile_width=16,
-                            tile_height=16)
+castle = displayio.TileGrid(
+    sprite_sheet,
+    pixel_shader=palette,
+    width=10,
+    height=8,
+    tile_width=16,
+    tile_height=16,
+)
 
 # Create a Group to hold the sprite and add it
 sprite_group = displayio.Group()
