@@ -101,8 +101,8 @@ Adafruit_VS1053_FilePlayer musicPlayer =
   Adafruit_VS1053_FilePlayer(VS1053_RESET, VS1053_CS, VS1053_DCS, VS1053_DREQ, CARDCS);
 
 
-RTC_DS3231 rtc;
-//RTC_PCF8523 rtc; // RTC object
+//RTC_DS3231 rtc;
+RTC_PCF8523 rtc; // RTC object
 DST_RTC dst_rtc; // DST object
 
 // Do you live in a country or territory that observes Daylight Saving Time?
@@ -143,7 +143,7 @@ void setup() {
   // Set volume for left, right channels. lower numbers == louder volume!
   musicPlayer.setVolume(VOLUME, VOLUME);
 
-  musicPlayer.sineTest(0x44, 500);    // Make a tone to indicate VS1053 is working
+  musicPlayer.sineTest(0x44, 1000);    // Make a tone to indicate VS1053 is working
 
   if (!SD.begin(CARDCS)) {
     Serial.println(F("SD failed, or not present"));
@@ -182,7 +182,7 @@ void setup() {
   }
 
   // set RTC time if needed
-  //if (rtc.lostPower()) {
+  //if (rtc.lostPower()) { // if using DS3231
   if (! rtc.initialized()) {
     Serial.println("RTC lost power, lets set the time!");
     // following line sets the RTC to the date & time this sketch was compiled
