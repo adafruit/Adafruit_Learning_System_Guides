@@ -5,10 +5,9 @@ import board
 import displayio
 import adafruit_imageload
 from displayio import Palette
-
+import ugame
 import terminalio
 from adafruit_display_text import label
-from tilegame_assets.controls_helper import controls
 from tilegame_assets.tiles import TILES
 from tilegame_assets.tiles import take_item
 from tilegame_assets.states import *
@@ -433,12 +432,12 @@ with open(
     # main loop
     while True:
         # set the current button values into variables
-        cur_btn_vals = controls.button
-        cur_up = cur_btn_vals.up
-        cur_down = cur_btn_vals.down
-        cur_right = cur_btn_vals.right
-        cur_left = cur_btn_vals.left
-        cur_a = cur_btn_vals.a
+        cur_btn_vals = ugame.buttons.get_pressed()
+        cur_up = cur_btn_vals & ugame.K_UP
+        cur_down = cur_btn_vals & ugame.K_DOWN
+        cur_right = cur_btn_vals & ugame.K_RIGHT
+        cur_left = cur_btn_vals & ugame.K_LEFT
+        cur_a = cur_btn_vals & ugame.K_O
 
         if GAME_STATE["STATE"] == STATE_WAITING:
             print(cur_a)

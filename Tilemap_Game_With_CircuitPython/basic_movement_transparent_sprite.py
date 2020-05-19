@@ -1,7 +1,7 @@
 import board
 import displayio
 import adafruit_imageload
-from tilegame_assets.controls_helper import controls
+import ugame
 
 display = board.DISPLAY
 player_loc = {"x":4, "y":3}
@@ -69,18 +69,18 @@ sprite.y = 16 * player_loc["y"]
 # Add the Group to the Display
 display.show(group)
 
-prev_btn_vals = controls.button
+prev_btn_vals = ugame.buttons.get_pressed()
 
 while True:
-    cur_btn_vals = controls.button
-    if not prev_btn_vals.up and cur_btn_vals.up:
+    cur_btn_vals = ugame.buttons.get_pressed()
+    if not prev_btn_vals & ugame.K_UP and cur_btn_vals & ugame.K_UP:
         player_loc["y"] = max(1, player_loc["y"]-1)
-    if not prev_btn_vals.down and cur_btn_vals.down:
+    if not prev_btn_vals & ugame.K_DOWN and cur_btn_vals & ugame.K_DOWN:
         player_loc["y"] = min(6, player_loc["y"]+1)
 
-    if not prev_btn_vals.right and cur_btn_vals.right:
+    if not prev_btn_vals & ugame.K_RIGHT and cur_btn_vals & ugame.K_RIGHT:
         player_loc["x"] = min(8, player_loc["x"]+1)
-    if not prev_btn_vals.left and cur_btn_vals.left:
+    if not prev_btn_vals & ugame.K_LEFT and cur_btn_vals & ugame.K_LEFT:
         player_loc["x"] = max(1, player_loc["x"]-1)
 
     # update the the player sprite position
