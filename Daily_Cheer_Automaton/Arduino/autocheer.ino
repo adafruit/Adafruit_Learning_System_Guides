@@ -202,11 +202,12 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
 
+  DateTime theTime;
   // check time
   if (OBSERVE_DST == 1) {
-    DateTime theTime = dst_rtc.calculateTime(rtc.now()); // takes into account DST
+    theTime = dst_rtc.calculateTime(rtc.now()); // takes into account DST
   } else {
-    DateTime theTime = rtc.now(); // use if you don't need DST
+    theTime = rtc.now(); // use if you don't need DST
   }
 
   printTheTime(theTime);
