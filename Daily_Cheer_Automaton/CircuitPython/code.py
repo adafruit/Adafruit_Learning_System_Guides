@@ -1,8 +1,8 @@
 # AUTOCHEER DEVICE
 # code by Andy Doro
-# 
+#
 # plays an MP3 at a specific time.
-# 
+#
 # uses native CircuitPython mp3 playback
 #
 # REQUIREMENTS:
@@ -13,7 +13,7 @@
 # HARDWARE:
 # Feather M4 Express https://www.adafruit.com/product/3857
 # Adalogger https://www.adafruit.com/product/2922
-# 
+#
 #
 # TO DO
 # ---
@@ -45,10 +45,10 @@ import storage
 # NeoPixel
 #import neopixel
 
- 
+
 # Use any pin that is not taken by SPI
 # For Adalogger FeatherWing: https://learn.adafruit.com/adafruit-adalogger-featherwing/pinouts
-# The SDCS pin is the chip select line: 
+# The SDCS pin is the chip select line:
 #    On ESP8266, the SD CS pin is on GPIO 15
 #    On ESP32 it's GPIO 33
 #    On WICED it's GPIO PB5
@@ -57,7 +57,7 @@ import storage
 #    On Teensy 3.x it's on GPIO 10
 
 SD_CS = board.D10 # for M4
- 
+
 # Connect to the card and mount the filesystem.
 spi = io.SPI(board.SCK, board.MOSI, board.MISO)
 cs = digitalio.DigitalInOut(SD_CS)
