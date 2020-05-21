@@ -4,12 +4,10 @@ import gc
 import board
 import displayio
 import adafruit_imageload
-from displayio import Palette
 import ugame
 import terminalio
 from adafruit_display_text import label
 from tilegame_assets.tiles import TILES
-from tilegame_assets.tiles import take_item
 from tilegame_assets.states import (
     STATE_PLAYING,
     STATE_MAPWIN,
@@ -19,6 +17,8 @@ from tilegame_assets.states import (
 )
 from tilegame_assets.fun_facts import FACTS
 from tilegame_assets.text_helper import wrap_nicely
+
+# pylint: disable=bad-continuation
 
 # Direction constants for comparison
 UP = 0
@@ -78,18 +78,29 @@ ENTITY_SPRITES = []
 NEED_TO_DRAW_ENTITIES = []
 
 
-# return from GAME_STATE['CURRENT_MAP'] the tile name of the tile of the given coords
 def get_tile(coords):
+    """
+    :param coords: (x, y) tuple
+    :return: tile name of the tile at the given coords from GAME_STATE['CURRENT_MAP']
+    """
     return GAME_STATE["CURRENT_MAP"][coords[0], coords[1]]
 
 
-# return from TILES dict the tile object with stats and behavior for the tile at the given coords.
 def get_tile_obj(coords):
+    """
+    :param coords: (x, y) tuple
+    :return: tile object with stats and behavior for the tile at the given coords.
+    """
     return TILES[GAME_STATE["CURRENT_MAP"][coords[0], coords[1]]]
 
 
-# check the can_walk property of the tile at the given coordinates
+#
 def is_tile_moveable(tile_coords):
+    """
+    Check the can_walk property of the tile at the given coordinates
+    :param tile_coords: (x, y) tuple
+    :return: True if the player can walk on this tile. False otherwise.
+    """
     return TILES[GAME_STATE["CURRENT_MAP"][tile_coords[0], tile_coords[1]]]["can_walk"]
 
 
@@ -134,6 +145,7 @@ group.append(sprite_group)
 
 
 def load_map(file_name):
+    # pylint: disable=global-statement,too-many-statements,too-many-nested-blocks,too-many-branches
     global ENTITY_SPRITES, CAMERA_VIEW
 
     # empty the sprite_group
@@ -142,7 +154,7 @@ def load_map(file_name):
     # remove player sprite
     try:
         sprite_group.remove(GAME_STATE["PLAYER_SPRITE"])
-    except:
+    except ValueError:
         pass
 
     # reset map and other game state objects
@@ -233,7 +245,7 @@ def load_map(file_name):
                             # print("setting GAME_STATE['ENTITY_SPRITES_DICT'][%s,%s]" % (x,y))
 
                             # create an entity obj
-                            entity_obj = {
+                            _entity_obj = {
                                 "entity_sprite_index": len(ENTITY_SPRITES) - 1,
                                 "map_tile_name": tile_name,
                             }
@@ -241,11 +253,11 @@ def load_map(file_name):
                             # if there are no entities at this location yet
                             if (x, y) not in GAME_STATE["ENTITY_SPRITES_DICT"]:
                                 # create a list and add it to the dictionary at the x,y location
-                                GAME_STATE["ENTITY_SPRITES_DICT"][x, y] = [entity_obj]
+                                GAME_STATE["ENTITY_SPRITES_DICT"][x, y] = [_entity_obj]
                             else:
                                 # append the entity to the existing list in the dictionary
                                 GAME_STATE["ENTITY_SPRITES_DICT"][x, y].append(
-                                    entity_obj
+                                    _entity_obj
                                 )
 
                     else:  # tile is not entity
@@ -313,10 +325,13 @@ def can_player_move(direction):
             GAME_STATE["CURRENT_MAP"][tile_right_of_coords[0], tile_right_of_coords[1]]
         ]["can_walk"]
 
+    return None
+
 
 # set the appropriate tiles into the CAMERA_VIEW dictionary
 # based on given starting coords and size
 def set_camera_view(startX, startY, width, height):
+    # pylint: disable=global-statement
     global CAMERA_OFFSET_X
     global CAMERA_OFFSET_Y
     # set the offset variables for use in other parts of the code
@@ -342,6 +357,7 @@ def draw_camera_view():
     # any entities not in this list should get moved off the screen
     drew_entities = []
     # print(CAMERA_VIEW)
+    # pylint: disable=too-many-nested-blocks
 
     # loop over y tile coordinates
     for y in range(0, SCREEN_HEIGHT_TILES):
@@ -597,7 +613,10 @@ with open(
             elif GAME_STATE["STATE"] == STATE_LOST_SPARKY:
                 GAME_STATE["MAP_INDEX"] = 0
                 GAME_STATE["STATE"] = STATE_WAITING
-                game_over_text = "Be careful not to \ntouch Sparky unless \nyou've collected \nenough Mho's.\nStarting Over"
+                game_over_text = (
+                    "Be careful not to \ntouch Sparky unless \n"
+                    "you've collected \nenough Mho's.\nStarting Over"
+                )
                 show_splash(game_over_text, 0x25AFBB)
                 load_map(MAPS[GAME_STATE["MAP_INDEX"]])
             # talking to minerva
