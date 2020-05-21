@@ -1,4 +1,9 @@
-from tilegame_assets.states import *
+from tilegame_assets.states import (
+    STATE_MAPWIN,
+    STATE_LOST_SPARKY,
+    STATE_MINERVA,
+)
+# pylint: disable=unused-argument
 
 
 # Minerva before_move. Set game state to STATE_MINERVA

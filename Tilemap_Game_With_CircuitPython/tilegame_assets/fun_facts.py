@@ -1,3 +1,4 @@
+# pylint: disable=line-too-long
 # Fun facts to be read to the player by Minerva
 FACTS = [
     "The digitalio module lets you read and write HIGH and LOW values with IO pins.",
