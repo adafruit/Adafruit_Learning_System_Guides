@@ -72,10 +72,10 @@ class PlaybackDisplay:
         self.group = displayio.Group(max_size=4)
         self.glyph_width, self.glyph_height = font.get_bounding_box()[:2]
         self.pbar = ProgressBar(0, 0, board.DISPLAY.width,
-                                self.glyph_height, bar_color=0x0000ff,
+                                self.glyph_height*2, bar_color=0x0000ff,
                                 outline_color=0x333333, stroke=1)
         self.iconbar = icons.IconBar()
-        self.iconbar.group.y = 112
+        self.iconbar.group.y = 1000
         for i in range(5, 8):
             self.iconbar.icons[i].x += 32
         self.label = adafruit_display_text.label.Label(font, line_spacing=1.0,
@@ -471,6 +471,7 @@ def play_all(playlist, *, folder='', trim=0, location='/sd'):
     'folder' is a display name for the user."""
     i = 0
     board.DISPLAY.show(playback_display.group)
+    playback_display.iconbar.group.y = 112
     while 0 <= i < len(playlist):
         filename = playlist[i]
         i = play_one_file(i, join(location, filename), folder, filename[trim:-4], len(playlist))
