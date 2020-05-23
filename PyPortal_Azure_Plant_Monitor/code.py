@@ -15,9 +15,9 @@ from digitalio import DigitalInOut
 from adafruit_esp32spi import adafruit_esp32spi, adafruit_esp32spi_wifimanager
 import adafruit_esp32spi.adafruit_esp32spi_socket as socket
 import neopixel
+from adafruit_ntp import NTP
 from adafruit_azureiot import IoTCentralDevice
 from adafruit_seesaw.seesaw import Seesaw
-from adafruit_ntp import NTP
 
 # gfx helper
 import azure_gfx_helper
