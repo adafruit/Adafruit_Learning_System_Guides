@@ -1,19 +1,23 @@
 """
 PyPortal Azure IoT Plant Monitor
 ====================================================
-Log plant vitals to Microsoft Azure IoT with
+Log plant vitals to Microsoft Azure IoT Central with
 your PyPortal
 
-Author: Brent Rubell for Adafruit Industries, 2019
+Authors: Brent Rubell for Adafruit Industries, 2019
+       : Jim Bennett for Microsoft, 2020
 """
 import time
+import json
 import board
 import busio
 from digitalio import DigitalInOut
 from adafruit_esp32spi import adafruit_esp32spi, adafruit_esp32spi_wifimanager
+import adafruit_esp32spi.adafruit_esp32spi_socket as socket
 import neopixel
-from adafruit_azureiot import IOT_Hub
+from adafruit_azureiot import IoTCentralDevice
 from adafruit_seesaw.seesaw import Seesaw
+from adafruit_ntp import NTP
 
 # gfx helper
 import azure_gfx_helper
@@ -33,13 +37,29 @@ spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
 esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset)
 status_light = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.2)
 wifi = adafruit_esp32spi_wifimanager.ESPSPI_WiFiManager(esp, secrets, status_light)
+wifi.connect()
+
+# Time setup, needed to authenticate with Azure IoT Central
+ntp = NTP(esp)
+while not ntp.valid_time:
+    time.sleep(5)
+    ntp.set_time()
 
 # Soil Sensor Setup
 i2c_bus = busio.I2C(board.SCL, board.SDA)
 ss = Seesaw(i2c_bus, addr=0x36)
 
-# Create an instance of the Azure IoT Hub
-hub = IOT_Hub(wifi, secrets['azure_iot_hub'], secrets['azure_iot_sas'], secrets['azure_device_id'])
+# Create an instance of the Azure IoT Central device
+device = IoTCentralDevice(
+    socket,
+    esp,
+    secrets["id_scope"],
+    secrets["device_id"],
+    secrets["key"]
+)
+
+# Connect to Azure IoT Central
+device.connect()
 
 # init. graphics helper
 gfx = azure_gfx_helper.Azure_GFX(False)
@@ -55,12 +75,20 @@ while True:
         temperature = gfx.display_temp(temperature)
         print('Sending data to Azure')
         gfx.display_azure_status('Sending data...')
-        hub.send_device_message(temperature)
-        hub.send_device_message(moisture_level)
+
+        # send the temperature and moisture level to Azure
+        message = {
+            "Temperature": temperature,
+            "MoistureLevel": moisture_level
+        }
+        device.send_telemetry(json.dumps(message))
+
         gfx.display_azure_status('Data sent!')
         print('Data sent!')
     except (ValueError, RuntimeError) as e:
         print("Failed to get data, retrying\n", e)
         wifi.reset()
+        wifi.connect()
+        device.reconnect()
         continue
     time.sleep(60)
