@@ -289,41 +289,49 @@ prev_right = False
 # helper function returns true if player is allowed to move given direction
 # based on can_walk property of the tiles next to the player
 def can_player_move(direction):
-    if direction == UP:
-        tile_above_coords = (
-            GAME_STATE["PLAYER_LOC"][0],
-            GAME_STATE["PLAYER_LOC"][1] - 1,
-        )
-        return TILES[
-            GAME_STATE["CURRENT_MAP"][tile_above_coords[0], tile_above_coords[1]]
-        ]["can_walk"]
+    try:
+        if direction == UP:
+            tile_above_coords = (
+                GAME_STATE["PLAYER_LOC"][0],
+                GAME_STATE["PLAYER_LOC"][1] - 1,
+            )
 
-    if direction == DOWN:
-        tile_below_coords = (
-            GAME_STATE["PLAYER_LOC"][0],
-            GAME_STATE["PLAYER_LOC"][1] + 1,
-        )
-        return TILES[
-            GAME_STATE["CURRENT_MAP"][tile_below_coords[0], tile_below_coords[1]]
-        ]["can_walk"]
+            return TILES[
+                GAME_STATE["CURRENT_MAP"][tile_above_coords[0], tile_above_coords[1]]
+            ]["can_walk"]
 
-    if direction == LEFT:
-        tile_left_of_coords = (
-            GAME_STATE["PLAYER_LOC"][0] - 1,
-            GAME_STATE["PLAYER_LOC"][1],
-        )
-        return TILES[
-            GAME_STATE["CURRENT_MAP"][tile_left_of_coords[0], tile_left_of_coords[1]]
-        ]["can_walk"]
+        if direction == DOWN:
+            tile_below_coords = (
+                GAME_STATE["PLAYER_LOC"][0],
+                GAME_STATE["PLAYER_LOC"][1] + 1,
+            )
+            return TILES[
+                GAME_STATE["CURRENT_MAP"][tile_below_coords[0], tile_below_coords[1]]
+            ]["can_walk"]
 
-    if direction == RIGHT:
-        tile_right_of_coords = (
-            GAME_STATE["PLAYER_LOC"][0] + 1,
-            GAME_STATE["PLAYER_LOC"][1],
-        )
-        return TILES[
-            GAME_STATE["CURRENT_MAP"][tile_right_of_coords[0], tile_right_of_coords[1]]
-        ]["can_walk"]
+        if direction == LEFT:
+            tile_left_of_coords = (
+                GAME_STATE["PLAYER_LOC"][0] - 1,
+                GAME_STATE["PLAYER_LOC"][1],
+            )
+            return TILES[
+                GAME_STATE["CURRENT_MAP"][
+                    tile_left_of_coords[0], tile_left_of_coords[1]
+                ]
+            ]["can_walk"]
+
+        if direction == RIGHT:
+            tile_right_of_coords = (
+                GAME_STATE["PLAYER_LOC"][0] + 1,
+                GAME_STATE["PLAYER_LOC"][1],
+            )
+            return TILES[
+                GAME_STATE["CURRENT_MAP"][
+                    tile_right_of_coords[0], tile_right_of_coords[1]
+                ]
+            ]["can_walk"]
+    except KeyError:
+        return False
 
     return None
 
@@ -462,7 +470,7 @@ with open(
         cur_down = cur_btn_vals & ugame.K_DOWN
         cur_right = cur_btn_vals & ugame.K_RIGHT
         cur_left = cur_btn_vals & ugame.K_LEFT
-        cur_a = cur_btn_vals & ugame.K_O
+        cur_a = cur_btn_vals & ugame.K_O or cur_btn_vals & ugame.K_X
 
         if GAME_STATE["STATE"] == STATE_WAITING:
             print(cur_a)
