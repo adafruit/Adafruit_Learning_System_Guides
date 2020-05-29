@@ -36,7 +36,6 @@ class Azure_GFX(displayio.Group):
         self._cwd = cwd
         self.set_icon(self._cwd+"/images/azure_splash.bmp")
 
-    def show_text(self):
         print('loading fonts...')
         glyphs = b'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-,.: '
         data_glyphs = b'012345678-,.:/FC'

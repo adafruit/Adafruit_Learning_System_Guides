@@ -22,9 +22,6 @@ from adafruit_seesaw.seesaw import Seesaw
 # gfx helper
 import azure_gfx_helper
 
-# init. graphics helper
-gfx = azure_gfx_helper.Azure_GFX(False)
-
 # Get wifi details and more from a secrets.py file
 try:
     from secrets import secrets
@@ -66,7 +63,8 @@ device = IoTCentralDevice(
 # Connect to Azure IoT Central
 device.connect()
 
-gfx.show_text()
+# init. graphics helper
+gfx = azure_gfx_helper.Azure_GFX(is_celsius = True)
 
 while True:
     try:
