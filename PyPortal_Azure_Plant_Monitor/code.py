@@ -22,6 +22,9 @@ from adafruit_seesaw.seesaw import Seesaw
 # gfx helper
 import azure_gfx_helper
 
+# init. graphics helper
+gfx = azure_gfx_helper.Azure_GFX(False)
+
 # Get wifi details and more from a secrets.py file
 try:
     from secrets import secrets
@@ -61,8 +64,7 @@ device = IoTCentralDevice(
 # Connect to Azure IoT Central
 device.connect()
 
-# init. graphics helper
-gfx = azure_gfx_helper.Azure_GFX(False)
+gfx.show_text()
 
 while True:
     try:
@@ -72,7 +74,8 @@ while True:
         temperature = ss.get_temp()
         # display soil sensor values on pyportal
         gfx.display_moisture(moisture_level)
-        temperature = gfx.display_temp(temperature)
+        gfx.display_temp(temperature)
+        
         print('Sending data to Azure')
         gfx.display_azure_status('Sending data...')
 
