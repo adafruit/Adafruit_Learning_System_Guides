@@ -94,4 +94,6 @@ while True:
         wifi.connect()
         device.reconnect()
         continue
-    time.sleep(60)
+
+    # Sleep for 10 minutes before getting the next value
+    time.sleep(600)
