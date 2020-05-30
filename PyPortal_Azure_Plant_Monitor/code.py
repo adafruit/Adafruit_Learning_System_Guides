@@ -66,6 +66,7 @@ device = IoTCentralDevice(
 # Connect to Azure IoT Central
 device.connect()
 
+# Hide the splash screen and show the telemetry values
 gfx.show_text()
 
 while True:
@@ -87,6 +88,7 @@ while True:
             "MoistureLevel": moisture_level
         }
         device.send_telemetry(json.dumps(message))
+        device.loop()
 
         gfx.display_azure_status('Data sent!')
         print('Data sent!')
