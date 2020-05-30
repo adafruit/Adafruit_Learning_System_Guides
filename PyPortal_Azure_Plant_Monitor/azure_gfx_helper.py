@@ -13,7 +13,7 @@ main_font = cwd+"/fonts/EarthHeart-26.bdf"
 data_font = cwd+"/fonts/Collegiate-50.bdf"
 
 class Azure_GFX(displayio.Group):
-    def __init__(self, is_celsius=True):
+    def __init__(self, is_celsius):
         """Creates an Azure_GFX object.
         :param bool is_celsius: Temperature displayed in Celsius.
         """
