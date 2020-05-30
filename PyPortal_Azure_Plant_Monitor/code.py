@@ -23,7 +23,7 @@ from adafruit_seesaw.seesaw import Seesaw
 import azure_gfx_helper
 
 # init. graphics helper
-gfx = azure_gfx_helper.Azure_GFX(is_celsius = True)
+gfx = azure_gfx_helper.Azure_GFX(is_celsius=True)
 
 # Get wifi details and more from a secrets.py file
 try:
@@ -78,7 +78,7 @@ while True:
         # display soil sensor values on pyportal
         gfx.display_moisture(moisture_level)
         gfx.display_temp(temperature)
-        
+
         print('Sending data to Azure')
         gfx.display_azure_status('Sending data...')
 

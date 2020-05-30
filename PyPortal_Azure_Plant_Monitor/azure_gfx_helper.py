@@ -36,7 +36,6 @@ class Azure_GFX(displayio.Group):
         self._cwd = cwd
         self.set_icon(self._cwd+"/images/azure_splash.bmp")
 
-    def show_text(self):
         print('loading fonts...')
         glyphs = b'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-,.: '
         data_glyphs = b'012345678-,.:/FC'
@@ -77,8 +76,8 @@ class Azure_GFX(displayio.Group):
         self.azure_status_text.y = 225
         self._text_group.append(self.azure_status_text)
 
+    def show_text(self):
         board.DISPLAY.show(self._text_group)
-
 
     def display_azure_status(self, status_text):
         """Displays the system status on the PyPortal
