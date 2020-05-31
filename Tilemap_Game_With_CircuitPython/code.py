@@ -129,31 +129,23 @@ castle = displayio.TileGrid(
     tile_height=16,
 )
 
-# Create a Group to hold the sprites and add it
-sprite_group = displayio.Group(max_size=32)
-
-# Create a Group to hold the castle and add it
-castle_group = displayio.Group()
-castle_group.append(castle)
-
 # Create a Group to hold the sprite and castle
-group = displayio.Group()
+group = displayio.Group(max_size=33)
 
-# Add the sprite and castle to the group
-group.append(castle_group)
-group.append(sprite_group)
+# Add castle to the group
+group.append(castle)
 
 
 def load_map(file_name):
     # pylint: disable=global-statement,too-many-statements,too-many-nested-blocks,too-many-branches
     global ENTITY_SPRITES, CAMERA_VIEW
 
-    # empty the sprite_group
+    # empty the sprites from the group
     for cur_s in ENTITY_SPRITES:
-        sprite_group.remove(cur_s)
+        group.remove(cur_s)
     # remove player sprite
     try:
-        sprite_group.remove(GAME_STATE["PLAYER_SPRITE"])
+        group.remove(GAME_STATE["PLAYER_SPRITE"])
     except ValueError:
         pass
 
@@ -223,7 +215,7 @@ def load_map(file_name):
                             GAME_STATE["PLAYER_LOC"] = (x, y)
 
                             # add sprite to the group
-                            sprite_group.append(GAME_STATE["PLAYER_SPRITE"])
+                            group.append(GAME_STATE["PLAYER_SPRITE"])
                         else:  # not the player
                             # Create the sprite TileGrid
                             entity_srite = displayio.TileGrid(
@@ -270,7 +262,7 @@ def load_map(file_name):
     # add all entity sprites to the group
     print("appending {} sprites".format(len(ENTITY_SPRITES)))
     for entity in ENTITY_SPRITES:
-        sprite_group.append(entity)
+        group.append(entity)
 
 
 print("loading map")
@@ -605,18 +597,18 @@ with open(
                 if GAME_STATE["MAP_INDEX"] >= len(MAPS):
                     GAME_STATE["MAP_INDEX"] = 0
                     GAME_STATE["STATE"] = STATE_WAITING
+                    load_map(MAPS[GAME_STATE["MAP_INDEX"]])
                     show_splash(
                         "You Win \n =D \nCongratulations. \nStart Over?", 0x29C1CF
                     )
-                    load_map(MAPS[GAME_STATE["MAP_INDEX"]])
                 else:
                     # prompt to start next
                     GAME_STATE["STATE"] = STATE_WAITING
+                    load_map(MAPS[GAME_STATE["MAP_INDEX"]])
                     show_splash(
                         "You beat this level\n =D \nCongratulations. \nStart Next?",
                         0x29C1CF,
                     )
-                    load_map(MAPS[GAME_STATE["MAP_INDEX"]])
             # game over from sparky
             elif GAME_STATE["STATE"] == STATE_LOST_SPARKY:
                 GAME_STATE["MAP_INDEX"] = 0
