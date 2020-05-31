@@ -617,8 +617,9 @@ with open(
                     "Be careful not to \ntouch Sparky unless \n"
                     "you've collected \nenough Mho's.\nStarting Over"
                 )
-                show_splash(game_over_text, 0x25AFBB)
                 load_map(MAPS[GAME_STATE["MAP_INDEX"]])
+                show_splash(game_over_text, 0x25AFBB)
+
             # talking to minerva
             elif GAME_STATE["STATE"] == STATE_MINERVA:
                 GAME_STATE["STATE"] = STATE_WAITING
