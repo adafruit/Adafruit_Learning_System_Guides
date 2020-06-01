@@ -17,7 +17,7 @@ rst = digitalio.DigitalInOut(board.D4)
 fona = FONA(uart, rst)
 
 # Use this for FONA3G
-# fona = FONA3G(uart, rst, ri)
+# fona = FONA3G(uart, rst)
 
 # Initialize BME280 Sensor
 i2c = busio.I2C(board.SCL, board.SDA)
