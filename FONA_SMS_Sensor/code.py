@@ -57,8 +57,7 @@ while True:
         elif message in ["pres", "pressure", "p"]:
             response = "Pressure: %0.1f hPa" % pres
         elif message in ["status", "s"]:
-            response = "Temperature: {0:.2f}C\nHumidity: {1:.1f}% \
-                     Pressure: {2:.1f}hPa".format(
+            response = "Temperature: {0:.2f}C\nHumidity: {1:.1f}%Pressure: {2:.1f}hPa".format(
                 temp, humid, pres
             )
         elif message in ["help"]:
