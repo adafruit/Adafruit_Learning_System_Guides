@@ -56,7 +56,7 @@ class Azure_GFX(displayio.Group):
         self.temp_label.y = 65
         self._text_group.append(self.temp_label)
 
-        self.temp_text = Label(self.data_font, max_glyphs=10, text="")
+        self.temp_text = Label(self.data_font, max_glyphs=10)
         self.temp_text.x = 200
         self.temp_text.y = 85
         self._text_group.append(self.temp_text)
@@ -66,12 +66,12 @@ class Azure_GFX(displayio.Group):
         self.moisture_label.y = 135
         self._text_group.append(self.moisture_label)
 
-        self.moisture_text = Label(self.data_font, max_glyphs=10, text="")
+        self.moisture_text = Label(self.data_font, max_glyphs=10)
         self.moisture_text.x = 200
         self.moisture_text.y = 175
         self._text_group.append(self.moisture_text)
 
-        self.azure_status_text = Label(self.main_font, max_glyphs=15, text="")
+        self.azure_status_text = Label(self.main_font, max_glyphs=15)
         self.azure_status_text.x = 65
         self.azure_status_text.y = 225
         self._text_group.append(self.azure_status_text)

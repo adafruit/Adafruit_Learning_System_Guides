@@ -42,11 +42,14 @@ esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset)
 # Set up the WiFi manager with a status light to show the WiFi connection status
 status_light = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.2)
 wifi = adafruit_esp32spi_wifimanager.ESPSPI_WiFiManager(esp, secrets, status_light)
+print("WiFi connecting...")
 wifi.connect()
+print("WiFi connected!")
 
 # Time setup, needed to authenticate with Azure IoT Central
 ntp = NTP(esp)
 while not ntp.valid_time:
+    print("Failed to obtain time, retrying in 5 seconds...")
     time.sleep(5)
     ntp.set_time()
 
