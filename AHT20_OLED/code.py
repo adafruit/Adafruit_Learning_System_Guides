@@ -17,7 +17,7 @@ i2c = busio.I2C(board.SCL, board.SDA, frequency=100000)
 
 # Create library object using our Bus I2C port
 #i2c = busio.I2C(board.SCL, board.SDA)
-sensor = adafruit_ahtx0.AHTx0(i2c)
+aht20 = adafruit_ahtx0.AHTx0(i2c)
 
 
 #OLED
@@ -33,6 +33,6 @@ text_area = label.Label(terminalio.FONT, color=0xFFFF00, x=15, y=0, max_glyphs=2
 splash.append(text_area)
 
 while True:
-    text_area.text = "temp: %0.1f C \nhumidity: %0.1f %%" % (sensor.temperature, sensor.relative_humidity)
+    text_area.text = "temp: %0.1fC \nhumid: %0.1f%%" % (aht20.temperature, aht20.relative_humidity)
     print(text_area.text)
     time.sleep(1)
