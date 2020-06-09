@@ -1,20 +1,8 @@
 import time
-import board
-import displayio
-import adafruit_imageload
 from adafruit_button import Button
 from adafruit_pyportal import PyPortal
 
-display = board.DISPLAY
-
-pyportal = PyPortal()
-
-bitmap, palette = adafruit_imageload.load("/stock-pyportal.bmp",
-                                          bitmap=displayio.Bitmap,
-                                          palette=displayio.Palette)
-
-# Create a TileGrid to hold the bitmap
-tile_grid = displayio.TileGrid(bitmap, pixel_shader=palette)
+pyportal = PyPortal(default_bg="/stock-pyportal.bmp")
 
 lowE = "/sounds/lowE.wav"
 A = "/sounds/A.wav"
@@ -33,8 +21,6 @@ pegs = [
     {'label': "B", 'pos': (124, 150), 'size': (65, 90)},
     {'label': "highE", 'pos': (53, 150), 'size': (65, 90)}
     ]
-
-pyportal.splash.append(tile_grid)
 
 buttons = []
 for peg in pegs:
