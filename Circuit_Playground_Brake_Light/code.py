@@ -41,7 +41,7 @@ while True:
                 light_on = True
         i += 1
 
-    # light_on variable is for short circuiting. Not really necessary, but it makes things run faster
+    # light_on variable is for short circuiting. Not really necessary, just makes things run faster
     elif not light_on or time.monotonic() - start > 0.4:
         # Sine wave used for the color breathing effect.
         # Max brightness can be adjusted with the coefficient.
