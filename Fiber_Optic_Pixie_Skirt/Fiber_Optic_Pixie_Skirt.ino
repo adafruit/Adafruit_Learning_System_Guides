@@ -1,9 +1,9 @@
 #include <Adafruit_Pixie.h>
 #include "SoftwareSerial.h"
-
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
-#include <Adafruit_LSM303_U.h>
+#include <Adafruit_LSM303DLH_Mag.h>
+#include <Adafruit_LSM303_Accel.h>
 
 int ledMode = 0;  //FIRST ACTIVE MODE
 
@@ -16,7 +16,7 @@ SoftwareSerial pixieSerial(-1, PIXIEPIN);
 Adafruit_Pixie strip = Adafruit_Pixie(NUMPIXIES, &pixieSerial);
 
 Adafruit_LSM303_Accel_Unified accel = Adafruit_LSM303_Accel_Unified(54321);
-Adafruit_LSM303_Mag_Unified mag = Adafruit_LSM303_Mag_Unified(12345);
+Adafruit_LSM303DLH_Mag_Unified mag = Adafruit_LSM303DLH_Mag_Unified(12345);
 
 const float twirl = 7; // accelerometer threshold for toggling modes -- change this number to change sensitivity
 long twirlStart = 0;
