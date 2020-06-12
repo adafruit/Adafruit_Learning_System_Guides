@@ -37,7 +37,7 @@ while True:
                 cp.pixels.brightness = 0.25
                 start = time.monotonic()
                 sleep = True
-        i +=1
+        i += 1
 
     # sleep variable is for short circuiting
     elif not sleep or time.monotonic() - start > 0.4:
