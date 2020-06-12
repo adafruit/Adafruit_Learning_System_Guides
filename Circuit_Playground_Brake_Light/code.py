@@ -13,7 +13,7 @@ l50 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 i = 0
 cp.pixels.fill((255, 0, 0))
 
-sleep = False
+light_on = False
 
 while True:
     x, y, z = cp.acceleration
@@ -38,16 +38,16 @@ while True:
             if not cp.shake(shake_threshold=10):
                 cp.pixels.brightness = 1
                 start = time.monotonic()
-                sleep = True
+                light_on = True
         i += 1
 
-    # sleep variable is for short circuiting. Not really necessary, but it makes things run faster
-    elif not sleep or time.monotonic() - start > 0.4:
+    # light_on variable is for short circuiting. Not really necessary, but it makes things run faster
+    elif not light_on or time.monotonic() - start > 0.4:
         # Sine wave used for the color breathing effect.
         # Max brightness can be adjusted with the coefficient.
         cp.pixels.brightness = abs(math.sin(brightness)) * 0.5
         brightness += 0.05
         i = 0
-        sleep = False
+        light_on = False
 
     time.sleep(0.02)
