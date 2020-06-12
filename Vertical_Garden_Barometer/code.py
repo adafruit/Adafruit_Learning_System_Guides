@@ -5,11 +5,7 @@ Display a "sinking" or "rising" graphic on the screen along with recent reading 
 
 Code by Erin St Blaine for Adafruit Industries
 """
-<<<<<<< HEAD
 import time
-=======
-
->>>>>>> origin/master
 import board
 import neopixel
 from adafruit_clue import clue
@@ -54,11 +50,8 @@ reading3 = reading2
 counter = 0
 toggle = 1  # for on/off switch on button A
 displayOn = 1  # to turn the display on and off with button B
-<<<<<<< HEAD
 button_b_pressed = False
 button_a_pressed = False
-=======
->>>>>>> origin/master
 
 clue.display.brightness = 0.8
 clue_display = displayio.Group(max_size=4)
@@ -109,11 +102,7 @@ waterPalette = [0x00d9ff, 0x006f82, 0x43bfb9, 0x0066ff]
 icePalette = [0x8080FF, 0x8080FF, 0x8080FF, 0x0000FF, 0xC88AFF]
 sunPalette = [0xffaa00, 0xffdd00, 0x7d5b06, 0xfffca8]
 firePalette = [0xff0000, 0xff5500, 0x8a3104, 0xffaa00 ]
-<<<<<<< HEAD
 forestPalette = [0x76DB00, 0x69f505, 0x05f551, 0x3B6D00]
-=======
-forestPalette = [0xccffa8, 0x69f505, 0x05f551, 0x2c8247]
->>>>>>> origin/master
 
 # set up default initial palettes, just for startup
 palette = forestPalette
@@ -139,7 +128,6 @@ while True:
             toggle = 1
             pixels.brightness = 1.0
             clue.display.brightness = 0.8
-<<<<<<< HEAD
         button_a_pressed = True  # Set to True.
         time.sleep(0.03)  # Debounce.
     if not clue.button_a and button_a_pressed:  # On button release...
@@ -148,10 +136,6 @@ while True:
     if clue.button_b and not button_b_pressed:  # If button B pressed...
         print("Button B pressed.")
         # Toggle only the display on and off
-=======
-    if clue.button_b:
-    # Toggle only the display on and off
->>>>>>> origin/master
         if displayOn == 0:
             clue.display.brightness = 0.8
             displayOn = 1
@@ -256,11 +240,7 @@ while True:
             reading3_label.y = 194
             timer_label.y = 224
         # if reading is falling, show sinking image and position text at the top
-<<<<<<< HEAD
         elif reading1 < reading2:  #reading is falling
-=======
-        elif reading2 < reading3:  #reading is falling
->>>>>>> origin/master
             sinking_sprite.x = 0
             reading_label.y = 24
             reading2_label.y = 54
