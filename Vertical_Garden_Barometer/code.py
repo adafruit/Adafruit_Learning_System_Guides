@@ -1,4 +1,3 @@
-
 """
 Read the barometric reading in the air
 Visualize air reading changes over time as a color animation on a NeoPixel strip
@@ -6,7 +5,6 @@ Display a "sinking" or "rising" graphic on the screen along with recent reading 
 
 Code by Erin St Blaine for Adafruit Industries
 """
-
 import time
 import board
 import neopixel
@@ -16,14 +14,13 @@ import displayio
 from adafruit_display_text import label
 from adafruit_bitmap_font import bitmap_font
 
-
 num_leds = 79 #number of LEDs in your strip
-timeToCheck = 100 # set the amount of time between sensor checks. 7800 is approx. 1 hour
+timeToCheck = 23400 # set the amount of time between sensor checks. 7800 is approx. 1 hour
 
 # Barometer or Thermometer? Uncomment the section you want to use
 
-# BAROMETER RANGES (hPa)
-# set desired reading range -- the NeoPixel palette choice will be determined by these thresholds
+#BAROMETER RANGES (hPa)
+#set desired reading range -- the NeoPixel palette choice will be determined by these thresholds
 deviceType = 0
 min_reading = 960
 med_reading = 965
@@ -32,15 +29,15 @@ max_reading = 975
 
 """
 # THERMOMETER RANGES (C)
-# set desired temperature range -- the NeoPixel palette choice will be determined by these thresholds
+# set desired temperature range - NeoPixel palette choice determined by these thresholds
 deviceType = 1
 min_reading = 25
-med_reading = 27
-high_reading= 31
-max_reading = 33
+med_reading = 26
+high_reading= 27
+max_reading = 28
 """
 
-#get an initial sensor reading
+# get an initial sensor reading
 if deviceType ==0:
     reading = clue.pressure
 else:
@@ -51,8 +48,10 @@ reading1 = reading
 reading2 = reading1
 reading3 = reading2
 counter = 0
-toggle = 1  #for on/off switch on button A
-displayOn = 1  #to turn the display on and off with button B
+toggle = 1  # for on/off switch on button A
+displayOn = 1  # to turn the display on and off with button B
+button_b_pressed = False
+button_a_pressed = False
 
 clue.display.brightness = 0.8
 clue_display = displayio.Group(max_size=4)
@@ -99,34 +98,13 @@ clue_display.append(text_group)
 clue.display.show(clue_display)
 
 # Define color Palettes
-waterPalette = [
-            0x00d9ff,
-            0x006f82,
-            0x43bfb9,
-            0x0066ff]
-icePalette = [
-            0x8080FF,
-            0x8080FF,
-            0x8080FF,
-            0x0000FF,
-            0xC88AFF]
-sunPalette = [
-            0xffaa00,
-            0xffdd00,
-            0x7d5b06,
-            0xfffca8]
-firePalette = [
-            0xff0000,
-            0xff5500,
-            0x8a3104,
-            0xffaa00 ]
-forestPalette = [
-            0xccffa8,
-            0x69f505,
-            0x05f551,
-            0x2c8247]
+waterPalette = [0x00d9ff, 0x006f82, 0x43bfb9, 0x0066ff]
+icePalette = [0x8080FF, 0x8080FF, 0x8080FF, 0x0000FF, 0xC88AFF]
+sunPalette = [0xffaa00, 0xffdd00, 0x7d5b06, 0xfffca8]
+firePalette = [0xff0000, 0xff5500, 0x8a3104, 0xffaa00 ]
+forestPalette = [0x76DB00, 0x69f505, 0x05f551, 0x3B6D00]
 
-#set up default initial palettes, just for startup
+# set up default initial palettes, just for startup
 palette = forestPalette
 palette2 = waterPalette
 palette3 = icePalette
@@ -140,7 +118,8 @@ offset = 0  # Positional offset into color palette to get it to 'spin'
 
 while True:
     # use button A to toggle the NeoPixels on or off by changing brightness
-    if clue.button_a:
+    if clue.button_a and not button_a_pressed:  # If button A pressed...
+        print("Button A pressed.")
         if toggle == 1:
             toggle = 0
             pixels.brightness = 0
@@ -149,27 +128,38 @@ while True:
             toggle = 1
             pixels.brightness = 1.0
             clue.display.brightness = 0.8
-    if clue.button_b:
-    #Toggle only the display on and off
+        button_a_pressed = True  # Set to True.
+        time.sleep(0.03)  # Debounce.
+    if not clue.button_a and button_a_pressed:  # On button release...
+        button_a_pressed = False  # Set to False.
+        time.sleep(0.03)  # Debounce.
+    if clue.button_b and not button_b_pressed:  # If button B pressed...
+        print("Button B pressed.")
+        # Toggle only the display on and off
         if displayOn == 0:
             clue.display.brightness = 0.8
             displayOn = 1
         else:
             clue.display.brightness = 0
             displayOn = 0
+        button_b_pressed = True  # Set to True.
+        time.sleep(0.03)  # Debounce.
+    if not clue.button_b and button_b_pressed:  # On button release...
+        button_b_pressed = False  # Set to False.
+        time.sleep(0.03)  # Debounce.
 
-    #assign color palette to NeoPixel section 1 based on the current reading reading
+    # assign color palette to NeoPixel section 1 based on the current reading reading
     if reading1 < min_reading:
         palette = firePalette
-    elif reading1 > min_reading and reading1 < med_reading:
+    elif min_reading > reading1 > med_reading:
         palette = sunPalette
-    elif reading1 > med_reading and reading1 < high_reading:
+    elif med_reading > reading1 > high_reading:
         palette = forestPalette
-    elif reading1 > high_reading and reading1 < max_reading:
+    elif high_reading > reading1 > max_reading:
         palette = waterPalette
     else:
         palette = icePalette
-    #Map colors to pixels. Adjust range numbers to light up specific pixels. This configuration
+    # Map colors to pixels. Adjust range numbers to light up specific pixels. This configuration
     # maps to a reflected gradient, with pixel 0 in the upper left corner
     # Load each pixel's color from the palette using an offset, run it
     # through the gamma function, pack RGB value and assign to pixel.
@@ -227,35 +217,35 @@ while True:
     timer_label.text = "{}".format(counter)
     clue.display.show(clue_display)
 
-    #Is it time to update?
+    # Is it time to update?
     if counter > timeToCheck:
-        #This moves the current data to the "1 hour old" section of pixels and the "1 hour old" data
-        #to the "2 hours old" section of pixels
+        # This moves the current data to the "1 hour old" section of pixels and the "1 hour old"
+        # data to the "2 hours old" section of pixels
         palette3 = palette2
         palette2 = palette
         reading3 = reading2
         reading2 = reading1
         reading1 = reading
-        #take a new sensor reading and reset the counter
+        # take a new sensor reading and reset the counter
         if deviceType == 0:
             reading = clue.pressure
         else:
             reading = clue.temperature
         counter = 0
-        #if reading is rising, show rising image and position text at the bottom
+        # if reading is rising, show rising image and position text at the bottom
         if reading1 > reading2:
             sinking_sprite.x = 300
             reading_label.y = 134
             reading2_label.y = 164
             reading3_label.y = 194
             timer_label.y = 224
-        #if reading is falling, show sinking image and position text at the top
-        elif reading2 < reading3:  #reading is falling
+        # if reading is falling, show sinking image and position text at the top
+        elif reading1 < reading2:  #reading is falling
             sinking_sprite.x = 0
             reading_label.y = 24
             reading2_label.y = 54
             reading3_label.y = 84
             timer_label.y = 114
-    #otherwise keep counting up
+    # otherwise keep counting up
     else:
         counter = counter + 1
