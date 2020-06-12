@@ -3,7 +3,7 @@ Read the barometric reading in the air
 Visualize air reading changes over time as a color animation on a NeoPixel strip
 Display a "sinking" or "rising" graphic on the screen along with recent reading data
 
-Code by Erin St Blaine for Adafruit Industries
+Code by Erin St Blaine for Adafruit Industries :)
 """
 import time
 import board
