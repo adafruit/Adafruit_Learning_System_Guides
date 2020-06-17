@@ -1,4 +1,4 @@
-x"""
+"""
 This example solicits that apple devices that provide notifications connect to it, initiates
 pairing, prints existing notifications and then prints any new ones as they arrive.
 """
