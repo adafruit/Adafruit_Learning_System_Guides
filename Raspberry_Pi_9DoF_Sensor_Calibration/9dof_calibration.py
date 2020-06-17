@@ -7,8 +7,10 @@ from adafruit_lis3mdl import LIS3MDL
 
 SAMPLE_SIZE = 500
 
+
 class KeyListener:
     """Object for listening for input in a separate thread"""
+
     def __init__(self):
         self._input_key = None
         self._listener_thread = None
@@ -33,7 +35,7 @@ class KeyListener:
 
     @property
     def pressed(self):
-        "Return whether enter was pressed since last checked"""
+        "Return whether enter was pressed since last checked" ""
         result = False
         if self._input_key is not None:
             self._input_key = None
@@ -42,6 +44,7 @@ class KeyListener:
 
 
 def main():
+    # pylint: disable=too-many-locals, too-many-statements
     i2c = busio.I2C(board.SCL, board.SDA)
 
     gyro_accel = LSM6DSOX(i2c)
@@ -49,10 +52,9 @@ def main():
     key_listener = KeyListener()
     key_listener.start()
 
-
-    """
-    Magnetometer Calibration
-    """
+    ############################
+    # Magnetometer Calibration #
+    ############################
 
     print("Magnetometer Calibration")
     print("Start moving the board in all directions")
@@ -112,9 +114,9 @@ def main():
         )
     )
 
-    """
-    Gyroscope Calibration
-    """
+    #########################
+    # Gyroscope Calibration #
+    #########################
 
     gyro_x, gyro_y, gyro_z = gyro_accel.gyro
     min_x = max_x = gyro_x
