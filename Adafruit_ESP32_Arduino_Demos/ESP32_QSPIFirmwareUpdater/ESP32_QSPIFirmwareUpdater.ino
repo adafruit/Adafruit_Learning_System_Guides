@@ -36,6 +36,8 @@
   #define SPIWIFI_ACK   11   // a.k.a BUSY or READY pin
   #define ESP32_GPIO0   10
   #define NEOPIXEL_PIN   8
+#endif
+
 
 #if defined(EXTERNAL_FLASH_USE_QSPI)
   Adafruit_FlashTransport_QSPI flashTransport;
@@ -45,10 +47,9 @@
 
 #else
   #error No QSPI/SPI flash are defined on your board variant.h !
-#endif  
-Adafruit_SPIFlash flash(&flashTransport);
-
 #endif
+
+Adafruit_SPIFlash flash(&flashTransport);
 
 // file system object from SdFat
 FatFileSystem fatfs;
@@ -78,7 +79,7 @@ void setup() {
   }
 
     
-  myFile = fatfs.open("/NINA_W102-1.7.0.bin", FILE_READ);
+  myFile = fatfs.open("/NINA HCI BT.bin", FILE_READ);
   if (!myFile) {
     Serial.println("Failed to open firmware file");
     while (1);
