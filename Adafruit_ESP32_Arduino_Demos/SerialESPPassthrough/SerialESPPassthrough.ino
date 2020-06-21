@@ -71,8 +71,12 @@ unsigned long baud = 115200;
   #define ESP32_RESETN   5   // Reset pin
   #define ESP32_GPIO0   -1   // Not connected
   #define NEOPIXEL_PIN   8
-#elif defined(ADAFRUIT_PYPORTAL)
+#endif
+
+#if defined(ADAFRUIT_PYPORTAL)
   #define NEOPIXEL_PIN   2
+#elif defined(ADAFRUIT_METRO_M4_AIRLIFT_LITE)
+  #define NEOPIXEL_PIN   40
 #endif
 
 Adafruit_NeoPixel pixel = Adafruit_NeoPixel(1, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
