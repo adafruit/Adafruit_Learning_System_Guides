@@ -12,7 +12,7 @@ from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text.label import Label
 from adafruit_button import Button
 import adafruit_touchscreen
-from adafruit_minimqtt import MQTT
+import adafruit_minimqtt.adafruit_minimqtt as MQTT
 
 # ------------- WiFi ------------- #
 
