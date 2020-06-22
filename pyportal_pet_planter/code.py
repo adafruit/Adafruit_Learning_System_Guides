@@ -11,7 +11,7 @@ import neopixel
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text.label import Label
 from adafruit_io.adafruit_io import IO_MQTT
-import adafruit_minimqtt as MQTT
+import adafruit_minimqtt.adafruit_minimqtt as MQTT
 from adafruit_pyportal import PyPortal
 from adafruit_seesaw.seesaw import Seesaw
 from simpleio import map_range
