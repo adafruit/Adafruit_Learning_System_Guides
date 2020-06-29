@@ -114,7 +114,7 @@ void setup(void) {
   case LSM6DS_GYRO_RANGE_2000_DPS:
     Serial.println("2000 degrees/s");
     break;
-  case ISM330DHCT_GYRO_RANGE_4000_DPS:
+  default:
     break; // unsupported range for the DSOX
   }
   // lsm6ds.setGyroDataRate(LSM6DS_RATE_12_5_HZ);
