@@ -1,5 +1,9 @@
-// Basic demo for accelerometer, gyro, and magnetometer readings from the Adafruit
-// LSM6DSOX+LIS3MDL Breakout or FeatherWing and the LSM6DSOX+LIS3MDL Breakout
+// Basic demo for accelerometer, gyro, and magnetometer readings
+// from the following Adafruit ST Sensor combo boards:
+// * LSM6DSOX + LIS3MDL FeatherWing : https://www.adafruit.com/product/4565
+// * ISM330DHCX + LIS3MDL FeatherWing https://www.adafruit.com/product/4569
+// * LSM6DSOX + LIS3MDL Breakout : https://www.adafruit.com/product/4517
+// * LSM6DS33 + LIS3MDL Breakout Lhttps://www.adafruit.com/product/4485
 
 #include <Adafruit_LSM6DSOX.h>
 Adafruit_LSM6DSOX lsm6ds;
@@ -9,8 +13,12 @@ Adafruit_LSM6DSOX lsm6ds;
 //#include <Adafruit_LSM6DS33.h>
 //Adafruit_LSM6DS33 lsm6ds;
 
-#include <Adafruit_LIS3MDL.h>
+// To use with the ISM330DHCX+LIS3MDL Feather Wing, uncomment these two lines
+// and comment out the lines referring to the LSM6DSOX above
+//#include <Adafruit_ISM330DHCX.h>
+//Adafruit_ISM330DHCX lsm6ds;
 
+#include <Adafruit_LIS3MDL.h>
 Adafruit_LIS3MDL lis3mdl;
 
 void setup(void) {
@@ -114,8 +122,9 @@ void setup(void) {
   case LSM6DS_GYRO_RANGE_2000_DPS:
     Serial.println("2000 degrees/s");
     break;
-  default:
-    break; // unsupported range for the DSOX
+  case ISM330DHCX_GYRO_RANGE_4000_DPS:
+    Serial.println("4000 degrees/s");
+    break;
   }
   // lsm6ds.setGyroDataRate(LSM6DS_RATE_12_5_HZ);
   Serial.print("Gyro data rate set to: ");
