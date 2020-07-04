@@ -29,39 +29,39 @@ class Electioncal_Graphics(displayio.Group):
         self.small_font.load_glyphs(glyphs)
         self.medium_font.load_glyphs(glyphs)
 
+        self.date_text = Label(self.small_font, max_glyphs=21)
+        self.date_text.x = 15
+        self.date_text.y = 195
+        self.date_text.color = 0xFFFFFF
+        self._text_group.append(self.date_text)
+
         self.url_text = Label(self.small_font, max_glyphs=35)
-        self.url_text.x = 10
-        self.url_text.y = 195
+        self.url_text.x = 15
+        self.url_text.y = 220
         self.url_text.color = 0xFFFFFF
         self._text_group.append(self.url_text)
         self.url_text.text = "Visit us at https://electioncal.us"
 
-        self.date_text = Label(self.small_font, max_glyphs=21)
-        self.date_text.x = 10
-        self.date_text.y = 220
-        self.date_text.color = 0xFFFFFF
-        self._text_group.append(self.date_text)
-
         self.state_text = Label(self.small_font, max_glyphs=60)
-        self.state_text.x = 10
+        self.state_text.x = 15
         self.state_text.y = 10
         self.state_text.color = 0xFFFFFF
         self._text_group.append(self.state_text)
 
         self.election_date_text = Label(self.medium_font, max_glyphs=11)
-        self.election_date_text.x = 10
+        self.election_date_text.x = 15
         self.election_date_text.y = 60
         self.election_date_text.color = 0xFFFFFF
         self._text_group.append(self.election_date_text)
 
         self.election_name_text = Label(self.small_font, max_glyphs=60)
-        self.election_name_text.x = 10
+        self.election_name_text.x = 15
         self.election_name_text.y = 95
         self.election_name_text.color = 0xFFFFFF
         self._text_group.append(self.election_name_text)
 
         self.election_name_text_line2 = Label(self.small_font, max_glyphs=60)
-        self.election_name_text_line2.x = 10
+        self.election_name_text_line2.x = 15
         self.election_name_text_line2.y = 120
         self.election_name_text_line2.color = 0xFFFFFF
         self._text_group.append(self.election_name_text_line2)
@@ -69,7 +69,7 @@ class Electioncal_Graphics(displayio.Group):
 
     def load_data(self, election_data):
         self.electioncal = json.loads(election_data)
-        self.state_text.text = self.electioncal["dates"][0]["state"] + " State, " + self.electioncal["dates"][1]["county"]
+        self.state_text.text = self.electioncal["dates"][1]["county"] + ", " + self.electioncal["dates"][0]["state"]
 
     def elections_cycle(self):
         self.update_time()
@@ -80,7 +80,7 @@ class Electioncal_Graphics(displayio.Group):
                 self.election_date_text.text = self.electioncal["dates"][i]["date"]
                 # splitting the line at around 40 chars seems ok for regular PyPortal
                 self.election_name_text_line2.text, self.election_name_text.text = self.paragrapher(self.electioncal["dates"][i]["name"], 40)
-                time.sleep(4)
+                time.sleep(30)
 
     def update_time(self):
         """Fetch the time.localtime(), parse it out and update the display text"""

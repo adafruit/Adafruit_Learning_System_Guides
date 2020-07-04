@@ -6,11 +6,6 @@ cwd = ("/"+__file__).rsplit('/', 1)[0] # the current working directory (where th
 sys.path.append(cwd)
 import electioncal_graphics  # pylint: disable=wrong-import-position
 
-# Optional, to take a screenshot to SD card
-#from adafruit_bitmapsaver import save_pixels
-#import storage
-#import busio
-
 # Get wifi details and more from a secrets.py file
 try:
     from secrets import secrets
@@ -18,10 +13,9 @@ except ImportError:
     print("WiFi secrets are kept in secrets.py, please add them there!")
     raise
 
-#STATE="puerto_rico"
-#COUNTY="aguada"
-STATE="texas"
-COUNTY="andrews"
+# Change this to your state and county, replacing spaces for underscores and in lowercase
+STATE="new_york"
+COUNTY="new_york"
 
 DATA_SOURCE = "https://electioncal.us/en/" + STATE +"/" + COUNTY + "/voter.json"
 DATA_LOCATION = []
@@ -59,11 +53,3 @@ while True:
     except RuntimeError as e:
         print("Some error ocurred, retrying! -", e)
         continue
-
-    # Optional: to take screenshot to SD card
-    #storage.remount("/", False)
-    #print('Taking Screenshot...')
-    #save_pixels('/screenshot.bmp')
-    #print('Screenshot taken')
-
-    #time.sleep(60)  # wait 60 seconds before updating anything again
