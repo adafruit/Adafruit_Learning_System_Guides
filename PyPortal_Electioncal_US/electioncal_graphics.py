@@ -21,13 +21,20 @@ class Electioncal_Graphics(displayio.Group):
 
         self._icon_sprite = None
         self._icon_file = None
-        self.set_icon(cwd+"/icons/us-sat.bmp")
+        self.set_icon(cwd+"/icons/electioncal.bmp")
 
         self.small_font = bitmap_font.load_font(small_font)
         self.medium_font = bitmap_font.load_font(medium_font)
         glyphs = b'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-,.: '
         self.small_font.load_glyphs(glyphs)
         self.medium_font.load_glyphs(glyphs)
+
+        self.url_text = Label(self.small_font, max_glyphs=35)
+        self.url_text.x = 10
+        self.url_text.y = 195
+        self.url_text.color = 0xFFFFFF
+        self._text_group.append(self.url_text)
+        self.url_text.text = "Visit us at https://electioncal.us"
 
         self.date_text = Label(self.small_font, max_glyphs=21)
         self.date_text.x = 10
@@ -41,46 +48,39 @@ class Electioncal_Graphics(displayio.Group):
         self.state_text.color = 0xFFFFFF
         self._text_group.append(self.state_text)
 
-        self.county_text = Label(self.small_font, max_glyphs=60)
-        self.county_text.x = 10
-        self.county_text.y = 35
-        self.county_text.color = 0xFFFFFF
-        self._text_group.append(self.county_text)
+        self.election_date_text = Label(self.medium_font, max_glyphs=11)
+        self.election_date_text.x = 10
+        self.election_date_text.y = 60
+        self.election_date_text.color = 0xFFFFFF
+        self._text_group.append(self.election_date_text)
 
-        self.date0_name_text = Label(self.small_font, max_glyphs=60)
-        self.date0_name_text.x = 10
-        self.date0_name_text.y = 80
-        self.date0_name_text.color = 0xFFFFFF
-        self._text_group.append(self.date0_name_text)
+        self.election_name_text = Label(self.small_font, max_glyphs=60)
+        self.election_name_text.x = 10
+        self.election_name_text.y = 95
+        self.election_name_text.color = 0xFFFFFF
+        self._text_group.append(self.election_name_text)
 
-        self.date0_date_text = Label(self.medium_font, max_glyphs=11)
-        self.date0_date_text.x = 10
-        self.date0_date_text.y = 105
-        self.date0_date_text.color = 0xFFFFFF
-        self._text_group.append(self.date0_date_text)
+        self.election_name_text_line2 = Label(self.small_font, max_glyphs=60)
+        self.election_name_text_line2.x = 10
+        self.election_name_text_line2.y = 120
+        self.election_name_text_line2.color = 0xFFFFFF
+        self._text_group.append(self.election_name_text_line2)
 
-        self.date1_name_text = Label(self.small_font, max_glyphs=60)
-        self.date1_name_text.x = 10
-        self.date1_name_text.y = 140
-        self.date1_name_text.color = 0xFFFFFF
-        self._text_group.append(self.date1_name_text)
 
-        self.date1_date_text = Label(self.medium_font, max_glyphs=11)
-        self.date1_date_text.x = 10
-        self.date1_date_text.y = 165
-        self.date1_date_text.color = 0xFFFFFF
-        self._text_group.append(self.date1_date_text)
+    def load_data(self, election_data):
+        self.electioncal = json.loads(election_data)
+        self.state_text.text = self.electioncal["dates"][0]["state"] + " State, " + self.electioncal["dates"][1]["county"]
 
-    def display_elections(self, electioncal_data, STATE, COUNTY):
-        electioncal = json.loads(electioncal_data)
-
+    def elections_cycle(self):
         self.update_time()
-        self.state_text.text = "State: " + STATE
-        self.county_text.text = "County: " + COUNTY
-        self.date0_name_text.text = electioncal["dates"][0]["name"]
-        self.date0_date_text.text = electioncal["dates"][0]["date"]
-        self.date1_name_text.text = electioncal["dates"][1]["name"]
-        self.date1_date_text.text = electioncal["dates"][1]["date"]
+        num_elections = len(self.electioncal["dates"])
+
+        for i in range(0,num_elections):
+            if self.date_text.text[10:] < self.electioncal["dates"][i]["date"]:
+                self.election_date_text.text = self.electioncal["dates"][i]["date"]
+                # splitting the line at around 40 chars seems ok for regular PyPortal
+                self.election_name_text_line2.text, self.election_name_text.text = self.paragrapher(self.electioncal["dates"][i]["name"], 40)
+                time.sleep(4)
 
     def update_time(self):
         """Fetch the time.localtime(), parse it out and update the display text"""
@@ -103,6 +103,23 @@ class Electioncal_Graphics(displayio.Group):
         time_str = time_format_str % (hour, minute)
         date_str = date_format_str % (year, month, day)
         self.date_text.text = "Today is: " + date_str
+
+    def paragrapher(self, text, cut):
+        """ Cuts a long line into two, having spaces in mind.
+        Note we return line2 first as it looks better to clear the line2
+        before printing a line1 with empty line2
+        We run from cut, backwards till we find a space.
+        """
+        if len(text) > cut:
+            for i in range(cut,0,-1):
+                if text[i] == " ":
+                    break
+            line1 = text[0:i]
+            line2 = text[i+1:80]
+        else:
+            line1 = text
+            line2 = ""
+        return line2, line1
 
     def set_icon(self, filename):
         """The background image to a bitmap file.

@@ -18,8 +18,10 @@ except ImportError:
     print("WiFi secrets are kept in secrets.py, please add them there!")
     raise
 
-STATE="hawaii"
-COUNTY="hawaii"
+#STATE="puerto_rico"
+#COUNTY="aguada"
+STATE="texas"
+COUNTY="andrews"
 
 DATA_SOURCE = "https://electioncal.us/en/" + STATE +"/" + COUNTY + "/voter.json"
 DATA_LOCATION = []
@@ -31,8 +33,8 @@ pyportal = PyPortal(url=DATA_SOURCE,
                     status_neopixel=board.NEOPIXEL,
                     default_bg=0x000000)
 
-gfx = electioncal_graphics.Electioncal_Graphics(pyportal.splash, am_pm=True)
 
+gfx = electioncal_graphics.Electioncal_Graphics(pyportal.splash, am_pm=True)
 display_refresh = None
 while True:
     # only query the online time once per hour (and on first run)
@@ -47,17 +49,21 @@ while True:
 
         try:
             value = pyportal.fetch()
-            print("Response is", value)
-            gfx.display_elections(value, STATE, COUNTY)
+            #print("Response is", value)
+            gfx.load_data(value)
         except RuntimeError as e:
             print("Some error occured, retrying! -", e)
             continue
+    try:
+        gfx.elections_cycle()
+    except RuntimeError as e:
+        print("Some error ocurred, retrying! -", e)
+        continue
 
-    gfx.update_time()
     # Optional: to take screenshot to SD card
     #storage.remount("/", False)
     #print('Taking Screenshot...')
     #save_pixels('/screenshot.bmp')
     #print('Screenshot taken')
 
-    time.sleep(60)  # wait 60 seconds before updating anything again
+    #time.sleep(60)  # wait 60 seconds before updating anything again
