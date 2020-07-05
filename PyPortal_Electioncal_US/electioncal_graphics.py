@@ -68,8 +68,12 @@ class Electioncal_Graphics(displayio.Group):
 
 
     def load_data(self, election_data):
-        self.electioncal = json.loads(election_data)
-        self.state_text.text = self.electioncal["dates"][1]["county"] + ", " + self.electioncal["dates"][0]["state"]
+        try:
+            self.electioncal = json.loads(election_data)
+            self.state_text.text = self.electioncal["dates"][1]["county"] + ", " + self.electioncal["dates"][0]["state"]
+        except ValueError:
+            print("Error loading JSON data: Please check the configuration of county and state, in code.py")
+            raise
 
     def elections_cycle(self):
         self.update_time()
