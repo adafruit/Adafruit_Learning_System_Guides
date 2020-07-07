@@ -135,7 +135,7 @@ def openchannel(channel):
             response.close()
             print("OK")
         response = None
-    except (ValueError, RuntimeError) as e:
+    except (ValueError, RuntimeError):
         print("Probably worked")
         wifi.reset()
     response = None
@@ -223,13 +223,11 @@ while True:
         x = math.floor(p[0] / 80)
         y = abs(math.floor(p[1] / 80) - 2)
         index = 3 * x + y
-        if (
-            last_index == index
-        ):  # Used to prevent the touchscreen sending incorrect results
+        # Used to prevent the touchscreen sending incorrect results
+        if last_index == index:
             if page[index]:
-                if (
-                    page[index] == switchpage
-                ):  # pylint: disable=comparison-with-callable
+                # pylint: disable=comparison-with-callable
+                if page[index] == switchpage:
                     page, page_vals = switchpage(page_vals[index])
                 else:
                     page[index](page_vals[index])
