@@ -13,8 +13,7 @@ import displayio
 import adafruit_touchscreen
 import adafruit_imageload
 
-PURPLE = 0x64337E
-
+# Set up the touchscreen
 ts = adafruit_touchscreen.Touchscreen(
     board.TOUCH_XL,
     board.TOUCH_XR,
@@ -43,40 +42,44 @@ status_light = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.2)
 
 wifi = adafruit_esp32spi_wifimanager.ESPSPI_WiFiManager(esp, secrets, status_light)
 
-keys = [
-    "Home",
-    "Rev",
-    "Fwd",
-    "Play",
-    "Select",
-    "Left",
-    "Right",
-    "Down",
-    "Up",
-    "Back",
-    "InstantReplay",
-    "Info",
-    "Backspace",
-    "Search",
-    "Enter",
-    "FindRemote",
-]
+# Set the ip of your Roku here
+ip = "192.168.1.3"
 
-# Keys that only work on smart TVs with built-in Rokus
-rokutvkeys = [
-    "VolumeDown",
-    "VolumeMute",
-    "VolumeUp",
-    "PowerOff",
-    "ChannelUp",
-    "ChannelDown",
-]
+"""
+Possible keypress key values to send the Roku
+Home
+Rev
+Fwd
+Play
+Select
+Left
+Right
+Down
+Up
+Back
+InstantReplay
+Info
+Backspace
+Search
+Enter
+FindRemote
+
+Keypress key values that only work on smart TVs with built-in Rokus
+VolumeDown
+VolumeMute
+VolumeUp
+PowerOff
+ChannelUp
+ChannelDown
+"""
 
 
 def getchannels():
+    """ Gets the channels installed on the device. Also useful because it
+        verifies that the PyPortal can see the Roku"""
     try:
         print("Getting channels. Usually takes around 10 seconds...", end="")
-        response = wifi.get("http://192.168.1.3:8060/query/apps")
+        response = wifi.get("http://{}:8060/query/apps".format(ip))
         channel_dict = {}
         for i in response.text.split("<app")[2:]:
             a = i.split("=")
@@ -94,9 +97,10 @@ def getchannels():
 
 
 def sendkey(key):
+    """ Sends a key to the Roku """
     try:
         print("Sending key: {}...".format(key), end="")
-        response = wifi.post("http://192.168.1.3:8060/keypress/{}".format(key))
+        response = wifi.post("http://{}:8060/keypress/{}".format(ip, key))
         if response:
             response.close()
             print("OK")
@@ -108,9 +112,10 @@ def sendkey(key):
 
 
 def sendletter(letter):
+    """ Sends a letter to the Roku, not used in this guide """
     try:
         print("Sending letter: {}...".format(letter), end="")
-        response = wifi.post("http://192.168.1.3:8060/keypress/lit_{}".format(letter))
+        response = wifi.post("http://{}:8060/keypress/lit_{}".format(ip, letter))
         if response:
             response.close()
             print("OK")
@@ -122,9 +127,10 @@ def sendletter(letter):
 
 
 def openchannel(channel):
+    """ Tells the Roku to open the channel with the corresponding channel id """
     try:
         print("Opening channel: {}...".format(channel), end="")
-        response = wifi.post("http://192.168.1.3:8060/launch/{}".format(channel))
+        response = wifi.post("http://{}:8060/launch/{}".format(ip, channel))
         if response:
             response.close()
             print("OK")
@@ -136,6 +142,7 @@ def openchannel(channel):
 
 
 def switchpage(tup):
+    """ Used to switch to a different page """
     p_num = tup[0]
     tile_grid = tup[1]
     new_page = pages[p_num - 1]
@@ -144,8 +151,8 @@ def switchpage(tup):
     return new_page, new_page_vals
 
 
+# Verifies the Roku and Pyportal are connected and visible
 channels = getchannels()
-
 
 my_display_group = displayio.Group(max_size=25)
 
@@ -216,9 +223,13 @@ while True:
         x = math.floor(p[0] / 80)
         y = abs(math.floor(p[1] / 80) - 2)
         index = 3 * x + y
-        if last_index == index:
+        if (
+            last_index == index
+        ):  # Used to prevent the touchscreen sending incorrect results
             if page[index]:
-                if page[index] == switchpage: # pylint: disable=comparison-with-callable
+                if (
+                    page[index] == switchpage
+                ):  # pylint: disable=comparison-with-callable
                     page, page_vals = switchpage(page_vals[index])
                 else:
                     page[index](page_vals[index])
