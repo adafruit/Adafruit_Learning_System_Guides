@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 import time
+import math
 import board
 import busio
 from digitalio import DigitalInOut
@@ -9,11 +10,9 @@ import neopixel
 from adafruit_esp32spi import adafruit_esp32spi
 from adafruit_esp32spi import adafruit_esp32spi_wifimanager
 import displayio
-import math
 import adafruit_touchscreen
 import adafruit_imageload
 
-#board.DISPLAY.rotation=0
 PURPLE = 0x64337E
 
 ts = adafruit_touchscreen.Touchscreen(
@@ -78,19 +77,20 @@ def getchannels():
     try:
         print("Getting channels. Usually takes around 10 seconds...", end="")
         response = wifi.get("http://192.168.1.3:8060/query/apps")
-        channels = {}
+        channel_dict = {}
         for i in response.text.split("<app")[2:]:
             a = i.split("=")
             chan_id = a[1].split('"')[1]
             name = a[-1].split(">")[1].split("<")[0]
-            channels[name] = chan_id
+            channel_dict[name] = chan_id
         response.close()
-        return channels
+        return channel_dict
     except (ValueError, RuntimeError) as e:
         print("Failed to get data\n", e)
         wifi.reset()
-        return
+        return None
     response = None
+    return None
 
 
 def sendkey(key):
@@ -134,13 +134,15 @@ def openchannel(channel):
         wifi.reset()
     response = None
 
+
 def switchpage(tup):
     p_num = tup[0]
     tile_grid = tup[1]
-    page = pages[p_num-1]
-    page_vals = pages_vals[p_num-1]
+    new_page = pages[p_num - 1]
+    new_page_vals = pages_vals[p_num - 1]
     my_display_group[-1] = tile_grid
-    return page, page_vals
+    return new_page, new_page_vals
+
 
 channels = getchannels()
 
@@ -163,6 +165,7 @@ image_3, palette_3 = adafruit_imageload.load(
 )
 tile_grid_3 = displayio.TileGrid(image_3, pixel_shader=palette_3)
 
+# fmt: off
 # Page 1
 page_1 = [sendkey, sendkey, sendkey,
           sendkey, sendkey, sendkey,
@@ -194,6 +197,7 @@ page_3_vals = [None, None, None,
                "Search", None, "Info",
                "Rev", "Play", "Fwd",
                (2, tile_grid_2), "Back", "Home"]
+# fmt: on
 
 pages = [page_1, page_2, page_3]
 pages_vals = [page_1_vals, page_2_vals, page_3_vals]
@@ -209,12 +213,12 @@ last_index = 0
 while True:
     p = ts.touch_point
     if p:
-        x = math.floor(p[0]/80)
-        y = abs(math.floor(p[1]/80) - 2)
-        index = 3*x + y
+        x = math.floor(p[0] / 80)
+        y = abs(math.floor(p[1] / 80) - 2)
+        index = 3 * x + y
         if last_index == index:
             if page[index]:
-                if page[index] == switchpage:
+                if page[index] == switchpage: # pylint: disable=comparison-with-callable
                     page, page_vals = switchpage(page_vals[index])
                 else:
                     page[index](page_vals[index])
