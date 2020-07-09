@@ -67,7 +67,7 @@ i2c = busio.I2C(board.SCL, board.SDA)
 mpr121 = adafruit_mpr121.MPR121(i2c)
 
 # Demo MODE LED Animations  ------------------------------------------------------
-rainbow = Rainbow(pixels, speed=0.1, period=10, name="rainbow", step=1)
+rainbow = Rainbow(pixels, speed=0, period=10, name="rainbow", step=1)
 rainbow_chase = RainbowChase(pixels, speed=0, size=5, spacing=10)
 chase = Chase(pixels, speed=0.1, color=RED, size=1, spacing=6)
 rainbow_comet = RainbowComet(pixels, speed=0.01, tail_length=60, bounce=True)
@@ -146,7 +146,7 @@ def play_bottle(bottle_id, is_octave):
     light_up(bottle_id)
     if is_octave:
         audio.play(tracks[bottle_id + 7])  # Start playing sound
-        light_up(9)
+        light_up(8)
     else:
         audio.play(tracks[bottle_id])  # Start playing sound
     pixels.show()
@@ -157,6 +157,7 @@ def check_buttons(touched):
     ''' check to see if buttons have been pressed'''
     global MODE, LAST_BUTTON
     octave = touched[11]
+    off = touched[9]
     if octave:
         light_up(8)
     for pad in range(1, 9):
@@ -165,7 +166,7 @@ def check_buttons(touched):
         if pad != LAST_BUTTON and touched[pad]:
             LAST_BUTTON = pad
             play_bottle(pad - 1, octave)
-    if touched[9]:
+    if off:
         MODE = 9
         go_dark()
     if touched[10]:
@@ -180,7 +181,7 @@ def check_buttons(touched):
 while True:
     # Idle mode: Play a Rainbow animation when nothing's being touched
     if MODE == 0:
-        pixels.brightness = 1  #rainbow mode is much brighter than the other modes, so adjust here
+        pixels.brightness = 0.3  #rainbow mode is much brighter than the other modes, so adjust here
         rainbow.animate()
         for button in buttons:
             button.update()
@@ -210,8 +211,8 @@ while True:
             else:
                 MODE = 0  # Return to idle mode
         if MODE == 9:  # MODE 9 is "off" mode, listening for a new button press to wake up.
-            for button in buttons:
-                button.update()
+#             for button in buttons:
+#                 button.update()
             for i in range(12):
                 if buttons[i].fell:
                     MODE = 1
