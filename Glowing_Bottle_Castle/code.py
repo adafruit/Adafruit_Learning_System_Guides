@@ -67,7 +67,7 @@ i2c = busio.I2C(board.SCL, board.SDA)
 mpr121 = adafruit_mpr121.MPR121(i2c)
 
 # Demo MODE LED Animations  ------------------------------------------------------
-rainbow = Rainbow(pixels, speed=0.1, period=10, name="rainbow", step=1)
+rainbow = Rainbow(pixels, speed=0, period=10, name="rainbow", step=1)
 rainbow_chase = RainbowChase(pixels, speed=0, size=5, spacing=10)
 chase = Chase(pixels, speed=0.1, color=RED, size=1, spacing=6)
 rainbow_comet = RainbowComet(pixels, speed=0.01, tail_length=60, bounce=True)
@@ -102,21 +102,22 @@ spkr_enable.value = True
 audio = AudioOut(board.SPEAKER)
 
 tracks = (
-    WaveFile(open("sounds/F1.wav", "rb")),  # 0
-    WaveFile(open("sounds/G1.wav", "rb")),  # 1
-    WaveFile(open("sounds/A1.wav", "rb")),  # 2
-    WaveFile(open("sounds/Bb1.wav", "rb")),  # 3
-    WaveFile(open("sounds/C1.wav", "rb")),  # 4
-    WaveFile(open("sounds/D2.wav", "rb")),  # 5
-    WaveFile(open("sounds/E2.wav", "rb")),  # 6
-    WaveFile(open("sounds/F2.wav", "rb")),  # 7
-    WaveFile(open("sounds/G2.wav", "rb")),  # 8
-    WaveFile(open("sounds/A2.wav", "rb")),  # 9
-    WaveFile(open("sounds/Bb2.wav", "rb")),  # 10
-    WaveFile(open("sounds/C2.wav", "rb")),  # 11
-    WaveFile(open("sounds/D3.wav", "rb")),  # 12
-    WaveFile(open("sounds/E3.wav", "rb")),  # 13
-    WaveFile(open("sounds/F3.wav", "rb")),  # 13
+    WaveFile(open("sounds/F2.wav", "rb")),  # 0
+    WaveFile(open("sounds/G2.wav", "rb")),  # 1
+    WaveFile(open("sounds/A2.wav", "rb")),  # 2
+    WaveFile(open("sounds/Bb2.wav", "rb")),  # 3
+    WaveFile(open("sounds/C2.wav", "rb")),  # 4
+    WaveFile(open("sounds/D3.wav", "rb")),  # 5
+    WaveFile(open("sounds/E3.wav", "rb")),  # 6
+    WaveFile(open("sounds/F3.wav", "rb")),  # 7
+    WaveFile(open("sounds/F1.wav", "rb")),  # 7
+    WaveFile(open("sounds/G1.wav", "rb")),  # 8
+    WaveFile(open("sounds/A1.wav", "rb")),  # 9
+    WaveFile(open("sounds/Bb1.wav", "rb")),  # 10
+    WaveFile(open("sounds/C1.wav", "rb")),  # 11
+    WaveFile(open("sounds/D2.wav", "rb")),  # 12
+    WaveFile(open("sounds/E2.wav", "rb")),  # 13
+    WaveFile(open("sounds/F2.wav", "rb")),  # 13
 )
 
 # Add or change song track names here. They will play in the order listed.
@@ -146,7 +147,7 @@ def play_bottle(bottle_id, is_octave):
     light_up(bottle_id)
     if is_octave:
         audio.play(tracks[bottle_id + 7])  # Start playing sound
-        light_up(9)
+        light_up(8)
     else:
         audio.play(tracks[bottle_id])  # Start playing sound
     pixels.show()
@@ -157,6 +158,7 @@ def check_buttons(touched):
     ''' check to see if buttons have been pressed'''
     global MODE, LAST_BUTTON
     octave = touched[11]
+    off = touched[9]
     if octave:
         light_up(8)
     for pad in range(1, 9):
@@ -165,7 +167,7 @@ def check_buttons(touched):
         if pad != LAST_BUTTON and touched[pad]:
             LAST_BUTTON = pad
             play_bottle(pad - 1, octave)
-    if touched[9]:
+    if off:
         MODE = 9
         go_dark()
     if touched[10]:
@@ -180,10 +182,12 @@ def check_buttons(touched):
 while True:
     # Idle mode: Play a Rainbow animation when nothing's being touched
     if MODE == 0:
-        pixels.brightness = 1  #rainbow mode is much brighter than the other modes, so adjust here
+        pixels.brightness = 0.3  #rainbow mode is much brighter than the other modes, so adjust here
         rainbow.animate()
         for button in buttons:
             button.update()
+        check_buttons(mpr121.touched_pins)
+        time.sleep(0.1)
         for i in range(12):
             if buttons[i].fell:
                 MODE = 1
@@ -210,8 +214,8 @@ while True:
             else:
                 MODE = 0  # Return to idle mode
         if MODE == 9:  # MODE 9 is "off" mode, listening for a new button press to wake up.
-            for button in buttons:
-                button.update()
+#             for button in buttons:
+#                 button.update()
             for i in range(12):
                 if buttons[i].fell:
                     MODE = 1
