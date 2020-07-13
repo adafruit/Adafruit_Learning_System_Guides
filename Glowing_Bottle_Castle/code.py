@@ -102,21 +102,22 @@ spkr_enable.value = True
 audio = AudioOut(board.SPEAKER)
 
 tracks = (
-    WaveFile(open("sounds/F1.wav", "rb")),  # 0
-    WaveFile(open("sounds/G1.wav", "rb")),  # 1
-    WaveFile(open("sounds/A1.wav", "rb")),  # 2
-    WaveFile(open("sounds/Bb1.wav", "rb")),  # 3
-    WaveFile(open("sounds/C1.wav", "rb")),  # 4
-    WaveFile(open("sounds/D2.wav", "rb")),  # 5
-    WaveFile(open("sounds/E2.wav", "rb")),  # 6
-    WaveFile(open("sounds/F2.wav", "rb")),  # 7
-    WaveFile(open("sounds/G2.wav", "rb")),  # 8
-    WaveFile(open("sounds/A2.wav", "rb")),  # 9
-    WaveFile(open("sounds/Bb2.wav", "rb")),  # 10
-    WaveFile(open("sounds/C2.wav", "rb")),  # 11
-    WaveFile(open("sounds/D3.wav", "rb")),  # 12
-    WaveFile(open("sounds/E3.wav", "rb")),  # 13
-    WaveFile(open("sounds/F3.wav", "rb")),  # 13
+    WaveFile(open("sounds/F2.wav", "rb")),  # 0
+    WaveFile(open("sounds/G2.wav", "rb")),  # 1
+    WaveFile(open("sounds/A2.wav", "rb")),  # 2
+    WaveFile(open("sounds/Bb2.wav", "rb")),  # 3
+    WaveFile(open("sounds/C2.wav", "rb")),  # 4
+    WaveFile(open("sounds/D3.wav", "rb")),  # 5
+    WaveFile(open("sounds/E3.wav", "rb")),  # 6
+    WaveFile(open("sounds/F3.wav", "rb")),  # 7
+    WaveFile(open("sounds/F1.wav", "rb")),  # 7
+    WaveFile(open("sounds/G1.wav", "rb")),  # 8
+    WaveFile(open("sounds/A1.wav", "rb")),  # 9
+    WaveFile(open("sounds/Bb1.wav", "rb")),  # 10
+    WaveFile(open("sounds/C1.wav", "rb")),  # 11
+    WaveFile(open("sounds/D2.wav", "rb")),  # 12
+    WaveFile(open("sounds/E2.wav", "rb")),  # 13
+    WaveFile(open("sounds/F2.wav", "rb")),  # 13
 )
 
 # Add or change song track names here. They will play in the order listed.
@@ -185,6 +186,8 @@ while True:
         rainbow.animate()
         for button in buttons:
             button.update()
+        check_buttons(mpr121.touched_pins)
+        time.sleep(0.1)
         for i in range(12):
             if buttons[i].fell:
                 MODE = 1
