@@ -2,7 +2,7 @@ import time
 import board
 import pulseio
 
-led = pulseio.PWMOut(board.D16, frequency=5000, duty_cycle=0)
+led = pulseio.PWMOut(board.D5, frequency=5000, duty_cycle=0)
 
 while True:
     for i in range(100):
