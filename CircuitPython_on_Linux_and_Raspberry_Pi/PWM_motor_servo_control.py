@@ -6,7 +6,7 @@ from adafruit_motor import servo
 # create a PWMOut object on Pin D5.
 pwm = pulseio.PWMOut(board.D5, duty_cycle=2 ** 15,  frequency=50)
 
-# Create a servo object, my_servo.
+# Create a servo object.
 servo = servo.Servo(pwm)
 
 while True:
