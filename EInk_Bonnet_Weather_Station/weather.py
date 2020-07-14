@@ -9,7 +9,6 @@ import urllib.parse
 import digitalio
 import busio
 import board
-from adafruit_epd.epd import Adafruit_EPD
 from adafruit_epd.ssd1675 import Adafruit_SSD1675
 from weather_graphics import Weather_Graphics
 
@@ -22,6 +21,9 @@ busy = digitalio.DigitalInOut(board.D17)
 # You'll need to get a token from openweathermap.org, looks like:
 # 'b6907d289e10d714a6e88b30761fae22'
 OPEN_WEATHER_TOKEN = ""
+
+# Use cityname, country code where countrycode is ISO3166 format.
+# E.g. "New York, US" or "London, GB"
 LOCATION = "Manhattan, US"
 DATA_SOURCE_URL = "http://api.openweathermap.org/data/2.5/weather"
 
