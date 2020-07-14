@@ -69,6 +69,10 @@ button.pull = digitalio.Pull.UP
 #  setup for speaker pin
 speaker = audioio.AudioOut(board.A0)
 
+#  mp3 decoder setup
+file = "/hoopBloop0.mp3"
+mp3stream = audiomp3.MP3Decoder(open(file, "rb"))
+
 #  state machines used in the loop
 score = 0
 hoops = False
@@ -99,10 +103,8 @@ while True:
             score += 2
             #  an mp3 plays
             file = "/hoopBloop{}.mp3".format(sample)
-            mp3stream = audiomp3.MP3Decoder(open(file, "rb"))
+            mp3stream.file = open(file, "rb")
             speaker.play(mp3stream)
-            #  delay for mp3, otherwise memory error
-            time.sleep(0.5)
             print("score!")
             #  resets break beam
             beam_state = False
@@ -118,9 +120,11 @@ while True:
         #  score text x pos if 2 digit score
         elif score >= 10:
             score_text.x = 16
+        elif score >= 0:
+            score_text.x = 23
         #  updates score text to show current score
         score_text.text = score
-        time.sleep(0.1)
+        time.sleep(0.01)
     #  if a game is in progress and you press the button:
     if not button.value and hoops:
         #  game stops
@@ -128,6 +132,7 @@ while True:
         button_state = False
         #  score is reset to 0
         score = 0
+        score_text.text = score
         #  display shows the start splash graphic
         display.show(start_group)
         print("end game!")
