@@ -1,7 +1,7 @@
 // please read credits at the bottom of file
 
 #include <Adafruit_Arcada.h>
-#include "GifDecoder.h"
+#include <Arcada_GifDecoder.h>
 
 /*************** Display setup */
 Adafruit_Arcada arcada;
