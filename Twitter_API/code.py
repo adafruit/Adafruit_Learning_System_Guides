@@ -14,11 +14,11 @@ All text above must be included in any redistribution.
 
 #pylint:disable=invalid-name
 import time
-import binascii
+import adafruit_binascii as binascii
 import json
 import board
 from adafruit_pyportal import PyPortal
-import adafruit_esp32spi.adafruit_esp32spi_requests as requests
+import adafruit_requests as requests
 
 username = 'codewisdom'
 
@@ -71,7 +71,7 @@ pyportal = PyPortal(url=url,
                     caption_position=(5, 210),
                     caption_color=0x808080)
 
-bearer_token = get_bearer_token()
+bearer_token = secrets['twitter_bearer_token']
 
 pyportal.set_headers({'Authorization': 'Bearer ' + bearer_token})
 
