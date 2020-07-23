@@ -1,4 +1,4 @@
-# clue-multi-rpsgame v1.18
+# clue-multi-rpsgame v1.19
 # CircuitPython massively multiplayer rock paper scissors game over Bluetooth LE
 
 # Tested with CLUE and Circuit Playground Bluefruit Alpha with TFT Gizmo
@@ -70,7 +70,7 @@ except ImportError:
     pass
 
 
-debug = 3
+debug = 1
 
 def d_print(level, *args, **kwargs):
     """A simple conditional print for debugging based on global debug level."""
@@ -173,7 +173,7 @@ else:
 blankScreen(display, pixels)
 
 # Set to True for blue flashing when devices are joining the playing group
-JG_FLASH = True  # TODO DISABLE THIS FOR THE ADAFRUIT RELEASE
+JG_FLASH = False
 
 IMAGE_DIR = "rps/images"
 AUDIO_DIR = "rps/audio"
@@ -497,7 +497,7 @@ while True:
 
         # Free up some memory by deleting any data that's no longer needed
         del allmsg_by_addr
-        gc.collect()  # TODO - try removing this
+        gc.collect()
         d_print(2, "GC after comms", gc.mem_free())
 
         sample.wait()  # Ensure end-tx has completed

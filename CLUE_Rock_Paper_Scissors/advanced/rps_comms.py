@@ -87,8 +87,13 @@ def startScan(radio, send_ad, send_advertising,
               received_ads_by_addr, blenames_by_addr,
               send_ad_rxs, acks):
     # pylint: disable=too-many-locals,too-many-branches,too-many-statements
-    """TODO - explain what this does and think about it writing the explanation
-       to ensure it all makes sense."""
+    """Send an Advertisement send_ad and then wait for up to scan_time to
+       receive receive_n Advertisement packets from other devices.
+       If receive_n is 0 then wait for the remaining scan_time.
+       The callbacks can only be called when packets are received
+       so endscan_db has limited functionality.
+       This is called repeatedly by broadcastAndReceive.
+       """
     complete = False
 
     if send_advertising:
@@ -98,9 +103,10 @@ def startScan(radio, send_ad, send_advertising,
             pass  # catch and ignore "Already advertising."
 
     # Timeout value is in seconds
-    # RSSI -100 is probably minimum, -128 would be 8bit signed min
+    # RSSI -100 is probably practical minimum, -128 would be 8bit signed min
     # window and interval are 0.1 by default - same value means
-    # continuous scanning
+    # continuous scanning although actual BLE implementations do have a
+    # brief gaps in scanning
     # The 1800 byte buffer_size is a quirky workaround for
     # MemoryError: memory allocation failed, allocating 1784 bytes
     # from CP's symbol table growing as the program executes
@@ -133,7 +139,7 @@ def startScan(radio, send_ad, send_advertising,
             adv = None
             for cls in rx_ad_classes:
                 prefix = cls.prefix
-                # TODO - this does not implement proper matching
+                # This DOES NOT IMPLEMENT PROPER MATCHING
                 # proper matching would involve parsing prefix and then matching each
                 # resulting prefix against each dict entry from decode_data()
                 # starting at 1 skips over the message length value
@@ -236,15 +242,17 @@ def broadcastAndReceive(radio,
                         endscan_cb=None
                         ):
     # pylint: disable=too-many-locals,too-many-branches,too-many-statements
-    """Send an Advertisement sendad and then wait max_time seconds to receive_n
-       receive_n Advertisements from other devices.
-       If receive_n is 0 then wait for the remaining max_time.
+    """Send an Advertisement send_ad and then wait for up to scan_time to
+       receive receive_n Advertisement packets from other devices.
+       If receive_n is 0 then wait for the remaining scan_time.
        Returns list of received Advertisements not necessarily in arrival order and
        dictionary indexed by the compressed text representation of the address with a list
        of tuples of (advertisement, bytes(advertisement)).
        This MODIFIES send_ad by setting sequence_number and ack if those
        properties are present.
        This is likely to run for a fraction of second longer than scan_time.
+       The default scan_response_request of False should reduce traffic and
+       may reduce collisions.
        The buffer_size of 1800 helps to prevent 1784 MemoryError
        from dict enlargement including the interpreter's symbol table.
        """
@@ -254,13 +262,6 @@ def broadcastAndReceive(radio,
         sequence_number = seq_tx[0]
         send_ad.sequence_number = sequence_number
         seq_tx[0] += 1
-
-    # Page 126 35.5 recommends an initial 30s of 20ms intervals
-    # https://developer.apple.com/accessories/Accessory-Design-Guidelines.pdf
-    # So this low value seems appropriate but interval=0.020 gives this
-    # _bleio.BluetoothError: Unknown soft device error: 0007
-    # 0.037 ok 0.021 ok 0.0201 ok 0.02001 ok - damn FP!!
-    ## radio.start_advertising(tx_message, interval=0.02001)
 
     # A dict to store unique Advertisement indexed by mac address
     # as text string
@@ -329,7 +330,7 @@ def broadcastAndReceive(radio,
             duration = 0.9  # 900ms
             advertising_duration += duration
 
-        # TODO kwargs for startScan
+        # Lots of arguments passed here, would be safer as keyword args
         (complete, ss_matched,
          awaiting_allrx,
          awaiting_allacks) = startScan(radio, send_ad, send_advertising,

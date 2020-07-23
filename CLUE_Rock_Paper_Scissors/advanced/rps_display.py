@@ -222,7 +222,12 @@ class RPSDisplay():
                    ch_idx,
                    game_no=None, round_no=None, rounds_tot=None,
                    won_sf=None, drew_sf=None, lost_sf=None):
-        """TODO DOC"""
+        """Show player's choice on NeoPixels or display.
+           The display also has game and round info and win/draw summary.
+           This removes all the graphical objects and re-adds them which
+           causes visible flickering during an update - this could be
+           improved by only replacing / updating what needs changing.
+        """
         if self.disp is None:
             self.pix.fill(BLACK)
             self.pix[self.choiceToPixIdx(ch_idx)] = CHOICE_COL[ch_idx]
@@ -449,15 +454,15 @@ class RPSDisplay():
 
     def showGameResultScreen(self, pla, sco, rounds_tot=None):
         # pylint: disable=unused-argument,too-many-locals,too-many-statements
-        """Display a high score table with some visual sorting."""
+        """Display a high score table with a visual bubble sort
+           slow enough to see the algorithm at work."""
         self.fadeUpDown("down")
         self.emptyGroup(self.disp_group)
 
         # Score list group + background + question mark for sorting
         gs_group = Group(max_size=4)
 
-        # TODO increase size and split this into two
-        # Add a background with centered GAME over SCORES
+        # Pale grey large GAME SCORES background
         bg_scale = 6
         sbg_dob1 = Label(self.font,
                          text="GAME",
@@ -606,6 +611,7 @@ class RPSDisplay():
         else:
             self.showGameResultScreen(pla, sco, rounds_tot=rounds_tot)
 
+        # Sound samples for exceptional scores
         if sco[0] == 0:
             self.sample.play("humiliation")
         elif sco[0] >= int((len(sco) - 1) * rounds_tot * 1.5):
@@ -637,8 +643,7 @@ class RPSDisplay():
         if void:
             error_tot = 3
             error_group = Group(max_size=error_tot + 1)
-            # TODO - this would benefit from having op_name on the screen
-            # Put three error messages to go on screen to match sound sample
+            # Opponent's name helps pinpoint the error
             op_dob = Label(self.font,
                            text=op_name,
                            scale=2,
@@ -651,6 +656,8 @@ class RPSDisplay():
             if result is not None:
                 self.sample.play(result)
             font_scale = 2
+            # Attempting to put the three pieces of "Error!" text on screen
+            # synchronised with the sound sample repeating the word
             for idx in range(error_tot):
                 error_dob = Label(self.font,
                                   text="Error!",
