@@ -782,8 +782,10 @@ class Plotter():
             self._displayio_info = Label(self._font, text=value,
                                          line_spacing=line_spacing,
                                          scale=font_scale,
-                                         background_color=self.INFO_FG_COLOR,
+                                         background_color=None,
                                          color=self.INFO_BG_COLOR)
+            self._displayio_info.palette[0] = self.INFO_FG_COLOR
+            self._displayio_info.palette.make_opaque(0)
             # centre the (left justified) text
             self._displayio_info.x = (self._screen_width
                                       - font_scale * font_w * max_word_chars) // 2
