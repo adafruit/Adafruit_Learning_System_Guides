@@ -14,8 +14,8 @@ import adafruit_touchscreen
 Coords = namedtuple("Point", "x y")
 
 # Settings
-SCREEN_WIDTH = 480
-SCREEN_HEIGHT = 320
+SCREEN_WIDTH = board.DISPLAY.width
+SCREEN_HEIGHT = board.DISPLAY.height
 BUTTON_WIDTH = int(SCREEN_WIDTH / 5) # was 60
 BUTTON_HEIGHT = int(SCREEN_WIDTH / 10) # was 30
 BUTTON_MARGIN = 8
