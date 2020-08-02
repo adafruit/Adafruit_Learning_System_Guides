@@ -3,9 +3,8 @@
 import time
 
 import board
-import busio
 
-i2c = busio.I2C(board.SCL, board.SDA)
+i2c = board.I2C()
 
 while not i2c.try_lock():
     pass
