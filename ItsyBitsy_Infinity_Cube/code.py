@@ -4,8 +4,10 @@ NeoPixel Animator code for ItsyBitsy nRF52840 NeoPixel Animation and Color Remot
 
 import board
 import neopixel
-from adafruit_led_animation.animation import Comet, Sparkle, AnimationGroup,\
-    AnimationSequence
+from adafruit_led_animation.animation.comet import Comet
+from adafruit_led_animation.animation.sparkle import Sparkle
+from adafruit_led_animation.group import AnimationGroup
+from adafruit_led_animation.sequence import AnimationSequence
 import adafruit_led_animation.color as color
 
 from adafruit_ble import BLERadio
