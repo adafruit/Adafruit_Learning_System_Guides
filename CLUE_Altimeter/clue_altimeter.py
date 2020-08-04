@@ -30,7 +30,8 @@ clue._pressure.iir_filter = 0x02  # 4
 clue._pressure.standby_period = 0x01  # 62.5 ms
 
 # restore saved sea level pressure from NVM
-clue.sea_level_pressure = struct.unpack("f", nvm[0:4])[0]
+slp = struct.unpack("f", nvm[0:4])[0]
+clue.sea_level_pressure = slp if 0 < slp < 2000 else STD_SLP
 
 # --------------------------------------------------------------------
 # D I S P L A Y    S E T U P
