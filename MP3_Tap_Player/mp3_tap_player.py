@@ -1,5 +1,5 @@
 # MP3 playback with tap trigger
-# Works on M4 and nRF52840 based boards with accelerometer or Propmaker
+# Works on Feather M4 (or other M4 based boards) with Propmaker
 import time
 import board
 import busio
