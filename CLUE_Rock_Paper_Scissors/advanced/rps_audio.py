@@ -57,7 +57,7 @@ class SampleJukebox():
             except OSError:
                 # OSError: [Errno 2] No such file/directory: 'filename.ext'
                 missing.append(filename)
-        
+
         # Raises an exception at the end to allow it to report ALL
         # of the missing files in one go to help out the user
         if missing:
