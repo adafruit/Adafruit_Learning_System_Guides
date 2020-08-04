@@ -23,6 +23,15 @@
 from audiocore import WaveFile
 
 
+class SampleJukeboxError(OSError):
+    """Exception raised for any missing audio files.
+    """
+
+    def __init__(self, files):
+        self.files = files
+        super().__init__("Missing audio files: " + ", ".join(files))
+
+
 class SampleJukebox():
     """This plays wav files and tries to control the timing of memory
        allocations within the nRF52840 PWMAudioOut library to minimise
@@ -30,26 +39,29 @@ class SampleJukebox():
 
     _file_buf = None  # Use for WaveFile objects
 
-
     def _init_wave_files(self, files, directory):
         """Open files from AUDIO_DIR and return a dict with FileIO objects
            or None if file not present."""
 
         # 2048 triggers bug in https://github.com/adafruit/circuitpython/issues/3030
         self._file_buf = bytearray(512)  # DO NOT CHANGE size til #3030 is fixed
-        error_output = None
 
+        missing = []
         fhs = {}
         for file in files:
             wav_file = None
             filename = directory + "/" + file + ".wav"
             try:
                 wav_file = open(filename, "rb")
+                fhs[file] = WaveFile(wav_file, self._file_buf)
             except OSError:
                 # OSError: [Errno 2] No such file/directory: 'filename.ext'
-                if error_output:
-                    print("ERROR: missing audio file:", filename)
-            fhs[file] = WaveFile(wav_file, self._file_buf)
+                missing.append(filename)
+        
+        # Raises an exception at the end to allow it to report ALL
+        # of the missing files in one go to help out the user
+        if missing:
+            raise SampleJukeboxError(missing)
         self._wave_files = fhs
 
 
