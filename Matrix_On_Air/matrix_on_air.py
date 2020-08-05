@@ -5,8 +5,8 @@ import time
 import board
 import displayio
 import adafruit_display_text.label
-from adafruit_display_shapes.line import Line
 from adafruit_display_shapes.rect import Rect
+from adafruit_display_shapes.polygon import Polygon
 from adafruit_bitmap_font import bitmap_font
 from adafruit_matrixportal.network import Network
 from adafruit_matrixportal.matrix import Matrix
@@ -81,28 +81,22 @@ def redraw_frame():  # to adjust spacing at bottom later
     rect6.fill = color[2]
 
 
-# draw the wings w line shapes
-wing_lines = []
+# draw the wings w polygon shapes
+wing_polys = []
 
-wing_lines.append(Line(3, 3, 10, 3, color[1]))  # x-start, y-start, x-end, y-end, color
-wing_lines.append(Line(4, 4, 10, 4, color[1]))
-wing_lines.append(Line(5, 6, 10, 6, color[1]))
-wing_lines.append(Line(6, 7, 10, 7, color[1]))
-wing_lines.append(Line(7, 9, 10, 9, color[1]))
-wing_lines.append(Line(8, 10, 10, 10, color[1]))
-wing_lines.append(Line(54, 3, 61, 3, color[1]))
-wing_lines.append(Line(54, 4, 60, 4, color[1]))
-wing_lines.append(Line(54, 6, 59, 6, color[1]))
-wing_lines.append(Line(54, 7, 58, 7, color[1]))
-wing_lines.append(Line(54, 9, 57, 9, color[1]))
-wing_lines.append(Line(54, 10, 56, 10, color[1]))
+wing_polys.append(Polygon([(3, 3), (9, 3), (9, 4), (4, 4)], outline=color[1]))
+wing_polys.append(Polygon([(5, 6), (9, 6), (9, 7), (6, 7)], outline=color[1]))
+wing_polys.append(Polygon([(7, 9), (9, 9), (9, 10), (8, 10)], outline=color[1]))
+wing_polys.append(Polygon([(54, 3), (60, 3), (59, 4), (54, 4)], outline=color[1]))
+wing_polys.append(Polygon([(54, 6), (58, 6), (57, 7), (54, 7)], outline=color[1]))
+wing_polys.append(Polygon([(54, 9), (56, 9), (55, 10), (54, 10)], outline=color[1]))
 
-for wing_line in wing_lines:
-    group.append(wing_line)
+for wing_poly in wing_polys:
+    group.append(wing_poly)
 
 
 def redraw_wings(index):  # to change colors
-    for wing in wing_lines:
+    for wing in wing_polys:
         wing.outline = color[index]
 
 
