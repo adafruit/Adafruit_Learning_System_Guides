@@ -82,33 +82,20 @@ def redraw_frame():  # to adjust spacing at bottom later
 
 
 # draw the wings w line shapes
-wing1 = Line(3, 3, 10, 3, color[1])  # x-start, y-start, x-end, y-end, color
-wing2 = Line(4, 4, 10, 4, color[1])
-wing3 = Line(5, 6, 10, 6, color[1])
-wing4 = Line(6, 7, 10, 7, color[1])
-wing5 = Line(7, 9, 10, 9, color[1])
-wing6 = Line(8, 10, 10, 10, color[1])
-wing7 = Line(54, 3, 61, 3, color[1])
-wing8 = Line(54, 4, 60, 4, color[1])
-wing9 = Line(54, 6, 59, 6, color[1])
-wing10 = Line(54, 7, 58, 7, color[1])
-wing11 = Line(54, 9, 57, 9, color[1])
-wing12 = Line(54, 10, 56, 10, color[1])
+wing_lines = []
 
-wing_lines = [
-    wing1,
-    wing2,
-    wing3,
-    wing4,
-    wing5,
-    wing6,
-    wing7,
-    wing8,
-    wing9,
-    wing10,
-    wing11,
-    wing12,
-]
+wing_lines.append(Line(3, 3, 10, 3, color[1]))  # x-start, y-start, x-end, y-end, color
+wing_lines.append(Line(4, 4, 10, 4, color[1]))
+wing_lines.append(Line(5, 6, 10, 6, color[1]))
+wing_lines.append(Line(6, 7, 10, 7, color[1]))
+wing_lines.append(Line(7, 9, 10, 9, color[1]))
+wing_lines.append(Line(8, 10, 10, 10, color[1]))
+wing_lines.append(Line(54, 3, 61, 3, color[1]))
+wing_lines.append(Line(54, 4, 60, 4, color[1]))
+wing_lines.append(Line(54, 6, 59, 6, color[1]))
+wing_lines.append(Line(54, 7, 58, 7, color[1]))
+wing_lines.append(Line(54, 9, 57, 9, color[1]))
+wing_lines.append(Line(54, 10, 56, 10, color[1]))
 
 for wing_line in wing_lines:
     group.append(wing_line)
