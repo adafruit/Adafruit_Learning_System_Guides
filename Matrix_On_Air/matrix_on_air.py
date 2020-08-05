@@ -63,8 +63,8 @@ group.append(tile_grid)
 # draw the frame for startup
 rect1 = Rect(0, 0, 2, 32, fill=color[2])
 rect2 = Rect(62, 0, 2, 32, fill=color[2])
-rect3 = Rect(2, 0, 9, 2, fill=color[2])
-rect4 = Rect(53, 0, 9, 2, fill=color[2])
+rect3 = Rect(2, 0, 9, 2, fill=color[0])
+rect4 = Rect(53, 0, 9, 2, fill=color[0])
 rect5 = Rect(2, 30, 12, 2, fill=color[0])
 rect6 = Rect(50, 30, 12, 2, fill=color[0])
 
@@ -77,6 +77,8 @@ group.append(rect6)
 
 
 def redraw_frame():  # to adjust spacing at bottom later
+    rect3.fill = color[2]
+    rect4.fill = color[2]
     rect5.fill = color[2]
     rect6.fill = color[2]
 
