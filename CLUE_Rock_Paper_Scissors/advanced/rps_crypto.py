@@ -39,14 +39,12 @@ def bytesPad(text, size=8, pad=0):
 
 def strUnpad(text_as_bytes, pad=0):
     """Convert a bytes or bytearray
-       to a str removing trailing characters matching pad."""
+       to a str removing trailing bytes matching int pad."""
+    text_b = bytes(text_as_bytes)  # bytes type has the useful methods
     if pad is not None:
-        end_ex = len(text_as_bytes)
-        while end_ex > 0 and text_as_bytes[end_ex - 1] == pad:
-            end_ex -= 1
+        text_b = text_b.rstrip(bytes([pad]))
 
-    # bytearray does not have decode method so need to convert here
-    return bytes(text_as_bytes[0:end_ex]).decode("utf-8")
+    return text_b.decode("utf-8")
 
 
 def enlargeKey(small_key, mult):
