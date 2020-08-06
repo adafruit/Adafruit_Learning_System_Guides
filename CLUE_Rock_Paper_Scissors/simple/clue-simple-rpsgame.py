@@ -1,4 +1,4 @@
-# clue-simple-rpsgame v1.1
+# clue-simple-rpsgame v1.2
 # CircuitPython rock paper scissors game over Bluetooth LE
 
 # Tested with CLUE and Circuit Playground Bluefruit Alpha with TFT Gizmo
@@ -233,16 +233,19 @@ class RpsAdvertisement(Advertisement):
 
     flags = None
 
-    _PREFIX_FMT = "<B" "BHBH"
+    _PREFIX_FMT = "<BHBH"
     _DATA_FMT = "8s"  # this NUL pads if necessary
 
-    prefix = struct.pack(
-        _PREFIX_FMT,
-        struct.calcsize(_PREFIX_FMT) - 1,
-        MANUFACTURING_DATA_ADT,
-        ADAFRUIT_COMPANY_ID,
-        struct.calcsize("<H" + _DATA_FMT),
-        RPS_DATA_ID
+    # match_prefixes tuple replaces deprecated prefix
+    # comma for 1 element is very important!
+    match_prefixes = (
+        struct.pack(
+            _PREFIX_FMT,
+            MANUFACTURING_DATA_ADT,
+            ADAFRUIT_COMPANY_ID,
+            struct.calcsize("<H" + _DATA_FMT),
+            RPS_DATA_ID
+        ),
     )
     manufacturer_data = LazyObjectField(
         ManufacturerData,

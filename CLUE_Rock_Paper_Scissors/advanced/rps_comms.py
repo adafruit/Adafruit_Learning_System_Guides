@@ -133,10 +133,10 @@ def startScan(radio, send_ad, send_advertising,
         # If using application Advertisement type matching then
         # check the Advertisement's prefix and continue for loop if it
         # does not match
+        adv = None
+        d_print(5, "RXed RTA", match_locally, addr_text, repr(adv_ss))
         if match_locally:
-            d_print(5, "RXed RTA", addr_text, repr(adv_ss))
             adv_ss_as_bytes = adafruit_ble.advertising.standard.encode_data(adv_ss.data_dict)
-            adv = None
             for cls in rx_ad_classes:
                 prefix = cls.prefix
                 # This DOES NOT IMPLEMENT PROPER MATCHING
@@ -151,15 +151,17 @@ def startScan(radio, send_ad, send_advertising,
                     d_print(4, "RXed mm RTA", addr_text, adv)
                     break
 
-            if adv is None:
-                if endscan_cb is not None and endscan_cb(addr_text, adv_ss.address, adv_ss):
-                    complete = True
-                    break
-                else:
-                    continue
         else:
-            adv = adv_ss
-            d_print(4, "RXed RTA", addr_text, adv)
+            if any(isinstance(adv_ss, cls) for cls in rx_ad_classes):
+                adv = adv_ss
+
+        # Continue loop after an endscan callback if ad is not of interest
+        if adv is None:  # this means adv was not in rx_ad_classes
+            if endscan_cb is not None and endscan_cb(addr_text, adv_ss.address, adv_ss):
+                complete = True
+                break
+            else:
+                continue
 
         # Must be a match if this is reached
         matching_ads += 1
@@ -233,7 +235,7 @@ def broadcastAndReceive(radio,
                         minimum_rssi=-90,
                         receive_n=0,
                         seq_tx=None,
-                        match_locally=True,
+                        match_locally=False,
                         scan_response_request=False,
                         ad_cb=None,
                         ads_by_addr={},
@@ -274,6 +276,8 @@ def broadcastAndReceive(radio,
 
     if match_locally:
         ss_rx_ad_classes = (Advertisement,)
+    elif scan_response_request:
+        ss_rx_ad_classes = rx_ad_classes + (Advertisement,)
     else:
         ss_rx_ad_classes = rx_ad_classes
 

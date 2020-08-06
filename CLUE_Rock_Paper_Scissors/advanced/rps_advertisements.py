@@ -63,16 +63,19 @@ class RpsEncDataAdvertisement(Advertisement):
        """
     flags = None
 
-    _PREFIX_FMT = "<B" "BHBH"
+    _PREFIX_FMT = "<BHBH"
     _DATA_FMT_ENC_DATA = "8s"
 
-    prefix = struct.pack(
-        _PREFIX_FMT,
-        struct.calcsize(_PREFIX_FMT) - 1,
-        MANUFACTURING_DATA_ADT,
-        ADAFRUIT_COMPANY_ID,
-        struct.calcsize("<H" + _DATA_FMT_ENC_DATA),
-        RPS_ENC_DATA_ID
+    # match_prefixes tuple replaces deprecated prefix
+    # comma for 1 element is very important!
+    match_prefixes = (
+        struct.pack(
+            _PREFIX_FMT,
+            MANUFACTURING_DATA_ADT,
+            ADAFRUIT_COMPANY_ID,
+            struct.calcsize("<H" + _DATA_FMT_ENC_DATA),
+            RPS_ENC_DATA_ID
+        ),
     )
     manufacturer_data = LazyObjectField(
         ManufacturerData,
@@ -111,20 +114,19 @@ class RpsKeyDataAdvertisement(Advertisement):
        """
     flags = None
 
-    _PREFIX_FMT = "<B" "BHBH"
+    _PREFIX_FMT = "<BHBH"
     _DATA_FMT_KEY_DATA = "8s"
 
-    # prefix appears to be used to determine whether an incoming
-    # packet matches this class
-    # The second struct.calcsize needs to include the _DATA_FMT for some
-    # reason I either don't know or can't remember
-    prefix = struct.pack(
-        _PREFIX_FMT,
-        struct.calcsize(_PREFIX_FMT) - 1,
-        MANUFACTURING_DATA_ADT,
-        ADAFRUIT_COMPANY_ID,
-        struct.calcsize("<H" + _DATA_FMT_KEY_DATA),
-        RPS_KEY_DATA_ID
+    # match_prefixes tuple replaces deprecated prefix
+    # comma for 1 element is very important!
+    match_prefixes = (
+        struct.pack(
+            _PREFIX_FMT,
+            MANUFACTURING_DATA_ADT,
+            ADAFRUIT_COMPANY_ID,
+            struct.calcsize("<H" + _DATA_FMT_KEY_DATA),
+            RPS_KEY_DATA_ID
+        ),
     )
     manufacturer_data = LazyObjectField(
         ManufacturerData,
@@ -164,15 +166,18 @@ class RpsRoundEndAdvertisement(Advertisement):
        """
     flags = None
 
-    _PREFIX_FMT = "<B" "BHBH"
+    _PREFIX_FMT = "<BHBH"
 
-    prefix = struct.pack(
-        _PREFIX_FMT,
-        struct.calcsize(_PREFIX_FMT) - 1,
-        MANUFACTURING_DATA_ADT,
-        ADAFRUIT_COMPANY_ID,
-        struct.calcsize("<H" + _DATA_FMT_ROUND),
-        RPS_ROUND_ID
+    # match_prefixes tuple replaces deprecated prefix
+    # comma for 1 element is very important!
+    match_prefixes = (
+        struct.pack(
+            _PREFIX_FMT,
+            MANUFACTURING_DATA_ADT,
+            ADAFRUIT_COMPANY_ID,
+            struct.calcsize("<H" + _DATA_FMT_ROUND),
+            RPS_ROUND_ID
+        ),
     )
     manufacturer_data = LazyObjectField(
         ManufacturerData,
@@ -207,18 +212,19 @@ class JoinGameAdvertisement(Advertisement):
        """
     flags = None
 
-    _PREFIX_FMT = "<B" "BHBH"
+    _PREFIX_FMT = "<BHBH"
     _DATA_FMT = "8s"  # this NUL pads for 8s if necessary
 
-    prefix = struct.pack(
-        _PREFIX_FMT,
-        struct.calcsize(_PREFIX_FMT) - 1,
-        MANUFACTURING_DATA_ADT,
-        ADAFRUIT_COMPANY_ID,
-        ##struct.calcsize("<H" + _SEQ_FMT + _DATA_FMT),
-        struct.calcsize("<H" + _DATA_FMT),
-        ##struct.calcsize("<H"),
-        GM_JOIN_ID
+    # match_prefixes tuple replaces deprecated prefix
+    # comma for 1 element is very important!
+    match_prefixes = (
+        struct.pack(
+            _PREFIX_FMT,
+            MANUFACTURING_DATA_ADT,
+            ADAFRUIT_COMPANY_ID,
+            struct.calcsize("<H" + _DATA_FMT),
+            GM_JOIN_ID
+        ),
     )
     manufacturer_data = LazyObjectField(
         ManufacturerData,
