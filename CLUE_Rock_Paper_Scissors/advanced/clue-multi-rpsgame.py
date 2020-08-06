@@ -178,23 +178,23 @@ JG_FLASH = False
 IMAGE_DIR = "rps/images"
 AUDIO_DIR = "rps/audio"
 
-files = (("searching", "welcome-to", "arena", "ready")
-         + ("rock", "paper", "scissors")
-         + ("start-tx", "end-tx", "txing")
-         + ("rock-scissors", "paper-rock", "scissors-paper")
-         + ("you-win", "draw", "you-lose", "error")
-         + ("humiliation", "excellent"))
+audio_files = (("searching", "welcome-to", "arena", "ready")
+               + ("rock", "paper", "scissors")
+               + ("start-tx", "end-tx", "txing")
+               + ("rock-scissors", "paper-rock", "scissors-paper")
+               + ("you-win", "draw", "you-lose", "error")
+               + ("humiliation", "excellent"))
 
 gc.collect()
 d_print(2, "GC before SJ", gc.mem_free())
-sample = SampleJukebox(audio_out, files,
-                       directory=AUDIO_DIR, error_output=True)
-del files  # not needed anymore
+sample = SampleJukebox(audio_out, audio_files,
+                       directory=AUDIO_DIR)
+del audio_files  # not needed anymore
 gc.collect()
 d_print(2, "GC after SJ", gc.mem_free())
 
-# A lookup table in Dict form for win/lose
-# does not need to cater for draw condition
+# A lookup table in Dict form for win/lose, each value is a sample name
+# Does not need to cater for draw (tie) condition
 WAV_VICTORY_NAME = { "rp": "paper-rock",
                      "pr": "paper-rock",
                      "ps": "scissors-paper",
