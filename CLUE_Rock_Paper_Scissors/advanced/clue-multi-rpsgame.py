@@ -33,6 +33,7 @@ import gc
 import os
 import random
 
+from micropython import const
 import board
 import digitalio
 
@@ -244,38 +245,34 @@ KEY_SIZE = 8  # in bytes
 KEY_ENLARGE = 256 // KEY_SIZE // 8
 
 
+WIN = const(1)
+DRAW = const(2)  # AKA tie
+LOSE = const(3)
+INVALID = const(4)
+
 def evaluateRound(mine, yours):
-    """Determine who won the game based on the two strings mine and yours.
-       Returns three booleans (win, draw, void)."""
-    # Return with void at True if any input is None
+    """Determine who won the round in this game based on the two strings mine and yours.
+       Returns WIN, DRAW, LOSE or INVALID for bad input."""
+    # Return INVALID if any input is None
     try:
         mine_lc = mine.lower()
         yours_lc = yours.lower()
     except AttributeError:
-        return (False, False, True)
+        return INVALID
 
-    r_win = r_draw = r_void = False
+    if mine_lc not in CHOICES or yours_lc not in CHOICES:
+        return INVALID
+
+    # Both inputs are valid choices if we got this far
     # pylint: disable=too-many-boolean-expressions
-    if (mine_lc == "rock" and yours_lc == "rock"
-            or mine_lc == "paper" and yours_lc == "paper"
-            or mine_lc == "scissors" and yours_lc == "scissors"):
-        r_draw = True
-    elif (mine_lc == "rock" and yours_lc == "paper"):
-        pass  # r_win default is False
-    elif (mine_lc == "rock" and yours_lc == "scissors"):
-        r_win = True
-    elif (mine_lc == "paper" and yours_lc == "rock"):
-        r_win = True
-    elif (mine_lc == "paper" and yours_lc == "scissors"):
-        pass  # r_win default is False
-    elif (mine_lc == "scissors" and yours_lc == "rock"):
-        pass  # r_win default is False
-    elif (mine_lc == "scissors" and yours_lc == "paper"):
-        r_win = True
-    else:
-        r_void = True
+    if mine_lc == yours_lc:
+        return DRAW
+    elif (mine_lc == "rock" and yours_lc == "scissors"
+          or mine_lc == "paper" and yours_lc == "rock"
+          or mine_lc == "scissors" and yours_lc == "paper"):
+        return WIN
 
-    return (r_win, r_draw, r_void)
+    return LOSE
 
 
 rps_display.playerListScreen()
@@ -508,12 +505,13 @@ while True:
         for p_idx0, (p0_name, _) in enumerate(players[:len(players) - 1]):
             for p_idx1, (p1_name, _) in enumerate(players[p_idx0 + 1:], p_idx0 + 1):
                 # evaluateRound takes text strings for RPS
-                (win, draw, void) = evaluateRound(player_choices[p_idx0],
-                                                  player_choices[p_idx1])
+                result = evaluateRound(player_choices[p_idx0],
+                                       player_choices[p_idx1])
 
                 # this_player is used to control incrementing the summary
                 # for the tally for this local player
                 this_player = 0
+                void = False
                 if p_idx0 == 0:
                     this_player = 1
                     p0_ch_idx = None
@@ -529,15 +527,17 @@ while True:
                     # showPlayerVPlayer takes int index values for RPS
                     rps_display.showPlayerVPlayer(p0_name, p1_name, p_idx1,
                                                   p0_ch_idx, p1_ch_idx,
-                                                  win, draw, void)
+                                                  result == WIN,
+                                                  result == DRAW,
+                                                  result == INVALID or void)
 
-                if void:
+                if result == INVALID or void:
                     voids += this_player
-                elif draw:
+                elif result == DRAW:
                     draws += this_player
                     scores[p_idx0] += 1
                     scores[p_idx1] += 1
-                elif win:
+                elif result == WIN:
                     wins += this_player
                     scores[p_idx0] += 2
                 else:
@@ -547,7 +547,7 @@ while True:
                 d_print(2,
                         p0_name, player_choices[p_idx0], "vs",
                         p1_name, player_choices[p_idx1],
-                        "win", win, "draw", draw, "void", void)
+                        "result", result)
 
         print("Game {:d}, round {:d}, wins {:d}, losses {:d}, draws {:d}, "
               "void {:d}".format(game_no, round_no, wins, losses, draws, voids))
