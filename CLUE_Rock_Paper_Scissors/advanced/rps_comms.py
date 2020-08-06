@@ -288,10 +288,10 @@ def broadcastAndReceive(radio,
             send_ad_rxs[addr_text] = True
 
         # Pick out any Advertisements with an ack field with a value
-        acks_thisaddr = list(filter(lambda adnb: hasattr(adnb[0], "ack")
-                                    and isinstance(adnb[0].ack, int),
-                                    adsnb_per_addr))
-        # list() must have been run on acks_thisaddr to expand iterator
+        acks_thisaddr = [adnb for adnb in adsnb_per_addr
+                         if hasattr(adnb[0], "ack")
+                         and isinstance(adnb[0].ack, int)]
+
         if acks_thisaddr:
             seqs = [adnb[0].ack for adnb in acks_thisaddr]
             acks[addr_text] = seqs
