@@ -707,13 +707,19 @@ class RPSDisplay():
 
                 pvp_group.append(s_group)
 
-            # max_glyphs is set to the maximum len of all the possible strings
-            # the + 1 is workaround in case a buggy version of library is used
+            if draw:
+                sum_text = "Draw"
+            elif win:
+                sum_text = "You win"
+            else:
+                sum_text = "You lose"
+            # Text starts invisible (BLACK) and color is later changed
             summary_dob = Label(self.font,
-                                text="",
-                                max_glyphs=8 + 1,
+                                text=sum_text,
                                 scale=3,
                                 color=BLACK)
+            summary_dob.x = round((self.width
+                                   - 3 * self.font_width * len(sum_text)) / 2)
             summary_dob.y = round(self.height - (3 * self.font_height / 2))
             pvp_group.append(summary_dob)
 
@@ -742,15 +748,6 @@ class RPSDisplay():
 
             if summary is not None:
                 self.sample.play(summary)
-            # max length of sum_text must be set in max_glyphs in summary_dob
-            if draw:
-                sum_text = "Draw"
-            elif win:
-                sum_text = "You win"
-            else:
-                sum_text = "You lose"
-            summary_dob.text = sum_text
-            summary_dob.x = round((self.width - 3 * self.font_width * len(sum_text)) // 2)
 
             # Flash colours for win, fad up to blue for rest
             if not draw and win:
