@@ -68,7 +68,7 @@ try:
         if ble_name is None:
             print("INFO: No rps_name or ble_name entry found in secrets dict")
 except ImportError:
-    pass
+    pass   # File is optional, reaching here is not a program error
 
 
 debug = 1
@@ -232,10 +232,7 @@ if ble_name is not None:
 
 game_no = 1
 round_no = 1
-wins = 0
-losses = 0
-draws = 0
-voids = 0
+wins = losses = draws = voids = 0
 
 # TOTAL_ROUNDS = 5
 TOTAL_ROUNDS = 3
@@ -244,6 +241,9 @@ CRYPTO_ALGO = "chacha20"
 KEY_SIZE = 8  # in bytes
 KEY_ENLARGE = 256 // KEY_SIZE // 8
 
+# Scoring values
+POINTS_WIN = 2
+POINTS_DRAW = 1
 
 WIN = const(1)
 DRAW = const(2)  # AKA tie
@@ -350,10 +350,7 @@ while True:
 
         # Reset variables for another game
         round_no = 1
-        wins = 0
-        losses = 0
-        draws = 0
-        voids = 0
+        wins = losses = draws = voids = 0
         scores = [0] * len(players)
         game_no += 1
 
@@ -535,14 +532,14 @@ while True:
                     voids += this_player
                 elif result == DRAW:
                     draws += this_player
-                    scores[p_idx0] += 1
-                    scores[p_idx1] += 1
+                    scores[p_idx0] += POINTS_DRAW
+                    scores[p_idx1] += POINTS_DRAW
                 elif result == WIN:
                     wins += this_player
-                    scores[p_idx0] += 2
+                    scores[p_idx0] += POINTS_WIN
                 else:
                     losses += this_player
-                    scores[p_idx1] += 2
+                    scores[p_idx1] += POINTS_WIN
 
                 d_print(2,
                         p0_name, player_choices[p_idx0], "vs",
