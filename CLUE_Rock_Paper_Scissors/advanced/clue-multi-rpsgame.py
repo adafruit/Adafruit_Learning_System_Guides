@@ -308,11 +308,12 @@ jg_msg = JoinGameAdvertisement(game="RPS")
                                 scan_time=JG_MSG_TIME_S,
                                 scan_response_request=True,
                                 ad_cb=((lambda _a, _b, _c:
-                                        rps_display.flashBLE()) if JG_FLASH
+                                        rps_display.flashBLE())
+                                       if JG_FLASH
                                        else None),
                                 endscan_cb=lambda _a, _b, _c: button_left(),
                                 name_cb=addPlayer)
-_ = None  # Clear to allow GC
+del _  # To clean-up with GC below
 sample.stop()
 gc.collect()
 d_print(2, "GC after JG", gc.mem_free())
@@ -441,8 +442,8 @@ while True:
                                                receive_n=num_other_players,
                                                seq_tx=seq_tx,
                                                ads_by_addr=key_data_by_addr)
-        del key_data_by_addr
-        _ = None  # Allow old value of _ to be GC'd, del does not work on _
+        del key_data_by_addr, _  # To allow GC
+
         # This will have accumulated all the messages for this round
         allmsg_by_addr = re_by_addr
         del re_by_addr
