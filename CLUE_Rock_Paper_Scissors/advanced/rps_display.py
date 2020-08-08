@@ -375,7 +375,7 @@ class RPSDisplay():
                 right_dob.x = x_pos
                 time.sleep(0.06)
 
-            time.sleep(8)  # leave on screen for further 6 seconds
+            time.sleep(8)  # leave on screen for further 8 seconds
 
 
     def playerListScreen(self):
@@ -516,7 +516,7 @@ class RPSDisplay():
         sort_scores = list(sco)  # Make an independent local copy
         if not descending:
             empty_group = Group()  # minor hack to aid swaps in scores_group
-            step = 4
+            step = 3
             qm_dob = Label(self.font,
                            text="?",
                            scale=2,
@@ -545,7 +545,7 @@ class RPSDisplay():
                         for offset in offsets:
                             scores_group[idx].y = above_y + offset
                             scores_group[idx + 1].y = below_y - offset
-                            time.sleep(0.040)
+                            time.sleep(0.050)
 
                         # swap the scores around
                         sort_scores[idx] = sort_scores[idx + 1]
