@@ -27,9 +27,10 @@ unsigned long baud = 115200;
   defined(ADAFRUIT_FEATHER_M0_EXPRESS) || \
   defined(ARDUINO_AVR_FEATHER32U4) || \
   defined(ARDUINO_NRF52840_FEATHER) || \
-  defined(ADAFRUIT_ITSYBITSY_M0_EXPRESS) || \
+  defined(ADAFRUIT_ITSYBITSY_M0) || \
   defined(ADAFRUIT_ITSYBITSY_M4_EXPRESS) || \
-  defined(ARDUINO_AVR_ITSYBITSY32U4_3V)
+  defined(ARDUINO_AVR_ITSYBITSY32U4_3V) || \
+  defined(ARDUINO_NRF52_ITSYBITSY)
   // Configure the pins used for the ESP32 connection
   #define SerialESP32   Serial1
   #define SPIWIFI       SPI  // The SPI port
