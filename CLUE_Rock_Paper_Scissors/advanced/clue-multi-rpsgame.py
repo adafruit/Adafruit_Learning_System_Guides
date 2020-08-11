@@ -1,4 +1,4 @@
-# clue-multi-rpsgame v1.19
+# clue-multi-rpsgame v1.20
 # CircuitPython massively multiplayer rock paper scissors game over Bluetooth LE
 
 # Tested with CLUE and Circuit Playground Bluefruit Alpha with TFT Gizmo
@@ -138,16 +138,15 @@ if clue_less:
     _button_b = digitalio.DigitalInOut(board.BUTTON_B)
     _button_b.switch_to_input(pull=digitalio.Pull.DOWN)
     if display is None:
-        button_left = lambda: _button_a.value
-        button_right = lambda: _button_b.value
-        ##button_left = lambda: cp.button_a
-        ##button_right = lambda: cp.button_b
-
+        def button_left():
+            return _button_a.value
+        def button_right():
+            return _button_b.value
     else:
-        button_left = lambda: _button_b.value
-        button_right = lambda: _button_a.value
-        ##button_left = lambda: cp.button_b
-        ##button_right = lambda: cp.button_a
+        def button_left():
+            return _button_b.value
+        def button_right():
+            return _button_a.value
 
 else:
     # CLUE with builtin screen (240x240)
@@ -166,10 +165,11 @@ else:
     _button_a.switch_to_input(pull=digitalio.Pull.UP)
     _button_b = digitalio.DigitalInOut(board.BUTTON_B)
     _button_b.switch_to_input(pull=digitalio.Pull.UP)
-    button_left = lambda: not _button_a.value
-    button_right = lambda: not _button_b.value
-    ##button_left = lambda: clue.button_a
-    ##button_right = lambda: clue.button_b
+    def button_left():
+        return not _button_a.value
+    def  button_right():
+        return not _button_b.value
+
 
 blankScreen(display, pixels)
 
@@ -296,6 +296,20 @@ my_name = ble.name
 rps_display.fadeUpDown("down")
 addPlayer(my_name, addrToText(ble.address_bytes), None, None)
 
+
+# These two functions mainly serve to adapt the call back arguments
+# to the called functions which do not use them
+def jgAdCallbackFlashBLE(_a, _b, _c):
+    """Used in broadcastAndReceive to flash the NeoPixels
+       when advertising messages are received."""
+    return rps_display.flashBLE()
+
+def jgEndscanCallback(_a, _b, _c):
+    """Used in broadcastAndReceive to allow early termination of the scanning
+       when the left button is pressed.
+       Button may need to be held down for a second."""
+    return button_left()
+
 # Join Game
 gc.collect()
 d_print(2, "GC before JG", gc.mem_free())
@@ -307,11 +321,10 @@ jg_msg = JoinGameAdvertisement(game="RPS")
                                 jg_msg,
                                 scan_time=JG_MSG_TIME_S,
                                 scan_response_request=True,
-                                ad_cb=((lambda _a, _b, _c:
-                                        rps_display.flashBLE())
+                                ad_cb=(jgAdCallbackFlashBLE
                                        if JG_FLASH
                                        else None),
-                                endscan_cb=lambda _a, _b, _c: button_left(),
+                                endscan_cb=jgEndscanCallback,
                                 name_cb=addPlayer)
 del _  # To clean-up with GC below
 sample.stop()

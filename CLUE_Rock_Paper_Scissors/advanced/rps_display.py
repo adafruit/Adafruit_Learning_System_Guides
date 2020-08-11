@@ -578,8 +578,14 @@ class RPSDisplay():
            gradually lighting up pixels in a circle using rainbow
            colours for each revolution of the NeoPixels starting at orange.
            """
+        def selectSecondElem(seq):
+            """Used in a sort() method to sort my second element in a list."""
+            return seq[1]
+
+        # Sort the scores into highest first order
         idx_n_score = [(s, sco[s]) for s in range(len(sco))]
-        idx_n_score.sort(key=lambda s: s[1], reverse=True)
+        idx_n_score.sort(key=selectSecondElem, reverse=True)
+        ##idx_n_score.sort(key=lambda s: s[1], reverse=True)
 
         bg_col = BLACK
         for idx, score in idx_n_score:

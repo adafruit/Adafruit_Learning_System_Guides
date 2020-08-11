@@ -1,4 +1,4 @@
-# clue-simple-rpsgame v1.2
+# clue-simple-rpsgame v1.3
 # CircuitPython rock paper scissors game over Bluetooth LE
 
 # Tested with CLUE and Circuit Playground Bluefruit Alpha with TFT Gizmo
@@ -96,11 +96,15 @@ if clue_less:
     _button_b = digitalio.DigitalInOut(board.BUTTON_B)
     _button_b.switch_to_input(pull=digitalio.Pull.DOWN)
     if display is None:
-        button_left = lambda: _button_a.value
-        button_right = lambda: _button_b.value
+        def button_left():
+            return _button_a.value
+        def button_right():
+            return _button_b.value
     else:
-        button_left = lambda: _button_b.value
-        button_right = lambda: _button_a.value
+        def button_left():
+            return _button_b.value
+        def button_right():
+            return _button_a.value
 
 else:
     # CLUE with builtin screen (240x240)
@@ -113,8 +117,10 @@ else:
     _button_a.switch_to_input(pull=digitalio.Pull.UP)
     _button_b = digitalio.DigitalInOut(board.BUTTON_B)
     _button_b.switch_to_input(pull=digitalio.Pull.UP)
-    button_left = lambda: not _button_a.value
-    button_right = lambda: not _button_b.value
+    def button_left():
+        return not _button_a.value
+    def button_right():
+        return not _button_b.value
 
 if display is None:
     print("FATAL:", "This version of program only works with a display")
