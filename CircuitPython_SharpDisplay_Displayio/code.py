@@ -153,7 +153,7 @@ def sample(population, k):
 # if necessary
 displayio.release_displays()
 bus = board.SPI()
-framebuffer = sharpdisplay.SharpMemoryFramebuffer(bus, board.D2, 400, 240)
+framebuffer = sharpdisplay.SharpMemoryFramebuffer(bus, board.D6, 400, 240)
 display = framebufferio.FramebufferDisplay(framebuffer, auto_refresh = True)
 
 # Load our font
