@@ -153,7 +153,7 @@ def sample(population, k):
 # if necessary
 displayio.release_displays()
 bus = board.SPI()
-framebuffer = sharpdisplay.SharpMemoryFramebuffer(bus, board.D2, 400, 240)
+framebuffer = sharpdisplay.SharpMemoryFramebuffer(bus, board.D6, 400, 240)
 display = framebufferio.FramebufferDisplay(framebuffer, auto_refresh = True)
 
 # Load our font
@@ -231,7 +231,15 @@ while True:
         print(name)
         lines = name.split(" ")
         with BatchDisplayUpdate(display):
-            names_font[0].text = lines[0]
-            names_font[1].text = lines[1]
+            for i in range(2):
+                names_font[i].text = lines[i]
+
+                # Due to a bug in adafruit_display_text, we need to reestablish
+                # the position of the labels when updating them.
+                # Once https://github.com/adafruit/Adafruit_CircuitPython_Display_Text/issues/82
+                # has been resolved, this code will no longer be necessary (but
+                # will not be harmful either)
+                names_font[i].anchor_point = (0.5, 0)
+                names_font[i].anchored_position = (200, i*84+42)
         time.sleep(5)
     names_font[0].text = names_font[1].text = ""
