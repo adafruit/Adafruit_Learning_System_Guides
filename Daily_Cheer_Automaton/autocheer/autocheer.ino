@@ -111,6 +111,10 @@ DST_RTC dst_rtc; // DST object
 // you'll need to modify the code in the DST_RTC library to make this work properly.
 #define OBSERVE_DST 1
 
+// Define US or EU rules for DST comment out as required. More countries could be added with different rules in DST_RTC.cpp
+const char rulesDST[] = "US"; // US DST rules
+// const char rulesDST[] = "EU";   // EU DST rules
+
 // the hour and minute you'd like MP3 to start playing
 const int PLAYHOUR = 19; // 24 hour time
 const int PLAYMIN = 0;
