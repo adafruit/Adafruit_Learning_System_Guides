@@ -185,7 +185,7 @@ print("Connected to WiFi!")
 MQTT.set_socket(socket, esp)
 
 # Initialize a new MQTT Client object
-mqtt_client = MQTT.MQTT(broker="https://io.adafruit.com",
+mqtt_client = MQTT.MQTT(broker="io.adafruit.com",
                         username=secrets["aio_user"],
                         password=secrets["aio_key"])
 
