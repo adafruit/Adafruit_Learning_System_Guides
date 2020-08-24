@@ -3,7 +3,8 @@ import math
 import board
 from digitalio import DigitalInOut, Direction, Pull
 import pulseio
-from adafruit_lsm6ds import LSM6DS33, AccelRange, AccelHPF, Rate
+from adafruit_lsm6ds import AccelRange, AccelHPF, Rate
+import adafruit_lsm6ds.lsm6ds33
 from adafruit_display_text import label
 import displayio
 import terminalio
@@ -39,7 +40,7 @@ splash.append(text_group)
 board.DISPLAY.show(splash)
 
 # connect to the accelerometer
-sensor = LSM6DS33(board.I2C())
+sensor = adafruit_lsm6ds.lsm6ds33.LSM6DS33(board.I2C())
 # highest range for impacts!
 sensor.accelerometer_range = AccelRange.RANGE_16G
 # we'll read at about 1KHz

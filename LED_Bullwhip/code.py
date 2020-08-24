@@ -16,7 +16,7 @@ import digitalio
 import audiobusio
 import board
 import neopixel
-import adafruit_lsm6ds
+import adafruit_lsm6ds.lsm6ds33
 
 # CUSTOMISE COLORS HERE:
 COLOR = (40, 3, 0)      # Default idle is blood orange
@@ -70,7 +70,7 @@ i2c = board.I2C()
 
 #Set up accelerometer & mic
 
-sensor = adafruit_lsm6ds.LSM6DS33(i2c)
+sensor = adafruit_lsm6ds.lsm6ds33.LSM6DS33(i2c)
 mic = audiobusio.PDMIn(board.MICROPHONE_CLOCK,
                        board.MICROPHONE_DATA,
                        sample_rate=16000,

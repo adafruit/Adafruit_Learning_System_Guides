@@ -3,14 +3,14 @@
 import time
 import adafruit_ble_broadcastnet
 import board
-import adafruit_lsm6ds   # accelerometer
+import adafruit_lsm6ds.lsm6ds33   # accelerometer
 import adafruit_sht31d   # humidity sensor
 import adafruit_bmp280   # barometric sensor
 import adafruit_lis3mdl  # magnetic sensor
 
 i2c = board.I2C()
 
-sense_accel = adafruit_lsm6ds.LSM6DS33(i2c)
+sense_accel = adafruit_lsm6ds.lsm6ds33.LSM6DS33(i2c)
 sense_humid = adafruit_sht31d.SHT31D(i2c)
 sense_barometric = adafruit_bmp280.Adafruit_BMP280_I2C(i2c)
 sense_magnet = adafruit_lis3mdl.LIS3MDL(i2c)
