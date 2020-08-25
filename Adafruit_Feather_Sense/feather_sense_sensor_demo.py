@@ -7,7 +7,7 @@ import audiobusio
 import adafruit_apds9960.apds9960
 import adafruit_bmp280
 import adafruit_lis3mdl
-import adafruit_lsm6ds
+import adafruit_lsm6ds.lsm6ds33
 import adafruit_sht31d
 
 i2c = board.I2C()
@@ -15,7 +15,7 @@ i2c = board.I2C()
 apds9960 = adafruit_apds9960.apds9960.APDS9960(i2c)
 bmp280 = adafruit_bmp280.Adafruit_BMP280_I2C(i2c)
 lis3mdl = adafruit_lis3mdl.LIS3MDL(i2c)
-lsm6ds33 = adafruit_lsm6ds.LSM6DS33(i2c)
+lsm6ds33 = adafruit_lsm6ds.lsm6ds33.LSM6DS33(i2c)
 sht31d = adafruit_sht31d.SHT31D(i2c)
 microphone = audiobusio.PDMIn(board.MICROPHONE_CLOCK, board.MICROPHONE_DATA,
                               sample_rate=16000, bit_depth=16)
