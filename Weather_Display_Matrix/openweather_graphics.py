@@ -167,7 +167,6 @@ class OpenWeather_Graphics(displayio.Group):
             if icon_name[2] == "n":
                 column = 1
             if row is not None:
-                print(column, row)
                 self._icon_sprite[0] = (row * 2) + column
                 self._icon_group.append(self._icon_sprite)
 

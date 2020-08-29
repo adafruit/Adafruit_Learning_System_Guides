@@ -49,13 +49,9 @@ SCROLL_HOLD_TIME = 0  # set this to hold each line before finishing scroll
 # --- Display setup ---
 matrix = Matrix()
 network = Network(status_neopixel=board.NEOPIXEL, debug=True)
-if UNITS == "imperial":
+if UNITS == "imperial" or UNITS == "metric":
     gfx = openweather_graphics.OpenWeather_Graphics(
-        matrix.display, am_pm=True, units="imperial"
-    )
-elif UNITS == "metric":
-    gfx = openweather_graphics.OpenWeather_Graphics(
-        matrix.display, am_pm=True, units="metric"
+        matrix.display, am_pm=True, units=UNITS
     )
 
 print("gfx loaded")
