@@ -29,7 +29,7 @@ void loop()
   
   digitalWrite(ledPin, HIGH); // turn the LED off
 
-  output_voltage = (output_voltage / 1023) * LOGIC_VOLTAGE;
+  output_voltage = (output_voltage / 1023) * ANALOG_VOLTAGE;
   dust_density = (0.18 * output_voltage) - 0.1;
 
   Serial.print("Voltage = ");
