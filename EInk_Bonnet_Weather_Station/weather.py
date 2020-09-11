@@ -41,7 +41,7 @@ display = Adafruit_SSD1675(
     122, 250, spi, cs_pin=ecs, dc_pin=dc, sramcs_pin=None, rst_pin=rst, busy_pin=busy,
 )
 
-display.rotation = 3
+display.rotation = 1
 
 gfx = Weather_Graphics(display, am_pm=True, celsius=False)
 weather_refresh = None
