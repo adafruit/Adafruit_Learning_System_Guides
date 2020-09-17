@@ -88,6 +88,7 @@ def on_relay_msg(client, topic, message):
     else:
         print("Unexpected message received on /feeds/relay.")
 
+
 def on_message(client, topic, message):
     # Method callled when a client's subscribed feed has a new value.
     print("New message on topic {0}: {1}".format(topic, message))
@@ -123,14 +124,13 @@ client.connect()
 # Subscribe to all updates on relay feed
 client.subscribe(feed_relay)
 
-# Start a blocking message loop...
-# NOTE: NO code below this loop will execute
+
 while True:
-    try:
+    try: # Poll for new messages on feed_relay
         client.loop()
     except (ValueError, RuntimeError) as e:
         print("Failed to get data, retrying\n", e)
         wifi.reset()
         client.reconnect()
         continue
-    time.sleep(0.5)
+    time.sleep(0.05)
