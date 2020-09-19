@@ -10,6 +10,7 @@
 
 #include "wsksymdef.h"
 #include "nextkeyboard.h"
+#include <Keyboard.h>
 
 // the timing per bit, 50microseconds
 #define TIMING 50

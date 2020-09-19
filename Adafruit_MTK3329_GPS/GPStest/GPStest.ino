@@ -1,10 +1,10 @@
-/ Test code for Adafruit GPS modules using MTK driver
+// Test code for Adafruit GPS modules using MTK driver
 // such as www.adafruit.com/products/660 (discontinued)
 // For new use see www.adafruit.com/products/746 (needs different code)
 // help support open source hardware & software! -adafruit
 
-#include <SoftSerial.h>
-SoftSerial mySerial(2, 3);
+#include <SoftwareSerial.h>
+SoftwareSerial mySerial(2, 3);
 
 // Connect the GPS Power pin to 3.3V
 // Connect the GPS Ground pin to ground

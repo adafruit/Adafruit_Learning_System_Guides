@@ -13,7 +13,7 @@ main_font = cwd+"/fonts/EarthHeart-26.bdf"
 data_font = cwd+"/fonts/Collegiate-50.bdf"
 
 class Azure_GFX(displayio.Group):
-    def __init__(self, is_celsius=True):
+    def __init__(self, is_celsius):
         """Creates an Azure_GFX object.
         :param bool is_celsius: Temperature displayed in Celsius.
         """
@@ -76,8 +76,8 @@ class Azure_GFX(displayio.Group):
         self.azure_status_text.y = 225
         self._text_group.append(self.azure_status_text)
 
+    def show_text(self):
         board.DISPLAY.show(self._text_group)
-
 
     def display_azure_status(self, status_text):
         """Displays the system status on the PyPortal

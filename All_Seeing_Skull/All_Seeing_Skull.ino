@@ -199,10 +199,9 @@ void setup(void) {
   // from either mirrorOLED[] (first eye) or rotateOLED[] (others).
   // The OLED library doesn't normally use the remap reg (TFT does).
   for(e=0; e<NUM_EYES; e++) {
-    eye[e].display->writeCommand(SSD1351_CMD_SETREMAP);
-    eye[e].display->writeData(e ?
-      rotateOLED[eyeInfo[e].rotation & 3] :
-      mirrorOLED[eyeInfo[e].rotation & 3]);
+    uint8_t d = e ? rotateOLED[eyeInfo[e].rotation & 3] :
+                    mirrorOLED[eyeInfo[e].rotation & 3];
+    eye[e].display->sendCommand(SSD1351_CMD_SETREMAP, &d, 1);
   }
 #endif
 

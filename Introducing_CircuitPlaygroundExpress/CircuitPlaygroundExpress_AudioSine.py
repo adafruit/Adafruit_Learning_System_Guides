@@ -24,7 +24,7 @@ SAMPLERATE = 8000  # 8000 samples/second, recommended!
 length = SAMPLERATE // FREQUENCY
 sine_wave = array.array("H", [0] * length)
 for i in range(length):
-    sine_wave[i] = int(math.sin(math.pi * 2 * i / 18) * (2 ** 15) + 2 ** 15)
+    sine_wave[i] = int(math.sin(math.pi * 2 * i / length) * (2 ** 15) + 2 ** 15)
 
 # Enable the speaker
 speaker_enable = digitalio.DigitalInOut(board.SPEAKER_ENABLE)

@@ -90,7 +90,7 @@ int getStringLength(const char *str, int strlength = 0)
 // returns substring of wrapped text.
 char *wrapWord(const char *str, int linesize)
 {
-  static char buff[255];
+  static char buff[1024];
   int linestart = 0;
   static int lineend = 0;
   static int bufflen = 0;

@@ -6,8 +6,11 @@ To be used with another Circuit Playground Bluefruit running the Remote Control 
 import board
 import neopixel
 from adafruit_circuitplayground.bluefruit import cpb
-from adafruit_led_animation.animation import Blink, Comet, Sparkle, AnimationGroup,\
-    AnimationSequence
+from adafruit_led_animation.animation.blink import Blink
+from adafruit_led_animation.animation.comet import Comet
+from adafruit_led_animation.animation.sparkle import Sparkle
+from adafruit_led_animation.group import AnimationGroup
+from adafruit_led_animation.sequence import AnimationSequence
 import adafruit_led_animation.color as color
 
 from adafruit_ble import BLERadio

@@ -12,7 +12,8 @@
 
 #include <Adafruit_GPS.h>
 #include <SoftwareSerial.h>
-#include "Adafruit_FloraPixel.h"
+#include "Adafruit_NeoPixel.h"
+
 Adafruit_GPS GPS(&Serial1);
 
 // Set GPSECHO to 'false' to turn off echoing the GPS data to the Serial console
@@ -51,7 +52,8 @@ float tripDistance;
 boolean isStarted = false;
 
 // Set the first variable to the NUMBER of pixels. 25 = 25 pixels in a row
-Adafruit_FloraPixel strip = Adafruit_FloraPixel(2);
+// second var is pin
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(2, 6, NEO_GRB + NEO_KHZ800);
 
 
 uint8_t LED_Breathe_Table[]  = {   80,  87,  95, 103, 112, 121, 131, 141, 151, 161, 172, 182, 192, 202, 211, 220,

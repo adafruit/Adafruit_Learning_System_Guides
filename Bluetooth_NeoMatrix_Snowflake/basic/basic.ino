@@ -273,6 +273,7 @@ void SnowFlake12(uint32_t c){
  
 }
  
+/*
 void showAllSnowflakes(uint32_t c){
         SnowFlake1(matrix.Color(red, green, blue));
         matrix.show(); // This sends the updated pixel colors to the hardware.
@@ -322,3 +323,4 @@ void showAllSnowflakes(uint32_t c){
         matrix.show(); // This sends the updated pixel colors to the hardware.
         delay(500); 
 }
+*/

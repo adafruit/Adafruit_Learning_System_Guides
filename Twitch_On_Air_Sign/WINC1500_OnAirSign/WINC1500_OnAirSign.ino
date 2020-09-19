@@ -1,5 +1,5 @@
 #include <SPI.h>
-#include <Adafruit_WINC1500.h>
+#include <WiFi101.h>
 #include <Adafruit_NeoPixel.h>
 
 #define PIN 12
@@ -16,12 +16,6 @@ Adafruit_NeoPixel strip = Adafruit_NeoPixel(30, PIN, NEO_GRBW + NEO_KHZ800);
 
 #define LED 13
 
-// Setup the WINC1500 connection with the pins above and the default hardware SPI.
-Adafruit_WINC1500 WiFi(WINC_CS, WINC_IRQ, WINC_RST);
-
-// Or just use hardware SPI (SCK/MOSI/MISO) and defaults, SS -> #10, INT -> #7, RST -> #5, EN -> 3-5V
-//Adafruit_WINC1500 WiFi;
-
 char ssid[] = "ssid"; //  your network SSID (name)
 char pass[] = "password";    // your network password (use for WPA, or use as key for WEP)
 int keyIndex = 0;            // your network key Index number (needed only for WEP)
@@ -31,7 +25,7 @@ int status = WL_IDLE_STATUS;
 #define PATH "/kraken/streams/adafruit"
 #define REFRESH 20  // seconds between refresh
 
-Adafruit_WINC1500SSLClient client;
+WiFiSSLClient client;
 
 // Fill the dots one after the other with a color
 void colorWipe(uint32_t c, uint8_t wait) {
@@ -47,13 +41,14 @@ void setup() {
   pinMode(WINC_EN, OUTPUT);
   digitalWrite(WINC_EN, HIGH);
 #endif
+  WiFi.setPins(WINC_CS, WINC_IRQ, WINC_RST);
 
   pinMode(LED, OUTPUT);
   
   //Initialize serial and wait for port to open:
   Serial.begin(9600);
 
-strip.begin();
+  strip.begin();
 
   // check for the presence of the shield:
   if (WiFi.status() == WL_NO_SHIELD) {

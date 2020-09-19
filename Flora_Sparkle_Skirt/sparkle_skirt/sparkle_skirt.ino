@@ -1,6 +1,6 @@
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
-#include <Adafruit_LSM303_U.h>
+#include <Adafruit_LSM303DLH_Mag.h>
 #include <Adafruit_NeoPixel.h>
 
 // Parameter 1 = number of pixels in strip
@@ -11,7 +11,7 @@
 //   NEO_KHZ400  400 KHz bitstream (e.g. FLORA pixels)
 //   NEO_KHZ800  800 KHz bitstream (e.g. High Density LED strip)
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(6, 6, NEO_GRB + NEO_KHZ800);
-Adafruit_LSM303_Accel_Unified accel = Adafruit_LSM303_Accel_Unified(54321);
+Adafruit_LSM303DLH_Mag_Unified accel = Adafruit_LSM303DLH_Mag_Unified(54321);
 
 // Here is where you can put in your favorite colors that will appear!
 // just add new {nnn, nnn, nnn}, lines. They will be picked out randomly

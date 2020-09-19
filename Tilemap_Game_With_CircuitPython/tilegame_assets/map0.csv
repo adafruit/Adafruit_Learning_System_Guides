@@ -1,0 +1,8 @@
+top_left_wall,top_wall,top_wall,top_right_wall,,,top_left_wall,top_wall,top_wall,top_wall,top_right_wall,,,
+left_wall,player,floor,floor,top_wall,top_wall,floor,floor,floor,right_wall,right_wall,top_wall,top_wall,top_right_wall
+left_wall,floor,floor,mho,floor,floor,floor,floor,top_wall,right_wall,minerva,floor,sparky,right_wall
+left_wall,minerva,floor,floor,heart,floor,floor,left_wall,floor,sparky,floor,floor,floor,right_wall
+left_wall,top_wall,top_wall,sparky,top_wall,top_wall,top_wall,left_wall,floor,right_wall,floor,floor,floor,right_wall
+left_wall,floor,floor,mho,floor,floor,floor,floor,floor,right_wall,heart,floor,robot,right_wall
+left_wall,floor,floor,floor,floor,floor,heart,floor,floor,right_wall,right_wall,bottom_wall,bottom_wall,bottom_right_wall
+bottom_left_wall,bottom_wall,bottom_wall,bottom_wall,bottom_wall,bottom_wall,bottom_wall,bottom_wall,bottom_wall,bottom_wall,bottom_right_wall,,,

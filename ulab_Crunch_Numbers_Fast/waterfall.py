@@ -81,8 +81,8 @@ def main():
         # to change any zeros to nonzero numbers
         spectrogram1 = ulab.vector.log(spectrogram1 + 1e-7)
         spectrogram1 = spectrogram1[1:(fft_size//2)-1]
-        min_curr = ulab.numerical.min(spectrogram1)[0]
-        max_curr = ulab.numerical.max(spectrogram1)[0]
+        min_curr = ulab.numerical.min(spectrogram1)
+        max_curr = ulab.numerical.max(spectrogram1)
 
         if max_curr > max_all:
             max_all = max_curr

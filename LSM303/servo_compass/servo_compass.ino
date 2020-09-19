@@ -8,14 +8,14 @@
 
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
-#include <Adafruit_LSM303AGR_Mag.h>
+#include <Adafruit_LIS2MDL.h>
 
 //Uncomment this line and comment out the above for the LSM303DLH
 //#include <Adafruit_LSM303DLH_Mag.h>
 #include <Servo.h>
 
 /* Assign a unique ID to this sensor at the same time */
-Adafruit_LSM303AGR_Mag_Unified mag = Adafruit_LSM303AGR_Mag_Unified(12345);
+Adafruit_LIS2MDL mag = Adafruit_LIS2MDL(12345);
 //Uncomment this line and comment out the above for the LSM303DLH
 //Adafruit_LSM303DLH_Mag_Unified mag = Adafruit_LSM303AGR_Mag_Unified(12345);
 

@@ -10,6 +10,7 @@ Uses Modern Device's Capacitive Sensing library: https://github.com/moderndevice
   
 */
 #include <CapPin.h>
+#include <Keyboard.h>
 
 CapPin cPin_10 = CapPin(10);    // read pin 10 (D10 on Flora) - connect to NES B
 CapPin cPin_9  = CapPin(9);     // read pin 9 (D9 on Flora)   - connect to NES A

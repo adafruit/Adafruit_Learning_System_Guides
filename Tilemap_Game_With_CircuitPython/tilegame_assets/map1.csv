@@ -1,0 +1,17 @@
+top_left_wall,top_wall,top_wall,top_right_wall,floor,floor,top_left_wall,top_wall,top_wall,top_wall,top_right_wall,,,
+left_wall,mho,floor,floor,top_wall,top_wall,minerva,floor,right_wall,floor,heart,top_wall,top_wall,top_right_wall
+left_wall,floor,player,floor,floor,left_wall,floor,floor,sparky,floor,floor,floor,floor,right_wall
+left_wall,floor,floor,floor,floor,sparky,floor,floor,right_wall,mho,floor,floor,floor,right_wall
+left_wall,floor,floor,floor,floor,left_wall,floor,floor,right_wall,top_wall,top_wall,sparky,top_wall,right_wall
+left_wall,floor,mho,floor,floor,left_wall,floor,floor,right_wall,floor,floor,floor,floor,right_wall
+left_wall,floor,floor,floor,floor,left_wall,heart,floor,right_wall,floor,floor,floor,mho,right_wall
+bottom_left_wall,bottom_wall,bottom_wall,bottom_wall,bottom_wall,bottom_wall,bottom_wall,bottom_wall,bottom_wall,bottom_wall,heart,floor,floor,right_wall
+,top_left_wall,top_wall,top_wall,top_wall,top_wall,top_right_wall,floor,floor,floor,left_wall,floor,floor,right_wall
+,left_wall,robot,floor,floor,floor,sparky,floor,floor,floor,left_wall,heart,floor,right_wall
+,left_wall,floor,floor,floor,floor,right_wall,floor,floor,floor,sparky,floor,floor,right_wall
+,left_wall,floor,floor,minerva,floor,right_wall,floor,heart,floor,left_wall,floor,floor,right_wall
+,left_wall,floor,floor,floor,floor,right_wall,top_wall,top_wall,top_wall,left_wall,floor,floor,right_wall
+,left_wall,floor,floor,floor,floor,right_wall,floor,floor,floor,left_wall,floor,mho,right_wall
+,left_wall,floor,floor,floor,floor,sparky,floor,mho,floor,sparky,floor,minerva,right_wall
+,left_wall,floor,floor,floor,floor,right_wall,floor,floor,floor,left_wall,floor,floor,right_wall
+,bottom_left_wall,bottom_wall,bottom_wall,bottom_wall,bottom_wall,bottom_wall,bottom_wall,bottom_wall,bottom_wall,bottom_wall,bottom_wall,bottom_wall,bottom_right_wall

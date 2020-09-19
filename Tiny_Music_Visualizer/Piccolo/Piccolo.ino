@@ -21,7 +21,7 @@ ffft library is provided under its own terms -- see ffft.S for specifics.
 // IMPORTANT: FFT_N should be #defined as 128 in ffft.h.
 
 #include <avr/pgmspace.h>
-#include <ffft.h>
+#include "ffft.h"
 #include <math.h>
 #include <Wire.h>
 #include <Adafruit_GFX.h>

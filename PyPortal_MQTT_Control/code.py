@@ -12,7 +12,7 @@ from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text.label import Label
 from adafruit_button import Button
 import adafruit_touchscreen
-from adafruit_minimqtt import MQTT
+import adafruit_minimqtt.adafruit_minimqtt as MQTT
 
 # ------------- WiFi ------------- #
 
@@ -62,17 +62,22 @@ def set_backlight(val):
     board.DISPLAY.auto_brightness = False
     board.DISPLAY.brightness = val
 
+
 # Touchscreen setup
-ts = adafruit_touchscreen.Touchscreen(board.TOUCH_XL, board.TOUCH_XR,
-                                      board.TOUCH_YD, board.TOUCH_YU,
-                                      calibration=((5200, 59000), (5800, 57000)),
-                                      size=(320, 240))
+ts = adafruit_touchscreen.Touchscreen(
+    board.TOUCH_XL,
+    board.TOUCH_XR,
+    board.TOUCH_YD,
+    board.TOUCH_YU,
+    calibration=((5200, 59000), (5800, 57000)),
+    size=(320, 240),
+)
 
 # ---------- Set the font and preload letters ----------
 # Be sure to put your font into a folder named "fonts".
 font = bitmap_font.load_font("/fonts/Helvetica-Bold-16.bdf")
 # This will preload the text images.
-font.load_glyphs(b'abcdefghjiklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890- ()')
+font.load_glyphs(b"abcdefghjiklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890- ()")
 
 # ------------- User Inretface Eliments ------------- #
 
@@ -84,8 +89,7 @@ board.DISPLAY.show(splash)
 color_bitmap = displayio.Bitmap(320, 240, 1)
 color_palette = displayio.Palette(1)
 color_palette[0] = 0x3D0068
-bg_sprite = displayio.TileGrid(color_bitmap, x=0, y=0,
-                               pixel_shader=color_palette)
+bg_sprite = displayio.TileGrid(color_bitmap, x=0, y=0, pixel_shader=color_palette)
 splash.append(bg_sprite)
 
 buttons = []
@@ -95,18 +99,32 @@ BUTTON_HEIGHT = 100
 BUTTON_MARGIN = 10
 
 # Button Objects
-button_1 = Button(x=BUTTON_MARGIN, y=BUTTON_MARGIN,
-                  width=BUTTON_WIDTH, height=BUTTON_HEIGHT,
-                  label="Button 1", label_font=font,
-                  style=Button.SHADOWROUNDRECT, label_color=0x505050,
-                  fill_color=0x9e9e9e, outline_color=0x464646)
+button_1 = Button(
+    x=BUTTON_MARGIN,
+    y=BUTTON_MARGIN,
+    width=BUTTON_WIDTH,
+    height=BUTTON_HEIGHT,
+    label="Button 1",
+    label_font=font,
+    style=Button.SHADOWROUNDRECT,
+    label_color=0x505050,
+    fill_color=0x9E9E9E,
+    outline_color=0x464646,
+)
 buttons.append(button_1)
 
-button_2 = Button(x=BUTTON_MARGIN, y=BUTTON_MARGIN*2+BUTTON_HEIGHT,
-                  width=BUTTON_WIDTH, height=BUTTON_HEIGHT,
-                  label="Button 2", label_font=font,
-                  style=Button.SHADOWROUNDRECT, label_color=0x505050,
-                  fill_color=0x9e9e9e, outline_color=0x464646)
+button_2 = Button(
+    x=BUTTON_MARGIN,
+    y=BUTTON_MARGIN * 2 + BUTTON_HEIGHT,
+    width=BUTTON_WIDTH,
+    height=BUTTON_HEIGHT,
+    label="Button 2",
+    label_font=font,
+    style=Button.SHADOWROUNDRECT,
+    label_color=0x505050,
+    fill_color=0x9E9E9E,
+    outline_color=0x464646,
+)
 buttons.append(button_2)
 
 for b in buttons:
@@ -140,14 +158,14 @@ splash.append(feed2_label)
 
 # ------------- MQTT Topic Setup ------------- #
 
-mqtt_topic = 'test/topic'
-mqtt_temperature = 'pyportal/temperature'
-mqtt_lux = 'pyportal/lux'
-mqtt_PIR = 'pyportal/pir'
-mqtt_button1 = 'pyportal/button1'
-mqtt_button2 = 'pyportal/button2'
-mqtt_feed1 = 'pyportal/feed1'
-mqtt_feed2 = 'pyportal/feed2'
+mqtt_topic = "test/topic"
+mqtt_temperature = "pyportal/temperature"
+mqtt_lux = "pyportal/lux"
+mqtt_PIR = "pyportal/pir"
+mqtt_button1 = "pyportal/button1"
+mqtt_button2 = "pyportal/button2"
+mqtt_feed1 = "pyportal/feed1"
+mqtt_feed2 = "pyportal/feed2"
 
 # ------------- MQTT Functions ------------- #
 
@@ -156,20 +174,24 @@ mqtt_feed2 = 'pyportal/feed2'
 def connect(client, userdata, flags, rc):
     # This function will be called when the client is connected
     # successfully to the broker.
-    print('Connected to MQTT Broker!')
-    print('Flags: {0}\n RC: {1}'.format(flags, rc))
+    print("Connected to MQTT Broker!")
+    print("Flags: {0}\n RC: {1}".format(flags, rc))
+
 
 def disconnected(client, userdata, rc):
     # This method is called when the client is disconnected
-    print('Disconnected from MQTT Broker!')
+    print("Disconnected from MQTT Broker!")
+
 
 def subscribe(client, userdata, topic, granted_qos):
     # This method is called when the client subscribes to a new feed.
-    print('Subscribed to {0} with QOS level {1}'.format(topic, granted_qos))
+    print("Subscribed to {0} with QOS level {1}".format(topic, granted_qos))
+
 
 def publish(client, userdata, topic, pid):
     # This method is called when the client publishes data to a feed.
-    print('Published to {0} with PID {1}'.format(topic, pid))
+    print("Published to {0} with PID {1}".format(topic, pid))
+
 
 def message(client, topic, message):
     """Method callled when a client's subscribed feed has a new
@@ -177,33 +199,39 @@ def message(client, topic, message):
     :param str topic: The topic of the feed with a new value.
     :param str message: The new value
     """
-    print('New message on topic {0}: {1}'.format(topic, message))
+    print("New message on topic {0}: {1}".format(topic, message))
     if topic == "pyportal/feed1":
-        feed1_label.text = 'Next Bus: {}'.format(message)
+        feed1_label.text = "Next Bus: {}".format(message)
     if topic == "pyportal/feed2":
-        feed2_label.text = 'Weather: \n    {}'.format(message)
+        feed2_label.text = "Weather: \n    {}".format(message)
     if topic == "pyportal/button1":
         if message == "1":
-            buttons[0].label="ON"
+            buttons[0].label = "ON"
             buttons[0].selected = False
             print("Button 1 ON")
         else:
-            buttons[0].label="OFF"
+            buttons[0].label = "OFF"
             buttons[0].selected = True
             print("Button 1 OFF")
+
 
 # ------------- Network Connection ------------- #
 
 # Connect to WiFi
+print("Connecting to WiFi...")
 wifi.connect()
+print("Connected to WiFi!")
+
+# Initialize MQTT interface with the esp interface
+MQTT.set_socket(socket, esp)
 
 # Set up a MiniMQTT Client
-client = MQTT(socket,
-              broker = secrets['broker'],
-              port = 1883,
-              username = secrets['user'],
-              password = secrets['pass'],
-              network_manager = wifi)
+client = MQTT(
+    broker=secrets["broker"],
+    port=1883,
+    username=secrets["user"],
+    password=secrets["pass"],
+)
 
 # Connect callback handlers to client
 client.on_connect = connect
@@ -212,10 +240,13 @@ client.on_subscribe = subscribe
 client.on_publish = publish
 client.on_message = message
 
-print('Attempting to connect to %s' % client.broker)
+print("Attempting to connect to %s" % client.broker)
 client.connect()
 
-print('Subscribing to %s, %s, %s, and %s' % (mqtt_feed1, mqtt_feed2, mqtt_button1, mqtt_button2))
+print(
+    "Subscribing to %s, %s, %s, and %s"
+    % (mqtt_feed1, mqtt_feed2, mqtt_button1, mqtt_button2)
+)
 client.subscribe(mqtt_feed1)
 client.subscribe(mqtt_feed2)
 client.subscribe(mqtt_button1)
@@ -228,18 +259,18 @@ while True:
 
     # Read sensor data and format
     light_value = lux = light_sensor.value
-    light_label.text = 'Light Sensor: {}'.format(light_value)
+    light_label.text = "Light Sensor: {}".format(light_value)
     temperature = round(adt.temperature)
-    temperature_label.text = 'Temp Sensor: {}'.format(temperature)
+    temperature_label.text = "Temp Sensor: {}".format(temperature)
     movement_value = movement_sensor.value
-    motion_label.text = 'PIR Sensor: {}'.format(movement_value)
+    motion_label.text = "PIR Sensor: {}".format(movement_value)
 
     # Read display button press
     touch = ts.touch_point
     if touch:
         for i, b in enumerate(buttons):
             if b.contains(touch):
-                print('Sending button%d pressed' % i)
+                print("Sending button%d pressed" % i)
                 if i == 0:
                     # Toggle switch button type
                     if button1_state == 0:
@@ -252,7 +283,7 @@ while True:
                         b.label = "OFF"
                         b.selected = True
                         print("Button 1 OFF")
-                    print('Sending button 1 state: ')
+                    print("Sending button 1 state: ")
                     client.publish(mqtt_button1, button1_state)
                     # for debounce
                     while ts.touch_point:
@@ -260,22 +291,22 @@ while True:
                 if i == 1:
                     # Momentary button type
                     b.selected = True
-                    print('Sending button 2 state: ')
+                    print("Sending button 2 state: ")
                     client.publish(mqtt_button2, 1)
                     # for debounce
                     while ts.touch_point:
                         print("Button 2 Pressed")
                     print("Button 2 reliced")
-                    print('Sending button 2 state: ')
+                    print("Sending button 2 state: ")
                     client.publish(mqtt_button2, 0)
                     b.selected = False
 
     # Publish sensor data to MQTT
-    print('Sending light sensor value: %d' % light_value)
+    print("Sending light sensor value: %d" % light_value)
     client.publish(mqtt_lux, light_value)
 
-    print('Sending temperature value: %d' % temperature)
+    print("Sending temperature value: %d" % temperature)
     client.publish(mqtt_temperature, temperature)
 
-    print('Sending motion sensor value: %d' % movement_value)
-    client.publish(mqtt_PIR, '{}'.format(movement_value))
+    print("Sending motion sensor value: %d" % movement_value)
+    client.publish(mqtt_PIR, "{}".format(movement_value))

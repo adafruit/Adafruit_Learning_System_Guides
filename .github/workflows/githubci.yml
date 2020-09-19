@@ -1,0 +1,60 @@
+name: Arduino Library CI
+
+on: [pull_request, push, repository_dispatch]
+
+jobs:
+  arduino:
+    strategy:
+      fail-fast: false
+      matrix:
+        arduino-platform: ["uno", "nrf52832", "cpx_ada", "pyportal", "protrinket_3v", "protrinket_5v", "metro_m0", "esp8266", "esp32", "trinket_3v", "trinket_5v", "gemma", "flora", "feather32u4", "feather_m0_express", "gemma_m0", "trinket_m0", "hallowing_m0", "monster_m4sk", "hallowing_m4", "neotrellis_m4", "pybadge", "cpb", "cpc"]
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/setup-python@v1
+      with:
+        python-version: '3.x'
+    - uses: actions/checkout@v2
+    - uses: actions/checkout@v2
+      with:
+         repository: adafruit/ci-arduino
+         path: ci
+
+    - name: pre-install
+      run: bash ci/actions_install.sh
+
+    # manually install some libraries
+    - name: extra libraries
+      run: |
+        git clone --quiet https://github.com/adafruit/Cryptosuite.git /home/runner/Arduino/libraries/Cryptosuite
+        git clone --quiet https://github.com/adafruit/WiFiNINA.git /home/runner/Arduino/libraries/WiFiNINA
+        git clone --quiet https://github.com/adafruit/Adafruit_LSM303.git /home/runner/Arduino/libraries/Adafruit_LSM303
+        git clone --quiet https://github.com/moderndevice/CapSense.git /home/runner/Arduino/libraries/CapSense
+        git clone --quiet https://github.com/PaintYourDragon/ffft.git /home/runner/Arduino/libraries/ffft
+        git clone --quiet https://github.com/adafruit/RadioHead.git /home/runner/Arduino/libraries/RadioHead
+        git clone --quiet https://github.com/me-no-dev/ESPAsyncTCP /home/runner/Arduino/libraries/ESPAsyncTCP
+        git clone --quiet https://github.com/adafruit/Talkie /home/runner/Arduino/libraries/Talkie
+
+    - name: test platforms
+      run: python3 ci/build_platform.py ${{ matrix.arduino-platform }}
+
+
+  pylint:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Set up Python 3.6
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.6
+    - name: Versions
+      run: |
+        python3 --version
+    - name: Pip install pylint, black, & Sphinx
+      run: |
+        pip install --force-reinstall pylint==1.9.2
+    - name: Checkout Current Repo
+      uses: actions/checkout@v2
+
+    - name: lint
+      run: ./pylint_check.sh
