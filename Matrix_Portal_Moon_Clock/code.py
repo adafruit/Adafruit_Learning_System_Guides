@@ -172,9 +172,9 @@ MATRIX = Matrix(bit_depth=BITPLANES)
 DISPLAY = MATRIX.display
 ACCEL = adafruit_lis3dh.LIS3DH_I2C(busio.I2C(board.SCL, board.SDA),
                                    address=0x19)
-ROTATE = (int(((math.atan2(-ACCEL.acceleration.y, -ACCEL.acceleration.x) +
-                math.pi) / (math.pi * 2) - 0.125) * 4) % 4) * 90
-DISPLAY.rotation = ROTATE
+DISPLAY.rotation = (int(((math.atan2(-ACCEL.acceleration.y,
+                                     -ACCEL.acceleration.x) + math.pi) /
+                         (math.pi * 2) + 0.875) * 4) % 4) * 90
 
 LARGE_FONT = bitmap_font.load_font('/fonts/helvB12.bdf')
 SMALL_FONT = bitmap_font.load_font('/fonts/helvR10.bdf')
@@ -189,7 +189,7 @@ GROUP = displayio.Group(max_size=10)
 # Element 0 is a stand-in item, later replaced with the moon phase bitmap
 # pylint: disable=bare-except
 try:
-    FILENAME = 'moon/splash-' + str(ROTATE) + '.bmp'
+    FILENAME = 'moon/splash-' + str(DISPLAY.rotation) + '.bmp'
     BITMAP = displayio.OnDiskBitmap(open(FILENAME, 'rb'))
     TILE_GRID = displayio.TileGrid(BITMAP,
                                    pixel_shader=displayio.ColorConverter(),)
@@ -339,7 +339,7 @@ while True:
             else:
                 NEXT_EVENT = NEXT_PERIOD.set
 
-    if ROTATE in (0, 180): # Horizontal 'landscape' orientation
+    if DISPLAY.rotation in (0, 180): # Horizontal 'landscape' orientation
         CENTER_X = 48      # Text along right
         MOON_Y = 0         # Moon at left
         TIME_Y = 6         # Time at top right
