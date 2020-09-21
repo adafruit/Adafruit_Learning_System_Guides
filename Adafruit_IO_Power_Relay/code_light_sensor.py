@@ -11,6 +11,7 @@ import adafruit_esp32spi.adafruit_esp32spi_socket as socket
 import adafruit_minimqtt.adafruit_minimqtt as MQTT
 
 ### Sensor Calibration ###
+# Appliance power LED's light level, in Lux
 APPLIANCE_ON_LUX = 30.0
 # How often the light sensor will be read, in seconds
 SENSOR_READ_TIME = 10.0
@@ -135,7 +136,7 @@ client.connect()
 # Subscribe to all updates on relay feed
 client.subscribe(feed_relay)
 
-# Holds state of light sensor
+# Holds previous state of light sensor
 prv_sensor_value = 0
 # Time in seconds since start
 start_time = time.monotonic()
@@ -162,6 +163,7 @@ while True:
                     print("Appliance OFF, publishing to IO...")
                     client.publish(feed_status, 2)
                     print("Published!")
+                prv_sensor_value = sensor_value
             start_time = now
     except (ValueError, RuntimeError) as e:
         print("Failed to get data, retrying\n", e)
