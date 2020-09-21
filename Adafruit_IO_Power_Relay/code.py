@@ -77,22 +77,20 @@ def unsubscribe(client, userdata, topic, pid):
     # This method is called when the client unsubscribes from a feed.
     print("Unsubscribed from {0} with PID {1}".format(topic, pid))
 
-
-def on_relay_msg(client, topic, message):
-    # Called when feeds/relay has a new value
-    print("Received relay value: ", message)
-    if message == "ON":
-        power_pin.value = True
-    elif message == "OFF":
-        power_pin.value = False
-    else:
-        print("Unexpected message received on /feeds/relay.")
-
-
 def on_message(client, topic, message):
     # Method callled when a client's subscribed feed has a new value.
     print("New message on topic {0}: {1}".format(topic, message))
 
+
+def on_relay_msg(client, topic, value):
+    # Called when relay feed obtains a new value
+    print("Turning Relay %s"%value)
+    if value == "ON":
+        power_pin.value = True
+    elif value == "OFF":
+        power_pin.value = False
+    else:
+        print("Unexpected value received on relay feed.")
 
 # Connect to WiFi
 print("Connecting to WiFi...")
@@ -123,7 +121,6 @@ client.connect()
 
 # Subscribe to all updates on relay feed
 client.subscribe(feed_relay)
-
 
 while True:
     try: # Poll for new messages on feed_relay
