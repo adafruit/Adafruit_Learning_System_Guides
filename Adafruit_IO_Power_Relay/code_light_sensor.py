@@ -11,11 +11,9 @@ import adafruit_esp32spi.adafruit_esp32spi_socket as socket
 import adafruit_minimqtt.adafruit_minimqtt as MQTT
 
 ### Sensor Calibration ###
-
 APPLIANCE_ON_LUX = 30.0
-APPLIANCE_OFF_LUX = 4.0
 # How often the light sensor will be read, in seconds
-SENSOR_READ_TIME = 5.0
+SENSOR_READ_TIME = 10.0
 
 ### WiFi ###
 
