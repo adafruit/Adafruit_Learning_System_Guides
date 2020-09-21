@@ -146,7 +146,7 @@ while True:
         # Poll for new messages on feed_relay
         client.loop()
         now = time.monotonic()
-        if now - start_time > 3.0:
+        if now - start_time > SENSOR_READ_TIME:
             # Read light sensor
             print("Reading light sensor")
             sensor_value = sensor.lux
