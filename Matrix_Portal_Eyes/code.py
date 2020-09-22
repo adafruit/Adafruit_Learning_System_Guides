@@ -6,7 +6,6 @@ RASTER EYES for Adafruit Matrix Portal: animated spooky eyes.
 import math
 import random
 import time
-#import board
 import displayio
 import adafruit_imageload
 from adafruit_matrixportal.matrix import Matrix
