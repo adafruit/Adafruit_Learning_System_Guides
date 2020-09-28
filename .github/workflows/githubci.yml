@@ -7,7 +7,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arduino-platform: ["uno", "nrf52832", "cpx_ada", "pyportal", "protrinket_3v", "protrinket_5v", "metro_m0", "esp8266", "esp32", "trinket_3v", "trinket_5v", "gemma", "flora", "feather32u4", "feather_m0_express", "gemma_m0", "trinket_m0", "hallowing_m0", "monster_m4sk", "hallowing_m4", "neotrellis_m4", "pybadge", "cpb"]
+        arduino-platform: ["uno", "nrf52832", "cpx_ada", "pyportal", "protrinket_3v", "protrinket_5v", "metro_m0", "esp8266", "esp32", "trinket_3v", "trinket_5v", "gemma", "flora", "feather32u4", "feather_m0_express", "gemma_m0", "trinket_m0", "hallowing_m0", "monster_m4sk", "hallowing_m4", "neotrellis_m4", "pybadge", "cpb", "cpc"]
 
     runs-on: ubuntu-latest
 
