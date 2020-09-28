@@ -94,6 +94,7 @@ def on_relay_msg(client, topic, message):
     else:
         print("Unexpected value received on relay feed.")
 
+
 # Connect to WiFi
 print("Connecting to WiFi...")
 wifi.connect()
@@ -104,7 +105,9 @@ MQTT.set_socket(socket, esp)
 
 # Initialize a new MQTT Client object
 mqtt_client = MQTT.MQTT(
-    broker="io.adafruit.com", username=secrets["aio_username"], password=secrets["aio_key"],
+    broker="io.adafruit.com",
+    username=secrets["aio_username"],
+    password=secrets["aio_key"],
 )
 
 # Initialize an Adafruit IO MQTT Client
