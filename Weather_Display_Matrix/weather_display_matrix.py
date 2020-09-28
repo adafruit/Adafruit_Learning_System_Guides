@@ -8,6 +8,7 @@ if you can find something that spits out JSON data, we can display it
 """
 import time
 import board
+import microcontroller
 from digitalio import DigitalInOut, Direction, Pull
 from adafruit_matrixportal.network import Network
 from adafruit_matrixportal.matrix import Matrix
@@ -20,11 +21,29 @@ except ImportError:
     print("WiFi secrets are kept in secrets.py, please add them there!")
     raise
 
-jumper = DigitalInOut(board.D12)
-jumper.direction = Direction.INPUT
-jumper.pull = Pull.UP
+if hasattr(board, "D12"):
+    jumper = DigitalInOut(board.D12)
+    jumper.direction = Direction.INPUT
+    jumper.pull = Pull.UP
+    is_metric = jumper.value
+elif hasattr(board, "BUTTON_DOWN") and hasattr(board, "BUTTON_UP"):
+    button_down = DigitalInOut(board.BUTTON_DOWN)
+    button_down.switch_to_input(pull=Pull.UP)
 
-if jumper.value:
+    button_up = DigitalInOut(board.BUTTON_UP)
+    button_up.switch_to_input(pull=Pull.UP)
+    if not button_down.value:
+        print("Down Button Pressed")
+        microcontroller.nvm[0] = 1
+    elif not button_up.value:
+        print("Up Button Pressed")
+        microcontroller.nvm[0] = 0
+    print(microcontroller.nvm[0])
+    is_metric = microcontroller.nvm[0]
+else:
+    is_metric = False
+
+if is_metric:
     UNITS = "metric"  # can pick 'imperial' or 'metric' as part of URL query
     print("Jumper set to metric")
 else:
