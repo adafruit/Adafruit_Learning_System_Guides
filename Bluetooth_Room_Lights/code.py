@@ -1,7 +1,7 @@
 """
 Bluetooth Controlled Room Lights using a Circuit Playground Bluetooth
    Scroll between 7 modes and control brightness with your smartphone via Bluetooth
-   Full tutorial: https://learn.adafruit.com/easy-bluetooth-controlled-room-lights/overview
+   Full tutorial: https://learn.adafruit.com/easy-no-solder-bluetooth-controlled-room-lights/overview
 Code by Kattni Rembor & Erin St Blaine for Adafruit Industries
 Adafruit invests time and resources to bring you this code! Please support our shop!
 """
