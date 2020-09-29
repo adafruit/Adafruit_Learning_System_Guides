@@ -1,13 +1,13 @@
 import time
 import board
-import adafruit_lsm6ds
+import adafruit_lsm6ds.lsm6ds33
 from adafruit_ht16k33 import matrix
 import matrixsand
 
 DELAY = 0.00 # add some delay if you want
 
 # the accelo
-accelo = adafruit_lsm6ds.LSM6DS33(board.I2C())
+accelo = adafruit_lsm6ds.lsm6ds33.LSM6DS33(board.I2C())
 
 # the matrix
 matrix1 = matrix.Matrix8x8(board.I2C(), 0x70)
