@@ -10,14 +10,14 @@ from adafruit_display_text.label import Label
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_shapes.rect import Rect
 import adafruit_amg88xx
-from adafruit_pybadger import PyBadger
+from adafruit_pybadger import pybadger as panel
 from thermal_cam_converters import celsius_to_fahrenheit, fahrenheit_to_celsius
 # Load default alarm and min/max range values list from config file
 from thermal_cam_config import ALARM_F, MIN_RANGE_F, MAX_RANGE_F
 
 # Establish panel instance and check for joystick
-panel = PyBadger(pixels_brightness=0.1)  # Set NeoPixel brightness
-panel.pixels.fill(0)                     # Clear all NeoPixels
+panel.pixels.brightness = 0.1              # Set NeoPixel brightness
+panel.pixels.fill(0)                       # Clear all NeoPixels
 if hasattr(board, "JOYSTICK_X"):
     panel.has_joystick = True     # PyGamer
 else: panel.has_joystick = False  # Must be PyBadge
