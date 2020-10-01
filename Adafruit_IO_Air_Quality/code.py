@@ -50,13 +50,13 @@ def connected(client):
     # calls against it easily.
     print("Connected to Adafruit IO!")
 
-    # Subscribe to Group
-    io.subscribe(group_key=group_name)
-
 # pylint: disable=unused-argument
 def disconnected(client):
     # Disconnected function will be called when the client disconnects.
     print("Disconnected from Adafruit IO!")
+
+def message(client, topic, message):
+    pass
 
 ### Sensor Functions ###
 def calculate_aqi(pm_sensor_reading):
@@ -137,6 +137,7 @@ def read_bme280(is_celsius=False):
         temperature = temperature * 1.8 + 32
     return temperature, humidity
 
+
 ### CODE ###
 
 # Connect to WiFi
@@ -152,13 +153,13 @@ mqtt_client = MQTT.MQTT(
     broker="io.adafruit.com", username=secrets["aio_user"], password=secrets["aio_key"],
 )
 
-
 # Initialize an Adafruit IO MQTT Client
 io = IO_MQTT(mqtt_client)
 
 # Connect the callback methods defined above to Adafruit IO
 io.on_connect = connected
 io.on_disconnect = disconnected
+io.on_message = message
 
 # Connect to Adafruit IO
 print("Connecting to Adafruit IO...")
@@ -189,13 +190,25 @@ while True:
     aqi_reading = sample_aq_sensor()
     aqi, aqi_category = calculate_aqi(aqi_reading)
     print("AQI: %d"%aqi)
+    
     print("category: %s"%aqi_category)
+    
     # temp and humidity
     temperature, humidity = read_bme280()
     print("Temperature: %0.1f F" % temperature)
     print("Humidity: %0.1f %%" % humidity)
+
+    # Publish to IO
+    print("Publishing to Adafruit IO...")
+    # TODO: sleep a bit after these calls
+    io.publish(feed_aqi, aqi)
+    io.publish(feed_aqi_category, aqi_category)
+    io.publish(feed_humid, humidity)
+    io.publish(feed_temp, temperature)
+    print("Published!")
   except (ValueError, RuntimeError) as e:
       print("Failed to get data, retrying\n", e)
       wifi.reset()
       io.reconnect()
       continue
+  time.sleep(10)
