@@ -3,7 +3,8 @@ import math
 import board
 from digitalio import DigitalInOut, Direction, Pull
 import pulseio
-from adafruit_lsm6ds import LSM6DS33, AccelRange, AccelHPF, Rate
+from adafruit_lsm6ds.lsm6ds33 import LSM6DS33
+from adafruit_lsm6ds import AccelRange, AccelHPF, Rate
 from adafruit_display_text import label
 import displayio
 import terminalio
