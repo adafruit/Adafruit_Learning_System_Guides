@@ -8,7 +8,7 @@ from adafruit_esp32spi import adafruit_esp32spi_wifimanager
 import adafruit_esp32spi.adafruit_esp32spi_socket as socket
 import adafruit_minimqtt.adafruit_minimqtt as MQTT
 from adafruit_io.adafruit_io import IO_MQTT
-
+from adafruit_io.adafruit_io_errors import AdafruitIO_MQTTError
 from simpleio import map_range
 
 import adafruit_pm25
@@ -57,6 +57,23 @@ def disconnected(client):
 
 def message(client, topic, message):
     pass
+
+def on_new_time(client, topic, message):
+    """Obtains new time from Adafruit IO time service.
+    """
+    current_time = message.split("-")[2].split("T")[1]
+    current_time = current_time.split(".")[0]
+    current_hour = current_time.split(":")[0]
+    current_minute = current_time.split(":")[1]
+    # Add new PM.25 reading to hourly average
+    if (current_hour - prv_hour >= 1):
+        print("new hour!")
+        prv_hour = current_hour
+    if (current_minute - prv_minute >= 10):
+        print("new 10m increment!")
+        prv_minute = current_minute
+
+    
 
 ### Sensor Functions ###
 def calculate_aqi(pm_sensor_reading):
@@ -179,36 +196,51 @@ feed_aqi = group_air_quality + ".aqi"
 # Air quality index category
 feed_aqi_category = group_air_quality + ".category"
 
+# Set up location metadata
+# TODO: Use secrets.py
+location_metadata = "40.726190, -74.005334, -6"
 
+
+# Call on_new_time to update the time from Adafruit IO
+io._client.add_topic_callback("time/ISO-8601", on_new_time)
+# Subscribe to the Adafruit IO  UTC time service
+io.subscribe_to_time("ISO-8601")
+
+prv_minute = 0
+prv_hour = 0
+
+initial_time = time.monotonic()
 while True:
   try:
     # Keep device connected to io.adafruit.com
     # and process any incoming data.
     io.loop()
-    # TODO: read every 10min
-    # air quality
-    aqi_reading = sample_aq_sensor()
-    aqi, aqi_category = calculate_aqi(aqi_reading)
-    print("AQI: %d"%aqi)
-    
-    print("category: %s"%aqi_category)
-    
-    # temp and humidity
-    temperature, humidity = read_bme280()
-    print("Temperature: %0.1f F" % temperature)
-    print("Humidity: %0.1f %%" % humidity)
+    now = time.monotonic()
+    print(now-initial_time)
+    while (now - initial_time >= 10):
+        # air quality
+        aqi_reading = sample_aq_sensor()
+        aqi, aqi_category = calculate_aqi(aqi_reading)
+        print("AQI: %d"%aqi)
+        print("category: %s"%aqi_category)
 
-    # Publish to IO
-    print("Publishing to Adafruit IO...")
-    # TODO: sleep a bit after these calls
-    io.publish(feed_aqi, aqi)
-    io.publish(feed_aqi_category, aqi_category)
-    io.publish(feed_humid, humidity)
-    io.publish(feed_temp, temperature)
-    print("Published!")
-  except (ValueError, RuntimeError) as e:
+        # temp and humidity
+        temperature, humidity = read_bme280()
+        print("Temperature: %0.1f F" % temperature)
+        print("Humidity: %0.1f %%" % humidity)
+
+        # Publish to IO
+        print("Publishing to Adafruit IO...")
+        io.publish(feed_aqi, int(aqi), location_metadata)
+        io.publish(feed_aqi_category, aqi_category)
+        io.publish(feed_humid, humidity)
+        io.publish(feed_temp, temperature)
+        print("Published!")
+
+        initial_time = now
+  except (ValueError, RuntimeError, AdafruitIO_MQTTError) as e:
       print("Failed to get data, retrying\n", e)
       wifi.reset()
       io.reconnect()
       continue
-  time.sleep(10)
+  time.sleep(0.5)
