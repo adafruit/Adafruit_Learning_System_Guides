@@ -14,6 +14,7 @@ from simpleio import map_range
 import adafruit_pm25
 import adafruit_bme280
 
+
 ### WiFi ###
 
 # Get wifi details and more from a secrets.py file
@@ -59,21 +60,16 @@ def message(client, topic, message):
     pass
 
 def on_new_time(client, topic, message):
-    """Obtains new time from Adafruit IO time service.
+    """Obtains new time from Adafruit IO time service
+    and parses the current_hour/current_minute
     """
+    global current_hour, current_minute
     current_time = message.split("-")[2].split("T")[1]
     current_time = current_time.split(".")[0]
-    current_hour = current_time.split(":")[0]
-    current_minute = current_time.split(":")[1]
-    # Add new PM.25 reading to hourly average
-    if (current_hour - prv_hour >= 1):
-        print("new hour!")
-        prv_hour = current_hour
-    if (current_minute - prv_minute >= 10):
-        print("new 10m increment!")
-        prv_minute = current_minute
+    current_hour = int(current_time.split(":")[0])
+    current_minute = int(current_time.split(":")[1])
 
-    
+
 
 ### Sensor Functions ###
 def calculate_aqi(pm_sensor_reading):
@@ -200,47 +196,82 @@ feed_aqi_category = group_air_quality + ".category"
 # TODO: Use secrets.py
 location_metadata = "40.726190, -74.005334, -6"
 
-
 # Call on_new_time to update the time from Adafruit IO
 io._client.add_topic_callback("time/ISO-8601", on_new_time)
 # Subscribe to the Adafruit IO  UTC time service
 io.subscribe_to_time("ISO-8601")
 
-prv_minute = 0
-prv_hour = 0
-
 initial_time = time.monotonic()
+
+current_hour = 0
+current_minute = 0
+prv_hour = 0
+prv_minute = 0
+time_elapsed = 0
+
+average_aqi = 0
+
 while True:
   try:
     # Keep device connected to io.adafruit.com
     # and process any incoming data.
     io.loop()
-    now = time.monotonic()
-    print(now-initial_time)
-    while (now - initial_time >= 10):
-        # air quality
-        aqi_reading = sample_aq_sensor()
-        aqi, aqi_category = calculate_aqi(aqi_reading)
-        print("AQI: %d"%aqi)
-        print("category: %s"%aqi_category)
-
-        # temp and humidity
-        temperature, humidity = read_bme280()
-        print("Temperature: %0.1f F" % temperature)
-        print("Humidity: %0.1f %%" % humidity)
-
-        # Publish to IO
-        print("Publishing to Adafruit IO...")
-        io.publish(feed_aqi, int(aqi), location_metadata)
-        io.publish(feed_aqi_category, aqi_category)
-        io.publish(feed_humid, humidity)
-        io.publish(feed_temp, temperature)
-        print("Published!")
-
-        initial_time = now
   except (ValueError, RuntimeError, AdafruitIO_MQTTError) as e:
       print("Failed to get data, retrying\n", e)
       wifi.reset()
+      wifi.connect()
       io.reconnect()
       continue
-  time.sleep(0.5)
+
+  # Check current time against io.adafruit time service
+  if (current_hour - prv_hour >= 1):
+      print("new hour!")
+      # Reset prv_hour
+      prv_hour = current_hour
+      io.publish(feed_temp, current_minute)
+      time_elapsed = True
+  elif (current_minute - prv_minute >= 1):
+      print("new 1m increment!")
+      print(current_minute)
+      # Reset prv_minute
+      prv_minute = int(current_minute)
+      io.publish(feed_temp, current_minute)
+      time_elapsed = True
+  elif current_minute % 10 == 0:
+      print("new 10m increment!")
+      # Reset prv_minute
+      prv_minute = int(current_minute)
+      io.publish(feed_temp, current_minute)
+      time_elapsed = True
+  else:
+      # no difference in current time
+      continue
+
+  if time_elapsed:
+    aqi_reading = sample_aq_sensor()
+    aqi, aqi_category = calculate_aqi(aqi_reading)
+    # Average AQI readings over amount of readings
+    if current_minute > 0:
+      average_aqi += aqi
+      average_aqi /= current_minute
+
+    print("AQI: %d"%aqi)
+    print("Category: %s"%aqi_category)
+
+    # temp and humidity
+    temperature, humidity = read_bme280()
+    print("Temperature: %0.1f F" % temperature)
+    print("Humidity: %0.1f %%" % humidity)
+
+    # Publish to IO
+    print("Publishing to Adafruit IO...")
+    # TODO: These need to be within a try/except block
+    io.publish(feed_aqi, int(aqi), location_metadata)
+    io.publish(feed_aqi_category, aqi_category)
+    io.publish(feed_humid, humidity)
+    io.publish(feed_temp, temperature)
+    print("Published!")
+    # Reset time_elapsed
+    time_elapsed = False
+
+  time.sleep(60)
