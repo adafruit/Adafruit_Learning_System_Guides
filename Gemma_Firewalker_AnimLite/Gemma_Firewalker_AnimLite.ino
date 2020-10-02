@@ -73,7 +73,6 @@ void setup() {
   memset(stepX  , 0, sizeof(stepX));
   strip.begin();
   stepFiltered = analogRead(STEP_PIN); // Initial input
-  Serial.begin(9600);
 }
 
 void loop() {
@@ -82,7 +81,6 @@ void loop() {
   // Read analog input, with a little noise filtering
   //stepFiltered = ((stepFiltered * 3) + analogRead(STEP_PIN)) >> 2;
     stepFiltered = (((stepFiltered * 3) - 100) + analogRead(STEP_PIN)) >> 2;
-    Serial.println (stepFiltered);
     
   // The strip doesn't simply display the current pressure reading.  Instead,
   // there's a bit of an animated flourish from heel to toe.  This takes time,
