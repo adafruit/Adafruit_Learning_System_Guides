@@ -2,7 +2,7 @@ import time
 import board
 import busio
 from digitalio import DigitalInOut, Direction, Pull
-import adafruit_dotstar as dotstar
+import neopixel
 from adafruit_esp32spi import adafruit_esp32spi, adafruit_esp32spi_wifimanager
 from adafruit_io.adafruit_io import IO_HTTP, AdafruitIO_RequestError
 from simpleio import map_range
@@ -27,7 +27,7 @@ esp32_ready = DigitalInOut(board.D11)
 
 spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
 esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset)
-status_light = dotstar.DotStar(board.APA102_SCK, board.APA102_MOSI, 1, brightness=0.2)
+status_light = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.2)
 wifi = adafruit_esp32spi_wifimanager.ESPSPI_WiFiManager(esp, secrets, status_light)
 
 # Connect to a PM2.5 sensor over UART
@@ -91,7 +91,7 @@ def sample_aq_sensor():
     while (time.monotonic() - time_start <= 2.3):
         try:
             aqdata = pm25.read()
-            aq_samples.append(aqdata["particles 25um"])
+            aq_samples.append(aqdata["pm25 env"])
         except RuntimeError:
             print("Unable to read from sensor, retrying...")
             continue
@@ -130,34 +130,43 @@ feed_temperature = io.get_feed("air-quality-sensor.temperature")
 
 # Set up location metadata
 # TODO: Use secrets.py instead!
-location_metadata = "40.726190, -74.005334, -6"
+location_metadata = "41.823990, -71.412834, 19"
 
 elapsed_minutes = 0
 prv_mins = 0
-aqi_readings = 0
+aqi_readings = 0.0
+fetch_time_attempts = 0
+
 
 while True:
-    print("Obtaining time")
-    try:
-        cur_time = io.receive_time()
-        # print(cur_time)
-    except (ValueError, RuntimeError) as e:
+    if fetch_time_attempts <= 3:
+        try:
+            print("Fetching time...")
+            print("attempt ", fetch_time_attempts)
+            cur_time = io.receive_time()
+        except (ValueError, RuntimeError) as e:
+            print("attempt ", fetch_time_attempts)
             print("Failed to get data, retrying\n", e)
             wifi.reset()
+            fetch_time_attempts+=1
             continue
+    else:
+        print("attempt ", fetch_time_attempts)
+        print("failed to fetch time, resetting wifi")
+        wifi.reset()
+        fetch_time_attempts = 0
+        continue
 
     if cur_time[4] > prv_mins:
         print("%d min elapsed.."%elapsed_minutes)
-        # Sample the AQI every minute
-        aqi_readings += sample_aq_sensor()
         prv_mins = cur_time[4]
         elapsed_minutes += 1
+        fetch_time_attempts+=1
 
-    if elapsed_minutes >= 10:
+    if elapsed_minutes >= 2:
         print("Sampling AQI...")
-        # Average AQI over 10 individual readings
-        aqi_readings /= 10
-        aqi, aqi_category = calculate_aqi(aqi_readings)
+        aqi_reading = sample_aq_sensor()
+        aqi, aqi_category = calculate_aqi(aqi_reading)
         print("AQI: %d"%aqi)
         print("Category: %s"%aqi_category)
 
@@ -166,20 +175,21 @@ while True:
         temperature, humidity = read_bme280()
         print("Temperature: %0.1f F" % temperature)
         print("Humidity: %0.1f %%" % humidity)
-        # TODO: Publish all values to Adafruit IO
 
+        # Publish all values to Adafruit IO
+        # TODO: This should be within a retry loop...
+        print("Publishing to Adafruit IO...")
         try:
             io.send_data(feed_aqi["key"], str(aqi))
             io.send_data(feed_aqi_category["key"], aqi_category)
             io.send_data(feed_temperature["key"], str(temperature))
             io.send_data(feed_humidity["key"], str(humidity))
+            print("Published!")
         except (ValueError, RuntimeError) as e:
-            print("Failed to get data, retrying\n", e)
+            print("Failed to send data, retrying\n", e)
             wifi.reset()
             continue
-
-
         # Reset timer
         elapsed_minutes = 0
+    fetch_time_attempts += 1
     time.sleep(30)
-
