@@ -15,6 +15,7 @@ from adafruit_matrixportal.matrix import Matrix
 from eyes.werewolf.data import EYE_DATA
 #from eyes.cyclops.data import EYE_DATA
 #from eyes.kobold.data import EYE_DATA
+#from eyes.adabot.data import EYE_DATA
 
 # UTILITY FUNCTIONS AND CLASSES --------------------------------------------
 
@@ -89,8 +90,8 @@ LOWER_LID_MAX = (max(EYE_DATA['lower_lid_open'][0],
                      EYE_DATA['lower_lid_closed'][0]),
                  max(EYE_DATA['lower_lid_open'][1],
                      EYE_DATA['lower_lid_closed'][1]))
-EYE_PREV = EYE_CENTER
-EYE_NEXT = EYE_CENTER
+EYE_PREV = (0, 0)
+EYE_NEXT = (0, 0)
 MOVE_STATE = False                                     # Initially stationary
 MOVE_EVENT_DURATION = random.uniform(0.1, 3)           # Time to first move
 BLINK_STATE = 2                                        # Start eyes closed
