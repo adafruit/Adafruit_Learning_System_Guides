@@ -16,6 +16,7 @@ from eyes.werewolf.data import EYE_DATA
 #from eyes.cyclops.data import EYE_DATA
 #from eyes.kobold.data import EYE_DATA
 #from eyes.adabot.data import EYE_DATA
+#from eyes.skull.data import EYE_DATA
 
 # UTILITY FUNCTIONS AND CLASSES --------------------------------------------
 
