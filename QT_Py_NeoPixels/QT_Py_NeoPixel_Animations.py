@@ -1,3 +1,4 @@
+"""Basic NeoPixel LED animations for the QT Py."""
 import time
 import board
 import neopixel
@@ -11,25 +12,6 @@ num_pixels = 30
 pixels = neopixel.NeoPixel(pixel_pin, num_pixels, auto_write=False)
 # Set to 0-1 to change the brightness of the NeoPixels
 pixels.brightness = 0.2
-
-
-def color_wipe(color, wait):
-    """Color wipe animation. Wipes across all pixels."""
-    for pixel in range(num_pixels):
-        pixels[pixel] = color
-        time.sleep(wait)
-        pixels.show()
-    time.sleep(0.5)
-
-
-def rainbow_cycle(wait):
-    """Rainbow cycle animation. Cycles across all pixels."""
-    for color_index in range(255):
-        for pixel in range(num_pixels):
-            pixel_index = (pixel * 256 // num_pixels) + color_index
-            pixels[pixel] = adafruit_pypixelbuf.colorwheel(pixel_index & 255)
-        pixels.show()
-        time.sleep(wait)
 
 
 def blink(color, wait):
@@ -63,6 +45,25 @@ def chase(color, spacing=3, iteration_step=1):
         if pixel + chase_pixel > len(pixels) - 1:
             break
         pixels[pixel + chase_pixel] = (0, 0, 0)
+
+
+def color_wipe(color, wait):
+    """Color wipe animation. Wipes across all pixels."""
+    for pixel in range(num_pixels):
+        pixels[pixel] = color
+        time.sleep(wait)
+        pixels.show()
+    time.sleep(0.5)
+
+
+def rainbow_cycle(wait):
+    """Rainbow cycle animation. Cycles across all pixels."""
+    for color_index in range(255):
+        for pixel in range(num_pixels):
+            pixel_index = (pixel * 256 // num_pixels) + color_index
+            pixels[pixel] = adafruit_pypixelbuf.colorwheel(pixel_index & 255)
+        pixels.show()
+        time.sleep(wait)
 
 
 RED = (255, 0, 0)
