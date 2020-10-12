@@ -115,13 +115,25 @@ class MoonData():
         rise     : Epoch time of moon rise within this 24-hour period.
         set      : Epoch time of moon set within this 24-hour period.
     """
-    def __init__(self, datetime, utc_offset):
+    def __init__(self, datetime, hours_ahead, utc_offset):
         """ Initialize MoonData object elements (see above) from a
-            time.struct_time and a UTC offset (as a string) and a query
-            to the MET Norway Sunrise API (also provides lunar data),
-            documented at:
+            time.struct_time, hours to skip ahead (typically 0 or 24),
+            and a UTC offset (as a string) and a query to the MET Norway
+            Sunrise API (also provides lunar data), documented at:
             https://api.met.no/weatherapi/sunrise/2.0/documentation
         """
+        if hours_ahead:
+            # Can't change attribute in datetime struct, need to create
+            # a new one which will roll the date ahead as needed. Convert
+            # to epoch seconds and back for the offset to work
+            datetime = time.localtime(time.mktime(time.struct_time(
+                datetime.tm_year,
+                datetime.tm_mon,
+                datetime.tm_mday,
+                datetime.tm_hour + hours_ahead,
+                datetime.tm_min,
+                datetime.tm_sec,
+                -1, -1, -1)))
         # strftime() not available here
         url = ('https://api.met.no/weatherapi/sunrise/2.0/.json?lat=' +
                str(LATITUDE) + '&lon=' + str(LONGITUDE) +
@@ -140,30 +152,21 @@ class MoonData():
                 self.age = float(moon_data['moonphase']['value']) / 100
                 self.midnight = time.mktime(parse_time(
                     moon_data['moonphase']['time']))
-                self.rise = time.mktime(
-                    parse_time(moon_data['moonrise']['time']))
-                self.set = time.mktime(
-                    parse_time(moon_data['moonset']['time']))
+                if 'moonrise' in moon_data:
+                    self.rise = time.mktime(
+                        parse_time(moon_data['moonrise']['time']))
+                else:
+                    self.rise = None
+                if 'moonset' in moon_data:
+                    self.set = time.mktime(
+                        parse_time(moon_data['moonset']['time']))
+                else:
+                    self.set = None
                 return # Success!
             except:
                 # Moon server error (maybe), try again after 15 seconds.
                 # (Might be a memory error, that should be handled different)
                 time.sleep(15)
-
-
-def next_moon_data(datetime, utc_offset):
-    """ Given a time.struct_time, compute and return a MoonData object
-        for the NEXT 24 hour period ahead.
-    """
-    tomorrow = time.struct_time(datetime.tm_year,
-                                datetime.tm_mon,
-                                datetime.tm_mday,
-                                datetime.tm_hour + 24,
-                                datetime.tm_min,
-                                datetime.tm_sec,
-                                -1, -1, -1)
-    # Convert to epoch seconds and back for the +24 hour offset to work
-    return MoonData(time.localtime(time.mktime(tomorrow)), utc_offset)
 
 
 # ONE-TIME INITIALIZATION --------------------------------------------------
@@ -172,6 +175,8 @@ MATRIX = Matrix(bit_depth=BITPLANES)
 DISPLAY = MATRIX.display
 ACCEL = adafruit_lis3dh.LIS3DH_I2C(busio.I2C(board.SCL, board.SDA),
                                    address=0x19)
+_ = ACCEL.acceleration # Dummy reading to blow out any startup residue
+time.sleep(0.1)
 DISPLAY.rotation = (int(((math.atan2(-ACCEL.acceleration.y,
                                      -ACCEL.acceleration.x) + math.pi) /
                          (math.pi * 2) + 0.875) * 4) % 4) * 90
@@ -257,11 +262,14 @@ except:
     DATETIME, UTC_OFFSET = time.localtime(), '+00:00'
 LAST_SYNC = time.mktime(DATETIME)
 
-# Poll server for moon data for current 24-hour period
-CURRENT_PERIOD = MoonData(DATETIME, UTC_OFFSET)
-
-# Then do same for 24 hours ahead...
-NEXT_PERIOD = next_moon_data(DATETIME, UTC_OFFSET)
+# Poll server for moon data for current 24-hour period and +24 ahead
+PERIOD = []
+for DAY in range(2):
+    PERIOD.append(MoonData(DATETIME, DAY * 24, UTC_OFFSET))
+# PERIOD[0] is the current 24-hour time period we're in. PERIOD[1] is the
+# following 24 hours. Data is shifted down and new data fetched as days
+# expire. Thought we might need a PERIOD[2] for certain circumstances but
+# it appears not, that's changed easily enough if needed.
 
 
 # MAIN LOOP ----------------------------------------------------------------
@@ -283,29 +291,28 @@ while True:
             # the server with repeated queries).
             LAST_SYNC += 30 * 60 * 60 # 30 minutes -> seconds
 
-    # If NEXT_PERIOD has expired, move that to CURRENT_PERIOD and fetch anew
-    if NOW >= NEXT_PERIOD.midnight:
-        CURRENT_PERIOD = NEXT_PERIOD
-        NEXT_PERIOD = next_moon_data(time.localtime(), UTC_OFFSET)
-        continue # NOW is stale due to server query time; refresh
+    # If PERIOD has expired, move data down and fetch new +24-hour data
+    if NOW >= PERIOD[1].midnight:
+        PERIOD[0] = PERIOD[1]
+        PERIOD[1] = MoonData(time.localtime(), 24, UTC_OFFSET)
 
     # Determine weighting of tomorrow's phase vs today's, using current time
-    RATIO = ((NOW - CURRENT_PERIOD.midnight) /
-             (NEXT_PERIOD.midnight - CURRENT_PERIOD.midnight))
+    RATIO = ((NOW - PERIOD[0].midnight) /
+             (PERIOD[1].midnight - PERIOD[0].midnight))
     # Determine moon phase 'age'
     # 0.0  = new moon
     # 0.25 = first quarter
     # 0.5  = full moon
     # 0.75 = last quarter
     # 1.0  = new moon
-    if CURRENT_PERIOD.age < NEXT_PERIOD.age:
-        AGE = (CURRENT_PERIOD.age +
-               (NEXT_PERIOD.age - CURRENT_PERIOD.age) * RATIO) % 1.0
+    if PERIOD[0].age < PERIOD[1].age:
+        AGE = (PERIOD[0].age +
+               (PERIOD[1].age - PERIOD[0].age) * RATIO) % 1.0
     else: # Handle age wraparound (1.0 -> 0.0)
         # If tomorrow's age is less than today's, it indicates a new moon
         # crossover. Add 1 to tomorrow's age when computing age delta.
-        AGE = (CURRENT_PERIOD.age +
-               (NEXT_PERIOD.age + 1 - CURRENT_PERIOD.age) * RATIO) % 1.0
+        AGE = (PERIOD[0].age +
+               (PERIOD[1].age + 1 - PERIOD[0].age) * RATIO) % 1.0
 
     # AGE can be used for direct lookup to moon bitmap (0 to 99) -- these
     # images are pre-rendered for a linear timescale (solar terminator moves
@@ -318,26 +325,22 @@ while True:
     else:          # Full -> last quarter -> new
         PERCENT = (1 + math.cos((AGE - 0.5) * 2 * math.pi)) * 50
 
-    if CURRENT_PERIOD.set > CURRENT_PERIOD.rise:
-        if CURRENT_PERIOD.rise < NOW < CURRENT_PERIOD.set:
-            RISEN = True
-            NEXT_EVENT = CURRENT_PERIOD.set
-        else:
+    # Find next rise/set event, complicated by the fact that some 24-hour
+    # periods might not have one or the other (but usually do) due to the
+    # Moon rising ~50 mins later each day. This uses a brute force approach,
+    # working backwards through the time periods to locate rise/set events
+    # that A) exist in that 24-hour period (are not None), B) are still in
+    # the future, and C) are closer than the last guess. What's left at the
+    # end is the next rise or set (and the inverse of the event type tells
+    # us whether Moon's currently risen or not).
+    NEXT_EVENT = PERIOD[1].midnight + 100000 # Force first match
+    for DAY in reversed(PERIOD):
+        if DAY.rise and NEXT_EVENT >= DAY.rise >= NOW:
+            NEXT_EVENT = DAY.rise
             RISEN = False
-            if NOW < CURRENT_PERIOD.rise:
-                NEXT_EVENT = CURRENT_PERIOD.rise
-            else:
-                NEXT_EVENT = NEXT_PERIOD.rise
-    else:
-        if CURRENT_PERIOD.set < NOW < CURRENT_PERIOD.rise:
-            RISEN = False
-            NEXT_EVENT = CURRENT_PERIOD.rise
-        else:
+        if DAY.set and NEXT_EVENT >= DAY.set >= NOW:
+            NEXT_EVENT = DAY.set
             RISEN = True
-            if NOW < CURRENT_PERIOD.set:
-                NEXT_EVENT = CURRENT_PERIOD.set
-            else:
-                NEXT_EVENT = NEXT_PERIOD.set
 
     if DISPLAY.rotation in (0, 180): # Horizontal 'landscape' orientation
         CENTER_X = 48      # Text along right
@@ -367,7 +370,7 @@ while True:
     GROUP[0] = TILE_GRID
 
     # Update percent value (5 labels: GROUP[1-4] for outline, [5] for text)
-    if PERCENT >= 100:
+    if PERCENT >= 99.95:
         STRING = '100%'
     else:
         STRING = '{:.1f}'.format(PERCENT + 0.05) + '%'
@@ -420,4 +423,5 @@ while True:
     GROUP[7].x = CENTER_X - GROUP[7].bounding_box[2] // 2
     GROUP[7].y = TIME_Y + 10
 
+    DISPLAY.refresh() # Force full repaint (splash screen sometimes sticks)
     time.sleep(5)

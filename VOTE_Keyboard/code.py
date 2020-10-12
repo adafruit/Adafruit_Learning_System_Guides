@@ -1,14 +1,11 @@
 import board
 from digitalio import DigitalInOut, Direction, Pull
-import adafruit_dotstar as dotstar
+import usb_hid
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keycode import Keycode
 from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS
 
-dot = dotstar.DotStar(board.APA102_SCK, board.APA102_MOSI, 1, brightness=0.2)
-dot[0] = (0, 0, 0)
-
-kbd = Keyboard()
+kbd = Keyboard(usb_hid.devices)
 kbdLayout = KeyboardLayoutUS(kbd)
 state = []
 pins = {}
@@ -58,8 +55,7 @@ while True:
     for oldID in oldState:
         if not oldID in newState:
             kbd.release(buttonIDtoKeycode[oldID])
-            dot[0] = (0, 0, 0)
     if newBtn:
         kbd.press(buttonIDtoKeycode[newBtn])
-        dot[0] = (255, 0, 0)
     state = newState
+    
