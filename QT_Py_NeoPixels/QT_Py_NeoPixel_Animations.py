@@ -24,10 +24,10 @@ def color_wipe(color, wait):
 
 def rainbow_cycle(wait):
     """Rainbow cycle animation. Cycles across all pixels."""
-    for color_index in range(255):
+    for color_cycle in range(255):
         for pixel in range(num_pixels):
-            pixel_index = (pixel * 256 // num_pixels) + color_index
-            pixels[i] = adafruit_pypixelbuf.colorwheel(pixel_index & 255)
+            rc_index = (pixel * 256 // num_pixels) + color_cycle
+            pixels[pixel] = adafruit_pypixelbuf.colorwheel(rc_index & 255)
         pixels.show()
         time.sleep(wait)
 
