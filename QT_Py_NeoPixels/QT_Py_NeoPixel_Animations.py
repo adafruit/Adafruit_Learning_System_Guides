@@ -15,8 +15,8 @@ pixels.brightness = 0.2
 
 def color_wipe(color, wait):
     """Color wipe animation. Wipes across all pixels."""
-    for i in range(num_pixels):
-        pixels[i] = color
+    for pixel in range(num_pixels):
+        pixels[pixel] = color
         time.sleep(wait)
         pixels.show()
     time.sleep(0.5)
@@ -24,10 +24,10 @@ def color_wipe(color, wait):
 
 def rainbow_cycle(wait):
     """Rainbow cycle animation. Cycles across all pixels."""
-    for j in range(255):
-        for i in range(num_pixels):
-            rc_index = (i * 256 // num_pixels) + j
-            pixels[i] = adafruit_pypixelbuf.colorwheel(rc_index & 255)
+    for color_index in range(255):
+        for pixel in range(num_pixels):
+            pixel_index = (pixel * 256 // num_pixels) + color_index
+            pixels[i] = adafruit_pypixelbuf.colorwheel(pixel_index & 255)
         pixels.show()
         time.sleep(wait)
 
