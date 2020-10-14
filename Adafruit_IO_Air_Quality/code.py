@@ -128,42 +128,35 @@ feed_humidity = io.get_feed("air-quality-sensor.humidity")
 feed_temperature = io.get_feed("air-quality-sensor.temperature")
 
 
-# Set up location metadata
-# TODO: Use secrets.py instead!
-location_metadata = "41.823990, -71.412834, 19"
+# Set up location metadata from secrets.py file
+location_metadata = (secrets['latitude'], secrets['longitude'], secrets['elevation'])
+
+io.send_data(feed_aqi["key"], 'test', location_metadata)
 
 elapsed_minutes = 0
 prv_mins = 0
 aqi_readings = 0.0
-fetch_time_attempts = 0
-
 
 while True:
-    if fetch_time_attempts <= 3:
-        try:
-            print("Fetching time...")
-            print("attempt ", fetch_time_attempts)
-            cur_time = io.receive_time()
-        except (ValueError, RuntimeError) as e:
-            print("attempt ", fetch_time_attempts)
-            print("Failed to get data, retrying\n", e)
-            wifi.reset()
-            fetch_time_attempts+=1
-            continue
-    else:
-        print("attempt ", fetch_time_attempts)
-        print("failed to fetch time, resetting wifi")
+    try:
+        print("Fetching time...")
+        cur_time = io.receive_time()
+        print("Time fetched OK!")
+        # Hourly reset
+        if cur_time.tm_min == 0:
+            prv_mins = 0
+    except (ValueError, RuntimeError) as e:
+        print("Failed to fetch time, retrying\n", e)
         wifi.reset()
-        fetch_time_attempts = 0
+        wifi.connect()
         continue
 
-    if cur_time[4] > prv_mins:
+    if cur_time.tm_min >= prv_mins:
         print("%d min elapsed.."%elapsed_minutes)
-        prv_mins = cur_time[4]
+        prv_mins = cur_time.tm_min
         elapsed_minutes += 1
-        fetch_time_attempts+=1
 
-    if elapsed_minutes >= 2:
+    if elapsed_minutes >= 1:
         print("Sampling AQI...")
         aqi_reading = sample_aq_sensor()
         aqi, aqi_category = calculate_aqi(aqi_reading)
@@ -177,19 +170,18 @@ while True:
         print("Humidity: %0.1f %%" % humidity)
 
         # Publish all values to Adafruit IO
-        # TODO: This should be within a retry loop...
         print("Publishing to Adafruit IO...")
         try:
-            io.send_data(feed_aqi["key"], str(aqi))
+            io.send_data(feed_aqi["key"], str(aqi), location_metadata)
             io.send_data(feed_aqi_category["key"], aqi_category)
             io.send_data(feed_temperature["key"], str(temperature))
             io.send_data(feed_humidity["key"], str(humidity))
             print("Published!")
         except (ValueError, RuntimeError) as e:
-            print("Failed to send data, retrying\n", e)
+            print("Failed to send data to IO, retrying\n", e)
             wifi.reset()
+            wifi.connect()
             continue
         # Reset timer
         elapsed_minutes = 0
-    fetch_time_attempts += 1
     time.sleep(30)
