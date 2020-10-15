@@ -1,10 +1,10 @@
 import time
 import board
 import busio
-from digitalio import DigitalInOut, Direction, Pull
+from digitalio import DigitalInOut
 import neopixel
 from adafruit_esp32spi import adafruit_esp32spi, adafruit_esp32spi_wifimanager
-from adafruit_io.adafruit_io import IO_HTTP, AdafruitIO_RequestError
+from adafruit_io.adafruit_io import IO_HTTP
 from simpleio import map_range
 
 import adafruit_pm25
@@ -20,7 +20,7 @@ except ImportError:
     print("WiFi secrets are kept in secrets.py, please add them there!")
     raise
 
-# If you have an externally connected ESP32:
+# AirLift FeatherWing
 esp32_cs = DigitalInOut(board.D13)
 esp32_reset = DigitalInOut(board.D12)
 esp32_ready = DigitalInOut(board.D11)
@@ -51,31 +51,31 @@ def calculate_aqi(pm_sensor_reading):
     # Check sensor reading using EPA breakpoint (Clow-Chigh)
     if 0.0 <= pm_sensor_reading <= 12.0:
         # AQI calculation using EPA breakpoints (Ilow-IHigh)
-        aqi = map_range(int(pm_sensor_reading), 0, 12, 0, 50)
-        aqi_category = "Good"
+        aqi_val = map_range(int(pm_sensor_reading), 0, 12, 0, 50)
+        aqi_cat = "Good"
     elif 12.1 <= pm_sensor_reading <= 35.4:
-        aqi = map_range(int(pm_sensor_reading), 12, 35, 51, 100)
-        aqi_category = "Moderate"
+        aqi_val = map_range(int(pm_sensor_reading), 12, 35, 51, 100)
+        aqi_cat = "Moderate"
     elif 35.5 <= pm_sensor_reading <= 55.4:
-        aqi = map_range(int(pm_sensor_reading), 36, 55, 101, 150)
-        aqi_category = "Unhealthy for Sensitive Groups"
+        aqi_val = map_range(int(pm_sensor_reading), 36, 55, 101, 150)
+        aqi_cat = "Unhealthy for Sensitive Groups"
     elif 55.5 <= pm_sensor_reading <= 150.4:
-        aqi = map_range(int(pm_sensor_reading), 56, 150, 151, 200)
-        aqi_category = "Unhealthy"
+        aqi_val = map_range(int(pm_sensor_reading), 56, 150, 151, 200)
+        aqi_cat = "Unhealthy"
     elif 150.5 <= pm_sensor_reading <= 250.4:
-        aqi = map_range(int(pm_sensor_reading), 151, 250, 201, 300)
-        aqi_category = "Very Unhealthy"
+        aqi_val = map_range(int(pm_sensor_reading), 151, 250, 201, 300)
+        aqi_cat = "Very Unhealthy"
     elif 250.5 <= pm_sensor_reading <= 350.4:
-        aqi = map_range(int(pm_sensor_reading), 251, 350, 301, 400)
-        aqi_category = "Hazardous"
+        aqi_val = map_range(int(pm_sensor_reading), 251, 350, 301, 400)
+        aqi_cat = "Hazardous"
     elif 350.5 <= pm_sensor_reading <= 500.4:
-        aqi = map_range(int(pm_sensor_reading), 351, 500, 401, 500)
-        aqi_category = "Hazardous"
+        aqi_val = map_range(int(pm_sensor_reading), 351, 500, 401, 500)
+        aqi_cat = "Hazardous"
     else:
         print("Invalid PM2.5 concentration")
-        aqi = -1
-        aqi_category = None
-    return aqi, aqi_category
+        aqi_val = -1
+        aqi_cat = None
+    return aqi_val, aqi_cat
 
 def sample_aq_sensor():
     """Samples PM2.5 sensor
@@ -88,7 +88,7 @@ def sample_aq_sensor():
     # initial timestamp
     time_start = time.monotonic()
     # sample pm2.5 sensor over 2.3 sec sample rate
-    while (time.monotonic() - time_start <= 2.3):
+    while time.monotonic() - time_start <= 2.3:
         try:
             aqdata = pm25.read()
             aq_samples.append(aqdata["pm25 env"])
@@ -111,11 +111,11 @@ def read_bme280(is_celsius=False):
     :param bool is_celsius: Returns temperature in degrees celsius
                             if True, otherwise fahrenheit.
     """
-    humidity = bme280.humidity
-    temperature = bme280.temperature
+    humid = bme280.humidity
+    temp = bme280.temperature
     if not is_celsius:
-        temperature = temperature * 1.8 + 32
-    return temperature, humidity
+        temp = temp * 1.8 + 32
+    return temperature, humid
 
 
 # Create an instance of the Adafruit IO HTTP client
