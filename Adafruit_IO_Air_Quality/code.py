@@ -1,7 +1,7 @@
 import time
 import board
 import busio
-from digitalio import DigitalInOut, Direction
+from digitalio import DigitalInOut
 import neopixel
 from adafruit_esp32spi import adafruit_esp32spi, adafruit_esp32spi_wifimanager
 from adafruit_io.adafruit_io import IO_HTTP
@@ -10,6 +10,11 @@ from simpleio import map_range
 import adafruit_pm25
 import adafruit_bme280
 
+### Configure Sensor ###
+# Return BME280 environmental sensor readings in degrees Celsius
+USE_CELSIUS = False
+# Interval the sensor publishes to Adafruit IO, in minutes
+PUBLISH_INTERVAL = 10
 
 ### WiFi ###
 
@@ -31,11 +36,8 @@ status_light = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.2)
 wifi = adafruit_esp32spi_wifimanager.ESPSPI_WiFiManager(esp, secrets, status_light)
 
 # Connect to a PM2.5 sensor over UART
-reset_pin = DigitalInOut(board.G0)
-reset_pin.direction = Direction.OUTPUT
-reset_pin.value = False
 uart = busio.UART(board.TX, board.RX, baudrate=9600)
-pm25 = adafruit_pm25.PM25_UART(uart, reset_pin)
+pm25 = adafruit_pm25.PM25_UART(uart)
 
 # Connect to a BME280 sensor over I2C
 i2c = busio.I2C(board.SCL, board.SDA)
@@ -80,6 +82,7 @@ def calculate_aqi(pm_sensor_reading):
         aqi_cat = None
     return aqi_val, aqi_cat
 
+
 def sample_aq_sensor():
     """Samples PM2.5 sensor
     over a 2.3 second sample rate.
@@ -107,6 +110,7 @@ def sample_aq_sensor():
     aq_samples.clear()
     return aq_reading
 
+
 def read_bme280(is_celsius=False):
     """Returns temperature and humidity
     from BME280 environmental sensor, as a tuple.
@@ -122,7 +126,7 @@ def read_bme280(is_celsius=False):
 
 
 # Create an instance of the Adafruit IO HTTP client
-io = IO_HTTP(secrets['aio_user'], secrets['aio_key'], wifi)
+io = IO_HTTP(secrets["aio_user"], secrets["aio_key"], wifi)
 
 # Describes feeds used to hold Adafruit IO data
 feed_aqi = io.get_feed("air-quality-sensor.aqi")
@@ -130,15 +134,11 @@ feed_aqi_category = io.get_feed("air-quality-sensor.category")
 feed_humidity = io.get_feed("air-quality-sensor.humidity")
 feed_temperature = io.get_feed("air-quality-sensor.temperature")
 
-
 # Set up location metadata from secrets.py file
-location_metadata = (secrets['latitude'], secrets['longitude'], secrets['elevation'])
-
-io.send_data(feed_aqi["key"], 'test', location_metadata)
+location_metadata = (secrets["latitude"], secrets["longitude"], secrets["elevation"])
 
 elapsed_minutes = 0
 prv_mins = 0
-aqi_readings = 0.0
 
 while True:
     try:
@@ -155,20 +155,20 @@ while True:
         continue
 
     if cur_time.tm_min >= prv_mins:
-        print("%d min elapsed.."%elapsed_minutes)
+        print("%d min elapsed.." % elapsed_minutes)
         prv_mins = cur_time.tm_min
         elapsed_minutes += 1
 
-    if elapsed_minutes >= 1:
+    if elapsed_minutes >= PUBLISH_INTERVAL:
         print("Sampling AQI...")
         aqi_reading = sample_aq_sensor()
         aqi, aqi_category = calculate_aqi(aqi_reading)
-        print("AQI: %d"%aqi)
-        print("Category: %s"%aqi_category)
+        print("AQI: %d" % aqi)
+        print("Category: %s" % aqi_category)
 
         # temp and humidity
         print("Sampling environmental sensor...")
-        temperature, humidity = read_bme280()
+        temperature, humidity = read_bme280(USE_CELSIUS)
         print("Temperature: %0.1f F" % temperature)
         print("Humidity: %0.1f %%" % humidity)
 
