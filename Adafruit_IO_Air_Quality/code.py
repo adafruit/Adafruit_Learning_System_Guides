@@ -1,7 +1,7 @@
 import time
 import board
 import busio
-from digitalio import DigitalInOut
+from digitalio import DigitalInOut, Direction
 import neopixel
 from adafruit_esp32spi import adafruit_esp32spi, adafruit_esp32spi_wifimanager
 from adafruit_io.adafruit_io import IO_HTTP
@@ -31,8 +31,11 @@ status_light = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.2)
 wifi = adafruit_esp32spi_wifimanager.ESPSPI_WiFiManager(esp, secrets, status_light)
 
 # Connect to a PM2.5 sensor over UART
+reset_pin = DigitalInOut(board.G0)
+reset_pin.direction = Direction.OUTPUT
+reset_pin.value = False
 uart = busio.UART(board.TX, board.RX, baudrate=9600)
-pm25 = adafruit_pm25.PM25_UART(uart)
+pm25 = adafruit_pm25.PM25_UART(uart, reset_pin)
 
 # Connect to a BME280 sensor over I2C
 i2c = busio.I2C(board.SCL, board.SDA)
