@@ -12,8 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Setup Python
-    - uses: actions/setup-python@v2
+      uses: actions/setup-python@v2
       with:
         # 3.9 has issue with intelhex https://github.com/python-intelhex/intelhex/issues/45
         python-version: '3.8'
