@@ -48,7 +48,7 @@ except (SystemError, ImportError):
 
 try:
     import board
-    from digitalio import DigitalInOut, Direction, Pull
+    from digitalio import DigitalInOut
     import adafruit_dotstar
 except ImportError:
     print("Blinka not installed? Run 'pip3 install adafruit-circuitpython-dotstar'")
@@ -70,9 +70,6 @@ dots = adafruit_dotstar.DotStar(
     pixel_order=adafruit_dotstar.BGR,
 )
 dots.fill(0x000000)
-
-# Setup OLED
-i2c = board.I2C()
 
 ASSISTANT_API_ENDPOINT = "embeddedassistant.googleapis.com"
 END_OF_UTTERANCE = embedded_assistant_pb2.AssistResponse.END_OF_UTTERANCE
