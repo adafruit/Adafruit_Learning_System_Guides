@@ -166,9 +166,9 @@ display.show(blm_group)
 # Create a 3 line set of text for BLM
 blm_font = [None, None, None]
 for line in range(3):
-    label = adafruit_display_text.label.Label(
-        font, color=0xFFFFFF, x=8, y=line * 84+12, max_glyphs=16,
-    )
+    label = adafruit_display_text.label.Label(font, color=0xFFFFFF, max_glyphs=16)
+    label.anchor_point = (0, 0)
+    label.anchored_position = (8, line*84+8)
     blm_font[line] = label
     blm_group.append(label)
 
