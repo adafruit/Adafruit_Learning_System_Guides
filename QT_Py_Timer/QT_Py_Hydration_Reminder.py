@@ -41,16 +41,6 @@ STATE_TIMING_COMPLETE = "Timing complete"
 RED_ALERT = "Red Alert"
 
 
-def minutes_to_seconds(minutes):
-    """
-    Convert minutes to seconds for use with time.monotonic().
-
-    :param minutes: The number of minutes. Can be a float, e.g. 0.5 for half a minute.
-    """
-    seconds = minutes * 60
-    return seconds
-
-
 def gradient(color_one, color_two, blend_weight):
     """
     Blend between two colors with a given ratio.
