@@ -41,16 +41,6 @@ STATE_TIMING_COMPLETE = "Timing complete"
 RED_ALERT = "Red Alert"
 
 
-def minutes_to_seconds(minutes):
-    """
-    Convert minutes to seconds for use with time.monotonic().
-
-    :param minutes: The number of minutes. Can be a float, e.g. 0.5 for half a minute.
-    """
-    seconds = minutes * 60
-    return seconds
-
-
 def gradient(color_one, color_two, blend_weight):
     """
     Blend between two colors with a given ratio.
@@ -129,7 +119,7 @@ def timing():
     """The timing active state."""
     state_from_orientation()
 
-    activity_duration = minutes_to_seconds(hydration_reminder)
+    activity_duration = hydration_reminder * 60  # Converts minutes to seconds.
 
     elapsed = time.monotonic() - state_changed
 
@@ -149,7 +139,7 @@ def timing_complete():
 
     elapsed = time.monotonic() - state_changed
 
-    if elapsed >= minutes_to_seconds(red_alert_delay):
+    if elapsed >= (red_alert_delay * 60):  # Converts minutes to seconds.
         set_state(RED_ALERT)
         return
 
