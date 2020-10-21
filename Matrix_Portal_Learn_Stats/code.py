@@ -1,7 +1,7 @@
 import time
 import board
-import terminalio
 import rtc
+import terminalio
 from adafruit_matrixportal.matrixportal import MatrixPortal
 
 # --- Data Setup --- #
@@ -9,7 +9,7 @@ GUIDE_INDEX = 0
 # Number of guides to fetch and display from the Adafruit Learning System
 DISPLAY_NUM_GUIDES = 5
 DATA_SOURCE = "https://learn.adafruit.com/api/guides/new.json?count=%d"%DISPLAY_NUM_GUIDES
-TITLE_DATA_LOCATION = ["guides", GUIDE_INDEX, "guide", "title"]
+TITLE_DATA_LOCATION = ["guides"]
 TAGLINE_DATA_LOCATION = ["guides", GUIDE_INDEX, "guide", "tagline"]
 
 # the current working directory (where this file is)
@@ -22,44 +22,68 @@ matrixportal = MatrixPortal(
     debug=True
 )
 
-print(matrixportal.graphics.display.height)
+# --- Display Setup --- #
+# Delay for scrolling the text
+SCROLL_DELAY = 0.03
+# id = 0, title
 matrixportal.add_text(
     text_font=terminalio.FONT,
-    text_position=(2, 4),
-    text_color=0xFFFFFF,
-    scrolling=True,
+    text_position=((matrixportal.graphics.display.width // 3) - 1, (matrixportal.graphics.display.height // 3) - 1),
+    text_color=0x800000,
+    text_scale = 2
 )
 
+# id = 1, author
+matrixportal.add_text(
+    text_font=terminalio.FONT,
+    text_position=(2, 25),
+    text_color=0x000080,
+    scrolling = True
+)
+
+def get_guide_info(index):
+    if index > DISPLAY_NUM_GUIDES:
+        raise RuntimeError("Provided index may not be larger than DISPLAY_NUM_GUIDES.")
+    print("Obtaining guide info for guide %d..."%index)
+    # Traverse JSON data for title
+    guide_count = matrixportal.network.json_traverse(als_data.json(), ["guide_count"])
+    guides = matrixportal.network.json_traverse(als_data.json(), TITLE_DATA_LOCATION)
+    guide_title = guides[index]["guide"]["title"]
+    print("Guide Title", guide_title)
+    return (guide_count, guide_title)
 
 
+idx = 0
+prv_hour = 0
 refresh_time = None
 while True:
-    # Query local time every hour and on first run
+
     if (not refresh_time) or (time.monotonic() - refresh_time) > 3600:
         try:
-            print("Getting time from internet!")
+            print("obtaining time from adafruit.io server...")
             matrixportal.get_local_time()
             refresh_time = time.monotonic()
         except RuntimeError as e:
-            print("Some error occured, retrying! -", e)
+            print("Retrying! - ", e)
             continue
- 
-    the_time = time.localtime()
-    print("Time: ", the_time)
 
-    try:
-        print("Index is ", GUIDE_INDEX)
-        # Update title location index
-        TITLE_DATA_LOCATION = ["guides", GUIDE_INDEX, "guide", "title"]
-        matrixportal.json_path=TITLE_DATA_LOCATION
-        value = matrixportal.fetch()
-        print("Response is", value)
-    except (ValueError, RuntimeError) as e:
-        print("Some error occured, retrying! -", e)
-    matrixportal.scroll_text(0.01)
-    if GUIDE_INDEX == DISPLAY_NUM_GUIDES - 1: # reached the end of the guides
-        # reset the index
-        print("Reached the end of the new guides, resetting!")
-        GUIDE_INDEX = 0
-    GUIDE_INDEX += 1
+    if time.localtime()[3] != prv_hour:
+        # Fetch and store guide info response
+        als_data = matrixportal.network.fetch(DATA_SOURCE)
+        prv_hour = time.localtime()[3]
+
+    # Cycle through guides retrieved
+    if idx < DISPLAY_NUM_GUIDES:
+        guide_count, guide_title = get_guide_info(idx)
+        # Set title text
+        matrixportal.set_text(guide_count, 0)
+
+        # Set author text
+        matrixportal.set_text(guide_title, 1)
+
+        # Scroll the scrollable text blocks
+        matrixportal.scroll_text(SCROLL_DELAY)
+        idx += 1
+    else:
+        idx = 0
     time.sleep(0.5)
