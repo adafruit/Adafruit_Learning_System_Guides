@@ -129,7 +129,7 @@ def timing():
     """The timing active state."""
     state_from_orientation()
 
-    activity_duration = minutes_to_seconds(hydration_reminder)
+    activity_duration = hydration_reminder * 60  # Converts minutes to seconds.
 
     elapsed = time.monotonic() - state_changed
 
@@ -149,7 +149,7 @@ def timing_complete():
 
     elapsed = time.monotonic() - state_changed
 
-    if elapsed >= minutes_to_seconds(red_alert_delay):
+    if elapsed >= (red_alert_delay * 60):  # Converts minutes to seconds.
         set_state(RED_ALERT)
         return
 
