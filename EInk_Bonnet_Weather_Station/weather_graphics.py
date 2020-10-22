@@ -59,7 +59,7 @@ class Weather_Graphics:
         self._time_text = None
 
     def display_weather(self, weather):
-        weather = json.loads(weather)
+        weather = json.loads(weather.decode("utf-8"))
 
         # set the icon/background
         self._weather_icon = ICON_MAP[weather["weather"][0]["icon"]]
