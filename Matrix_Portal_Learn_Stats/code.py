@@ -1,5 +1,6 @@
 import time
 import board
+from random import randrange
 import rtc
 import terminalio
 from adafruit_matrixportal.matrixportal import MatrixPortal
@@ -23,6 +24,12 @@ matrixportal = MatrixPortal(
 )
 
 # --- Display Setup --- #
+
+# Colors for guide name
+colors = [0xff0000, 0xffa500, 0xffff00,
+          0x008000, 0x0000ff, 0x4b0082,
+          0xee82ee]
+
 # Delay for scrolling the text
 SCROLL_DELAY = 0.03
 # id = 0, title
@@ -45,15 +52,27 @@ def get_guide_info(index):
     if index > DISPLAY_NUM_GUIDES:
         raise RuntimeError("Provided index may not be larger than DISPLAY_NUM_GUIDES.")
     print("Obtaining guide info for guide %d..."%index)
+
     # Traverse JSON data for title
     guide_count = matrixportal.network.json_traverse(als_data.json(), ["guide_count"])
+    # Set guide count
+    matrixportal.set_text(guide_count, 0)
+
     guides = matrixportal.network.json_traverse(als_data.json(), TITLE_DATA_LOCATION)
     guide_title = guides[index]["guide"]["title"]
     print("Guide Title", guide_title)
-    return (guide_count, guide_title)
+    
+    # Select color for title text
+    color_index = randrange(0, len(colors))
+
+    # Set the title text color
+    matrixportal.set_text_color(colors[color_index], 1)
+
+    # Set the title text
+    matrixportal.set_text(guide_title, 1)
 
 
-idx = 0
+guide_idx = 0
 prv_hour = 0
 refresh_time = None
 while True:
@@ -73,17 +92,12 @@ while True:
         prv_hour = time.localtime()[3]
 
     # Cycle through guides retrieved
-    if idx < DISPLAY_NUM_GUIDES:
-        guide_count, guide_title = get_guide_info(idx)
-        # Set title text
-        matrixportal.set_text(guide_count, 0)
-
-        # Set author text
-        matrixportal.set_text(guide_title, 1)
+    if guide_idx < DISPLAY_NUM_GUIDES:
+        get_guide_info(guide_idx)
 
         # Scroll the scrollable text blocks
         matrixportal.scroll_text(SCROLL_DELAY)
-        idx += 1
+        guide_idx += 1
     else:
-        idx = 0
+        guide_idx = 0
     time.sleep(0.5)
