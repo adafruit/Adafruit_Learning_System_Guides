@@ -234,7 +234,7 @@ class PlaybackDisplay:
     @staticmethod
     def has_any_mp3s(folder):
         """True if the folder contains at least one item ending in .mp3"""
-        return any(fn.lower().endswith(".mp3") for fn in os.listdir(folder))
+        return any(not fn.startswith(".") and fn.lower().endswith(".mp3") for fn in os.listdir(folder))
 
     def choose_folder(self, base='/sd'):
         """Let the user choose a folder within a base directory"""
@@ -493,7 +493,7 @@ def longest_common_prefix(seq):
 
 def play_folder(location):
     """Play everything within a given folder"""
-    playlist = [d for d in os.listdir(location) if d.lower().endswith('.mp3')]
+    playlist = [d for d in os.listdir(location) if not d.startswith('.') and d.lower().endswith('.mp3')]
     if not playlist:
         # hmm, no mp3s in a folder?  Well, don't crash okay?
         del playlist
