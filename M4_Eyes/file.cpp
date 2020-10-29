@@ -1,5 +1,6 @@
 //34567890123456789012345678901234567890123456789012345678901234567890123456
 
+#define ARDUINOJSON_ENABLE_COMMENTS 1
 #include <ArduinoJson.h>          // JSON config file functions
 #include "globals.h"
 
