@@ -1,8 +1,9 @@
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keycode import Keycode
+import usb_hid
 import puff_detector
 
-kbd = Keyboard()
+kbd = Keyboard(usb_hid.devices)
 
 detector = puff_detector.PuffDetector()
 
