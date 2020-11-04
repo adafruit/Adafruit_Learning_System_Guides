@@ -11,7 +11,7 @@ if hasattr(board, 'CAN_STANDBY'):
 
 # If the CAN transceiver is powered by a boost converter, turn on its supply
 if hasattr(board, 'BOOST_ENABLE'):
-    standby = digitalio.DigitalInOut(board.CAN_STANDBY)
+    standby = digitalio.DigitalInOut(board.BOOST_ENABLE)
     standby.switch_to_output(True)
 
 can = canio.CAN(rx=board.CAN_RX, tx=board.CAN_TX, baudrate=250_000, auto_restart=True)
