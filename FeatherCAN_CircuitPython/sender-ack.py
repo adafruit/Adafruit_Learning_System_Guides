@@ -1,8 +1,9 @@
+import struct
+import time
+
 import board
 import canio
 import digitalio
-import struct
-import time
 
 # If the CAN transceiver has a standby pin, bring it out of standby mode
 if hasattr(board, 'CAN_STANDBY'):
