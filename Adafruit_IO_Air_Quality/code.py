@@ -15,7 +15,6 @@ USE_CELSIUS = False
 # Interval the sensor publishes to Adafruit IO, in minutes
 PUBLISH_INTERVAL = 10
 
-
 ### WiFi ###
 
 # Get wifi details and more from a secrets.py file
@@ -34,7 +33,6 @@ spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
 esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset)
 status_light = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.2)
 wifi = adafruit_esp32spi_wifimanager.ESPSPI_WiFiManager(esp, secrets, status_light)
-
 
 # Connect to a PM2.5 sensor over UART
 reset_pin = None
@@ -122,9 +120,9 @@ def sample_aq_sensor():
     return aq_reading
 
 
-def read_bme280(is_celsius=False):
+def read_bme(is_celsius=False):
     """Returns temperature and humidity
-    from BME280 environmental sensor, as a tuple.
+    from BME280/BME680 environmental sensor, as a tuple.
 
     :param bool is_celsius: Returns temperature in degrees celsius
                             if True, otherwise fahrenheit.
@@ -179,7 +177,7 @@ while True:
 
         # temp and humidity
         print("Sampling environmental sensor...")
-        temperature, humidity = read_bme280(USE_CELSIUS)
+        temperature, humidity = read_bme(USE_CELSIUS)
         print("Temperature: %0.1f F" % temperature)
         print("Humidity: %0.1f %%" % humidity)
 
