@@ -242,8 +242,8 @@ extern void            user_setup(void);
 extern void            user_setup(StaticJsonDocument<2048> &doc);
 extern void            user_loop(void);
 
-// user callable functions
-extern void eyesWide(bool);
+// User callable functions in M4_Eyes.ino
+extern void eyesWide();
 extern void eyesBlink();
 extern void eyesToCorner(float x, float y, bool immediate);
 extern void eyesNormal();

@@ -190,7 +190,6 @@ void user_loop(void) {
   int chaseColor = 0;
   // Serial.println("cornerXY=" + String(cornerX) + "," + String(cornerY));
   if(cornerX == 1 && cornerY == 1) { // return to normal when the joystick is in the middle
-    // Serial.println("eyesNormal()");
     eyesNormal();
     neoPixelState = LUMINESCENT;
   } else {
@@ -212,20 +211,22 @@ void user_loop(void) {
   }
   
   bool buttonC = nunchuck1.getButtonC();
-  eyesWide(buttonC);
   bool buttonZ = nunchuck1.getButtonZ();
-  if(buttonZ) {
-    Serial.println("buttonZ");
-    eyesBlink();
-  }
 
   if(buttonC && buttonZ) {
-    Serial.println("buttonC & buttonZ");
-    chaseColor = red;
-    if(neoPixelState == LUMINESCENT) neoPixelState = CHASE_UP;
-  } else if(buttonC) {
-    Serial.println("buttonC");
-    neoPixelState = SPARKLE;
+	Serial.println("buttonC & buttonZ");
+	chaseColor = red;
+    if(neoPixelState == LUMINESCENT)
+		neoPixelState = CHASE_UP;
+  } else {
+	  if(buttonC) {
+		Serial.println("buttonC");
+		eyesWide();
+		neoPixelState = SPARKLE;
+	  } else if(buttonZ) {
+		Serial.println("buttonZ");
+		eyesBlink();
+	  }
   }
 
   if(strip.numPixels() > 0) {

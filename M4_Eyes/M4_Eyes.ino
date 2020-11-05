@@ -135,10 +135,10 @@ uint32_t availableRAM(void) {
 
 // USER CALLABLE FUNCTIONS
 
-// Set the booped flag.
-void eyesWide(bool t) {
+// Force the booped flag to be set true.
+void eyesWide() {
   // Serial.println("eyesWide()");
-  booped = t;
+  boopSum = 99999;
 }
 
 // Start a blink.
