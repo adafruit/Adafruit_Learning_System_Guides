@@ -1,4 +1,4 @@
-#if 1 // Change to 0 to disable this code (must enable ONE user*.cpp only!)
+#if 0 // Change to 0 to disable this code (must enable ONE user*.cpp only!)
 
 // This user loop is designed to be used with a WiiChuck for command inputs and 
 // connects to a NeoPixel strip for additional output. It was used with a unicorn 
@@ -28,9 +28,9 @@
 // Button Z: eyes blink
 // BOTH buttons: eyes are both wide AND blinking, and the colors change to red
 
-#define ARDUINOJSON_ENABLE_COMMENTS 1	// ARDUINOJSON_ENABLE_COMMENTS must be set to 1 before including the library.
-										// The same value of ARDUINOJSON_ENABLE_COMMENTS must be set in each compilation unit.
-#include <ArduinoJson.h>				// JSON config file functions
+#define ARDUINOJSON_ENABLE_COMMENTS 1   // ARDUINOJSON_ENABLE_COMMENTS must be set to 1 before including the library.
+                                        // The same value of ARDUINOJSON_ENABLE_COMMENTS must be set in each compilation unit.
+#include <ArduinoJson.h>                // JSON config file functions
 #include <WiiChuck.h>
 #include <Adafruit_NeoPixel.h>
 #include "globals.h"
@@ -64,14 +64,14 @@ void user_setup(void) {
   // follow the WiiAccessory.ino example:
   nunchuck1.begin();
   if(nunchuck1.type == Unknown) {
-    /** If the device isn't auto-detected, set the type explicatly
-     * 	NUNCHUCK,
-     WIICLASSIC,
-     GuitarHeroController,
-     GuitarHeroWorldTourDrums,
-     DrumController,
-     DrawsomeTablet,
-     Turntable
+    /** If the device isn't auto-detected, set the type explicitly:
+      NUNCHUCK,
+      WIICLASSIC,
+      GuitarHeroController,
+      GuitarHeroWorldTourDrums,
+      DrumController,
+      DrawsomeTablet,
+      Turntable
     */
     nunchuck1.type = NUNCHUCK;
   }
@@ -214,19 +214,19 @@ void user_loop(void) {
   bool buttonZ = nunchuck1.getButtonZ();
 
   if(buttonC && buttonZ) {
-	Serial.println("buttonC & buttonZ");
-	chaseColor = red;
+    Serial.println("buttonC & buttonZ");
+    chaseColor = red;
     if(neoPixelState == LUMINESCENT)
-		neoPixelState = CHASE_UP;
+      neoPixelState = CHASE_UP;
   } else {
-	  if(buttonC) {
-		Serial.println("buttonC");
-		eyesWide();
-		neoPixelState = SPARKLE;
-	  } else if(buttonZ) {
-		Serial.println("buttonZ");
-		eyesBlink();
-	  }
+    if(buttonC) {
+      Serial.println("buttonC");
+      eyesWide();
+      neoPixelState = SPARKLE;
+    } else if(buttonZ) {
+      Serial.println("buttonZ");
+      eyesBlink();
+    }
   }
 
   if(strip.numPixels() > 0) {

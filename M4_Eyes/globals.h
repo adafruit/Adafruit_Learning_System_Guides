@@ -235,9 +235,9 @@ extern float           screen2map(int in);
 extern float           map2screen(int in);
 
 // Functions in user.cpp
-#define ARDUINOJSON_ENABLE_COMMENTS 1	// ARDUINOJSON_ENABLE_COMMENTS must be set to 1 before including the library.
-										// The same value of ARDUINOJSON_ENABLE_COMMENTS must be set in each compilation unit.
-#include <ArduinoJson.h>				// JSON config file functions
+#define ARDUINOJSON_ENABLE_COMMENTS 1   // ARDUINOJSON_ENABLE_COMMENTS must be set to 1 before including the library.
+                                        // The same value of ARDUINOJSON_ENABLE_COMMENTS must be set in each compilation unit.
+#include <ArduinoJson.h>                // JSON config file functions
 extern void            user_setup(void);
 extern void            user_setup(StaticJsonDocument<2048> &doc);
 extern void            user_loop(void);

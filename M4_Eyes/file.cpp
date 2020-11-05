@@ -1,8 +1,8 @@
 //34567890123456789012345678901234567890123456789012345678901234567890123456
 
-#define ARDUINOJSON_ENABLE_COMMENTS 1	// ARDUINOJSON_ENABLE_COMMENTS must be set to 1 before including the library.
-										// The same value of ARDUINOJSON_ENABLE_COMMENTS must be set in each compilation unit.
-#include <ArduinoJson.h>				// JSON config file functions
+#define ARDUINOJSON_ENABLE_COMMENTS 1   // ARDUINOJSON_ENABLE_COMMENTS must be set to 1 before including the library.
+                                        // The same value of ARDUINOJSON_ENABLE_COMMENTS must be set in each compilation unit.
+#include <ArduinoJson.h>                // JSON config file functions
 #include "globals.h"
 
 extern Adafruit_Arcada arcada;
