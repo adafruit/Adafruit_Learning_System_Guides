@@ -22,7 +22,7 @@ void HeatSensor::setup()
     
     // default settings
     status = amg.begin();
-    if (!status) {
+    if(!status) {
         Serial.println("Could not find a valid AMG88xx sensor, check wiring!");
         while (1);
     }
@@ -77,7 +77,7 @@ void HeatSensor::find_focus()
     for (int i = 1; i <= AMG88xx_PIXEL_ARRAY_SIZE; i++) {
       int val = min(5, round(max(0, pixels[i-1] - 20) / 2));
       Serial.print(charPixels[val]);
-      if (i % 8 == 0) 
+      if(i % 8 == 0) 
         Serial.println();
     }
     Serial.println();

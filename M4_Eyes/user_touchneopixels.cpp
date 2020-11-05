@@ -260,7 +260,7 @@ void user_loop(void) {
     uint8_t pressed_buttons = arcada.readButtons();
     uint8_t justpressed_buttons = arcada.justPressedButtons();
     
-    if (justpressed_buttons & ARCADA_BUTTONMASK_UP){
+    if(justpressed_buttons & ARCADA_BUTTONMASK_UP){
       changeBehavior(0, elapsedSince);
     }
     else if(justpressed_buttons & ARCADA_BUTTONMASK_DOWN) {
@@ -274,7 +274,7 @@ void user_loop(void) {
     }
   }
     
-  if (elapsedSince - lastWave > SAMPLE_TIME) {
+  if(elapsedSince - lastWave > SAMPLE_TIME) {
     lastWave = elapsedSince;
     switch (currentBehavior) {
       case 0:
@@ -295,7 +295,7 @@ void user_loop(void) {
         break;
     }
 
-    if ((elapsedSince - lastBehaviorChange) > (SAMPLE_TIME * 1000)) {
+    if((elapsedSince - lastBehaviorChange) > (SAMPLE_TIME * 1000)) {
       lastBehaviorChange = elapsedSince;
       currentBehavior++;
       currentBehavior %= 4;

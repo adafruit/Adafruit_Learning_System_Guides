@@ -1,4 +1,4 @@
-#if 0 // Change to 0 to disable this code (must enable ONE user*.cpp only!)
+#if 1 // Change to 0 to disable this code (must enable ONE user*.cpp only!)
 
 // This user loop is designed to be used with a WiiChuck for command inputs and 
 // connects to a NeoPixel strip for additional output. It was used with a unicorn 
@@ -63,7 +63,7 @@ const int red = Adafruit_NeoPixel::Color(127,0,0);
 void user_setup(void) {
   // follow the WiiAccessory.ino example:
   nunchuck1.begin();
-  if (nunchuck1.type == Unknown) {
+  if(nunchuck1.type == Unknown) {
     /** If the device isn't auto-detected, set the type explicatly
      * 	NUNCHUCK,
      WIICLASSIC,
@@ -90,10 +90,10 @@ void user_setup(StaticJsonDocument<2048> &doc) {
   int32_t neomax = getDocInt(doc, "wiichuck","neopixel","max",-1);
   Serial.println("neopin=" + String(neomax));
 
-  if (neopin && neomax > -1) {
-    if ((strcmp(neopin, "d2") == 0) || (strcmp(neopin, "D2") == 0))
+  if(neopin && neomax > -1) {
+    if((strcmp(neopin, "d2") == 0) || (strcmp(neopin, "D2") == 0))
       neoPixelPin = 2;
-    else if ((strcmp(neopin, "d3") == 0) || (strcmp(neopin, "D3") == 0))
+    else if((strcmp(neopin, "d3") == 0) || (strcmp(neopin, "D3") == 0))
       neoPixelPin = 3;
     neoPixelMax = neomax;
 
@@ -189,23 +189,23 @@ void user_loop(void) {
   int cornerY = (joyY - low) / divFactor;
   int chaseColor = 0;
   // Serial.println("cornerXY=" + String(cornerX) + "," + String(cornerY));
-  if (cornerX == 1 && cornerY == 1) { // return to normal when the joystick is in the middle
+  if(cornerX == 1 && cornerY == 1) { // return to normal when the joystick is in the middle
     // Serial.println("eyesNormal()");
     eyesNormal();
     neoPixelState = LUMINESCENT;
   } else {
     // Serial.println("eyesToCorner(" + String(x) + "," + String(-y) + ")");
     eyesToCorner(x, -y, true);
-    if (cornerX < 1) {
+    if(cornerX < 1) {
       chaseColor = green;
       neoPixelState = CHASE_LEFT;
-    } else if (cornerX > 1) {
+    } else if(cornerX > 1) {
       chaseColor = blue;
       neoPixelState = CHASE_RIGHT;
-    } else if (cornerY > 1) {
+    } else if(cornerY > 1) {
       neoPixelState = CHASE_UP;
       chaseColor = green;
-    } else if (cornerY < 1) {
+    } else if(cornerY < 1) {
       neoPixelState = CHASE_DOWN;
       chaseColor = blue;
     }
@@ -214,18 +214,22 @@ void user_loop(void) {
   bool buttonC = nunchuck1.getButtonC();
   eyesWide(buttonC);
   bool buttonZ = nunchuck1.getButtonZ();
-  if (buttonZ)
+  if(buttonZ) {
+    Serial.println("buttonZ");
     eyesBlink();
+  }
 
-  if (buttonC && buttonZ) {
+  if(buttonC && buttonZ) {
+    Serial.println("buttonC & buttonZ");
     chaseColor = red;
-    if (neoPixelState == LUMINESCENT) neoPixelState = CHASE_UP;
-  } else if (buttonC) {
+    if(neoPixelState == LUMINESCENT) neoPixelState = CHASE_UP;
+  } else if(buttonC) {
+    Serial.println("buttonC");
     neoPixelState = SPARKLE;
   }
-  // Serial.println("neo state=" + String(neoPixelState));
 
-  if (strip.numPixels() > 0) {
+  if(strip.numPixels() > 0) {
+    // Serial.println("neo state=" + String(neoPixelState));
     switch (neoPixelState) {
       case LUMINESCENT: neoShine(); break;
       case CHASE_RIGHT: neoChase(4, 3, chaseColor); break;

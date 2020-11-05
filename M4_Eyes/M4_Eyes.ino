@@ -135,27 +135,30 @@ uint32_t availableRAM(void) {
 
 // USER CALLABLE FUNCTIONS
 
-// set the booped flag
+// Set the booped flag.
 void eyesWide(bool t) {
+  // Serial.println("eyesWide()");
   booped = t;
 }
 
-// start a blink
+// Start a blink.
 void eyesBlink() {
-     timeToNextBlink = 0;
+  // Serial.println("eyesBlink()");
+  timeToNextBlink = 0;
 }
 
-// force the eyes to a position on the screen
+// Force the eyes to a position on the screen.
 void eyesToCorner(float x, float y, bool immediate) {
   moveEyesRandomly = false;
   eyeTargetX = x;
   eyeTargetY = y;
-  if (immediate) 
+  if(immediate) 
     eyeMoveDuration = 0;
 }
 
-// return the eyes to normal random movement
+// Return the eyes to normal random movement.
 void eyesNormal() {
+  // Serial.println("eyesNormal()");
   moveEyesRandomly = true;
 }
 
@@ -163,6 +166,8 @@ void eyesNormal() {
 // SETUP FUNCTION - CALLED ONCE AT PROGRAM START ---------------------------
 
 void setup() {
+  Serial.println("SETUP BEGINS");
+
   if(!arcada.arcadaBegin())     fatal("Arcada init fail!", 100);
 #if defined(USE_TINYUSB)
   if(!arcada.filesysBeginMSD()) fatal("No filesystem found!", 250);
@@ -214,10 +219,10 @@ void setup() {
   #endif
 
   yield();
-  if (showSplashScreen) {
-    if (arcada.drawBMP((char *)"/splash.bmp", 0, 0, (eye[0].display)) == IMAGE_SUCCESS) {
+  if(showSplashScreen) {
+    if(arcada.drawBMP((char *)"/splash.bmp", 0, 0, (eye[0].display)) == IMAGE_SUCCESS) {
       Serial.println("Splashing");
-      if (NUM_EYES > 1) {    // other eye
+      if(NUM_EYES > 1) {    // other eye
         yield();
         arcada.drawBMP((char *)"/splash.bmp", 0, 0, (eye[1].display));
       }
@@ -448,8 +453,9 @@ void setup() {
   }
 
   lastLightReadTime = micros() + 2000000; // Delay initial light reading
+  
+  Serial.println("END OF SETUP");
 }
-
 
 
 // LOOP FUNCTION - CALLED REPEATEDLY UNTIL POWER-OFF -----------------------
@@ -504,7 +510,7 @@ void loop() {
       if(eyeInMotion) {                       // Currently moving?
         if(dt >= eyeMoveDuration) {           // Time up?  Destination reached.
           eyeInMotion      = false;           // Stop moving
-          if (moveEyesRandomly) {
+          if(moveEyesRandomly) {
             eyeMoveDuration  = random(10000, 3000000); // 0.01-3 sec stop
             eyeMoveStartTime = t;               // Save initial time of stop
           }
@@ -524,7 +530,7 @@ void loop() {
           float r = (float)mapDiameter - (float)DISPLAY_SIZE * M_PI_2; // radius of motion
           r *= 0.6;  // calibration constant
 
-          if (moveEyesRandomly) {
+          if(moveEyesRandomly) {
             eyeNewX = random(-r, r);
             float h = sqrt(r * r - x * x);
             eyeNewY = random(-h, h);
@@ -629,13 +635,14 @@ void loop() {
       // of both screens is about 1/2 this.
       frames++;
       if(((t - lastFrameRateReportTime) >= 1000000) && t) { // Once per sec.
-        Serial.println((frames * 1000) / (t / 1000));
+        Serial.printf("Frame rate: %d\n", (frames * 1000) / (t / 1000));
         lastFrameRateReportTime = t;
       }
 
       // Once per frame (of eye #0), reset boopSum...
       if((eyeNum == 0) && (boopPin >= 0)) {
         boopSumFiltered = ((boopSumFiltered * 3) + boopSum) / 4;
+		// Serial.printf("boopSum: %d, boopSumFiltered: %d, boopThreshold: %d, booped: %s\n", boopSum, boopSumFiltered, boopThreshold, (booped ? "true" : "false"));
         if(boopSumFiltered > boopThreshold) {
           if(!booped) {
             Serial.println("BOOP!");
