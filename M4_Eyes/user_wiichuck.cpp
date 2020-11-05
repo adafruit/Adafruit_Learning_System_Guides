@@ -28,7 +28,9 @@
 // Button Z: eyes blink
 // BOTH buttons: eyes are both wide AND blinking, and the colors change to red
 
-#include <ArduinoJson.h>          // JSON config file functions
+#define ARDUINOJSON_ENABLE_COMMENTS 1	// ARDUINOJSON_ENABLE_COMMENTS must be set to 1 before including the library.
+										// The same value of ARDUINOJSON_ENABLE_COMMENTS must be set in each compilation unit.
+#include <ArduinoJson.h>				// JSON config file functions
 #include <WiiChuck.h>
 #include <Adafruit_NeoPixel.h>
 #include "globals.h"
