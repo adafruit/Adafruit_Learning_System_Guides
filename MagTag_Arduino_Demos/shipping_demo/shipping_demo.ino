@@ -12,7 +12,7 @@ Adafruit_LIS3DH lis = Adafruit_LIS3DH();
 uint8_t j = 0;
 void setup() {
   Serial.begin(115200);
-  while (!Serial) { delay(10); }
+  //while (!Serial) { delay(10); }
   delay(100);
   Serial.println("Adafruit EPD Portal demo");
 
