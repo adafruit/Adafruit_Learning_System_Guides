@@ -17,6 +17,7 @@ void setup() {
 
   pixels.begin();
   pixels.setBrightness(50);
+  pixels.fill(0xFF00FF);
   pixels.show(); // Initialize all pixels to 'off'
 }
 
