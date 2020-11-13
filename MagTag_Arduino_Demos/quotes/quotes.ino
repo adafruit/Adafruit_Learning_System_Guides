@@ -10,6 +10,7 @@
 #include <ArduinoJson.h>
 #include "Adafruit_ThinkInk.h"
 #include "Adafruit_NeoPixel.h"
+#include <Fonts/FreeSans9pt7b.h>
 
 const char* ssid     = "adafruit";     // your network SSID (name of wifi network)
 const char* password = "ffffffff"; // your network password
@@ -31,7 +32,7 @@ void deepSleep() {
   pinMode(13, OUTPUT);
   digitalWrite(13, LOW);
 
-  esp_sleep_enable_timer_wakeup(10000000); // 10 seconds
+  esp_sleep_enable_timer_wakeup(60 * 1000000); // 60 seconds
   esp_deep_sleep_start();  
 }
 
@@ -39,8 +40,30 @@ void setup() {
   //Initialize serial and wait for port to open:
   Serial.begin(115200);
   //while (!Serial) delay(10);
+
+  pinMode(BUTTON_A, INPUT_PULLUP);
+  pinMode(BUTTON_B, INPUT_PULLUP);
+  pinMode(BUTTON_C, INPUT_PULLUP);
+  pinMode(BUTTON_D, INPUT_PULLUP);
+  pinMode(EPD_BUSY, INPUT);
+  pinMode(13, OUTPUT);
+  digitalWrite(13, HIGH);
+
+  
+  display.begin(THINKINK_GRAYSCALE4);
+
   Serial.print("Attempting to connect to SSID: ");
   Serial.println(ssid);
+
+  display.clearBuffer();
+  display.setFont(&FreeSans9pt7b);
+  display.setTextSize(1);
+  display.setTextColor(EPD_BLACK);
+  display.setCursor(10, 30);
+  display.print("Connecting to SSID ");
+  display.println(ssid);
+  display.display();
+  
   WiFi.begin(ssid, password);
 
   // attempt to connect to Wifi network:
@@ -55,16 +78,6 @@ void setup() {
   //client.setCACert(test_root_ca);
   //client.setCertificate(test_client_key); // for client verification
   //client.setPrivateKey(test_client_cert);	// for client verification
-
-  pinMode(BUTTON_A, INPUT_PULLUP);
-  pinMode(BUTTON_B, INPUT_PULLUP);
-  pinMode(BUTTON_C, INPUT_PULLUP);
-  pinMode(BUTTON_D, INPUT_PULLUP);
-  pinMode(EPD_BUSY, INPUT);
-  pinMode(13, OUTPUT);
-  digitalWrite(13, HIGH);
-  
-  display.begin(THINKINK_GRAYSCALE4);
 
 // Neopixel power
   pinMode(NEOPIXEL_POWER, OUTPUT);
@@ -142,13 +155,14 @@ void setup() {
   Serial.print("Author: "); Serial.println(root_0_author);
 
   display.clearBuffer();
-  display.setTextSize(2);
+  display.setFont(&FreeSans9pt7b);
+  display.setTextSize(1);
   display.setTextWrap(true);
   display.setTextColor(EPD_BLACK);
-  display.setCursor(10, 0);
+  display.setCursor(10, 30);
   display.println(root_0_text);
   display.setTextColor(EPD_DARK);
-  display.setCursor(40, 110);
+  display.setCursor(40, 120);
   display.println(root_0_author);
   display.display();
   while (!digitalRead(EPD_BUSY)) {
