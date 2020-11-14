@@ -22,8 +22,8 @@ def quote_transform(val):
 # quote in bold text, with text wrapping
 magtag.add_text(
     text_font="Arial-Bold-12.bdf",
-    text_wrap=34,
-    text_maxlen=150,
+    text_wrap=33,
+    text_maxlen=160,
     text_position=(10, 15),
     line_spacing=0.75,
 )
@@ -31,7 +31,7 @@ magtag.add_text(
 # author in italic text, no wrapping
 magtag.add_text(
     text_font="Arial-Italic-12.bdf",
-    text_position=(150, 110),
+    text_position=(100, 110),
 )
 
 timestamp = None
