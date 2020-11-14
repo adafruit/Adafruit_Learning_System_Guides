@@ -36,7 +36,7 @@ magtag.add_text(
 
 timestamp = None
 while True:
-    if not timestamp or (time.monotonic() - timestamp) > 3:  # once every 60 seconds...
+    if not timestamp or (time.monotonic() - timestamp) > 60:  # once every 60 seconds...
         try:
             value = magtag.fetch()
             print("Response is", value)
