@@ -15,10 +15,6 @@ magtag = MagTag(
 )
 magtag.network.connect()
 
-
-def quote_transform(val):
-    return val
-
 # quote in bold text, with text wrapping
 magtag.add_text(
     text_font="Arial-Bold-12.bdf",
