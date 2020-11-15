@@ -20,7 +20,7 @@ print("ESP32-S2 WebClient Test")
 
 print("My MAC addr:", [hex(i) for i in wifi.radio.mac_address])
 
-print("Avaliable WiFi networks:")
+print("Available WiFi networks:")
 for network in wifi.radio.start_scanning_networks():
     print("\t%s\t\tRSSI: %d\tChannel: %d" % (str(network.ssid, "utf-8"),
             network.rssi, network.channel))
@@ -28,7 +28,7 @@ wifi.radio.stop_scanning_networks()
 
 print("Connecting to %s"%secrets["ssid"])
 wifi.radio.connect(secrets["ssid"], secrets["password"])
-print(print("Connected to %s!"%secrets["ssid"]))
+print("Connected to %s!"%secrets["ssid"])
 print("My IP address is", wifi.radio.ipv4_address)
 
 ipv4 = ipaddress.ip_address("8.8.4.4")
