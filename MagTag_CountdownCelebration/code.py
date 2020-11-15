@@ -27,7 +27,7 @@ event_time = time.struct_time(
 )  # we dont know day of week/year or DST
 
 # Set up where we'll be fetching data from
-# Chekc http://worldtimeapi.org/timezones for valid values
+# Check http://worldtimeapi.org/timezones for valid values
 # pylint: disable=line-too-long
 DATA_SOURCE = "http://worldtimeapi.org/api/timezone/America/New_York"
 #DATA_SOURCE = "http://worldtimeapi.org/api/timezone/Europe/Stockholm"
