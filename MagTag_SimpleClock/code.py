@@ -29,13 +29,13 @@ while True:
     hour = now[3]
     minute = now[4]
     if HOUR_MODE_24:
-        timestr = "%d:%2d" % (hour, minute)
+        timestr = "%d:%02d" % (hour, minute)
     else:
         is_pm = (hour >= 12)
         hour %= 12
         if hour == 0:
             hour = 12
-        timestr = "%d:%2d" % (hour, minute)
+        timestr = "%d:%02d" % (hour, minute)
     if timestr != last_timestr:
         magtag.set_text(timestr)
         last_timestr = timestr
