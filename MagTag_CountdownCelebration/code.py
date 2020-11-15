@@ -12,9 +12,19 @@ EVENT_DAY = 20
 EVENT_HOUR = 12
 EVENT_MINUTE = 00
 # we'll make a python-friendly structure
-event_time = time.struct_time((EVENT_YEAR, EVENT_MONTH, EVENT_DAY,
-                               EVENT_HOUR, EVENT_MINUTE, 0,  # we don't track seconds
-                               -1, -1, False))  # we dont know day of week/year or DST
+event_time = time.struct_time(
+    (
+        EVENT_YEAR,
+        EVENT_MONTH,
+        EVENT_DAY,
+        EVENT_HOUR,
+        EVENT_MINUTE,
+        0,  # we don't track seconds
+        -1,
+        -1,
+        False,
+    )
+)  # we dont know day of week/year or DST
 
 # Set up where we'll be fetching data from
 # Chekc http://worldtimeapi.org/timezones for valid values
@@ -27,12 +37,11 @@ magtag.network.connect()
 
 magtag.add_text(
     text_font="Arial-Bold-24.bdf",
-    text_position=(10, 64),
+    text_position=(10, (magtag.graphics.display.height // 2) - 1,),
     line_spacing=0.85,
 )
 
-magtag.graphics.qrcode(b"https://buildbackbetter.com/",
-                       qr_size=3, x=200, y=25)
+magtag.graphics.qrcode(b"https://buildbackbetter.com/", qr_size=3, x=200, y=25)
 
 timestamp = None
 lasttimefetch_stamp = None
@@ -65,11 +74,11 @@ while True:
             magtag.set_text("It's Time\nTo Party!")
             magtag.peripherals.neopixel_disable = False
             while True:  # that's all folks
-                magtag.peripherals.neopixels.fill(0xFF0000) # red
+                magtag.peripherals.neopixels.fill(0xFF0000)  # red
                 time.sleep(0.25)
-                magtag.peripherals.neopixels.fill(0xFFFFFF) # white
+                magtag.peripherals.neopixels.fill(0xFFFFFF)  # white
                 time.sleep(0.25)
-                magtag.peripherals.neopixels.fill(0x0000FF) # blue
+                magtag.peripherals.neopixels.fill(0x0000FF)  # blue
                 time.sleep(0.25)
         secs_remaining = remaining % 60
         remaining //= 60
@@ -78,10 +87,14 @@ while True:
         hours_remaining = remaining % 24
         remaining //= 24
         days_remaining = remaining
-        print("%d days, %d hours, %d minutes and %s seconds" %
-              (days_remaining, hours_remaining, mins_remaining, secs_remaining))
-        magtag.set_text("%d Days\n%d Hours\n%d Mins" %
-                        (days_remaining, hours_remaining, mins_remaining))
+        print(
+            "%d days, %d hours, %d minutes and %s seconds"
+            % (days_remaining, hours_remaining, mins_remaining, secs_remaining)
+        )
+        magtag.set_text(
+            "%d Days\n%d Hours\n%d Mins"
+            % (days_remaining, hours_remaining, mins_remaining)
+        )
         timestamp = time.monotonic()
     # wait around
     time.sleep(1)
