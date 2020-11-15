@@ -17,15 +17,17 @@ event_time = time.struct_time((EVENT_YEAR, EVENT_MONTH, EVENT_DAY,
                                -1, -1, False))  # we dont know day of week/year or DST
 
 # Set up where we'll be fetching data from
+# Chekc http://worldtimeapi.org/timezones for valid values
 # pylint: disable=line-too-long
 DATA_SOURCE = "http://worldtimeapi.org/api/timezone/America/New_York"
+#DATA_SOURCE = "http://worldtimeapi.org/api/timezone/Europe/Stockholm"
 
 magtag = MagTag()
 magtag.network.connect()
 
 magtag.add_text(
     text_font="Arial-Bold-24.bdf",
-    text_position=(10, 25),
+    text_position=(10, 64),
     line_spacing=0.85,
 )
 
@@ -37,17 +39,16 @@ lasttimefetch_stamp = None
 while True:
     if not lasttimefetch_stamp or (time.monotonic() - lasttimefetch_stamp) > 3600:
         try:
+            # America/New_York - 2020-11-15T11:14:49.970836-05:00
+            # Europe/Stockholm - 2020-11-15T17:15:01.186119+01:00
             response = magtag.network.requests.get(DATA_SOURCE)
             datetime_str = response.json()['datetime']
-            datesplit = datetime_str.split("-")
-            year = int(datesplit[0])
-            month = int(datesplit[1])
-            timesplit = datesplit[2].split("T")
-            mday = int(timesplit[0])
-            timesplit = timesplit[1].split(":")
-            hours = int(timesplit[0])
-            minutes = int(timesplit[1])
-            seconds = int(float(timesplit[2].split("-")[0]))
+            year = int(datetime_str[0:4])
+            month = int(datetime_str[5:7])
+            mday = int(datetime_str[8:10])
+            hours = int(datetime_str[11:13])
+            minutes = int(datetime_str[14:16])
+            seconds = int(datetime_str[17:19])
             rtc.RTC().datetime = time.struct_time((year, month, mday, hours, minutes, seconds, 0, 0, False))
             lasttimefetch_stamp = time.monotonic()
         except (ValueError, RuntimeError) as e:
