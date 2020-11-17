@@ -18,7 +18,7 @@ publicContact = "oshw@adafruit.com"
 projectName = "Adafruit QT Py = SAMD21 Dev Board with STEMMA QT"
 projectWebsite = "https://www.adafruit.com/product/4600"
 projectVersion = "Rev C"
-previousVersions = "[]"  # Don't forget \" around each item
+previousVersions = "[]"
 projectDescription = "This diminutive dev board comes with our favorite lil chip, the SAMD21. OLEDs! Inertial Measurement Units! Sensors a-plenty. All plug-and-play thanks to the innovative chainable design: SparkFun Qwiic-compatible STEMMA QT connectors for the I2C bus so you don't even need to solder. It also has 11 GPIO pins and a built-in NeoPixel RGB LED. This board ships with CircuitPython but also works great with Arduino."
 primaryType = "Electronics"
 additionalType = '[ "Electronics"]'
