@@ -36,6 +36,7 @@ headers = {"Content-Type": "application/json", "Authorization": f"Bearer {token}
 
 r = requests.request("POST", url, headers=headers, data=payload)
 
+print("\n")
 print(r.status_code)
-print(r.text)
+print("\n")
 print(r.json())
