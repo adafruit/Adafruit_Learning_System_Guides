@@ -75,12 +75,12 @@ unsigned long baud = 115200;
 #endif
 
 #if defined(ADAFRUIT_PYPORTAL)
-  #define NEOPIXEL_PIN   2
+  #define PIN_NEOPIXEL   2
 #elif defined(ADAFRUIT_METRO_M4_AIRLIFT_LITE)
-  #define NEOPIXEL_PIN   40
+  #define PIN_NEOPIXEL   40
 #endif
 
-Adafruit_NeoPixel pixel = Adafruit_NeoPixel(1, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel pixel = Adafruit_NeoPixel(1, PIN_NEOPIXEL, NEO_GRB + NEO_KHZ800);
 
 void setup() {
   Serial.begin(baud);

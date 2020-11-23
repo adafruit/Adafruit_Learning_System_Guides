@@ -6,12 +6,13 @@ import neopixel
 from adafruit_esp32spi import adafruit_esp32spi, adafruit_esp32spi_wifimanager
 from adafruit_io.adafruit_io import IO_HTTP
 from simpleio import map_range
-
-import adafruit_pm25
+from adafruit_pm25.uart import PM25_UART
+# Uncomment below for PMSA003I Air Quality Breakout
+# from adafruit_pm25.i2c import PM25_I2C
 import adafruit_bme280
 
 ### Configure Sensor ###
-# Return BME280 environmental sensor readings in degrees Celsius
+# Return environmental sensor readings in degrees Celsius
 USE_CELSIUS = False
 # Interval the sensor publishes to Adafruit IO, in minutes
 PUBLISH_INTERVAL = 10
@@ -36,12 +37,22 @@ status_light = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.2)
 wifi = adafruit_esp32spi_wifimanager.ESPSPI_WiFiManager(esp, secrets, status_light)
 
 # Connect to a PM2.5 sensor over UART
+reset_pin = None
 uart = busio.UART(board.TX, board.RX, baudrate=9600)
-pm25 = adafruit_pm25.PM25_UART(uart)
+pm25 = PM25_UART(uart, reset_pin)
 
-# Connect to a BME280 sensor over I2C
-i2c = busio.I2C(board.SCL, board.SDA)
-bme280 = adafruit_bme280.Adafruit_BME280_I2C(i2c)
+# Create i2c object
+i2c = busio.I2C(board.SCL, board.SDA, frequency=100000)
+
+# Connect to a BME280 over I2C
+bme_sensor = adafruit_bme280.Adafruit_BME280_I2C(i2c)
+
+# Uncomment below for PMSA003I Air Quality Breakout
+# pm25 = PM25_I2C(i2c, reset_pin)
+
+# Uncomment below for BME680
+# import adafruit_bme680
+# bme_sensor = adafruit_bme680.Adafruit_BME680_I2C(i2c)
 
 ### Sensor Functions ###
 def calculate_aqi(pm_sensor_reading):
@@ -111,18 +122,18 @@ def sample_aq_sensor():
     return aq_reading
 
 
-def read_bme280(is_celsius=False):
+def read_bme(is_celsius=False):
     """Returns temperature and humidity
-    from BME280 environmental sensor, as a tuple.
+    from BME280/BME680 environmental sensor, as a tuple.
 
     :param bool is_celsius: Returns temperature in degrees celsius
                             if True, otherwise fahrenheit.
     """
-    humid = bme280.humidity
-    temp = bme280.temperature
+    humid = bme_sensor.humidity
+    temp = bme_sensor.temperature
     if not is_celsius:
         temp = temp * 1.8 + 32
-    return temperature, humid
+    return temp, humid
 
 
 # Create an instance of the Adafruit IO HTTP client
@@ -168,7 +179,7 @@ while True:
 
         # temp and humidity
         print("Sampling environmental sensor...")
-        temperature, humidity = read_bme280(USE_CELSIUS)
+        temperature, humidity = read_bme(USE_CELSIUS)
         print("Temperature: %0.1f F" % temperature)
         print("Humidity: %0.1f %%" % humidity)
 
