@@ -11,11 +11,13 @@ from adafruit_slideshow import PlayBackOrder, SlideShow, PlayBackDirection
 
 magtag = MagTag()
 
+
 def blink(color, duration):
     magtag.peripherals.neopixel_disable = False
     magtag.peripherals.neopixels.fill(color)
     time.sleep(duration)
     magtag.peripherals.neopixel_disable = True
+
 
 RED = 0x880000
 GREEN = 0x008800
@@ -66,10 +68,7 @@ while True:
     slideshow.update()
     if magtag.peripherals.button_a_pressed:
         if sound_toggle:
-            try:  # dealing with an ocassional bug here
-                magtag.peripherals.play_tone(220, 0.15)
-            except NameError:
-                pass
+            magtag.peripherals.play_tone(220, 0.15)
         blink(YELLOW, 0.4)
         slideshow.direction = PlayBackDirection.BACKWARD
         time.sleep(5)
@@ -77,43 +76,30 @@ while True:
 
     if magtag.peripherals.button_b_pressed:
         if not sound_toggle:
-            try:  # dealing with an ocassional bug here
-                magtag.peripherals.play_tone(660, 0.15)
-            except NameError:
-                pass
+            magtag.peripherals.play_tone(660, 0.15)
             blink(CYAN, 0.4)
-            sound_toggle = True
         else:
             blink(MAGENTA, 0.4)
-            sound_toggle = False
+        sound_toggle = not sound_toggle
 
     if magtag.peripherals.button_c_pressed:
         if not autoplay_toggle:
             if sound_toggle:
-                try:  # dealing with an ocassional bug here
-                    magtag.peripherals.play_tone(440, 0.15)
-                except NameError:
-                    pass
+                magtag.peripherals.play_tone(440, 0.15)
             blink(GREEN, 0.4)
             autoplay_toggle = True
             slideshow.direction = PlayBackDirection.FORWARD
             slideshow.auto_advance = True
         else:
             if sound_toggle:
-                try:  # dealing with an ocassional bug here
-                    magtag.peripherals.play_tone(110, 0.15)
-                except NameError:
-                    pass
+                magtag.peripherals.play_tone(110, 0.15)
             blink(RED, 0.4)
             autoplay_toggle = False
             slideshow.auto_advance = False
 
     if magtag.peripherals.button_d_pressed:
         if sound_toggle:
-            try:  # dealing with an ocassional bug here
-                magtag.peripherals.play_tone(880, 0.15)
-            except NameError:
-                pass
+            magtag.peripherals.play_tone(880, 0.15)
         blink(BLUE, 0.4)
         slideshow.direction = PlayBackDirection.FORWARD
         time.sleep(5)
