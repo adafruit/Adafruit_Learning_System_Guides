@@ -18,28 +18,28 @@ DATE_LOCATION = ['date_local']
 
 def mission_transform(val):
     if val == None:
-	    val = "Unavailable"
+        val = "Unavailable"
     return "Mission: " + val
 
 def time_transform(val2):
     if val2 == None:
-	    return "When: Unavailable"
-	# Uncomment the line below to get the full date and time and offset to UTC time (more universal)
-#    return "When: " + val2[0:10] + " at " + val2[11:19] + " (" + val2[19:25] + " UTC)"
+        return "When: Unavailable"
+    # Uncomment the line below to get the full date and time and offset to UTC time (more universal)
+    #  return "When: " + val2[0:10] + " at " + val2[11:19] + " (" + val2[19:25] + " UTC)"
     # Uncomment the lines below to get a Month Day and local launch time display am/pm (more US)
     hour = int(val2[11:12])
     if hour <= 12:
         return "When: " + months[int(val2[5:7])-1] + str(int(val2[8:10])) + ", " + val2[0:4] +  " at " + val2[11:16] + " am"
     else:
         hour = hour - 11
-        return "When: " + months[int(val2[5:7])-1] + str(int(val2[8:10])) + ", " + val2[0:4] +  " at " + str(hour) + val2[13:16] + " pm"
+    return "When: " + months[int(val2[5:7])-1] + str(int(val2[8:10])) + ", " + val2[0:4] +  " at " + str(hour) + val2[13:16] + " pm"
 	   
 def details_transform(val3):
     if val3 == None:
-	    return "Details: To Be Determined"
+        return "Details: To Be Determined"
     val3_length = len(val3)
     if val3_length == 0:
-		return "Details: To Be Determined"
+        return "Details: To Be Determined"
     return "Details: " + val3[0:max(val3_length,202)] + "..."
 
 # Set up the MagTag with the JSON data parameters
@@ -54,7 +54,7 @@ magtag.add_text(
     text_font="Lato-Bold-ltd-25.bdf",
     text_position=(10,15),
     text_scale=1,
-	is_data=False
+    is_data=False
 )
 # Display heading text below with formatting above
 magtag.set_text("Next SpaceX Launch")
@@ -80,8 +80,8 @@ magtag.add_text(
     text_font="Lato-Regular-10.bdf",
     text_position=(10,94),
     text_scale=1,
-	line_spacing=0.8,
-	text_wrap=47,
+    line_spacing=0.8,
+    text_wrap=47,
     text_transform=details_transform
 )
 
@@ -92,10 +92,10 @@ timestamp = None
 while True:
     if not timestamp or (time.monotonic() - timestamp) > 300:  # once every 5 minutes...
         try:
-		    # This statement gets the JSON data and displays it automagically
+            # This statement gets the JSON data and displays it automagically
             value = magtag.fetch()
             print("Response is", value)
         except (ValueError, RuntimeError) as e:
             print("Some error occured, retrying! -", e)
-	timestamp = time.monotonic()
+    timestamp = time.monotonic()
 # END
