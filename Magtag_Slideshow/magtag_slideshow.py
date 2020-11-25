@@ -58,7 +58,7 @@ slideshow = SlideShow(
     magtag.graphics.display,
     None,
     auto_advance=autoplay_toggle,
-    folder="/slides",
+    folder="/slides/",
     loop=True,
     order=PlayBackOrder.ALPHABETICAL,
     dwell=auto_pause,
