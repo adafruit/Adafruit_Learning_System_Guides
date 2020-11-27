@@ -6,7 +6,9 @@ import neopixel
 from adafruit_esp32spi import adafruit_esp32spi, adafruit_esp32spi_wifimanager
 from adafruit_io.adafruit_io import IO_HTTP
 from simpleio import map_range
-import adafruit_pm25
+from adafruit_pm25.uart import PM25_UART
+# Uncomment below for PMSA003I Air Quality Breakout
+# from adafruit_pm25.i2c import PM25_I2C
 import adafruit_bme280
 
 ### Configure Sensor ###
@@ -37,7 +39,7 @@ wifi = adafruit_esp32spi_wifimanager.ESPSPI_WiFiManager(esp, secrets, status_lig
 # Connect to a PM2.5 sensor over UART
 reset_pin = None
 uart = busio.UART(board.TX, board.RX, baudrate=9600)
-pm25 = adafruit_pm25.PM25_UART(uart, reset_pin)
+pm25 = PM25_UART(uart, reset_pin)
 
 # Create i2c object
 i2c = busio.I2C(board.SCL, board.SDA, frequency=100000)
@@ -46,7 +48,7 @@ i2c = busio.I2C(board.SCL, board.SDA, frequency=100000)
 bme_sensor = adafruit_bme280.Adafruit_BME280_I2C(i2c)
 
 # Uncomment below for PMSA003I Air Quality Breakout
-# pm25 = adafruit_pm25.PM25_I2C(i2c, reset_pin)
+# pm25 = PM25_I2C(i2c, reset_pin)
 
 # Uncomment below for BME680
 # import adafruit_bme680
