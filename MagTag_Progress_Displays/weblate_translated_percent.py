@@ -7,7 +7,6 @@ from Weblate and show it on the screen with text
 and a progress bar
 """
 import time
-import terminalio
 from adafruit_magtag.magtag import MagTag
 from adafruit_progressbar import ProgressBar
 
