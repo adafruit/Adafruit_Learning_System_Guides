@@ -2,9 +2,10 @@
 #
 # SPDX-License-Identifier: Unlicense
 """
-Pull the current translated percent of CircuitPython
-from Weblate and show it on the screen with text
-and a progress bar
+Show the progress through the year with text and a progress bar.
+
+Copy epilogue18.bdf into fonts/ on your CIRCUITPY drive.
+
 """
 import time
 from adafruit_magtag.magtag import MagTag
@@ -75,10 +76,16 @@ timestamp = None
 time.sleep(5)
 
 while True:
-    magtag.network.get_local_time()
-    now = rtc.RTC().datetime
-    progress_bar.progress = now.tm_yday / days_in_year(now)
-    magtag.set_text(text_transform(now.tm_yday / days_in_year(now) * 100.0), index=0)
+    try:
+        magtag.network.get_local_time()
+        now = rtc.RTC().datetime
+        progress_bar.progress = now.tm_yday / days_in_year(now)
+        magtag.set_text(
+            text_transform(now.tm_yday / days_in_year(now) * 100.0), index=0
+        )
 
-    print(now)
-    time.sleep(60 * 60)  # one hour
+        print(now)
+        time.sleep(60 * 60)  # one hour
+    except (ValueError, RuntimeError) as e:
+        print("Some error occurred, retrying! -", e)
+        time.sleep(60)  # one  minute

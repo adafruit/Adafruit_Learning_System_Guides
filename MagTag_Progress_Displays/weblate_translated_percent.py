@@ -4,7 +4,10 @@
 """
 Pull the current translated percent of CircuitPython
 from Weblate and show it on the screen with text
-and a progress bar
+and a progress bar.
+
+Copy leaguespartan18.bdf and leaguespartan11.bdf
+into fonts/ on your CIRCUITPY drive.
 """
 import time
 from adafruit_magtag.magtag import MagTag
@@ -89,9 +92,9 @@ while True:
         try:
             value = magtag.fetch()
             print("Response is", value)
-            time.sleep(5)
+            time.sleep(5)  # wait for display
             progress_bar.progress = value / 100.0
             magtag.refresh()
         except (ValueError, RuntimeError) as e:
-            print("Some error occured, retrying! -", e)
+            print("Some error occurred, retrying! -", e)
         timestamp = time.monotonic()
