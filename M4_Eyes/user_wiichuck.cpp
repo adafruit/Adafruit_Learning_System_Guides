@@ -87,7 +87,7 @@ void user_setup(StaticJsonDocument<2048> &doc) {
 
   const char *neopin = doc["wiichuck"]["neopixel"]["pin"];
   Serial.println("neopin=" + String(neopin ? neopin : "(null)"));
-  int32_t neomax = getDocInt(doc, "wiichuck","neopixel","max",-1);
+  int32_t neomax = getDocInt(doc, "wiichuck", "neopixel", "max", -1);
   Serial.println("neopin=" + String(neomax));
 
   if(neopin && neomax > -1) {
@@ -106,8 +106,7 @@ void user_setup(StaticJsonDocument<2048> &doc) {
   }    
 }
 
-static void neoChase(int addend, int div, int color)
-{
+static void neoChase(int addend, int div, int color) {
   curChasePixel += addend;
   curChasePixel %= div;
 
@@ -118,8 +117,7 @@ static void neoChase(int addend, int div, int color)
   strip.show();
 }
 
-static void neoUpDown(int color, int dir)
-{
+static void neoUpDown(int color, int dir) {
   int np = strip.numPixels();
   curChasePixel += np + dir;
   curChasePixel %= np;
@@ -130,8 +128,7 @@ static void neoUpDown(int color, int dir)
   strip.show();
 }
 
-static void neoShine()
-{
+static void neoShine() {
   // code from user_neopixel.cpp
   for(int i=0; i<strip.numPixels(); i++) { // For each pixel in strip...
     // Offset pixel hue by an amount to make one full revolution of the
@@ -149,15 +146,13 @@ static void neoShine()
   firstPixelHue += 256;
 }
 
-static void neoSparkle()
-{
+static void neoSparkle() {
   strip.clear();
   int i = random(0, strip.numPixels());
   int pixelHue = firstPixelHue + (i * 65536L / strip.numPixels());
   strip.setPixelColor(i, strip.gamma32(strip.ColorHSV(pixelHue)));
   strip.show(); // Update strip with new contents  
 }
-
 
 // the normal map() function doesn't seem to work properly for floats
 static float map2(long x, long in_min, long in_max, float out_min, float out_max) {

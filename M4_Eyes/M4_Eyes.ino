@@ -59,6 +59,7 @@ int      iPupilFactor            = 42;
 uint32_t boopSum                 = 0,
          boopSumFiltered         = 0;
 bool     booped                  = false;
+bool     eyelidsWide             = false;
 int      fixate                  = 7;
 uint8_t  lightSensorFailCount    = 0;
 
@@ -136,14 +137,20 @@ uint32_t availableRAM(void) {
 // USER CALLABLE FUNCTIONS
 
 // Force the booped flag to be set true.
-void eyesWide() {
-  // Serial.println("eyesWide()");
+void eyesBoop() {
+  Serial.println("eyesBoop()");
   boopSum = 99999;
+}
+
+// Open eyelids wide.
+void eyesWide() {
+  Serial.println("eyesWide()");
+  eyelidsWide = true;
 }
 
 // Start a blink.
 void eyesBlink() {
-  // Serial.println("eyesBlink()");
+  Serial.println("eyesBlink()");
   timeToNextBlink = 0;
 }
 
@@ -158,7 +165,7 @@ void eyesToCorner(float x, float y, bool immediate) {
 
 // Return the eyes to normal random movement.
 void eyesNormal() {
-  // Serial.println("eyesNormal()");
+//  Serial.println("eyesNormal()");
   moveEyesRandomly = true;
 }
 
@@ -508,24 +515,24 @@ void loop() {
       // Eye movement
       int32_t dt = t - eyeMoveStartTime;      // uS elapsed since last eye event
       if(eyeInMotion) {                       // Currently moving?
-        if(dt >= eyeMoveDuration) {           // Time up?  Destination reached.
-          eyeInMotion      = false;           // Stop moving
+        if(dt >= eyeMoveDuration) {           // Time up? Destination reached.
+          eyeInMotion = false;                // Stop moving
           if(moveEyesRandomly) {
-            eyeMoveDuration  = random(10000, 3000000); // 0.01-3 sec stop
-            eyeMoveStartTime = t;               // Save initial time of stop
+            eyeMoveDuration = random(10000, 3000000); // 0.01-3 sec stop
+            eyeMoveStartTime = t;             // Save initial time of stop
           }
           eyeX = eyeOldX = eyeNewX;           // Save position
           eyeY = eyeOldY = eyeNewY;
         } else { // Move time's not yet fully elapsed -- interpolate position
           float e  = (float)dt / float(eyeMoveDuration); // 0.0 to 1.0 during move
           e = 3 * e * e - 2 * e * e * e; // Easing function: 3*e^2-2*e^3 0.0 to 1.0
-          eyeX = eyeOldX + (eyeNewX - eyeOldX) * e; // Interp X
-          eyeY = eyeOldY + (eyeNewY - eyeOldY) * e; // and Y
+          eyeX = eyeOldX + (eyeNewX - eyeOldX) * e;      // Interp X
+          eyeY = eyeOldY + (eyeNewY - eyeOldY) * e;      // and Y
         }
-      } else {                                // Eye stopped
+      } else {                                           // Eye stopped
         eyeX = eyeOldX;
         eyeY = eyeOldY;
-        if(dt > eyeMoveDuration) {            // Time up?  Begin new move.
+        if(dt > eyeMoveDuration) {                       // Time up?  Begin new move.
           // r is the radius in X and Y that the eye can go, from (0,0) in the center.
           float r = (float)mapDiameter - (float)DISPLAY_SIZE * M_PI_2; // radius of motion
           r *= 0.6;  // calibration constant
@@ -543,9 +550,9 @@ void loop() {
           eyeNewY += mapRadius;
 
           // Set the duration for this move, and start it going.
-          eyeMoveDuration  = random(83000, 166000); // ~1/12 - ~1/6 sec
-          eyeMoveStartTime = t;               // Save initial time of move
-          eyeInMotion      = true;            // Start move on next frame
+          eyeMoveDuration  = random(83000, 166000);      // ~1/12 - ~1/6 sec
+          eyeMoveStartTime = t;                          // Save initial time of move
+          eyeInMotion      = true;                       // Start move on next frame
         }
       }
 
@@ -594,7 +601,7 @@ void loop() {
         } else {
           uq = (float)(iy - upperClosed[ix]) / (float)(upperOpen[ix] - upperClosed[ix]);
         }
-        if(booped) {
+        if(booped || eyelidsWide) {
           uq = 0.9;
           lq = 0.7;
         } else {
@@ -642,7 +649,7 @@ void loop() {
       // Once per frame (of eye #0), reset boopSum...
       if((eyeNum == 0) && (boopPin >= 0)) {
         boopSumFiltered = ((boopSumFiltered * 3) + boopSum) / 4;
-		// Serial.printf("boopSum: %d, boopSumFiltered: %d, boopThreshold: %d, booped: %s\n", boopSum, boopSumFiltered, boopThreshold, (booped ? "true" : "false"));
+//        Serial.printf("boopSum: %d, boopSumFiltered: %d, boopThreshold: %d, booped: %s\n", boopSum, boopSumFiltered, boopThreshold, (booped ? "true" : "false"));
         if(boopSumFiltered > boopThreshold) {
           if(!booped) {
             Serial.println("BOOP!");
@@ -652,6 +659,11 @@ void loop() {
           booped = false;
         }
         boopSum = 0;
+      }
+
+      // Once per frame (of eye #1), reset eyelidsWide...
+      if((eyeNum == 1) && (eyelidsWide)) {
+        eyelidsWide = false;
       }
 
       float mins = (float)millis() / 60000.0;
