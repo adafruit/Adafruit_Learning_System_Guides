@@ -1,6 +1,6 @@
 // Code by Erin St. Blaine for Adafruit Industries
 // NeoPixel Aquarium Tutorial: https://learn.adafruit.com/neopixel-aquarium-with-submersible-lights/
-// For QT Py board
+// For QT Py board 
 
 #include "Adafruit_FreeTouch.h"
 #include "FastLED.h"
