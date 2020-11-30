@@ -18,7 +18,7 @@ strip_pin = board.D10
 strip_num = 30
 
 # The LED brightness, where 0.0 is 0% (off) and 1.0 is 100% brightness, e.g. 0.3 is 30%.
-pixel_brightness = 0.2
+pixel_brightness = 0.5
 
 # IF YOU ADD NEW COLORS, YOU MUST IMPORT THEM.
 # The colors to cycle through. Can be any number of colors.
@@ -84,6 +84,22 @@ animations = AnimationSequence(
     ),
     auto_clear=True,
 )
+
+# Set the background image.
+magtag.set_background("/adaflake.bmp")
+
+# Add lines of text including button labels.
+magtag.add_text(text_color=0xFFFFFF, text_position=(0, 10), text_scale=2)
+magtag.set_text("Button functions:")
+magtag.add_text(text_color=0xFFFFFF, text_position=(0, 65))
+magtag.set_text(" Button A: Color Cycle\n"
+                " Button B: Sparkle\n"
+                " Button C: Comet\n"
+                " Button D: LEDs off",
+                index=1)
+magtag.add_text(text_color=0xFFFFFF, text_position=(0, 120))
+magtag.set_text("    A           B           C           D", index=2)
+magtag.refresh()
 
 # Main loop.
 while True:
