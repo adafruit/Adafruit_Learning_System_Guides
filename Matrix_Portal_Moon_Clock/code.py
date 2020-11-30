@@ -36,6 +36,7 @@ except ImportError:
 
 TWELVE_HOUR = True # If set, use 12-hour time vs 24-hour (e.g. 3:00 vs 15:00)
 COUNTDOWN = False  # If set, show time to (vs time of) next rise/set event
+MONTH_DAY = True   # If set, use MM/DD vs DD/MM (e.g. 31/12 vs 12/31)
 BITPLANES = 6      # Ideally 6, but can set lower if RAM is tight
 
 
@@ -418,7 +419,10 @@ while True:
     GROUP[6].text = STRING
     GROUP[6].x = CENTER_X - GROUP[6].bounding_box[2] // 2
     GROUP[6].y = TIME_Y
-    STRING = str(NOW.tm_mon) + '/' + str(NOW.tm_mday)
+    if MONTH_DAY:
+        STRING = str(NOW.tm_mon) + '/' + str(NOW.tm_mday)
+    else:
+        STRING = str(NOW.tm_mday) + '/' + str(NOW.tm_mon)
     GROUP[7].text = STRING
     GROUP[7].x = CENTER_X - GROUP[7].bounding_box[2] // 2
     GROUP[7].y = TIME_Y + 10

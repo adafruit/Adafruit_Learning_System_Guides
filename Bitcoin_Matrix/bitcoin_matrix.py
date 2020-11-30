@@ -31,7 +31,7 @@ matrixportal = MatrixPortal(
     json_path=DATA_LOCATION,
     status_neopixel=board.NEOPIXEL,
     default_bg=cwd + "/bitcoin_background.bmp",
-    debug=True,
+    debug=False,
 )
 
 matrixportal.add_text(
