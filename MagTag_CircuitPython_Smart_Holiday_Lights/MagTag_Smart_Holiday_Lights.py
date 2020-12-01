@@ -17,8 +17,10 @@ strip_pin = board.D10
 # The number of NeoPixels on the strip.
 strip_num = 30
 
-# The LED brightness, where 0.0 is 0% (off) and 1.0 is 100% brightness, e.g. 0.3 is 30%.
+# The MagTag LED brightness, where 0.0 is 0% (off) and 1.0 is 100% brightness, e.g. 0.3 is 30%.
 pixel_brightness = 0.5
+# The strip LED brightness, where 0.0 is 0% (off) and 1.0 is 100% brightness, e.g. 0.3 is 30%.
+strip_brightness = 1
 
 # IF YOU ADD NEW COLORS, YOU MUST IMPORT THEM.
 # The colors to cycle through. Can be any number of colors.
@@ -52,7 +54,7 @@ magtag = MagTag()
 pixels = magtag.peripherals.neopixels
 pixels.brightness = pixel_brightness
 magtag.peripherals.neopixel_disable = False
-strip = neopixel.NeoPixel(strip_pin, strip_num, brightness=pixel_brightness, auto_write=False)
+strip = neopixel.NeoPixel(strip_pin, strip_num, brightness=strip_brightness, auto_write=False)
 
 # Create animations in sequences and groups.
 animations = AnimationSequence(
