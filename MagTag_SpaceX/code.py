@@ -1,5 +1,6 @@
 # SpaceX Launch Display, by Anne Barela November 2020
 # MIT License - for Adafruit Industries LLC
+# See https://github.com/r-spacex/SpaceX-API for API info
 
 import time
 from adafruit_magtag.magtag import MagTag
@@ -40,7 +41,7 @@ def details_transform(val3):
     val3_length = len(val3)
     if val3_length == 0:
         return "Details: To Be Determined"
-    return "Details: " + val3[0:max(val3_length,202)] + "..."
+    return "Details: " + val3[0:min(val3_length,350)] + "..."
 
 # Set up the MagTag with the JSON data parameters
 magtag = MagTag(
@@ -80,8 +81,8 @@ magtag.add_text(
     text_font="Lato-Regular-10.bdf",
     text_position=(10,94),
     text_scale=1,
-    line_spacing=0.8,
-    text_wrap=47,
+    line_spacing=0.9, # Tighten up line spacing a bit
+    text_wrap=63,     # wrap text at this count
     text_transform=details_transform
 )
 
@@ -90,7 +91,7 @@ timestamp = None
 # Loop forever, checking the time elapsed and updating the screen after a set time
 # When power savings code is available, this can be used to save battery life below.
 while True:
-    if not timestamp or (time.monotonic() - timestamp) > 300:  # once every 5 minutes...
+    if not timestamp or (time.monotonic() - timestamp) > 86400:  # once every day
         try:
             # This statement gets the JSON data and displays it automagically
             value = magtag.fetch()
