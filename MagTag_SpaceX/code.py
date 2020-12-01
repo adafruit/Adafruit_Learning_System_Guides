@@ -51,6 +51,7 @@ magtag = MagTag(
 # Have the MagTag connect to the internet
 magtag.network.connect()
 
+# Define how the text is to be displayed - first the heading
 magtag.add_text(
     text_font="Lato-Bold-ltd-25.bdf",
     text_position=(10,15),
