@@ -85,7 +85,9 @@ while True:
         )
 
         print(now)
-        time.sleep(60 * 60)  # one hour
+        time.sleep(24 * 60 * 60)  # one day
+        # We will use deep sleep once it's available in CircuitPython.
+
     except (ValueError, RuntimeError) as e:
         print("Some error occurred, retrying! -", e)
         time.sleep(60)  # one  minute

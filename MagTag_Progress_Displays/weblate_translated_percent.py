@@ -86,9 +86,10 @@ magtag.graphics.splash.append(progress_bar)
 timestamp = None
 
 while True:
+    # We will use deep sleep once it's available in CircuitPython
     if (
-        not timestamp or (time.monotonic() - timestamp) > 600
-    ):  # once every 600 seconds...
+        not timestamp or (time.monotonic() - timestamp) > 24 * 60 * 60
+    ):  # once per day...
         try:
             value = magtag.fetch()
             print("Response is", value)
