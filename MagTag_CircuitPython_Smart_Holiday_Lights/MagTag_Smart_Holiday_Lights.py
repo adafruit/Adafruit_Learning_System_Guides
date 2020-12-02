@@ -102,7 +102,6 @@ magtag.set_text(" Button A: Color Cycle\n"
                 auto_refresh=False)
 magtag.add_text(text_color=0xFFFFFF, text_position=(0, 120))
 magtag.set_text("    A           B           C           D", index=2)
-magtag.refresh()
 
 # Main loop.
 while True:
