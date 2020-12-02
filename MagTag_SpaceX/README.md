@@ -8,7 +8,11 @@ MIT License
 
 This code is for an Adafruit Learning System guide on displaying next launch data for SpaceX
 on the epaper display of the Adafruit MagTag. All internet connectivity is done by the
-ESP32-S2 processor on the MagTag.
+ESP32-S2 processor on the MagTag:
+
+Guide: SpaceX Next Launch Display with Adafruit MagTag
+
+https://learn.adafruit.com/spacex-next-launch-display-with-adafruit-magtag/overview
 
 Data from https://api.spacexdata.com/v4/launches/next
 
