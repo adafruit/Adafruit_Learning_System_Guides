@@ -92,16 +92,16 @@ magtag.set_background("/adaflake.bmp")
 
 # Add lines of text including button labels.
 magtag.add_text(text_color=0xFFFFFF, text_position=(0, 10), text_scale=2)
-magtag.set_text("Button functions:")
+magtag.set_text("Button functions:", auto_refresh=False)
 magtag.add_text(text_color=0xFFFFFF, text_position=(0, 65))
 magtag.set_text(" Button A: Color Cycle\n"
                 " Button B: Sparkle\n"
                 " Button C: Comet\n"
                 " Button D: LEDs off",
-                index=1)
+                index=1,
+                auto_refresh=False)
 magtag.add_text(text_color=0xFFFFFF, text_position=(0, 120))
 magtag.set_text("    A           B           C           D", index=2)
-magtag.refresh()
 
 # Main loop.
 while True:
