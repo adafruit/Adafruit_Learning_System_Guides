@@ -16,59 +16,57 @@ from adafruit_progressbar import ProgressBar
 time.sleep(4)
 # Set up where we'll be fetching data from
 DATA_SOURCE = "https://hosted.weblate.org/api/projects/circuitpython/statistics/"
-DATA_LOCATION = ["translated_percent"]
+NAME_LOCATION = ["name"]
+PERCENT_LOCATION = ["translated_percent"]
+URL_LOCATION = ["url"]
 
-
-def text_transform(val):
-    return "Translated: {}%".format(val)
 
 
 magtag = MagTag(
     url=DATA_SOURCE,
-    json_path=DATA_LOCATION,
+    json_path=(NAME_LOCATION, PERCENT_LOCATION, URL_LOCATION),
 )
 
 magtag.network.connect()
+
+# name
+magtag.add_text(
+    text_font="fonts/leaguespartan18.bdf",
+    text_position=(
+        (magtag.graphics.display.width // 2) - 1,
+        20,
+    ),
+    text_anchor_point=(0.5, 0.5),
+)
+
+# percentage
+def textpercent_transform(val):
+    return "Translated: {}%".format(val)
 
 magtag.add_text(
     text_font="fonts/leaguespartan18.bdf",
     text_position=(
         (magtag.graphics.display.width // 2) - 1,
-        42,
+        45,
     ),
-    text_scale=1,
-    text_transform=text_transform,
+    text_transform=textpercent_transform,
     text_anchor_point=(0.5, 0.5),
 )
 
-bottom_lbl_txt = "hosted.weblate.org/projects/circuitpython/"
+# URL
+def texturl_transform(val):
+    return val.replace("https://", "")  # remove known prefix!
+
 magtag.add_text(
     text_font="fonts/leaguespartan11.bdf",
     text_position=(
         (magtag.graphics.display.width // 2) - 1,
         (magtag.graphics.display.height) - 8,
     ),
-    text_scale=1,
-    text_transform=text_transform,
+    text_transform=texturl_transform,
     text_anchor_point=(0.5, 1.0),
-    is_data=False,
 )
 
-top_lbl_txt = "CircuitPython"
-magtag.add_text(
-    text_font="fonts/leaguespartan18.bdf",
-    text_position=(
-        (magtag.graphics.display.width // 2) - 1,
-        16,
-    ),
-    text_scale=1,
-    text_transform=text_transform,
-    text_anchor_point=(0.5, 0.5),
-    is_data=False,
-)
-
-magtag.set_text(bottom_lbl_txt, index=1)
-magtag.set_text(top_lbl_txt, index=2)
 # set progress bar width and height relative to board's display
 BAR_WIDTH = magtag.graphics.display.width - 80
 BAR_HEIGHT = 30
@@ -94,7 +92,7 @@ while True:
             value = magtag.fetch()
             print("Response is", value)
             time.sleep(5)  # wait for display
-            progress_bar.progress = value / 100.0
+            progress_bar.progress = value[1] / 100.0
             magtag.refresh()
         except (ValueError, RuntimeError) as e:
             print("Some error occurred, retrying! -", e)
