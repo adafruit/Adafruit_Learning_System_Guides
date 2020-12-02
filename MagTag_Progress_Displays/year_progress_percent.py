@@ -12,50 +12,35 @@ from adafruit_magtag.magtag import MagTag
 from adafruit_progressbar import ProgressBar
 import rtc
 
-time.sleep(4)
-
-
 def days_in_year(date_obj):
     # check for leap year
     if date_obj.tm_year % 4 == 0:
         return 366
     return 365
 
-
-def text_transform(val):
-    return "{:.2f}%".format(val)
-
-
 magtag = MagTag()
-
 magtag.network.connect()
 
 magtag.add_text(
     text_font="fonts/epilogue18.bdf",
     text_position=(
         (magtag.graphics.display.width // 2) - 1,
-        50,
+        24,
     ),
-    text_scale=1,
-    text_transform=text_transform,
     text_anchor_point=(0.5, 0.5),
     is_data=False,
 )
+magtag.set_text("Year Progress:")
 
-top_lbl_txt = "Year Progress:"
 magtag.add_text(
     text_font="fonts/epilogue18.bdf",
     text_position=(
         (magtag.graphics.display.width // 2) - 1,
-        24,
+        55,
     ),
-    text_scale=1,
-    text_transform=text_transform,
     text_anchor_point=(0.5, 0.5),
     is_data=False,
 )
-
-magtag.set_text(top_lbl_txt, index=1)
 
 # set progress bar width and height relative to board's display
 BAR_WIDTH = magtag.graphics.display.width - 80
@@ -71,17 +56,13 @@ progress_bar = ProgressBar(
 
 magtag.graphics.splash.append(progress_bar)
 
-timestamp = None
-
-time.sleep(5)
-
 while True:
     try:
         magtag.network.get_local_time()
         now = rtc.RTC().datetime
         progress_bar.progress = now.tm_yday / days_in_year(now)
         magtag.set_text(
-            text_transform(now.tm_yday / days_in_year(now) * 100.0), index=0
+            "{:.2f}%".format(now.tm_yday / days_in_year(now) * 100.0), index=1
         )
 
         print(now)
