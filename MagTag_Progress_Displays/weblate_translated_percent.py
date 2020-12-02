@@ -13,14 +13,11 @@ import time
 from adafruit_magtag.magtag import MagTag
 from adafruit_progressbar import ProgressBar
 
-time.sleep(4)
 # Set up where we'll be fetching data from
 DATA_SOURCE = "https://hosted.weblate.org/api/projects/circuitpython/statistics/"
 NAME_LOCATION = ["name"]
 PERCENT_LOCATION = ["translated_percent"]
 URL_LOCATION = ["url"]
-
-
 
 magtag = MagTag(
     url=DATA_SOURCE,
