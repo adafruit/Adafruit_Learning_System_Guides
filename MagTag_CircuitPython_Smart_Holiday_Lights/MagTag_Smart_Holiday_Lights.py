@@ -18,7 +18,7 @@ strip_pin = board.D10
 strip_num = 30
 
 # The MagTag LED brightness, where 0.0 is 0% (off) and 1.0 is 100% brightness, e.g. 0.3 is 30%.
-pixel_brightness = 0.05
+pixel_brightness = 0.5
 # The strip LED brightness, where 0.0 is 0% (off) and 1.0 is 100% brightness, e.g. 0.3 is 30%.
 strip_brightness = 1
 
