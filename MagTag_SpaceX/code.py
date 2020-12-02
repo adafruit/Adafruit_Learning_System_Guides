@@ -3,6 +3,7 @@
 # See https://github.com/r-spacex/SpaceX-API for API info
 
 import time
+import terminalio
 from adafruit_magtag.magtag import MagTag
 
 months = ["January", "February", "March", "April", "May", "June", "July", 
@@ -30,10 +31,10 @@ def time_transform(val2):
     # Uncomment the lines below to get a Month Day and local launch time display am/pm (more US)
     hour = int(val2[11:12])
     if hour <= 12:
-        return "When: " + months[int(val2[5:7])-1] + str(int(val2[8:10])) + ", " + val2[0:4] +  " at " + val2[11:16] + " am"
+        return months[int(val2[5:7])-1] + " " + str(int(val2[8:10])) + ", " + val2[0:4] +  " at " + val2[11:16] + " am"
     else:
         hour = hour - 11
-    return "When: " + months[int(val2[5:7])-1] + str(int(val2[8:10])) + ", " + val2[0:4] +  " at " + str(hour) + val2[13:16] + " pm"
+    return months[int(val2[5:7])-1] + " " + str(int(val2[8:10])) + ", " + val2[0:4] +  " at " + str(hour) + val2[13:16] + " pm"
 	   
 def details_transform(val3):
     if val3 == None:
@@ -41,7 +42,7 @@ def details_transform(val3):
     val3_length = len(val3)
     if val3_length == 0:
         return "Details: To Be Determined"
-    return "Details: " + val3[0:min(val3_length,350)] + "..."
+    return "Details: " + val3[0:min(val3_length,166)] + "..."
 
 # Set up the MagTag with the JSON data parameters
 magtag = MagTag(
@@ -51,7 +52,6 @@ magtag = MagTag(
 # Have the MagTag connect to the internet
 magtag.network.connect()
 
-# Define how the text is to be displayed - first the heading
 magtag.add_text(
     text_font="Lato-Bold-ltd-25.bdf",
     text_position=(10,15),
@@ -71,19 +71,19 @@ magtag.add_text(
 
 # Formatting for the launch time text
 magtag.add_text(
-    text_font="Lato-Regular-14.bdf",
-    text_position=(10,58),
+    text_font="Arial-12.bdf",
+    text_position=(10,60),
     text_scale=1,
     text_transform=time_transform
 )
 
 # Formatting for the details text
 magtag.add_text(
-    text_font="Lato-Regular-10.bdf",
+    text_font=terminalio.FONT,
     text_position=(10,94),
     text_scale=1,
-    line_spacing=0.9, # Tighten up line spacing a bit
-    text_wrap=63,     # wrap text at this count
+    line_spacing=0.8, 
+    text_wrap=47,     # wrap text at this count
     text_transform=details_transform
 )
 
