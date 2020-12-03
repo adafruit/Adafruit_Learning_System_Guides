@@ -138,7 +138,6 @@ magtag.splash.append(station_info)
 
 def get_data_source_url(station=STATION_ID, metric=METRIC, hilo_only=True):
     """Build and return the URL for the tides API."""
-    # now = time.localtime()
     date = "{}{:02}{:02}".format(now.tm_year, now.tm_mon, now.tm_mday)
 
     URL = "https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?format=json"
