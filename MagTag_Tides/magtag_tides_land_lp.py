@@ -72,12 +72,12 @@ plot_y_labels.append(plot_y_neg)
 # ----------------------------
 date_label = displayio.Group(max_size=5)
 date_text = [label.Label(DATE_FONT, text="A", color=0xFFFFFF) for _ in range(5)]
-y_offset = 8
+y = 8
 for text in date_text:
     date_label.append(text)
     text.anchor_point = (0.5, 0)
-    text.anchored_position = (20, y_offset)
-    y_offset += 23
+    text.anchored_position = (20, y)
+    y += 23
 
 # ----------------------------
 # HiLo Times and Icons
@@ -85,13 +85,13 @@ for text in date_text:
 tide_info = displayio.Group(max_size=8)
 
 hilo_times = [label.Label(TIME_FONT, text="12:34 P", color=0x000000) for _ in range(4)]
-y_offset = 18
+y = 18
 for hilo in hilo_times:
     tide_info.append(hilo)
     hilo.hidden = True
     hilo.anchor_point = (1, 0.5)
-    hilo.anchored_position = (158, y_offset)
-    y_offset += 28
+    hilo.anchored_position = (158, y)
+    y += 28
 
 icon_bmp, icon_pal = adafruit_imageload.load("/tides_icons.bmp")
 icon_pal.make_transparent(1)
@@ -106,13 +106,13 @@ hilo_icons = [
     )
     for _ in range(4)
 ]
-y_offset = 6
+y = 6
 for icon in hilo_icons:
     tide_info.append(icon)
     icon.hidden = True
     icon.x = 46
-    icon.y = y_offset
-    y_offset += 28
+    icon.y = y
+    y += 28
 
 # ----------------------------
 # Station ID
@@ -138,6 +138,7 @@ magtag.splash.append(station_info)
 
 def get_data_source_url(station=STATION_ID, metric=METRIC, hilo_only=True):
     """Build and return the URL for the tides API."""
+    # now = time.localtime()
     date = "{}{:02}{:02}".format(now.tm_year, now.tm_mon, now.tm_mday)
 
     URL = "https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?format=json"
@@ -217,24 +218,24 @@ def plot_tides():
         for yfill in range(y, PLOT_HEIGHT):
             try:
                 tide_plot[x, yfill] = 2
-            except IndexError:
+            except:
                 pass
         tide_plot[x, y] = 0
 
 
 def show_hilo():
     """Show high / low times."""
-    for i in hilo_icons:
-        i.hidden = True
-    for t in hilo_times:
-        t.hidden = True
-    for i, data in enumerate(hilo_data):
+    for icon in hilo_icons:
+        icon.hidden = True
+    for text in hilo_times:
+        text.hidden = True
+    for i, hilo in enumerate(hilo_data):
         # make it visible
         hilo_icons[i].hidden = False
         # icon
-        hilo_icons[i][0] = 0 if data["type"] == "H" else 1
+        hilo_icons[i][0] = 0 if hilo["type"] == "H" else 1
         # time
-        h, m = data["t"].split(" ")[1].split(":")
+        h, m = hilo["t"].split(" ")[1].split(":")
         m = int(m)
         h = int(h)
         ampm = "A" if h < 12 else "P"
@@ -242,22 +243,19 @@ def show_hilo():
         hilo_times[i].text = "{:>2}:{:02} {}".format(h, m, ampm)
 
 
-def go_to_sleep():
-    # turn off neopixel
-    magtag.peripherals.neopixel_disable = True
+def time_to_sleep():
+    """Compute amount of time to sleep."""
     # daily event time
     event_time = time.struct_time(
         (now[0], now[1], now[2], DAILY_UPDATE_HOUR, 0, 0, -1, -1, now[8])
     )
     # how long is that from now?
     remaining = time.mktime(event_time) - time.mktime(now)
+    # is that today or tomorrow?
     if remaining < 0:  # ah its aready happened today...
         remaining += 24 * 60 * 60  # wrap around to the next day
-    # determine total sleep time
-    pause = alarm.time.TimeAlarm(monotonic_time=time.monotonic() + remaining)
-    # and sleep
-    alarm.exit_and_deep_sleep_until_alarms(pause)
-
+    # return it
+    return remaining
 
 # ===========
 #  M A I N
@@ -284,4 +282,6 @@ while True:
     time.sleep(magtag.display.time_to_refresh + 1)
 
     # ZZZZZZzzzzzzzzz
-    go_to_sleep()
+    now = time.localtime()
+    magtag.exit_and_deep_sleep(time_to_sleep())
+
