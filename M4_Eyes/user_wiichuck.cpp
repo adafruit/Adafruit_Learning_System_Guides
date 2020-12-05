@@ -1,4 +1,4 @@
-#if 1 // Change to 0 to disable this code (must enable ONE user*.cpp only!)
+#if 0 // Change to 0 to disable this code (must enable ONE user*.cpp only!)
 
 // This user loop is designed to be used with a WiiChuck for command inputs and 
 // connects to a NeoPixel strip for additional output. It was used with a unicorn 
