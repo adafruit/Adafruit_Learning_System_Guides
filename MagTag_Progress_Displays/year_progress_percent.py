@@ -56,19 +56,18 @@ progress_bar = ProgressBar(
 
 magtag.graphics.splash.append(progress_bar)
 
-while True:
-    try:
-        magtag.network.get_local_time()
-        now = rtc.RTC().datetime
-        progress_bar.progress = now.tm_yday / days_in_year(now)
-        magtag.set_text(
-            "{:.2f}%".format(now.tm_yday / days_in_year(now) * 100.0), index=1
-        )
 
-        print(now)
-        time.sleep(24 * 60 * 60)  # one day
-        # We will use deep sleep once it's available in CircuitPython.
+try:
+    magtag.network.get_local_time()
+    now = rtc.RTC().datetime
+    progress_bar.progress = now.tm_yday / days_in_year(now)
+    magtag.set_text(
+        "{:.2f}%".format(now.tm_yday / days_in_year(now) * 100.0), index=1
+    )
 
-    except (ValueError, RuntimeError) as e:
-        print("Some error occurred, retrying! -", e)
-        time.sleep(60)  # one  minute
+    print(now)
+    magtag.exit_and_deep_sleep(24 * 60 * 60)  # one day
+
+except (ValueError, RuntimeError) as e:
+    print("Some error occurred, retrying after 1 minute! -", e)
+    magtag.exit_and_deep_sleep(60)  # one  minute
