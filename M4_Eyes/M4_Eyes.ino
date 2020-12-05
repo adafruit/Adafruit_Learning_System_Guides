@@ -59,6 +59,7 @@ int      iPupilFactor            = 42;
 uint32_t boopSum                 = 0,
          boopSumFiltered         = 0;
 bool     booped                  = false;
+bool     eyelidsClosed           = false;
 bool     eyelidsWide             = false;
 int      fixate                  = 7;
 uint8_t  lightSensorFailCount    = 0;
@@ -136,22 +137,34 @@ uint32_t availableRAM(void) {
 
 // USER CALLABLE FUNCTIONS
 
+// Start a blink.
+void eyesBlink() {
+  Serial.println("eyesBlink()");
+  timeToNextBlink = 0;
+}
+
 // Force the booped flag to be set true.
 void eyesBoop() {
   Serial.println("eyesBoop()");
   boopSum = 99999;
 }
 
+// Close eyelids.
+void eyesClose() {
+  Serial.println("eyesClose()");
+  eyelidsClosed = true;
+}
+
+// Return the eyes to normal random movement.
+void eyesNormal() {
+//  Serial.println("eyesNormal()");
+  moveEyesRandomly = true;
+}
+
 // Open eyelids wide.
 void eyesWide() {
   Serial.println("eyesWide()");
   eyelidsWide = true;
-}
-
-// Start a blink.
-void eyesBlink() {
-  Serial.println("eyesBlink()");
-  timeToNextBlink = 0;
 }
 
 // Force the eyes to a position on the screen.
@@ -161,12 +174,6 @@ void eyesToCorner(float x, float y, bool immediate) {
   eyeTargetY = y;
   if(immediate) 
     eyeMoveDuration = 0;
-}
-
-// Return the eyes to normal random movement.
-void eyesNormal() {
-//  Serial.println("eyesNormal()");
-  moveEyesRandomly = true;
 }
 
 
@@ -594,17 +601,20 @@ void loop() {
             iy = (int)map2screen(mapRadius - eye[eyeNum].eyeY) + (DISPLAY_SIZE/2); // on screen
         iy += irisRadius * trackFactor;
         if(eyeNum & 1) ix = DISPLAY_SIZE - 1 - ix; // Flip for right eye
-        if(iy > upperOpen[ix]) {
+        if(eyelidsWide) {
           uq = 1.0;
-        } else if(iy < upperClosed[ix]) {
-          uq = 0.0;
-        } else {
-          uq = (float)(iy - upperClosed[ix]) / (float)(upperOpen[ix] - upperClosed[ix]);
-        }
-        if(booped || eyelidsWide) {
+          lq = 1.0;
+        } else if(booped) {
           uq = 0.9;
           lq = 0.7;
         } else {
+          if(iy > upperOpen[ix]) {
+            uq = 1.0;
+          } else if(iy < upperClosed[ix]) {
+            uq = 0.0;
+          } else {
+            uq = (float)(iy - upperClosed[ix]) / (float)(upperOpen[ix] - upperClosed[ix]);
+          }
           lq = 1.0 - uq;
         }
       } else {
@@ -612,6 +622,10 @@ void loop() {
         uq = 1.0;
         lq = 1.0;
       }
+      if(eyelidsClosed) {
+        uq = 0.0;
+        lq = 0.0;
+      }      
       // Dampen eyelid movements slightly
       // SAVE upper & lower lid factors per eye,
       // they need to stay consistent across frame
@@ -661,8 +675,9 @@ void loop() {
         boopSum = 0;
       }
 
-      // Once per frame (of eye #1), reset eyelidsWide...
-      if((eyeNum == 1) && (eyelidsWide)) {
+      // Once per frame (of eye #1), reset eyelid states...
+      if(eyeNum == 1) {
+        eyelidsClosed = false;
         eyelidsWide = false;
       }
 

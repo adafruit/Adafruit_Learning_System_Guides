@@ -1,4 +1,4 @@
-#if 0 // Change to 0 to disable this code (must enable ONE user*.cpp only!)
+#if 1 // Change to 0 to disable this code (must enable ONE user*.cpp only!)
 
 // This user loop is designed to be used with a WiiChuck for command inputs and 
 // connects to a NeoPixel strip for additional output. It was used with a unicorn 
@@ -183,12 +183,12 @@ void user_loop(void) {
   int cornerX = (joyX - low) / divFactor;
   int cornerY = (joyY - low) / divFactor;
   int chaseColor = 0;
-  // Serial.println("cornerXY=" + String(cornerX) + "," + String(cornerY));
+//  Serial.println("cornerXY=" + String(cornerX) + "," + String(cornerY));
   if(cornerX == 1 && cornerY == 1) { // return to normal when the joystick is in the middle
     eyesNormal();
     neoPixelState = LUMINESCENT;
   } else {
-    // Serial.println("eyesToCorner(" + String(x) + "," + String(-y) + ")");
+//    Serial.println("eyesToCorner(" + String(x) + "," + String(-y) + ")");
     eyesToCorner(x, -y, true);
     if(cornerX < 1) {
       chaseColor = green;
@@ -220,7 +220,7 @@ void user_loop(void) {
       neoPixelState = SPARKLE;
     } else if(buttonZ) {
       Serial.println("buttonZ");
-      eyesBlink();
+      eyesClose();
     }
   }
 
