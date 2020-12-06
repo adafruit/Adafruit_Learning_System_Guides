@@ -169,6 +169,7 @@ void eyesWide() {
 
 // Force the eyes to a position on the screen.
 void eyesToCorner(float x, float y, bool immediate) {
+//  Serial.println("eyesToCorner(" + String(x) + ", " + String(-y) + ", " + (immediate ? "TRUE" : "FALSE") + ")");
   moveEyesRandomly = false;
   eyeTargetX = x;
   eyeTargetY = y;

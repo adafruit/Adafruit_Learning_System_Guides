@@ -178,17 +178,16 @@ void user_loop(void) {
   
   int joyX = nunchuck1.getJoyX();
   int joyY = nunchuck1.getJoyY();
+//  Serial.println("joyXY(" + String(joyX) + ", " + String(joyY) + ")");
   float x = map2(joyX, low, high, -1.0, 1.0);
   float y = map2(joyY, low, high, -1.0, 1.0);
   int cornerX = (joyX - low) / divFactor;
   int cornerY = (joyY - low) / divFactor;
   int chaseColor = 0;
-//  Serial.println("cornerXY=" + String(cornerX) + "," + String(cornerY));
   if(cornerX == 1 && cornerY == 1) { // return to normal when the joystick is in the middle
     eyesNormal();
     neoPixelState = LUMINESCENT;
   } else {
-//    Serial.println("eyesToCorner(" + String(x) + "," + String(-y) + ")");
     eyesToCorner(x, -y, true);
     if(cornerX < 1) {
       chaseColor = green;
