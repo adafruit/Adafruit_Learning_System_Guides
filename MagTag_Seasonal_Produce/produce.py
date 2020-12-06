@@ -4,7 +4,6 @@
 """
 
 # pylint: disable=too-many-nested-blocks, pointless-string-statement
-# pylint: disable=protected-access
 
 import json
 
@@ -20,9 +19,13 @@ class Produce():
         self.geo = None
         self.produce = None
 
-    def fetch(self, network=None):
+
+    def fetch(self, magtag=None):
         """ Retrieves current seasonal produce data from server,
             does some deserializing and processing for later filtering.
+            This is currently tied to a MagTag object -- would prefer
+            to function with more general WiFi-type object in the future
+            so this could work on other boards.
         """
         if self.url.startswith('file:'):
             # JSON data is in local file (network value is ignored)
@@ -30,7 +33,7 @@ class Produce():
                 json_data = json.load(jsonfile)
         else:
             # JSON data is on remote server
-            response = network._wifi.requests.get(self.url)
+            response = magtag.network.fetch(self.url)
             if response.status_code == 200:
                 json_data = response.json()
 
@@ -62,7 +65,6 @@ class Produce():
         return None                            # No match
 
 
-
     def in_season(self, month):
         """ With JSON produce data previously loaded and geographic location
             previously set, and given a month number (1-12), return a
@@ -89,7 +91,6 @@ class Produce():
                     pass                           # try next widest geo ring
         veg_list.sort()                            # Alphabetize list
         return veg_list                            # Return alphabetized list
-
 
 
 """ NOTES
