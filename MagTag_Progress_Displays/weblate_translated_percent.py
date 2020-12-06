@@ -80,17 +80,12 @@ magtag.graphics.splash.append(progress_bar)
 
 timestamp = None
 
-while True:
-    # We will use deep sleep once it's available in CircuitPython
-    if (
-        not timestamp or (time.monotonic() - timestamp) > 24 * 60 * 60
-    ):  # once per day...
-        try:
-            value = magtag.fetch()
-            print("Response is", value)
-            time.sleep(5)  # wait for display
-            progress_bar.progress = value[1] / 100.0
-            magtag.refresh()
-        except (ValueError, RuntimeError) as e:
-            print("Some error occurred, retrying! -", e)
-        timestamp = time.monotonic()
+try:
+    value = magtag.fetch()
+    print("Response is", value)
+    progress_bar.progress = value[1] / 100.0
+    magtag.refresh()
+    magtag.exit_and_deep_sleep(24 * 60 * 60)  # one day
+except (ValueError, RuntimeError) as e:
+    print("Some error occurred, retrying! -", e)
+    magtag.exit_and_deep_sleep(60)  # one minute
