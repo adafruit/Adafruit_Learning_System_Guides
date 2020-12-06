@@ -20,7 +20,7 @@ class Produce():
         self.geo = None
         self.produce = None
 
-    def fetch(self, network=None):
+    def fetch(self, magtag=None):
         """ Retrieves current seasonal produce data from server,
             does some deserializing and processing for later filtering.
         """
@@ -30,7 +30,7 @@ class Produce():
                 json_data = json.load(jsonfile)
         else:
             # JSON data is on remote server
-            response = network._wifi.requests.get(self.url)
+            response = magtag.network.fetch(self.url)
             if response.status_code == 200:
                 json_data = response.json()
 
