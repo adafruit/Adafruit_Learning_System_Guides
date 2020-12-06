@@ -242,22 +242,19 @@ def show_hilo():
         hilo_times[i].text = "{:>2}:{:02} {}".format(h, m, ampm)
 
 
-def go_to_sleep():
-    # turn off neopixel
-    magtag.peripherals.neopixel_disable = True
+def time_to_sleep():
+    """Compute amount of time to sleep."""
     # daily event time
     event_time = time.struct_time(
         (now[0], now[1], now[2], DAILY_UPDATE_HOUR, 0, 0, -1, -1, now[8])
     )
     # how long is that from now?
     remaining = time.mktime(event_time) - time.mktime(now)
+    # is that today or tomorrow?
     if remaining < 0:  # ah its aready happened today...
         remaining += 24 * 60 * 60  # wrap around to the next day
-    # determine total sleep time
-    pause = alarm.time.TimeAlarm(monotonic_time=time.monotonic() + remaining)
-    # and sleep
-    alarm.exit_and_deep_sleep_until_alarms(pause)
-
+    # return it
+    return remaining
 
 # ===========
 #  M A I N
@@ -284,4 +281,6 @@ while True:
     time.sleep(magtag.display.time_to_refresh + 1)
 
     # ZZZZZZzzzzzzzzz
-    go_to_sleep()
+    now = time.localtime()
+    magtag.exit_and_deep_sleep(time_to_sleep())
+
