@@ -1,5 +1,5 @@
 """
-NeoPixel Animator code for ItsyBitsy nRF52840 NeoPixel Animation and Color Remote Control.
+Code for ItsyBitsy nRF52840 Infinity Cube.
 """
 
 import board
