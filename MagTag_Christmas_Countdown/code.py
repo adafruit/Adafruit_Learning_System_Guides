@@ -10,8 +10,7 @@ try:
 except (ConnectionError, ValueError, RuntimeError) as e:
     print("*** MagTag(), Some error occured, retrying! -", e)
     # Exit program and restart in 1 seconds.
-    pause = alarm.time.TimeAlarm(monotonic_time=time.monotonic() + 1)
-    alarm.exit_and_deep_sleep_until_alarms(pause)
+    magtag.exit_and_deep_sleep(1)
 
 
 
