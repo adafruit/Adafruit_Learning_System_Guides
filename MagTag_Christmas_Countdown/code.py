@@ -77,10 +77,10 @@ magtag.get_local_time()
 now = time.localtime()
 month = now[1]
 day = now[2]
-hour = now[3]
-minutes = now[4]
-seconds_since_midnight = 60 * (hour*60 + minutes)
-print("day is", day, "(", seconds_since_midnight, "seconds since midnight")
+(hour, minutes, seconds) = now[3:6]
+seconds_since_midnight = 60 * (hour*60 + minutes)+seconds
+print( f"day is {day}, ({seconds_since_midnight} seconds since midnight)")
+
 
 #  sets colors of circles to transparent to reveal dates that have passed & current date
 for i in range(day):
@@ -95,7 +95,7 @@ time.sleep(5)
 #  goes into deep sleep till a 'stroke' past midnight
 print("entering deep sleep")
 seconds_to_sleep = 24*60*60 - seconds_since_midnight + 10
-print("sleeping for ",seconds_to_sleep,"seconds")
+print( f"sleeping for {seconds_to_sleep} seconds")
 magtag.exit_and_deep_sleep(seconds_to_sleep)
 
 #  entire code will run again after deep sleep cycle
