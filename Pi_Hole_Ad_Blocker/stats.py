@@ -114,7 +114,7 @@ while True:
         continue
 
     draw.text((x, top), "IP: " + str(IP) +
-              "( " + HOST + ")", font=font, fill=255)
+              " (" + HOST + ")", font=font, fill=255)
     draw.text((x, top + 8), "Ads Blocked: " +
               str(ADSBLOCKED), font=font, fill=255)
     draw.text((x, top + 16), "Clients:     " +
