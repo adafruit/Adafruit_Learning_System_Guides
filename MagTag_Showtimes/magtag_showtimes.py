@@ -1,89 +1,48 @@
+# MagTag Showtimes Event Viewer
+# Uses the events.json file to display next or current event
 # Be sure to put WiFi access point info in secrets.py file to connect
 
 import time
+import json
+import re
 from adafruit_magtag.magtag import MagTag
 
-FAKETIME = None  # time.struct_time(2020, 12, 9,     20, 01, 00,    2, 344, -1)
+# You can test by setting a time.struct here, to pretend its a different day
 # (tm_year, tm_mon, tm_mday, tm_hour, tm_min, tm_sec, tm_wday, tm_yday, tm_isdst)
+FAKETIME = False  # time.struct_time(2020, 12, 11,     15, 01, 00,    4, 346, -1)
 
-BEEP_ON_EVENTSTART = True
+BEEP_ON_EVENTSTART = True   # beep when the event begins?
+EVENT_FILE = "events.json"  # file containing events
+USE_24HR_TIME = False   # True for 24-hr time on display, false for 12 hour (am/pm) time
 
 magtag = MagTag()
 magtag.add_text(
     text_font="/fonts/Arial-Bold-12.pcf",
     text_color=0xFFFFFF,
-    text_position=(10, 112),
+    text_position=(2, 112),
     text_anchor_point=(0, 0),
 )
 
 # According to Python, monday is index 0...this array will help us track it
-day_names = ("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
-fullday_names = (
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-    "Sunday",
-)
+day_names = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+events = None
+with open(EVENT_FILE, 'r') as evfile:
+    events = json.load(evfile)
 
-events = []
-events.append(
-    {
-        "name": "JP's Product Pick of the Week",
-        "day_of_week": day_names.index("Tue"),
-        "graphic": "/bmps/jpp.bmp",
-        "start_time": "13:00",  # 4:00 pm local time
-        "end_time": "13:30",
-    }
-)
-events.append(
-    {
-        "name": "3D Hangouts",
-        "day_of_week": day_names.index("Wed"),
-        "graphic": "/bmps/3dh.bmp",
-        "start_time": "8:00",  # 11:00 am local time
-        "end_time": "9:00",
-    }
-)
-events.append(
-    {
-        "name": "Show & Tell",
-        "day_of_week": day_names.index("Wed"),
-        "graphic": "/bmps/snt.bmp",
-        "start_time": "16:30",  # 7:30 pm local time
-        "end_time": "17:00",
-    }
-)
-events.append(
-    {
-        "name": "Ask An Engineer",
-        "day_of_week": day_names.index("Wed"),
-        "graphic": "/bmps/aae.bmp",
-        "start_time": "17:00",  # 8:00 pm local time
-        "end_time": "18:00",
-    }
-)
-events.append(
-    {
-        "name": "John Park's Workshop",
-        "day_of_week": day_names.index("Thu"),
-        "graphic": "/bmps/jpw.bmp",
-        "start_time": "13:00",  # 4:00 pm local time
-        "end_time": "14:00",
-    }
-)
-events.append(
-    {
-        "name": "Scott's Deep Dive",
-        "day_of_week": day_names.index("Fri"),
-        "graphic": "/bmps/dds.bmp",
-        "start_time": "14:00",  # 5:00 pm local time
-        "end_time": "15:00",
-    }
-)
+# validate data
+for i, event in enumerate(events):
+    if not event.get('name'):
+        raise RuntimeError("No name in event %d" % i)
+    if not event.get('day_of_week') or event['day_of_week'] not in day_names:
+        raise RuntimeError("Invalid day of week for event '%s'" % event['name'])
+    r = re.compile('[0-2]?[0-9]:[0-5][0-9]')
+    if not event.get('start_time') or not r.match(event['start_time']) :
+        raise RuntimeError("Invalid start time for event '%s'" % event['name'])
+    if not event.get('end_time') or not r.match(event['end_time']) :
+        raise RuntimeError("Invalid end time for event '%s'" % event['name'])
+
 print(events)
+
 now = None
 if not FAKETIME:
     magtag.network.connect()
@@ -94,12 +53,24 @@ else:
 
 print("Now: ", now)
 
+# Helper to convert times into am/pm times
+def time_format(timestr):
+    if USE_24HR_TIME:
+        return timestr
+    hr, mn = [int(x) for x in timestr.split(":")]
+    if hr > 12:
+        return "%d:%02d PM" % (hr-12, mn)
+    elif hr > 0:
+        return "%d:%02d AM" % (hr, mn)
+    else:
+        return "12:%02d AM" % (mn)
+
 # find next event!
 remaining_starttimes = []
 remaining_endtimes = []
 current_event = None
 for event in events:
-    days_till_event = (event["day_of_week"] - now[6] + 7) % 7
+    days_till_event = (day_names.index(event["day_of_week"]) - now[6] + 7) % 7
 
     # now figure out minutes until event
     eventstart_hr, eventstart_min = event["start_time"].split(":")
@@ -154,8 +125,8 @@ next_up = events[remaining_starttimes.index(mins_till_next_eventstart)]
 sleep_time = None
 if current_event:
     print("Currently: ", current_event)
-    magtag.set_background(current_event["graphic"])
-    magtag.set_text("Currently streaming until " + current_event["end_time"])
+    magtag.set_background("bmps/"+current_event["graphic"])
+    magtag.set_text("Currently streaming until " + time_format(current_event["end_time"]))
     remaining_starttimes.index(mins_till_next_eventstart)
     if BEEP_ON_EVENTSTART:
         for _ in range(3):
@@ -164,13 +135,13 @@ if current_event:
     sleep_time = mins_till_next_eventend + 1
 else:
     print("Next up! ", next_up)
-    magtag.set_background(next_up["graphic"])
+    magtag.set_background("bmps/"+next_up["graphic"])
 
     string = (
         "Coming up on "
-        + day_names[next_up["day_of_week"]]
+        + next_up["day_of_week"]
         + " at "
-        + next_up["start_time"]
+        + time_format(next_up["start_time"])
     )
     magtag.set_text(string)
     sleep_time = mins_till_next_eventstart
