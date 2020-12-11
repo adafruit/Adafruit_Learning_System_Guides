@@ -1,6 +1,6 @@
 {
   "0" : {
-          "name" : "JP\'s Product Pick of the Week",
+          "name" : "JP's Product Pick of the Week",
            "day_of_week" : "Tuesday",
            "graphic" : "jpp.bmp",
            "start_time" : "13:00",
@@ -28,14 +28,14 @@
           "end_time": "18:00"
         },
   "4" : {
-         "name" : "John Park\'s Workshop",
+         "name" : "John Park's Workshop",
           "day_of_week" : "Thursday",
           "graphic" : "jpw.bmp",
           "start_time" : "13:00",
           "end_time": "14:00"
         },
   "4" : {
-         "name" : "Scott\'s Deep Dive",
+         "name" : "Scott's Deep Dive",
           "day_of_week" : "Friday",
           "graphic" : "dds.bmp",
           "start_time" : "14:00",
