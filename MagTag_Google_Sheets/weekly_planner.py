@@ -46,7 +46,7 @@ def hh_mm(time_struct, twelve_hour=True):
 
 # First text label (index 0) is day of week -- empty for now, is set later
 MAGTAG.add_text(
-    text_font='/fonts/helvB24.bdf',
+    text_font='/fonts/helvB24.pcf',
     text_position=(MAGTAG.graphics.display.width // 2, 4),
     line_spacing=1.0,
     text_anchor_point=(0.5, 0), # Center top
@@ -55,7 +55,7 @@ MAGTAG.add_text(
 
 # Second (index 1) is task list -- again, empty on start, is set later
 MAGTAG.add_text(
-    text_font='/fonts/ncenR14.bdf',
+    text_font='/fonts/ncenR14.pcf',
     text_position=(3, 36),
     line_spacing=1.0,
     text_anchor_point=(0, 0), # Top left
@@ -70,7 +70,7 @@ MAGTAG.graphics.splash.append(Rect(0, MAGTAG.graphics.display.height - 14,
 
 # Center white text (index 2) over black bar to show last update time
 MAGTAG.add_text(
-    text_font='/fonts/helvB12.bdf',
+    text_font='/fonts/helvB12.pcf',
     text_position=(MAGTAG.graphics.display.width // 2,
                    MAGTAG.graphics.display.height - 1),
     text_color=0xFFFFFF,

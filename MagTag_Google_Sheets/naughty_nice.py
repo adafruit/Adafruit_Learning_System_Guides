@@ -1,7 +1,7 @@
 """
 Google Sheets to MagTag example: Naughty or Nice?
 Gets JSON spreadsheet from Google, displays names from one column or other.
-"Smart cursive" BDF font by Thomas A. Fine, helvB12.bdf from Xorg fonts.
+"Smart cursive" font by Thomas A. Fine, helvB12 from Xorg fonts.
 """
 
 # pylint: disable=import-error, line-too-long
@@ -46,7 +46,7 @@ MAGTAG.graphics.set_background('bitmaps/nice.bmp' if NICE else
 
 # Add empty name list here in the drawing stack, names are added later
 MAGTAG.add_text(
-    text_font='/fonts/cursive-smart.bdf',
+    text_font='/fonts/cursive-smart.pcf',
     text_position=(8, 40),
     line_spacing=1.0,
     text_anchor_point=(0, 0), # Top left
@@ -62,7 +62,7 @@ MAGTAG.graphics.splash.append(Rect(0, MAGTAG.graphics.display.height - 14,
 # Center white text label over black bar to show last update time
 # (Initially a placeholder, string is not assigned to label until later)
 MAGTAG.add_text(
-    text_font='/fonts/helvB12.bdf',
+    text_font='/fonts/helvB12.pcf',
     text_position=(MAGTAG.graphics.display.width // 2,
                    MAGTAG.graphics.display.height - 1),
     text_color=0xFFFFFF,
