@@ -60,11 +60,15 @@ spots = (
 
 #  circles to cover-up bitmap's number ornaments
 
+ball_color = [0x555555, 0xaaaaaa, 0xFFFFFF] # All colors except black (0x000000)
+ball_index = 0
+
 #  creating the circles & pulling in positions from spots
 for spot in spots:
-    circle = Circle(x0=spot[0], y0=spot[1],
-                    r=11,
-                    fill=0xFF00FF)
+    circle = Circle(x0=spot[0], y0=spot[1], r=11, fill=ball_color[ball_index]) # Each ball has a color
+    ball_index += 1
+    ball_index %= len(ball_color)
+
 	#  adding circles to their display group
     circle_group.append(circle)
 
