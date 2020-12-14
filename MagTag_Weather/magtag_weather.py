@@ -37,8 +37,7 @@ magtag = MagTag()
 # ----------------------------
 # Backgrounnd bitmap
 # ----------------------------
-bg_bmp, bg_pal = adafruit_imageload.load(BACKGROUND_BMP)
-background = displayio.TileGrid(bg_bmp, pixel_shader=bg_pal)
+magtag.graphics.set_background(BACKGROUND_BMP)
 
 # ----------------------------
 # Weather icons sprite sheet
@@ -237,7 +236,6 @@ city_name = label.Label(
 city_name.anchor_point = (0, 0)
 city_name.anchored_position = (15, 24)
 
-magtag.splash.append(background)
 magtag.splash.append(today_banner)
 for future_banner in future_banners:
     magtag.splash.append(future_banner)
