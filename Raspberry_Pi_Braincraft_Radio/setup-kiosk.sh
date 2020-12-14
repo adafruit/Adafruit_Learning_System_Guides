@@ -33,6 +33,10 @@ xset -dpms
 unclutter -idle 0.5 -root &
 sudo python3 /home/pi/braincraftKeys.py &
 while true; do
+    # Set speaker volume down -7dB (~40% volume)
+    amixer -c 2 -- sset Speaker -7dB
+    amixer -c 2 -- sset Headphone -7dB
+
     # Wait for network to come up
     while ! ping -c 1 youtube.com; do sleep 1; done
 
