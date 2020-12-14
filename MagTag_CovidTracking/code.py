@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2020 Ladyada, written for Adafruit Industries
+# SPDX-FileCopyrightText: 2020 ladyada, written for Adafruit Industries
 #
 # SPDX-License-Identifier: Unlicense
 import time
@@ -6,6 +6,10 @@ import alarm
 import supervisor
 import alarm
 from adafruit_magtag.magtag import MagTag
+
+# Change this to the hour you want to check the data at, for us its 8pm
+# local time (eastern), which is 20:00 hrs
+DAILY_UPDATE_HOUR = 20
 
 # Set up where we'll be fetching data from
 DATA_SOURCE = "https://api.covidtracking.com/v1/us/current.json"
@@ -15,7 +19,6 @@ CURRHOSP_LOCATION = [0, 'hospitalizedCurrently']
 NEWHOSP_LOCATION = [0, 'hospitalizedIncrease']
 ALLDEATH_LOCATION = [0, 'death']
 NEWDEATH_LOCATION = [0, 'deathIncrease']
-DAILY_UPDATE_HOUR = 20  # 8 pm local time is when it normally updates
 
 magtag = MagTag(
     url=DATA_SOURCE,
@@ -24,61 +27,59 @@ magtag = MagTag(
                ALLDEATH_LOCATION, NEWDEATH_LOCATION),
 )
 
-magtag.peripherals.neopixels.brightness = 0.1
-magtag.peripherals.neopixel_disable = False # turn on lights
-magtag.peripherals.neopixels.fill(0x0F0000) # red!
 
 # Date stamp of info
 magtag.add_text(
-    text_font="Arial-Bold-12.bdf",
+    text_font="Arial-Bold-12.pcf",
     text_position=(10, 15),
     text_transform=lambda x: "Date: {}".format(x[0:10]),
 )
 # Positive increase
 magtag.add_text(
-    text_font="Arial-Bold-12.bdf",
+    text_font="Arial-Bold-12.pcf",
     text_position=(10, 35),
     text_transform=lambda x: "New positive:   {:,}".format(x),
 )
 # Curr hospitalized
 magtag.add_text(
-    text_font="Arial-Bold-12.bdf",
+    text_font="Arial-Bold-12.pcf",
     text_position=(10, 55),
     text_transform=lambda x: "Current Hospital:   {:,}".format(x),
 )
 # Change in hospitalized
 magtag.add_text(
-    text_font="Arial-Bold-12.bdf",
+    text_font="Arial-Bold-12.pcf",
     text_position=(10, 75),
     text_transform=lambda x: "Change in Hospital:   {:,}".format(x),
 )
 # All deaths
 magtag.add_text(
-    text_font="Arial-Bold-12.bdf",
+    text_font="Arial-Bold-12.pcf",
     text_position=(10, 95),
     text_transform=lambda x: "Total deaths:   {:,}".format(x),
 )
 # new deaths
 magtag.add_text(
-    text_font="Arial-Bold-12.bdf",
+    text_font="Arial-Bold-12.pcf",
     text_position=(10, 115),
     text_transform=lambda x: "New deaths:   {:,}".format(x),
 )
 
 # updated time
 magtag.add_text(
-    text_font="Arial-Bold-12.bdf",
+    text_font="Arial-Bold-12.pcf",
     text_position=(245, 30),
     line_spacing=0.75,
     is_data=False
 )
 
-# Add a QR code we can scan!
 magtag.graphics.qrcode(b"https://covidtracking.com/data",
                        qr_size=2, x=240, y=70)
 
-# connect to the internet, get the time
-magtag.network.connect()
+magtag.peripherals.neopixels.brightness = 0.1
+magtag.peripherals.neopixel_disable = False # turn on lights
+magtag.peripherals.neopixels.fill(0x0F0000) # red!
+
 magtag.get_local_time()
 try:
     now = time.localtime()
@@ -91,9 +92,9 @@ try:
     # get data from the Covid Tracking Project
     value = magtag.fetch()
     print("Response is", value)
-    
+
     # OK we're done!
-    magtag.peripherals.neopixels.fill(0x000F00) # green
+    magtag.peripherals.neopixels.fill(0x000F00) # greten
 except (ValueError, RuntimeError) as e:
     print("Some error occured, trying again later -", e)
 

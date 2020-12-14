@@ -1,5 +1,4 @@
 import time
-import alarm
 import terminalio
 import displayio
 import adafruit_imageload
@@ -259,28 +258,29 @@ def time_to_sleep():
 # ===========
 #  M A I N
 # ===========
-while True:
-    # get current time
-    magtag.get_local_time()
-    now = time.localtime()
+# get current time
+magtag.get_local_time()
+now = time.localtime()
 
-    # show today's date
-    show_today()
+# show today's date
+show_today()
 
-    # get and plot tide levels
-    tide_data = get_tide_data()
-    plot_tides()
+# get and plot tide levels
+tide_data = get_tide_data()
+plot_tides()
 
-    # get and show hilo tide times
-    hilo_data = get_hilo_data()
-    show_hilo()
+# get and show hilo tide times
+hilo_data = get_hilo_data()
+show_hilo()
 
-    # refresh display
-    time.sleep(magtag.display.time_to_refresh + 1)
-    magtag.display.refresh()
-    time.sleep(magtag.display.time_to_refresh + 1)
+# refresh display
+time.sleep(magtag.display.time_to_refresh + 1)
+magtag.display.refresh()
+time.sleep(magtag.display.time_to_refresh + 1)
 
-    # ZZZZZZzzzzzzzzz
-    now = time.localtime()
-    magtag.exit_and_deep_sleep(time_to_sleep())
-
+# ZZZZZZzzzzzzzzz
+now = time.localtime()
+magtag.exit_and_deep_sleep(time_to_sleep())
+#
+# code.py runs again when board wakes up
+#
