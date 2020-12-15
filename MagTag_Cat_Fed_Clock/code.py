@@ -1,6 +1,5 @@
 import time
 from adafruit_magtag.magtag import MagTag
-import rtc
 
 USE_AMPM_TIME = True
 weekdays = ("mon", "tue", "wed", "thur", "fri", "sat", "sun")
@@ -47,7 +46,7 @@ def hh_mm(time_struct, twelve_hour=True):
         hour_string = '{hh:02d}'.format(hh=time_struct.tm_hour)
     return hour_string + ':{mm:02d}'.format(mm=time_struct.tm_min) + postfix
 
-while(True):
+while True:
     if not last_sync or (time.monotonic() - last_sync) > 3600:
         # at start or once an hour
         magtag.network.get_local_time()
