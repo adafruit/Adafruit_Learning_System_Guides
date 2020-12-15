@@ -2,13 +2,14 @@ import time
 from adafruit_magtag.magtag import MagTag
 import rtc
 
-PET_NAME = "Midi"
 USE_AMPM_TIME = True
-weekdays = ("mon", "tues", "wed", "thurs", "fri", "sat", "sun")
+weekdays = ("mon", "tue", "wed", "thur", "fri", "sat", "sun")
+last_sync = None
+last_minute = None
 
 magtag = MagTag()
 
-magtag.graphics.set_background("/cat_clock_background3.bmp")
+magtag.graphics.set_background("/background.bmp")
 
 mid_x = magtag.graphics.display.width // 2 - 1
 magtag.add_text(
@@ -17,7 +18,7 @@ magtag.add_text(
     text_anchor_point=(0.5,0),
     is_data=False,
 )
-magtag.set_text("00:00", auto_refresh = False)
+magtag.set_text("00:00a", auto_refresh = False)
 
 magtag.add_text(
     text_font="/BebasNeueRegular-41.bdf",
@@ -25,7 +26,7 @@ magtag.add_text(
     text_anchor_point=(0,0),
     is_data=False,
 )
-magtag.set_text("DAY 00:00", index = 1)
+magtag.set_text("DAY 00:00a", index = 1, auto_refresh = False)
 
 def hh_mm(time_struct, twelve_hour=True):
     """ Given a time.struct_time, return a string as H:MM or HH:MM, either
@@ -46,12 +47,9 @@ def hh_mm(time_struct, twelve_hour=True):
         hour_string = '{hh:02d}'.format(hh=time_struct.tm_hour)
     return hour_string + ':{mm:02d}'.format(mm=time_struct.tm_min) + postfix
 
-last_sync = None
-last_minute = None
-
 while(True):
     if not last_sync or (time.monotonic() - last_sync) > 3600:
-        # at start or once an ho
+        # at start or once an hour
         magtag.network.get_local_time()
         last_sync = time.monotonic()
 
