@@ -75,7 +75,7 @@ def get_forecast(location):
     """Use OneCall API to fetch forecast and timezone data."""
     resp = magtag.network.fetch(get_data_source_url(api="onecall", location=location))
     json_data = resp.json()
-    return json_data["daily"], json_data["timezone_offset"]
+    return json_data["daily"], json_data["current"]["dt"], json_data["timezone_offset"]
 
 
 def make_banner(x=0, y=0):
@@ -150,10 +150,10 @@ def update_today(data, tz_offset=0):
     today_sunset.text = "{:2d}:{:02d} PM".format(sunset.tm_hour - 12, sunset.tm_min)
 
 
-def go_to_sleep():
+def go_to_sleep(current_time):
     """Enter deep sleep for time needed."""
     # compute current time offset in seconds
-    hour, minutes, seconds = time.localtime()[3:6]
+    hour, minutes, seconds = time.localtime(current_time)[3:6]
     seconds_since_midnight = 60 * (hour * 60 + minutes) + seconds
     # wake up 15 minutes after midnite
     seconds_to_sleep = (24 * 60 * 60 - seconds_since_midnight) + 15 * 60
@@ -171,6 +171,12 @@ def go_to_sleep():
 today_date = label.Label(terminalio.FONT, text="?" * 30, color=0x000000)
 today_date.anchor_point = (0, 0)
 today_date.anchored_position = (15, 13)
+
+city_name = label.Label(
+    terminalio.FONT, text=secrets["openweather_location"], color=0x000000
+)
+city_name.anchor_point = (0, 0)
+city_name.anchored_position = (15, 24)
 
 today_icon = displayio.TileGrid(
     icons_large_bmp,
@@ -213,6 +219,7 @@ today_sunset.anchored_position = (130, 117)
 
 today_banner = displayio.Group(max_size=10)
 today_banner.append(today_date)
+today_banner.append(city_name)
 today_banner.append(today_icon)
 today_banner.append(today_morn_temp)
 today_banner.append(today_day_temp)
@@ -230,29 +237,20 @@ future_banners = [
     make_banner(x=210, y=102),
 ]
 
-city_name = label.Label(
-    terminalio.FONT, text=secrets["openweather_location"], color=0x000000
-)
-city_name.anchor_point = (0, 0)
-city_name.anchored_position = (15, 24)
-
 magtag.splash.append(today_banner)
 for future_banner in future_banners:
     magtag.splash.append(future_banner)
-magtag.splash.append(city_name)
 
 # ===========
 #  M A I N
 # ===========
-magtag.get_local_time()
-
 print("Getting Lat/Lon...")
 latlon = get_latlon()
 print(secrets["openweather_location"])
 print(latlon)
 
 print("Fetching forecast...")
-forecast_data, local_tz_offset = get_forecast(latlon)
+forecast_data, utc_time, local_tz_offset = get_forecast(latlon)
 
 print("Updating...")
 update_today(forecast_data[0], local_tz_offset)
@@ -265,6 +263,7 @@ magtag.display.refresh()
 time.sleep(magtag.display.time_to_refresh + 1)
 
 print("Sleeping...")
-go_to_sleep()
+go_to_sleep(utc_time + local_tz_offset)
 #  entire code will run again after deep sleep cycle
 #  similar to hitting the reset button
+
