@@ -3,12 +3,16 @@ from adafruit_magtag.magtag import MagTag
 import rtc
 
 PET_NAME = "Midi"
+USE_AMPM_TIME = True
+weekdays = ("mon", "tues", "wed", "thurs", "fri", "sat", "sun")
 
 magtag = MagTag()
 
+magtag.graphics.set_background("/cat_clock_background3.bmp")
+
 mid_x = magtag.graphics.display.width // 2 - 1
 magtag.add_text(
-    text_font="/Montserrat-Regular-78.bdf",
+    text_font="Lato-Regular-74.bdf",
     text_position=(mid_x,10),
     text_anchor_point=(0.5,0),
     is_data=False,
@@ -16,72 +20,52 @@ magtag.add_text(
 magtag.set_text("00:00", auto_refresh = False)
 
 magtag.add_text(
-    text_font="/Arial-12.bdf",
-    text_position=(48  ,94),
-    text_anchor_point=(0,0),
-    line_spacing=0.7,
-    is_data=False,
-)
-magtag.set_text("last feeding:", index = 1, auto_refresh = False)
-
-magtag.add_text(
-    text_font="/Montserrat-Regular-39.bdf",
-    text_position=(141,86),
+    text_font="/BebasNeueRegular-41.bdf",
+    text_position=(126,86), #was 141
     text_anchor_point=(0,0),
     is_data=False,
 )
-magtag.set_text("00:00", index = 2)
+magtag.set_text("DAY 00:00", index = 1)
 
-def network_time():
-    magtag.network.get_local_time()
-    now = rtc.RTC().datetime
-    return now
+def hh_mm(time_struct, twelve_hour=True):
+    """ Given a time.struct_time, return a string as H:MM or HH:MM, either
+        12- or 24-hour style depending on twelve_hour flag.
+    """
+    postfix = ""
+    if twelve_hour:
+        if time_struct.tm_hour > 12:
+            hour_string = str(time_struct.tm_hour - 12) # 13-23 -> 1-11 (pm)
+            postfix = "p"
+        elif time_struct.tm_hour > 0:
+            hour_string = str(time_struct.tm_hour) # 1-12
+            postfix = "a"
+        else:
+            hour_string = '12' # 0 -> 12 (am)
+            postfix = "a"
+    else:
+        hour_string = '{hh:02d}'.format(hh=time_struct.tm_hour)
+    return hour_string + ':{mm:02d}'.format(mm=time_struct.tm_min) + postfix
 
-def time_for_display(new_time):
-    hour = new_time.tm_hour if new_time.tm_hour <= 12 else new_time.tm_hour - 12
-    suffix = "a" if new_time.tm_hour < 12 else "p"
-    time_string = str(hour) + ":" + str(new_time.tm_min) + suffix
-    return time_string
-
-magtag.network.connect()
-
-# Set initial clock time
-# pylint: disable=bare-except
-try:
-    DATETIME = network_time()
-except:
-    DATETIME = time.localtime()
-LAST_SYNC = time.mktime(DATETIME)
-
-LAST_DISPLAY = 0
-
+last_sync = None
+last_minute = None
 
 while(True):
+    if not last_sync or (time.monotonic() - last_sync) > 3600:
+        # at start or once an ho
+        magtag.network.get_local_time()
+        last_sync = time.monotonic()
 
-    NOW = time.time() # Current epoch time in seconds
+    # get current time
+    now = time.localtime()
 
-    # Sync with time server every hour
-    if NOW - LAST_SYNC > 60 * 60:
-        try:
-            DATETIME = network_time()
-            LAST_SYNC = time.mktime(DATETIME)
-            continue # Time may have changed; refresh NOW value
-        except:
-            # if unable to sync time, try again in 30 min
-            LAST_SYNC += 30 * 60 # 30 minutes -> seconds
+    # minute updated, refresh display!
+    if not last_minute or (last_minute != now.tm_min):  # minute has updated
+        magtag.set_text(hh_mm(now, USE_AMPM_TIME), index = 0)
+        last_minute = now.tm_min
 
-    if NOW - LAST_DISPLAY > 60:
-        # display new time
-        magtag.set_text(time_for_display(DATETIME), index = 0)
-        # increment local time
-        diff_secs = NOW - LAST_DISPLAY
-        new_secs = time.mktime(DATETIME) + diff_secs
-        DATETIME = time.localtime(new_secs) # OverflowError: overflow converting long int to machine word
-        LAST_DISPLAY = NOW
-
+    # timestamp
     if magtag.peripherals.button_a_pressed:
-        magtag.set_text(time_for_display(DATETIME), index = 2)
-        #magtag.show()
-        time.sleep(2)
-
-    time.sleep(0.01)
+        out = weekdays[now.tm_wday] + " " + hh_mm(now, USE_AMPM_TIME)
+        magtag.set_text(out, index = 1)
+        while magtag.peripherals.button_a_pressed: # wait till released
+            pass
