@@ -14,7 +14,7 @@ import rtc
 
 def days_in_year(date_obj):
     # check for leap year
-    if date_obj.tm_year % 4 == 0:
+    if (date_obj.tm_year % 100 != 0 or date_obj.tm_year % 400 == 0) and date_obj.tm_year % 4 == 0:
         return 366
     return 365
 
