@@ -4,8 +4,15 @@ from adafruit_magtag.magtag import MagTag
 from adafruit_display_shapes.circle import Circle
 
 #  create MagTag and connect to network
-magtag = MagTag()
-magtag.network.connect()
+try:
+    magtag = MagTag()
+    magtag.network.connect()
+except (ConnectionError, ValueError, RuntimeError) as e:
+    print("*** MagTag(), Some error occured, retrying! -", e)
+    # Exit program and restart in 1 seconds.
+    magtag.exit_and_deep_sleep(1)
+
+
 
 #  displayio groups
 group = displayio.Group(max_size=30)
@@ -53,11 +60,15 @@ spots = (
 
 #  circles to cover-up bitmap's number ornaments
 
+ball_color = [0x555555, 0xaaaaaa, 0xFFFFFF] # All colors except black (0x000000)
+ball_index = 0
+
 #  creating the circles & pulling in positions from spots
 for spot in spots:
-    circle = Circle(x0=spot[0], y0=spot[1],
-                    r=11,
-                    fill=0xFF00FF)
+    circle = Circle(x0=spot[0], y0=spot[1], r=11, fill=ball_color[ball_index]) # Each ball has a color
+    ball_index += 1
+    ball_index %= len(ball_color)
+
 	#  adding circles to their display group
     circle_group.append(circle)
 
@@ -70,7 +81,10 @@ magtag.get_local_time()
 now = time.localtime()
 month = now[1]
 day = now[2]
-print("day is", day)
+(hour, minutes, seconds) = now[3:6]
+seconds_since_midnight = 60 * (hour*60 + minutes)+seconds
+print( f"day is {day}, ({seconds_since_midnight} seconds since midnight)")
+
 
 #  sets colors of circles to transparent to reveal dates that have passed & current date
 for i in range(day):
@@ -82,9 +96,11 @@ magtag.display.show(group)
 magtag.display.refresh()
 time.sleep(5)
 
-#  goes into deep sleep for 12 hours
+#  goes into deep sleep till a 'stroke' past midnight
 print("entering deep sleep")
-magtag.exit_and_deep_sleep(43200)
+seconds_to_sleep = 24*60*60 - seconds_since_midnight + 10
+print( f"sleeping for {seconds_to_sleep} seconds")
+magtag.exit_and_deep_sleep(seconds_to_sleep)
 
 #  entire code will run again after deep sleep cycle
 #  similar to hitting the reset button
