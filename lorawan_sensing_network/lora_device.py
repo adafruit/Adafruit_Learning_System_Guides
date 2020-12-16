@@ -80,10 +80,10 @@ while True:
     # Send the packet data
     print('Sending data...')
     LED.value = True
-    rfm9x.send(bme280_data)
+    rfm9x.send(bme280_data_bytes)
     print('Sent data!')
     LED.value = False
 
     # Wait to send the packet again
     time.sleep(SENSOR_SEND_DELAY * 60)
-  
+
