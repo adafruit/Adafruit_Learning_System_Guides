@@ -1,3 +1,4 @@
+"""CircuitPython Essentials UART possible pin-pair identifying script"""
 import board
 import busio
 from microcontroller import Pin
@@ -28,8 +29,5 @@ for tx_pin in get_unique_pins():
     for rx_pin in get_unique_pins():
         if rx_pin is tx_pin:
             continue
-        else:
-            if is_hardware_uart(tx_pin, rx_pin):
-                print("RX pin:", rx_pin, "\t TX pin:", tx_pin)
-            else:
-                pass
+        if is_hardware_uart(tx_pin, rx_pin):
+            print("RX pin:", rx_pin, "\t TX pin:", tx_pin)

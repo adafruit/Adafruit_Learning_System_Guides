@@ -1,9 +1,7 @@
-# CircuitPython Demo - I2C sensor
-
+"""CircuitPython Essentials I2C sensor example using TSL2591"""
 import time
-
-import adafruit_tsl2561
 import board
+import adafruit_tsl2591
 
 i2c = board.I2C()
 
@@ -11,16 +9,15 @@ i2c = board.I2C()
 while not i2c.try_lock():
     pass
 # Print the addresses found once
-print("I2C addresses found:", [hex(device_address)
-                               for device_address in i2c.scan()])
+print("I2C addresses found:", [hex(device_address) for device_address in i2c.scan()])
 
 # Unlock I2C now that we're done scanning.
 i2c.unlock()
 
 # Create library object on our I2C port
-tsl2561 = adafruit_tsl2561.TSL2561(i2c)
+tsl2591 = adafruit_tsl2591.TSL2591(i2c)
 
 # Use the object to print the sensor readings
 while True:
-    print("Lux:", tsl2561.lux)
-    time.sleep(1.0)
+    print("Lux:", tsl2591.lux)
+    time.sleep(0.5)

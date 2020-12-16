@@ -1,3 +1,4 @@
+"""CircuitPython Essentials PWM piezo simpleio example"""
 import time
 import board
 import simpleio

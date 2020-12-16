@@ -1,3 +1,4 @@
+"""CircuitPython Essentials Hardware SPI pin verification script"""
 import board
 import busio
 
