@@ -1,8 +1,5 @@
-# CircuitPython Demo - Cap Touch Multiple Pins
-# Example does NOT work with Trinket M0!
-
+"""CircuitPython Essentials Capacitive Touch on two pins example. Does not work on Trinket M0!"""
 import time
-
 import board
 import touchio
 

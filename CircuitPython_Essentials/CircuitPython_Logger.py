@@ -1,10 +1,13 @@
+"""CircuitPython Essentials Storage logging example"""
 import time
-
 import board
 import digitalio
 import microcontroller
 
+# For most CircuitPython boards:
 led = digitalio.DigitalInOut(board.D13)
+# For QT Py M0:
+# led = digitalio.DigitalInOut(board.SCK)
 led.switch_to_output()
 
 try:

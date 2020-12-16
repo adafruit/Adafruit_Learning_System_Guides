@@ -1,5 +1,5 @@
+"""CircuitPython Essentials Capacitive Touch example"""
 import time
-
 import board
 import touchio
 

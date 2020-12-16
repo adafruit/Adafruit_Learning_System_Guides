@@ -1,3 +1,4 @@
+"""CircuitPython Essentials Audio Out tone example"""
 import time
 import array
 import math

@@ -1,5 +1,5 @@
+"""CircuitPython Essentials HID Mouse example"""
 import time
-
 import analogio
 import board
 import digitalio

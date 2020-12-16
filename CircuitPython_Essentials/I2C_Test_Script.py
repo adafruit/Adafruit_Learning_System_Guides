@@ -1,6 +1,8 @@
+"""CircuitPython Essentials I2C possible pin-pair identifying script"""
 import board
 import busio
 from microcontroller import Pin
+
 
 def is_hardware_I2C(scl, sda):
     try:

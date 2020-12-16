@@ -1,3 +1,4 @@
+"""CircuitPython Essentials UART possible pin-pair identifying script"""
 import board
 import busio
 from microcontroller import Pin
