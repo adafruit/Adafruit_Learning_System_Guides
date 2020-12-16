@@ -1,8 +1,8 @@
 """CircuitPython Essentials I2C Scan example"""
 # If you run this and it seems to hang, try manually unlocking
 # your I2C bus from the REPL with
-#  >>> import board 
-#  >>> board.I2C().unlock() 
+#  >>> import board
+#  >>> board.I2C().unlock()
 
 import time
 import board

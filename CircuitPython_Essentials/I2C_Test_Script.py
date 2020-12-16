@@ -31,8 +31,5 @@ for scl_pin in get_unique_pins():
     for sda_pin in get_unique_pins():
         if scl_pin is sda_pin:
             continue
-        else:
-            if is_hardware_I2C(scl_pin, sda_pin):
-                print("SCL pin:", scl_pin, "\t SDA pin:", sda_pin)
-            else:
-                pass
+        if is_hardware_I2C(scl_pin, sda_pin):
+            print("SCL pin:", scl_pin, "\t SDA pin:", sda_pin)
