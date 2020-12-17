@@ -10,6 +10,7 @@ from board import SCL, SDA
 import digitalio
 import busio
 import audioio
+import audiocore
 import adafruit_rgbled
 from adafruit_neotrellis.neotrellis import NeoTrellis
 import adafruit_lis3dh
@@ -69,7 +70,7 @@ def play_file(audio_filename):
     if audio_file:
         audio_file.close()
     audio_file = open("/sounds/"+audio_filename, "rb")
-    wav = audioio.WaveFile(audio_file)
+    wav = audiocore.WaveFile(audio_file)
     print("Playing "+audio_filename+".")
     myaudio.play(wav)
 

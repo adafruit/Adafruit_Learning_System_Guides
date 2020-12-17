@@ -4,7 +4,7 @@ import array
 import math
 import board
 import busio
-import audioio
+import audiocore
 import displayio
 import digitalio
 from adafruit_pyportal import PyPortal
@@ -83,7 +83,7 @@ class Beep(object):
         for i in range(length):
             sine_wave[i] = int((1 + math.sin(math.pi * 2 * i / length))
                                * tone_volume * (2 ** 15 - 1))
-        self.sine_wave_sample = audioio.RawSample(sine_wave)
+        self.sine_wave_sample = audiocore.RawSample(sine_wave)
 
     # pylint: disable=protected-access
     def play(self, duration=0.1):

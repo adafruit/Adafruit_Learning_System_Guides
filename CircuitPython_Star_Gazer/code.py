@@ -68,8 +68,9 @@ if NEOPIXELS_ON_CHANGE:
 # music!
 if PLAY_SOUND_ON_CHANGE:
     import audioio
+    import audiocore
     wave_file = open("coin.wav", "rb")
-    wave = audioio.WaveFile(wave_file)
+    wave = audiocore.WaveFile(wave_file)
 
 # we'll save the value in question
 last_value = value = 0

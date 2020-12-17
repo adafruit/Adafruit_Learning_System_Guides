@@ -4,6 +4,7 @@ import gc
 import time
 
 import audioio
+import audiocore
 import board
 from adafruit_motor import servo
 from adafruit_seesaw.pwmout import PWMOut
@@ -36,7 +37,7 @@ a = audioio.AudioOut(board.A0)
 # Start playing the file (in the background)
 def play_file(wavfile):
     f = open(wavfile, "rb")
-    wav = audioio.WaveFile(f)
+    wav = audiocore.WaveFile(f)
     a.play(wav)
 
 

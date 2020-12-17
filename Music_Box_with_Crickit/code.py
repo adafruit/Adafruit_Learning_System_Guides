@@ -5,13 +5,14 @@ from adafruit_crickit import crickit
 from analogio import AnalogIn
 import neopixel
 import audioio
+import audiocore
 import board
 
 AUDIO_FILENAME = 'fur-elise.wav'
 
 # Audio output
 cpx_audio = audioio.AudioOut(board.A0)
-audio = audioio.WaveFile(open(AUDIO_FILENAME, "rb"))
+audio = audiocore.WaveFile(open(AUDIO_FILENAME, "rb"))
 
 # Rotating dancer
 dancer = crickit.servo_2

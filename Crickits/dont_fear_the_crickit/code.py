@@ -1,5 +1,6 @@
 import time
 import audioio
+import audiocore
 from digitalio import DigitalInOut, Pull, Direction
 from adafruit_seesaw.seesaw import Seesaw
 from adafruit_seesaw.pwmout import PWMOut
@@ -60,7 +61,7 @@ fog_on.duty_cycle = 0
 a = audioio.AudioOut(board.A0)
 def play_file(wavfile):
     with open(wavfile, "rb") as file:
-        wavf = audioio.WaveFile(file)
+        wavf = audiocore.WaveFile(file)
         a.play(wavf)
         while a.playing:
             servos[1].angle = MOUTH_START
@@ -96,7 +97,7 @@ print("Ready for playing audio")
 time.sleep(1)
 
 f = open("fear11.wav", "rb")
-wav = audioio.WaveFile(f)
+wav = audiocore.WaveFile(f)
 a.play(wav)
 
 while True:

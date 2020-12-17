@@ -1,6 +1,7 @@
 import time
 import random
 import audioio
+import audiocore
 import board
 import neopixel
 from adafruit_crickit import crickit
@@ -31,7 +32,7 @@ while True:
 
     # Start playing the file (in the background)
     audio_file = open(random.choice(audio_files), "rb")   # muahaha
-    wav = audioio.WaveFile(audio_file)
+    wav = audiocore.WaveFile(audio_file)
     speaker.play(wav)
 
     # move motor back and forth for 3 seconds total

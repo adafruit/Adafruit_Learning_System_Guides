@@ -29,6 +29,7 @@ import math
 import random
 import board
 import audioio
+import audiocore
 import busio
 import adafruit_trellism4
 import adafruit_adxl34x
@@ -77,7 +78,7 @@ occupied_bits = [False for _ in range(WIDTH * HEIGHT)]
 
 # Add Audio file...
 f = open("water-click.wav", "rb")
-wav = audioio.WaveFile(f)
+wav = audiocore.WaveFile(f)
 print("%d channels, %d bits per sample, %d Hz sample rate " %
       (wav.channel_count, wav.bits_per_sample, wav.sample_rate))
 audio = audioio.AudioOut(board.A1)

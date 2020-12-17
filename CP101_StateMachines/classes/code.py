@@ -21,6 +21,7 @@ import  digitalio
 import busio
 import adafruit_ds3231
 import audioio
+import audiocore
 import pulseio
 from adafruit_motor import servo
 import neopixel
@@ -191,7 +192,7 @@ def shower(machine, time_now):
 
 def start_playing(fname):
     sound_file = open(fname, 'rb')
-    wav = audioio.WaveFile(sound_file)
+    wav = audiocore.WaveFile(sound_file)
     audio.play(wav, loop=False)
 
 def stop_playing():

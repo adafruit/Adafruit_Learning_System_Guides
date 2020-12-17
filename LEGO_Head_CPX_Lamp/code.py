@@ -3,6 +3,7 @@
 # with CircuitPython
 import time
 import audioio
+import audiocore
 import board
 
 from adafruit_circuitplayground.express import cpx
@@ -25,7 +26,7 @@ def play_wav(name, loop=False):
         wave_file.close()
     try:
         wave_file = open('sounds/' + name + '.wav', 'rb') # using wave files from sounds folder
-        wave = audioio.WaveFile(wave_file)
+        wave = audiocore.WaveFile(wave_file)
         audio.play(wave, loop=loop)
     except OSError:
         pass # we'll just skip playing then

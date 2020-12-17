@@ -16,6 +16,7 @@ import board
 from digitalio import DigitalInOut, Direction, Pull
 import displayio
 import audioio
+import audiocore
 from busio import UART
 import adafruit_gps
 from adafruit_debouncer import Debouncer
@@ -50,7 +51,7 @@ board.DISPLAY.show(splash)
 def play_wave(filename):
     try:
         wave_file = open(filename, "rb")
-        wave = audioio.WaveFile(wave_file)
+        wave = audiocore.WaveFile(wave_file)
         audio.play(wave)
         while audio.playing:
             pass

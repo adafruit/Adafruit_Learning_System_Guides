@@ -8,6 +8,7 @@ import time
 import board
 import adafruit_thermistor
 import audioio
+import audiocore
 from digitalio import DigitalInOut, Direction, Pull
 
 D1 = board.BUTTON_A
@@ -34,7 +35,7 @@ def play_file(wavfile):
     wavfile = "/numbers/" + wavfile
     print("Playing", wavfile)
     with open(wavfile, "rb") as f:
-        wav = audioio.WaveFile(f)
+        wav = audiocore.WaveFile(f)
         aout.play(wav)
         while aout.playing:
             pass

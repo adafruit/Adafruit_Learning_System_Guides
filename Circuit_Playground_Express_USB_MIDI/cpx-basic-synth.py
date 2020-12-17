@@ -37,6 +37,7 @@ import math
 
 import digitalio
 import audioio
+import audiocore
 import board
 import usb_midi
 import neopixel
@@ -90,7 +91,7 @@ def waveform_sawtooth(length, waves, volumes):
                                                     * twopi
                                                     + math.pi))
                                for idx in list(range(length))])
-        waves.append((audioio.RawSample(waveraw), waveraw))
+        waves.append((audiocore.RawSample(waveraw), waveraw))
 
 # Make some square waves of different volumes volumes, generated with
 # n=10;[round(math.sqrt(x)/n*32767*n/math.sqrt(n)) for x in range(1, n+1)]

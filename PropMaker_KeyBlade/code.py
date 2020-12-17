@@ -12,6 +12,7 @@ All text above must be included in any redistribution.
 import time
 import digitalio
 import audioio
+import audiocore
 import busio
 import board
 import neopixel
@@ -70,7 +71,7 @@ def play_wav(name, loop=False):
     print("playing", name)
     try:
         wave_file = open('sounds/' + name + '.wav', 'rb')
-        wave = audioio.WaveFile(wave_file)
+        wave = audiocore.WaveFile(wave_file)
         audio.play(wave, loop=loop)
     except:  # pylint: disable=bare-except
         return

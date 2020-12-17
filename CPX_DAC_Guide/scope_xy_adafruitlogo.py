@@ -34,6 +34,7 @@ import array
 
 import board
 import audioio
+import audiocore
 import analogio
 
 ### Vector data for logo
@@ -95,7 +96,7 @@ for part in data:
 ### 32768 and 32000 exhibit this bug but 25000 so far appears to be a
 ### workaround, albeit a mysterious one
 ### https://github.com/adafruit/circuitpython/issues/1992
-### Using "h" for audioio.RawSample() DAC range will be 20268 to 45268
+### Using "h" for audiocore.RawSample() DAC range will be 20268 to 45268
 dac_x_min = 0
 dac_y_min = 0
 dac_x_max = 25000
@@ -129,7 +130,7 @@ leave_wav_looping = True
 
 ### A0 will be x, A1 will be y
 if use_wav:
-    print("Using audioio.RawSample for DACs")
+    print("Using audiocore.RawSample for DACs")
     dacs = audioio.AudioOut(board.A0, right_channel=board.A1)
 else:
     print("Using analogio.AnalogOut for DACs")
@@ -166,7 +167,7 @@ while True:
     if use_wav:
         ### 200k (maybe 166.667k) seems to be practical limit
         ### 1M permissible but seems same as around 200k
-        output_wave = audioio.RawSample(rawdata,
+        output_wave = audiocore.RawSample(rawdata,
                                         channel_count=2,
                                         sample_rate=200 * 1000)
 
