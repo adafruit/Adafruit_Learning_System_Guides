@@ -26,7 +26,7 @@ MONTHS = (
     "May",
     "June",
     "July",
-    "Augsut",
+    "August",
     "September",
     "October",
     "November",
