@@ -1,3 +1,4 @@
+"""CircuitPython Essentials PWM with variable frequency piezo example"""
 import time
 import board
 import pulseio

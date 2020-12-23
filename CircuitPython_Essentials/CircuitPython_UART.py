@@ -1,10 +1,12 @@
-# CircuitPython Demo - USB/Serial echo
-
+"""CircuitPython Essentials UART Serial example"""
 import board
 import busio
 import digitalio
 
+# For most CircuitPython boards:
 led = digitalio.DigitalInOut(board.D13)
+# For QT Py M0:
+# led = digitalio.DigitalInOut(board.SCK)
 led.direction = digitalio.Direction.OUTPUT
 
 uart = busio.UART(board.TX, board.RX, baudrate=9600)

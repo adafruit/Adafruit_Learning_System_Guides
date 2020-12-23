@@ -105,8 +105,8 @@ while True:
                     sparkle_color = MAGENTA
                 animations = AnimationSequence(
                     AnimationGroup(
-                        Sparkle(magtag_pixels, speed=0.1, color=sparkle_color, num_sparkles=15),
-                        Sparkle(strip_pixels, speed=0.01, color=sparkle_color, num_sparkles=1),
+                        Sparkle(magtag_pixels, speed=0.1, color=sparkle_color, num_sparkles=1),
+                        Sparkle(strip_pixels, speed=0.01, color=sparkle_color, num_sparkles=15),
                     )
                 )
 

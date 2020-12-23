@@ -1,3 +1,4 @@
+"""CircuitPython Essentials Audio Out MP3 Example"""
 import board
 import digitalio
 

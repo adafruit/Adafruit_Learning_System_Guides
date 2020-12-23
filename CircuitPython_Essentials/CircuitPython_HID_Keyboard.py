@@ -1,5 +1,4 @@
-# CircuitPython demo - Keyboard emulator
-
+"""CircuitPython Essentials HID Keyboard example"""
 import time
 
 import board
@@ -31,7 +30,10 @@ for pin in keypress_pins:
     key_pin.pull = digitalio.Pull.UP
     key_pin_array.append(key_pin)
 
+# For most CircuitPython boards:
 led = digitalio.DigitalInOut(board.D13)
+# For QT Py M0:
+# led = digitalio.DigitalInOut(board.SCK)
 led.direction = digitalio.Direction.OUTPUT
 
 print("Waiting for key pin...")

@@ -1,4 +1,4 @@
-# Continuous Servo Test Program for CircuitPython
+"""CircuitPython Essentials Servo continuous rotation servo example"""
 import time
 import board
 import pulseio

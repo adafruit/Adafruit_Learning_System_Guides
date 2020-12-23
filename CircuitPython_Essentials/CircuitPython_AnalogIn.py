@@ -1,4 +1,4 @@
-# CircuitPython AnalogIn Demo
+"""CircuitPython Essentials Analog In example"""
 import time
 import board
 from analogio import AnalogIn

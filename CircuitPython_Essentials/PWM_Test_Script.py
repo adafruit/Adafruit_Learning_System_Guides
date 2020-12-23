@@ -1,3 +1,4 @@
+"""CircuitPython Essentials PWM pin identifying script"""
 import board
 import pulseio
 

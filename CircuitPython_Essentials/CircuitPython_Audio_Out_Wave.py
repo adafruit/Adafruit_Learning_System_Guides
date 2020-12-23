@@ -1,3 +1,4 @@
+"""CircuitPython Essentials Audio Out WAV example"""
 import time
 import board
 import digitalio
