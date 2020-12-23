@@ -14,13 +14,11 @@ All text above must be included in any redistribution.
 
 #pylint:disable=invalid-name
 import time
-import binascii
+import adafruit_binascii as binascii
 import json
 import board
 from adafruit_pyportal import PyPortal
-import adafruit_esp32spi.adafruit_esp32spi_requests as requests
-
-username = 'codewisdom'
+import adafruit_requests as requests
 
 try:
     from secrets import secrets
@@ -29,26 +27,8 @@ except ImportError:
 the secrets dictionary must contain 'ssid' and 'password' at a minimum""")
     raise
 
-def halt_and_catch_fire(message, *args):
-    """Log a critical error and stall the system."""
-    print(message % args)
-    while True:
-        pass
-
-def get_bearer_token():
-    """Get the bearer authentication token from twitter."""
-    raw_key = secrets['twitter_api_key'] + ':' + secrets['twitter_secret_key']
-    encoded_key = binascii.b2a_base64(bytes(raw_key, 'utf8'))
-    string_key = bytes.decode(encoded_key)
-    headers = {'Authorization': 'Basic ' + string_key,
-               'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'}
-    response = requests.post('https://api.twitter.com/oauth2/token',
-                             headers=headers,
-                             data='grant_type=client_credentials')
-    response_dict = json.loads(response.content)
-    if response_dict['token_type'] != 'bearer':
-        halt_and_catch_fire('Wrong token type from twitter: %s', response_dict['token_type'])
-    return response_dict['access_token']
+# Set this to the username you'd like to display tweets from
+username = 'codewisdom'
 
 # determine the current working directory
 # needed so we know where to find files
@@ -71,8 +51,8 @@ pyportal = PyPortal(url=url,
                     caption_position=(5, 210),
                     caption_color=0x808080)
 
-bearer_token = get_bearer_token()
-
+# Set OAuth2.0 Bearer Token
+bearer_token = secrets['twitter_bearer_token']
 pyportal.set_headers({'Authorization': 'Bearer ' + bearer_token})
 
 while True:
