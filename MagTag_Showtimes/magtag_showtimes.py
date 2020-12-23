@@ -12,7 +12,7 @@ from adafruit_magtag.magtag import MagTag
 FAKETIME = False  # time.struct_time(2020, 12, 11,     15, 01, 00,    4, 346, -1)
 
 BEEP_ON_EVENTSTART = True   # beep when the event begins?
-EVENT_FILE = "events.json"  # file containing events
+EVENT_FILE = "/projects/events.json"  # file containing events
 USE_24HR_TIME = False   # True for 24-hr time on display, false for 12 hour (am/pm) time
 
 magtag = MagTag()
@@ -125,7 +125,7 @@ next_up = events[remaining_starttimes.index(mins_till_next_eventstart)]
 sleep_time = None
 if current_event:
     print("Currently: ", current_event)
-    magtag.set_background("bmps/"+current_event["graphic"])
+    magtag.set_background("/bmps/"+current_event["graphic"])
     magtag.set_text("Currently streaming until " + time_format(current_event["end_time"]))
     remaining_starttimes.index(mins_till_next_eventstart)
     if BEEP_ON_EVENTSTART:
@@ -135,7 +135,7 @@ if current_event:
     sleep_time = mins_till_next_eventend + 1
 else:
     print("Next up! ", next_up)
-    magtag.set_background("bmps/"+next_up["graphic"])
+    magtag.set_background("/bmps/"+next_up["graphic"])
 
     string = (
         "Coming up on "
