@@ -14,11 +14,8 @@ All text above must be included in any redistribution.
 
 #pylint:disable=invalid-name
 import time
-import adafruit_binascii as binascii
-import json
 import board
 from adafruit_pyportal import PyPortal
-import adafruit_requests as requests
 
 try:
     from secrets import secrets
