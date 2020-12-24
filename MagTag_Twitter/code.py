@@ -43,22 +43,24 @@ magtag.add_text(
 # Twitter handle (@username)
 magtag.add_text(
     text_position=(70, 30),
-    text_font="/fonts/Arial-Bold-12.pcf",
+    text_font="/fonts/Arial-12.bdf",
     text_transform=lambda x: "@%s"%x,
 )
 
 # Tweet text
 magtag.add_text(
+    text_font="/fonts/Arial-Bold-12.pcf",
+    text_wrap=40,
+    text_maxlen=120,
     text_position=(
-        (magtag.graphics.display.width // 2),
-        (magtag.graphics.display.height // 2) - 50,
+        10,
+        (magtag.graphics.display.height // 2)+20,
     ),
-    text_font="/fonts/Arial-Italic-12.bdf",
-    text_wrap=28,
-    line_spacing = 0.75,
-    text_maxlen=140,
-    text_anchor_point=(0.5, 0.5)
+    line_spacing=0.75,
 )
+
+# preload characters
+magtag.preload_font()
 
 try:
     value = magtag.fetch()
