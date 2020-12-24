@@ -13,14 +13,14 @@ the secrets dictionary must contain 'ssid' and 'password' at a minimum""")
     raise
 
 # Set to the twitter username you'd like to fetch tweets from
-TWITTER_USERNAME = 'adafruit'
+TWITTER_USERNAME = 'nytimes'
 
 # Set to the amount of time to deep sleep for, in minutes
 SLEEP_TIME = 15
 
 # Set up where we'll be fetching data from
-DATA_SOURCE = "https://api.twitter.com/1.1/statuses/user_timeline.json?count=1&screen_name=%s"%TWITTER_USERNAME
-TWEET_TEXT = [0, 'text']
+DATA_SOURCE="https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=%s&count=1&tweet_mode=extended"%TWITTER_USERNAME
+TWEET_TEXT = [0, 'full_text']
 TWEET_FULL_NAME = [0, 'user', 'name']
 TWEET_HANDLE = [0, 'user', 'screen_name']
 
@@ -28,13 +28,14 @@ magtag = MagTag(
     url=DATA_SOURCE,
     json_path=(TWEET_FULL_NAME, TWEET_HANDLE, TWEET_TEXT)
 )
-magtag.set_background("/images/background.bmp")
-
 # Set Twitter OAuth2.0 Bearer Token
 bearer_token = secrets['twitter_bearer_token']
 magtag.set_headers({'Authorization': 'Bearer ' + bearer_token})
 
-# Twitter username
+# Display setup
+magtag.set_background("/images/background.bmp")
+
+# Twitter name
 magtag.add_text(
     text_position=(70, 10),
     text_font="/fonts/Arial-Bold-12.pcf",
@@ -50,10 +51,10 @@ magtag.add_text(
 # Tweet text
 magtag.add_text(
     text_font="/fonts/Arial-Bold-12.pcf",
-    text_wrap=35,
-    text_maxlen=140,
+    text_wrap=30,
+    text_maxlen=160,
     text_position=(
-        10,
+        5,
         (magtag.graphics.display.height // 2)+20,
     ),
     line_spacing=0.75,
