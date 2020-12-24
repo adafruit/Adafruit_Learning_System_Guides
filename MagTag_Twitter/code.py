@@ -13,7 +13,10 @@ the secrets dictionary must contain 'ssid' and 'password' at a minimum""")
     raise
 
 # Set to the twitter username you'd like to fetch tweets from
-TWITTER_USERNAME = 'cnn'
+TWITTER_USERNAME = 'adafruit'
+
+# Set to the amount of time to deep sleep for, in minutes
+SLEEP_TIME = 15
 
 # Set up where we'll be fetching data from
 DATA_SOURCE = "https://api.twitter.com/1.1/statuses/user_timeline.json?count=1&screen_name=%s"%TWITTER_USERNAME
@@ -31,10 +34,7 @@ magtag.set_background("/images/background.bmp")
 bearer_token = secrets['twitter_bearer_token']
 magtag.set_headers({'Authorization': 'Bearer ' + bearer_token})
 
-print('W: ', magtag.graphics.display.width)
-print('H: ', magtag.graphics.display.height)
-
-# Twitter full name
+# Twitter username
 magtag.add_text(
     text_position=(70, 10),
     text_font="/fonts/Arial-Bold-12.pcf",
@@ -50,8 +50,8 @@ magtag.add_text(
 # Tweet text
 magtag.add_text(
     text_font="/fonts/Arial-Bold-12.pcf",
-    text_wrap=40,
-    text_maxlen=120,
+    text_wrap=35,
+    text_maxlen=140,
     text_position=(
         10,
         (magtag.graphics.display.height // 2)+20,
@@ -67,4 +67,7 @@ try:
     print("Response is", value)
 except (ValueError, RuntimeError) as e:
     print("Some error occured, retrying! -", e)
-magtag.exit_and_deep_sleep(60)
+
+time.sleep(2)
+print("Sleeping!")
+magtag.exit_and_deep_sleep(SLEEP_TIME * 60)
