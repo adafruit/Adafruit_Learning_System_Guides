@@ -13,13 +13,14 @@ the secrets dictionary must contain 'ssid' and 'password' at a minimum""")
     raise
 
 # Set to the twitter username you'd like to fetch tweets from
-TWITTER_USERNAME = 'nytimes'
+TWITTER_USERNAME = 'ap'
 
 # Set to the amount of time to deep sleep for, in minutes
 SLEEP_TIME = 15
 
 # Set up where we'll be fetching data from
-DATA_SOURCE="https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=%s&count=1&tweet_mode=extended"%TWITTER_USERNAME
+DATA_SOURCE="https://api.twitter.com/1.1/statuses/user_timeline.json? \
+                screen_name=%s&count=1&tweet_mode=extended"%TWITTER_USERNAME
 TWEET_TEXT = [0, 'full_text']
 TWEET_FULL_NAME = [0, 'user', 'name']
 TWEET_HANDLE = [0, 'user', 'screen_name']
