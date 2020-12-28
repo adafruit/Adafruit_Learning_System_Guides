@@ -1,3 +1,7 @@
+# Based on code written by @DavidGlaude on Twitter
+# https://twitter.com/DavidGlaude/status/1340365817138044933
+# https://gist.github.com/dglaude/4bf8d0a13c9c8ca8b05d6c0e9176bd20
+
 import time
 import alarm
 import displayio
@@ -17,8 +21,6 @@ projects = [
     "showtimes",
     "slideshow",
 ]
-
-buttons_pin = [board.D15, board.D14, board.D12, board.D11]
 
 btnA = DigitalInOut(board.D15)
 btnA.direction = Direction.INPUT
