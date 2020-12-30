@@ -30,44 +30,44 @@ magtag = MagTag(
 
 # Date stamp of info
 magtag.add_text(
-    text_font="Arial-Bold-12.pcf",
+    text_font="/fonts/Arial-Bold-12.pcf",
     text_position=(10, 15),
     text_transform=lambda x: "Date: {}".format(x[0:10]),
 )
 # Positive increase
 magtag.add_text(
-    text_font="Arial-Bold-12.pcf",
+    text_font="/fonts/Arial-Bold-12.pcf",
     text_position=(10, 35),
     text_transform=lambda x: "New positive:   {:,}".format(x),
 )
 # Curr hospitalized
 magtag.add_text(
-    text_font="Arial-Bold-12.pcf",
+    text_font="/fonts/Arial-Bold-12.pcf",
     text_position=(10, 55),
     text_transform=lambda x: "Current Hospital:   {:,}".format(x),
 )
 # Change in hospitalized
 magtag.add_text(
-    text_font="Arial-Bold-12.pcf",
+    text_font="/fonts/Arial-Bold-12.pcf",
     text_position=(10, 75),
     text_transform=lambda x: "Change in Hospital:   {:,}".format(x),
 )
 # All deaths
 magtag.add_text(
-    text_font="Arial-Bold-12.pcf",
+    text_font="/fonts/Arial-Bold-12.pcf",
     text_position=(10, 95),
     text_transform=lambda x: "Total deaths:   {:,}".format(x),
 )
 # new deaths
 magtag.add_text(
-    text_font="Arial-Bold-12.pcf",
+    text_font="/fonts/Arial-Bold-12.pcf",
     text_position=(10, 115),
     text_transform=lambda x: "New deaths:   {:,}".format(x),
 )
 
 # updated time
 magtag.add_text(
-    text_font="Arial-Bold-12.pcf",
+    text_font="/fonts/Arial-Bold-12.pcf",
     text_position=(245, 30),
     line_spacing=0.75,
     is_data=False
