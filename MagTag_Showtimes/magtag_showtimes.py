@@ -12,7 +12,7 @@ from adafruit_magtag.magtag import MagTag
 FAKETIME = False  # time.struct_time(2020, 12, 11,     15, 01, 00,    4, 346, -1)
 
 BEEP_ON_EVENTSTART = True   # beep when the event begins?
-EVENT_FILE = "/projects/events.json"  # file containing events
+EVENT_FILE = "events.json"  # file containing events
 USE_24HR_TIME = False   # True for 24-hr time on display, false for 12 hour (am/pm) time
 
 magtag = MagTag()
