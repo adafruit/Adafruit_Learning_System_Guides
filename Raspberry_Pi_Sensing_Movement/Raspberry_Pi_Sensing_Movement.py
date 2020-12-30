@@ -9,6 +9,7 @@ pir_sensor.direction = digitalio.Direction.INPUT
 # set up door sensor
 door_sensor = digitalio.DigitalInOut(board.D23)
 door_sensor.direction = digitalio.Direction.INPUT
+door_sensor.pull = digitalio.Pull.UP
 
 while True:
 
