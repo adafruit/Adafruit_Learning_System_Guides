@@ -60,9 +60,6 @@ try:
 except:
     TIME_ZONE = None # Use IP geolocation
 
-# Battery level to indicate near-empty, time to recharge.
-LOW_BATT_VOLTAGE = 2.45
-
 
 # SOME UTILITY FUNCTIONS ---------------------------------------------------
 
@@ -150,12 +147,11 @@ NETWORK = Network(status_neopixel=None)
 GRAPHICS = Graphics(auto_refresh=False)
 DISPLAY = GRAPHICS.display
 
-FONT_SMALL = bitmap_font.load_font('/fonts/Impact-16.bdf')
-FONT_MEDIUM = bitmap_font.load_font('/fonts/Impact-24.bdf')
-FONT_LARGE = bitmap_font.load_font('/fonts/Impact-30.bdf')
+FONT_SMALL = bitmap_font.load_font('/fonts/Impact-16.pcf')
+FONT_MEDIUM = bitmap_font.load_font('/fonts/Impact-24.pcf')
+FONT_LARGE = bitmap_font.load_font('/fonts/Impact-30.pcf')
 
-# Two displayio groups are created. First is the "main" group which holds
-# all the labels for the stops and predictions...
+# displayio group holds all the labels for the stops and predictions...
 GROUP = displayio.Group(max_size=14)
 GROUP.append(fillrect(0, 0, DISPLAY.width, DISPLAY.height, 0xFFFFFF))
 # Clear the screen ASAP before populating rest of group (erase any old
@@ -163,32 +159,6 @@ GROUP.append(fillrect(0, 0, DISPLAY.width, DISPLAY.height, 0xFFFFFF))
 DISPLAY.show(GROUP)
 DISPLAY.refresh()
 time.sleep(5) # Don't allow another refresh() too soon
-
-# Second group is the low battery display. Populate this one now,
-# then we'll get back to the main group with the stop data in a moment...
-BATT_GROUP = displayio.Group(max_size=3)
-BATT_GROUP.append(fillrect(0, 0, DISPLAY.width, DISPLAY.height, 0xFFFFFF))
-try:
-    # Attempt loading low-battery icon, centered on screen
-    # pylint: disable=no-member
-    FILE = open('bitmaps/lowbatt.bmp', 'rb')
-    BATT_BITMAP = displayio.OnDiskBitmap(FILE)
-    BATT_ICON_TILEGRID = displayio.TileGrid(
-        BATT_BITMAP, pixel_shader=displayio.ColorConverter())
-    BATT_ICON_TILEGRID.x = (DISPLAY.width - BATT_BITMAP.width + 1) // 2
-    BATT_ICON_TILEGRID.y = (DISPLAY.height - BATT_BITMAP.height + 1) // 2
-    # onDiskBitmap seems to treat black as transparent...image won't
-    # show correctly on white background, so make an in-between rect
-    # to fill the area behind the battery icon with black.
-    BATT_GROUP.append(fillrect(BATT_ICON_TILEGRID.x, BATT_ICON_TILEGRID.y,
-                               BATT_BITMAP.width, BATT_BITMAP.height, 0))
-    BATT_GROUP.append(BATT_ICON_TILEGRID)
-except:
-    # If load fails, fall back on text low-batt message
-    TEXT = Label(FONT_MEDIUM, text='LOW BATTERY', color=0)
-    TEXT.anchor_point = (0.5, 0.5)
-    TEXT.anchored_position = (DISPLAY.width // 2, DISPLAY.height // 2)
-    BATT_GROUP.append(TEXT)
 
 # Populate list of NextBus objects from STOPS[] and generate initial text
 # labels (these get positioned in a second pass later)...
@@ -246,17 +216,6 @@ LAST_QUERY_TIME = -QUERY_INTERVAL
 # MAIN LOOP ----------------------------------------------------------------
 
 while True:
-
-    # If battery is low, DO NOT SHOW PREDICTIONS. Because the display
-    # persists without power, information shown could "look right" but
-    # actually be WAY out of date. Instead, display low-battery indicator
-    # once and then wait for battery recharge or USB power.
-    if PERIPHERALS.battery < LOW_BATT_VOLTAGE:
-        DISPLAY.show(BATT_GROUP)
-        DISPLAY.refresh()
-        while PERIPHERALS.battery < LOW_BATT_VOLTAGE:
-            time.sleep(60)
-        DISPLAY.show(GROUP)
 
     # Periodically sync clock with time server
     if time.monotonic() - LAST_SYNC_TIME >= CLOCK_SYNC_INTERVAL:

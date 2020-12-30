@@ -1,7 +1,7 @@
 """
 Seasonal produce finder for Adafruit MagTag w/CircuitPython 6.1 or later.
 Lists in-season fruits and vegetables for a user's location and season.
-"Smart cursive" BDF font by Thomas A. Fine, helvB12.bdf from Xorg fonts.
+"Smart cursive" BDF font by Thomas A. Fine, helvB12 from Xorg fonts.
 """
 
 # pylint: disable=import-error, line-too-long
@@ -52,7 +52,7 @@ MAGTAG.graphics.set_background('bitmaps/produce.bmp')
 
 # Produce list is inserted at this position
 MAGTAG.add_text(
-    text_font='/fonts/cursive-smart.bdf',
+    text_font='/fonts/cursive-smart.pcf',
     text_position=(3, 2),
     line_spacing=1.0,
     text_anchor_point=(0, 0),  # top left
@@ -68,10 +68,9 @@ MAGTAG.graphics.splash.append(Rect(0, MAGTAG.graphics.display.height - 14,
 # Center white text label over black bar to show last update time
 # (Initially a placeholder, string is not assigned to label until later)
 MAGTAG.add_text(
-    text_font='/fonts/helvB12.bdf',
+    text_font='/fonts/helvB12.pcf',
     text_position=(MAGTAG.graphics.display.width // 2,
                    MAGTAG.graphics.display.height - 1),
-    text_maxlen=19,
     text_color=0xFFFFFF,
     text_anchor_point=(0.5, 1),
     is_data=False, # we'll set this text manually later
