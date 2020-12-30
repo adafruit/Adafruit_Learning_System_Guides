@@ -1,4 +1,4 @@
-# CircuitPython demo - NeoPixel
+"""CircuitPython Essentials NeoPixel example"""
 import time
 import board
 import neopixel

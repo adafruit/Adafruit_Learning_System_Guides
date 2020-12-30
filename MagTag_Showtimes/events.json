@@ -1,0 +1,44 @@
+[
+  {
+    "name": "JP's Product Pick of the Week",
+    "day_of_week": "Tuesday",
+    "graphic": "jpp.bmp",
+    "start_time": "13:00",
+    "end_time": "13:30"
+  },
+  {
+    "name": "3D Hangouts",
+    "day_of_week": "Wednesday",
+    "graphic": "3dh.bmp",
+    "start_time": "8:00",
+    "end_time": "9:00"
+  },
+  {
+    "name": "Show & Tell",
+    "day_of_week": "Wednesday",
+    "graphic": "snt.bmp",
+    "start_time": "16:30",
+    "end_time": "17:00"
+  },
+  {
+    "name": "Ask An Engineer",
+    "day_of_week": "Wednesday",
+    "graphic": "aae.bmp",
+    "start_time": "17:00",
+    "end_time": "18:00"
+  },
+  {
+    "name": "John Park's Workshop",
+    "day_of_week": "Thursday",
+    "graphic": "jpw.bmp",
+    "start_time": "13:00",
+    "end_time": "14:00"
+  },
+  {
+    "name": "Scott's Deep Dive",
+    "day_of_week": "Friday",
+    "graphic": "dds.bmp",
+    "start_time": "14:00",
+    "end_time": "15:00"
+  }
+]

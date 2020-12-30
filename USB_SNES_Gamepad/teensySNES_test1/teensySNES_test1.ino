@@ -22,11 +22,17 @@ const int pinLEDOutput = 11;
 byte buttons[] = {  pinBtnUp, pinBtnRight, pinBtnDown, pinBtnLeft, pinBtnSelect, pinBtnStart,
                     pinBtnB, pinBtnA, pinBtnY, pinBtnX, pinBtnTrigLeft, pinBtnTrigRight
                  }; 
-short keys[] = {KEY_U, KEY_R, KEY_D, KEY_L, KEY_ENTER, KEY_TAB, KEY_B, KEY_A, KEY_Y, KEY_X, KEY_P, KEY_Q};
+uint16_t keys[] = {KEY_U, KEY_R, KEY_D, KEY_L, KEY_ENTER, KEY_TAB, KEY_B, KEY_A, KEY_Y, KEY_X, KEY_P, KEY_Q};
+void myset_key1(uint16_t c);
+void myset_key2(uint16_t c);
+void myset_key3(uint16_t c);
+void myset_key4(uint16_t c);
+void myset_key5(uint16_t c);
+void myset_key6(uint16_t c);
 
 #define NUMBUTTONS sizeof(buttons)
 
-typedef void KeyFunction_t(uint8_t c);
+typedef void KeyFunction_t(uint16_t c);
 
 KeyFunction_t* buttonActive[NUMBUTTONS];
 KeyFunction_t* keyList[] = {myset_key6, myset_key5, myset_key4, myset_key3, myset_key2, myset_key1};
@@ -110,32 +116,32 @@ void releaseButton(byte index)
   keySlot++;                                 //pop the keySlot stack
 }
 
-void myset_key1(uint8_t c)
+void myset_key1(uint16_t c)
 {
   Keyboard.set_key1(c);
 }
 
-void myset_key2(uint8_t c)
+void myset_key2(uint16_t c)
 {
   Keyboard.set_key2(c);
 }
 
-void myset_key3(uint8_t c)
+void myset_key3(uint16_t c)
 {
   Keyboard.set_key3(c);
 }
 
-void myset_key4(uint8_t c)
+void myset_key4(uint16_t c)
 {
   Keyboard.set_key4(c);
 }
 
-void myset_key5(uint8_t c)
+void myset_key5(uint16_t c)
 {
   Keyboard.set_key5(c);
 }
 
-void myset_key6(uint8_t c)
+void myset_key6(uint16_t c)
 {
   Keyboard.set_key6(c);
 }

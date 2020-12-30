@@ -36,6 +36,7 @@ except ImportError:
 
 TWELVE_HOUR = True # If set, use 12-hour time vs 24-hour (e.g. 3:00 vs 15:00)
 COUNTDOWN = False  # If set, show time to (vs time of) next rise/set event
+MONTH_DAY = True   # If set, use MM/DD vs DD/MM (e.g. 31/12 vs 12/31)
 BITPLANES = 6      # Ideally 6, but can set lower if RAM is tight
 
 
@@ -175,6 +176,8 @@ MATRIX = Matrix(bit_depth=BITPLANES)
 DISPLAY = MATRIX.display
 ACCEL = adafruit_lis3dh.LIS3DH_I2C(busio.I2C(board.SCL, board.SDA),
                                    address=0x19)
+_ = ACCEL.acceleration # Dummy reading to blow out any startup residue
+time.sleep(0.1)
 DISPLAY.rotation = (int(((math.atan2(-ACCEL.acceleration.y,
                                      -ACCEL.acceleration.x) + math.pi) /
                          (math.pi * 2) + 0.875) * 4) % 4) * 90
@@ -368,7 +371,7 @@ while True:
     GROUP[0] = TILE_GRID
 
     # Update percent value (5 labels: GROUP[1-4] for outline, [5] for text)
-    if PERCENT >= 100:
+    if PERCENT >= 99.95:
         STRING = '100%'
     else:
         STRING = '{:.1f}'.format(PERCENT + 0.05) + '%'
@@ -416,9 +419,13 @@ while True:
     GROUP[6].text = STRING
     GROUP[6].x = CENTER_X - GROUP[6].bounding_box[2] // 2
     GROUP[6].y = TIME_Y
-    STRING = str(NOW.tm_mon) + '/' + str(NOW.tm_mday)
+    if MONTH_DAY:
+        STRING = str(NOW.tm_mon) + '/' + str(NOW.tm_mday)
+    else:
+        STRING = str(NOW.tm_mday) + '/' + str(NOW.tm_mon)
     GROUP[7].text = STRING
     GROUP[7].x = CENTER_X - GROUP[7].bounding_box[2] // 2
     GROUP[7].y = TIME_Y + 10
 
+    DISPLAY.refresh() # Force full repaint (splash screen sometimes sticks)
     time.sleep(5)
