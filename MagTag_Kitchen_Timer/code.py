@@ -53,7 +53,10 @@ while True:
             magtag.peripherals.neopixels.fill((128, 0, 0))
 
     else:
+        time.sleep(1)
         remaining = alarm_time - (time.time() - start)
+        if (remaining < 0):
+            remaining = 0
         print(remaining)
         if remaining == 0:
             magtag.peripherals.neopixels.fill((255, 0, 0))
