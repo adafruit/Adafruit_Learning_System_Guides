@@ -125,7 +125,7 @@ next_up = events[remaining_starttimes.index(mins_till_next_eventstart)]
 sleep_time = None
 if current_event:
     print("Currently: ", current_event)
-    magtag.set_background("bmps/"+current_event["graphic"])
+    magtag.set_background("/bmps/"+current_event["graphic"])
     magtag.set_text("Currently streaming until " + time_format(current_event["end_time"]))
     remaining_starttimes.index(mins_till_next_eventstart)
     if BEEP_ON_EVENTSTART:
@@ -135,7 +135,7 @@ if current_event:
     sleep_time = mins_till_next_eventend + 1
 else:
     print("Next up! ", next_up)
-    magtag.set_background("bmps/"+next_up["graphic"])
+    magtag.set_background("/bmps/"+next_up["graphic"])
 
     string = (
         "Coming up on "

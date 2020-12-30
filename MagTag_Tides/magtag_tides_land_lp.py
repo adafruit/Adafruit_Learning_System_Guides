@@ -21,8 +21,8 @@ PLOT_HEIGHT = 116
 PLOT_X = 174
 PLOT_Y = 6
 PLOT_Y_SCALE = round(PLOT_HEIGHT / (4 * VSCALE))
-DATE_FONT = bitmap_font.load_font("/Kanit-Black-24.bdf")
-TIME_FONT = bitmap_font.load_font("/Kanit-Medium-20.bdf")
+DATE_FONT = bitmap_font.load_font("/fonts/Kanit-Black-24.bdf")
+TIME_FONT = bitmap_font.load_font("/fonts/Kanit-Medium-20.bdf")
 
 # our MagTag
 magtag = MagTag()
@@ -31,7 +31,7 @@ magtag.json_path = ["predictions"]
 # ----------------------------
 # Grid overlay for plot
 # ----------------------------
-grid_bmp, grid_pal = adafruit_imageload.load("/tides_bg_land.bmp")
+grid_bmp, grid_pal = adafruit_imageload.load("/bmps/tides_bg_land.bmp")
 grid_pal.make_transparent(1)
 grid_overlay = displayio.TileGrid(grid_bmp, pixel_shader=grid_pal)
 
@@ -92,7 +92,7 @@ for hilo in hilo_times:
     hilo.anchored_position = (158, y_offset)
     y_offset += 28
 
-icon_bmp, icon_pal = adafruit_imageload.load("/tides_icons.bmp")
+icon_bmp, icon_pal = adafruit_imageload.load("/bmps/tides_icons.bmp")
 icon_pal.make_transparent(1)
 hilo_icons = [
     displayio.TileGrid(

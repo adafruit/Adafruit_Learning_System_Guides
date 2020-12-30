@@ -24,7 +24,7 @@ magtag.graphics.set_background("/bmps/magtag_shower_bg.bmp")
 
 # quote in bold text, with text wrapping
 magtag.add_text(
-    text_font="/fonts/Arial-Bold-12.bdf",
+    text_font="/fonts/Arial-Bold-12.pcf",
     text_wrap=28,
     text_maxlen=120,
     text_position=(
