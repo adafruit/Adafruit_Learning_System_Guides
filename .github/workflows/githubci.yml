@@ -53,6 +53,7 @@ jobs:
     - name: Pip install pylint, black, & Sphinx
       run: |
         pip install --force-reinstall pylint==1.9.2
+        pip install --force-reinstall isort==4.2.5
     - name: Checkout Current Repo
       uses: actions/checkout@v2
 
