@@ -61,7 +61,7 @@ pause = 0.25
 
 # pylint: disable=too-many-statements
 def launch_terminal():
-    if operating_system is 0:
+    if not operating_system:
         led.value = False
         # open Finder search on mac os
         kbd.press(Keycode.GUI, Keycode.SPACE)  # macos command key, aka 'GUI'
@@ -119,7 +119,7 @@ def launch_terminal():
         led.value = True
         time.sleep(1)
 
-    elif operating_system is 1:
+    elif operating_system:
         led.value = False
         # open os search
         kbd.press(Keycode.GUI)  # the windows  key, aka "GUI"
@@ -263,7 +263,7 @@ def hide_everything():
 
 while True:
     # check for presence of jumper from GND to D2
-    if buttons[0].value is False and payload_delivered is 0:
+    if buttons[0].value is False and not payload_delivered:
         led.value = True
         print("Jumpered safely.")
         for i in range(6):  # blink 3 times
@@ -272,17 +272,17 @@ while True:
         led.value = False
         payload_delivered = 1
 
-    if buttons[0].value is True and payload_delivered is 0:  # run it
+    if buttons[0].value is True and not payload_delivered:  # run it
         led.value = True
         print("Release the water fowl!")  # for debugging in screen or putty
         for i in range(10):  # blink 5 times
             led.value = not led.value
             time.sleep(0.3)
         time.sleep(1)
-        if payload is 0:
+        if not payload:
             launch_terminal()
             payload_delivered = 1
-        elif payload is 1:
+        elif payload:
             launch_terminal()
             download_image()  # only uncomment and run this on mac os
             replace_background()  # only uncomment and run this on mac os

@@ -8,10 +8,10 @@ Author: Brent Rubell for Adafruit Industries, 2019
 """
 import time
 import board
-import neopixel
 import busio
 from digitalio import DigitalInOut
 from analogio import AnalogIn
+import neopixel
 import adafruit_adt7410
 
 from adafruit_esp32spi import adafruit_esp32spi, adafruit_esp32spi_wifimanager
@@ -47,7 +47,7 @@ try:
     ADAFRUIT_IO_KEY = secrets['aio_key']
 except KeyError:
     raise KeyError('To use this code, you need to include your Adafruit IO username \
-and password in a secrets.py file on the CIRCUITPY drive.')
+and password in a secrets.py file on the CIRCUITPY drive.') from KeyError
 
 # Create an instance of the IO_HTTP client
 io = IO_HTTP(ADAFRUIT_IO_USER, ADAFRUIT_IO_KEY, wifi)
@@ -100,7 +100,7 @@ while True:
             print('Data sent!')
             gfx.display_io_status('Data sent!')
         except AdafruitIO_RequestError as e:
-            raise AdafruitIO_RequestError('IO Error: ', e)
+            raise AdafruitIO_RequestError('IO Error: ', e) from e
     except (ValueError, RuntimeError) as e: # WiFi Connection Failure
         print("Failed to get data, retrying\n", e)
         wifi.reset()

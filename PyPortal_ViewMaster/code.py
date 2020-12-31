@@ -51,7 +51,7 @@ def print_directory(path, tabs=0):
 try:
     print_directory(IMAGE_DIRECTORY)
 except OSError as error:
-    raise Exception("No images found on flash or SD Card")
+    raise Exception("No images found on flash or SD Card") from error
 
 # Create the slideshow object that plays through once alphabetically.
 slideshow = SlideShow(board.DISPLAY, None, folder=IMAGE_DIRECTORY, loop=True,

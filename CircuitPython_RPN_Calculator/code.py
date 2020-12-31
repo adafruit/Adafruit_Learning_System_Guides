@@ -3,17 +3,17 @@
 import gc
 import time
 
+import microcontroller
+import board
+import digitalio
 from adafruit_display_text.label import Label
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS
 from adafruit_hid.keycode import Keycode
 from jepler_udecimal import Decimal, getcontext, localcontext
 import jepler_udecimal.utrig
-import board
-import digitalio
 import displayio
 import framebufferio
-import microcontroller
 import sharpdisplay
 import supervisor
 import terminalio

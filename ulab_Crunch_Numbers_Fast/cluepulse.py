@@ -1,8 +1,8 @@
 import time
 
-import adafruit_apds9960.apds9960
 import board
 import digitalio
+import adafruit_apds9960.apds9960
 import ulab
 import ulab.filter
 

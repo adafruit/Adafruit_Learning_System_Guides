@@ -17,11 +17,11 @@ All text above must be included in any redistribution.
 import time
 import random
 import board
-from digitalio import DigitalInOut, Direction, Pull
+import pulseio
 import busio
+from digitalio import DigitalInOut, Direction, Pull
 import adafruit_ds3231
 import audioio
-import pulseio
 from adafruit_motor import servo
 import neopixel
 from adafruit_debouncer import Debouncer

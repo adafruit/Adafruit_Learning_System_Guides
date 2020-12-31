@@ -1,8 +1,8 @@
 import time
+import board
 from adafruit_circuitplayground.express import cpx
 import touchio
 import simpleio
-import board
 
 cpx.pixels.brightness = 0.2
 touch = touchio.TouchIn(board.A1)

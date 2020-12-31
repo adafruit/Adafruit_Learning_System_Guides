@@ -4,10 +4,10 @@
 #  written by John Park with Kattni Rembor and Jan Goolsbey for range and hysteresis code
 
 import time
-import adafruit_midi
 import board
-from simpleio import map_range
 from analogio import AnalogIn
+import adafruit_midi
+from simpleio import map_range
 print("---Grand Central MIDI Knobs---")
 
 midi = adafruit_midi.MIDI(out_channel=0)  # Set the output MIDI channel (0-15)

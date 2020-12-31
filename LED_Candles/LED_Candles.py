@@ -1,8 +1,8 @@
 import time
 
 import board
-import neopixel
 from analogio import AnalogIn
+import neopixel
 
 try:
     import urandom as random

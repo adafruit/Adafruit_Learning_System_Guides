@@ -1,7 +1,7 @@
 ﻿import time
 
-import adafruit_thermistor
 import board
+import adafruit_thermistor
 
 thermistor = adafruit_thermistor.Thermistor(
     board.TEMPERATURE, 10000, 10000, 25, 3950)

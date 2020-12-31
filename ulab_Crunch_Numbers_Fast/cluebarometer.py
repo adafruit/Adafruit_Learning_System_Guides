@@ -1,7 +1,7 @@
 import time
 
-import adafruit_bmp280
 import board
+import adafruit_bmp280
 import displayio
 import ulab
 import ulab.filter

@@ -1,7 +1,7 @@
 import time
 import board
-import adafruit_lis3dh
 import busio
+import adafruit_lis3dh
 
 i2c = busio.I2C(board.ACCELEROMETER_SCL, board.ACCELEROMETER_SDA)
 lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c, address=0x19)

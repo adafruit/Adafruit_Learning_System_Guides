@@ -1,6 +1,6 @@
 import time
-import audioio
 import board
+import audioio
 import neopixel
 from adafruit_crickit import crickit
 

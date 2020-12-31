@@ -1,9 +1,9 @@
 import time
 import board
+import analogio
 from adafruit_pyportal import PyPortal
 from adafruit_button import Button
 import neopixel
-import analogio
 
 # Set the background color
 BACKGROUND_COLOR = 0x443355

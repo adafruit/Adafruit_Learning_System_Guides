@@ -4,8 +4,8 @@
 # products from Adafruit!
 
 import board
-import neopixel
 from analogio import AnalogIn
+import neopixel
 # pylint: disable=global-statement
 
 try:

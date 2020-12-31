@@ -12,9 +12,6 @@ Licensed under the MIT license.
 All text above must be included in any redistribution.
 """
 
-
-#pylint:disable=missing-super-argument
-
 from adafruit_logging import LoggingHandler
 from adafruit_ble.uart import UARTServer
 

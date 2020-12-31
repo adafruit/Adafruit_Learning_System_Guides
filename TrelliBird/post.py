@@ -17,7 +17,7 @@ All text above must be included in any redistribution.
 from color_names import *
 
 
-class Post(object):
+class Post():
     """Obstacles the user must avoice colliding with."""
 
     def __init__(self, from_bottom=0, from_top=0):

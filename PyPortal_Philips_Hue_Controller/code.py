@@ -4,12 +4,12 @@ PyPortal Philips Hue Lighting Controller
 Brent Rubell for Adafruit Industries, 2019
 """
 import board
+import busio
 import displayio
 from adafruit_bitmap_font import bitmap_font
 from adafruit_button import Button
 import adafruit_touchscreen
 from digitalio import DigitalInOut
-import busio
 import neopixel
 from adafruit_esp32spi import adafruit_esp32spi
 from adafruit_esp32spi import adafruit_esp32spi_wifimanager

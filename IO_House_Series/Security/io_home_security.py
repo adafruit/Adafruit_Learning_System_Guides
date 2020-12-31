@@ -21,6 +21,12 @@ Dependencies:
 # Import standard python modules
 import time
 import base64
+
+# import Adafruit Blinka
+from board import SCL, SDA, D18, D22, D24
+from busio import I2C
+import digitalio
+
 # import Adafruit IO REST client
 from Adafruit_IO import Client, RequestError
 
@@ -28,11 +34,6 @@ from Adafruit_IO import Client, RequestError
 import neopixel
 import adafruit_sgp30
 import picamera
-
-# import Adafruit Blinka
-from board import SCL, SDA, D18, D22, D24
-from busio import I2C
-import digitalio
 
 # Number of NeoPixels connected to the strip
 NUM_PIXELS_STRIP = 60

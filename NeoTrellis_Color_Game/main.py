@@ -2,8 +2,8 @@ import time
 import random
 import board
 from board import SCL, SDA
-import digitalio
 import busio
+import digitalio
 from adafruit_neotrellis.neotrellis import NeoTrellis
 
 # create the i2c object for the trellis

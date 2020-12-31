@@ -13,8 +13,6 @@ All text above must be included in any redistribution.
 """
 
 
-#pylint:disable=missing-super-argument
-
 # Example:
 #
 # import board

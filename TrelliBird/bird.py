@@ -17,7 +17,7 @@ All text above must be included in any redistribution.
 import time
 from color_names import *
 
-class Bird(object):
+class Bird():
     """The 'bird': the user's piece."""
 
     def __init__(self, weight=0.5):

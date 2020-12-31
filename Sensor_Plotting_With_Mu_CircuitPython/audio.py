@@ -2,8 +2,8 @@
 import math
 import time
 
-import audiobusio
 import board
+import audiobusio
 
 
 def mean(values):

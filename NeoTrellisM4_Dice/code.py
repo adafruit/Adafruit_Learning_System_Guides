@@ -18,9 +18,9 @@ import math
 import time
 import random
 import board
+import busio
 import adafruit_trellism4
 import adafruit_adxl34x
-import busio
 
 # Set up the trellis and accelerometer
 

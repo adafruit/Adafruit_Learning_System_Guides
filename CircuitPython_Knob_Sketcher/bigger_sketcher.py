@@ -1,9 +1,9 @@
 import board
 import busio
-import adafruit_ssd1306
-from simpleio import map_range
 from analogio import AnalogIn
 from digitalio import DigitalInOut, Direction, Pull
+import adafruit_ssd1306
+from simpleio import map_range
 
 # Create SPI bus
 spi = busio.SPI(board.SCK, board.MOSI)

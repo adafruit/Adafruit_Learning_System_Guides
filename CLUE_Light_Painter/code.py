@@ -14,10 +14,10 @@ import gc
 from time import monotonic, sleep
 import board
 import busio
-import displayio
-from digitalio import DigitalInOut, Direction
-from bmp2led import BMP2LED, BMPError
 from neopixel_write import neopixel_write
+from digitalio import DigitalInOut, Direction
+import displayio
+from bmp2led import BMP2LED, BMPError
 from richbutton import RichButton
 from adafruit_display_text import label
 from adafruit_display_shapes.rect import Rect
@@ -314,7 +314,7 @@ class ClueLightPainter:
         group = displayio.Group(max_size=7)
         group.append(centered_label('TAP L/R to', 3, 2))
         group.append(centered_label('select item' if main_config else
-                                    'select image' if self.config_mode is 0
+                                    'select image' if not self.config_mode
                                     else 'change', 16, 2))
         group.append(centered_label('HOLD L: item config' if main_config else
                                     'HOLD L: back', 100, 2))
@@ -360,8 +360,7 @@ class ClueLightPainter:
                 reload_image |= reload
                 if paint:
                     break # Exit loop, resume paint
-                else:
-                    board.DISPLAY.show(group) # Put config UI back up
+                board.DISPLAY.show(group) # Put config UI back up
             elif action_right is RichButton.HOLD:
                 break
             elif action_left is RichButton.TAP:

@@ -1,9 +1,9 @@
 import board
 import busio
-import adafruit_ssd1306
-from simpleio import map_range
 from analogio import AnalogIn
 from digitalio import DigitalInOut
+import adafruit_ssd1306
+from simpleio import map_range
 
 # Create the I2C bus
 i2c = busio.I2C(board.SCL, board.SDA)

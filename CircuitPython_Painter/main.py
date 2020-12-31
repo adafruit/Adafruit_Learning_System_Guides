@@ -96,9 +96,8 @@ try:
 
 except OSError as e:
     if e.args[0] == 28:
-        raise OSError("OS Error 28 0.25")
-    else:
-        raise OSError("OS Error 0.5")
+        raise OSError("OS Error 28 0.25") from e
+    raise OSError("OS Error 0.5") from e
 except BMPError as e:
     print("Failed to parse BMP: " + e.args[0])
 

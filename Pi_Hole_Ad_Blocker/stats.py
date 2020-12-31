@@ -31,13 +31,13 @@ import time
 # Import Requests Library
 import requests
 
+# Import Python Imaging Library
+from PIL import Image, ImageDraw, ImageFont
+
 # Import Blinka
 from board import SCL, SDA
 import busio
 import adafruit_ssd1306
-
-# Import Python Imaging Library
-from PIL import Image, ImageDraw, ImageFont
 
 api_url = 'http://localhost/admin/api.php'
 

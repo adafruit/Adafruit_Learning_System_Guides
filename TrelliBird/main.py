@@ -14,11 +14,11 @@ All text above must be included in any redistribution.
 
 # pylint: disable=wildcard-import,unused-wildcard-import,eval-used
 
-import game
 import board
+import busio
+import game
 import adafruit_trellism4
 import adafruit_adxl34x
-import busio
 from color_names import *
 
 

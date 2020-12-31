@@ -29,7 +29,7 @@ try:
 except ImportError:
     pass
 
-class Color(object):
+class Color():
     """Standard colors"""
     WHITE = 0xFFFFFF
     BLACK = 0x000000
@@ -48,7 +48,7 @@ class Color(object):
 
 ################################################################################
 
-class TouchscreenPoller(object):
+class TouchscreenPoller():
     """Get 'pressed' and location updates from a touch screen device."""
 
     def __init__(self, splash, cursor_bmp):
@@ -105,7 +105,7 @@ class TouchscreenPoller(object):
 
 ################################################################################
 
-class CursorPoller(object):
+class CursorPoller():
     """Get 'pressed' and location updates from a D-Pad/joystick device."""
 
     def __init__(self, splash, cursor_bmp):
@@ -146,7 +146,7 @@ class CursorPoller(object):
         self.poke()
 
 ################################################################################
-class Paint(object):
+class Paint():
 
     #pylint:disable=too-many-statements
     def __init__(self, display=board.DISPLAY):

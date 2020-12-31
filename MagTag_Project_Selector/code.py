@@ -3,13 +3,13 @@
 # https://gist.github.com/dglaude/4bf8d0a13c9c8ca8b05d6c0e9176bd20
 
 import time
+import board
+from digitalio import DigitalInOut, Direction, Pull
 import alarm
 import displayio
-import board
 import adafruit_imageload
 from adafruit_display_shapes.rect import Rect
 from adafruit_magtag.magtag import Graphics
-from digitalio import DigitalInOut, Direction, Pull
 
 projects = [
     "weather",

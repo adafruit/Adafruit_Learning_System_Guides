@@ -19,12 +19,12 @@ Dependencies:
 # Import standard python modules
 import time
 
-# import Adafruit IO REST client
-from Adafruit_IO import Client
-
 # import Adafruit Blinka
 from busio import I2C
 from board import SCL, SDA, D18
+
+# import Adafruit IO REST client
+from Adafruit_IO import Client
 
 # import Adafruit_CircuitPython_Si7021 Library
 import adafruit_si7021

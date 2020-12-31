@@ -31,8 +31,7 @@ for tx_pin in get_unique_pins():
     for rx_pin in get_unique_pins():
         if rx_pin is tx_pin:
             continue
+        if is_hardware_UART(tx_pin, rx_pin):
+            print("RX pin:", rx_pin, "\t TX pin:", tx_pin)
         else:
-            if is_hardware_UART(tx_pin, rx_pin):
-                print("RX pin:", rx_pin, "\t TX pin:", tx_pin)
-            else:
-                pass
+            pass

@@ -7,12 +7,13 @@ import subprocess
 # Import Requests Library
 import requests
 
-#Import Blinka
-import digitalio
-import board
-
 # Import Python Imaging Library
 from PIL import Image, ImageDraw, ImageFont
+
+#Import Blinka
+import board
+import digitalio
+
 import adafruit_rgb_display.st7789 as st7789
 
 api_url = 'http://localhost/admin/api.php'

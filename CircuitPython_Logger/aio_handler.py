@@ -12,8 +12,6 @@ Licensed under the MIT license.
 All text above must be included in any redistribution.
 """
 
-#pylint:disable=missing-super-argument
-
 # Example:
 #
 # from aio_handler import AIOHandler

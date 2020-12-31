@@ -8,11 +8,11 @@ Author: Brent Rubell for Adafruit Industries, 2019
 """
 import time
 import board
-import neopixel
 import busio
 import analogio
-from simpleio import map_range
 from digitalio import DigitalInOut
+import neopixel
+from simpleio import map_range
 
 from adafruit_esp32spi import adafruit_esp32spi, adafruit_esp32spi_wifimanager
 from adafruit_io.adafruit_io import IO_HTTP, AdafruitIO_RequestError
@@ -131,7 +131,7 @@ while True:
             gfx.display_io_status('Data Sent!')
             print('Data sent!')
         except AdafruitIO_RequestError as e:
-            raise AdafruitIO_RequestError('IO Error: ', e)
+            raise AdafruitIO_RequestError('IO Error: ', e) from e
     except (ValueError, RuntimeError) as e:
         print("Failed to get data, retrying\n", e)
         wifi.reset()

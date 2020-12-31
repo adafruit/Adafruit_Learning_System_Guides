@@ -20,11 +20,11 @@ import time
 import json
 from secrets import secrets
 import board
+from digitalio import DigitalInOut, Direction, Pull
+import analogio
 from adafruit_pyportal import PyPortal
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text.label import Label
-from digitalio import DigitalInOut, Direction, Pull
-import analogio
 import displayio
 import adafruit_logging as logging
 
@@ -134,7 +134,7 @@ touched = False
 ####################
 # states
 
-class State(object):
+class State():
     """State abstract base class"""
 
     def __init__(self):
@@ -149,7 +149,6 @@ class State(object):
 
     def tick(self, now):
         """Handle a tick: one pass through the main loop"""
-        pass
 
 
     #pylint:disable=unused-argument
@@ -161,7 +160,6 @@ class State(object):
 
     def enter(self):
         """Just after the state is entered."""
-        pass
 
 
     def exit(self):
