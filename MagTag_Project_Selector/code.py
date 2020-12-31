@@ -22,6 +22,8 @@ projects = [
     "slideshow",
 ]
 
+string = "This string is very long. It is longer than the max line length for this file. Hopefully it will make pylint upset"
+
 btnA = DigitalInOut(board.D15)
 btnA.direction = Direction.INPUT
 btnA.pull = Pull.UP
