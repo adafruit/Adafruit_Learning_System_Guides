@@ -12,8 +12,8 @@
   "eyelidIndex"     : "0x00", // 8-bit value; from table learn.adafruit.com/assets/61921
 
   // independent irisTexture, scleraTexture, irisColor, scleraColor,
-  //  pupilColor, backColor, irisAngle, scleraAngle, irisSpin, scleraSpin,
-  //  irisMirror, scleraMirror, and rotate can be specified
+  // pupilColor, backColor, irisAngle, scleraAngle, irisSpin, scleraSpin,
+  // irisMirror, scleraMirror, and rotate can be specified
   "left" : {
   },
   "right" : {
