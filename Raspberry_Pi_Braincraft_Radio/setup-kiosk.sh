@@ -61,6 +61,15 @@ import os
 import sys
 from datetime import datetime
 
+# If you change the LCD rotation, also change this line:
+ROTATION=90
+
+print("Using rotation", ROTATION)
+
+DEBUG = False
+BOUNCE_TIME = 0.01 # Debounce time in seconds
+POWEROFF_TIMEOUT = 5
+
 try:
     from evdev import uinput, UInput, ecodes as e
 except ImportError:
@@ -69,19 +78,27 @@ except ImportError:
 import digitalio
 import board
 
-DEBUG = False
-BOUNCE_TIME = 0.01 # Debounce time in seconds
-POWEROFF_TIMEOUT = 5
+if ROTATION == 0:
+    UP, RIGHT, DOWN, LEFT = board.D22, board.D23, board.D24, board.D27
+elif ROTATION == 90:
+    LEFT, UP, RIGHT, DOWN = board.D22, board.D23, board.D24, board.D27
+elif ROTATION == 180:
+    DOWN, LEFT, UP, RIGHT = board.D22, board.D23, board.D24, board.D27
+elif ROTATION == 270:
+    RIGHT, DOWN, LEFT, UP = board.D22, board.D23, board.D24, board.D27
+else:
+    raise ValueError("Invalid rotation value %r" % ROTATION)
 
 KEYS= [ # EDIT KEYCODES IN THIS TABLE TO YOUR PREFERENCES:
-	# See /usr/include/linux/input.h for keycode names
-	# Keyboard  Action (tuple = press together, no repeat)
-        (board.D17, (e.KEY_K,)), # button - play/pause
+        # See /usr/include/linux/input.h for keycode names
+        # Keyboard  Action (tuple = press together, no repeat)
+        # FIRST item will shut down when HELD for 5 seconds
+        (board.D17, (e.KEY_K,)),                # button - play/pause
         (board.D16, (e.KEY_LEFTCTRL, e.KEY_R)), # push stick - reload
-	(board.D22, (e.KEY_LEFTSHIFT, e.KEY_P)), # left - previous in playlist
-	(board.D24, (e.KEY_LEFTSHIFT, e.KEY_N)),  # right - next in playlist
-	(board.D23, e.KEY_EQUAL),        # up - volume up
-	(board.D27, e.KEY_MINUS),        # down - volume down
+        (LEFT, (e.KEY_LEFTSHIFT, e.KEY_P)),     # left - previous in playlist
+        (RIGHT, (e.KEY_LEFTSHIFT, e.KEY_N)),    # right - next in playlist
+        (UP, e.KEY_EQUAL),                      # up - volume up
+        (DOWN, e.KEY_MINUS),                    # down - volume down
 ]
 
 key_values = set()
