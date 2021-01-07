@@ -2,9 +2,9 @@
 # sequence on LED matrix. Press reset button to display again.
 
 import time
-import adafruit_ht16k33.matrix
 import board
 import busio as io
+import adafruit_ht16k33.matrix
 import touchio
 
 touch = touchio.TouchIn(board.D1)

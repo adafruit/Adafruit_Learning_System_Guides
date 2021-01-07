@@ -1,5 +1,5 @@
-import audioio
 import board
+import audioio
 import audiobusio
 
 wave_file = open("StreetChicken.wav", "rb")

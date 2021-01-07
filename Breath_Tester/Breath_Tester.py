@@ -1,8 +1,8 @@
 import time
 
-import adafruit_sgp30
 import board
 import busio
+import adafruit_sgp30
 
 i2c = busio.I2C(board.SCL, board.SDA, frequency=100000)
 

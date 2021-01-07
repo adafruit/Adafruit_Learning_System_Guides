@@ -18,7 +18,7 @@ while True:
 
     timer = time.monotonic() - start_time
 
-    if timer >= interval and timer <= (interval + on_time):
+    if interval <= timer <= (interval + on_time):
         vibrating_disc.value = True
 
     elif timer >= (interval + on_time):

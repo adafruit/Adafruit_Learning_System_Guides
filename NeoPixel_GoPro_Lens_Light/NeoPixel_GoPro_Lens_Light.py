@@ -1,8 +1,8 @@
 import time
 
 import board
-import neopixel
 from analogio import AnalogIn
+import neopixel
 
 pot = AnalogIn(board.A1)  # what pin the pot is on
 pixpin = board.D0  # what pin the LEDs are on

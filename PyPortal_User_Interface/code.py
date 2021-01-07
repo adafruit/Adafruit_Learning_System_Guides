@@ -1,9 +1,9 @@
 import time
 import board
 import microcontroller
-import displayio
 import busio
 from analogio import AnalogIn
+import displayio
 import neopixel
 import adafruit_adt7410
 from adafruit_bitmap_font import bitmap_font

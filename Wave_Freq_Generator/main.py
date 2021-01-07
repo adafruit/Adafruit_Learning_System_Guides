@@ -12,9 +12,9 @@ Licensed under the MIT license.
 All text above must be included in any redistribution.
 """
 
-import rotaryio
 import board
 import digitalio
+import rotaryio
 from display import Display
 from adafruit_debouncer import Debouncer
 from generator import Generator

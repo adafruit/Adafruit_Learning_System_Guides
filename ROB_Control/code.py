@@ -6,8 +6,8 @@
 
 import time
 import gc
-from digitalio import DigitalInOut, Direction
 import board
+from digitalio import DigitalInOut, Direction
 from adafruit_circuitplayground.express import cpx
 
 # Commands, each 8 bit command is preceded by the 5 bit Init sequence

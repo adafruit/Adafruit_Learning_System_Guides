@@ -3,14 +3,14 @@ from datetime import datetime
 import time
 import pickle
 import os.path
-from googleapiclient.discovery import build
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
 import textwrap
+from google.auth.transport.requests import Request
 import digitalio
 import busio
 import board
 from PIL import Image, ImageDraw, ImageFont
+from googleapiclient.discovery import build
+from google_auth_oauthlib.flow import InstalledAppFlow
 from adafruit_epd.epd import Adafruit_EPD
 from adafruit_epd.ssd1675 import Adafruit_SSD1675
 
@@ -69,7 +69,7 @@ last_check = None
 events = []
 
 
-def display_event(event_id):
+def display_event(event_id): #pylint: disable=too-many-locals
     event_index = search_id(event_id)
     if event_index is None:
         if len(events) > 0:

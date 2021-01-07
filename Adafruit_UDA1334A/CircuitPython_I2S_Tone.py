@@ -1,8 +1,8 @@
 import time
 import array
 import math
-import audioio
 import board
+import audioio
 import audiobusio
 
 tone_volume = 0.1  # Increase this to increase the volume of the tone.

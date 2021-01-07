@@ -15,8 +15,8 @@ All text above must be included in any redistribution.
 import time
 import busio
 import board
-import adafruit_lis3dh
 import pulseio
+import adafruit_lis3dh
 from adafruit_motor import servo
 
 

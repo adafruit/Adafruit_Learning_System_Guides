@@ -120,7 +120,7 @@ def main():
             # We gathered enough data to fill the filters, and
             # the light value crossed the zero line in the positive direction
             # Therefore we need to record a pulse
-            if n > len(taps) and old_value < 0 and filtered >= 0:
+            if n > len(taps) and old_value < 0 <= filtered:
                 # This crossing time is estimated, but it increases the pulse
                 # estimate resolution quite a bit.  If only the nearest 1/8s
                 # was used for pulse estimation, the smallest pulse increment

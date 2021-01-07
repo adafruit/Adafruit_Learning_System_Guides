@@ -6,11 +6,11 @@ Display a bitmaps for waiting and washing modes.
 
 import time
 import board
+import pulseio
 from adafruit_clue import clue
 from adafruit_display_text import label
 from adafruit_bitmap_font import bitmap_font
 import displayio
-import pulseio
 
 clue.display.brightness = 0.8
 clue_display = displayio.Group(max_size=4)

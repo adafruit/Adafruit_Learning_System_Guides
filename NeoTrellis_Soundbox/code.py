@@ -7,8 +7,8 @@ import os
 import random
 import board
 from board import SCL, SDA
-import digitalio
 import busio
+import digitalio
 import audioio
 import adafruit_rgbled
 from adafruit_neotrellis.neotrellis import NeoTrellis
@@ -104,7 +104,7 @@ shuffled = False
 for soundfile in wavefiles:
     print("Processing "+soundfile)
     pos = int(soundfile[0:2])
-    if pos >= 0 and pos < 16:      # Valid filenames start with 00 to 15
+    if 0 <= pos < 16:      # Valid filenames start with 00 to 15
         wavnames[pos] = soundfile  # Store soundfile in proper index
         shuffled_names[pos] = soundfile
         skip = soundfile[3:].find('-') + 3

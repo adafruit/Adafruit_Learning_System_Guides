@@ -20,8 +20,8 @@ import time
 import json
 from secrets import secrets
 import board
-from digitalio import DigitalInOut, Direction, Pull
 import analogio
+from digitalio import DigitalInOut, Direction, Pull
 from adafruit_pyportal import PyPortal
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text.label import Label

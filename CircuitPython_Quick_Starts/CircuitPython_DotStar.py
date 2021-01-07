@@ -2,8 +2,8 @@
 
 import time
 
-import adafruit_dotstar
 import board
+import adafruit_dotstar
 
 num_pixels = 30
 pixels = adafruit_dotstar.DotStar(
