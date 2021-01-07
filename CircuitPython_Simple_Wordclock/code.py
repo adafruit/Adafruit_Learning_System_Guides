@@ -60,30 +60,30 @@ def writetime(the_hr, the_min):
     if (the_hr == 12) and (the_min == 0):
         return NOON
     # set minute
-    if (the_min > 3) and (the_min < 8):
+    if 8 > the_min > 3:
         value = value | FIVEMIN
-    if (the_min > 7) and (the_min < 13):
+    if 13 > the_min > 7:
         value = value | TENMIN
-    if (the_min > 12) and (the_min < 18):
+    if 18 > the_min > 12:
         value = value | QUARTER
-    if (the_min > 17) and (the_min < 23):
+    if 23 > the_min > 17:
         value = value | TWENTY
-    if (the_min > 22) and (the_min < 28):
+    if 28 > the_min > 22:
         value = value | TWENTY | FIVEMIN
-    if (the_min > 27) and (the_min < 33):
+    if 33 > the_min > 27:
         value = value | HALF
-    if (the_min > 32) and (the_min < 38):
+    if 38 > the_min > 32:
         value = value | TWENTY | FIVEMIN
-    if (the_min > 37) and (the_min < 43):
+    if 43 > the_min > 37:
         value = value | TWENTY
-    if (the_min > 42) and (the_min < 48):
+    if 48 > the_min > 42:
         value = value | QUARTER
-    if (the_min > 47) and (the_min <= 53):
+    if 53 >= the_min > 47:
         value = value | TENMIN
     if the_min >= 54:
         value = value | FIVEMIN
     # before or after
-    if (the_min > 3) and (the_min <= 32):
+    if 32 >= the_min > 3:
         value = value | PAST
     if the_min >= 33:
         the_hr = the_hr + 1  # for the TO case

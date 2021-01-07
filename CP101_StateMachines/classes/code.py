@@ -202,7 +202,7 @@ def stop_playing():
 ################################################################################
 # State Machine
 
-class StateMachine(object):
+class StateMachine():
 
     def __init__(self):
         self.state = None
@@ -264,7 +264,7 @@ class StateMachine(object):
 
 # Abstract parent state class.
 
-class State(object):
+class State():
 
     def __init__(self):
         pass

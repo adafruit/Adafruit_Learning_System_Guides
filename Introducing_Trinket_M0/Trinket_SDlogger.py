@@ -1,10 +1,10 @@
 import time
 
-import adafruit_sdcard
 import board
 import busio
 import digitalio
 import microcontroller
+import adafruit_sdcard
 import storage
 
 # Use any pin that is not taken by SPI

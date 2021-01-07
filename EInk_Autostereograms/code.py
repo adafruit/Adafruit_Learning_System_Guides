@@ -118,7 +118,6 @@ def display_bitmap(epd, filename):
     finally:
         f.close()
     print("Finished drawing")
-    return
 
 
 def read_le(s):
@@ -148,7 +147,6 @@ def display_bitmap_alternate(epd, filename):
         for x in range(display.width):
             if image[x, y] == 0:
                 epd.pixel(x, y, Adafruit_EPD.BLACK)
-    return
 
 
 # display message both on the screen and the serial port
@@ -158,7 +156,6 @@ def display_message(message):
     display.fill_rect(0, 10, 264, 20, Adafruit_EPD.WHITE)
     display.text(message, 10, 10, Adafruit_EPD.BLACK)
     display.display()
-    return
 
 
 # slide show routine
@@ -184,7 +181,6 @@ def show_files():
     except OSError:
         display_message("Error: Couldn't display file " + file)
     led.value = False
-    return
 
 #pylint: disable-msg=too-many-branches
 #pylint: disable-msg=too-many-statements
@@ -281,9 +277,7 @@ def run_job(jobfile):
                         for x2 in range(panelwidth):
                             tpanel[x2] = tcanvas[x + x2 - panelwidth]
                     offset = 0
-                    if (x >= 22 and
-                            x < (image.width + panelwidth // 2)
-                            and y < image.height):
+                    if (22 <= x < (image.width + panelwidth // 2) and y < image.height):
                         if (
                                 (image[x - panelwidth // 2, y] != 0 and not inv
                                 ) or (
@@ -331,7 +325,6 @@ def run_job(jobfile):
     except (ValueError) as e:
         display_message("Error: " + e.args[0])
     led.value = False
-    return
 
 # main routine
 display.fill(Adafruit_EPD.WHITE)

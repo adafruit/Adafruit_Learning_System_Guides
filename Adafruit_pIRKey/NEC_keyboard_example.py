@@ -3,13 +3,13 @@
 # type out keypresses.
 
 import time
+import pulseio
+import board
 import adafruit_irremote
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keycode import Keycode
 from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS
 import adafruit_dotstar
-import pulseio
-import board
 import usb_hid
 
 led = adafruit_dotstar.DotStar(board.APA102_SCK, board.APA102_MOSI, 1)

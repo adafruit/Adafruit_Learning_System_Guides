@@ -23,7 +23,7 @@ from color_names import *
 
 BLACK = 0x000000
 
-class Game(object):
+class Game():
     """Overall game control."""
 
     def __init__(self, trellis, accel, ramp=20, challenge_ramp=30):

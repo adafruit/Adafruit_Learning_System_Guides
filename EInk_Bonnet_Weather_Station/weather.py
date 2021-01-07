@@ -29,7 +29,7 @@ DATA_SOURCE_URL = "http://api.openweathermap.org/data/2.5/weather"
 
 if len(OPEN_WEATHER_TOKEN) == 0:
     raise RuntimeError(
-        "You need to set your token first. If you don't already have one, you can register for a free account at https://home.openweathermap.org/users/sign_up"
+        "You need to set your token first. If you don't already have one, you can register for a free account at https://home.openweathermap.org/users/sign_up" #pylint: disable=line-too-long
     )
 
 # Set up where we'll be fetching data from
@@ -56,7 +56,7 @@ while True:
             gfx.display_weather(value)
             weather_refresh = time.monotonic()
         else:
-            print("Unable to retrieve data at {}".format(url))
+            print("Unable to retrieve data at {}".format(data_source))
 
     gfx.update_time()
     time.sleep(300)  # wait 5 minutes before updating anything again

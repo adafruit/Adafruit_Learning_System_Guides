@@ -8,7 +8,7 @@ then points extracte from SVG data.
 
 ### pylint 2.3.1 has some strange opinions on data structure indentation here
 ### and this conflicts with version 1.9.2
-### pylint: disable=invalid-name,bad-continuation
+### pylint: disable=invalid-name
 offset_x = -10
 offset_y = 9
 

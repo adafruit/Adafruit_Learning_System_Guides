@@ -3,8 +3,8 @@
 
 import board
 import pulseio
-from adafruit_motor import servo
 from analogio import AnalogIn
+from adafruit_motor import servo
 
 # servo pin for the M0 boards:
 pwm = pulseio.PWMOut(board.A2, duty_cycle=2 ** 15, frequency=50)

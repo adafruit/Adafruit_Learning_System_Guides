@@ -254,11 +254,11 @@ enter_state(ARMED_STATE)
 while True:
     now = time.monotonic()
 
-    if update_time > 0 and now > update_time:
+    if now > update_time > 0:
         update_time += update_interval
         update_function()
 
-    if timeout_time > 0 and now > timeout_time:
+    if now > timeout_time > 0:
         handle_event(TIMEOUT_EVENT)
 
     elif started_moving():

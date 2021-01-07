@@ -1,7 +1,7 @@
 import time
-import adafruit_dotstar
-import board
 import random
+import board
+import adafruit_dotstar
 import touchio
 from adafruit_pixel_framebuf import PixelFramebuffer
 from adafruit_led_animation.animation.rainbowchase import RainbowChase
@@ -13,7 +13,6 @@ from adafruit_ble import BLERadio
 from adafruit_ble.advertising.standard import ProvideServicesAdvertisement
 from adafruit_ble.services.nordic import UARTService
 from adafruit_bluefruit_connect.packet import Packet
-from adafruit_bluefruit_connect.color_packet import ColorPacket
 from adafruit_bluefruit_connect.button_packet import ButtonPacket
 
 ################################################################################
@@ -104,11 +103,11 @@ def scroll_text(packet, word):
         if touch.value:
             pixel_framebuf.fill(0)
             pixel_framebuf.display()
-            return;
+            return
 
         # detect new packet
         if isinstance(packet, ButtonPacket) and packet.pressed:
-            return;
+            return
 
         color = color_list[color_i]
         scroll_framebuf_neg_x(word, color, x_pos, 0)
@@ -157,18 +156,18 @@ def no(color):
 def yes_or_no():
     pixels.fill(0)
     print(touch.raw_value)
-    value = 0
+    #value = 0
     pick=0
 
     pick = random.randint(0,64)
     time.sleep(0.1)
 
     if pick % 2:
-        print('picked yes!');
+        print('picked yes!')
         yes(PINK)
         time.sleep(1)
     else:
-        print('picked no!');
+        print('picked no!')
         no(TEAL)
         time.sleep(1)
 
@@ -178,7 +177,7 @@ def twinkle_show():
     pixels.show()
     time.sleep(.1)
     if touch.value:
-        return;
+        return
 
 def twinkle():
     # randomly choose 3 pixels

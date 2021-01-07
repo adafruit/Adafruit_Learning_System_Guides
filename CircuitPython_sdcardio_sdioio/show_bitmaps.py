@@ -2,9 +2,7 @@ import os
 import time
 
 import board
-import digitalio
 import displayio
-import mount_sd
 
 display = board.DISPLAY
 

@@ -160,8 +160,7 @@ def startScan(radio, send_ad, send_advertising,
             if endscan_cb is not None and endscan_cb(addr_text, adv_ss.address, adv_ss):
                 complete = True
                 break
-            else:
-                continue
+            continue
 
         # Must be a match if this is reached
         matching_ads += 1
@@ -242,7 +241,7 @@ def broadcastAndReceive(radio,
                         names_by_addr={},
                         name_cb=None,
                         endscan_cb=None
-                        ):
+                        ): #pylint: disable=dangerous-default-value
     # pylint: disable=too-many-locals,too-many-branches,too-many-statements
     """Send an Advertisement send_ad and then wait for up to scan_time to
        receive receive_n Advertisement packets from other devices.

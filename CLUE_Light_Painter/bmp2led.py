@@ -11,7 +11,6 @@ BUFFER_ROWS = 32
 
 class BMPError(Exception):
     """Used for raising errors in the BMP2LED Class."""
-    pass
 
 
 # pylint: disable=too-few-public-methods
@@ -390,8 +389,7 @@ class BMP2LED:
 
         except OSError as err:
             if err.args[0] == 28:
-                raise OSError("OS Error 28 0.25")
-            else:
-                raise OSError("OS Error 0.5")
+                raise OSError("OS Error 28 0.25") from err
+            raise OSError("OS Error 0.5") from err
         except BMPError as err:
             print("Failed to parse BMP: " + err.args[0])

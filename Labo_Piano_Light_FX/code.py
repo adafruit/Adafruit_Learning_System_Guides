@@ -1,6 +1,6 @@
 import board
-import neopixel
 from analogio import AnalogIn
+import neopixel
 
 n_pixels = 10  # Number of pixels you are using
 dc_offset = 0  # DC offset in mic signal - if unusure, leave 0

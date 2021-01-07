@@ -3,9 +3,9 @@ This example script shows how to blink multiple LEDs at different
 rates simultaneously without each affecting the others.
 """
 
+import time
 import board
 import digitalio
-import time
 
 BLINK_LIST = [
     {
@@ -43,11 +43,11 @@ while True:
     now = time.monotonic()
 
     for led in BLINK_LIST:
-        if led["PIN"].value == False:
+        if not led["PIN"].value:
             if now >= led["PREV_TIME"] + led["OFF"]:
                 led["PREV_TIME"] = now
                 led["PIN"].value = True
-        if led["PIN"].value == True:
+        if led["PIN"].value:
             if now >= led["PREV_TIME"] + led["ON"]:
                 led["PREV_TIME"] = now
                 led["PIN"].value = False

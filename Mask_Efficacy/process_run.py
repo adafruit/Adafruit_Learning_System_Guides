@@ -20,7 +20,7 @@ print("Processing", end='')
 for frame in vid:
     print('.', end='', flush=True)
     frame_bin = rgb2gray(frame) > THRESH
-    frame_count = np.count_nonzero(frame_bin == True)
+    frame_count = np.count_nonzero(frame_bin)
     frame_percent = 100 * frame_count / (1920*1080)
     frame_data.append((frame_count, frame_percent))
 # overall stats
@@ -45,7 +45,9 @@ with open('run_{:03d}.csv'.format(RUN), 'w') as fp:
 #---------
 print("Generating plots...")
 fig, ax = plt.subplots(1, figsize = (10,5))
-ax.set_title("RUN {:03d}\nTHRESH = {}, AVG_CNT = {:4.2}, AVG_PER = {:.3}".format(RUN, THRESH,avg_count, avg_percent))
+ax.set_title("RUN {:03d}\nTHRESH = {}, AVG_CNT = {:4.2}, AVG_PER = {:.3}".format(RUN,
+                                                                                 THRESH,avg_count,
+                                                                                 avg_percent))
 ax.set_xlabel("FRAME")
 ax.set_ylabel("COUNT")
 ax.plot([x[0] for x in frame_data])

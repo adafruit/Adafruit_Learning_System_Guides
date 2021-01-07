@@ -7,19 +7,17 @@ Press Down button to cycle between slideshow folders
 """
 import time
 import board
-import adafruit_lis3dh
-import displayio
 import busio
 from digitalio import DigitalInOut, Pull
+import adafruit_lis3dh
+import displayio
 from adafruit_matrixportal.matrix import Matrix
 from adafruit_slideshow import SlideShow, HorizontalAlignment
 from adafruit_debouncer import Debouncer
 
-'''
-Display will go to sleep after SLEEP_DURATION seconds have elapsed with no accelerometer movement
-Each slide will play for IMAGE_DURATION - customizable for each folder
-Add folders to the list to add more slideshows.
-'''
+# Display will go to sleep after SLEEP_DURATION seconds have elapsed with no accelerometer movement
+# Each slide will play for IMAGE_DURATION - customizable for each folder
+# Add folders to the list to add more slideshows.
 
 SLEEP_DURATION = 60
 IMAGE_DURATION = (1, 0.5, 10)

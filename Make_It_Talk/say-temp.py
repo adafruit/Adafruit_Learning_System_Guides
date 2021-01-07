@@ -52,7 +52,7 @@ def read_temp(temp):
     elif temp >= 100:
         play_file("100.wav")
         temp = temp - 100
-    if (temp >= 0 and temp < 20) or temp % 10 == 0:
+    if 0 <= temp < 20 or temp % 10 == 0:
         play_file(str(temp) + ".wav")
     else:
         play_file(str(temp // 10) + "0.wav")

@@ -2,9 +2,6 @@
 #
 # SPDX-License-Identifier: Unlicense
 import time
-import alarm
-import supervisor
-import alarm
 from adafruit_magtag.magtag import MagTag
 
 # Change this to the hour you want to check the data at, for us its 8pm

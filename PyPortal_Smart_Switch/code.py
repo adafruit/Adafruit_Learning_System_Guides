@@ -2,11 +2,11 @@ import time
 import gc
 import board
 import busio
+import digitalio
+import analogio
 from adafruit_esp32spi import adafruit_esp32spi_socket as socket
 from adafruit_esp32spi import adafruit_esp32spi, adafruit_esp32spi_wifimanager
 import adafruit_requests as requests
-import digitalio
-import analogio
 from adafruit_pyportal import PyPortal
 from adafruit_display_shapes.circle import Circle
 from adafruit_display_shapes.roundrect import RoundRect
@@ -41,7 +41,7 @@ def get_local_timestamp(location=None):
         aio_username = secrets['aio_username']
         aio_key = secrets['aio_key']
     except KeyError:
-        raise KeyError("\n\nOur time service requires a login/password to rate-limit. Please register for a free adafruit.io account and place the user/key in your secrets file under 'aio_username' and 'aio_key'")# pylint: disable=line-too-long
+        raise KeyError("\n\nOur time service requires a login/password to rate-limit. Please register for a free adafruit.io account and place the user/key in your secrets file under 'aio_username' and 'aio_key'") from KeyError # pylint: disable=line-too-long
 
     location = secrets.get('timezone', location)
     if location:
@@ -66,7 +66,7 @@ def get_local_timestamp(location=None):
             tzseconds += tzminutes * 60
         print(seconds + tzseconds, tzoffset, tzhours, tzminutes)
     except KeyError:
-        raise KeyError("Was unable to lookup the time, try setting secrets['timezone'] according to http://worldtimeapi.org/timezones")  # pylint: disable=line-too-long
+        raise KeyError("Was unable to lookup the time, try setting secrets['timezone'] according to http://worldtimeapi.org/timezones") from KeyError  # pylint: disable=line-too-long
 
     # now clean up
     response.close()
@@ -85,7 +85,7 @@ def create_text_areas(configs):
         text_areas.append(textarea)
     return text_areas
 
-class Switch(object):
+class Switch():
     def __init__(self, pin, my_pyportal):
         self.switch = digitalio.DigitalInOut(pin)
         self.switch.direction = digitalio.Direction.OUTPUT
@@ -122,7 +122,7 @@ TIME_SERVICE = "http://io.adafruit.com/api/v2/%s/integrations/time/strftime?x-ai
 # See https://apidock.com/ruby/DateTime/strftime for full options
 TIME_SERVICE_TIMESTAMP = '&fmt=%25s+%25z'
 
-class Clock(object):
+class Clock():
     def __init__(self, my_pyportal):
         self.low_light = False
         self.update_time = None

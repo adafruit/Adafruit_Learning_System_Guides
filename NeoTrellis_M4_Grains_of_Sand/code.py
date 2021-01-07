@@ -28,8 +28,8 @@
 import math
 import random
 import board
-import audioio
 import busio
+import audioio
 import adafruit_trellism4
 import adafruit_adxl34x
 

@@ -150,7 +150,7 @@ while True:
             wav = audioio.WaveFile(f)
 
             # is something else playing? interrupt it!
-            if currently_playing['voice'] != None:
+            if currently_playing['voice'] is not None:
                 print("Interrupt")
                 stop_playing_sample(currently_playing)
 
@@ -170,7 +170,7 @@ while True:
     #    print("Just released:", just_released)
 
     # check if any samples are done
-    if not audio.playing and currently_playing['voice'] != None:
+    if not audio.playing and currently_playing['voice'] is not None:
         stop_playing_sample(currently_playing)
 
     time.sleep(0.01)  # a little delay here helps avoid debounce annoyances

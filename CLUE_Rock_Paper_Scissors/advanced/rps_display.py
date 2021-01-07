@@ -130,7 +130,7 @@ class RPSDisplay():
     def loadSprites(filename, transparent=0):
         """Load horizontal sprite sheet if running with a display
         """
-        import adafruit_imageload
+        import adafruit_imageload #pylint: disable=import-outside-toplevel
         s_bit, s_pal = adafruit_imageload.load(filename,
                                                bitmap=displayio.Bitmap,
                                                palette=displayio.Palette)

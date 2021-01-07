@@ -86,4 +86,3 @@ while True:
 
     # Wait to send the packet again
     time.sleep(SENSOR_SEND_DELAY * 60)
-

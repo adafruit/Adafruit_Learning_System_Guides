@@ -12,8 +12,8 @@ import random
 import array
 import gc
 import board
-import digitalio
 import analogio
+import digitalio
 
 # This code works on both CPB and CPX boards by bringing
 # in classes with same name

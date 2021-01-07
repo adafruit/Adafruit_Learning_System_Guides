@@ -1,16 +1,16 @@
 """Bluetooth Key Tracker."""
+from array import array
+from math import pi, sin
+from time import sleep
 from adafruit_ble import BLERadio
 from adafruit_led_animation.animation import Pulse, Solid
 import adafruit_led_animation.color as color
 from analogio import AnalogIn
-from array import array
 from audiobusio import I2SOut
 from audiocore import RawSample, WaveFile
 from board import BATTERY, D5, D6, D9, NEOPIXEL, RX, TX
 from digitalio import DigitalInOut, Direction, Pull
-from math import pi, sin
 from neopixel import NeoPixel
-from time import sleep
 
 battery = AnalogIn(BATTERY)
 
@@ -81,7 +81,7 @@ while True:
                         hits |= 0b010
                     elif advertisement.complete_name == '<Your 3rd beacon name here>':
                         hits |= 0b100
-        except Exception as e:
+        except Exception as e: #pylint: disable=broad-except
             print(repr(e))
         hit_count = len([ones for ones in bin(hits) if ones == '1'])
         solid.color = hit_status[hit_count]

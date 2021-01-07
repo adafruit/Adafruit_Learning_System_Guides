@@ -65,7 +65,7 @@ ball_index = 0
 
 #  creating the circles & pulling in positions from spots
 for spot in spots:
-    circle = Circle(x0=spot[0], y0=spot[1], r=11, fill=ball_color[ball_index]) # Each ball has a color
+    circle = Circle(x0=spot[0], y0=spot[1], r=11, fill=ball_color[ball_index]) # Each ball has color
     ball_index += 1
     ball_index %= len(ball_color)
 

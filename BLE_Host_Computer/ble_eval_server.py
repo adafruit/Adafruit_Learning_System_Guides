@@ -18,7 +18,7 @@ while True:
         s = uart.readline()
         if s:
             try:
-                result = str(eval(s))
-            except Exception as e:
+                result = str(eval(s)) #pylint: disable=eval-used
+            except Exception as e: #pylint: disable=broad-except
                 result = repr(e)
             uart.write(result.encode("utf-8"))

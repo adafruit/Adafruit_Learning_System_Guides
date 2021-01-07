@@ -12,8 +12,8 @@ Author: Collin Cunningham for Adafruit Industries, 2019
 import time
 import array
 import math
-import audiobusio
 import board
+import audiobusio
 import neopixel
 
 from adafruit_ble import BLERadio

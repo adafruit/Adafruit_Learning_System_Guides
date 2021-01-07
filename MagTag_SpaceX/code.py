@@ -22,29 +22,29 @@ DATE_LOCATION = ['date_local']
 #   how to display the data. They're used in the add_text blocks below
 
 def mission_transform(val):
-    if val == None:
+    if val is None:
         val = "Unavailable"
     return "Mission: " + val
 
 def time_transform(val2):
-    if val2 == None:
+    if val2 is None:
         return "When: Unavailable"
     month = int(val2[5:7])
     day = int(val2[8:10])
     hour = int(val2[11:13])
-    min = int(val2[14:16])
+    minute = int(val2[14:16])
 
     if USE_24HR_TIME:
-        timestring = "%d:%02d" % (hour, min)
+        timestring = "%d:%02d" % (hour, minute)
     elif hour > 12:
-        timestring = "%d:%02d pm" % (hour-12, min)
+        timestring = "%d:%02d pm" % (hour-12, minute)
     else:
-        timestring = "%d:%02d am" % (hour, min)
+        timestring = "%d:%02d am" % (hour, minute)
 
     return "%s %d, at %s" % (months[month-1], day, timestring)
 
 def details_transform(val3):
-    if val3 == None or not len(val3):
+    if val3 is None or not len(val3):
         return "Details: To Be Determined"
     return "Details: " + val3[0:166] + "..."
 
@@ -80,7 +80,7 @@ magtag.add_text(
 magtag.add_text(
     text_font=terminalio.FONT,
     text_position=(10, 94),
-    line_spacing=0.8, 
+    line_spacing=0.8,
     text_wrap=47,     # wrap text at this count
     text_transform=details_transform
 )

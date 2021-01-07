@@ -16,7 +16,7 @@ All text above must be included in any redistribution.
 # pylint: disable=unused-argument,no-self-use
 
 
-class Event(object):
+class Event():
 
     def __init__(self, delta_time):
         self._delta_time = delta_time

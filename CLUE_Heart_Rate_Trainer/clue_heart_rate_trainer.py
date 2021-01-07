@@ -88,9 +88,9 @@ while True:
             #print(values)  # returns the full heart_rate data set
             if values:
                 bpm = (values.heart_rate)
-                if bpm is not 0:
+                if bpm != 0:
                     pct_target = (round(100*(bpm/max_rate)))
-                if values.heart_rate is 0:
+                if values.heart_rate == 0:
                     print("----")
                     clue_data[0].text = "BPM: ---"
                     clue_data[0].color = ((80, 0, 0))

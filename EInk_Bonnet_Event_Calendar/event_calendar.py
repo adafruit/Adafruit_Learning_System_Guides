@@ -5,10 +5,10 @@ import pickle
 import os.path
 import textwrap
 from google.auth.transport.requests import Request
-import digitalio
 import busio
 import board
 from PIL import Image, ImageDraw, ImageFont
+import digitalio
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from adafruit_epd.epd import Adafruit_EPD

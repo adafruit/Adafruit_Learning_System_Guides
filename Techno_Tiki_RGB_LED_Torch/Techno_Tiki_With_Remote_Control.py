@@ -8,9 +8,9 @@
 
 import time
 import board
+import pulseio
 import neopixel
 import adafruit_irremote
-import pulseio
 # pylint: disable=global-statement
 
 pixel_pin = board.D1    # Pin where NeoPixels are connected

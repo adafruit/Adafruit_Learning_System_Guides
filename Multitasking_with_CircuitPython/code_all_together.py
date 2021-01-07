@@ -3,9 +3,9 @@ This example script shows the usage of servos, LEDs, and buttons all
 used simultaneously without interrupting each other.
 """
 
+import time
 import board
 import digitalio
-import time
 import neopixel
 import pulseio
 from adafruit_motor import servo
@@ -108,11 +108,11 @@ while True:
     prev_state = cur_state
 
     for led in BLINK_LIST:
-        if led["PIN"].value == False:
+        if not led["PIN"].value:
             if now >= led["PREV_TIME"] + led["OFF"]:
                 led["PREV_TIME"] = now
                 led["PIN"].value = True
-        if led["PIN"].value == True:
+        if led["PIN"].value:
             if now >= led["PREV_TIME"] + led["ON"]:
                 led["PREV_TIME"] = now
                 led["PIN"].value = False
@@ -131,6 +131,6 @@ while True:
             if servo["SERVO"].angle >= servo["MAX_ANGLE"] or \
                 servo["SERVO"].angle <= servo["MIN_ANGLE"]:
 
-                    servo["MOVE_BY"] = -servo["MOVE_BY"]
+                servo["MOVE_BY"] = -servo["MOVE_BY"]
 
             servo["PREV_TIME"] = now

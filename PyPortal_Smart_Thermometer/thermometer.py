@@ -9,8 +9,8 @@ Author: Brent Rubell for Adafruit Industries, 2019
 import time
 import board
 import busio
-from digitalio import DigitalInOut
 from analogio import AnalogIn
+from digitalio import DigitalInOut
 import neopixel
 import adafruit_adt7410
 

@@ -7,10 +7,10 @@
 # Released under a MIT license: http://opensource.org/licenses/MIT
 
 import time
-import adafruit_irremote
-import board
-import neopixel
 import pulseio
+import board
+import adafruit_irremote
+import neopixel
 
 # pylint: disable=global-statement
 

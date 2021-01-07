@@ -1,10 +1,10 @@
 import time
+from secrets import secrets
 import terminalio
 import displayio
 import adafruit_imageload
 from adafruit_display_text import label
 from adafruit_magtag.magtag import MagTag
-from secrets import secrets
 
 # --| USER CONFIG |--------------------------
 METRIC = False  # set to True for metric units
@@ -266,4 +266,3 @@ print("Sleeping...")
 go_to_sleep(utc_time + local_tz_offset)
 #  entire code will run again after deep sleep cycle
 #  similar to hitting the reset button
-

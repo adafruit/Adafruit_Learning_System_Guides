@@ -10,8 +10,8 @@
 
 import random
 import board
-import neopixel
 from analogio import AnalogIn
+import neopixel
 
 n_leds = 29             # number of LEDs per horn
 led_pin = board.D0      # which pin your pixels are connected to

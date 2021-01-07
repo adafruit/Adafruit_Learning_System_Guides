@@ -1,5 +1,4 @@
 import board
-import digitalio
 import neopixel
 from adafruit_magtag.magtag import MagTag
 

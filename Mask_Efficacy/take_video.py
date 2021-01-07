@@ -1,4 +1,3 @@
-import time
 import math
 import os
 import RPi.GPIO as GPIO

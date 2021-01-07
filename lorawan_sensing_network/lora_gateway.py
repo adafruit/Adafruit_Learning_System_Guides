@@ -8,13 +8,13 @@ by Brent Rubell for Adafruit Industries
 # Import Python System Libraries
 import time
 
-# Import Adafruit IO REST client.
-from Adafruit_IO import Client
-
 # Import Blinka Libraries
 import busio
 import board
 from digitalio import DigitalInOut, Direction, Pull
+
+# Import Adafruit IO REST client.
+from Adafruit_IO import Client
 
 # Import SSD1306 module.
 import adafruit_ssd1306

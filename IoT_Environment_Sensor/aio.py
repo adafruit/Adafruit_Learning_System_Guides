@@ -38,7 +38,7 @@ except ImportError:
     logger.critical('WiFi settings are kept in settings.py, please add them there!')
     raise
 
-class AIO(object):
+class AIO():
 
     def __init__(self):
         try:
@@ -117,7 +117,7 @@ class AIO(object):
             aio_username = secrets['aio_username']
             aio_key = secrets['aio_key']
         except KeyError:
-            raise KeyError("\n\nOur time service requires a login/password to rate-limit. Please register for a free adafruit.io account and place the user/key in your secrets file under 'aio_username' and 'aio_key'")# pylint: disable=line-too-long
+            raise KeyError("\n\nOur time service requires a login/password to rate-limit. Please register for a free adafruit.io account and place the user/key in your secrets file under 'aio_username' and 'aio_key'") from KeyError # pylint: disable=line-too-long
 
         location = secrets['timezone']
         if location:
@@ -139,7 +139,7 @@ class AIO(object):
             week_day = int(times[3])
             is_dst = None  # no way to know yet
         except KeyError:
-            raise KeyError("Was unable to lookup the time, try setting secrets['timezone'] according to http://worldtimeapi.org/timezones")  # pylint: disable=line-too-long
+            raise KeyError("Was unable to lookup the time, try setting secrets['timezone'] according to http://worldtimeapi.org/timezones") from KeyError  # pylint: disable=line-too-long
         year, month, mday = [int(x) for x in the_date.split('-')]
         the_time = the_time.split('.')[0]
         hours, minutes, seconds = [int(x) for x in the_time.split(':')]

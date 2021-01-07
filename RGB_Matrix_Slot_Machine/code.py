@@ -1,12 +1,12 @@
 import random
 import time
 
+import board
+import digitalio
 import adafruit_imageload.bmp
 import audioio
 import audiomp3
-import board
 import displayio
-import digitalio
 import framebufferio
 import rgbmatrix
 

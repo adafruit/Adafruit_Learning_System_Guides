@@ -33,8 +33,8 @@ import math
 import array
 
 import board
-import audioio
 import analogio
+import audioio
 
 ### Vector data for logo
 import adafruit_logo_vector

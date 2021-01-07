@@ -66,14 +66,13 @@ while True:
         accel_z = accel_data[2]
 
         print(
-            "x:{} y:{} z:{} thumb:{} index:{} middle:{} ring:{}".format(
-                accel_x,
+            "x:{x} y:{} z:{x} thumb:{} index:{} middle:{} ring:{}".format(
                 accel_y,
-                accel_x,
                 analog_in_thumb.value,
                 analog_in_index.value,
                 analog_in_middle.value,
                 analog_in_ring.value,
+                x = accel_x,
             )
         )
         time.sleep(0.2)

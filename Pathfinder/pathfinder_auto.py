@@ -31,7 +31,7 @@ PURPLE = (180, 0, 255)
 BLACK = (0, 0, 0)
 GREY = (10, 10, 10)
 
-if eye_mode is not 0:
+if eye_mode != 0:
     colors = [PINK, RED, ORANGE, CYAN, YELLOW, GREEN, WHITE, RED, PURPLE, GREEN, GREY]
 else:
     colors = [RED, RED, RED, RED, RED, RED, RED, RED, RED, RED, RED]
@@ -81,7 +81,7 @@ with open(emote_img[0], "rb") as bitmap_file:
     group.append(tile_grid)
     # Add the Group to the Display
     display.show(group)
-    if sound_mode is not 0:
+    if sound_mode != 0:
         # play a sound file
         pyportal.play_file(vo_sound[10])
     else:
@@ -105,7 +105,7 @@ while True:
         group = displayio.Group()
         group.append(tile_grid)
         display.show(group)
-        if sound_mode is not 0:
+        if sound_mode != 0:
             # play a sound file
             pyportal.play_file(vo_sound[i])
         else:

@@ -1,9 +1,9 @@
 import time
 import board
-from adafruit_debouncer import Debouncer
 import busio as io
 import digitalio
 import pulseio
+from adafruit_debouncer import Debouncer
 import adafruit_ssd1306
 
 i2c = io.I2C(board.SCL, board.SDA)

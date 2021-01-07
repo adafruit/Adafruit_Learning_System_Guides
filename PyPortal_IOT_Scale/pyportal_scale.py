@@ -6,9 +6,9 @@ Brent Rubell for Adafruit Industries, 2019
 """
 import time
 import board
-import adafruit_dymoscale
 import busio
 import digitalio
+import adafruit_dymoscale
 
 import displayio
 from adafruit_display_text.label import Label

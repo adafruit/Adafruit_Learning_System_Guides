@@ -72,7 +72,7 @@ ts = adafruit_touchscreen.Touchscreen(board.TOUCH_XL, board.TOUCH_XR,
                                           ),
                                       size=(WIDTH, HEIGHT))
 
-class Beep(object):
+class Beep():
     def __init__(self):
         self.duration = 0
         self.start = 0
@@ -108,7 +108,7 @@ class Beep(object):
         if time.monotonic() - self.start >= self.duration:
             self.stop()
 
-class ReflowOvenControl(object):
+class ReflowOvenControl():
     states = ("wait", "ready", "start", "preheat", "soak", "reflow", "cool")
 
     def __init__(self, pin):
@@ -258,7 +258,7 @@ class ReflowOvenControl(object):
             # bad sensor
             pass
 
-class Graph(object):
+class Graph():
     def __init__(self):
         self.xmin = 0
         self.xmax = 720  # graph up to 12 minutes

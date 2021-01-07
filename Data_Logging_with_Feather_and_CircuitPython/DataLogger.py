@@ -1,11 +1,11 @@
 import time
 
-import adafruit_am2320
-import adafruit_sdcard
 import analogio
 import board
 import busio
 import digitalio
+import adafruit_am2320
+import adafruit_sdcard
 import storage
 
 vbat_voltage = analogio.AnalogIn(board.D9)

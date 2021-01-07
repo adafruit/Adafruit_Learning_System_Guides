@@ -224,7 +224,7 @@ while True:
                 current_source_idx = (current_source_idx + 1) % len(sources)
                 break  # to leave inner while and select the new source
 
-            elif opt == 1:  # toggle palette
+            if opt == 1:  # toggle palette
                 use_def_pal = not use_def_pal
                 plotter.channel_colidx = select_colors(plotter, source,
                                                        use_def_pal)

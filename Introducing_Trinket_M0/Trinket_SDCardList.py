@@ -1,9 +1,9 @@
 import os
 
-import adafruit_sdcard
 import board
 import busio
 import digitalio
+import adafruit_sdcard
 import storage
 
 # Use any pin that is not taken by SPI

@@ -3,9 +3,8 @@ This example script shows how to sweep servo(s) without using
 time.sleep().
 """
 
-import board
-import digitalio
 import time
+import board
 import pulseio
 from adafruit_motor import servo
 
@@ -44,6 +43,6 @@ while True:
             if servo["SERVO"].angle >= servo["MAX_ANGLE"] or \
                 servo["SERVO"].angle <= servo["MIN_ANGLE"]:
 
-                    servo["MOVE_BY"] = -servo["MOVE_BY"]
+                servo["MOVE_BY"] = -servo["MOVE_BY"]
 
             servo["PREV_TIME"] = now

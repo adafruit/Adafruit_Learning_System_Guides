@@ -1,7 +1,7 @@
-import adafruit_irremote
 import board
-import neopixel
 import pulseio
+import adafruit_irremote
+import neopixel
 
 pixels = neopixel.NeoPixel(board.NEOPIXEL, 10)
 

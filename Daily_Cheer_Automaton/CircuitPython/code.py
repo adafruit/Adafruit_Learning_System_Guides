@@ -122,7 +122,6 @@ days = ("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Satur
 playhour = 19
 playmin = 0
 
-# pylint: disable-msg=bad-whitespace
 # pylint: disable-msg=using-constant-test
 # no DST adjustment yet!
 if False:  # change to True if you want to set the time!
@@ -134,7 +133,6 @@ if False:  # change to True if you want to set the time!
     rtc.datetime = t
     print()
 # pylint: enable-msg=using-constant-test
-# pylint: enable-msg=bad-whitespace
 
 # setup NeoPixel
 #pixel = neopixel.NeoPixel(board.NEOPIXEL, 1)

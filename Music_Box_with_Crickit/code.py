@@ -1,11 +1,11 @@
 # Music Box code in CircuitPython - Dano Wall and Mike Barela
 # Revised by Ladyada 2019-01-16
 
-from adafruit_crickit import crickit
 from analogio import AnalogIn
+import board
+from adafruit_crickit import crickit
 import neopixel
 import audioio
-import board
 
 AUDIO_FILENAME = 'fur-elise.wav'
 

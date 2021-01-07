@@ -86,7 +86,6 @@ def flash_status(text="", duration=0.05):  # Flash status message once
     time.sleep(duration)
     status_label.color = BLACK
     time.sleep(duration)
-    return
 
 def update_image_frame():  # Get camera data and display
     minimum = MAX_SENSOR_C  # Set minimum to sensor's maximum C value

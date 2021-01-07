@@ -12,7 +12,7 @@ Licensed under the MIT license.
 All text above must be included in any redistribution.
 """
 
-class MidiHeader(object):
+class MidiHeader():
 
     def __init__(self,
                  midi_format,
