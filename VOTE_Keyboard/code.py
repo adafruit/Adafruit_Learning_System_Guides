@@ -58,4 +58,3 @@ while True:
     if newBtn:
         kbd.press(buttonIDtoKeycode[newBtn])
     state = newState
-    
