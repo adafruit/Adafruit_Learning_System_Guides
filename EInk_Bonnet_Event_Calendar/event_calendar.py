@@ -201,7 +201,6 @@ current_time = get_current_time()
 
 def get_events(calendar_id):
     print("Fetching Events for {}".format(calendar_id))
-    page_token = None
     events = (
         service.events()
         .list(
