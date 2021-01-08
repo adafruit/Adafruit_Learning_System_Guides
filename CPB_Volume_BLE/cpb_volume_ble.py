@@ -23,8 +23,9 @@ ble = adafruit_ble.BLERadio()
 ble.name = "Bluefruit-Volume-Control"
 # Using default HID Descriptor.
 hid = HIDService()
-device_info = DeviceInfoService(software_revision=adafruit_ble.__version__,
-                                manufacturer="Adafruit Industries")
+device_info = DeviceInfoService(
+    software_revision=adafruit_ble.__version__, manufacturer="Adafruit Industries"
+)
 advertisement = ProvideServicesAdvertisement(hid)
 cc = ConsumerControl(hid.devices)
 
@@ -35,7 +36,7 @@ DISCONNECTED_COLOR = (40, 40, 0)
 
 # NeoPixel LED ring
 # Ring code will auto-adjust if not 16 so change to any value!
-ring = neopixel.NeoPixel(board.NEOPIXEL, 10, brightness=0.05, auto_write = False)
+ring = neopixel.NeoPixel(board.NEOPIXEL, 10, brightness=0.05, auto_write=False)
 ring.fill(DISCONNECTED_COLOR)
 ring.show()
 dot_location = 0  # what dot is currently lit
@@ -83,13 +84,12 @@ while True:
             ble.start_advertising(advertisement)
             advertising = True
         continue
+    if connection_made:
+        pass
     else:
-        if connection_made:
-            pass
-        else:
-            ring.fill(FILL_COLOR)
-            ring.show()
-            connection_made = True
+        ring.fill(FILL_COLOR)
+        ring.show()
+        connection_made = True
 
     advertising = False
 

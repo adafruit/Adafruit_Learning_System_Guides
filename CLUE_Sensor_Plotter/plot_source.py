@@ -40,7 +40,7 @@ import math
 import analogio
 
 
-class PlotSource():
+class PlotSource:
     """An abstract class for a sensor which returns the data from the sensor
        and provides some metadata useful for plotting.
        Sensors returning vector quanities like a 3-axis accelerometer are supported.
@@ -61,13 +61,24 @@ class PlotSource():
     :param colors: A list of the suggested colors for data.
     :param debug: A numerical debug level, defaults to 0.
        """
-    DEFAULT_COLORS = (0xffff00, 0x00ffff, 0xff0080)
-    RGB_COLORS = (0xff0000, 0x00ff00, 0x0000ff)
 
-    def __init__(self, values, name, units="",
-                 abs_min=0, abs_max=65535, initial_min=None, initial_max=None,
-                 range_min=None,
-                 rate=None, colors=None, debug=0):
+    DEFAULT_COLORS = (0xFFFF00, 0x00FFFF, 0xFF0080)
+    RGB_COLORS = (0xFF0000, 0x00FF00, 0x0000FF)
+
+    def __init__(
+        self,
+        values,
+        name,
+        units="",
+        abs_min=0,
+        abs_max=65535,
+        initial_min=None,
+        initial_max=None,
+        range_min=None,
+        rate=None,
+        colors=None,
+        debug=0,
+    ):
         if type(self) == PlotSource:  # pylint: disable=unidiomatic-typecheck
             raise TypeError("PlotSource must be subclassed")
         self._values = values
@@ -156,14 +167,17 @@ class TemperaturePlotSource(PlotSource):
             mode_name = "Celsius"
             self._scale = 1.0
             self._offset = 0.0
-        super().__init__(1, "Temperature",
-                         units=mode_name[0],
-                         abs_min=self._convert(-40),
-                         abs_max=self._convert(85),
-                         initial_min=self._convert(10),
-                         initial_max=self._convert(40),
-                         range_min=range_min,
-                         rate=24)
+        super().__init__(
+            1,
+            "Temperature",
+            units=mode_name[0],
+            abs_min=self._convert(-40),
+            abs_max=self._convert(85),
+            initial_min=self._convert(10),
+            initial_max=self._convert(40),
+            range_min=range_min,
+            rate=24,
+        )
 
     def data(self):
         return self._convert(self._clue.temperature)
@@ -186,11 +200,17 @@ class PressurePlotSource(PlotSource):
             units = "hPa"  # AKA millibars (mb)
             range_min = 1
 
-        super().__init__(1, "Pressure", units=units,
-                         abs_min=self._convert(300), abs_max=self._convert(1100),
-                         initial_min=self._convert(980), initial_max=self._convert(1040),
-                         range_min=range_min,
-                         rate=22)
+        super().__init__(
+            1,
+            "Pressure",
+            units=units,
+            abs_min=self._convert(300),
+            abs_max=self._convert(1100),
+            initial_min=self._convert(980),
+            initial_max=self._convert(1040),
+            range_min=range_min,
+            rate=22,
+        )
 
     def data(self):
         return self._convert(self._clue.pressure)
@@ -199,9 +219,7 @@ class PressurePlotSource(PlotSource):
 class ProximityPlotSource(PlotSource):
     def __init__(self, my_clue):
         self._clue = my_clue
-        super().__init__(1, "Proximity",
-                         abs_min=0, abs_max=255,
-                         rate=720)
+        super().__init__(1, "Proximity", abs_min=0, abs_max=255, rate=720)
 
     def data(self):
         return self._clue.proximity
@@ -210,19 +228,27 @@ class ProximityPlotSource(PlotSource):
 class HumidityPlotSource(PlotSource):
     def __init__(self, my_clue):
         self._clue = my_clue
-        super().__init__(1, "Rel. Humidity", units="%",
-                         abs_min=0, abs_max=100, initial_min=20, initial_max=60,
-                         rate=54)
+        super().__init__(
+            1,
+            "Rel. Humidity",
+            units="%",
+            abs_min=0,
+            abs_max=100,
+            initial_min=20,
+            initial_max=60,
+            rate=54,
+        )
 
     def data(self):
         return self._clue.humidity
+
 
 # If clue.touch_N has not been used then it doesn't instantiate
 # the TouchIn object so there's no problem with creating an AnalogIn...
 class PinPlotSource(PlotSource):
     def __init__(self, pin):
         try:
-            pins = [p for p in pin]
+            pins = [p for p in pin]  # pylint: disable=unnecessary-comprehension
         except TypeError:
             pins = [pin]
 
@@ -231,19 +257,23 @@ class PinPlotSource(PlotSource):
         # Assumption here that reference_voltage is same for all
         # 3.3V graphs nicely with rounding up to 4.0V
         self._reference_voltage = self._analogin[0].reference_voltage
-        self._conversion_factor = self._reference_voltage / (2**16 - 1)
-        super().__init__(len(pins),
-                         "Pad: " + ", ".join([str(p).split('.')[-1] for p in pins]),
-                         units="V",
-                         abs_min=0.0, abs_max=math.ceil(self._reference_voltage),
-                         rate=10000)
+        self._conversion_factor = self._reference_voltage / (2 ** 16 - 1)
+        super().__init__(
+            len(pins),
+            "Pad: " + ", ".join([str(p).split(".")[-1] for p in pins]),
+            units="V",
+            abs_min=0.0,
+            abs_max=math.ceil(self._reference_voltage),
+            rate=10000,
+        )
 
     def data(self):
         if len(self._analogin) == 1:
             return self._analogin[0].value * self._conversion_factor
         else:
-            return tuple([ana.value * self._conversion_factor
-                          for ana in self._analogin])
+            return tuple(
+                [ana.value * self._conversion_factor for ana in self._analogin]
+            )
 
     def pins(self):
         return self._pins
@@ -252,11 +282,14 @@ class PinPlotSource(PlotSource):
 class ColorPlotSource(PlotSource):
     def __init__(self, my_clue):
         self._clue = my_clue
-        super().__init__(3, "Color: R, G, B",
-                         abs_min=0, abs_max=8000,  # 7169 looks like max
-                         rate=50,
-                         colors=self.RGB_COLORS,
-                        )
+        super().__init__(
+            3,
+            "Color: R, G, B",
+            abs_min=0,
+            abs_max=8000,  # 7169 looks like max
+            rate=50,
+            colors=self.RGB_COLORS,
+        )
 
     def data(self):
         (r, g, b, _) = self._clue.color  # fourth value is clear value
@@ -286,11 +319,16 @@ class IlluminatedColorPlotSource(PlotSource):
             raise ValueError("Colour must be Red, Green, Blue or Clear")
 
         self._channel = col_fl_lc
-        super().__init__(1, "Illum. color: " + self._channel.upper(),
-                         abs_min=0, abs_max=8000,
-                         initial_min=0, initial_max=2000,
-                         colors=(plot_colour,),
-                         rate=50)
+        super().__init__(
+            1,
+            "Illum. color: " + self._channel.upper(),
+            abs_min=0,
+            abs_max=8000,
+            initial_min=0,
+            initial_max=2000,
+            colors=(plot_colour,),
+            rate=50,
+        )
 
     def data(self):
         (r, g, b, c) = self._clue.color
@@ -320,17 +358,22 @@ class IlluminatedColorPlotSource(PlotSource):
 class VolumePlotSource(PlotSource):
     def __init__(self, my_clue):
         self._clue = my_clue
-        super().__init__(1, "Volume", units="dB",
-                         abs_min=0, abs_max=97+3,   # 97dB is 16bit dynamic range
-                         initial_min=10, initial_max=60,
-                         rate=41)
+        super().__init__(
+            1,
+            "Volume",
+            units="dB",
+            abs_min=0,
+            abs_max=97 + 3,  # 97dB is 16bit dynamic range
+            initial_min=10,
+            initial_max=60,
+            rate=41,
+        )
 
     # 20 due to conversion of amplitude of signal
     _LN_CONVERSION_FACTOR = 20 / math.log(10)
 
     def data(self):
-        return (math.log(self._clue.sound_level + 1)
-                * self._LN_CONVERSION_FACTOR)
+        return math.log(self._clue.sound_level + 1) * self._LN_CONVERSION_FACTOR
 
 
 # This appears not to be a blocking read in terms of waiting for a
@@ -342,11 +385,17 @@ class VolumePlotSource(PlotSource):
 class GyroPlotSource(PlotSource):
     def __init__(self, my_clue):
         self._clue = my_clue
-        super().__init__(3, "Gyro", units="dps",
-                         abs_min=-287-13, abs_max=287+13,  # 286.703 appears to be max
-                         initial_min=-100, initial_max=100,
-                         colors=self.RGB_COLORS,
-                         rate=500)
+        super().__init__(
+            3,
+            "Gyro",
+            units="dps",
+            abs_min=-287 - 13,
+            abs_max=287 + 13,  # 286.703 appears to be max
+            initial_min=-100,
+            initial_max=100,
+            colors=self.RGB_COLORS,
+            rate=500,
+        )
 
     def data(self):
         return self._clue.gyro
@@ -355,11 +404,17 @@ class GyroPlotSource(PlotSource):
 class AccelerometerPlotSource(PlotSource):
     def __init__(self, my_clue):
         self._clue = my_clue
-        super().__init__(3, "Accelerometer", units="ms-2",
-                         abs_min=-40, abs_max=40,  # 39.1992 approx max
-                         initial_min=-20, initial_max=20,
-                         colors=self.RGB_COLORS,
-                         rate=500)
+        super().__init__(
+            3,
+            "Accelerometer",
+            units="ms-2",
+            abs_min=-40,
+            abs_max=40,  # 39.1992 approx max
+            initial_min=-20,
+            initial_max=20,
+            colors=self.RGB_COLORS,
+            rate=500,
+        )
 
     def data(self):
         return self._clue.acceleration
@@ -368,11 +423,17 @@ class AccelerometerPlotSource(PlotSource):
 class MagnetometerPlotSource(PlotSource):
     def __init__(self, my_clue):
         self._clue = my_clue
-        super().__init__(3, "Magnetometer", units="uT",
-                         abs_min=-479-21, abs_max=479+21,  # 478.866 approx max
-                         initial_min=-80, initial_max=80,  # Earth around 60uT
-                         colors=self.RGB_COLORS,
-                         rate=500)
+        super().__init__(
+            3,
+            "Magnetometer",
+            units="uT",
+            abs_min=-479 - 21,
+            abs_max=479 + 21,  # 478.866 approx max
+            initial_min=-80,
+            initial_max=80,  # Earth around 60uT
+            colors=self.RGB_COLORS,
+            rate=500,
+        )
 
     def data(self):
         return self._clue.magnetic

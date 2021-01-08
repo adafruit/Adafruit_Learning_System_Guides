@@ -19,7 +19,7 @@ decoder = adafruit_irremote.GenericDecode()
 received_code = bytearray(4)
 
 # IR Remote Mapping
-'''
+"""
  1: [255, 2, 247, 8]
  2: [255, 2, 119, 136]
  3: [255, 2, 183, 72]
@@ -45,7 +45,7 @@ Vol - : [255, 2, 255, 0]
 Vol + : [255, 2, 191, 64]
 
 Play/Pause: [255, 2, 127, 128]
-'''
+"""
 
 last_command = None
 
@@ -96,5 +96,5 @@ while True:
         pixels[9] = (0, 30, 0)
     elif command == 207:
         pixels[0] = (0, 30, 0)
-    elif command == 111 or command == 143:
-        pixels.fill((0, 0, 0)) # clear on enter or back key
+    elif command in (111, 143):
+        pixels.fill((0, 0, 0))  # clear on enter or back key

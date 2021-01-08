@@ -3,7 +3,6 @@ import time
 import board
 import digitalio
 import microcontroller
-import mount_sd
 
 led = digitalio.DigitalInOut(board.D13)
 led.direction = digitalio.Direction.OUTPUT

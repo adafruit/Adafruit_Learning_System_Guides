@@ -4,10 +4,13 @@ import displayio
 from adafruit_display_text.label import Label
 from adafruit_bitmap_font import bitmap_font
 
-cwd = ("/"+__file__).rsplit('/', 1)[0] # the current working directory (where this file is)
+cwd = ("/" + __file__).rsplit("/", 1)[
+    0
+]  # the current working directory (where this file is)
 
-small_font = cwd+"/fonts/Arial-12.bdf"
-medium_font = cwd+"/fonts/Arial-16.bdf"
+small_font = cwd + "/fonts/Arial-12.bdf"
+medium_font = cwd + "/fonts/Arial-16.bdf"
+
 
 class Electioncal_Graphics(displayio.Group):
     def __init__(self, root_group, *, am_pm=True):
@@ -21,11 +24,11 @@ class Electioncal_Graphics(displayio.Group):
 
         self._icon_sprite = None
         self._icon_file = None
-        self.set_icon(cwd+"/icons/electioncal.bmp")
+        self.set_icon(cwd + "/icons/electioncal.bmp")
 
         self.small_font = bitmap_font.load_font(small_font)
         self.medium_font = bitmap_font.load_font(medium_font)
-        glyphs = b'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-,.: '
+        glyphs = b"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-,.: "
         self.small_font.load_glyphs(glyphs)
         self.medium_font.load_glyphs(glyphs)
 
@@ -66,24 +69,34 @@ class Electioncal_Graphics(displayio.Group):
         self.election_name_text_line2.color = 0xFFFFFF
         self._text_group.append(self.election_name_text_line2)
 
-
     def load_data(self, election_data):
         try:
-            self.electioncal = json.loads(election_data)
-            self.state_text.text = self.electioncal["dates"][1]["county"] + ", " + self.electioncal["dates"][0]["state"]
+            self.electioncal = json.loads(
+                election_data
+            )  # pylint: disable=attribute-defined-outside-init
+            self.state_text.text = (
+                self.electioncal["dates"][1]["county"]
+                + ", "
+                + self.electioncal["dates"][0]["state"]
+            )
         except ValueError:
-            print("Error loading JSON data: Please check the configuration of county and state, in code.py")
+            print(
+                "Error loading JSON data: Please check the configuration of county and state, in code.py"
+            )
             raise
 
     def elections_cycle(self):
         self.update_time()
         num_elections = len(self.electioncal["dates"])
 
-        for i in range(0,num_elections):
+        for i in range(0, num_elections):
             if self.date_text.text[10:] < self.electioncal["dates"][i]["date"]:
                 self.election_date_text.text = self.electioncal["dates"][i]["date"]
                 # splitting the line at around 40 chars seems ok for regular PyPortal
-                self.election_name_text_line2.text, self.election_name_text.text = self.paragrapher(self.electioncal["dates"][i]["name"], 40)
+                (
+                    self.election_name_text_line2.text,
+                    self.election_name_text.text,
+                ) = self.paragrapher(self.electioncal["dates"][i]["name"], 40)
                 time.sleep(30)
 
     def update_time(self):
@@ -99,9 +112,9 @@ class Electioncal_Graphics(displayio.Group):
         if self.am_pm:
             if hour >= 12:
                 hour -= 12
-                time_format_str = time_format_str+" PM"
+                time_format_str = time_format_str + " PM"
             else:
-                time_format_str = time_format_str+" AM"
+                time_format_str = time_format_str + " AM"
             if hour == 0:
                 hour = 12
         time_str = time_format_str % (hour, minute)
@@ -115,11 +128,11 @@ class Electioncal_Graphics(displayio.Group):
         We run from cut, backwards till we find a space.
         """
         if len(text) > cut:
-            for i in range(cut,0,-1):
+            for i in range(cut, 0, -1):
                 if text[i] == " ":
                     break
             line1 = text[0:i]
-            line2 = text[i+1:80]
+            line2 = text[i + 1 : 80]
         else:
             line1 = text
             line2 = ""
@@ -142,10 +155,11 @@ class Electioncal_Graphics(displayio.Group):
         self._icon_file = open(filename, "rb")
         icon = displayio.OnDiskBitmap(self._icon_file)
         try:
-            self._icon_sprite = displayio.TileGrid(icon,
-                                                   pixel_shader=displayio.ColorConverter())
+            self._icon_sprite = displayio.TileGrid(
+                icon, pixel_shader=displayio.ColorConverter()
+            )
         except TypeError:
-            self._icon_sprite = displayio.TileGrid(icon,
-                                                   pixel_shader=displayio.ColorConverter(),
-                                                   position=(0,0))
+            self._icon_sprite = displayio.TileGrid(
+                icon, pixel_shader=displayio.ColorConverter(), position=(0, 0)
+            )
         self._icon_group.append(self._icon_sprite)

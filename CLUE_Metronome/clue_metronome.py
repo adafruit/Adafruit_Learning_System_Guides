@@ -152,7 +152,7 @@ while True:
 
     # tempo changes
     if clue.touch_0:
-        if tempo_increment is 1:
+        if tempo_increment == 1:
             tempo_increment = 10
             increment_label.text = "-10 +10"
         else:

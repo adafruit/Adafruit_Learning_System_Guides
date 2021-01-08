@@ -7,26 +7,26 @@ Show the progress through the year with text and a progress bar.
 Copy epilogue18.bdf into fonts/ on your CIRCUITPY drive.
 
 """
-import time
 from adafruit_magtag.magtag import MagTag
 from adafruit_progressbar import ProgressBar
 import rtc
 
+
 def days_in_year(date_obj):
     # check for leap year
-    if (date_obj.tm_year % 100 != 0 or date_obj.tm_year % 400 == 0) and date_obj.tm_year % 4 == 0:
+    if (
+        date_obj.tm_year % 100 != 0 or date_obj.tm_year % 400 == 0
+    ) and date_obj.tm_year % 4 == 0:
         return 366
     return 365
+
 
 magtag = MagTag()
 magtag.network.connect()
 
 magtag.add_text(
     text_font="/fonts/epilogue18.bdf",
-    text_position=(
-        (magtag.graphics.display.width // 2) - 1,
-        24,
-    ),
+    text_position=((magtag.graphics.display.width // 2) - 1, 24,),
     text_anchor_point=(0.5, 0.5),
     is_data=False,
 )
@@ -34,10 +34,7 @@ magtag.set_text("Year Progress:", auto_refresh=False)
 
 magtag.add_text(
     text_font="/fonts/epilogue18.bdf",
-    text_position=(
-        (magtag.graphics.display.width // 2) - 1,
-        55,
-    ),
+    text_position=((magtag.graphics.display.width // 2) - 1, 55,),
     text_anchor_point=(0.5, 0.5),
     is_data=False,
 )
@@ -61,9 +58,7 @@ try:
     magtag.network.get_local_time()
     now = rtc.RTC().datetime
     progress_bar.progress = now.tm_yday / days_in_year(now)
-    magtag.set_text(
-        "{:.2f}%".format(now.tm_yday / days_in_year(now) * 100.0), index=1
-    )
+    magtag.set_text("{:.2f}%".format(now.tm_yday / days_in_year(now) * 100.0), index=1)
 
     print(now)
     magtag.exit_and_deep_sleep(24 * 60 * 60)  # one day

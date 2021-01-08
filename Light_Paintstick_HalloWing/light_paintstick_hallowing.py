@@ -12,32 +12,32 @@ from analogio import AnalogIn
 from neopixel_write import neopixel_write
 
 # uncomment one line only here to select bitmap
-FILENAME = "bats.bmp" # BMP file to load from flash filesystem
-#FILENAME = "digikey.bmp"
-#FILENAME = "burger.bmp"
-#FILENAME = "afbanner.bmp"
-#FILENAME = "blinka.bmp"
-#FILENAME = "ghost04.bmp"
-#FILENAME = "ghost07.bmp"
-#FILENAME = "ghost02.bmp"
-#FILENAME = "helix-32x30.bmp"
-#FILENAME = "wales2-107x30.bmp"
-#FILENAME = "pumpkin.bmp"
-#FILENAME = "rainbow.bmp"
-#FILENAME = "rainbowRoad.bmp"
-#FILENAME = "rainbowZig.bmp"
-#FILENAME = "skull.bmp"
-#FILENAME = "adabot.bmp"
-#FILENAME = "green_stripes.bmp"
-#FILENAME = "red_blue.bmp"
-#FILENAME = "minerva.bmp"
+FILENAME = "bats.bmp"  # BMP file to load from flash filesystem
+# FILENAME = "digikey.bmp"
+# FILENAME = "burger.bmp"
+# FILENAME = "afbanner.bmp"
+# FILENAME = "blinka.bmp"
+# FILENAME = "ghost04.bmp"
+# FILENAME = "ghost07.bmp"
+# FILENAME = "ghost02.bmp"
+# FILENAME = "helix-32x30.bmp"
+# FILENAME = "wales2-107x30.bmp"
+# FILENAME = "pumpkin.bmp"
+# FILENAME = "rainbow.bmp"
+# FILENAME = "rainbowRoad.bmp"
+# FILENAME = "rainbowZig.bmp"
+# FILENAME = "skull.bmp"
+# FILENAME = "adabot.bmp"
+# FILENAME = "green_stripes.bmp"
+# FILENAME = "red_blue.bmp"
+# FILENAME = "minerva.bmp"
 
-TOUCH = touchio.TouchIn(board.A2) # Rightmost capacitive touch pad
-ANALOG = AnalogIn(board.SENSE)    # Potentiometer on SENSE pin
-BRIGHTNESS = 1.0                  # NeoPixel brightness 0.0 (min) to 1.0 (max)
-GAMMA = 2.7                       # Adjusts perceived brighthess linearity
-NUM_PIXELS = 30                   # NeoPixel strip length (in pixels)
-LOOP = False  #set to True for looping
+TOUCH = touchio.TouchIn(board.A2)  # Rightmost capacitive touch pad
+ANALOG = AnalogIn(board.SENSE)  # Potentiometer on SENSE pin
+BRIGHTNESS = 1.0  # NeoPixel brightness 0.0 (min) to 1.0 (max)
+GAMMA = 2.7  # Adjusts perceived brighthess linearity
+NUM_PIXELS = 30  # NeoPixel strip length (in pixels)
+LOOP = False  # set to True for looping
 # Switch off onboard NeoPixel...
 NEOPIXEL_PIN = digitalio.DigitalInOut(board.NEOPIXEL)
 NEOPIXEL_PIN.direction = digitalio.Direction.OUTPUT
@@ -46,6 +46,7 @@ neopixel_write(NEOPIXEL_PIN, bytearray(3))
 NEOPIXEL_PIN = digitalio.DigitalInOut(board.EXTERNAL_NEOPIXEL)
 NEOPIXEL_PIN.direction = digitalio.Direction.OUTPUT
 neopixel_write(NEOPIXEL_PIN, bytearray(NUM_PIXELS * 3))
+
 
 def read_le(value):
     """Interpret multi-byte value from file as little-endian value"""
@@ -56,9 +57,10 @@ def read_le(value):
         shift += 8
     return result
 
+
 class BMPError(Exception):
     """Error handler for BMP-loading function"""
-    pass
+
 
 def load_bmp(filename):
     """Load BMP file, return as list of column buffers"""
@@ -67,13 +69,13 @@ def load_bmp(filename):
         print("Loading", filename)
         with open("/" + filename, "rb") as bmp:
             print("File opened")
-            if bmp.read(2) != b'BM':  # check signature
+            if bmp.read(2) != b"BM":  # check signature
                 raise BMPError("Not BitMap file")
 
-            bmp.read(8) # Read & ignore file size and creator bytes
+            bmp.read(8)  # Read & ignore file size and creator bytes
 
-            bmp_image_offset = read_le(bmp.read(4)) # Start of image data
-            bmp.read(4) # Read & ignore header size
+            bmp_image_offset = read_le(bmp.read(4))  # Start of image data
+            bmp.read(4)  # Read & ignore header size
             bmp_width = read_le(bmp.read(4))
             bmp_height = read_le(bmp.read(4))
             # BMPs are traditionally stored bottom-to-top.
@@ -88,7 +90,7 @@ def load_bmp(filename):
 
             if read_le(bmp.read(2)) != 1:
                 raise BMPError("Not single-plane")
-            if read_le(bmp.read(2)) != 24: # bits per pixel
+            if read_le(bmp.read(2)) != 24:  # bits per pixel
                 raise BMPError("Not 24-bit")
             if read_le(bmp.read(2)) != 0:
                 raise BMPError("Compressed file")
@@ -111,15 +113,19 @@ def load_bmp(filename):
                     pos = bmp_image_offset + (bmp_height - 1 - row) * row_size
                 else:  # Bitmap is stored top-to-bottom
                     pos = bmp_image_offset + row * row_size
-                bmp.seek(pos) # Start of scanline
-                for column in columns: # For each pixel of scanline...
+                bmp.seek(pos)  # Start of scanline
+                for column in columns:  # For each pixel of scanline...
                     # BMP files use BGR color order
                     blue, green, red = bmp.read(3)
                     # Rearrange into NeoPixel strip's color order,
                     # while handling brightness & gamma correction:
                     column[idx] = int(pow(green / 255, GAMMA) * BRIGHTNESS * 255 + 0.5)
-                    column[idx+1] = int(pow(red / 255, GAMMA) * BRIGHTNESS * 255 + 0.5)
-                    column[idx+2] = int(pow(blue / 255, GAMMA) * BRIGHTNESS * 255 + 0.5)
+                    column[idx + 1] = int(
+                        pow(red / 255, GAMMA) * BRIGHTNESS * 255 + 0.5
+                    )
+                    column[idx + 2] = int(
+                        pow(blue / 255, GAMMA) * BRIGHTNESS * 255 + 0.5
+                    )
                 idx -= 3  # Advance (back) one pixel
 
             # Add one more column with no color data loaded.  This is used
@@ -133,9 +139,8 @@ def load_bmp(filename):
 
     except OSError as err:
         if err.args[0] == 28:
-            raise OSError("OS Error 28 0.25")
-        else:
-            raise OSError("OS Error 0.5")
+            raise OSError("OS Error 28 0.25") from err
+        raise OSError("OS Error 0.5") from err
     except BMPError as err:
         print("Failed to parse BMP: " + err.args[0])
 

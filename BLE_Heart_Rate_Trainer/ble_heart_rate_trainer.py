@@ -61,9 +61,10 @@ display_B.print(max_rate)
 time.sleep(2)
 
 # PyLint can't find BLERadio for some reason so special case it here.
-ble = adafruit_ble.BLERadio()    # pylint: disable=no-member
+ble = adafruit_ble.BLERadio()  # pylint: disable=no-member
 
 hr_connection = None
+
 
 def display_SCAN():
     display_A.fill(0)
@@ -80,15 +81,18 @@ def display_bLE():
     display_B.set_digit_raw(2, 0b00111000)
     display_B.set_digit_raw(3, 0b01111001)
 
+
 def display_dots():  # "...."
     for j in range(4):
         display_A.set_digit_raw(j, 0b10000000)
         display_B.set_digit_raw(j, 0b10000000)
 
+
 def display_dashes():  # "----"
     for k in range(4):
         display_A.set_digit_raw(k, 0b01000000)
         display_B.set_digit_raw(k, 0b01000000)
+
 
 # Start with a fresh connection.
 if ble.connected:
@@ -108,7 +112,6 @@ while True:
     display_SCAN()
     display_bLE()
     time.sleep(1)
-
 
     for adv in ble.start_scan(ProvideServicesAdvertisement, timeout=5):
         if HeartRateService in adv.services:
@@ -150,12 +153,12 @@ while True:
             values = hr_service.measurement_values
             print(values)  # returns the full heart_rate data set
             if values:
-                bpm = (values.heart_rate)
-                if bpm is not 0:
-                    pct_target = (round(100*(bpm/max_rate)))
+                bpm = values.heart_rate
+                if bpm != 0:
+                    pct_target = round(100 * (bpm / max_rate))
                 display_A.fill(0)  # clear the display
                 display_B.fill(0)
-                if values.heart_rate is 0:
+                if values.heart_rate == 0:
                     display_dashes()
                 else:
                     display_A.fill(0)

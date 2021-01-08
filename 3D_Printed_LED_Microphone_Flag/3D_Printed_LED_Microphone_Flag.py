@@ -36,7 +36,7 @@ from analogio import AnalogIn
 n_pixels = 16  # Number of pixels you are using
 mic_pin = AnalogIn(board.A1)  # Microphone is attached to this analog pin
 led_pin = board.D1  # NeoPixel LED strand is connected to this pin
-sample_window = .1  # Sample window for average level
+sample_window = 0.1  # Sample window for average level
 peak_hang = 24  # Time of pause before peak dot falls
 peak_fall = 4  # Rate of falling peak dot
 input_floor = 10  # Lower range of analogRead input
@@ -94,7 +94,7 @@ def fscale(originalmin, originalmax, newbegin, newend, inputvalue, curve):
     # - invert and scale -
     # this seems more intuitive
     # postive numbers give more weight to high end on output
-    curve = (curve * -.1)
+    curve = curve * -0.1
     # convert linear scale into lograthimic exponent for other pow function
     curve = pow(10, curve)
 
@@ -134,9 +134,7 @@ def fscale(originalmin, originalmax, newbegin, newend, inputvalue, curve):
 
 def drawLine(fromhere, to):
     if fromhere > to:
-        fromheretemp = fromhere
-        fromhere = to
-        to = fromheretemp
+        fromhere, to = to, fromhere
 
     for index in range(fromhere, to):
         strip[index] = (0, 0, 0)

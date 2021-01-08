@@ -6,6 +6,7 @@ import socketpool
 import wifi
 from adafruit_io.adafruit_io import IO_HTTP
 from adafruit_pixel_framebuf import PixelFramebuffer
+
 # adafruit_circuitpython_adafruitio usage with native wifi networking
 
 # Neopixel matrix configuration
@@ -28,13 +29,8 @@ PIXELS = neopixel.NeoPixel(
 )
 
 PIXEL_FRAMEBUF = PixelFramebuffer(
-    PIXELS,
-    PIXEL_WIDTH,
-    PIXEL_HEIGHT,
-    alternating=True,
-    rotation=1,
-    reverse_x=True
-    )
+    PIXELS, PIXEL_WIDTH, PIXEL_HEIGHT, alternating=True, rotation=1, reverse_x=True
+)
 
 # Adafruit.io feeds setup
 QUOTE_FEED = "sign-quotes.signtext"
@@ -44,7 +40,7 @@ CURRENT_COLOR = 0xFFFFFF
 
 # Helper function to get updated data from Adafruit.io
 def update_data():
-    global CURRENT_TEXT, CURRENT_COLOR
+    global CURRENT_TEXT, CURRENT_COLOR  # pylint: disable=global-statement
     print("Updating data from Adafruit IO")
     try:
         quote_feed = IO.get_feed(QUOTE_FEED)

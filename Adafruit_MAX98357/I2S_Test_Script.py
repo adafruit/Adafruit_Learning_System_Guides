@@ -13,10 +13,12 @@ def is_hardware_i2s(bit_clock, word_select, data):
 
 
 def get_unique_pins():
-    exclude = ['NEOPIXEL', 'APA102_MOSI', 'APA102_SCK']
-    pins = [pin for pin in [
-        getattr(board, p) for p in dir(board) if p not in exclude]
-            if isinstance(pin, Pin)]
+    exclude = ["NEOPIXEL", "APA102_MOSI", "APA102_SCK"]
+    pins = [
+        pin
+        for pin in [getattr(board, p) for p in dir(board) if p not in exclude]
+        if isinstance(pin, Pin)
+    ]
     unique = []
     for p in pins:
         if p not in unique:
@@ -27,12 +29,20 @@ def get_unique_pins():
 for bit_clock_pin in get_unique_pins():
     for word_select_pin in get_unique_pins():
         for data_pin in get_unique_pins():
-            if bit_clock_pin is word_select_pin or bit_clock_pin is data_pin or word_select_pin\
-                    is data_pin:
+            if (
+                bit_clock_pin is word_select_pin
+                or bit_clock_pin is data_pin
+                or word_select_pin is data_pin
+            ):
                 continue
+            if is_hardware_i2s(bit_clock_pin, word_select_pin, data_pin):
+                print(
+                    "Bit clock pin:",
+                    bit_clock_pin,
+                    "\t Word select pin:",
+                    word_select_pin,
+                    "\t Data pin:",
+                    data_pin,
+                )
             else:
-                if is_hardware_i2s(bit_clock_pin, word_select_pin, data_pin):
-                    print("Bit clock pin:", bit_clock_pin, "\t Word select pin:", word_select_pin,
-                          "\t Data pin:", data_pin)
-                else:
-                    pass
+                pass

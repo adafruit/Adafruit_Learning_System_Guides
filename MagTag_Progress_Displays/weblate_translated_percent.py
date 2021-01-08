@@ -9,7 +9,6 @@ and a progress bar.
 Copy leaguespartan18.bdf and leaguespartan11.bdf
 into fonts/ on your CIRCUITPY drive.
 """
-import time
 from adafruit_magtag.magtag import MagTag
 from adafruit_progressbar import ProgressBar
 
@@ -20,8 +19,7 @@ PERCENT_LOCATION = ["translated_percent"]
 URL_LOCATION = ["url"]
 
 magtag = MagTag(
-    url=DATA_SOURCE,
-    json_path=(NAME_LOCATION, PERCENT_LOCATION, URL_LOCATION),
+    url=DATA_SOURCE, json_path=(NAME_LOCATION, PERCENT_LOCATION, URL_LOCATION),
 )
 
 magtag.network.connect()
@@ -29,10 +27,7 @@ magtag.network.connect()
 # name
 magtag.add_text(
     text_font="fonts/leaguespartan18.bdf",
-    text_position=(
-        (magtag.graphics.display.width // 2) - 1,
-        20,
-    ),
+    text_position=((magtag.graphics.display.width // 2) - 1, 20,),
     text_anchor_point=(0.5, 0.5),
 )
 
@@ -40,12 +35,10 @@ magtag.add_text(
 def textpercent_transform(val):
     return "Translated: {}%".format(val)
 
+
 magtag.add_text(
     text_font="fonts/leaguespartan18.bdf",
-    text_position=(
-        (magtag.graphics.display.width // 2) - 1,
-        45,
-    ),
+    text_position=((magtag.graphics.display.width // 2) - 1, 45,),
     text_transform=textpercent_transform,
     text_anchor_point=(0.5, 0.5),
 )
@@ -53,6 +46,7 @@ magtag.add_text(
 # URL
 def texturl_transform(val):
     return val.replace("https://", "")  # remove known prefix!
+
 
 magtag.add_text(
     text_font="fonts/leaguespartan11.bdf",

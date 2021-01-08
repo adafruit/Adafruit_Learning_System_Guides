@@ -12,7 +12,7 @@ import analogio
 from simpleio import map_range
 
 # Initialize neopixels
-pixels = neopixel.NeoPixel(board.NEOPIXEL, 10, brightness=.1)
+pixels = neopixel.NeoPixel(board.NEOPIXEL, 10, brightness=0.1)
 
 # set variables for capacitive touch inputs, later used for soil moisture variables
 touch = touchio.TouchIn(board.A1)
@@ -20,7 +20,7 @@ touch2 = touchio.TouchIn(board.A2)
 
 DRY_VALUE = 3100  # calibrate this by hand!
 WET_VALUE = 4000  # calibrate this by hand!
-tempThreshhold = 43 #celius temperature of threshold for ideal compost temperature
+tempThreshhold = 43  # celius temperature of threshold for ideal compost temperature
 
 # Initialize one-wire bus on board pin A3.
 ow_bus = OneWireBus(board.A3)
@@ -42,7 +42,7 @@ while True:
 
     # take the average of both moisture levels
     avgMoist = value_A1 + value_A2 / 2
-    print("Moisture level:",(avgMoist,))
+    print("Moisture level:", (avgMoist,))
 
     # TEMPERATURE READINGS
 
@@ -50,56 +50,56 @@ while True:
     compostTemp = ds18.temperature
 
     # print the temperature
-    print('Temperature: {0:0.3f}C'.format(compostTemp))
+    print("Temperature: {0:0.3f}C".format(compostTemp))
 
     # IF STATEMENTS TO DETERMINE STATE OF COMPOST
 
     # RED & YELLOW = TOO COLD & TOO DRY
-    if((compostTemp<tempThreshhold) and (avgMoist<DRY_VALUE)):
-        pixels[0] = (255,0,0)    # red
-        pixels[1] = (255,255,0)  # yellow
-        pixels[2] = (255,0,0)
-        pixels[3] = (255,255,0)
-        pixels[4] = (255,0,0)
-        pixels[5] = (255,255,0)
-        pixels[6] = (255,0,0)
-        pixels[7] = (255,255,0)
-        pixels[8] = (255,0,0)
-        pixels[9] = (255,255,0)
+    if (compostTemp < tempThreshhold) and (avgMoist < DRY_VALUE):
+        pixels[0] = (255, 0, 0)  # red
+        pixels[1] = (255, 255, 0)  # yellow
+        pixels[2] = (255, 0, 0)
+        pixels[3] = (255, 255, 0)
+        pixels[4] = (255, 0, 0)
+        pixels[5] = (255, 255, 0)
+        pixels[6] = (255, 0, 0)
+        pixels[7] = (255, 255, 0)
+        pixels[8] = (255, 0, 0)
+        pixels[9] = (255, 255, 0)
 
         print("Not hot enough, too dry")
 
     # BLUE & YELLOW = TOO COLD & TOO WET
-    elif((compostTemp<tempThreshhold) and (avgMoist>WET_VALUE)):
-        pixels[0] = (0,0,255)    # blue
-        pixels[1] = (255,255,0)  # yellow
-        pixels[2] = (0,0,255)
-        pixels[3] = (255,255,0)
-        pixels[4] = (0,0,255)
-        pixels[5] = (255,255,0)
-        pixels[6] = (0,0,255)
-        pixels[7] = (255,255,0)
-        pixels[8] = (0,0,255)
-        pixels[9] = (255,255,0)
+    elif (compostTemp < tempThreshhold) and (avgMoist > WET_VALUE):
+        pixels[0] = (0, 0, 255)  # blue
+        pixels[1] = (255, 255, 0)  # yellow
+        pixels[2] = (0, 0, 255)
+        pixels[3] = (255, 255, 0)
+        pixels[4] = (0, 0, 255)
+        pixels[5] = (255, 255, 0)
+        pixels[6] = (0, 0, 255)
+        pixels[7] = (255, 255, 0)
+        pixels[8] = (0, 0, 255)
+        pixels[9] = (255, 255, 0)
         print("Not hot enough, too wet")
 
     # GREEN & YELLOW = TOO COLD & MOISTURE LEVEL OPTIMUM
-    elif((compostTemp<tempThreshhold) and (avgMoist >DRY_VALUE and avgMoist<WET_VALUE)):
-        pixels[0] = (0,255,0)    # green
-        pixels[1] = (255,255,0)  # yellow
-        pixels[2] = (0,255,0)
-        pixels[3] = (255,255,0)
-        pixels[4] = (0,255,0)
-        pixels[5] = (255,255,0)
-        pixels[6] = (0,255,0)
-        pixels[7] = (255,255,0)
-        pixels[8] = (0,255,0)
-        pixels[9] = (255,255,0)
+    elif (compostTemp < tempThreshhold) and (DRY_VALUE < avgMoist < WET_VALUE):
+        pixels[0] = (0, 255, 0)  # green
+        pixels[1] = (255, 255, 0)  # yellow
+        pixels[2] = (0, 255, 0)
+        pixels[3] = (255, 255, 0)
+        pixels[4] = (0, 255, 0)
+        pixels[5] = (255, 255, 0)
+        pixels[6] = (0, 255, 0)
+        pixels[7] = (255, 255, 0)
+        pixels[8] = (0, 255, 0)
+        pixels[9] = (255, 255, 0)
         print("Not hot enough, right moisture level")
 
     # ALL GREEN = COMPOST AT OPTIMUM TEMPERATURE & MOISTURE
     elif compostTemp > tempThreshhold:
-        pixels.fill((0,255,0))  # green
+        pixels.fill((0, 255, 0))  # green
         print("Compost Ready")
 
     # LIGHTING CONFIGURATION

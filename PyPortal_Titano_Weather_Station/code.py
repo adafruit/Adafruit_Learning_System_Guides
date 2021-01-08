@@ -17,20 +17,22 @@ except ImportError:
 
 # Use cityname, country code where countrycode is ISO3166 format.
 # E.g. "New York, US" or "London, GB"
-LOCATION = secrets['location']
+LOCATION = secrets["location"]
 
 # Set up where we'll be fetching data from
-DATA_SOURCE = "http://api.openweathermap.org/data/2.5/weather?q="+LOCATION
-DATA_SOURCE += "&appid="+secrets['openweather_token']
+DATA_SOURCE = "http://api.openweathermap.org/data/2.5/weather?q=" + LOCATION
+DATA_SOURCE += "&appid=" + secrets["openweather_token"]
 # You'll need to get a token from openweather.org, looks like 'b6907d289e10d714a6e88b30761fae22'
 DATA_LOCATION = []
 
 # Initialize the pyportal object and let us know what data to fetch and where
 # to display it
-pyportal = PyPortal(url=DATA_SOURCE,
-                    json_path=DATA_LOCATION,
-                    status_neopixel=board.NEOPIXEL,
-                    default_bg=0x000000)
+pyportal = PyPortal(
+    url=DATA_SOURCE,
+    json_path=DATA_LOCATION,
+    status_neopixel=board.NEOPIXEL,
+    default_bg=0x000000,
+)
 
 display = board.DISPLAY
 
@@ -40,20 +42,29 @@ alarm_sound_bed = "/sounds/sleep.wav"
 alarm_sound_eat = "/sounds/eat.wav"
 
 #  the alarm sounds in an array that matches the order of the gfx & alarm check-ins
-alarm_sounds = [alarm_sound_trash, alarm_sound_bed,
-                alarm_sound_eat, alarm_sound_eat, alarm_sound_eat]
+alarm_sounds = [
+    alarm_sound_trash,
+    alarm_sound_bed,
+    alarm_sound_eat,
+    alarm_sound_eat,
+    alarm_sound_eat,
+]
 
 #  setting up the bitmaps for the alarms
 
 #  sleep alarm
 sleep_bitmap = displayio.OnDiskBitmap(open("/sleepBMP.bmp", "rb"))
-sleep_tilegrid = displayio.TileGrid(sleep_bitmap, pixel_shader=displayio.ColorConverter())
+sleep_tilegrid = displayio.TileGrid(
+    sleep_bitmap, pixel_shader=displayio.ColorConverter()
+)
 group_bed = displayio.Group()
 group_bed.append(sleep_tilegrid)
 
 #  trash alarm
 trash_bitmap = displayio.OnDiskBitmap(open("/trashBMP.bmp", "rb"))
-trash_tilegrid = displayio.TileGrid(trash_bitmap, pixel_shader=displayio.ColorConverter())
+trash_tilegrid = displayio.TileGrid(
+    trash_bitmap, pixel_shader=displayio.ColorConverter()
+)
 group_trash = displayio.Group()
 group_trash.append(trash_tilegrid)
 
@@ -66,37 +77,47 @@ group_eat.append(eat_tilegrid)
 #  snooze touch screen buttons
 #  one for each alarm bitmap
 snooze_controls = [
-    {'label': "snooze_trash", 'pos': (4, 222), 'size': (236, 90), 'color': None},
-    {'label': "snooze_bed", 'pos': (4, 222), 'size': (236, 90), 'color': None},
-    {'label': "snooze_eat", 'pos': (4, 222), 'size': (236, 90), 'color': None},
-    ]
+    {"label": "snooze_trash", "pos": (4, 222), "size": (236, 90), "color": None},
+    {"label": "snooze_bed", "pos": (4, 222), "size": (236, 90), "color": None},
+    {"label": "snooze_eat", "pos": (4, 222), "size": (236, 90), "color": None},
+]
 
 #  setting up the snooze buttons as buttons
 snooze_buttons = []
 for s in snooze_controls:
-    snooze_button = Button(x=s['pos'][0], y=s['pos'][1],
-                           width=s['size'][0], height=s['size'][1],
-                           style=Button.RECT,
-                           fill_color=s['color'], outline_color=None,
-                           name=s['label'])
+    snooze_button = Button(
+        x=s["pos"][0],
+        y=s["pos"][1],
+        width=s["size"][0],
+        height=s["size"][1],
+        style=Button.RECT,
+        fill_color=s["color"],
+        outline_color=None,
+        name=s["label"],
+    )
     snooze_buttons.append(snooze_button)
 
 #  dismiss touch screen buttons
 #  one for each alarm bitmap
 dismiss_controls = [
-    {'label': "dismiss_trash", 'pos': (245, 222), 'size': (230, 90), 'color': None},
-    {'label': "dismiss_bed", 'pos': (245, 222), 'size': (230, 90), 'color': None},
-    {'label': "dismiss_eat", 'pos': (245, 222), 'size': (230, 90), 'color': None},
-    ]
+    {"label": "dismiss_trash", "pos": (245, 222), "size": (230, 90), "color": None},
+    {"label": "dismiss_bed", "pos": (245, 222), "size": (230, 90), "color": None},
+    {"label": "dismiss_eat", "pos": (245, 222), "size": (230, 90), "color": None},
+]
 
 #  setting up the dismiss buttons as buttons
 dismiss_buttons = []
 for d in dismiss_controls:
-    dismiss_button = Button(x=d['pos'][0], y=d['pos'][1],
-                            width=d['size'][0], height=d['size'][1],
-                            style=Button.RECT,
-                            fill_color=d['color'], outline_color=None,
-                            name=d['label'])
+    dismiss_button = Button(
+        x=d["pos"][0],
+        y=d["pos"][1],
+        width=d["size"][0],
+        height=d["size"][1],
+        style=Button.RECT,
+        fill_color=d["color"],
+        outline_color=None,
+        name=d["label"],
+    )
     dismiss_buttons.append(dismiss_button)
 
 #  adding the touch screen buttons to the different alarm gfx groups
@@ -118,12 +139,20 @@ switch_dismiss.pull = Pull.UP
 
 #  grabbing the alarm times from the calendar file
 #  'None' is the placeholder for trash, which is weekly rather than daily
-alarm_checks = [None, alarms['bed'],alarms['breakfast'],alarms['lunch'],alarms['dinner']]
+alarm_checks = [
+    None,
+    alarms["bed"],
+    alarms["breakfast"],
+    alarms["lunch"],
+    alarms["dinner"],
+]
 #  all of the alarm graphics
 alarm_gfx = [group_trash, group_bed, group_eat, group_eat, group_eat]
 
 #  allows for the openweather_graphics to show
-gfx = openweather_graphics.OpenWeather_Graphics(pyportal.splash, am_pm=True, celsius=False)
+gfx = openweather_graphics.OpenWeather_Graphics(
+    pyportal.splash, am_pm=True, celsius=False
+)
 
 #  state machines
 localtile_refresh = None
@@ -144,9 +173,9 @@ button_mode = 0
 weekday = ["Mon.", "Tues.", "Wed.", "Thurs.", "Fri.", "Sat.", "Sun."]
 
 #  weekly alarm setup. checks for weekday and time
-weekly_alarms = [alarms['trash']]
-weekly_day = [alarms['trash'][0]]
-weekly_time = [alarms['trash'][1]]
+weekly_alarms = [alarms["trash"]]
+weekly_day = [alarms["trash"][0]]
+weekly_time = [alarms["trash"][1]]
 
 while True:
     # while esp.is_connected:
@@ -161,8 +190,8 @@ while True:
             continue
 
     if not alarm:
-    # only query the weather every 10 minutes (and on first run)
-    #  only updates if an alarm is not active
+        # only query the weather every 10 minutes (and on first run)
+        #  only updates if an alarm is not active
         if (not weather_refresh) or (time.monotonic() - weather_refresh) > 600:
             try:
                 value = pyportal.fetch()
@@ -187,9 +216,9 @@ while True:
         date_format_str = " %d, %d"
         if hour >= 12:
             hour -= 12
-            format_str = format_str+" PM"
+            format_str = format_str + " PM"
         else:
-            format_str = format_str+" AM"
+            format_str = format_str + " AM"
         if hour == 0:
             hour = 12
         #  formats date display
@@ -285,7 +314,7 @@ while True:
     #  pulls snooze_time from calendar and then when it's up
     #  splashes the snoozed alarm's graphic, plays the alarm sound and goes back into
     #  alarm state
-    if (snoozed) and (time.monotonic() - touched) > timers['snooze_time']:
+    if (snoozed) and (time.monotonic() - touched) > timers["snooze_time"]:
         print("snooze over")
         snoozed = False
         alarm = True

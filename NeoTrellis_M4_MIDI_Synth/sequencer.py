@@ -14,8 +14,8 @@ All text above must be included in any redistribution.
 
 import time
 
-class Sequencer(object):
 
+class Sequencer:
     def __init__(self, synth):
         self._synth = synth
         self.set_tempo(120)
@@ -34,29 +34,31 @@ class Sequencer(object):
             while event.time > delta_time:
                 delta_time += 1
                 self._tick()
-            print('Executing %s' % str(event))
+            print("Executing %s" % str(event))
             if event.execute(self):
                 return
 
     def set_tempo(self, tempo):
-        print('Setting tempo %d' % tempo)
+        print("Setting tempo %d" % tempo)
         self._tempo = tempo
         self._tick_size = tempo / 250000000.0
 
     def set_time_signature(self, numerator, denominator, clocks_per_metronome_click):
-        print('Setting time signature')
+        print("Setting time signature")
         self._numerator = numerator
         self._denominator = denominator
         self._clocks_per_metronome_click = clocks_per_metronome_click
 
     def note_on(self, key, velocity):
-#        print('Note on')
+        #        print('Note on')
         self._synth.note_on(key, velocity)
 
     def note_off(self, key, velocity):
-#        print('Note off')
+        #        print('Note off')
         self._synth.note_off(key, velocity)
 
     def end_track(self):
         pass
+
+
 #        print('End track')

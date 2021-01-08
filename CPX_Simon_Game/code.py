@@ -13,9 +13,9 @@ REGION_LEDS = (
 
 REGION_COLOR = (
     (255, 255, 0),  # yellow region
-    (0, 0, 255),    # blue region
-    (255, 0, 0),    # red region
-    (0, 255, 0),    # green region
+    (0, 0, 255),  # blue region
+    (255, 0, 0),  # red region
+    (0, 255, 0),  # green region
 )
 
 REGION_TONE = (
@@ -26,14 +26,15 @@ REGION_TONE = (
 )
 
 PAD_REGION = {
-    'A1': 0,  # yellow region
-    'A2': 2,  # red region
-    'A3': 2,  # red region
-    'A4': 3,  # green region
-    'A5': 3,  # green region
-    'A6': 1,  # blue region
-    'A7': 1,  # blue region
+    "A1": 0,  # yellow region
+    "A2": 2,  # red region
+    "A3": 2,  # red region
+    "A4": 3,  # green region
+    "A5": 3,  # green region
+    "A6": 1,  # blue region
+    "A7": 1,  # blue region
 }
+
 
 def light_region(region, duration=1):
     # turn the LEDs for the selected region on
@@ -53,39 +54,41 @@ def light_region(region, duration=1):
     for led in REGION_LEDS[region]:
         cpx.pixels[led] = (0, 0, 0)
 
+
 def read_region(timeout=30):
     val = 0
     start_time = time.time()
     while time.time() - start_time < timeout:
         if cpx.touch_A1:
-            val = PAD_REGION['A1']
-            time.sleep(.3)
+            val = PAD_REGION["A1"]
+            time.sleep(0.3)
             break
-        elif cpx.touch_A2:
-            val = PAD_REGION['A2']
-            time.sleep(.3)
+        if cpx.touch_A2:
+            val = PAD_REGION["A2"]
+            time.sleep(0.3)
             break
-        elif cpx.touch_A3:
-            val = PAD_REGION['A3']
-            time.sleep(.3)
+        if cpx.touch_A3:
+            val = PAD_REGION["A3"]
+            time.sleep(0.3)
             break
-        elif cpx.touch_A4:
-            val = PAD_REGION['A4']
-            time.sleep(.3)
+        if cpx.touch_A4:
+            val = PAD_REGION["A4"]
+            time.sleep(0.3)
             break
-        elif cpx.touch_A5:
-            val = PAD_REGION['A5']
-            time.sleep(.3)
+        if cpx.touch_A5:
+            val = PAD_REGION["A5"]
+            time.sleep(0.3)
             break
-        elif cpx.touch_A6:
-            val = PAD_REGION['A6']
-            time.sleep(.3)
+        if cpx.touch_A6:
+            val = PAD_REGION["A6"]
+            time.sleep(0.3)
             break
-        elif cpx.touch_A7:
-            val = PAD_REGION['A7']
-            time.sleep(.3)
+        if cpx.touch_A7:
+            val = PAD_REGION["A7"]
+            time.sleep(0.3)
             break
     return val
+
 
 def play_sequence(sequence):
     duration = 1 - len(sequence) * 0.05
@@ -93,6 +96,7 @@ def play_sequence(sequence):
         duration = 0.1
     for region in sequence:
         light_region(region, duration)
+
 
 def read_sequence(sequence):
     for region in sequence:
@@ -102,10 +106,12 @@ def read_sequence(sequence):
         light_region(region, 0.25)
     return True
 
+
 def play_error():
     cpx.start_tone(160)
     time.sleep(1)
     cpx.stop_tone()
+
 
 def play_game():
     sequence = []
@@ -117,6 +123,7 @@ def play_game():
             play_error()
             break
         time.sleep(1)
+
 
 while True:
     play_game()

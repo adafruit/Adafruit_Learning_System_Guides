@@ -17,12 +17,13 @@ All text above must be included in any redistribution.
 import header
 import events
 
+
 def log(txt):
     print(txt)
-    #pass
+    # pass
 
-class MidiParser(object):
 
+class MidiParser:
     def __init__(self):
         pass
 
@@ -39,7 +40,7 @@ class MidiParser(object):
         return (d[0] << 24) | (d[1] << 16) | (d[2] << 8) | d[3]
 
     def _as_str(self, d):
-        return str(d, encoding='utf8')
+        return str(d, encoding="utf8")
 
     def _read_bytes(self, f, count):
         val = f.read(count)
@@ -70,7 +71,7 @@ class MidiParser(object):
         return self._as_32(self._read_bytes(f, 4))
 
     def _parse_header(self, f):
-        if self._read_4_bytes(f) != b'MThd':
+        if self._read_4_bytes(f) != b"MThd":
             return None
         if self._read_32(f) != 6:
             return None
@@ -85,11 +86,13 @@ class MidiParser(object):
             ticks_per_frame = None
             negative_SMPTE_format = None
             ticks_per_quarternote = (d[0] << 8) | d[1]
-        return header.MidiHeader(midi_format,
-                                 midi_number_of_tracks,
-                                 ticks_per_frame,
-                                 negative_SMPTE_format,
-                                 ticks_per_quarternote)
+        return header.MidiHeader(
+            midi_format,
+            midi_number_of_tracks,
+            ticks_per_frame,
+            negative_SMPTE_format,
+            ticks_per_quarternote,
+        )
 
     def _parse_variable_length_number(self, f):
         value = self._read_8(f)
@@ -150,13 +153,15 @@ class MidiParser(object):
         elif meta_event_type == 0x54:
             if length != 5:
                 return None
-            return events.SmpteOffsetMetaEvent(delta_time, data[0], data[1],
-                                               data[2], data[3], data[4])
+            return events.SmpteOffsetMetaEvent(
+                delta_time, data[0], data[1], data[2], data[3], data[4]
+            )
         elif meta_event_type == 0x58:
             if length != 4:
                 return None
-            return events.TimeSignatureMetaEvent(delta_time, data[0], data[1],
-                                                 data[2], data[3])
+            return events.TimeSignatureMetaEvent(
+                delta_time, data[0], data[1], data[2], data[3]
+            )
         elif meta_event_type == 0x59:
             if length != 2:
                 return None
@@ -179,7 +184,9 @@ class MidiParser(object):
                     return events.NoteOffEvent(delta_time, channel, data_1, data_2)
                 return events.NoteOnEvent(delta_time, channel, data_1, data_2)
             elif command == 10:
-                return events.PolyphonicKeyPressureEvent(delta_time, channel, data_1, data_2)
+                return events.PolyphonicKeyPressureEvent(
+                    delta_time, channel, data_1, data_2
+                )
             elif command == 11:
                 return events.ControlChangeEvent(delta_time, channel, data_1, data_2)
             elif command == 12:
@@ -187,7 +194,9 @@ class MidiParser(object):
             elif command == 13:
                 return events.ChannelPressureEvent(delta_time, channel, data_1)
             elif command == 14:
-                return events.PitchWheelChangeEvent(delta_time, channel, (data_2 << 7) | data_1)
+                return events.PitchWheelChangeEvent(
+                    delta_time, channel, (data_2 << 7) | data_1
+                )
             return None
         message_id = status & 0x0F
         if message_id == 0:
@@ -223,33 +232,33 @@ class MidiParser(object):
     def parse_mtrk_event(self, f):
         delta_time = self._parse_variable_length_number(f)
         event_type = self._read_8(f)
-        if event_type == 0xF0:            #sysex event
+        if event_type == 0xF0:  # sysex event
             event = self._parse_F0_sysex_event(f, delta_time)
-        elif event_type == 0xF7:          #sysex event
+        elif event_type == 0xF7:  # sysex event
             event = self._parse_F7_sysex_event(f, delta_time)
-        elif event_type == 0xFF:          #meta event
+        elif event_type == 0xFF:  # meta event
             event = self._parse_meta_event(f, delta_time)
-        else:                         #regular midi event
+        else:  # regular midi event
             event = self._parse_midi_event(f, delta_time, event_type)
         log(event)
         return event
 
     def _parse_track(self, f):
-        if self._read_4_bytes(f) != b'MTrk':
+        if self._read_4_bytes(f) != b"MTrk":
             return None
         track_length = self._read_32(f)
         track_data = []
         for _ in range(track_length):
             event = self.parse_mtrk_event(f)
             if event is None:
-                log('Error')
+                log("Error")
             track_data.append(event)
             if isinstance(event, events.EndOfTrackMetaEvent):
                 return track_data
         return track_data
 
     def parse(self, filename):
-        with open(filename, 'rb') as f:
+        with open(filename, "rb") as f:
             tracks = []
             h = self._parse_header(f)
             for _ in range(h.number_of_tracks):

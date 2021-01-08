@@ -1,6 +1,5 @@
 import os
 
-import mount_sd
 
 def print_directory(path, tabs=0):
     for file in os.listdir(path):
@@ -21,7 +20,7 @@ def print_directory(path, tabs=0):
         prettyprintname += file
         if isdir:
             prettyprintname += "/"
-        print('{0:<40} Size: {1:>10}'.format(prettyprintname, sizestr))
+        print("{0:<40} Size: {1:>10}".format(prettyprintname, sizestr))
 
         # recursively print directory contents
         if isdir:

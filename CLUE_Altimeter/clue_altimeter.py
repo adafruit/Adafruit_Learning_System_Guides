@@ -4,7 +4,6 @@ import displayio
 import terminalio
 from microcontroller import nvm
 from adafruit_display_text import label
-from adafruit_bitmap_font import bitmap_font
 import adafruit_imageload
 from adafruit_clue import clue
 
@@ -22,12 +21,14 @@ DELAY = 0.05
 STD_SLP = 1013.25
 # ==| USER CONFIG |=====================
 
+# pylint: disable=protected-access
 # configure pressure sensor (see Table 15 in datasheet)
 clue._pressure.mode = 0x03  # normal
 clue._pressure.overscan_pressure = 0x05  # x16
 clue._pressure.overscan_temperature = 0x02  # x2
 clue._pressure.iir_filter = 0x02  # 4
 clue._pressure.standby_period = 0x01  # 62.5 ms
+# pylint: enable=protected-access
 
 # restore saved sea level pressure from NVM
 slp = struct.unpack("f", nvm[0:4])[0]
@@ -107,7 +108,7 @@ def average_readings(samples=10, delay=0.05):
     return pressure / samples, temperature / samples
 
 
-def recalibrate(current_sea_level_pressure=None):
+def recalibrate():
     """Enter current altitude."""
     cal_mode.text = "CAL"
     alt2_disp.text = "-----"
@@ -182,7 +183,7 @@ while True:
         while clue.button_a and clue.button_b:
             if time.monotonic() - now > HOLD_TO_SET:
                 print("set")
-                recalibrate(clue.sea_level_pressure)
+                recalibrate()
                 break
         # wait for release if still being held
         while clue.button_a and clue.button_b:

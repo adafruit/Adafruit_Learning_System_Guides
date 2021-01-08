@@ -18,7 +18,6 @@ from tilegame_assets.states import (
 from tilegame_assets.fun_facts import FACTS
 from tilegame_assets.text_helper import wrap_nicely
 
-# pylint: disable=bad-continuation
 
 # Direction constants for comparison
 UP = 0

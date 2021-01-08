@@ -20,9 +20,11 @@ BUTTON_START = const(4)
 BUTTON_A = const(2)
 BUTTON_B = const(1)
 
-pad = GamePadShift(digitalio.DigitalInOut(board.BUTTON_CLOCK),
-                   digitalio.DigitalInOut(board.BUTTON_OUT),
-                   digitalio.DigitalInOut(board.BUTTON_LATCH))
+pad = GamePadShift(
+    digitalio.DigitalInOut(board.BUTTON_CLOCK),
+    digitalio.DigitalInOut(board.BUTTON_OUT),
+    digitalio.DigitalInOut(board.BUTTON_LATCH),
+)
 
 current_buttons = pad.get_pressed()
 last_read = 0
@@ -46,16 +48,21 @@ display = board.DISPLAY
 group = displayio.Group(max_size=30, scale=2)
 
 #  Blinka sprite setup
-blinka, blinka_pal = adafruit_imageload.load("/spritesNew.bmp",
-                                             bitmap=displayio.Bitmap,
-                                             palette=displayio.Palette)
+blinka, blinka_pal = adafruit_imageload.load(
+    "/spritesNew.bmp", bitmap=displayio.Bitmap, palette=displayio.Palette
+)
 
 #  creates a transparent background for Blinka
 blinka_pal.make_transparent(7)
-blinka_grid = displayio.TileGrid(blinka, pixel_shader=blinka_pal,
-                                 width=2, height=1,
-                                 tile_height=16, tile_width=16,
-                                 default_tile=EMPTY)
+blinka_grid = displayio.TileGrid(
+    blinka,
+    pixel_shader=blinka_pal,
+    width=2,
+    height=1,
+    tile_height=16,
+    tile_width=16,
+    default_tile=EMPTY,
+)
 blinka_grid.x = 0
 blinka_grid.y = 32
 
@@ -63,14 +70,19 @@ blinka_group = displayio.Group()
 blinka_group.append(blinka_grid)
 
 #  first Sparky sprite
-sparky0, sparky0_pal = adafruit_imageload.load("/spritesNew.bmp",
-                                               bitmap=displayio.Bitmap,
-                                               palette=displayio.Palette)
+sparky0, sparky0_pal = adafruit_imageload.load(
+    "/spritesNew.bmp", bitmap=displayio.Bitmap, palette=displayio.Palette
+)
 sparky0_pal.make_transparent(7)
-sparky0_grid = displayio.TileGrid(sparky0, pixel_shader=sparky0_pal,
-                                  width=1, height=1,
-                                  tile_height=16, tile_width=16,
-                                  default_tile=SPARKY)
+sparky0_grid = displayio.TileGrid(
+    sparky0,
+    pixel_shader=sparky0_pal,
+    width=1,
+    height=1,
+    tile_height=16,
+    tile_width=16,
+    default_tile=SPARKY,
+)
 #  all Sparky sprites begin off screen
 sparky0_grid.x = 100
 sparky0_grid.y = 32
@@ -79,14 +91,19 @@ sparky0_group = displayio.Group()
 sparky0_group.append(sparky0_grid)
 
 #  2nd Sparky sprite
-sparky1, sparky1_pal = adafruit_imageload.load("/spritesNew.bmp",
-                                               bitmap=displayio.Bitmap,
-                                               palette=displayio.Palette)
+sparky1, sparky1_pal = adafruit_imageload.load(
+    "/spritesNew.bmp", bitmap=displayio.Bitmap, palette=displayio.Palette
+)
 sparky1_pal.make_transparent(7)
-sparky1_grid = displayio.TileGrid(sparky1, pixel_shader=sparky1_pal,
-                                  width=1, height=1,
-                                  tile_height=16, tile_width=16,
-                                  default_tile=SPARKY)
+sparky1_grid = displayio.TileGrid(
+    sparky1,
+    pixel_shader=sparky1_pal,
+    width=1,
+    height=1,
+    tile_height=16,
+    tile_width=16,
+    default_tile=SPARKY,
+)
 sparky1_grid.x = 100
 sparky1_grid.y = 32
 
@@ -94,14 +111,19 @@ sparky1_group = displayio.Group()
 sparky1_group.append(sparky1_grid)
 
 #  3rd Sparky sprite
-sparky2, sparky2_pal = adafruit_imageload.load("/spritesNew.bmp",
-                                               bitmap=displayio.Bitmap,
-                                               palette=displayio.Palette)
+sparky2, sparky2_pal = adafruit_imageload.load(
+    "/spritesNew.bmp", bitmap=displayio.Bitmap, palette=displayio.Palette
+)
 sparky2_pal.make_transparent(7)
-sparky2_grid = displayio.TileGrid(sparky2, pixel_shader=sparky2_pal,
-                                  width=1, height=1,
-                                  tile_height=16, tile_width=16,
-                                  default_tile=SPARKY)
+sparky2_grid = displayio.TileGrid(
+    sparky2,
+    pixel_shader=sparky2_pal,
+    width=1,
+    height=1,
+    tile_height=16,
+    tile_width=16,
+    default_tile=SPARKY,
+)
 sparky2_grid.x = 100
 sparky2_grid.y = 32
 
@@ -109,13 +131,18 @@ sparky2_group = displayio.Group()
 sparky2_group.append(sparky2_grid)
 
 #  heart sprite group
-life_bit, life_pal = adafruit_imageload.load("/spritesNew.bmp",
-                                             bitmap=displayio.Bitmap,
-                                             palette=displayio.Palette)
-life_grid = displayio.TileGrid(life_bit, pixel_shader=life_pal,
-                               width=3, height=1,
-                               tile_height=16, tile_width=16,
-                               default_tile=HEART)
+life_bit, life_pal = adafruit_imageload.load(
+    "/spritesNew.bmp", bitmap=displayio.Bitmap, palette=displayio.Palette
+)
+life_grid = displayio.TileGrid(
+    life_bit,
+    pixel_shader=life_pal,
+    width=3,
+    height=1,
+    tile_height=16,
+    tile_width=16,
+    default_tile=HEART,
+)
 
 life_group = displayio.Group()
 life_group.append(life_grid)
@@ -133,11 +160,11 @@ font = terminalio.FONT
 score_color = 0x0000FF
 
 #  text for "game over" graphic
-game_over_text = label.Label(font, text = "         ", color = 0xFF00FF)
+game_over_text = label.Label(font, text="         ", color=0xFF00FF)
 # score text
 score_area = label.Label(font, text=score_text, color=score_color)
 #  text for "new game" graphic
-new_game_text = label.Label(font, text = "           ", color = 0xFF00FF)
+new_game_text = label.Label(font, text="           ", color=0xFF00FF)
 
 # coordinants for text areas
 score_area.x = 57
@@ -175,6 +202,7 @@ def life():
         life_grid[_, 0] = EMPTY
         for hearts in range(life_count):
             life_grid[hearts, 0] = HEART
+
 
 #  lives at beginning of the game
 life_count = 3
@@ -297,7 +325,7 @@ while True:
                 sparky_x[2] = sparky2_grid.x
 
         #  if no lives are left then the game ends
-        if life_count is 0:
+        if life_count == 0:
             game_over = True
 
         #  if the A button is pressed then Blinka is no longer in the default

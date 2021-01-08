@@ -2,6 +2,7 @@ import board
 import storage
 from analogio import AnalogIn
 
+
 def read_buttons():
     with AnalogIn(board.A3) as ain:
         reading = ain.value / 65535
@@ -15,10 +16,11 @@ def read_buttons():
             return 2
         return 1
 
+
 readonly = True
 # if a button is pressed while booting up, CircuitPython can write to the drive
 button = read_buttons()
-if button != None:
+if button is not None:
     readonly = False
 if readonly:
     print("OS has write access to CircuitPython drive")

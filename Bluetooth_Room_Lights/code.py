@@ -1,7 +1,7 @@
 """
 Bluetooth Controlled Room Lights using a Circuit Playground Bluetooth
    Scroll between 7 modes and control brightness with your smartphone via Bluetooth
-   Full tutorial: https://learn.adafruit.com/easy-no-solder-bluetooth-controlled-room-lights/overview
+   Full tutorial https://learn.adafruit.com/easy-no-solder-bluetooth-controlled-room-lights/overview
 Code by Kattni Rembor & Erin St Blaine for Adafruit Industries
 Adafruit invests time and resources to bring you this code! Please support our shop!
 """
@@ -39,33 +39,40 @@ from adafruit_bluefruit_connect.packet import Packet
 from adafruit_bluefruit_connect.button_packet import ButtonPacket
 from adafruit_bluefruit_connect.color_packet import ColorPacket
 
-NUM_LEDS = 240                   # change to reflect your LED strip
-NEOPIXEL_PIN = board.A1        # change to reflect your wiring
+NUM_LEDS = 240  # change to reflect your LED strip
+NEOPIXEL_PIN = board.A1  # change to reflect your wiring
 
 # Declare a NeoPixel object on NEOPIXEL_PIN with NUM_LEDS pixels,
 # no auto-write.
 # Set brightness to max, we'll control it later in the code
-pixels = neopixel.NeoPixel(NEOPIXEL_PIN, NUM_LEDS, brightness=1.0,
-                           auto_write=False,
-                           #pixel_order=(1,0,2,3) #uncomment if using RGBW NeoPixels
-                           )
+pixels = neopixel.NeoPixel(
+    NEOPIXEL_PIN,
+    NUM_LEDS,
+    brightness=1.0,
+    auto_write=False,
+    # pixel_order=(1,0,2,3) #uncomment if using RGBW NeoPixels
+)
 
 
 ble = BLERadio()
 uart_service = UARTService()
 advertisement = ProvideServicesAdvertisement(uart_service)
 
+
 class RainbowFade(Animation):
-    ''' fades the entire strip through the whole spectrum '''
-    _color_index = 150 # choose start color (0-255)
-    def __init__(self, pixel_object, speed, name): # define animation
+    """ fades the entire strip through the whole spectrum """
+
+    _color_index = 150  # choose start color (0-255)
+
+    def __init__(self, pixel_object, speed, name):  # define animation
         super().__init__(pixel_object, speed=speed, color=WHITE, name=name)
 
-    def draw(self): # draw the animation
-        ''' fades the entire strip through the whole spectrum '''
+    def draw(self):  # draw the animation
+        """ fades the entire strip through the whole spectrum """
         self.color = colorwheel(self._color_index + 1)
         self._color_index = (self._color_index + 1) % 256
         self.fill(self.color)
+
 
 # ANIMATION DEFINITIONS --
 #    create as many animations as you'd like and define their attributes here.
@@ -73,20 +80,21 @@ class RainbowFade(Animation):
 #    at the same time, overlaid on top of each other.
 
 
-readingLight = Solid(pixels, color=0xFF7D13) #warm white color HEX code
+readingLight = Solid(pixels, color=0xFF7D13)  # warm white color HEX code
 brightWhite = Solid(pixels, color=(150, 150, 150))
 rainbow = Rainbow(pixels, speed=0.1, period=10, step=0.5)
 rainbowfade = RainbowFade(pixels, speed=0.4, name="rainbowfade")
 powerup = RainbowComet(pixels, speed=0, tail_length=50, bounce=False)
 off = Solid(pixels, color=BLACK)
 
-#startup animation will play just once
+# startup animation will play just once
 startup = AnimateOnce(powerup)
 
-#starrynight and fire are animation groups with layered effects.
+# starrynight and fire are animation groups with layered effects.
 starrynight = AnimationGroup(
     SparklePulse(pixels, speed=0.01, color=(0, 0, 150), period=1),
-    Comet(pixels, speed=0, tail_length=8, color=(150, 150, 150), bounce=False),)
+    Comet(pixels, speed=0, tail_length=8, color=(150, 150, 150), bounce=False),
+)
 
 fire = AnimationGroup(
     Comet(pixels, speed=0, tail_length=1, color=BLACK),
@@ -95,20 +103,13 @@ fire = AnimationGroup(
     Sparkle(pixels, speed=0.05, num_sparkles=20, color=ORANGE),
     Sparkle(pixels, speed=0.05, num_sparkles=5, color=0xFF7D13),
     Sparkle(pixels, speed=0.05, num_sparkles=10, color=BLACK),
-    )
+)
 
 # Here is the animation playlist where you set the order of modes
 
 animations = AnimationSequence(
-        readingLight,
-        fire,
-        rainbow,
-        starrynight,
-        rainbowfade,
-        brightWhite,
-        auto_clear=True,
-        )
-
+    readingLight, fire, rainbow, starrynight, rainbowfade, brightWhite, auto_clear=True,
+)
 
 
 MODE = 0
@@ -161,7 +162,7 @@ while True:
                     elif packet.button == ButtonPacket.LEFT:
                         MODE = 4
                         off.animate()
-                    #change the brightness with up and down arrows
+                    # change the brightness with up and down arrows
                     elif packet.button == ButtonPacket.UP:
                         pixels.brightness = pixels.brightness + 0.1
                         pixels.show()

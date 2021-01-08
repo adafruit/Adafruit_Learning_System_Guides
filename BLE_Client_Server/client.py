@@ -17,21 +17,20 @@ switch = Debouncer(pin)
 
 pixels = NeoPixel(NEOPIXEL, 1)  # Set up built-in NeoPixel
 
-AQUA = 0x00FFFF    # (0, 255, 255)
-GREEN = 0x00FF00   # (0, 255, 0)
+AQUA = 0x00FFFF  # (0, 255, 255)
+GREEN = 0x00FF00  # (0, 255, 0)
 ORANGE = 0xFF8000  # (255, 128, 0)
-RED = 0xFF0000     # (255, 0, 0)
-BLUE = 0x0000FF    # (0, 0, 255)
+RED = 0xFF0000  # (255, 0, 0)
+BLUE = 0x0000FF  # (0, 0, 255)
 
-gradients = {'Off': [(0.0, RED), (0.75, ORANGE)],
-             'On':  [(0.0, GREEN), (1.0, AQUA)]}
-palette = fancy.expand_gradient(gradients['Off'], 30)
+gradients = {"Off": [(0.0, RED), (0.75, ORANGE)], "On": [(0.0, GREEN), (1.0, AQUA)]}
+palette = fancy.expand_gradient(gradients["Off"], 30)
 
 gamma_levels = (0.25, 0.3, 0.15)
 color_index = 1
 fade_direction = 1
 
-TARGET = 'a0:b4:c2:d0:e7:f2'  # CHANGE TO YOUR BLE ADDRESS
+TARGET = "a0:b4:c2:d0:e7:f2"  # CHANGE TO YOUR BLE ADDRESS
 
 button_packet = ButtonPacket("1", True)  # Transmits pressed button 1
 
@@ -63,10 +62,10 @@ while True:
             if isinstance(packet, ColorPacket):
                 if fancy.CRGB(*packet.color).pack() == GREEN:  # Color match
                     # Green indicates on state
-                    palette = fancy.expand_gradient(gradients['On'], 30)
+                    palette = fancy.expand_gradient(gradients["On"], 30)
                 else:
                     # Otherwise red indicates off
-                    palette = fancy.expand_gradient(gradients['Off'], 30)
+                    palette = fancy.expand_gradient(gradients["Off"], 30)
 
         # NeoPixel color fading routing
         color = fancy.palette_lookup(palette, color_index / 29)
@@ -74,7 +73,7 @@ while True:
         c = color.pack()
         pixels[0] = c
         pixels.show()
-        if color_index == 0 or color_index == 28:
+        if color_index in (0, 28):
             fade_direction *= -1  # Change direction
         color_index += fade_direction
 
