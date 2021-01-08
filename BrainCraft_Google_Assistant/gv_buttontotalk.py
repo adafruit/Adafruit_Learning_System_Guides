@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# pylint: skip-file
+
 """Sample that implements a gRPC client for the Google Assistant API."""
 
 import concurrent.futures
@@ -19,14 +21,13 @@ import json
 import logging
 import os
 import os.path
+import pathlib2 as pathlib
 import sys
 import time
 import uuid
-import pathlib2 as pathlib
 
 sys.path.append("env/lib/python3.7/site-packages/googlesamples/assistant/grpc")
 
-#pylint: disable=wrong-import-position
 import click
 import grpc
 import google.auth.transport.grpc
@@ -55,8 +56,7 @@ except ImportError:
     print("Blinka not installed? Run 'pip3 install adafruit-circuitpython-dotstar'")
     raise ImportError(
         "Blinka not installed? Run 'pip3 install adafruit-circuitpython-dotstar'"
-    ) from ImportError
-#pylint: enable=wrong-import-position
+    )
 
 # Setup button
 button = DigitalInOut(board.D17)
@@ -81,7 +81,7 @@ PLAYING = embedded_assistant_pb2.ScreenOutConfig.PLAYING
 DEFAULT_GRPC_DEADLINE = 60 * 3 + 5
 
 
-class SampleAssistant():
+class SampleAssistant(object):
     """Sample Assistant that supports conversations and device actions.
 
     Args:
@@ -136,7 +136,6 @@ class SampleAssistant():
             return False
         self.conversation_stream.close()
 
-    @staticmethod
     def is_grpc_error_unavailable(e):
         is_grpc_error = isinstance(e, grpc.RpcError)
         if is_grpc_error and (e.code() == grpc.StatusCode.UNAVAILABLE):
@@ -148,7 +147,7 @@ class SampleAssistant():
         reraise=True,
         stop=stop_after_attempt(3),
         retry=retry_if_exception(is_grpc_error_unavailable),
-    ) #pylint: disable=too-many-branches
+    )
     def assist(self):
         """Send a voice request to the Assistant and playback the response.
 
@@ -351,7 +350,6 @@ class SampleAssistant():
     show_default=True,
     help="Size of each read during audio stream iteration in bytes.",
 )
-#pylint: disable=too-many-statements,too-many-branches,too-many-locals
 @click.option(
     "--audio-block-size",
     default=audio_helpers.DEFAULT_AUDIO_DEVICE_BLOCK_SIZE,
@@ -427,7 +425,7 @@ def main(
             )
             http_request = google.auth.transport.requests.Request()
             credentials.refresh(http_request)
-    except Exception as e: #pylint: disable=broad-except
+    except Exception as e:
         logging.error("Error loading credentials: %s", e)
         logging.error(
             "Run google-oauthlib-tool to initialize " "new OAuth 2.0 credentials."
@@ -485,8 +483,8 @@ def main(
                 logging.info(
                     "Using device model %s and device id %s", device_model_id, device_id
                 )
-        except Exception as e: #pylint: disable=broad-except
-            logging.warning("Device config not found: %s", e)
+        except Exception as e:
+            logging.warning("Device config not found: %s" % e)
             logging.info("Registering device")
             if not device_model_id:
                 logging.error(
@@ -523,21 +521,21 @@ def main(
     device_handler = device_helpers.DeviceRequestHandler(device_id)
 
     @device_handler.command("action.devices.commands.OnOff")
-    def onoff(on): #pylint: disable=unused-variable
+    def onoff(on):
         if on:
             logging.info("Turning device on")
         else:
             logging.info("Turning device off")
 
     @device_handler.command("com.example.commands.BlinkLight")
-    def blink(speed, number): #pylint: disable=unused-variable
-        logging.info("Blinking device %s times.", number)
+    def blink(speed, number):
+        logging.info("Blinking device %s times." % number)
         delay = 1
         if speed == "SLOWLY":
             delay = 2
         elif speed == "QUICKLY":
             delay = 0.5
-        for _ in range(int(number)):
+        for i in range(int(number)):
             logging.info("Device is blinking.")
             time.sleep(delay)
 

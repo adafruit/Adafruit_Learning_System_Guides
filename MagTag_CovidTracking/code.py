@@ -25,6 +25,7 @@ magtag = MagTag(
 )
 
 
+#pylint: disable=unnecessary-lambda
 # Date stamp of info
 magtag.add_text(
     text_font="/fonts/Arial-Bold-12.pcf",
@@ -69,6 +70,7 @@ magtag.add_text(
     line_spacing=0.75,
     is_data=False
 )
+#pylint: enable=unnecessary-lambda
 
 magtag.graphics.qrcode(b"https://covidtracking.com/data",
                        qr_size=2, x=240, y=70)

@@ -19,6 +19,7 @@ magtag = MagTag(
 )
 magtag.network.connect()
 
+#pylint: disable=unnecessary-lambda
 # Color
 magtag.add_text(
     text_font="Arial-Bold-12.bdf",
@@ -31,6 +32,7 @@ magtag.add_text(
     text_position=(10, 35),
     text_transform=lambda x: "Updated on: {}".format(x),
 )
+#pylint: enable=unnecessary-lambda
 
 timestamp = None
 while True:
