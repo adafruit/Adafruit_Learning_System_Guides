@@ -101,7 +101,7 @@ def state_from_orientation():
     """Determines the state based on orientation."""
     global current_orientation
     new_orientation = orientation_debounced()
-    if new_orientation != current_orientation:
+    if new_orientation != current_orientation: #pylint: disable=used-before-assignment
         if new_orientation == 'side':
             set_state(STATE_IDLE)
             current_orientation = orientation_debounced()

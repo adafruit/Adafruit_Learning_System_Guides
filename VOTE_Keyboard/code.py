@@ -48,7 +48,7 @@ while True:
         r.value = True
         if pins[button["col"]].value:
             newState += [button["id"]]
-            if not button["id"] in oldState:
+            if button["id"] not in oldState:
                 newBtn = button["id"]
         r.value = False
     # Press & release keys

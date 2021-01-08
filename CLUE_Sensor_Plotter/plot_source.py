@@ -248,7 +248,7 @@ class HumidityPlotSource(PlotSource):
 class PinPlotSource(PlotSource):
     def __init__(self, pin):
         try:
-            pins = [p for p in pin]  # pylint: disable=unnecessary-comprehension
+            pins = [p for p in pin]
         except TypeError:
             pins = [pin]
 

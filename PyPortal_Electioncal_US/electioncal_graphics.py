@@ -71,9 +71,9 @@ class Electioncal_Graphics(displayio.Group):
 
     def load_data(self, election_data):
         try:
-            self.electioncal = json.loads(
+            self.electioncal = json.loads(  # pylint: disable=attribute-defined-outside-init
                 election_data
-            )  # pylint: disable=attribute-defined-outside-init
+            )
             self.state_text.text = (
                 self.electioncal["dates"][1]["county"]
                 + ", "
@@ -81,7 +81,7 @@ class Electioncal_Graphics(displayio.Group):
             )
         except ValueError:
             print(
-                "Error loading JSON data: Please check the configuration of county and state, in code.py"
+                "Error loading JSON data: Please check the configuration of county and state, in code.py" #pylint: disable=line-too-long
             )
             raise
 
@@ -103,7 +103,6 @@ class Electioncal_Graphics(displayio.Group):
         """Fetch the time.localtime(), parse it out and update the display text"""
         now = time.localtime()
         hour = now[3]
-        minute = now[4]
         year = now[0]
         month = now[1]
         day = now[2]
@@ -117,17 +116,18 @@ class Electioncal_Graphics(displayio.Group):
                 time_format_str = time_format_str + " AM"
             if hour == 0:
                 hour = 12
-        time_str = time_format_str % (hour, minute)
         date_str = date_format_str % (year, month, day)
         self.date_text.text = "Today is: " + date_str
 
-    def paragrapher(self, text, cut):
+    @staticmethod
+    def paragrapher(text, cut):
         """ Cuts a long line into two, having spaces in mind.
         Note we return line2 first as it looks better to clear the line2
         before printing a line1 with empty line2
         We run from cut, backwards till we find a space.
         """
         if len(text) > cut:
+            i = 0
             for i in range(cut, 0, -1):
                 if text[i] == " ":
                     break

@@ -9,11 +9,10 @@ import digitalio
 import neopixel
 import pulseio
 from adafruit_motor import servo
-from digitalio import DigitalInOut, Direction, Pull
 
-btn = DigitalInOut(board.SWITCH)
-btn.direction = Direction.INPUT
-btn.pull = Pull.UP
+btn = digitalio.DigitalInOut(board.SWITCH)
+btn.direction = digitalio.Direction.INPUT
+btn.pull = digitalio.Pull.UP
 
 prev_state = btn.value
 

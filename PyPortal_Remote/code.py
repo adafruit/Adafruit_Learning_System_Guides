@@ -226,7 +226,6 @@ while True:
         # Used to prevent the touchscreen sending incorrect results
         if last_index == index:
             if page[index]:
-                # pylint: disable=comparison-with-callable
                 if page[index] == switchpage:
                     page, page_vals = switchpage(page_vals[index])
                 else:
