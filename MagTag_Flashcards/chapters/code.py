@@ -1,8 +1,6 @@
-import time
 import json
-import terminalio
-import digitalio
 import random
+import terminalio
 from adafruit_display_shapes.rect import Rect
 from adafruit_magtag.magtag import MagTag
 magtag = MagTag()

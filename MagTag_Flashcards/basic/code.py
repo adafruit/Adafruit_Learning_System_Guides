@@ -1,7 +1,5 @@
 import time
 import json
-import terminalio
-import digitalio
 import random
 from adafruit_magtag.magtag import MagTag
 
