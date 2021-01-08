@@ -60,6 +60,9 @@ import signal
 import os
 import sys
 from datetime import datetime
+from collections import deque
+import re
+import fileinput
 
 try:
     from evdev import uinput, UInput, ecodes as e
@@ -69,6 +72,37 @@ except ImportError:
 import digitalio
 import board
 
+def detect_rotation():
+    rotation_pattern = "^dtoverlay=drm-minipitft13,rotation=([0-9]+)"
+    hdmi_pattern = "^display_hdmi_rotate=([0-9])"
+    param_rotation = None
+    param_hdmi = None
+    for line in fileinput.FileInput("/boot/config.txt"):
+        rotation_match = re.search(rotation_pattern, line)
+        hdmi_match = re.search(hdmi_pattern, line)
+        if rotation_match:
+            param_rotation = int(rotation_match.group(1))
+        if hdmi_match:
+            param_hdmi = int(hdmi_match.group(1))
+        if param_rotation is not None and param_hdmi is not None:
+            break
+    if param_hdmi == 3:
+        return 180
+    if param_hdmi == 2:
+        return 270
+    if param_hdmi == 1:
+        return 0
+    return param_rotation
+
+arrow_pins = deque((
+    board.D23, # up
+    board.D24, # right
+    board.D27, # down
+    board.D22, # left
+))
+
+arrow_pins.rotate((detect_rotation() // 90) - 1)
+
 DEBUG = False
 BOUNCE_TIME = 0.01 # Debounce time in seconds
 POWEROFF_TIMEOUT = 5
@@ -76,12 +110,12 @@ POWEROFF_TIMEOUT = 5
 KEYS= [ # EDIT KEYCODES IN THIS TABLE TO YOUR PREFERENCES:
 	# See /usr/include/linux/input.h for keycode names
 	# Keyboard  Action (tuple = press together, no repeat)
-        (board.D17, (e.KEY_K,)), # button - play/pause
-        (board.D16, (e.KEY_LEFTCTRL, e.KEY_R)), # push stick - reload
-	(board.D22, (e.KEY_LEFTSHIFT, e.KEY_P)), # left - previous in playlist
-	(board.D24, (e.KEY_LEFTSHIFT, e.KEY_N)),  # right - next in playlist
-	(board.D23, e.KEY_EQUAL),        # up - volume up
-	(board.D27, e.KEY_MINUS),        # down - volume down
+    (board.D17, (e.KEY_K,)), # button - play/pause
+    (board.D16, (e.KEY_LEFTCTRL, e.KEY_R)), # push stick - reload
+	(arrow_pins[3], (e.KEY_LEFTSHIFT, e.KEY_P)), # left - previous in playlist
+	(arrow_pins[1], (e.KEY_LEFTSHIFT, e.KEY_N)),  # right - next in playlist
+	(arrow_pins[0], e.KEY_EQUAL),        # up - volume up
+	(arrow_pins[2], e.KEY_MINUS),        # down - volume down
 ]
 
 key_values = set()

@@ -1,7 +1,7 @@
 import time
 import array
 import math
-import audioio
+import audiocore
 import board
 import audiobusio
 
@@ -20,7 +20,7 @@ audio = audiobusio.I2SOut(board.D1, board.D0, board.D9)
 # audio = audiobusio.I2SOut(board.D1, board.D10, board.D11)
 # For Metro M4 Express
 # audio = audiobusio.I2SOut(board.D3, board.D9, board.D8)
-sine_wave_sample = audioio.RawSample(sine_wave, sample_rate=sample_rate)
+sine_wave_sample = audiocore.RawSample(sine_wave, sample_rate=sample_rate)
 
 while True:
     audio.play(sine_wave_sample, loop=True)

@@ -238,7 +238,7 @@ button_2 = Button(x=BIG_BUTTON_WIDTH, y=BIG_BUTTON_Y,
                   selected_label=0x525252)
 buttons.append(button_2)  # adding this button to the buttons group
 
-# Add all of the main buttons to the spalsh Group
+# Add all of the main buttons to the splash Group
 for b in buttons:
     splash.append(b.group)
 

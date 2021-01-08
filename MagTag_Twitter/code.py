@@ -22,9 +22,8 @@ SLEEP_TIME = 15
 
 # Set up where we'll be fetching data from
 DATA_SOURCE = (
-    "https://api.twitter.com/1.1/statuses/user_timeline.json? \
-                screen_name=%s&count=1&tweet_mode=extended"
-    % TWITTER_USERNAME
+    "https://api.twitter.com/1.1/statuses/user_timeline.json?"
+    "screen_name=%s&count=1&tweet_mode=extended" % TWITTER_USERNAME
 )
 TWEET_TEXT = [0, "full_text"]
 TWEET_FULL_NAME = [0, "user", "name"]
