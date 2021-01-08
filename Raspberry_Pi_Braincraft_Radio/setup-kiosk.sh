@@ -88,6 +88,8 @@ def detect_rotation():
             break
     if param_hdmi == 3:
         return 180
+    if param_hdmi == 2:
+        return 270
     if param_hdmi == 1:
         return 0
     return param_rotation
