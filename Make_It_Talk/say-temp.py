@@ -11,6 +11,11 @@ import audioio
 import audiocore
 from digitalio import DigitalInOut, Direction, Pull
 
+# Enables the speaker for audio output
+spkrenable = DigitalInOut(board.SPEAKER_ENABLE)
+spkrenable.direction = Direction.OUTPUT
+spkrenable.value = True
+
 D1 = board.BUTTON_A
 D2 = board.BUTTON_B
 
@@ -43,7 +48,7 @@ def play_file(wavfile):
 # Function should take an integer -299 to 299 and say it
 # Assumes wav files are available for the numbers
 def read_temp(temp):
-    play_file("temperature.wav")
+    play_file("The temperature is.wav")
     if temp < 0:
         play_file("negative.wav")
         temp = - temp
