@@ -73,7 +73,7 @@ def main():
     sensor.enable_proximity = True
     while True:
         # Wait for user to put finger over sensor
-        while sensor.proximity() < PROXIMITY_THRESHOLD_HI:
+        while sensor.proximity < PROXIMITY_THRESHOLD_HI:
             time.sleep(.01)
 
         # After the finger is sensed, set up the color sensor
@@ -107,7 +107,7 @@ def main():
         # frequency.
         t0 = deadline = time.monotonic_ns()
         # As long as their finger is over the sensor, capture data
-        while sensor.proximity() >= PROXIMITY_THRESHOLD_LO:
+        while sensor.proximity >= PROXIMITY_THRESHOLD_LO:
             deadline += dt
             sleep_deadline(deadline)
             value = sum(sensor.color_data) # Combination of all channels

@@ -22,7 +22,7 @@ magtag = MagTag()
 magtag.network.connect()
 
 magtag.add_text(
-    text_font="fonts/epilogue18.bdf",
+    text_font="/fonts/epilogue18.bdf",
     text_position=(
         (magtag.graphics.display.width // 2) - 1,
         24,
@@ -30,10 +30,10 @@ magtag.add_text(
     text_anchor_point=(0.5, 0.5),
     is_data=False,
 )
-magtag.set_text("Year Progress:")
+magtag.set_text("Year Progress:", auto_refresh=False)
 
 magtag.add_text(
-    text_font="fonts/epilogue18.bdf",
+    text_font="/fonts/epilogue18.bdf",
     text_position=(
         (magtag.graphics.display.width // 2) - 1,
         55,

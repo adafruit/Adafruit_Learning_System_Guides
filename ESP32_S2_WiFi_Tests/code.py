@@ -32,7 +32,7 @@ print("Connected to %s!"%secrets["ssid"])
 print("My IP address is", wifi.radio.ipv4_address)
 
 ipv4 = ipaddress.ip_address("8.8.4.4")
-print("Ping google.com: %f ms" % wifi.radio.ping(ipv4))
+print("Ping google.com: %f ms" % (wifi.radio.ping(ipv4)*1000))
 
 pool = socketpool.SocketPool(wifi.radio)
 requests = adafruit_requests.Session(pool, ssl.create_default_context())

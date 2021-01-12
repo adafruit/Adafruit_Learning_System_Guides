@@ -13,9 +13,9 @@ METRIC = False  # set to True for metric units
 # ----------------------------
 # Define various assets
 # ----------------------------
-BACKGROUND_BMP = "/weather_bg.bmp"
-ICONS_LARGE_FILE = "/weather_icons_70px.bmp"
-ICONS_SMALL_FILE = "/weather_icons_20px.bmp"
+BACKGROUND_BMP = "/bmps/weather_bg.bmp"
+ICONS_LARGE_FILE = "/bmps/weather_icons_70px.bmp"
+ICONS_SMALL_FILE = "/bmps/weather_icons_20px.bmp"
 ICON_MAP = ("01", "02", "03", "04", "09", "10", "11", "13", "50")
 DAYS = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
 MONTHS = (
@@ -26,7 +26,7 @@ MONTHS = (
     "May",
     "June",
     "July",
-    "Augsut",
+    "August",
     "September",
     "October",
     "November",

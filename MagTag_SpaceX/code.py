@@ -55,7 +55,7 @@ magtag = MagTag(
 )
 
 magtag.add_text(
-    text_font="Lato-Bold-ltd-25.bdf",
+    text_font="/fonts/Lato-Bold-ltd-25.bdf",
     text_position=(10, 15),
     is_data=False
 )
@@ -64,14 +64,14 @@ magtag.set_text("Next SpaceX Launch")
 
 # Formatting for the mission text
 magtag.add_text(
-    text_font="Arial-Bold-12.bdf",
+    text_font="/fonts/Arial-Bold-12.pcf",
     text_position=(10, 38),
     text_transform=mission_transform
 )
 
 # Formatting for the launch time text
 magtag.add_text(
-    text_font="Arial-12.bdf",
+    text_font="/fonts/Arial-12.bdf",
     text_position=(10, 60),
     text_transform=time_transform
 )
