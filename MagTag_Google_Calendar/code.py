@@ -1,5 +1,6 @@
-# MagTag Google Calendar Event Viewer
-# Brent Rubell for Adafruit Industries, 2021
+# SPDX-FileCopyrightText: 2021 Brent Rubell, written for Adafruit Industries
+#
+# SPDX-License-Identifier: Unlicense
 import time
 import ssl
 import board
@@ -55,9 +56,6 @@ print("Connected to %s!" % secrets["ssid"])
 pool = socketpool.SocketPool(wifi.radio)
 requests = requests.Session(pool, ssl.create_default_context())
 
-magtag = MagTag()
-r = rtc.RTC()
-
 # Initialize an OAuth2 object with GCal API scope
 scopes = ["https://www.googleapis.com/auth/calendar.readonly"]
 google_auth = OAuth2(
@@ -69,8 +67,6 @@ google_auth = OAuth2(
     secrets["google_refresh_token"],
 )
 
-if not google_auth.refresh_access_token():
-    raise RuntimeError("Unable to refresh access token - has the token been revoked?")
 
 def get_current_time(time_max=False):
     """Gets local time from Adafruit IO and converts to RFC3339 timestamp."""
@@ -188,6 +184,11 @@ def display_calendar_events(resp_events):
             line_spacing=0.65,
         )
         magtag.splash.append(label_event_desc)
+
+
+# Create a new MagTag object
+magtag = MagTag()
+r = rtc.RTC()
 
 # DisplayIO Setup
 magtag.set_background(0xFFFFFF)

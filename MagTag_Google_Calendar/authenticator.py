@@ -1,4 +1,6 @@
-# Google OAuth2.0 Workflow for MagTag
+# SPDX-FileCopyrightText: 2021 Brent Rubell, written for Adafruit Industries
+#
+# SPDX-License-Identifier: Unlicense
 import ssl
 import board
 import wifi
@@ -27,6 +29,7 @@ print("Connected to %s!" % secrets["ssid"])
 pool = socketpool.SocketPool(wifi.radio)
 requests = requests.Session(pool, ssl.create_default_context())
 
+# DisplayIO setup
 font_small = bitmap_font.load_font("/fonts/Arial-12.pcf")
 font_large = bitmap_font.load_font("/fonts/Arial-14.pcf")
 
