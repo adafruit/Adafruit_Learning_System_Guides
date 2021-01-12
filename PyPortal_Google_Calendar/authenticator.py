@@ -1,5 +1,6 @@
-# CircuitPython Google OAuth
-# for PyPortal
+# SPDX-FileCopyrightText: 2021 Brent Rubell, written for Adafruit Industries
+#
+# SPDX-License-Identifier: Unlicense
 import board
 import busio
 from digitalio import DigitalInOut
