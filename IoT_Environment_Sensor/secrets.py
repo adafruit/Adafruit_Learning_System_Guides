@@ -2,9 +2,9 @@
 # If you put them in the code you risk committing that info or sharing it
 
 secrets = {
-    'ssid' : b'Shibari',
-    'password' : b'$k7cGE$7=jY67kg#',
-    'timezone' : 'America/Toronto',
-    'aio_username' : 'dastels',
-    'aio_key' : '796252b4b3484ed3b00665fab73de47c7fb8ea9e',
+    "ssid": b"My_SSID",
+    "password": b"My_WIFI_Password",
+    "timezone": "Area/City",
+    "aio_username": "my_username",
+    "aio_key": "my_key",
 }
