@@ -86,7 +86,15 @@ def get_current_time(time_max=False):
     cur_time = r.datetime
     if time_max:  # maximum time to fetch events is midnight (4:59:59UTC)
         cur_time_max = time.struct_time(
-            cur_time[0], cur_time[1], cur_time[2] + 1, 4, 59, 59, cur_time[6], cur_time[7], cur_time[8]
+            cur_time[0],
+            cur_time[1],
+            cur_time[2] + 1,
+            4,
+            59,
+            59,
+            cur_time[6],
+            cur_time[7],
+            cur_time[8],
         )
         cur_time = cur_time_max
     cur_time = "{:04d}-{:02d}-{:02d}T{:02d}:{:02d}:{:02d}{:s}".format(
@@ -157,7 +165,9 @@ def format_datetime(datetime, pretty_date=False):
     # via https://github.com/micropython/micropython/issues/3087
     formatted_time = "{:01d}:{:02d}{:s}".format(hours, minutes, am_pm)
     if pretty_date:  # return a nice date for header label
-        formatted_date = "{} {}.{:02d}, {:04d} ".format(WEEKDAYS[r.datetime[6]], MONTHS[month], mday, year)
+        formatted_date = "{} {}.{:02d}, {:04d} ".format(
+            WEEKDAYS[r.datetime[6]], MONTHS[month], mday, year
+        )
         return formatted_date
     # Event occurs today, return the time only
     return formatted_time
@@ -208,9 +218,7 @@ line_header = Line(0, 30, 320, 30, color=0x000000)
 magtag.splash.append(line_header)
 
 font_h1 = bitmap_font.load_font("fonts/Arial-18.pcf")
-label_header = label.Label(
-    font_h1, x=5, y=15, color=0x000000, max_glyphs=30
-)
+label_header = label.Label(font_h1, x=5, y=15, color=0x000000, max_glyphs=30)
 magtag.splash.append(label_header)
 
 # Set up calendar event fonts
