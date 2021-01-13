@@ -2,6 +2,7 @@ import time
 import board
 import digitalio
 import audioio
+import audiocore
 import neopixel
 
 # user variables
@@ -48,7 +49,7 @@ def blink(times, speed):
 
 def play_waves(file_num):
     wave_file = open(wave_files[file_num], "rb")  # open a wav file
-    wave = audioio.WaveFile(wave_file)
+    wave = audiocore.WaveFile(wave_file)
     audio.play(wave)  # play the wave file
     while audio.playing:  # allow the wav to finish playing
         pass

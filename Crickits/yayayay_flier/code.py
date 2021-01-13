@@ -17,6 +17,8 @@ import neopixel
 gc.collect()
 import audioio
 gc.collect()
+import audiocore
+gc.collect()
 
 
 print("Blimp!")
@@ -43,7 +45,7 @@ a = audioio.AudioOut(board.A0)
 
 def play_audio(wavfile):
     f = open(wavfile, "rb")
-    wav = audioio.WaveFile(f)
+    wav = audiocore.WaveFile(f)
     a.play(wav)
     while a.playing:
         pass

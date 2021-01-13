@@ -5,6 +5,7 @@ from adafruit_seesaw.pwmout import PWMOut
 from adafruit_motor import servo
 from busio import I2C
 import audioio
+import audiocore
 import microcontroller
 import board
 
@@ -54,7 +55,7 @@ except:
 #################### Audio files
 wavfile = "yanny.wav"
 f = open(wavfile, "rb")
-wav = audioio.WaveFile(f)
+wav = audiocore.WaveFile(f)
 a = audioio.AudioOut(board.A0)
 a.play(wav)
 t = time.monotonic()

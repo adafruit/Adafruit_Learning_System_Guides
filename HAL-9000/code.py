@@ -3,6 +3,7 @@ import random
 import time
 import board
 import audioio
+import audiocore
 from adafruit_crickit import crickit
 
 # Hal button-and-voice example
@@ -27,7 +28,7 @@ AUDIO = audioio.AudioOut(board.A0)
 def play_file(wavfile):
     print("Playing", wavfile)
     with open(wavfile, "rb") as f:
-        wav = audioio.WaveFile(f)
+        wav = audiocore.WaveFile(f)
         AUDIO.play(wav)
         while AUDIO.playing:
             LED.duty_cycle = random.randint(5000, 30000)

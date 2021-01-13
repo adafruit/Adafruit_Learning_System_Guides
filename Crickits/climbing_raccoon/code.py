@@ -1,5 +1,6 @@
 import time
 import audioio
+import audiocore
 from digitalio import DigitalInOut, Pull, Direction
 from adafruit_seesaw.seesaw import Seesaw
 from adafruit_seesaw.pwmout import PWMOut
@@ -56,7 +57,7 @@ def rainbow():
 a = audioio.AudioOut(board.A0)
 def play_file(wavfile):
     with open(wavfile, "rb") as file:
-        wavf = audioio.WaveFile(file)
+        wavf = audiocore.WaveFile(file)
         a.play(wavf)
         while a.playing:
             rainbow()

@@ -6,6 +6,7 @@ from adafruit_seesaw.seesaw import Seesaw
 from adafruit_seesaw.pwmout import PWMOut
 import touchio
 import audioio
+import audiocore
 import neopixel
 import board
 
@@ -67,7 +68,7 @@ a = audioio.AudioOut(board.A0)
 startfile = "startup.wav"
 loopfile = "loop.wav"
 with open(startfile, "rb") as f:
-    wav = audioio.WaveFile(f)
+    wav = audiocore.WaveFile(f)
     a.play(wav)
     for _ in range(3):
         IR_Command(Calibrate)
@@ -78,7 +79,7 @@ with open(startfile, "rb") as f:
         IR_Command(Close)
         time.sleep(1)
 f = open(loopfile, "rb")
-wav = audioio.WaveFile(f)
+wav = audiocore.WaveFile(f)
 a.play(wav, loop=True)
 
 while True:                          # Main Loop poll switches, do commands

@@ -16,6 +16,7 @@ import math
 import array
 import board
 import audioio
+import audiocore
 import shapes
 
 
@@ -94,4 +95,4 @@ class Generator:
             self.make_sawtooth()
 
         self.dac.stop()
-        self.dac.play(audioio.RawSample(self.sample, channel_count=1, sample_rate=64000), loop=True)
+        self.dac.play(audiocore.RawSample(self.sample, channel_count=1, sample_rate=64000), loop=True)

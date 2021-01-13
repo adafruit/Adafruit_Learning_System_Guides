@@ -2,6 +2,7 @@ import time
 import os
 import digitalio
 import audioio
+import audiocore
 import board
 import adafruit_matrixkeypad
 
@@ -34,7 +35,7 @@ def play_file(filename):
     if audio_file:
         audio_file.close()
     audio_file = open(filename, "rb")
-    wav = audioio.WaveFile(audio_file)
+    wav = audiocore.WaveFile(audio_file)
     gc_audio.play(wav)
 
 while True:

@@ -10,6 +10,7 @@ import busio
 import board
 import digitalio
 import audioio
+import audiocore
 import touchio
 import neopixel
 
@@ -20,7 +21,7 @@ def load_wav(name):
                  this, e.g. passing 'foo' will load file 'foo.wav'.
     @return WAV buffer that can be passed to play_wav() below.
     """
-    return audioio.WaveFile(open(name + '.wav', 'rb'))
+    return audiocore.WaveFile(open(name + '.wav', 'rb'))
 
 def play_wav(wav):
     """

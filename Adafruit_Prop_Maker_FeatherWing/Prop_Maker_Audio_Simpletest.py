@@ -3,6 +3,7 @@
 import digitalio
 import board
 import audioio
+import audiocore
 
 WAV_FILE_NAME = "StreetChicken.wav"  # Change to the name of your wav file!
 
@@ -12,7 +13,7 @@ enable.value = True
 
 with audioio.AudioOut(board.A0) as audio:  # Speaker connector
     wave_file = open(WAV_FILE_NAME, "rb")
-    wave = audioio.WaveFile(wave_file)
+    wave = audiocore.WaveFile(wave_file)
 
     audio.play(wave)
     while audio.playing:

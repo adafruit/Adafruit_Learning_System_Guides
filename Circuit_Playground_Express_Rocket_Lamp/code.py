@@ -14,6 +14,7 @@ import board
 import neopixel
 import digitalio
 import audioio
+import audiocore
 
 # enables the speaker for audio output
 spkrenable = digitalio.DigitalInOut(board.SPEAKER_ENABLE)
@@ -49,7 +50,7 @@ def play_audio():
     #open the file
     wave_file = open("liftoff.wav", "rb")
     #play the file
-    with audioio.WaveFile(wave_file) as wave:
+    with audiocore.WaveFile(wave_file) as wave:
         with audioio.AudioOut(board.A0) as audio:
             audio.play(wave)
             #wait until audio is done

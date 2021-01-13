@@ -10,6 +10,7 @@ from adafruit_motor import servo
 import digitalio
 import touchio
 import audioio
+import audiocore
 # Setup LED and PIR pins
 LED_PIN = board.D13  # Pin number for the board's built in LED.
 PIR_PIN = board.SENSE   # Pin port connected to PIR sensor output wire.
@@ -37,7 +38,7 @@ servo_ready()
 # Function for playing wav file, releasing servo
 def play_wave():
     wave_file = open("hiss01.wav", "rb")  # open a wav file
-    wave = audioio.WaveFile(wave_file)
+    wave = audiocore.WaveFile(wave_file)
     audio.play(wave)  # play the wave file
     led.value = True
     servo_release()
@@ -55,7 +56,7 @@ length = 8000 // frequency_hz
 sine_wave = array.array("H", [0] * length)
 for i in range(length):
     sine_wave[i] = int((1 + math.sin(math.pi * 2 * i / length)) * tone_volume * (2 ** 15 - 1))
-sine_wave_sample = audioio.RawSample(sine_wave)
+sine_wave_sample = audiocore.RawSample(sine_wave)
 
 # Function for beeping, usage: 'beep(3)' will beep 3x
 def beep(count):

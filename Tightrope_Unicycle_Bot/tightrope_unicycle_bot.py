@@ -2,6 +2,7 @@ import time
 import board
 import neopixel
 import audioio
+import audiocore
 import adafruit_crickit
 
 print("Adabot Tightrope Unicyclist!")
@@ -23,7 +24,7 @@ speed = 0.65
 cpx_audio = audioio.AudioOut(board.A0)  # speaker out on Crickit
 def play_file(wavfile):
     with open(wavfile, "rb") as f:
-        wav = audioio.WaveFile(f)
+        wav = audiocore.WaveFile(f)
         cpx_audio.play(wav)
         while cpx_audio.playing:
             pass
