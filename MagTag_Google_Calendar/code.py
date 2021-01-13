@@ -15,7 +15,7 @@ from adafruit_display_text import label
 from adafruit_magtag.magtag import MagTag
 
 # Calendar ID
-CALENDAR_ID = "YOUR_CALENDAR_ID@group.calendar.google.com"
+CALENDAR_ID = "YOUR_CALENDAR_ID"
 
 # Maximum amount of events to display
 MAX_EVENTS = 3
@@ -37,6 +37,16 @@ MONTHS = {
     10: "Oct",
     11: "Nov",
     12: "Dec",
+}
+# Dict. of day names for pretty-printing the header
+WEEKDAYS = {
+    0: "Monday",
+    1: "Tuesday",
+    2: "Wednesday",
+    3: "Thursday",
+    4: "Friday",
+    5: "Saturday",
+    6: "Sunday",
 }
 
 # Add a secrets.py to your filesystem that has a dictionary called secrets with "ssid" and
@@ -76,7 +86,7 @@ def get_current_time(time_max=False):
     cur_time = r.datetime
     if time_max:  # maximum time to fetch events is midnight (4:59:59UTC)
         cur_time_max = time.struct_time(
-            cur_time[0], cur_time[1], cur_time[2] + 1, 4, 59, 59, 0, -1, -1
+            cur_time[0], cur_time[1], cur_time[2] + 1, 4, 59, 59, cur_time[6], cur_time[7], cur_time[8]
         )
         cur_time = cur_time_max
     cur_time = "{:04d}-{:02d}-{:02d}T{:02d}:{:02d}:{:02d}{:s}".format(
@@ -169,7 +179,7 @@ def display_calendar_events(resp_events):
         label_event_time = label.Label(
             font_event,
             x=7,
-            y=35 + (event_idx * 35),
+            y=40 + (event_idx * 35),
             color=0x000000,
             text=format_datetime(event_start),
         )
@@ -178,7 +188,7 @@ def display_calendar_events(resp_events):
         label_event_desc = label.Label(
             font_event,
             x=88,
-            y=35 + (event_idx * 35),
+            y=40 + (event_idx * 35),
             color=0x000000,
             text=event_name,
             line_spacing=0.65,
@@ -194,23 +204,17 @@ r = rtc.RTC()
 magtag.set_background(0xFFFFFF)
 
 # Add the header
-line_header = Line(0, 25, 320, 25, color=0x000000)
+line_header = Line(0, 30, 320, 30, color=0x000000)
 magtag.splash.append(line_header)
 
-font_h1 = bitmap_font.load_font("fonts/Arial-Bold-18.pcf")
-font_h1.load_glyphs(
-    b"abcdefghjiklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890-,. "
-)
+font_h1 = bitmap_font.load_font("fonts/Arial-18.pcf")
 label_header = label.Label(
-    font_h1, x=(board.DISPLAY.width // 5) + 1, y=10, color=0x000000, max_glyphs=13
+    font_h1, x=5, y=15, color=0x000000, max_glyphs=30
 )
 magtag.splash.append(label_header)
 
 # Set up calendar event fonts
 font_event = bitmap_font.load_font("fonts/Arial-12.pcf")
-font_event.load_glyphs(
-    b"abcdefghjiklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890-:/ ()"
-)
 
 if not google_auth.refresh_access_token():
     raise RuntimeError("Unable to refresh access token - has the token been revoked?")
