@@ -155,9 +155,9 @@ def format_datetime(datetime, pretty_date=False):
         if not hours == 12:
             hours -= 12
     # via https://github.com/micropython/micropython/issues/3087
-    formatted_time = "{:02d}:{:02d}{:s}".format(hours, minutes, am_pm)
+    formatted_time = "{:01d}:{:02d}{:s}".format(hours, minutes, am_pm)
     if pretty_date:  # return a nice date for header label
-        formatted_date = "{}. {:02d}, {:04d} ".format(MONTHS[month], mday, year)
+        formatted_date = "{} {}.{:02d}, {:04d} ".format(WEEKDAYS[r.datetime[6]], MONTHS[month], mday, year)
         return formatted_date
     # Event occurs today, return the time only
     return formatted_time
