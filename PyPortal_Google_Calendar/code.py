@@ -1,5 +1,6 @@
-# PyPortal Google Calendar Viewer
-# Brent Rubell for Adafruit Industries, 2021
+# SPDX-FileCopyrightText: 2021 Brent Rubell, written for Adafruit Industries
+#
+# SPDX-License-Identifier: Unlicense
 import time
 import board
 import busio
@@ -15,7 +16,7 @@ from adafruit_pyportal import PyPortal
 import rtc
 
 # Calendar ID
-CALENDAR_ID = "YOUR_CALENDAR_ID"
+CALENDAR_ID = "YOUR_CAL_ID"
 
 # Maximum amount of events to display
 MAX_EVENTS = 5
@@ -36,6 +37,17 @@ MONTHS = {
     10: "Oct",
     11: "Nov",
     12: "Dec",
+}
+
+# Dict. of day names for pretty-printing the header
+WEEKDAYS = {
+    0: "Monday",
+    1: "Tuesday",
+    2: "Wednesday",
+    3: "Thursday",
+    4: "Friday",
+    5: "Saturday",
+    6: "Sunday",
 }
 
 # Add a secrets.py to your filesystem that has a dictionary called secrets with "ssid" and
@@ -93,7 +105,15 @@ def get_current_time(time_max=False):
     cur_time = r.datetime
     if time_max:  # maximum time to fetch events is midnight (4:59:59UTC)
         cur_time_max = time.struct_time(
-            cur_time[0], cur_time[1], cur_time[2] + 1, 4, 59, 59, 0, -1, -1
+            cur_time[0],
+            cur_time[1],
+            cur_time[2] + 1,
+            4,
+            59,
+            59,
+            cur_time[6],
+            cur_time[7],
+            cur_time[8],
         )
         cur_time = cur_time_max
     cur_time = "{:04d}-{:02d}-{:02d}T{:02d}:{:02d}:{:02d}{:s}".format(
@@ -161,9 +181,11 @@ def format_datetime(datetime, pretty_date=False):
         # convert to 12hr time
         hours -= 12
     # via https://github.com/micropython/micropython/issues/3087
-    formatted_time = "{:02d}:{:02d}{:s}".format(hours, minutes, am_pm)
+    formatted_time = "{:01d}:{:02d}{:s}".format(hours, minutes, am_pm)
     if pretty_date:  # return a nice date for header label
-        formatted_date = "{}. {:02d}, {:04d} ".format(MONTHS[month], mday, year)
+        formatted_date = "{} {}.{:02d}, {:04d} ".format(
+            WEEKDAYS[r.datetime[6]], MONTHS[month], mday, year
+        )
         return formatted_date
     # Event occurs today, return the time only
     return formatted_time
@@ -208,20 +230,12 @@ pyportal.set_background(0xFFFFFF)
 line_header = Line(0, 50, 320, 50, color=0x000000)
 pyportal.splash.append(line_header)
 
-font_h1 = bitmap_font.load_font("fonts/Arial-Bold-24.pcf")
-font_h1.load_glyphs(
-    b"abcdefghjiklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890-,. "
-)
-label_header = label.Label(
-    font_h1, x=(board.DISPLAY.width // 5) + 1, y=30, color=0x000000, max_glyphs=13
-)
+font_h1 = bitmap_font.load_font("fonts/Arial-18.pcf")
+label_header = label.Label(font_h1, x=10, y=30, color=0x000000, max_glyphs=30)
 pyportal.splash.append(label_header)
 
 # Set up calendar event fonts
 font_events = bitmap_font.load_font("fonts/Arial-14.pcf")
-font_events.load_glyphs(
-    b"abcdefghjiklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890- ()"
-)
 
 if not google_auth.refresh_access_token():
     raise RuntimeError("Unable to refresh access token - has the token been revoked?")
