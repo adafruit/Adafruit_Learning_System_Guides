@@ -1,6 +1,7 @@
 import time
 import random
 import audioio
+import audiocore
 import board
 import busio
 from digitalio import DigitalInOut
@@ -16,7 +17,7 @@ button = digitalio.DigitalInOut(board.A1)
 button.switch_to_input(pull=digitalio.Pull.UP)
 
 wave_file = open("sound/Rain.wav", "rb")
-wave = audioio.WaveFile(wave_file)
+wave = audiocore.WaveFile(wave_file)
 audio = audioio.AudioOut(board.A0)
 
 
@@ -130,17 +131,17 @@ while True:
             if weather_type == 'Sunny':
                 palette = sunny_palette
                 wave_file = open("sound/Clear.wav", "rb")
-                wave = audioio.WaveFile(wave_file)
+                wave = audiocore.WaveFile(wave_file)
                 has_sound = True
             if weather_type == 'Clouds':
                 palette = cloudy_palette
                 wave_file = open("sound/Clouds.wav", "rb")
-                wave = audioio.WaveFile(wave_file)
+                wave = audiocore.WaveFile(wave_file)
                 has_sound = True
             if weather_type == 'Rain':
                 palette = cloudy_palette
                 wave_file = open("sound/Rain.wav", "rb")
-                wave = audioio.WaveFile(wave_file)
+                wave = audiocore.WaveFile(wave_file)
                 raining = True
                 has_sound = True
             if weather_type == 'Thunderstorm':
@@ -152,7 +153,7 @@ while True:
             if weather_type == 'Snow':
                 palette = cloudy_palette
                 wave_file = open("sound/Snow.wav", "rb")
-                wave = audioio.WaveFile(wave_file)
+                wave = audiocore.WaveFile(wave_file)
                 snowing = True
                 has_sound = True
             weather_refresh = time.monotonic()
@@ -204,6 +205,6 @@ while True:
             wave_file = open("sound/Thunderstorm1.wav", "rb")
         elif Thunder == 2:
             wave_file = open("sound/Thunderstorm2.wav", "rb")
-        wave = audioio.WaveFile(wave_file)
+        wave = audiocore.WaveFile(wave_file)
         audio.play(wave)
         next_bolt_time = time.monotonic() + random.randint(5, 15)  # between 5 and 15 s

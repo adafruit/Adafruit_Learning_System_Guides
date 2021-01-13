@@ -14,6 +14,7 @@ import digitalio
 import board
 import busio
 import audioio
+import audiocore
 import neopixel
 
 def load_wav(name):
@@ -23,7 +24,7 @@ def load_wav(name):
                  this, e.g. passing 'foo' will load file 'foo.wav'.
     @return WAV buffer that can be passed to play_wav() below.
     """
-    return audioio.WaveFile(open(name + '.wav', 'rb'))
+    return audiocore.WaveFile(open(name + '.wav', 'rb'))
 
 STOMP_WAV = load_wav('stomp') # WAV file to play with each step
 ROAR_WAV = load_wav('roar')   # WAV when jumping

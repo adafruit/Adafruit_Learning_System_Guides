@@ -7,6 +7,7 @@ from adafruit_motor import motor
 from busio import I2C
 import neopixel
 import audioio
+import audiocore
 import board
 
 # Create seesaw object
@@ -39,7 +40,7 @@ def map_range(x, in_min, in_max, out_min, out_max):
 # Get the audio file ready
 wavfile = "unchained.wav"
 f = open(wavfile, "rb")
-wav = audioio.WaveFile(f)
+wav = audiocore.WaveFile(f)
 a = audioio.AudioOut(board.A0)
 
 time_to_play = 0  # when to start playing

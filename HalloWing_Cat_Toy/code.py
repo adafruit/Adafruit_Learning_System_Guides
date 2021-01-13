@@ -21,6 +21,7 @@ import displayio
 import digitalio
 import touchio
 import audioio
+import audiocore
 import neopixel
 # import busio
 # import adafruit_lis3dh
@@ -59,7 +60,7 @@ pixels.show()
 
 def play_wave(filename):
     wave_file = open(filename, "rb")
-    wave = audioio.WaveFile(wave_file)
+    wave = audiocore.WaveFile(wave_file)
     audio.play(wave)
     while audio.playing:
         pass

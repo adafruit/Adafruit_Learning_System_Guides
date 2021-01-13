@@ -6,6 +6,7 @@
 
 import time
 import audioio
+import audiocore
 import board
 import neopixel
 from digitalio import DigitalInOut, Pull, Direction
@@ -39,7 +40,7 @@ motorInc = 0
 # Start playing the file (in the background)
 def play_file(wavfile):
     audio_file = open(wavfile, "rb")
-    wav = audioio.WaveFile(audio_file)
+    wav = audiocore.WaveFile(audio_file)
     speaker.play(wav,loop = True)
 
 while True:

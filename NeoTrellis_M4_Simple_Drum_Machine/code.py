@@ -2,6 +2,7 @@ import time
 import board
 import busio
 import audioio
+import audiocore
 import adafruit_fancyled.adafruit_fancyled as fancy
 import adafruit_trellism4
 import adafruit_adxl34x
@@ -56,7 +57,7 @@ def wheel(pos): # Input a value 0 to 255 to get a color value.
 with audioio.AudioOut(board.A1, right_channel=board.A0) as audio:
     try:
         f = open("welcome.wav", "rb")
-        wave = audioio.WaveFile(f)
+        wave = audiocore.WaveFile(f)
         audio.play(wave)
         swirl = 0  # we'll swirl through the colors in the gradient
         while audio.playing:
@@ -79,7 +80,7 @@ with audioio.AudioOut(board.A1, right_channel=board.A0) as audio:
 
 # Parse the first file to figure out what format its in
 with open(VOICES[0], "rb") as f:
-    wav = audioio.WaveFile(f)
+    wav = audiocore.WaveFile(f)
     print("%d channels, %d bits per sample, %d Hz sample rate " %
           (wav.channel_count, wav.bits_per_sample, wav.sample_rate))
 
@@ -107,7 +108,7 @@ for v in range(4):
     # OK we managed to open the wave OK
     for x in range(1, 4):
         trellis.pixels[(v, x)] = DRUM_COLOR[v]
-    sample = audioio.WaveFile(wave_file)
+    sample = audiocore.WaveFile(wave_file)
     # debug play back on load!
     mixer.play(sample, voice=0)
     for x in range(4, 7):

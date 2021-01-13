@@ -3,6 +3,7 @@ import time
 import random
 import board
 import audioio
+import audiocore
 from adafruit_crickit import crickit
 
 # Sparky automaton
@@ -31,7 +32,7 @@ a = audioio.AudioOut(board.A0)
 def play_file(wavfile):
     print("Playing", wavfile)
     with open(wavfile, "rb") as f:
-        wav = audioio.WaveFile(f)
+        wav = audiocore.WaveFile(f)
         a.play(wav)
         while a.playing:  # turn servos, motors, etc. during playback
             mouth_servo.angle = MOUTH_END

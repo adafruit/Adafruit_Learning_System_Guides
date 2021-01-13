@@ -5,6 +5,7 @@ from digitalio import DigitalInOut, Direction, Pull
 import analogio
 import supervisor
 import audioio
+import audiocore
 import board
 import neopixel
 
@@ -35,7 +36,7 @@ button_a.pull = Pull.DOWN
 cpx_audio = audioio.AudioOut(board.A0)
 def play_file(wavfile):
     with open(wavfile, "rb") as f:
-        wav = audioio.WaveFile(f)
+        wav = audiocore.WaveFile(f)
         cpx_audio.play(wav)
         while cpx_audio.playing:
             pass
@@ -104,7 +105,7 @@ while True:
 
     # determine squeek
     freq = int(map_range(light.value, DARK, BRIGHT, 440, 8800))
-    sine_wave = audioio.RawSample(wave_array, channel_count=1, sample_rate=freq)
+    sine_wave = audiocore.RawSample(wave_array, channel_count=1, sample_rate=freq)
     cpx_audio.stop()
     cpx_audio.play(sine_wave, loop=True)
 

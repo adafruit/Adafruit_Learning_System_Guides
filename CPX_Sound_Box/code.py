@@ -2,6 +2,7 @@ import time
 import board
 from digitalio import DigitalInOut, Direction, Pull
 import audioio
+import audiocore
 import neopixel
 
 filename = "electrons.wav"
@@ -37,7 +38,7 @@ def simpleCircle(wait):
 def play_file(playname):
     print("Playing File " + playname)
     wave_file = open(playname, "rb")
-    with audioio.WaveFile(wave_file) as wave:
+    with audiocore.WaveFile(wave_file) as wave:
         with audioio.AudioOut(board.A0) as audio:
             audio.play(wave)
             while audio.playing:

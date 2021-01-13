@@ -1,9 +1,9 @@
-import audioio
+import audiocore
 import board
 import audiobusio
 
 wave_file = open("StreetChicken.wav", "rb")
-wave = audioio.WaveFile(wave_file)
+wave = audiocore.WaveFile(wave_file)
 
 # For Feather M0 Express, ItsyBitsy M0 Express, Metro M0 Express
 audio = audiobusio.I2SOut(board.D1, board.D0, board.D9)

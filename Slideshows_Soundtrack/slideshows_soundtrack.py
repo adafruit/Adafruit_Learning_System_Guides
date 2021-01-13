@@ -1,6 +1,7 @@
 import board
 from adafruit_slideshow import SlideShow, PlayBackDirection
 import audioio
+import audiocore
 import digitalio
 import touchio
 
@@ -43,7 +44,7 @@ def basename(file_name):
 def play_file(wav_file_name):
     try:
         data = open(wav_file_name, "rb")
-        wav = audioio.WaveFile(data)
+        wav = audiocore.WaveFile(data)
         a.play(wav)
         print("Playing: " + wav_file_name)
         while a.playing:

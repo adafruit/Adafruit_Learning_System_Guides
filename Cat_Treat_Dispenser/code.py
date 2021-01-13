@@ -1,6 +1,7 @@
 import time
 import board
 import audioio
+import audiocore
 from adafruit_crickit import crickit
 
 print("Cat Feeder")
@@ -10,7 +11,7 @@ feed_servo = crickit.servo_1
 # audio output
 cpx_audio = audioio.AudioOut(board.A0)
 f = open("activate.wav", "rb")
-wav = audioio.WaveFile(f)
+wav = audiocore.WaveFile(f)
 
 while True:
     if crickit.touch_1.value:

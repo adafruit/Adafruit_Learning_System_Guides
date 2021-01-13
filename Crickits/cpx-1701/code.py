@@ -5,6 +5,7 @@ from adafruit_seesaw.pwmout import PWMOut
 from adafruit_motor import motor
 import neopixel
 import audioio
+import audiocore
 import board
 
 print("The voyages of the CPX-1701!")
@@ -29,7 +30,7 @@ time.sleep(1)
 motor_a.throttle = 0  # warp drive off
 
 f = open("01space.wav", "rb")
-wav = audioio.WaveFile(f)
+wav = audiocore.WaveFile(f)
 cpx_audio.play(wav)
 
 t = time.monotonic()  # take a timestamp
@@ -52,7 +53,7 @@ f.close()
 
 # play the warp drive and theme music!
 f = open("02warp.wav", "rb")
-wav = audioio.WaveFile(f)
+wav = audiocore.WaveFile(f)
 cpx_audio.play(wav)
 
 time.sleep(1)

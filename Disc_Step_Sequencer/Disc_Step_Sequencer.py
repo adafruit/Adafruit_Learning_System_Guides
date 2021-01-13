@@ -15,6 +15,7 @@ All text above must be included in any redistribution.
 """
 
 import audioio
+import audiocore
 import board
 from digitalio import DigitalInOut, Direction
 from adafruit_crickit import crickit
@@ -27,7 +28,7 @@ from adafruit_debouncer import Debouncer
 VOICES = ["bd_tek.wav", "elec_hi_snare.wav", "ch_01.wav", "clap_01.wav"]
 # Parse the first file to figure out what format its in
 with open(VOICES[0], "rb") as f:
-    wav = audioio.WaveFile(f)
+    wav = audiocore.WaveFile(f)
     print("%d channels, %d bits per sample, %d Hz sample rate " %
           (wav.channel_count, wav.bits_per_sample, wav.sample_rate))
 
@@ -54,7 +55,7 @@ for v in VOICES:
     wave_file = open(v, "rb")
     print(v)
     # OK we managed to open the wave OK
-    sample = audioio.WaveFile(wave_file)
+    sample = audiocore.WaveFile(wave_file)
     # debug play back on load!
     mixer.play(sample, voice=0)
     while mixer.playing:

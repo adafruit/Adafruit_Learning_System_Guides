@@ -1,6 +1,7 @@
 import time
 import random
 import audioio
+import audiocore
 from digitalio import DigitalInOut, Pull, Direction
 from adafruit_seesaw.seesaw import Seesaw
 from adafruit_seesaw.pwmout import PWMOut
@@ -49,7 +50,7 @@ a = audioio.AudioOut(board.A0)
 def play_file(wavfile):
     print("Playing", wavfile)
     with open(wavfile, "rb") as f:
-        wav = audioio.WaveFile(f)
+        wav = audiocore.WaveFile(f)
         a.play(wav)
         while a.playing:
             my_servo.angle = MOUTH_END

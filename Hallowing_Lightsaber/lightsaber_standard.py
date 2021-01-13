@@ -4,6 +4,7 @@
 import time
 import math
 import audioio
+import audiocore
 import busio
 import board
 import touchio
@@ -51,7 +52,7 @@ def play_wav(name, loop=False):
     """
     try:
         wave_file = open('sounds/' + name + '.wav', 'rb')
-        wave = audioio.WaveFile(wave_file)
+        wave = audiocore.WaveFile(wave_file)
         AUDIO.play(wave, loop=loop)
     except:
         return

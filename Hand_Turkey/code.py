@@ -4,6 +4,7 @@ import random
 import board
 from busio import I2C
 import audioio
+import audiocore
 import adafruit_lis3dh
 from adafruit_crickit import crickit
 
@@ -38,7 +39,7 @@ mouth_servo.angle = MOUTH_START
 def play_file(wavfile):
     print("Playing", wavfile)
     with open(wavfile, "rb") as f:
-        wav = audioio.WaveFile(f)
+        wav = audiocore.WaveFile(f)
         a.play(wav)
         while a.playing:  # turn servos, motors, etc. during playback
             mouth_servo.angle = MOUTH_END

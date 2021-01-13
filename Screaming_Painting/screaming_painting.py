@@ -3,6 +3,7 @@ import math
 import array
 import audiobusio
 import audioio
+import audiocore
 import board
 from adafruit_crickit import crickit
 
@@ -40,7 +41,7 @@ a = audioio.AudioOut(board.A0)
 def play_file(wavfile):
     print("Playing scream!")
     with open(wavfile, "rb") as f:
-        wav = audioio.WaveFile(f)
+        wav = audiocore.WaveFile(f)
         a.play(wav)
         while a.playing:
             head_servo.angle = 60

@@ -1,6 +1,7 @@
 import time
 import board
 import audioio
+import audiocore
 import adafruit_fancyled.adafruit_fancyled as fancy
 import adafruit_trellism4
 from color_names import * # pylint: disable=wildcard-import,unused-wildcard-import
@@ -56,7 +57,7 @@ trellis = adafruit_trellism4.TrellisM4Express(rotation=0)
 with audioio.AudioOut(board.A1, right_channel=board.A0) as audio:
     try:
         f = open("welcome.wav", "rb")
-        wave = audioio.WaveFile(f)
+        wave = audiocore.WaveFile(f)
         audio.play(wave)
         swirl = 0  # we'll swirl through the colors in the gradient
         while audio.playing:
@@ -81,7 +82,7 @@ channel_count = None
 bits_per_sample = None
 sample_rate = None
 with open(SAMPLE_FOLDER+SAMPLES[0][0], "rb") as f:
-    wav = audioio.WaveFile(f)
+    wav = audiocore.WaveFile(f)
     print("%d channels, %d bits per sample, %d Hz sample rate " %
           (wav.channel_count, wav.bits_per_sample, wav.sample_rate))
 
@@ -102,7 +103,7 @@ for i, v in enumerate(SAMPLES):
     filename = SAMPLE_FOLDER+v[0]
     try:
         with open(filename, "rb") as f:
-            wav = audioio.WaveFile(f)
+            wav = audiocore.WaveFile(f)
             print(filename,
                   "%d channels, %d bits per sample, %d Hz sample rate " %
                   (wav.channel_count, wav.bits_per_sample, wav.sample_rate))
@@ -147,7 +148,7 @@ while True:
         try:
             filename = SAMPLE_FOLDER+SAMPLES[sample_num][0]
             f = open(filename, "rb")
-            wav = audioio.WaveFile(f)
+            wav = audiocore.WaveFile(f)
 
             # is something else playing? interrupt it!
             if currently_playing['voice'] != None:
