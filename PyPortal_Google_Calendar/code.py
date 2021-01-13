@@ -15,7 +15,7 @@ from adafruit_pyportal import PyPortal
 import rtc
 
 # Calendar ID
-CALENDAR_ID = "YOUR_CAL_ID_HERE@group.calendar.google.com"
+CALENDAR_ID = "YOUR_CALENDAR_ID"
 
 # Maximum amount of events to display
 MAX_EVENTS = 5
