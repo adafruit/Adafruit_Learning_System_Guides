@@ -2,12 +2,18 @@ import time
 import board
 import busio
 import digitalio
+import sys
 from adafruit_mcp9600 import MCP9600
 
 SENSOR_ADDR = 0X67
 
 i2c = busio.I2C(board.SCL, board.SDA,frequency=200000)
-sensor = MCP9600(i2c,SENSOR_ADDR,"K")
+try:
+    sensor = MCP9600(i2c,SENSOR_ADDR,"K")
+except ValueError as e:
+    print(e)
+    print("Unable to connect to the thermocouple sensor.")
+    sys.exit(1)
 
 oven = digitalio.DigitalInOut(board.D4)
 oven.direction = digitalio.Direction.OUTPUT
