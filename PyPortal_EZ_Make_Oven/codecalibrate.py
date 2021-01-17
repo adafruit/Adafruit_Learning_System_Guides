@@ -22,7 +22,7 @@ print("for your oven to use with the EZ Make Oven.\n\n")
 print("Calibration will start in 10 seconds...")
 time.sleep(10)
 print("Starting...")
-print("Calibrating oven temperature to ",check_temp)
+print("Calibrating oven temperature to %d C" % check_temp)
 finish = False
 oven_control(True)
 maxloop=300
@@ -31,7 +31,7 @@ while not finish:
     time.sleep(1)
     counter += 1
     current_temp = sensor.temperature
-    print(current_temp)
+    print("%.02f C" % current_temp)
     if current_temp >= check_temp:
         finish = True
         oven_control(False)
