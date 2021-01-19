@@ -17,7 +17,7 @@ VSCALE = 20              # vertical plot scale
 #-------------------------------------------
 
 # pylint: disable=line-too-long
-DATA_SOURCE = "https://tidesandcurrents.noaa.gov/api/datagetter?date=today&product=predictions&datum=mllw&format=json&units=metric&time_zone=lst_ldt&station="+STATION_ID
+DATA_SOURCE = "https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?date=today&product=predictions&datum=mllw&format=json&units=metric&time_zone=lst_ldt&station="+STATION_ID
 DATA_LOCATION = ["predictions"]
 
 WIDTH = board.DISPLAY.width
@@ -132,7 +132,6 @@ def update_display(time_info, update_tides=False):
                                                  time_info.tm_min,
                                                  time_info.tm_sec)
 
-    board.DISPLAY.refresh_soon()
 
 # First run update
 tide_data = get_tide_data()
