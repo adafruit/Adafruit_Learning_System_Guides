@@ -240,7 +240,7 @@ buttons.append(button_2)  # adding this button to the buttons group
 
 # Add all of the main buttons to the splash Group
 for b in buttons:
-    splash.append(b.group)
+    splash.append(b)
 
 
 # Make a button to change the icon image on view2
@@ -253,7 +253,7 @@ button_icon = Button(x=150, y=60,
 buttons.append(button_icon)  # adding this button to the buttons group
 
 # Add this button to view2 Group
-view2.append(button_icon.group)
+view2.append(button_icon)
 
 # Make a button to play a sound on view2
 button_sound = Button(x=150, y=170,
@@ -265,7 +265,7 @@ button_sound = Button(x=150, y=170,
 buttons.append(button_sound)  # adding this button to the buttons group
 
 # Add this button to view2 Group
-view3.append(button_sound.group)
+view3.append(button_sound)
 
 #pylint: disable=global-statement
 def switch_view(what_view):
