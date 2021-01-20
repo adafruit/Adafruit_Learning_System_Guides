@@ -12,7 +12,7 @@ DATE_COLOR = 0xFFFFFF    # date and time color
 #-------------------------------------------
 
 # pylint: disable=line-too-long
-DATA_SOURCE = "https://tidesandcurrents.noaa.gov/api/datagetter?date=today&product=predictions&datum=mllw&interval=hilo&format=json&units=metric&time_zone=lst_ldt&station="+STATION_ID
+DATA_SOURCE = "https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?date=today&product=predictions&datum=mllw&interval=hilo&format=json&units=metric&time_zone=lst_ldt&station="+STATION_ID
 DATA_LOCATION = ["predictions"]
 
 # determine the current working directory needed so we know where to find files
@@ -83,7 +83,6 @@ def update_display(time_info, update_tides=False):
                                                                    time_info.tm_min,
                                                                    time_info.tm_sec)
 
-    board.DISPLAY.refresh_soon()
 
 # First run update
 tide_info = get_tide_info()
