@@ -89,7 +89,7 @@ class Beep(object):
     def play(self, duration=0.1):
         if not pyportal.peripherals._speaker_enable.value:
             pyportal.peripherals._speaker_enable.value = True
-            pyportal.audio.play(self.sine_wave_sample, loop=True)
+            pyportal.peripherals.audio.play(self.sine_wave_sample, loop=True)
             self.start = time.monotonic()
             self.duration = duration
             if duration <= .5:
@@ -101,7 +101,7 @@ class Beep(object):
     def stop(self):
         if pyportal.peripherals._speaker_enable.value:
             self.duration = 0
-            pyportal.audio.stop()
+            pyportal.peripherals.audio.stop()
             pyportal.peripherals._speaker_enable.value = False
 
     def refresh(self):
