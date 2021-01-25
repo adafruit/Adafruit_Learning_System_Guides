@@ -4,8 +4,10 @@ NeoPixel Animator code for ItsyBitsy nRF52840 NeoPixel Animation and Color Remot
 
 import board
 import neopixel
-from adafruit_led_animation.animation import Comet, Sparkle, AnimationGroup,\
-    AnimationSequence
+from adafruit_led_animation.animation.comet import Comet
+from adafruit_led_animation.animation.sparkle import Sparkle
+from adafruit_led_animation.group import AnimationGroup
+from adafruit_led_animation.sequence import AnimationSequence
 import adafruit_led_animation.color as color
 
 from adafruit_ble import BLERadio
@@ -18,7 +20,7 @@ from adafruit_bluefruit_connect.button_packet import ButtonPacket
 
 # The number of NeoPixels in the externally attached strip
 # If using two strips connected to the same pin, count only one strip for this number!
-STRIP_PIXEL_NUMBER = 43
+STRIP_PIXEL_NUMBER = 44
 
 # Setup for comet animation
 COMET_SPEED = 0.05  # Lower numbers increase the animation speed
