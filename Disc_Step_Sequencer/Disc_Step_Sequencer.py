@@ -16,6 +16,7 @@ All text above must be included in any redistribution.
 
 import audioio
 import audiocore
+import audiomixer
 import board
 from digitalio import DigitalInOut, Direction
 from adafruit_crickit import crickit
@@ -23,7 +24,7 @@ from adafruit_debouncer import Debouncer
 
 #  You get 4 samples, they must all have the same sample rate and must
 #  all be mono or stereo (no mix-n-match!)
-#  mixer info https://circuitpython.readthedocs.io/en/latest/shared-bindings/audioio/Mixer.html
+#  mixer info https://circuitpython.readthedocs.io/en/latest/shared-bindings/audiomixer/Mixer.html
 
 VOICES = ["bd_tek.wav", "elec_hi_snare.wav", "ch_01.wav", "clap_01.wav"]
 # Parse the first file to figure out what format its in
@@ -41,7 +42,7 @@ with open(VOICES[0], "rb") as f:
         audio = audioio.AudioOut(board.A0)
     else:
         raise RuntimeError("Must be mono or stereo waves!")
-    mixer = audioio.Mixer(voice_count=4,
+    mixer = audiomixer.Mixer(voice_count=4,
                           sample_rate=wav.sample_rate,
                           channel_count=wav.channel_count,
                           bits_per_sample=wav.bits_per_sample,

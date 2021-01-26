@@ -3,6 +3,7 @@ import board
 import busio
 import audioio
 import audiocore
+import audiomixer
 import adafruit_fancyled.adafruit_fancyled as fancy
 import adafruit_trellism4
 import adafruit_adxl34x
@@ -92,7 +93,7 @@ with open(VOICES[0], "rb") as f:
         audio = audioio.AudioOut(board.A1, right_channel=board.A0)
     else:
         raise RuntimeError("Must be mono or stereo waves!")
-    mixer = audioio.Mixer(voice_count=4,
+    mixer = audiomixer.Mixer(voice_count=4,
                           sample_rate=wav.sample_rate,
                           channel_count=wav.channel_count,
                           bits_per_sample=wav.bits_per_sample,

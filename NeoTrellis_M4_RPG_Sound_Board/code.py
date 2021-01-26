@@ -18,6 +18,7 @@ import time
 import board
 import audioio
 import audiocore
+import audiomixer
 import adafruit_trellism4
 from color_names import *
 
@@ -64,7 +65,7 @@ with open(SAMPLE_FOLDER+SAMPLES[0][0], 'rb') as f:
     else:
         raise RuntimeError('Must be mono or stereo waves!')
 
-mixer = audioio.Mixer(voice_count=2,
+mixer = audiomixer.Mixer(voice_count=2,
                       sample_rate=sample_rate,
                       channel_count=channel_count,
                       bits_per_sample=bits_per_sample,
