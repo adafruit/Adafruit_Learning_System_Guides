@@ -1,6 +1,6 @@
 import time
 import board
-import pulseio
+import pwmio
 import simpleio
 from digitalio import DigitalInOut, Direction, Pull
 import adafruit_fancyled.adafruit_fancyled as fancy
@@ -11,9 +11,9 @@ NEOPIXEL_NUM = 31
 pixels = neopixel.NeoPixel(NEOPIXEL_PIN, NEOPIXEL_NUM, auto_write=False)
 
 # Since its common anode, 'off' is max duty cycle
-red_led = pulseio.PWMOut(board.D9, frequency=5000, duty_cycle=65535)
-green_led = pulseio.PWMOut(board.D10, frequency=5000, duty_cycle=65535)
-blue_led = pulseio.PWMOut(board.D11, frequency=5000, duty_cycle=65535)
+red_led = pwmio.PWMOut(board.D9, frequency=5000, duty_cycle=65535)
+green_led = pwmio.PWMOut(board.D10, frequency=5000, duty_cycle=65535)
+blue_led = pwmio.PWMOut(board.D11, frequency=5000, duty_cycle=65535)
 
 switch = DigitalInOut(board.D12)
 switch.direction = Direction.INPUT

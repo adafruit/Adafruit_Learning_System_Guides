@@ -11,7 +11,7 @@ import time
 
 import analogio
 import board
-import pulseio
+import pwmio
 
 photocell_pin = board.A1  # CdS photocell connected to this ANALOG pin
 speaker_pin = board.D0  # Speaker is connected to this DIGITAL pin
@@ -19,7 +19,7 @@ scale = 0.03  # Change this to adjust tone scale
 
 # Initialize input/output pins
 photocell = analogio.AnalogIn(photocell_pin)
-pwm = pulseio.PWMOut(speaker_pin, variable_frequency=True, duty_cycle=0)
+pwm = pwmio.PWMOut(speaker_pin, variable_frequency=True, duty_cycle=0)
 
 while True:  # Loop forever...
     # Read photocell analog pin and convert voltage to frequency

@@ -3,7 +3,7 @@ import board
 from adafruit_debouncer import Debouncer
 import busio as io
 import digitalio
-import pulseio
+import pwmio
 import adafruit_ssd1306
 
 i2c = io.I2C(board.SCL, board.SDA)
@@ -56,7 +56,7 @@ songbook = {'Twinkle Twinkle': [(C4, 0.5), (C4, 0.5), (G4, 0.5), (G4, 0.5), (A4,
 
 def play_note(note):
     if note[0] != 0:
-        pwm = pulseio.PWMOut(board.D12, duty_cycle = 0, frequency=note[0])
+        pwm = pwmio.PWMOut(board.D12, duty_cycle = 0, frequency=note[0])
         # Hex 7FFF (binary 0111111111111111) is half of the largest value for a 16-bit int,
         # i.e. 50%
         pwm.duty_cycle = 0x7FFF

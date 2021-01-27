@@ -2,10 +2,11 @@ import time
 from adafruit_circuitplayground.express import cpx
 import adafruit_irremote
 import pulseio
+import pwmio
 import board
 
-# Create a 'pulseio' output, to send infrared signals on the IR transmitter @ 38KHz
-pwm = pulseio.PWMOut(board.IR_TX, frequency=38000, duty_cycle=2 ** 15)
+# Create a 'pwmio' output, to send infrared signals on the IR transmitter @ 38KHz
+pwm = pwmio.PWMOut(board.IR_TX, frequency=38000, duty_cycle=2 ** 15)
 pulseout = pulseio.PulseOut(pwm)
 # Create an encoder that will take numbers and turn them into NEC IR pulses
 encoder = adafruit_irremote.GenericTransmit(header=[9500, 4500], one=[550, 550],

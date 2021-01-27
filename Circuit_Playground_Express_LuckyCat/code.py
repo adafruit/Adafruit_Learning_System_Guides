@@ -3,11 +3,11 @@
 
 import time
 import board
-import pulseio
+import pwmio
 from adafruit_motor import servo
 
 # create a PWMOut object on Pin A1
-pwm = pulseio.PWMOut(board.A1, frequency=50)
+pwm = pwmio.PWMOut(board.A1, frequency=50)
 
 # Create a servo object, my_servo
 my_servo = servo.Servo(pwm)

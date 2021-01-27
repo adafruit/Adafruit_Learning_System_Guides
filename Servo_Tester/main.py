@@ -17,7 +17,7 @@ import board
 import busio
 import digitalio
 import rotaryio
-import pulseio
+import pwmio
 import adafruit_ssd1306
 from adafruit_motor import servo
 from adafruit_debouncer import Debouncer
@@ -49,7 +49,7 @@ max_pulse_index = 0
 #-------------------------------------------------------------------------------
 # Initialize servo
 
-pwm = pulseio.PWMOut(board.D5, frequency=50)
+pwm = pwmio.PWMOut(board.D5, frequency=50)
 test_servo = servo.Servo(pwm, min_pulse=1000, max_pulse=2000)
 test_servo.angle = 0
 

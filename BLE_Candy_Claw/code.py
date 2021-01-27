@@ -1,6 +1,6 @@
 import time
 import board
-import pulseio
+import pwmio
 from adafruit_motor import servo
 from adafruit_bluefruit_connect.packet import Packet
 from adafruit_bluefruit_connect.button_packet import ButtonPacket
@@ -12,7 +12,7 @@ ble = BLERadio()
 uart = UARTService()
 advertisement = ProvideServicesAdvertisement(uart)
 
-pwm = pulseio.PWMOut(board.A3, duty_cycle=2 ** 15, frequency=50)
+pwm = pwmio.PWMOut(board.A3, duty_cycle=2 ** 15, frequency=50)
 
 my_servo = servo.Servo(pwm)
 

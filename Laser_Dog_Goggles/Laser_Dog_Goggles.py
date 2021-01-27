@@ -3,11 +3,11 @@
 
 import time
 import board
-import pulseio
+import pwmio
 from adafruit_motor import servo
 
 # servo pin for the M0 boards:
-pwm = pulseio.PWMOut(board.A2, duty_cycle=2 ** 15, frequency=50)
+pwm = pwmio.PWMOut(board.A2, duty_cycle=2 ** 15, frequency=50)
 my_servo = servo.Servo(pwm)
 speed = .04     # 40ms lower value means faster movement
 max_turn = 180  # rotation range 180 degree, half a circle

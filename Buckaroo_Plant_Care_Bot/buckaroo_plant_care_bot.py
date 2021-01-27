@@ -8,7 +8,7 @@ from adafruit_clue import clue
 from adafruit_display_text import label
 import displayio
 import terminalio
-import pulseio
+import pwmio
 
 moist_level = 50  # adjust this value as needed for your plant
 
@@ -56,7 +56,7 @@ board.DISPLAY.show(clue_display)
 motor = DigitalInOut(board.P2)
 motor.direction = Direction.OUTPUT
 
-buzzer = pulseio.PWMOut(board.SPEAKER, variable_frequency=True)
+buzzer = pwmio.PWMOut(board.SPEAKER, variable_frequency=True)
 buzzer.frequency = 1000
 
 sense_pin = board.P1

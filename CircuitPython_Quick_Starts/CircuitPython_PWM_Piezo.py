@@ -1,9 +1,9 @@
 import time
 
 import board
-import pulseio
+import pwmio
 
-piezo = pulseio.PWMOut(board.A2, duty_cycle=0,
+piezo = pwmio.PWMOut(board.A2, duty_cycle=0,
                        frequency=440, variable_frequency=True)
 
 while True:

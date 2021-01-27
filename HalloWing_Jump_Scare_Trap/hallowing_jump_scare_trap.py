@@ -5,7 +5,7 @@ import array
 import math
 import board
 import displayio
-import pulseio
+import pwmio
 from adafruit_motor import servo
 import digitalio
 import touchio
@@ -21,8 +21,8 @@ pir.direction = digitalio.Direction.INPUT
 led = digitalio.DigitalInOut(LED_PIN)
 led.direction = digitalio.Direction.OUTPUT
 # Setup servo
-# servo = pulseio.PWMOut(board.D4, frequency=50)
-pwm = pulseio.PWMOut(board.D4)
+# servo = pwmio.PWMOut(board.D4, frequency=50)
+pwm = pwmio.PWMOut(board.D4)
 servo = servo.Servo(pwm)
 
 # Setup cap touch button
@@ -84,7 +84,7 @@ def blink(count, speed):
         time.sleep(speed)
 
 # display setup
-backlight = pulseio.PWMOut(board.TFT_BACKLIGHT)
+backlight = pwmio.PWMOut(board.TFT_BACKLIGHT)
 splash = displayio.Group()
 board.DISPLAY.show(splash)
 max_brightness = 2 ** 15

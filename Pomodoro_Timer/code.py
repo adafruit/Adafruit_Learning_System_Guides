@@ -30,7 +30,7 @@ import rotaryio
 import neopixel
 from adafruit_debouncer import Debouncer
 import digitalio
-import pulseio
+import pwmio
 
 # Setup the hardware
 
@@ -110,7 +110,7 @@ def beep(count, duration, interstitial, freq):
     :param float interstitial: the length (in seconds) of the silence between beeps
     :param int freq: the frequency of the beeps
     """
-    pwm = pulseio.PWMOut(board.D12, duty_cycle = 0, frequency=freq)
+    pwm = pwmio.PWMOut(board.D12, duty_cycle = 0, frequency=freq)
     for _ in range(count):
         pwm.duty_cycle = 0x7FFF
         time.sleep(duration)

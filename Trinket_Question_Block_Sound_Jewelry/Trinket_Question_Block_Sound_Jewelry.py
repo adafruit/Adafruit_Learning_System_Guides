@@ -1,7 +1,7 @@
 import time
 import board
 import simpleio
-import pulseio
+import pwmio
 import digitalio
 
 # PWM is not available on Trinket D1
@@ -10,7 +10,7 @@ speaker_pin = board.D2      # PWM speaker
 pwm_leds = board.D4         # PWM "fading" LEDs
 
 # initialize PWM for LEDs
-pwm = pulseio.PWMOut(pwm_leds, frequency=256, duty_cycle=50)
+pwm = pwmio.PWMOut(pwm_leds, frequency=256, duty_cycle=50)
 led_fade_delay = .001       # delay in seconds makes color fade visible
 led_fade_step = 1024        # fade amount
 

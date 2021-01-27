@@ -19,7 +19,7 @@
 import time
 import random
 import board
-import pulseio
+import pwmio
 from adafruit_motor import servo
 
 # we are intentionally avoiding Trinket Pin #1 (board.A0)
@@ -28,8 +28,8 @@ tilt_servo_pin = board.A2   # servo control line (orange) Trinket Pin #0
 rotate_servo_pin = board.A1 # servo control line (orange) Trinket Pin #2
 
 # servo object setup for the M0 boards:
-tilt_pwm = pulseio.PWMOut(tilt_servo_pin, duty_cycle=2 ** 15, frequency=50)
-rotate_pwm = pulseio.PWMOut(rotate_servo_pin, duty_cycle=2 ** 15, frequency=50)
+tilt_pwm = pwmio.PWMOut(tilt_servo_pin, duty_cycle=2 ** 15, frequency=50)
+rotate_pwm = pwmio.PWMOut(rotate_servo_pin, duty_cycle=2 ** 15, frequency=50)
 tilt_servo = servo.Servo(tilt_pwm)
 rotate_servo = servo.Servo(rotate_pwm)
 

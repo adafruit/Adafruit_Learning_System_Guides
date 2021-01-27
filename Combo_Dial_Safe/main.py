@@ -5,11 +5,11 @@
 import time
 
 import board
-import pulseio
+import pwmio
 from adafruit_motor import servo
 from adafruit_circuitplayground.express import cpx
 
-pwm = pulseio.PWMOut(board.A3, duty_cycle=2 ** 15, frequency=50)
+pwm = pwmio.PWMOut(board.A3, duty_cycle=2 ** 15, frequency=50)
 
 #  plug red servo wire to VOUT, brown to GND, yellow to A3
 servo = servo.Servo(pwm)

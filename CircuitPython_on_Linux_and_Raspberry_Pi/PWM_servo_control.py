@@ -1,9 +1,9 @@
 import time
 import board
-import pulseio
+import pwmio
 
 # Initialize PWM output for the servo (on pin D5):
-servo = pulseio.PWMOut(board.D5, frequency=50)
+servo = pwmio.PWMOut(board.D5, frequency=50)
 
 
 # Create a function to simplify setting PWM duty cycle for the servo:

@@ -1,13 +1,13 @@
 """CircuitPython Essentials PWM with variable frequency piezo example"""
 import time
 import board
-import pulseio
+import pwmio
 
 # For the M0 boards:
-piezo = pulseio.PWMOut(board.A2, duty_cycle=0, frequency=440, variable_frequency=True)
+piezo = pwmio.PWMOut(board.A2, duty_cycle=0, frequency=440, variable_frequency=True)
 
 # For the M4 boards:
-# piezo = pulseio.PWMOut(board.A1, duty_cycle=0, frequency=440, variable_frequency=True)
+# piezo = pwmio.PWMOut(board.A1, duty_cycle=0, frequency=440, variable_frequency=True)
 
 while True:
     for f in (262, 294, 330, 349, 392, 440, 494, 523):

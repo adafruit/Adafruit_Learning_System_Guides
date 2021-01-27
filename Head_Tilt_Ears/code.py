@@ -16,7 +16,7 @@ import time
 import busio
 import board
 import adafruit_lis3dh
-import pulseio
+import pwmio
 from adafruit_motor import servo
 
 
@@ -25,8 +25,8 @@ i2c = busio.I2C(board.ACCELEROMETER_SCL, board.ACCELEROMETER_SDA)
 sensor = adafruit_lis3dh.LIS3DH_I2C(i2c, address=0x19)
 
 # Setup servos
-left_pwm = pulseio.PWMOut(board.A1, frequency=50)
-right_pwm = pulseio.PWMOut(board.A2, frequency=50)
+left_pwm = pwmio.PWMOut(board.A1, frequency=50)
+right_pwm = pwmio.PWMOut(board.A2, frequency=50)
 
 left_ear = servo.Servo(left_pwm)
 right_ear = servo.Servo(right_pwm)

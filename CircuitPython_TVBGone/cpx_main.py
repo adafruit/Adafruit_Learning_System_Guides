@@ -3,6 +3,7 @@ import time
 
 import board
 import pulseio
+import pwmio
 from digitalio import DigitalInOut, Direction, Pull
 # pylint: disable=eval-used
 # Switch to select 'stealth-mode'
@@ -28,7 +29,7 @@ button_b = DigitalInOut(board.BUTTON_B)
 button_b.direction = Direction.INPUT
 button_b.pull = Pull.DOWN
 
-pwm = pulseio.PWMOut(board.REMOTEOUT, frequency=38000,
+pwm = pwmio.PWMOut(board.REMOTEOUT, frequency=38000,
                      duty_cycle=2 ** 15, variable_frequency=True)
 pulse = pulseio.PulseOut(pwm)
 

@@ -5,6 +5,7 @@ import time
 import adafruit_dotstar
 import board
 import pulseio
+import pwmio
 from digitalio import DigitalInOut, Direction
 
 # pylint: disable=eval-used
@@ -17,7 +18,7 @@ pixel.fill((0, 0, 0))
 led = DigitalInOut(board.D13)
 led.direction = Direction.OUTPUT
 
-pwm = pulseio.PWMOut(board.A2, frequency=38000,
+pwm = pwmio.PWMOut(board.A2, frequency=38000,
                      duty_cycle=2 ** 15, variable_frequency=True)
 pulse = pulseio.PulseOut(pwm)
 

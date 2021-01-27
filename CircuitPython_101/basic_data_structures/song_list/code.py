@@ -1,6 +1,6 @@
 import time
 import board
-import pulseio
+import pwmio
 
 C4     = 261
 C_SH_4 = 277
@@ -20,7 +20,7 @@ twinkle = [(C4, 0.5), (C4, 0.5), (G4, 0.5), (G4, 0.5), (A4, 0.5), (A4, 0.5), (G4
 
 def play_note(note):
     if note[0] != 0:
-        pwm = pulseio.PWMOut(board.D12, duty_cycle = 0, frequency=note[0])
+        pwm = pwmio.PWMOut(board.D12, duty_cycle = 0, frequency=note[0])
         # Hex 7FFF (binary 0111111111111111) is half of the largest value for a 16-bit int,
         # i.e. 50%
         pwm.duty_cycle = 0x7FFF

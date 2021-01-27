@@ -22,7 +22,7 @@ import busio
 import adafruit_ds3231
 import audioio
 import audiocore
-import pulseio
+import pwmio
 from adafruit_motor import servo
 import neopixel
 from adafruit_debouncer import Debouncer
@@ -78,7 +78,7 @@ switch_io.pull = Pull.UP
 switch = Debouncer(switch_io)
 
 # create a PWMOut object on Pin A2.
-pwm = pulseio.PWMOut(SERVO_PIN, duty_cycle=2 ** 15, frequency=50)
+pwm = pwmio.PWMOut(SERVO_PIN, duty_cycle=2 ** 15, frequency=50)
 
 # Create a servo object, my_servo.
 servo = servo.ContinuousServo(pwm)

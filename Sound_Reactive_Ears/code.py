@@ -17,7 +17,7 @@ import math
 import array
 import board
 import audiobusio
-import pulseio
+import pwmio
 from adafruit_motor import servo
 from adafruit_circuitplayground.express import cpx
 
@@ -31,8 +31,8 @@ NUM_SAMPLES = 90
 
 # the trigger threshhold
 THRESHOLD = 6
-left_pwm = pulseio.PWMOut(board.A1, frequency=50)
-right_pwm = pulseio.PWMOut(board.A2, frequency=50)
+left_pwm = pwmio.PWMOut(board.A1, frequency=50)
+right_pwm = pwmio.PWMOut(board.A2, frequency=50)
 
 left_ear = servo.Servo(left_pwm)
 right_ear = servo.Servo(right_pwm)

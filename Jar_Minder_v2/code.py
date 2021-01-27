@@ -7,7 +7,7 @@ done.value = False
 
 #pylint: disable=wrong-import-position,wrong-import-order
 import time
-import pulseio
+import pwmio
 import busio
 from adafruit_epd.epd import Adafruit_EPD
 from adafruit_epd.il0373 import Adafruit_IL0373
@@ -31,7 +31,7 @@ sensor = adafruit_si7021.SI7021(i2c)
 ON = 2**15
 OFF = 0
 
-buzzer = pulseio.PWMOut(board.D5, variable_frequency=True)
+buzzer = pwmio.PWMOut(board.D5, variable_frequency=True)
 buzzer.duty_cycle = OFF
 
 silence_button = digitalio.DigitalInOut(board.A5)
