@@ -102,7 +102,7 @@ add_button(3, 4, "=", 1, BLUE, WHITE)
 calc_group.append(border)
 calc_group.append(calc_display)
 for b in buttons:
-    calc_group.append(b.group)
+    calc_group.append(b)
 
 calculator = Calculator(calc_display, clear_button, LABEL_OFFSET)
 
