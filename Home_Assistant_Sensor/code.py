@@ -1,9 +1,15 @@
-# adafruit_minimqtt usage with native wifi
+"""
+SHTC3 Temperature/Humidity Sensor Example for
+using CircuitPython with Home Assistant
+
+Author: Melissa LeBlanc-Williams for Adafruit Industries
+"""
+
 import time
-import board
-import busio
 import ssl
 import json
+import board
+import busio
 import socketpool
 import wifi
 import adafruit_minimqtt.adafruit_minimqtt as MQTT
@@ -23,9 +29,9 @@ except ImportError:
     print("WiFi secrets are kept in secrets.py, please add them there!")
     raise
 
-print("Connecting to %s"%secrets["ssid"])
+print("Connecting to %s" % secrets["ssid"])
 wifi.radio.connect(secrets["ssid"], secrets["password"])
-print("Connected to %s!"%secrets["ssid"])
+print("Connected to %s!" % secrets["ssid"])
 
 
 ### Secrets File Setup ###
@@ -40,12 +46,12 @@ pool = socketpool.SocketPool(wifi.radio)
 
 # Set up a MiniMQTT Client
 mqtt_client = MQTT.MQTT(
-    broker=secrets['mqtt_broker'],
-    port=secrets['mqtt_port'],
-    username=secrets['mqtt_username'],
-    password=secrets['mqtt_password'],
+    broker=secrets["mqtt_broker"],
+    port=secrets["mqtt_port"],
+    username=secrets["mqtt_username"],
+    password=secrets["mqtt_password"],
     socket_pool=pool,
-    ssl_context= ssl.create_default_context()
+    ssl_context=ssl.create_default_context(),
 )
 
 print("Attempting to connect to %s" % mqtt_client.broker)
@@ -56,7 +62,8 @@ while True:
 
     output = {
         "temperature": temperature,
-        "humidity": relative_humidity,}
+        "humidity": relative_humidity,
+    }
 
     print("Publishing to %s" % MQTT_TOPIC)
     mqtt_client.publish(MQTT_TOPIC, json.dumps(output))
