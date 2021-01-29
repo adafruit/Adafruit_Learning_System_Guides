@@ -9,16 +9,17 @@ import ssl
 import json
 import alarm
 import board
-import busio
 import socketpool
 import wifi
 import adafruit_minimqtt.adafruit_minimqtt as MQTT
 import adafruit_shtc3
 
-sht = adafruit_shtc3.SHTC3(busio.I2C(board.SCL, board.SDA))
 PUBLISH_DELAY = 60
 MQTT_TOPIC = "state/temp-sensor"
-USE_DEEP_SLEEP = False
+USE_DEEP_SLEEP = True
+
+# Connect to the Sensor
+sht = adafruit_shtc3.SHTC3(board.I2C())
 
 # Add a secrets.py to your filesystem that has a dictionary called secrets with "ssid" and
 # "password" keys with your WiFi credentials. DO NOT share that file or commit it into Git or other
@@ -30,17 +31,8 @@ except ImportError:
     print("WiFi secrets are kept in secrets.py, please add them there!")
     raise
 
-print("Connecting to %s" % secrets["ssid"])
 wifi.radio.connect(secrets["ssid"], secrets["password"])
 print("Connected to %s!" % secrets["ssid"])
-
-
-### Secrets File Setup ###
-try:
-    from secrets import secrets
-except ImportError:
-    print("Connection secrets are kept in secrets.py, please add them there!")
-    raise
 
 # Create a socket pool
 pool = socketpool.SocketPool(wifi.radio)
@@ -68,12 +60,12 @@ while True:
 
     print("Publishing to %s" % MQTT_TOPIC)
     mqtt_client.publish(MQTT_TOPIC, json.dumps(output))
-    last_update = time.monotonic()
 
     if USE_DEEP_SLEEP:
         mqtt_client.disconnect()
         pause = alarm.time.TimeAlarm(monotonic_time=time.monotonic() + PUBLISH_DELAY)
         alarm.exit_and_deep_sleep_until_alarms(pause)
     else:
+        last_update = time.monotonic()
         while time.monotonic() < last_update + PUBLISH_DELAY:
             mqtt_client.loop()
