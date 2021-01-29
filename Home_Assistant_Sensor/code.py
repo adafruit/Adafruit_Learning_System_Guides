@@ -1,13 +1,13 @@
 """
 SHTC3 Temperature/Humidity Sensor Example for
 using CircuitPython with Home Assistant
-
 Author: Melissa LeBlanc-Williams for Adafruit Industries
 """
 
 import time
 import ssl
 import json
+import alarm
 import board
 import busio
 import socketpool
@@ -18,6 +18,7 @@ import adafruit_shtc3
 sht = adafruit_shtc3.SHTC3(busio.I2C(board.SCL, board.SDA))
 PUBLISH_DELAY = 60
 MQTT_TOPIC = "state/temp-sensor"
+USE_DEEP_SLEEP = False
 
 # Add a secrets.py to your filesystem that has a dictionary called secrets with "ssid" and
 # "password" keys with your WiFi credentials. DO NOT share that file or commit it into Git or other
@@ -69,8 +70,10 @@ while True:
     mqtt_client.publish(MQTT_TOPIC, json.dumps(output))
     last_update = time.monotonic()
 
-    # Pump the loop until we receive a message on `mqtt_topic`
-    while time.monotonic() < last_update + PUBLISH_DELAY:
-        mqtt_client.loop()
-
-mqtt_client.disconnect()
+    if USE_DEEP_SLEEP:
+        mqtt_client.disconnect()
+        pause = alarm.time.TimeAlarm(monotonic_time=time.monotonic() + PUBLISH_DELAY)
+        alarm.exit_and_deep_sleep_until_alarms(pause)
+    else:
+        while time.monotonic() < last_update + PUBLISH_DELAY:
+            mqtt_client.loop()
