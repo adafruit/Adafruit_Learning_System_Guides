@@ -25,8 +25,9 @@ def oven_control(enable=False):
 check_temp = 100
 print("This program will determine calibration settings ")
 print("for your oven to use with the EZ Make Oven.\n\n")
-print("Calibration will start in 10 seconds...")
-time.sleep(10)
+for i in range(10):
+    print("Calibration will start in %d seconds..." % (10-i))
+    time.sleep(1)
 print("Starting...")
 print("Calibrating oven temperature to %d C" % check_temp)
 finish = False
