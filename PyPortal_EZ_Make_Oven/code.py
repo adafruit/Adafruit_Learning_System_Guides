@@ -129,11 +129,8 @@ class ReflowOvenControl(object):
             self.sensor_status = True
         except ValueError:
             print("temperature sensor not available")
-        self.ontime = 0
-        self.offtime = 0
         self.control = False
         self.reset()
-        self.reflow_start = 0
         self.beep = Beep()
         self.set_state("ready")
         if self.sensor_status:
@@ -145,6 +142,7 @@ class ReflowOvenControl(object):
         self.ontime = 0
         self.offtime = 0
         self.enable(False)
+        self.reflow_start = 0
 
     def get_profile_temp(self, seconds):
         x1 = self.sprofile["profile"][0][0]
@@ -178,8 +176,12 @@ class ReflowOvenControl(object):
             if self.state != self.last_state:
                 # change in status, time for a beep!
                 self.beep.play(0.1)
-            if temp < 50:
+            if temp < 35:
                 self.set_state("ready")
+                oven.reset()
+                draw_profile(sgraph, oven.sprofile)
+                timer_data.text = format_time(0)
+
         if self.state == "ready":
             self.enable(False)
         if self.state == "start" and temp >= 50:
@@ -567,6 +569,7 @@ while True:
             if oven.state == "ready":
                 button.label = "Stop"
                 oven.set_state("start")
+
             else:
                 # cancel operation
                 message.text = "Wait"
@@ -578,6 +581,7 @@ while True:
             status = "Ready"
             if last_state != "ready":
                 oven.beep.refresh()
+                oven.reset()
                 draw_profile(sgraph, oven.sprofile)
                 timer_data.text = format_time(0)
             if button.label != "Start":
