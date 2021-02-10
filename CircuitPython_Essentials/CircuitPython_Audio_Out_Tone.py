@@ -4,11 +4,7 @@ import array
 import math
 import board
 import digitalio
-
-try:
-    from audiocore import RawSample
-except ImportError:
-    from audioio import RawSample
+from audiocore import RawSample
 
 try:
     from audioio import AudioOut
