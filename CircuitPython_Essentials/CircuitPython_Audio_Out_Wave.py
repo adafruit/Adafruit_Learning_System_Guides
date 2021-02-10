@@ -2,11 +2,7 @@
 import time
 import board
 import digitalio
-
-try:
-    from audiocore import WaveFile
-except ImportError:
-    from audioio import WaveFile
+from audiocore import WaveFile
 
 try:
     from audioio import AudioOut
