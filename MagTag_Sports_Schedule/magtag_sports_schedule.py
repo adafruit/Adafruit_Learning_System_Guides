@@ -12,6 +12,7 @@
 
 import time
 import json
+from adafruit_datetime import datetime, timedelta
 from adafruit_magtag.magtag import MagTag
 
 USE_24HR_TIME = False
@@ -116,27 +117,21 @@ magtag = MagTag(
 def format_date(iso_formatted_date):
     if iso_formatted_date is None:
         return "When: Unavailable"
-    month = int(iso_formatted_date[5:7])
-    day = int(iso_formatted_date[8:10])
-    hour = int(iso_formatted_date[11:13])
-    if hour is 00:
-        adjusted_hour = (24 + TIME_ZONE_OFFSET) % 24
-    else:
-        adjusted_hour = (hour + TIME_ZONE_OFFSET) % 24
-    minute = int(iso_formatted_date[14:16])
+    date = datetime.fromisoformat(iso_formatted_date[:-1])
+    date += timedelta(hours=TIME_ZONE_OFFSET)
 
     if USE_24HR_TIME:
-        timestring = "%d:%02d %s" % (adjusted_hour, minute, TIME_ZONE_NAME)
-    elif adjusted_hour > 12:
+        timestring = "%d:%02d %s" % (date.hour, date.minute, TIME_ZONE_NAME)
+    elif date.hour > 12:
         timestring = "%d:%02d pm %s" % (
-            abs((adjusted_hour - 12) % 12),
-            minute,
+            abs((date.hour - 12) % 12),
+            date.minute,
             TIME_ZONE_NAME,
         )
     else:
-        timestring = "%d:%02d am %s" % (adjusted_hour, minute, TIME_ZONE_NAME)
+        timestring = "%d:%02d am %s" % (date.hour, date.minute, TIME_ZONE_NAME)
 
-    return "%s %d, %s" % (months[month - 1], day, timestring)
+    return "%s %d, %s" % (months[date.month - 1], date.day, timestring)
 
 
 def format_score(scores, is_final):
