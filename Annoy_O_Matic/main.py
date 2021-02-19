@@ -3,10 +3,10 @@
 import time
 
 import board
-import pulseio
+import pwmio
 
 # pylint: disable=unused-variable,consider-using-enumerate,redefined-outer-name,too-many-locals
-piezo = pulseio.PWMOut(board.D0, duty_cycle=0, frequency=440,
+piezo = pwmio.PWMOut(board.D0, duty_cycle=0, frequency=440,
                        variable_frequency=True)
 
 # pick the mode here:

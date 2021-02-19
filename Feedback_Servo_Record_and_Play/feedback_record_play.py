@@ -3,7 +3,7 @@
 
 import time
 import board
-import pulseio
+import pwmio
 from simpleio import map_range
 from adafruit_motor import servo
 from analogio import AnalogIn
@@ -40,7 +40,7 @@ led.direction = Direction.OUTPUT
 led.value = False
 
 # Setup servo
-pwm = pulseio.PWMOut(SERVO_PIN, duty_cycle=2 ** 15, frequency=50)
+pwm = pwmio.PWMOut(SERVO_PIN, duty_cycle=2 ** 15, frequency=50)
 servo = servo.Servo(pwm)
 servo.angle = None
 

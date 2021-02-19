@@ -6,9 +6,9 @@ Gemma M0 with Piezo on D0 and GND
 import time
 
 import board
-import pulseio
+import pwmio
 
-piezo = pulseio.PWMOut(board.D0, duty_cycle=0, frequency=440,
+piezo = pwmio.PWMOut(board.D0, duty_cycle=0, frequency=440,
                        variable_frequency=True)
 
 tempo = 1.6

@@ -2,6 +2,7 @@ import time
 import busio
 import board
 import pulseio
+import pwmio
 import adafruit_irremote
 import adafruit_lis3dh
 
@@ -25,8 +26,8 @@ TRANSMIT_DELAY = 0.1
 i2c = busio.I2C(board.ACCELEROMETER_SCL, board.ACCELEROMETER_SDA)
 sensor = adafruit_lis3dh.LIS3DH_I2C(i2c, address=0x19)
 
-# Create a 'pulseio' output, to send infrared signals on the IR transmitter @ 38KHz
-pwm = pulseio.PWMOut(board.IR_TX, frequency=38000, duty_cycle=2 ** 15)
+# Create a 'pwmio' output, to send infrared signals on the IR transmitter @ 38KHz
+pwm = pwmio.PWMOut(board.IR_TX, frequency=38000, duty_cycle=2 ** 15)
 pulseout = pulseio.PulseOut(pwm)
 
 # Create an encoder that will take numbers and turn them into IR pulses

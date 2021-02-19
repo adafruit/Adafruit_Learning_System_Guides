@@ -6,7 +6,7 @@ time.sleep().
 import board
 import digitalio
 import time
-import pulseio
+import pwmio
 from adafruit_motor import servo
 
 SERVO_LIST = [
@@ -22,7 +22,7 @@ SERVO_LIST = [
 ]
 
 for cur_servo in SERVO_LIST:
-    pwm = pulseio.PWMOut(cur_servo["PIN"], duty_cycle=2 ** 15, frequency=50)
+    pwm = pwmio.PWMOut(cur_servo["PIN"], duty_cycle=2 ** 15, frequency=50)
     # Create a servo object.
     cur_servo["SERVO"] = servo.Servo(pwm)
 

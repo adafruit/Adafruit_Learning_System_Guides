@@ -14,11 +14,11 @@ All text above must be included in any redistribution.
 
 import time
 import board
-import pulseio
+import pwmio
 from adafruit_circuitplayground.express import cpx
 from adafruit_motor import servo
 
-pwm = pulseio.PWMOut(board.A1, duty_cycle=2 ** 15, frequency=50)
+pwm = pwmio.PWMOut(board.A1, duty_cycle=2 ** 15, frequency=50)
 my_servo = servo.Servo(pwm)
 
 cpx.pixels.fill((0, 0, 0))

@@ -6,6 +6,7 @@ import adafruit_dotstar
 import board
 import pwmio
 import pulseio
+import pwmio
 from digitalio import DigitalInOut, Direction
 
 # pylint: disable=eval-used

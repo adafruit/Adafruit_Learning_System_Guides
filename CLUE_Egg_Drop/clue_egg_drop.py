@@ -2,7 +2,7 @@ import time
 import math
 import board
 from digitalio import DigitalInOut, Direction, Pull
-import pulseio
+import pwmio
 from adafruit_lsm6ds.lsm6ds33 import LSM6DS33
 from adafruit_lsm6ds import AccelRange, AccelHPF, Rate
 from adafruit_display_text import label
@@ -50,7 +50,7 @@ sensor.high_pass_filter = AccelHPF.SLOPE
 sensor.high_pass_filter_enabled = True
 
 # and make a lil buzzer
-buzzer = pulseio.PWMOut(board.SPEAKER, variable_frequency=True)
+buzzer = pwmio.PWMOut(board.SPEAKER, variable_frequency=True)
 buzzer.frequency = 1000
 
 max_slope = 0

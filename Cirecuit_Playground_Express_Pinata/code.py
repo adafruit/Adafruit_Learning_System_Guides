@@ -3,12 +3,12 @@
 import time
 import random
 import board
-import pulseio
+import pwmio
 from adafruit_motor import servo
 from adafruit_circuitplayground.express import cpx
 
 # create a PWMOut object on CPX Pin A1
-pwm = pulseio.PWMOut(board.A1, frequency=50)
+pwm = pwmio.PWMOut(board.A1, frequency=50)
 # Create a servo object cpx_servo
 cpx_servo = servo.Servo(pwm)
 

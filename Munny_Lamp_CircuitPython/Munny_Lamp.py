@@ -7,7 +7,7 @@ import time
 import random
 import board
 import busio
-import pulseio
+import pwmio
 from digitalio import DigitalInOut, Direction
 from adafruit_bluefruitspi import BluefruitSPI
 import adafruit_lis3dh
@@ -15,9 +15,9 @@ import adafruit_lis3dh
 ADVERT_NAME = b'BlinkaNeoLamp'
 
 # RGB LED on D11, 12, 13, we're using a Prop Maker wing
-red_led = pulseio.PWMOut(board.D11, frequency=50000, duty_cycle=0)
-green_led = pulseio.PWMOut(board.D12, frequency=50000, duty_cycle=0)
-blue_led = pulseio.PWMOut(board.D13, frequency=50000, duty_cycle=0)
+red_led = pwmio.PWMOut(board.D11, frequency=50000, duty_cycle=0)
+green_led = pwmio.PWMOut(board.D12, frequency=50000, duty_cycle=0)
+blue_led = pwmio.PWMOut(board.D13, frequency=50000, duty_cycle=0)
 # Prop maker wing has a power pin for the LED!
 power_pin = DigitalInOut(board.D10)
 power_pin.direction = Direction.OUTPUT

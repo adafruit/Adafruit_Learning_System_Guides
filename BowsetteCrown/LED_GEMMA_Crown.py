@@ -1,14 +1,14 @@
 import time
 
 import board
-import pulseio
+import pwmio
 
 # PWM (fading) LEDs are connected on D0, D2 (PWM not avail on D1)
 pwm_leds = board.D2
-pwm = pulseio.PWMOut(pwm_leds, frequency=1000, duty_cycle=0)
+pwm = pwmio.PWMOut(pwm_leds, frequency=1000, duty_cycle=0)
 
 pwm2_leds = board.D0
-pwm2 = pulseio.PWMOut(pwm2_leds, frequency=1000, duty_cycle=0)
+pwm2 = pwmio.PWMOut(pwm2_leds, frequency=1000, duty_cycle=0)
 
 brightness = 0  # how bright the LED is
 fade_amount = 1285  # 2% steping of 2^16

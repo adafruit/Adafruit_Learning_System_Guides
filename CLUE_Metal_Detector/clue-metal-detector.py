@@ -41,7 +41,7 @@ import os
 import gc
 
 import board
-import pulseio
+import pwmio
 import analogio
 import ulab
 
@@ -483,7 +483,7 @@ CONV_FACTOR = pin_input.reference_voltage / 65535
 # Start pwm output on P0 or A1
 # 400kHz and 55000 (84%) duty_cycle were chosen empirically to maximise
 # the voltage and the voltage drop detecting a small pair of metal scissors
-pwm = pulseio.PWMOut(board_pin_output, frequency=400 * 1000,
+pwm = pwmio.PWMOut(board_pin_output, frequency=400 * 1000,
                      duty_cycle=0, variable_frequency=True)
 pwm.duty_cycle = 55000
 

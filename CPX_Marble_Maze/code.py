@@ -2,14 +2,14 @@
 # Adafruit Industries, 2019. MIT License
 import time
 import board
-import pulseio
+import pwmio
 from adafruit_motor import servo
 import simpleio
 from adafruit_circuitplayground.express import cpx
 
 # create a PWMOut object on Pin A2.
-pwm1 = pulseio.PWMOut(board.A1, duty_cycle=2 ** 15, frequency=50)
-pwm2 = pulseio.PWMOut(board.A2, duty_cycle=2 ** 15, frequency=50)
+pwm1 = pwmio.PWMOut(board.A1, duty_cycle=2 ** 15, frequency=50)
+pwm2 = pwmio.PWMOut(board.A2, duty_cycle=2 ** 15, frequency=50)
 
 # Create a servo object, my_servo.
 my_servo1 = servo.Servo(pwm1)

@@ -1,12 +1,12 @@
 import time
 
 import board
-import pulseio
+import pwmio
 from digitalio import DigitalInOut, Direction
 
 # PWM (fading) LEDs are connected on D0 (PWM not avail on D1)
 pwm_leds = board.D0
-pwm = pulseio.PWMOut(pwm_leds, frequency=1000, duty_cycle=0)
+pwm = pwmio.PWMOut(pwm_leds, frequency=1000, duty_cycle=0)
 
 # digital LEDs connected on D2
 digital_leds = DigitalInOut(board.D2)

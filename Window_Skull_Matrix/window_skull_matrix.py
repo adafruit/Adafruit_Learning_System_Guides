@@ -7,13 +7,13 @@ import math
 import random
 import time
 import board
-import pulseio
+import pwmio
 import displayio
 from adafruit_motor import servo
 import adafruit_imageload
 from adafruit_matrixportal.matrix import Matrix
 
-pwm = pulseio.PWMOut(board.A4, duty_cycle=2 ** 15, frequency=50)
+pwm = pwmio.PWMOut(board.A4, duty_cycle=2 ** 15, frequency=50)
 jaw_servo = servo.Servo(pwm)
 
 

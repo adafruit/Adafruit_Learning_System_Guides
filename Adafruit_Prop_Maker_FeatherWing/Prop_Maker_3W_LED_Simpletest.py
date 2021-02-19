@@ -1,5 +1,5 @@
 """Simple rainbow swirl example for 3W LED"""
-import pulseio
+import pwmio
 import board
 import digitalio
 
@@ -7,9 +7,9 @@ enable = digitalio.DigitalInOut(board.D10)
 enable.direction = digitalio.Direction.OUTPUT
 enable.value = True
 
-red = pulseio.PWMOut(board.D11, duty_cycle=0, frequency=20000)
-green = pulseio.PWMOut(board.D12, duty_cycle=0, frequency=20000)
-blue = pulseio.PWMOut(board.D13, duty_cycle=0, frequency=20000)
+red = pwmio.PWMOut(board.D11, duty_cycle=0, frequency=20000)
+green = pwmio.PWMOut(board.D12, duty_cycle=0, frequency=20000)
+blue = pwmio.PWMOut(board.D13, duty_cycle=0, frequency=20000)
 
 
 def wheel(pos):

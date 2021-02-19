@@ -2,6 +2,7 @@ import time
 import board
 import neopixel
 import adafruit_irremote
+import pwmio
 import pulseio
 
 pixpin = board.D1
@@ -14,7 +15,7 @@ numpix = 60
 strip = neopixel.NeoPixel(pixpin, numpix, brightness=1, auto_write=False)
 
 # IR LED output for 38kHz PWM
-pwm = pulseio.PWMOut(ir_led, frequency=38000)
+pwm = pwmio.PWMOut(ir_led, frequency=38000)
 
 # IR Sensor input to detect basketball
 pulses = pulseio.PulseIn(ir_sensor, maxlen=200, idle_state=True)

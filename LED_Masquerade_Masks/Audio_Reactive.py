@@ -2,14 +2,14 @@ import time
 
 import analogio
 import board
-import pulseio
+import pwmio
 
 sampleWindow = 0.033  # Sample window width (0.033 sec = 33 mS = ~30 Hz)
 ledPin = board.D0  # Pin where LEDs are connected (PWM not avail on D1)
 micPin = board.A1  # Microphone 'OUT' is connected here
 
 mic = analogio.AnalogIn(micPin)
-pwm = pulseio.PWMOut(ledPin, frequency=1000, duty_cycle=0)
+pwm = pwmio.PWMOut(ledPin, frequency=1000, duty_cycle=0)
 
 while True:
     # Listen to mic for short interval, recording min & max signal

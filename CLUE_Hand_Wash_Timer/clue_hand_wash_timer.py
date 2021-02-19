@@ -10,7 +10,7 @@ from adafruit_clue import clue
 from adafruit_display_text import label
 from adafruit_bitmap_font import bitmap_font
 import displayio
-import pulseio
+import pwmio
 
 clue.display.brightness = 0.8
 clue_display = displayio.Group(max_size=4)
@@ -74,7 +74,7 @@ def countdown(seconds):
     timer_label.text = ("Wave to start")
 
 # setup buzzer
-buzzer = pulseio.PWMOut(board.SPEAKER, variable_frequency=True)
+buzzer = pwmio.PWMOut(board.SPEAKER, variable_frequency=True)
 buzzer.frequency = 1000
 
 while True:

@@ -2,11 +2,11 @@ import time
 
 import adafruit_motor.servo
 import board
-import pulseio
+import pwmio
 from analogio import AnalogIn
 from digitalio import DigitalInOut, Direction, Pull
 
-pwm = pulseio.PWMOut(board.D5, frequency=50)
+pwm = pwmio.PWMOut(board.D5, frequency=50)
 servo = adafruit_motor.servo.Servo(pwm)
 switch = DigitalInOut(board.D7)
 switch.direction = Direction.INPUT

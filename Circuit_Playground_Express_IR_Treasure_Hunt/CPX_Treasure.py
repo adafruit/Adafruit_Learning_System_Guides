@@ -1,5 +1,6 @@
 import time
 import board
+import pwmio
 import pulseio
 import adafruit_irremote
 import neopixel
@@ -11,8 +12,8 @@ TRANSMIT_DELAY = 15  # change this as desired to affect game dynamics, or just l
 # Create NeoPixel object to indicate status
 pixels = neopixel.NeoPixel(board.NEOPIXEL, 10)
 
-# Create a 'pulseio' output, to send infrared signals on the IR transmitter @ 38KHz
-pwm = pulseio.PWMOut(board.IR_TX, frequency=38000, duty_cycle=2 ** 15)
+# Create a 'pwmio' output, to send infrared signals on the IR transmitter @ 38KHz
+pwm = pwmio.PWMOut(board.IR_TX, frequency=38000, duty_cycle=2 ** 15)
 pulseout = pulseio.PulseOut(pwm)
 
 # Create an encoder that will take numbers and turn them into IR pulses
