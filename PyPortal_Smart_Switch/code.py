@@ -40,8 +40,8 @@ def get_local_timestamp(location=None):
     try:
         aio_username = secrets['aio_username']
         aio_key = secrets['aio_key']
-    except KeyError:
-        raise KeyError("\n\nOur time service requires a login/password to rate-limit. Please register for a free adafruit.io account and place the user/key in your secrets file under 'aio_username' and 'aio_key'") from KeyError # pylint: disable=line-too-long
+    except KeyError as e:
+        raise KeyError("\n\nOur time service requires a login/password to rate-limit. Please register for a free adafruit.io account and place the user/key in your secrets file under 'aio_username' and 'aio_key'") from e # pylint: disable=line-too-long
 
     location = secrets.get('timezone', location)
     if location:
@@ -65,8 +65,8 @@ def get_local_timestamp(location=None):
         else:
             tzseconds += tzminutes * 60
         print(seconds + tzseconds, tzoffset, tzhours, tzminutes)
-    except KeyError:
-        raise KeyError("Was unable to lookup the time, try setting secrets['timezone'] according to http://worldtimeapi.org/timezones") from KeyError  # pylint: disable=line-too-long
+    except KeyError as e:
+        raise KeyError("Was unable to lookup the time, try setting secrets['timezone'] according to http://worldtimeapi.org/timezones") from e  # pylint: disable=line-too-long
 
     # now clean up
     response.close()

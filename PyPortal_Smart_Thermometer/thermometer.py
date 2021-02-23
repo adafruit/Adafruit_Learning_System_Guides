@@ -45,9 +45,9 @@ wifi = adafruit_esp32spi_wifimanager.ESPSPI_WiFiManager(esp, secrets, status_lig
 try:
     ADAFRUIT_IO_USER = secrets['aio_username']
     ADAFRUIT_IO_KEY = secrets['aio_key']
-except KeyError:
+except KeyError as e:
     raise KeyError('To use this code, you need to include your Adafruit IO username \
-and password in a secrets.py file on the CIRCUITPY drive.') from KeyError
+and password in a secrets.py file on the CIRCUITPY drive.') from e
 
 # Create an instance of the IO_HTTP client
 io = IO_HTTP(ADAFRUIT_IO_USER, ADAFRUIT_IO_KEY, wifi)
