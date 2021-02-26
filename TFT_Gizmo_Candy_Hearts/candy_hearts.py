@@ -64,7 +64,7 @@ while True:
     line2.anchored_position = (120, 175)
     # pick a random text color
     line1.color = line2.color = choice(MESSAGE_COLORS)
-    # pick a ranomd heart color
+    # pick a random heart color
     palette[1] = choice(HEART_COLORS)
     # OK, now turn auto refresh back on to display
     display.auto_refresh = True
