@@ -8,22 +8,26 @@ from adafruit_display_text import label
 import adafruit_imageload
 from adafruit_clue import clue
 
-#--| User Config |-------------------------
-TVOC_LEVELS = (80, 120) # set two TVOC levels
-MESSAGES = ("GOOD", "SUS?", "BAD!") # set three messages (4 char max)
-#------------------------------------------
+# --| User Config |-------------------------
+TVOC_LEVELS = (80, 120)  # set two TVOC levels
+MESSAGES = ("GOOD", "SUS?", "BAD!")  # set three messages (4 char max)
+# ------------------------------------------
 
 # setup UI
 cow_bmp, cow_pal = adafruit_imageload.load("bmps/milk_bg.bmp")
 background = displayio.TileGrid(cow_bmp, pixel_shader=cow_pal)
 
 mouth_bmp, mouth_pal = adafruit_imageload.load("bmps/mouth_sheet.bmp")
-mouth = displayio.TileGrid(mouth_bmp, pixel_shader=mouth_pal,
-    tile_width = 40,
-    tile_height = 20,
-    width = 1,
-    height = 1,
-    x = 35, y=110)
+mouth = displayio.TileGrid(
+    mouth_bmp,
+    pixel_shader=mouth_pal,
+    tile_width=40,
+    tile_height=20,
+    width=1,
+    height=1,
+    x=35,
+    y=110,
+)
 
 msg_font = bitmap_font.load_font("fonts/Alphakind_28.bdf")
 msg_font.load_glyphs("".join(MESSAGES))
