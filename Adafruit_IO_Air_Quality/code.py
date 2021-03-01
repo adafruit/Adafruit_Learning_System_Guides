@@ -7,6 +7,7 @@ from adafruit_esp32spi import adafruit_esp32spi, adafruit_esp32spi_wifimanager
 from adafruit_io.adafruit_io import IO_HTTP
 from simpleio import map_range
 from adafruit_pm25.uart import PM25_UART
+
 # Uncomment below for PMSA003I Air Quality Breakout
 # from adafruit_pm25.i2c import PM25_I2C
 import adafruit_bme280
@@ -146,7 +147,11 @@ feed_humidity = io.get_feed("air-quality-sensor.humidity")
 feed_temperature = io.get_feed("air-quality-sensor.temperature")
 
 # Set up location metadata from secrets.py file
-location_metadata = (secrets["latitude"], secrets["longitude"], secrets["elevation"])
+location_metadata = {
+    "lat": secrets["latitude"],
+    "lon": secrets["longitude"],
+    "ele": secrets["elevation"],
+}
 
 elapsed_minutes = 0
 prv_mins = 0
