@@ -119,14 +119,12 @@ for led in led_pins:
     led_pin.direction = digitalio.Direction.OUTPUT
     leds.append(led_pin)
 
-#  coordinates for navigating main GUI
-select_x = [0, 32, 64, 96]
-select_y = [0, 32, 64, 96]
+
 
 #  button pins, all pins in order skipping GP15
 note_pins = [board.GP7, board.GP8, board.GP9, board.GP10, board.GP11,
              board.GP12, board.GP13, board.GP14, board.GP16, board.GP17,
-             board.GP18, board.GP19, board.GP20, board.GP21, board.GP22]
+             board.GP18, board.GP19, board.GP20, board.GP21, board.GP22, board.GP26]
 
 note_buttons = []
 
@@ -178,6 +176,10 @@ left_state = None
 right_state = None
 midi_state = None
 
+#  coordinates for navigating main GUI
+select_x = [0, 32, 64, 96]
+select_y = [0, 32, 64, 96]
+
 #  y coordinate for 5-way switch navigation
 y_pos = 0
 #  x coordinate for 5-way switch navigation
@@ -228,7 +230,7 @@ while True:
         select_state = None
 
     #  MIDI input
-    for i in range(15):
+    for i in range(16):
         buttons = note_buttons[i]
         #  if button is pressed...
         if not buttons.value and note_states[i] is False:
