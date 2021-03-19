@@ -73,9 +73,9 @@ try:
 
     magtag.refresh()
 
+    seconds_to_sleep = 24 * 60 * 60  # Sleep for one day
+    print(f"Sleeping for {seconds_to_sleep} seconds")
+    magtag.exit_and_deep_sleep(seconds_to_sleep)
+
 except (ValueError, RuntimeError) as e:
     print("Some error occured, retrying! -", e)
-
-seconds_to_sleep = 24 * 60 * 60  # Sleep for one day
-print(f"Sleeping for {seconds_to_sleep} seconds")
-magtag.exit_and_deep_sleep(seconds_to_sleep)
