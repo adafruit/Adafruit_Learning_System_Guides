@@ -30,6 +30,7 @@ cwd = ("/"+__file__).rsplit('/', 1)[0]
 pyportal = PyPortal(url=DATA_SOURCE,
                     json_path=DATA_LOCATION,
                     status_neopixel=board.NEOPIXEL,
+                    text_font=None,
                     default_bg=cwd+"/map.bmp")
 
 # Connect to the internet and get local time
