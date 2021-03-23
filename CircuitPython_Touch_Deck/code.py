@@ -8,15 +8,23 @@ This version runs on Feather RP2040 with a 3.5" FeatherWing
 import time
 import displayio
 import terminalio
-from adafruit_display_text import label, bitmap_label
+from adafruit_display_text import bitmap_label
 from adafruit_displayio_layout.layouts.grid_layout import GridLayout
-from touch_deck_layers import touch_deck_config, KEY, STRING, MEDIA, KEY_PRESS, KEY_RELEASE
+from adafruit_displayio_layout.widgets.icon_widget import IconWidget
+from adafruit_featherwing import tft_featherwing_35
 import usb_hid
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS
 from adafruit_hid.consumer_control import ConsumerControl
-from adafruit_displayio_layout.widgets.icon_widget import IconWidget
-from adafruit_featherwing import tft_featherwing_35
+from touch_deck_layers import (
+    touch_deck_config,
+    KEY,
+    STRING,
+    MEDIA,
+    KEY_PRESS,
+    KEY_RELEASE,
+)
+
 
 # seems to help the touchscreen not get stuck with chip not found
 time.sleep(3)
@@ -53,13 +61,17 @@ display.show(main_group)
 loading_group = displayio.Group()
 
 # black background, screen size minus side buttons
-loading_background = displayio.Bitmap((display.width-40)//20, display.height//20, 1)
+loading_background = displayio.Bitmap(
+    (display.width - 40) // 20, display.height // 20, 1
+)
 loading_palette = displayio.Palette(1)
 loading_palette[0] = 0x0
 
 # scaled group to match screen size minus side buttons
 loading_background_scale_group = displayio.Group(scale=20)
-loading_background_tilegrid = displayio.TileGrid(loading_background, pixel_shader=loading_palette)
+loading_background_tilegrid = displayio.TileGrid(
+    loading_background, pixel_shader=loading_palette
+)
 loading_background_scale_group.append(loading_background_tilegrid)
 
 # loading screen label
@@ -98,31 +110,19 @@ layer_label.anchored_position = (display.width // 2, 4)
 main_group.append(layer_label)
 
 # right side layer buttons
-next_layer_btn = IconWidget(
-    "",
-    "touch_deck_icons/layer_next.bmp",
-    on_disk=True
-)
+next_layer_btn = IconWidget("", "touch_deck_icons/layer_next.bmp", on_disk=True)
 next_layer_btn.x = display.width - 40
 next_layer_btn.y = display.height - 100
 next_layer_btn.resize = (40, 100)
 main_group.append(next_layer_btn)
 
-prev_layer_btn = IconWidget(
-    "",
-    "touch_deck_icons/layer_prev.bmp",
-    on_disk=True
-)
+prev_layer_btn = IconWidget("", "touch_deck_icons/layer_prev.bmp", on_disk=True)
 prev_layer_btn.x = display.width - 40
 prev_layer_btn.y = 110
 prev_layer_btn.resize = (40, 100)
 main_group.append(prev_layer_btn)
 
-home_layer_btn = IconWidget(
-    "",
-    "touch_deck_icons/layer_home.bmp",
-    on_disk=True
-)
+home_layer_btn = IconWidget("", "touch_deck_icons/layer_home.bmp", on_disk=True)
 home_layer_btn.x = display.width - 40
 home_layer_btn.y = 0
 home_layer_btn.resize = (40, 100)
@@ -202,7 +202,10 @@ while True:
                         # print(p)
 
                         # Next layer button pressed
-                        if next_layer_btn.contains(p) and NEXT_LAYER_INDEX not in _pressed_icons:
+                        if (
+                            next_layer_btn.contains(p)
+                            and NEXT_LAYER_INDEX not in _pressed_icons
+                        ):
 
                             # increment layer
                             current_layer += 1
@@ -219,7 +222,10 @@ while True:
                             _pressed_icons.append(NEXT_LAYER_INDEX)
 
                         # home layer button pressed
-                        if home_layer_btn.contains(p) and HOME_LAYER_INDEX not in _pressed_icons:
+                        if (
+                            home_layer_btn.contains(p)
+                            and HOME_LAYER_INDEX not in _pressed_icons
+                        ):
                             # 0 index is home layer
                             current_layer = 0
                             # load the home layer
@@ -232,7 +238,10 @@ while True:
                             _pressed_icons.append(HOME_LAYER_INDEX)
 
                         # Previous layer button pressed
-                        if prev_layer_btn.contains(p) and PREV_LAYER_INDEX not in _pressed_icons:
+                        if (
+                            prev_layer_btn.contains(p)
+                            and PREV_LAYER_INDEX not in _pressed_icons
+                        ):
 
                             # decrement layer
                             current_layer -= 1
@@ -258,8 +267,9 @@ while True:
                                     # print("pressed {}".format(index))
 
                                     # get actions for this icon from config object
-                                    _cur_actions = touch_deck_config["layers"][current_layer]["shortcuts"][index][
-                                        "actions"]
+                                    _cur_actions = touch_deck_config["layers"][
+                                        current_layer
+                                    ]["shortcuts"][index]["actions"]
 
                                     # tuple means it's a single action
                                     if isinstance(_cur_actions, tuple):
