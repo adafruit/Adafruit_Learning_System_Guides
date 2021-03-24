@@ -1,6 +1,6 @@
 import time
 
-from adafruit_circuitplayground.express import cpx
+from adafruit_circuitplayground import cp
 
 # Red, green, blue, and simple mixes of 2 or 3.
 # Add your own choices here.
@@ -30,48 +30,48 @@ BRIGHTNESS_STEPS = 15
 brightness_step = 2
 color_index = 0
 num_pixels = 2
-cpx.pixels.auto_write = False
+cp.pixels.auto_write = False
 
 while True:
-    if cpx.light > TURN_OFF:
+    if cp.light > TURN_OFF:
         # Indicate the nightlight is off.
-        cpx.red_led = True
+        cp.red_led = True
         continue
     else:
-        cpx.red_led = False
+        cp.red_led = False
 
     # Decrease brightness.
-    if cpx.touch_A7:
+    if cp.touch_A7:
         # Don't go below 1.
         brightness_step = max(1, brightness_step - 1)
 
     # Increase brightness.
-    if cpx.touch_A6:
+    if cp.touch_A6:
         # Don't go above BRIGHTNESS_STEPS.
         brightness_step = min(BRIGHTNESS_STEPS, brightness_step + 1)
 
     # Change color.
-    if cpx.touch_A3:
+    if cp.touch_A3:
         # Cycle through 0 to len(COLORS)-1 and then wrap around.
         color_index = (color_index + 1) % len(COLORS)
 
     # Increase number of pixels.
-    if cpx.touch_A5:
+    if cp.touch_A5:
         # Don't go below 1.
         num_pixels = max(1, num_pixels - 1)
 
     # Decrease number of pixels.
-    if cpx.touch_A4:
-        # Don't go above 10 (number on CPX).
+    if cp.touch_A4:
+        # Don't go above 10 (number on Circuit Playgrounds).
         num_pixels = min(10, num_pixels + 1)
 
 
     # Scale brightness to be 0.0 - MAX_BRIGHTNESS.
-    cpx.pixels.brightness = (brightness_step / BRIGHTNESS_STEPS) * MAX_BRIGHTNESS
+    cp.pixels.brightness = (brightness_step / BRIGHTNESS_STEPS) * MAX_BRIGHTNESS
     for i in range(num_pixels):
-        cpx.pixels[i] = COLORS[color_index]
+        cp.pixels[i] = COLORS[color_index]
     for i in range(num_pixels, 10):
-        cpx.pixels[i] = 0
-    cpx.pixels.show()
+        cp.pixels[i] = 0
+    cp.pixels.show()
 
     time.sleep(0.2)
