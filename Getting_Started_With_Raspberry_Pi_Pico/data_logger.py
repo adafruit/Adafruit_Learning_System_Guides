@@ -12,7 +12,7 @@ led.switch_to_output()
 try:
     with open("/temperature.txt", "a") as datalog:
         while True:
-            temp = microcontroller.cpu[0].temperature
+            temp = microcontroller.cpu.temperature
             datalog.write('{0:f}\n'.format(temp))
             datalog.flush()
             led.value = not led.value
