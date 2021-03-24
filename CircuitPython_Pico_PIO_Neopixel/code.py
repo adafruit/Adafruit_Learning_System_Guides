@@ -14,7 +14,7 @@ pixels = NeoPIO(board.GP0, board.GP1, board.GP2, num_strands*strand_length,
     num_strands=num_strands, auto_write=False, brightness=.18)
 
 # Make a virtual PixelMap so that each strip can be controlled independently
-strips = [PixelMap(pixels, range(i*30, (i+1)*30), individual_pixels=True)
+strips = [PixelMap(pixels, range(i*strand_length, (i+1)*strand_length), individual_pixels=True)
     for i in range(num_strands)]
 
 # This function makes a comet animation with slightly random settings
