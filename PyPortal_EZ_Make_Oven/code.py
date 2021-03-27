@@ -5,18 +5,16 @@ import math
 import gc
 import board
 import busio
+import audioio
 import audiocore
 import displayio
 import digitalio
-from adafruit_pyportal import PyPortal
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text import bitmap_label as label
 from adafruit_display_shapes.circle import Circle
 from adafruit_button import Button
 import adafruit_touchscreen
 from adafruit_mcp9600 import MCP9600
-
-pyportal = PyPortal()
 
 TITLE = "EZ Make Oven Controller"
 VERSION = "1.3.0"
@@ -91,11 +89,21 @@ class Beep(object):
             )
         self.sine_wave_sample = audiocore.RawSample(sine_wave)
 
+        self._speaker_enable = digitalio.DigitalInOut(board.SPEAKER_ENABLE)
+        self._speaker_enable.switch_to_output(False)
+
+        if hasattr(board, "AUDIO_OUT"):
+            self.audio = audioio.AudioOut(board.AUDIO_OUT)
+        elif hasattr(board, "SPEAKER"):
+            self.audio = audioio.AudioOut(board.SPEAKER)
+        else:
+            raise AttributeError("Board does not have a builtin speaker!")
+
     # pylint: disable=protected-access
     def play(self, duration=0.1):
-        if not pyportal.peripherals._speaker_enable.value:
-            pyportal.peripherals._speaker_enable.value = True
-            pyportal.peripherals.audio.play(self.sine_wave_sample, loop=True)
+        if not self._speaker_enable.value:
+            self._speaker_enable.value = True
+            self.audio.play(self.sine_wave_sample, loop=True)
             self.start = time.monotonic()
             self.duration = duration
             if duration <= 0.5:
@@ -105,10 +113,10 @@ class Beep(object):
                 self.stop()
 
     def stop(self):
-        if pyportal.peripherals._speaker_enable.value:
+        if self._speaker_enable.value:
             self.duration = 0
-            pyportal.peripherals.audio.stop()
-            pyportal.peripherals._speaker_enable.value = False
+            self.audio.stop()
+            self._speaker_enable.value = False
 
     def refresh(self):
         if time.monotonic() - self.start >= self.duration:
