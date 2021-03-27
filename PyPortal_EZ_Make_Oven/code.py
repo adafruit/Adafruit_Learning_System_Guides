@@ -2,6 +2,7 @@ import time
 import json
 import array
 import math
+import gc
 import board
 import busio
 import audiocore
@@ -9,11 +10,13 @@ import displayio
 import digitalio
 from adafruit_pyportal import PyPortal
 from adafruit_bitmap_font import bitmap_font
-from adafruit_display_text import label
+from adafruit_display_text import bitmap_label as label
 from adafruit_display_shapes.circle import Circle
 from adafruit_button import Button
 import adafruit_touchscreen
 from adafruit_mcp9600 import MCP9600
+
+pyportal = PyPortal()
 
 TITLE = "EZ Make Oven Controller"
 VERSION = "1.3.0"
@@ -24,7 +27,7 @@ time.sleep(2)
 display_group = displayio.Group(max_size=20)
 board.DISPLAY.show(display_group)
 
-PROFILE_SIZE = 2            # plot thickness
+PROFILE_SIZE = 2  # plot thickness
 GRID_SIZE = 2
 GRID_STYLE = 3
 TEMP_SIZE = 2
@@ -38,8 +41,6 @@ YELLOW = 0xFFFF00
 
 WIDTH = board.DISPLAY.width
 HEIGHT = board.DISPLAY.height
-
-pyportal = PyPortal()
 
 palette = displayio.Palette(5)
 palette[0] = BLACK
@@ -62,15 +63,19 @@ GWIDTH = WIDTH - GXSTART
 GHEIGHT = HEIGHT - GYSTART
 plot = displayio.Bitmap(GWIDTH, GHEIGHT, 4)
 
-pyportal.splash.append(displayio.TileGrid(plot, pixel_shader=palette, x=GXSTART, y=GYSTART))
+display_group.append(
+    displayio.TileGrid(plot, pixel_shader=palette, x=GXSTART, y=GYSTART)
+)
 
-ts = adafruit_touchscreen.Touchscreen(board.TOUCH_XL, board.TOUCH_XR,
-                                      board.TOUCH_YD, board.TOUCH_YU,
-                                      calibration=(
-                                          (5200, 59000),
-                                          (5800, 57000)
-                                          ),
-                                      size=(WIDTH, HEIGHT))
+ts = adafruit_touchscreen.Touchscreen(
+    board.TOUCH_XL,
+    board.TOUCH_XR,
+    board.TOUCH_YD,
+    board.TOUCH_YU,
+    calibration=((5200, 59000), (5800, 57000)),
+    size=(WIDTH, HEIGHT),
+)
+
 
 class Beep(object):
     def __init__(self):
@@ -81,8 +86,9 @@ class Beep(object):
         length = 4000 // frequency
         sine_wave = array.array("H", [0] * length)
         for i in range(length):
-            sine_wave[i] = int((1 + math.sin(math.pi * 2 * i / length))
-                               * tone_volume * (2 ** 15 - 1))
+            sine_wave[i] = int(
+                (1 + math.sin(math.pi * 2 * i / length)) * tone_volume * (2 ** 15 - 1)
+            )
         self.sine_wave_sample = audiocore.RawSample(sine_wave)
 
     # pylint: disable=protected-access
@@ -92,7 +98,7 @@ class Beep(object):
             pyportal.peripherals.audio.play(self.sine_wave_sample, loop=True)
             self.start = time.monotonic()
             self.duration = duration
-            if duration <= .5:
+            if duration <= 0.5:
                 # for beeps less than .5 sec, sleep here,
                 # otherwise, use refresh() in loop to turn off long beep
                 time.sleep(duration)
@@ -107,6 +113,7 @@ class Beep(object):
     def refresh(self):
         if time.monotonic() - self.start >= self.duration:
             self.stop()
+
 
 class ReflowOvenControl(object):
     states = ("wait", "ready", "start", "preheat", "soak", "reflow", "cool")
@@ -189,22 +196,24 @@ class ReflowOvenControl(object):
         if self.state == "start":
             message.text = "Starting"
             self.enable(True)
-        if (self.state == "preheat" and temp >=
-                self.sprofile["stages"]["soak"][1]):
+        if self.state == "preheat" and temp >= self.sprofile["stages"]["soak"][1]:
             self.set_state("soak")
         if self.state == "preheat":
             message.text = "Preheat"
-        if (self.state == "soak" and temp >=
-                self.sprofile["stages"]["reflow"][1]):
+        if self.state == "soak" and temp >= self.sprofile["stages"]["reflow"][1]:
             self.set_state("reflow")
         if self.state == "soak":
             message.text = "Soak"
-        if (self.state == "reflow"
-                and temp >= self.sprofile["stages"]["cool"][1]
-                and self.reflow_start > 0
-                and (time.monotonic() - self.reflow_start >=
-                     self.sprofile["stages"]["cool"][0]
-                     - self.sprofile["stages"]["reflow"][0])):
+        if (
+            self.state == "reflow"
+            and temp >= self.sprofile["stages"]["cool"][1]
+            and self.reflow_start > 0
+            and (
+                time.monotonic() - self.reflow_start
+                >= self.sprofile["stages"]["cool"][0]
+                - self.sprofile["stages"]["reflow"][0]
+            )
+        ):
             self.set_state("cool")
             self.beep.play(5)
         if self.state == "reflow":
@@ -218,26 +227,33 @@ class ReflowOvenControl(object):
         if self.state in ("start", "preheat", "soak", "reflow"):
             if self.state != self.last_state:
                 # change in status, time for a beep!
-                self.beep.play(.1)
+                self.beep.play(0.1)
             # oven temp control here
             # check range of calibration to catch any humps in the graph
             checktime = 0
             checktimemax = self.config["calibrate_seconds"]
             checkoven = False
             if not self.control:
-                checktimemax = max(0, self.config["calibrate_seconds"] -
-                                   (time.monotonic() - self.offtime))
+                checktimemax = max(
+                    0,
+                    self.config["calibrate_seconds"]
+                    - (time.monotonic() - self.offtime),
+                )
             while checktime <= checktimemax:
                 check_temp = self.get_profile_temp(int(timediff + checktime))
-                if (temp + self.config["calibrate_temp"]*checktime/checktimemax
-                        < check_temp):
+                if (
+                    temp + self.config["calibrate_temp"] * checktime / checktimemax
+                    < check_temp
+                ):
                     checkoven = True
                     break
                 checktime += 5
             if not checkoven:
                 # hold oven temperature
-                if (self.state in ("start", "preheat", "soak") and
-                        self.offtemp > self.sensor.temperature):
+                if (
+                    self.state in ("start", "preheat", "soak")
+                    and self.offtemp > self.sensor.temperature
+                ):
                     checkoven = True
             self.enable(checkoven)
 
@@ -260,6 +276,7 @@ class ReflowOvenControl(object):
             # bad sensor
             pass
 
+
 class Graph(object):
     def __init__(self):
         self.xmin = 0
@@ -275,14 +292,14 @@ class Graph(object):
     def draw_line(self, x1, y1, x2, y2, size=PROFILE_SIZE, color=1, style=1):
         # print("draw_line:", x1, y1, x2, y2)
         # convert graph coords to screen coords
-        x1p = (self.xstart + self.width * (x1 - self.xmin)
-               // (self.xmax - self.xmin))
-        y1p = (self.ystart + int(self.height * (y1 - self.ymin)
-                                 / (self.ymax - self.ymin)))
-        x2p = (self.xstart + self.width * (x2 - self.xmin) //
-               (self.xmax - self.xmin))
-        y2p = (self.ystart + int(self.height * (y2 - self.ymin) /
-                                 (self.ymax - self.ymin)))
+        x1p = self.xstart + self.width * (x1 - self.xmin) // (self.xmax - self.xmin)
+        y1p = self.ystart + int(
+            self.height * (y1 - self.ymin) / (self.ymax - self.ymin)
+        )
+        x2p = self.xstart + self.width * (x2 - self.xmin) // (self.xmax - self.xmin)
+        y2p = self.ystart + int(
+            self.height * (y2 - self.ymin) / (self.ymax - self.ymin)
+        )
         # print("screen coords:", x1p, y1p, x2p, y2p)
 
         if (max(x1p, x2p) - min(x1p, x2p)) > (max(y1p, y2p) - min(y1p, y2p)):
@@ -321,10 +338,8 @@ class Graph(object):
 
         # wrap around graph point when x goes out of bounds
         x = (x - self.xmin) % (self.xmax - self.xmin) + self.xmin
-        xx = (self.xstart + self.width * (x - self.xmin)
-              // (self.xmax - self.xmin))
-        yy = (self.ystart + int(self.height * (y - self.ymin)
-                                / (self.ymax - self.ymin)))
+        xx = self.xstart + self.width * (x - self.xmin) // (self.xmax - self.xmin)
+        yy = self.ystart + int(self.height * (y - self.ymin) / (self.ymax - self.ymin))
         print("graph point:", x, y, xx, yy)
         self.draw_point(xx, max(0 + size, yy), size, color)
 
@@ -333,15 +348,16 @@ class Graph(object):
         if y is None:
             return
         offset = size // 2
-        for xx in range(x-offset, x+offset+1):
+        for xx in range(x - offset, x + offset + 1):
             if xx in range(self.xstart, self.xstart + self.width):
-                for yy in range(y-offset, y+offset+1):
+                for yy in range(y - offset, y + offset + 1):
                     if yy in range(self.ystart, self.ystart + self.height):
                         try:
                             yy = GHEIGHT - yy
                             plot[xx, yy] = color
                         except IndexError:
                             pass
+
 
 def draw_profile(graph, profile):
     """Update the display with current info."""
@@ -350,43 +366,87 @@ def draw_profile(graph, profile):
 
     # draw stage lines
     # preheat
-    graph.draw_line(profile["stages"]["preheat"][0], profile["temp_range"][0],
-                    profile["stages"]["preheat"][0], profile["temp_range"][1]
-                    * 1.1,
-                    GRID_SIZE, GRID_COLOR, GRID_STYLE)
-    graph.draw_line(profile["time_range"][0], profile["stages"]["preheat"][1],
-                    profile["time_range"][1], profile["stages"]["preheat"][1],
-                    GRID_SIZE, GRID_COLOR, GRID_STYLE)
+    graph.draw_line(
+        profile["stages"]["preheat"][0],
+        profile["temp_range"][0],
+        profile["stages"]["preheat"][0],
+        profile["temp_range"][1] * 1.1,
+        GRID_SIZE,
+        GRID_COLOR,
+        GRID_STYLE,
+    )
+    graph.draw_line(
+        profile["time_range"][0],
+        profile["stages"]["preheat"][1],
+        profile["time_range"][1],
+        profile["stages"]["preheat"][1],
+        GRID_SIZE,
+        GRID_COLOR,
+        GRID_STYLE,
+    )
     # soak
-    graph.draw_line(profile["stages"]["soak"][0], profile["temp_range"][0],
-                    profile["stages"]["soak"][0], profile["temp_range"][1]*1.1,
-                    GRID_SIZE, GRID_COLOR, GRID_STYLE)
-    graph.draw_line(profile["time_range"][0], profile["stages"]["soak"][1],
-                    profile["time_range"][1], profile["stages"]["soak"][1],
-                    GRID_SIZE, GRID_COLOR, GRID_STYLE)
+    graph.draw_line(
+        profile["stages"]["soak"][0],
+        profile["temp_range"][0],
+        profile["stages"]["soak"][0],
+        profile["temp_range"][1] * 1.1,
+        GRID_SIZE,
+        GRID_COLOR,
+        GRID_STYLE,
+    )
+    graph.draw_line(
+        profile["time_range"][0],
+        profile["stages"]["soak"][1],
+        profile["time_range"][1],
+        profile["stages"]["soak"][1],
+        GRID_SIZE,
+        GRID_COLOR,
+        GRID_STYLE,
+    )
     # reflow
-    graph.draw_line(profile["stages"]["reflow"][0], profile["temp_range"][0],
-                    profile["stages"]["reflow"][0], profile["temp_range"][1]
-                    * 1.1,
-                    GRID_SIZE, GRID_COLOR, GRID_STYLE)
-    graph.draw_line(profile["time_range"][0], profile["stages"]["reflow"][1],
-                    profile["time_range"][1], profile["stages"]["reflow"][1],
-                    GRID_SIZE, GRID_COLOR, GRID_STYLE)
+    graph.draw_line(
+        profile["stages"]["reflow"][0],
+        profile["temp_range"][0],
+        profile["stages"]["reflow"][0],
+        profile["temp_range"][1] * 1.1,
+        GRID_SIZE,
+        GRID_COLOR,
+        GRID_STYLE,
+    )
+    graph.draw_line(
+        profile["time_range"][0],
+        profile["stages"]["reflow"][1],
+        profile["time_range"][1],
+        profile["stages"]["reflow"][1],
+        GRID_SIZE,
+        GRID_COLOR,
+        GRID_STYLE,
+    )
     # cool
-    graph.draw_line(profile["stages"]["cool"][0], profile["temp_range"][0],
-                    profile["stages"]["cool"][0], profile["temp_range"][1]*1.1,
-                    GRID_SIZE, GRID_COLOR, GRID_STYLE)
-    graph.draw_line(profile["time_range"][0], profile["stages"]["cool"][1],
-                    profile["time_range"][1], profile["stages"]["cool"][1],
-                    GRID_SIZE, GRID_COLOR, GRID_STYLE)
+    graph.draw_line(
+        profile["stages"]["cool"][0],
+        profile["temp_range"][0],
+        profile["stages"]["cool"][0],
+        profile["temp_range"][1] * 1.1,
+        GRID_SIZE,
+        GRID_COLOR,
+        GRID_STYLE,
+    )
+    graph.draw_line(
+        profile["time_range"][0],
+        profile["stages"]["cool"][1],
+        profile["time_range"][1],
+        profile["stages"]["cool"][1],
+        GRID_SIZE,
+        GRID_COLOR,
+        GRID_STYLE,
+    )
 
     # draw labels
     x = profile["time_range"][0]
     y = profile["stages"]["reflow"][1]
-    xp = int(GXSTART + graph.width * (x - graph.xmin)
-             // (graph.xmax - graph.xmin))
-    yp = int(GHEIGHT * (y - graph.ymin)
-             // (graph.ymax - graph.ymin))
+    xp = int(GXSTART + graph.width * (x - graph.xmin) // (graph.xmax - graph.xmin))
+    yp = int(GHEIGHT * (y - graph.ymin) // (graph.ymax - graph.ymin))
 
     label_reflow.x = xp + 10
     label_reflow.y = HEIGHT - yp
@@ -398,32 +458,57 @@ def draw_profile(graph, profile):
     y = profile["stages"]["reflow"][1]
 
     # draw time line (horizontal)
-    graph.draw_line(graph.xmin, graph.ymin + 1, graph.xmax,
-                    graph.ymin + 1, AXIS_SIZE, AXIS_COLOR, 1)
-    graph.draw_line(graph.xmin, graph.ymax, graph.xmax, graph.ymax,
-                    AXIS_SIZE, AXIS_COLOR, 1)
+    graph.draw_line(
+        graph.xmin, graph.ymin + 1, graph.xmax, graph.ymin + 1, AXIS_SIZE, AXIS_COLOR, 1
+    )
+    graph.draw_line(
+        graph.xmin, graph.ymax, graph.xmax, graph.ymax, AXIS_SIZE, AXIS_COLOR, 1
+    )
     # draw time ticks
     tick = graph.xmin
     while tick < (graph.xmax - graph.xmin):
-        graph.draw_line(tick, graph.ymin, tick, graph.ymin + 10,
-                        AXIS_SIZE, AXIS_COLOR, 1)
-        graph.draw_line(tick, graph.ymax, tick, graph.ymax - 10 - AXIS_SIZE,
-                        AXIS_SIZE, AXIS_COLOR, 1)
+        graph.draw_line(
+            tick, graph.ymin, tick, graph.ymin + 10, AXIS_SIZE, AXIS_COLOR, 1
+        )
+        graph.draw_line(
+            tick,
+            graph.ymax,
+            tick,
+            graph.ymax - 10 - AXIS_SIZE,
+            AXIS_SIZE,
+            AXIS_COLOR,
+            1,
+        )
         tick += 60
 
     # draw temperature line (vertical)
-    graph.draw_line(graph.xmin, graph.ymin, graph.xmin,
-                    graph.ymax, AXIS_SIZE, AXIS_COLOR, 1)
-    graph.draw_line(graph.xmax - AXIS_SIZE + 1, graph.ymin,
-                    graph.xmax - AXIS_SIZE + 1,
-                    graph.ymax, AXIS_SIZE, AXIS_COLOR, 1)
+    graph.draw_line(
+        graph.xmin, graph.ymin, graph.xmin, graph.ymax, AXIS_SIZE, AXIS_COLOR, 1
+    )
+    graph.draw_line(
+        graph.xmax - AXIS_SIZE + 1,
+        graph.ymin,
+        graph.xmax - AXIS_SIZE + 1,
+        graph.ymax,
+        AXIS_SIZE,
+        AXIS_COLOR,
+        1,
+    )
     # draw temperature ticks
     tick = graph.ymin
-    while tick < (graph.ymax - graph.ymin)*1.1:
-        graph.draw_line(graph.xmin, tick, graph.xmin + 10, tick,
-                        AXIS_SIZE, AXIS_COLOR, 1)
-        graph.draw_line(graph.xmax, tick, graph.xmax - 10 - AXIS_SIZE,
-                        tick, AXIS_SIZE, AXIS_COLOR, 1)
+    while tick < (graph.ymax - graph.ymin) * 1.1:
+        graph.draw_line(
+            graph.xmin, tick, graph.xmin + 10, tick, AXIS_SIZE, AXIS_COLOR, 1
+        )
+        graph.draw_line(
+            graph.xmax,
+            tick,
+            graph.xmax - 10 - AXIS_SIZE,
+            tick,
+            AXIS_SIZE,
+            AXIS_COLOR,
+            1,
+        )
         tick += 50
 
     # draw profile
@@ -437,99 +522,101 @@ def draw_profile(graph, profile):
         x1 = x2
         y1 = y2
 
+
 def format_time(seconds):
     minutes = seconds // 60
     seconds = int(seconds) % 60
     return "{:02d}:{:02d}".format(minutes, seconds, width=2)
 
+
 timediff = 0
 oven = ReflowOvenControl(board.D4)
 print("melting point: ", oven.sprofile["melting_point"])
 font1 = bitmap_font.load_font("/fonts/OpenSans-9.bdf")
-font1.load_glyphs(b'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789/:')
+
 font2 = bitmap_font.load_font("/fonts/OpenSans-12.bdf")
-font2.load_glyphs(b'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789/:')
+
 font3 = bitmap_font.load_font("/fonts/OpenSans-16.bdf")
-font3.load_glyphs(b'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789/:')
 
-
-label_reflow = label.Label(font1, text="", max_glyphs=10,
-                           color=0xFFFFFF, line_spacing=0)
+label_reflow = label.Label(
+    font1, text="", max_glyphs=10, color=0xFFFFFF, line_spacing=0
+)
 label_reflow.x = 0
 label_reflow.y = -20
-pyportal.splash.append(label_reflow)
+display_group.append(label_reflow)
 title_label = label.Label(font3, text=TITLE)
 title_label.x = 5
 title_label.y = 14
-pyportal.splash.append(title_label)
+display_group.append(title_label)
 # version_label = label.Label(font1, text=VERSION, color=0xAAAAAA)
 # version_label.x = 300
 # version_label.y = 40
-# pyportal.splash.append(version_label)
+# display_group.append(version_label)
 message = label.Label(font2, text="Wait", max_glyphs=30)
 message.x = 100
 message.y = 40
-pyportal.splash.append(message)
+display_group.append(message)
 alloy_label = label.Label(font1, text="Alloy:", color=0xAAAAAA)
 alloy_label.x = 5
 alloy_label.y = 40
-pyportal.splash.append(alloy_label)
+display_group.append(alloy_label)
 alloy_data = label.Label(font1, text=str(oven.sprofile["alloy"]))
 alloy_data.x = 10
 alloy_data.y = 60
-pyportal.splash.append(alloy_data)
+display_group.append(alloy_data)
 profile_label = label.Label(font1, text="Profile:", color=0xAAAAAA)
 profile_label.x = 5
 profile_label.y = 80
-pyportal.splash.append(profile_label)
+display_group.append(profile_label)
 profile_data = label.Label(font1, text=oven.sprofile["title"])
 profile_data.x = 10
 profile_data.y = 100
-pyportal.splash.append(profile_data)
+display_group.append(profile_data)
 timer_label = label.Label(font1, text="Time:", color=0xAAAAAA)
 timer_label.x = 5
 timer_label.y = 120
-pyportal.splash.append(timer_label)
+display_group.append(timer_label)
 timer_data = label.Label(font3, text=format_time(timediff), max_glyphs=10)
 timer_data.x = 10
 timer_data.y = 140
-pyportal.splash.append(timer_data)
+display_group.append(timer_data)
 temp_label = label.Label(font1, text="Temp(C):", color=0xAAAAAA)
 temp_label.x = 5
 temp_label.y = 160
-pyportal.splash.append(temp_label)
+display_group.append(temp_label)
 temp_data = label.Label(font3, text="--", max_glyphs=10)
 temp_data.x = 10
 temp_data.y = 180
-pyportal.splash.append(temp_data)
+display_group.append(temp_data)
 circle = Circle(308, 12, 8, fill=0)
-pyportal.splash.append(circle)
+display_group.append(circle)
 
 sgraph = Graph()
 
-#sgraph.xstart = 100
-#sgraph.ystart = 4
+# sgraph.xstart = 100
+# sgraph.ystart = 4
 sgraph.xstart = 0
 sgraph.ystart = 0
-#sgraph.width = WIDTH - sgraph.xstart - 4  # 216 for standard PyPortal
-#sgraph.height = HEIGHT - 80  # 160 for standard PyPortal
+# sgraph.width = WIDTH - sgraph.xstart - 4  # 216 for standard PyPortal
+# sgraph.height = HEIGHT - 80  # 160 for standard PyPortal
 sgraph.width = GWIDTH  # 216 for standard PyPortal
 sgraph.height = GHEIGHT  # 160 for standard PyPortal
 sgraph.xmin = oven.sprofile["time_range"][0]
 sgraph.xmax = oven.sprofile["time_range"][1]
 sgraph.ymin = oven.sprofile["temp_range"][0]
-sgraph.ymax = oven.sprofile["temp_range"][1]*1.1
+sgraph.ymax = oven.sprofile["temp_range"][1] * 1.1
 print("x range:", sgraph.xmin, sgraph.xmax)
 print("y range:", sgraph.ymin, sgraph.ymax)
 draw_profile(sgraph, oven.sprofile)
 buttons = []
 if oven.sensor_status:
-    button = Button(x=0, y=HEIGHT-40, width=80, height=40,
-                    label="Start", label_font=font2)
+    button = Button(
+        x=0, y=HEIGHT - 40, width=80, height=40, label="Start", label_font=font2
+    )
     buttons.append(button)
 
 for b in buttons:
-    pyportal.splash.append(b.group)
+    display_group.append(b.group)
 
 try:
     board.DISPLAY.refresh(target_frames_per_second=60)
@@ -542,6 +629,7 @@ last_control = False
 second_timer = time.monotonic()
 timer = time.monotonic()
 while True:
+    gc.collect()
     try:
         board.DISPLAY.refresh(target_frames_per_second=60)
     except AttributeError:
@@ -617,7 +705,8 @@ while True:
             timer_data.text = format_time(timediff)
             print(oven.state)
             if oven_temp >= 50:
-                sgraph.draw_graph_point(int(timediff), oven_temp,
-                                        size=TEMP_SIZE, color=TEMP_COLOR)
+                sgraph.draw_graph_point(
+                    int(timediff), oven_temp, size=TEMP_SIZE, color=TEMP_COLOR
+                )
 
         last_state = oven.state
