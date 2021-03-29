@@ -310,7 +310,7 @@ while True:
         #  display the secondary GUI menu
         display.show(big_splash)
         #  display the selected button's MIDI note
-        big_text.text = midi_num
+        big_text.text = str(midi_num)
 
         #  blink the selected button's LED without pausing the loop
         if (time.monotonic() > (clock + 1)) and led_check is None:
@@ -360,7 +360,7 @@ while True:
             #  change back to main menu mode
             sub_state = False
             #  update new MIDI number text label
-            text_labels[button_pos].text = midi_num
+            text_labels[button_pos].text = str(midi_num)
             #  show main GUI display
             display.show(splash)
             #  turn off blinking LED
