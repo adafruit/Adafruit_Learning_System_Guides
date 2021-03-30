@@ -61,7 +61,7 @@ def update_data():
         print(error)
 
     if not quotes or not colors:
-        raise "Please add at least one quote and color to your feeds"
+        raise RuntimeError("Please add at least one quote and color to your feeds")
     matrixportal.set_text(" ", 1)
 
 
