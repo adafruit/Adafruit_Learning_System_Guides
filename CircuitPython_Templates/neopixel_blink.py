@@ -1,6 +1,9 @@
 """
 CircuitPython NeoPixel Blink example - blinking the built-in NeoPixel(s).
 
+This example is meant for boards that have built-in NeoPixel LEDs but do not have a little
+red LED. If a little red LED is present, use the standard Blink template and example.
+
 Update NUMBER_OF_PIXELS to the match the number of built-in NeoPixels on the board.
 
 DO NOT INCLUDE THE pylint: disable LINE IN THE GUIDE CODE. It is present only to deal with the
