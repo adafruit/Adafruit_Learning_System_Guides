@@ -1,23 +1,9 @@
 import time
-import board
-import digitalio
 import displayio
-import audiocore
-from audiopwmio import PWMAudioOut as AudioOut
+from adafruit_circuitplayground import cp
 import adafruit_imageload
 from adafruit_gizmo import tft_gizmo
 from adafruit_display_shapes.circle import Circle
-
-#  setup for the speaker
-speaker_enable = digitalio.DigitalInOut(board.SPEAKER_ENABLE)
-speaker_enable.switch_to_output(value=True)
-
-#  setup for the CP Bluefruit's buttons
-button_a = digitalio.DigitalInOut(board.BUTTON_A)
-button_a.switch_to_input(pull=digitalio.Pull.DOWN)
-
-button_b = digitalio.DigitalInOut(board.BUTTON_B)
-button_b.switch_to_input(pull=digitalio.Pull.DOWN)
 
 #  setup for the Gizmo TFT
 display = tft_gizmo.TFT_Gizmo()
@@ -66,15 +52,6 @@ main_group.append(jewel_splash)
 #  showing the main group on the display
 display.show(main_group)
 
-#  setting up the audio output
-speaker = AudioOut(board.SPEAKER)
-#  importing the .wav file
-moonlight = "/moonlight_densetsu.wav"
-#  function to open the .wav file
-data = open(moonlight, "rb")
-#  decoding the .wav file
-wav = audiocore.WaveFile(data)
-
 #  tracks the tilegrid index location for the crescent moon
 moon = 0
 #  holds time.monotonic()
@@ -90,9 +67,9 @@ animation_pause = False
 
 while True:
     #  button debouncing
-    if not button_a.value and a_pressed:
+    if not cp.button_a and a_pressed:
         a_pressed = False
-    if not button_b.value and b_pressed:
+    if not cp.button_b and b_pressed:
         b_pressed = False
     #  runs crescent moon animation
     if not music_playing and not animation_pause:
@@ -108,32 +85,24 @@ while True:
             if moon > 35:
                 moon = 0
     #  if music is NOT playing and you press the a button...
-    if not music_playing and (button_a.value and not a_pressed):
+    if not music_playing and (cp.button_a and not a_pressed):
         #  music begins playing and will loop
-        speaker.play(wav, loop = True)
-        a_pressed = True
-        #  music_playing state is updated
         music_playing = True
-        #  debugging REPL message
-        print("music playing")
-    #  if music IS playing and you press the a button...
-    if music_playing and (button_a.value and not a_pressed):
-        #  music stops
-        speaker.stop()
         a_pressed = True
+        print("music playing")
+        #  song plays once
+        cp.play_file("moonlight_densetsu.wav")
         #  music_playing state is updated
         music_playing = False
-        #  debugging REPL message
-        print("music stopped")
     #  if the animation IS playing and you press the b button...
-    if not animation_pause and (button_b.value and not b_pressed):
+    if not animation_pause and (cp.button_b and not b_pressed):
         #  the animation pauses by updating the animation_pause state
         animation_pause = True
         b_pressed = True
         #  debugging REPL message
         print("animation paused")
     #  if the animation is PAUSED and you press the b button...
-    if animation_pause and (button_b.value and not b_pressed):
+    if animation_pause and (cp.button_b and not b_pressed):
         #  the animation begins again by updating the animation_pause state
         animation_pause = False
         b_pressed = True
