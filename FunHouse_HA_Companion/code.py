@@ -112,9 +112,7 @@ def message(client, topic, payload):
         print(settings)
         if settings["state"] == "on":
             if "brightness" in settings:
-                funhouse.peripherals.dotstars.brightness = int(
-                    settings["brightness"] // 255
-                )
+                funhouse.peripherals.dotstars.brightness = settings["brightness"] / 255
             else:
                 funhouse.peripherals.dotstars.brightness = 0.3
             if "color" in settings:
@@ -204,4 +202,4 @@ while True:
         last_publish_timestamp = time.monotonic()
 
     # Check any topics we are subscribed to
-    funhouse.network.mqtt_loop(0.25)
+    funhouse.network.mqtt_loop(0.5)
