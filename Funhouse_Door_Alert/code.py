@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: 2017 Scott Shawcroft, written for Adafruit Industries
-# SPDX-FileCopyrightText: Copyright (c) 2021 Melissa LeBlanc-Williams John Park for Adafruit
+# SPDX-FileCopyrightText: Copyright (c) 2021 Melissa LeBlanc-Williams & John Park for Adafruit
 #
 # SPDX-License-Identifier: MIT
 
@@ -18,7 +18,6 @@ funhouse.peripherals.set_dotstars(RED, RED, RED, RED, RED)
 switch = DigitalInOut(board.A1)
 switch.direction = Direction.INPUT
 switch.pull = Pull.UP
-door_value = 0
 
 # Initialize a new MQTT Client object
 funhouse.network.init_io_mqtt()
@@ -26,34 +25,30 @@ funhouse.network.init_io_mqtt()
 print("Connecting to Adafruit IO...")
 funhouse.network.mqtt_connect()
 
-door_value = 0
 last_door = 1
 
 
-def send_io_data():
+def send_io_data(door_value):
     funhouse.peripherals.led = True
     print("Sending data to adafruit IO!")
     funhouse.network.mqtt_publish("door", door_value)
     funhouse.peripherals.led = False
 
 
-send_io_data()
+send_io_data(0)
 
 while True:
 
     if switch.value and last_door is 0:
-        door_value = 0  # create an int to send to feed
         print("Door is open")
         funhouse.peripherals.play_tone(2000, 0.25)
         funhouse.peripherals.dotstars.fill(RED)
         last_door = 1
-        send_io_data()
+        send_io_data(0)
 
     elif not switch.value and last_door is 1:
-
-        door_value = 1
         print("Door is closed")
         funhouse.peripherals.play_tone(800, 0.25)
         funhouse.peripherals.dotstars.fill(GREEN)
         last_door = 0
-        send_io_data()
+        send_io_data(1)
