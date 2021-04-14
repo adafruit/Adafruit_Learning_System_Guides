@@ -11,7 +11,7 @@ from adafruit_display_shapes.circle import Circle
 from adafruit_funhouse import FunHouse
 
 PUBLISH_DELAY = 60
-ENVIRONMENT_CHECK_DELAY = 1
+ENVIRONMENT_CHECK_DELAY = 5
 ENABLE_PIR = True
 MQTT_TOPIC = "funhouse/state"
 LIGHT_STATE_TOPIC = "funhouse/light/state"
@@ -78,17 +78,19 @@ funhouse.splash.append(status)
 
 def update_enviro():
     global environment
-    environment["temperature"] = aht20.temperature
-    environment["pressure"] = dps310.pressure
-    environment["humidity"] = aht20.relative_humidity
-    environment["light"] = funhouse.peripherals.light
 
-    temp = environment["temperature"]
+    temp = aht20.temperature
     unit = "C"
     if USE_FAHRENHEIT:
         temp = temp * (9 / 5) + 32
         unit = "F"
-    funhouse.set_text("{:.1f}{}".format(temp, unit), temp_label)
+
+    environment["temperature"] = temp
+    environment["pressure"] = dps310.pressure
+    environment["humidity"] = aht20.relative_humidity
+    environment["light"] = funhouse.peripherals.light
+
+    funhouse.set_text("{:.1f}{}".format(environment["temperature"], unit), temp_label)
     funhouse.set_text("{:.1f}%".format(environment["humidity"]), hum_label)
     funhouse.set_text("{}kPa".format(environment["light"]), pres_label)
 
@@ -109,7 +111,6 @@ def message(client, topic, payload):
     print("Topic {0} received new value: {1}".format(topic, payload))
     if topic == LIGHT_COMMAND_TOPIC:
         settings = json.loads(payload)
-        print(settings)
         if settings["state"] == "on":
             if "brightness" in settings:
                 funhouse.peripherals.dotstars.brightness = settings["brightness"] / 255
@@ -125,7 +126,7 @@ def message(client, topic, payload):
 def publish_light_state():
     funhouse.peripherals.led = True
     output = {
-        "brightness": funhouse.peripherals.dotstars.brightness * 255,
+        "brightness": round(funhouse.peripherals.dotstars.brightness * 255),
         "state": "on" if funhouse.peripherals.dotstars.brightness > 0 else "off",
         "color": funhouse.peripherals.dotstars[0],
     }
@@ -148,6 +149,7 @@ funhouse.network.on_mqtt_message = message
 
 print("Attempting to connect to {}".format(secrets["mqtt_broker"]))
 funhouse.network.mqtt_connect()
+
 last_publish_timestamp = None
 
 last_peripheral_state = {
@@ -187,16 +189,16 @@ while True:
 
     if funhouse.peripherals.slider is not None:
         output["slider"] = funhouse.peripherals.slider
+        peripheral_state_changed = True
 
-    # every PUBLISH_DELAY, write temp/hum/press
+    # Every PUBLISH_DELAY, write temp/hum/press/light or if a peripheral changed
     if (
         last_publish_timestamp is None
         or peripheral_state_changed
         or (time.monotonic() - last_publish_timestamp) > PUBLISH_DELAY
     ):
-        print("Sending data to MQTT!")
         funhouse.peripherals.led = True
-        print("Publishing to %s" % MQTT_TOPIC)
+        print("Publishing to {}".format(MQTT_TOPIC))
         funhouse.network.mqtt_publish(MQTT_TOPIC, json.dumps(output))
         funhouse.peripherals.led = False
         last_publish_timestamp = time.monotonic()
