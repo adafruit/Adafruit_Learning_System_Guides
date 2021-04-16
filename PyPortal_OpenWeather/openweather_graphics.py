@@ -36,7 +36,7 @@ class OpenWeather_Graphics(displayio.Group):
         self.large_font.load_glyphs(('°',))  # a non-ascii character we need for sure
         self.city_text = None
 
-        self.time_text = Label(self.medium_font, max_glyphs=8)
+        self.time_text = Label(self.medium_font, max_glyphs=9)
         self.time_text.x = 200
         self.time_text.y = 12
         self.time_text.color = 0xFFFFFF
