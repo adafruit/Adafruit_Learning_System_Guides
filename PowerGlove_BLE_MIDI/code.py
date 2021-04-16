@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2021 John Park for Adafruit Industries.
+#
+# SPDX-License-Identifier: MIT
 """
 Power Glove BLE MIDI with Feather Sense nRF52840
 Sends MIDI CC values based on finger flex sensors and accelerometer
@@ -11,12 +14,12 @@ import adafruit_midi
 from adafruit_midi.control_change import ControlChange
 # from adafruit_midi.note_on import NoteOn
 # from adafruit_midi.pitch_bend import PitchBend
-import adafruit_lsm6ds  # accelerometer
+import adafruit_lsm6ds.lsm6ds33  # accelerometer
 import simpleio
 from analogio import AnalogIn
 
 i2c = board.I2C()
-sense_accel = adafruit_lsm6ds.LSM6DS33(i2c)
+sense_accel = adafruit_lsm6ds.lsm6ds33.LSM6DS33(i2c)
 
 analog_in_thumb = AnalogIn(board.A3)
 analog_in_index = AnalogIn(board.A2)
