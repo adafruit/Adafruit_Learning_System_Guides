@@ -1,5 +1,7 @@
 #include <Adafruit_DotStar.h>
 
+#define NUM_DOTSTAR 5
+
 // LEDs!
 Adafruit_DotStar pixels(NUM_DOTSTAR, PIN_DOTSTAR_DATA, PIN_DOTSTAR_CLOCK, DOTSTAR_BRG);
 

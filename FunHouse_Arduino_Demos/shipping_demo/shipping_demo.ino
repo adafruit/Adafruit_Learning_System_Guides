@@ -4,6 +4,7 @@
 #include <Adafruit_DPS310.h>
 #include <Adafruit_AHTX0.h>
 
+#define NUM_DOTSTAR 5
 #define BG_COLOR ST77XX_BLACK
 
 // display!
