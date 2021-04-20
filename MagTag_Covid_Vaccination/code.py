@@ -1,5 +1,5 @@
 from adafruit_magtag.magtag import MagTag
-from adafruit_progressbar import ProgressBar
+from adafruit_progressbar.progressbar import ProgressBar
 
 # Set up where we'll be fetching data from
 DATA_SOURCE = "https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/vaccinations/country_data/United%20States.csv"

@@ -9,7 +9,7 @@ from simpleio import map_range
 import adafruit_hashlib as hashlib
 import adafruit_touchscreen
 from adafruit_button import Button
-from adafruit_progressbar import ProgressBar
+from adafruit_progressbar.progressbar import ProgressBar
 from adafruit_display_text.label import Label
 from adafruit_esp32spi import adafruit_esp32spi
 from adafruit_ntp import NTP
