@@ -290,7 +290,7 @@ while True:
             # respond. That's OK, keep running with our current time, and
             # push sync time ahead to retry in 30 minutes (don't overwhelm
             # the server with repeated queries).
-            LAST_SYNC += 30 * 60 * 60 # 30 minutes -> seconds
+            LAST_SYNC += 30 * 60 # 30 minutes -> seconds
 
     # If PERIOD has expired, move data down and fetch new +24-hour data
     if NOW >= PERIOD[1].midnight:
