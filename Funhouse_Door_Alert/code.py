@@ -6,6 +6,7 @@
 import board
 from digitalio import DigitalInOut, Direction, Pull
 from adafruit_funhouse import FunHouse
+from adafruit_debouncer import Debouncer
 
 i2c = board.I2C()
 
@@ -13,25 +14,18 @@ RED = 0x200000
 GREEN = 0x002000
 
 funhouse = FunHouse(default_bg=None)
-funhouse.peripherals.set_dotstars(RED, RED, RED, RED, RED)
+funhouse.peripherals.dotstars.fill(RED)
 
-switch = DigitalInOut(board.A1)
-switch.direction = Direction.INPUT
-switch.pull = Pull.UP
-
-# Initialize a new MQTT Client object
-funhouse.network.init_io_mqtt()
-
-print("Connecting to Adafruit IO...")
-funhouse.network.mqtt_connect()
-
-last_door = 1
+switch_pin = DigitalInOut(board.A1)
+switch_pin.direction = Direction.INPUT
+switch_pin.pull = Pull.UP
+switch = Debouncer(switch_pin)
 
 
 def send_io_data(door_value):
     funhouse.peripherals.led = True
     print("Sending data to adafruit IO!")
-    funhouse.network.mqtt_publish("door", door_value)
+    funhouse.network.push_to_io("door", door_value)
     funhouse.peripherals.led = False
 
 
@@ -39,14 +33,15 @@ send_io_data(0)
 
 while True:
 
-    if switch.value and last_door is 0:
+    switch.update()
+    if switch.rose:
         print("Door is open")
         funhouse.peripherals.play_tone(2000, 0.25)
         funhouse.peripherals.dotstars.fill(RED)
         last_door = 1
         send_io_data(0)
 
-    elif not switch.value and last_door is 1:
+    if switch.fell:
         print("Door is closed")
         funhouse.peripherals.play_tone(800, 0.25)
         funhouse.peripherals.dotstars.fill(GREEN)
