@@ -8,7 +8,6 @@ from digitalio import DigitalInOut, Direction, Pull
 from adafruit_funhouse import FunHouse
 from adafruit_debouncer import Debouncer
 
-i2c = board.I2C()
 
 RED = 0x200000
 GREEN = 0x002000
@@ -38,12 +37,10 @@ while True:
         print("Door is open")
         funhouse.peripherals.play_tone(2000, 0.25)
         funhouse.peripherals.dotstars.fill(RED)
-        last_door = 1
         send_io_data(0)
 
     if switch.fell:
         print("Door is closed")
         funhouse.peripherals.play_tone(800, 0.25)
         funhouse.peripherals.dotstars.fill(GREEN)
-        last_door = 0
         send_io_data(1)
