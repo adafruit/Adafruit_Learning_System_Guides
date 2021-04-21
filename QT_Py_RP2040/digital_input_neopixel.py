@@ -12,4 +12,4 @@ while True:
     if not button.value:
         pixel.fill((255, 0, 0))
     else:
-        pixel.fill(0)
+        pixel.fill((0, 0, 0))
