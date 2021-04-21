@@ -22,7 +22,7 @@ def rainbow(delay):
     for color_value in range(255):
         for pixels in range(1):
             pixel_index = (pixels * 256 // 1) + color_value
-            pixel[i] = colorwheel(pixel_index & 255)
+            pixel[pixels] = colorwheel(pixel_index & 255)
         pixel.show()
         time.sleep(delay)
 
