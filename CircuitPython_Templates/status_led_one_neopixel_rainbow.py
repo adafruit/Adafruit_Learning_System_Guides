@@ -18,13 +18,13 @@ pixel = neopixel.NeoPixel(board.NEOPIXEL, 1, auto_write=False)
 pixel.brightness = 0.3
 
 
-def rainbow(speed):
+def rainbow(delay):
     for j in range(255):
         for i in range(1):
             pixel_index = (i * 256 // 1) + j
             pixel[i] = colorwheel(pixel_index & 255)
         pixel.show()
-        time.sleep(speed)
+        time.sleep(delay)
 
 
 while True:
