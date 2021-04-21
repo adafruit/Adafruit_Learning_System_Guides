@@ -3,10 +3,7 @@
 #
 # SPDX-License-Identifier: MIT
 import time
-import board
 import json
-import adafruit_dps310
-import adafruit_ahtx0
 from adafruit_display_shapes.circle import Circle
 from adafruit_funhouse import FunHouse
 
@@ -24,11 +21,6 @@ try:
 except ImportError:
     print("WiFi secrets are kept in secrets.py, please add them there!")
     raise
-
-# Connect to the Sensors
-i2c = board.I2C()
-dps310 = adafruit_dps310.DPS310(i2c)
-aht20 = adafruit_ahtx0.AHTx0(i2c)
 
 funhouse = FunHouse(default_bg=0x0F0F00)
 funhouse.peripherals.dotstars.fill(INITIAL_LIGHT_COLOR)
@@ -79,15 +71,15 @@ funhouse.splash.append(status)
 def update_enviro():
     global environment
 
-    temp = aht20.temperature
+    temp = funhouse.peripherals.temperature
     unit = "C"
     if USE_FAHRENHEIT:
         temp = temp * (9 / 5) + 32
         unit = "F"
 
     environment["temperature"] = temp
-    environment["pressure"] = dps310.pressure
-    environment["humidity"] = aht20.relative_humidity
+    environment["pressure"] = funhouse.peripherals.pressure
+    environment["humidity"] = funhouse.peripherals.relative_humidity
     environment["light"] = funhouse.peripherals.light
 
     funhouse.set_text("{:.1f}{}".format(environment["temperature"], unit), temp_label)
