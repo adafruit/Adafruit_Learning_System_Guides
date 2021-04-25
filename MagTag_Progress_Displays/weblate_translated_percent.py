@@ -11,7 +11,7 @@ into fonts/ on your CIRCUITPY drive.
 """
 import time
 from adafruit_magtag.magtag import MagTag
-from adafruit_progressbar import ProgressBar
+from adafruit_progressbar.progressbar import ProgressBar
 
 # Set up where we'll be fetching data from
 DATA_SOURCE = "https://hosted.weblate.org/api/projects/circuitpython/statistics/"

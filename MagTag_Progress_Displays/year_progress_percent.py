@@ -9,7 +9,7 @@ Copy epilogue18.bdf into fonts/ on your CIRCUITPY drive.
 """
 import time
 from adafruit_magtag.magtag import MagTag
-from adafruit_progressbar import ProgressBar
+from adafruit_progressbar.progressbar import ProgressBar
 import rtc
 
 def days_in_year(date_obj):

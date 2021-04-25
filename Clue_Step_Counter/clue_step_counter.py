@@ -6,7 +6,7 @@ from simpleio import map_range
 from adafruit_bitmap_font import bitmap_font
 from adafruit_lsm6ds.lsm6ds33 import LSM6DS33
 from adafruit_lsm6ds import Rate, AccelRange
-from adafruit_progressbar import ProgressBar
+from adafruit_progressbar.progressbar import ProgressBar
 from adafruit_display_text.label import Label
 
 #  turns off onboard NeoPixel to conserve battery
