@@ -19,7 +19,7 @@ button = digitalio.DigitalInOut(board.BUTTON_PIN)
 button.switch_to_input(pull=digitalio.Pull.UP)
 
 while True:
-    if button.value:
-        led.value = False
-    else:
+    if not button.value:
         led.value = True
+    else:
+        led.value = False
