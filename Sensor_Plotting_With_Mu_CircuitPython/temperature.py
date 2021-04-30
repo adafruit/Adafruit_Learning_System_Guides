@@ -1,4 +1,4 @@
-﻿import time
+import time
 
 import adafruit_thermistor
 import board

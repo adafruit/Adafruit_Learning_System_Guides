@@ -1,4 +1,4 @@
-﻿import analogio
+import analogio
 import board
 import neopixel
 

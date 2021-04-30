@@ -1,4 +1,4 @@
-﻿import array
+import array
 import math
 import time
 
