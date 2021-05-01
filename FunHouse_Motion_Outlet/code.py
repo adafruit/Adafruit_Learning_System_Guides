@@ -23,6 +23,7 @@ def set_outlet_state(value):
     global last_pir_timestamp
     if value:
         funhouse.peripherals.dotstars.fill(0x00FF00)
+        last_pir_timestamp = time.monotonic()
     else:
         funhouse.peripherals.dotstars.fill(0xFF0000)
         last_pir_timestamp = time.monotonic() - MOTION_TIMEOUT
