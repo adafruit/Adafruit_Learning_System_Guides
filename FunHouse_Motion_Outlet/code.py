@@ -12,13 +12,14 @@ from adafruit_funhouse import FunHouse
 OUTLET_STATE_TOPIC = "funhouse/outlet/state"
 OUTLET_COMMAND_TOPIC = "funhouse/outlet/set"
 MOTION_TIMEOUT = 300  # Timeout in seconds
-USE_MQTT = True
+USE_MQTT = False
 
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
+if USE_MQTT:
+    try:
+        from secrets import secrets
+    except ImportError:
+        print("WiFi secrets are kept in secrets.py, please add them there!")
+        raise
 
 def set_outlet_state(value):
     global last_pir_timestamp
