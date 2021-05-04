@@ -10,9 +10,9 @@ dots.brightness = 0.3
 
 def rainbow(delay):
     for color_value in range(255):
-        for pixels in range(5):
-            pixel_index = (pixels * 256 // 5) + color_value
-            dots[pixels] = colorwheel(pixel_index & 255)
+        for led in range(5):
+            pixel_index = (led * 256 // 5) + color_value
+            dots[led] = colorwheel(pixel_index & 255)
         dots.show()
         time.sleep(delay)
 

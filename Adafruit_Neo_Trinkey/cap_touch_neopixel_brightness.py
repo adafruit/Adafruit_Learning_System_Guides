@@ -12,9 +12,9 @@ pixels = neopixel.NeoPixel(board.NEOPIXEL, 4, auto_write=False)
 
 
 def rainbow(color_index):
-    for pixel in range(4):
-        pixel_index = (pixel * 256 // 4) + color_index
-        pixels[pixel] = colorwheel(pixel_index & 255)
+    for led in range(4):
+        pixel_index = (led * 256 // 4) + color_index
+        pixels[led] = colorwheel(pixel_index & 255)
     pixels.show()
 
 
