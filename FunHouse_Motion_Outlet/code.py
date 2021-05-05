@@ -12,12 +12,14 @@ from adafruit_funhouse import FunHouse
 OUTLET_STATE_TOPIC = "funhouse/outlet/state"
 OUTLET_COMMAND_TOPIC = "funhouse/outlet/set"
 MOTION_TIMEOUT = 300  # Timeout in seconds
+USE_MQTT = False
 
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
+if USE_MQTT:
+    try:
+        from secrets import secrets
+    except ImportError:
+        print("WiFi secrets are kept in secrets.py, please add them there!")
+        raise
 
 def set_outlet_state(value):
     global last_pir_timestamp
@@ -32,7 +34,7 @@ def set_outlet_state(value):
     publish_outlet_state()
 
 def publish_outlet_state():
-    if OUTLET_STATE_TOPIC and OUTLET_COMMAND_TOPIC:
+    if USE_MQTT:
         funhouse.peripherals.led = True
         output = "on" if outlet.value else "off"
         # Publish the Dotstar State
@@ -88,7 +90,7 @@ status = Circle(229, 10, 10, fill=0xFF0000, outline=0x880000)
 funhouse.splash.append(status)
 
 # Initialize a new MQTT Client object
-if OUTLET_STATE_TOPIC and OUTLET_COMMAND_TOPIC:
+if USE_MQTT:
     funhouse.network.init_mqtt(
         secrets["mqtt_broker"],
         secrets["mqtt_port"],
@@ -112,4 +114,5 @@ while True:
         set_outlet_state(False)
     funhouse.set_text(timeleft(), countdown_label) 
     # Check any topics we are subscribed to
-    funhouse.network.mqtt_loop(0.5)
+    if USE_MQTT:
+        funhouse.network.mqtt_loop(0.5)
