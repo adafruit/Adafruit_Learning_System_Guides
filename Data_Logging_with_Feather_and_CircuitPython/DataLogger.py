@@ -1,20 +1,19 @@
 import time
 
-import adafruit_am2320
-import adafruit_sdcard
 import analogio
 import board
-import busio
 import digitalio
 import storage
+import adafruit_am2320
+import adafruit_sdcard
 
 vbat_voltage = analogio.AnalogIn(board.D9)
 
-i2c = busio.I2C(board.SCL, board.SDA)
+i2c = board.I2C()  # uses board.SCL and board.SDA
 am2320 = adafruit_am2320.AM2320(i2c)
 
 SD_CS = board.D10
-spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
+spi = board.SPI()
 cs = digitalio.DigitalInOut(SD_CS)
 sd_card = adafruit_sdcard.SDCard(spi, cs)
 vfs = storage.VfsFat(sd_card)
