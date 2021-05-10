@@ -84,7 +84,7 @@ def update_enviro():
 
     funhouse.set_text("{:.1f}{}".format(environment["temperature"], unit), temp_label)
     funhouse.set_text("{:.1f}%".format(environment["humidity"]), hum_label)
-    funhouse.set_text("{}kPa".format(environment["light"]), pres_label)
+    funhouse.set_text("{}kPa".format(environment["pressure"]), pres_label)
 
 
 def connected(client, userdata, result, payload):
