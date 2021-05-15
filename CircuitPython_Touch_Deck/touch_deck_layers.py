@@ -6,6 +6,7 @@ KEY = 2
 STRING = 3
 KEY_PRESS = 4
 KEY_RELEASE = 5
+CHANGE_LAYER = 6
 
 touch_deck_config = {
     "layers": [
