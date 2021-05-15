@@ -23,8 +23,8 @@ from touch_deck_layers import (
     MEDIA,
     KEY_PRESS,
     KEY_RELEASE,
+    CHANGE_LAYER,
 )
-
 
 # seems to help the touchscreen not get stuck with chip not found
 time.sleep(3)
@@ -40,7 +40,7 @@ kbd = Keyboard(usb_hid.devices)
 cc = ConsumerControl(usb_hid.devices)
 kbd_layout = KeyboardLayoutUS(kbd)
 
-# variables to envorce timout between icon presses
+# variables to enforce timout between icon presses
 COOLDOWN_TIME = 0.5
 LAST_PRESS_TIME = -1
 
@@ -132,7 +132,6 @@ main_group.append(home_layer_btn)
 # helper method to laod icons for an index by its index in the
 # list of layers
 def load_layer(layer_index):
-
     # show the loading screen
     main_group.append(loading_group)
     time.sleep(0.05)
@@ -298,6 +297,17 @@ while True:
                                         # Key release
                                         elif _action[0] == KEY_RELEASE:
                                             kbd.release(*_action[1])
+
+                                        # Change Layer
+                                        elif _action[0] == CHANGE_LAYER:
+                                            if isinstance(
+                                                _action[1], int
+                                            ) and 0 <= _action[1] < len(
+                                                touch_deck_config["layers"]
+                                            ):
+
+                                                current_layer = _action[1]
+                                                load_layer(_action[1])
 
                                         # if there are multiple actions
                                         if len(_cur_actions) > 1:
