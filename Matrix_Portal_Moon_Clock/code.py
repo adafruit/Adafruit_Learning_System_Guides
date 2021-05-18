@@ -15,7 +15,6 @@ included in derivative projects, thanks. Tall splash images licensed from
 import gc
 import time
 import math
-import json
 import board
 import busio
 import displayio
@@ -146,8 +145,9 @@ class MoonData():
         # pylint: disable=bare-except
         for _ in range(5): # Retries
             try:
-                full_data = json.loads(NETWORK.fetch_data(url))
-                moon_data = full_data['location']['time'][0]
+                location_data = NETWORK.fetch_data(url,
+                                                   json_path=[['location']])
+                moon_data = location_data['time'][0]
                 #print(moon_data)
                 # Reconstitute JSON data into the elements we need
                 self.age = float(moon_data['moonphase']['value']) / 100
