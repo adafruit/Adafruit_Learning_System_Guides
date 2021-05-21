@@ -22,6 +22,7 @@
 #include "ESP32BootROM.h"
 #include "SdFat.h"
 #include "Adafruit_SPIFlash.h"
+#include <Adafruit_TinyUSB.h>
 
 #if defined(ADAFRUIT_FEATHER_M4_EXPRESS) || \
   defined(ADAFRUIT_FEATHER_M0_EXPRESS) || \

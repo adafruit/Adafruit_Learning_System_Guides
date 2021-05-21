@@ -10,6 +10,7 @@
 #include <SdFat.h>
 #include <WiFiNINA.h>
 #include "coin.h"
+#include <Adafruit_TinyUSB.h>
 
 #define RED_LED       13
 #define TFT_RESET     24

@@ -21,6 +21,7 @@
 
 #include "ESP32BootROM.h"
 #include <SD.h>
+#include <Adafruit_TinyUSB.h>
 
 static const int MAX_PAYLOAD_SIZE = 1024;
 uint32_t firmsize;

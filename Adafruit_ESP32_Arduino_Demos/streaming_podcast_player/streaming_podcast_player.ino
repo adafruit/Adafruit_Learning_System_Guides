@@ -7,6 +7,7 @@
 #include <CircularBuffer.h>  // From Agileware
 #include "Adafruit_MP3.h"
 #include "arduino_secrets.h" 
+#include <Adafruit_TinyUSB.h>
 
 ///////please enter your sensitive data in the Secret tab/arduino_secrets.h
 char ssid[] = SECRET_SSID;        // your network SSID (name)
