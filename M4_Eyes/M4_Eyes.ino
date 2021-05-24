@@ -34,6 +34,7 @@
   #error "Please select Tools->USB Stack->TinyUSB before compiling"
 #endif
 
+#include "Adafruit_TinyUSB.h"
 #define GLOBAL_VAR
 #include "globals.h"
 
