@@ -6,6 +6,10 @@
 
 #include <MIDI.h>
 
+#ifdef USE_TINYUSB
+#include <Adafruit_TinyUSB.h>
+#endif
+
 MIDI_CREATE_DEFAULT_INSTANCE();
 
 int notes[] = {69, 72, 74, 76, 72, 81, 79};  // melody notes
