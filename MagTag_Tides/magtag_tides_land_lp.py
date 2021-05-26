@@ -13,6 +13,7 @@ STATION_ID = (
 METRIC = False  # set to True for metric units
 VSCALE = 2  # pixels per ft or m
 DAILY_UPDATE_HOUR = 3  # 24 hour format
+DST_ON = True  # Day Light Saving currently active?
 # -------------------------------------------
 
 # don't change these
@@ -144,7 +145,7 @@ def get_data_source_url(station=STATION_ID, metric=METRIC, hilo_only=True):
     URL += "&interval=hilo" if hilo_only else ""
     URL += "&datum=mllw"  # MLLW = "tides"
     URL += "&units=metric" if metric else "&units=english"
-    URL += "&time_zone=lst_ldt" if now.tm_isdst == 1 else "&time_zone=lst"
+    URL += "&time_zone=lst_ldt" if DST_ON else "&time_zone=lst"
     URL += "&begin_date=" + date
     URL += "&end_date=" + date
     URL += "&station=" + station
