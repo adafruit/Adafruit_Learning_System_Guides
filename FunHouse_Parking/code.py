@@ -10,7 +10,7 @@ import neopixel
 from adafruit_funhouse import FunHouse
 
 SLOW_DISTANCE = 30  # distance (in centimeters) when you should slow
-STOP_DISTANCE = 8  # distnace when you should hit those brakes
+STOP_DISTANCE = 8  # distance when you should hit those brakes
 
 GREEN = 0x00FF00
 AMBER = 0xF0D000
