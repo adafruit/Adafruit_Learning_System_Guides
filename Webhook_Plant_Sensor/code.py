@@ -14,7 +14,13 @@ from adafruit_io.adafruit_io import IO_MQTT
 from adafruit_seesaw.seesaw import Seesaw
 import busio
 
+# Used to make sure that the Adafruit IO Trigger is only run once when the moisture value is below
+# the desired threshold, set in MIN
 LOW = False
+# The minimum moisture value. If the value is below this number, it will activate the Adafruit IO
+# trigger. This number should match the number you set in your Adafruit IO trigger. Feel free
+# to mess around and try out different moisture values as how wet this actually is can vary a lot
+# depending on where the sensor is and the soil in the pot.
 MIN = 500
 
 # Set up moisture sensor with seesaw
