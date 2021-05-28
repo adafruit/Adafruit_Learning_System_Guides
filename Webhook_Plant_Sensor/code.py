@@ -14,6 +14,9 @@ from adafruit_io.adafruit_io import IO_MQTT
 from adafruit_seesaw.seesaw import Seesaw
 import busio
 
+LOW = False
+MIN = 500
+
 # Set up moisture sensor with seesaw
 i2c_bus = board.I2C()
 seesaw = Seesaw(i2c_bus, addr=0x36)
@@ -79,11 +82,9 @@ io.on_message = message
 # Connect to Adafruit IO
 print("Connecting to Adafruit IO...")
 io.connect()
+plant_feed = "plant"
 
 START = 0
-LOW = False
-
-MIN = 500
 
 while True:
     # read moisture level through capacitive touch pad
@@ -94,12 +95,12 @@ while True:
 
     if touch < MIN:
         if not LOW:
-            io.publish("plant", touch)
+            io.publish(plant_feed, touch)
             print("published")
         LOW = True
 
     elif touch >= MIN and time.time() - START > 10:
-        io.publish("plant", touch)
+        io.publish(plant_feed, touch)
         print("published to Adafruit IO")
         START = time.time()
         LOW = False
