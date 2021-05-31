@@ -188,7 +188,7 @@ typedef struct {
 
 #ifdef INIT_EYESTRUCTS
   eyeStruct eye[NUM_EYES] = {
-  #if defined(ADAFRUIT_MONSTER_M4SK_EXPRESS)
+  #if (NUM_EYES > 1)
     // name     spi  cs  dc rst wink
     { "right", &ARCADA_TFT_SPI , ARCADA_TFT_CS,  ARCADA_TFT_DC, ARCADA_TFT_RST, -1 },
     { "left" , &ARCADA_LEFTTFT_SPI, ARCADA_LEFTTFT_CS, ARCADA_LEFTTFT_DC, ARCADA_LEFTTFT_RST, -1 } };
