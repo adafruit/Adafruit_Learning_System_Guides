@@ -11,9 +11,10 @@
   #define GLOBAL_INIT(X)
 #endif
 
-#if defined(ADAFRUIT_MONSTER_M4SK_EXPRESS)
+#if defined(ARCADA_LEFTTFT_SPI) // MONSTER M4SK or custom Arcada setup
   #define NUM_EYES 2
-  // Light sensor is not active by default. Use "lightSensor : 102" in config
+  // MONSTER M4SK light sensor is not active by default.
+  // Use "lightSensor : 102" in config
 #else
   #define NUM_EYES 1
 #endif
