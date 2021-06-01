@@ -481,7 +481,7 @@ void loop() {
           if(dt >= eyeMoveDuration) {           // Time up?  Destination reached.
             eyeInMotion = false;                // Stop moving
             // The "move" duration temporarily becomes a hold duration...
-            eyeMoveDuration = random(30000, 1000000); // Time between microsaccades
+            eyeMoveDuration = random(35000, 1000000); // Time between microsaccades
             if(!saccadeInterval) {              // Cleared when "big" saccade finishes
               lastSaccadeStop = t;              // Time when saccade stopped
               saccadeInterval = random(eyeMoveDuration, 3000000); // Next in 30ms to 3sec
@@ -510,16 +510,16 @@ void loop() {
               eyeMoveDuration = random(83000, 166000); // ~1/12 - ~1/6 sec
               saccadeInterval = 0; // Calc next interval when this one stops
             } else { // Microsaccade
-              // r is possible radius of motion, 1/10 size of full saccade.
+              // r is possible radius of motion, ~1/10 size of full saccade.
               // We don't bother with clipping because if it strays just a little,
               // that's okay, it'll get put in-bounds on next full saccade.
               float r = (float)mapDiameter - (float)DISPLAY_SIZE * M_PI_2;
-              r *= 0.06;
+              r *= 0.07;
               float dx = random(-r, r);
               eyeNewX = eyeX - mapRadius + dx;
               float h = sqrt(r * r - dx * dx);
               eyeNewY = eyeY - mapRadius + random(-h, h);
-              eyeMoveDuration = random(6000, 25000); // 6-25 ms microsaccade
+              eyeMoveDuration = random(7000, 25000); // 7-25 ms microsaccade
             }
             eyeNewX += mapRadius;    // Translate new point into map space
             eyeNewY += mapRadius;
