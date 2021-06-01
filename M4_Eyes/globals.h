@@ -73,7 +73,7 @@ GLOBAL_VAR float     trackFactor         GLOBAL_INIT(0.5);
 
 // Random eye motion: provided by the base project, but overridable by user code.
 GLOBAL_VAR bool      moveEyesRandomly    GLOBAL_INIT(true);   // Clear to suppress random eye motion and let user code control it
-GLOBAL_VAR float     eyeTargetX          GLOBAL_INIT(0.0);  // THen set these continuously in user_loop.
+GLOBAL_VAR float     eyeTargetX          GLOBAL_INIT(0.0);  // Then set these continuously in user_loop.
 GLOBAL_VAR float     eyeTargetY          GLOBAL_INIT(0.0);  // Range is from -1.0 to +1.0.
 
 // Pin definition stuff will go here

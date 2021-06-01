@@ -1,5 +1,7 @@
 #if 1 // Change to 0 to disable this code (must enable ONE user*.cpp only!)
 
+#include "globals.h"
+
 // This file provides a crude way to "drop in" user code to the eyes,
 // allowing concurrent operations without having to maintain a bunch of
 // special derivatives of the eye code (which is still undergoing a lot

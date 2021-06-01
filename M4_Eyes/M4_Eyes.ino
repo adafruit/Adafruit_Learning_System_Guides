@@ -34,7 +34,6 @@
   #error "Please select Tools->USB Stack->TinyUSB before compiling"
 #endif
 
-#include <Adafruit_TinyUSB.h>
 #define GLOBAL_VAR
 #include "globals.h"
 
@@ -43,6 +42,8 @@ bool     eyeInMotion = false;
 float    eyeOldX, eyeOldY, eyeNewX, eyeNewY;
 uint32_t eyeMoveStartTime = 0L;
 int32_t  eyeMoveDuration  = 0L;
+uint32_t lastSaccadeStop  = 0L;
+int32_t  saccadeInterval  = 0L;
 
 // Some sloppy eye state stuff, some carried over from old eye code...
 // kinda messy and badly named and will get cleaned up/moved/etc.
@@ -472,49 +473,65 @@ void loop() {
 
       // ONCE-PER-FRAME EYE ANIMATION LOGIC HAPPENS HERE -------------------
 
-      float eyeX, eyeY;
       // Eye movement
-      int32_t dt = t - eyeMoveStartTime;      // uS elapsed since last eye event
-      if(eyeInMotion) {                       // Currently moving?
-        if(dt >= eyeMoveDuration) {           // Time up?  Destination reached.
-          eyeInMotion      = false;           // Stop moving
-          if (moveEyesRandomly) {
-            eyeMoveDuration  = random(10000, 3000000); // 0.01-3 sec stop
-            eyeMoveStartTime = t;               // Save initial time of stop
+      float eyeX, eyeY;
+      if(moveEyesRandomly) {
+        int32_t dt = t - eyeMoveStartTime;      // uS elapsed since last eye event
+        if(eyeInMotion) {                       // Eye currently moving?
+          if(dt >= eyeMoveDuration) {           // Time up?  Destination reached.
+            eyeInMotion = false;                // Stop moving
+            // The "move" duration temporarily becomes a hold duration...
+            eyeMoveDuration = random(30000, 1000000); // Time between microsaccades
+            if(!saccadeInterval) {              // Cleared when "big" saccade finishes
+              lastSaccadeStop = t;              // Time when saccade stopped
+              saccadeInterval = random(eyeMoveDuration, 3000000); // Next in 30ms to 3sec
+            }
+            // Similarly, the "move" start time becomes the "stop" starting time...
+            eyeMoveStartTime = t;               // Save time of event
+            eyeX = eyeOldX = eyeNewX;           // Save position
+            eyeY = eyeOldY = eyeNewY;
+          } else { // Move time's not yet fully elapsed -- interpolate position
+            float e  = (float)dt / float(eyeMoveDuration); // 0.0 to 1.0 during move
+            e = 3 * e * e - 2 * e * e * e; // Easing function: 3*e^2-2*e^3 0.0 to 1.0
+            eyeX = eyeOldX + (eyeNewX - eyeOldX) * e; // Interp X
+            eyeY = eyeOldY + (eyeNewY - eyeOldY) * e; // and Y
           }
-          eyeX = eyeOldX = eyeNewX;           // Save position
-          eyeY = eyeOldY = eyeNewY;
-        } else { // Move time's not yet fully elapsed -- interpolate position
-          float e  = (float)dt / float(eyeMoveDuration); // 0.0 to 1.0 during move
-          e = 3 * e * e - 2 * e * e * e; // Easing function: 3*e^2-2*e^3 0.0 to 1.0
-          eyeX = eyeOldX + (eyeNewX - eyeOldX) * e; // Interp X
-          eyeY = eyeOldY + (eyeNewY - eyeOldY) * e; // and Y
-        }
-      } else {                                // Eye stopped
-        eyeX = eyeOldX;
-        eyeY = eyeOldY;
-        if(dt > eyeMoveDuration) {            // Time up?  Begin new move.
-          // r is the radius in X and Y that the eye can go, from (0,0) in the center.
-          float r = (float)mapDiameter - (float)DISPLAY_SIZE * M_PI_2; // radius of motion
-          r *= 0.6;  // calibration constant
-
-          if (moveEyesRandomly) {
-            eyeNewX = random(-r, r);
-            float h = sqrt(r * r - x * x);
-            eyeNewY = random(-h, h);
-          } else {
-            eyeNewX = eyeTargetX * r;
-            eyeNewY = eyeTargetY * r;
+        } else {                       // Eye is currently stopped
+          eyeX = eyeOldX;
+          eyeY = eyeOldY;
+          if(dt > eyeMoveDuration) {   // Time up?  Begin new move.
+            if((t - lastSaccadeStop) > saccadeInterval) { // Time for a "big" saccade
+              // r is the radius in X and Y that the eye can go, from (0,0) in the center.
+              float r = ((float)mapDiameter - (float)DISPLAY_SIZE * M_PI_2) * 0.75;
+              eyeNewX = random(-r, r);
+              float h = sqrt(r * r - eyeNewX * eyeNewX);
+              eyeNewY = random(-h, h);
+              // Set the duration for this move, and start it going.
+              eyeMoveDuration = random(83000, 166000); // ~1/12 - ~1/6 sec
+              saccadeInterval = 0; // Calc next interval when this one stops
+            } else { // Microsaccade
+              // r is possible radius of motion, 1/10 size of full saccade.
+              // We don't bother with clipping because if it strays just a little,
+              // that's okay, it'll get put in-bounds on next full saccade.
+              float r = (float)mapDiameter - (float)DISPLAY_SIZE * M_PI_2;
+              r *= 0.06;
+              float dx = random(-r, r);
+              eyeNewX = eyeX - mapRadius + dx;
+              float h = sqrt(r * r - dx * dx);
+              eyeNewY = eyeY - mapRadius + random(-h, h);
+              eyeMoveDuration = random(6000, 25000); // 6-25 ms microsaccade
+            }
+            eyeNewX += mapRadius;    // Translate new point into map space
+            eyeNewY += mapRadius;
+            eyeMoveStartTime = t;    // Save initial time of move
+            eyeInMotion      = true; // Start move on next frame
           }
-    
-          eyeNewX += mapRadius;
-          eyeNewY += mapRadius;
-
-          // Set the duration for this move, and start it going.
-          eyeMoveDuration  = random(83000, 166000); // ~1/12 - ~1/6 sec
-          eyeMoveStartTime = t;               // Save initial time of move
-          eyeInMotion      = true;            // Start move on next frame
         }
+      } else {
+        // Allow user code to control eye position (e.g. IR sensor, joystick, etc.)
+        float r = ((float)mapDiameter - (float)DISPLAY_SIZE * M_PI_2) * 0.9;
+        eyeX = mapRadius + eyeTargetX * r;
+        eyeY = mapRadius + eyeTargetY * r;
       }
 
       // Eyes fixate (are slightly crossed) -- amount is filtered for boops
