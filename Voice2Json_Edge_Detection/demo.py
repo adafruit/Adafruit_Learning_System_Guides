@@ -5,8 +5,8 @@ import json
 import re
 from datetime import datetime
 import board
-import adafruit_dotstar
 import displayio
+import adafruit_dotstar
 from adafruit_st7789 import ST7789
 
 IMAGE_FOLDER = "images"
