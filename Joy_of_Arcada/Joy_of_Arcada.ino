@@ -39,7 +39,7 @@
 #include "graphics.h" // Face bitmaps are here
 #include "sound.h"    // "Pew" sound is here
 #include "keys.h"     // Key name-to-value table is here
-//#include "Adafruit_TinyUSB.h"
+#include "Adafruit_TinyUSB.h"
 
 #define JOY_CONFIG_FILE "/joy.cfg"
 
