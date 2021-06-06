@@ -5,6 +5,11 @@
 // "Uncanny Eyes" project (better for SAMD21 chips or Teensy 3.X and
 // 128x128 TFT or OLED screens, single SPI bus).
 
+// IMPORTANT: DO NOT compile with optimizer settings exceeding -O3, else
+// the flash storage code may brick your board! If this happens, install
+// CircuitPython to reinitialize the filesystem, copy over your eye files
+// (keep backups!), then upload this code (compiled at -O3 or less).
+
 // LET'S HAVE A WORD ABOUT COORDINATE SYSTEMS before continuing. From an
 // outside observer's point of view, looking at the display(s) on these
 // boards, the eyes are rendered COLUMN AT A TIME, working LEFT TO RIGHT,
