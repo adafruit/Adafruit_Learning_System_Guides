@@ -1,16 +1,17 @@
 """
-Slider Trinkey Hue Dimmer Python Example
-(Requires Hue Dimmer CircuitPython example to be running on the Slider Trinkey)
+Slider Trinkey Hue Brightness Python Example
+(Requires Hue and Monitor Brightness CircuitPython example to be running on the Slider Trinkey)
 """
+import sys
 from phue import Bridge
 import serial
 from serial.tools import list_ports
 
 # Update this to the room, zone or individual lamp you want to control.
-LAMP_OR_GROUP_NAME = "Office Desk Stand Lamp"
+LAMP_OR_GROUP_NAME = "Office"
 
 # Update this to the IP address of your Hue Bridge.
-b = Bridge("10.19.69.50")
+b = Bridge("0.0.0.0")
 
 slider_trinkey_port = None
 ports = list_ports.comports(include_links=False)
@@ -20,14 +21,11 @@ for p in ports:
         if p.pid == 0x8102:
             slider_trinkey_port = p
             print("Found Slider Trinkey!")
+            trinkey = serial.Serial(p.device)
             break
-        else:
-            print()
 else:
     print("Did not find Slider Trinkey port :(")
-    exit(-1)
-
-trinkey = serial.Serial(p.device)
+    sys.exit()
 
 # If the app is not registered and the button on the Hue Bridge is not pressed, press the button
 # and call connect() (this only needs to be run a single time)
