@@ -38,15 +38,7 @@ spkrenable.direction = digitalio.Direction.OUTPUT
 spkrenable.value = True
 
 
-# Make the 2 input buttons
-buttonA = digitalio.DigitalInOut(board.BUTTON_A)
-buttonA.direction = digitalio.Direction.INPUT
-buttonA.pull = digitalio.Pull.DOWN
-
-buttonB = digitalio.DigitalInOut(board.BUTTON_B)
-buttonB.direction = digitalio.Direction.INPUT
-buttonB.pull = digitalio.Pull.DOWN
-
+# Make the input buttons
 btn1 = digitalio.DigitalInOut(board.D10)  # Marked A3
 btn1.direction = digitalio.Direction.INPUT
 btn1.pull = digitalio.Pull.UP
