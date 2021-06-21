@@ -1,5 +1,6 @@
 """
-Blink example for QT Py using onboard NeoPixel.
+Blink example for boards with ONLY a NeoPixel LED (e.g. without a built-in red LED).
+Includes QT Py and various Trinkeys.
 
 Requires two libraries from the Adafruit CircuitPython Library Bundle. Download the bundle
 from circuitpython.org/libraries and copy the following files to your CIRCUITPY/lib folder:

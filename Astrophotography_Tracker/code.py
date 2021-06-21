@@ -10,7 +10,7 @@ steps = 200 # Steps per revolution
 microsteps = 64 # Microstepping resolution
 total_steps = steps * microsteps # Total microsteps per revolution
 
-wait = 1/ ((gear_ratio * total_steps) / 86400)
+wait = 1/ ((gear_ratio * total_steps) / 86164.1)
 
 step = digitalio.DigitalInOut(board.D6)
 direct = digitalio.DigitalInOut(board.D5)
