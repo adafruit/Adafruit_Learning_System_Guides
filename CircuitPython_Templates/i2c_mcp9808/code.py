@@ -9,5 +9,5 @@ mcp9808 = adafruit_mcp9808.MCP9808(i2c)
 while True:
     temperature_celsius = mcp9808.temperature
     temperature_fahrenheit = temperature_celsius * 9 / 5 + 32
-    print("Temperature: {} C {} F ".format(temperature_celsius, temperature_fahrenheit))
+    print("Temperature: {:.2f} C {:.2f} F ".format(temperature_celsius, temperature_fahrenheit))
     time.sleep(2)
