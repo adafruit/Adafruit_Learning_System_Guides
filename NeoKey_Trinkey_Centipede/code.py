@@ -1,5 +1,6 @@
 """NeoKey Trinkey Capacitive Touch and HID Keyboard example"""
 import time
+import math
 import board
 import neopixel
 import usb_hid
@@ -9,8 +10,6 @@ from adafruit_hid.keycode import Keycode  # pylint: disable=unused-import
 from adafruit_hid.mouse import Mouse
 from digitalio import DigitalInOut, Pull
 import touchio
-import random
-import math
 
 mouse = Mouse(usb_hid.devices)
 print("NeoKey Trinkey HID")
@@ -33,12 +32,12 @@ touch = touchio.TouchIn(board.TOUCH)
 touch_state = False
 
 key_output = (
-   {'keys': Keycode.GUI, 'delay': 0.1},
-   {'keys': "notepad\n", 'delay': 1},  # give it a moment to launch!
-   {'keys': "YOU HAVE BEEN DUCKIED!", 'delay': 0.1},
-   {'keys': (Keycode.ALT, Keycode.O), 'delay': 0.1}, # open format menu
-   {'keys': Keycode.F, 'delay': 0.1}, # open font submenu
-   {'keys': "\t\t100\n", 'delay': 0.1}, # tab over to font size, enter 100
+    {"keys": Keycode.GUI, "delay": 0.1},
+    {"keys": "notepad\n", "delay": 1},  # give it a moment to launch!
+    {"keys": "YOU HAVE BEEN DUCKIED!", "delay": 0.1},
+    {"keys": (Keycode.ALT, Keycode.O), "delay": 0.1},  # open format menu
+    {"keys": Keycode.F, "delay": 0.1},  # open font submenu
+    {"keys": "\t\t100\n", "delay": 0.1},  # tab over to font size, enter 100
 )
 
 ssid = ""
@@ -49,43 +48,44 @@ account_password = ""
 
 DELAY = 0.05
 key_output = (
-   {'keys': None, 'delay': 2}, # Wifi setup
-   {'keys': Keycode.TAB, 'delay': DELAY},
-   {'keys': Keycode.TAB, 'delay': DELAY},
-   {'keys': Keycode.TAB, 'delay': DELAY},
-   {'keys': Keycode.TAB, 'delay': DELAY},
-   {'keys': Keycode.ENTER, 'delay': 1},
-   {'keys': Keycode.TAB, 'delay': DELAY},
-   {'keys': Keycode.TAB, 'delay': DELAY},
-   {'keys': Keycode.TAB, 'delay': DELAY},
-   {'keys': Keycode.ENTER, 'delay': 0.5},
-   {'keys': ssid, 'delay': 0.5},
-   {'keys': Keycode.TAB, 'delay': 0.5},
-   {'keys': Keycode.DOWN_ARROW, 'delay': DELAY},
-   {'keys': Keycode.DOWN_ARROW, 'delay': 0.5},
-   {'keys': Keycode.TAB, 'delay': DELAY},
-   {'keys': password, 'delay': 0.5},
-   {'keys': Keycode.ENTER, 'delay': 9}, # Long pause while connection is established
-   {'keys': Keycode.TAB, 'delay': DELAY}, # Go Through first run setup
-   {'keys': Keycode.TAB, 'delay': DELAY},
-   {'keys': Keycode.ENTER, 'delay': 0.5},
-   {'keys': Keycode.TAB, 'delay': DELAY},
-   {'keys': Keycode.TAB, 'delay': DELAY},
-   {'keys': Keycode.TAB, 'delay': DELAY},
-   {'keys': Keycode.ENTER, 'delay': 0.5},
-   {'keys': (Keycode.CONTROL, Keycode.ALT, Keycode.E), 'delay': DELAY},
-   {'keys': Keycode.TAB, 'delay': DELAY},
-   {'keys': Keycode.TAB, 'delay': DELAY},
-   {'keys': Keycode.TAB, 'delay': DELAY},
-   {'keys': Keycode.TAB, 'delay': DELAY},
-   {'keys': Keycode.TAB, 'delay': DELAY}, # Part Two: Enrollment
-   {'keys': Keycode.ENTER, 'delay': 4},
-   {'keys': account, 'delay': DELAY},
-   {'keys': Keycode.ENTER, 'delay': 5},
-   {'keys': account_password, 'delay': 0.5},
-   {'keys': Keycode.ENTER, 'delay': 8}, # Long pause while device is enrolled
-   {'keys': Keycode.ENTER, 'delay': DELAY},
+    {"keys": None, "delay": 2},  # Wifi setup
+    {"keys": Keycode.TAB, "delay": DELAY},
+    {"keys": Keycode.TAB, "delay": DELAY},
+    {"keys": Keycode.TAB, "delay": DELAY},
+    {"keys": Keycode.TAB, "delay": DELAY},
+    {"keys": Keycode.ENTER, "delay": 1},
+    {"keys": Keycode.TAB, "delay": DELAY},
+    {"keys": Keycode.TAB, "delay": DELAY},
+    {"keys": Keycode.TAB, "delay": DELAY},
+    {"keys": Keycode.ENTER, "delay": 0.5},
+    {"keys": ssid, "delay": 0.5},
+    {"keys": Keycode.TAB, "delay": 0.5},
+    {"keys": Keycode.DOWN_ARROW, "delay": DELAY},
+    {"keys": Keycode.DOWN_ARROW, "delay": 0.5},
+    {"keys": Keycode.TAB, "delay": DELAY},
+    {"keys": password, "delay": 0.5},
+    {"keys": Keycode.ENTER, "delay": 9},  # Long pause while connection is established
+    {"keys": Keycode.TAB, "delay": DELAY},  # Go Through first run setup
+    {"keys": Keycode.TAB, "delay": DELAY},
+    {"keys": Keycode.ENTER, "delay": 0.5},
+    {"keys": Keycode.TAB, "delay": DELAY},
+    {"keys": Keycode.TAB, "delay": DELAY},
+    {"keys": Keycode.TAB, "delay": DELAY},
+    {"keys": Keycode.ENTER, "delay": 0.5},
+    {"keys": (Keycode.CONTROL, Keycode.ALT, Keycode.E), "delay": DELAY},
+    {"keys": Keycode.TAB, "delay": DELAY},
+    {"keys": Keycode.TAB, "delay": DELAY},
+    {"keys": Keycode.TAB, "delay": DELAY},
+    {"keys": Keycode.TAB, "delay": DELAY},
+    {"keys": Keycode.TAB, "delay": DELAY},  # Part Two: Enrollment
+    {"keys": Keycode.ENTER, "delay": 4},
+    {"keys": account, "delay": DELAY},
+    {"keys": Keycode.ENTER, "delay": 5},
+    {"keys": account_password, "delay": 0.5},
+    {"keys": Keycode.ENTER, "delay": 8},  # Long pause while device is enrolled
+    {"keys": Keycode.ENTER, "delay": DELAY},
 )
+
 
 def make_keystrokes(keys, delay):
     start = time.monotonic()
@@ -94,19 +94,20 @@ def make_keystrokes(keys, delay):
         print(keys)
     elif isinstance(keys, int):  # If its a single key
         keyboard.press(keys)  # "Press"...
-        pixel.fill((math.sin(keys)*255, math.cos(keys)*255, math.tan(keys)*255))
+        pixel.fill((math.sin(keys) * 255, math.cos(keys) * 255, math.tan(keys) * 255))
         keyboard.release_all()  # ..."Release"!
         print(keys)
     elif isinstance(keys, (list, tuple)):  # If its multiple keys
         keyboard.press(*keys)  # "Press"...
         for key in keys:
-            pixel.fill((math.sin(key)*255, math.cos(key)*255, math.tan(key)*255))
+            pixel.fill((math.sin(key) * 255, math.cos(key) * 255, math.tan(key) * 255))
         keyboard.release_all()  # ..."Release"!
         print(*keys)
     while time.monotonic() < start + delay:
         if button.value:
             print("Stopped")
             return
+
 
 activated = False
 while True:
@@ -121,7 +122,7 @@ while True:
                 activated = False
                 time.sleep(0.2)
                 break
-            make_keystrokes(k['keys'], k['delay'])
+            make_keystrokes(k["keys"], k["delay"])
         print("Done!")
         pixel.fill(0xFFFFFF)
         time.sleep(0.1)
