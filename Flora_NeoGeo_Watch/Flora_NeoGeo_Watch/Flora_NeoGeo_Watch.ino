@@ -13,7 +13,7 @@
 #include <Adafruit_GPS.h>
 #include <Adafruit_NeoPixel.h>
 #include <SoftwareSerial.h>
-#include <Time.h>
+#include <TimeLib.h>
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_LSM303DLH_Mag.h>
