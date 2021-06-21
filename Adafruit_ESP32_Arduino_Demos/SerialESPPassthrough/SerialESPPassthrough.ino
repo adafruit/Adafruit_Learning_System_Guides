@@ -20,7 +20,6 @@
 */
 
 #include <Adafruit_NeoPixel.h>
-#include <Adafruit_TinyUSB.h>
 
 unsigned long baud = 115200;
 
