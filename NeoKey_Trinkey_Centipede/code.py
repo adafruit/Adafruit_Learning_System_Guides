@@ -1,4 +1,3 @@
-"""NeoKey Trinkey Capacitive Touch and HID Keyboard example"""
 import time
 import math
 import board
@@ -7,12 +6,7 @@ import usb_hid
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS
 from adafruit_hid.keycode import Keycode  # pylint: disable=unused-import
-from adafruit_hid.mouse import Mouse
 from digitalio import DigitalInOut, Pull
-import touchio
-
-mouse = Mouse(usb_hid.devices)
-print("NeoKey Trinkey HID")
 
 # create the pixel and turn it off
 pixel = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.1)
@@ -26,19 +20,6 @@ keyboard_layout = KeyboardLayoutUS(keyboard)  # We're in the US :)
 button = DigitalInOut(board.SWITCH)
 button.switch_to_input(pull=Pull.DOWN)
 button_state = False
-
-# create the captouch element and start it with not touched
-touch = touchio.TouchIn(board.TOUCH)
-touch_state = False
-
-key_output = (
-    {"keys": Keycode.GUI, "delay": 0.1},
-    {"keys": "notepad\n", "delay": 1},  # give it a moment to launch!
-    {"keys": "YOU HAVE BEEN DUCKIED!", "delay": 0.1},
-    {"keys": (Keycode.ALT, Keycode.O), "delay": 0.1},  # open format menu
-    {"keys": Keycode.F, "delay": 0.1},  # open font submenu
-    {"keys": "\t\t100\n", "delay": 0.1},  # tab over to font size, enter 100
-)
 
 ssid = ""
 password = ""
