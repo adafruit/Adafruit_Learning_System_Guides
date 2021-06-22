@@ -7,14 +7,27 @@ import usb_hid
 from adafruit_hid.consumer_control import ConsumerControl
 from adafruit_hid.consumer_control_code import ConsumerControlCode
 
+# how frequently we check the encoder value and apply brightness changes
+ACTION_INTERVAL = 3  # seconds
 
+# if encoder value increases at least this much
+# then brightness stays the same
+# if encoder value increases less than this
+# then brightness goes down
 STAY_EVEN_CHANGE_THRESHOLD = 50
-INCREASE_CHANGE_THRESHOLD = 85
-ACTION_INTERVAL = 3 # seconds
 
+# if encoder value increases at least this much
+# then brightness goes up
+INCREASE_CHANGE_THRESHOLD = 85
+
+# timestamp of last time an action occured
 LAST_ACTION_TIME = 0
 
+# encoder value variable
 CUR_VALUE = 0
+
+# pause state
+PAUSED = True
 
 cc = ConsumerControl(usb_hid.devices)
 
@@ -23,42 +36,62 @@ switch = digitalio.DigitalInOut(board.SWITCH)
 switch.switch_to_input(pull=digitalio.Pull.DOWN)
 
 switch_state = None
+
+# previous encoder position variable
 last_position = encoder.position
 
+prev_switch_value = False
 
 while True:
     now = time.monotonic()
-    if (now > LAST_ACTION_TIME + ACTION_INTERVAL):
-        print("Time for action")
-        print(CUR_VALUE)
 
-        LAST_ACTION_TIME = now
-        if CUR_VALUE < STAY_EVEN_CHANGE_THRESHOLD:
-            cc.send(ConsumerControlCode.BRIGHTNESS_DECREMENT)
-            print("brightness down")
-        elif CUR_VALUE < INCREASE_CHANGE_THRESHOLD:
-            print("stay even")
-        else:
-            print("brightness up")
-            cc.send(ConsumerControlCode.BRIGHTNESS_INCREMENT)
+    if switch.value and not prev_switch_value:
+        print("toggling pause")
+        PAUSED = not PAUSED
 
-        CUR_VALUE = 0
+        if not PAUSED:
+            LAST_ACTION_TIME = now
 
+    prev_switch_value = switch.value
 
-    current_position = encoder.position
-    position_change = int(current_position - last_position)
+    if not PAUSED:
+        # is it time for an action?
+        if (now > LAST_ACTION_TIME + ACTION_INTERVAL):
+            # print(CUR_VALUE)
 
-    if position_change > 0:
+            # update previous time variable
+            LAST_ACTION_TIME = now
 
-        for _ in range(position_change):
-            CUR_VALUE += position_change
+            # less than stay even threshold
+            if CUR_VALUE < STAY_EVEN_CHANGE_THRESHOLD:
+                cc.send(ConsumerControlCode.BRIGHTNESS_DECREMENT)
+                print("brightness down")
 
-    elif position_change < 0:
-        for _ in range(-position_change):
-            CUR_VALUE += int(math.fabs(position_change))
+            # more than stay even threshold
+            elif CUR_VALUE < INCREASE_CHANGE_THRESHOLD:
+                print("stay even")
 
-    last_position = current_position
-    if not switch.value and switch_state is None:
-        switch_state = "pressed"
-    if switch.value and switch_state == "pressed":
-        print("switch pressed.")
+            # more than increase threshold
+            else:
+                cc.send(ConsumerControlCode.BRIGHTNESS_INCREMENT)
+                print("brightness up")
+
+            # reset encoder value
+            CUR_VALUE = 0
+
+        # read current encoder value
+        current_position = encoder.position
+        position_change = int(current_position - last_position)
+
+        # positive change
+        if position_change > 0:
+            for _ in range(position_change):
+                CUR_VALUE += position_change
+
+        # negative change
+        elif position_change < 0:
+            for _ in range(-position_change):
+                # use absolute value to convert to positive
+                CUR_VALUE += int(math.fabs(position_change))
+
+        last_position = current_position
