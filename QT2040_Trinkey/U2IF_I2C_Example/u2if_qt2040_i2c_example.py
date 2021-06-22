@@ -1,5 +1,5 @@
 """
-CircuitPython U2IF I2C QAT2040 Trinkey Example
+CircuitPython U2IF I2C QT2040 Trinkey Example
 
 Reads the temperature every two seconds from an MCP9808 I2C temperature sensor
 connected via STEMMA QT.
