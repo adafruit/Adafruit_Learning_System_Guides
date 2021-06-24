@@ -7,7 +7,7 @@ import time
 import math
 import board
 import digitalio
-import rotaryiogk
+import rotaryio
 import usb_hid
 from adafruit_hid.consumer_control import ConsumerControl
 from adafruit_hid.consumer_control_code import ConsumerControlCode
