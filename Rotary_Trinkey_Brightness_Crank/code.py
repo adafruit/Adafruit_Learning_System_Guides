@@ -1,8 +1,13 @@
+"""
+Rotary Trinkey gadget that forces you to crank the handle in order
+to keep the brightness up on your phone or tablet.
+"""
+
 import time
+import math
 import board
 import digitalio
-import rotaryio
-import math
+import rotaryiogk
 import usb_hid
 from adafruit_hid.consumer_control import ConsumerControl
 from adafruit_hid.consumer_control_code import ConsumerControlCode
@@ -27,7 +32,7 @@ LAST_ACTION_TIME = 0
 CUR_VALUE = 0
 
 # pause state
-PAUSED = True
+PAUSED = False
 
 cc = ConsumerControl(usb_hid.devices)
 
@@ -40,6 +45,7 @@ switch_state = None
 # previous encoder position variable
 last_position = encoder.position
 
+# previous switch variable
 prev_switch_value = False
 
 while True:
@@ -56,7 +62,7 @@ while True:
 
     if not PAUSED:
         # is it time for an action?
-        if (now > LAST_ACTION_TIME + ACTION_INTERVAL):
+        if now > LAST_ACTION_TIME + ACTION_INTERVAL:
             # print(CUR_VALUE)
 
             # update previous time variable
