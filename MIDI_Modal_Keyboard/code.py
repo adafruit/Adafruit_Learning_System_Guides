@@ -5,6 +5,7 @@
 # 7x3 mech keyboard
 # Each key sends MIDI NoteOn / NoteOff message over USB
 # Can be any scale/mode
+# Key combo sends MIDI panic (see bottom section of code)
 
 import time
 import board
@@ -33,7 +34,7 @@ led.value = True
 num_keys = 21
 
 # list of pins to use (skipping GP15 on Pico because it's funky)
-pins = [
+pins = (
     board.GP0,
     board.GP1,
     board.GP2,
@@ -55,7 +56,7 @@ pins = [
     board.GP19,
     board.GP20,
     board.GP21,
-]
+)
 
 
 keys = []
@@ -64,13 +65,13 @@ for pin in pins:
     tmp_pin.pull = Pull.UP
     keys.append(Debouncer(tmp_pin))
 
-root_notes = [48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59]  # used during config
-note_numbers = [48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59,
+root_notes = (48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59)  # used during config
+note_numbers = (48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59,
                 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71,
-                72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83]
-note_names = ["C2", "C#2", "D2", "D#2", "E2", "F2", "F#2", "G2", "G#2", "A2", "A#2", "B2",
+                72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83)
+note_names = ("C2", "C#2", "D2", "D#2", "E2", "F2", "F#2", "G2", "G#2", "A2", "A#2", "B2",
               "C3", "C#3", "D3", "D#3", "E3", "F3", "F#3", "G3", "G#3", "A3", "A#3", "B3",
-              "C4", "C#4", "D4", "D#4", "E4", "F4", "F#4", "G4", "G#4", "A4", "A#4", "B4"]
+              "C4", "C#4", "D4", "D#4", "E4", "F4", "F#4", "G4", "G#4", "A4", "A#4", "B4",)
 scale_root = root_notes[0]  # default if nothing is picked
 root_picked = False  # state of root selection
 mode_picked = False  # state of mode selection
@@ -92,7 +93,6 @@ while not root_picked:
             print("Root is", note_names[i])
         if keys[i].rose:
             midi.send(NoteOff(root_notes[i], 0))
-            # root_picked = True
     keys[20].update()
 
     if keys[20].rose:
@@ -100,13 +100,13 @@ while not root_picked:
         print("Root picked.\n")
 
 #  lists of mode intervals relative to root
-major = [ 0, 2, 4, 5, 7, 9, 11 ]
-minor = [ 0, 2, 3, 5, 7, 8, 10 ]
-dorian = [ 0, 2, 3, 5, 7, 9, 10 ]
-phrygian = [ 0, 1, 3, 5, 7, 8, 10 ]
-lydian = [0 , 2, 4, 6, 7, 9, 11 ]
-mixolydian = [ 0, 2, 4, 5, 7, 9, 10]
-locrian = [ 0, 1, 3, 5, 6, 8, 10]
+major = ( 0, 2, 4, 5, 7, 9, 11 )
+minor = ( 0, 2, 3, 5, 7, 8, 10 )
+dorian = ( 0, 2, 3, 5, 7, 9, 10 )
+phrygian = ( 0, 1, 3, 5, 7, 8, 10 )
+lydian = (0 , 2, 4, 6, 7, 9, 11 )
+mixolydian = ( 0, 2, 4, 5, 7, 9, 10)
+locrian = ( 0, 1, 3, 5, 6, 8, 10)
 
 modes = []
 modes.append(major)
@@ -117,15 +117,15 @@ modes.append(lydian)
 modes.append(mixolydian)
 modes.append(locrian)
 
-mode_names = ["Major/Ionian",
+mode_names = ("Major/Ionian",
               "Minor/Aeolian",
               "Dorian",
               "Phrygian",
               "Lydian",
               "Mixolydian",
-              "Locrian"]
+              "Locrian")
 
-intervals = mixolydian.copy()  # intervals for Mixolydian by default
+intervals = list(mixolydian)  # intervals for Mixolydian by default
 
 print("Pick the mode with top seven keys, then press bottom right key to enter:")
 print(". . . . . . .")
@@ -175,6 +175,7 @@ for m in range(7):
 led.value = False
 print("Ready, set, play!")
 
+
 while True:
 
     for i in range(num_keys):
@@ -196,15 +197,14 @@ while True:
                 pass
 
     #  Key combo for MIDI panic
-    #  * o o o o o *
-    #  o o o * o o o
-    #  * o o o o o *
+    # . o o o o o .
+    # o o o . o o o
+    # . o o o o o .
 
     if (not keys[0].value and
-            not keys[6].value and
-            not keys[10].value and
-            not keys[14].value and
-            not keys[20].value):
-
+            not keys[6].value
+            and not keys[10].value
+            and not keys[14].value
+            and not keys[20].value):
         send_midi_panic()
         time.sleep(1)
