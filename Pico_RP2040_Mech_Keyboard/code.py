@@ -21,7 +21,7 @@ kbd = Keyboard(usb_hid.devices)
 cc = ConsumerControl(usb_hid.devices)
 
 # list of pins to use (skipping GP15 on Pico because it's funky)
-pins = [
+pins = (
     board.GP0,
     board.GP1,
     board.GP2,
@@ -43,7 +43,7 @@ pins = [
     board.GP19,
     board.GP20,
     board.GP21,
-]
+)
 
 MEDIA = 1
 KEY = 2
@@ -74,14 +74,14 @@ keymap = {
     (20): (KEY, [Keycode.U]),
 
 }
-switches = [0, 1, 2, 3, 4, 5, 6,
-            7, 8, 9, 10, 11, 12, 13,
-            14, 15, 16, 17, 18, 19, 20, 21]
 
-for i in range(21):
-    switches[i] = DigitalInOut(pins[i])
-    switches[i].direction = Direction.INPUT
-    switches[i].pull = Pull.UP
+switches = []
+for i in range(len(pins)):
+    switch = DigitalInOut(pins[i])
+    switch.direction = Direction.INPUT
+    switch.pull = Pull.UP
+    switches.append(switch)
+
 
 switch_state = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
