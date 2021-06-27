@@ -19,13 +19,13 @@ ACTION_INTERVAL = 3  # seconds
 # then brightness stays the same
 # if encoder value increases less than this
 # then brightness goes down
-STAY_EVEN_CHANGE_THRESHOLD = 50
+STAY_EVEN_CHANGE_THRESHOLD = 60
 
 # if encoder value increases at least this much
 # then brightness goes up
-INCREASE_CHANGE_THRESHOLD = 85
+INCREASE_CHANGE_THRESHOLD = 95
 
-# timestamp of last time an action occured
+# timestamp of last time an action occurred
 LAST_ACTION_TIME = 0
 
 # encoder value variable
@@ -60,10 +60,27 @@ while True:
 
     prev_switch_value = switch.value
 
+    # read current encoder value
+    current_position = encoder.position
+    position_change = int(current_position - last_position)
+
+    # positive change
+    if position_change > 0:
+        for _ in range(position_change):
+            CUR_VALUE += position_change
+
+    # negative change
+    elif position_change < 0:
+        for _ in range(-position_change):
+            # use absolute value to convert to positive
+            CUR_VALUE += int(math.fabs(position_change))
+
+    last_position = current_position
+
     if not PAUSED:
         # is it time for an action?
         if now > LAST_ACTION_TIME + ACTION_INTERVAL:
-            # print(CUR_VALUE)
+            print(CUR_VALUE)
 
             # update previous time variable
             LAST_ACTION_TIME = now
@@ -85,19 +102,4 @@ while True:
             # reset encoder value
             CUR_VALUE = 0
 
-        # read current encoder value
-        current_position = encoder.position
-        position_change = int(current_position - last_position)
 
-        # positive change
-        if position_change > 0:
-            for _ in range(position_change):
-                CUR_VALUE += position_change
-
-        # negative change
-        elif position_change < 0:
-            for _ in range(-position_change):
-                # use absolute value to convert to positive
-                CUR_VALUE += int(math.fabs(position_change))
-
-        last_position = current_position
