@@ -106,7 +106,7 @@ class AWS_GFX(displayio.Group):
                 self.temp_data_label.color = 0xFD2EE
             elif temp_data <= 32:
                 self.temp_data_label.color = 0xFF0000
-            self.temp_data_label = '%0.0f°F'%temp_data
+            self.temp_data_label.text = '%0.0f°F'%temp_data
             temp_data = '%0.0f'%temp_data
             return int(temp_data)
         else:
