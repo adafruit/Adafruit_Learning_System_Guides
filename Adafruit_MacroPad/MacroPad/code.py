@@ -4,6 +4,8 @@ import digitalio
 import rotaryio
 import neopixel
 import keypad
+from _pixelbuf import colorwheel
+
 
 key_pins = (board.KEY1, board.KEY2, board.KEY3, board.KEY4, board.KEY5, board.KEY6,
             board.KEY7, board.KEY8, board.KEY9, board.KEY10, board.KEY11, board.KEY12)
@@ -14,19 +16,6 @@ button = digitalio.DigitalInOut(board.BUTTON)
 button.switch_to_input(pull=digitalio.Pull.UP)
 
 pixels = neopixel.NeoPixel(board.NEOPIXEL, 12, brightness=0.2)
-
-
-def colorwheel(color):
-    if color < 0 or color > 255:
-        return 0, 0, 0
-    if color < 85:
-        return 255 - color * 3, color * 3, 0
-    if color < 170:
-        color -= 85
-        return 0, 255 - color * 3, color * 3
-    color -= 170
-    return color * 3, 0, 255 - color * 3
-
 
 last_position = None
 while True:
