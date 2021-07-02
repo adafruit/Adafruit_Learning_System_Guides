@@ -1,5 +1,9 @@
 """
-Add description here
+A fairly straightforward macro/hotkey program for Adafruit MACROPAD.
+Macro key setups are stored in the /macros folder (configurable below),
+load up just the ones you're likely to use. Plug into computer's USB port,
+use dial to select an application macro set, press MACROPAD keys to send
+key sequences.
 """
 
 # pylint: disable=import-error, unused-import, too-few-public-methods, eval-used
@@ -18,14 +22,16 @@ from adafruit_display_text import label
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keycode import Keycode
 
+
 # CONFIGURABLES ------------------------
 
 MACRO_FOLDER = '/macros'
 
+
 # CLASSES AND FUNCTIONS ----------------
 
 class Key:
-    """ Add class doccstring here"""
+    """ Class representing the physical hardware of each MACROPAD key. """
     DEBOUNCE_TIME = 1 / 50
 
     def __init__(self, keyname):
@@ -36,7 +42,9 @@ class Key:
         self.last_time = time.monotonic()
 
     def debounce(self):
-        """ Add function docstring here """
+        """ Read a key's current state (hardware pin value), filtering out
+            any "bounce" noise. This function needs to be called frequently,
+            once for each key on pad, plus encoder switch. """
         value = self.pin.value
         if value != self.last_value:
             now = time.monotonic()
@@ -48,7 +56,8 @@ class Key:
         return None
 
 class Macro:
-    """ Add class doccstring here"""
+    """ Class representing a single macro sequence - a text label, LED color
+        for the keypad, and a keycode sequence to issue when activated. """
     def __init__(self, desc, color, sequence):
         self.desc = desc
         self.color = eval(color)
@@ -60,7 +69,8 @@ class Macro:
                 break
 
 class App:
-    """ Add class doccstring here"""
+    """ Class representing a host-side application, for which we have a set
+        of macro sequences. """
     def __init__(self, filename):
         with open(MACRO_FOLDER + '/' + filename) as jsonfile:
             json_data = json.load(jsonfile)
@@ -74,21 +84,23 @@ class App:
                     mac['sequence'] if 'sequence' in mac else None))
 
     def switch(self):
-        """ Add function docstring here """
-        GROUP[12].text = self.name
+        """ Activate application settings; update OLED labels and LED
+            colors. """
+        GROUP[12].text = self.name   # Application name
         for i in range(12):
-            if i < len(self.macros):
+            if i < len(self.macros): # Key in use, set label + LED color
                 PIXELS[i] = self.macros[i].color
                 GROUP[i].text = self.macros[i].desc
-            else:
+            else:                    # Key not in use, no label or LED
                 PIXELS[i] = 0
                 GROUP[i].text = ''
         PIXELS.show()
 
-# Convert key code name (e.g. "COMMAND") to a numeric value for press/release
 def code(name):
-    """ Add function doccstring here"""
+    """ Convert a key code name (e.g. 'COMMAND') to a numeric value for
+        press/release events. """
     return eval('Keycode.' + name.upper())
+
 
 # INITIALIZATION -----------------------
 
@@ -133,6 +145,7 @@ LAST_POSITION = None
 APP_INDEX = 0
 APPS[APP_INDEX].switch()
 
+
 # MAIN LOOP ----------------------------
 
 while True:
@@ -147,6 +160,8 @@ while True:
         if action is not None:
             keys = APPS[APP_INDEX].macros[KEY_INDEX].sequence
             if action is False: # Macro key pressed
+                PIXELS[KEY_INDEX] = 0xFFFFFF
+                PIXELS.show()
                 if APPS[APP_INDEX].macros[KEY_INDEX].in_order:
                     for x in APPS[APP_INDEX].macros[KEY_INDEX].sequence:
                         if x.startswith('+'):   # Press and hold key
@@ -156,7 +171,7 @@ while True:
                         else:                   # Press and release key
                             KEYBOARD.press(code(x))
                             KEYBOARD.release(code(x))
-                else:
+                else: # Send press events now, release later
                     for x in APPS[APP_INDEX].macros[KEY_INDEX].sequence:
                         KEYBOARD.press(code(x))
             elif action is True: # Macro key released
@@ -166,3 +181,5 @@ while True:
                         KEYBOARD.release(code(x[1:]))
                     else:
                         KEYBOARD.release(code(x))
+                PIXELS[KEY_INDEX] = APPS[APP_INDEX].macros[KEY_INDEX].color
+                PIXELS.show()
