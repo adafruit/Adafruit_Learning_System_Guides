@@ -63,7 +63,7 @@ for keyname in (board.KEY1, board.KEY2, board.KEY3, board.KEY4, board.KEY5,
 class macro:
     def __init__(self, desc, color, sequence):
         self.desc = desc
-        self.color = color
+        self.color = eval(color)
         self.sequence = sequence
         self.in_order = False
         for key in sequence:
@@ -76,7 +76,7 @@ class app:
         with open(filename) as jsonfile:
             json_data = json.load(jsonfile)
             self.name = json_data['name']
-            default_color = json_data['color'] if 'color' in json_data else None
+            default_color = json_data['color'] if 'color' in json_data else '0'
             self.macros = []
             for mac in json_data['macros']:
                 self.macros.append(macro(
@@ -84,9 +84,14 @@ class app:
                     mac['color'] if 'color' in mac else default_color,
                     mac['sequence'] if 'sequence' in mac else None))
 
-    def activate(self):
-        # Config screen, button colors, key sequences here
-        pass
+    def switch(self):
+        # Set up LED colors
+        PIXELS.fill(0)
+        for i, mac in enumerate(self.macros):
+            PIXELS[i] = mac.color
+        PIXELS.show()
+        # DO SCREEN HERE
+        text_area.text = self.name
 
 
 APPS = []
@@ -101,22 +106,22 @@ if not len(APPS):
     while True:
         pass
 
+LAST_POSITION = None
 APP_INDEX = 0
+APPS[APP_INDEX].switch()
 
-
-
-FOO = ((Keycode.A, Keycode.ONE, Keycode.X), Keycode.B, Keycode.C)
-
-
-last_position = None
 while True:
     position = ENCODER.position
-    if position != last_position:
-        PIXELS.fill(0)
-        PIXELS[position % len(APPS)] = 0xFFFFFF
-        PIXELS.show()
-        print(position)
-        last_position = position
+    if position != LAST_POSITION:
+        APP_INDEX = position % len(APPS)
+        APPS[APP_INDEX].switch()
+        LAST_POSITION = position
+
+#        PIXELS.fill(0)
+#        PIXELS[position % len(APPS)] = 0xFFFFFF
+#        PIXELS.show()
+#        print(position)
+
     for i, key in enumerate(KEYS):
         action = key.debounce()
         if action is not None:

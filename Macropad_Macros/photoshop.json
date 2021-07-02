@@ -2,11 +2,11 @@
   "name": "Photoshop",
   "macros": [
     {"desc": "Undo",
-     "color": "0xFF0000",
+     "color": "0x000020",
      "sequence": ["ONE", "TWO", "THREE"]
     },
     {"desc": "Redo",
-     "color": "0x00FF00",
+     "color": "0x002020",
      "sequence": ["FOUR", "FIVE", "SIX"]
     }
   ]
