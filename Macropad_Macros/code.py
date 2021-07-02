@@ -25,10 +25,13 @@ ENCODER = rotaryio.IncrementalEncoder(board.ENCODER_B, board.ENCODER_A)
 PIXELS = neopixel.NeoPixel(board.NEOPIXEL, 12, auto_write=False)
 KEYBOARD = Keyboard(usb_hid.devices)
 
-group = displayio.Group(max_size=10)
-text1 = "0123\n4567\n89AB\nCDEF\n1234\n5678\n9AB"
-text_area = label.Label(terminalio.FONT, text=text1, color=0xFFFFFF, x=8, y=8)
+group = displayio.Group(max_size=13)
+text_area = label.Label(terminalio.FONT, text='M', color=0xFFFFFF, x=DISPLAY.width//2, y=0, anchor_point=(0.5, 0.0), max_glyphs=30)
 group.append(text_area)
+# Use baseline alignment for these!
+#labels = []
+#for i in range(13):
+#    labels.append = label.Label(terminalio.FONT, text='M', color=0xFFFFFF, x=0, y=0, max_glyphs=15)
 
 DISPLAY.show(group)
 
@@ -67,7 +70,7 @@ class macro:
         self.sequence = sequence
         self.in_order = False
         for key in sequence:
-            if key.startswith('-'):
+            if key.startswith('+') or key.startswith('-'):
                 self.in_order = True
                 break
 
@@ -90,7 +93,7 @@ class app:
         for i, mac in enumerate(self.macros):
             PIXELS[i] = mac.color
         PIXELS.show()
-        # DO SCREEN HERE
+        # Set up screen
         text_area.text = self.name
 
 
@@ -106,6 +109,10 @@ if not len(APPS):
     while True:
         pass
 
+# Convert key code name (e.g. "COMMAND") to a numeric value for press/release
+def code(name):
+    return eval('Keycode.' + name.upper())
+
 LAST_POSITION = None
 APP_INDEX = 0
 APPS[APP_INDEX].switch()
@@ -117,11 +124,6 @@ while True:
         APPS[APP_INDEX].switch()
         LAST_POSITION = position
 
-#        PIXELS.fill(0)
-#        PIXELS[position % len(APPS)] = 0xFFFFFF
-#        PIXELS.show()
-#        print(position)
-
     for i, key in enumerate(KEYS):
         action = key.debounce()
         if action is not None:
@@ -131,22 +133,28 @@ while True:
                 continue # Ignore if key # exceeds macro list length
 
             keys = APPS[APP_INDEX].macros[i].sequence
-            if action is False: # Key pressed
+            if action is False: # Macro key pressed
                 print('Press', i)
                 if APPS[APP_INDEX].macros[i].in_order:
                     for x in APPS[APP_INDEX].macros[i].sequence:
-                        if x.startswith('-'):
-                            KEYBOARD.release(eval('Keycode.' + x[1:]))
-                        else:
-                            KEYBOARD.press(eval('Keycode.' + x))
+                        if x.startswith('+'):   # Press and hold key
+                            KEYBOARD.press(code(x[1:]))
+                        elif x.startswith('-'): # Release key
+                            KEYBOARD.release(code(x[1:]))
+                        else:                   # Press and release key
+                            KEYBOARD.press(code(x))
+                            KEYBOARD.release(code(x))
                 else:
                     for x in APPS[APP_INDEX].macros[i].sequence:
-                        KEYBOARD.press(eval('Keycode.' + x))
-            elif action is True: # Key released
+                        KEYBOARD.press(code(x))
+            elif action is True: # Macro key released
                 print('Release', i)
+                # Release all keys in reverse order
                 for x in reversed(APPS[APP_INDEX].macros[i].sequence):
-                    if not x.startswith('-'):
-                        KEYBOARD.release(eval('Keycode.' + x))
+                    if x.startswith('+') or x.startswith('-'):
+                        KEYBOARD.release(code(x[1:]))
+                    else:
+                        KEYBOARD.release(code(x))
 
 
 META = ('LEFT_CONTROL', 'CONTROL', 'LEFT_SHIFT', 'SHIFT', 'LEFT_ALT', 'ALT',

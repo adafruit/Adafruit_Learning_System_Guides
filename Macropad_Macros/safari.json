@@ -3,7 +3,7 @@
   "macros": [
     {"desc": "Fruit",
      "color": "0xFF0000",
-     "sequence": ["COMMAND", "N", "-COMMAND", "W", "W", "W", ".", "A", "D", "A", "F", "R", "U", "I", "T", ".", "C", "O", "M", "RETURN"]
+     "sequence": ["+COMMAND", "N", "-COMMAND", "W", "W", "W", "PERIOD", "A", "D", "A", "F", "R", "U", "I", "T", "PERIOD", "C", "O", "M", "ENTER"]
     }
   ]
 }
