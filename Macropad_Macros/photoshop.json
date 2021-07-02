@@ -1,0 +1,13 @@
+{ 
+  "name": "Photoshop",
+  "macros": [
+    {"desc": "Undo",
+     "color": "0xFF0000",
+     "sequence": ["ONE", "TWO", "THREE"]
+    },
+    {"desc": "Redo",
+     "color": "0x00FF00",
+     "sequence": ["FOUR", "FIVE", "SIX"]
+    }
+  ]
+}
