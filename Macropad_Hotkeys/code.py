@@ -8,7 +8,6 @@ key sequences.
 
 # pylint: disable=import-error, unused-import, too-few-public-methods, eval-used
 
-import json
 import os
 import time
 import board
@@ -18,9 +17,11 @@ import neopixel
 import rotaryio
 import terminalio
 import usb_hid
+from adafruit_display_shapes.rect import Rect
 from adafruit_display_text import label
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keycode import Keycode
+from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS
 
 
 # CONFIGURABLES ------------------------
@@ -55,51 +56,25 @@ class Key:
                 return value
         return None
 
-class Macro:
-    """ Class representing a single macro sequence - a text label, LED color
-        for the keypad, and a keycode sequence to issue when activated. """
-    def __init__(self, desc, color, sequence):
-        self.desc = desc
-        self.color = eval(color)
-        self.sequence = sequence
-        self.in_order = False
-        for key in sequence:
-            if key.startswith('+') or key.startswith('-'):
-                self.in_order = True
-                break
-
 class App:
     """ Class representing a host-side application, for which we have a set
         of macro sequences. """
-    def __init__(self, filename):
-        with open(MACRO_FOLDER + '/' + filename) as jsonfile:
-            json_data = json.load(jsonfile)
-            self.name = json_data['name']
-            default_color = json_data['color'] if 'color' in json_data else '0'
-            self.macros = []
-            for mac in json_data['macros']:
-                self.macros.append(Macro(
-                    mac['desc'] if 'desc' in mac else None,
-                    mac['color'] if 'color' in mac else default_color,
-                    mac['sequence'] if 'sequence' in mac else None))
+    def __init__(self, appdata):
+        self.name = appdata['name']
+        self.macros = appdata['macros']
 
     def switch(self):
         """ Activate application settings; update OLED labels and LED
             colors. """
-        GROUP[12].text = self.name   # Application name
+        GROUP[13].text = self.name   # Application name
         for i in range(12):
             if i < len(self.macros): # Key in use, set label + LED color
-                PIXELS[i] = self.macros[i].color
-                GROUP[i].text = self.macros[i].desc
+                PIXELS[i] = self.macros[i][0]
+                GROUP[i].text = self.macros[i][1]
             else:                    # Key not in use, no label or LED
                 PIXELS[i] = 0
                 GROUP[i].text = ''
         PIXELS.show()
-
-def code(name):
-    """ Convert a key code name (e.g. 'COMMAND') to a numeric value for
-        press/release events. """
-    return eval('Keycode.' + name.upper())
 
 
 # INITIALIZATION -----------------------
@@ -108,18 +83,21 @@ DISPLAY = board.DISPLAY
 ENCODER = rotaryio.IncrementalEncoder(board.ENCODER_B, board.ENCODER_A)
 PIXELS = neopixel.NeoPixel(board.NEOPIXEL, 12, auto_write=False)
 KEYBOARD = Keyboard(usb_hid.devices)
+LAYOUT = KeyboardLayoutUS(KEYBOARD)
 
-GROUP = displayio.Group(max_size=13)
+
+GROUP = displayio.Group(max_size=14)
 for KEY_INDEX in range(12):
     x = KEY_INDEX % 3
     y = KEY_INDEX // 3
     GROUP.append(label.Label(terminalio.FONT, text='', color=0xFFFFFF,
                              anchored_position=((DISPLAY.width - 1) * x / 2,
                                                 DISPLAY.height - 1 -
-                                                (3 - y) * 11),
+                                                (3 - y) * 12),
                              anchor_point=(x / 2, 1.0), max_glyphs=15))
-GROUP.append(label.Label(terminalio.FONT, text='', color=0xFFFFFF,
-                         anchored_position=(DISPLAY.width//2, 0),
+GROUP.append(Rect(0, 0, DISPLAY.width, 12, fill=0xFFFFFF))
+GROUP.append(label.Label(terminalio.FONT, text='', color=0x000000,
+                         anchored_position=(DISPLAY.width//2, -2),
                          anchor_point=(0.5, 0.0), max_glyphs=30))
 DISPLAY.show(GROUP)
 
@@ -129,12 +107,14 @@ for pin in (board.KEY1, board.KEY2, board.KEY3, board.KEY4, board.KEY5,
             board.KEY11, board.KEY12, board.ENCODER_SWITCH):
     KEYS.append(Key(pin))
 
+# Load all the macro key setups from .py files in MACRO_FOLDER
 APPS = []
 FILES = os.listdir(MACRO_FOLDER)
 FILES.sort()
 for FILENAME in FILES:
-    if FILENAME.endswith('.json'):
-        APPS.append(App(FILENAME))
+    if FILENAME.endswith('.py'):
+        module = __import__(MACRO_FOLDER + '/' + FILENAME[:-3])
+        APPS.append(App(module.app))
 
 if not APPS:
     print('No valid macro files found')
@@ -158,28 +138,24 @@ while True:
     for KEY_INDEX, KEY in enumerate(KEYS[0: len(APPS[APP_INDEX].macros)]):
         action = KEY.debounce()
         if action is not None:
-            keys = APPS[APP_INDEX].macros[KEY_INDEX].sequence
+            sequence = APPS[APP_INDEX].macros[KEY_INDEX][2]
             if action is False: # Macro key pressed
-                PIXELS[KEY_INDEX] = 0xFFFFFF
-                PIXELS.show()
-                if APPS[APP_INDEX].macros[KEY_INDEX].in_order:
-                    for x in APPS[APP_INDEX].macros[KEY_INDEX].sequence:
-                        if x.startswith('+'):   # Press and hold key
-                            KEYBOARD.press(code(x[1:]))
-                        elif x.startswith('-'): # Release key
-                            KEYBOARD.release(code(x[1:]))
-                        else:                   # Press and release key
-                            KEYBOARD.press(code(x))
-                            KEYBOARD.release(code(x))
-                else: # Send press events now, release later
-                    for x in APPS[APP_INDEX].macros[KEY_INDEX].sequence:
-                        KEYBOARD.press(code(x))
-            elif action is True: # Macro key released
-                # Release all keys in reverse order
-                for x in reversed(APPS[APP_INDEX].macros[KEY_INDEX].sequence):
-                    if x.startswith('+') or x.startswith('-'):
-                        KEYBOARD.release(code(x[1:]))
+                if KEY_INDEX < 12:
+                    PIXELS[KEY_INDEX] = 0xFFFFFF
+                    PIXELS.show()
+                for item in sequence:
+                    if isinstance(item, int):
+                        if item >= 0:
+                            KEYBOARD.press(item)
+                        else:
+                            KEYBOARD.release(item)
                     else:
-                        KEYBOARD.release(code(x))
-                PIXELS[KEY_INDEX] = APPS[APP_INDEX].macros[KEY_INDEX].color
-                PIXELS.show()
+                        LAYOUT.write(item)
+            elif action is True: # Macro key released
+                # Release any still-pressed modifier keys
+                for item in sequence:
+                    if isinstance(item, int) and item >= 0:
+                        KEYBOARD.release(item)
+                if KEY_INDEX < 12:
+                    PIXELS[KEY_INDEX] = APPS[APP_INDEX].macros[KEY_INDEX][0]
+                    PIXELS.show()
