@@ -6,7 +6,7 @@ use dial to select an application macro set, press MACROPAD keys to send
 key sequences.
 """
 
-# pylint: disable=import-error, unused-import, too-few-public-methods
+# pylint: disable=import-error, unused-import, too-few-public-methods, bare-except
 
 import os
 import board
@@ -88,8 +88,11 @@ FILES = os.listdir(MACRO_FOLDER)
 FILES.sort()
 for FILENAME in FILES:
     if FILENAME.endswith('.py'):
-        module = __import__(MACRO_FOLDER + '/' + FILENAME[:-3])
-        APPS.append(App(module.app))
+        try:
+            module = __import__(MACRO_FOLDER + '/' + FILENAME[:-3])
+            APPS.append(App(module.app))
+        except:
+            pass
 
 if not APPS:
     GROUP[13].text = 'NO MACRO FILES FOUND'
