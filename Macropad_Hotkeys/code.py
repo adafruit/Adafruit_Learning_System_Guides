@@ -6,15 +6,15 @@ use dial to select an application macro set, press MACROPAD keys to send
 key sequences.
 """
 
-# pylint: disable=import-error, unused-import, too-few-public-methods, eval-used
+# pylint: disable=import-error, unused-import, too-few-public-methods
 
 import os
-import time
 import board
 import digitalio
 import displayio
 import neopixel
 import rotaryio
+import keypad
 import terminalio
 import usb_hid
 from adafruit_display_shapes.rect import Rect
@@ -30,31 +30,6 @@ MACRO_FOLDER = '/macros'
 
 
 # CLASSES AND FUNCTIONS ----------------
-
-class Key:
-    """ Class representing the physical hardware of each MACROPAD key. """
-    DEBOUNCE_TIME = 1 / 50
-
-    def __init__(self, keyname):
-        self.pin = digitalio.DigitalInOut(keyname)
-        self.pin.direction = digitalio.Direction.INPUT
-        self.pin.pull = digitalio.Pull.UP
-        self.last_value = self.pin.value # Initial state
-        self.last_time = time.monotonic()
-
-    def debounce(self):
-        """ Read a key's current state (hardware pin value), filtering out
-            any "bounce" noise. This function needs to be called frequently,
-            once for each key on pad, plus encoder switch. """
-        value = self.pin.value
-        if value != self.last_value:
-            now = time.monotonic()
-            elapsed = now - self.last_time
-            if elapsed >= self.DEBOUNCE_TIME:
-                self.last_value = value
-                self.last_time = now
-                return value
-        return None
 
 class App:
     """ Class representing a host-side application, for which we have a set
@@ -86,7 +61,12 @@ ENCODER = rotaryio.IncrementalEncoder(board.ENCODER_B, board.ENCODER_A)
 PIXELS = neopixel.NeoPixel(board.NEOPIXEL, 12, auto_write=False)
 KEYBOARD = Keyboard(usb_hid.devices)
 LAYOUT = KeyboardLayoutUS(KEYBOARD)
+KEYS = keypad.Keys((board.KEY1, board.KEY2, board.KEY3, board.KEY4, board.KEY5,
+                    board.KEY6, board.KEY7, board.KEY8, board.KEY9, board.KEY10,
+                    board.KEY11, board.KEY12, board.ENCODER_SWITCH),
+                   value_when_pressed=False, pull=True)
 
+# Set up displayio group with all labels
 GROUP = displayio.Group(max_size=14)
 for KEY_INDEX in range(12):
     x = KEY_INDEX % 3
@@ -102,12 +82,6 @@ GROUP.append(label.Label(terminalio.FONT, text='', color=0x000000,
                          anchor_point=(0.5, 0.0), max_glyphs=30))
 DISPLAY.show(GROUP)
 
-KEYS = []
-for pin in (board.KEY1, board.KEY2, board.KEY3, board.KEY4, board.KEY5,
-            board.KEY6, board.KEY7, board.KEY8, board.KEY9, board.KEY10,
-            board.KEY11, board.KEY12, board.ENCODER_SWITCH):
-    KEYS.append(Key(pin))
-
 # Load all the macro key setups from .py files in MACRO_FOLDER
 APPS = []
 FILES = os.listdir(MACRO_FOLDER)
@@ -118,7 +92,8 @@ for FILENAME in FILES:
         APPS.append(App(module.app))
 
 if not APPS:
-    print('No valid macro files found')
+    GROUP[13].text = 'NO MACRO FILES FOUND'
+    DISPLAY.refresh()
     while True:
         pass
 
@@ -136,27 +111,27 @@ while True:
         APPS[APP_INDEX].switch()
         LAST_POSITION = POSITION
 
-    for KEY_INDEX, KEY in enumerate(KEYS[0: len(APPS[APP_INDEX].macros)]):
-        action = KEY.debounce()
-        if action is not None:
-            sequence = APPS[APP_INDEX].macros[KEY_INDEX][2]
-            if action is False: # Macro key pressed
-                if KEY_INDEX < 12:
-                    PIXELS[KEY_INDEX] = 0xFFFFFF
-                    PIXELS.show()
-                for item in sequence:
-                    if isinstance(item, int):
-                        if item >= 0:
-                            KEYBOARD.press(item)
-                        else:
-                            KEYBOARD.release(item)
+    EVENT = KEYS.events.get()
+    if EVENT and EVENT.key_number < len(APPS[APP_INDEX].macros):
+        SEQUENCE = APPS[APP_INDEX].macros[EVENT.key_number][2]
+        if EVENT.pressed:
+            if EVENT.key_number < 12:
+                PIXELS[EVENT.key_number] = 0xFFFFFF
+                PIXELS.show()
+            for item in SEQUENCE:
+                if isinstance(item, int):
+                    if item >= 0:
+                        KEYBOARD.press(item)
                     else:
-                        LAYOUT.write(item)
-            elif action is True: # Macro key released
-                # Release any still-pressed modifier keys
-                for item in sequence:
-                    if isinstance(item, int) and item >= 0:
                         KEYBOARD.release(item)
-                if KEY_INDEX < 12:
-                    PIXELS[KEY_INDEX] = APPS[APP_INDEX].macros[KEY_INDEX][0]
-                    PIXELS.show()
+                else:
+                    LAYOUT.write(item)
+        else:
+            # Release any still-pressed modifier keys
+            for item in SEQUENCE:
+                if isinstance(item, int) and item >= 0:
+                    KEYBOARD.release(item)
+            if EVENT.key_number < 12:
+                PIXELS[EVENT.key_number] = APPS[APP_INDEX].macros[
+                    EVENT.key_number][0]
+                PIXELS.show()
