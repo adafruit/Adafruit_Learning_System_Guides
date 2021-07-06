@@ -6,7 +6,7 @@ use dial to select an application macro set, press MACROPAD keys to send
 key sequences.
 """
 
-# pylint: disable=import-error, unused-import, too-few-public-methods, bare-except
+# pylint: disable=import-error, unused-import, too-few-public-methods
 
 import os
 import board
@@ -91,7 +91,8 @@ for FILENAME in FILES:
         try:
             module = __import__(MACRO_FOLDER + '/' + FILENAME[:-3])
             APPS.append(App(module.app))
-        except:
+        except (SyntaxError, ImportError, AttributeError, KeyError, NameError,
+                IndexError, TypeError) as err:
             pass
 
 if not APPS:
