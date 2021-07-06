@@ -120,7 +120,7 @@ screen.append(cc_x_num_label)
 
 # cc x value
 cc_x_label = label.Label(
-    terminalio.FONT, text=(cc_x), scale=3, color=ORANGE, max_glyphs=3
+    terminalio.FONT, text=str(cc_x), scale=3, color=ORANGE, max_glyphs=3
 )
 cc_x_label.x = column_b
 cc_x_label.y = row_a
@@ -143,7 +143,7 @@ cc_y_num_label.y = row_b
 screen.append(cc_y_num_label)
 
 # cc y value text
-cc_y_label = label.Label(terminalio.FONT, text=cc_y, scale=3, color=BLUE, max_glyphs=3,)
+cc_y_label = label.Label(terminalio.FONT, text=str(cc_y), scale=3, color=BLUE, max_glyphs=3,)
 cc_y_label.x = column_b
 cc_y_label.y = row_b
 screen.append(cc_y_label)
@@ -166,7 +166,7 @@ screen.append(cc_prox_num_label)
 
 # cc prox value text
 cc_prox_label = label.Label(
-    terminalio.FONT, text=cc_prox, scale=3, color=SILVER, max_glyphs=3,
+    terminalio.FONT, text=str(cc_prox), scale=3, color=SILVER, max_glyphs=3,
 )
 cc_prox_label.x = column_b
 cc_prox_label.y = row_c
@@ -245,9 +245,9 @@ while True:
                         ControlChange(cc_prox_num, cc_prox),
                     ]
                 )
-            cc_x_label.text = cc_x
-            cc_y_label.text = cc_y
-            cc_prox_label.text = cc_prox
+            cc_x_label.text = str(cc_x)
+            cc_y_label.text = str(cc_y)
+            cc_prox_label.text = str(cc_prox)
 
             # If you want to send NoteOn or Pitch Bend, here are examples:
             # midi.send(NoteOn(44, 1column_a))  # G sharp 2nd octave
