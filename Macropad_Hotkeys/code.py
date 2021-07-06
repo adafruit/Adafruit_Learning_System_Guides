@@ -88,8 +88,12 @@ FILES = os.listdir(MACRO_FOLDER)
 FILES.sort()
 for FILENAME in FILES:
     if FILENAME.endswith('.py'):
-        module = __import__(MACRO_FOLDER + '/' + FILENAME[:-3])
-        APPS.append(App(module.app))
+        try:
+            module = __import__(MACRO_FOLDER + '/' + FILENAME[:-3])
+            APPS.append(App(module.app))
+        except (SyntaxError, ImportError, AttributeError, KeyError, NameError,
+                IndexError, TypeError) as err:
+            pass
 
 if not APPS:
     GROUP[13].text = 'NO MACRO FILES FOUND'

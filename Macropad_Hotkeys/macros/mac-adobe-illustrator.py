@@ -1,3 +1,5 @@
+# MACROPAD Hotkeys example: Adobe Illustrator for Mac
+
 from adafruit_hid.keycode import Keycode # REQUIRED if using Keycode.* values
 
 app = {                     # REQUIRED dict, must be named 'app'
