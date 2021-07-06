@@ -75,16 +75,17 @@ class App:
                 PIXELS[i] = 0
                 GROUP[i].text = ''
         PIXELS.show()
+        DISPLAY.refresh()
 
 
 # INITIALIZATION -----------------------
 
 DISPLAY = board.DISPLAY
+DISPLAY.auto_refresh = False
 ENCODER = rotaryio.IncrementalEncoder(board.ENCODER_B, board.ENCODER_A)
 PIXELS = neopixel.NeoPixel(board.NEOPIXEL, 12, auto_write=False)
 KEYBOARD = Keyboard(usb_hid.devices)
 LAYOUT = KeyboardLayoutUS(KEYBOARD)
-
 
 GROUP = displayio.Group(max_size=14)
 for KEY_INDEX in range(12):
