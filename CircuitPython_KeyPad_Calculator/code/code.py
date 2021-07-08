@@ -59,6 +59,7 @@ WIDTH = 128
 HEIGHT = 64
 
 display = adafruit_displayio_sh1107.SH1107(display_bus, width=WIDTH, height=HEIGHT, rotation=180)
+display.auto_refresh = False
 
 font = bitmap_font.load_font("/digit-16px.pcf")
 text_area = label.Label(font, text=" ", line_spacing=0.95)
@@ -82,17 +83,17 @@ class Calculator:
     def __init__(self):
         self._number1 = N("0")
         self._number2 = None
-        self.trail = []
+        self.trail = ["Ready."]
         self.entry = ""
         self.op = None
         self.keyboard = None
         self.keyboard_layout = None
 
-    def paste(text):
+    def paste(self, text):
         if self.keyboard is None:
             if usb_hid:
                 self.keyboard = Keyboard(usb_hid.devices)
-                self.keyboard_layout = KeyboardLayoutUS(keyboard)
+                self.keyboard_layout = KeyboardLayoutUS(self.keyboard)
             else:
                 return
 
@@ -100,13 +101,13 @@ class Calculator:
             self.add_trail(f"No USB")
         else:
             text = str(text)
-            keyboard_layout.write(text)
+            self.keyboard_layout.write(text)
 
             self.add_trail(f"Pasted {text}")
 
 
     def add_trail(self, msg):
-        self.trail = self.trail[:3] + [str(msg)]
+        self.trail = self.trail[-3:] + [str(msg).upper()]
         
     @property
     def number1(self):
@@ -140,9 +141,13 @@ class Calculator:
         if k == K_CL:
             if self.entry:
                 self.entry = self.entry[:-1]
+            elif self.op:
+                print("clear op")
+                self.op = None
             elif self.number2 is None:
                 self.clear()
             else:
+                print("clear entry - op = ", self.op)
                 self.clear_entry()
 
         if len(k) == 1 and k in "0123456789":
@@ -154,9 +159,9 @@ class Calculator:
 
         if k == K_PA:
             if self.number2 is not None:
-                paste(self.number2)
+                self.paste(self.number2)
             else:
-                paste(self.number1)
+                self.paste(self.number1)
 
         if k == "=":
             self.do_binary_op(0)
@@ -190,8 +195,6 @@ class Calculator:
             self.clear_entry()
 
     def show(self):
-        display.auto_refresh = False
-
         rows = [""] * 4
         trail = self.trail
         if len(trail) > 0:
@@ -203,10 +206,11 @@ class Calculator:
 
         entry_or_number = self.entry or self.number2
         cursor = ' :' if (self.number2 is None or self.entry != "") else ""
-        rows[-1] = f"{self.op or ''}{entry_or_number or ''}{cursor}"
+        op = self.op or ''
+        op = 'd' if op == '/' else op
+        rows[-1] = f"{op}{entry_or_number or ''}{cursor}"
         for r in rows: print(r)
         text_area.text = "\n".join(rows)
-        display.auto_refresh = True
 
 km=keypad.KeyMatrix(row_pins=(board.A2, board.A1, board.A3, board.A0, board.D0), column_pins=(board.D25, board.D11, board.D12, board.D24))
 
@@ -229,3 +233,6 @@ while True:
         elif ev.released:
             if key == K_FN:
                 layer = 0
+
+    else:
+        display.refresh()
