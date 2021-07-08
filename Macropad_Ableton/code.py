@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 # Ableton Live Macropad Launcher
 # In Ableton, choose "Launchpad Mini Mk3" as controller with MacroPad 2040 as in and out
+# Use empty fifth scene to allow "unlaunching" of tracks with encoder modifier
 import board
 from digitalio import DigitalInOut, Pull
 import keypad
@@ -156,7 +157,7 @@ while True:
             "\n"
         )
     # send neopixel lightup code to key, text to display
-        if msg_in.note < 84 and msg_in.note > 50:
+        if msg_in.note in LP_PADS:
             pixels[LP_PADS[msg_in.note]] = LP_COLORS[msg_in.velocity]
             pixels.show()
             if msg_in.velocity == 21:  # active pad is indicated by Live as vel 21
