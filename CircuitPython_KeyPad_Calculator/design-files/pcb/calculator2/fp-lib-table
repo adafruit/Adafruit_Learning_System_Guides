@@ -1,0 +1,3 @@
+(fp_lib_table
+  (lib (name Modules)(type KiCad)(uri /home/jepler/src/KiCad-Libraries/modules/Modules.pretty)(options "")(descr ""))
+)

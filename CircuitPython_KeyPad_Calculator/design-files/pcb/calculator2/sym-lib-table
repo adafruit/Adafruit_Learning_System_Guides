@@ -1,0 +1,4 @@
+(sym_lib_table
+  (lib (name MiscellaneousDevices)(type Legacy)(uri /home/jepler/src/KiCad-Libraries/symbols/MiscellaneousDevices.lib)(options "")(descr ""))
+  (lib (name calculator2-rescue)(type Legacy)(uri ${KIPRJMOD}/calculator2-rescue.lib)(options "")(descr ""))
+)
