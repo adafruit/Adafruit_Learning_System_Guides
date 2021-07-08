@@ -1,7 +1,7 @@
 // entry point for customizer script. This probably isn't useful to most people,
 // as it's just a wrapper that helps generate customizer.scad for thingiverse.
 
-/* [Basic-Settings] */
+/* [Hidden] */
 
 // what preset profile do you wish to use? disable if you are going to set paramters below
 key_profile = "flat"; // [dcs, oem, dsa, sa, g20, flat, disable]
@@ -13,7 +13,7 @@ legend = "";
 
 $using_customizer = true;
 
-/* [Basic-Settings] */
+/* [Hidden] */
 
 // Length in units of key. A regular key is 1 unit; spacebar is usually 6.25
 $key_length = 1.0; // Range not working in thingiverse customizer atm [1:0.25:16]
@@ -21,12 +21,24 @@ $key_length = 1.0; // Range not working in thingiverse customizer atm [1:0.25:16
 // What type of stem you want. Most people want Cherry.
 $stem_type = "cherry";  // [cherry, alps, rounded_cherry, box_cherry, filled, disable]
 
+/* [Stem tuning] */
+
 // The stem is the hardest part to print, so this variable controls how much 'slop' there is in the stem
 // if your keycaps stick in the switch raise this value
-$stem_slop = 0.50; // Not working in thingiverse customizer atm [0:0.01:1]
+$stem_slop = 0.50; // [0:0.01:1]
 // broke this out. if your keycaps are falling off lower this value. only works for cherry stems rn
-$stem_inner_slop = 0.12;
+$stem_inner_slop = 0.12; // [0:0.01:1]
 
+/* [Printing Options] */
+
+orient_for_printing = true;
+
+// Choose -1 to print all rows
+print_only_row = -1; // [-1:1:5]
+// Choose -1 to print all columns
+print_only_column = -1; // [-1:1:4]
+
+/* [Hidden] */
 // Font size used for text
 $font_size = 7.5;
 
@@ -48,7 +60,7 @@ $stem_support_type = "disable"; // [tines, brim, disable]
 // broken off from artisan support since who wants outset legends?
 $outset_legends = false;
 
-/* [Key] */
+/* [Hidden] */
 // Height in units of key. should remain 1 for most uses
 $key_height = 1.0;
 // Keytop thickness, aka how many millimeters between the inside and outside of the top surface of the key
@@ -79,7 +91,7 @@ $top_skew = 1.7;
 // for double axis sculpted keycaps and probably not much else
 $top_skew_x = 0;
 
-/* [Stem] */
+/* [Hidden] */
 
 // How far the throw distance of the switch is. determines how far the 'cross' in the cherry switch digs into the stem, and how long the keystem needs to be before supports can start. luckily, alps and cherries have a pretty similar throw. can modify to have stouter keycaps for low profile switches, etc
 $stem_throw = 4;
@@ -97,7 +109,7 @@ $stem_rotation = 0;
 // keycap. only works on tines right now
 $extra_long_stem_support = false;
 
-/* [Shape] */
+/* [Hidden] */
 
 // Key shape type, determines the shape of the key. default is 'rounded square'
 $key_shape_type = "rounded_square";
@@ -107,7 +119,7 @@ $linear_extrude_height_adjustment = 0;
 // If you're doing fancy bowed keycap sides, this controls how many slices you take
 $height_slices = 1;
 
-/* [Dish] */
+/* [Hidden] */
 
 // What type of dish the key has. note that unlike stems and supports a dish ALWAYS gets rendered.
 $dish_type = "disable"; // [cylindrical, spherical, sideways cylindrical, old spherical, disable]
@@ -122,7 +134,7 @@ $dish_overdraw_width = 0;
 // Same as width but for height
 $dish_overdraw_height = 0;
 
-/* [Misc] */
+/* [Hidden] */
 // There's a bevel on the cherry stems to aid insertion / guard against first layer squishing making a hard-to-fit stem.
 $cherry_bevel = true;
 
@@ -147,7 +159,7 @@ $minkowski_radius = .33;
 // how recessed inset legends / artisans are from the top of the key
 $inset_legend_depth = 0.8;
 
-/* [Features] */
+/* [Hidden] */
 
 //insert locating bump
 $key_bump = false;
@@ -4518,26 +4530,20 @@ module zupside_down(row) {
 }
 
 prow = [1, 2, 3, -1, 0];
-printing = 1;
-pitch = printing ? 20 : 18.5;
-if(1)
-for(i=[0:1:4]) {
-    echo(i, keys[i]);
-    for(j=[0:1:len(keys[i])-1]) {
-    //for(j=[1]) {
+pitch = orient_for_printing ? 20 : 18.5;
+print_rows = (print_only_row == -1) ? [0:1:len(keys)-1] : [print_only_row];
+
+for(i=print_rows) {
+    print_columns = (print_only_column == -1) ? [0:1:len(keys[i])-1] : [print_only_column];
+    for(j=print_columns) {
         k = prow[i];
-        translate([j*pitch,printing?k*pitch:-i*pitch,0])
-        // key_profile(key_profile, row) legend(keys[i][j], $top_tilt=4*(i-2), $total_depth=11.5+2*abs(i-2)) {
+        translate([j*pitch,orient_for_printing?k*pitch:-i*pitch,0])
         key_profile(key_profile, 1+i) legend(keys[i][j]) {
-        if(printing)
+        if(orient_for_printing)
           zupside_down(row)
           key();
         else
           key();
         }
     }
-}
-else
-key_profile(key_profile, row) legend(legend) {
-  key();
 }
