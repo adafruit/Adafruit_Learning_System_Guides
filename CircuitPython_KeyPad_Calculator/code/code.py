@@ -1,11 +1,9 @@
 import board
 import displayio
 import keypad
-import time
 import adafruit_displayio_sh1107
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS
-from adafruit_hid.keycode import Keycode
 from adafruit_display_text import label
 from adafruit_bitmap_font import bitmap_font
 
@@ -40,6 +38,7 @@ keymaps = {
     1: KEYMAP1,
 }
 
+# pylint: disable=redefined-outer-name
 def lookup(layer, key_number):
     while layer >= 0:
         if (key := keymaps[layer][key_number]) is not None:
@@ -98,7 +97,7 @@ class Calculator:
                 return
 
         if self.keyboard_layout is None:
-            self.add_trail(f"No USB")
+            self.add_trail("No USB")
         else:
             text = str(text)
             self.keyboard_layout.write(text)
@@ -108,7 +107,7 @@ class Calculator:
 
     def add_trail(self, msg):
         self.trail = self.trail[-3:] + [str(msg).upper()]
-        
+
     @property
     def number1(self):
         return self._number1
@@ -137,7 +136,7 @@ class Calculator:
     def clear_entry(self):
         self.number2 = None
 
-    def key_pressed(self, k):
+    def key_pressed(self, k): # pylint: disable=too-many-branches
         if k == K_CL:
             if self.entry:
                 self.entry = self.entry[:-1]
@@ -154,7 +153,8 @@ class Calculator:
             self.entry = self.entry + k
 
         if k == "." and not "." in self.entry:
-            if self.entry == "": self.entry = "0"
+            if self.entry == "":
+                self.entry = "0"
             self.entry = self.entry + k
 
         if k == K_PA:
@@ -209,10 +209,13 @@ class Calculator:
         op = self.op or ''
         op = 'd' if op == '/' else op
         rows[-1] = f"{op}{entry_or_number or ''}{cursor}"
-        for r in rows: print(r)
+        for r in rows:
+            print(r)
         text_area.text = "\n".join(rows)
 
-km=keypad.KeyMatrix(row_pins=(board.A2, board.A1, board.A3, board.A0, board.D0), column_pins=(board.D25, board.D11, board.D12, board.D24))
+km=keypad.KeyMatrix(
+    row_pins=(board.A2, board.A1, board.A3, board.A0, board.D0),
+    column_pins=(board.D25, board.D11, board.D12, board.D24))
 
 calculator=Calculator()
 calculator.show()
@@ -226,7 +229,7 @@ while True:
                 layer = 1
             try:
                 calculator.key_pressed(key)
-            except Exception as e:
+            except Exception as e: # pylint: disable=broad-except
                 calculator.add_trail(e)
             calculator.show()
 
