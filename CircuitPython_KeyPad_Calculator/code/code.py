@@ -41,7 +41,8 @@ keymaps = {
 # pylint: disable=redefined-outer-name
 def lookup(layer, key_number):
     while layer >= 0:
-        if (key := keymaps[layer][key_number]) is not None:
+        key = keymaps[layer][key_number]
+        if key is not None:
             return key
         layer -= 1
     return None
@@ -169,7 +170,8 @@ class Calculator:
         if k == "%":
             self.do_binary_op(1)
 
-        if op := unary.get(k):
+        op = unary.get(k)
+        if op:
             self.do_unary_op(op)
 
         if k in binary:
@@ -222,7 +224,8 @@ calculator.show()
 
 layer = 0
 while True:
-    if ev := km.events.get():
+    ev = km.events.get()
+    if ev:
         key = lookup(layer, ev.key_number)
         if ev.pressed:
             if key == K_FN:
