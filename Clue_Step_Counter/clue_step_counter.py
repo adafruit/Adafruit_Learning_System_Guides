@@ -62,7 +62,7 @@ clueGroup = displayio.Group(max_size=20)
 
 #  loading bitmap background
 clue_bg = displayio.OnDiskBitmap(open(clue_bgBMP, "rb"))
-clue_tilegrid = displayio.TileGrid(clue_bg, pixel_shader=displayio.ColorConverter())
+clue_tilegrid = displayio.TileGrid(clue_bg, pixel_shader=getattr(clue_bg, 'pixel_shader', displayio.ColorConverter()))
 clueGroup.append(clue_tilegrid)
 
 #  creating the ProgressBar object

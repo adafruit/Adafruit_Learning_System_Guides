@@ -129,7 +129,7 @@ class PlaybackDisplay:
             bitmap = displayio.OnDiskBitmap(bitmap_file)
             self._bitmap_filename = i
             # Create a TileGrid to hold the bitmap
-            self.tile_grid = displayio.TileGrid(bitmap, pixel_shader=displayio.ColorConverter())
+            self.tile_grid = displayio.TileGrid(bitmap, pixel_shader=getattr(bitmap, 'pixel_shader', displayio.ColorConverter()))
 
             # Add the TileGrid to the Group
             if len(self.group) == 0:

@@ -50,7 +50,7 @@ bitmap_file = open("/rbg.bmp", "rb")
 # Setup the file as the bitmap data source
 bitmap = displayio.OnDiskBitmap(bitmap_file)
 # Create a TileGrid to hold the bitmap
-tile_grid = displayio.TileGrid(bitmap, pixel_shader=displayio.ColorConverter())
+tile_grid = displayio.TileGrid(bitmap, pixel_shader=getattr(bitmap, 'pixel_shader', displayio.ColorConverter()))
 print(dir(tile_grid))
 
 while True:

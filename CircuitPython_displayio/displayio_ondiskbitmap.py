@@ -10,7 +10,7 @@ with open("/purple.bmp", "rb") as bitmap_file:
     bitmap = displayio.OnDiskBitmap(bitmap_file)
 
     # Create a TileGrid to hold the bitmap
-    tile_grid = displayio.TileGrid(bitmap, pixel_shader=displayio.ColorConverter())
+    tile_grid = displayio.TileGrid(bitmap, pixel_shader=getattr(bitmap, 'pixel_shader', displayio.ColorConverter()))
 
     # Create a Group to hold the TileGrid
     group = displayio.Group()

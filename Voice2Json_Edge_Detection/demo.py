@@ -54,7 +54,7 @@ def load_image(path):
     if len(splash):
         splash.pop()
     bitmap = displayio.OnDiskBitmap(open(path, "rb"))
-    sprite = displayio.TileGrid(bitmap, pixel_shader=displayio.ColorConverter())
+    sprite = displayio.TileGrid(bitmap, pixel_shader=getattr(bitmap, 'pixel_shader', displayio.ColorConverter()))
     splash.append(sprite)
 
 def change_light_color(lightname, color):

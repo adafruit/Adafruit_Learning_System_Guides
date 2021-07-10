@@ -20,13 +20,13 @@ clue_display = displayio.Group(max_size=4)
 # draw the dry plant
 dry_plant_file = open("dry.bmp", "rb")
 dry_plant_bmp = displayio.OnDiskBitmap(dry_plant_file)
-dry_plant_sprite = displayio.TileGrid(dry_plant_bmp, pixel_shader=displayio.ColorConverter())
+dry_plant_sprite = displayio.TileGrid(dry_plant_bmp, pixel_shader=getattr(dry_plant_bmp, 'pixel_shader', displayio.ColorConverter()))
 clue_display.append(dry_plant_sprite)
 
 # draw the happy plant on top (so it can be moved out of the way when needed)
 happy_plant_file = open("happy.bmp", "rb")
 happy_plant_bmp = displayio.OnDiskBitmap(happy_plant_file)
-happy_plant_sprite = displayio.TileGrid(happy_plant_bmp, pixel_shader=displayio.ColorConverter())
+happy_plant_sprite = displayio.TileGrid(happy_plant_bmp, pixel_shader=getattr(happy_plant_bmp, 'pixel_shader', displayio.ColorConverter()))
 clue_display.append(happy_plant_sprite)
 
 # Create text

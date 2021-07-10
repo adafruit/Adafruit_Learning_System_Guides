@@ -56,7 +56,7 @@ display = ST7789(display_bus, width=240, height=240, rowstart=80)
 bitmap = displayio.OnDiskBitmap(open("/parrot-240-sheet.bmp", "rb"))
 
 # Create a TileGrid to hold the bitmap
-parrot0_grid = displayio.TileGrid(bitmap, pixel_shader=displayio.ColorConverter(),
+parrot0_grid = displayio.TileGrid(bitmap, pixel_shader=getattr(bitmap, 'pixel_shader', displayio.ColorConverter()),
                                     width=1, height=1,
                                  tile_height=240, tile_width=240,
                                  default_tile=0,

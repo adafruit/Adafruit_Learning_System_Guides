@@ -46,7 +46,7 @@ class OpenWeather_Graphics(displayio.Group):
         background = displayio.OnDiskBitmap(open("loading.bmp", "rb"))
         bg_sprite = displayio.TileGrid(
             background,
-            pixel_shader=displayio.ColorConverter(),
+            pixel_shader=getattr(background, 'pixel_shader', displayio.ColorConverter()),
         )
         splash.append(bg_sprite)
         display.show(splash)
@@ -67,7 +67,7 @@ class OpenWeather_Graphics(displayio.Group):
         icons = displayio.OnDiskBitmap(open(icon_spritesheet, "rb"))
         self._icon_sprite = displayio.TileGrid(
             icons,
-            pixel_shader=displayio.ColorConverter(),
+            pixel_shader=getattr(icons, 'pixel_shader', displayio.ColorConverter()),
             width=1,
             height=1,
             tile_width=icon_width,

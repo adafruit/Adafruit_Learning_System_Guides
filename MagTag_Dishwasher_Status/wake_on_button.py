@@ -20,7 +20,7 @@ bmp_file = "clean.bmp" if alarm.sleep_memory[0] else "dirty.bmp"
 # show bitmap
 with open(bmp_file, "rb") as fp:
     bitmap = displayio.OnDiskBitmap(fp)
-    tile_grid = displayio.TileGrid(bitmap, pixel_shader=displayio.ColorConverter())
+    tile_grid = displayio.TileGrid(bitmap, pixel_shader=getattr(bitmap, 'pixel_shader', displayio.ColorConverter()))
     group = displayio.Group(max_size=1)
     group.append(tile_grid)
     epd.show(group)

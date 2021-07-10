@@ -73,7 +73,7 @@ def play_wave(filename):
 def show_image(filename):
     image_file = open(filename, "rb")
     odb = displayio.OnDiskBitmap(image_file)
-    face = displayio.Sprite(odb, pixel_shader=displayio.ColorConverter(), position=(0, 0))
+    face = displayio.Sprite(odb, pixel_shader=getattr(odb, 'pixel_shader', displayio.ColorConverter()), position=(0, 0))
     backlight.value = False
     splash.append(face)
     try:

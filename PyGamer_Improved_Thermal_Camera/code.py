@@ -65,7 +65,7 @@ amg8833 = adafruit_amg88xx.AMG88XX(i2c)
 with open("/thermal_cam_splash.bmp", "rb") as bitmap_file:
     bitmap = displayio.OnDiskBitmap(bitmap_file)
     splash = displayio.Group(scale=display.width // 160)
-    splash.append(displayio.TileGrid(bitmap, pixel_shader=displayio.ColorConverter()))
+    splash.append(displayio.TileGrid(bitmap, pixel_shader=getattr(bitmap, 'pixel_shader', displayio.ColorConverter())))
     display.show(splash)
     time.sleep(0.1)  # Give the splash graphic some time to display
 

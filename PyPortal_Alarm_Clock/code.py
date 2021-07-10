@@ -265,11 +265,11 @@ class Time_State(State):
                     icon = displayio.OnDiskBitmap(self.icon_file)
                     try:
                         icon_sprite = displayio.TileGrid(icon,
-                                                         pixel_shader=displayio.ColorConverter(),
+                                                         pixel_shader=getattr(icon, 'pixel_shader', displayio.ColorConverter()),
                                                          x=0, y=0)
                     except TypeError:
                         icon_sprite = displayio.TileGrid(icon,
-                                                         pixel_shader=displayio.ColorConverter(),
+                                                         pixel_shader=getattr(icon, 'pixel_shader', displayio.ColorConverter()),
                                                          position=(0, 0))
 
 
@@ -339,11 +339,11 @@ class Time_State(State):
             icon = displayio.OnDiskBitmap(self.snooze_file)
             try:
                 icon_sprite = displayio.TileGrid(icon,
-                                                 pixel_shader=displayio.ColorConverter(),
+                                                 pixel_shader=getattr(icon, 'pixel_shader', displayio.ColorConverter()),
                                                  x=0, y=0)
             except TypeError:
                 icon_sprite = displayio.TileGrid(icon,
-                                                 pixel_shader=displayio.ColorConverter(),
+                                                 pixel_shader=getattr(icon, 'pixel_shader', displayio.ColorConverter()),
                                                  position=(0, 0))
             self.snooze_icon.append(icon_sprite)
             pyportal.splash.append(self.snooze_icon)

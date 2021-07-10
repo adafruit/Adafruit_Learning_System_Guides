@@ -444,7 +444,7 @@ with open(
 
     odb = displayio.OnDiskBitmap(game_message_background)
 
-    bg_grid = displayio.TileGrid(odb, pixel_shader=displayio.ColorConverter())
+    bg_grid = displayio.TileGrid(odb, pixel_shader=getattr(odb, 'pixel_shader', displayio.ColorConverter()))
 
     splash.append(bg_grid)
 

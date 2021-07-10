@@ -33,7 +33,7 @@ while True:
             print("Image unsupported {}".format(images[i]))
             del images[i]
             continue
-        face = displayio.TileGrid(odb, pixel_shader=displayio.ColorConverter())
+        face = displayio.TileGrid(odb, pixel_shader=getattr(odb, 'pixel_shader', displayio.ColorConverter()))
 
         splash.append(face)
         # Wait for the image to load.

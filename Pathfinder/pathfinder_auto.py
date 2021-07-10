@@ -74,7 +74,7 @@ with open(emote_img[0], "rb") as bitmap_file:
     # Setup the file as the bitmap data source
     bitmap = displayio.OnDiskBitmap(bitmap_file)
     # Create a TileGrid to hold the bitmap
-    tile_grid = displayio.TileGrid(bitmap, pixel_shader=displayio.ColorConverter())
+    tile_grid = displayio.TileGrid(bitmap, pixel_shader=getattr(bitmap, 'pixel_shader', displayio.ColorConverter()))
     # Create a Group to hold the TileGrid
     group = displayio.Group()
     # Add the TileGrid to the Group
@@ -101,7 +101,7 @@ while True:
     time.sleep(1)
     with open(emote_img[i], "rb") as bitmap_file:
         bitmap = displayio.OnDiskBitmap(bitmap_file)
-        tile_grid = displayio.TileGrid(bitmap, pixel_shader=displayio.ColorConverter())
+        tile_grid = displayio.TileGrid(bitmap, pixel_shader=getattr(bitmap, 'pixel_shader', displayio.ColorConverter()))
         group = displayio.Group()
         group.append(tile_grid)
         display.show(group)
