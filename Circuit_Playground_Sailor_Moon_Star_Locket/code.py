@@ -9,34 +9,40 @@ from adafruit_display_shapes.circle import Circle
 display = tft_gizmo.TFT_Gizmo()
 
 #  loading the background image
-bg_bitmap, bg_palette = adafruit_imageload.load("/clouds_bg.bmp",
-                                         bitmap=displayio.Bitmap,
-                                         palette=displayio.Palette)
+bg_bitmap, bg_palette = adafruit_imageload.load(
+    "/clouds_bg.bmp", bitmap=displayio.Bitmap, palette=displayio.Palette
+)
 bg_grid = displayio.TileGrid(bg_bitmap, pixel_shader=bg_palette)
 
 #  loading the crescent moon bitmap sequence
-bitmap, palette = adafruit_imageload.load("/moon_anime.bmp",
-                                         bitmap=displayio.Bitmap,
-                                         palette=displayio.Palette)
+bitmap, palette = adafruit_imageload.load(
+    "/moon_anime.bmp", bitmap=displayio.Bitmap, palette=displayio.Palette
+)
 #  makes the black background transparent so we only see the cresent moon
 palette.make_transparent(0)
 
-tile_grid = displayio.TileGrid(bitmap, pixel_shader=palette, width = 1, height = 1,
-                               tile_height = 120, tile_width = 120,
-                               default_tile = 0)
+tile_grid = displayio.TileGrid(
+    bitmap,
+    pixel_shader=palette,
+    width=1,
+    height=1,
+    tile_height=120,
+    tile_width=120,
+    default_tile=0,
+)
 
 #  two circles for the center "jewel"
-jewel_outline = Circle(x0=120, y0=120, r=40, fill=0xfbf236)
-jewel = Circle(x0=120, y0=120, r=35, fill=0xf70570)
+jewel_outline = Circle(x0=120, y0=120, r=40, fill=0xFBF236)
+jewel = Circle(x0=120, y0=120, r=35, fill=0xF70570)
 
 #  adding the two jewel circle elements to a group
-jewel_splash = displayio.Group(max_size=20)
+jewel_splash = displayio.Group()
 jewel_splash.append(jewel_outline)
 jewel_splash.append(jewel)
 
 #  making a group for the crescent moon sequence
 #  scale is 2 because at full 240x240 resolution image is too big
-moon_group = displayio.Group(scale = 2)
+moon_group = displayio.Group(scale=2)
 #  group to hold all of the display elements
 main_group = displayio.Group()
 
@@ -74,7 +80,7 @@ while True:
     #  runs crescent moon animation
     if not music_playing and not animation_pause:
         #  every .8 seconds...
-        if (crescent + .8) < time.monotonic():
+        if (crescent + 0.8) < time.monotonic():
             #  the moon animation cycles
             tile_grid[0] = moon
             #  moon is the tilegrid index location
