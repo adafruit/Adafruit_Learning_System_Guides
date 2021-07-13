@@ -22,7 +22,7 @@ green_led = digitalio.DigitalInOut(board.GP13)
 green_led.direction = digitalio.Direction.OUTPUT
 button = digitalio.DigitalInOut(board.GP16)
 button.switch_to_input(pull=digitalio.Pull.DOWN)
-buzzer = pwmio.PWMOut(board.GP13, frequency=660, duty_cycle=0, variable_frequency=True)
+buzzer = pwmio.PWMOut(board.GP12, frequency=660, duty_cycle=0, variable_frequency=True)
 
 button_pressed = False
 
