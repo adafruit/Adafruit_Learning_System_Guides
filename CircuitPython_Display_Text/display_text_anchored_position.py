@@ -14,7 +14,7 @@ from adafruit_display_text import label
 display = board.DISPLAY
 
 # Make the display context
-main_group = displayio.Group(max_size=10)
+main_group = displayio.Group()
 display.show(main_group)
 DISPLAY_WIDTH = 320
 DISPLAY_HEIGHT = 240
@@ -64,7 +64,7 @@ text_area_bottom_right = label.Label(
 text_area_bottom_right.anchor_point = (1.0, 1.0)
 text_area_bottom_right.anchored_position = (DISPLAY_WIDTH - 8, DISPLAY_HEIGHT - 8)
 
-text_group = displayio.Group(max_size=9)
+text_group = displayio.Group()
 text_group.append(text_area_top_middle)
 text_group.append(text_area_top_left)
 text_group.append(text_area_top_right)

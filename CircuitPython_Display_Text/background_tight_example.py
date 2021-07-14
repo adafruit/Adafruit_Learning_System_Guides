@@ -14,7 +14,7 @@ from adafruit_display_text import label
 display = board.DISPLAY
 
 # Make the display context
-main_group = displayio.Group(max_size=10)
+main_group = displayio.Group()
 display.show(main_group)
 
 font = bitmap_font.load_font("fonts/Fayette-HandwrittenScript-48.bdf")
