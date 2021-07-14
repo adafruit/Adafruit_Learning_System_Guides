@@ -6,7 +6,7 @@ use dial to select an application macro set, press MACROPAD keys to send
 key sequences.
 """
 
-# pylint: disable=import-error, unused-import, too-few-public-methods, protected-access
+# pylint: disable=import-error, unused-import, too-few-public-methods
 
 import os
 import displayio
@@ -25,7 +25,8 @@ MACRO_FOLDER = '/macros'
 
 class App:
     """ Class representing a host-side application, for which we have a set
-        of macro sequences. """
+        of macro sequences. Project code was originally more complex and
+        this was helpful, but maybe it's excessive now?"""
     def __init__(self, appdata):
         self.name = appdata['name']
         self.macros = appdata['macros']
@@ -49,9 +50,9 @@ class App:
 
 MACROPAD = MacroPad()
 MACROPAD.display.auto_refresh = False
-MACROPAD._pixels.auto_write = False
+MACROPAD.pixels.auto_write = False
 
-# Set up displayio group with all labels
+# Set up displayio group with all the labels
 GROUP = displayio.Group(max_size=14) # 12 keys + rect + app name
 for KEY_INDEX in range(12):
     x = KEY_INDEX % 3
@@ -136,7 +137,7 @@ while True:
                 else:
                     MACROPAD.keyboard.release(item)
             else:
-                MACROPAD._keyboard_layout.write(item)
+                MACROPAD.keyboard_layout.write(item)
     else:
         # Release any still-pressed modifier keys
         for item in SEQUENCE:
