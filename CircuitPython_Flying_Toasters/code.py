@@ -11,8 +11,6 @@ Copyright (c) 2019 Adafruit Industries
 Licensed under the MIT license.
 
 All text above must be included in any redistribution.
-
-Requires CircuitPython 5.0 or later.
 """
 
 import time
@@ -37,24 +35,19 @@ NUMBER_OF_SPRITES = TOAST + 1
 
 FIRST_CELL = CELL_1
 LAST_CELL = CELL_4
-
 NUMBER_OF_CELLS = (LAST_CELL - FIRST_CELL) + 1
 
 # A boolean array corresponding to the sprites, True if it's part of the animation sequence.
-ANIMATED = [_sprite >= FIRST_CELL and _sprite <= LAST_CELL for _sprite in range(NUMBER_OF_SPRITES)]
-
+ANIMATED = [FIRST_CELL <= _sprite <= LAST_CELL for _sprite in range(NUMBER_OF_SPRITES)]
 
 # The chance (out of 10) that toast will enter
 CHANCE_OF_NEW_TOAST = 2
 
-# How many sprites to styart with
+# How many sprites to start with
 INITIAL_NUMBER_OF_SPRITES = 4
 
-# Global variables
-display = None
-tilegrid = None
-
 seed(int(time.monotonic()))
+
 
 def make_display():
     """Set up the display support.
@@ -63,16 +56,17 @@ def make_display():
     spi = board.SPI()
     while not spi.try_lock():
         pass
-    spi.configure(baudrate=24000000) # Configure SPI for 24MHz
+    spi.configure(baudrate=24000000)  # Configure SPI for 24MHz
     spi.unlock()
     displayio.release_displays()
     display_bus = displayio.FourWire(spi, command=board.D7, chip_select=board.D10, reset=board.D9)
 
     return ST7789(display_bus, width=240, height=240, rowstart=80, auto_refresh=True)
 
+
 def make_tilegrid():
     """Construct and return the tilegrid."""
-    group = displayio.Group(max_size=10)
+    group = displayio.Group()
 
     sprite_sheet, palette = adafruit_imageload.load("/spritesheet-2x.bmp",
                                                     bitmap=displayio.Bitmap,
@@ -86,15 +80,18 @@ def make_tilegrid():
     display.show(group)
     return grid
 
+
 def random_cell():
     return randint(FIRST_CELL, LAST_CELL)
 
+
 def evaluate_position(row, col):
-    """Return whether how long of aa toaster is placable at the given location.
+    """Return whether how long of a toaster is placeable at the given location.
     :param row: the tile row (0-9)
     :param col: the tile column (0-9)
     """
     return tilegrid[col, row] == EMPTY
+
 
 def seed_toasters(number_of_toasters):
     """Create the initial toasters so it doesn't start empty"""
@@ -106,20 +103,24 @@ def seed_toasters(number_of_toasters):
                 break
         tilegrid[col, row] = random_cell()
 
+
 def next_sprite(sprite):
     if ANIMATED[sprite]:
         return (((sprite - FIRST_CELL) + 1) % NUMBER_OF_CELLS) + FIRST_CELL
     return sprite
+
 
 def advance_animation():
     """Cycle through animation cells each time."""
     for tile_number in range(25):
         tilegrid[tile_number] = next_sprite(tilegrid[tile_number])
 
+
 def slide_tiles():
     """Move the tilegrid one pixel to the bottom-left."""
     tilegrid.x -= 1
     tilegrid.y += 1
+
 
 def shift_tiles():
     """Move tiles one spot to the left, and reset the tilegrid's position"""
@@ -132,11 +133,13 @@ def shift_tiles():
     tilegrid.x = 0
     tilegrid.y = -64
 
+
 def get_entry_row():
     while True:
         row = randint(0, 4)
         if tilegrid[4, row] == EMPTY and tilegrid[3, row] == EMPTY:
             return row
+
 
 def get_entry_column():
     while True:
@@ -144,8 +147,9 @@ def get_entry_column():
         if tilegrid[col, 0] == EMPTY and tilegrid[col, 1] == EMPTY:
             return col
 
+
 def add_toaster_or_toast():
-    """Maybe add a new toaster or toast on the right and/or top at a randon open location"""
+    """Maybe add a new toaster or toast on the right and/or top at a random open location"""
     if randint(1, 10) <= CHANCE_OF_NEW_TOAST:
         tile = TOAST
     else:
@@ -157,6 +161,7 @@ def add_toaster_or_toast():
     else:
         tile = random_cell()
     tilegrid[get_entry_column(), 0] = tile
+
 
 display = make_display()
 tilegrid = make_tilegrid()
