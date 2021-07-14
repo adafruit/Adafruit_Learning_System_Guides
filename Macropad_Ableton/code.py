@@ -4,15 +4,11 @@
 # In Ableton, choose "Launchpad Mini Mk3" as controller with MacroPad 2040 as in and out
 # Use empty fifth scene to allow "unlaunching" of tracks with encoder modifier
 import board
-from digitalio import DigitalInOut, Pull
-import keypad
+from adafruit_macropad import MacroPad
 import displayio
 import terminalio
-import neopixel
-import rotaryio
 from adafruit_simplemath import constrain
 from adafruit_display_text import label
-from adafruit_debouncer import Debouncer
 import usb_midi
 import adafruit_midi
 from adafruit_midi.control_change import ControlChange
@@ -20,13 +16,15 @@ from adafruit_midi.note_off import NoteOff
 from adafruit_midi.note_on import NoteOn
 from adafruit_midi.midi_message import MIDIUnknownEvent
 
+macropad = MacroPad()
+
 TITLE_TEXT = "Live Launcher 2040"
 print(TITLE_TEXT)
 TRACK_NAMES = ["DRUM", "BASS", "SYNTH"]  # Customize these
 LIVE_CC_NUMBER = 74  # CC number to send w encoder
 FADER_TEXT = "cutoff"  # change for intended CC name
 
-
+# --- MIDI recieve is complex, so not using macropad.midi
 midi = adafruit_midi.MIDI(
                         midi_in=usb_midi.ports[0],
                         in_channel=(0, 1, 2),
@@ -34,15 +32,6 @@ midi = adafruit_midi.MIDI(
                         out_channel=0
 )
 
-# ---Specify key pins---
-key_pins = (
-            board.KEY1, board.KEY2, board.KEY3,
-            board.KEY4, board.KEY5, board.KEY6,
-            board.KEY7, board.KEY8, board.KEY9,
-            board.KEY10, board.KEY11, board.KEY12
-)
-# ---Create keypad object---
-keys = keypad.Keys(key_pins, value_when_pressed=False, pull=True)
 
 # ---Official Launchpad colors---
 LP_COLORS = (
@@ -76,17 +65,12 @@ CC_OFFSET = 20
 modifier = False  # use to add encoder switch modifier to keys for clip mute
 MODIFIER_NOTES = [41, 42, 43, 41, 42, 43, 41, 42, 43, 41, 42, 43]  # blank row in Live
 
-# ---Encoder setup---
-encoder = rotaryio.IncrementalEncoder(board.ENCODER_B, board.ENCODER_A)
-sw = DigitalInOut(board.ENCODER_SWITCH)
-sw.switch_to_input(pull=Pull.UP)
-switch = Debouncer(sw)
 last_position = 0  # encoder position state
 
 # ---NeoPixel setup---
 BRIGHT = 0.125
 DIM = 0.0625
-pixels = neopixel.NeoPixel(board.NEOPIXEL, 12, brightness=BRIGHT, auto_write=False)
+macropad.pixels.brightness = BRIGHT
 
 # ---Display setup---
 display = board.DISPLAY
@@ -97,7 +81,7 @@ HEIGHT = 64
 FONT = terminalio.FONT
 # Draw a title label
 title = TITLE_TEXT
-title_area = label.Label(FONT, text=title, color=0xFFFFFF,x=6, y=3)
+title_area = label.Label(FONT, text=title, color=0xFFFFFF, x=6, y=3)
 screen.append(title_area)
 
 # --- create display strings and positions
@@ -139,7 +123,7 @@ for data in label_data:
     group = displayio.Group(max_size=4, x=x, y=y)
     group.append(label_area)
     screen.append(group)
-    labels.append(label_area)  # these can be individually addressed later
+    labels.append(label_area)  # these are individually addressed later
 
 num = 1
 
@@ -158,18 +142,22 @@ while True:
         )
     # send neopixel lightup code to key, text to display
         if msg_in.note in LP_PADS:
-            pixels[LP_PADS[msg_in.note]] = LP_COLORS[msg_in.velocity]
-            pixels.show()
+            macropad.pixels[LP_PADS[msg_in.note]] = LP_COLORS[msg_in.velocity]
+            macropad.pixels.show()
             if msg_in.velocity == 21:  # active pad is indicated by Live as vel 21
                 labels[LP_PADS[msg_in.note]+3].text = "o"
             else:
                 labels[LP_PADS[msg_in.note]+3].text = "."
 
-    elif (
-        isinstance(msg_in, NoteOff)
-        or isinstance(msg_in, NoteOn)
-        and msg_in.velocity == 0
-    ):
+    elif isinstance(msg_in, NoteOff):
+        print(
+            "received NoteOff",
+            "from channel",
+            msg_in.channel + 1,
+            "\n"
+        )
+
+    elif isinstance(msg_in, NoteOn) and msg_in.velocity == 0:
         print(
             "received NoteOff",
             "from channel",
@@ -200,11 +188,11 @@ while True:
     elif msg_in is not None:
         midi.send(msg_in)
 
-    event = keys.events.get()  # check for keypad events
+    key_event = macropad.keys.events.get()  # check for keypad events
 
-    if not event:  # Event is None; no keypad event happened, do other stuff
+    if not key_event:  # Event is None; no keypad event happened, do other stuff
 
-        position = encoder.position  # store encoder position state
+        position = macropad.encoder  # store encoder position state
         cc_position = constrain((position + CC_OFFSET), 0, 127)  # lock to cc range
         if last_position is None or position != last_position:
 
@@ -219,35 +207,33 @@ while True:
                 cc_val_text_area.text = str(cc_position)
         last_position = position
 
-        switch.update()  # check the encoder switch w debouncer
-        if switch.fell:
+        macropad.encoder_switch_debounced.update()  # check the encoder switch w debouncer
+        if macropad.encoder_switch_debounced.pressed:
             print("Mod")
             push_text_area.text = "[.]"
             modifier = True
-            pixels.brightness = DIM
-            pixels.show()
+            macropad.pixels.brightness = DIM
 
-        if switch.rose:
+        if macropad.encoder_switch_debounced.released:
             modifier = False
             push_text_area.text = "[o]"
-            pixels.brightness = BRIGHT
-            pixels.show()
+            macropad.pixels.brightness = BRIGHT
 
         continue
 
-    num = event.key_number
+    num = key_event.key_number
 
-    if event.pressed and not modifier:
+    if key_event.pressed and not modifier:
         midi.send(NoteOn(LIVE_NOTES[num], 127))
         print("\nsent note", LIVE_NOTES[num], "\n")
 
-    if event.pressed and modifier:
+    if key_event.pressed and modifier:
         midi.send(NoteOn(MODIFIER_NOTES[num], 127))
 
-    if event.released and not modifier:
+    if key_event.released and not modifier:
         midi.send(NoteOff(LIVE_NOTES[num], 0))
 
-    if event.released and modifier:
+    if key_event.released and modifier:
         midi.send(NoteOff(MODIFIER_NOTES[num], 0))
 
-    pixels.show()
+    macropad.pixels.show()
