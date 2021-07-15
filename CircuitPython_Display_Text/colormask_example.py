@@ -34,7 +34,7 @@ bg_palette = displayio.Palette(1)
 bg_palette[0] = 0xDDDD00
 
 # Make the display context
-main_group = displayio.Group(max_size=10)
+main_group = displayio.Group()
 display.show(main_group)
 
 font = bitmap_font.load_font("fonts/LeagueSpartan-Bold-16.bdf")
