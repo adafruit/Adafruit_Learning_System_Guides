@@ -5,7 +5,7 @@
 # Click encoder to switch modes
 # Turn encoder to adjust CC, ProgramChange, or PitchBend
 from adafruit_macropad import MacroPad
-from rainbow import colorwheel
+from rainbowio import colorwheel
 
 CC_NUM = 74  # select your CC number
 
