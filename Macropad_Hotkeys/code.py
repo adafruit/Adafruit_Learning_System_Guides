@@ -9,19 +9,11 @@ key sequences.
 # pylint: disable=import-error, unused-import, too-few-public-methods
 
 import os
-import board
-import digitalio
 import displayio
-import neopixel
-import rotaryio
-import keypad
 import terminalio
-import usb_hid
 from adafruit_display_shapes.rect import Rect
 from adafruit_display_text import label
-from adafruit_hid.keyboard import Keyboard
-from adafruit_hid.keycode import Keycode
-from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS
+from adafruit_macropad import MacroPad
 
 
 # CONFIGURABLES ------------------------
@@ -33,7 +25,8 @@ MACRO_FOLDER = '/macros'
 
 class App:
     """ Class representing a host-side application, for which we have a set
-        of macro sequences. """
+        of macro sequences. Project code was originally more complex and
+        this was helpful, but maybe it's excessive now?"""
     def __init__(self, appdata):
         self.name = appdata['name']
         self.macros = appdata['macros']
@@ -44,43 +37,36 @@ class App:
         GROUP[13].text = self.name   # Application name
         for i in range(12):
             if i < len(self.macros): # Key in use, set label + LED color
-                PIXELS[i] = self.macros[i][0]
+                MACROPAD.pixels[i] = self.macros[i][0]
                 GROUP[i].text = self.macros[i][1]
-            else:                    # Key not in use, no label or LED
-                PIXELS[i] = 0
+            else:  # Key not in use, no label or LED
+                MACROPAD.pixels[i] = 0
                 GROUP[i].text = ''
-        PIXELS.show()
-        DISPLAY.refresh()
+        MACROPAD.pixels.show()
+        MACROPAD.display.refresh()
 
 
 # INITIALIZATION -----------------------
 
-DISPLAY = board.DISPLAY
-DISPLAY.auto_refresh = False
-ENCODER = rotaryio.IncrementalEncoder(board.ENCODER_B, board.ENCODER_A)
-PIXELS = neopixel.NeoPixel(board.NEOPIXEL, 12, auto_write=False)
-KEYBOARD = Keyboard(usb_hid.devices)
-LAYOUT = KeyboardLayoutUS(KEYBOARD)
-KEYS = keypad.Keys((board.KEY1, board.KEY2, board.KEY3, board.KEY4, board.KEY5,
-                    board.KEY6, board.KEY7, board.KEY8, board.KEY9, board.KEY10,
-                    board.KEY11, board.KEY12, board.ENCODER_SWITCH),
-                   value_when_pressed=False, pull=True)
+MACROPAD = MacroPad()
+MACROPAD.display.auto_refresh = False
+MACROPAD.pixels.auto_write = False
 
-# Set up displayio group with all labels
-GROUP = displayio.Group(max_size=14)
+# Set up displayio group with all the labels
+GROUP = displayio.Group(max_size=14) # 12 keys + rect + app name
 for KEY_INDEX in range(12):
     x = KEY_INDEX % 3
     y = KEY_INDEX // 3
     GROUP.append(label.Label(terminalio.FONT, text='', color=0xFFFFFF,
-                             anchored_position=((DISPLAY.width - 1) * x / 2,
-                                                DISPLAY.height - 1 -
+                             anchored_position=((MACROPAD.display.width - 1) * x / 2,
+                                                MACROPAD.display.height - 1 -
                                                 (3 - y) * 12),
                              anchor_point=(x / 2, 1.0), max_glyphs=15))
-GROUP.append(Rect(0, 0, DISPLAY.width, 12, fill=0xFFFFFF))
+GROUP.append(Rect(0, 0, MACROPAD.display.width, 12, fill=0xFFFFFF))
 GROUP.append(label.Label(terminalio.FONT, text='', color=0x000000,
-                         anchored_position=(DISPLAY.width//2, -2),
+                         anchored_position=(MACROPAD.display.width//2, -2),
                          anchor_point=(0.5, 0.0), max_glyphs=30))
-DISPLAY.show(GROUP)
+MACROPAD.display.show(GROUP)
 
 # Load all the macro key setups from .py files in MACRO_FOLDER
 APPS = []
@@ -97,11 +83,12 @@ for FILENAME in FILES:
 
 if not APPS:
     GROUP[13].text = 'NO MACRO FILES FOUND'
-    DISPLAY.refresh()
+    MACROPAD.display.refresh()
     while True:
         pass
 
 LAST_POSITION = None
+LAST_ENCODER_SWITCH = MACROPAD.encoder_switch_debounced.pressed
 APP_INDEX = 0
 APPS[APP_INDEX].switch()
 
@@ -109,33 +96,53 @@ APPS[APP_INDEX].switch()
 # MAIN LOOP ----------------------------
 
 while True:
-    POSITION = ENCODER.position
+    # Read encoder position. If it's changed, switch apps.
+    POSITION = MACROPAD.encoder
     if POSITION != LAST_POSITION:
         APP_INDEX = POSITION % len(APPS)
         APPS[APP_INDEX].switch()
         LAST_POSITION = POSITION
 
-    EVENT = KEYS.events.get()
-    if EVENT and EVENT.key_number < len(APPS[APP_INDEX].macros):
-        SEQUENCE = APPS[APP_INDEX].macros[EVENT.key_number][2]
-        if EVENT.pressed:
-            if EVENT.key_number < 12:
-                PIXELS[EVENT.key_number] = 0xFFFFFF
-                PIXELS.show()
-            for item in SEQUENCE:
-                if isinstance(item, int):
-                    if item >= 0:
-                        KEYBOARD.press(item)
-                    else:
-                        KEYBOARD.release(item)
+    # Handle encoder button. If state has changed, and if there's a
+    # corresponding macro, set up variables to act on this just like
+    # the keypad keys, as if it were a 13th key/macro.
+    MACROPAD.encoder_switch_debounced.update()
+    ENCODER_SWITCH = MACROPAD.encoder_switch_debounced.pressed
+    if ENCODER_SWITCH != LAST_ENCODER_SWITCH:
+        LAST_ENCODER_SWITCH = ENCODER_SWITCH
+        if len(APPS[APP_INDEX].macros) < 13:
+            continue    # No 13th macro, just resume main loop
+        KEY_NUMBER = 12 # else process below as 13th macro
+        PRESSED = ENCODER_SWITCH
+    else:
+        EVENT = MACROPAD.keys.events.get()
+        if not EVENT or EVENT.key_number >= len(APPS[APP_INDEX].macros):
+            continue # No key events, or no corresponding macro, resume loop
+        KEY_NUMBER = EVENT.key_number
+        PRESSED = EVENT.pressed
+
+    # If code reaches here, a key or the encoder button WAS pressed/released
+    # and there IS a corresponding macro available for it...other situations
+    # are avoided by 'continue' statements above which resume the loop.
+
+    SEQUENCE = APPS[APP_INDEX].macros[KEY_NUMBER][2]
+    if PRESSED:
+        if KEY_NUMBER < 12: # No pixel for encoder button
+            MACROPAD.pixels[KEY_NUMBER] = 0xFFFFFF
+            MACROPAD.pixels.show()
+        for item in SEQUENCE:
+            if isinstance(item, int):
+                if item >= 0:
+                    MACROPAD.keyboard.press(item)
                 else:
-                    LAYOUT.write(item)
-        else:
-            # Release any still-pressed modifier keys
-            for item in SEQUENCE:
-                if isinstance(item, int) and item >= 0:
-                    KEYBOARD.release(item)
-            if EVENT.key_number < 12:
-                PIXELS[EVENT.key_number] = APPS[APP_INDEX].macros[
-                    EVENT.key_number][0]
-                PIXELS.show()
+                    MACROPAD.keyboard.release(item)
+            else:
+                MACROPAD.keyboard_layout.write(item)
+    else:
+        # Release any still-pressed modifier keys
+        for item in SEQUENCE:
+            if isinstance(item, int) and item >= 0:
+                MACROPAD.keyboard.release(item)
+        if KEY_NUMBER < 12: # No pixel for encoder button
+            MACROPAD.pixels[KEY_NUMBER] = APPS[APP_INDEX].macros[KEY_NUMBER][0]
+            MACROPAD.pixels.show()
