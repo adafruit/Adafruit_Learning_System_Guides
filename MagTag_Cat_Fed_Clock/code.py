@@ -39,6 +39,8 @@ def hh_mm(time_struct, twelve_hour=True):
         elif time_struct.tm_hour > 0:
             hour_string = str(time_struct.tm_hour) # 1-12
             postfix = "a"
+            if time_struct.tm_hour == 12:
+                postfix = "p" # 12 -> 12 (pm)
         else:
             hour_string = '12' # 0 -> 12 (am)
             postfix = "a"
