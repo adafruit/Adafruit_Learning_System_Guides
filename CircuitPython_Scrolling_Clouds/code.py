@@ -1,6 +1,6 @@
 """
 Continuously scroll randomly generated Mario style clouds.
-Designed fr an ItsyBitsy M4 Express and a 1.3" 240x240 TFT
+Designed for an ItsyBitsy M4 Express and a 1.3" 240x240 TFT
 
 Adafruit invests time and resources providing this open source code.
 Please support Adafruit and open source hardware by purchasing
@@ -20,6 +20,7 @@ import displayio
 from adafruit_st7789 import ST7789
 import adafruit_imageload
 
+
 # Sprite cell values
 EMPTY = 0
 LEFT = 1
@@ -35,11 +36,8 @@ CHANCE_OF_NEW_CLOUD = 4
 # The chance an existing cloud gets extended
 CHANCE_OF_EXTENDING_A_CLOUD = 5
 
-# Global variables
-display = None
-tilegrid = None
-
 seed(int(time.monotonic()))
+
 
 def make_display():
     """Set up the display support.
@@ -48,7 +46,7 @@ def make_display():
     spi = board.SPI()
     while not spi.try_lock():
         pass
-    spi.configure(baudrate=24000000) # Configure SPI for 24MHz
+    spi.configure(baudrate=24000000)  # Configure SPI for 24MHz
     spi.unlock()
 
     displayio.release_displays()
@@ -56,9 +54,10 @@ def make_display():
 
     return ST7789(display_bus, width=240, height=240, rowstart=80, auto_refresh=True)
 
+
 def make_tilegrid():
     """Construct and return the tilegrid."""
-    group = displayio.Group(max_size=10)
+    group = displayio.Group()
 
     sprite_sheet, palette = adafruit_imageload.load("/tilesheet-2x.bmp",
                                                     bitmap=displayio.Bitmap,
@@ -71,8 +70,9 @@ def make_tilegrid():
     display.show(group)
     return grid
 
+
 def evaluate_position(row, col):
-    """Return how long of a cloud is placable at the given location.
+    """Return how long of a cloud is placeable at the given location.
     :param row: the tile row (0-4)
     :param col: the tile column (0-8)
     """
@@ -82,6 +82,7 @@ def evaluate_position(row, col):
     while end_col < 9 and tilegrid[end_col, row] == EMPTY:
         end_col += 1
     return min([4, end_col - col])
+
 
 def seed_clouds(number_of_clouds):
     """Create the initial clouds so it doesn't start empty"""
@@ -99,6 +100,7 @@ def seed_clouds(number_of_clouds):
             tilegrid[col, row] = MIDDLE
         tilegrid[col + 1, row] = RIGHT
 
+
 def slide_tiles():
     """Move the tilegrid to the left, one pixel at a time, a full time width"""
     for _ in range(32):
@@ -114,6 +116,7 @@ def shift_tiles():
         tilegrid[8, row] = EMPTY
     tilegrid.x = 0
 
+
 def extend_clouds():
     """Extend any clouds on the right edge, either finishing them with a right
     end or continuing them with a middle piece
@@ -125,8 +128,9 @@ def extend_clouds():
             else:
                 tilegrid[8, row] = RIGHT
 
+
 def add_cloud():
-    """Maybe add a new cloud on the right at a randon open row"""
+    """Maybe add a new cloud on the right at a random open row"""
     if randint(1, 10) > CHANCE_OF_NEW_CLOUD:
         count = 0
         while True:
@@ -137,6 +141,7 @@ def add_cloud():
             if tilegrid[7, row] == EMPTY and tilegrid[8, row] == EMPTY:
                 break
         tilegrid[8, row] = LEFT
+
 
 display = make_display()
 tilegrid = make_tilegrid()
