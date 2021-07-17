@@ -11,9 +11,10 @@
   #define GLOBAL_INIT(X)
 #endif
 
-#if defined(ADAFRUIT_MONSTER_M4SK_EXPRESS)
+#if defined(ARCADA_LEFTTFT_SPI) // MONSTER M4SK or custom Arcada setup
   #define NUM_EYES 2
-  // Light sensor is not active by default. Use "lightSensor : 102" in config
+  // MONSTER M4SK light sensor is not active by default.
+  // Use "lightSensor : 102" in config
 #else
   #define NUM_EYES 1
 #endif
@@ -26,8 +27,6 @@ GLOBAL_VAR bool      showSplashScreen    GLOBAL_INIT(true);   // Clear to suppre
 
 #define MAX_DISPLAY_SIZE 240
 GLOBAL_VAR int       DISPLAY_SIZE        GLOBAL_INIT(240);    // Start with assuming a 240x240 display
-GLOBAL_VAR int       DISPLAY_X_OFFSET    GLOBAL_INIT(0);      // Used with rectangular screens
-GLOBAL_VAR int       DISPLAY_Y_OFFSET    GLOBAL_INIT(0);      // Used with rectangular screens
 GLOBAL_VAR uint32_t  stackReserve        GLOBAL_INIT(5192);   // See image-loading code
 GLOBAL_VAR int       eyeRadius           GLOBAL_INIT(0);      // 0 = Use default in loadConfig()
 GLOBAL_VAR int       eyeDiameter;                             // Calculated from eyeRadius later
@@ -69,10 +68,11 @@ GLOBAL_VAR float     irisMin             GLOBAL_INIT(0.45);
 GLOBAL_VAR float     irisRange           GLOBAL_INIT(0.35);
 GLOBAL_VAR bool      tracking            GLOBAL_INIT(true);
 GLOBAL_VAR float     trackFactor         GLOBAL_INIT(0.5);
+GLOBAL_VAR uint32_t  gazeMax             GLOBAL_INIT(3000000); // Max wait time (uS) for major eye movements
 
 // Random eye motion: provided by the base project, but overridable by user code.
 GLOBAL_VAR bool      moveEyesRandomly    GLOBAL_INIT(true);   // Clear to suppress random eye motion and let user code control it
-GLOBAL_VAR float     eyeTargetX          GLOBAL_INIT(0.0);  // THen set these continuously in user_loop.
+GLOBAL_VAR float     eyeTargetX          GLOBAL_INIT(0.0);  // Then set these continuously in user_loop.
 GLOBAL_VAR float     eyeTargetY          GLOBAL_INIT(0.0);  // Range is from -1.0 to +1.0.
 
 // Pin definition stuff will go here
@@ -188,7 +188,7 @@ typedef struct {
 
 #ifdef INIT_EYESTRUCTS
   eyeStruct eye[NUM_EYES] = {
-  #if defined(ADAFRUIT_MONSTER_M4SK_EXPRESS)
+  #if (NUM_EYES > 1)
     // name     spi  cs  dc rst wink
     { "right", &ARCADA_TFT_SPI , ARCADA_TFT_CS,  ARCADA_TFT_DC, ARCADA_TFT_RST, -1 },
     { "left" , &ARCADA_LEFTTFT_SPI, ARCADA_LEFTTFT_CS, ARCADA_LEFTTFT_DC, ARCADA_LEFTTFT_RST, -1 } };
