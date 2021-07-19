@@ -7,6 +7,7 @@ from adafruit_display_text.label import Label
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS
 from jepler_udecimal import Decimal, getcontext, localcontext
+import jepler_udecimal.utrig  # Needed for trig functions in Decimal
 import board
 import digitalio
 import displayio
