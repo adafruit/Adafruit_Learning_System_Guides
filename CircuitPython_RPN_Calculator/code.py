@@ -6,16 +6,13 @@ import time
 from adafruit_display_text.label import Label
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS
-from adafruit_hid.keycode import Keycode
 from jepler_udecimal import Decimal, getcontext, localcontext
-import jepler_udecimal.utrig
 import board
 import digitalio
 import displayio
 import framebufferio
 import microcontroller
 import sharpdisplay
-import supervisor
 import terminalio
 
 try:
@@ -199,15 +196,15 @@ class Impl:
         self.keyboard = None
         self.keyboard_layout = None
 
-        g = displayio.Group(max_size=7)
+        g = displayio.Group()
 
         self.labels = labels = []
-        labels.append(Label(terminalio.FONT, max_glyphs=32, scale=2, color=0))
-        labels.append(Label(terminalio.FONT, max_glyphs=32, scale=3, color=0))
-        labels.append(Label(terminalio.FONT, max_glyphs=32, scale=3, color=0))
-        labels.append(Label(terminalio.FONT, max_glyphs=32, scale=3, color=0))
-        labels.append(Label(terminalio.FONT, max_glyphs=32, scale=3, color=0))
-        labels.append(Label(terminalio.FONT, max_glyphs=32, scale=3, color=0))
+        labels.append(Label(terminalio.FONT, scale=2, color=0))
+        labels.append(Label(terminalio.FONT, scale=3, color=0))
+        labels.append(Label(terminalio.FONT, scale=3, color=0))
+        labels.append(Label(terminalio.FONT, scale=3, color=0))
+        labels.append(Label(terminalio.FONT, scale=3, color=0))
+        labels.append(Label(terminalio.FONT, scale=3, color=0))
 
         for li in labels:
             g.append(li)
