@@ -26,7 +26,7 @@ messages = [
 
 
 clue.display.brightness = 1.0
-screen = displayio.Group(max_size=5)
+screen = displayio.Group()
 
 VFD_GREEN = 0x00FFD2
 VFD_BG = 0x000505
@@ -65,11 +65,13 @@ messages_config = [
 
 messages_labels = {}  # dictionary of configured messages_labels
 
-message_group = displayio.Group(max_size=5, scale=1)
+message_group = displayio.Group(scale=1)
 
 for message_config in messages_config:
     (name, textline, color, x, y) = message_config  # unpack tuple into five var names
-    message_label = label.Label(terminalio.FONT, text=textline, color=color, max_glyphs=50)
+    message_label = label.Label(
+        terminalio.FONT, text=textline, color=color, max_glyphs=50
+    )
     message_label.x = x
     message_label.y = y
     messages_labels[name] = message_label
