@@ -19,7 +19,7 @@ from adafruit_ble.services.nordic import UARTService
 ble = BLERadio()
 uart_server = UARTService()
 advertisement = ProvideServicesAdvertisement(uart_server)
-ble._adapter.name = "TTY_MACHINE" # pylint: disable=protected-access
+ble._adapter.name = "TTY_MACHINE"  # pylint: disable=protected-access
 
 # constants for sine wave generation
 SIN_LENGTH = 100  # more is less choppy
@@ -148,7 +148,8 @@ def baudot_bit(pitch=bit_1, duration=0.022):  # spec says 20ms, but adjusted as 
     # dac.stop()
 
 
-def baudot_carrier(duration=0.15):  # Carrier is transmitted 150 ms before first character is sent
+def baudot_carrier(duration=0.15):
+    # Carrier is transmitted 150 ms before first character is sent
     baudot_bit(carrier, duration)
     dac.stop()
 

@@ -5,6 +5,15 @@
 // "Uncanny Eyes" project (better for SAMD21 chips or Teensy 3.X and
 // 128x128 TFT or OLED screens, single SPI bus).
 
+// IMPORTANT: in rare situations, a board may get "bricked" when running
+// this code while simultaneously connected to USB. A quick-flashing status
+// LED indicates the filesystem has gone corrupt. If this happens, install
+// CircuitPython to reinitialize the filesystem, copy over your eye files
+// (keep backups!), then re-upload this code. It seems to happen more often
+// at high optimization settings (above -O3), but there's not 1:1 causality.
+// The exact cause has not yet been found...possibly insufficient yield()
+// calls, or some rare alignment in the Arcada library or USB-handling code.
+
 // LET'S HAVE A WORD ABOUT COORDINATE SYSTEMS before continuing. From an
 // outside observer's point of view, looking at the display(s) on these
 // boards, the eyes are rendered COLUMN AT A TIME, working LEFT TO RIGHT,
@@ -34,7 +43,6 @@
   #error "Please select Tools->USB Stack->TinyUSB before compiling"
 #endif
 
-#include <Adafruit_TinyUSB.h>
 #define GLOBAL_VAR
 #include "globals.h"
 
@@ -43,6 +51,8 @@ bool     eyeInMotion = false;
 float    eyeOldX, eyeOldY, eyeNewX, eyeNewY;
 uint32_t eyeMoveStartTime = 0L;
 int32_t  eyeMoveDuration  = 0L;
+uint32_t lastSaccadeStop  = 0L;
+int32_t  saccadeInterval  = 0L;
 
 // Some sloppy eye state stuff, some carried over from old eye code...
 // kinda messy and badly named and will get cleaned up/moved/etc.
@@ -148,9 +158,10 @@ void setup() {
 
   arcada.displayBegin();
 
-  DISPLAY_SIZE     = min(ARCADA_TFT_WIDTH, ARCADA_TFT_HEIGHT);
-  DISPLAY_X_OFFSET = (ARCADA_TFT_WIDTH  - DISPLAY_SIZE) / 2;
-  DISPLAY_Y_OFFSET = (ARCADA_TFT_HEIGHT - DISPLAY_SIZE) / 2;
+  // Backlight(s) off ASAP, they'll switch on after screen(s) init & clear
+  arcada.setBacklight(0);
+
+  DISPLAY_SIZE = min(ARCADA_TFT_WIDTH, ARCADA_TFT_HEIGHT);
 
   Serial.begin(115200);
   //while(!Serial) yield();
@@ -158,9 +169,6 @@ void setup() {
   Serial.printf("Available RAM at start: %d\n", availableRAM());
   Serial.printf("Available flash at start: %d\n", arcada.availableFlash());
   yield(); // Periodic yield() makes sure mass storage filesystem stays alive
-
-  // Backlight(s) off ASAP, they'll switch on after screen(s) init & clear
-  arcada.setBacklight(0);
 
   // No file selector yet. In the meantime, you can override the default
   // config file by holding one of the 3 edge buttons at startup (loads
@@ -179,42 +187,20 @@ void setup() {
   }
 
   yield();
-  // Initialize displays
-  #if (NUM_EYES > 1)
-    eye[0].display = arcada._display;
-    eye[1].display = arcada.display2;  
-  #else
-    eye[0].display = arcada.display;
-  #endif
-
-  yield();
-  if (showSplashScreen) {
-    if (arcada.drawBMP((char *)"/splash.bmp", 0, 0, (eye[0].display)) == IMAGE_SUCCESS) {
-      Serial.println("Splashing");
-      if (NUM_EYES > 1) {    // other eye
-        yield();
-        arcada.drawBMP((char *)"/splash.bmp", 0, 0, (eye[1].display));
-      }
-      // backlight on for a bit
-      for (int bl=0; bl<=250; bl+=20) {
-        arcada.setBacklight(bl);
-        delay(20);
-      }
-      delay(2000);
-      // backlight back off
-      for (int bl=250; bl>=0; bl-=20) {
-        arcada.setBacklight(bl);
-        delay(20);
-      }
-    }
-  }
+  // Initialize display(s)
+#if (NUM_EYES > 1)
+  eye[0].display = arcada._display;
+  eye[1].display = arcada.display2;  
+#else
+  eye[0].display = arcada.display;
+#endif
 
   // Initialize DMAs
   yield();
   uint8_t e;
   for(e=0; e<NUM_EYES; e++) {
-#if (ARCADA_TFT_WIDTH != 160) && (ARCADA_TFT_HEIGHT != 128)   // 160x128 is ST7735 which isn't able to deal
-    eye[e].spi->setClockSource(DISPLAY_CLKSRC);
+#if (ARCADA_TFT_WIDTH != 160) && (ARCADA_TFT_HEIGHT != 128) // 160x128 is ST7735 which isn't able to deal
+    eye[e].spi->setClockSource(DISPLAY_CLKSRC); // Accelerate SPI!
 #endif
     eye[e].display->fillScreen(0);
     eye[e].dma.allocate();
@@ -265,12 +251,36 @@ void setup() {
 
     // Uncanny eyes carryover stuff for now, all messy:
     eye[e].blink.state = NOBLINK;
-//    eye[e].eyeX        = 512;
-//    eye[e].eyeY        = 512;
     eye[e].blinkFactor = 0.0;
   }
 
-  arcada.setBacklight(255);
+  // SPLASH SCREEN (IF FILE PRESENT) ---------------------------------------
+
+  yield();
+  uint32_t startTime, elapsed;
+  if (showSplashScreen) {
+    showSplashScreen = ((arcada.drawBMP((char *)"/splash.bmp",
+                         0, 0, eye[0].display)) == IMAGE_SUCCESS);
+    if (showSplashScreen) { // Loaded OK?
+      Serial.println("Splashing");
+      if (NUM_EYES > 1) {   // Load on other eye too, ignore status
+        yield();
+        arcada.drawBMP((char *)"/splash.bmp", 0, 0, eye[1].display);
+      }
+      // Ramp up backlight over 1/2 sec duration
+      startTime = millis();
+      while ((elapsed = (millis() - startTime)) <= 500) {
+        yield();
+        arcada.setBacklight(255 * elapsed / 500);
+      }
+      arcada.setBacklight(255); // To the max
+      startTime = millis();     // Note current time for backlight hold later
+    }
+  }
+
+  // If no splash, or load failed, turn backlight on early so user gets a
+  // little feedback, that the board is not locked up, just thinking.
+  if (!showSplashScreen) arcada.setBacklight(255);
 
   // LOAD CONFIGURATION FILE -----------------------------------------------
 
@@ -301,7 +311,7 @@ void setup() {
   // leave some RAM for the stack to operate over the lifetime of this
   // program and to handle small heap allocations.
 
-  uint32_t        maxRam = availableRAM() - stackReserve;
+  uint32_t maxRam = availableRAM() - stackReserve;
 
   // Load texture maps for eyes
   uint8_t e2;
@@ -392,10 +402,26 @@ void setup() {
   randomSeed(SysTick->VAL + analogRead(A2));
   eyeOldX = eyeNewX = eyeOldY = eyeNewY = mapRadius; // Start in center
   for(e=0; e<NUM_EYES; e++) { // For each eye...
-    // Set up screen rotation (MUST be done after config load!)
     eye[e].display->setRotation(eye[e].rotation);
     eye[e].eyeX = eyeOldX; // Set up initial position
     eye[e].eyeY = eyeOldY;
+  }
+
+  if (showSplashScreen) { // Image(s) loaded above?
+    // Hold backlight on for up to 2 seconds (minus other initialization time)
+    if ((elapsed = (millis() - startTime)) < 2000) {
+      delay(2000 - elapsed);
+    }
+    // Ramp down backlight over 1/2 sec duration
+    startTime = millis();
+    while ((elapsed = (millis() - startTime)) <= 500) {
+      yield();
+      arcada.setBacklight(255 - (255 * elapsed / 500));
+    }
+    arcada.setBacklight(0);
+    for(e=0; e<NUM_EYES; e++) {
+      eye[e].display->fillScreen(0);
+    }
   }
 
 #if defined(ADAFRUIT_MONSTER_M4SK_EXPRESS)
@@ -412,6 +438,8 @@ void setup() {
   }
 #endif
 
+  arcada.setBacklight(255); // Back on, impending graphics
+
   yield();
   if(boopPin >= 0) {
     boopThreshold = 0;
@@ -423,7 +451,6 @@ void setup() {
 
   lastLightReadTime = micros() + 2000000; // Delay initial light reading
 }
-
 
 
 // LOOP FUNCTION - CALLED REPEATEDLY UNTIL POWER-OFF -----------------------
@@ -472,49 +499,67 @@ void loop() {
 
       // ONCE-PER-FRAME EYE ANIMATION LOGIC HAPPENS HERE -------------------
 
-      float eyeX, eyeY;
       // Eye movement
-      int32_t dt = t - eyeMoveStartTime;      // uS elapsed since last eye event
-      if(eyeInMotion) {                       // Currently moving?
-        if(dt >= eyeMoveDuration) {           // Time up?  Destination reached.
-          eyeInMotion      = false;           // Stop moving
-          if (moveEyesRandomly) {
-            eyeMoveDuration  = random(10000, 3000000); // 0.01-3 sec stop
-            eyeMoveStartTime = t;               // Save initial time of stop
+      float eyeX, eyeY;
+      if(moveEyesRandomly) {
+        int32_t dt = t - eyeMoveStartTime;      // uS elapsed since last eye event
+        if(eyeInMotion) {                       // Eye currently moving?
+          if(dt >= eyeMoveDuration) {           // Time up?  Destination reached.
+            eyeInMotion = false;                // Stop moving
+            // The "move" duration temporarily becomes a hold duration...
+            // Normally this is 35 ms to 1 sec, but don't exceed gazeMax setting
+            uint32_t limit = min(1000000, gazeMax);
+            eyeMoveDuration = random(35000, limit); // Time between microsaccades
+            if(!saccadeInterval) {              // Cleared when "big" saccade finishes
+              lastSaccadeStop = t;              // Time when saccade stopped
+              saccadeInterval = random(eyeMoveDuration, gazeMax); // Next in 30ms to 3sec
+            }
+            // Similarly, the "move" start time becomes the "stop" starting time...
+            eyeMoveStartTime = t;               // Save time of event
+            eyeX = eyeOldX = eyeNewX;           // Save position
+            eyeY = eyeOldY = eyeNewY;
+          } else { // Move time's not yet fully elapsed -- interpolate position
+            float e  = (float)dt / float(eyeMoveDuration); // 0.0 to 1.0 during move
+            e = 3 * e * e - 2 * e * e * e; // Easing function: 3*e^2-2*e^3 0.0 to 1.0
+            eyeX = eyeOldX + (eyeNewX - eyeOldX) * e; // Interp X
+            eyeY = eyeOldY + (eyeNewY - eyeOldY) * e; // and Y
           }
-          eyeX = eyeOldX = eyeNewX;           // Save position
-          eyeY = eyeOldY = eyeNewY;
-        } else { // Move time's not yet fully elapsed -- interpolate position
-          float e  = (float)dt / float(eyeMoveDuration); // 0.0 to 1.0 during move
-          e = 3 * e * e - 2 * e * e * e; // Easing function: 3*e^2-2*e^3 0.0 to 1.0
-          eyeX = eyeOldX + (eyeNewX - eyeOldX) * e; // Interp X
-          eyeY = eyeOldY + (eyeNewY - eyeOldY) * e; // and Y
-        }
-      } else {                                // Eye stopped
-        eyeX = eyeOldX;
-        eyeY = eyeOldY;
-        if(dt > eyeMoveDuration) {            // Time up?  Begin new move.
-          // r is the radius in X and Y that the eye can go, from (0,0) in the center.
-          float r = (float)mapDiameter - (float)DISPLAY_SIZE * M_PI_2; // radius of motion
-          r *= 0.6;  // calibration constant
-
-          if (moveEyesRandomly) {
-            eyeNewX = random(-r, r);
-            float h = sqrt(r * r - x * x);
-            eyeNewY = random(-h, h);
-          } else {
-            eyeNewX = eyeTargetX * r;
-            eyeNewY = eyeTargetY * r;
+        } else {                       // Eye is currently stopped
+          eyeX = eyeOldX;
+          eyeY = eyeOldY;
+          if(dt > eyeMoveDuration) {   // Time up?  Begin new move.
+            if((t - lastSaccadeStop) > saccadeInterval) { // Time for a "big" saccade
+              // r is the radius in X and Y that the eye can go, from (0,0) in the center.
+              float r = ((float)mapDiameter - (float)DISPLAY_SIZE * M_PI_2) * 0.75;
+              eyeNewX = random(-r, r);
+              float h = sqrt(r * r - eyeNewX * eyeNewX);
+              eyeNewY = random(-h, h);
+              // Set the duration for this move, and start it going.
+              eyeMoveDuration = random(83000, 166000); // ~1/12 - ~1/6 sec
+              saccadeInterval = 0; // Calc next interval when this one stops
+            } else { // Microsaccade
+              // r is possible radius of motion, ~1/10 size of full saccade.
+              // We don't bother with clipping because if it strays just a little,
+              // that's okay, it'll get put in-bounds on next full saccade.
+              float r = (float)mapDiameter - (float)DISPLAY_SIZE * M_PI_2;
+              r *= 0.07;
+              float dx = random(-r, r);
+              eyeNewX = eyeX - mapRadius + dx;
+              float h = sqrt(r * r - dx * dx);
+              eyeNewY = eyeY - mapRadius + random(-h, h);
+              eyeMoveDuration = random(7000, 25000); // 7-25 ms microsaccade
+            }
+            eyeNewX += mapRadius;    // Translate new point into map space
+            eyeNewY += mapRadius;
+            eyeMoveStartTime = t;    // Save initial time of move
+            eyeInMotion      = true; // Start move on next frame
           }
-    
-          eyeNewX += mapRadius;
-          eyeNewY += mapRadius;
-
-          // Set the duration for this move, and start it going.
-          eyeMoveDuration  = random(83000, 166000); // ~1/12 - ~1/6 sec
-          eyeMoveStartTime = t;               // Save initial time of move
-          eyeInMotion      = true;            // Start move on next frame
         }
+      } else {
+        // Allow user code to control eye position (e.g. IR sensor, joystick, etc.)
+        float r = ((float)mapDiameter - (float)DISPLAY_SIZE * M_PI_2) * 0.9;
+        eyeX = mapRadius + eyeTargetX * r;
+        eyeY = mapRadius + eyeTargetY * r;
       }
 
       // Eyes fixate (are slightly crossed) -- amount is filtered for boops
@@ -578,7 +623,6 @@ void loop() {
       // they need to stay consistent across frame
       eye[eyeNum].upperLidFactor = (eye[eyeNum].upperLidFactor * 0.6) + (uq * 0.4);
       eye[eyeNum].lowerLidFactor = (eye[eyeNum].lowerLidFactor * 0.6) + (lq * 0.4);
-
 
       // Process blinks
       if(eye[eyeNum].blink.state) { // Eye currently blinking?
@@ -858,7 +902,7 @@ void loop() {
     // Initialize new SPI transaction & address window...
     eye[eyeNum].spi->beginTransaction(settings);
     digitalWrite(eye[eyeNum].cs, LOW);  // Chip select
-    eye[eyeNum].display->setAddrWindow(DISPLAY_X_OFFSET, DISPLAY_Y_OFFSET, DISPLAY_SIZE, DISPLAY_SIZE);
+    eye[eyeNum].display->setAddrWindow((eye[eyeNum].display->width() - DISPLAY_SIZE) / 2, (eye[eyeNum].display->height() - DISPLAY_SIZE) / 2, DISPLAY_SIZE, DISPLAY_SIZE);
     delayMicroseconds(1);
     digitalWrite(eye[eyeNum].dc, HIGH); // Data mode
     if(eyeNum == (NUM_EYES-1)) {

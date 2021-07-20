@@ -24,7 +24,7 @@ void calcDisplacement() {
     // Displacement is calculated for the first quadrant in traditional
     // "+Y is up" Cartesian coordinate space; any mirroring or rotation
     // is handled in eye rendering code.
-    for(y=0; y<120; y++) {
+    for(y=0; y<(DISPLAY_SIZE/2); y++) {
       yield(); // Periodic yield() makes sure mass storage filesystem stays alive
       dy  = (float)y + 0.5;
       dy *= dy; // Now dy^2
@@ -110,6 +110,7 @@ void calcMap(void) {
           dx = x + 0.5;           // Distance to center point, X component
           d2 = dx * dx + dy2;     // Distance to center, squared
           if(d2 <= irisRadius2) { // If inside iris...
+            yield();
             xp = x + 0.5;
             // This is a bit ugly in that it iteratively calculates the
             // polarDist value...trial and error. It should be possible to

@@ -85,7 +85,6 @@ void loadConfig(char *filename) {
     StaticJsonDocument<2048> doc;
 
     yield();
-//  delay(100); // Make sure mass storage handler has a turn first!
     DeserializationError error = deserializeJson(doc, file);
     yield();
     if(error) {
@@ -100,6 +99,7 @@ void loadConfig(char *filename) {
       eyelidIndex     = dwim(doc["eyelidIndex"]);
       irisRadius      = dwim(doc["irisRadius"]);
       slitPupilRadius = dwim(doc["slitPupilRadius"]);
+      gazeMax         = dwim(doc["gazeMax"], gazeMax);
       JsonVariant v;
       v = doc["coverage"];
       if(v.is<int>() || v.is<float>()) coverage = v.as<float>();
@@ -328,6 +328,7 @@ ImageReturnCode loadEyelid(char *filename,
   ImageReturnCode status;
   Adafruit_ImageReader *reader;
 
+  yield();
   reader = arcada.getImageReader();
   if (!reader) {
      return IMAGE_ERR_FILE_NOT_FOUND;
@@ -337,6 +338,7 @@ ImageReturnCode loadEyelid(char *filename,
   memset(maxArray, init, DISPLAY_SIZE); // mark 'no eyelid data for this column'
 
   // This is the "booster seat" described in m4eyes.ino
+  yield();
   if(reader->bmpDimensions(filename, &w, &h) == IMAGE_SUCCESS) {
     tempBytes = ((w + 7) / 8) * h; // Bitmap size in bytes
     if (maxRam > tempBytes) {
@@ -374,6 +376,7 @@ ImageReturnCode loadEyelid(char *filename,
       uint8_t    *buffer = canvas->getBuffer();
       int         bytesPerLine = (image.width() + 7) / 8;
       for(x=sx1; x <= sx2; x++, ix++) { // For each column...
+        yield();
         // Get initial pointer into image buffer
         uint8_t *ptr  = &buffer[iy * bytesPerLine + ix / 8];
         uint8_t  mask = 0x80 >> (ix & 7); // Column mask
@@ -414,6 +417,7 @@ ImageReturnCode loadTexture(char *filename, uint16_t **data,
   ImageReturnCode status;
   Adafruit_ImageReader *reader;
 
+  yield();
   reader = arcada.getImageReader();
   if (!reader) {
      return IMAGE_ERR_FILE_NOT_FOUND;
