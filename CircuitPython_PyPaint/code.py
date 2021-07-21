@@ -59,7 +59,7 @@ class TouchscreenPoller(object):
                                                              calibration=((9000, 59000),
                                                                           (8000, 57000)),
                                                              size=(320, 240))
-        self._cursor_grp = displayio.Group(max_size=1)
+        self._cursor_grp = displayio.Group()
         self._cur_palette = displayio.Palette(3)
         self._cur_palette.make_transparent(0)
         self._cur_palette[1] = 0xFFFFFF
@@ -158,7 +158,7 @@ class Paint(object):
         self._x = self._w // 2
         self._y = self._h // 2
 
-        self._splash = displayio.Group(max_size=5)
+        self._splash = displayio.Group()
 
         self._bg_bitmap = displayio.Bitmap(self._w, self._h, 1)
         self._bg_palette = displayio.Palette(1)
