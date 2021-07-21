@@ -53,7 +53,7 @@ class Wheel(displayio.TileGrid):
             if time.monotonic_ns() > self.stop_time:
                 self.state = BRAKING
         elif self.state == BRAKING:
-            # More quickly lose speed when baking, down to speed 7
+            # More quickly lose speed when braking, down to speed 7
             self.vel = max(self.vel * 85 // 100, 7)
 
         # Advance the wheel according to the velocity, and wrap it around
@@ -72,7 +72,6 @@ class Wheel(displayio.TileGrid):
         if self.state == BRAKING and self.vel == 7 and yyy < 4:
             self.pos = off * 24 * 16
             self.vel = 0
-            yy = 0
             self.state = STOPPED
 
         # Move the displayed tiles to the correct height and make sure the
@@ -87,11 +86,11 @@ class Wheel(displayio.TileGrid):
     def kick(self, i):
         self.state = RUNNING
         self.vel = random.randint(256, 320)
-        self.stop_time = time.monotonic_ns() + 3000000000 + i * 350000000
+        self.stop_time = time.monotonic_ns() + 3_000_000_000 + i * 350_000_000
 
 # Our fruit machine has 3 wheels, let's create them with a correct horizontal
 # (x) offset and arbitrary vertical (y) offset.
-g = displayio.Group(max_size=3)
+g = displayio.Group()
 wheels = []
 for idx in range(3):
     wheel = Wheel()
@@ -119,7 +118,7 @@ for idx, si in enumerate(wheels):
 
 # Here's the main loop
 while True:
-    # Refresh the dislpay (doing this manually ensures the wheels move
+    # Refresh the display (doing this manually ensures the wheels move
     # together, not at different times)
     display.refresh(minimum_frames_per_second=0)
     if all_stopped():
