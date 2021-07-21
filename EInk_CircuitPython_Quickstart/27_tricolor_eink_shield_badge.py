@@ -69,7 +69,7 @@ f = open("/picture.bmp", "rb")
 
 pic = displayio.OnDiskBitmap(f)
 # Create a Tilegrid with the bitmap and put in the displayio group
-t = displayio.TileGrid(pic, pixel_shader=displayio.ColorConverter())
+t = displayio.TileGrid(pic, pixel_shader=getattr(pic, 'pixel_shader', displayio.ColorConverter()))
 g.append(t)
 
 # Draw simple text using the built-in font into a displayio group

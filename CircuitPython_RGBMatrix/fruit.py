@@ -35,7 +35,7 @@ def shuffled(seq):
 class Wheel(displayio.TileGrid):
     def __init__(self):
         # Portions of up to 3 tiles are visible.
-        super().__init__(bitmap=bitmap, pixel_shader=displayio.ColorConverter(),
+        super().__init__(bitmap=bitmap, pixel_shader=getattr(bitmap, 'pixel_shader', displayio.ColorConverter()),
                          width=1, height=3, tile_width=20, tile_height=24)
         self.order = shuffled(range(20))
         self.state = STOPPED

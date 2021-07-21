@@ -47,19 +47,19 @@ alarm_sounds = [alarm_sound_trash, alarm_sound_bed,
 
 #  sleep alarm
 sleep_bitmap = displayio.OnDiskBitmap(open("/sleepBMP.bmp", "rb"))
-sleep_tilegrid = displayio.TileGrid(sleep_bitmap, pixel_shader=displayio.ColorConverter())
+sleep_tilegrid = displayio.TileGrid(sleep_bitmap, pixel_shader=getattr(sleep_bitmap, 'pixel_shader', displayio.ColorConverter()))
 group_bed = displayio.Group()
 group_bed.append(sleep_tilegrid)
 
 #  trash alarm
 trash_bitmap = displayio.OnDiskBitmap(open("/trashBMP.bmp", "rb"))
-trash_tilegrid = displayio.TileGrid(trash_bitmap, pixel_shader=displayio.ColorConverter())
+trash_tilegrid = displayio.TileGrid(trash_bitmap, pixel_shader=getattr(trash_bitmap, 'pixel_shader', displayio.ColorConverter()))
 group_trash = displayio.Group()
 group_trash.append(trash_tilegrid)
 
 #  meal alarm
 eat_bitmap = displayio.OnDiskBitmap(open("/eatBMP.bmp", "rb"))
-eat_tilegrid = displayio.TileGrid(eat_bitmap, pixel_shader=displayio.ColorConverter())
+eat_tilegrid = displayio.TileGrid(eat_bitmap, pixel_shader=getattr(eat_bitmap, 'pixel_shader', displayio.ColorConverter()))
 group_eat = displayio.Group()
 group_eat.append(eat_tilegrid)
 

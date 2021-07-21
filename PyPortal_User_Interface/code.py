@@ -125,9 +125,9 @@ def set_image(group, filename):
     image_file = open(filename, "rb")
     image = displayio.OnDiskBitmap(image_file)
     try:
-        image_sprite = displayio.TileGrid(image, pixel_shader=displayio.ColorConverter())
+        image_sprite = displayio.TileGrid(image, pixel_shader=getattr(image, 'pixel_shader', displayio.ColorConverter()))
     except TypeError:
-        image_sprite = displayio.TileGrid(image, pixel_shader=displayio.ColorConverter(),
+        image_sprite = displayio.TileGrid(image, pixel_shader=getattr(image, 'pixel_shader', displayio.ColorConverter()),
                                           position=(0, 0))
     group.append(image_sprite)
 

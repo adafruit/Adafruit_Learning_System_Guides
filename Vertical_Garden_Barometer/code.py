@@ -59,13 +59,13 @@ clue_display = displayio.Group(max_size=4)
 # draw the rising image
 rising_file = open("rising.bmp", "rb")
 rising_bmp = displayio.OnDiskBitmap(rising_file)
-rising_sprite = displayio.TileGrid(rising_bmp, pixel_shader=displayio.ColorConverter())
+rising_sprite = displayio.TileGrid(rising_bmp, pixel_shader=getattr(rising_bmp, 'pixel_shader', displayio.ColorConverter()))
 clue_display.append(rising_sprite)
 
 # draw the sinking image
 sinking_file = open("sinking.bmp", "rb")
 sinking_bmp = displayio.OnDiskBitmap(sinking_file)
-sinking_sprite = displayio.TileGrid(sinking_bmp, pixel_shader=displayio.ColorConverter())
+sinking_sprite = displayio.TileGrid(sinking_bmp, pixel_shader=getattr(sinking_bmp, 'pixel_shader', displayio.ColorConverter()))
 clue_display.append(sinking_sprite)
 
 # Create text

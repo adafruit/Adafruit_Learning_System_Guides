@@ -136,10 +136,10 @@ class AWS_GFX(displayio.Group):
         icon = displayio.OnDiskBitmap(self._icon_file)
         try:
             self._icon_sprite = displayio.TileGrid(icon,
-                                                   pixel_shader=displayio.ColorConverter())
+                                                   pixel_shader=getattr(icon, 'pixel_shader', displayio.ColorConverter()))
         except TypeError:
             self._icon_sprite = displayio.TileGrid(icon,
-                                                   pixel_shader=displayio.ColorConverter(),
+                                                   pixel_shader=getattr(icon, 'pixel_shader', displayio.ColorConverter()),
                                                    position=(0,0))
 
         self._icon_group.append(self._icon_sprite)

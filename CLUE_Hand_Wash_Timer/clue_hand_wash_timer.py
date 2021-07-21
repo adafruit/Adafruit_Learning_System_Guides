@@ -18,13 +18,13 @@ clue_display = displayio.Group(max_size=4)
 # draw the background image
 wash_on_file = open("wash_on.bmp", "rb")
 wash_on_bmp = displayio.OnDiskBitmap(wash_on_file)
-wash_on_sprite = displayio.TileGrid(wash_on_bmp, pixel_shader=displayio.ColorConverter())
+wash_on_sprite = displayio.TileGrid(wash_on_bmp, pixel_shader=getattr(wash_on_bmp, 'pixel_shader', displayio.ColorConverter()))
 clue_display.append(wash_on_sprite)
 
 # draw the foreground image
 wash_off_file = open("wash_off.bmp", "rb")
 wash_off_bmp = displayio.OnDiskBitmap(wash_off_file)
-wash_off_sprite = displayio.TileGrid(wash_off_bmp, pixel_shader=displayio.ColorConverter())
+wash_off_sprite = displayio.TileGrid(wash_off_bmp, pixel_shader=getattr(wash_off_bmp, 'pixel_shader', displayio.ColorConverter()))
 clue_display.append(wash_off_sprite)
 
 

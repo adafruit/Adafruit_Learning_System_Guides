@@ -19,7 +19,7 @@ while True:
         bitmap_file = open(filename, "rb")
         bitmap = displayio.OnDiskBitmap(bitmap_file)
         tile_grid = displayio.TileGrid(bitmap,
-            pixel_shader=displayio.ColorConverter())
+            pixel_shader=getattr(bitmap, 'pixel_shader', displayio.ColorConverter()))
         group = displayio.Group()
         group.append(tile_grid)
         display.show(group)

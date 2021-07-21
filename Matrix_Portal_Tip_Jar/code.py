@@ -77,7 +77,7 @@ def load_image():
 
     sprite = displayio.TileGrid(
         bitmap,
-        pixel_shader=displayio.ColorConverter(),
+        pixel_shader=getattr(bitmap, 'pixel_shader', displayio.ColorConverter()),
         width=1,
         height=1,
         tile_width=bitmap.width,

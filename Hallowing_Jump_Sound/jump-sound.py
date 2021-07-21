@@ -86,7 +86,7 @@ try:
     BITMAP = displayio.OnDiskBitmap(open(IMAGEFILE, 'rb'))
     SCREEN.append(
         displayio.TileGrid(BITMAP,
-                           pixel_shader=displayio.ColorConverter(),
+                           pixel_shader=getattr(BITMAP, 'pixel_shader', displayio.ColorConverter()),
                            x=0, y=0))
     board.DISPLAY.brightness = 1.0
 except (ImportError, NameError, AttributeError) as err:

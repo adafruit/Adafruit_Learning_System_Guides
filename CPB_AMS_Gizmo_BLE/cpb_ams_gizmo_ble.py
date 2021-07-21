@@ -30,7 +30,7 @@ radio.start_advertising(a)
 
 def wrap_in_tilegrid(open_file):
     odb = displayio.OnDiskBitmap(open_file)
-    return displayio.TileGrid(odb, pixel_shader=displayio.ColorConverter())
+    return displayio.TileGrid(odb, pixel_shader=getattr(odb, 'pixel_shader', displayio.ColorConverter()))
 
 def make_background(width, height, color):
     color_bitmap = displayio.Bitmap(width, height, 1)

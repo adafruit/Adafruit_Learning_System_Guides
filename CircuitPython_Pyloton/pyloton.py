@@ -156,7 +156,7 @@ class Pyloton:
             return
         with open('blinka-pyloton.bmp', 'rb') as bitmap_file:
             bitmap1 = displayio.OnDiskBitmap(bitmap_file)
-            tile_grid = displayio.TileGrid(bitmap1, pixel_shader=displayio.ColorConverter())
+            tile_grid = displayio.TileGrid(bitmap1, pixel_shader=getattr(bitmap1, 'pixel_shader', displayio.ColorConverter()))
             self.loading_group.append(tile_grid)
             self.display.show(self.loading_group)
             status_heading = label.Label(font=self.arial16, x=80, y=175,

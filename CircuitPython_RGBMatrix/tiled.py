@@ -44,7 +44,7 @@ BITMAP = displayio.OnDiskBitmap(open('wales.bmp', 'rb'))
 GROUP = displayio.Group()
 GROUP.append(displayio.TileGrid(
     BITMAP,
-    pixel_shader=displayio.ColorConverter(),
+    pixel_shader=getattr(BITMAP, 'pixel_shader', displayio.ColorConverter()),
     width=1,
     height=1,
     tile_width=BITMAP.width,

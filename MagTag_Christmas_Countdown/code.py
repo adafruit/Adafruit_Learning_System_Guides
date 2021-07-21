@@ -22,7 +22,7 @@ circle_group = displayio.Group(max_size=30)
 #  import tree bitmap
 tree = displayio.OnDiskBitmap(open("/atree.bmp", "rb"))
 
-tree_grid = displayio.TileGrid(tree, pixel_shader=displayio.ColorConverter())
+tree_grid = displayio.TileGrid(tree, pixel_shader=getattr(tree, 'pixel_shader', displayio.ColorConverter()))
 
 #  add bitmap to its group
 tree_group.append(tree_grid)

@@ -90,7 +90,7 @@ advertisement.solicited_services.append(AppleNotificationCenterService)
 
 def wrap_in_tilegrid(open_file):
     odb = displayio.OnDiskBitmap(open_file)
-    return displayio.TileGrid(odb, pixel_shader=displayio.ColorConverter())
+    return displayio.TileGrid(odb, pixel_shader=getattr(odb, 'pixel_shader', displayio.ColorConverter()))
 
 display = tft_gizmo.TFT_Gizmo()
 group = displayio.Group(max_size=3)

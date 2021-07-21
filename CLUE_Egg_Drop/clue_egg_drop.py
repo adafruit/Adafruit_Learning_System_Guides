@@ -19,14 +19,14 @@ splash = displayio.Group(max_size=3)
 begg_file = open("broken_egg.bmp", "rb")
 begg_bmp = displayio.OnDiskBitmap(begg_file)
 begg_sprite = displayio.TileGrid(begg_bmp,
-                                 pixel_shader=displayio.ColorConverter())
+                                 pixel_shader=getattr(begg_bmp, 'pixel_shader', displayio.ColorConverter()))
 splash.append(begg_sprite)
 
 # draw the good egg on top
 gegg_file = open("good_egg.bmp", "rb")
 gegg_bmp = displayio.OnDiskBitmap(gegg_file)
 gegg_sprite = displayio.TileGrid(gegg_bmp,
-                                 pixel_shader=displayio.ColorConverter())
+                                 pixel_shader=getattr(gegg_bmp, 'pixel_shader', displayio.ColorConverter()))
 splash.append(gegg_sprite)
 
 # Draw a label

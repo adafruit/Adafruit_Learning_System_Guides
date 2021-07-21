@@ -198,7 +198,7 @@ try:
     FILENAME = 'moon/splash-' + str(DISPLAY.rotation) + '.bmp'
     BITMAP = displayio.OnDiskBitmap(open(FILENAME, 'rb'))
     TILE_GRID = displayio.TileGrid(BITMAP,
-                                   pixel_shader=displayio.ColorConverter(),)
+                                   pixel_shader=getattr(BITMAP, 'pixel_shader', displayio.ColorConverter()),)
     GROUP.append(TILE_GRID)
 except:
     GROUP.append(adafruit_display_text.label.Label(SMALL_FONT, color=0xFF0000,
@@ -365,7 +365,7 @@ while True:
     FILENAME = 'moon/moon' + '{0:0>2}'.format(FRAME) + '.bmp'
     BITMAP = displayio.OnDiskBitmap(open(FILENAME, 'rb'))
     TILE_GRID = displayio.TileGrid(BITMAP,
-                                   pixel_shader=displayio.ColorConverter(),)
+                                   pixel_shader=getattr(BITMAP, 'pixel_shader', displayio.ColorConverter()),)
     TILE_GRID.x = 0
     TILE_GRID.y = MOON_Y
     GROUP[0] = TILE_GRID
