@@ -4,7 +4,7 @@ import digitalio
 import rotaryio
 import neopixel
 import keypad
-from _pixelbuf import colorwheel
+from rainbowio import colorwheel
 
 
 key_pins = (board.KEY1, board.KEY2, board.KEY3, board.KEY4, board.KEY5, board.KEY6,
