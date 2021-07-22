@@ -160,13 +160,13 @@ display = framebufferio.FramebufferDisplay(framebuffer, auto_refresh = True)
 font = bitmap_font.load_font("/GothamBlack-54.bdf")
 
 # Create a Group for the BLM text
-blm_group = displayio.Group(max_size=10)
+blm_group = displayio.Group()
 display.show(blm_group)
 
 # Create a 3 line set of text for BLM
 blm_font = [None, None, None]
 for line in range(3):
-    label = adafruit_display_text.label.Label(font, color=0xFFFFFF, max_glyphs=16)
+    label = adafruit_display_text.label.Label(font, color=0xFFFFFF)
     label.anchor_point = (0, 0)
     label.anchored_position = (8, line*84+8)
     blm_font[line] = label
@@ -186,18 +186,14 @@ font.load_glyphs(b"' DFGHJNOPQUWXYZabcdefghijklmnopqrstuvwxyz")
 # Create a 2 line set of font text for names
 names_font = [None, None]
 for line in range(2):
-    label = adafruit_display_text.label.Label(
-        font,
-        color=0xFFFFFF,
-        max_glyphs=16,
-    )
+    label = adafruit_display_text.label.Label(font, color=0xFFFFFF)
     # Center each line horizontally, position vertically
     label.anchor_point = (0.5, 0)
     label.anchored_position = (200, line*84+42)
     names_font[line] = label
 
 # Create a Group for the name text
-name_group = displayio.Group(max_size=10)
+name_group = displayio.Group()
 for line in names_font:
     name_group.append(line)
 
