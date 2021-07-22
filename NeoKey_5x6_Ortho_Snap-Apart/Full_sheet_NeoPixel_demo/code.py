@@ -1,5 +1,5 @@
 """
-MeoKey 5x6 Ortho Snap-Apart simple key press NeoPixel demo.
+NeoKey 5x6 Ortho Snap-Apart simple key press NeoPixel demo.
 """
 import board
 import keypad
