@@ -48,10 +48,9 @@ class IconBar:
     """An icon bar presents n 16x16 icons in a row.
 One icon can be "selected" and any number can be "active"."""
     def __init__(self, n=8, filename="/rsrc/icons.bmp"):
-        self.group = displayio.Group(max_size=n)
+        self.group = displayio.Group()
         self.bitmap_file = open(filename, "rb")
         self.bitmap = adafruit_imageload.bmp.load(self.bitmap_file, bitmap=displayio.Bitmap)[0]
-
 
         self._selected = None
         self.icons = [displayio.TileGrid(self.bitmap,
