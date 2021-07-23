@@ -27,12 +27,6 @@ DISPLAY_TIMEOUT = 60   # screen saver timeout in seconds
 DISPLAY_RATE = 1       # screen refresh rate
 #-------------------------------------------------------------------------
 
-# TODO: remove this once this is resolved:
-# https://github.com/adafruit/circuitpython/issues/4893
-# and this gets merged:
-# https://github.com/adafruit/circuitpython/pull/4961
-EPOCH_OFFSET = 946684800 # delta from above issue thread
-
 # Get sekrets from a secrets.py file
 try:
     from secrets import secrets
@@ -95,7 +89,7 @@ display.show(splash)
 #                    H E L P E R    F U N C S
 #-------------------------------------------------------------------------
 def timebase(timetime):
-    return (timetime + EPOCH_OFFSET - (UTC_OFFSET*3600)) // 30
+    return (timetime - (UTC_OFFSET*3600)) // 30
 
 def compute_codes(timestamp):
     codes = []
