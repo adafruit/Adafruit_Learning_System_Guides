@@ -129,7 +129,7 @@ class Pyloton:
 
         self.start = time.time()
 
-        self.splash = displayio.Group(max_size=25)
+        self.splash = displayio.Group()
         self.loading_group = displayio.Group()
 
         self._load_fonts()
@@ -140,9 +140,9 @@ class Pyloton:
 
         self.text_group = displayio.Group()
         self.status = label.Label(font=self.arial12, x=10, y=200,
-                                  text='', color=self.YELLOW, max_glyphs=30)
+                                  text='', color=self.YELLOW)
         self.status1 = label.Label(font=self.arial12, x=10, y=220,
-                                   text='', color=self.YELLOW, max_glyphs=30)
+                                   text='', color=self.YELLOW)
 
         self.text_group.append(self.status)
         self.text_group.append(self.status1)
@@ -413,7 +413,7 @@ class Pyloton:
         """
         if not font:
             font = self.arial24
-        return label.Label(font=font, x=x, y=y, text=text, color=self.WHITE, max_glyphs=30)
+        return label.Label(font=font, x=x, y=y, text=text, color=self.WHITE)
 
 
     def _get_y(self):
