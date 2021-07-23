@@ -277,7 +277,7 @@ class PuffDetector:
         high_pressure_label.x = 0
         high_pressure_label.y = BOTTOM_ROW
 
-        splash = Group(max_size=10)
+        splash = Group()
         splash.append(banner)
         splash.append(state)
         splash.append(detector_result)
