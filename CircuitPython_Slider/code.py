@@ -31,14 +31,14 @@ stop = 0
 z = 0
 
 #image groups
-five_minGroup = displayio.Group(max_size=20)
-ten_minGroup = displayio.Group(max_size=20)
-twenty_minGroup = displayio.Group(max_size=20)
-hourGroup = displayio.Group(max_size=20)
-reverseqGroup = displayio.Group(max_size=20)
-backingUpGroup = displayio.Group(max_size=20)
-stopGroup = displayio.Group(max_size=20)
-progBarGroup = displayio.Group(max_size=20)
+five_minGroup = displayio.Group()
+ten_minGroup = displayio.Group()
+twenty_minGroup = displayio.Group()
+hourGroup = displayio.Group()
+reverseqGroup = displayio.Group()
+backingUpGroup = displayio.Group()
+stopGroup = displayio.Group()
+progBarGroup = displayio.Group()
 
 #bitmap setup for all of the menu screens
 five_minBG, five_minPal = adafruit_imageload.load(five_minBMP,
