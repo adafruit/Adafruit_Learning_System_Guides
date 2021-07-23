@@ -6,11 +6,13 @@ import displayio
 from adafruit_display_text.label import Label
 from adafruit_bitmap_font import bitmap_font
 
-cwd = ("/"+__file__).rsplit('/', 1)[0] # the current working directory (where this file is)
+# the current working directory (where this file is)
+cwd = ("/" + __file__).rsplit("/", 1)[0]
 
 # Fonts within /fonts folder
-main_font = cwd+"/fonts/EarthHeart-26.bdf"
-data_font = cwd+"/fonts/Collegiate-50.bdf"
+main_font = cwd + "/fonts/EarthHeart-26.bdf"
+data_font = cwd + "/fonts/Collegiate-50.bdf"
+
 
 class Azure_GFX(displayio.Group):
     def __init__(self, is_celsius):
@@ -34,18 +36,18 @@ class Azure_GFX(displayio.Group):
         self._icon_sprite = None
         self._icon_file = None
         self._cwd = cwd
-        self.set_icon(self._cwd+"/images/azure_splash.bmp")
+        self.set_icon(self._cwd + "/images/azure_splash.bmp")
 
-        print('loading fonts...')
-        glyphs = b'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-,.: '
-        data_glyphs = b'012345678-,.:/FC'
+        print("loading fonts...")
+        glyphs = b"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-,.: "
+        data_glyphs = b"012345678-,.:/FC"
         self.main_font = bitmap_font.load_font(main_font)
         self.main_font.load_glyphs(glyphs)
         self.data_font = bitmap_font.load_font(data_font)
         self.data_font.load_glyphs(data_glyphs)
-        self.data_font.load_glyphs(('°',)) # extra glyph for temperature font
+        self.data_font.load_glyphs(("°",))  # extra glyph for temperature font
 
-        print('setting up labels...')
+        print("setting up labels...")
         self.title_text = Label(self.main_font, text="Azure Plant Monitor")
         self.title_text.x = 35
         self.title_text.y = 25
@@ -89,7 +91,7 @@ class Azure_GFX(displayio.Group):
         """Displays the moisture from the Stemma Soil Sensor.
         :param int moisture_data: Moisture value
         """
-        print('Moisture Level: ', moisture_data)
+        print("Moisture Level: ", moisture_data)
         self.moisture_text.text = str(moisture_data)
 
     def display_temp(self, temp_data):
@@ -98,22 +100,22 @@ class Azure_GFX(displayio.Group):
         """
         if not self._is_celsius:
             temp_data = (temp_data * 9 / 5) + 32 - 15
-            print('Temperature: %0.0f°F'%temp_data)
+            print("Temperature: %0.0f°F" % temp_data)
             if temp_data >= 212:
                 self.temp_text.color = 0xFD2EE
             elif temp_data <= 32:
                 self.temp_text.color = 0xFF0000
-            self.temp_text.text = '%0.0f°F'%temp_data
-            temp_data = '%0.0f'%temp_data
+            self.temp_text.text = "%0.0f°F" % temp_data
+            temp_data = "%0.0f" % temp_data
             return int(temp_data)
         else:
-            print('Temperature: %0.0f°C'%temp_data)
+            print("Temperature: %0.0f°C" % temp_data)
             if temp_data <= 0:
                 self.temp_text.color = 0xFD2EE
             elif temp_data >= 100:
                 self.temp_text.color = 0xFF0000
-            self.temp_text.text = '%0.0f°C'%temp_data
-            temp_data = '%0.0f'%temp_data
+            self.temp_text.text = "%0.0f°C" % temp_data
+            temp_data = "%0.0f" % temp_data
             return int(temp_data)
 
     def set_icon(self, filename):
@@ -133,8 +135,9 @@ class Azure_GFX(displayio.Group):
             self._icon_file.close()
         self._icon_file = open(filename, "rb")
         icon = displayio.OnDiskBitmap(self._icon_file)
-        self._icon_sprite = displayio.TileGrid(icon,
-                                               pixel_shader=getattr(icon, 'pixel_shader', displayio.ColorConverter()))
+        self._icon_sprite = displayio.TileGrid(
+            icon, pixel_shader=getattr(icon, "pixel_shader", displayio.ColorConverter())
+        )
 
         # CircuitPython 7 compatible
         # # Remove self._icon_file - it is no longer used
