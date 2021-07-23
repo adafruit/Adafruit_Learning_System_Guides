@@ -18,18 +18,18 @@ class Azure_GFX(displayio.Group):
         :param bool is_celsius: Temperature displayed in Celsius.
         """
         # root displayio group
-        root_group = displayio.Group(max_size=23)
+        root_group = displayio.Group()
         board.DISPLAY.show(root_group)
-        super().__init__(max_size=15)
+        super().__init__()
 
         # temperature display option
         self._is_celsius = is_celsius
 
         # create background icon group
-        self._icon_group = displayio.Group(max_size=3)
+        self._icon_group = displayio.Group()
         board.DISPLAY.show(self._icon_group)
         # create text object group
-        self._text_group = displayio.Group(max_size=9)
+        self._text_group = displayio.Group()
 
         self._icon_sprite = None
         self._icon_file = None
@@ -56,7 +56,7 @@ class Azure_GFX(displayio.Group):
         self.temp_label.y = 65
         self._text_group.append(self.temp_label)
 
-        self.temp_text = Label(self.data_font, max_glyphs=10)
+        self.temp_text = Label(self.data_font)
         self.temp_text.x = 200
         self.temp_text.y = 85
         self._text_group.append(self.temp_text)
@@ -66,12 +66,12 @@ class Azure_GFX(displayio.Group):
         self.moisture_label.y = 135
         self._text_group.append(self.moisture_label)
 
-        self.moisture_text = Label(self.data_font, max_glyphs=10)
+        self.moisture_text = Label(self.data_font)
         self.moisture_text.x = 200
         self.moisture_text.y = 175
         self._text_group.append(self.moisture_text)
 
-        self.azure_status_text = Label(self.main_font, max_glyphs=15)
+        self.azure_status_text = Label(self.main_font)
         self.azure_status_text.x = 65
         self.azure_status_text.y = 225
         self._text_group.append(self.azure_status_text)
@@ -127,16 +127,18 @@ class Azure_GFX(displayio.Group):
 
         if not filename:
             return  # we're done, no icon desired
+
+        # CircuitPython 6 & 7 compatible
         if self._icon_file:
             self._icon_file.close()
         self._icon_file = open(filename, "rb")
         icon = displayio.OnDiskBitmap(self._icon_file)
-        try:
-            self._icon_sprite = displayio.TileGrid(icon,
-                                                   pixel_shader=getattr(icon, 'pixel_shader', displayio.ColorConverter()))
-        except TypeError:
-            self._icon_sprite = displayio.TileGrid(icon,
-                                                   pixel_shader=getattr(icon, 'pixel_shader', displayio.ColorConverter()),
-                                                   position=(0,0))
+        self._icon_sprite = displayio.TileGrid(icon,
+                                               pixel_shader=getattr(icon, 'pixel_shader', displayio.ColorConverter()))
+
+        # CircuitPython 7 compatible
+        # # Remove self._icon_file - it is no longer used
+        # icon = displayio.OnDiskBitmap(filename)
+        # self._icon_sprite = displayio.TileGrid(icon, pixel_shader=icon.pixel_shader)
 
         self._icon_group.append(self._icon_sprite)
