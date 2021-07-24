@@ -13,8 +13,8 @@ from adafruit_display_text import label
 from adafruit_bitmap_font import bitmap_font
 
 clue.display.brightness = 1.0
-homescreen_screen = displayio.Group(max_size=3)
-temperatures_screen = displayio.Group(max_size=2)
+homescreen_screen = displayio.Group()
+temperatures_screen = displayio.Group()
 
 # define custom colors
 GREEN = 0x00D929
@@ -44,7 +44,7 @@ homescreen_screen.append(outer_circle)
 
 title_font = bitmap_font.load_font("/font/GothamBlack-50.bdf")
 title_font.load_glyphs("BQLUE".encode("utf-8"))
-title_label = label.Label(title_font, text="BBQLUE", color=clue.ORANGE, max_glyphs=15)
+title_label = label.Label(title_font, text="BBQLUE", color=clue.ORANGE)
 title_label.x = 12
 title_label.y = 120
 homescreen_screen.append(title_label)
@@ -66,11 +66,11 @@ my_labels_config = [
 
 my_labels = {}  # dictionary of configured my_labels
 
-text_group = displayio.Group(max_size=8, scale=1)
+text_group = displayio.Group()
 
 for label_config in my_labels_config:
     (name, text, color, x, y) = label_config  # unpack a tuple into five var names
-    templabel = label.Label(temp_font, text=text, color=color, max_glyphs=15)
+    templabel = label.Label(temp_font, text=text, color=color)
     templabel.x = x
     templabel.y = y
     my_labels[name] = templabel
@@ -78,9 +78,7 @@ for label_config in my_labels_config:
 
 temperatures_screen.append(text_group)
 
-temp_title_label = label.Label(
-    title_font, text="BBQLUE", color=clue.ORANGE, max_glyphs=15
-)
+temp_title_label = label.Label(title_font, text="BBQLUE", color=clue.ORANGE)
 temp_title_label.x = 12
 temp_title_label.y = 30
 temperatures_screen.append(temp_title_label)
