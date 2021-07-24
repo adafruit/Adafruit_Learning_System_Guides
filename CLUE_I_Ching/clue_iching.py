@@ -61,7 +61,7 @@ tile_grid = displayio.TileGrid(sprite_sheet, pixel_shader=palette,
                                tile_width = 11,
                                tile_height = 2)
 
-hexagram = displayio.Group(max_size=1, x=60, y=15, scale=10)
+hexagram = displayio.Group(x=60, y=15, scale=10)
 hexagram.append(tile_grid)
 
 # Hexagram name label
