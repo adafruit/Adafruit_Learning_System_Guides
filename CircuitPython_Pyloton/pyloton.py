@@ -129,7 +129,7 @@ class Pyloton:
 
         self.start = time.time()
 
-        self.splash = displayio.Group(max_size=25)
+        self.splash = displayio.Group()
         self.loading_group = displayio.Group()
 
         self._load_fonts()
@@ -140,9 +140,9 @@ class Pyloton:
 
         self.text_group = displayio.Group()
         self.status = label.Label(font=self.arial12, x=10, y=200,
-                                  text='', color=self.YELLOW, max_glyphs=30)
+                                  text='', color=self.YELLOW)
         self.status1 = label.Label(font=self.arial12, x=10, y=220,
-                                   text='', color=self.YELLOW, max_glyphs=30)
+                                   text='', color=self.YELLOW)
 
         self.text_group.append(self.status)
         self.text_group.append(self.status1)
@@ -154,7 +154,11 @@ class Pyloton:
         """
         if self.debug:
             return
-        with open('blinka-pyloton.bmp', 'rb') as bitmap_file:
+
+        blinka_bitmap = "blinka-pyloton.bmp"
+
+        # Compatible with CircuitPython 6 & 7
+        with open(blinka_bitmap, 'rb') as bitmap_file:
             bitmap1 = displayio.OnDiskBitmap(bitmap_file)
             tile_grid = displayio.TileGrid(bitmap1, pixel_shader=getattr(bitmap1, 'pixel_shader', displayio.ColorConverter()))
             self.loading_group.append(tile_grid)
@@ -165,6 +169,16 @@ class Pyloton:
             self.loading_group.append(rect)
             self.loading_group.append(status_heading)
 
+        # # Compatible with CircuitPython 7+
+        # bitmap1 = displayio.OnDiskBitmap(blinka_bitmap)
+        # tile_grid = displayio.TileGrid(bitmap1, pixel_shader=bitmap1.pixel_shader)
+        # self.loading_group.append(tile_grid)
+        # self.display.show(self.loading_group)
+        # status_heading = label.Label(font=self.arial16, x=80, y=175,
+        #                              text="Status", color=self.YELLOW)
+        # rect = Rect(0, 165, 240, 75, fill=self.PURPLE)
+        # self.loading_group.append(rect)
+        # self.loading_group.append(status_heading)
 
     def _load_fonts(self):
         """
@@ -413,7 +427,7 @@ class Pyloton:
         """
         if not font:
             font = self.arial24
-        return label.Label(font=font, x=x, y=y, text=text, color=self.WHITE, max_glyphs=30)
+        return label.Label(font=font, x=x, y=y, text=text, color=self.WHITE)
 
 
     def _get_y(self):
