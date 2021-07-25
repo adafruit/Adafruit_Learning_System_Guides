@@ -71,7 +71,7 @@ font.load_glyphs(b'ABCDEFGHIJKLMNOPQRSTUVWXYZ')
 hexname = label.Label(font, text=" "*40, color=FONT_COLOR)
 # this will initially hold the "shake for reading" message
 hexname.text = " SHAKE\n   FOR\nREADING"
-hexname.anchor_point = (0.5, 0.0)
+hexname.anchor_point = (0.5, 0.5)
 hexname.anchored_position = (120, 120)
 
 # Set up main display group (splash)
