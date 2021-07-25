@@ -2,6 +2,7 @@ import puff_detector
 
 detector = puff_detector.PuffDetector()
 
+
 @detector.on_sip
 def on_sip(strength, duration):
     if strength == puff_detector.STRONG:

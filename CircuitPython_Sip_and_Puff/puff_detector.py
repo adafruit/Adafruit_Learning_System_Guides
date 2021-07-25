@@ -39,13 +39,14 @@ pressure_string = " "
 input_type_string = " "
 # pylint:disable=too-many-locals,exec-used,eval-used
 
+
 class PuffDetector:
     def __init__(
-            self,
-            min_pressure=MIN_PRESSURE,
-            high_pressure=HIGH_PRESSURE,
-            config_filename="settings.json",
-            display_timeout=1,
+        self,
+        min_pressure=MIN_PRESSURE,
+        high_pressure=HIGH_PRESSURE,
+        config_filename="settings.json",
+        display_timeout=1,
     ):
         # misc detection state
         self.current_pressure = 0
@@ -103,7 +104,6 @@ class PuffDetector:
 
         self.pressure_sensor.filter_enabled = True
         self.pressure_sensor.filter_config = True
-
 
     def _load_config(self):
         if not self._config_filename in os.listdir("/"):
@@ -245,6 +245,7 @@ class PuffDetector:
 
             if self.start_polarity == 1:
                 self.state_str = "PUFF STARTED..."
+
     def _update_display(self):
         self._update_display_strings()
         banner = label.Label(FONT, text=BANNER_STRING, color=COLOR)
@@ -276,7 +277,7 @@ class PuffDetector:
         high_pressure_label.x = 0
         high_pressure_label.y = BOTTOM_ROW
 
-        splash = Group(max_size=10)
+        splash = Group()
         splash.append(banner)
         splash.append(state)
         splash.append(detector_result)
