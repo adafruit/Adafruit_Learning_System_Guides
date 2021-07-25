@@ -23,7 +23,7 @@ import neopixel
 import ulab.numerical as numerical
 import ulab.extras as extras
 import ulab as np
-import adafruit_lsm6ds
+import adafruit_lsm6ds.lsm6ds33
 from adafruit_led_animation.helper import PixelMap
 from adafruit_led_animation.sequence import AnimationSequence
 from adafruit_led_animation.group import AnimationGroup
@@ -128,7 +128,7 @@ pixel_map = [
 ]
 
 #Set up accelerometer & mic
-sensor = adafruit_lsm6ds.LSM6DS33(i2c)
+sensor = adafruit_lsm6ds.lsm6ds33.LSM6DS33(i2c)
 mic = audiobusio.PDMIn(board.MICROPHONE_CLOCK,
                        board.MICROPHONE_DATA,
                        sample_rate=16000,
