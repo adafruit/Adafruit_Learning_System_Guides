@@ -85,10 +85,10 @@ b2 = displayio.Bitmap(display.width//SCALE, display.height//SCALE, 2)
 palette = displayio.Palette(2)
 tg1 = displayio.TileGrid(b1, pixel_shader=palette)
 tg2 = displayio.TileGrid(b2, pixel_shader=palette)
-g1 = displayio.Group(max_size=3, scale=SCALE)
+g1 = displayio.Group(scale=SCALE)
 g1.append(tg1)
 display.show(g1)
-g2 = displayio.Group(max_size=3, scale=SCALE)
+g2 = displayio.Group(scale=SCALE)
 g2.append(tg2)
 
 # First time, show the Conway tribute
