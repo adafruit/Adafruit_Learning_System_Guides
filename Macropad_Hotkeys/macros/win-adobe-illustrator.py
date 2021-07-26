@@ -1,14 +1,14 @@
-# MACROPAD Hotkeys example: Adobe Illustrator for Mac
+# MACROPAD Hotkeys example: Adobe Illustrator for Windows
 
 from adafruit_hid.keycode import Keycode # REQUIRED if using Keycode.* values
 
 app = {                         # REQUIRED dict, must be named 'app'
-    'name' : 'Mac Illustrator', # Application name
+    'name' : 'Win Illustrator', # Application name
     'macros' : [                # List of button macros...
         # COLOR    LABEL    KEY SEQUENCE
         # 1st row ----------
-        (0x004000, 'Undo', [Keycode.COMMAND, 'z']),
-        (0x004000, 'Redo', [Keycode.COMMAND, 'Z']),
+        (0x004000, 'Undo', [Keycode.CONTROL, 'z']),
+        (0x004000, 'Redo', [Keycode.CONTROL, 'Z']),
         (0x303000, 'Pen', 'p'),     # Path-drawing tool
         # 2nd row ----------
 
@@ -24,6 +24,6 @@ app = {                         # REQUIRED dict, must be named 'app'
         (0x400000, 'Scale', 's'),   # Scale selection
         (0x303000, 'Text', 't'),    # Type tool
         # Encoder button ---
-        (0x000000, '', [Keycode.COMMAND, Keycode.OPTION, 'S']) # Save for web
+        (0x000000, '', [Keycode.CONTROL, Keycode.ALT, 'S']) # Save for web
     ]
 }
