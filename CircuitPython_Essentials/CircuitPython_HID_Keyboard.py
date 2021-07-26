@@ -31,7 +31,7 @@ for pin in keypress_pins:
     key_pin_array.append(key_pin)
 
 # For most CircuitPython boards:
-led = digitalio.DigitalInOut(board.D13)
+led = digitalio.DigitalInOut(board.LED)
 # For QT Py M0:
 # led = digitalio.DigitalInOut(board.SCK)
 led.direction = digitalio.Direction.OUTPUT

@@ -5,7 +5,7 @@ import digitalio
 import microcontroller
 
 # For most CircuitPython boards:
-led = digitalio.DigitalInOut(board.D13)
+led = digitalio.DigitalInOut(board.LED)
 # For QT Py M0:
 # led = digitalio.DigitalInOut(board.SCK)
 led.switch_to_output()

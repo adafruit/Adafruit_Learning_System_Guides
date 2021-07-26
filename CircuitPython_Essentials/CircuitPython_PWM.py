@@ -4,7 +4,7 @@ import board
 import pwmio
 
 # LED setup for most CircuitPython boards:
-led = pwmio.PWMOut(board.D13, frequency=5000, duty_cycle=0)
+led = pwmio.PWMOut(board.LED, frequency=5000, duty_cycle=0)
 # LED setup for QT Py M0:
 # led = pwmio.PWMOut(board.SCK, frequency=5000, duty_cycle=0)
 
