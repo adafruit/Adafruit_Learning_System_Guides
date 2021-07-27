@@ -448,8 +448,7 @@ voltage_units_dob = Label(font=terminalio.FONT,
 voltage_units_dob.y = voltage_value_dob.y
 voltage_units_dob.x = len(voltage_value_dob.text) * FONT_WIDTH * FONT_SCALE
 
-# 9 elements, 4 added immediately, 4 later, 1 spare for on-screen text
-screen_group = Group(max_size=4 + 4 + 1)
+screen_group = Group()
 if magnetometer is not None:
     screen_group.append(magnet_value_dob)
     screen_group.append(magnet_units_dob)
