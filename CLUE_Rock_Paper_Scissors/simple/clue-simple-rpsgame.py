@@ -177,7 +177,7 @@ def flashWinner(c_idx, who):
 
 # The 6x14 terminalio classic font
 FONT_WIDTH, FONT_HEIGHT = terminalio.FONT.get_bounding_box()
-screen_group = Group(max_size=len(choices) * 2 + 1 + 1)
+screen_group = Group()
 
 # The position of the two players RPS Label objects inside screen_group
 rps_dob_idx = []
