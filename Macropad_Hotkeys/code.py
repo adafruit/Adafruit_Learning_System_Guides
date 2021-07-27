@@ -42,6 +42,7 @@ class App:
             else:  # Key not in use, no label or LED
                 MACROPAD.pixels[i] = 0
                 GROUP[i].text = ''
+        MACROPAD.keyboard.release_all()
         MACROPAD.pixels.show()
         MACROPAD.display.refresh()
 
