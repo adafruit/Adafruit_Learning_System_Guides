@@ -49,6 +49,16 @@ class Clue:
                 ret.add(button)
         return ret
 
+    @property
+    def button_a(self):
+        """``True`` when Button A is pressed. ``False`` if not."""
+        return not self._a.value
+
+    @property
+    def button_b(self):
+        """``True`` when Button B is pressed. ``False`` if not."""
+        return not self._b.value
+
     def _touch(self, i):
         if not isinstance(self._touches[i], touchio.TouchIn):
             self._touches[i] = touchio.TouchIn(self._touches[i])
@@ -549,12 +559,12 @@ class Pyloton:
                 time.sleep(0.25)
 
             # If button B (on the right) is pressed, it increases the volume
-            if 'B' in self.clue.were_pressed:
+            if self.clue.button_b:
                 self.ams.volume_up()
                 time.sleep(0.1)
 
             # If button A (on the left) is pressed, the volume decreases
-            if 'A' in self.clue.were_pressed:
+            if self.clue.button_a:
                 self.ams.volume_down()
                 time.sleep(0.1)
         except (RuntimeError, UnsupportedCommand, AttributeError):
