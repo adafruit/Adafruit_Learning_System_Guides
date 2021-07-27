@@ -8,8 +8,8 @@ app = {                # REQUIRED dict, must be named 'app'
     'macros' : [       # List of button macros...
         # COLOR    LABEL    KEY SEQUENCE
         # 1st row ----------
-        (0x004000, '< Tab', [Keycode.COMMAND, Keycode.SHIFT, Keycode.TAB]),
-        (0x004000, 'Tab >', [Keycode.COMMAND, Keycode.TAB]),
+        (0x004000, '< Tab', [Keycode.CONTROL, Keycode.SHIFT, Keycode.TAB]),
+        (0x004000, 'Tab >', [Keycode.CONTROL, Keycode.TAB]),
         (0x400000, 'Up', [Keycode.SHIFT, ' ']),      # Scroll up
         # 2nd row ----------
         # Full schedule in new tab
