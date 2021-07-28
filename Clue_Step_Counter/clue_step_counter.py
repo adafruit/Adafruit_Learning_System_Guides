@@ -58,15 +58,23 @@ clue_display = board.DISPLAY
 clue_display.brightness = 0.5
 
 #  graphics group
-clueGroup = displayio.Group(max_size=20)
+clueGroup = displayio.Group()
 
 #  loading bitmap background
+# CircuitPython 6 & 7 compatible
 clue_bg = displayio.OnDiskBitmap(open(clue_bgBMP, "rb"))
-clue_tilegrid = displayio.TileGrid(clue_bg, pixel_shader=getattr(clue_bg, 'pixel_shader', displayio.ColorConverter()))
+clue_tilegrid = displayio.TileGrid(
+    clue_bg, pixel_shader=getattr(clue_bg, 'pixel_shader', displayio.ColorConverter())
+)
 clueGroup.append(clue_tilegrid)
 
+# # CircuitPython 7+ compatible
+# clue_bg = displayio.OnDiskBitmap(clue_bgBMP)
+# clue_tilegrid = displayio.TileGrid(clue_bg, pixel_shader=clue_bg.pixel_shader)
+# clueGroup.append(clue_tilegrid)
+
 #  creating the ProgressBar object
-bar_group = displayio.Group(max_size=20)
+bar_group = displayio.Group()
 prog_bar = ProgressBar(1, 1, 239, 25, bar_color=0x652f8f)
 bar_group.append(prog_bar)
 
