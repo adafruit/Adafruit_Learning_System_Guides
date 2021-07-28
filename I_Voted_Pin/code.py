@@ -32,7 +32,7 @@ font = bitmap_font.load_font('/mround-31.bdf')
 i2c = board.I2C()
 display_bus = displayio.I2CDisplay(i2c, device_address=0x3C)
 display = adafruit_displayio_ssd1306.SSD1306(display_bus, width=128, height=32)
-group = displayio.Group(max_size=1)
+group = displayio.Group()
 display.show(group)
 
 # Add content to group
@@ -59,4 +59,3 @@ while True:
         text_area.x = 18
 
     display.show(group)
-	
