@@ -40,29 +40,29 @@ except ImportError:
     raise
 
 # Make the rgb group for setting rgb hex values for NeoPixels
-rgb_group = displayio.Group(max_size=9)
+rgb_group = displayio.Group()
 R_label = Label(
     terminalio.FONT,
     text="   +\nR:\n   -",
     color=0xFFFFFF,
-    anchor_point=((0, 0.5)),
-    anchored_position=((5, 120)),
+    anchor_point=(0, 0.5),
+    anchored_position=(5, 120),
     scale=2,
 )
 G_label = Label(
     terminalio.FONT,
     text="   +\nG:\n   -",
     color=0xFFFFFF,
-    anchor_point=((0, 0.5)),
-    anchored_position=((90, 120)),
+    anchor_point=(0, 0.5),
+    anchored_position=(90, 120),
     scale=2,
 )
 B_label = Label(
     terminalio.FONT,
     text="   +\nB:\n   -",
     color=0xFFFFFF,
-    anchor_point=((0, 0.5)),
-    anchored_position=((175, 120)),
+    anchor_point=(0, 0.5),
+    anchored_position=(175, 120),
     scale=2,
 )
 rgb_group.append(R_label)
@@ -72,24 +72,24 @@ R = Label(
     terminalio.FONT,
     text="00",
     color=0xFFFFFF,
-    anchor_point=((0, 0.5)),
-    anchored_position=((35, 120)),
+    anchor_point=(0, 0.5),
+    anchored_position=(35, 120),
     scale=2,
 )
 G = Label(
     terminalio.FONT,
     text="00",
     color=0xFFFFFF,
-    anchor_point=((0, 0.5)),
-    anchored_position=((120, 120)),
+    anchor_point=(0, 0.5),
+    anchored_position=(120, 120),
     scale=2,
 )
 B = Label(
     terminalio.FONT,
     text="00",
     color=0xFFFFFF,
-    anchor_point=((0, 0.5)),
-    anchored_position=((205, 120)),
+    anchor_point=(0, 0.5),
+    anchored_position=(205, 120),
     scale=2,
 )
 rgb_group.append(R)
