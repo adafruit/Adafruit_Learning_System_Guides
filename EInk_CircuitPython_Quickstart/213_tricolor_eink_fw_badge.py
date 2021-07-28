@@ -67,18 +67,27 @@ bg_sprite = displayio.TileGrid(background_bitmap,
 g.append(bg_sprite)
 
 # Display a picture from the root directory of the CIRCUITPY drive
-# Picture should be HEIGHTxHEIGHT square idealy for a portrait
+# Picture should be HEIGHTxHEIGHT square ideally for a portrait
 # But could be the entire WIDTHxHEIGHT for a non-portrait
-f = open("/picture.bmp", "rb")
+filename = "/picture.bmp"
 
-pic = displayio.OnDiskBitmap(f)
 # Create a Tilegrid with the bitmap and put in the displayio group
-t = displayio.TileGrid(pic, pixel_shader=getattr(pic, 'pixel_shader', displayio.ColorConverter()))
+
+# CircuitPython 6 & 7 compatible
+pic = displayio.OnDiskBitmap(open(filename, "rb"))
+t = displayio.TileGrid(
+    pic, pixel_shader=getattr(pic, 'pixel_shader', displayio.ColorConverter())
+)
 g.append(t)
+
+# # CircuitPython 7+ compatible
+# pic = displayio.OnDiskBitmap(filename)
+# t = displayio.TileGrid(pic, pixel_shader=pic.pixel_shader)
+# g.append(t)
 
 # Draw simple text using the built-in font into a displayio group
 # For smaller text, change scale=2 to scale=1
-text_group = displayio.Group(max_size=10, scale=2,
+text_group = displayio.Group(scale=2,
                              x=DISPLAY_HEIGHT + 10,
                              y=int(DISPLAY_HEIGHT/2) - 13)
 first_name = "Limor"
@@ -88,7 +97,7 @@ text_group.append(text_area)  # Add this text to the text group
 g.append(text_group)
 
 # Draw simple text using the built-in font into a displayio group
-text_group = displayio.Group(max_size=10, scale=2,
+text_group = displayio.Group(scale=2,
                              x=DISPLAY_HEIGHT + 10,
                              y=int(DISPLAY_HEIGHT/2) + 13)
 last_name = "Ladyada"
