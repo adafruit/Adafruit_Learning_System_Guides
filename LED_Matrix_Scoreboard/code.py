@@ -26,8 +26,8 @@ matrix = rgbmatrix.RGBMatrix(
 display = framebufferio.FramebufferDisplay(matrix)
 
 #  display groups
-start_group = displayio.Group(max_size=30, scale=1)
-score_group = displayio.Group(max_size=30, scale=1)
+start_group = displayio.Group()
+score_group = displayio.Group()
 
 #  text & bg color setup for scoreboard
 score_text = "      "
