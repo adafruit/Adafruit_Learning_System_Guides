@@ -74,7 +74,7 @@ macropad.pixels.brightness = BRIGHT
 
 # ---Display setup---
 display = board.DISPLAY
-screen = displayio.Group(max_size=12)
+screen = displayio.Group()
 display.show(screen)
 WIDTH = 128
 HEIGHT = 64
@@ -120,7 +120,7 @@ labels = []
 for data in label_data:
     text, x, y = data
     label_area = label.Label(FONT, text=text, color=0xffffff)
-    group = displayio.Group(max_size=4, x=x, y=y)
+    group = displayio.Group(x=x, y=y)
     group.append(label_area)
     screen.append(group)
     labels.append(label_area)  # these are individually addressed later
@@ -193,7 +193,7 @@ while True:
     if not key_event:  # Event is None; no keypad event happened, do other stuff
 
         position = macropad.encoder  # store encoder position state
-        cc_position = constrain((position + CC_OFFSET), 0, 127)  # lock to cc range
+        cc_position = int(constrain((position + CC_OFFSET), 0, 127))  # lock to cc range
         if last_position is None or position != last_position:
 
             if position < last_position:
