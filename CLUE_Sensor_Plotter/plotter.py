@@ -346,7 +346,7 @@ class Plotter():
         tg_bottom_line.x = tg_plot_grid.x
         tg_bottom_line.y = tg_plot_grid.y + grid_height
 
-        g_plot_grid = displayio.Group(max_size=3)
+        g_plot_grid = displayio.Group()
         g_plot_grid.append(tg_plot_grid)
         g_plot_grid.append(tg_right_line)
         g_plot_grid.append(tg_bottom_line)
@@ -358,7 +358,6 @@ class Plotter():
 
         self._displayio_title = Label(self._font,
                                       text=self._title,
-                                      max_glyphs=self._max_title_len,
                                       scale=2,
                                       line_spacing=1,
                                       color=self._y_lab_color)
@@ -367,7 +366,6 @@ class Plotter():
 
         self._displayio_y_axis_lab = Label(self._font,
                                            text=self._y_axis_lab,
-                                           max_glyphs=self._y_lab_width,
                                            line_spacing=1,
                                            color=self._y_lab_color)
         self._displayio_y_axis_lab.x = 0  # 0 works here because text is ""
@@ -378,7 +376,6 @@ class Plotter():
         for y_div in range(self._y_divs + 1):
             plot_y_labels.append(Label(self._font,
                                        text=" " * self._y_lab_width,
-                                       max_glyphs=self._y_lab_width,
                                        line_spacing=1,
                                        color=self._y_lab_color))
             plot_y_labels[-1].x = (self._screen_width - self._plot_width
@@ -388,7 +385,7 @@ class Plotter():
         self._displayio_y_labs = plot_y_labels
 
         # Three items (grid, axis label, title) plus the y tick labels
-        g_background = displayio.Group(max_size=3+len(plot_y_labels))
+        g_background = displayio.Group()
         g_background.append(self._make_tg_grid())
         for label in self._displayio_y_labs:
             g_background.append(label)
@@ -404,7 +401,7 @@ class Plotter():
 
         # Create the main Group for display with one spare slot for
         # popup informational text
-        main_group = displayio.Group(max_size=3)
+        main_group = displayio.Group()
         main_group.append(g_background)
         main_group.append(tg_plot)
         self._displayio_info = None
