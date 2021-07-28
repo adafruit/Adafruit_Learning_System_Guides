@@ -18,7 +18,7 @@ print("Party Parrot Twitter Matrix")
 bear = secrets['bearer_token']
 
 #  query URL for tweets. looking for hashtag partyparrot sent to a specific username
-DATA_SOURCE = ('https://api.twitter.com/2/tweets/search/recent?query=#partyparrot to:blitzcitydiy')
+DATA_SOURCE = 'https://api.twitter.com/2/tweets/search/recent?query=#partyparrot to:blitzcitydiy'
 #  json data path to get most recent tweet's ID number
 DATA_LOCATION = ["meta", "newest_id"]
 
@@ -33,7 +33,7 @@ matrixportal = MatrixPortal(
 matrix = Matrix(width=32, height=32)
 display = matrix.display
 
-group = displayio.Group(max_size=20)
+group = displayio.Group()
 
 #  load in party parrot bitmap
 parrot_bit, parrot_pal = adafruit_imageload.load("/partyParrotsTweet.bmp",
