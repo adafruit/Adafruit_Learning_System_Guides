@@ -1,8 +1,13 @@
 from time import sleep
-from adafruit_ble.uart_server import UARTServer
+
+from adafruit_ble import BLERadio
+from adafruit_ble.advertising.standard import ProvideServicesAdvertisement
+from adafruit_ble.services.nordic import UARTService
+
 from adafruit_bluefruit_connect.packet import Packet
 from adafruit_bluefruit_connect.button_packet import ButtonPacket
 from adafruit_bluefruit_connect.color_packet import ColorPacket
+
 from board import A0, D13
 from analogio import AnalogIn
 from digitalio import DigitalInOut, Direction
@@ -13,17 +18,19 @@ solenoid = DigitalInOut(D13)  # Initialize solenoid
 solenoid.direction = Direction.OUTPUT
 solenoid.value = False
 
-uart_server = UARTServer()
+ble = BLERadio()
+uart_service = UARTService()
+advertisement = ProvideServicesAdvertisement(uart_service)
 
 while True:
-    uart_server.start_advertising()  # Advertise when not connected.
+    ble.start_advertising(advertisement)  # Advertise when not connected.
 
-    while not uart_server.connected:  # Wait for connection
+    while not ble.connected:  # Wait for connection
         pass
 
-    while uart_server.connected:  # Connected
-        if uart_server.in_waiting:  # Check BLE commands
-            packet = Packet.from_stream(uart_server)
+    while ble.connected:  # Connected
+        if uart_service.in_waiting:  # Check BLE commands
+            packet = Packet.from_stream(uart_service)
             if isinstance(packet, ButtonPacket):
                 if packet.button == '1' and packet.pressed:
                     solenoid.value = True  # Activate solenoid for 1 second
@@ -35,7 +42,7 @@ while True:
         # Color: red = off, green = on
         color_packet = ColorPacket((255 * int(not led_on), 255 * led_on, 0))
         try:
-            uart_server.write(color_packet.to_bytes())  # Transmit state color
+            uart_service.write(color_packet.to_bytes())  # Transmit state color
         except OSError:
             pass
 
