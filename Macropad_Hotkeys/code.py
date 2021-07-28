@@ -54,7 +54,7 @@ MACROPAD.display.auto_refresh = False
 MACROPAD.pixels.auto_write = False
 
 # Set up displayio group with all the labels
-GROUP = displayio.Group(max_size=14) # 12 keys + rect + app name
+GROUP = displayio.Group()
 for KEY_INDEX in range(12):
     x = KEY_INDEX % 3
     y = KEY_INDEX // 3
@@ -62,11 +62,11 @@ for KEY_INDEX in range(12):
                              anchored_position=((MACROPAD.display.width - 1) * x / 2,
                                                 MACROPAD.display.height - 1 -
                                                 (3 - y) * 12),
-                             anchor_point=(x / 2, 1.0), max_glyphs=15))
+                             anchor_point=(x / 2, 1.0)))
 GROUP.append(Rect(0, 0, MACROPAD.display.width, 12, fill=0xFFFFFF))
 GROUP.append(label.Label(terminalio.FONT, text='', color=0x000000,
                          anchored_position=(MACROPAD.display.width//2, -2),
-                         anchor_point=(0.5, 0.0), max_glyphs=30))
+                         anchor_point=(0.5, 0.0)))
 MACROPAD.display.show(GROUP)
 
 # Load all the macro key setups from .py files in MACRO_FOLDER
