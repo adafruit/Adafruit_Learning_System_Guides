@@ -47,7 +47,7 @@ display = adafruit_il91874.IL91874(display_bus, width=DISPLAY_WIDTH,
                                    highlight_color=0xff0000, rotation=90)
 
 # Create a display group for our screen objects
-g = displayio.Group(max_size=10)
+g = displayio.Group()
 
 # Set a background
 background_bitmap = displayio.Bitmap(DISPLAY_WIDTH, DISPLAY_HEIGHT, 1)
@@ -63,19 +63,28 @@ bg_sprite = displayio.TileGrid(background_bitmap,
 g.append(bg_sprite)
 
 # Display a picture from the root directory of the CIRCUITPY drive
-# Picture should be HEIGHTxHEIGHT square idealy for a portrait
+# Picture should be HEIGHTxHEIGHT square ideally for a portrait
 # But could be the entire WIDTHxHEIGHT for a non-portrait
-f = open("/picture.bmp", "rb")
+filename = "/picture.bmp"
 
-pic = displayio.OnDiskBitmap(f)
 # Create a Tilegrid with the bitmap and put in the displayio group
-t = displayio.TileGrid(pic, pixel_shader=getattr(pic, 'pixel_shader', displayio.ColorConverter()))
+
+# CircuitPython 6 & 7 compatible
+pic = displayio.OnDiskBitmap(open(filename, "rb"))
+t = displayio.TileGrid(
+    pic, pixel_shader=getattr(pic, 'pixel_shader', displayio.ColorConverter())
+)
 g.append(t)
+
+# # CircuitPython 7+ compatible
+# pic = displayio.OnDiskBitmap(filename)
+# t = displayio.TileGrid(pic, pixel_shader=pic.pixel_shader)
+# g.append(t)
 
 # Draw simple text using the built-in font into a displayio group
 # For smaller text, change scale=2 to scale=1 as scale 2 doesn't
 # allow for much text but the text is bigger.
-text_group = displayio.Group(max_size=10, scale=2,
+text_group = displayio.Group(scale=2,
                              x=DISPLAY_HEIGHT + 5,
                              y=int(DISPLAY_HEIGHT/2) - 13)
 first_name = "Limor"
@@ -87,7 +96,7 @@ g.append(text_group)
 # Draw simple text using the built-in font into a displayio group
 # For smaller text, change scale=2 to scale=1 as scale 2 doesn't
 # allow for much text but the text is bigger.
-text_group = displayio.Group(max_size=10, scale=2,
+text_group = displayio.Group(scale=2,
                              x=DISPLAY_HEIGHT + 5,
                              y=int(DISPLAY_HEIGHT/2) + 13)
 last_name = "Fried"

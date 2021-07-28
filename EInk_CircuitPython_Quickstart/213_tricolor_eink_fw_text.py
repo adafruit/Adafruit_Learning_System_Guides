@@ -54,7 +54,7 @@ display = adafruit_il0373.IL0373(display_bus, width=DISPLAY_WIDTH,
                                  highlight_color=0xff0000)
 
 # Create a display group for our screen objects
-g = displayio.Group(max_size=10)
+g = displayio.Group()
 
 # Set a background
 background_bitmap = displayio.Bitmap(DISPLAY_WIDTH, DISPLAY_HEIGHT, 1)
@@ -67,7 +67,7 @@ t = displayio.TileGrid(background_bitmap, pixel_shader=palette)
 g.append(t)
 
 # Draw simple text using the built-in font into a displayio group
-text_group = displayio.Group(max_size=10, scale=2, x=20, y=40)
+text_group = displayio.Group(scale=2, x=20, y=40)
 text = "Hello World!"
 text_area = label.Label(terminalio.FONT, text=text, color=FOREGROUND_COLOR)
 text_group.append(text_area)  # Add this text to the text group
