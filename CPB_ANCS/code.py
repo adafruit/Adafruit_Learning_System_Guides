@@ -88,13 +88,20 @@ advertisement = SolicitServicesAdvertisement()
 advertisement.complete_name = "CIRCUITPY"
 advertisement.solicited_services.append(AppleNotificationCenterService)
 
-def wrap_in_tilegrid(open_file):
-    odb = displayio.OnDiskBitmap(open_file)
-    return displayio.TileGrid(odb, pixel_shader=getattr(odb, 'pixel_shader', displayio.ColorConverter()))
+def wrap_in_tilegrid(filename:str):
+    # CircuitPython 6 & 7 compatible
+    odb = displayio.OnDiskBitmap(open(filename, "rb"))
+    return displayio.TileGrid(
+        odb, pixel_shader=getattr(odb, 'pixel_shader', displayio.ColorConverter())
+    )
+
+    # # CircuitPython 7+ compatible
+    # odb = displayio.OnDiskBitmap(filename)
+    # return displayio.TileGrid(odb, pixel_shader=odb.pixel_shader)
 
 display = tft_gizmo.TFT_Gizmo()
-group = displayio.Group(max_size=3)
-group.append(wrap_in_tilegrid(open("/ancs_connect.bmp", "rb")))
+group = displayio.Group()
+group.append(wrap_in_tilegrid("/ancs_connect.bmp"))
 display.show(group)
 
 current_notification = None
@@ -116,58 +123,57 @@ while True:
     dimmer.update()
     play_sound()
 
-    with open("/ancs_none.bmp", "rb") as no_notifications:
-        group.append(wrap_in_tilegrid(no_notifications))
-        while active_connection.connected:
-            all_ids.clear()
-            current_notifications = notification_service.active_notifications
-            for notif_id in current_notifications:
-                notification = current_notifications[notif_id]
-                if notification.app_id not in APP_ICONS or notification.app_id in BLOCKLIST:
-                    continue
-                all_ids.append(notif_id)
+    no_notifications = "/ancs_none.bmp"
+    group.append(wrap_in_tilegrid(no_notifications))
+    while active_connection.connected:
+        all_ids.clear()
+        current_notifications = notification_service.active_notifications
+        for notif_id in current_notifications:
+            notification = current_notifications[notif_id]
+            if notification.app_id not in APP_ICONS or notification.app_id in BLOCKLIST:
+                continue
+            all_ids.append(notif_id)
 
-            # pylint: disable=protected-access
-            all_ids.sort(key=lambda x: current_notifications[x]._raw_date)
-            # pylint: enable=protected-access
+        # pylint: disable=protected-access
+        all_ids.sort(key=lambda x: current_notifications[x]._raw_date)
+        # pylint: enable=protected-access
 
-            if current_notification and current_notification.removed:
-                # Stop showing the latest and show that there are no new notifications.
-                current_notification = None
+        if current_notification and current_notification.removed:
+            # Stop showing the latest and show that there are no new notifications.
+            current_notification = None
 
-            if not current_notification and not all_ids and not cleared:
-                cleared = True
+        if not current_notification and not all_ids and not cleared:
+            cleared = True
+            dimmer.update()
+            group[1] = wrap_in_tilegrid(no_notifications)
+        elif all_ids:
+            cleared = False
+            now = time.monotonic()
+            if current_notification and current_notification.id in all_ids and \
+                now - last_press < DELAY_AFTER_PRESS:
+                index = all_ids.index(current_notification.id)
+            else:
+                index = len(all_ids) - 1
+            if now - last_press >= DEBOUNCE:
+                if b.value and index > 0:
+                    last_press = now
+                    index += -1
+                if a.value and index < len(all_ids) - 1:
+                    last_press = now
+                    index += 1
+            notif_id = all_ids[index]
+            if not current_notification or current_notification.id != notif_id:
                 dimmer.update()
-                group[1] = wrap_in_tilegrid(no_notifications)
-            elif all_ids:
-                cleared = False
-                now = time.monotonic()
-                if current_notification and current_notification.id in all_ids and \
-                    now - last_press < DELAY_AFTER_PRESS:
-                    index = all_ids.index(current_notification.id)
-                else:
-                    index = len(all_ids) - 1
-                if now - last_press >= DEBOUNCE:
-                    if b.value and index > 0:
-                        last_press = now
-                        index += -1
-                    if a.value and index < len(all_ids) - 1:
-                        last_press = now
-                        index += 1
-                notif_id = all_ids[index]
-                if not current_notification or current_notification.id != notif_id:
-                    dimmer.update()
-                    current_notification = current_notifications[notif_id]
-                    # pylint: disable=protected-access
-                    print(current_notification._raw_date, current_notification)
-                    # pylint: enable=protected-access
-                    app_icon_file = open(APP_ICONS[current_notification.app_id], "rb")
-                    group[1] = wrap_in_tilegrid(app_icon_file)
+                current_notification = current_notifications[notif_id]
+                # pylint: disable=protected-access
+                print(current_notification._raw_date, current_notification)
+                # pylint: enable=protected-access
+                group[1] = wrap_in_tilegrid(APP_ICONS[current_notification.app_id])
 
-            dimmer.check_timeout()
+        dimmer.check_timeout()
 
-        # Bluetooth Disconnected
-        group.pop()
-        dimmer.update()
-        active_connection = None
-        notification_service = None
+    # Bluetooth Disconnected
+    group.pop()
+    dimmer.update()
+    active_connection = None
+    notification_service = None
