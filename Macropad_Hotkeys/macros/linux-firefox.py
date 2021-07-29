@@ -19,9 +19,9 @@ app = {                    # REQUIRED dict, must be named 'app'
         (0x000040, 'Home', [Keycode.CONTROL, 'h']),
         (0x000040, 'Private', [Keycode.CONTROL, Keycode.SHIFT, 'p']),
         # 4th row ----------
-        (0x000000, 'Ada', [Keycode.CONTROL, 't', -Keycode.CONTROL,
+        (0x101010, 'Ada', [Keycode.CONTROL, 't', -Keycode.CONTROL,
                            'www.adafruit.com\n']),   # adafruit.com in a new tab
-        (0x800000, 'Dev Mode', [Keycode.F12]),    # dev mode
+        (0x000040, 'Dev Mode', [Keycode.F12]),    # dev mode
         (0x101010, 'Digi', [Keycode.CONTROL, 't', -Keycode.CONTROL,
                              'digikey.com\n']), # digikey in a new tab
         # Encoder button ---
