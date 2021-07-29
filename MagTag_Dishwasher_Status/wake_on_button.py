@@ -18,16 +18,31 @@ alarm.sleep_memory[0] = not alarm.sleep_memory[0]
 bmp_file = "clean.bmp" if alarm.sleep_memory[0] else "dirty.bmp"
 
 # show bitmap
+
+# CircuitPython 6 & 7 compatible
 with open(bmp_file, "rb") as fp:
     bitmap = displayio.OnDiskBitmap(fp)
-    tile_grid = displayio.TileGrid(bitmap, pixel_shader=getattr(bitmap, 'pixel_shader', displayio.ColorConverter()))
-    group = displayio.Group(max_size=1)
+    tile_grid = displayio.TileGrid(
+        bitmap, pixel_shader=getattr(bitmap, 'pixel_shader', displayio.ColorConverter())
+    )
+    group = displayio.Group()
     group.append(tile_grid)
     epd.show(group)
     time.sleep(epd.time_to_refresh + 0.01)
     epd.refresh()
     while epd.busy:
         pass
+
+# # CircuitPython 7+ compatible
+# bitmap = displayio.OnDiskBitmap(bmp_file)
+# tile_grid = displayio.TileGrid(bitmap, pixel_shader=bitmap.pixel_shader)
+# group = displayio.Group()
+# group.append(tile_grid)
+# epd.show(group)
+# time.sleep(epd.time_to_refresh + 0.01)
+# epd.refresh()
+# while epd.busy:
+#     pass
 
 # go to sleep
 alarm.exit_and_deep_sleep_until_alarms(*pin_alarms)
