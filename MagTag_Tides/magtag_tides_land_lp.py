@@ -63,14 +63,14 @@ plot_y_neg.text = "{:>3}".format(-1 * PLOT_Y_SCALE)
 plot_y_neg.anchor_point = (1.0, 0.5)
 plot_y_neg.anchored_position = (178, 92)
 
-plot_y_labels = displayio.Group(max_size=2)
+plot_y_labels = displayio.Group()
 plot_y_labels.append(plot_y_pos)
 plot_y_labels.append(plot_y_neg)
 
 # ----------------------------
 # Date label
 # ----------------------------
-date_label = displayio.Group(max_size=5)
+date_label = displayio.Group()
 date_text = [label.Label(DATE_FONT, text="A", color=0xFFFFFF) for _ in range(5)]
 y_offset = 8
 for text in date_text:
@@ -82,7 +82,7 @@ for text in date_text:
 # ----------------------------
 # HiLo Times and Icons
 # ----------------------------
-tide_info = displayio.Group(max_size=8)
+tide_info = displayio.Group()
 
 hilo_times = [label.Label(TIME_FONT, text="12:34 P", color=0x000000) for _ in range(4)]
 y_offset = 18
