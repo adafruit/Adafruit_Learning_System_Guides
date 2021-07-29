@@ -99,7 +99,7 @@ def make_banner(x=0, y=0):
     day_temp.anchor_point = (0, 0.5)
     day_temp.anchored_position = (50, 10)
 
-    group = displayio.Group(max_size=3, x=x, y=y)
+    group = displayio.Group(x=x, y=y)
     group.append(day_of_week)
     group.append(icon)
     group.append(day_temp)
@@ -217,7 +217,7 @@ today_sunset = label.Label(terminalio.FONT, text="12:12 PM", color=0x000000)
 today_sunset.anchor_point = (0, 0.5)
 today_sunset.anchored_position = (130, 117)
 
-today_banner = displayio.Group(max_size=10)
+today_banner = displayio.Group()
 today_banner.append(today_date)
 today_banner.append(city_name)
 today_banner.append(today_icon)
