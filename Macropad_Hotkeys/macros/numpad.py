@@ -1,4 +1,4 @@
-# MACROPAD Hotkeys example: Safari web browser for Mac
+# MACROPAD Hotkeys example: Universal Numpad
 
 from adafruit_hid.keycode import Keycode # REQUIRED if using Keycode.* values
 
