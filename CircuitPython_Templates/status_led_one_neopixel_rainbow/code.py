@@ -1,8 +1,14 @@
-"""CircuitPython NeoPixel rainbow example for QT Py RP2040"""
+"""CircuitPython status NeoPixel rainbow example."""
 import time
 import board
 import neopixel
-from _pixelbuf import colorwheel
+try:
+    from rainbowio import colorwheel
+except ImportError:
+    try:
+        from _pixelbuf import colorwheel
+    except ImportError:
+        from adafruit_pypixelbuf import colorwheel
 
 pixel = neopixel.NeoPixel(board.NEOPIXEL, 1, auto_write=False)
 

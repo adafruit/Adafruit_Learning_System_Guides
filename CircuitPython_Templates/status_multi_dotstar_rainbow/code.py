@@ -9,13 +9,6 @@ in THREE places in the code.
 For example:
 If you are using a FunHouse, change NUMBER_OF_PIXELS to 5.
 
-** Update PIXELBUF_VERSION to _pixelbuf if available for the board (this is the most common case!)
-or to adafruit_pypixelbuf where necessary (typically non-Express SAMD21 M0 boards).
-
-For example:
-If you are using a FunHouse, change PIXELBUF_VERSION to _pixelbuf.
-If you are using a Trinket M0, change PIXELBUF_VERSION to adafruit_pypixelbuf.
-
 ** DO NOT INCLUDE THE pylint: disable LINE IN THE GUIDE CODE. It is present only to deal with the
 NUMBER_OF_PIXELS variable being undefined, and the dots setup line being too long with the variable
 in it in this pseudo-code. As you will be updating the variable in the guide, you will not need
@@ -26,7 +19,13 @@ the pylint: disable.
 import time
 import board
 import adafruit_dotstar
-from PIXELBUF_VERSION import colorwheel
+try:
+    from rainbowio import colorwheel
+except ImportError:
+    try:
+        from _pixelbuf import colorwheel
+    except ImportError:
+        from adafruit_pypixelbuf import colorwheel
 
 dots = adafruit_dotstar.DotStar(board.DOTSTAR_CLOCK, board.DOTSTAR_DATA, NUMBER_OF_PIXELS, auto_write=False)
 dots.brightness = 0.3

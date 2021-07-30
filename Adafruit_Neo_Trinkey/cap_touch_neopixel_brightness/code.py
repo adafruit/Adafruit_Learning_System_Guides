@@ -1,4 +1,4 @@
-"""CircuitPython Capacitive Touch NeoPixel Brightness Control Exmaple"""
+"""CircuitPython Capacitive Touch NeoPixel Brightness Control Example"""
 import time
 import board
 import touchio
