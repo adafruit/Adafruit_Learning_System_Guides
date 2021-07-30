@@ -40,7 +40,7 @@ labels = []
 for index in range(12):
     x = index % 3
     y = index // 3
-    labels.append(label.Label(terminalio.FONT, text=label_names[index], max_glyphs=10))
+    labels.append(label.Label(terminalio.FONT, text=label_names[index]))
     layout.add_content(labels[index], grid_position=(x, y), cell_size=(1, 1))
 
 # Display the text
