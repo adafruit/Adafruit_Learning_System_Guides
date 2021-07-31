@@ -20,9 +20,8 @@ import digitalio
 import audiobusio
 import board
 import neopixel
-import ulab.numerical as numerical
-import ulab.extras as extras
-import ulab as np
+from ulab.scipy.signal import spectrogram
+from ulab import numpy as np
 import adafruit_lsm6ds
 from adafruit_led_animation.helper import PixelMap
 from adafruit_led_animation.sequence import AnimationSequence
@@ -236,11 +235,11 @@ while True:
     elif MODE >= 1:  # If not OFF MODE...
         mic.record(samples_bit, len(samples_bit))
         samples = np.array(samples_bit[3:])
-        spectrum = extras.spectrogram(samples)
+        spectrum = spectrogram(samples)
         spectrum = spectrum[:128]
         spectrum[0] = 0
         spectrum[1] = 0
-        peak_idx = numerical.argmax(spectrum)
+        peak_idx = np.argmax(spectrum)
         peak_freq = peak_idx * 16000 / 256
 #        print((peak_idx, peak_freq, spectrum[peak_idx]))
         magnitude = spectrum[peak_idx]
