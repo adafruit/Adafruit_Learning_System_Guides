@@ -24,6 +24,19 @@ MAX_EGGS = 6
 
 # UTILITY FUNCTIONS AND CLASSES --------
 
+AUDIO = None
+
+import audiocore
+import audiopwmio
+import board
+AUDIO = audiopwmio.PWMAudioOut(board.SPEAKER)
+
+def background_sound(filename):
+    AUDIO.stop()
+    MACROPAD._speaker_enable.value = True
+    AUDIO.play(audiocore.WaveFile(open(filename, 'rb')))
+
+
 # pylint: disable=too-few-public-methods
 class Sprite:
     """ Class for sprite (eggs, fireballs) state information """
@@ -148,6 +161,8 @@ while True:
                     TILE[0] = 3 + int((NOW * 6) % 2.0)
                     # Fire catch logic
                     if y >= MACROPAD.display.height - 40 and COLUMN_PRESSED[COLUMN]:
+                        background_sound('dragondrop/sizzle.wav')
+
                         sprite.paused = True
                         sprite.start_time = NOW
                         TILE.y = MACROPAD.display.height - 20
@@ -155,6 +170,7 @@ while True:
             else:
                 if y >= MACROPAD.display.height - 22:
                     # Egg hit ground
+                    background_sound('dragondrop/splat.wav')
                     TILE.y = MACROPAD.display.height - 22
                     TILE[0] = 1 # Broken egg
                     sprite.paused = True
@@ -163,6 +179,7 @@ while True:
                 elif y >= MACROPAD.display.height - 40:
                     if COLUMN_PRESSED[COLUMN]:
                         # Egg caught at right time
+                        background_sound('dragondrop/rawr.wav')
                         TILE.y = MACROPAD.display.height - 22
                         TILE[0] = 2 # Dragon hatchling
                         SCORE += 10
@@ -172,6 +189,7 @@ while True:
                 elif y >= MACROPAD.display.height - 58:
                     if COLUMN_PRESSED[COLUMN]:
                         # Egg caught too soon
+                        background_sound('dragondrop/splat.wav')
                         TILE.y = MACROPAD.display.height - 40
                         TILE[0] = 1 # Broken egg
                         sprite.paused = True
@@ -203,4 +221,6 @@ while True:
                 break
 
     MACROPAD.display.refresh()
+    if not AUDIO.playing:
+        MACROPAD._speaker_enable.value = False
     gc.collect()
