@@ -11,8 +11,10 @@ import time
 import displayio
 import adafruit_imageload
 from adafruit_macropad import MacroPad
-#from adafruit_display_shapes.rect import Rect
-#from adafruit_display_text import label
+from adafruit_bitmap_font import bitmap_font
+from adafruit_display_text import label
+from adafruit_progressbar.progressbar import HorizontalProgressBar
+
 
 
 # CONFIGURABLES ------------------------
@@ -33,8 +35,8 @@ class Sprite:
         self.prev_pos = 0
 
 # List of Sprite objects, appended and popped as needed. Same is done with
-# the GROUP list (below), but they're not 1:1 -- latter has extra elements
-# for background, score, etc.
+# the PLAY_GROUP list (below), but they're not 1:1 -- latter has extra
+# elements for background, score, etc.
 SPRITES = []
 
 # ONE-TIME INITIALIZATION --------------
@@ -43,24 +45,38 @@ MACROPAD = MacroPad(rotation=90)
 MACROPAD.display.auto_refresh = False
 MACROPAD.pixels.auto_write = False
 
-GROUP = displayio.Group(max_size=MAX_EGGS + 10)
+TITLE_GROUP = displayio.Group(max_size=1)
+# Bitmap containing title screen
+TITLE_BITMAP, TITLE_PALETTE = adafruit_imageload.load(
+    'dragondrop/title.bmp', bitmap=displayio.Bitmap, palette=displayio.Palette)
+TITLE_GROUP.append(displayio.TileGrid(TITLE_BITMAP, pixel_shader=TITLE_PALETTE, width=1,
+                                      height=1, tile_width=TITLE_BITMAP.width,
+                                      tile_height=TITLE_BITMAP.height))
+
+PLAY_GROUP = displayio.Group(max_size=MAX_EGGS + 10)
 
 # Bitmap containing five shadow tiles (no shadow through max shadow)
-BITMAP, PALETTE = adafruit_imageload.load(
-    'shadow.bmp', bitmap=displayio.Bitmap, palette=displayio.Palette)
+SHADOW_BITMAP, SHADOW_PALETTE = adafruit_imageload.load(
+    'dragondrop/shadow.bmp', bitmap=displayio.Bitmap, palette=displayio.Palette)
 # Tilegrid containing four shadows; one per column
-SHADOW = displayio.TileGrid(BITMAP, pixel_shader=PALETTE, width=4, height=1,
-                            tile_width=16, tile_height=BITMAP.height,
-                            x=0, y=MACROPAD.display.height - BITMAP.height)
-GROUP.append(SHADOW)
+SHADOW = displayio.TileGrid(SHADOW_BITMAP, pixel_shader=SHADOW_PALETTE, width=4, height=1,
+                            tile_width=16, tile_height=SHADOW_BITMAP.height,
+                            x=0, y=MACROPAD.display.height - SHADOW_BITMAP.height)
+PLAY_GROUP.append(SHADOW)
 
 # Bitmap containing eggs, hatchling and fireballs
 SPRITE_BITMAP, SPRITE_PALETTE = adafruit_imageload.load(
-    'sprites.bmp', bitmap=displayio.Bitmap, palette=displayio.Palette)
+    'dragondrop/sprites.bmp', bitmap=displayio.Bitmap, palette=displayio.Palette)
 SPRITE_PALETTE.make_transparent(0)
 
-MACROPAD.display.show(GROUP)
-MACROPAD.display.refresh()
+FONT = bitmap_font.load_font("/dragondrop/cursive-smart.pcf")
+SCORE_LABEL = label.Label(FONT, text='0', max_glyphs=10, color=0xFFFFFF, anchor_point=(0.5, 0.0), anchored_position=(MACROPAD.display.width // 2, 10))
+PLAY_GROUP.append(SCORE_LABEL)
+
+LIFE_BAR = HorizontalProgressBar((0, 0), (MACROPAD.display.width, 7), value=100, min_value=0, max_value=100, bar_color=0xFFFFFF, outline_color=0xFFFFFF, fill_color=0, margin_size=1)
+PLAY_GROUP.append(LIFE_BAR)
+
+
 
 # Sprite states include falling, paused for catch and paused for breakage.
 # Following pause, sprite is removed.
@@ -69,6 +85,15 @@ MACROPAD.display.refresh()
 # MAIN LOOP ----------------------------
 
 START_TIME = time.monotonic()
+
+MACROPAD.display.show(TITLE_GROUP)
+MACROPAD.display.refresh()
+while not MACROPAD.keys.events.get():
+    pass
+
+MACROPAD.display.show(PLAY_GROUP)
+MACROPAD.display.refresh()
+SCORE = 0
 
 while True:
     NOW = time.monotonic()
@@ -92,13 +117,17 @@ while True:
     for i in range(len(SPRITES) - 1, -1, -1):
         sprite = SPRITES[i]
         COLUMN = sprite.column
-        TILE = GROUP[i + 1]               # Corresponding TileGroup for sprite
+        TILE = PLAY_GROUP[i + 1] # Corresponding TileGroup for sprite
         ELAPSED = NOW - sprite.start_time # Time since add or pause event
+
+        if sprite.is_fire:
+            # Animate fire sprites
+            TILE[0] = 3 + int((NOW * 6) % 2.0)
 
         if sprite.paused:
             if ELAPSED > 0.75:  # Hold position for 3/4 second
                 SPRITES.pop(i)
-                GROUP.pop(i + 1)
+                PLAY_GROUP.pop(i + 1)
                 continue
             if not sprite.is_fire:
                 COLUMN_MAX[COLUMN] = max(COLUMN_MAX[COLUMN], MACROPAD.display.height - 22)
@@ -107,44 +136,49 @@ while True:
             COLUMN_MIN[COLUMN] = min(COLUMN_MIN[COLUMN], y)
             if not sprite.is_fire:
                 COLUMN_MAX[COLUMN] = max(COLUMN_MAX[COLUMN], y)
-            TILE.y = int(y) # Sprite's vertical position in GROUP list
+            TILE.y = int(y) # Sprite's vertical position in PLAY_GROUP list
 
-        if sprite.is_fire:
-            if y >= MACROPAD.display.height:
-                SPRITES.pop(i)
-                GROUP.pop(i + 1)
-                continue
+            if sprite.is_fire:
+                if y >= MACROPAD.display.height:
+                    SPRITES.pop(i)
+                    PLAY_GROUP.pop(i + 1)
+                    continue
+                else:
+                    # Animate fire sprites
+                    TILE[0] = 3 + int((NOW * 6) % 2.0)
+                    # Fire catch logic
+                    if y >= MACROPAD.display.height - 40 and COLUMN_PRESSED[COLUMN]:
+                        sprite.paused = True
+                        sprite.start_time = NOW
+                        TILE.y = MACROPAD.display.height - 20
+                        LIFE_BAR.value = max(0, LIFE_BAR.value - 4)
             else:
-                # Animate fire sprites
-                TILE[0] = 3 + int((NOW * 6) % 2.0)
-                # Fire catch logic
-                if y >= MACROPAD.display.height - 40 and COLUMN_PRESSED[COLUMN]:
-                    sprite.paused = True
-                    sprite.start_time = NOW
-                    TILE.y = MACROPAD.display.height - 20
-        else:
-            if y >= MACROPAD.display.height - 22:
-                # Egg hit ground
-                TILE.y = MACROPAD.display.height - 22
-                TILE[0] = 1 # Broken egg
-                sprite.paused = True
-                sprite.start_time = NOW
-            elif y >= MACROPAD.display.height - 40:
-                if COLUMN_PRESSED[COLUMN]:
-                    # Egg caught at right time
+                if y >= MACROPAD.display.height - 22:
+                    # Egg hit ground
                     TILE.y = MACROPAD.display.height - 22
-                    TILE[0] = 2 # Dragon hatchling
-                    sprite.paused = True
-                    sprite.start_time = NOW
-            elif y >= MACROPAD.display.height - 58:
-                if COLUMN_PRESSED[COLUMN]:
-                    # Egg caught too soon
-                    TILE.y = MACROPAD.display.height - 40
                     TILE[0] = 1 # Broken egg
                     sprite.paused = True
                     sprite.start_time = NOW
-
-        sprite.prev_pos = y
+                    LIFE_BAR.value = max(0, LIFE_BAR.value - 4)
+                elif y >= MACROPAD.display.height - 40:
+                    if COLUMN_PRESSED[COLUMN]:
+                        # Egg caught at right time
+                        TILE.y = MACROPAD.display.height - 22
+                        TILE[0] = 2 # Dragon hatchling
+                        SCORE += 10
+                        SCORE_LABEL.text = str(SCORE)
+                        sprite.paused = True
+                        sprite.start_time = NOW
+                elif y >= MACROPAD.display.height - 58:
+                    if COLUMN_PRESSED[COLUMN]:
+                        # Egg caught too soon
+                        TILE.y = MACROPAD.display.height - 40
+                        TILE[0] = 1 # Broken egg
+                        sprite.paused = True
+                        sprite.start_time = NOW
+                        LIFE_BAR.value = max(0, LIFE_BAR.value - 4)
+    
+            sprite.prev_pos = y
 
     # Select shadow bitmaps based on each column's lowest sprite
     for i in range(4):
@@ -159,7 +193,7 @@ while True:
                     continue
                 # Found a spot. Add sprite and break loop
                 SPRITES.append(Sprite(COLUMN, NOW))
-                GROUP.append(displayio.TileGrid(SPRITE_BITMAP,
+                PLAY_GROUP.insert(-2, displayio.TileGrid(SPRITE_BITMAP,
                                                 pixel_shader=SPRITE_PALETTE,
                                                 width=1, height=1,
                                                 tile_width=16,
