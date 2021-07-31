@@ -3,8 +3,7 @@ import time
 import adafruit_apds9960.apds9960
 import board
 import digitalio
-import ulab
-import ulab.filter
+import ulab.numpy as np
 
 # Blank the screen.  Scrolling text causes unwanted delays.
 import displayio
@@ -18,7 +17,7 @@ board.DISPLAY.show(d)
 # Window type: Regular
 # Number of coefficients: 31
 # Manually trimmed to 16 coefficients
-taps = ulab.array([
+taps = np.array([
     +0.861745279666917052/2,
     -0.134728583242092248,
     -0.124472980501612152,
@@ -89,7 +88,7 @@ def main():
 
         # And our data structures
         # The most recent data samples, equal in number to the filter taps
-        data = ulab.zeros(len(taps))
+        data = np.zeros(len(taps))
         # The filtered value on the previous iteration
         old_value = 1
         # The times of the most recent pulses registered.  Increasing this number
@@ -111,11 +110,11 @@ def main():
             deadline += dt
             sleep_deadline(deadline)
             value = sum(sensor.color_data) # Combination of all channels
-            ulab.numerical.roll(data, 1)
+            data = np.roll(data, 1)
             data[-1] = value
             # Compute the new filtered variable by applying the filter to the
             # recent data samples
-            filtered = ulab.numerical.sum(data * taps)
+            filtered = np.sum(data * taps)
 
             # We gathered enough data to fill the filters, and
             # the light value crossed the zero line in the positive direction
