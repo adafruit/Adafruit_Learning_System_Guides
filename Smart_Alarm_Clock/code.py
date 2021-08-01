@@ -222,7 +222,7 @@ framebuffer = sharpdisplay.SharpMemoryFramebuffer(bus, chip_select_pin, 400, 240
 
 display = framebufferio.FramebufferDisplay(framebuffer)
 
-splash = displayio.Group(max_size=13)
+splash = displayio.Group()
 display.show(splash)
 
 
