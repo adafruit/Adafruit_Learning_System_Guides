@@ -53,8 +53,14 @@ def load_image(path):
     "Load an image from the path"
     if len(splash):
         splash.pop()
+    # CircuitPython 6 & 7 compatible
     bitmap = displayio.OnDiskBitmap(open(path, "rb"))
     sprite = displayio.TileGrid(bitmap, pixel_shader=getattr(bitmap, 'pixel_shader', displayio.ColorConverter()))
+
+    # # CircuitPython 7+ compatible
+    # bitmap = displayio.OnDiskBitmap(path)
+    # sprite = displayio.TileGrid(bitmap, pixel_shader=bitmap.pixel_shader)
+
     splash.append(sprite)
 
 def change_light_color(lightname, color):
@@ -99,7 +105,7 @@ display = ST7789(
     backlight_pin=tft_lite,
 )
 
-splash = displayio.Group(max_size=10)
+splash = displayio.Group()
 display.show(splash)
 
 for output_line in shell_command(listen_command):
