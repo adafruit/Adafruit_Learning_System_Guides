@@ -1,3 +1,5 @@
+# TO DO: pylint the code, clean up play mechanic a bit
+
 """
 Dragon Drop: a simple game for Adafruit MACROPAD. Uses OLED display in
 portrait (vertical) orientation. Tap one of four keys across a row to
@@ -14,213 +16,258 @@ from adafruit_macropad import MacroPad
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text import label
 from adafruit_progressbar.progressbar import HorizontalProgressBar
-
+import board      # These three can be removed
+import audiocore  # if/when MacroPad library
+import audiopwmio # adds background audio
 
 
 # CONFIGURABLES ------------------------
 
-MAX_EGGS = 6
+MAX_EGGS = 7          # Some are fireballs; max count of all projectiles
+PATH = '/dragondrop/' # Location of graphics, fonts, WAVs, etc.
 
 
 # UTILITY FUNCTIONS AND CLASSES --------
 
-AUDIO = None
-
-import audiocore
-import audiopwmio
-import board
-AUDIO = audiopwmio.PWMAudioOut(board.SPEAKER)
-
 def background_sound(filename):
-    AUDIO.stop()
+    """ Start a WAV file playing in the background (non-blocking). This
+        func can be removed if/when MacroPad lib gets background audio. """
+    # pylint: disable=protected-access
     MACROPAD._speaker_enable.value = True
-    AUDIO.play(audiocore.WaveFile(open(filename, 'rb')))
+    AUDIO.play(audiocore.WaveFile(open(PATH + filename, 'rb')))
 
+def show_screen(group):
+    """ Activate a given displayio group, pause until keypress. """
+    MACROPAD.display.show(group)
+    MACROPAD.display.refresh()
+    # Purge any queued up key events...
+    while MACROPAD.keys.events.get():
+        pass
+    while True: # ...then wait for first new key press event
+        event = MACROPAD.keys.events.get()
+        if event and event.pressed:
+            return
 
 # pylint: disable=too-few-public-methods
 class Sprite:
-    """ Class for sprite (eggs, fireballs) state information """
+    """ Class holds sprite (eggs, fireballs) state information. """
     def __init__(self, column, start_time):
         self.column = column                    # 0-3
         self.is_fire = (random.random() < 0.25) # 1/4 chance of fireballs
         self.start_time = start_time            # For drop physics
         self.paused = False
-        self.prev_pos = 0
 
-# List of Sprite objects, appended and popped as needed. Same is done with
-# the PLAY_GROUP list (below), but they're not 1:1 -- latter has extra
-# elements for background, score, etc.
-SPRITES = []
 
 # ONE-TIME INITIALIZATION --------------
 
 MACROPAD = MacroPad(rotation=90)
 MACROPAD.display.auto_refresh = False
 MACROPAD.pixels.auto_write = False
+MACROPAD.pixels.brightness = 0.5
+AUDIO = audiopwmio.PWMAudioOut(board.SPEAKER) # For background audio
+
+FONT = bitmap_font.load_font(PATH + 'cursive-smart.pcf')
+
+# Create 3 displayio groups -- one each for the title, play and end screens.
 
 TITLE_GROUP = displayio.Group(max_size=1)
-# Bitmap containing title screen
-TITLE_BITMAP, TITLE_PALETTE = adafruit_imageload.load(
-    'dragondrop/title.bmp', bitmap=displayio.Bitmap, palette=displayio.Palette)
-TITLE_GROUP.append(displayio.TileGrid(TITLE_BITMAP, pixel_shader=TITLE_PALETTE, width=1,
-                                      height=1, tile_width=TITLE_BITMAP.width,
+TITLE_BITMAP, TITLE_PALETTE = adafruit_imageload.load(PATH + 'title.bmp',
+                                                      bitmap=displayio.Bitmap,
+                                                      palette=displayio.Palette)
+TITLE_GROUP.append(displayio.TileGrid(TITLE_BITMAP, pixel_shader=TITLE_PALETTE,
+                                      width=1, height=1,
+                                      tile_width=TITLE_BITMAP.width,
                                       tile_height=TITLE_BITMAP.height))
-
-PLAY_GROUP = displayio.Group(max_size=MAX_EGGS + 10)
-
-# Bitmap containing five shadow tiles (no shadow through max shadow)
-SHADOW_BITMAP, SHADOW_PALETTE = adafruit_imageload.load(
-    'dragondrop/shadow.bmp', bitmap=displayio.Bitmap, palette=displayio.Palette)
-# Tilegrid containing four shadows; one per column
-SHADOW = displayio.TileGrid(SHADOW_BITMAP, pixel_shader=SHADOW_PALETTE, width=4, height=1,
-                            tile_width=16, tile_height=SHADOW_BITMAP.height,
-                            x=0, y=MACROPAD.display.height - SHADOW_BITMAP.height)
-PLAY_GROUP.append(SHADOW)
 
 # Bitmap containing eggs, hatchling and fireballs
 SPRITE_BITMAP, SPRITE_PALETTE = adafruit_imageload.load(
-    'dragondrop/sprites.bmp', bitmap=displayio.Bitmap, palette=displayio.Palette)
+    PATH + 'sprites.bmp', bitmap=displayio.Bitmap, palette=displayio.Palette)
 SPRITE_PALETTE.make_transparent(0)
 
-FONT = bitmap_font.load_font("/dragondrop/cursive-smart.pcf")
-SCORE_LABEL = label.Label(FONT, text='0', max_glyphs=10, color=0xFFFFFF, anchor_point=(0.5, 0.0), anchored_position=(MACROPAD.display.width // 2, 10))
-PLAY_GROUP.append(SCORE_LABEL)
-
-LIFE_BAR = HorizontalProgressBar((0, 0), (MACROPAD.display.width, 7), value=100, min_value=0, max_value=100, bar_color=0xFFFFFF, outline_color=0xFFFFFF, fill_color=0, margin_size=1)
+PLAY_GROUP = displayio.Group(max_size=MAX_EGGS + 10)
+# Bitmap containing five shadow tiles ('no shadow' through 'max shadow')
+SHADOW_BITMAP, SHADOW_PALETTE = adafruit_imageload.load(
+    PATH + 'shadow.bmp', bitmap=displayio.Bitmap, palette=displayio.Palette)
+# Tilegrid with four shadow tiles; one per column
+SHADOW = displayio.TileGrid(SHADOW_BITMAP, pixel_shader=SHADOW_PALETTE,
+                            width=4, height=1, tile_width=16,
+                            tile_height=SHADOW_BITMAP.height, x=0,
+                            y=MACROPAD.display.height - SHADOW_BITMAP.height)
+PLAY_GROUP.append(SHADOW)
+LIFE_BAR = HorizontalProgressBar((0, 0), (MACROPAD.display.width, 7),
+                                 value=100, min_value=0, max_value=100,
+                                 bar_color=0xFFFFFF, outline_color=0xFFFFFF,
+                                 fill_color=0, margin_size=1)
 PLAY_GROUP.append(LIFE_BAR)
+# Score is last object in PLAY_GROUP, can be indexed as -1
+PLAY_GROUP.append(label.Label(FONT, text='0', max_glyphs=10, color=0xFFFFFF,
+                              anchor_point=(0.5, 0.0),
+                              anchored_position=(MACROPAD.display.width // 2,
+                                                 10)))
+
+END_GROUP = displayio.Group(max_size=1)
+END_BITMAP, END_PALETTE = adafruit_imageload.load(
+    PATH + 'gameover.bmp', bitmap=displayio.Bitmap, palette=displayio.Palette)
+END_GROUP.append(displayio.TileGrid(END_BITMAP, pixel_shader=END_PALETTE,
+                                    width=1, height=1,
+                                    tile_width=END_BITMAP.width,
+                                    tile_height=END_BITMAP.height))
+END_GROUP.append(label.Label(FONT, text='0', max_glyphs=10, color=0xFFFFFF,
+                             anchor_point=(0.5, 0.0),
+                             anchored_position=(MACROPAD.display.width // 2,
+                                                90)))
 
 
+# MAIN LOOP -- alternates play and end-game screens
 
-# Sprite states include falling, paused for catch and paused for breakage.
-# Following pause, sprite is removed.
-
-
-# MAIN LOOP ----------------------------
-
-START_TIME = time.monotonic()
-
-MACROPAD.display.show(TITLE_GROUP)
-MACROPAD.display.refresh()
-while not MACROPAD.keys.events.get():
-    pass
-
-MACROPAD.display.show(PLAY_GROUP)
-MACROPAD.display.refresh()
-SCORE = 0
+show_screen(TITLE_GROUP) # Just do this once on startup
 
 while True:
-    NOW = time.monotonic()
-    SPEED = 10 + (NOW - START_TIME) / 30
 
-    # Coalese any/all queued-up keypress events per column
-    COLUMN_PRESSED = [False] * 4
-    while True:
-        EVENT = MACROPAD.keys.events.get()
-        if not EVENT:
-            break
-        if EVENT.pressed:
-            COLUMN_PRESSED[EVENT.key_number % 4] = True
+    # NEW GAME -------------------------
 
-    # For determining upper/lower extents of active egg sprites per column
-    COLUMN_MIN = [MACROPAD.display.height] * 4
-    COLUMN_MAX = [0] * 4
+    SPRITES = []
+    SCORE = 0
+    PLAY_GROUP[-1].text = '0'
+    LIFE_BAR.value = 100
+    AUDIO.stop()
+    MACROPAD.display.show(PLAY_GROUP)
+    MACROPAD.display.refresh()
+    START_TIME = time.monotonic()
 
-#    for i, sprite in enumerate(SPRITES):
-    # Traverse sprite list backwards so we can pop() without index problems
-    for i in range(len(SPRITES) - 1, -1, -1):
-        sprite = SPRITES[i]
-        COLUMN = sprite.column
-        TILE = PLAY_GROUP[i + 1] # Corresponding TileGroup for sprite
-        ELAPSED = NOW - sprite.start_time # Time since add or pause event
+    # PLAY UNTIL LIFE BAR DEPLETED -----
 
-        if sprite.is_fire:
-            # Animate fire sprites
-            TILE[0] = 3 + int((NOW * 6) % 2.0)
+    while LIFE_BAR.value > 0:
+        NOW = time.monotonic()
+        SPEED = 10 + (NOW - START_TIME) / 30   # Gradually speed up
+        FIRE_SPRITE = 3 + int((NOW * 6) % 2.0) # For animating fire
 
-        if sprite.paused:
-            if ELAPSED > 0.75:  # Hold position for 3/4 second
-                SPRITES.pop(i)
-                PLAY_GROUP.pop(i + 1)
-                continue
-            if not sprite.is_fire:
-                COLUMN_MAX[COLUMN] = max(COLUMN_MAX[COLUMN], MACROPAD.display.height - 22)
-        else:
-            y = SPEED * ELAPSED * ELAPSED - 16
-            COLUMN_MIN[COLUMN] = min(COLUMN_MIN[COLUMN], y)
-            if not sprite.is_fire:
-                COLUMN_MAX[COLUMN] = max(COLUMN_MAX[COLUMN], y)
-            TILE.y = int(y) # Sprite's vertical position in PLAY_GROUP list
+        # Coalese any/all queued-up keypress events per column
+        COLUMN_PRESSED = [False] * 4
+        while True:
+            EVENT = MACROPAD.keys.events.get()
+            if not EVENT:
+                break
+            if EVENT.pressed:
+                COLUMN_PRESSED[EVENT.key_number % 4] = True
+
+        # For determining upper/lower extents of active egg sprites per column
+        COLUMN_MIN = [MACROPAD.display.height] * 4
+        COLUMN_MAX = [0] * 4
+
+        # Traverse sprite list backwards so we can pop() without index problems
+        for i in range(len(SPRITES) - 1, -1, -1):
+            sprite = SPRITES[i]
+            COLUMN = sprite.column
+            TILE = PLAY_GROUP[i + 1] # Corresponding TileGroup for sprite
+            ELAPSED = NOW - sprite.start_time # Time since add or pause event
 
             if sprite.is_fire:
-                if y >= MACROPAD.display.height:
-                    SPRITES.pop(i)
-                    PLAY_GROUP.pop(i + 1)
-                    continue
-                else:
-                    # Animate fire sprites
-                    TILE[0] = 3 + int((NOW * 6) % 2.0)
-                    # Fire catch logic
-                    if y >= MACROPAD.display.height - 40 and COLUMN_PRESSED[COLUMN]:
-                        background_sound('dragondrop/sizzle.wav')
+                TILE[0] = FIRE_SPRITE
 
-                        sprite.paused = True
-                        sprite.start_time = NOW
-                        TILE.y = MACROPAD.display.height - 20
-                        LIFE_BAR.value = max(0, LIFE_BAR.value - 4)
+            if sprite.paused:
+                if ELAPSED > 0.75:        # Hold position for 3/4 second,
+                    for x in range(0, 9, 4):
+                        MACROPAD.pixels[x + sprite.column] = (0, 0, 0)
+                    SPRITES.pop(i)        # then delete Sprite object and
+                    PLAY_GROUP.pop(i + 1) # element from displayio group
+                    continue
+                if not sprite.is_fire:
+                    COLUMN_MAX[COLUMN] = max(COLUMN_MAX[COLUMN], MACROPAD.display.height - 22)
             else:
-                if y >= MACROPAD.display.height - 22:
-                    # Egg hit ground
-                    background_sound('dragondrop/splat.wav')
-                    TILE.y = MACROPAD.display.height - 22
-                    TILE[0] = 1 # Broken egg
-                    sprite.paused = True
-                    sprite.start_time = NOW
-                    LIFE_BAR.value = max(0, LIFE_BAR.value - 4)
-                elif y >= MACROPAD.display.height - 40:
-                    if COLUMN_PRESSED[COLUMN]:
-                        # Egg caught at right time
-                        background_sound('dragondrop/rawr.wav')
+                y = SPEED * ELAPSED * ELAPSED - 16
+                COLUMN_MIN[COLUMN] = min(COLUMN_MIN[COLUMN], y)
+                if not sprite.is_fire:
+                    COLUMN_MAX[COLUMN] = max(COLUMN_MAX[COLUMN], y)
+                TILE.y = int(y) # Sprite's vertical position in PLAY_GROUP list
+
+                if sprite.is_fire:
+                    if y >= MACROPAD.display.height:
+                        SPRITES.pop(i)
+                        PLAY_GROUP.pop(i + 1)
+                        continue
+                    else:
+                        # Animate fire sprites
+                        TILE[0] = 3 + int((NOW * 6) % 2.0)
+                        # Fire catch logic
+                        if y >= MACROPAD.display.height - 40 and COLUMN_PRESSED[COLUMN]:
+                            background_sound('sizzle.wav')
+
+                            sprite.paused = True
+                            sprite.start_time = NOW
+                            TILE.y = MACROPAD.display.height - 20
+                            LIFE_BAR.value = max(0, LIFE_BAR.value - 5)
+                            for x in range(0, 9, 4):
+                                MACROPAD.pixels[x + sprite.column] = (255, 0, 0)
+                else:
+                    if y >= MACROPAD.display.height - 22:
+                        # Egg hit ground
+                        background_sound('splat.wav')
                         TILE.y = MACROPAD.display.height - 22
-                        TILE[0] = 2 # Dragon hatchling
-                        SCORE += 10
-                        SCORE_LABEL.text = str(SCORE)
-                        sprite.paused = True
-                        sprite.start_time = NOW
-                elif y >= MACROPAD.display.height - 58:
-                    if COLUMN_PRESSED[COLUMN]:
-                        # Egg caught too soon
-                        background_sound('dragondrop/splat.wav')
-                        TILE.y = MACROPAD.display.height - 40
                         TILE[0] = 1 # Broken egg
                         sprite.paused = True
                         sprite.start_time = NOW
-                        LIFE_BAR.value = max(0, LIFE_BAR.value - 4)
-    
-            sprite.prev_pos = y
+                        LIFE_BAR.value = max(0, LIFE_BAR.value - 5)
+                        MACROPAD.pixels[8 + sprite.column] = (255, 255, 0)
+                    elif y >= MACROPAD.display.height - 40:
+                        if COLUMN_PRESSED[COLUMN]:
+                            # Egg caught at right time
+                            background_sound('rawr.wav')
+                            TILE.y = MACROPAD.display.height - 22
+                            TILE[0] = 2 # Dragon hatchling
+                            SCORE += 10
+                            PLAY_GROUP[-1].text = str(SCORE)
+                            sprite.paused = True
+                            sprite.start_time = NOW
+                            MACROPAD.pixels[4 + sprite.column] = (0, 255, 0)
+                    elif y >= MACROPAD.display.height - 58:
+                        if COLUMN_PRESSED[COLUMN]:
+                            # Egg caught too soon
+                            background_sound('splat.wav')
+                            TILE.y = MACROPAD.display.height - 40
+                            TILE[0] = 1 # Broken egg
+                            sprite.paused = True
+                            sprite.start_time = NOW
+                            LIFE_BAR.value = max(0, LIFE_BAR.value - 5)
+                            MACROPAD.pixels[sprite.column] = (255, 255, 0)
 
-    # Select shadow bitmaps based on each column's lowest sprite
-    for i in range(4):
-        SHADOW[i] = min(4, int(5 * COLUMN_MAX[i] / MACROPAD.display.height))
+        # Select shadow bitmaps based on each column's lowest sprite
+        for i in range(4):
+            SHADOW[i] = min(4, int(5 * COLUMN_MAX[i] / (MACROPAD.display.height - 20)))
 
-    # Time to introduce a new sprite?
-    if len(SPRITES) < MAX_EGGS and random.random() < 0.05:
-        if max(COLUMN_MIN) > 16: # At least one column has space
-            while True:
-                COLUMN = random.randint(0, 3)
-                if COLUMN_MIN[COLUMN] <= 16:
-                    continue
-                # Found a spot. Add sprite and break loop
-                SPRITES.append(Sprite(COLUMN, NOW))
-                PLAY_GROUP.insert(-2, displayio.TileGrid(SPRITE_BITMAP,
-                                                pixel_shader=SPRITE_PALETTE,
-                                                width=1, height=1,
-                                                tile_width=16,
-                                                tile_height=SPRITE_BITMAP.height,
-                                                x=COLUMN * 16,
-                                                y=-16))
-                break
+        # Time to introduce a new sprite?
+        if len(SPRITES) < MAX_EGGS and random.random() < 0.05:
+            if max(COLUMN_MIN) > 16: # At least one column has space
+                while True:
+                    COLUMN = random.randint(0, 3)
+                    if COLUMN_MIN[COLUMN] <= 16:
+                        continue
+                    # Found a spot. Add sprite and break loop
+                    SPRITES.append(Sprite(COLUMN, NOW))
+                    PLAY_GROUP.insert(-2, displayio.TileGrid(SPRITE_BITMAP,
+                                                             pixel_shader=SPRITE_PALETTE,
+                                                             width=1, height=1,
+                                                             tile_width=16,
+                                                             tile_height=SPRITE_BITMAP.height,
+                                                             x=COLUMN * 16,
+                                                             y=-16))
+                    break
 
-    MACROPAD.display.refresh()
-    if not AUDIO.playing:
-        MACROPAD._speaker_enable.value = False
-    gc.collect()
+        MACROPAD.display.refresh()
+        MACROPAD.pixels.show()
+        if not AUDIO.playing:
+            # pylint: disable=protected-access
+            MACROPAD._speaker_enable.value = False
+        gc.collect()
+
+    # GAME OVER ------------------------
+
+    time.sleep(1.5) # Pause display for a moment
+    MACROPAD.pixels.fill(0)
+    MACROPAD.pixels.show()
+    # Pop any sprites from PLAY_GROUP (other elements remain, and SPRITES[]
+    # list is cleared at start of next game).
+    for _ in SPRITES:
+        PLAY_GROUP.pop(1)
+    END_GROUP[-1].text = str(SCORE)
+    show_screen(END_GROUP)
