@@ -32,7 +32,7 @@ class OpenWeather_Graphics(displayio.Group):
             am_pm=True,
             units="imperial"
     ):
-        super().__init__(max_size=3)
+        super().__init__()
         self.am_pm = am_pm
         if units == "metric":
             self.celsius = True
@@ -42,28 +42,34 @@ class OpenWeather_Graphics(displayio.Group):
             self.meters_speed = False
         self.display = display
 
-        splash = displayio.Group(max_size=1)
+        splash = displayio.Group()
+        # CircuitPython 6 & 7 compatible
         background = displayio.OnDiskBitmap(open("loading.bmp", "rb"))
         bg_sprite = displayio.TileGrid(
             background,
             pixel_shader=getattr(background, 'pixel_shader', displayio.ColorConverter()),
         )
+        # # CircuitPython 7+ compatible
+        # background = displayio.OnDiskBitmap("loading.bmp")
+        # bg_sprite = displayio.TileGrid(background, pixel_shader=background.pixel_shader)
+
         splash.append(bg_sprite)
         display.show(splash)
 
-        self.root_group = displayio.Group(max_size=15)
+        self.root_group = displayio.Group()
         self.root_group.append(self)
-        self._icon_group = displayio.Group(max_size=1)
+        self._icon_group = displayio.Group()
         self.append(self._icon_group)
-        self._text_group = displayio.Group(max_size=5)
+        self._text_group = displayio.Group()
         self.append(self._text_group)
-        self._scrolling_group = displayio.Group(max_size=1)
+        self._scrolling_group = displayio.Group()
         self.append(self._scrolling_group)
 
         # The label index we're currently scrolling
         self._current_label = None
 
         # Load the icon sprite sheet
+        # CircuitPython 6 & 7 compatible
         icons = displayio.OnDiskBitmap(open(icon_spritesheet, "rb"))
         self._icon_sprite = displayio.TileGrid(
             icons,
@@ -76,6 +82,20 @@ class OpenWeather_Graphics(displayio.Group):
             x=0,
             y=0,
         )
+        # # CircuitPython 7+ compatible
+        # icons = displayio.OnDiskBitmap(icon_spritesheet)
+        # self._icon_sprite = displayio.TileGrid(
+        #             icons,
+        #             pixel_shader=icons.pixel_shader,
+        #             width=1,
+        #             height=1,
+        #             tile_width=icon_width,
+        #             tile_height=icon_height,
+        #             default_tile=0,
+        #             x=0,
+        #             y=0,
+        #         )
+
         self.set_icon(None)
         self._scrolling_texts = []
 
@@ -88,21 +108,21 @@ class OpenWeather_Graphics(displayio.Group):
 
         self.city_text = None
 
-        self.temp_text = Label(self.medium_font, max_glyphs=6)
+        self.temp_text = Label(self.medium_font)
         self.temp_text.x = 20
         self.temp_text.y = 7
         self.temp_text.color = TEMP_COLOR
         self._text_group.append(self.temp_text)
 
-        self.description_text = Label(self.small_font, max_glyphs=60)
+        self.description_text = Label(self.small_font)
         self.description_text.color = DESCRIPTION_COLOR
         self._scrolling_texts.append(self.description_text)
 
-        self.humidity_text = Label(self.small_font, max_glyphs=14)
+        self.humidity_text = Label(self.small_font)
         self.humidity_text.color = HUMIDITY_COLOR  #
         self._scrolling_texts.append(self.humidity_text)
 
-        self.wind_text = Label(self.small_font, max_glyphs=10)
+        self.wind_text = Label(self.small_font)
         self.wind_text.color = WIND_COLOR
         self._scrolling_texts.append(self.wind_text)
 
