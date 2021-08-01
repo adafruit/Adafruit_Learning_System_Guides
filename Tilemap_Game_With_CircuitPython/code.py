@@ -130,7 +130,7 @@ castle = displayio.TileGrid(
 )
 
 # Create a Group to hold the sprite and castle
-group = displayio.Group(max_size=33)
+group = displayio.Group()
 
 # Add castle to the group
 group.append(castle)
@@ -430,7 +430,8 @@ y_offset = 0
 def show_splash(new_text, color, vertical_offset=18):
     text_area.text = ""
     text_area.text = new_text
-    text_area.y = round(text_area.text.count("\n") * vertical_offset / 2)
+    text_area.anchor_point = (0, 0)
+    text_area.anchored_position = (0, vertical_offset)
     text_area.color = color
     group.append(splash)
 
@@ -440,16 +441,20 @@ with open(
     "tilegame_assets/game_message_background.bmp", "rb"
 ) as game_message_background:
     # Make the splash context
-    splash = displayio.Group(max_size=4)
+    splash = displayio.Group()
 
+    # CircuitPython 6 & 7 compatible
     odb = displayio.OnDiskBitmap(game_message_background)
-
     bg_grid = displayio.TileGrid(odb, pixel_shader=getattr(odb, 'pixel_shader', displayio.ColorConverter()))
+
+    # # CircuitPython 7+ compatible
+    # odb = displayio.OnDiskBitmap("tilegame_assets/game_message_background.bmp")
+    # bg_grid = displayio.TileGrid(odb, pixel_shader=odb.pixel_shader)
 
     splash.append(bg_grid)
 
     # Text for the message
-    text_group = displayio.Group(max_size=8, scale=1, x=14, y=18)
+    text_group = displayio.Group(x=14, y=8)
     text_area = label.Label(terminalio.FONT, text=" " * 180, color=0xD39AE5)
     text_group.append(text_area)
     splash.append(text_group)
@@ -625,7 +630,7 @@ with open(
                 GAME_STATE["STATE"] = STATE_WAITING
                 random_fact = random.choice(FACTS)
                 minerva_txt = wrap_nicely("Minerva: {}".format(random_fact), 23)
-                show_splash(minerva_txt, 0xD39AE5, 10)
+                show_splash(minerva_txt, 0xD39AE5, 0)
 
             # store the last update time
             last_update_time = now
