@@ -3,7 +3,7 @@ import random
 import board
 import neopixel
 from rainbowio import colorwheel as wheel
-import ulab.numpy as np
+from ulab import numpy as np
 
 # Customize your neopixel configuration here...
 pixel_pin = board.D5

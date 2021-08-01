@@ -3,7 +3,7 @@ import time
 import adafruit_bmp280
 import board
 import displayio
-import ulab.numpy as np
+from ulab import numpy as np
 
 # Blank the screen.  Scrolling text causes unwanted delays.
 d = displayio.Group()

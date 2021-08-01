@@ -3,7 +3,7 @@ import time
 import adafruit_apds9960.apds9960
 import board
 import digitalio
-import ulab.numpy as np
+from ulab import numpy as np
 
 # Blank the screen.  Scrolling text causes unwanted delays.
 import displayio

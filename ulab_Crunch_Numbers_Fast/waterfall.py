@@ -7,7 +7,7 @@ import array
 import board
 import audiobusio
 import displayio
-import ulab.numpy as np
+from ulab import numpy as np
 from ulab.scipy.signal import spectrogram
 
 display = board.DISPLAY
