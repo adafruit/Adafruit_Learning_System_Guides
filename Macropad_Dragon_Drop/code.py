@@ -68,7 +68,7 @@ FONT = bitmap_font.load_font(PATH + 'cursive-smart.pcf')
 
 # Create 3 displayio groups -- one each for the title, play and end screens.
 
-TITLE_GROUP = displayio.Group(max_size=1)
+TITLE_GROUP = displayio.Group()
 TITLE_BITMAP, TITLE_PALETTE = adafruit_imageload.load(PATH + 'title.bmp',
                                                       bitmap=displayio.Bitmap,
                                                       palette=displayio.Palette)
@@ -82,7 +82,7 @@ SPRITE_BITMAP, SPRITE_PALETTE = adafruit_imageload.load(
     PATH + 'sprites.bmp', bitmap=displayio.Bitmap, palette=displayio.Palette)
 SPRITE_PALETTE.make_transparent(0)
 
-PLAY_GROUP = displayio.Group(max_size=MAX_EGGS + 10)
+PLAY_GROUP = displayio.Group()
 # Bitmap containing five shadow tiles ('no shadow' through 'max shadow')
 SHADOW_BITMAP, SHADOW_PALETTE = adafruit_imageload.load(
     PATH + 'shadow.bmp', bitmap=displayio.Bitmap, palette=displayio.Palette)
@@ -99,19 +99,19 @@ LIFE_BAR = HorizontalProgressBar((0, 0), (MACROPAD.display.width, 7),
                                  fill_color=0, margin_size=1)
 PLAY_GROUP.append(LIFE_BAR)
 # Score is last object in PLAY_GROUP, can be indexed as -1
-PLAY_GROUP.append(label.Label(FONT, text='0', max_glyphs=10, color=0xFFFFFF,
+PLAY_GROUP.append(label.Label(FONT, text='0', color=0xFFFFFF,
                               anchor_point=(0.5, 0.0),
                               anchored_position=(MACROPAD.display.width // 2,
                                                  10)))
 
-END_GROUP = displayio.Group(max_size=1)
+END_GROUP = displayio.Group()
 END_BITMAP, END_PALETTE = adafruit_imageload.load(
     PATH + 'gameover.bmp', bitmap=displayio.Bitmap, palette=displayio.Palette)
 END_GROUP.append(displayio.TileGrid(END_BITMAP, pixel_shader=END_PALETTE,
                                     width=1, height=1,
                                     tile_width=END_BITMAP.width,
                                     tile_height=END_BITMAP.height))
-END_GROUP.append(label.Label(FONT, text='0', max_glyphs=10, color=0xFFFFFF,
+END_GROUP.append(label.Label(FONT, text='0', color=0xFFFFFF,
                              anchor_point=(0.5, 0.0),
                              anchored_position=(MACROPAD.display.width // 2,
                                                 90)))
@@ -258,6 +258,18 @@ while True:
             MACROPAD._speaker_enable.value = False
         gc.collect()
 
+        # Encoder button pauses/resumes game.
+        MACROPAD.encoder_switch_debounced.update()
+        if MACROPAD.encoder_switch_debounced.pressed:
+            for n in (True, False, True): # Press, release, press
+                while n == MACROPAD.encoder_switch_debounced.pressed:
+                    MACROPAD.encoder_switch_debounced.update()
+            # Sprite start times must be offset by pause duration
+            # because time.monotonic() is used for drop physics.
+            NOW = time.monotonic() - NOW # Pause duration
+            for sprite in SPRITES:
+                sprite.start_time += NOW
+
     # GAME OVER ------------------------
 
     time.sleep(1.5) # Pause display for a moment
@@ -269,3 +281,5 @@ while True:
         PLAY_GROUP.pop(1)
     END_GROUP[-1].text = str(SCORE)
     show_screen(END_GROUP)
+    # pylint: disable=protected-access
+    MACROPAD._speaker_enable.value = False
