@@ -68,7 +68,7 @@ FONT = bitmap_font.load_font(PATH + 'cursive-smart.pcf')
 
 # Create 3 displayio groups -- one each for the title, play and end screens.
 
-TITLE_GROUP = displayio.Group(max_size=1)
+TITLE_GROUP = displayio.Group()
 TITLE_BITMAP, TITLE_PALETTE = adafruit_imageload.load(PATH + 'title.bmp',
                                                       bitmap=displayio.Bitmap,
                                                       palette=displayio.Palette)
@@ -82,7 +82,7 @@ SPRITE_BITMAP, SPRITE_PALETTE = adafruit_imageload.load(
     PATH + 'sprites.bmp', bitmap=displayio.Bitmap, palette=displayio.Palette)
 SPRITE_PALETTE.make_transparent(0)
 
-PLAY_GROUP = displayio.Group(max_size=MAX_EGGS + 10)
+PLAY_GROUP = displayio.Group()
 # Bitmap containing five shadow tiles ('no shadow' through 'max shadow')
 SHADOW_BITMAP, SHADOW_PALETTE = adafruit_imageload.load(
     PATH + 'shadow.bmp', bitmap=displayio.Bitmap, palette=displayio.Palette)
@@ -99,19 +99,19 @@ LIFE_BAR = HorizontalProgressBar((0, 0), (MACROPAD.display.width, 7),
                                  fill_color=0, margin_size=1)
 PLAY_GROUP.append(LIFE_BAR)
 # Score is last object in PLAY_GROUP, can be indexed as -1
-PLAY_GROUP.append(label.Label(FONT, text='0', max_glyphs=10, color=0xFFFFFF,
+PLAY_GROUP.append(label.Label(FONT, text='0', color=0xFFFFFF,
                               anchor_point=(0.5, 0.0),
                               anchored_position=(MACROPAD.display.width // 2,
                                                  10)))
 
-END_GROUP = displayio.Group(max_size=1)
+END_GROUP = displayio.Group()
 END_BITMAP, END_PALETTE = adafruit_imageload.load(
     PATH + 'gameover.bmp', bitmap=displayio.Bitmap, palette=displayio.Palette)
 END_GROUP.append(displayio.TileGrid(END_BITMAP, pixel_shader=END_PALETTE,
                                     width=1, height=1,
                                     tile_width=END_BITMAP.width,
                                     tile_height=END_BITMAP.height))
-END_GROUP.append(label.Label(FONT, text='0', max_glyphs=10, color=0xFFFFFF,
+END_GROUP.append(label.Label(FONT, text='0', color=0xFFFFFF,
                              anchor_point=(0.5, 0.0),
                              anchored_position=(MACROPAD.display.width // 2,
                                                 90)))
