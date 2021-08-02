@@ -50,7 +50,7 @@ pad = GamePadShift(digitalio.DigitalInOut(board.BUTTON_CLOCK),
                    digitalio.DigitalInOut(board.BUTTON_LATCH))
 
 # Make the Display Background
-splash = displayio.Group(max_size=20)
+splash = displayio.Group()
 board.DISPLAY.show(splash)
 
 color_bitmap = displayio.Bitmap(160, 128, 1)
