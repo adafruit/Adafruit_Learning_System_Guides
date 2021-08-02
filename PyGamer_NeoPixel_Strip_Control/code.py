@@ -21,7 +21,7 @@ strip.fill(0)
 display = board.DISPLAY
 
 # Create the display context
-splash = displayio.Group(max_size=15)
+splash = displayio.Group()
 
 # Button colors
 RED = (255, 0, 0)
