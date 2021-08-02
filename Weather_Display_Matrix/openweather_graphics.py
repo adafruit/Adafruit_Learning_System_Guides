@@ -74,27 +74,17 @@ class OpenWeather_Graphics(displayio.Group):
         self._icon_sprite = displayio.TileGrid(
             icons,
             pixel_shader=getattr(icons, 'pixel_shader', displayio.ColorConverter()),
-            width=1,
-            height=1,
             tile_width=icon_width,
-            tile_height=icon_height,
-            default_tile=0,
-            x=0,
-            y=0,
+            tile_height=icon_height
         )
         # # CircuitPython 7+ compatible
         # icons = displayio.OnDiskBitmap(icon_spritesheet)
         # self._icon_sprite = displayio.TileGrid(
-        #             icons,
-        #             pixel_shader=icons.pixel_shader,
-        #             width=1,
-        #             height=1,
-        #             tile_width=icon_width,
-        #             tile_height=icon_height,
-        #             default_tile=0,
-        #             x=0,
-        #             y=0,
-        #         )
+        #     icons,
+        #     pixel_shader=icons.pixel_shader,
+        #     tile_width=icon_width,
+        #     tile_height=icon_height
+        # )
 
         self.set_icon(None)
         self._scrolling_texts = []
