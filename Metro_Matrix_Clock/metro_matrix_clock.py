@@ -28,7 +28,7 @@ display = matrix.display
 network = Network(status_neopixel=board.NEOPIXEL, debug=False)
 
 # --- Drawing setup ---
-group = displayio.Group(max_size=4)  # Create a Group
+group = displayio.Group()  # Create a Group
 bitmap = displayio.Bitmap(64, 32, 2)  # Create a bitmap object,width, height, bit depth
 color = displayio.Palette(4)  # Create a color palette
 color[0] = 0x000000  # black background
@@ -46,7 +46,7 @@ if not DEBUG:
 else:
     font = terminalio.FONT
 
-clock_label = Label(font, max_glyphs=6)
+clock_label = Label(font)
 
 
 def update_time(*, hours=None, minutes=None, show_colon=False):
