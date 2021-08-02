@@ -64,7 +64,7 @@ sprite_sheet, palette = adafruit_imageload.load("/SpriteSheet.bmp",
                                                 palette=displayio.Palette)
 
 display = board.DISPLAY
-group = displayio.Group(scale=1, max_size=5)
+group = displayio.Group()
 touchscreen = adafruit_touchscreen.Touchscreen(board.TOUCH_XL, board.TOUCH_XR,
                                                board.TOUCH_YD, board.TOUCH_YU,
                                                calibration=((9000, 59000),
