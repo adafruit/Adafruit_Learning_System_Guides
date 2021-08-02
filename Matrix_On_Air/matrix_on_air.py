@@ -46,7 +46,7 @@ network = Network(status_neopixel=board.NEOPIXEL, debug=False)
 
 # --- Drawing setup ---
 # Create a Group
-group = displayio.Group(max_size=22)
+group = displayio.Group()
 # Create a bitmap object
 bitmap = displayio.Bitmap(64, 32, 2)  # width, height, bit depth
 # Create a color palette
@@ -117,15 +117,11 @@ air_x = 15
 air_y = 25
 
 
-text_line1 = adafruit_display_text.label.Label(
-    deco_font, color=color[3], text="OFF", max_glyphs=6
-)
+text_line1 = adafruit_display_text.label.Label(deco_font, color=color[3], text="OFF")
 text_line1.x = off_x
 text_line1.y = off_y
 
-text_line2 = adafruit_display_text.label.Label(
-    deco_font, color=color[1], text="AIR", max_glyphs=6
-)
+text_line2 = adafruit_display_text.label.Label(deco_font, color=color[1], text="AIR")
 text_line2.x = air_x
 text_line2.y = air_y
 
