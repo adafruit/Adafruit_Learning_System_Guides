@@ -45,7 +45,7 @@ BLINKA_2 = 2
 display = adafruit_displayio_ssd1306.SSD1306(display_bus, width=WIDTH, height=HEIGHT)
 
 # create the displayio object
-splash = displayio.Group(max_size=40)
+splash = displayio.Group()
 display.show(splash)
 
 #  text for BPM
