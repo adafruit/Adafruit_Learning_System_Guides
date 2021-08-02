@@ -29,14 +29,14 @@ midi = adafruit_midi.MIDI(midi_out=usb_midi.ports[1], out_channel=0)
 WIDTH = 128
 HEIGHT = 128
 #  display setup
-display = adafruit_ssd1327.SSD1327(display_bus, width=WIDTH, height=HEIGHT, brightness = 0.01)
+display = adafruit_ssd1327.SSD1327(display_bus, width=WIDTH, height=HEIGHT, brightness=0.01)
 
 #  main display group, shows default GUI menu
-splash = displayio.Group(max_size=60)
+splash = displayio.Group()
 #  group for circle icons
-circle_group = displayio.Group(max_size=30)
+circle_group = displayio.Group()
 #  group for text labels on circles
-text_group = displayio.Group(max_size=30)
+text_group = displayio.Group()
 
 #  list of circle positions
 spots = (
@@ -64,7 +64,7 @@ for spot in spots:
     # adding circles to their display group
     circle_group.append(circle)
 #  square to show position on menu
-rect = Rect(0, 0, 33, 33, fill=None, outline=0x00FF00, stroke = 3)
+rect = Rect(0, 0, 33, 33, fill=None, outline=0x00FF00, stroke=3)
 
 splash.append(circle_group)
 splash.append(rect)
@@ -99,7 +99,7 @@ for text in texts:
 splash.append(text_group)
 
 #  secondary display group, shows large circle when button is selected
-big_splash = displayio.Group(max_size=60)
+big_splash = displayio.Group()
 #  large circle to fill display
 big_circle = Circle(x0=64, y0=64, r=62, fill=0x888888)
 big_splash.append(big_circle)
@@ -201,8 +201,10 @@ up_scroll = 0
 down_scroll = 0
 left_scroll = 0
 right_scroll = 0
-switch_coordinates = [(0, 0), (1, 0), (2, 0), (3, 0), (0, 1), (1, 1), (2, 1), (3, 1), (0, 2),
-            (1, 2), (2, 2), (3, 2), (0, 3), (1, 3), (2, 3), (3, 3)]
+switch_coordinates = [(0, 0), (1, 0), (2, 0), (3, 0),
+                      (0, 1), (1, 1), (2, 1), (3, 1),
+                      (0, 2), (1, 2), (2, 2), (3, 2),
+                      (0, 3), (1, 3), (2, 3), (3, 3)]
 
 #  array of default MIDI notes
 midi_notes = [60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75]
