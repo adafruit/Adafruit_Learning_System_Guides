@@ -61,7 +61,7 @@ spots = (
 #  creating the circles & pulling in positions from spots
 for spot in spots:
     circle = Circle(x0=spot[0], y0=spot[1], r=14, fill=0x888888)
-	#  adding circles to their display group
+    # adding circles to their display group
     circle_group.append(circle)
 #  square to show position on menu
 rect = Rect(0, 0, 33, 33, fill=None, outline=0x00FF00, stroke = 3)
