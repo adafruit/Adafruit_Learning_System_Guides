@@ -302,62 +302,62 @@ for row in range(0, GRID_AXIS):
         image_group.append(cell)
 
 # Define labels and values
-status_label = Label(font_0, text="", color=None, max_glyphs=6)
+status_label = Label(font_0, text="", color=None)
 status_label.anchor_point = (0.5, 0.5)
 status_label.anchored_position = ((WIDTH // 2) + (GRID_X_OFFSET // 2), HEIGHT // 2)
 image_group.append(status_label)  # image_group[225]
 
-alarm_label = Label(font_0, text="alm", color=WHITE, max_glyphs=3)
+alarm_label = Label(font_0, text="alm", color=WHITE)
 alarm_label.anchor_point = (0, 0)
 alarm_label.anchored_position = (1, 16)
 image_group.append(alarm_label)  # image_group[226]
 
-max_label = Label(font_0, text="max", color=RED, max_glyphs=3)
+max_label = Label(font_0, text="max", color=RED)
 max_label.anchor_point = (0, 0)
 max_label.anchored_position = (1, 46)
 image_group.append(max_label)  # image_group[227]
 
-min_label = Label(font_0, text="min", color=CYAN, max_glyphs=3)
+min_label = Label(font_0, text="min", color=CYAN)
 min_label.anchor_point = (0, 0)
 min_label.anchored_position = (1, 106)
 image_group.append(min_label)  # image_group[228]
 
-ave_label = Label(font_0, text="ave", color=YELLOW, max_glyphs=3)
+ave_label = Label(font_0, text="ave", color=YELLOW)
 ave_label.anchor_point = (0, 0)
 ave_label.anchored_position = (1, 76)
 image_group.append(ave_label)  # image_group[229]
 
-alarm_value = Label(font_0, text=str(ALARM_F), color=WHITE, max_glyphs=3)
+alarm_value = Label(font_0, text=str(ALARM_F), color=WHITE)
 alarm_value.anchor_point = (0, 0)
 alarm_value.anchored_position = (1, 5)
 image_group.append(alarm_value)  # image_group[230]
 
-max_value = Label(font_0, text=str(MAX_RANGE_F), color=RED, max_glyphs=3)
+max_value = Label(font_0, text=str(MAX_RANGE_F), color=RED)
 max_value.anchor_point = (0, 0)
 max_value.anchored_position = (1, 35)
 image_group.append(max_value)  # image_group[231]
 
-min_value = Label(font_0, text=str(MIN_RANGE_F), color=CYAN, max_glyphs=3)
+min_value = Label(font_0, text=str(MIN_RANGE_F), color=CYAN)
 min_value.anchor_point = (0, 0)
 min_value.anchored_position = (1, 95)
 image_group.append(min_value)  # image_group[232]
 
-ave_value = Label(font_0, text="---", color=YELLOW, max_glyphs=3)
+ave_value = Label(font_0, text="---", color=YELLOW)
 ave_value.anchor_point = (0, 0)
 ave_value.anchored_position = (1, 65)
 image_group.append(ave_value)  # image_group[233]
 
-min_histo = Label(font_0, text="", color=None, max_glyphs=3)
+min_histo = Label(font_0, text="", color=None)
 min_histo.anchor_point = (0, 0.5)
 min_histo.anchored_position = (GRID_X_OFFSET, 121)
 image_group.append(min_histo)  # image_group[234]
 
-max_histo = Label(font_0, text="", color=None, max_glyphs=3)
+max_histo = Label(font_0, text="", color=None)
 max_histo.anchor_point = (1, 0.5)
 max_histo.anchored_position = (WIDTH - 2, 121)
 image_group.append(max_histo)  # image_group[235]
 
-range_histo = Label(font_0, text="-RANGE-", color=None, max_glyphs=7)
+range_histo = Label(font_0, text="-RANGE-", color=None)
 range_histo.anchor_point = (0.5, 0.5)
 range_histo.anchored_position = ((WIDTH // 2) + (GRID_X_OFFSET // 2), 121)
 image_group.append(range_histo)  # image_group[236]
