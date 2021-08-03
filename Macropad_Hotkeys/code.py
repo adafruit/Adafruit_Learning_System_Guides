@@ -137,7 +137,7 @@ while True:
                     MACROPAD.keyboard.press(item)
                 else:
                     MACROPAD.keyboard.release(item)
-            if isinstance(item, list):
+            elif isinstance(item, list):
                     MACROPAD.keyboard.send(*item)
             else:
                 MACROPAD.keyboard_layout.write(item)
