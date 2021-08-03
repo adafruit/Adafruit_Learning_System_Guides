@@ -29,7 +29,7 @@ amg8833 = adafruit_amg88xx.AMG88XX(i2c)
 # Load the text font from the fonts folder
 font = bitmap_font.load_font("/fonts/OpenSans-9.bdf")
 
-# Display spash graphics and play startup tones
+# Display splash graphics and play startup tones
 with open("/thermal_cam_splash.bmp", "rb") as bitmap_file:
     bitmap = displayio.OnDiskBitmap(bitmap_file)
     splash = displayio.Group()
@@ -231,7 +231,7 @@ def move_buttons(joystick=False):  # Read position buttons and joystick
     return move_u, move_d
 
 ### Define the display group ###
-image_group = displayio.Group(max_size=77)
+image_group = displayio.Group()
 
 # Create a background color fill layer; image_group[0]
 color_bitmap = displayio.Bitmap(WIDTH, HEIGHT, 1)
@@ -252,73 +252,73 @@ for row in range(0, 8):
         image_group.append(element)
 
 # Define labels and values using element grid coordinates
-status_label = Label(font, text="", color=BLACK, max_glyphs=6)
+status_label = Label(font, text="", color=BLACK)
 pos_x, pos_y = element_grid(2.5, 4)
 status_label.x = pos_x
 status_label.y = pos_y
 image_group.append(status_label)  # image_group[65]
 
-alarm_label = Label(font, text="alm", color=WHITE, max_glyphs=3)
+alarm_label = Label(font, text="alm", color=WHITE)
 pos_x, pos_y = element_grid(-1.8, 1.5)
 alarm_label.x = pos_x
 alarm_label.y = pos_y
 image_group.append(alarm_label)  # image_group[66]
 
-max_label = Label(font, text="max", color=RED, max_glyphs=3)
+max_label = Label(font, text="max", color=RED)
 pos_x, pos_y = element_grid(-1.8, 3.5)
 max_label.x = pos_x
 max_label.y = pos_y
 image_group.append(max_label)  # image_group[67]
 
-min_label = Label(font, text="min", color=CYAN, max_glyphs=3)
+min_label = Label(font, text="min", color=CYAN)
 pos_x, pos_y = element_grid(-1.8, 7.5)
 min_label.x = pos_x
 min_label.y = pos_y
 image_group.append(min_label)  # image_group[68]
 
-ave_label = Label(font, text="ave", color=YELLOW, max_glyphs=3)
+ave_label = Label(font, text="ave", color=YELLOW)
 pos_x, pos_y = element_grid(-1.8, 5.5)
 ave_label.x = pos_x
 ave_label.y = pos_y
 image_group.append(ave_label)  # image_group[69]
 
-alarm_value = Label(font, text=str(ALARM_F), color=WHITE, max_glyphs=5)
+alarm_value = Label(font, text=str(ALARM_F), color=WHITE)
 pos_x, pos_y = element_grid(-1.8, 0.5)
 alarm_value.x = pos_x
 alarm_value.y = pos_y
 image_group.append(alarm_value)  # image_group[70]
 
-max_value = Label(font, text=str(MAX_RANGE_F), color=RED, max_glyphs=5)
+max_value = Label(font, text=str(MAX_RANGE_F), color=RED)
 pos_x, pos_y = element_grid(-1.8, 2.5)
 max_value.x = pos_x
 max_value.y = pos_y
 image_group.append(max_value)  # image_group[71]
 
-min_value = Label(font, text=str(MIN_RANGE_F), color=CYAN, max_glyphs=5)
+min_value = Label(font, text=str(MIN_RANGE_F), color=CYAN)
 pos_x, pos_y = element_grid(-1.8, 6.5)
 min_value.x = pos_x
 min_value.y = pos_y
 image_group.append(min_value)  # image_group[72]
 
-ave_value = Label(font, text="---", color=YELLOW, max_glyphs=5)
+ave_value = Label(font, text="---", color=YELLOW)
 pos_x, pos_y = element_grid(-1.8, 4.5)
 ave_value.x = pos_x
 ave_value.y = pos_y
 image_group.append(ave_value)  # image_group[73]
 
-min_histo = Label(font, text="", color=CYAN, max_glyphs=3)
+min_histo = Label(font, text="", color=CYAN)
 pos_x, pos_y = element_grid(0.5, 7.5)
 min_histo.x = pos_x
 min_histo.y = pos_y
 image_group.append(min_histo)  # image_group[74]
 
-max_histo = Label(font, text="", color=RED, max_glyphs=3)
+max_histo = Label(font, text="", color=RED)
 pos_x, pos_y = element_grid(6.5, 7.5)
 max_histo.x = pos_x
 max_histo.y = pos_y
 image_group.append(max_histo)  # image_group[75]
 
-range_histo = Label(font, text="", color=BLUE, max_glyphs=7)
+range_histo = Label(font, text="", color=BLUE)
 pos_x, pos_y = element_grid(2.5, 7.5)
 range_histo.x = pos_x
 range_histo.y = pos_y
@@ -348,7 +348,7 @@ while True:
     else:  # Histogram display mode and gather min, max, and sum stats
         v_min, v_max, v_sum = update_histo_frame()
 
-    # Display alarm setting and maxumum, minimum, and average stats
+    # Display alarm setting and maximum, minimum, and average stats
     alarm_value.text = str(ALARM_F)
     max_value.text   = str(celsius_to_fahrenheit(v_max))
     min_value.text   = str(celsius_to_fahrenheit(v_min))
