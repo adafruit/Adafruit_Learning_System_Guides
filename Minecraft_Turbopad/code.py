@@ -87,7 +87,7 @@ label_text = [
 ]
 labels = []
 for j in range(12):
-    labels.append(label.Label(terminalio.FONT, text=label_text[j], max_glyphs=10))
+    labels.append(label.Label(terminalio.FONT, text=label_text[j]))
 
 for index in range(12):
     x = index % 3
