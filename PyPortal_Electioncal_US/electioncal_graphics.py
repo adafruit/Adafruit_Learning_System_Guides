@@ -11,16 +11,16 @@ medium_font = cwd+"/fonts/Arial-16.bdf"
 
 class Electioncal_Graphics(displayio.Group):
     def __init__(self, root_group, *, am_pm=True):
-        super().__init__(max_size=2)
+        super().__init__()
         self.am_pm = am_pm
         root_group.append(self)
-        self._icon_group = displayio.Group(max_size=1)
+        self._icon_group = displayio.Group()
         self.append(self._icon_group)
-        self._text_group = displayio.Group(max_size=9)
+        self._text_group = displayio.Group()
         self.append(self._text_group)
 
         self._icon_sprite = None
-        self._icon_file = None
+        self._icon_file = None  # Remove when CircuitPython 6 support is dropped
         self.set_icon(cwd+"/icons/electioncal.bmp")
 
         self.small_font = bitmap_font.load_font(small_font)
@@ -29,38 +29,38 @@ class Electioncal_Graphics(displayio.Group):
         self.small_font.load_glyphs(glyphs)
         self.medium_font.load_glyphs(glyphs)
 
-        self.date_text = Label(self.small_font, max_glyphs=21)
+        self.date_text = Label(self.small_font)
         self.date_text.x = 15
         self.date_text.y = 195
         self.date_text.color = 0xFFFFFF
         self._text_group.append(self.date_text)
 
-        self.url_text = Label(self.small_font, max_glyphs=35)
+        self.url_text = Label(self.small_font)
         self.url_text.x = 15
         self.url_text.y = 220
         self.url_text.color = 0xFFFFFF
         self._text_group.append(self.url_text)
         self.url_text.text = "Visit us at https://electioncal.us"
 
-        self.state_text = Label(self.small_font, max_glyphs=60)
+        self.state_text = Label(self.small_font)
         self.state_text.x = 15
         self.state_text.y = 10
         self.state_text.color = 0xFFFFFF
         self._text_group.append(self.state_text)
 
-        self.election_date_text = Label(self.medium_font, max_glyphs=11)
+        self.election_date_text = Label(self.medium_font)
         self.election_date_text.x = 15
         self.election_date_text.y = 60
         self.election_date_text.color = 0xFFFFFF
         self._text_group.append(self.election_date_text)
 
-        self.election_name_text = Label(self.small_font, max_glyphs=60)
+        self.election_name_text = Label(self.small_font)
         self.election_name_text.x = 15
         self.election_name_text.y = 95
         self.election_name_text.color = 0xFFFFFF
         self._text_group.append(self.election_name_text)
 
-        self.election_name_text_line2 = Label(self.small_font, max_glyphs=60)
+        self.election_name_text_line2 = Label(self.small_font)
         self.election_name_text_line2.x = 15
         self.election_name_text_line2.y = 120
         self.election_name_text_line2.color = 0xFFFFFF
@@ -137,15 +137,19 @@ class Electioncal_Graphics(displayio.Group):
 
         if not filename:
             return  # we're done, no icon desired
+
+        # CircuitPython 6 & 7 compatible
         if self._icon_file:
             self._icon_file.close()
         self._icon_file = open(filename, "rb")
         icon = displayio.OnDiskBitmap(self._icon_file)
-        try:
-            self._icon_sprite = displayio.TileGrid(icon,
-                                                   pixel_shader=getattr(icon, 'pixel_shader', displayio.ColorConverter()))
-        except TypeError:
-            self._icon_sprite = displayio.TileGrid(icon,
-                                                   pixel_shader=getattr(icon, 'pixel_shader', displayio.ColorConverter()),
-                                                   position=(0,0))
+        self._icon_sprite = displayio.TileGrid(
+            icon,
+            pixel_shader=getattr(icon, 'pixel_shader', displayio.ColorConverter())
+        )
+
+        # # CircuitPython 7+ compatible
+        # icon = displayio.OnDiskBitmap(filename)
+        # self._icon_sprite = displayio.TileGrid(icon, pixel_shader=icon.pixel_shader)
+
         self._icon_group.append(self._icon_sprite)
