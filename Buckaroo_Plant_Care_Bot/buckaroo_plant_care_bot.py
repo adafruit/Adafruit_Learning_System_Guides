@@ -56,14 +56,12 @@ title_label.y = 4
 # Append label to group
 text_group.append(title_label)
 
-soil_label = label.Label(terminalio.FONT, text="Soil: ", color=0xFFAA88, max_glyphs=10)
+soil_label = label.Label(terminalio.FONT, text="Soil: ", color=0xFFAA88)
 soil_label.x = 4
 soil_label.y = 64
 text_group.append(soil_label)
 
-motor_label = label.Label(
-    terminalio.FONT, text="Motor off", color=0xFF0000, max_glyphs=9
-)
+motor_label = label.Label(terminalio.FONT, text="Motor off", color=0xFF0000)
 motor_label.x = 4
 motor_label.y = 74
 text_group.append(motor_label)
