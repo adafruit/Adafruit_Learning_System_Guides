@@ -29,7 +29,7 @@ splash = displayio.Group()
 display.show(splash)
 
 text = "hello world"
-text_area = label.Label(terminalio.FONT, color=0xFFFF00, x=15, y=0, max_glyphs=200)
+text_area = label.Label(terminalio.FONT, color=0xFFFF00, x=15, y=0)
 splash.append(text_area)
 
 while True:
