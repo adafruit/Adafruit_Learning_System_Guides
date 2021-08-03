@@ -19,11 +19,11 @@ app = {                    # REQUIRED dict, must be named 'app'
         (0x000040, 'Home', [Keycode.COMMAND, 'H']),
         (0x000040, 'Private', [Keycode.COMMAND, 'N']),
         # 4th row ----------
-        (0x000000, 'Ada', [Keycode.COMMAND, 'n', -Keycode.COMMAND,
+        (0x000000, 'Ada', [[Keycode.COMMAND, KEYCODE.N],
                            'www.adafruit.com\n']),   # Adafruit in new window
-        (0x800000, 'Digi', [Keycode.COMMAND, 'n', -Keycode.COMMAND,
+        (0x800000, 'Digi', [[Keycode.COMMAND, KEYCODE.N],
                             'www.digikey.com\n']),   # Digi-Key in new window
-        (0x101010, 'Hacks', [Keycode.COMMAND, 'n', -Keycode.COMMAND,
+        (0x101010, 'Hacks', [[Keycode.COMMAND, KEYCODE.N],
                              'www.hackaday.com\n']), # Hack-a-Day in new win
         # Encoder button ---
         (0x000000, '', [Keycode.COMMAND, 'w']) # Close window/tab
