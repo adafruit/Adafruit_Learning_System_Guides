@@ -39,7 +39,7 @@ text_color = 0xFFFFFF
 
 text_areas = []
 for pos in (days_position, hours_position, minutes_position):
-    textarea = Label(big_font, max_glyphs=3)
+    textarea = Label(big_font)
     textarea.x = pos[0]
     textarea.y = pos[1]
     textarea.color = text_color
