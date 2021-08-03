@@ -33,7 +33,7 @@ try:
                                                     bitmap=displayio.Bitmap,
                                                     palette=displayio.Palette)
 # Or just use solid color
-except (OSError, TypeError):
+except (OSError, TypeError, AttributeError):
     BACKGROUND = BACKGROUND if isinstance(BACKGROUND, int) else 0x000000
     bg_bitmap = displayio.Bitmap(display.width, display.height, 1)
     bg_palette = displayio.Palette(1)
@@ -52,7 +52,7 @@ if FLAKE_TRAN_COLOR is not None:
             break
 NUM_SPRITES = flake_bitmap.width // FLAKE_WIDTH * flake_bitmap.height // FLAKE_HEIGHT
 flake_pos = [0.0] * NUM_FLAKES
-flakes = displayio.Group(max_size=NUM_FLAKES)
+flakes = displayio.Group()
 for _ in range(NUM_FLAKES):
     flakes.append(displayio.TileGrid(flake_bitmap, pixel_shader=flake_palette,
                                      width = 1,
