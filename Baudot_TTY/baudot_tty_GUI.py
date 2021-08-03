@@ -41,7 +41,7 @@ screen.append(bg_sprite)
 
 # title
 title_label = label.Label(
-    terminalio.FONT, text="TTY CLUE", scale=4, color=VFD_GREEN, max_glyphs=11
+    terminalio.FONT, text="TTY CLUE", scale=4, color=VFD_GREEN
 )
 title_label.x = 20
 title_label.y = 16
@@ -49,7 +49,7 @@ screen.append(title_label)
 
 # footer
 footer_label = label.Label(
-    terminalio.FONT, text="<PICK         SEND>", scale=2, color=VFD_GREEN, max_glyphs=40
+    terminalio.FONT, text="<PICK         SEND>", scale=2, color=VFD_GREEN
 )
 footer_label.x = 4
 footer_label.y = 220
@@ -69,9 +69,7 @@ message_group = displayio.Group(scale=1)
 
 for message_config in messages_config:
     (name, textline, color, x, y) = message_config  # unpack tuple into five var names
-    message_label = label.Label(
-        terminalio.FONT, text=textline, color=color, max_glyphs=50
-    )
+    message_label = label.Label(terminalio.FONT, text=textline, color=color)
     message_label.x = x
     message_label.y = y
     messages_labels[name] = message_label
