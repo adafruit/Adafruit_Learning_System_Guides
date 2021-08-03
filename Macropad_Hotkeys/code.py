@@ -136,7 +136,7 @@ while True:
                 if item >= 0:
                     MACROPAD.keyboard.press(item)
                 else:
-                    MACROPAD.keyboard.release(item)
+                    MACROPAD.keyboard.release(-item)
             else:
                 MACROPAD.keyboard_layout.write(item)
     else:
