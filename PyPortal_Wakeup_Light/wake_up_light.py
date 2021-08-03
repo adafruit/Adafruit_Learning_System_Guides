@@ -67,17 +67,17 @@ info_font.load_glyphs(b'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRST
 
 time_color = 0xFFFFFF
 time_position = (75,130)
-time_textarea = Label(big_font, max_glyphs=15, color=time_color,
+time_textarea = Label(big_font, color=time_color,
                       x=time_position[0], y=time_position[1])
 
 wakeup_time_color = 0xFFFFFF
 wakeup_time_position = (15,200)
-wakeup_time_textarea = Label(info_font, max_glyphs=30, color=wakeup_time_color,
+wakeup_time_textarea = Label(info_font, color=wakeup_time_color,
                              x=wakeup_time_position[0], y=wakeup_time_position[1])
 
 light_on_time_color = 0xFFFFFF
 light_on_time_position = (15,220)
-light_on_time_textarea = Label(info_font, max_glyphs=30, color=light_on_time_color,
+light_on_time_textarea = Label(info_font, color=light_on_time_color,
                                x=light_on_time_position[0], y=light_on_time_position[1])
 
 pyportal.splash.append(time_textarea)
