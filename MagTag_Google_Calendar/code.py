@@ -218,7 +218,7 @@ line_header = Line(0, 30, 320, 30, color=0x000000)
 magtag.splash.append(line_header)
 
 font_h1 = bitmap_font.load_font("fonts/Arial-18.pcf")
-label_header = label.Label(font_h1, x=5, y=15, color=0x000000, max_glyphs=30)
+label_header = label.Label(font_h1, x=5, y=15, color=0x000000)
 magtag.splash.append(label_header)
 
 # Set up calendar event fonts
