@@ -32,18 +32,15 @@ symbols = ["DJIA", "INX", "AAPL", "TSLA", "MSFT"]
 
 # Set text, font, and color
 group = displayio.Group()
-symbol_text = label.Label(terminalio.FONT, text="WiFi", color=0xFFFFFF,
-                          scale=3, max_glyphs=10)
+symbol_text = label.Label(terminalio.FONT, text="WiFi", color=0xFFFFFF, scale=3)
 symbol_text.anchor_point = (0.0, 0.0)
 symbol_text.anchored_position = (0, 10)
 
-price_text = label.Label(terminalio.FONT, text="Connect...", color=0xFFFF00,
-                         scale=3, max_glyphs=10)
+price_text = label.Label(terminalio.FONT, text="Connect...", color=0xFFFF00, scale=3)
 price_text.anchor_point = (0, 1)
 price_text.anchored_position = (0, 75)
 
-change_text = label.Label(terminalio.FONT, text="", color=0xFFFF00,
-                          scale=2, max_glyphs=10)
+change_text = label.Label(terminalio.FONT, text="", color=0xFFFF00, scale=2)
 change_text.anchor_point = (0, 0)
 change_text.anchored_position = (80, 10)
 
