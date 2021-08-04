@@ -7,9 +7,8 @@ import array
 import board
 import audiobusio
 import displayio
-import ulab
-import ulab.fft
-import ulab.vector
+from ulab import numpy as np
+from ulab.scipy.signal import spectrogram
 
 display = board.DISPLAY
 
@@ -75,14 +74,14 @@ def main():
 
     while True:
         mic.record(samples_bit, len(samples_bit))
-        samples = ulab.array(samples_bit[3:])
-        spectrogram1 = ulab.fft.spectrogram(samples)
+        samples = np.array(samples_bit[3:])
+        spectrogram1 = spectrogram(samples)
         # spectrum() is always nonnegative, but add a tiny value
         # to change any zeros to nonzero numbers
-        spectrogram1 = ulab.vector.log(spectrogram1 + 1e-7)
+        spectrogram1 = np.log(spectrogram1 + 1e-7)
         spectrogram1 = spectrogram1[1:(fft_size//2)-1]
-        min_curr = ulab.numerical.min(spectrogram1)
-        max_curr = ulab.numerical.max(spectrogram1)
+        min_curr = np.min(spectrogram1)
+        max_curr = np.max(spectrogram1)
 
         if max_curr > max_all:
             max_all = max_curr
@@ -94,7 +93,7 @@ def main():
         # Plot FFT
         data = (spectrogram1 - min_curr) * (51. / (max_all - min_curr))
         # This clamps any negative numbers to zero
-        data = data * ulab.array((data > 0))
+        data = data * np.array((data > 0))
         graph.show(data)
 
 main()

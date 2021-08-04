@@ -209,10 +209,10 @@ class BMP2LED:
         # It's formed just like valid strip data (with header, per-pixel
         # start markers and footer), with colors all '0' to start...these
         # will be filled later.
-        dotstar_buffer = ulab.array([0] * 4 +
+        dotstar_buffer = ulab.numpy.array([0] * 4 +
                                     [255, 0, 0, 0] * self.num_pixels +
                                     [255] * ((self.num_pixels + 15) // 16),
-                                    dtype=ulab.uint8)
+                                    dtype=ulab.numpy.uint8)
         dotstar_row_size = len(dotstar_buffer)
 
         # Output rows are held in RAM and periodically written,
@@ -251,8 +251,8 @@ class BMP2LED:
 
                 # Each output row is interpolated from two BMP rows,
                 # we'll call them 'a' and 'b' here.
-                row_a_data = ulab.zeros(row_bytes, dtype=ulab.uint8)
-                row_b_data = ulab.zeros(row_bytes, dtype=ulab.uint8)
+                row_a_data = ulab.numpy.zeros(row_bytes, dtype=ulab.numpy.uint8)
+                row_b_data = ulab.numpy.zeros(row_bytes, dtype=ulab.numpy.uint8)
                 prev_row_a_index, prev_row_b_index = None, None
 
                 with open(output_filename, 'wb') as led_file:
@@ -323,7 +323,7 @@ class BMP2LED:
                         # operations. First, the 'want' values are quantized
                         # to uint8's -- so these will always be slightly
                         # dimmer (v. occasionally equal) to the 'want' vals.
-                        got = ulab.array(want, dtype=ulab.uint8)
+                        got = ulab.numpy.array(want, dtype=ulab.numpy.uint8)
                         # Note: naive 'foo = foo + bar' syntax used in this
                         # next section is intentional. ndarrays don't seem
                         # to always play well with '+=' syntax.
@@ -335,7 +335,7 @@ class BMP2LED:
                         # Accumulated error vals will all now be 0.0 to <2.0.
                         # Quantizing err into a new uint8 ndarray, all values
                         # will be 0 or 1.
-                        err_bits = ulab.array(err, dtype=ulab.uint8)
+                        err_bits = ulab.numpy.array(err, dtype=ulab.numpy.uint8)
                         # Add the 1's back into 'got', increasing the
                         # brightness of certain pixels by 1. Because the max
                         # value in 'got' is 254 (not 255), no clipping need
