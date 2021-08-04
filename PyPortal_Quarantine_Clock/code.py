@@ -74,13 +74,13 @@ font_large.load_glyphs(b'abcdefghjiklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123
 font_small.load_glyphs(b'abcdefghjiklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890- ()')
 
 # Set up label for the day
-label_day = label.Label(font_large, color=LABEL_DAY_COLOR, max_glyphs=200)
+label_day = label.Label(font_large, color=LABEL_DAY_COLOR)
 label_day.x = board.DISPLAY.width // 7
 label_day.y = 80
 pyportal.splash.append(label_day)
 
 # Set up label for the time
-label_time = label.Label(font_small, color=LABEL_TIME_COLOR, max_glyphs=200)
+label_time = label.Label(font_small, color=LABEL_TIME_COLOR)
 label_time.x = board.DISPLAY.width // 4
 label_time.y = 150
 pyportal.splash.append(label_time)
