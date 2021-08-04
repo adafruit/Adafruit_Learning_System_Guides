@@ -275,11 +275,11 @@ while True:
     time.sleep(1.5) # Pause display for a moment
     MACROPAD.pixels.fill(0)
     MACROPAD.pixels.show()
+    # pylint: disable=protected-access
+    MACROPAD._speaker_enable.value = False
     # Pop any sprites from PLAY_GROUP (other elements remain, and SPRITES[]
     # list is cleared at start of next game).
     for _ in SPRITES:
         PLAY_GROUP.pop(1)
     END_GROUP[-1].text = str(SCORE)
     show_screen(END_GROUP)
-    # pylint: disable=protected-access
-    MACROPAD._speaker_enable.value = False
