@@ -22,7 +22,7 @@ VERSION = "1.3.1"
 print(TITLE, "version ", VERSION)
 time.sleep(2)
 
-display_group = displayio.Group(max_size=20)
+display_group = displayio.Group()
 board.DISPLAY.show(display_group)
 
 PROFILE_SIZE = 2  # plot thickness
@@ -546,9 +546,7 @@ font2 = bitmap_font.load_font("/fonts/OpenSans-12.bdf")
 
 font3 = bitmap_font.load_font("/fonts/OpenSans-16.bdf")
 
-label_reflow = label.Label(
-    font1, text="", max_glyphs=10, color=0xFFFFFF, line_spacing=0
-)
+label_reflow = label.Label(font1, text="", color=0xFFFFFF, line_spacing=0)
 label_reflow.x = 0
 label_reflow.y = -20
 display_group.append(label_reflow)
@@ -560,7 +558,7 @@ display_group.append(title_label)
 # version_label.x = 300
 # version_label.y = 40
 # display_group.append(version_label)
-message = label.Label(font2, text="Wait", max_glyphs=30)
+message = label.Label(font2, text="Wait")
 message.x = 100
 message.y = 40
 display_group.append(message)
@@ -584,7 +582,7 @@ timer_label = label.Label(font1, text="Time:", color=0xAAAAAA)
 timer_label.x = 5
 timer_label.y = 120
 display_group.append(timer_label)
-timer_data = label.Label(font3, text=format_time(timediff), max_glyphs=10)
+timer_data = label.Label(font3, text=format_time(timediff))
 timer_data.x = 10
 timer_data.y = 140
 display_group.append(timer_data)
@@ -592,7 +590,7 @@ temp_label = label.Label(font1, text="Temp(C):", color=0xAAAAAA)
 temp_label.x = 5
 temp_label.y = 160
 display_group.append(temp_label)
-temp_data = label.Label(font3, text="--", max_glyphs=10)
+temp_data = label.Label(font3, text="--")
 temp_data.x = 10
 temp_data.y = 180
 display_group.append(temp_data)
