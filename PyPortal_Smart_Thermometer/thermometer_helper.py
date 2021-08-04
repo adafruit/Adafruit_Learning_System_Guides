@@ -20,18 +20,18 @@ class Thermometer_GFX(displayio.Group):
         :param bool usa_date: Use mon/day/year date-time formatting.
         """
         # root displayio group
-        root_group = displayio.Group(max_size=20)
+        root_group = displayio.Group()
         board.DISPLAY.show(root_group)
-        super().__init__(max_size=20)
+        super().__init__()
 
         self._celsius = celsius
         self._usa_date = usa_date
 
         # create background icon group
-        self._icon_group = displayio.Group(max_size=1)
+        self._icon_group = displayio.Group()
         board.DISPLAY.show(self._icon_group)
         # create text object group
-        self._text_group = displayio.Group(max_size=6)
+        self._text_group = displayio.Group()
 
         self._icon_sprite = None
         self._icon_file = None
@@ -58,22 +58,22 @@ class Thermometer_GFX(displayio.Group):
         self.subtitle_text.y = 35
         self._text_group.append(self.subtitle_text)
 
-        self.temp_text = Label(self.c_font, max_glyphs=8)
+        self.temp_text = Label(self.c_font)
         self.temp_text.x = 25
         self.temp_text.y = 110
         self._text_group.append(self.temp_text)
 
-        self.time_text = Label(self.info_font, max_glyphs=40)
+        self.time_text = Label(self.info_font)
         self.time_text.x = 240
         self.time_text.y = 150
         self._text_group.append(self.time_text)
 
-        self.date_text = Label(self.info_font, max_glyphs=40)
+        self.date_text = Label(self.info_font)
         self.date_text.x = 30
         self.date_text.y = 160
         self._text_group.append(self.date_text)
 
-        self.io_status_text = Label(self.info_font, max_glyphs=40)
+        self.io_status_text = Label(self.info_font)
         self.io_status_text.x = 100
         self.io_status_text.y = 220
         self._text_group.append(self.io_status_text)
@@ -130,14 +130,15 @@ class Thermometer_GFX(displayio.Group):
             return  # we're done, no icon desired
         if self._icon_file:
             self._icon_file.close()
+
+        # CircuitPython 6 & 7 compatible
         self._icon_file = open(filename, "rb")
         icon = displayio.OnDiskBitmap(self._icon_file)
-        try:
-            self._icon_sprite = displayio.TileGrid(icon,
-                                                   pixel_shader=getattr(icon, 'pixel_shader', displayio.ColorConverter()))
-        except TypeError:
-            self._icon_sprite = displayio.TileGrid(icon,
-                                                   pixel_shader=getattr(icon, 'pixel_shader', displayio.ColorConverter()),
-                                                   position=(0,0))
+        self._icon_sprite = displayio.TileGrid(icon,
+                                               pixel_shader=getattr(icon, 'pixel_shader', displayio.ColorConverter()))
+
+        # # CircuitPython 7+ compatible
+        # icon = displayio.OnDiskBitmap(filename)
+        # self._icon_sprite = displayio.TileGrid(icon, pixel_shader=icon.pixel_shader)
 
         self._icon_group.append(self._icon_sprite)
