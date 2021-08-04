@@ -17,7 +17,7 @@ import adafruit_touchscreen
 from adafruit_mcp9600 import MCP9600
 
 TITLE = "EZ Make Oven Controller"
-VERSION = "1.3.1"
+VERSION = "1.3.2"
 
 print(TITLE, "version ", VERSION)
 time.sleep(2)
