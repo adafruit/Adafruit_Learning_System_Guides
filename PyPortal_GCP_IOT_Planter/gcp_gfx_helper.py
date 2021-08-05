@@ -19,23 +19,23 @@ class Google_GFX(displayio.Group):
         :param bool is_celsius: Temperature displayed in Celsius.
         """
         # root displayio group
-        root_group = displayio.Group(max_size=23)
+        root_group = displayio.Group()
         self.display = board.DISPLAY
         self.display.show(root_group)
-        super().__init__(max_size=15)
+        super().__init__()
 
         # temperature display option
         self._is_celsius = is_celsius
 
         # create background icon group
-        self._icon_group = displayio.Group(max_size=3)
+        self._icon_group = displayio.Group()
         self.display.show(self._icon_group)
         # create text object group
-        self._text_group = displayio.Group(max_size=40)
+        self._text_group = displayio.Group()
 
         print("Displaying splash screen")
         self._icon_sprite = None
-        self._icon_file = None
+        self._icon_file = None  # Remove once CircuitPython 6 support is dropped
         self._cwd = cwd
         self.set_icon(self._cwd+"/images/gcp_splash.bmp")
 
@@ -48,7 +48,7 @@ class Google_GFX(displayio.Group):
         self._text_group.append(header_group)
 
         # Temperature Display
-        temp_group = displayio.Group(scale=2, max_size=3)
+        temp_group = displayio.Group(scale=2)
         temp_label = Label(font, text="Temperature: ")
         temp_label.x = (self.display.width//2) // 11
         temp_label.y = 55
@@ -61,7 +61,7 @@ class Google_GFX(displayio.Group):
         self._text_group.append(temp_group)
 
         # Water Level
-        water_group = displayio.Group(scale=2, max_size=2)
+        water_group = displayio.Group(scale=2)
         self.water_level = Label(font, text="Water Level: ")
         self.water_level.x = (self.display.width//2) // 11
         self.water_level.y = 75
@@ -131,16 +131,19 @@ class Google_GFX(displayio.Group):
 
         if not filename:
             return  # we're done, no icon desired
+
+        # CircuitPython 6 & 7 compatible
         if self._icon_file:
             self._icon_file.close()
         self._icon_file = open(filename, "rb")
         icon = displayio.OnDiskBitmap(self._icon_file)
-        try:
-            self._icon_sprite = displayio.TileGrid(icon,
-                                                   pixel_shader=getattr(icon, 'pixel_shader', displayio.ColorConverter()))
-        except TypeError:
-            self._icon_sprite = displayio.TileGrid(icon,
-                                                   pixel_shader=getattr(icon, 'pixel_shader', displayio.ColorConverter()),
-                                                   position=(0,0))
+        self._icon_sprite = displayio.TileGrid(
+            icon,
+            pixel_shader=getattr(icon, 'pixel_shader', displayio.ColorConverter())
+        )
+
+        # # CircuitPython 7+ compatible
+        # icon = displayio.OnDiskBitmap(filename)
+        # self._icon_sprite = displayio.TileGrid(icon, pixel_shader=icon.pixel_shader)
 
         self._icon_group.append(self._icon_sprite)
