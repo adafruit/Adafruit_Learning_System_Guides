@@ -12,14 +12,14 @@ large_font = cwd+"/fonts/Arial-Bold-24.bdf"
 
 class OpenWeather_Graphics(displayio.Group):
     def __init__(self, root_group, *, am_pm=True, celsius=True):
-        super().__init__(max_size=2)
+        super().__init__()
         self.am_pm = am_pm
         self.celsius = celsius
 
         root_group.append(self)
-        self._icon_group = displayio.Group(max_size=1)
+        self._icon_group = displayio.Group()
         self.append(self._icon_group)
-        self._text_group = displayio.Group(max_size=5)
+        self._text_group = displayio.Group()
         self.append(self._text_group)
 
         self._icon_sprite = None
@@ -36,25 +36,25 @@ class OpenWeather_Graphics(displayio.Group):
         self.large_font.load_glyphs(('°',))  # a non-ascii character we need for sure
         self.city_text = None
 
-        self.time_text = Label(self.medium_font, max_glyphs=9)
+        self.time_text = Label(self.medium_font)
         self.time_text.x = 200
         self.time_text.y = 12
         self.time_text.color = 0xFFFFFF
         self._text_group.append(self.time_text)
 
-        self.temp_text = Label(self.large_font, max_glyphs=6)
+        self.temp_text = Label(self.large_font)
         self.temp_text.x = 200
         self.temp_text.y = 195
         self.temp_text.color = 0xFFFFFF
         self._text_group.append(self.temp_text)
 
-        self.main_text = Label(self.large_font, max_glyphs=20)
+        self.main_text = Label(self.large_font)
         self.main_text.x = 10
         self.main_text.y = 195
         self.main_text.color = 0xFFFFFF
         self._text_group.append(self.main_text)
 
-        self.description_text = Label(self.small_font, max_glyphs=60)
+        self.description_text = Label(self.small_font)
         self.description_text.x = 10
         self.description_text.y = 225
         self.description_text.color = 0xFFFFFF
@@ -125,15 +125,17 @@ class OpenWeather_Graphics(displayio.Group):
 
         if not filename:
             return  # we're done, no icon desired
+
+        # CircuitPython 6 & 7 compatible
         if self._icon_file:
             self._icon_file.close()
         self._icon_file = open(filename, "rb")
         icon = displayio.OnDiskBitmap(self._icon_file)
-        try:
-            self._icon_sprite = displayio.TileGrid(icon,
-                                                   pixel_shader=getattr(icon, 'pixel_shader', displayio.ColorConverter()))
-        except TypeError:
-            self._icon_sprite = displayio.TileGrid(icon,
-                                                   pixel_shader=getattr(icon, 'pixel_shader', displayio.ColorConverter()),
-                                                   position=(0,0))
+        self._icon_sprite = displayio.TileGrid(
+            icon, pixel_shader=getattr(icon, 'pixel_shader', displayio.ColorConverter()))
+
+        # # CircuitPython 7+ compatible
+        # icon = displayio.OnDiskBitmap(filename)
+        # self._icon_sprite = displayio.TileGrid(icon, pixel_shader=background.pixel_shader)
+
         self._icon_group.append(self._icon_sprite)
