@@ -37,7 +37,7 @@ pyportal = PyPortal(status_neopixel=board.NEOPIXEL,
 big_font = bitmap_font.load_font(cwd+"/fonts/DSEG14ModernMiniBI-44.bdf")
 big_font.load_glyphs(b'0123456789:AP') # pre-load glyphs for fast printing
 
-time_textarea = Label(big_font, max_glyphs=15)
+time_textarea = Label(big_font)
 time_textarea.x = 0
 time_textarea.y = 130
 time_textarea.color = 0xFF0000
