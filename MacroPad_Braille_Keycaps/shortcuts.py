@@ -3,7 +3,7 @@ A Python dictionary containing information to be associated with the twelve keys
 MacroPad.
 """
 from adafruit_macropad import MacroPad
-macropad = MacroPad
+macropad = MacroPad()
 """
 ** Understanding the Dictionary **
 The following explains how to configure each entry below.
