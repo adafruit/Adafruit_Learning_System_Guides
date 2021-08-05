@@ -35,7 +35,7 @@ icons_bmp, icons_pal = adafruit_imageload.load(
 for i, c in enumerate(icons_pal):
     if c == 0xFFFF00:
         icons_pal.make_transparent(i)
-storm_icons = displayio.Group(max_size=MAX_STORMS)
+storm_icons = displayio.Group()
 pyportal.splash.append(storm_icons)
 STORM_CLASS = ("TD", "TS", "HU")
 
@@ -87,7 +87,7 @@ def update_display():
         ):
             continue
         # OK, let's make a group for all the graphics
-        storm_gfx = displayio.Group(max_size=3)  # icon + label + arrow
+        storm_gfx = displayio.Group()
         # convert to sreen coords
         x = int(map_range(lon, LON_RANGE[0], LON_RANGE[1], 0, board.DISPLAY.width - 1))
         y = math.radians(lat)
