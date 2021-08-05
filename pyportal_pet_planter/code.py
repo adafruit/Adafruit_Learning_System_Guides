@@ -83,7 +83,7 @@ pyportal = PyPortal(esp=esp,
 pyportal.set_backlight(0.5)
 
 # Create a new DisplayIO group
-splash = displayio.Group(max_size=15)
+splash = displayio.Group()
 
 # show splash group
 display.show(splash)
@@ -132,19 +132,19 @@ full_glyphs = b'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-,
 font_small.load_glyphs(full_glyphs)
 
 # Label to display Adafruit IO status
-label_status = Label(font_small, max_glyphs=20)
+label_status = Label(font_small)
 label_status.x = 305
 label_status.y = 10
 splash.append(label_status)
 
 # Create a label to display the temperature
-label_temp = Label(font, max_glyphs=4)
+label_temp = Label(font)
 label_temp.x = 35
 label_temp.y = 300
 splash.append(label_temp)
 
 # Create a label to display the water level
-label_level = Label(font, max_glyphs=4)
+label_level = Label(font)
 label_level.x = display.width - 130
 label_level.y = 300
 splash.append(label_level)
