@@ -59,7 +59,7 @@ ts = adafruit_touchscreen.Touchscreen(board.TOUCH_XL, board.TOUCH_XR,
 
 
 # Make the display context
-button_group = displayio.Group(max_size=20)
+button_group = displayio.Group()
 board.DISPLAY.show(button_group)
 # preload the font
 print('loading font...')
