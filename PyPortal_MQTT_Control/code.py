@@ -82,7 +82,7 @@ font.load_glyphs(b"abcdefghjiklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789
 # ------------- User Inretface Eliments ------------- #
 
 # Make the display context
-splash = displayio.Group(max_size=200)
+splash = displayio.Group()
 board.DISPLAY.show(splash)
 
 # Make a background color fill
@@ -131,27 +131,27 @@ for b in buttons:
     splash.append(b.group)
 
 # Text Label Objects
-temperature_label = Label(font, text="temperature", color=0xE300D2, max_glyphs=40)
+temperature_label = Label(font, text="temperature", color=0xE300D2)
 temperature_label.x = 130
 temperature_label.y = 20
 splash.append(temperature_label)
 
-light_label = Label(font, text="lux", color=0xE300D2, max_glyphs=40)
+light_label = Label(font, text="lux", color=0xE300D2)
 light_label.x = 130
 light_label.y = 40
 splash.append(light_label)
 
-motion_label = Label(font, text="motion", color=0xE300D2, max_glyphs=40)
+motion_label = Label(font, text="motion", color=0xE300D2)
 motion_label.x = 130
 motion_label.y = 60
 splash.append(motion_label)
 
-feed1_label = Label(font, text="MQTT feed1", color=0xE39300, max_glyphs=100)
+feed1_label = Label(font, text="MQTT feed1", color=0xE39300)
 feed1_label.x = 130
 feed1_label.y = 130
 splash.append(feed1_label)
 
-feed2_label = Label(font, text="MQTT feed2", color=0x00DCE3, max_glyphs=100)
+feed2_label = Label(font, text="MQTT feed2", color=0x00DCE3)
 feed2_label.x = 130
 feed2_label.y = 200
 splash.append(feed2_label)
