@@ -53,16 +53,16 @@ glyphs = b"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-,.: "
 font_small.load_glyphs(glyphs)
 font_large.load_glyphs(glyphs)
 
-group_verification = displayio.Group(max_size=25)
+group_verification = displayio.Group()
 label_overview_text = Label(
     font_large, x=0, y=45, text="To authorize this device with Google:"
 )
 group_verification.append(label_overview_text)
 
-label_verification_url = Label(font_small, x=0, y=100, line_spacing=1, max_glyphs=90)
+label_verification_url = Label(font_small, x=0, y=100, line_spacing=1)
 group_verification.append(label_verification_url)
 
-label_user_code = Label(font_small, x=0, y=150, max_glyphs=50)
+label_user_code = Label(font_small, x=0, y=150)
 group_verification.append(label_user_code)
 
 label_qr_code = Label(font_small, x=0, y=190, text="Or scan the QR code:")

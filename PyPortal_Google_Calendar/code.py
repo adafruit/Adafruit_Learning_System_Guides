@@ -231,7 +231,7 @@ line_header = Line(0, 50, 320, 50, color=0x000000)
 pyportal.splash.append(line_header)
 
 font_h1 = bitmap_font.load_font("fonts/Arial-18.pcf")
-label_header = label.Label(font_h1, x=10, y=30, color=0x000000, max_glyphs=30)
+label_header = label.Label(font_h1, x=10, y=30, color=0x000000)
 pyportal.splash.append(label_header)
 
 # Set up calendar event fonts
