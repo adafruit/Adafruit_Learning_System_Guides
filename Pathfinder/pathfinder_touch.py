@@ -86,7 +86,7 @@ with open(emote_img[0], "rb") as bitmap_file:
         pyportal.play_file("/vo/pathfnd_silent.wav")  # hack to deal w no mute method
 
 while True:
-    if pyportal.touchscreen.touch_point:
+    if not pyportal.touchscreen.touch_point:
         time.sleep(0.01)
         continue
 
