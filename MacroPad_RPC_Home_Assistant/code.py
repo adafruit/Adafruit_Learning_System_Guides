@@ -62,7 +62,7 @@ def update_key(key_number):
     if switch_state is not None:
         macropad.pixels[key_number] = NEOPIXEL_COLORS[switch_state]
     else:
-        macropad.pixels[key_number] = None
+        macropad.pixels[key_number] = 0
 
 mqtt_init()
 last_macropad_encoder_value = macropad.encoder
