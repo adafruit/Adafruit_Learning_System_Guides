@@ -92,6 +92,8 @@ while True:
             if "key_number" in output:
                 time.sleep(UPDATE_DELAY)
                 update_key(output["key_number"])
+            elif ENCODER_ITEM is not None:
+                update_key(ENCODER_ITEM)
         except MqttError:
             mqtt_init()
         except RpcError as err_msg:
