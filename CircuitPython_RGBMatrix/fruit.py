@@ -18,8 +18,17 @@ display = framebufferio.FramebufferDisplay(matrix, auto_refresh=False)
 # This bitmap contains the emoji we're going to use. It is assumed
 # to contain 20 icons, each 20x24 pixels. This fits nicely on the 64x32
 # RGB matrix display.
-bitmap_file = open("emoji.bmp", 'rb')
+
+filename = "emoji.bmp"
+
+# CircuitPython 6 & 7 compatible
+bitmap_file = open(filename, 'rb')
 bitmap = displayio.OnDiskBitmap(bitmap_file)
+pixel_shader = getattr(bitmap, 'pixel_shader', displayio.ColorConverter())
+
+# # CircuitPython 7+ compatible
+# bitmap = displayio.OnDiskBitmap(filename)
+# pixel_shader = bitmap.pixel_shader
 
 # Each wheel can be in one of three states:
 STOPPED, RUNNING, BRAKING = range(3)
@@ -35,7 +44,7 @@ def shuffled(seq):
 class Wheel(displayio.TileGrid):
     def __init__(self):
         # Portions of up to 3 tiles are visible.
-        super().__init__(bitmap=bitmap, pixel_shader=getattr(bitmap, 'pixel_shader', displayio.ColorConverter()),
+        super().__init__(bitmap=bitmap, pixel_shader=pixel_shader,
                          width=1, height=3, tile_width=20, tile_height=24)
         self.order = shuffled(range(20))
         self.state = STOPPED
