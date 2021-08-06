@@ -103,8 +103,6 @@ g.append(label)
 display.show(g)
 display.auto_refresh = False
 
-i = 0
-spin = ".oOo"
 old_payload = None
 while True:
     cam.capture(bitmap)
@@ -126,10 +124,6 @@ while True:
                 except OSError as e:
                     print(e)
                     mqtt_client.reconnect()
-            old_payload = payload
-        else:
-            print(end="+")
-    print(spin[(i := (i + 1) % len(spin))], end="\10")
 
     # Clear out the odd bytes, so that the bitmap displays as greyscale
     view[1::2] = 0
