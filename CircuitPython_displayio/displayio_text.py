@@ -9,8 +9,8 @@ text = "HELLO WORLD"
 font = terminalio.FONT
 color = 0x0000FF
 
-# Create the tet label
-text_area = label.Label(font, text="HELLO WORLD", color=0x00FF00)
+# Create the text label
+text_area = label.Label(font, text=text, color=color)
 
 # Set the location
 text_area.x = 100
