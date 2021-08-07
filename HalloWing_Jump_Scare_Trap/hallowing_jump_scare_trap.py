@@ -108,11 +108,7 @@ def show_image(filename):
 
     backlight.duty_cycle = 0
     splash.append(face)
-    # Wait for the image to load.
-    try:
-        board.DISPLAY.refresh(target_frames_per_second=60)
-    except AttributeError:
-        board.DISPLAY.wait_for_frame()
+    board.DISPLAY.refresh(target_frames_per_second=60)
     backlight.duty_cycle = max_brightness
 
 beep(1)  # startup beep
