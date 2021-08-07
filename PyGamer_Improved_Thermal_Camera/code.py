@@ -61,13 +61,22 @@ panel = GamePadShift(
 i2c = busio.I2C(board.SCL, board.SDA, frequency=400000)
 amg8833 = adafruit_amg88xx.AMG88XX(i2c)
 
-# Display spash graphics
+# CircuitPython 6 & 7 compatible
+# Display splash graphics
 with open("/thermal_cam_splash.bmp", "rb") as bitmap_file:
     bitmap = displayio.OnDiskBitmap(bitmap_file)
     splash = displayio.Group(scale=display.width // 160)
     splash.append(displayio.TileGrid(bitmap, pixel_shader=getattr(bitmap, 'pixel_shader', displayio.ColorConverter())))
     display.show(splash)
     time.sleep(0.1)  # Give the splash graphic some time to display
+
+# # CircuitPython 7+ compatible
+# Display splash graphics
+# splash = displayio.Group(scale=display.width // 160)
+# bitmap = displayio.OnDiskBitmap("/thermal_cam_splash.bmp")
+# splash.append(displayio.TileGrid(bitmap, pixel_shader=bitmap.pixel_shader))
+# board.DISPLAY.show(splash)
+# time.sleep(0.1)  # Allow the splash to display
 
 # Set up ulab arrays
 n = 8  # Thermal sensor grid axis size; AMG8833 sensor is 8x8
