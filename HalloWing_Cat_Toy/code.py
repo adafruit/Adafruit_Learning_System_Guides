@@ -23,7 +23,6 @@ import touchio
 import audioio
 import audiocore
 import neopixel
-# import busio
 # import adafruit_lis3dh
 
 #-------------------------------------------------------------------------------
@@ -35,7 +34,7 @@ pir.direction = digitalio.Direction.INPUT
 touch_1 = touchio.TouchIn(board.TOUCH1)
 touch_4 = touchio.TouchIn(board.TOUCH4)
 
-audio = audioio.AudioOut(board.A0)
+audio = audioio.AudioOut(board.SPEAKER)
 
 backlight = digitalio.DigitalInOut(board.TFT_BACKLIGHT)
 backlight.direction = digitalio.Direction.OUTPUT
@@ -51,7 +50,7 @@ pixels.fill((0, 0, 0))
 pixels.show()
 
 # setup accelerometer
-# i2c = busio.I2C(board.SCL, board.SDA)
+# i2c = board.I2C()
 # lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c)
 
 
@@ -71,9 +70,18 @@ def play_wave(filename):
 # Display an image on the HalloWing TFT screen
 
 def show_image(filename):
+    # CircuitPython 6 & 7 compatible
     image_file = open(filename, "rb")
     odb = displayio.OnDiskBitmap(image_file)
-    face = displayio.Sprite(odb, pixel_shader=displayio.ColorConverter(), position=(0, 0))
+    face = displayio.TileGrid(
+        odb,
+        pixel_shader=getattr(odb, 'pixel_shader', displayio.ColorConverter())
+    )
+
+    # # CircuitPython 7+ compatible
+    # odb = displayio.OnDiskBitmap(filename)
+    # face = displayio.TileGrid(odb, pixel_shader=odb.pixel_shader)
+
     backlight.value = False
     splash.append(face)
     try:
@@ -92,13 +100,13 @@ def random_colour():
 # Set 6 random pixels to random colours.
 # Keep track of which are lit so they can be turned off next time
 
-twinkle_indecies = [0 ,0, 0, 0, 0, 0]
+twinkle_indices = [0 , 0, 0, 0, 0, 0]
 
 def twinkle():
     for p in range(6):
-        pixels[twinkle_indecies[p]] = (0,0,0)
-        twinkle_indecies[p] = randrange(len(pixels))
-        pixels[twinkle_indecies[p]] = random_colour()
+        pixels[twinkle_indices[p]] = (0, 0, 0)
+        twinkle_indices[p] = randrange(len(pixels))
+        pixels[twinkle_indices[p]] = random_colour()
     pixels.show()
 
 
