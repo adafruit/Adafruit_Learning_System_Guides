@@ -84,10 +84,7 @@ def show_image(filename):
 
     backlight.value = False
     splash.append(face)
-    try:
-        board.DISPLAY.refresh(target_frames_per_second=60)
-    except AttributeError:
-        board.DISPLAY.wait_for_frame()
+    board.DISPLAY.refresh(target_frames_per_second=60)
     backlight.value = True
 
 
