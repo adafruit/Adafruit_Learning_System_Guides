@@ -30,6 +30,7 @@ amg8833 = adafruit_amg88xx.AMG88XX(i2c)
 font = bitmap_font.load_font("/fonts/OpenSans-9.bdf")
 
 # Display splash graphics and play startup tones
+# CircuitPython 6 & 7 compatible
 with open("/thermal_cam_splash.bmp", "rb") as bitmap_file:
     bitmap = displayio.OnDiskBitmap(bitmap_file)
     splash = displayio.Group()
@@ -37,6 +38,14 @@ with open("/thermal_cam_splash.bmp", "rb") as bitmap_file:
                                      pixel_shader=getattr(bitmap, 'pixel_shader', displayio.ColorConverter())))
     board.DISPLAY.show(splash)
     time.sleep(0.1)  # Allow the splash to display
+
+# # CircuitPython 7+ compatible
+# splash = displayio.Group()
+# bitmap = displayio.OnDiskBitmap("/thermal_cam_splash.bmp")
+# splash.append(displayio.TileGrid(bitmap, pixel_shader=bitmap.pixel_shader))
+# board.DISPLAY.show(splash)
+# time.sleep(0.1)  # Allow the splash to display
+
 panel.play_tone(440, 0.1)  # A4
 panel.play_tone(880, 0.1)  # A5
 
