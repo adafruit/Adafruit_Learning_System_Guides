@@ -12,7 +12,7 @@ import touchio
 import audioio
 import audiocore
 # Setup LED and PIR pins
-LED_PIN = board.D13  # Pin number for the board's built in LED.
+LED_PIN = board.LED  # Pin number for the board's built in LED.
 PIR_PIN = board.SENSE   # Pin port connected to PIR sensor output wire.
 # Setup digital input for PIR sensor:
 pir = digitalio.DigitalInOut(PIR_PIN)
@@ -94,9 +94,18 @@ images = ["trap_sprung.bmp", "reset_trap.bmp", "please_standby.bmp",
           "trap_set.bmp"]
 # Function for displaying images on HalloWing TFT screen
 def show_image(filename):
+    # CircuitPython 6 & 7 compatible
     image_file = open(filename, "rb")
     odb = displayio.OnDiskBitmap(image_file)
-    face = displayio.Sprite(odb, pixel_shader=displayio.ColorConverter(), position=(0, 0))
+    face = displayio.TileGrid(
+        odb,
+        pixel_shader=getattr(odb, 'pixel_shader', displayio.ColorConverter())
+    )
+
+    # # CircuitPython 7+ compatible
+    # odb = displayio.OnDiskBitmap(filename)
+    # face = displayio.TileGrid(odb, pixel_shader=odb.pixel_shader)
+
     backlight.duty_cycle = 0
     splash.append(face)
     # Wait for the image to load.
