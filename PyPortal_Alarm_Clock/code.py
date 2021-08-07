@@ -258,20 +258,21 @@ class Time_State(State):
                 except IndexError:
                     pass
                 filename = "/icons/"+weather_icon_name+".bmp"
+
                 if filename:
+                    # CircuitPython 6 & 7 compatible
                     if self.icon_file:
                         self.icon_file.close()
                     self.icon_file = open(filename, "rb")
                     icon = displayio.OnDiskBitmap(self.icon_file)
-                    try:
-                        icon_sprite = displayio.TileGrid(icon,
-                                                         pixel_shader=getattr(icon, 'pixel_shader', displayio.ColorConverter()),
-                                                         x=0, y=0)
-                    except TypeError:
-                        icon_sprite = displayio.TileGrid(icon,
-                                                         pixel_shader=getattr(icon, 'pixel_shader', displayio.ColorConverter()),
-                                                         position=(0, 0))
 
+                    icon_sprite = displayio.TileGrid(icon,
+                                                     pixel_shader=getattr(icon, 'pixel_shader', displayio.ColorConverter()),
+                                                     x=0, y=0)
+
+                    # # CircuitPython 7+ compatible
+                    # icon = displayio.OnDiskBitmap(filename)
+                    # icon_sprite = displayio.TileGrid(icon, pixel_shader=icon.pixel_shader)
 
                     self.weather_icon.append(icon_sprite)
 
