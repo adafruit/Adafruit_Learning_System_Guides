@@ -25,46 +25,57 @@ ACCEL.range = adafruit_lis3dh.RANGE_4_G
 
 while True:
     shaken = False
-    with open(images[i], "rb") as f:
-        print("Image load {}".format(images[i]))
+
+    print("Image load {}".format(images[i]))
+    # CircuitPython 6 & 7 compatible
+    try:
+        f = open(images[i], "rb")
+        odb = displayio.OnDiskBitmap(f)
+    except ValueError:
+        print("Image unsupported {}".format(images[i]))
+        del images[i]
+        continue
+    face = displayio.TileGrid(odb, pixel_shader=getattr(odb, 'pixel_shader', displayio.ColorConverter()))
+
+    # # CircuitPython 7+ compatible
+    # try:
+    #     odb = displayio.OnDiskBitmap(images[i])
+    # except ValueError:
+    #     print("Image unsupported {}".format(images[i]))
+    #     del images[i]
+    #     continue
+    # face = displayio.TileGrid(odb, pixel_shader=odb.pixel_shader)
+
+    splash.append(face)
+    # Wait for the image to load.
+    try:
+        board.DISPLAY.refresh(target_frames_per_second=60)
+    except AttributeError:
+        board.DISPLAY.wait_for_frame()
+
+    # Fade up the backlight
+    for b in range(101):
+        board.DISPLAY.brightness = b / 100
+        time.sleep(0.01)  # default (0.01)
+
+    # Wait until the board gets shaken
+    while not shaken:
         try:
-            odb = displayio.OnDiskBitmap(f)
-        except ValueError:
-            print("Image unsupported {}".format(images[i]))
-            del images[i]
-            continue
-        face = displayio.TileGrid(odb, pixel_shader=getattr(odb, 'pixel_shader', displayio.ColorConverter()))
+            ACCEL_Z = ACCEL.acceleration[2]  # Read Z axis acceleration
+        except OSError:
+            pass
+        # print(ACCEL_Z)  # uncomment to see the accelerometer z reading
+        if ACCEL_Z > SENSITIVITY:
+            shaken = True
 
-        splash.append(face)
-        # Wait for the image to load.
-        try:
-            board.DISPLAY.refresh(target_frames_per_second=60)
-        except AttributeError:
-            board.DISPLAY.wait_for_frame()
+    # Fade down the backlight
+    for b in range(100, 0, -1):
+        board.DISPLAY.brightness = b
+        time.sleep(0.005)  # default (0.005)
 
-        # Fade up the backlight
-        for b in range(101):
-            board.DISPLAY.brightness = b / 100
-            time.sleep(0.01)  # default (0.01)
+    splash.pop()
 
-        # Wait until the board gets shaken
-        while not shaken:
-            try:
-                ACCEL_Z = ACCEL.acceleration[2]  # Read Z axis acceleration
-            except OSError:
-                pass
-            # print(ACCEL_Z)  # uncomment to see the accelerometer z reading
-            if ACCEL_Z > SENSITIVITY:
-                shaken = True
-
-        # Fade down the backlight
-        for b in range(100, 0, -1):
-            board.DISPLAY.brightness = b
-            time.sleep(0.005)  # default (0.005)
-
-        splash.pop()
-
-        i = random.randint(0, (len(images)-1))  # pick a new random image
-        # print("shaken")
-        faceup = False
-        i %= len(images) - 1
+    i = random.randint(0, (len(images)-1))  # pick a new random image
+    # print("shaken")
+    faceup = False
+    i %= len(images) - 1
