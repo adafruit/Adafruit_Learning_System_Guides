@@ -52,15 +52,20 @@ display_bus = displayio.FourWire(
 #  display setup
 display = ST7789(display_bus, width=240, height=240, rowstart=80)
 
+# CircuitPython 6 & 7 compatible
 #  bitmap setup
 bitmap = displayio.OnDiskBitmap(open("/parrot-240-sheet.bmp", "rb"))
 
 # Create a TileGrid to hold the bitmap
 parrot0_grid = displayio.TileGrid(bitmap, pixel_shader=getattr(bitmap, 'pixel_shader', displayio.ColorConverter()),
-                                    width=1, height=1,
-                                 tile_height=240, tile_width=240,
-                                 default_tile=0,
-                                 x=0, y=0)
+                                 tile_height=240, tile_width=240)
+
+# # CircuitPython 7+ compatible
+# bitmap = displayio.OnDiskBitmap("/parrot-240-sheet.bmp")
+
+# Create a TileGrid to hold the bitmap
+# parrot0_grid = displayio.TileGrid(bitmap, pixel_shader=bitmap.pixel_shader,
+#                                tile_height=240, tile_width=240)
 
 # Create a Group to hold the TileGrid
 group = displayio.Group()
