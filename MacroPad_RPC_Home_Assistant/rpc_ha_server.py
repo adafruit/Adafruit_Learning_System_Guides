@@ -68,10 +68,14 @@ def mqtt_get_last_value(topic):
         return last_mqtt_messages[topic]
     return None
 
+def is_running():
+    return True
+
 def handle_rpc(packet):
     """This function will verify good data in packet,
     call the method with parameters, and generate a response
     packet as the return value"""
+    print("Received packet")
     func_name = packet['function']
     if func_name in PROTECTED_FUNCTIONS:
         return rpc.create_response_packet(error=True, message=f"{func_name}'() is a protected function and can not be called.")
