@@ -1,0 +1,56 @@
+REM ChromeBook Keyboard Key Sequence
+REM Part One: Wifi Setup
+DELAY 1000
+DELAY 1000
+TAB
+TAB
+TAB
+TAB
+ENTER
+DELAY 1000
+TAB
+TAB
+TAB
+ENTER
+DELAY 500
+STRING WiFi SSID
+DELAY 500
+TAB
+DELAY 500
+DOWN
+DOWN
+DELAY 500
+TAB
+STRING WiFi Password
+DELAY 500
+ENTER
+REM Long Pause while Connection is established.
+DELAY 9000
+REM Part One and One half: Go through First run Setup.
+TAB
+TAB
+ENTER
+DELAY 500
+TAB
+TAB
+TAB
+ENTER
+DELAY 500
+CTRL ALT E
+TAB
+TAB
+TAB
+TAB
+TAB
+ENTER
+REM Part Two: Enrollment (Long Pauses in case it's having issues with wifi or render)
+DELAY 4000
+STRING Google Account
+ENTER
+DELAY 5000
+STRING Google Account Password
+DELAY 500
+ENTER
+REM Long Pause while device is enrolled.
+DELAY 8000
+ENTER
