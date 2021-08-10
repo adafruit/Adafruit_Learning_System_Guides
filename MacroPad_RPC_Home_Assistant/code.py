@@ -48,7 +48,7 @@ macropad.display.show(group)
 def rpc_call(function, *args, **kwargs):
     response = rpc.call(function, *args, **kwargs)
     if response["error"]:
-        if response["error_type"]:
+        if response["error_type"] == "mqtt":
             raise MqttError(response["message"])
         raise RpcError(response["message"])
     return response["return_val"]
@@ -62,7 +62,16 @@ def update_key(key_number):
     if switch_state is not None:
         macropad.pixels[key_number] = NEOPIXEL_COLORS[switch_state]
     else:
-        macropad.pixels[key_number] = None
+        macropad.pixels[key_number] = 0
+
+server_is_running = False
+print("Waiting for server...")
+while not server_is_running:
+    try:
+        server_is_running = rpc_call("is_running")
+        print("Connected")
+    except RpcError:
+        pass
 
 mqtt_init()
 last_macropad_encoder_value = macropad.encoder
@@ -92,6 +101,8 @@ while True:
             if "key_number" in output:
                 time.sleep(UPDATE_DELAY)
                 update_key(output["key_number"])
+            elif ENCODER_ITEM is not None:
+                update_key(ENCODER_ITEM)
         except MqttError:
             mqtt_init()
         except RpcError as err_msg:
