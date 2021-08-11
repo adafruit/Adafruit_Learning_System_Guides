@@ -30,7 +30,7 @@ GRAY = 0x888888
 LABEL_OFFSET = 290
 
 # Make the display context
-calc_group = displayio.Group(max_size=25)
+calc_group = displayio.Group()
 board.DISPLAY.show(calc_group)
 
 # Make a background color fill
@@ -68,7 +68,7 @@ def find_button(label):
     return result
 
 border = Rect(20, 8, 280, 35, fill=WHITE, outline=BLACK, stroke=2)
-calc_display = Label(font, text="0", color=BLACK, max_glyphs=MAX_DIGITS)
+calc_display = Label(font, text="0", color=BLACK)
 calc_display.y = 25
 
 clear_button = add_button(0, 0, "AC")
