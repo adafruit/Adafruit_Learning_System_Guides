@@ -58,11 +58,12 @@ def mqtt_init():
     rpc_call("mqtt_connect")
 
 def update_key(key_number):
-    switch_state = rpc_call("mqtt_get_last_value", SUBSCRIBE_TOPICS[key_number])
-    if switch_state is not None:
-        macropad.pixels[key_number] = NEOPIXEL_COLORS[switch_state]
-    else:
-        macropad.pixels[key_number] = 0
+    if key_number < len(SUBSCRIBE_TOPICS):
+        switch_state = rpc_call("mqtt_get_last_value", SUBSCRIBE_TOPICS[key_number])
+        if switch_state is not None:
+            macropad.pixels[key_number] = NEOPIXEL_COLORS[switch_state]
+        else:
+            macropad.pixels[key_number] = 0
 
 server_is_running = False
 print("Waiting for server...")
