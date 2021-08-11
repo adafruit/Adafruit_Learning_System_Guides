@@ -7,7 +7,6 @@ This demo is designed for the Kaluga development kit version 1.3 with the
 ILI9341 display.
 """
 
-import ssl
 from ulab import numpy as np
 from terminalio import FONT
 import board
