@@ -7,9 +7,9 @@ fades a led using a potentiometer
 
 import analogio
 import board
-import pulseio
+import pwmio
 
-led = pulseio.PWMOut(board.D9)
+led = pwmio.PWMOut(board.D9)
 pot = analogio.AnalogIn(board.A0)
 
 while True:

@@ -8,10 +8,10 @@ requires:
 """
 import time
 import board
-import pulseio
+import pwmio
 from adafruit_motor import servo
 
-SERVO = servo.Servo(pulseio.PWMOut(board.D9))
+SERVO = servo.Servo(pwmio.PWMOut(board.D9))
 
 while True:
     SERVO.angle = 0
