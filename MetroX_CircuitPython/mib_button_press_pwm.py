@@ -7,10 +7,10 @@ fade a led in and out using two buttons
 import time
 import digitalio
 import board
-import pulseio
+import pwmio
 
 
-led = pulseio.PWMOut(board.D13)
+led = pwmio.PWMOut(board.D13)
 btn1 = digitalio.DigitalInOut(board.D3)
 btn2 = digitalio.DigitalInOut(board.D2)
 btn1.switch_to_input()

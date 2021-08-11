@@ -15,8 +15,8 @@ except ImportError:
     import usb_cdc as serial
     json_decode_exception = ValueError
 
-RESPONSE_TIMEOUT=1
-DATA_TIMEOUT=0.2
+RESPONSE_TIMEOUT=5
+DATA_TIMEOUT=0.5
 
 class RpcError(Exception):
     """For RPC Specific Errors"""
