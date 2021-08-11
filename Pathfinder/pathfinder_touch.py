@@ -86,21 +86,35 @@ with open(emote_img[0], "rb") as bitmap_file:
         pyportal.play_file("/vo/pathfnd_silent.wav")  # hack to deal w no mute method
 
 while True:
-    if pyportal.touchscreen.touch_point:
-        i = (i + 1) % 11
-        pixel.fill(colors[i])
-        pixel.show()
-        time.sleep(1)
-        with open(emote_img[i], "rb") as bitmap_file:
-            bitmap = displayio.OnDiskBitmap(bitmap_file)
-            tile_grid = displayio.TileGrid(
-                bitmap, pixel_shader=getattr(bitmap, 'pixel_shader', displayio.ColorConverter())
-            )
-            group = displayio.Group()
-            group.append(tile_grid)
-            display.show(group)
-            if sound_mode is not 0:
-                # play a sound file
-                pyportal.play_file(vo_sound[i])
-            else:
-                pyportal.play_file("/vo/pathfnd_silent.wav")
+    if not pyportal.touchscreen.touch_point:
+        time.sleep(0.01)
+        continue
+
+    i = (i + 1) % 11
+    pixel.fill(colors[i])
+    pixel.show()
+    time.sleep(1)
+
+    # CircuitPython 6 & 7 compatible
+    with open(emote_img[i], "rb") as bitmap_file:
+        bitmap = displayio.OnDiskBitmap(bitmap_file)
+        tile_grid = displayio.TileGrid(
+            bitmap,
+            pixel_shader=getattr(bitmap, 'pixel_shader', displayio.ColorConverter())
+        )
+        group = displayio.Group()
+        group.append(tile_grid)
+        display.show(group)
+
+    # # CircuitPython 7+ compatible
+    # bitmap = displayio.OnDiskBitmap(emote_img[i])
+    # tile_grid = displayio.TileGrid(bitmap, pixel_shader=bitmap.pixel_shader)
+    # group = displayio.Group()
+    # group.append(tile_grid)
+    # display.show(group)
+
+    if sound_mode is not 0:
+        # play a sound file
+        pyportal.play_file(vo_sound[i])
+    else:
+        pyportal.play_file("/vo/pathfnd_silent.wav")
