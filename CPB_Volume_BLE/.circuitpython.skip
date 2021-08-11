@@ -1,0 +1,1 @@
+CPB_Volume_BLE/cpb_volume_ble.py 78: Unnecessary "else" after "continue" (no-else-continue)

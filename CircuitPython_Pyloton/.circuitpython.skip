@@ -1,0 +1,4 @@
+CircuitPython_Pyloton/pyloton.py 173: Line too long (126/100) (line-too-long)
+CircuitPython_Pyloton/pyloton.py 547: Using a conditional statement with a constant value (using-constant-test)
+CircuitPython_Pyloton/pyloton.py 552: Using a conditional statement with a constant value (using-constant-test)
+CircuitPython_Pyloton/pyloton.py 557: Using a conditional statement with a constant value (using-constant-test)

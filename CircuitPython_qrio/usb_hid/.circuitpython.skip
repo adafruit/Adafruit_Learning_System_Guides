@@ -1,0 +1,2 @@
+CircuitPython_qrio/usb_hid/code.py 20: Unused adafruit_minimqtt.adafruit_minimqtt imported as MQTT (unused-import)
+CircuitPython_qrio/usb_hid/code.py 24: Unused Keycode imported from adafruit_hid.keycode (unused-import)

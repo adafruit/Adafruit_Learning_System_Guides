@@ -1,0 +1,8 @@
+EInk_Bonnet_Event_Calendar/event_calendar.py 84: Redefining name 'current_time' from outer scope (line 199) (redefined-outer-name)
+EInk_Bonnet_Event_Calendar/event_calendar.py 72: Too many local variables (19/15) (too-many-locals)
+EInk_Bonnet_Event_Calendar/event_calendar.py 195: Redefining name 'now' from outer scope (line 239) (redefined-outer-name)
+EInk_Bonnet_Event_Calendar/event_calendar.py 202: Redefining name 'calendar_id' from outer scope (line 242) (redefined-outer-name)
+EInk_Bonnet_Event_Calendar/event_calendar.py 205: Redefining name 'events' from outer scope (line 69) (redefined-outer-name)
+EInk_Bonnet_Event_Calendar/event_calendar.py 204: Unused variable 'page_token' (unused-variable)
+EInk_Bonnet_Event_Calendar/event_calendar.py 221: Redefining name 'calendar_ids' from outer scope (line 240) (redefined-outer-name)
+EInk_Bonnet_Event_Calendar/event_calendar.py 9: standard import "import textwrap" should be placed before "from googleapiclient.discovery import build" (wrong-import-order)

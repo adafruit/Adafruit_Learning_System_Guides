@@ -1,0 +1,1 @@
+PowerGlove_BLE_MIDI/code.py 72: Duplicate string formatting argument 'accel_x', consider passing as named argument (duplicate-string-formatting-argument)

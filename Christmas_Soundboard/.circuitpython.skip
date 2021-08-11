@@ -1,0 +1,2 @@
+Christmas_Soundboard/code.py 154: Comparison 'currently_playing['voice'] != None' should be 'currently_playing['voice'] is not None' (singleton-comparison)
+Christmas_Soundboard/code.py 174: Comparison 'currently_playing['voice'] != None' should be 'currently_playing['voice'] is not None' (singleton-comparison)

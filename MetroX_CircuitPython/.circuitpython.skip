@@ -1,0 +1,3 @@
+MetroX_CircuitPython/fading_led.py 20: Final newline missing (missing-final-newline)
+MetroX_CircuitPython/fading_led.py 20: Unexpected line ending format. There is 'CRLF' while it should be 'LF'. (unexpected-line-ending-format)
+MetroX_CircuitPython/fading_led.py 10: standard import "import time" should be placed before "import pwmio" (wrong-import-order)

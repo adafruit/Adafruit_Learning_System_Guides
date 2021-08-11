@@ -1,0 +1,6 @@
+Sunflower_Mobile/code.py 20: Unused Pull imported from digitalio (unused-import)
+Sunflower_Mobile/code.py 29: Unused PixelMap imported from adafruit_led_animation.helper (unused-import)
+Sunflower_Mobile/code.py 37: Unused Comet imported from adafruit_led_animation.animation.comet (unused-import)
+Sunflower_Mobile/code.py 39: Unused colorwheel imported from adafruit_led_animation.color (unused-import)
+Sunflower_Mobile/code.py 40: Unused RED imported from adafruit_led_animation.color (unused-import)
+Sunflower_Mobile/code.py 40: Unused WHITE imported from adafruit_led_animation.color (unused-import)

@@ -1,0 +1,2 @@
+PyLeap_NeoPixel_demo/code.py 11: Access to a protected member _pixelbuf of a client class (protected-access)
+PyLeap_NeoPixel_demo/code.py 1: Unused import time (unused-import)

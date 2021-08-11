@@ -1,0 +1,3 @@
+PyPortal_Alarm_Clock/code.py 137: Class 'State' inherits from object, can be safely removed from bases in python3 (useless-object-inheritance)
+PyPortal_Alarm_Clock/code.py 152: Unnecessary pass statement (unnecessary-pass)
+PyPortal_Alarm_Clock/code.py 164: Unnecessary pass statement (unnecessary-pass)

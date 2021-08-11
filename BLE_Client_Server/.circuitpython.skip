@@ -1,0 +1,1 @@
+BLE_Client_Server/client.py 77: Consider merging these comparisons with "in" to 'color_index in (0, 28)' (consider-using-in)
