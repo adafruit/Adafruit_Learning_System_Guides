@@ -1,10 +1,13 @@
 import time
 import random
+from adafruit_pyportal import PyPortal
 from aio_handler import AIOHandler
 import adafruit_logging as logging
 
+device=PyPortal()
+
 l = logging.getLogger('aio')
-l.addHandler(AIOHandler('test'))
+l.addHandler(AIOHandler('test'), device)
 
 def go():
     while True:
