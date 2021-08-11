@@ -7,10 +7,10 @@ force sensitive resistor (fsr) with circuitpython
 
 import analogio
 import board
-import pulseio
+import pwmio
 
 FORCE_SENS_RESISTOR = analogio.AnalogIn(board.A2)
-LED = pulseio.PWMOut(board.D10)
+LED = pwmio.PWMOut(board.D10)
 
 while True:
     LED.duty_cycle = FORCE_SENS_RESISTOR.value

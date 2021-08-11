@@ -7,10 +7,10 @@ spins a DC motor using pulseio
 
 import time
 import board
-import pulseio
+import pwmio
 
 motor_pin = board.D9
-motor = pulseio.PWMOut(motor_pin, frequency=1000)
+motor = pwmio.PWMOut(motor_pin, frequency=1000)
 
 
 def motor_on_then_off_with_speed():
