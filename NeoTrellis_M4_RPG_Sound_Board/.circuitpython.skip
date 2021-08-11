@@ -1,0 +1,2 @@
+NeoTrellis_M4_RPG_Sound_Board/code.py 123: Comparison 'current_background['voice'] != None' should be 'current_background['voice'] is not None' (singleton-comparison)
+NeoTrellis_M4_RPG_Sound_Board/code.py 136: Comparison 'currently_playing['voice'] != None' should be 'currently_playing['voice'] is not None' (singleton-comparison)

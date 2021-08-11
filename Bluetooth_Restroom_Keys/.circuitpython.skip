@@ -1,0 +1,4 @@
+Bluetooth_Restroom_Keys/code.py 84: Catching too general exception Exception (broad-except)
+Bluetooth_Restroom_Keys/code.py 6: standard import "from array import array" should be placed before "from adafruit_ble import BLERadio" (wrong-import-order)
+Bluetooth_Restroom_Keys/code.py 11: standard import "from math import pi, sin" should be placed before "from adafruit_ble import BLERadio" (wrong-import-order)
+Bluetooth_Restroom_Keys/code.py 13: standard import "from time import sleep" should be placed before "from adafruit_ble import BLERadio" (wrong-import-order)

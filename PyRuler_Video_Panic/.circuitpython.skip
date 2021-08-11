@@ -1,0 +1,2 @@
+PyRuler_Video_Panic/code.py 1: Unused import os (unused-import)
+PyRuler_Video_Panic/code.py 4: standard import "import time" should be placed before "import board" (wrong-import-order)

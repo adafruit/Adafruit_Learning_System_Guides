@@ -1,0 +1,2 @@
+BLE_Host_Computer/ble_eval_server.py 22: Catching too general exception Exception (broad-except)
+BLE_Host_Computer/ble_eval_server.py 21: Use of eval (eval-used)

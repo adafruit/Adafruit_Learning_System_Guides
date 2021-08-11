@@ -1,0 +1,7 @@
+QT_Py_Bracelet/code.py 10: Line too long (111/100) (line-too-long)
+QT_Py_Bracelet/code.py 25: Trailing whitespace (trailing-whitespace)
+QT_Py_Bracelet/code.py 36: Unnecessary parens after 'return' keyword (superfluous-parens)
+QT_Py_Bracelet/code.py 44: Trailing whitespace (trailing-whitespace)
+QT_Py_Bracelet/code.py 54: Trailing whitespace (trailing-whitespace)
+QT_Py_Bracelet/code.py 56: Trailing whitespace (trailing-whitespace)
+QT_Py_Bracelet/code.py 3: Unused import time (unused-import)

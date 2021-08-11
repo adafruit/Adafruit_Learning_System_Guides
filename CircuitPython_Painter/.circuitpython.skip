@@ -1,0 +1,3 @@
+CircuitPython_Painter/main.py 98: Unnecessary "else" after "raise" (no-else-raise)
+CircuitPython_Painter/main.py 99: Consider explicitly re-raising using the 'from' keyword (raise-missing-from)
+CircuitPython_Painter/main.py 101: Consider explicitly re-raising using the 'from' keyword (raise-missing-from)

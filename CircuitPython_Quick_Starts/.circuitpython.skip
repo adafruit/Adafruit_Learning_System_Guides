@@ -1,0 +1,1 @@
+CircuitPython_Quick_Starts/UART_Test_Script.py 32: Unnecessary "else" after "continue" (no-else-continue)

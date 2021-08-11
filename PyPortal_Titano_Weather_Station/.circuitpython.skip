@@ -1,0 +1,5 @@
+PyPortal_Titano_Weather_Station/code.py 245: Assigning the same variable 'mode' to itself (self-assigning-variable)
+PyPortal_Titano_Weather_Station/code.py 253: Assigning the same variable 'mode' to itself (self-assigning-variable)
+PyPortal_Titano_Weather_Station/code.py 269: Assigning the same variable 'mode' to itself (self-assigning-variable)
+PyPortal_Titano_Weather_Station/code.py 277: Assigning the same variable 'mode' to itself (self-assigning-variable)
+PyPortal_Titano_Weather_Station/code.py 292: Assigning the same variable 'mode' to itself (self-assigning-variable)
