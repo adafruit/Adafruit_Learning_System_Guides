@@ -20,10 +20,11 @@ LAT_RANGE = (45, 5)  # set to match map
 LON_RANGE = (-100, -40)  # set to match map
 # --------------------------------------------------------------------
 
+URL = "https://www.nhc.noaa.gov/CurrentStorms.json"
+JSON_PATH = ["activeStorms"]
+
 # setup pyportal
 pyportal = PyPortal(
-    url="https://www.nhc.noaa.gov/CurrentStorms.json",
-    json_path=["activeStorms"],
     status_neopixel=board.NEOPIXEL,
     default_bg="/map.bmp",
 )
@@ -67,7 +68,8 @@ def update_display():
 
     # get latest storm data
     try:
-        storm_data = pyportal.fetch()
+        resp = pyportal.network.fetch(URL)
+        storm_data = pyportal.network.process_json(resp.json(), (JSON_PATH,))[0]
     except RuntimeError:
         return
     print("Number of storms:", len(storm_data))
