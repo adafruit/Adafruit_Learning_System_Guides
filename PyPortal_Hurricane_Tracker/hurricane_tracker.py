@@ -62,6 +62,7 @@ Y_OFFSET = VIRTUAL_HEIGHT / 2 - Y_OFFSET
 
 
 def update_display():
+    # pylint: disable=too-many-locals
     # clear out existing icons
     while len(storm_icons):
         _ = storm_icons.pop()
