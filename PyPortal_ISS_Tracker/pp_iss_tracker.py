@@ -46,11 +46,11 @@ pyportal.splash.append(time_label)
 trail_bitmap = displayio.Bitmap(3, 3, 1)
 trail_palette = displayio.Palette(1)
 trail_palette[0] = TRAIL_COLOR
-trail = displayio.Group(max_size=TRAIL_LENGTH)
+trail = displayio.Group()
 pyportal.splash.append(trail)
 
 # ISS location marker
-marker = displayio.Group(max_size=MARK_THICKNESS)
+marker = displayio.Group()
 for r in range(MARK_SIZE - MARK_THICKNESS, MARK_SIZE):
     marker.append(Circle(0, 0, r, outline=MARK_COLOR))
 pyportal.splash.append(marker)

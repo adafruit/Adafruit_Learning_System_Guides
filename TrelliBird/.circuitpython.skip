@@ -1,0 +1,3 @@
+TrelliBird/post.py 20: Class 'Post' inherits from object, can be safely removed from bases in python3 (useless-object-inheritance)
+TrelliBird/bird.py 20: Class 'Bird' inherits from object, can be safely removed from bases in python3 (useless-object-inheritance)
+TrelliBird/game.py 26: Class 'Game' inherits from object, can be safely removed from bases in python3 (useless-object-inheritance)

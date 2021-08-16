@@ -137,7 +137,7 @@ display = framebufferio.FramebufferDisplay(matrix)
 blm_font = [None, None, None]
 for line in range(3):
     label = adafruit_display_text.label.Label(
-        terminalio.FONT, color=0xFFFFFF, x=2, y=line * 10 - 2, max_glyphs=16
+        terminalio.FONT, color=0xFFFFFF, x=2, y=line * 10 + 5
     )
     blm_font[line] = label
 
@@ -147,14 +147,12 @@ for line in range(2):
     label = adafruit_display_text.label.Label(
         terminalio.FONT,
         color=0xFFFFFF,
-        x=36,
-        y=line * 14,  # these will center text when anchor is top-middle
-        max_glyphs=16,
+        anchored_position=(32, line * 14)  # these will center text when anchor is top-middle
     )
     label.anchor_point = (0.5, 0)
     names_font[line] = label
 
-g = displayio.Group(max_size=10)
+g = displayio.Group()
 for line in blm_font:
     g.append(line)
 for line in names_font:

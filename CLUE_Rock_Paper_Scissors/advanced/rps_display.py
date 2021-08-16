@@ -78,7 +78,7 @@ def blankScreen(disp, pix):
     if disp is None:
         return
 
-    disp.show(Group(max_size=1))
+    disp.show(Group())
 
 
 class RPSDisplay():
@@ -235,7 +235,7 @@ class RPSDisplay():
 
         self.emptyGroup(self.disp_group)
         # Would be slightly better to create this Group once and re-use it
-        round_choice_group = Group(max_size=3)
+        round_choice_group = Group()
 
         if round_no is not None:
             title_dob = Label(self.font,
@@ -261,7 +261,7 @@ class RPSDisplay():
             gamesum_dob.y = round(self.height - 2 * self.font_height // 2)
             round_choice_group.append(gamesum_dob)
 
-        s_group = Group(scale=3, max_size=1)
+        s_group = Group(scale=3)
         s_group.x = 32
         s_group.y = (self.height - 3 * self.sprite_size) // 2
         s_group.append(self.sprites[ch_idx])
@@ -275,7 +275,7 @@ class RPSDisplay():
         """Introduction screen."""
         if self.disp is not None:
             self.emptyGroup(self.disp_group)
-            intro_group = Group(max_size=7)
+            intro_group = Group()
             welcometo_dob = Label(self.font,
                                   text="Welcome To",
                                   scale=3,
@@ -289,7 +289,7 @@ class RPSDisplay():
             spacing = 3 * self.sprite_size + extra_space
             y_adj = (-6, -2, -2)
             for idx, sprite in enumerate(self.sprites):
-                s_group = Group(scale=3, max_size=1)
+                s_group = Group(scale=3)
                 s_group.x = -96
                 s_group.y = round((self.height - 1.5 * self.sprite_size) / 2
                                   + (idx - 1) * spacing) + y_adj[idx]
@@ -384,7 +384,7 @@ class RPSDisplay():
 
         self.emptyGroup(self.disp_group)
         # The two multiplier allows for rssi as separate label
-        playerlist_group = Group(max_size=self.max_players * 2)
+        playerlist_group = Group()
         self.showGroup(playerlist_group)
 
 
@@ -460,7 +460,7 @@ class RPSDisplay():
         self.emptyGroup(self.disp_group)
 
         # Score list group + background + question mark for sorting
-        gs_group = Group(max_size=4)
+        gs_group = Group()
 
         # Pale grey large GAME SCORES background
         bg_scale = 6
@@ -500,7 +500,7 @@ class RPSDisplay():
                            - len(pla) * scale * self.font_height
                            - (len(pla) - 1) * spacing) / 2
                           + scale * self.font_height / 2)
-        scores_group = Group(max_size=len(pla))
+        scores_group = Group()
         gs_group.append(scores_group)
         for idx, (name, _) in enumerate(pla):
             op_dob = Label(self.font,
@@ -648,7 +648,7 @@ class RPSDisplay():
 
         if void:
             error_tot = 3
-            error_group = Group(max_size=error_tot + 1)
+            error_group = Group()
             # Opponent's name helps pinpoint the error
             op_dob = Label(self.font,
                            text=op_name,
@@ -677,7 +677,7 @@ class RPSDisplay():
 
         else:
             # Would be slightly better to create this Group once and re-use it
-            pvp_group = Group(max_size=3)
+            pvp_group = Group()
 
             # Add player's name and sprite just off left side of screen
             # and opponent's just off right
@@ -696,7 +696,7 @@ class RPSDisplay():
             for (name, sprite,
                  start_x,
                  fg, bg) in player_detail:
-                s_group = Group(scale=2, max_size=2)  # Audio is choppy at scale=3
+                s_group = Group(scale=2)  # Audio is choppy at scale=3
                 s_group.x = start_x
                 s_group.y = (self.height - 2 * (self.sprite_size + self.font_height)) // 2
 

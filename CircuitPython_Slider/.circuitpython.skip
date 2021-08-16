@@ -1,0 +1,3 @@
+CircuitPython_Slider/code.py 142: Assigning the same variable 'mode' to itself (self-assigning-variable)
+CircuitPython_Slider/code.py 156: Assigning the same variable 'mode' to itself (self-assigning-variable)
+CircuitPython_Slider/code.py 166: Redundant comparison - mode == mode (comparison-with-itself)

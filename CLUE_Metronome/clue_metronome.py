@@ -16,7 +16,7 @@ delay = 60 / tempo
 
 clue.display.brightness = 1.0
 clue.pixel.brightness = 0.2
-screen = displayio.Group(max_size=11)
+screen = displayio.Group()
 TEAL = 0x009E98
 LT_TEAL = 0x000F0F
 GRAY = 0x02403E
@@ -40,7 +40,7 @@ screen.append(title_box)
 
 # title text
 title_label = label.Label(
-    terminalio.FONT, text="Metronome", scale=4, color=TEAL, max_glyphs=11
+    terminalio.FONT, text="Metronome", scale=4, color=TEAL
 )
 title_label.x = 14
 title_label.y = 26
@@ -48,7 +48,7 @@ screen.append(title_label)
 
 # interval text
 interval_label = label.Label(
-    terminalio.FONT, text=("{} BPM".format(tempo)), scale=5, color=WHITE, max_glyphs=7
+    terminalio.FONT, text="{} BPM".format(tempo), scale=5, color=WHITE
 )
 interval_label.x = 20
 interval_label.y = 95
@@ -65,10 +65,9 @@ screen.append(vert_line)
 # Signature text
 sig_label = label.Label(
     terminalio.FONT,
-    text=("{}/4".format(time_signature)),
+    text="{}/4".format(time_signature),
     scale=3,
     color=BLACK,
-    max_glyphs=3,
 )
 sig_label.x = 30
 sig_label.y = 160
@@ -76,7 +75,7 @@ screen.append(sig_label)
 
 # play text
 play_label = label.Label(
-    terminalio.FONT, text=(" play"), scale=3, color=BLACK, max_glyphs=5
+    terminalio.FONT, text=" play", scale=3, color=BLACK
 )
 play_label.x = 138
 play_label.y = 160
@@ -88,7 +87,7 @@ screen.append(footer_line)
 
 # increment label
 increment_label = label.Label(
-    terminalio.FONT, text=("-1  +1"), scale=3, color=GRAY, max_glyphs=8
+    terminalio.FONT, text="-1  +1", scale=3, color=GRAY
 )
 increment_label.x = 3
 increment_label.y = 220

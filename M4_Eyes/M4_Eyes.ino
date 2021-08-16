@@ -5,10 +5,14 @@
 // "Uncanny Eyes" project (better for SAMD21 chips or Teensy 3.X and
 // 128x128 TFT or OLED screens, single SPI bus).
 
-// IMPORTANT: DO NOT compile with optimizer settings exceeding -O3, else
-// the flash storage code may brick your board! If this happens, install
+// IMPORTANT: in rare situations, a board may get "bricked" when running
+// this code while simultaneously connected to USB. A quick-flashing status
+// LED indicates the filesystem has gone corrupt. If this happens, install
 // CircuitPython to reinitialize the filesystem, copy over your eye files
-// (keep backups!), then upload this code (compiled at -O3 or less).
+// (keep backups!), then re-upload this code. It seems to happen more often
+// at high optimization settings (above -O3), but there's not 1:1 causality.
+// The exact cause has not yet been found...possibly insufficient yield()
+// calls, or some rare alignment in the Arcada library or USB-handling code.
 
 // LET'S HAVE A WORD ABOUT COORDINATE SYSTEMS before continuing. From an
 // outside observer's point of view, looking at the display(s) on these
@@ -154,9 +158,10 @@ void setup() {
 
   arcada.displayBegin();
 
-  DISPLAY_SIZE     = min(ARCADA_TFT_WIDTH, ARCADA_TFT_HEIGHT);
-  DISPLAY_X_OFFSET = (ARCADA_TFT_WIDTH  - DISPLAY_SIZE) / 2;
-  DISPLAY_Y_OFFSET = (ARCADA_TFT_HEIGHT - DISPLAY_SIZE) / 2;
+  // Backlight(s) off ASAP, they'll switch on after screen(s) init & clear
+  arcada.setBacklight(0);
+
+  DISPLAY_SIZE = min(ARCADA_TFT_WIDTH, ARCADA_TFT_HEIGHT);
 
   Serial.begin(115200);
   //while(!Serial) yield();
@@ -164,9 +169,6 @@ void setup() {
   Serial.printf("Available RAM at start: %d\n", availableRAM());
   Serial.printf("Available flash at start: %d\n", arcada.availableFlash());
   yield(); // Periodic yield() makes sure mass storage filesystem stays alive
-
-  // Backlight(s) off ASAP, they'll switch on after screen(s) init & clear
-  arcada.setBacklight(0);
 
   // No file selector yet. In the meantime, you can override the default
   // config file by holding one of the 3 edge buttons at startup (loads
@@ -185,42 +187,20 @@ void setup() {
   }
 
   yield();
-  // Initialize displays
-  #if (NUM_EYES > 1)
-    eye[0].display = arcada._display;
-    eye[1].display = arcada.display2;  
-  #else
-    eye[0].display = arcada.display;
-  #endif
-
-  yield();
-  if (showSplashScreen) {
-    if (arcada.drawBMP((char *)"/splash.bmp", 0, 0, (eye[0].display)) == IMAGE_SUCCESS) {
-      Serial.println("Splashing");
-      if (NUM_EYES > 1) {    // other eye
-        yield();
-        arcada.drawBMP((char *)"/splash.bmp", 0, 0, (eye[1].display));
-      }
-      // backlight on for a bit
-      for (int bl=0; bl<=250; bl+=20) {
-        arcada.setBacklight(bl);
-        delay(20);
-      }
-      delay(2000);
-      // backlight back off
-      for (int bl=250; bl>=0; bl-=20) {
-        arcada.setBacklight(bl);
-        delay(20);
-      }
-    }
-  }
+  // Initialize display(s)
+#if (NUM_EYES > 1)
+  eye[0].display = arcada._display;
+  eye[1].display = arcada.display2;  
+#else
+  eye[0].display = arcada.display;
+#endif
 
   // Initialize DMAs
   yield();
   uint8_t e;
   for(e=0; e<NUM_EYES; e++) {
-#if (ARCADA_TFT_WIDTH != 160) && (ARCADA_TFT_HEIGHT != 128)   // 160x128 is ST7735 which isn't able to deal
-    eye[e].spi->setClockSource(DISPLAY_CLKSRC);
+#if (ARCADA_TFT_WIDTH != 160) && (ARCADA_TFT_HEIGHT != 128) // 160x128 is ST7735 which isn't able to deal
+    eye[e].spi->setClockSource(DISPLAY_CLKSRC); // Accelerate SPI!
 #endif
     eye[e].display->fillScreen(0);
     eye[e].dma.allocate();
@@ -271,12 +251,36 @@ void setup() {
 
     // Uncanny eyes carryover stuff for now, all messy:
     eye[e].blink.state = NOBLINK;
-//    eye[e].eyeX        = 512;
-//    eye[e].eyeY        = 512;
     eye[e].blinkFactor = 0.0;
   }
 
-  arcada.setBacklight(255);
+  // SPLASH SCREEN (IF FILE PRESENT) ---------------------------------------
+
+  yield();
+  uint32_t startTime, elapsed;
+  if (showSplashScreen) {
+    showSplashScreen = ((arcada.drawBMP((char *)"/splash.bmp",
+                         0, 0, eye[0].display)) == IMAGE_SUCCESS);
+    if (showSplashScreen) { // Loaded OK?
+      Serial.println("Splashing");
+      if (NUM_EYES > 1) {   // Load on other eye too, ignore status
+        yield();
+        arcada.drawBMP((char *)"/splash.bmp", 0, 0, eye[1].display);
+      }
+      // Ramp up backlight over 1/2 sec duration
+      startTime = millis();
+      while ((elapsed = (millis() - startTime)) <= 500) {
+        yield();
+        arcada.setBacklight(255 * elapsed / 500);
+      }
+      arcada.setBacklight(255); // To the max
+      startTime = millis();     // Note current time for backlight hold later
+    }
+  }
+
+  // If no splash, or load failed, turn backlight on early so user gets a
+  // little feedback, that the board is not locked up, just thinking.
+  if (!showSplashScreen) arcada.setBacklight(255);
 
   // LOAD CONFIGURATION FILE -----------------------------------------------
 
@@ -307,7 +311,7 @@ void setup() {
   // leave some RAM for the stack to operate over the lifetime of this
   // program and to handle small heap allocations.
 
-  uint32_t        maxRam = availableRAM() - stackReserve;
+  uint32_t maxRam = availableRAM() - stackReserve;
 
   // Load texture maps for eyes
   uint8_t e2;
@@ -398,10 +402,26 @@ void setup() {
   randomSeed(SysTick->VAL + analogRead(A2));
   eyeOldX = eyeNewX = eyeOldY = eyeNewY = mapRadius; // Start in center
   for(e=0; e<NUM_EYES; e++) { // For each eye...
-    // Set up screen rotation (MUST be done after config load!)
     eye[e].display->setRotation(eye[e].rotation);
     eye[e].eyeX = eyeOldX; // Set up initial position
     eye[e].eyeY = eyeOldY;
+  }
+
+  if (showSplashScreen) { // Image(s) loaded above?
+    // Hold backlight on for up to 2 seconds (minus other initialization time)
+    if ((elapsed = (millis() - startTime)) < 2000) {
+      delay(2000 - elapsed);
+    }
+    // Ramp down backlight over 1/2 sec duration
+    startTime = millis();
+    while ((elapsed = (millis() - startTime)) <= 500) {
+      yield();
+      arcada.setBacklight(255 - (255 * elapsed / 500));
+    }
+    arcada.setBacklight(0);
+    for(e=0; e<NUM_EYES; e++) {
+      eye[e].display->fillScreen(0);
+    }
   }
 
 #if defined(ADAFRUIT_MONSTER_M4SK_EXPRESS)
@@ -418,6 +438,8 @@ void setup() {
   }
 #endif
 
+  arcada.setBacklight(255); // Back on, impending graphics
+
   yield();
   if(boopPin >= 0) {
     boopThreshold = 0;
@@ -429,7 +451,6 @@ void setup() {
 
   lastLightReadTime = micros() + 2000000; // Delay initial light reading
 }
-
 
 
 // LOOP FUNCTION - CALLED REPEATEDLY UNTIL POWER-OFF -----------------------
@@ -486,10 +507,12 @@ void loop() {
           if(dt >= eyeMoveDuration) {           // Time up?  Destination reached.
             eyeInMotion = false;                // Stop moving
             // The "move" duration temporarily becomes a hold duration...
-            eyeMoveDuration = random(35000, 1000000); // Time between microsaccades
+            // Normally this is 35 ms to 1 sec, but don't exceed gazeMax setting
+            uint32_t limit = min(1000000, gazeMax);
+            eyeMoveDuration = random(35000, limit); // Time between microsaccades
             if(!saccadeInterval) {              // Cleared when "big" saccade finishes
               lastSaccadeStop = t;              // Time when saccade stopped
-              saccadeInterval = random(eyeMoveDuration, 3000000); // Next in 30ms to 3sec
+              saccadeInterval = random(eyeMoveDuration, gazeMax); // Next in 30ms to 3sec
             }
             // Similarly, the "move" start time becomes the "stop" starting time...
             eyeMoveStartTime = t;               // Save time of event
@@ -600,7 +623,6 @@ void loop() {
       // they need to stay consistent across frame
       eye[eyeNum].upperLidFactor = (eye[eyeNum].upperLidFactor * 0.6) + (uq * 0.4);
       eye[eyeNum].lowerLidFactor = (eye[eyeNum].lowerLidFactor * 0.6) + (lq * 0.4);
-
 
       // Process blinks
       if(eye[eyeNum].blink.state) { // Eye currently blinking?
@@ -880,7 +902,7 @@ void loop() {
     // Initialize new SPI transaction & address window...
     eye[eyeNum].spi->beginTransaction(settings);
     digitalWrite(eye[eyeNum].cs, LOW);  // Chip select
-    eye[eyeNum].display->setAddrWindow(DISPLAY_X_OFFSET, DISPLAY_Y_OFFSET, DISPLAY_SIZE, DISPLAY_SIZE);
+    eye[eyeNum].display->setAddrWindow((eye[eyeNum].display->width() - DISPLAY_SIZE) / 2, (eye[eyeNum].display->height() - DISPLAY_SIZE) / 2, DISPLAY_SIZE, DISPLAY_SIZE);
     delayMicroseconds(1);
     digitalWrite(eye[eyeNum].dc, HIGH); // Data mode
     if(eyeNum == (NUM_EYES-1)) {

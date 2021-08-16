@@ -1,0 +1,1 @@
+Adafruit_MAX98357/I2S_Test_Script.py 30: Unnecessary "else" after "continue" (no-else-continue)

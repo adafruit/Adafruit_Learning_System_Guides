@@ -30,7 +30,7 @@ cwd = ("/"+__file__).rsplit('/', 1)[0]
 large_font = cwd+"/fonts/Helvetica-Bold-36.bdf"
 small_font = cwd+"/fonts/Helvetica-Bold-16.bdf"
 
-root_group = displayio.Group(max_size=3)
+root_group = displayio.Group()
 print('loading fonts...')
 weight_font = bitmap_font.load_font(large_font)
 weight_font.load_glyphs(b'0123456789.goz-SCALEROIO ')
@@ -39,19 +39,19 @@ text_font = bitmap_font.load_font(small_font)
 text_font.load_glyphs(b'sendig!t.')
 
 print('making labels...')
-weight_label = Label(weight_font, max_glyphs=20)
+weight_label = Label(weight_font)
 weight_label.x = 75
 weight_label.y = 120
 root_group.append(weight_label)
 weight_label.text = "---"
 
-title_label = Label(weight_font, max_glyphs=20)
+title_label = Label(weight_font)
 title_label.x = 65
 title_label.y = 20
 root_group.append(title_label)
 title_label.text = "IO SCALE"
 
-text_label = Label(text_font, max_glyphs=25)
+text_label = Label(text_font)
 text_label.x = 100
 text_label.y = 200
 text_label.color = 0xFFFFFF

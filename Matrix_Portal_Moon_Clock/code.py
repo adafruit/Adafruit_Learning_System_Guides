@@ -191,20 +191,31 @@ SYMBOL_FONT.load_glyphs('\u21A5\u21A7')
 
 # Display group is set up once, then we just shuffle items around later.
 # Order of creation here determines their stacking order.
-GROUP = displayio.Group(max_size=10)
+GROUP = displayio.Group()
+
 # Element 0 is a stand-in item, later replaced with the moon phase bitmap
 # pylint: disable=bare-except
 try:
     FILENAME = 'moon/splash-' + str(DISPLAY.rotation) + '.bmp'
+
+    # CircuitPython 6 & 7 compatible
     BITMAP = displayio.OnDiskBitmap(open(FILENAME, 'rb'))
-    TILE_GRID = displayio.TileGrid(BITMAP,
-                                   pixel_shader=displayio.ColorConverter(),)
+    TILE_GRID = displayio.TileGrid(
+        BITMAP,
+        pixel_shader=getattr(BITMAP, 'pixel_shader', displayio.ColorConverter())
+    )
+
+    # # CircuitPython 7+ compatible
+    # BITMAP = displayio.OnDiskBitmap(FILENAME)
+    # TILE_GRID = displayio.TileGrid(BITMAP, pixel_shader=BITMAP.pixel_shader)
+
     GROUP.append(TILE_GRID)
 except:
     GROUP.append(adafruit_display_text.label.Label(SMALL_FONT, color=0xFF0000,
                                                    text='AWOO'))
     GROUP[0].x = (DISPLAY.width - GROUP[0].bounding_box[2] + 1) // 2
     GROUP[0].y = DISPLAY.height // 2 - 1
+
 # Elements 1-4 are an outline around the moon percentage -- text labels
 # offset by 1 pixel up/down/left/right. Initial position is off the matrix,
 # updated on first refresh. Initial text value must be long enough for
@@ -363,9 +374,18 @@ while True:
 
     # Update moon image (GROUP[0])
     FILENAME = 'moon/moon' + '{0:0>2}'.format(FRAME) + '.bmp'
+
+    # CircuitPython 6 & 7 compatible
     BITMAP = displayio.OnDiskBitmap(open(FILENAME, 'rb'))
-    TILE_GRID = displayio.TileGrid(BITMAP,
-                                   pixel_shader=displayio.ColorConverter(),)
+    TILE_GRID = displayio.TileGrid(
+        BITMAP,
+        pixel_shader=getattr(BITMAP, 'pixel_shader', displayio.ColorConverter())
+    )
+
+    # # CircuitPython 7+ compatible
+    # BITMAP = displayio.OnDiskBitmap(FILENAME)
+    # TILE_GRID = displayio.TileGrid(BITMAP, pixel_shader=BITMAP.pixel_shader)
+
     TILE_GRID.x = 0
     TILE_GRID.y = MOON_Y
     GROUP[0] = TILE_GRID

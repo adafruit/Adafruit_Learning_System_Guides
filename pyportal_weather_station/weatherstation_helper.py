@@ -18,18 +18,18 @@ class WeatherStation_GFX(displayio.Group):
 
     def __init__(self, celsius=True):
         # root displayio group
-        root_group = displayio.Group(max_size=20)
+        root_group = displayio.Group()
         board.DISPLAY.show(root_group)
-        super().__init__(max_size=20)
+        super().__init__()
         self._celsius = celsius
 
         # create background icon group
-        self._icon_group = displayio.Group(max_size=1)
+        self._icon_group = displayio.Group()
         self.append(self._icon_group)
         board.DISPLAY.show(self._icon_group)
 
         # create text object group
-        self._text_group = displayio.Group(max_size=8)
+        self._text_group = displayio.Group()
         self.append(self._text_group)
 
         self._icon_sprite = None
@@ -49,33 +49,33 @@ class WeatherStation_GFX(displayio.Group):
         self.title_text.y = 10
         self._text_group.append(self.title_text)
 
-        self.io_status_text = Label(self.c_font, max_glyphs=30)
+        self.io_status_text = Label(self.c_font)
         self.io_status_text.x = 65
         self.io_status_text.y = 190
         self._text_group.append(self.io_status_text)
 
         # Set up Labels to label sensor data
-        self.veml_text = Label(self.medium_font, max_glyphs=16)
+        self.veml_text = Label(self.medium_font)
         self.veml_text.x = 3
         self.veml_text.y = 40
         self._text_group.append(self.veml_text)
 
-        self.bme_temp_humid_text = Label(self.medium_font, max_glyphs = 50)
+        self.bme_temp_humid_text = Label(self.medium_font)
         self.bme_temp_humid_text.x = 0
         self.bme_temp_humid_text.y = 70
         self._text_group.append(self.bme_temp_humid_text)
 
-        self.wind_speed_text = Label(self.medium_font, max_glyphs=30)
+        self.wind_speed_text = Label(self.medium_font)
         self.wind_speed_text.x = 0
         self.wind_speed_text.y = 100
         self._text_group.append(self.wind_speed_text)
 
-        self.bme_pres_alt_text = Label(self.medium_font, max_glyphs=50)
+        self.bme_pres_alt_text = Label(self.medium_font)
         self.bme_pres_alt_text.x = 0
         self.bme_pres_alt_text.y = 130
         self._text_group.append(self.bme_pres_alt_text)
 
-        self.sgp_text = Label(self.medium_font, max_glyphs=50)
+        self.sgp_text = Label(self.medium_font)
         self.sgp_text.x = 0
         self.sgp_text.y = 155
         self._text_group.append(self.sgp_text)
@@ -149,13 +149,16 @@ class WeatherStation_GFX(displayio.Group):
             self._icon_file.close()
         self._icon_file = open(filename, "rb")
         icon = displayio.OnDiskBitmap(self._icon_file)
-        try:
-            self._icon_sprite = displayio.TileGrid(icon,
-                                                   pixel_shader=displayio.ColorConverter())
-        except TypeError:
-            self._icon_sprite = displayio.TileGrid(icon,
-                                                   pixel_shader=displayio.ColorConverter(),
-                                                   position=(0,0))
+
+        # CircuitPython 6 & 7 compatible
+        self._icon_sprite = displayio.TileGrid(
+            icon,
+            pixel_shader=getattr(icon, 'pixel_shader', displayio.ColorConverter()))
+
+        # # CircuitPython 7+ compatible
+        # self._icon_sprite = displayio.TileGrid(
+        #     icon,
+        #     pixel_shader=icon.pixel_shader)
 
         self._icon_group.append(self._icon_sprite)
         try:

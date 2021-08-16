@@ -17,7 +17,7 @@ FRAME_DURATION_OVERRIDES = {
 
 # --- Display setup ---
 matrix = Matrix(bit_depth=4)
-sprite_group = displayio.Group(max_size=1)
+sprite_group = displayio.Group()
 matrix.display.show(sprite_group)
 
 # --- Button setup ---
@@ -57,27 +57,34 @@ def load_image():
     while sprite_group:
         sprite_group.pop()
 
-    bitmap = displayio.OnDiskBitmap(
-        open(SPRITESHEET_FOLDER + "/" + file_list[current_image], "rb")
-    )
+    filename = SPRITESHEET_FOLDER + "/" + file_list[current_image]
 
-    frame_count = int(bitmap.height / matrix.display.height)
-    frame_duration = DEFAULT_FRAME_DURATION
-    if file_list[current_image] in FRAME_DURATION_OVERRIDES:
-        frame_duration = FRAME_DURATION_OVERRIDES[file_list[current_image]]
-
+    # CircuitPython 6 & 7 compatible
+    bitmap = displayio.OnDiskBitmap(open(filename, "rb"))
     sprite = displayio.TileGrid(
         bitmap,
-        pixel_shader=displayio.ColorConverter(),
-        width=1,
-        height=1,
+        pixel_shader=getattr(bitmap, 'pixel_shader', displayio.ColorConverter()),
         tile_width=bitmap.width,
         tile_height=matrix.display.height,
     )
 
+    # # CircuitPython 7+ compatible
+    # bitmap = displayio.OnDiskBitmap(filename)
+    # sprite = displayio.TileGrid(
+    #     bitmap,
+    #     pixel_shader=bitmap.pixel_shader,
+    #     tile_width=bitmap.width,
+    #     tile_height=matrix.display.height,
+    # )
+
     sprite_group.append(sprite)
+
     current_frame = 0
     current_loop = 0
+    frame_count = int(bitmap.height / matrix.display.height)
+    frame_duration = DEFAULT_FRAME_DURATION
+    if file_list[current_image] in FRAME_DURATION_OVERRIDES:
+        frame_duration = FRAME_DURATION_OVERRIDES[file_list[current_image]]
 
 
 def advance_image():

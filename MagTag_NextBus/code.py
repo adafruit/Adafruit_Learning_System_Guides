@@ -152,7 +152,7 @@ FONT_MEDIUM = bitmap_font.load_font('/fonts/Impact-24.pcf')
 FONT_LARGE = bitmap_font.load_font('/fonts/Impact-30.pcf')
 
 # displayio group holds all the labels for the stops and predictions...
-GROUP = displayio.Group(max_size=14)
+GROUP = displayio.Group()
 GROUP.append(fillrect(0, 0, DISPLAY.width, DISPLAY.height, 0xFFFFFF))
 # Clear the screen ASAP before populating rest of group (erase any old
 # prediction data)...
@@ -179,8 +179,7 @@ for stop in STOPS:
     TEXT.anchor_point = (0.0, 1.0) # Bottom-left align description
     GROUP.append(TEXT)
     INITIAL = 'No predictions'
-    TEXT = Label(FONT_MEDIUM, text=INITIAL, color=0,
-                 max_glyphs=max(len(INITIAL), MAX_PREDICTIONS * 7))
+    TEXT = Label(FONT_MEDIUM, text=INITIAL, color=0)
     TEXT.anchor_point = (1.0, 1.0) # Bottom-right align predictions
     GROUP.append(TEXT)
 

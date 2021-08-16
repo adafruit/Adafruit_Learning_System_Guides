@@ -1,0 +1,4 @@
+Voice2Json_Edge_Detection/demo.py 18: Line too long (104/100) (line-too-long)
+Voice2Json_Edge_Detection/demo.py 58: Line too long (113/100) (line-too-long)
+Voice2Json_Edge_Detection/demo.py 78: Trailing whitespace (trailing-whitespace)
+Voice2Json_Edge_Detection/demo.py 72: Redefining name 'output_line' from outer scope (line 111) (redefined-outer-name)

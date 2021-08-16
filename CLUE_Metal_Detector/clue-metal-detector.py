@@ -448,8 +448,7 @@ voltage_units_dob = Label(font=terminalio.FONT,
 voltage_units_dob.y = voltage_value_dob.y
 voltage_units_dob.x = len(voltage_value_dob.text) * FONT_WIDTH * FONT_SCALE
 
-# 9 elements, 4 added immediately, 4 later, 1 spare for on-screen text
-screen_group = Group(max_size=4 + 4 + 1)
+screen_group = Group()
 if magnetometer is not None:
     screen_group.append(magnet_value_dob)
     screen_group.append(magnet_units_dob)
@@ -524,7 +523,7 @@ mag_mag = 0.0
 # Keep some historical voltage data to calculate median for re-baselining
 # aiming for about 10 reads per second so this gives
 # 20 seconds
-voltage_hist = ulab.zeros(20 * 10 + 1, dtype=ulab.float)
+voltage_hist = ulab.numpy.zeros(20 * 10 + 1, dtype=ulab.numpy.float)
 voltage_hist_idx = 0
 voltage_hist_complete = False
 voltage_hist_median = None
@@ -700,7 +699,7 @@ while True:
 
     # Adjust the reference base_voltage to the median of historical values
     if voltage_hist_complete and update_median:
-        voltage_hist_median = ulab.numerical.sort(voltage_hist)[len(voltage_hist) // 2]
+        voltage_hist_median = ulab.numpy.sort(voltage_hist)[len(voltage_hist) // 2]
         base_voltage = voltage_hist_median
 
     d_print(2, counter, sample_start_time_ns / 1e9,

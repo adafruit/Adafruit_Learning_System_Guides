@@ -25,7 +25,11 @@ except ImportError:
 funhouse = FunHouse(default_bg=0x0F0F00)
 funhouse.peripherals.dotstars.fill(INITIAL_LIGHT_COLOR)
 
+# Don't display the splash yet to avoid
+# redrawing labels after each one is added
 funhouse.display.show(None)
+
+# Add the labels
 funhouse.add_text(
     text="Temperature:",
     text_position=(20, 30),
@@ -62,11 +66,12 @@ pres_label = funhouse.add_text(
     text_color=0xFFFF00,
     text_font="fonts/Arial-Bold-24.pcf",
 )
+
+# Now display the splash to draw all labels at once
 funhouse.display.show(funhouse.splash)
 
 status = Circle(229, 10, 10, fill=0xFF0000, outline=0x880000)
 funhouse.splash.append(status)
-
 
 def update_enviro():
     global environment

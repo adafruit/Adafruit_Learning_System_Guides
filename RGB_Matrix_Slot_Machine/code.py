@@ -101,7 +101,7 @@ the_bitmap, the_palette = adafruit_imageload.load(
 
 # Our fruit machine has 3 wheels, let's create them with a correct horizontal
 # (x) offset and arbitrary vertical (y) offset.
-g = displayio.Group(max_size=3)
+g = displayio.Group()
 wheels = []
 for idx in range(3):
     wheel = Wheel(the_bitmap, the_palette)

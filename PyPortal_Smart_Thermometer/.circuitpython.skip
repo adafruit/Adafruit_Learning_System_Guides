@@ -1,0 +1,2 @@
+PyPortal_Smart_Thermometer/thermometer.py 49: Consider explicitly re-raising using the 'from' keyword (raise-missing-from)
+PyPortal_Smart_Thermometer/thermometer.py 103: Consider explicitly re-raising using the 'from' keyword (raise-missing-from)

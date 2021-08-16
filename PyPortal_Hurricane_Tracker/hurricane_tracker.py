@@ -20,10 +20,11 @@ LAT_RANGE = (45, 5)  # set to match map
 LON_RANGE = (-100, -40)  # set to match map
 # --------------------------------------------------------------------
 
+URL = "https://www.nhc.noaa.gov/CurrentStorms.json"
+JSON_PATH = ["activeStorms"]
+
 # setup pyportal
 pyportal = PyPortal(
-    url="https://www.nhc.noaa.gov/CurrentStorms.json",
-    json_path=["activeStorms"],
     status_neopixel=board.NEOPIXEL,
     default_bg="/map.bmp",
 )
@@ -35,7 +36,7 @@ icons_bmp, icons_pal = adafruit_imageload.load(
 for i, c in enumerate(icons_pal):
     if c == 0xFFFF00:
         icons_pal.make_transparent(i)
-storm_icons = displayio.Group(max_size=MAX_STORMS)
+storm_icons = displayio.Group()
 pyportal.splash.append(storm_icons)
 STORM_CLASS = ("TD", "TS", "HU")
 
@@ -61,13 +62,15 @@ Y_OFFSET = VIRTUAL_HEIGHT / 2 - Y_OFFSET
 
 
 def update_display():
+    # pylint: disable=too-many-locals
     # clear out existing icons
     while len(storm_icons):
         _ = storm_icons.pop()
 
     # get latest storm data
     try:
-        storm_data = pyportal.fetch()
+        resp = pyportal.network.fetch(URL)
+        storm_data = pyportal.network.process_json(resp.json(), (JSON_PATH,))[0]
     except RuntimeError:
         return
     print("Number of storms:", len(storm_data))
@@ -87,7 +90,7 @@ def update_display():
         ):
             continue
         # OK, let's make a group for all the graphics
-        storm_gfx = displayio.Group(max_size=3)  # icon + label + arrow
+        storm_gfx = displayio.Group()
         # convert to sreen coords
         x = int(map_range(lon, LON_RANGE[0], LON_RANGE[1], 0, board.DISPLAY.width - 1))
         y = math.radians(lat)

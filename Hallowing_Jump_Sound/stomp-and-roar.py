@@ -4,15 +4,13 @@ pedometer, plays different sounds in response to steps & jumps. Step
 detection based on "Full-Featured Pedometer Design Realized with 3-Axis
 Digital Accelerometer" by Neil Zhao, Analog Dialogue Technical Journal,
 June 2010.
-Image display requires CircuitPython 4.0.0-alpha1 or later (with displayio
-support). WILL work with earlier versions, just no image shown!
 """
 
 import time
 import math
 import digitalio
+import displayio
 import board
-import busio
 import audioio
 import audiocore
 import neopixel
@@ -44,12 +42,12 @@ try:
 except AttributeError:
     pass
 
-AUDIO = audioio.AudioOut(board.A0)              # Speaker
+AUDIO = audioio.AudioOut(board.SPEAKER)  # Speaker
 
 board.DISPLAY.auto_brightness = False
 
 # Set up accelerometer on I2C bus, 4G range:
-I2C = busio.I2C(board.SCL, board.SDA)
+I2C = board.I2C()
 if IS_HALLOWING_M4:
     import adafruit_msa301
     ACCEL = adafruit_msa301.MSA301(I2C)
@@ -73,21 +71,27 @@ FILTER_BUF = [0] * FILTER_SIZE
 FILTER_SUM = 0          # Initial average value
 FILTER_INDEX = 0        # Current position in sample-averaging buffer
 
-# Display BMP image. If this fails, it's not catastrophic (probably just
-# older CircuitPython) and the code will continue with the step detection.
+# Display BMP image.
 try:
-    import displayio
     board.DISPLAY.brightness = 0
     SCREEN = displayio.Group()
     board.DISPLAY.show(SCREEN)
+
+    # CircuitPython 6 & 7 compatible
     BITMAP = displayio.OnDiskBitmap(open(IMAGEFILE, 'rb'))
-    SCREEN.append(
-        displayio.TileGrid(BITMAP,
-                           pixel_shader=displayio.ColorConverter(),
-                           x=0, y=0))
+    TILEGRID = displayio.TileGrid(
+        BITMAP,
+        pixel_shader=getattr(BITMAP, 'pixel_shader', displayio.ColorConverter())
+    )
+
+    # # CircuitPython 7+ compatible
+    # BITMAP = displayio.OnDiskBitmap(IMAGEFILE)
+    # TILEGRID = displayio.TileGrid(BITMAP, pixel_shader=BITMAP.pixel_shader)
+
+    SCREEN.append(TILEGRID)
     board.DISPLAY.brightness = 1.0   # Turn on display backlight
-except (ImportError, NameError, AttributeError) as err:
-    pass # Probably earlier CircuitPython; no displayio support
+except (OSError, ValueError):
+    pass
 
 # If everything has initialized correctly, turn off the onboard NeoPixel:
 PIXEL = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0)

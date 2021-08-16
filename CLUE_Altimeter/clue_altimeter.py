@@ -4,7 +4,6 @@ import displayio
 import terminalio
 from microcontroller import nvm
 from adafruit_display_text import label
-from adafruit_bitmap_font import bitmap_font
 import adafruit_imageload
 from adafruit_clue import clue
 
@@ -38,7 +37,7 @@ clue.sea_level_pressure = slp if 0 < slp < 2000 else STD_SLP
 # --------------------------------------------------------------------
 
 # create main display group
-splash = displayio.Group(max_size=4)
+splash = displayio.Group()
 clue.display.show(splash)
 
 # background
@@ -52,7 +51,7 @@ for i, color in enumerate(bg_pal):
 background = displayio.TileGrid(bg_bmp, pixel_shader=bg_pal)
 
 # a group for both altitude readouts
-alti_readouts = displayio.Group(max_size=2, scale=6)
+alti_readouts = displayio.Group(scale=6)
 
 # altitude (corrected)
 alti_disp = label.Label(FONT, text="12345", color=ORANGE)

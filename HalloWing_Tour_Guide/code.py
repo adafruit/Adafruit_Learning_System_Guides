@@ -29,7 +29,7 @@ gps = adafruit_gps.GPS(uart)
 # Turn on the basic GGA and RMC info (what you typically want)
 gps.send_command(b'PMTK314,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0')
 
-# Set update rate to once a second (1hz) which is what you typically want.
+# Set update rate to once a second (1Hz) which is what you typically want.
 gps.send_command(b'PMTK220,1000')
 
 switch_io = DigitalInOut(board.SENSE)
@@ -38,7 +38,7 @@ switch_io.pull = Pull.UP
 
 switch = Debouncer(switch_io)
 
-audio = audioio.AudioOut(board.A0)
+audio = audioio.AudioOut(board.SPEAKER)
 
 backlight = DigitalInOut(board.TFT_BACKLIGHT)
 backlight.direction = Direction.OUTPUT
@@ -60,19 +60,27 @@ def play_wave(filename):
         pass
 
 def show_image(filename):
-    image_file = None
+    # CircuitPython 6 & 7 compatible
     try:
         image_file = open(filename, "rb")
     except OSError:
         image_file = open("missing.bmp", "rb")
     odb = displayio.OnDiskBitmap(image_file)
-    face = displayio.Sprite(odb, pixel_shader=displayio.ColorConverter(), position=(0, 0))
+    face = displayio.TileGrid(
+        odb,
+        pixel_shader=getattr(odb, 'pixel_shader', displayio.ColorConverter())
+    )
+
+    # # CircuitPython 7+ compatible
+    # try:
+    #     odb = displayio.OnDiskBitmap(filename)
+    # except (OSError, ValueError):
+    #     odb = displayio.OnDiskBitmap("missing.bmp")
+    # face = displayio.TileGrid(odb, pixel_shader=odb.pixel_shader)
+
     backlight.value = False
     splash.append(face)
-    try:
-        board.DISPLAY.refresh(target_frames_per_second=60)
-    except AttributeError:
-        board.DISPLAY.wait_for_frame()
+    board.DISPLAY.refresh(target_frames_per_second=60)
     backlight.value = True
 
 

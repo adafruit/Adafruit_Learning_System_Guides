@@ -311,7 +311,7 @@ class ClueLightPainter:
                                     0.0 = min, 1.0 = full display width.
         Returns: displayio group
         """
-        group = displayio.Group(max_size=7)
+        group = displayio.Group()
         group.append(centered_label('TAP L/R to', 3, 2))
         group.append(centered_label('select item' if main_config else
                                     'select image' if self.config_mode is 0

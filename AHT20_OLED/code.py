@@ -25,11 +25,11 @@ display_bus = displayio.I2CDisplay(i2c, device_address=0x3C)
 display = adafruit_displayio_ssd1306.SSD1306(display_bus, width=128, height=32)
 
 # Make the display context
-splash = displayio.Group(max_size=8)
+splash = displayio.Group()
 display.show(splash)
 
 text = "hello world"
-text_area = label.Label(terminalio.FONT, color=0xFFFF00, x=15, y=0, max_glyphs=200)
+text_area = label.Label(terminalio.FONT, color=0xFFFF00, x=15, y=0)
 splash.append(text_area)
 
 while True:

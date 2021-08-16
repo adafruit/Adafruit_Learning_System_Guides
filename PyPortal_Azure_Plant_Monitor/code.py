@@ -59,11 +59,7 @@ ss = Seesaw(i2c_bus, addr=0x36)
 
 # Create an instance of the Azure IoT Central device
 device = IoTCentralDevice(
-    socket,
-    esp,
-    secrets["id_scope"],
-    secrets["device_id"],
-    secrets["key"]
+    socket, esp, secrets["id_scope"], secrets["device_id"], secrets["key"]
 )
 
 # Connect to Azure IoT Central
@@ -82,19 +78,16 @@ while True:
         gfx.display_moisture(moisture_level)
         gfx.display_temp(temperature)
 
-        print('Sending data to Azure')
-        gfx.display_azure_status('Sending data...')
+        print("Sending data to Azure")
+        gfx.display_azure_status("Sending data...")
 
         # send the temperature and moisture level to Azure
-        message = {
-            "Temperature": temperature,
-            "MoistureLevel": moisture_level
-        }
+        message = {"Temperature": temperature, "MoistureLevel": moisture_level}
         device.send_telemetry(json.dumps(message))
         device.loop()
 
-        gfx.display_azure_status('Data sent!')
-        print('Data sent!')
+        gfx.display_azure_status("Data sent!")
+        print("Data sent!")
     except (ValueError, RuntimeError) as e:
         print("Failed to get data, retrying\n", e)
         wifi.reset()

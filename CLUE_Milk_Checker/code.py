@@ -1,6 +1,5 @@
 import time
 import board
-import terminalio
 import displayio
 import adafruit_sgp30
 from adafruit_bitmap_font import bitmap_font
@@ -45,7 +44,7 @@ eco2 = label.Label(data_font, text="eCO2=?????", color=0x000000)
 eco2.anchor_point = (0, 1)
 eco2.anchored_position = (130, 235)
 
-splash = displayio.Group(max_size=5)
+splash = displayio.Group()
 splash.append(background)
 splash.append(mouth)
 splash.append(message)

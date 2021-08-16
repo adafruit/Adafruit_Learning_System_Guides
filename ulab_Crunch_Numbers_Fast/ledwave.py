@@ -2,9 +2,8 @@ import random
 
 import board
 import neopixel
-from _pixelbuf import wheel
-import ulab
-import ulab.filter
+from rainbowio import colorwheel as wheel
+from ulab import numpy as np
 
 # Customize your neopixel configuration here...
 pixel_pin = board.D5
@@ -12,11 +11,11 @@ num_pixels = 96
 pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=0.1,
                            auto_write=False, pixel_order=neopixel.RGB)
 
-ddt = ulab.array([1.,-2.,1.])
+ddt = np.array([1.,-2.,1.])
 def step(u, um, f, n, dx, dt, c):
     dt2 = dt*dt
     C2 = (c*dt/dx)**2
-    deriv = ulab.filter.convolve(u, ddt)[1:-1] * C2
+    deriv = np.convolve(u, ddt)[1:-1] * C2
     up = -um + u * 2 + deriv + f * dt2
     up[0] = 0
     up[n-1] = 0
@@ -29,11 +28,11 @@ def main():
     w = [wheel(i) for i in range(256)]
 
     # This sets up the initial wave as a smooth gradient
-    u = ulab.zeros(num_pixels)
-    um = ulab.zeros(num_pixels)
-    f = ulab.zeros(num_pixels)
+    u = np.zeros(num_pixels)
+    um = np.zeros(num_pixels)
+    f = np.zeros(num_pixels)
 
-    slope = ulab.linspace(0, 256, num=num_pixels)
+    slope = np.linspace(0, 256, num=num_pixels)
     th = 1
 
     # the first time is always random (is that a contradiction?)

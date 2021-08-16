@@ -30,14 +30,14 @@ def tilegrid(palette):
         bitmap=terminalio.FONT.bitmap, pixel_shader=palette,
         width=1, height=1, tile_width=6, tile_height=14, default_tile=32)
 
-g = displayio.Group(max_size=2)
+g = displayio.Group()
 
 # We only use the built in font which we treat as being 7x14 pixels
 linelen = (64//7)+2
 
 # prepare the main groups
-l1 = displayio.Group(max_size=linelen)
-l2 = displayio.Group(max_size=linelen)
+l1 = displayio.Group()
+l2 = displayio.Group()
 g.append(l1)
 g.append(l2)
 display.show(g)
@@ -101,7 +101,6 @@ def scroll(t, b):
             l1.x = -j
             l2.x = -j
             display.refresh(minimum_frames_per_second=0)
-            #display.refresh(minimum_frames_per_second=0)
 
 # Repeatedly scroll all the pairs of lines
 while True:

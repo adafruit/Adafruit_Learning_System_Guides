@@ -130,7 +130,7 @@ castle = displayio.TileGrid(
 )
 
 # Create a Group to hold the sprite and castle
-group = displayio.Group(max_size=33)
+group = displayio.Group()
 
 # Add castle to the group
 group.append(castle)
@@ -430,202 +430,207 @@ y_offset = 0
 def show_splash(new_text, color, vertical_offset=18):
     text_area.text = ""
     text_area.text = new_text
-    text_area.y = round(text_area.text.count("\n") * vertical_offset / 2)
+    text_area.anchor_point = (0, 0)
+    text_area.anchored_position = (0, vertical_offset)
     text_area.color = color
     group.append(splash)
 
 
+# Make the splash context
+splash = displayio.Group()
+
+# CircuitPython 6 & 7 compatible
+
 # game message background bmp file
-with open(
-    "tilegame_assets/game_message_background.bmp", "rb"
-) as game_message_background:
-    # Make the splash context
-    splash = displayio.Group(max_size=4)
+game_message_background = open("tilegame_assets/game_message_background.bmp", "rb")
+odb = displayio.OnDiskBitmap(game_message_background)
+bg_grid = displayio.TileGrid(odb, pixel_shader=getattr(odb, 'pixel_shader', displayio.ColorConverter()))
 
-    odb = displayio.OnDiskBitmap(game_message_background)
+# # CircuitPython 7+ compatible
+# game message background bmp file
+# odb = displayio.OnDiskBitmap("tilegame_assets/game_message_background.bmp")
+# bg_grid = displayio.TileGrid(odb, pixel_shader=odb.pixel_shader)
 
-    bg_grid = displayio.TileGrid(odb, pixel_shader=displayio.ColorConverter())
+splash.append(bg_grid)
 
-    splash.append(bg_grid)
+# Text for the message
+text_group = displayio.Group(x=14, y=8)
+text_area = label.Label(terminalio.FONT, text=" " * 180, color=0xD39AE5)
+text_group.append(text_area)
+splash.append(text_group)
 
-    # Text for the message
-    text_group = displayio.Group(max_size=8, scale=1, x=14, y=18)
-    text_area = label.Label(terminalio.FONT, text=" " * 180, color=0xD39AE5)
-    text_group.append(text_area)
-    splash.append(text_group)
+# main loop
+while True:
+    # set the current button values into variables
+    cur_btn_vals = ugame.buttons.get_pressed()
+    cur_up = cur_btn_vals & ugame.K_UP
+    cur_down = cur_btn_vals & ugame.K_DOWN
+    cur_right = cur_btn_vals & ugame.K_RIGHT
+    cur_left = cur_btn_vals & ugame.K_LEFT
+    cur_a = cur_btn_vals & ugame.K_O or cur_btn_vals & ugame.K_X
 
-    # main loop
-    while True:
-        # set the current button values into variables
-        cur_btn_vals = ugame.buttons.get_pressed()
-        cur_up = cur_btn_vals & ugame.K_UP
-        cur_down = cur_btn_vals & ugame.K_DOWN
-        cur_right = cur_btn_vals & ugame.K_RIGHT
-        cur_left = cur_btn_vals & ugame.K_LEFT
-        cur_a = cur_btn_vals & ugame.K_O or cur_btn_vals & ugame.K_X
+    if GAME_STATE["STATE"] == STATE_WAITING:
+        print(cur_a)
+        if cur_a:
+            GAME_STATE["STATE"] = STATE_PLAYING
+            group.remove(splash)
 
-        if GAME_STATE["STATE"] == STATE_WAITING:
-            print(cur_a)
-            if cur_a:
-                GAME_STATE["STATE"] = STATE_PLAYING
-                group.remove(splash)
+    if GAME_STATE["STATE"] == STATE_PLAYING:
+        # check for up button press / release
+        if not cur_up and prev_up:
+            if can_player_move(UP):
+                x_offset = 0
+                y_offset = -1
 
-        if GAME_STATE["STATE"] == STATE_PLAYING:
-            # check for up button press / release
-            if not cur_up and prev_up:
-                if can_player_move(UP):
-                    x_offset = 0
-                    y_offset = -1
+        # check for down button press / release
+        if not cur_down and prev_down:
+            if can_player_move(DOWN):
+                x_offset = 0
+                y_offset = 1
 
-            # check for down button press / release
-            if not cur_down and prev_down:
-                if can_player_move(DOWN):
-                    x_offset = 0
-                    y_offset = 1
+        # check for right button press / release
+        if not cur_right and prev_right:
+            if can_player_move(RIGHT):
+                x_offset = 1
+                y_offset = 0
 
-            # check for right button press / release
-            if not cur_right and prev_right:
-                if can_player_move(RIGHT):
-                    x_offset = 1
-                    y_offset = 0
+        # check for left button press / release
+        if not cur_left and prev_left:
+            if can_player_move(LEFT):
+                x_offset = -1
+                y_offset = 0
 
-            # check for left button press / release
-            if not cur_left and prev_left:
-                if can_player_move(LEFT):
-                    x_offset = -1
-                    y_offset = 0
+        # if any offset is not zero then we need to process player movement
+        if x_offset != 0 or y_offset != 0:
+            # variable to store if player is allowed to move
+            can_move = False
 
-            # if any offset is not zero then we need to process player movement
-            if x_offset != 0 or y_offset != 0:
-                # variable to store if player is allowed to move
-                can_move = False
+            # coordinates the player is moving to
+            moving_to_coords = (
+                GAME_STATE["PLAYER_LOC"][0] + x_offset,
+                GAME_STATE["PLAYER_LOC"][1] + y_offset,
+            )
 
-                # coordinates the player is moving to
-                moving_to_coords = (
-                    GAME_STATE["PLAYER_LOC"][0] + x_offset,
-                    GAME_STATE["PLAYER_LOC"][1] + y_offset,
-                )
+            # tile name of the spot player is moving to
+            moving_to_tile_name = GAME_STATE["CURRENT_MAP"][
+                moving_to_coords[0], moving_to_coords[1]
+            ]
 
-                # tile name of the spot player is moving to
-                moving_to_tile_name = GAME_STATE["CURRENT_MAP"][
-                    moving_to_coords[0], moving_to_coords[1]
-                ]
+            # if there are entity(s) at spot the player is moving to
+            if moving_to_coords in GAME_STATE["ENTITY_SPRITES_DICT"]:
+                print("found entity(s) where we are moving to")
 
-                # if there are entity(s) at spot the player is moving to
-                if moving_to_coords in GAME_STATE["ENTITY_SPRITES_DICT"]:
-                    print("found entity(s) where we are moving to")
-
-                    # loop over all entities at the location player is moving to
-                    for entity_obj in GAME_STATE["ENTITY_SPRITES_DICT"][
-                        moving_to_coords
-                    ]:
-                        print("checking entity %s" % entity_obj["map_tile_name"])
-                        # if the entity has a before_move behavior function
-                        if "before_move" in TILES[entity_obj["map_tile_name"]].keys():
-                            print(
-                                "calling before_move %s, %s, %s"
-                                % (
-                                    moving_to_coords,
-                                    GAME_STATE["PLAYER_LOC"],
-                                    entity_obj,
-                                )
-                            )
-                            # call the before_move behavior function act upon it's result
-                            if TILES[entity_obj["map_tile_name"]]["before_move"](
+                # loop over all entities at the location player is moving to
+                for entity_obj in GAME_STATE["ENTITY_SPRITES_DICT"][
+                    moving_to_coords
+                ]:
+                    print("checking entity %s" % entity_obj["map_tile_name"])
+                    # if the entity has a before_move behavior function
+                    if "before_move" in TILES[entity_obj["map_tile_name"]].keys():
+                        print(
+                            "calling before_move %s, %s, %s"
+                            % (
                                 moving_to_coords,
                                 GAME_STATE["PLAYER_LOC"],
                                 entity_obj,
-                                GAME_STATE,
-                            ):
-                                # all the movement if it returned true
-                                can_move = True
-                            else:
-                                # break and don't allow movement if it returned false
-                                break
-                        else:  # entity does not have a before_move function
-                            # allow movement
+                            )
+                        )
+                        # call the before_move behavior function act upon it's result
+                        if TILES[entity_obj["map_tile_name"]]["before_move"](
+                            moving_to_coords,
+                            GAME_STATE["PLAYER_LOC"],
+                            entity_obj,
+                            GAME_STATE,
+                        ):
+                            # all the movement if it returned true
                             can_move = True
-                    if can_move:
-                        # set the player loc variable to the new coords
-                        GAME_STATE["PLAYER_LOC"] = moving_to_coords
-
-                else:  # no entities at the location player is moving to
-                    # set player loc variable to new coords
+                        else:
+                            # break and don't allow movement if it returned false
+                            break
+                    else:  # entity does not have a before_move function
+                        # allow movement
+                        can_move = True
+                if can_move:
+                    # set the player loc variable to the new coords
                     GAME_STATE["PLAYER_LOC"] = moving_to_coords
 
-            # reset movement offset variables
-            y_offset = 0
-            x_offset = 0
+            else:  # no entities at the location player is moving to
+                # set player loc variable to new coords
+                GAME_STATE["PLAYER_LOC"] = moving_to_coords
 
-            # set previous button values for next iteration
-            prev_up = cur_up
-            prev_down = cur_down
-            prev_right = cur_right
-            prev_left = cur_left
+        # reset movement offset variables
+        y_offset = 0
+        x_offset = 0
 
-            # current time
-            now = time.monotonic()
+        # set previous button values for next iteration
+        prev_up = cur_up
+        prev_down = cur_down
+        prev_right = cur_right
+        prev_left = cur_left
 
-            # if it has been long enough based on FPS delay
-            if now > last_update_time + FPS_DELAY:
-                # Set camera to 10x8 centered on the player
-                # Clamped to (0, MAP_WIDTH) and (0, MAP_HEIGHT)
-                set_camera_view(
-                    max(
-                        min(
-                            GAME_STATE["PLAYER_LOC"][0] - 4,
-                            GAME_STATE["MAP_WIDTH"] - SCREEN_WIDTH_TILES,
-                        ),
-                        0,
+        # current time
+        now = time.monotonic()
+
+        # if it has been long enough based on FPS delay
+        if now > last_update_time + FPS_DELAY:
+            # Set camera to 10x8 centered on the player
+            # Clamped to (0, MAP_WIDTH) and (0, MAP_HEIGHT)
+            set_camera_view(
+                max(
+                    min(
+                        GAME_STATE["PLAYER_LOC"][0] - 4,
+                        GAME_STATE["MAP_WIDTH"] - SCREEN_WIDTH_TILES,
                     ),
-                    max(
-                        min(
-                            GAME_STATE["PLAYER_LOC"][1] - 3,
-                            GAME_STATE["MAP_HEIGHT"] - SCREEN_HEIGHT_TILES,
-                        ),
-                        0,
+                    0,
+                ),
+                max(
+                    min(
+                        GAME_STATE["PLAYER_LOC"][1] - 3,
+                        GAME_STATE["MAP_HEIGHT"] - SCREEN_HEIGHT_TILES,
                     ),
-                    10,
-                    8,
-                )
-                # draw the camera
-                draw_camera_view()
-            # if player beat this map
-            if GAME_STATE["STATE"] == STATE_MAPWIN:
-                GAME_STATE["MAP_INDEX"] += 1
-                # if player has beaten all maps
-                if GAME_STATE["MAP_INDEX"] >= len(MAPS):
-                    GAME_STATE["MAP_INDEX"] = 0
-                    GAME_STATE["STATE"] = STATE_WAITING
-                    load_map(MAPS[GAME_STATE["MAP_INDEX"]])
-                    show_splash(
-                        "You Win \n =D \nCongratulations. \nStart Over?", 0x29C1CF
-                    )
-                else:
-                    # prompt to start next
-                    GAME_STATE["STATE"] = STATE_WAITING
-                    load_map(MAPS[GAME_STATE["MAP_INDEX"]])
-                    show_splash(
-                        "You beat this level\n =D \nCongratulations. \nStart Next?",
-                        0x29C1CF,
-                    )
-            # game over from sparky
-            elif GAME_STATE["STATE"] == STATE_LOST_SPARKY:
+                    0,
+                ),
+                10,
+                8,
+            )
+            # draw the camera
+            draw_camera_view()
+        # if player beat this map
+        if GAME_STATE["STATE"] == STATE_MAPWIN:
+            GAME_STATE["MAP_INDEX"] += 1
+            # if player has beaten all maps
+            if GAME_STATE["MAP_INDEX"] >= len(MAPS):
                 GAME_STATE["MAP_INDEX"] = 0
                 GAME_STATE["STATE"] = STATE_WAITING
-                game_over_text = (
-                    "Be careful not to \ntouch Sparky unless \n"
-                    "you've collected \nenough Mho's.\nStarting Over"
-                )
                 load_map(MAPS[GAME_STATE["MAP_INDEX"]])
-                show_splash(game_over_text, 0x25AFBB)
-
-            # talking to minerva
-            elif GAME_STATE["STATE"] == STATE_MINERVA:
+                show_splash(
+                    "You Win \n =D \nCongratulations. \nStart Over?", 0x29C1CF
+                )
+            else:
+                # prompt to start next
                 GAME_STATE["STATE"] = STATE_WAITING
-                random_fact = random.choice(FACTS)
-                minerva_txt = wrap_nicely("Minerva: {}".format(random_fact), 23)
-                show_splash(minerva_txt, 0xD39AE5, 10)
+                load_map(MAPS[GAME_STATE["MAP_INDEX"]])
+                show_splash(
+                    "You beat this level\n =D \nCongratulations. \nStart Next?",
+                    0x29C1CF,
+                )
+        # game over from sparky
+        elif GAME_STATE["STATE"] == STATE_LOST_SPARKY:
+            GAME_STATE["MAP_INDEX"] = 0
+            GAME_STATE["STATE"] = STATE_WAITING
+            game_over_text = (
+                "Be careful not to \ntouch Sparky unless \n"
+                "you've collected \nenough Mho's.\nStarting Over"
+            )
+            load_map(MAPS[GAME_STATE["MAP_INDEX"]])
+            show_splash(game_over_text, 0x25AFBB)
 
-            # store the last update time
-            last_update_time = now
+        # talking to minerva
+        elif GAME_STATE["STATE"] == STATE_MINERVA:
+            GAME_STATE["STATE"] = STATE_WAITING
+            random_fact = random.choice(FACTS)
+            minerva_txt = wrap_nicely("Minerva: {}".format(random_fact), 23)
+            show_splash(minerva_txt, 0xD39AE5, 0)
+
+        # store the last update time
+        last_update_time = now

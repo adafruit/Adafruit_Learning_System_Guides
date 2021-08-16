@@ -1,0 +1,4 @@
+PyPortal_Smart_Switch/code.py 44: Consider explicitly re-raising using the 'from' keyword (raise-missing-from)
+PyPortal_Smart_Switch/code.py 69: Consider explicitly re-raising using the 'from' keyword (raise-missing-from)
+PyPortal_Smart_Switch/code.py 88: Class 'Switch' inherits from object, can be safely removed from bases in python3 (useless-object-inheritance)
+PyPortal_Smart_Switch/code.py 125: Class 'Clock' inherits from object, can be safely removed from bases in python3 (useless-object-inheritance)

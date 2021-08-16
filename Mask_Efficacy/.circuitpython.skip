@@ -1,0 +1,3 @@
+Mask_Efficacy/take_video.py 1: Unused import time (unused-import)
+Mask_Efficacy/process_run.py 48: Line too long (117/100) (line-too-long)
+Mask_Efficacy/process_run.py 23: Comparison 'frame_bin == True' should be 'frame_bin is True' if checking for the singleton value True, or 'bool(frame_bin)' if testing for truthiness (singleton-comparison)

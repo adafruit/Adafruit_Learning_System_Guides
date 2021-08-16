@@ -62,7 +62,7 @@ ble.start_advertising(advertisement)
 
 clue.display.brightness = 1.0
 clue.pixel.brightness = 0.2
-screen = displayio.Group(max_size=17)
+screen = displayio.Group()
 
 ORANGE = 0xCE6136
 GRAY = 0x080808
@@ -95,9 +95,7 @@ bottom_trim_box = Rect(0, 232, 240, 8, fill=BROWN, outline=None)
 screen.append(bottom_trim_box)
 
 # title text
-title_label = label.Label(
-    terminalio.FONT, text="MIDI CLUE", scale=4, color=SILVER, max_glyphs=14
-)
+title_label = label.Label(terminalio.FONT, text="MIDI CLUE", scale=4, color=SILVER)
 title_label.x = 14
 title_label.y = 27
 screen.append(title_label)
@@ -112,16 +110,13 @@ cc_x_num_label = label.Label(
     text=("CC {}".format(cc_x_num)),
     scale=3,
     color=ORANGE,
-    max_glyphs=6,
 )
 cc_x_num_label.x = column_a
 cc_x_num_label.y = row_a
 screen.append(cc_x_num_label)
 
 # cc x value
-cc_x_label = label.Label(
-    terminalio.FONT, text=(cc_x), scale=3, color=ORANGE, max_glyphs=3
-)
+cc_x_label = label.Label(terminalio.FONT, text=str(cc_x), scale=3, color=ORANGE)
 cc_x_label.x = column_b
 cc_x_label.y = row_a
 screen.append(cc_x_label)
@@ -136,14 +131,14 @@ screen.append(mid_line_a)
 
 # cc y num
 cc_y_num_label = label.Label(
-    terminalio.FONT, text=("CC {}".format(cc_y_num)), scale=3, color=BLUE, max_glyphs=6
+    terminalio.FONT, text=("CC {}".format(cc_y_num)), scale=3, color=BLUE
 )
 cc_y_num_label.x = column_a
 cc_y_num_label.y = row_b
 screen.append(cc_y_num_label)
 
 # cc y value text
-cc_y_label = label.Label(terminalio.FONT, text=cc_y, scale=3, color=BLUE, max_glyphs=3,)
+cc_y_label = label.Label(terminalio.FONT, text=str(cc_y), scale=3, color=BLUE)
 cc_y_label.x = column_b
 cc_y_label.y = row_b
 screen.append(cc_y_label)
@@ -158,16 +153,13 @@ cc_prox_num_label = label.Label(
     text=("CC {}".format(cc_prox_num)),
     scale=3,
     color=SILVER,
-    max_glyphs=6,
 )
 cc_prox_num_label.x = column_a
 cc_prox_num_label.y = row_c
 screen.append(cc_prox_num_label)
 
 # cc prox value text
-cc_prox_label = label.Label(
-    terminalio.FONT, text=cc_prox, scale=3, color=SILVER, max_glyphs=3,
-)
+cc_prox_label = label.Label(terminalio.FONT, text=str(cc_prox), scale=3, color=SILVER)
 cc_prox_label.x = column_b
 cc_prox_label.y = row_c
 screen.append(cc_prox_label)
@@ -178,17 +170,13 @@ screen.append(footer_line)
 
 
 # patch label
-patch_label = label.Label(
-    terminalio.FONT, text=("Patch _"), scale=2, color=BLUE, max_glyphs=12,
-)
+patch_label = label.Label(terminalio.FONT, text="Patch _", scale=2, color=BLUE)
 patch_label.x = 4
 patch_label.y = 216
 screen.append(patch_label)
 
 # footer label
-footer_label = label.Label(
-    terminalio.FONT, text=("connect BLE"), scale=2, color=ORANGE, max_glyphs=14
-)
+footer_label = label.Label(terminalio.FONT, text="connect BLE", scale=2, color=ORANGE)
 footer_label.x = 102
 footer_label.y = 216
 screen.append(footer_label)
@@ -245,9 +233,9 @@ while True:
                         ControlChange(cc_prox_num, cc_prox),
                     ]
                 )
-            cc_x_label.text = cc_x
-            cc_y_label.text = cc_y
-            cc_prox_label.text = cc_prox
+            cc_x_label.text = str(cc_x)
+            cc_y_label.text = str(cc_y)
+            cc_prox_label.text = str(cc_prox)
 
             # If you want to send NoteOn or Pitch Bend, here are examples:
             # midi.send(NoteOn(44, 1column_a))  # G sharp 2nd octave

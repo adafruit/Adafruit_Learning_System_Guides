@@ -50,12 +50,12 @@ label_overview_text = Label(
 graphics.splash.append(label_overview_text)
 
 label_verification_url = Label(
-    font_small, x=0, y=40, line_spacing=0.75, color=0x000000, max_glyphs=90
+    font_small, x=0, y=40, line_spacing=0.75, color=0x000000
 )
 graphics.splash.append(label_verification_url)
 
 label_user_code = Label(
-    font_small, x=0, y=80, color=0x000000, line_spacing=0.75, max_glyphs=50
+    font_small, x=0, y=80, color=0x000000, line_spacing=0.75
 )
 graphics.splash.append(label_user_code)
 

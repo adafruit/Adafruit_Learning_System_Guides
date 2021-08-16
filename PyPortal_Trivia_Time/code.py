@@ -42,32 +42,30 @@ trivia_font = bitmap_font.load_font("/fonts/Arial-ItalicMT-17.bdf")
 
 loading_color = 0x8080FF
 loading_position = (100,120)
-loading_text_area = label.Label(trivia_font, max_glyphs=30, color=loading_color,
+loading_text_area = label.Label(trivia_font, color=loading_color,
                                 x=loading_position[0], y=loading_position[1])
 
 q_color = 0x8080FF
 q_position = (25, 70)
-q_text_area = label.Label(trivia_font, max_glyphs=120,
-                          x=q_position[0], y=q_position[1],
+q_text_area = label.Label(trivia_font, x=q_position[0], y=q_position[1],
                           color=q_color, line_spacing = 1)
 
 answer_choices = ("A","B","C","D")
-a_positions = ((25, 135), (25, 155), (25, 175), (25, 195))
+a_positions = ((25, 145), (25, 165), (25, 185), (25, 205))
 a_color = 0xFFFFFF
 ans_text_areas = []
 for answernum in range(4):
-    ans_text_areas.append(label.Label(trivia_font, max_glyphs=80,
-                                      color=a_color, line_spacing = 1.5,
-                                      x=a_positions[answernum][0],
+    ans_text_areas.append(label.Label(trivia_font, color=a_color,
+                                      line_spacing = 1.5, x=a_positions[answernum][0],
                                       y=a_positions[answernum][1]))
 
-reveal_position = (25, 75)
-reveal_text_area = label.Label(trivia_font, max_glyphs=120, color=loading_color,
+reveal_position = (25, 45)
+reveal_text_area = label.Label(trivia_font, color=loading_color,
                                x=reveal_position[0], y=reveal_position[1])
 
 timer_position = (25, 215)
 timer_color = 0xFF00FF
-timer_text_area = label.Label(trivia_font, max_glyphs=20, color=timer_color,
+timer_text_area = label.Label(trivia_font, color=timer_color,
                               x=timer_position[0], y=timer_position[1])
 
 # A function to shuffle trivia questions

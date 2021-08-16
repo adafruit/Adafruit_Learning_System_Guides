@@ -54,7 +54,7 @@ HOME_LAYER_INDEX = -3
 current_layer = 0
 
 # Make the main_group to hold everything
-main_group = displayio.Group(max_size=10)
+main_group = displayio.Group()
 display.show(main_group)
 
 # loading screen
@@ -93,7 +93,6 @@ layout = GridLayout(
     height=290,
     grid_size=(4, 3),
     cell_padding=6,
-    max_size=20,
 )
 
 # list that holds the IconWidget objects for each icon.

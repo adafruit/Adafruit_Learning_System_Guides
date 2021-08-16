@@ -26,7 +26,7 @@ class Reshader:
     '''reshader fades the image to mimic brightness control'''
     def __init__(self, palette):
         self.palette = palette
-        ulab_palette = ulab.zeros((len(palette), 3))
+        ulab_palette = ulab.numpy.zeros((len(palette), 3))
         for i in range(len(palette)):
             rgb = int(palette[i])
             ulab_palette[i, 2] = rgb & 0xff
@@ -37,7 +37,7 @@ class Reshader:
     def reshade(self, brightness):
         '''reshader'''
         palette = self.palette
-        shaded = ulab.array(self.ulab_palette * brightness, dtype=ulab.uint8)
+        shaded = ulab.numpy.array(self.ulab_palette * brightness, dtype=ulab.numpy.uint8)
         for i in range(len(palette)):
             palette[i] = tuple(shaded[i])
 

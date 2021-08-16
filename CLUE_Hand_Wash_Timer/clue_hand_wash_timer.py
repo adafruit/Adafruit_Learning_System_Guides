@@ -13,24 +13,46 @@ import displayio
 import pwmio
 
 clue.display.brightness = 0.8
-clue_display = displayio.Group(max_size=4)
+clue_display = displayio.Group()
 
 # draw the background image
-wash_on_file = open("wash_on.bmp", "rb")
+WASH_ON_FILENAME = "wash_on.bmp"
+
+# CircuitPython 6 & 7 compatible
+wash_on_file = open(WASH_ON_FILENAME, "rb")
 wash_on_bmp = displayio.OnDiskBitmap(wash_on_file)
-wash_on_sprite = displayio.TileGrid(wash_on_bmp, pixel_shader=displayio.ColorConverter())
+wash_on_sprite = displayio.TileGrid(
+    wash_on_bmp,
+    pixel_shader=getattr(wash_on_bmp, 'pixel_shader', displayio.ColorConverter())
+)
+
+# # CircuitPython 7+ compatible
+# wash_on_bmp = displayio.OnDiskBitmap(WASH_ON_FILENAME)
+# wash_on_sprite = displayio.TileGrid(wash_on_bmp, pixel_shader=wash_on_bmp.pixel_shader)
+
 clue_display.append(wash_on_sprite)
 
 # draw the foreground image
-wash_off_file = open("wash_off.bmp", "rb")
+WASH_OFF_FILENAME = "wash_off.bmp"
+
+# CircuitPython 6 & 7 compatible
+wash_off_file = open(WASH_OFF_FILENAME, "rb")
 wash_off_bmp = displayio.OnDiskBitmap(wash_off_file)
-wash_off_sprite = displayio.TileGrid(wash_off_bmp, pixel_shader=displayio.ColorConverter())
+wash_off_sprite = displayio.TileGrid(
+    wash_off_bmp,
+    pixel_shader=getattr(wash_off_bmp, 'pixel_shader', displayio.ColorConverter())
+)
+
+# # CircuitPython 7+ compatible
+# wash_off_bmp = displayio.OnDiskBitmap(WASH_OFF_FILENAME)
+# wash_off_sprite = displayio.TileGrid(wash_off_bmp, pixel_shader=wash_off_bmp.pixel_shader)
+
 clue_display.append(wash_off_sprite)
 
 
 # Create text
 # first create the group
-text_group = displayio.Group(max_size=5, scale=1)
+text_group = displayio.Group()
 # Make a label
 title_font = bitmap_font.load_font("/font/RacingSansOne-Regular-38.bdf")
 title_font.load_glyphs("HandWashTimer".encode('utf-8'))
@@ -50,7 +72,7 @@ text_group.append(title2_label)
 
 timer_font = bitmap_font.load_font("/font/RacingSansOne-Regular-29.bdf")
 timer_font.load_glyphs("0123456789ADSWabcdefghijklmnopqrstuvwxyz:!".encode('utf-8'))
-timer_label = label.Label(timer_font, text="Wave to start", color=0x4f3ab1, max_glyphs=15)
+timer_label = label.Label(timer_font, text="Wave to start", color=0x4f3ab1)
 timer_label.x = 24
 timer_label.y = 100
 text_group.append(timer_label)

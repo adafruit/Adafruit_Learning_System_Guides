@@ -1,0 +1,7 @@
+EInk_Autostereograms/boot.py 21: Comparison 'button != None' should be 'button is not None' (singleton-comparison)
+EInk_Autostereograms/code.py 52: Useless return at end of function or method (useless-return)
+EInk_Autostereograms/code.py 138: Useless return at end of function or method (useless-return)
+EInk_Autostereograms/code.py 155: Useless return at end of function or method (useless-return)
+EInk_Autostereograms/code.py 165: Useless return at end of function or method (useless-return)
+EInk_Autostereograms/code.py 284: Simplify chained comparison between the operands (chained-comparison)
+EInk_Autostereograms/code.py 193: Useless return at end of function or method (useless-return)

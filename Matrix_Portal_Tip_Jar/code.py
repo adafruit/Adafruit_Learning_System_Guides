@@ -28,7 +28,7 @@ THRESHOLD = 20
 
 # --- Display setup ---
 matrix = Matrix(bit_depth=4)
-sprite_group = displayio.Group(max_size=1)
+sprite_group = displayio.Group()
 matrix.display.show(sprite_group)
 
 # --- Button setup ---
@@ -68,23 +68,30 @@ def load_image():
     while sprite_group:
         sprite_group.pop()
 
-    bitmap = displayio.OnDiskBitmap(
-        open(SPRITESHEET_FOLDER + "/" + file_list[CURRENT_IMAGE], "rb")
-    )
+    filename = SPRITESHEET_FOLDER + "/" + file_list[CURRENT_IMAGE]
 
-    FRAME_COUNT = int(bitmap.height / matrix.display.height)
-    FRAME_DURATION = DEFAULT_FRAME_DURATION
-
+    # CircuitPython 6 & 7 compatible
+    bitmap = displayio.OnDiskBitmap(open(filename, "rb"))
     sprite = displayio.TileGrid(
         bitmap,
-        pixel_shader=displayio.ColorConverter(),
-        width=1,
-        height=1,
+        pixel_shader=getattr(bitmap, 'pixel_shader', displayio.ColorConverter()),
         tile_width=bitmap.width,
         tile_height=matrix.display.height,
     )
 
+    # # CircuitPython 7+ compatible
+    # bitmap = displayio.OnDiskBitmap(filename)
+    # sprite = displayio.TileGrid(
+    #     bitmap,
+    #     pixel_shader=bitmap.pixel_shader,
+    #     tile_width=bitmap.width,
+    #     tile_height=matrix.display.height,
+    # )
+
     sprite_group.append(sprite)
+
+    FRAME_COUNT = int(bitmap.height / matrix.display.height)
+    FRAME_DURATION = DEFAULT_FRAME_DURATION
     CURRENT_FRAME = 0
     CURRENT_LOOP = 0
 

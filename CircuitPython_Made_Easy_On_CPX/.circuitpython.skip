@@ -1,0 +1,1 @@
+CircuitPython_Made_Easy_On_CPX/cpx_acceleration_neopixels.py 6: Unnecessary "else" after "continue" (no-else-continue)

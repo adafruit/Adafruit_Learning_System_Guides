@@ -1,0 +1,6 @@
+NeoTrellis_M4_MIDI_Synth/header.py 15: Class 'MidiHeader' inherits from object, can be safely removed from bases in python3 (useless-object-inheritance)
+NeoTrellis_M4_MIDI_Synth/events.py 19: Class 'Event' inherits from object, can be safely removed from bases in python3 (useless-object-inheritance)
+NeoTrellis_M4_MIDI_Synth/synth.py 32: Class 'Synth' inherits from object, can be safely removed from bases in python3 (useless-object-inheritance)
+NeoTrellis_M4_MIDI_Synth/parser.py 24: Class 'MidiParser' inherits from object, can be safely removed from bases in python3 (useless-object-inheritance)
+NeoTrellis_M4_MIDI_Synth/parser.py 227: Positional arguments appear to be out of order (arguments-out-of-order)
+NeoTrellis_M4_MIDI_Synth/sequencer.py 17: Class 'Sequencer' inherits from object, can be safely removed from bases in python3 (useless-object-inheritance)

@@ -160,7 +160,7 @@ pyportal = PyPortal(esp=esp,
                     external_spi=spi)
 
 # Root DisplayIO
-root_group = displayio.Group(max_size=100)
+root_group = displayio.Group()
 display.show(root_group)
 
 BACKGROUND = BACKGROUND if isinstance(BACKGROUND, int) else 0x0
@@ -170,7 +170,7 @@ bg_palette[0] = BACKGROUND
 background = displayio.TileGrid(bg_bitmap, pixel_shader=bg_palette)
 
 # Create a new DisplayIO group
-splash = displayio.Group(max_size=15)
+splash = displayio.Group()
 
 splash.append(background)
 
@@ -181,7 +181,7 @@ label_secret.x = (display.width // 2) // 13
 label_secret.y = 17
 key_group.append(label_secret)
 
-label_title = Label(font, max_glyphs=14)
+label_title = Label(font)
 label_title.text = "  Loading.."
 label_title.x = 0
 label_title.y = 5
@@ -241,17 +241,17 @@ for i in secrets['totp_keys']:
 
 # append buttons to splash group
 for b in buttons:
-    splash.append(b.group)
+    splash.append(b)
 
 # refrsh timer label
-label_timer = Label(font, max_glyphs=2)
+label_timer = Label(font)
 label_timer.x = (display.width // 2) // 13
 label_timer.y = 15
 splash.append(label_timer)
 
 # create a new progress bar
 progress_bar = ProgressBar(display.width//5, 125,
-                           200, 30, bar_color = 0xFFFFFF)
+                           200, 30, bar_color = 0xAAAAAA)
 
 splash.append(progress_bar)
 

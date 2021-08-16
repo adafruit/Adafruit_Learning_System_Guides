@@ -6,10 +6,10 @@ uses LIGHT to control a LED
 """
 import analogio
 import board
-import pulseio
+import pwmio
 from simpleio import map_range
 
-LED = pulseio.PWMOut(board.D9)
+LED = pwmio.PWMOut(board.D9)
 LIGHT = analogio.AnalogIn(board.A0)
 
 

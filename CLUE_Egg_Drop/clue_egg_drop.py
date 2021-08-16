@@ -13,24 +13,45 @@ button_a = DigitalInOut(board.BUTTON_A)
 button_a.direction = Direction.INPUT
 button_a.pull = Pull.UP
 
-splash = displayio.Group(max_size=3)
+splash = displayio.Group()
+
+# bad egg
+BAD_EGG_FILENAME = "broken_egg.bmp"
+
+# CircuitPython 6 & 7 compatible
+begg_file = open(BAD_EGG_FILENAME, "rb")
+begg_bmp = displayio.OnDiskBitmap(begg_file)
+begg_sprite = displayio.TileGrid(
+    begg_bmp,
+    pixel_shader=getattr(begg_bmp, 'pixel_shader', displayio.ColorConverter())
+)
+
+# # CircuitPython 7+ compatible
+# begg_bmp = displayio.OnDiskBitmap(BAD_EGG_FILENAME)
+# begg_sprite = displayio.TileGrid(begg_bmp, pixel_shader=begg_bmp.pixel_shader)
+
+# good egg
+GOOD_EGG_FILENAME = "good_egg.bmp"
+
+# CircuitPython 6 & 7 compatible
+gegg_file = open(GOOD_EGG_FILENAME, "rb")
+gegg_bmp = displayio.OnDiskBitmap(gegg_file)
+gegg_sprite = displayio.TileGrid(
+    gegg_bmp,
+    pixel_shader=getattr(gegg_bmp, 'pixel_shader', displayio.ColorConverter())
+)
+
+# # CircuitPython 7+ compatible
+# gegg_bmp = displayio.OnDiskBitmap(GOOD_EGG_FILENAME)
+# gegg_sprite = displayio.TileGrid(gegg_bmp, pixel_shader=gegg_bmp.pixel_shader)
 
 # draw the bad egg!
-begg_file = open("broken_egg.bmp", "rb")
-begg_bmp = displayio.OnDiskBitmap(begg_file)
-begg_sprite = displayio.TileGrid(begg_bmp,
-                                 pixel_shader=displayio.ColorConverter())
 splash.append(begg_sprite)
-
 # draw the good egg on top
-gegg_file = open("good_egg.bmp", "rb")
-gegg_bmp = displayio.OnDiskBitmap(gegg_file)
-gegg_sprite = displayio.TileGrid(gegg_bmp,
-                                 pixel_shader=displayio.ColorConverter())
 splash.append(gegg_sprite)
 
 # Draw a label
-text_group = displayio.Group(max_size=1, scale=2, x=10, y=220)
+text_group = displayio.Group(scale=2, x=10, y=220)
 text = "Current & Max Acceleration"
 text_area = label.Label(terminalio.FONT, text=text, color=0x0000FF)
 text_group.append(text_area) # Subgroup for text scaling
@@ -65,7 +86,7 @@ while True:
     if max_slope < slope_g:
         max_slope = slope_g
         print(slope_g)
-        text_area.text = "Max Slope %0.1fg" % (max_slope)
+        text_area.text = "Max Slope %0.1fg" % max_slope
         if max_slope >= 9 and egg_ok:
             gegg_sprite.x = 300
             time.sleep(0.1)
@@ -74,7 +95,6 @@ while True:
             time.sleep(2)
             buzzer.duty_cycle = 0
             continue
-
 
     if button_a.value is False and egg_ok is False:
         print("Reset")

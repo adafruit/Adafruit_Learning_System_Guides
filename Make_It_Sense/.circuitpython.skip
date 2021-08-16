@@ -1,0 +1,1 @@
+Make_It_Sense/cpx-ir-decode.py 99: Consider merging these comparisons with "in" to 'command in (111, 143)' (consider-using-in)

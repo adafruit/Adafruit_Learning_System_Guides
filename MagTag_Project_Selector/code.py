@@ -40,7 +40,7 @@ btnD.pull = Pull.UP
 
 graphics = Graphics(auto_refresh=False)
 display = graphics.display
-group = displayio.Group(max_size=14)
+group = displayio.Group()
 
 selector = False
 if not btnA.value or not btnB.value or not btnC.value or not btnD.value:

@@ -54,42 +54,54 @@ button_b_pressed = False
 button_a_pressed = False
 
 clue.display.brightness = 0.8
-clue_display = displayio.Group(max_size=4)
+clue_display = displayio.Group()
 
 # draw the rising image
+# CircuitPython 6 & 7 compatible
 rising_file = open("rising.bmp", "rb")
 rising_bmp = displayio.OnDiskBitmap(rising_file)
-rising_sprite = displayio.TileGrid(rising_bmp, pixel_shader=displayio.ColorConverter())
+rising_sprite = displayio.TileGrid(rising_bmp, pixel_shader=getattr(rising_bmp, 'pixel_shader', displayio.ColorConverter()))
+
+# # CircuitPython 7+ compatible
+# rising_bmp = displayio.OnDiskBitmap("rising.bmp")
+# rising_sprite = displayio.TileGrid(rising_bmp, pixel_shader=rising_bmp.pixel_shader)
+
 clue_display.append(rising_sprite)
 
 # draw the sinking image
+# CircuitPython 6 & 7 compatible
 sinking_file = open("sinking.bmp", "rb")
 sinking_bmp = displayio.OnDiskBitmap(sinking_file)
-sinking_sprite = displayio.TileGrid(sinking_bmp, pixel_shader=displayio.ColorConverter())
+sinking_sprite = displayio.TileGrid(sinking_bmp, pixel_shader=getattr(sinking_bmp, 'pixel_shader', displayio.ColorConverter()))
+
+# # CircuitPython 7+ compatible
+# sinking_bmp = displayio.OnDiskBitmap("sinking.bmp")
+# sinking_sprite = displayio.TileGrid(sinking_bmp, pixel_shader=sinking_bmp.pixel_shader)
+
 clue_display.append(sinking_sprite)
 
 # Create text
 # first create the group
-text_group = displayio.Group(max_size=5, scale=1)
+text_group = displayio.Group()
 # Make a label
 reading_font = bitmap_font.load_font("/font/RacingSansOne-Regular-29.bdf")
 reading_font.load_glyphs("0123456789ADSWabcdefghijklmnopqrstuvwxyz:!".encode('utf-8'))
-reading_label = label.Label(reading_font, color=0xffffff, max_glyphs=15)
+reading_label = label.Label(reading_font, color=0xffffff)
 reading_label.x = 10
 reading_label.y = 24
 text_group.append(reading_label)
 
-reading2_label = label.Label(reading_font, color=0xdaf5f4, max_glyphs=15)
+reading2_label = label.Label(reading_font, color=0xdaf5f4)
 reading2_label.x = 10
 reading2_label.y = 54
 text_group.append(reading2_label)
 
-reading3_label = label.Label(reading_font, color=0x4f3ab1, max_glyphs=15)
+reading3_label = label.Label(reading_font, color=0x4f3ab1)
 reading3_label.x = 10
 reading3_label.y = 84
 text_group.append(reading3_label)
 
-timer_label = label.Label(reading_font, color=0x072170, max_glyphs=15)
+timer_label = label.Label(reading_font, color=0x072170)
 timer_label.x = 10
 timer_label.y = 114
 text_group.append(timer_label)

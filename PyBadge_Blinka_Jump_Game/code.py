@@ -43,7 +43,7 @@ JUMP_2 = 6
 #  creates display
 display = board.DISPLAY
 #  scale=2 allows the sprites to be bigger
-group = displayio.Group(max_size=30, scale=2)
+group = displayio.Group(scale=2)
 
 #  Blinka sprite setup
 blinka, blinka_pal = adafruit_imageload.load("/spritesNew.bmp",

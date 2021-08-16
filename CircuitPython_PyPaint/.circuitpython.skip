@@ -1,0 +1,4 @@
+CircuitPython_PyPaint/code.py 32: Class 'Color' inherits from object, can be safely removed from bases in python3 (useless-object-inheritance)
+CircuitPython_PyPaint/code.py 51: Class 'TouchscreenPoller' inherits from object, can be safely removed from bases in python3 (useless-object-inheritance)
+CircuitPython_PyPaint/code.py 108: Class 'CursorPoller' inherits from object, can be safely removed from bases in python3 (useless-object-inheritance)
+CircuitPython_PyPaint/code.py 149: Class 'Paint' inherits from object, can be safely removed from bases in python3 (useless-object-inheritance)

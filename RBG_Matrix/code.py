@@ -46,11 +46,24 @@ g.append(G)
 display.show(g)
 display.auto_refresh = True
 
+
+# CircuitPython 6 & 7 compatible
 bitmap_file = open("/rbg.bmp", "rb")
 # Setup the file as the bitmap data source
 bitmap = displayio.OnDiskBitmap(bitmap_file)
 # Create a TileGrid to hold the bitmap
-tile_grid = displayio.TileGrid(bitmap, pixel_shader=displayio.ColorConverter())
+tile_grid = displayio.TileGrid(
+    bitmap,
+    pixel_shader=getattr(bitmap, 'pixel_shader', displayio.ColorConverter())
+)
+
+# # CircuitPython 7+ compatible
+# # Setup the filename as the bitmap data source
+# bitmap = displayio.OnDiskBitmap("/rbg.bmp")
+# # Create a TileGrid to hold the bitmap
+# tile_grid = displayio.TileGrid(bitmap, pixel_shader=bitmap.pixel_shader)
+
+
 print(dir(tile_grid))
 
 while True:

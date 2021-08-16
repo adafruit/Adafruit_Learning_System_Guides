@@ -18,8 +18,17 @@ display = framebufferio.FramebufferDisplay(matrix, auto_refresh=False)
 # This bitmap contains the emoji we're going to use. It is assumed
 # to contain 20 icons, each 20x24 pixels. This fits nicely on the 64x32
 # RGB matrix display.
-bitmap_file = open("emoji.bmp", 'rb')
+
+filename = "emoji.bmp"
+
+# CircuitPython 6 & 7 compatible
+bitmap_file = open(filename, 'rb')
 bitmap = displayio.OnDiskBitmap(bitmap_file)
+pixel_shader = getattr(bitmap, 'pixel_shader', displayio.ColorConverter())
+
+# # CircuitPython 7+ compatible
+# bitmap = displayio.OnDiskBitmap(filename)
+# pixel_shader = bitmap.pixel_shader
 
 # Each wheel can be in one of three states:
 STOPPED, RUNNING, BRAKING = range(3)
@@ -35,7 +44,7 @@ def shuffled(seq):
 class Wheel(displayio.TileGrid):
     def __init__(self):
         # Portions of up to 3 tiles are visible.
-        super().__init__(bitmap=bitmap, pixel_shader=displayio.ColorConverter(),
+        super().__init__(bitmap=bitmap, pixel_shader=pixel_shader,
                          width=1, height=3, tile_width=20, tile_height=24)
         self.order = shuffled(range(20))
         self.state = STOPPED
@@ -53,7 +62,7 @@ class Wheel(displayio.TileGrid):
             if time.monotonic_ns() > self.stop_time:
                 self.state = BRAKING
         elif self.state == BRAKING:
-            # More quickly lose speed when baking, down to speed 7
+            # More quickly lose speed when braking, down to speed 7
             self.vel = max(self.vel * 85 // 100, 7)
 
         # Advance the wheel according to the velocity, and wrap it around
@@ -72,7 +81,6 @@ class Wheel(displayio.TileGrid):
         if self.state == BRAKING and self.vel == 7 and yyy < 4:
             self.pos = off * 24 * 16
             self.vel = 0
-            yy = 0
             self.state = STOPPED
 
         # Move the displayed tiles to the correct height and make sure the
@@ -87,11 +95,11 @@ class Wheel(displayio.TileGrid):
     def kick(self, i):
         self.state = RUNNING
         self.vel = random.randint(256, 320)
-        self.stop_time = time.monotonic_ns() + 3000000000 + i * 350000000
+        self.stop_time = time.monotonic_ns() + 3_000_000_000 + i * 350_000_000
 
 # Our fruit machine has 3 wheels, let's create them with a correct horizontal
 # (x) offset and arbitrary vertical (y) offset.
-g = displayio.Group(max_size=3)
+g = displayio.Group()
 wheels = []
 for idx in range(3):
     wheel = Wheel()
@@ -119,7 +127,7 @@ for idx, si in enumerate(wheels):
 
 # Here's the main loop
 while True:
-    # Refresh the dislpay (doing this manually ensures the wheels move
+    # Refresh the display (doing this manually ensures the wheels move
     # together, not at different times)
     display.refresh(minimum_frames_per_second=0)
     if all_stopped():

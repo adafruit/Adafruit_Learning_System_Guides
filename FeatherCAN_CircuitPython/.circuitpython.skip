@@ -1,0 +1,2 @@
+FeatherCAN_CircuitPython/sender-ack.py 51: Unnecessary "else" after "break" (no-else-break)
+FeatherCAN_CircuitPython/sender-ack.py 52: Using an f-string that does not have any interpolated variables (f-string-without-interpolation)

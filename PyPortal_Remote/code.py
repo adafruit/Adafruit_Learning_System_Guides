@@ -154,7 +154,7 @@ def switchpage(tup):
 # Verifies the Roku and Pyportal are connected and visible
 channels = getchannels()
 
-my_display_group = displayio.Group(max_size=25)
+my_display_group = displayio.Group()
 
 image_1, palette_1 = adafruit_imageload.load(
     "images/page_1.bmp", bitmap=displayio.Bitmap, palette=displayio.Palette

@@ -74,10 +74,10 @@ ts = adafruit_touchscreen.Touchscreen(board.TOUCH_YD, board.TOUCH_YU,
 
 
 # ------------- Display Groups ------------- #
-splash = displayio.Group(max_size=15)  # The Main Display Group
-view1 = displayio.Group(max_size=15)  # Group for View 1 objects
-view2 = displayio.Group(max_size=15)  # Group for View 2 objects
-view3 = displayio.Group(max_size=15)  # Group for View 3 objects
+splash = displayio.Group()  # The Main Display Group
+view1 = displayio.Group()  # Group for View 1 objects
+view2 = displayio.Group()  # Group for View 2 objects
+view3 = displayio.Group()  # Group for View 3 objects
 
 def hideLayer(hide_target):
     try:
@@ -98,11 +98,11 @@ def showLayer(show_target):
 pyportal.set_background('/images/loading.bmp')
 
 
-bg_group = displayio.Group(max_size=1)
+bg_group = displayio.Group()
 splash.append(bg_group)
 
 
-icon_group = displayio.Group(max_size=1)
+icon_group = displayio.Group()
 icon_group.x = 180
 icon_group.y = 120
 icon_group.scale = 1
@@ -122,13 +122,15 @@ def set_image(group, filename):
     if not filename:
         return  # we're done, no icon desired
 
+    # CircuitPython 6 & 7 compatible
     image_file = open(filename, "rb")
     image = displayio.OnDiskBitmap(image_file)
-    try:
-        image_sprite = displayio.TileGrid(image, pixel_shader=displayio.ColorConverter())
-    except TypeError:
-        image_sprite = displayio.TileGrid(image, pixel_shader=displayio.ColorConverter(),
-                                          position=(0, 0))
+    image_sprite = displayio.TileGrid(image, pixel_shader=getattr(image, 'pixel_shader', displayio.ColorConverter()))
+
+    # # CircuitPython 7+ compatible
+    # image = displayio.OnDiskBitmap(filename)
+    # image_sprite = displayio.TileGrid(image, pixel_shader=image.pixel_shader)
+
     group.append(image_sprite)
 
 set_image(bg_group, "/images/BGimage.bmp")
@@ -143,28 +145,28 @@ TABS_X = 5
 TABS_Y = 50
 
 # Text Label Objects
-feed1_label = Label(font, text="Text Wondow 1", color=0xE39300, max_glyphs=200)
+feed1_label = Label(font, text="Text Wondow 1", color=0xE39300)
 feed1_label.x = TABS_X
 feed1_label.y = TABS_Y
 view1.append(feed1_label)
 
-feed2_label = Label(font, text="Text Wondow 2", color=0xFFFFFF, max_glyphs=200)
+feed2_label = Label(font, text="Text Wondow 2", color=0xFFFFFF)
 feed2_label.x = TABS_X
 feed2_label.y = TABS_Y
 view2.append(feed2_label)
 
-sensors_label = Label(font, text="Data View", color=0x03AD31, max_glyphs=200)
+sensors_label = Label(font, text="Data View", color=0x03AD31)
 sensors_label.x = TABS_X
 sensors_label.y = TABS_Y
 view3.append(sensors_label)
 
-sensor_data = Label(font, text="Data View", color=0x03AD31, max_glyphs=100)
+sensor_data = Label(font, text="Data View", color=0x03AD31)
 sensor_data.x = TABS_X+15
 sensor_data.y = 170
 view3.append(sensor_data)
 
 
-text_hight = Label(font, text="M", color=0x03AD31, max_glyphs=10)
+text_hight = Label(font, text="M", color=0x03AD31)
 # return a reformatted string with word wrapping using PyPortal.wrap_nicely
 def text_box(target, top, string, max_chars):
     text = pyportal.wrap_nicely(string, max_chars)

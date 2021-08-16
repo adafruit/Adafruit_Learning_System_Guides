@@ -53,7 +53,7 @@ from micropython import const
 
 def clear_display():
     """Display nothing"""
-    board.DISPLAY.show(displayio.Group(max_size=1))
+    board.DISPLAY.show(displayio.Group())
 
 clear_display()
 
@@ -69,7 +69,7 @@ def px(x, y):
 class PlaybackDisplay:
     """Manage display during playback"""
     def __init__(self):
-        self.group = displayio.Group(max_size=4)
+        self.group = displayio.Group()
         self.glyph_width, self.glyph_height = font.get_bounding_box()[:2]
         self.pbar = ProgressBar(0, 0, board.DISPLAY.width,
                                 self.glyph_height*2, bar_color=0x0000ff,
@@ -78,8 +78,7 @@ class PlaybackDisplay:
         self.iconbar.group.y = 1000
         for i in range(5, 8):
             self.iconbar.icons[i].x += 32
-        self.label = adafruit_display_text.label.Label(font, line_spacing=1.0,
-                                                       max_glyphs=256)
+        self.label = adafruit_display_text.label.Label(font, line_spacing=1.0)
         self.label.y = 6
         self._bitmap_filename = None
         self._fallback_bitmap = ["/rsrc/background.bmp"]
@@ -95,6 +94,7 @@ class PlaybackDisplay:
         self.pixels.show()
         self.paused = False
         self.next_choice = 0
+        self.tile_grid = None
 
     @property
     def text(self):
@@ -122,6 +122,8 @@ class PlaybackDisplay:
         for i in candidates + self._fallback_bitmap:
             if i == self._bitmap_filename:
                 return # Already loaded
+
+            # CircuitPython 6 & 7 compatible
             try:
                 bitmap_file = open(i, 'rb')
             except OSError:
@@ -129,7 +131,23 @@ class PlaybackDisplay:
             bitmap = displayio.OnDiskBitmap(bitmap_file)
             self._bitmap_filename = i
             # Create a TileGrid to hold the bitmap
-            self.tile_grid = displayio.TileGrid(bitmap, pixel_shader=displayio.ColorConverter())
+            self.tile_grid = displayio.TileGrid(
+                bitmap,
+                pixel_shader=getattr(
+                    bitmap, "pixel_shader", displayio.ColorConverter()
+                ),
+            )
+
+            # # CircuitPython 7+ compatible
+            # try:
+            #     bitmap = displayio.OnDiskBitmap(i)
+            # except OSError:
+            #     continue
+            # self._bitmap_filename = i
+            # # Create a TileGrid to hold the bitmap
+            # self.tile_grid = displayio.TileGrid(
+            #     bitmap, pixel_shader=bitmap.pixel_shader
+            # )
 
             # Add the TileGrid to the Group
             if len(self.group) == 0:
@@ -328,10 +346,10 @@ def menu_choice(seq, button_ok, button_cancel=0, *, sel_idx=0, text_font=font):
                                  tile_height=glyph_height)
               for i in range(num_rows)]
     terminals = [terminalio.Terminal(li, text_font) for li in labels]
-    cursor = adafruit_display_text.label.Label(text_font, max_glyphs=1, color=0xddddff)
+    cursor = adafruit_display_text.label.Label(text_font, color=0xddddff)
     base_y = 0
     caret_offset = glyph_height//2-1
-    scene = displayio.Group(max_size=len(labels) + 1)
+    scene = displayio.Group()
     for i, label in enumerate(labels):
         label.x = round(glyph_width * 1.5)
         label.y = base_y + glyph_height * i

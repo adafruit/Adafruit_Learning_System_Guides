@@ -1,0 +1,2 @@
+CP101_StateMachines/classes/code.py 206: Class 'StateMachine' inherits from object, can be safely removed from bases in python3 (useless-object-inheritance)
+CP101_StateMachines/classes/code.py 268: Class 'State' inherits from object, can be safely removed from bases in python3 (useless-object-inheritance)

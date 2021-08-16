@@ -4,7 +4,7 @@ import busio
 import digitalio
 
 # For most CircuitPython boards:
-led = digitalio.DigitalInOut(board.D13)
+led = digitalio.DigitalInOut(board.LED)
 # For QT Py M0:
 # led = digitalio.DigitalInOut(board.SCK)
 led.direction = digitalio.Direction.OUTPUT

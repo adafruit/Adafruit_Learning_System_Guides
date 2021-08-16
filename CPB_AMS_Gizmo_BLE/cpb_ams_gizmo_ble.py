@@ -28,9 +28,16 @@ a = SolicitServicesAdvertisement()
 a.solicited_services.append(AppleMediaService)
 radio.start_advertising(a)
 
-def wrap_in_tilegrid(open_file):
-    odb = displayio.OnDiskBitmap(open_file)
-    return displayio.TileGrid(odb, pixel_shader=displayio.ColorConverter())
+def wrap_in_tilegrid(filename:str):
+    # CircuitPython 6 & 7 compatible
+    odb = displayio.OnDiskBitmap(open(filename, "rb"))
+    return displayio.TileGrid(
+        odb, pixel_shader=getattr(odb, 'pixel_shader', displayio.ColorConverter())
+    )
+
+    # # CircuitPython 7+ compatible
+    # odb = displayio.OnDiskBitmap(filename)
+    # return displayio.TileGrid(odb, pixel_shader=odb.pixel_shader)
 
 def make_background(width, height, color):
     color_bitmap = displayio.Bitmap(width, height, 1)
@@ -46,10 +53,10 @@ def load_font(fontname, text):
     font.load_glyphs(text.encode('utf-8'))
     return font
 
-def make_label(text, x, y, color, max_glyphs=30, font=terminalio.FONT):
+def make_label(text, x, y, color, font=terminalio.FONT):
     if isinstance(font, str):
         font = load_font(font, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.,?()")
-    text_area = Label(font, text=text, color=color, max_glyphs=max_glyphs)
+    text_area = Label(font, text=text, color=color)
     text_area.x = x
     text_area.y = y
     return text_area
@@ -66,12 +73,12 @@ def set_status(label, action_text, player):
     label.x = display.width - 10 - label_width
 
 display = tft_gizmo.TFT_Gizmo()
-group = displayio.Group(max_size=20)
+group = displayio.Group()
 display.show(group)
 
 while True:
     if not radio.connected:
-        group.append(wrap_in_tilegrid(open("/graphic_tfts_ams_connect.bmp", "rb")))
+        group.append(wrap_in_tilegrid("/graphic_tfts_ams_connect.bmp"))
 
         while not radio.connected:
             pass
@@ -83,7 +90,7 @@ while True:
 
     # Draw the text fields
     print("Loading Font Glyphs...")
-    group.append(wrap_in_tilegrid(open("/graphic_tfts_ams_loading.bmp", "rb")))
+    group.append(wrap_in_tilegrid("/graphic_tfts_ams_loading.bmp"))
     title_label = make_label("None", 12, 30, TEXT_COLOR, font="/fonts/Arial-Bold-18.bdf")
     artist_label = make_label("None", 12, 70, TEXT_COLOR, font="/fonts/Arial-16.bdf")
     album_label = make_label("None", 12, 184, TEXT_COLOR, font="/fonts/Arial-16.bdf")

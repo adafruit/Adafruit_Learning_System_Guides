@@ -15,14 +15,22 @@ except (ConnectionError, ValueError, RuntimeError) as e:
 
 
 #  displayio groups
-group = displayio.Group(max_size=30)
-tree_group = displayio.Group(max_size=30)
-circle_group = displayio.Group(max_size=30)
+group = displayio.Group()
+tree_group = displayio.Group()
+circle_group = displayio.Group()
 
 #  import tree bitmap
-tree = displayio.OnDiskBitmap(open("/atree.bmp", "rb"))
+filename = "/atree.bmp"
 
-tree_grid = displayio.TileGrid(tree, pixel_shader=displayio.ColorConverter())
+# CircuitPython 6 & 7 compatible
+tree = displayio.OnDiskBitmap(open(filename, "rb"))
+tree_grid = displayio.TileGrid(
+    tree, pixel_shader=getattr(tree, 'pixel_shader', displayio.ColorConverter())
+)
+
+# # CircuitPython 7+ compatible
+# tree = displayio.OnDiskBitmap(filename)
+# tree_grid = displayio.TileGrid(tree, pixel_shader=tree.pixel_shader)
 
 #  add bitmap to its group
 tree_group.append(tree_grid)

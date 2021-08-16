@@ -1,14 +1,12 @@
 """
 Jump & touch sound example for Adafruit Hallowing. Plays different sounds
 in response to jumping and capacitive touch pads.
-Image display requires CircuitPython 4.0.0-alpha1 or later (with displayio
-support). WILL work with earlier versions, just no image shown!
 """
 
 import time
-import busio
 import board
 import digitalio
+import displayio
 import audioio
 import audiocore
 import touchio
@@ -57,16 +55,16 @@ try:
 except AttributeError:
     pass
 
-AUDIO = audioio.AudioOut(board.A0)              # Speaker
+AUDIO = audioio.AudioOut(board.SPEAKER)  # Speaker
 
 board.DISPLAY.auto_brightness = False
-TOUCH1 = touchio.TouchIn(board.A2)              # Capacitive touch pads
-TOUCH2 = touchio.TouchIn(board.A3)
-TOUCH3 = touchio.TouchIn(board.A4)
-TOUCH4 = touchio.TouchIn(board.A5)
+TOUCH1 = touchio.TouchIn(board.TOUCH1)  # Capacitive touch pads
+TOUCH2 = touchio.TouchIn(board.TOUCH2)
+TOUCH3 = touchio.TouchIn(board.TOUCH3)
+TOUCH4 = touchio.TouchIn(board.TOUCH4)
 
 # Set up accelerometer on I2C bus, 4G range:
-I2C = busio.I2C(board.SCL, board.SDA)
+I2C = board.I2C()
 if IS_HALLOWING_M4:
     import adafruit_msa301
     ACCEL = adafruit_msa301.MSA301(I2C)
@@ -79,18 +77,25 @@ else:
     ACCEL.range = adafruit_lis3dh.RANGE_4_G
 
 try:
-    import displayio
     board.DISPLAY.brightness = 0
     SCREEN = displayio.Group()
     board.DISPLAY.show(SCREEN)
+
+    # CircuitPython 6 & 7 compatible
     BITMAP = displayio.OnDiskBitmap(open(IMAGEFILE, 'rb'))
-    SCREEN.append(
-        displayio.TileGrid(BITMAP,
-                           pixel_shader=displayio.ColorConverter(),
-                           x=0, y=0))
-    board.DISPLAY.brightness = 1.0
-except (ImportError, NameError, AttributeError) as err:
-    pass # Probably earlier CircuitPython; no displayio support
+    TILEGRID = displayio.TileGrid(
+        BITMAP,
+        pixel_shader=getattr(BITMAP, 'pixel_shader', displayio.ColorConverter())
+    )
+
+    # # CircuitPython 7+ compatible
+    # BITMAP = displayio.OnDiskBitmap(IMAGEFILE)
+    # TILEGRID = displayio.TileGrid(BITMAP, pixel_shader=BITMAP.pixel_shader)
+
+    SCREEN.append(TILEGRID)
+    board.DISPLAY.brightness = 1.0   # Turn on display backlight
+except (OSError, ValueError):
+    pass
 
 # If everything has initialized correctly, turn off the onboard NeoPixel:
 PIXEL = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0)

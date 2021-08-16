@@ -27,8 +27,6 @@ GLOBAL_VAR bool      showSplashScreen    GLOBAL_INIT(true);   // Clear to suppre
 
 #define MAX_DISPLAY_SIZE 240
 GLOBAL_VAR int       DISPLAY_SIZE        GLOBAL_INIT(240);    // Start with assuming a 240x240 display
-GLOBAL_VAR int       DISPLAY_X_OFFSET    GLOBAL_INIT(0);      // Used with rectangular screens
-GLOBAL_VAR int       DISPLAY_Y_OFFSET    GLOBAL_INIT(0);      // Used with rectangular screens
 GLOBAL_VAR uint32_t  stackReserve        GLOBAL_INIT(5192);   // See image-loading code
 GLOBAL_VAR int       eyeRadius           GLOBAL_INIT(0);      // 0 = Use default in loadConfig()
 GLOBAL_VAR int       eyeDiameter;                             // Calculated from eyeRadius later
@@ -70,6 +68,7 @@ GLOBAL_VAR float     irisMin             GLOBAL_INIT(0.45);
 GLOBAL_VAR float     irisRange           GLOBAL_INIT(0.35);
 GLOBAL_VAR bool      tracking            GLOBAL_INIT(true);
 GLOBAL_VAR float     trackFactor         GLOBAL_INIT(0.5);
+GLOBAL_VAR uint32_t  gazeMax             GLOBAL_INIT(3000000); // Max wait time (uS) for major eye movements
 
 // Random eye motion: provided by the base project, but overridable by user code.
 GLOBAL_VAR bool      moveEyesRandomly    GLOBAL_INIT(true);   // Clear to suppress random eye motion and let user code control it

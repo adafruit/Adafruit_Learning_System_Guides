@@ -23,14 +23,14 @@ holiday_greetings = [holidays['new years'][1],holidays['valentines'][1],
 class OpenWeather_Graphics(displayio.Group):
 
     def __init__(self, root_group, *, am_pm=True, celsius=True):
-        super().__init__(max_size=2)
+        super().__init__()
         self.am_pm = am_pm
         self.celsius = celsius
 
         root_group.append(self)
-        self._icon_group = displayio.Group(max_size=1)
+        self._icon_group = displayio.Group()
         self.append(self._icon_group)
-        self._text_group = displayio.Group(max_size=12)
+        self._text_group = displayio.Group()
         self.append(self._text_group)
 
         self._icon_sprite = None
@@ -50,31 +50,31 @@ class OpenWeather_Graphics(displayio.Group):
         self.city_text = None
         self.holiday_text = None
 
-        self.time_text = Label(self.medium_font, max_glyphs=8)
+        self.time_text = Label(self.medium_font)
         self.time_text.x = 365
         self.time_text.y = 15
         self.time_text.color = 0x5AF78E
         self._text_group.append(self.time_text)
 
-        self.date_text = Label(self.medium_font, max_glyphs=60)
+        self.date_text = Label(self.medium_font)
         self.date_text.x = 10
         self.date_text.y = 15
         self.date_text.color = 0x57C6FE
         self._text_group.append(self.date_text)
 
-        self.temp_text = Label(self.large_font, max_glyphs=6)
+        self.temp_text = Label(self.large_font)
         self.temp_text.x = 316
         self.temp_text.y = 165
         self.temp_text.color = 0xFF6AC1
         self._text_group.append(self.temp_text)
 
-        self.main_text = Label(self.weather_font, max_glyphs=20)
+        self.main_text = Label(self.weather_font)
         self.main_text.x = 10
         self.main_text.y = 258
         self.main_text.color = 0x99ECFD
         self._text_group.append(self.main_text)
 
-        self.description_text = Label(self.small_font, max_glyphs=60)
+        self.description_text = Label(self.small_font)
         self.description_text.x = 10
         self.description_text.y = 296
         self.description_text.color = 0x9FA0A2
@@ -151,7 +151,7 @@ class OpenWeather_Graphics(displayio.Group):
             h = holiday_checks.index(i)
             if holiday_date_str == holiday_checks[h]:
                 if not self.holiday_text:
-                    self.holiday_text = Label(self.medium_font, max_glyphs=60)
+                    self.holiday_text = Label(self.medium_font)
                     self.holiday_text.x = 10
                     self.holiday_text.y = 45
                     self.holiday_text.color = 0xf2f89d
@@ -172,13 +172,15 @@ class OpenWeather_Graphics(displayio.Group):
             return  # we're done, no icon desired
         if self._icon_file:
             self._icon_file.close()
+
+        # CircuitPython 6 & 7 compatible
         self._icon_file = open(filename, "rb")
         icon = displayio.OnDiskBitmap(self._icon_file)
-        try:
-            self._icon_sprite = displayio.TileGrid(icon,
-                                                   pixel_shader=displayio.ColorConverter())
-        except TypeError:
-            self._icon_sprite = displayio.TileGrid(icon,
-                                                   pixel_shader=displayio.ColorConverter(),
-                                                   position=(0,0))
+        self._icon_sprite = displayio.TileGrid(icon,
+                                               pixel_shader=getattr(icon, 'pixel_shader', displayio.ColorConverter()))
+
+        # # CircuitPython 7+ compatible
+        # icon = displayio.OnDiskBitmap(filename)
+        # self._icon_sprite = displayio.TileGrid(icon, pixel_shader=icon.pixel_shader)
+
         self._icon_group.append(self._icon_sprite)
