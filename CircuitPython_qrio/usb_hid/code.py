@@ -17,11 +17,9 @@ import qrio
 import adafruit_ov2640
 from adafruit_display_text.bitmap_label import Label
 from adafruit_ili9341 import ILI9341
-import adafruit_minimqtt.adafruit_minimqtt as MQTT
 import usb_hid
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS
-from adafruit_hid.keycode import Keycode
 
 print("Initializing display")
 displayio.release_displays()
