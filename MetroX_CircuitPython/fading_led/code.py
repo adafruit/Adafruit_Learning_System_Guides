@@ -5,9 +5,9 @@
 fades a LED using pulseio's PWM
 """
 
+import time
 import pwmio
 import board
-import time
 
 led = pwmio.PWMOut(board.D13, frequency=500, duty_cycle=0)
 
