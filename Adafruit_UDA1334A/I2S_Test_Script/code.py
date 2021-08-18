@@ -30,9 +30,8 @@ for bit_clock_pin in get_unique_pins():
             if bit_clock_pin is word_select_pin or bit_clock_pin is data_pin or word_select_pin\
                     is data_pin:
                 continue
+            if is_hardware_i2s(bit_clock_pin, word_select_pin, data_pin):
+                print("Bit clock pin:", bit_clock_pin, "\t Word select pin:", word_select_pin,
+                      "\t Data pin:", data_pin)
             else:
-                if is_hardware_i2s(bit_clock_pin, word_select_pin, data_pin):
-                    print("Bit clock pin:", bit_clock_pin, "\t Word select pin:", word_select_pin,
-                          "\t Data pin:", data_pin)
-                else:
-                    pass
+                pass
