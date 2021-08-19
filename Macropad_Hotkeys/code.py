@@ -50,8 +50,7 @@ class App:
 
 # INITIALIZATION -----------------------
 if True:
-    # The 'if True:' and indentation is a method to segment the code into logical blocks.
-    # Although not supported by MU, it also enables "code folding" by most editing programs
+    # The 'if True:' here is simply to help visually separate the code into logical sections.
     macropad = MacroPad()
     macropad.display.auto_refresh = False
     macropad.pixels.auto_write = False
@@ -153,7 +152,7 @@ while True:
             else:
                 macropad.keyboard_layout.write(item)
     else:
-        # Release any still-pressed modifier keys
+        # Release any still-pressed keys
         for item in sequence:
             if isinstance(item, int) and item >= 0:
                 macropad.keyboard.release(item)
