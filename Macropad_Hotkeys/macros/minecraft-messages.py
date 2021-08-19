@@ -7,7 +7,6 @@
 from adafruit_hid.keycode import Keycode # REQUIRED if using Keycode.* values
 
 DELAY_AFTER_ESCAPE = 0.05
-DELAY_AFTER_COMMAND = 0.10
 
 app = {                              # REQUIRED dict, must be named 'app'
     'name' : 'Minecraft (/msg)',     # Application name
@@ -15,15 +14,15 @@ app = {                              # REQUIRED dict, must be named 'app'
         # COLOR    LABEL    KEY SEQUENCE
         # 1st row ----------
         (0x000020, 'list', [
-            Keycode.ESCAPE, -Keycode.ESCAPE,
+            Keycode.ESCAPE, -Keycode.ESCAPE, DELAY_AFTER_ESCAPE,
             '/list',
             Keycode.RETURN, -Keycode.RETURN]),
         (0x000020, 'list', [
-            Keycode.ESCAPE, -Keycode.ESCAPE,
+            Keycode.ESCAPE, -Keycode.ESCAPE, DELAY_AFTER_ESCAPE,
             '/list',
             Keycode.RETURN, -Keycode.RETURN]),
         (0x000020, 'list', [
-            Keycode.ESCAPE, -Keycode.ESCAPE,
+            Keycode.ESCAPE, -Keycode.ESCAPE, DELAY_AFTER_ESCAPE,
             '/list',
             Keycode.RETURN, -Keycode.RETURN]),
         # 2nd row ----------
@@ -36,15 +35,15 @@ app = {                              # REQUIRED dict, must be named 'app'
         (0x000000, '',     []),
         # 4th row ----------
         (0x101010, 'bed', [
-            Keycode.ESCAPE, -Keycode.ESCAPE,
+            Keycode.ESCAPE, -Keycode.ESCAPE, DELAY_AFTER_ESCAPE,
             '/msg @a Time for bed!',
             Keycode.RETURN, -Keycode.RETURN]),
         (0x101010, 'bed', [
-            Keycode.ESCAPE, -Keycode.ESCAPE,
+            Keycode.ESCAPE, -Keycode.ESCAPE, DELAY_AFTER_ESCAPE,
             '/msg @a Time for bed!',
             Keycode.RETURN, -Keycode.RETURN]),
         (0x101010, 'bed', [
-            Keycode.ESCAPE, -Keycode.ESCAPE,
+            Keycode.ESCAPE, -Keycode.ESCAPE, DELAY_AFTER_ESCAPE,
             '/msg @a Time for bed!',
             Keycode.RETURN, -Keycode.RETURN]),
         # Encoder button ---

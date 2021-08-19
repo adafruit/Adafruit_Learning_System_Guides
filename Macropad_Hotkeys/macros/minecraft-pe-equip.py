@@ -11,6 +11,9 @@ from adafruit_hid.keycode import Keycode # REQUIRED if using Keycode.* values
 # Unfortunately, bedrock edition has no single command that both
 # gives an item and enchants it.  Thus, have to place the item in
 # the player's inventory slot, enchant it, then equip it.
+#
+# As a result, it is probably better to learn on less complex
+# macro files before attempting to adjust settings in this one.
 
 from adafruit_hid.keycode import Keycode # REQUIRED if using Keycode.* values
 
