@@ -50,6 +50,8 @@ class App:
 
 # INITIALIZATION -----------------------
 if True:
+    # The 'if True:' and indentation is a method to segment the code into logical blocks.
+    # Although not supported by MU, it also enables "code folding" by most editing programs
     macropad = MacroPad()
     macropad.display.auto_refresh = False
     macropad.pixels.auto_write = False
