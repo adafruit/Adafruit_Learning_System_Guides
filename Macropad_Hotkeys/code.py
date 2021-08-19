@@ -49,6 +49,7 @@ class App:
 
 
 # INITIALIZATION -----------------------
+
 macropad = MacroPad()
 macropad.display.auto_refresh = False
 macropad.pixels.auto_write = False
@@ -92,6 +93,7 @@ last_position = None
 last_encoder_switch = macropad.encoder_switch_debounced.pressed
 app_index = 0
 apps[app_index].switch()
+
 
 # MAIN LOOP ----------------------------
 
