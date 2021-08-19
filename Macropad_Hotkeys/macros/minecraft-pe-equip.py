@@ -39,7 +39,7 @@ app = {
             Keycode.RETURN, -Keycode.RETURN, DELAY_AFTER_COMMAND,
             Keycode.ESCAPE, -Keycode.ESCAPE, DELAY_AFTER_ESCAPE,
             'E']),
-        (12288, 'plate', [
+        (0x003000, 'plate', [
             Keycode.ESCAPE, -Keycode.ESCAPE, DELAY_AFTER_ESCAPE,
             '/replaceitem entity @s slot.weapon.mainhand 0 destroy netherite_chestplate', 
             Keycode.RETURN, -Keycode.RETURN, DELAY_AFTER_COMMAND,
@@ -51,7 +51,7 @@ app = {
             Keycode.RETURN, -Keycode.RETURN, DELAY_AFTER_COMMAND,
             Keycode.ESCAPE, -Keycode.ESCAPE, DELAY_AFTER_ESCAPE,
             'E']),
-        (12288, 'legs', [
+        (0x003000, 'legs', [
             Keycode.ESCAPE, -Keycode.ESCAPE, DELAY_AFTER_ESCAPE,
             '/replaceitem entity @s slot.weapon.mainhand 0 destroy netherite_leggings', 
             Keycode.RETURN, -Keycode.RETURN, DELAY_AFTER_COMMAND,
@@ -63,7 +63,7 @@ app = {
             Keycode.RETURN, -Keycode.RETURN, DELAY_AFTER_COMMAND,
             Keycode.ESCAPE, -Keycode.ESCAPE, DELAY_AFTER_ESCAPE,
             'E']),
-        (12288, 'boots', [
+        (0x003000, 'boots', [
             Keycode.ESCAPE, -Keycode.ESCAPE, DELAY_AFTER_ESCAPE,
             '/replaceitem entity @s slot.weapon.mainhand 0 destroy netherite_boots', 
             Keycode.RETURN, -Keycode.RETURN, DELAY_AFTER_COMMAND,
@@ -81,7 +81,7 @@ app = {
             Keycode.RETURN, -Keycode.RETURN, DELAY_AFTER_COMMAND,
             Keycode.ESCAPE, -Keycode.ESCAPE, DELAY_AFTER_ESCAPE,
             'E']),
-        (12288, 'frosty', [
+        (0x003000, 'frosty', [
             Keycode.ESCAPE, -Keycode.ESCAPE, DELAY_AFTER_ESCAPE,
             '/replaceitem entity @s slot.weapon.mainhand 0 destroy netherite_boots', 
             Keycode.RETURN, -Keycode.RETURN, DELAY_AFTER_COMMAND,
@@ -99,7 +99,7 @@ app = {
             Keycode.RETURN, -Keycode.RETURN, DELAY_AFTER_COMMAND,
             Keycode.ESCAPE, -Keycode.ESCAPE, DELAY_AFTER_ESCAPE,
             'E']),
-        (3145728, 'feedme', [
+        (0x300000, 'feedme', [
             Keycode.ESCAPE, -Keycode.ESCAPE, DELAY_AFTER_ESCAPE,
             '/replaceitem entity @s slot.weapon.mainhand 0 destroy netherite_sword', 
             Keycode.RETURN, -Keycode.RETURN, DELAY_AFTER_COMMAND,
@@ -117,7 +117,7 @@ app = {
             Keycode.RETURN, -Keycode.RETURN, DELAY_AFTER_COMMAND,
             Keycode.ESCAPE, -Keycode.ESCAPE, DELAY_AFTER_ESCAPE,
             Keycode.PAGE_UP, -Keycode.PAGE_UP]),
-        (3145728, 'excal', [
+        (0x300000, 'excal', [
             Keycode.ESCAPE, -Keycode.ESCAPE, DELAY_AFTER_ESCAPE,
             '/replaceitem entity @s slot.weapon.mainhand 0 destroy netherite_sword', 
             Keycode.RETURN, -Keycode.RETURN, DELAY_AFTER_COMMAND,
@@ -135,7 +135,7 @@ app = {
             Keycode.RETURN, -Keycode.RETURN, DELAY_AFTER_COMMAND,
             Keycode.ESCAPE, -Keycode.ESCAPE, DELAY_AFTER_ESCAPE,
             Keycode.PAGE_UP, -Keycode.PAGE_UP]),
-        (3145728, 'trident', [
+        (0x300000, 'trident', [
             Keycode.ESCAPE, -Keycode.ESCAPE, DELAY_AFTER_ESCAPE,
             '/replaceitem entity @s slot.weapon.mainhand 0 destroy trident', 
             Keycode.RETURN, -Keycode.RETURN, DELAY_AFTER_COMMAND,
@@ -153,7 +153,7 @@ app = {
             Keycode.RETURN, -Keycode.RETURN, DELAY_AFTER_COMMAND,
             Keycode.ESCAPE, -Keycode.ESCAPE, DELAY_AFTER_ESCAPE,
             Keycode.PAGE_UP, -Keycode.PAGE_UP]),
-        (3145728, 'bow', [
+        (0x300000, 'bow', [
             Keycode.ESCAPE, -Keycode.ESCAPE, DELAY_AFTER_ESCAPE,
             '/replaceitem entity @s slot.weapon.mainhand 0 destroy bow', 
             Keycode.RETURN, -Keycode.RETURN, DELAY_AFTER_COMMAND,
@@ -167,7 +167,7 @@ app = {
             Keycode.RETURN, -Keycode.RETURN, DELAY_AFTER_COMMAND,
             Keycode.ESCAPE, -Keycode.ESCAPE, DELAY_AFTER_ESCAPE,
             Keycode.PAGE_UP, -Keycode.PAGE_UP]),
-        (48, 'silky', [
+        (0x000030, 'silky', [
             Keycode.ESCAPE, -Keycode.ESCAPE, DELAY_AFTER_ESCAPE,
             '/replaceitem entity @s slot.weapon.mainhand 0 destroy netherite_pickaxe', 
             Keycode.RETURN, -Keycode.RETURN, DELAY_AFTER_COMMAND,
@@ -181,7 +181,7 @@ app = {
             Keycode.RETURN, -Keycode.RETURN, DELAY_AFTER_COMMAND,
             Keycode.ESCAPE, -Keycode.ESCAPE, DELAY_AFTER_ESCAPE,
             Keycode.PAGE_UP, -Keycode.PAGE_UP]),
-        (48, 'pickme', [
+        (0x000030, 'pickme', [
             Keycode.ESCAPE, -Keycode.ESCAPE, DELAY_AFTER_ESCAPE,
             '/replaceitem entity @s slot.weapon.mainhand 0 destroy netherite_pickaxe', 
             Keycode.RETURN, -Keycode.RETURN, DELAY_AFTER_COMMAND,
@@ -195,7 +195,7 @@ app = {
             Keycode.RETURN, -Keycode.RETURN, DELAY_AFTER_COMMAND,
             Keycode.ESCAPE, -Keycode.ESCAPE, DELAY_AFTER_ESCAPE,
             Keycode.PAGE_UP, -Keycode.PAGE_UP]),
-        (48, 'axe', [
+        (0x000030, 'axe', [
             Keycode.ESCAPE, -Keycode.ESCAPE, DELAY_AFTER_ESCAPE,
             '/replaceitem entity @s slot.weapon.mainhand 0 destroy netherite_axe',
             Keycode.RETURN, -Keycode.RETURN, DELAY_AFTER_COMMAND,
