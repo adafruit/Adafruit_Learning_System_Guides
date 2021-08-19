@@ -1,4 +1,4 @@
-# MACROPAD Hotkeys example: Universal Numpad
+# MACROPAD Hotkeys example: Minecraft hotbar (inventory)
 
 from adafruit_hid.keycode import Keycode # REQUIRED if using Keycode.* values
 
