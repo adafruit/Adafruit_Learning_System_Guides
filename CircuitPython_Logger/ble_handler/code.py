@@ -1,5 +1,5 @@
 """
-File based message handler for CircuitPython logging.
+BLE based message handler for CircuitPython logging.
 
 Adafruit invests time and resources providing this open source code.
 Please support Adafruit and open source hardware by purchasing
@@ -12,29 +12,22 @@ Licensed under the MIT license.
 All text above must be included in any redistribution.
 """
 
-#pylint:disable=missing-super-argument
-
-# Example:
-#
-#
-# from file_handler import FileHandler
-# import adafruit_logging as logging
-# l = logging.getLogger('file')
-# l.addHandler(FileHandler('log.txt'))
-# l.level = logging.ERROR
-# l.error("test")
 
 from adafruit_logging import LoggingHandler
+from adafruit_ble.uart import UARTServer
 
-class FileHandler(LoggingHandler):
+class BLEHandler(LoggingHandler):
+    """Send logging output to the BLE uart port."""
 
-    def __init__(self, filename):
+    def __init__(self):
         """Create an instance.
 
-        :param filename: the name of the file to which to write messages
+        :param uart: the busio.UART instance to which to write messages
 
         """
-        self._filename = filename
+        self._advertising_now = False
+        self._uart = UARTServer()
+        self._uart.start_advertising()
 
     def format(self, level, msg):
         """Generate a string to log.
@@ -52,5 +45,7 @@ class FileHandler(LoggingHandler):
         :param msg: The core message
 
         """
-        with open(self._filename, 'a+') as f:
-            f.write(self.format(level, msg))
+        while not self._uart.connected:
+            pass
+        data = bytes(self.format(level, msg), 'utf-8')
+        self._uart.write(data)

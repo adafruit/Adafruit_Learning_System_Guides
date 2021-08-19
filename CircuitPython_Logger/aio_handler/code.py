@@ -14,14 +14,13 @@ All text above must be included in any redistribution.
 
 from adafruit_portalbase import PortalBase
 
-#pylint:disable=missing-super-argument
-
 # Example:
 #
 # from aio_handler import AIOHandler
 # import adafruit_logging as logging
 # l = logging.getLogger('aio')
-# # Pass in the device object based on portal_base (Funhouse, PyPortal, MagTag, etc) as the 2nd parameter
+# # Pass in the device object based on portal_base
+# # (Funhouse, PyPortal, MagTag, etc) as the 2nd parameter
 # l.addHandler(AIOHandler('test'), portal_device)
 # l.level = logging.ERROR
 # l.error("test")

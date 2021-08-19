@@ -1,5 +1,5 @@
 """
-UART based message handler for CircuitPython logging.
+File based message handler for CircuitPython logging.
 
 Adafruit invests time and resources providing this open source code.
 Please support Adafruit and open source hardware by purchasing
@@ -12,34 +12,27 @@ Licensed under the MIT license.
 All text above must be included in any redistribution.
 """
 
-
-#pylint:disable=missing-super-argument
-
 # Example:
 #
-# import board
-# import busio
-# from uart_handler import UartHandler
-# import adafruit_logging as logging
 #
-# uart = busio.UART(board.TX, board.RX, baudrate=115200)
-# logger = logging.getLogger('uart')
-# logger.addHandler(UartHandler(uart))
-# logger.level = logging.INFO
-# logger.info('testing')
+# from file_handler import FileHandler
+# import adafruit_logging as logging
+# l = logging.getLogger('file')
+# l.addHandler(FileHandler('log.txt'))
+# l.level = logging.ERROR
+# l.error("test")
 
 from adafruit_logging import LoggingHandler
 
-class UartHandler(LoggingHandler):
-    """Send logging output to a serial port."""
+class FileHandler(LoggingHandler):
 
-    def __init__(self, uart):
+    def __init__(self, filename):
         """Create an instance.
 
-        :param uart: the busio.UART instance to which to write messages
+        :param filename: the name of the file to which to write messages
 
         """
-        self._uart = uart
+        self._filename = filename
 
     def format(self, level, msg):
         """Generate a string to log.
@@ -57,4 +50,5 @@ class UartHandler(LoggingHandler):
         :param msg: The core message
 
         """
-        self._uart.write(bytes(self.format(level, msg), 'utf-8'))
+        with open(self._filename, 'a+') as f:
+            f.write(self.format(level, msg))
