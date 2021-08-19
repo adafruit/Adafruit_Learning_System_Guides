@@ -9,7 +9,6 @@ from adafruit_hid.keycode import Keycode # REQUIRED if using Keycode.* values
 # See https://minecraft.fandom.com/wiki/Effect
 
 DELAY_AFTER_ESCAPE = 0.05
-DELAY_AFTER_COMMAND = 0.10
 
 app = {                                 # REQUIRED dict, must be named 'app'
     'name' : 'Minecraft PE (effect)',   # Application name
