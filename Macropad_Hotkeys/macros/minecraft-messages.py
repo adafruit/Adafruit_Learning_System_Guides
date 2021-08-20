@@ -9,7 +9,7 @@ from adafruit_hid.keycode import Keycode # REQUIRED if using Keycode.* values
 # NOTE: There appears to be some delay when bringing up the command screen.
 
 DELAY_AFTER_SLASH  = 0.80 # required so minecraft has time to bring up command screen
-
+DELAY_BEFORE_RETURN = 0.10
 
 # NOTE: On PC, characters are sometimes lost due to lag.  No simple fix for
 #       lost keystrokes is known.  However, the commands do work most of the time.
@@ -23,15 +23,15 @@ app = {                              # REQUIRED dict, must be named 'app'
         (0x000020, 'list', [
             '/', DELAY_AFTER_SLASH,
             'list',
-            Keycode.RETURN, -Keycode.RETURN]),
+            DELAY_BEFORE_RETURN, Keycode.RETURN, -Keycode.RETURN]),
         (0x000020, 'list', [
             '/', DELAY_AFTER_SLASH,
             'list',
-            Keycode.RETURN, -Keycode.RETURN]),
+            DELAY_BEFORE_RETURN, Keycode.RETURN, -Keycode.RETURN]),
         (0x000020, 'list', [
             '/', DELAY_AFTER_SLASH,
             'list',
-            Keycode.RETURN, -Keycode.RETURN]),
+            DELAY_BEFORE_RETURN, Keycode.RETURN, -Keycode.RETURN]),
         # 2nd row ----------
         (0x000000, '',     []),
         (0x000000, '',     []),
@@ -44,15 +44,15 @@ app = {                              # REQUIRED dict, must be named 'app'
         (0x101010, 'bed', [
             '/', DELAY_AFTER_SLASH,
             'msg @a Time for bed!',
-            Keycode.RETURN, -Keycode.RETURN]),
+            DELAY_BEFORE_RETURN, Keycode.RETURN, -Keycode.RETURN]),
         (0x101010, 'bed', [
             '/', DELAY_AFTER_SLASH,
             'msg @a Time for bed!',
-            Keycode.RETURN, -Keycode.RETURN]),
+            DELAY_BEFORE_RETURN, Keycode.RETURN, -Keycode.RETURN]),
         (0x101010, 'bed', [
             '/', DELAY_AFTER_SLASH,
             'msg @a Time for bed!',
-            Keycode.RETURN, -Keycode.RETURN]),
+            DELAY_BEFORE_RETURN, Keycode.RETURN, -Keycode.RETURN]),
         # Encoder button ---
         (0x000000, '', [])
     ]
