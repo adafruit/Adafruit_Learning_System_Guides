@@ -6,7 +6,14 @@
 
 from adafruit_hid.keycode import Keycode # REQUIRED if using Keycode.* values
 
-DELAY_AFTER_ESCAPE = 0.05
+# NOTE: There appears to be some delay when bringing up the command screen.
+
+DELAY_AFTER_SLASH  = 0.80 # required so minecraft has time to bring up command screen
+
+
+# NOTE: On PC, characters are sometimes lost due to lag.  No simple fix for
+#       lost keystrokes is known.  However, the commands do work most of the time.
+
 
 app = {                              # REQUIRED dict, must be named 'app'
     'name' : 'Minecraft (/msg)',     # Application name
@@ -14,16 +21,16 @@ app = {                              # REQUIRED dict, must be named 'app'
         # COLOR    LABEL    KEY SEQUENCE
         # 1st row ----------
         (0x000020, 'list', [
-            Keycode.ESCAPE, -Keycode.ESCAPE, DELAY_AFTER_ESCAPE,
-            '/list',
+            '/', DELAY_AFTER_SLASH,
+            'list',
             Keycode.RETURN, -Keycode.RETURN]),
         (0x000020, 'list', [
-            Keycode.ESCAPE, -Keycode.ESCAPE, DELAY_AFTER_ESCAPE,
-            '/list',
+            '/', DELAY_AFTER_SLASH,
+            'list',
             Keycode.RETURN, -Keycode.RETURN]),
         (0x000020, 'list', [
-            Keycode.ESCAPE, -Keycode.ESCAPE, DELAY_AFTER_ESCAPE,
-            '/list',
+            '/', DELAY_AFTER_SLASH,
+            'list',
             Keycode.RETURN, -Keycode.RETURN]),
         # 2nd row ----------
         (0x000000, '',     []),
@@ -35,16 +42,16 @@ app = {                              # REQUIRED dict, must be named 'app'
         (0x000000, '',     []),
         # 4th row ----------
         (0x101010, 'bed', [
-            Keycode.ESCAPE, -Keycode.ESCAPE, DELAY_AFTER_ESCAPE,
-            '/msg @a Time for bed!',
+            '/', DELAY_AFTER_SLASH,
+            'msg @a Time for bed!',
             Keycode.RETURN, -Keycode.RETURN]),
         (0x101010, 'bed', [
-            Keycode.ESCAPE, -Keycode.ESCAPE, DELAY_AFTER_ESCAPE,
-            '/msg @a Time for bed!',
+            '/', DELAY_AFTER_SLASH,
+            'msg @a Time for bed!',
             Keycode.RETURN, -Keycode.RETURN]),
         (0x101010, 'bed', [
-            Keycode.ESCAPE, -Keycode.ESCAPE, DELAY_AFTER_ESCAPE,
-            '/msg @a Time for bed!',
+            '/', DELAY_AFTER_SLASH,
+            'msg @a Time for bed!',
             Keycode.RETURN, -Keycode.RETURN]),
         # Encoder button ---
         (0x000000, '', [])
