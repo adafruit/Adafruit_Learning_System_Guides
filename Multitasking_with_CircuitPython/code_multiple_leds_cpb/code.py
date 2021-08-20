@@ -4,8 +4,6 @@ Blinking multiple LEDs at different rates.
 Circuit Playground Neopixels.
 """
 import time
-import digitalio
-import board
 from adafruit_circuitplayground import cp
 
 BLINK_MAP = {
@@ -45,7 +43,7 @@ while True:
     # Store the current time to refer to later.
     now = time.monotonic()
 
-    for color in BLINK_MAP.keys():
+    for color in BLINK_MAP.keys(): # pylint: disable=consider-iterating-dictionary
 
         # Is LED currently OFF?
         if cp.pixels[BLINK_MAP[color]["INDEX"]] == (0, 0, 0):
