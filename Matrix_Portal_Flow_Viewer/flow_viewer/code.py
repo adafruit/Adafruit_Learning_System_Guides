@@ -102,7 +102,7 @@ def show_solids():
         try:
             x, y = s
             bitmap[round(x), round(y)] = 1
-        except:
+        except: # pylint: disable=bare-except
             pass # just don't draw it
 
 def show_streamlines():
@@ -118,7 +118,7 @@ def show_streamlines():
                 bitmap[round(x), round(y)] = 3
             # draw head
             bitmap[round(x), round(y)] = 2
-        except:
+        except: # pylint: disable=bare-except
             pass # just don't draw it
 
 def animate_streamlines():
