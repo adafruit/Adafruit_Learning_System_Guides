@@ -1,40 +1,51 @@
+#======
+# NOTE: Run this on the Matrix Portal.
+#======
 import time
 import math
 import displayio
 from adafruit_matrixportal.matrix import Matrix
 
+from flow_solution import solution
+
 #--| User Config |-----------------------------------------
-SINGULARITIES = (
-    # type  location  strength
-    ('freestream', None, (1, 0)),
-    ('source', (26, 16), 3),
-    ('source', (38, 16), -3),
-    #('doublet', (32, 16), 1),
-    #('vortex', (32, 16), 1),
-)
 SEEDS = (
 #   (x, y) starting location
-    (0, 0),
+    (0, 1),
     (0, 3),
-    (0, 6),
+    (0, 5),
+    (0, 7),
     (0, 9),
-    (0, 12),
+    (0, 11),
+    (0, 13),
     (0, 15),
     (0, 17),
-    (0, 20),
+    (0, 19),
+    (0, 21),
     (0, 23),
-    (0, 26),
+    (0, 25),
+    (0, 27),
     (0, 29),
 )
-MATRIX_WIDTH = 64
-MATRIX_HEIGHT = 32
 BACK_COLOR = 0x000000 # background fill
-SING_COLOR = 0xADAF00 # singularities
+SOLI_COLOR = 0xADAF00 # solids
 HEAD_COLOR = 0x00FFFF # leading particles
 TAIL_COLOR = 0x000A0A # trailing particles
 TAIL_LENGTH = 10      # length in pixels
-DELAY = 0.01          # smaller = faster
+DELAY = 0.02          # smaller = faster
 #----------------------------------------------------------
+
+# use solution to define other items
+VX = solution['VX']
+VY = solution['VY']
+MATRIX_WIDTH = len(VX[0])
+MATRIX_HEIGHT = len(VX)
+# meh...too lazy to list comp
+SOLIDS = []
+for row in range(len(VX)):
+    for col, v in enumerate(VX[row]):
+        if v is None:
+            SOLIDS.append((col, row))
 
 # matrix and displayio setup
 matrix = Matrix(width=MATRIX_WIDTH, height=MATRIX_HEIGHT, bit_depth=6)
@@ -46,7 +57,7 @@ bitmap = displayio.Bitmap(display.width, display.height, 4)
 
 palette = displayio.Palette(4)
 palette[0] = BACK_COLOR
-palette[1] = SING_COLOR
+palette[1] = SOLI_COLOR
 palette[2] = HEAD_COLOR
 palette[3] = TAIL_COLOR
 
@@ -56,28 +67,6 @@ group.append(tile_grid)
 # global to store streamline data
 STREAMLINES = []
 
-def compute_velocity(x, y):
-    '''Compute resultant velocity induced at (x, y) from all singularities.'''
-    vx = vy = 0
-    for s in SINGULARITIES:
-        if s[0] == 'freestream':
-            vx += s[2][0]
-            vy += s[2][1]
-        else:
-            dx = x - s[1][0]
-            dy = y - s[1][1]
-            r2 = dx*dx + dy*dy
-            if s[0] == 'source':
-                vx += s[2] * dx / r2
-                vy += s[2] * dy / r2
-            elif s[0] == 'vortex':
-                vx -=  s[2] * dy / r2
-                vy +=  s[2] * dx / r2
-            elif s[0] == 'doublet':
-                vx += s[2] * (dy*dy - dx*dx) / (r2*r2)
-                vy -= s[2] * (2*dx*dy) / (r2*r2)
-    return vx, vy
-
 def compute_streamlines():
     '''Compute streamline for each starting point (seed) defined.'''
     for seed in SEEDS:
@@ -85,7 +74,8 @@ def compute_streamlines():
         x, y = seed
         px = round(x)
         py = round(y)
-        vx, vy = compute_velocity(x, y)
+        vx = VX[py][px]
+        vy = VY[py][px]
         streamline.append( ((px, py), (vx, vy)) )
         steps = 0
         while x < MATRIX_WIDTH and steps < 2 * MATRIX_WIDTH:
@@ -96,20 +86,23 @@ def compute_streamlines():
                 streamline.append( ((nx, ny), (vx, vy)) )
                 px = nx
                 py = ny
-            vx, vy = compute_velocity(x, y)
+            if 0 <= nx < MATRIX_WIDTH and 0 <= ny < MATRIX_HEIGHT:
+                vx = VX[ny][nx]
+                vy = VY[ny][nx]
+            if vx is None or vy is None:
+                break
             x += vx
             y += vy
             steps += 1
         # add streamline to global store
         STREAMLINES.append(streamline)
 
-def show_singularities():
-    '''Draw the singularites.'''
-    for s in SINGULARITIES:
+def show_solids():
+    for s in SOLIDS:
         try:
-            x, y = s[1]
+            x, y = s
             bitmap[round(x), round(y)] = 1
-        except:
+        except: # pylint: disable=bare-except
             pass # just don't draw it
 
 def show_streamlines():
@@ -125,7 +118,7 @@ def show_streamlines():
                 bitmap[round(x), round(y)] = 3
             # draw head
             bitmap[round(x), round(y)] = 2
-        except:
+        except: # pylint: disable=bare-except
             pass # just don't draw it
 
 def animate_streamlines():
@@ -153,7 +146,7 @@ def update_display():
     '''Update the matrix display.'''
     display.auto_refresh = False
     bitmap.fill(0)
-    show_singularities()
+    show_solids()
     show_streamlines()
     display.auto_refresh = True
 

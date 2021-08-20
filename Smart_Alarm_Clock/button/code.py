@@ -67,9 +67,9 @@ def message(client, feed_id, payload):
 
 
 def on_alarm(client, feed_id, payload):
-    global ALARM
+    global ALARM # pylint: disable=global-statement
     print(payload)
-    ALARM = eval(payload)
+    ALARM = eval(payload) # pylint: disable=eval-used
 
 
 # Create a socket pool

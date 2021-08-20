@@ -1,8 +1,8 @@
 import time
+import sys
 import board
 import busio
 import digitalio
-import sys
 from adafruit_mcp9600 import MCP9600
 
 SENSOR_ADDR = 0X67
