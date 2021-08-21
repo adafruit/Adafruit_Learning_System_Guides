@@ -30,3 +30,7 @@ bitmap[80, 50] = 1
 for x in range(150, 170):
     for y in range(100, 110):
         bitmap[x, y] = 1
+
+# Loop forever so you can enjoy your image
+while True:
+    pass
