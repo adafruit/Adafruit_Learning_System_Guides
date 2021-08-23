@@ -110,7 +110,7 @@ def mix(color_1, color_2, weight_2):
 while True:
 
     if TOUCH.value:                         # Capacitive pad touched?
-        if MODE is 0:                       # If currently off...
+        if MODE == 0:                       # If currently off...
             power('on', 1.7, False)         # Power up!
             play_wav('idle', loop=True)     # Play background hum sound
             MODE = 1                        # ON (idle) mode now
@@ -131,7 +131,7 @@ while True:
             play_wav('hit')                 # Start playing 'hit' sound
             COLOR_ACTIVE = COLOR_HIT        # Set color to fade from
             MODE = 3                        # HIT mode
-        elif MODE is 1 and ACCEL_SQUARED > SWING_THRESHOLD: # Mild = SWING
+        elif MODE == 1 and ACCEL_SQUARED > SWING_THRESHOLD: # Mild = SWING
             TRIGGER_TIME = time.monotonic() # Save initial time of swing
             play_wav('swing')               # Start playing 'swing' sound
             COLOR_ACTIVE = COLOR_SWING      # Set color to fade from
