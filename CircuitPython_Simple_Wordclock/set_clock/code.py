@@ -15,7 +15,6 @@ rtc = adafruit_ds3231.DS3231(i2c)
 LED13 = digitalio.DigitalInOut(board.D13)
 LED13.direction = digitalio.Direction.OUTPUT
 
-# pylint: disable-msg=bad-whitespace
 # pylint: disable-msg=using-constant-test
 if True:
     #                     year, mon, date, hour, min, sec, wday, yday, isdst
@@ -28,4 +27,3 @@ if True:
     print("Done!")
     LED13.value = True
 # pylint: enable-msg=using-constant-test
-# pylint: enable-msg=bad-whitespace

@@ -3,9 +3,9 @@ This example script shows the usage of servos, and LEDs
 used simultaneously without interrupting each other.
 """
 
+import time
 import board
 import digitalio
-import time
 import neopixel
 import pwmio
 from adafruit_motor import servo
@@ -67,11 +67,11 @@ while True:
     now = time.monotonic()
 
     for led in BLINK_LIST:
-        if led["PIN"].value == False:
+        if led["PIN"].value is False:
             if now >= led["PREV_TIME"] + led["OFF"]:
                 led["PREV_TIME"] = now
                 led["PIN"].value = True
-        if led["PIN"].value == True:
+        if led["PIN"].value is True:
             if now >= led["PREV_TIME"] + led["ON"]:
                 led["PREV_TIME"] = now
                 led["PIN"].value = False
@@ -91,6 +91,6 @@ while True:
             if servo["SERVO"].angle >= servo["MAX_ANGLE"] or \
                 servo["SERVO"].angle <= servo["MIN_ANGLE"]:
 
-                    servo["MOVE_BY"] = -servo["MOVE_BY"]
+                servo["MOVE_BY"] = -servo["MOVE_BY"]
 
             servo["PREV_TIME"] = now
