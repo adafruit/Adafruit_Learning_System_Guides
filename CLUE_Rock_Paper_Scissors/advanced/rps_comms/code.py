@@ -160,8 +160,7 @@ def startScan(radio, send_ad, send_advertising,
             if endscan_cb is not None and endscan_cb(addr_text, adv_ss.address, adv_ss):
                 complete = True
                 break
-            else:
-                continue
+            continue
 
         # Must be a match if this is reached
         matching_ads += 1
@@ -226,7 +225,7 @@ def startScan(radio, send_ad, send_advertising,
     return (complete, matching_ads, awaiting_allrx, awaiting_allacks)
 
 
-def broadcastAndReceive(radio,
+def broadcastAndReceive(radio, # pylint: disable=dangerous-default-value
                         send_ad,
                         *receive_ads_types,
                         scan_time=DEF_SEND_TIME_S,
