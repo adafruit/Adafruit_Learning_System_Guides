@@ -20,8 +20,6 @@ from adafruit_hid.keycode import Keycode # REQUIRED if using Keycode.* values
 # As a result, it is probably better to learn on less complex
 # macro files before attempting to adjust settings in this one.
 
-from adafruit_hid.keycode import Keycode # REQUIRED if using Keycode.* values
-
 DELAY_AFTER_COMMAND = 0.75
 DELAY_AFTER_SLASH  = 0.80 # required so minecraft has time to bring up command screen
 DELAY_BEFORE_RETURN = 0.10 # give minecraft time to show all the keys pressed...
