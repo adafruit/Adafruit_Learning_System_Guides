@@ -15,7 +15,6 @@ def show_value(heat_val):         # Show throttle on NeoPixels on CPX
     for i in range(num_pixels, 10):
         pixels[i] = (0, 0, 0)
     pixels.show()
-    return
 
 TMP36 = AnalogIn(board.A3)  # TMP36 connected to A3, power & ground
 POT = AnalogIn(board.A7)    # potentiometer connected to A7, power & ground
