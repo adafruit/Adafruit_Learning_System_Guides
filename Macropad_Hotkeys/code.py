@@ -9,9 +9,9 @@ key sequences.
 # pylint: disable=import-error, unused-import, too-few-public-methods
 
 import os
+import time
 import displayio
 import terminalio
-import time
 from adafruit_display_shapes.rect import Rect
 from adafruit_display_text import label
 from adafruit_macropad import MacroPad
