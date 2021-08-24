@@ -9,6 +9,7 @@ key sequences.
 # pylint: disable=import-error, unused-import, too-few-public-methods
 
 import os
+import time
 import displayio
 import terminalio
 from adafruit_display_shapes.rect import Rect
@@ -128,6 +129,15 @@ while True:
 
     sequence = apps[app_index].macros[key_number][2]
     if pressed:
+        # the sequence is arbitrary-length
+        # each item in the sequence is either
+        # an integer (e.g., Keycode.KEYPAD_MINUS),
+        # a floating point value (e.g., 0.20)
+        # or a string.
+        # Positive Integers ==> key pressed
+        # Negative Integers ==> key released
+        # Float             ==> sleep in seconds
+        # String            ==> each key in string pressed & released
         if key_number < 12: # No pixel for encoder button
             macropad.pixels[key_number] = 0xFFFFFF
             macropad.pixels.show()
@@ -137,10 +147,12 @@ while True:
                     macropad.keyboard.press(item)
                 else:
                     macropad.keyboard.release(-item)
+            elif isinstance(item, float):
+                time.sleep(item)
             else:
                 macropad.keyboard_layout.write(item)
     else:
-        # Release any still-pressed modifier keys
+        # Release any still-pressed keys
         for item in sequence:
             if isinstance(item, int) and item >= 0:
                 macropad.keyboard.release(item)
