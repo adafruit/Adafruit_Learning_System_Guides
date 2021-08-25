@@ -13,7 +13,6 @@ def show_value(val):            # Show value 0-9 on CPX NeoPixels
     for i in range(val, NUMPIXELS):
         pixels[i] = (0, 0, 0)
     pixels.show()
-    return
 
 while True:
 
