@@ -3,16 +3,15 @@ import time
 
 import board
 import digitalio
-import mount_sd
 
 # Updating the display can interfere with MP3 playback if it is not
 # done carefully
 try:
     board.DISPLAY.auto_refresh = False
-except:
+except: # pylint: disable=bare-except
     pass
 
-from audiomp3 import MP3Decoder
+from audiomp3 import MP3Decoder # pylint: disable=wrong-import-position
 
 try:
     from audioio import AudioOut

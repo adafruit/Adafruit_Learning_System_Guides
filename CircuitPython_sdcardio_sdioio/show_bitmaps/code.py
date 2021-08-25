@@ -4,8 +4,6 @@ import time
 import board
 import displayio
 
-import mount_sd
-
 display = board.DISPLAY
 
 # The bmp files on the sd card will be shown in alphabetical order

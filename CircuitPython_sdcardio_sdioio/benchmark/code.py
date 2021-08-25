@@ -1,10 +1,10 @@
 import time
 import os
 
-import mount_sd
 
 # First, just write the file 'hello.txt' to the card
-with open("/sd/hello.txt", "w") as f: print("hello world", file=f)
+with open("/sd/hello.txt", "w") as f:
+    print("hello world", file=f)
 
 print()
 print("SD card I/O benchmarks")
@@ -16,7 +16,8 @@ print("SD card I/O benchmarks")
 # time taken.
 for sz in 512, 4096:
     b = bytearray(sz)
-    for i in range(sz): b[i] = 0xaa
+    for i in range(sz):
+        b[i] = 0xaa
     for n in (1, 16):
         with open("/sd/hello.bin", "wb") as f:
             t0 = time.monotonic_ns()

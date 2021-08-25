@@ -58,7 +58,6 @@ def read_le(value):
 
 class BMPError(Exception):
     """Error handler for BMP-loading function"""
-    pass
 
 def load_bmp(filename):
     """Load BMP file, return as list of column buffers"""
@@ -133,11 +132,10 @@ def load_bmp(filename):
 
     except OSError as err:
         if err.args[0] == 28:
-            raise OSError("OS Error 28 0.25")
-        else:
-            raise OSError("OS Error 0.5")
+            raise OSError("OS Error 28 0.25") from err
+        raise OSError("OS Error 0.5") from err
     except BMPError as err:
-        print("Failed to parse BMP: " + err.args[0])
+        raise BMPError("Failed to parse BMP: " + err.args[0]) from err
 
 
 # Load BMP image, return 'COLUMNS' array:
