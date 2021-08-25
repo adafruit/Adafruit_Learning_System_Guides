@@ -105,7 +105,7 @@ try:
     # though they still must have a "Naughty" or "Nice" heading at top.
     for entry in ENTRIES:
         cell = entry['gs$cell']
-        if int(cell['row']) is 1:     # Only look at top row
+        if int(cell['row']) == 1:     # Only look at top row
             head = cell['$t'].lower() # Case-insensitive compare
             if ((NICE and head == 'nice') or (not NICE and head == 'naughty')):
                 NAME_COLUMN = int(cell['col'])

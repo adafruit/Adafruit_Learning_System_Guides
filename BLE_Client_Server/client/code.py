@@ -74,7 +74,7 @@ while True:
         c = color.pack()
         pixels[0] = c
         pixels.show()
-        if color_index == 0 or color_index == 28:
+        if color_index in (0, 28):
             fade_direction *= -1  # Change direction
         color_index += fade_direction
 
