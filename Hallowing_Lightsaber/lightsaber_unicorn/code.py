@@ -163,7 +163,7 @@ def power(sound, duration, reverse):
 while True:
 
     if TOUCH.value:                         # Capacitive pad touched?
-        if MODE == 0:                       # If currently off...
+        if MODE is 0:                       # If currently off...
             power('on', 3.0, False)         # Power up!
             play_wav('idle', loop=True)     # Play background hum sound
             MODE = 1                        # ON (idle) mode now
@@ -184,7 +184,7 @@ while True:
             play_wav('hit')                 # Start playing 'hit' sound
             ACTIVE_ANIM = HIT_ANIM
             MODE = 3                        # HIT mode
-        elif MODE == 1 and ACCEL_SQUARED > SWING_THRESHOLD: # Mild = SWING
+        elif MODE is 1 and ACCEL_SQUARED > SWING_THRESHOLD: # Mild = SWING
             TRIGGER_TIME = time.monotonic() # Save initial time of swing
             play_wav('swing')               # Start playing 'swing' sound
             ACTIVE_ANIM = SWING_ANIM

@@ -15,6 +15,7 @@ def show_value(time_val):         # Show time on NeoPixels on CPX
     for i in range(num_pixels, 10):
         pixels[i] = (0, 0, 0)
     pixels.show()
+    return
 
 TMP36 = AnalogIn(board.A3)  # TMP36 connected to A3, power & ground
 POT = AnalogIn(board.A7)    # potentiometer connected to A7, power & ground
@@ -33,7 +34,7 @@ while True:                   # Loop forever
     # between 0 and 1 is too short a time for a Peltier module
     if cool_value < 0.2:
         cool_value = 0.0
-    if 1.0 > cool_value >= 0.2:
+    if cool_value >= 0.2 and cool_value < 1.0:
         cool_value = 1.0
 
     print((tempF, cool_value))  # Show in REPL
