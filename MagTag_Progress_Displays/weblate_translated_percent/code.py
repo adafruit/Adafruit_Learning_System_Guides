@@ -9,7 +9,6 @@ and a progress bar.
 Copy leaguespartan18.bdf and leaguespartan11.bdf
 into fonts/ on your CIRCUITPY drive.
 """
-import time
 from adafruit_magtag.magtag import MagTag
 from adafruit_progressbar.progressbar import ProgressBar
 
