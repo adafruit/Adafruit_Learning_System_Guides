@@ -1,7 +1,5 @@
 import os
 
-import mount_sd
-
 def print_directory(path, tabs=0):
     for file in os.listdir(path):
         stats = os.stat(path + "/" + file)

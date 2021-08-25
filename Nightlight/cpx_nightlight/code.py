@@ -37,8 +37,7 @@ while True:
         # Indicate the nightlight is off.
         cp.red_led = True
         continue
-    else:
-        cp.red_led = False
+    cp.red_led = False
 
     # Decrease brightness.
     if cp.touch_A7:
