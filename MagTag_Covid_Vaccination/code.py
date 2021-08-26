@@ -58,8 +58,8 @@ try:
     value = magtag.fetch().split("\n")[-2].split(",")
     print("Response is", value)
 
-    vaccinated = int(value[-2]) / 331984513
-    fully_vaccinated = int(value[-1]) / 331984513
+    vaccinated = int(value[-3]) / 331984513
+    fully_vaccinated = int(value[-2]) / 331984513
 
     magtag.set_text(f"{value[0]} Vaccination Rates", 0, False)
     magtag.set_text(value[1], 1, False)
