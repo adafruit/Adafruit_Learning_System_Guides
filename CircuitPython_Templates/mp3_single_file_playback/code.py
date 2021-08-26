@@ -1,7 +1,10 @@
 """
-CircuitPython single MP3 playback example. Plays a single MP3 once.
+CircuitPython single MP3 playback example.
+Plays a single MP3 once.
 
 Remove this line and all of the following docstring content before submitting to the Learn repo.
+
+INCLUDE THE MP3 FILE IN THIS DIRECTORY IN A DIRECTORY WITH THE RESULTING CODE.PY FILE.
 
 Choose the setup section appropriate for the board into which this template code is going. The
 default is for SAMD51 boards.
