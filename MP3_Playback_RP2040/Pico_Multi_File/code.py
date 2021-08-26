@@ -1,5 +1,6 @@
 """
-CircuitPython multiple MP3 playback example. Plays two MP3 files consecutively, once time each.
+CircuitPython multiple MP3 playback example for Raspberry Pi Pico. Plays two MP3 files
+consecutively, once time each.
 """
 import board
 import audiomp3
