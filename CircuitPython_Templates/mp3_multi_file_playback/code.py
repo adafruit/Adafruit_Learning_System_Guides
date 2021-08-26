@@ -1,7 +1,10 @@
 """
-CircuitPython multiple MP3 playback example. Plays two MP3 files consecutively, once time each.
+CircuitPython multiple MP3 playback example.
+Plays two MP3 files consecutively, once time each.
 
 Remove this line and all of the following docstring content before submitting to the Learn repo.
+
+INCLUDE THE MP3 FILES IN THIS DIRECTORY IN A DIRECTORY WITH THE RESULTING CODE.PY FILE.
 
 Choose the setup section appropriate for the board into which this template code is going. The
 default is for SAMD51 boards.

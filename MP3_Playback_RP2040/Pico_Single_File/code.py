@@ -1,5 +1,6 @@
 """
-CircuitPython single MP3 playback example for Raspbeery Pi Pico. Plays a single MP3 once.
+CircuitPython single MP3 playback example for Raspberry Pi Pico.
+Plays a single MP3 once.
 """
 import board
 import audiomp3
