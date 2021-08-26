@@ -58,8 +58,8 @@ try:
     value = magtag.fetch().split("\n")[-2].split(",")
     print("Response is", value)
 
-    vaccinated = int(value[-2]) / 331984513
-    fully_vaccinated = int(value[-1]) / 331984513
+    vaccinated = int(value[7]) / 331984513
+    fully_vaccinated = int(value[8]) / 331984513
 
     magtag.set_text(f"{value[0]} Vaccination Rates", 0, False)
     magtag.set_text(value[1], 1, False)
@@ -74,8 +74,11 @@ try:
     magtag.refresh()
 
     seconds_to_sleep = 24 * 60 * 60  # Sleep for one day
-    print(f"Sleeping for {seconds_to_sleep} seconds")
-    magtag.exit_and_deep_sleep(seconds_to_sleep)
 
 except (ValueError, RuntimeError) as e:
-    print("Some error occured, retrying! -", e)
+    print("Some error occured, retrying in one hour! -", e)
+    seconds_to_sleep = 60 * 60  # Sleep for one hour
+
+print(f"Sleeping for {seconds_to_sleep} seconds")
+magtag.exit_and_deep_sleep(seconds_to_sleep)
+
