@@ -96,5 +96,5 @@ while True:
         pixels[9] = (0, 30, 0)
     elif command == 207:
         pixels[0] = (0, 30, 0)
-    elif command == 111 or command == 143:
+    elif command in (111, 143):
         pixels.fill((0, 0, 0)) # clear on enter or back key
