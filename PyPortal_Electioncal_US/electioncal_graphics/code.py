@@ -69,10 +69,10 @@ class Electioncal_Graphics(displayio.Group):
 
     def load_data(self, election_data):
         try:
-            self.electioncal = json.loads(election_data)
-            self.state_text.text = self.electioncal["dates"][1]["county"] + ", " + self.electioncal["dates"][0]["state"]
+            self.electioncal = json.loads(election_data)  # pylint: disable=attribute-defined-outside-init
+            self.state_text.text = self.electioncal["dates"][1]["county"] + ", " + self.electioncal["dates"][0]["state"] # pylint: disable=line-too-long
         except ValueError:
-            print("Error loading JSON data: Please check the configuration of county and state, in code.py")
+            print("Error loading JSON data: Please check the configuration of county and state, in code.py") # pylint: disable=line-too-long
             raise
 
     def elections_cycle(self):
@@ -83,7 +83,7 @@ class Electioncal_Graphics(displayio.Group):
             if self.date_text.text[10:] < self.electioncal["dates"][i]["date"]:
                 self.election_date_text.text = self.electioncal["dates"][i]["date"]
                 # splitting the line at around 40 chars seems ok for regular PyPortal
-                self.election_name_text_line2.text, self.election_name_text.text = self.paragrapher(self.electioncal["dates"][i]["name"], 40)
+                self.election_name_text_line2.text, self.election_name_text.text = self.paragrapher(self.electioncal["dates"][i]["name"], 40) # pylint: disable=line-too-long
                 time.sleep(30)
 
     def update_time(self):
@@ -104,11 +104,11 @@ class Electioncal_Graphics(displayio.Group):
                 time_format_str = time_format_str+" AM"
             if hour == 0:
                 hour = 12
-        time_str = time_format_str % (hour, minute)
+        time_str = time_format_str % (hour, minute) # pylint: disable=unused-variable
         date_str = date_format_str % (year, month, day)
         self.date_text.text = "Today is: " + date_str
 
-    def paragrapher(self, text, cut):
+    def paragrapher(self, text, cut): # pylint: disable=no-self-use
         """ Cuts a long line into two, having spaces in mind.
         Note we return line2 first as it looks better to clear the line2
         before printing a line1 with empty line2

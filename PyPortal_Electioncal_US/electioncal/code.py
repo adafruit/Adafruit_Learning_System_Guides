@@ -8,7 +8,7 @@ import electioncal_graphics  # pylint: disable=wrong-import-position
 
 # Get wifi details and more from a secrets.py file
 try:
-    from secrets import secrets
+    from secrets import secrets # pylint: disable=unused-import
 except ImportError:
     print("WiFi secrets are kept in secrets.py, please add them there!")
     raise
