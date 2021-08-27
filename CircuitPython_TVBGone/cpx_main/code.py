@@ -4,7 +4,6 @@ import time
 import board
 import pwmio
 import pulseio
-import pwmio
 from digitalio import DigitalInOut, Direction, Pull
 # pylint: disable=eval-used
 # Switch to select 'stealth-mode'
