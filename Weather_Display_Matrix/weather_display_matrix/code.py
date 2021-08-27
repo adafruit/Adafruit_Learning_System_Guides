@@ -68,7 +68,7 @@ SCROLL_HOLD_TIME = 0  # set this to hold each line before finishing scroll
 # --- Display setup ---
 matrix = Matrix()
 network = Network(status_neopixel=board.NEOPIXEL, debug=True)
-if UNITS == "imperial" or UNITS == "metric":
+if UNITS in ("imperial", "metric"):
     gfx = openweather_graphics.OpenWeather_Graphics(
         matrix.display, am_pm=True, units=UNITS
     )

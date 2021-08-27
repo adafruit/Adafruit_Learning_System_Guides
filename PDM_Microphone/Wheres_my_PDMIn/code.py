@@ -30,8 +30,7 @@ for clock_pin in get_unique_pins():
     for data_pin in get_unique_pins():
         if clock_pin is data_pin:
             continue
+        if is_hardware_PDM(clock_pin, data_pin):
+            print("Clock pin:", clock_pin, "\t Data pin:", data_pin)
         else:
-            if is_hardware_PDM(clock_pin, data_pin):
-                print("Clock pin:", clock_pin, "\t Data pin:", data_pin)
-            else:
-                pass
+            pass
