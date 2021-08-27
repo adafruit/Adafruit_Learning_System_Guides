@@ -49,7 +49,7 @@ while True:
 
         ack_count = struct.unpack("<I", data)[0]
         if ack_count == count:
-            print(f"Received ACK")
+            print("Received ACK")
             break
         print(f"Received incorrect ACK: {ack_count} should be {count}")
 
