@@ -62,7 +62,7 @@ try:
     fully_vaccinated = int(value[8]) / 331984513
 
     magtag.set_text(f"{value[0]} Vaccination Rates", 0, False)
-    magtag.set_text(value[1], 1, False)
+    magtag.set_text(value[2], 1, False)
     magtag.set_text("Vaccinated: {:.2f}%".format(vaccinated * 100), 2, False)
     magtag.set_text(
         "Fully Vaccinated: {:.2f}%".format(fully_vaccinated * 100), 3, False
