@@ -6,11 +6,11 @@ Scramblepad - a random scramble keypad simulation for Adafruit MACROPAD.
 # SPDX-License-Identifier: MIT
 
 import time
+import random
 import board
 from digitalio import DigitalInOut, Direction
 import displayio
 import terminalio
-import random
 from adafruit_display_shapes.rect import Rect
 from adafruit_display_text import label
 from adafruit_macropad import MacroPad
