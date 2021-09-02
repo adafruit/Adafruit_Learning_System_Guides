@@ -74,7 +74,7 @@ void loop() {
     power_all_disable();   // All peripherals off
     set_sleep_mode(SLEEP_MODE_PWR_DOWN);
     sleep_enable();
-    sei();                 // Keep interrupts disabled
+    sei();                 // Keep interrupts enabled
     sleep_mode();          // Power down CPU (pin 1 will wake)
     // Execution resumes here on wake.
     GIMSK = 0;             // Disable pin change interrupt
