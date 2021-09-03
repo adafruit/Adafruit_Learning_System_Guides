@@ -82,7 +82,7 @@ def base32_decode(encoded):
                 n = ord(c) - ord('A')
             elif '2' <= c <= '7':
                 n = ord(c) - ord('2') + 26
-            elif n == '=':
+            elif c == '=':
                 continue
             else:
                 raise ValueError("Not base32")
