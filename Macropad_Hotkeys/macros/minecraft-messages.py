@@ -8,16 +8,16 @@ from adafruit_hid.keycode import Keycode # REQUIRED if using Keycode.* values
 
 # NOTE: There appears to be some delay when bringing up the command screen.
 
-DELAY_AFTER_SLASH  = 0.80 # required so minecraft has time to bring up command screen
+DELAY_AFTER_SLASH = 0.80 # required so minecraft has time to bring up command screen
 DELAY_BEFORE_RETURN = 0.10
 
 # NOTE: On PC, characters are sometimes lost due to lag.  No simple fix for
 #       lost keystrokes is known.  However, the commands do work most of the time.
 
 
-app = {                              # REQUIRED dict, must be named 'app'
-    'name' : 'Minecraft (/msg)',     # Application name
-    'macros' : [                     # List of button macros...
+app = {                          # REQUIRED dict, must be named 'app'
+    'name' : 'Minecraft (/msg)', # Application name
+    'macros' : [                 # List of button macros...
         # COLOR    LABEL    KEY SEQUENCE
         # 1st row ----------
         (0x000020, 'list', [
@@ -33,13 +33,13 @@ app = {                              # REQUIRED dict, must be named 'app'
             'list',
             DELAY_BEFORE_RETURN, Keycode.RETURN, -Keycode.RETURN]),
         # 2nd row ----------
-        (0x000000, '',     []),
-        (0x000000, '',     []),
-        (0x000000, '',     []),
+        (0x000000, '', []),
+        (0x000000, '', []),
+        (0x000000, '', []),
         # 3rd row ----------
-        (0x000000, '',     []),
-        (0x000000, '',     []),
-        (0x000000, '',     []),
+        (0x000000, '', []),
+        (0x000000, '', []),
+        (0x000000, '', []),
         # 4th row ----------
         (0x101010, 'bed', [
             '/', DELAY_AFTER_SLASH,

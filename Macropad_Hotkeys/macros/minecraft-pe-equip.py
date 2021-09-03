@@ -3,11 +3,9 @@
 # Note: Must enable "full keyboad gameplay" to equip armor automatically.
 #       This is found under "settings", then "keyboard and mouse".
 
-# NOTE: There is a line length limit (? ~100 char ?). Exceeding that limit appears
-#       to result in silent failure.  Therefore, the key sequences are split
-#       across multiple lines.
-
-
+# NOTE: There is a line length limit (? ~100 char ?). Exceeding that limit
+#       appears to result in silent failure. Therefore, the key sequences are
+#       split across multiple lines.
 
 from adafruit_hid.keycode import Keycode # REQUIRED if using Keycode.* values
 
@@ -21,7 +19,7 @@ from adafruit_hid.keycode import Keycode # REQUIRED if using Keycode.* values
 # macro files before attempting to adjust settings in this one.
 
 DELAY_AFTER_COMMAND = 0.75
-DELAY_AFTER_SLASH  = 0.80 # required so minecraft has time to bring up command screen
+DELAY_AFTER_SLASH = 0.80 # required so minecraft has time to bring up command screen
 DELAY_BEFORE_RETURN = 0.10 # give minecraft time to show all the keys pressed...
 
 
