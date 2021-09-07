@@ -1,6 +1,7 @@
 import time
 import board
 import digitalio
+import simpleio
 import adafruit_lsm6ds.lsm6ds33
 import adafruit_apds9960.apds9960
 from adafruit_hid.mouse import Mouse
@@ -21,10 +22,6 @@ apds9960 = adafruit_apds9960.apds9960.APDS9960(i2c)
 
 #  enable proximity sensor
 apds9960.enable_proximity = True
-
-#  x and y axis setup
-x_axis = 0
-y_axis = 0
 
 #  setup for onboard button
 click = digitalio.DigitalInOut(board.SWITCH)
@@ -73,13 +70,29 @@ while True:
         pass
     while ble.connected:
         #  sets x and y values for accelerometer x and y values
-        x = lsm6ds33.acceleration[1]
-        y = lsm6ds33.acceleration[0]
+        #  x and y are swapped for orientation of feather
+        y, x, z = lsm6ds33.acceleration
+
+        #  map range of horizontal movement to mouse x movement
+        horizontal_mov = simpleio.map_range(steps(x), 1.0, 20.0, -15.0, 15.0)
+        #  map range of vertical movement to mouse y movement
+        vertical_mov = simpleio.map_range(steps(y), 20.0, 1.0, -15.0, 15.0)
+        #  map range of mouse y movement to scrolling
+        scroll_dir = simpleio.map_range(vertical_mov, -15.0, 15.0, 3.0, -3.0)
 
         #  if onboard button is pressed, sends left mouse click
-        if click.value is False:
+        if not click.value:
             mouse.click(Mouse.LEFT_BUTTON)
             time.sleep(0.2)
+        #  if the proximity sensor is covered
+        #  scroll the mouse
+        if apds9960.proximity > distance:
+            mouse.move(wheel=int(scroll_dir))
+        #  otherwise move mouse cursor in x and y directions
+        else:
+            mouse.move(x=int(horizontal_mov))
+            mouse.move(y=int(vertical_mov))
+
         #  debugging print for x and y values
         #  time.monotonic() is used so that the
         #  code is not delayed with time.sleep
@@ -87,49 +100,5 @@ while True:
             print("x", steps(x))
             print("y", steps(y))
             clock = time.monotonic()
-        #  mouse movement left and right
-        if steps(x) > 11.0:
-            mouse.move(x=1)
-        if steps(x) < 9.0:
-            mouse.move(x=-1)
 
-        if steps(x) > 19.0:
-            mouse.move(x=8)
-        if steps(x) < 1.0:
-            mouse.move(x=-8)
-        #  mouse movement up and down
-        #  and mouse scrolling using
-        #  proximity sensor
-        if steps(y) > 11.0:
-            if apds9960.proximity > distance:
-                #  scroll down
-                mouse.move(wheel=1)
-                time.sleep(0.1)
-            else:
-                #  move down
-                mouse.move(y=-1)
-        if steps(y) < 9.0:
-            if apds9960.proximity > distance:
-                #  scroll up
-                mouse.move(wheel=-1)
-                time.sleep(0.1)
-            else:
-                #  move up
-                mouse.move(y=1)
-
-        if steps(y) > 15.0:
-            if apds9960.proximity > distance:
-                #  scroll down
-                mouse.move(wheel=3)
-            else:
-                #  move down
-                mouse.move(y=-8)
-        if steps(y) < 1.0:
-            if apds9960.proximity > distance:
-                #  scroll up
-                mouse.move(wheel=-3)
-            else:
-            #  move up
-                mouse.move(y=8)
-        #print(apds9960.proximity)
     ble.start_advertising(advertisement)
