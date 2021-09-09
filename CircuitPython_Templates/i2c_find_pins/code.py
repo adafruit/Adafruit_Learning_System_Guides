@@ -16,10 +16,27 @@ def is_hardware_i2c(scl, sda):
 
 
 def get_unique_pins():
-    exclude = ['NEOPIXEL', 'APA102_MOSI', 'APA102_SCK']
-    pins = [pin for pin in [
-        getattr(board, p) for p in dir(board) if p not in exclude]
-            if isinstance(pin, Pin)]
+    exclude = [
+        getattr(board, p)
+        for p in [
+            # This is not an exhaustive list of unexposed pins. Your results
+            # may include other pins that you cannot easily connect to.
+            "NEOPIXEL",
+            "DOTSTAR_CLOCK",
+            "DOTSTAR_DATA",
+            "APA102_SCK",
+            "APA102_MOSI",
+            "LED",
+            "SWITCH",
+            "BUTTON",
+        ]
+        if p in dir(board)
+    ]
+    pins = [
+        pin
+        for pin in [getattr(board, p) for p in dir(board)]
+        if isinstance(pin, Pin) and pin not in exclude
+    ]
     unique = []
     for p in pins:
         if p not in unique:

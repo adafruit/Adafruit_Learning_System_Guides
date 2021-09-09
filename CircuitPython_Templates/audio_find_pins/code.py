@@ -31,7 +31,7 @@ def get_unique_pins():
             "DOTSTAR_DATA",
             "APA102_SCK",
             "APA102_MOSI",
-            "L",
+            "LED",
             "SWITCH",
             "BUTTON",
         ]
