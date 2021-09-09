@@ -1,1 +1,0 @@
-CircuitPython_Templates/cap_touch_pin_script/code.py 7: Either all return statements in a function should return an expression, or none of them should. (inconsistent-return-statements)
