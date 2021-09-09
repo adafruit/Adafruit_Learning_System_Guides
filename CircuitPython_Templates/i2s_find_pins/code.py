@@ -1,22 +1,17 @@
 """
-CircuitPython Audio-capable pin identifying script
+CircuitPython I2S Pin Combination Identification Script
 """
 import board
+import audiobusio
 from microcontroller import Pin
-try:
-    from audioio import AudioOut
-except ImportError:
-    from audiopwmio import PWMAudioOut as AudioOut
 
 
-def is_audio(audio_pin_name):
+def is_hardware_i2s(bit_clock, word_select, data):
     try:
-        p = AudioOut(audio_pin_name)
+        p = audiobusio.I2SOut(bit_clock, word_select, data)
         p.deinit()
         return True
     except ValueError:
-        return False
-    except RuntimeError:
         return False
 
 
@@ -49,6 +44,14 @@ def get_unique_pins():
     return unique
 
 
-for audio_pin in get_unique_pins():
-    if is_audio(audio_pin):
-        print("Audio pin:", audio_pin)
+for bit_clock_pin in get_unique_pins():
+    for word_select_pin in get_unique_pins():
+        for data_pin in get_unique_pins():
+            if bit_clock_pin is word_select_pin or bit_clock_pin is data_pin or word_select_pin \
+                    is data_pin:
+                continue
+            if is_hardware_i2s(bit_clock_pin, word_select_pin, data_pin):
+                print("Bit clock pin:", bit_clock_pin, "\t Word select pin:", word_select_pin,
+                      "\t Data pin:", data_pin)
+            else:
+                pass

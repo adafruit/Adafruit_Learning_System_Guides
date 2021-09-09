@@ -17,7 +17,7 @@ def is_touch_capable(pin_name):
         else:
             return False  # Otherwise, the pins are invalid.
     except TypeError:  # Error returned when checking a non-pin object in dir(board).
-        pass  # Passes over non-pin objects in dir(board).
+        return False  # Invalid if non-pin objects in dir(board).
 
 
 def get_pin_names():
