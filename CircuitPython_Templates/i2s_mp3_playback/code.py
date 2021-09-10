@@ -1,6 +1,6 @@
 """
 CircuitPython I2S MP3 playback example.
-Plays a single MP3 once.
+Plays an MP3 once.
 
 Remove this line and all of the following docstring content before submitting to the Learn repo.
 
