@@ -79,6 +79,7 @@ while True:
         if byte_read == b">":
             # End of message. Don't record the ">".
             # Now we have a complete message. Convert it to a string, and split it up.
+            print(message)
             message_parts = "".join(message).split(",")
             message_type = message_parts[0]
             message_started = False
