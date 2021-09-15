@@ -29,9 +29,9 @@ SLEEP_SEC  = 0.05        # Amount of time to sleep between loop iterations.
 
 # Get bulb address from command parameters.
 if len(sys.argv) != 2:
-    print 'Error must specify bulb address as parameter!'
-    print 'Usage: sudo python colorific.py <bulb address>'
-    print 'Example: sudo python colorific.py 5C:31:3E:F2:16:13'
+    print ('Error must specify bulb address as parameter!')
+    print ('Usage: sudo python colorific.py <bulb address>')
+    print ('Example: sudo python colorific.py 5C:31:3E:F2:16:13')
     sys.exit(1)
 bulb = sys.argv[1]
 
@@ -47,7 +47,7 @@ hue_min, hue_max = HUE_RANGE
 hue = hue_min
 
 # Enter main loop.
-print 'Press Ctrl-C to quit.'
+print ('Press Ctrl-C to quit.')
 last = time.time()
 while True:
     # Get amount of time elapsed since last update, then compute hue delta.
