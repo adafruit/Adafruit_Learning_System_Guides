@@ -134,7 +134,7 @@ while 1: # Main loop ---------------------------------------------------------
 
 	# Ustream broadcast query
 	try:                 uOnline = req(uUrl)['results'] == 'live'
-	except Exception, e: print "Error: {0} : {1}".format(type(e), e.args)
+	except Exception as e: print ("Error: {0} : {1}").format(type(e), e.args)
 
 	# G+ hangout query
 	try:
@@ -142,10 +142,10 @@ while 1: # Main loop ---------------------------------------------------------
 		while 1:
 			pageToken = paginate(pageToken)
 			if pageToken is None: break
-	except Exception, e: print "Error: {0} : {1}".format(type(e), e.args)
+	except Exception as e: print ("Error: {0} : {1}").format(type(e), e.args)
 
-	print 'G+ hangout: ' + ('online' if gOnline else 'offline')
-	print 'Ustream   : ' + ('online' if uOnline else 'offline')
+	print ('G+ hangout: ') + ('online' if gOnline else 'offline')
+	print ('Ustream   : ') + ('online' if uOnline else 'offline')
 	GPIO.output(pin, GPIO.HIGH if uOnline or gOnline else GPIO.LOW)
 
 	# Delay before next query
@@ -156,7 +156,7 @@ while 1: # Main loop ---------------------------------------------------------
 		i = bisect.bisect(mins, [m, 60]) - 1 # mins[] list index
 		d = mins[i][1] - (n - startTime)     # Time to next poll
 		if d > 0:
-			print 'Waiting ' + str(d) + ' seconds'
+			print ('Waiting ') + str(d) + ' seconds'
 			time.sleep(d)
 	except:
 		time.sleep(60)

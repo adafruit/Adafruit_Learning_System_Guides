@@ -30,9 +30,9 @@ SLEEP_SEC  = 0.01        # Amount of time to sleep between loop iterations.
 
 # Get bulb address from command parameters.
 if len(sys.argv) != 2:
-    print 'Error must specify bulb address as parameter!'
-    print 'Usage: sudo python colorific.py <bulb address>'
-    print 'Example: sudo python colorific.py 5C:31:3E:F2:16:13'
+    print ('Error must specify bulb address as parameter!')
+    print ('Usage: sudo python colorific.py <bulb address>')
+    print ('Example: sudo python colorific.py 5C:31:3E:F2:16:13')
     sys.exit(1)
 bulb = sys.argv[1]
 
@@ -48,7 +48,7 @@ hue_min, hue_max = HUE_RANGE
 hue = hue_min
 
 # Enter main loop.
-print 'Press Ctrl-C to quit.'
+print ('Press Ctrl-C to quit.')
 last = time.time()
 while True:
     # Get amount of time elapsed since last update, then compute hue delta.
@@ -64,7 +64,7 @@ while True:
     # Set light color by sending color change packet over BLE.
     # 56RRGGBB00f0aa
     line = 'char-write-cmd 0x002e 56{0:02X}{1:02X}{2:02X}00f0aa'.format(r, g, b)
-    print line
+    print (line)
     gatt.sendline(line)
     # Wait a short period of time and setup for the next loop iteration.
     time.sleep(SLEEP_SEC)
