@@ -138,16 +138,16 @@ for name in sys.argv[1:]: # For each image passed to script...
 
 	if image.bph > numLEDs: numLEDs = image.bph
 
-print "// Don't edit this file!  It's software-generated."
-print "// See convert.py script instead."
-print
-print "#define PALETTE1  0"
-print "#define PALETTE4  1"
-print "#define PALETTE8  2"
-print "#define TRUECOLOR 3"
-print
-print "#define NUM_LEDS %d" % numLEDs
-print
+print ("// Don't edit this file!  It's software-generated.")
+print ("// See convert.py script instead.")
+print()
+print ("#define PALETTE1  0")
+print ("#define PALETTE4  1")
+print ("#define PALETTE8  2")
+print ("#define TRUECOLOR 3")
+print()
+print ("#define NUM_LEDS %d" % numLEDs)
+print()
 
 # Second pass estimates current of each column, then peak & overall average
 
@@ -221,9 +221,9 @@ for imgNum, image in enumerate(images): # For each image in list...
 			  int(pow((lut[i][0]/255.0),gamma)*bR1+0.5),
 			  int(pow((lut[i][1]/255.0),gamma)*bG1+0.5),
 			  int(pow((lut[i][2]/255.0),gamma)*bB1+0.5)))
-			if i < (image.numColors - 1): print ","
-		print " };"
-		print
+			if i < (image.numColors - 1): print (",")
+		print (" };")
+		print()
 
 		sys.stdout.write(
 		  "const uint8_t PROGMEM pixels%02d[] = {" % imgNum)
@@ -299,19 +299,19 @@ for imgNum, image in enumerate(images): # For each image in list...
 					writeByte(0)
 					writeByte(0)
 
-	print " };" # end pixels[] array
-	print
+	print (" };") # end pixels[] array
+	print()
 
 # Last pass, print table of images...
 
-print "typedef struct {"
-print "  uint8_t        type;    // PALETTE[1,4,8] or TRUECOLOR"
-print "  line_t         lines;   // Length of image (in scanlines)"
-print "  const uint8_t *palette; // -> PROGMEM color table (NULL if truecolor)"
-print "  const uint8_t *pixels;  // -> Pixel data in PROGMEM"
-print "} image;"
-print
-print "const image PROGMEM images[] = {"
+print ("typedef struct {")
+print ("  uint8_t        type;    // PALETTE[1,4,8] or TRUECOLOR")
+print ("  line_t         lines;   // Length of image (in scanlines")
+print ("  const uint8_t *palette; // -> PROGMEM color table (NULL if truecolor")
+print ("  const uint8_t *pixels;  // -> Pixel data in PROGMEM")
+print ("} image;")
+print()
+print ("const image PROGMEM images[] = {")
 
 for imgNum, image in enumerate(images): # For each image in list...
 	sys.stdout.write("  { ")
@@ -338,6 +338,6 @@ for imgNum, image in enumerate(images): # For each image in list...
 	else:
 		print
 
-print "};"
-print
-print "#define NUM_IMAGES (sizeof(images) / sizeof(images[0]))"
+print ("};")
+print()
+print ("#define NUM_IMAGES (sizeof(images) / sizeof(images[0]))")
