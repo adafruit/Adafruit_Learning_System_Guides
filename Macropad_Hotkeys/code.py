@@ -1,9 +1,8 @@
 """
-A fairly straightforward macro/hotkey program for Adafruit MACROPAD.
-Macro key setups are stored in the /macros folder (configurable below),
-load up just the ones you're likely to use. Plug into computer's USB port,
-use dial to select an application macro set, press MACROPAD keys to send
-key sequences.
+A macro/hotkey program for Adafruit MACROPAD. Macro setups are stored in the
+/macros folder (configurable below), load up just the ones you're likely to
+use. Plug into computer's USB port, use dial to select an application macro
+set, press MACROPAD keys to send key sequences and other USB protocols.
 """
 
 # pylint: disable=import-error, unused-import, too-few-public-methods
@@ -44,6 +43,9 @@ class App:
                 macropad.pixels[i] = 0
                 group[i].text = ''
         macropad.keyboard.release_all()
+        macropad.consumer_control.release()
+        macropad.mouse.release_all()
+        macropad.stop_tone()
         macropad.pixels.show()
         macropad.display.refresh()
 
@@ -129,15 +131,13 @@ while True:
 
     sequence = apps[app_index].macros[key_number][2]
     if pressed:
-        # the sequence is arbitrary-length
-        # each item in the sequence is either
-        # an integer (e.g., Keycode.KEYPAD_MINUS),
-        # a floating point value (e.g., 0.20)
-        # or a string.
-        # Positive Integers ==> key pressed
-        # Negative Integers ==> key released
-        # Float             ==> sleep in seconds
-        # String            ==> each key in string pressed & released
+        # 'sequence' is an arbitrary-length list, each item is one of:
+        # Positive integer (e.g. Keycode.KEYPAD_MINUS): key pressed
+        # Negative integer: (absolute value) key released
+        # Float (e.g. 0.25): delay in seconds
+        # String (e.g. "Foo"): corresponding keys pressed & released
+        # List []: one or more Consumer Control codes (can also do float delay)
+        # Dict {}: mouse buttons/motion (might extend in future)
         if key_number < 12: # No pixel for encoder button
             macropad.pixels[key_number] = 0xFFFFFF
             macropad.pixels.show()
@@ -149,13 +149,49 @@ while True:
                     macropad.keyboard.release(-item)
             elif isinstance(item, float):
                 time.sleep(item)
-            else:
+            elif isinstance(item, str):
                 macropad.keyboard_layout.write(item)
+            elif isinstance(item, list):
+                for code in item:
+                    if isinstance(code, int):
+                        macropad.consumer_control.release()
+                        macropad.consumer_control.press(code)
+                    if isinstance(code, float):
+                        time.sleep(code)
+            elif isinstance(item, dict):
+                if 'buttons' in item:
+                    if item['buttons'] >= 0:
+                        macropad.mouse.press(item['buttons'])
+                    else:
+                        macropad.mouse.release(-item['buttons'])
+                macropad.mouse.move(item['x'] if 'x' in item else 0,
+                                    item['y'] if 'y' in item else 0,
+                                    item['wheel'] if 'wheel' in item else 0)
+                if 'tone' in item:
+                    if item['tone'] > 0:
+                        macropad.stop_tone()
+                        macropad.start_tone(item['tone'])
+                    else:
+                        macropad.stop_tone()
+                elif 'play' in item:
+                    macropad.play_file(item['play'])
     else:
-        # Release any still-pressed keys
+        # Release any still-pressed keys, consumer codes, mouse buttons
+        # Keys and mouse buttons are individually released this way (rather
+        # than release_all()) because pad supports multi-key rollover, e.g.
+        # could have a meta key or right-mouse held down by one macro and
+        # press/release keys/buttons with others. Navigate popups, etc.
         for item in sequence:
-            if isinstance(item, int) and item >= 0:
-                macropad.keyboard.release(item)
+            if isinstance(item, int):
+                if item >= 0:
+                    macropad.keyboard.release(item)
+            elif isinstance(item, dict):
+                if 'buttons' in item:
+                    if item['buttons'] >= 0:
+                        macropad.mouse.release(item['buttons'])
+                elif 'tone' in item:
+                    macropad.stop_tone()
+        macropad.consumer_control.release()
         if key_number < 12: # No pixel for encoder button
             macropad.pixels[key_number] = apps[app_index].macros[key_number][0]
             macropad.pixels.show()

@@ -20,8 +20,8 @@ app = {                      # REQUIRED dict, must be named 'app'
         (0x004000, 'Nums', [Keycode.SHIFT, Keycode.COMMAND, 'o']),
         (0x004000, 'Check', [Keycode.SHIFT, Keycode.COMMAND, 't']),
         # 4th row ----------
-        (0x004000, 'Date', [Keycode.SHIFT, Keycode.COMMAND, 'D' ]),
-        (0x004000, 'Time', [Keycode.OPTION, Keycode.SHIFT, Keycode.COMMAND, 'D' ]),
+        (0x004000, 'Date', [Keycode.SHIFT, Keycode.COMMAND, 'D']),
+        (0x004000, 'Time', [Keycode.OPTION, Keycode.SHIFT, Keycode.COMMAND, 'D']),
         (0x004000, 'Divider', [Keycode.SHIFT, Keycode.COMMAND, 'H']),
         # Encoder button ---
         (0x000000, '', [Keycode.COMMAND, 'w']) # Close window/tab
