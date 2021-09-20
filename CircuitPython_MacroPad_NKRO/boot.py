@@ -6,7 +6,7 @@ bitmap_keyboard_descriptor = bytes((
         0x05, 0x01,                     # Usage Page (Generic Desktop),
         0x09, 0x06,                     # Usage (Keyboard),
         0xA1, 0x01,                     # Collection (Application),
-        0x85, 0xFF,                     #   6,7 Report ID  [SET AT RUNTIME]
+        0x85, 0x04,                     #   6,7 Report ID
         # bitmap of modifiers
         0x75, 0x01,                     #   Report Size (1),
         0x95, 0x08,                     #   Report Count (8),
@@ -39,19 +39,19 @@ bitmap_keyboard_descriptor = bytes((
 ))
 
 bitmap_keyboard = usb_hid.Device(
-    report_descriptor = bitmap_keyboard_descriptor,
-    usage_page = 0x1,
-    usage = 0x6,
-    in_report_length = 16,
-    out_report_length = 1,
-    report_id_index = BITMAP_KEYBOARD_DESCRIPTOR_REPORT_ID,
+    report_descriptor=bitmap_keyboard_descriptor,
+    usage_page=0x1,
+    usage=0x6,
+    report_ids=(4,),
+    in_report_lengths=(16,),
+    out_report_lengths=(1,),
 )
 
-print(bitmap_keyboard)
-devices = [
-    bitmap_keyboard,
-    usb_hid.Device.CONSUMER_CONTROL,
-    usb_hid.Device.MOUSE,
-]
-usb_hid.enable(devices)
-print("enabled HID with custom keyboard device") 
+usb_hid.enable(
+    (
+        bitmap_keyboard,
+        usb_hid.Device.MOUSE,
+        usb_hid.Device.CONSUMER_CONTROL,
+    )
+)
+print("enabled HID with custom keyboard device")
