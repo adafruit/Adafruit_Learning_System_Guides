@@ -2,8 +2,8 @@
 import rotaryio
 import digitalio
 import board
+from rainbowio import colorwheel
 import neopixel
-import _pixelbuf
 
 print("Rotary Trinkey color picker example")
 
@@ -25,7 +25,7 @@ while True:
             else:
                 color -= 1
             color = (color + 256) % 256  # wrap around to 0-256
-            pixel.fill(_pixelbuf.colorwheel(color))
+            pixel.fill(colorwheel(color))
         else:
             # change the brightness
             if position > last_position:  # increase

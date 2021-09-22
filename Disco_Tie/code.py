@@ -14,6 +14,7 @@ import array
 import math
 import audiobusio
 import board
+from rainbowio import colorwheel
 import neopixel
 
 from adafruit_ble import BLERadio
@@ -86,34 +87,15 @@ input_floor = normalized_rms(samples) + 10
 input_ceiling = input_floor + 500
 peak = 0
 
-def wheel(wheel_pos):
-    # Input a value 0 to 255 to get a color value.
-    # The colours are a transition r - g - b - back to r.
-    if wheel_pos < 0 or wheel_pos > 255:
-        r = g = b = 0
-    elif wheel_pos < 85:
-        r = int(wheel_pos * 3)
-        g = int(255 - wheel_pos*3)
-        b = 0
-    elif wheel_pos < 170:
-        wheel_pos -= 85
-        r = int(255 - wheel_pos*3)
-        g = 0
-        b = int(wheel_pos*3)
-    else:
-        wheel_pos -= 170
-        r = 0
-        g = int(wheel_pos*3)
-        b = int(255 - wheel_pos*3)
-    return (r, g, b)
 
 def rainbow_cycle(delay):
     for j in range(255):
         for i in range(NUM_PIXELS):
             pixel_index = (i * 256 // NUM_PIXELS) + j
-            pixels[i] = wheel(pixel_index & 255)
+            pixels[i] = colorwheel(pixel_index & 255)
         pixels.show()
         time.sleep(delay)
+
 
 def audio_meter(new_peak):
     mic.record(samples, len(samples))

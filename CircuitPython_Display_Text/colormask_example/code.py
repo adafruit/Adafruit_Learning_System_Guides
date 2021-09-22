@@ -8,23 +8,9 @@ create a color mask cutout
 
 import board
 import displayio
+from rainbowio import colorwheel
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text import bitmap_label as label
-
-
-def wheel(pos):
-    # input a value 0 to 255 to get a color value
-    # the colors are a transition r-g-b-back to r.
-    if pos < 1 or pos > 255:
-        return (0, 0, 0)
-    if pos < 85:
-        return (255 - pos * 3, pos * 3, 0)
-    if pos < 170:
-        pos -= 85
-        return (0, 255 - pos * 3, pos * 3)
-    pos -= 170
-    return (pos * 3, 0, 255 - pos * 3)
-
 
 # Make the display context. Change size if you want
 display = board.DISPLAY
@@ -58,7 +44,7 @@ rainbow_bitmap = displayio.Bitmap(
 rainbow_palette = displayio.Palette(255)
 
 for i in range(0, 255):
-    rainbow_palette[i] = int("".join("%02x" % i for i in wheel(i)), 16)
+    rainbow_palette[i] = int("".join("%02x" % i for i in colorwheel(i)), 16)
 
 for y in range(rainbow_bitmap.height):
     for x in range(rainbow_bitmap.width):

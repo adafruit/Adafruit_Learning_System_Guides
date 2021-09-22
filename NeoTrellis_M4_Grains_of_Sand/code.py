@@ -31,6 +31,7 @@ import board
 import audioio
 import audiocore
 import busio
+from rainbowio import colorwheel
 import adafruit_trellism4
 import adafruit_adxl34x
 
@@ -107,18 +108,6 @@ def already_present(limit, x, y):
             return True
     return False
 
-def wheel(pos):
-    # Input a value 0 to 255 to get a color value.
-    # The colours are a transition r - g - b - back to r.
-    if pos < 0 or pos > 255:
-        return 0, 0, 0
-    if pos < 85:
-        return int(255 - pos*3), int(pos*3), 0
-    if pos < 170:
-        pos -= 85
-        return 0, int(255 - pos*3), int(pos*3)
-    pos -= 170
-    return int(pos * 3), 0, int(255 - (pos*3))
 
 for g in grains:
     placed = False
@@ -147,16 +136,16 @@ while True:
         # Random color every refresh
         if color_mode == 0:
             if occupied_bits[i]:
-                trellis.pixels[(i%8, i//8)] = wheel(random.randint(1, 254))
+                trellis.pixels[(i%8, i//8)] = colorwheel(random.randint(1, 254))
             else:
                 trellis.pixels[(i%8, i//8)] = (0, 0, 0)
         # Color by pixel
         if color_mode == 1:
-            trellis.pixels[(i%8, i//8)] = wheel(i*2) if occupied_bits[i] else (0, 0, 0)
+            trellis.pixels[(i%8, i//8)] = colorwheel(i*2) if occupied_bits[i] else (0, 0, 0)
 
         # Change color to random on button press, or cycle when you hold one down
         if color_mode == 2:
-            trellis.pixels[(i%8, i//8)] = wheel(color) if occupied_bits[i] else (0, 0, 0)
+            trellis.pixels[(i%8, i//8)] = colorwheel(color) if occupied_bits[i] else (0, 0, 0)
 
     # Change color to a new random color on button press
     pressed = set(trellis.pressed_keys)

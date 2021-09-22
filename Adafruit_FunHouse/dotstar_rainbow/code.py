@@ -2,7 +2,7 @@
 import time
 import board
 import adafruit_dotstar
-from _pixelbuf import colorwheel
+from rainbowio import colorwheel
 
 dots = adafruit_dotstar.DotStar(board.DOTSTAR_CLOCK, board.DOTSTAR_DATA, 5, auto_write=False)
 dots.brightness = 0.3

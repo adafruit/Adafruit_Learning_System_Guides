@@ -1,14 +1,8 @@
 """CircuitPython status NeoPixel rainbow example."""
 import time
 import board
+from rainbowio import colorwheel
 import neopixel
-try:
-    from rainbowio import colorwheel
-except ImportError:
-    try:
-        from _pixelbuf import colorwheel
-    except ImportError:
-        from adafruit_pypixelbuf import colorwheel
 
 pixel = neopixel.NeoPixel(board.NEOPIXEL, 1, auto_write=False)
 

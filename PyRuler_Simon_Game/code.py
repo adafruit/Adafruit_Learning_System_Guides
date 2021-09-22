@@ -9,6 +9,7 @@ Code adapted from Miguel Grinberg's Simon game for Circuit Playground Express
 import time
 import random
 import board
+from rainbowio import colorwheel
 from digitalio import DigitalInOut, Direction
 import touchio
 import adafruit_dotstar
@@ -35,24 +36,12 @@ for p in (board.LED4, board.LED5, board.LED6, board.LED7):
 
 cap_touches = [False, False, False, False]
 
-def wheel(pos):
-    # Input a value 0 to 255 to get a color value.
-    # The colours are a transition r - g - b - back to r.
-    if pos < 0 or pos > 255:
-        return (0, 0, 0)
-    if pos < 85:
-        return (255 - pos * 3, pos * 3, 0)
-    if pos < 170:
-        pos -= 85
-        return (0, 255 - pos * 3, pos * 3)
-    pos -= 170
-    return (pos * 3, 0, 255 - pos * 3)
 
 def rainbow_cycle(wait):
     for j in range(255):
         for i in range(len(pixels)):
             rc_index = (i * 256 // len(pixels)) + j
-            pixels[i] = wheel(rc_index & 255)
+            pixels[i] = colorwheel(rc_index & 255)
         time.sleep(wait)
 
 def read_caps():

@@ -16,6 +16,7 @@ All text above must be included in any redistribution.
 
 import time
 import random
+from rainbowio import colorwheel
 import adafruit_trellism4
 
 COLORS = [0xFF0000, 0xFFFF00, 0x00FF00, 0x00FFFF, 0x0000FF, 0xFF00FF]
@@ -35,18 +36,6 @@ def index_of(coord):
     x, y = coord
     return y * 8 + x
 
-def wheel(pos):
-    # Input a value 0 to 255 to get a color value.
-    # The colours are a transition r - g - b - back to r.
-    if pos < 0 or pos > 255:
-        return 0, 0, 0
-    if pos < 85:
-        return int(255 - pos*3), int(pos*3), 0
-    if pos < 170:
-        pos -= 85
-        return 0, int(255 - pos*3), int(pos*3)
-    pos -= 170
-    return int(pos * 3), 0, int(255 - (pos*3))
 
 def cycle_sequence(seq):
     while True:
@@ -56,7 +45,7 @@ def cycle_sequence(seq):
 def rainbow_lamp(seq):
     g = cycle_sequence(seq)
     while True:
-        trellis.pixels.fill(wheel(next(g)))
+        trellis.pixels.fill(colorwheel(next(g)))
         yield
 
 def splash():

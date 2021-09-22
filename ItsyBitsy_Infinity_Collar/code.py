@@ -4,6 +4,7 @@ and color to be controlled by input from the Adafruit Bluefruit App
 """
 import board
 import random
+from rainbowio import colorwheel
 import neopixel
 import digitalio
 from adafruit_debouncer import Debouncer
@@ -14,7 +15,6 @@ from adafruit_led_animation.animation.chase import Chase
 from adafruit_led_animation.animation.rainbowcomet import RainbowComet
 from adafruit_led_animation.animation.pulse import Pulse
 from adafruit_led_animation.sequence import AnimationSequence
-from adafruit_led_animation.color import colorwheel
 
 
 # Bluetooth modules

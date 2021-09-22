@@ -31,6 +31,7 @@ import time
 
 import board
 import neopixel
+from rainbowio import colorwheel
 from analogio import AnalogIn
 
 n_pixels = 16  # Number of pixels you are using
@@ -51,21 +52,6 @@ dotcount = 0  # Frame counter for peak dot
 dothangcount = 0  # Frame counter for holding peak dot
 
 strip = neopixel.NeoPixel(led_pin, n_pixels, brightness=1, auto_write=False)
-
-
-def wheel(pos):
-    # Input a value 0 to 255 to get a color value.
-    # The colours are a transition r - g - b - back to r.
-    if pos < 0 or pos > 255:
-        return (0, 0, 0)
-    if pos < 85:
-        return (int(pos * 3), int(255 - (pos * 3)), 0)
-    elif pos < 170:
-        pos -= 85
-        return (int(255 - pos * 3), 0, int(pos * 3))
-    else:
-        pos -= 170
-        return (0, int(pos * 3), int(255 - pos * 3))
 
 
 def remapRange(value, leftMin, leftMax, rightMin, rightMax):
@@ -168,7 +154,7 @@ while True:
 
     # Fill the strip with rainbow gradient
     for i in range(0, len(strip)):
-        strip[i] = wheel(remapRange(i, 0, (n_pixels - 1), 30, 150))
+        strip[i] = colorwheel(remapRange(i, 0, (n_pixels - 1), 30, 150))
 
     # Scale the input logarithmically instead of linearly
     c = fscale(input_floor, input_ceiling, (n_pixels - 1), 0, peaktopeak, 2)
@@ -182,7 +168,7 @@ while True:
 
     # Set the peak dot to match the rainbow gradient
     y = n_pixels - peak
-    strip.fill = (y - 1, wheel(remapRange(y, 0, (n_pixels - 1), 30, 150)))
+    strip.fill = (y - 1, colorwheel(remapRange(y, 0, (n_pixels - 1), 30, 150)))
     strip.write()
 
     # Frame based peak dot animation

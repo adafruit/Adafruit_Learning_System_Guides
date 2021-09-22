@@ -9,7 +9,7 @@
 
 import array
 
-from _pixelbuf import wheel
+from rainbowio import colorwheel
 import board
 import displayio
 import framebufferio
@@ -92,7 +92,7 @@ def scroll(t, b):
     for i in range(maxlen-linelen):
         # Set the letter displayed at each position, and its color
         for j in range(linelen):
-            sh[j][1] = wheel(3 * (2*i+j))
+            sh[j][1] = colorwheel(3 * (2*i+j))
             tg1[j][0] = charmap[t[i+j]]
             tg2[j][0] = charmap[b[i+j]]
         # And then for each pixel position, move the two labels

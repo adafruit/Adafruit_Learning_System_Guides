@@ -1,5 +1,5 @@
 import time
-
+from rainbowio import colorwheel
 import board
 import neopixel
 
@@ -19,26 +19,11 @@ offset = 0
 prevtime = 0
 
 
-def wheel(pos):
-    # Input a value 0 to 255 to get a color value.
-    # The colours are a transition r - g - b - back to r.
-    if (pos < 0) or (pos > 255):
-        return (0, 0, 0)
-    if pos < 85:
-        return (int(pos * 3), int(255 - (pos * 3)), 0)
-    elif pos < 170:
-        pos -= 85
-        return (int(255 - pos * 3), 0, int(pos * 3))
-
-    pos -= 170
-    return (0, int(pos * 3), int(255 - pos * 3))
-
-
 def rainbow_cycle(wait):
-    for j in range(255 * 6):  # 6 cycles of all colors on wheel
+    for j in range(255 * 6):  # 6 cycles of all colors on colorwheel
         for r in range(len(pixels)):
             idx = int((r * 255 / len(pixels)) + j)
-            pixels[r] = wheel(idx & 255)
+            pixels[r] = colorwheel(idx & 255)
         pixels.write()
         time.sleep(wait)
 
@@ -47,25 +32,25 @@ def rainbow(wait):
     for j in range(255):
         for index in range(len(pixels)):
             idx = int(index + j)
-            pixels[index] = wheel(idx & 255)
+            pixels[index] = colorwheel(idx & 255)
         pixels.write()
         time.sleep(wait)
 
 
 def rainbow_cycle_slow(wait):
-    for j in range(255 * 3):  # 3 cycles of all colors on wheel
+    for j in range(255 * 3):  # 3 cycles of all colors on colorwheel
         for r in range(len(pixels)):
             idx = int((r * 255 / len(pixels)) + j)
-            pixels[r] = wheel(idx & 255)
+            pixels[r] = colorwheel(idx & 255)
         pixels.write()
         time.sleep(wait)
 
 
 def rainbow_hold(wait):
-    for j in range(255 * 1):  # 3 cycles of all colors on wheel
+    for j in range(255 * 1):  # 3 cycles of all colors on colorwheel
         for r in range(len(pixels)):
             idx = int((r * 255 / len(pixels)) + j)
-            pixels[r] = wheel(idx & 255)
+            pixels[r] = colorwheel(idx & 255)
     pixels.write()
     time.sleep(wait)
 

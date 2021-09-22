@@ -17,6 +17,7 @@ import time
 import board
 import digitalio
 from digitalio import DigitalInOut, Direction, Pull
+from rainbowio import colorwheel
 import adafruit_lis3dh
 import neopixel
 from adafruit_led_animation.helper import PixelMap
@@ -29,7 +30,6 @@ from adafruit_led_animation.animation.rainbowcomet import RainbowComet
 from adafruit_led_animation.animation.solid import Solid
 from adafruit_led_animation.animation.chase import Chase
 from adafruit_led_animation.animation.comet import Comet
-from adafruit_led_animation.color import colorwheel
 from adafruit_led_animation.color import (
     BLACK,
     RED,

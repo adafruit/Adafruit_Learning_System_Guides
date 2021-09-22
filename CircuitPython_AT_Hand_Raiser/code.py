@@ -8,6 +8,7 @@
 
 from time import sleep
 import board
+from rainbowio import colorwheel
 import adafruit_dotstar
 import supervisor
 
@@ -65,19 +66,6 @@ curColor = black
 # wheel - change hue around the colorwheel (curColor is ignored)
 
 mode='wheel'
-
-# standard function to rotate around the colorwheel
-def wheel(cpos):
-    # Input a value 0 to 255 to get a color value.
-    # The colours are a transition r - g - b - back to r.
-    if cpos < 85:
-        return (int(cpos * 3), int(255 - (cpos * 3)), 0)
-    elif cpos < 170:
-        cpos -= 85
-        return (int(255 - (cpos * 3)), 0, int(cpos * 3))
-    else:
-        cpos -= 170
-        return (0, int(cpos * 3), int(255 - cpos * 3))
 
 # We start by turning off pixels
 pixels.fill(black)
@@ -148,7 +136,7 @@ while True:
         elif mode == 'wheel':
             sleep(.05)
             pos = (pos + 1) % 255
-            pixels.fill(wheel(pos))
+            pixels.fill(colorwheel(pos))
             pixels.show()
         elif mode == 'solid':
             pixels.fill(targetColor)

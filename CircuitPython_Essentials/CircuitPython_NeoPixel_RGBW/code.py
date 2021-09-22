@@ -10,7 +10,7 @@ pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=0.3, auto_write=Fal
                            pixel_order=(1, 0, 2, 3))
 
 
-def wheel(pos):
+def colorwheel(pos):
     # Input a value 0 to 255 to get a color value.
     # The colours are a transition r - g - b - back to r.
     if pos < 0 or pos > 255:
@@ -36,7 +36,7 @@ def rainbow_cycle(wait):
     for j in range(255):
         for i in range(num_pixels):
             rc_index = (i * 256 // num_pixels) + j
-            pixels[i] = wheel(rc_index & 255)
+            pixels[i] = colorwheel(rc_index & 255)
         pixels.show()
         time.sleep(wait)
 

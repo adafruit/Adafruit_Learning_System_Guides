@@ -16,7 +16,7 @@
 import adafruit_pioasm
 import bitops
 import microcontroller
-import _pixelbuf
+import adafruit_pixelbuf
 import rp2pio
 
 _program = """
@@ -68,7 +68,7 @@ def _pin_directly_follows(a, b):
         return False
     return _gpio_order.index(a) + 1 == _gpio_order.index(b)
 
-class NeoPIO(_pixelbuf.PixelBuf):
+class NeoPIO(adafruit_pixelbuf.PixelBuf):
     """
     A sequence of neopixels.
 

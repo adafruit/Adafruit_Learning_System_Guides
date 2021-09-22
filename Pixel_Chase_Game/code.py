@@ -1,6 +1,7 @@
 import time
 import random
 import board
+from rainbowio import colorwheel
 import neopixel
 import digitalio
 import adafruit_led_animation.color as color
@@ -16,23 +17,11 @@ num_pixels = 61
 
 pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=0.2, auto_write=False)
 
-#  wheel and rainbow_cycle setup
-def wheel(pos):
-    if pos < 0 or pos > 255:
-        return (0, 0, 0)
-    if pos < 85:
-        return (255 - pos * 3, pos * 3, 0)
-    if pos < 170:
-        pos -= 85
-        return (0, 255 - pos * 3, pos * 3)
-    pos -= 170
-    return (pos * 3, 0, 255 - pos * 3)
-
 def rainbow_cycle(wait):
     for j in range(255):
         for i in range(num_pixels):
             rc_index = (i * 256 // 10) + j
-            pixels[i] = wheel(rc_index & 255)
+            pixels[i] = colorwheel(rc_index & 255)
         pixels.show()
         time.sleep(wait)
 

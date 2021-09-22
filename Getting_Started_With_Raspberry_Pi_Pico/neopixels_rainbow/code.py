@@ -6,8 +6,8 @@ REQUIRED HARDWARE:
 """
 import time
 import board
+from rainbowio import colorwheel
 import neopixel
-from _pixelbuf import colorwheel
 
 # Update this to match the number of NeoPixel LEDs connected to your board.
 num_pixels = 30
