@@ -18,14 +18,8 @@ the pylint: disable.
 
 import time
 import board
+from rainbowio import colorwheel
 import adafruit_dotstar
-try:
-    from rainbowio import colorwheel
-except ImportError:
-    try:
-        from _pixelbuf import colorwheel
-    except ImportError:
-        from adafruit_pypixelbuf import colorwheel
 
 dots = adafruit_dotstar.DotStar(board.DOTSTAR_CLOCK, board.DOTSTAR_DATA, NUMBER_OF_PIXELS, auto_write=False)
 dots.brightness = 0.3

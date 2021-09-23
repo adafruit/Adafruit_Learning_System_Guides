@@ -1,5 +1,5 @@
 import array
-
+from rainbowio import colorwheel
 import board
 import neopixel
 from analogio import AnalogIn
@@ -25,20 +25,6 @@ vol = array.array('H', [0] * samples)
 mic_pin = AnalogIn(board.A1)
 
 strip = neopixel.NeoPixel(led_pin, n_pixels, brightness=.1, auto_write=True)
-
-
-def wheel(pos):
-    # Input a value 0 to 255 to get a color value.
-    # The colours are a transition r - g - b - back to r.
-    if (pos < 0) or (pos > 255):
-        return (0, 0, 0)
-    if pos < 85:
-        return (int(pos * 3), int(255 - (pos * 3)), 0)
-    elif pos < 170:
-        pos -= 85
-        return (int(255 - pos * 3), 0, int(pos * 3))
-    pos -= 170
-    return (0, int(pos * 3), int(255 - pos * 3))
 
 
 def remap_range(value, leftMin, leftMax, rightMin, rightMax):
@@ -82,7 +68,7 @@ while True:
         if i >= height:
             strip[i] = [0, 0, 0]
         else:
-            strip[i] = wheel(remap_range(i, 0, (n_pixels - 1), 30, 150))
+            strip[i] = colorwheel(remap_range(i, 0, (n_pixels - 1), 30, 150))
 
     # Save sample for dynamic leveling
     vol[vol_count] = n

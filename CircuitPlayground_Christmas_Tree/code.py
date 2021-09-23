@@ -23,9 +23,10 @@ pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=brightness, auto_wr
                            pixel_order=ORDER)
 
 
-def wheel(pos):
+def colorwheel(pos):
     # Input a value 0 to 255 to get a color value.
     # The colours are a transition r - g - b - back to r.
+    # Works with RGB or RGBW LEDs.
     if pos < 0 or pos > 255:
         r = g = b = 0
     elif pos < 85:
@@ -49,7 +50,7 @@ def rainbow_swirl(wait):
     for j in range(255):
         for i in range(num_pixels):
             pixel_index = (i * 256 // num_pixels) + j
-            pixels[i] = wheel(pixel_index & 255)
+            pixels[i] = colorwheel(pixel_index & 255)
         pixels.show()
         time.sleep(wait)
 
@@ -58,7 +59,7 @@ def rainbow_fill(wait):
     for j in range(255):
         for i in range(num_pixels):
             pixel_index = int(i + j)
-            pixels[i] = wheel(pixel_index & 255)
+            pixels[i] = colorwheel(pixel_index & 255)
         pixels.show()
         time.sleep(wait)
 

@@ -2,7 +2,7 @@ import random
 
 import board
 import neopixel
-from rainbowio import colorwheel as wheel
+from rainbowio import colorwheel
 from ulab import numpy as np
 
 # Customize your neopixel configuration here...
@@ -25,7 +25,7 @@ def step(u, um, f, n, dx, dt, c):
 def main():
     # This precomputes the color palette for maximum speed
     # You could change it to compute the color palette of your choice
-    w = [wheel(i) for i in range(256)]
+    w = [colorwheel(i) for i in range(256)]
 
     # This sets up the initial wave as a smooth gradient
     u = np.zeros(num_pixels)
@@ -62,7 +62,7 @@ def main():
         # of control
         u = u * .99
 
-        # incrementing th causes the wheel to slowly cycle even if nothing else is happening
+        # incrementing th causes the colorwheel to slowly cycle even if nothing else is happening
         th = (th + .25) % 256
         pixels.show()
 

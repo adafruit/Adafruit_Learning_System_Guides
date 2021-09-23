@@ -3,7 +3,7 @@ import time
 import board
 import touchio
 import neopixel
-from _pixelbuf import colorwheel
+from rainbowio import colorwheel
 
 touch1 = touchio.TouchIn(board.TOUCH1)
 touch2 = touchio.TouchIn(board.TOUCH2)

@@ -1,6 +1,7 @@
 # Drive NeoPixels on the NeoPixels Block on Crickit for
 #  Circuit Playground Express
 import time
+from rainbowio import colorwheel
 import neopixel
 import board
 
@@ -10,18 +11,6 @@ num_pixels = 30  # Number of pixels driven from Crickit NeoPixel terminal
 pixels = neopixel.NeoPixel(board.A1, num_pixels, brightness=0.3,
                            auto_write=False)
 
-def wheel(pos):
-    # Input a value 0 to 255 to get a color value.
-    # The colours are a transition r - g - b - back to r.
-    if pos < 0 or pos > 255:
-        return (0, 0, 0)
-    if pos < 85:
-        return (255 - pos * 3, pos * 3, 0)
-    if pos < 170:
-        pos -= 85
-        return (0, 255 - pos * 3, pos * 3)
-    pos -= 170
-    return (pos * 3, 0, 255 - pos * 3)
 
 def color_chase(color, wait):
     for i in range(num_pixels):
@@ -30,11 +19,12 @@ def color_chase(color, wait):
         pixels.show()
     time.sleep(0.5)
 
+
 def rainbow_cycle(wait):
     for j in range(255):
         for i in range(num_pixels):
             rc_index = (i * 256 // num_pixels) + j
-            pixels[i] = wheel(rc_index & 255)
+            pixels[i] = colorwheel(rc_index & 255)
         pixels.show()
         time.sleep(wait)
 

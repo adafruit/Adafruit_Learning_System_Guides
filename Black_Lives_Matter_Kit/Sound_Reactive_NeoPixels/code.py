@@ -3,7 +3,7 @@ import math
 import board
 import audiobusio
 import neopixel
-from adafruit_pypixelbuf import colorwheel
+from rainbowio import colorwheel
 
 # Increase this number to use this example in louder environments. As you increase the number, it
 # increases the level of sound needed to change the color of the LEDs. 5 is good for quiet up to

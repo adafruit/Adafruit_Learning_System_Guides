@@ -3,7 +3,7 @@ import board
 import touchio
 import digitalio
 import neopixel
-from adafruit_pypixelbuf import colorwheel
+from rainbowio import colorwheel
 
 pixels = neopixel.NeoPixel(board.NEOPIXEL, 6, auto_write=False)
 red_led = digitalio.DigitalInOut(board.D13)

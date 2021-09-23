@@ -12,13 +12,14 @@ Code by Roy Hooper using Adafruit's LED Animation Library:
 #Import libraries
 import board
 import neopixel
+from rainbowio import colorwheel
 from adafruit_circuitplayground import cp
 from adafruit_led_animation.animation.solid import Solid
 from adafruit_led_animation.animation import Animation
 from adafruit_led_animation.animation.rainbow import Rainbow
 from adafruit_led_animation.animation.sparkle import Sparkle
 from adafruit_led_animation.sequence import AnimationSequence
-from adafruit_led_animation.color import WHITE, colorwheel
+from adafruit_led_animation.color import WHITE
 
 speeds = (0.25, 0.125, 0.1, 0.08, 0.05, 0.02, 0.01)  # Customize speed levels here
 # periods = (7, 6, 5, 4, 3, 2, 1)

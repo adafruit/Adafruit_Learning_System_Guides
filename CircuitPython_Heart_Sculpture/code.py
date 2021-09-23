@@ -1,6 +1,6 @@
 import time
 import adafruit_dotstar
-import adafruit_pypixelbuf
+from rainbowio import colorwheel
 import board
 import touchio
 
@@ -13,5 +13,5 @@ while True:
     hue = hue + touch.value * 3
     if hue > 255:  # Wrap back around to red
         hue = hue - 255
-    pixel[0] = adafruit_pypixelbuf.colorwheel(hue)
+    pixel[0] = colorwheel(hue)
     time.sleep(.05)

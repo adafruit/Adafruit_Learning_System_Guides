@@ -42,18 +42,6 @@ trellis = adafruit_trellism4.TrellisM4Express(rotation=90)
 i2c = busio.I2C(board.ACCELEROMETER_SCL, board.ACCELEROMETER_SDA)
 accelerometer = adafruit_adxl34x.ADXL345(i2c)
 
-def wheel(pos): # Input a value 0 to 255 to get a color value.
-    if pos < 0 or pos > 255:
-        return (0, 0, 0)
-    elif pos < 85:
-        return(int(pos * 3), int(255 - pos*3), 0)
-    elif pos < 170:
-        pos -= 85
-        return(int(255 - pos*3), 0, int(pos * 3))
-    else:
-        pos -= 170
-        return(0, int(pos * 3), int(255 - pos*3))
-
 # Play the welcome wav (if its there)
 with audioio.AudioOut(board.A1, right_channel=board.A0) as audio:
     try:

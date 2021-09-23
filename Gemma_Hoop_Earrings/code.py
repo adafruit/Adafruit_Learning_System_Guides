@@ -2,7 +2,7 @@
 # few LEDs on at any time...uses MUCH less juice than rainbow display!
 
 import time
-
+from rainbowio import colorwheel
 import board
 import neopixel
 import adafruit_dotstar
@@ -19,25 +19,10 @@ numpix = 16  # Number of NeoPixels (e.g. 16-pixel ring)
 pixpin = board.D0  # Pin where NeoPixels are connected
 strip = neopixel.NeoPixel(pixpin, numpix, brightness=.3, auto_write=False)
 
-
-def wheel(pos):
-    # Input a value 0 to 255 to get a color value.
-    # The colours are a transition r - g - b - back to r.
-    if pos < 0 or pos > 255:
-        return (0, 0, 0)
-    if pos < 85:
-        return (int(255 - pos*3), int(pos*3), 0)
-    if pos < 170:
-        pos -= 85
-        return (0, int(255 - pos*3), int(pos*3))
-    pos -= 170
-    return (int(pos * 3), 0, int(255 - (pos*3)))
-
-
 mode = 0  # Current animation effect
 offset = 0  # Position of spinner animation
 hue = 0  # Starting hue
-color = wheel(hue & 255)  # hue -> RGB color
+color = colorwheel(hue & 255)  # hue -> RGB color
 prevtime = time.monotonic()  # Time of last animation mode switch
 
 while True:  # Loop forever...
@@ -50,7 +35,7 @@ while True:  # Loop forever...
         # pixel will be refreshed on the next pass.
         strip[i] = [0, 0, 0]
         time.sleep(0.008)  # 8 millisecond delay
-    elif mode == 1:  # Spinny wheel (4 LEDs on at a time)
+    elif mode == 1:  # Spinny colorwheel (4 LEDs on at a time)
         for i in range(numpix):  # For each LED...
             if ((offset + i) & 7) < 2:  # 2 pixels out of 8...
                 strip[i] = color    # are set to current color
@@ -69,6 +54,6 @@ while True:  # Loop forever...
         if mode > 1:  # End of modes?
             mode = 0  # Start over from beginning
             hue += 80  # And change color
-            color = wheel(hue & 255)
+            color = colorwheel(hue & 255)
         strip.fill([0, 0, 0])  # Turn off all pixels
         prevtime = t  # Record time of last mode change

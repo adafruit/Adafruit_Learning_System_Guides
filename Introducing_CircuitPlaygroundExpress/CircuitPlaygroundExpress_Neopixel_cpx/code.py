@@ -1,5 +1,5 @@
 import time
-
+from rainbowio import colorwheel
 from adafruit_circuitplayground.express import cpx
 
 # choose which demos to play
@@ -16,20 +16,6 @@ AQUA = (0, 10, 10)
 BLUE = (0, 0, 10)
 PURPLE = (10, 0, 10)
 BLACK = (0, 0, 0)
-
-
-def wheel(pos):
-    # Input a value 0 to 255 to get a color value.
-    # The colours are a transition r - g - b - back to r.
-    if pos < 85:
-        return (int(pos * 3), int(255 - (pos * 3)), 0)
-    elif pos < 170:
-        pos -= 85
-        return (int(255 - (pos * 3)), 0, int(pos * 3))
-    else:
-        pos -= 170
-        return (0, int(pos * 3), int(255 - pos * 3))
-
 
 while True:
     cpx.pixels.brightness = 0.2
@@ -86,7 +72,7 @@ while True:
         for j in range(255):
             for i in range(len(cpx.pixels)):
                 idx = int(i + j)
-                cpx.pixels[i] = wheel(idx & 255)
+                cpx.pixels[i] = colorwheel(idx & 255)
             time.sleep(.001)
 
     if rainbowCycleDemo:
@@ -94,5 +80,5 @@ while True:
         for j in range(255):
             for i in range(len(cpx.pixels)):
                 idx = int((i * 256 / len(cpx.pixels)) + j * 10)
-                cpx.pixels[i] = wheel(idx & 255)
+                cpx.pixels[i] = colorwheel(idx & 255)
             time.sleep(.001)

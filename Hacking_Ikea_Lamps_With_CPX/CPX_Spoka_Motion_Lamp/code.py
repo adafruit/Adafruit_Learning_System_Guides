@@ -1,20 +1,6 @@
 import time
-
+from rainbowio import colorwheel
 from adafruit_circuitplayground.express import cpx
-
-
-def wheel(pos):
-    # Input a value 0 to 255 to get a color value.
-    # The colours are a transition r - g - b - back to r.
-    if pos < 0 or pos > 255:
-        return 0, 0, 0
-    if pos < 85:
-        return int(255 - pos * 3), int(pos * 3), 0
-    if pos < 170:
-        pos -= 85
-        return 0, int(255 - pos * 3), int(pos * 3)
-    pos -= 170
-    return int(pos * 3), 0, int(255 - (pos * 3))
 
 
 # pylint: disable=redefined-outer-name
@@ -49,7 +35,7 @@ def rainbow_lamp(seq):
     g = cycle_sequence(seq)
     while True:
         # pylint: disable=stop-iteration-return
-        cpx.pixels.fill(wheel(next(g)))
+        cpx.pixels.fill(colorwheel(next(g)))
         yield
 
 

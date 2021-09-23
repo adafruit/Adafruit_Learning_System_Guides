@@ -7,6 +7,7 @@ import supervisor
 import audioio
 import audiocore
 import board
+from rainbowio import colorwheel
 import neopixel
 
 # NeoPixels
@@ -62,17 +63,6 @@ def map_range(x, in_min, in_max, out_min, out_max):
         return max(min(mapped, out_max), out_min)
     return min(max(mapped, out_max), out_min)
 
-def wheel(pos):
-    # Input a value 0 to 255 to get a color value.
-    # The colours are a transition r - g - b - back to r.
-    if pos < 85:
-        return (int(pos * 3), int(255 - (pos * 3)), 0)
-    elif pos < 170:
-        pos -= 85
-        return (int(255 - (pos * 3)), 0, int(pos * 3))
-    else:
-        pos -= 170
-        return (0, int(pos * 3), int(255 - pos * 3))
 
 time.sleep(2)
 
@@ -100,7 +90,7 @@ while True:
     pixel_height = map_range(light.value, DARK, BRIGHT, 0, num_pixels)
     pixels.fill((0, 0, 0))
     for p in range(pixel_height):
-        pixels[p] = wheel(int(p / num_pixels * 255))
+        pixels[p] = colorwheel(int(p / num_pixels * 255))
         pixels.show()
 
     # determine squeek

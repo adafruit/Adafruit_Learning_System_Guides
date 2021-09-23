@@ -63,21 +63,6 @@ heat_colors = [0x330000, 0x660000, 0x990000, 0xCC0000, 0xFF0000,
                0xFFFF33, 0xFFFF66, 0xFFFF99, 0xFFFFCC]
 
 
-def wheel(pos):
-    # Input a value 0 to 255 to get a color value.
-    # The colours are a transition r - g - b - back to r.
-    if (pos < 0) or (pos > 255):
-        return (0, 0, 0)
-    if pos < 85:
-        return (int(pos * 3), int(255 - (pos * 3)), 0)
-    elif pos < 170:
-        pos -= 85
-        return (int(255 - pos * 3), 0, int(pos * 3))
-    else:
-        pos -= 170
-        return (0, int(pos * 3), int(255 - pos * 3))
-
-
 def remapRange(value, leftMin, leftMax, rightMin, rightMax):
     # this remaps a value fromhere original (left) range to new (right) range
     # Figure out how 'wide' each range is

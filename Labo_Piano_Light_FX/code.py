@@ -1,4 +1,5 @@
 import board
+from rainbowio import colorwheel
 import neopixel
 from analogio import AnalogIn
 
@@ -17,21 +18,6 @@ strip = neopixel.NeoPixel(board.NEOPIXEL, n_pixels,
                           brightness=0.1, auto_write=False)
 strip.fill(0)
 strip.show()
-
-
-def wheel(pos):
-    # Input a value 0 to 255 to get a color value.
-    # The colours are a transition r - g - b - back to r.
-    if (pos < 0) or (pos > 255):
-        return (0, 0, 0)
-    if pos < 85:
-        return (int(pos * 3), int(255 - (pos * 3)), 0)
-    elif pos < 170:
-        pos -= 85
-        return (int(255 - pos * 3), 0, int(pos * 3))
-    else:
-        pos -= 170
-        return (0, int(pos * 3), int(255 - pos * 3))
 
 
 def remapRangeSafe(value, leftMin, leftMax, rightMin, rightMax):
@@ -67,7 +53,7 @@ while True:
     # Color pixels based on rainbow gradient
     vlvl = remapRangeSafe(lvl, 0, 255, wheelStart, wheelEnd)
     for i in range(0, len(strip)):
-        strip[i] = wheel(vlvl)
+        strip[i] = colorwheel(vlvl)
         # Set strip brightness based oncode audio level
         brightness = remapRangeSafe(lvl, 50, 255, 0, maxbrt)
         strip.brightness = float(brightness) / 255.0
