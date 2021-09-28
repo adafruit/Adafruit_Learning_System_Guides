@@ -1,7 +1,5 @@
 import struct
 
-# pylint: disable=consider-using-with
-
 class SeekableBitmap:
     """Allow random access to an uncompressed bitmap file on disk"""
     def __init__(
