@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Limor Fried for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 #define BITMAP_WIDTH  64
 #define BITMAP_HEIGHT 32
 const uint8_t PROGMEM bitmap_2020[] = {
