@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Phil Burgess for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+#
 # Adafruit Trinket+NeoPixel animation for Daft Punk-inspired helmet.
 # Contains some ATtiny85-specific stuff; won't run as-is on Uno, etc.
 
