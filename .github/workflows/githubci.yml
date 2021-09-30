@@ -7,7 +7,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arduino-platform: ["uno", "nrf52832", "cpx_ada", "pyportal", "protrinket_3v", "protrinket_5v", "metro_m0", "esp8266", "esp32", "trinket_3v", "gemma", "flora", "feather32u4", "feather_m0_express", "gemma_m0", "trinket_m0", "hallowing_m0", "monster_m4sk", "hallowing_m4", "hallowing_m4_tinyusb", "neotrellis_m4", "pybadge", "cpb", "cpc", "funhouse", "magtag"]
+        arduino-platform: ["cpb", "cpc", "cpx_ada", "esp32", "esp8266", "feather32u4", "feather_m0_express", "feather_m4_express", "feather_rp2040", "flora", "funhouse", "gemma", "gemma_m0", "hallowing_m0", "hallowing_m4_tinyusb", "magtag", "metro_m0", "metro_m0_tinyusb", "metro_m4", "metro_m4_tinyusb", "monster_m4sk", "monster_m4sk_tinyusb", "neokeytrinkey_m0", "neotrellis_m4", "nrf52832", "nrf52840", "protrinket_5v", "proxlighttrinkey_m0", "pybadge", "pygamer", "pyportal", "qt2040_trinkey", "qtpy_m0", "rotarytrinkey_m0", "slidetrinkey_m0", "trinket_m0" ]
     # "trinket_5v", was removed
     runs-on: ubuntu-18.04
 
