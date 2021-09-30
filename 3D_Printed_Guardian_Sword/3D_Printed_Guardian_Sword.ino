@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2017 Ruiz Brothers for Adafruit Industries
+S# SPDX-FileCopyrightText: 2017 Mikey Sklar for Adafruit Industries
 #
 # SPDX-License-Identifier: MIT
 #
