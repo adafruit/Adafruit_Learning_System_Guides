@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 John Edgar Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 // For Adafruit_AMRadio library -- Morse code transmits on AM 540.
 // Connect antenna (40" wire) to pin A0 and GND
 // RANGE IS LIMITED TO A FEW FEET
