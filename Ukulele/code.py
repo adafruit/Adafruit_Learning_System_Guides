@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Erin St. Blaine for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 LED Ukulele with Feather Sense and PropMaker Wing
 Adafruit invests time and resources providing this open source code.

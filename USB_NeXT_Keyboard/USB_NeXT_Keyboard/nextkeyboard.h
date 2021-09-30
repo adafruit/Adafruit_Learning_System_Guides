@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 #include "wsksymdef.h"
 
 /*	$NetBSD: wskbdmap_next.c,v 1.5 2008/04/28 20:23:30 martin Exp $	*/

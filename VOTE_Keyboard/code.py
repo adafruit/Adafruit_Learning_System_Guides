@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Collin Cunningham for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import board
 from digitalio import DigitalInOut, Direction, Pull
 import usb_hid

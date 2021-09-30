@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Erin St. Blaine for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 #include "Adafruit_FreeTouch.h"
 #include "FastLED.h"
 
