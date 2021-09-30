@@ -1,6 +1,6 @@
-# SPDX-FileCopyrightText: 2020 Limor Fried for Adafruit Industries
-#
-# SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2020 Limor Fried for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
 
 const uint8_t PROGMEM bitmap_2021[] = {
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
