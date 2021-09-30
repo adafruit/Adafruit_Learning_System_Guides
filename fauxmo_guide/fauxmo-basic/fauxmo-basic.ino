@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Brent Rubell for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include <ESPAsyncTCP.h>
