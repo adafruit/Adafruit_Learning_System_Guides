@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Erin St. Blaine for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 FancyLED Necklace Insert Code
 Written by Phil Burgess and Erin St Blaine for Adafruit Industries
