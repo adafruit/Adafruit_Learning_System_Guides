@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2017 Mikey Sklar for Adafruit Industries
+#
+# SPDX-License-Identifier: GNU
 #
 # 3D_Printed_NeoPixel_Ring_Hair_Dress.py
 #
@@ -9,7 +12,6 @@
 # major bug, you don't need tochange anything here
 #
 import time
-
 import board
 import neopixel
 
