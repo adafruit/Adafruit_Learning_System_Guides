@@ -1,5 +1,8 @@
-import time
+# SPDX-FileCopyrightText: 2017 by Mikey Sklar for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
 
+import time
 import board
 import neopixel
 from rainbowio import colorwheel
