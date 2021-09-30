@@ -1,8 +1,11 @@
+# SPDX-FileCopyrightText: 2021 Ruiz Brothers for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+#
 # 3D_Printed_Guardian_Sword
 # https://learn.adafruit.com/breath-of-the-wild-guardian-sword-led-3d-printed
 
 import time
-
 import board
 import neopixel
 
