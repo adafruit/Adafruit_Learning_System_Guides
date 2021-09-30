@@ -1,5 +1,8 @@
+# SPDX-FileCopyrightText: 2017 Phil Burgessr for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+#
 import time
-
 import board
 import neopixel
 
