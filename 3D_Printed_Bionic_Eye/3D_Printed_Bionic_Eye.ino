@@ -1,5 +1,6 @@
 /*******************************************************************
-  Bionic Eye sketch for Adafruit Trinket.  
+ 
+ Bionic Eye sketch for Adafruit Trinket.  
 
   by Bill Earl
   for Adafruit Industries
@@ -17,7 +18,10 @@
                                     (Orange)(Orange)
  
  *******************************************************************/
- 
+# SPDX-FileCopyrightText: 2018 Bill Earl for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 #include <Adafruit_SoftServo.h>  // SoftwareServo (works on non PWM pins)
  
 #define TILTSERVOPIN 0    // Servo control line (orange) on Trinket Pin #0
