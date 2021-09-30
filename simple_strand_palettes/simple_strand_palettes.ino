@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2017 firepixie for Adafruit Industries
+# SPDX-FileCopyrightText: 2017 Erin St. Blaine for Adafruit Industries
 #
 # SPDX-License-Identifier: MIT
 
