@@ -1,4 +1,7 @@
-
+# SPDX-FileCopyrightText: 2017 Mikey Sklar for Adafruit Industries
+#
+# SPDX-License-Identifier: GNU
+#
 /******************************************************************************
  *
  * this file is part of the gemma hoop animator example sketch
