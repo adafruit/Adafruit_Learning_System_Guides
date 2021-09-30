@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Brent Rubell for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Example for using the RFM69HCW Radio with Raspberry Pi.
 

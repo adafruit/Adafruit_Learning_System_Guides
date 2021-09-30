@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2017 firepixie for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 
 #include "FastLED.h"
 
