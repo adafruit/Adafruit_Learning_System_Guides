@@ -6,10 +6,14 @@
 */
 #include <Adafruit_NeoPixel.h>
 
+#ifdef USE_TINYUSB  // For Serial when selecting TinyUSB
+#include <Adafruit_TinyUSB.h>
+#endif
+
 // NeoPixel strip length, in pixels
 #define NUM_PIXELS 30
 
-#if defined(__SAMD21G18A__) || defined(__AVR_ATmega32U4__)
+#if defined(__SAMD21G18A__) || defined(__AVR_ATmega32U4__) || defined(NRF52840_XXAA)
   #define NEOPIXEL_PIN 5
   #define POWER_PIN    10
 #elif defined(__AVR_ATmega328P__)

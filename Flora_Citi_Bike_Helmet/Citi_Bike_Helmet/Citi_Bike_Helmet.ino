@@ -22,7 +22,7 @@ LSM303 compass;
 
 #define LAT_LON_SIZE 311
 
-float lat_lon[LAT_LON_SIZE][2] PROGMEM = {
+const float lat_lon[LAT_LON_SIZE][2] PROGMEM = {
   {40.767272, -73.993928},
   {40.719115, -74.006666},
   {40.711174, -74.000165},
@@ -475,7 +475,7 @@ void loop()                     // run over and over again
       //Serial.print("Altitude: "); Serial.println(GPS.altitude);
       //Serial.print("Satellites: "); Serial.println((int)GPS.satellites);
       compass.read();
-      int heading = compass.heading((LSM303::vector){0,-1,0});
+      int heading = compass.heading((LSM303::vector<int16_t>){0,-1,0});
       Serial.print("Heading: ");
       Serial.println(heading);
       if ((calc_bearing(fLat, fLon, targetLat, targetLon) - heading) > 0) {
@@ -639,8 +639,8 @@ unsigned long calc_dist(float flat1, float flon1, float flat2, float flon2)
 int find_closest_location(float current_lat, float current_lon)
 {  
   int closest = 0;
-  unsigned long minDistance = -1;
-  unsigned long tempDistance;
+  signed long minDistance = -1;
+  signed long tempDistance;
   for (int i=0; i < LAT_LON_SIZE; i++) {
     float target_lat = pgm_read_float(&lat_lon[i][0]);
     float target_lon = pgm_read_float(&lat_lon[i][1]);
@@ -729,7 +729,7 @@ void GoForward (uint32_t c, uint8_t wait) {
 
 // Slightly different, this makes the rainbow equally distributed throughout
 void rainbowCycle(uint8_t wait) {
-  uint16_t i, j;
+  uint16_t i;
 
   //for(j=0; j<256*5; j++) { // 5 cycles of all colors on wheel
     for(i=0; i< 10; i++) {
