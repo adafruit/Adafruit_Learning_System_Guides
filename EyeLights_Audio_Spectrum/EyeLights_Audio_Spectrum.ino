@@ -13,14 +13,13 @@ extern PDMClass             PDM;     // Mic
 #define NUM_SAMPLES   512               // Audio & FFT buffer, MUST be a power of two
 #define SPECTRUM_SIZE (NUM_SAMPLES / 2) // Output spectrum is 1/2 of FFT output
 
+short audio_buf[3][NUM_SAMPLES]; // Audio input buffers, 16-bit signed
+uint8_t active_buf = 0;          // Buffer # into which audio is currently recording
+volatile int samples_read = 0;   // # of samples read into current buffer thus far
+float spectrum[SPECTRUM_SIZE];   // FFT results are stored & further processed here
 
-short sampleBuffer[NUM_SAMPLES];  // buffer to read samples into, each sample is 16-bits
-
-//short sbuf[2][NUM_SAMPLES];
-//uint8_t sbuf_idx = 0;
-
-volatile int samplesRead; // number of samples read (set in interrupt)
-
+//short sampleBuffer[NUM_SAMPLES];  // buffer to read samples into, each sample is 16-bits
+short *sampleBuffer;
 
 // Bottom of spectrum tends to be noisy, while top often exceeds musical
 // range and is just harmonics, so clip both ends off:
@@ -34,13 +33,13 @@ void err(char *str, uint8_t hz) {
   for (;;) digitalWrite(LED_BUILTIN, (millis() * hz / 500) & 1);
 }
 
-float data[SPECTRUM_SIZE];
 
 struct {
   int      first_bin;
   int      num_bins;
   float   *bin_weights;
   uint32_t color;
+  float    top;
   float    dot;
   float    velocity;  
 } column_table[18];
@@ -89,18 +88,19 @@ Serial.printf("%d %f %f\n", spectrum_bits, low_frac, frac_range);
     Serial.println();
     Serial.println(column);
     for (int i=0; i<num_bins; i++) {
-      column_table[column].bin_weights[i] = column_table[column].bin_weights[i] / total_weight * (0.6 + (float)i / 18.0 * 1.8);
+      column_table[column].bin_weights[i] = column_table[column].bin_weights[i] / total_weight * (0.6 + (float)i / 18.0 * 2.0);
       Serial.printf("  %f\n", column_table[column].bin_weights[i]);
     }
     column_table[column].first_bin = first_bin;
     column_table[column].num_bins = num_bins;
     column_table[column].color = glasses.color565(glasses.ColorHSV(57600UL * column / 18, 255, 255));
-    column_table[column].dot = 5.0;
+    column_table[column].top = 6.0;
+    column_table[column].dot = 6.0;
     column_table[column].velocity = 0.0;
   }
 
   for (int i=0; i<SPECTRUM_SIZE; i++) {
-    data[i] = 0.0;
+    spectrum[i] = 0.0;
   }
 
   // Configure glasses for max brightness, enable output
@@ -120,57 +120,46 @@ float dynamic_level = 6.0;
 volatile bool mic_on = false;
 
 void loop() { // Repeat forever...
-  int samplesRemaining = NUM_SAMPLES;
-  samplesRead = 0;
-  mic_on = true;
-  while (samplesRemaining) {
-    if(samplesRead) { // Set in onPDMdata()
-      samplesRemaining -= samplesRead;
-      samplesRead = 0;
-    }
-    yield();
-  }
-  mic_on = false;
 
-// To do: could record into alternating buffers
+  short *audio_data;
 
-  ZeroFFT(sampleBuffer, NUM_SAMPLES);
+  while (mic_on) yield(); // Wait for next buffer to finish recording
+  // Full buffer received -- active_buf is index to new data
+  audio_data = &audio_buf[active_buf][0]; // New data is here
+  active_buf = 1 - active_buf; // Swap buffers to record into other,
+  mic_on = true;               // and start recording next batch
 
+  // Perform FFT operation on newly-received data,
+  // results go back into the same buffer.
+  ZeroFFT(audio_data, NUM_SAMPLES);
 
-  // Convert FFT output to spectrum
-  for(int i=0; i<SPECTRUM_SIZE; i++) {
-//    data[i] = (data[i] * 0.25) + ((float)sampleBuffer[i] * 0.75);
-    data[i] = (data[i] * 0.2) + ((sampleBuffer[i] ? log((float)sampleBuffer[i]) : 0.0) * 0.8);
-//    data[i] = (float)sampleBuffer[i];
+  // Convert FFT output to spectrum. log(y) looks better than raw data.
+  for(int i=LOW_BIN; i<=HIGH_BIN; i++) {
+    spectrum[i] = (audio_data[i] > 0) ? log((float)audio_data[i]) : 0.0;
   }
 
-  float lower = data[0], upper = data[0];
-  for (int i=1; i<SPECTRUM_SIZE; i++) {
-    if (data[i] < lower) lower = data[i];
-    if (data[i] > upper) upper = data[i];
+  // Find min & max range of spectrum values
+  float lower = spectrum[LOW_BIN], upper = spectrum[LOW_BIN];
+  for (int i=LOW_BIN+1; i<=HIGH_BIN; i++) {
+    if (spectrum[i] < lower) lower = spectrum[i];
+    if (spectrum[i] > upper) upper = spectrum[i];
   }
-//  Serial.printf("%f %f\n", lower, upper);
-//  if (lower < 4) lower = 4;
-//  if (upper < 10) upper = 10;
-  if (upper < 4.5) upper = 4.5; // because log
-
-
+  //Serial.printf("%f %f\n", lower, upper);
+  if (upper < 3.2) upper = 3.2;
 
   if (upper > dynamic_level) {
     // Got louder. Move level up quickly but allow initial "bump."
-    dynamic_level = upper * 0.5 + dynamic_level * 0.5;
+    dynamic_level = dynamic_level * 0.4 + upper * 0.6;
   } else {
     // Got quieter. Ease level down, else too many bumps.
-    dynamic_level = dynamic_level * 0.7 + lower * 0.3;
+    dynamic_level = dynamic_level * 0.75 + lower * 0.25;
   }
-//  dynamic_level = 20.0;
-//dynamic_level = upper;
 
   // Apply vertical scale to spectrum data. Results may exceed
   // matrix height...that's OK, adds impact!
-  float scale = 10.0 / (dynamic_level - lower);
-  for (int i=0; i<SPECTRUM_SIZE; i++) {
-    data[i] = (data[i] - lower) * scale;
+  float scale = 12.0 / (dynamic_level - lower);
+  for (int i=LOW_BIN; i<=HIGH_BIN; i++) {
+    spectrum[i] = (spectrum[i] - lower) * scale;
   }
 
   glasses.fill(0);
@@ -178,18 +167,23 @@ void loop() { // Repeat forever...
     int first_bin = column_table[column].first_bin;
     float column_top = 7.0;
     for (int bin_offset=0; bin_offset<column_table[column].num_bins; bin_offset++) {
-      column_top -= data[first_bin + bin_offset] * column_table[column].bin_weights[bin_offset];
+      column_top -= spectrum[first_bin + bin_offset] * column_table[column].bin_weights[bin_offset];
     }
+    // Column tops are filtered to appear less 'twitchy' --
+    // last data still has a 30% influence on current positions.
+    column_top = (column_top * 0.7) +  (column_table[column].top * 0.3);
+    column_table[column].top = column_top;
+
     if(column_top < column_table[column].dot) {
       column_table[column].dot = column_top - 0.5;
       column_table[column].velocity = 0.0;
     } else {
       column_table[column].dot += column_table[column].velocity;
-      column_table[column].velocity += 0.01;
+      column_table[column].velocity += 0.02;
     }
 
     int itop = (int)column_top;
-    glasses.drawLine(column, itop, column, itop + 50, column_table[column].color);
+    glasses.drawLine(column, itop, column, itop + 20, column_table[column].color);
     glasses.drawPixel(column, (int)column_table[column].dot, 0xE410);
   }
 
@@ -197,33 +191,25 @@ void loop() { // Repeat forever...
 
   frames += 1;
   uint32_t elapsed = millis() - start_time;
-//  Serial.println(frames * 1000 / elapsed);
+  Serial.println(frames * 1000 / elapsed);
 }
 
-int16_t bitbucket[512];
 void onPDMdata() {
-  pinMode(LED_BUILTIN, OUTPUT);
-  digitalWrite(LED_BUILTIN, (millis() * 2 / 500) & 1);
-
-  int bytesAvailable = PDM.available();
-  if (mic_on) {
-// wait, what? shouldn't this increment until full?
-// yes it should. No wonder.
-    if (bytesAvailable) {
-      int maxbytes = (NUM_SAMPLES - samplesRead) * 2;
-      if (bytesAvailable > maxbytes) bytesAvailable = maxbytes;
-      PDM.read(&sampleBuffer[samplesRead], bytesAvailable);
- //     PDM.read(sampleBuffer, bytesAvailable);
-      samplesRead = bytesAvailable / 2;
-    }
-  } else {
-    if (bytesAvailable) {
-      PDM.read(bitbucket, bytesAvailable);
+  digitalWrite(LED_BUILTIN, millis() & 1024); // Debug heartbeat
+  if (int bytes_to_read = PDM.available()) {
+    if (mic_on) {
+      int byte_limit = (NUM_SAMPLES - samples_read) * 2; // Space remaining,
+      bytes_to_read = min(bytes_to_read, byte_limit);    // don't overflow!
+      PDM.read(&audio_buf[active_buf][samples_read], bytes_to_read);
+      samples_read += bytes_to_read / 2; // Increment counter
+      if (samples_read >= NUM_SAMPLES) { // Buffer full?
+        mic_on = false;                  // Stop and
+        samples_read = 0;                // reset counter for next time
+      }
+    } else {
+      // Mic is off (code is busy) - must read but discard data.
+      // audio_buf[2] is a 'bit bucket' for this.
+      PDM.read(audio_buf[2], bytes_to_read);
     }
   }
-// When buffer is full...
-// indicate to calling code that it's ready
-// stop recording
-// calling code will indicate that next buffer is ready
-
 }
