@@ -90,25 +90,28 @@ void setup() {
   // initialize 
 
   Serial.println("Hello! Arcada version of game");
-  if (!arcada.begin()) {
+  if (!arcada.arcadaBegin()) {
     Serial.print("Failed to begin");
     strip.fill(RED);
     strip.show();
     while (1);
   }
+
+  arcada.displayBegin();         // Initialize display code
+  arcada.setBacklight(0);        // Initial display off
+  arcada.display->setRotation(0);         // Rotate to portrait
+  arcada.display->fillScreen(background); // Clear screen if necessary
+  arcada.display->setTextColor(ARCADA_GREEN, ARCADA_BLACK);
+  arcada.display->setTextSize(2);
+  arcada.display->println(" ");
+  arcada.display->println("  Bounce!");
+
   if( !arcada.hasAccel() ) {
     strip.fill(YELLOW);
     strip.show();
     arcada.haltBox("An accelerometer is required for this gamne");
   }
-  arcada.displayBegin();         // Initialize display code
-  arcada.setBacklight(0);        // Initial display off
-  arcada.setRotation(0);         // Rotate to portrait
-  arcada.fillScreen(background); // Clear screen if necessary
-  arcada.setTextColor(ARCADA_GREEN, ARCADA_BLACK);
-  arcada.setTextSize(2);
-  arcada.println(" ");
-  arcada.println("  Bounce!");
+
   // Set up the logo bitmap
   int logo_origin_x = (128 - 2*LOGO_WIDTH ) / 2;
   int logo_origin_y = (160 - 2*LOGO_HEIGHT) / 2;
@@ -118,34 +121,34 @@ void setup() {
       if(c & (0x80 >> (x & 7))) {
         int xx = logo_origin_x+2*x;
         int yy = logo_origin_y+2*y;
-        arcada.drawPixel(xx, yy, ARCADA_WHITE);
-        arcada.drawPixel(xx+1, yy, ARCADA_WHITE);
-        arcada.drawPixel(xx, yy+1, ARCADA_WHITE);
-        arcada.drawPixel(xx+1, yy+1, ARCADA_WHITE);
+        arcada.display->drawPixel(xx, yy, ARCADA_WHITE);
+        arcada.display->drawPixel(xx+1, yy, ARCADA_WHITE);
+        arcada.display->drawPixel(xx, yy+1, ARCADA_WHITE);
+        arcada.display->drawPixel(xx+1, yy+1, ARCADA_WHITE);
       }
     }
   }
-  arcada.println(" ");
-  arcada.println(" ");
-  arcada.println(" ");
-  arcada.println(" ");
-  arcada.println(" ");
-  arcada.setTextColor(ARCADA_ORANGE, ARCADA_BLACK);
-  arcada.setTextSize(1);
-  arcada.println(" ");
-  arcada.println("  Adafruit");
-  arcada.println("   Industries");
+  arcada.display->println(" ");
+  arcada.display->println(" ");
+  arcada.display->println(" ");
+  arcada.display->println(" ");
+  arcada.display->println(" ");
+  arcada.display->setTextColor(ARCADA_ORANGE, ARCADA_BLACK);
+  arcada.display->setTextSize(1);
+  arcada.display->println(" ");
+  arcada.display->println("  Adafruit");
+  arcada.display->println("   Industries");
   for (int i=0; i<220; i++) {    // Display initial text
     arcada.setBacklight(i);
     delay(14);
   }
   arcada.setBacklight(250);
-  arcada.setTextColor(ST7735_WHITE, ST7735_BLACK);
-  arcada.println(" ");
-  arcada.println(" ");
-  arcada.println("  Press Start");
+  arcada.display->setTextColor(ST7735_WHITE, ST7735_BLACK);
+  arcada.display->println(" ");
+  arcada.display->println(" ");
+  arcada.display->println("  Press Start");
   while(!(arcada.readButtons() & ARCADA_BUTTONMASK_START)) ; // wait for start button
-  arcada.fillScreen(background);                             // Clear screen
+  arcada.display->fillScreen(background);                             // Clear screen
 
   arcada.enableSpeaker(1);   // Enable the speaker and play opening tones
   pinMode(sound_pin, OUTPUT);
@@ -187,7 +190,7 @@ void loop() {
 
 int acc_avg(int pin) {
   int avg = 0;
-  arcada.accel.getEvent(&event);
+  arcada.accel->getEvent(&event);
   switch (pin) {
     case acc_pinX:
        for(int i = 0; i < 50; i++) {
@@ -214,7 +217,7 @@ int acc_avg(int pin) {
 
 int acc_readX() {
   int val;
-  arcada.accel.getEvent(&event);
+  arcada.accel->getEvent(&event);
   val = -1 * constrain((event.acceleration.y - acc_avgY)*7, -64, 64); // use Y for orientation
   // Serial.print("Acceleration: ");                                  // joystick is at top
   // Serial.println(val);
@@ -241,8 +244,8 @@ void BonusReset(){
   nextBonus = random(30, 60);
   b_pendingPlatform = false;
   b_remaining = 0;
-  arcada.fillRect(0, s_height+2, 96, 10, background);
-  arcada.fillRect(0, s_height+1, 96, 1, w_color);
+  arcada.display->fillRect(0, s_height+2, 96, 10, background);
+  arcada.display->fillRect(0, s_height+1, 96, 1, w_color);
   EndUseBonus();
 }
 
@@ -250,8 +253,8 @@ void ClearBonus(){
   EndUseBonus();
   b_remaining = 0;
   p_color = p_color_default;
-  arcada.fillRect(0, s_height+2, 96, 10, background);
-  arcada.fillRect(0, s_height+1, s_width-1,  1, w_color);
+  arcada.display->fillRect(0, s_height+2, 96, 10, background);
+  arcada.display->fillRect(0, s_height+1, s_width-1,  1, w_color);
   b_used = false;
 }
 
@@ -261,7 +264,7 @@ void GetBonus(){
   b_pendingPlatform = false;
   beep(sound_pin, 3500, 50);  // SOUND
   p_color = b_colors[b_onUseID];
-  arcada.fillRect(0, s_height+2, 96, 10, background);
+  arcada.display->fillRect(0, s_height+2, 96, 10, background);
 
   switch (b_onUseID){
   case 0:
@@ -286,19 +289,19 @@ void GetBonus(){
     break;
   }
   if(b_remaining > 1) {
-    arcada.fillRect(95, s_height+2, 1, 10, b_colors[b_onUseID]);
-    arcada.fillRect( 0, s_height+1, 95, 1, b_colors[b_onUseID]);
+    arcada.display->fillRect(95, s_height+2, 1, 10, b_colors[b_onUseID]);
+    arcada.display->fillRect( 0, s_height+1, 95, 1, b_colors[b_onUseID]);
   }
 }
 
 void UseBonus(){
   if(b_remaining){
     b_used = true;
-    arcada.fillRect(b_remaining*95/b_max, s_height+2, 1, 10, background);
-    arcada.drawPixel(b_remaining*95/b_max, s_height+1, w_color);
+    arcada.display->fillRect(b_remaining*95/b_max, s_height+2, 1, 10, background);
+    arcada.display->drawPixel(b_remaining*95/b_max, s_height+1, w_color);
     b_remaining --;
-    arcada.fillRect(b_remaining*95/b_max, s_height+2, 1, 10, b_colors[b_onUseID]);
-    arcada.drawPixel(b_remaining*95/b_max, s_height+1, b_colors[b_onUseID]);
+    arcada.display->fillRect(b_remaining*95/b_max, s_height+2, 1, 10, b_colors[b_onUseID]);
+    arcada.display->drawPixel(b_remaining*95/b_max, s_height+1, b_colors[b_onUseID]);
 
     switch (b_onUseID){
     case 0:
@@ -378,20 +381,20 @@ void CheckButtons(){
        drawChar(s_width-6, textline2, speaker_icon, ARCADA_RED);  // Put character in lower right corner to indicate speaker off
     } else {
        sound_on = 1;
-       arcada.fillRect( s_width-6, textline2, s_width-1, textline2+9, background); // Blank lower right character = sound on
+       arcada.display->fillRect( s_width-6, textline2, s_width-1, textline2+9, background); // Blank lower right character = sound on
     }
   }
 }
 
 void DrawPlayer(){
   CheckButtons();  // check more frequently
-  arcada.fillRect(p_lastX, p_lastY, p_width, p_height, background); // erase previous pos
+  arcada.display->fillRect(p_lastX, p_lastY, p_width, p_height, background); // erase previous pos
   if(p_lastX > (s_width-1 - p_width)) // if across the edge of the screen
-    arcada.fillRect(0, p_lastY, p_lastX + p_width - s_width, p_height, background);
+    arcada.display->fillRect(0, p_lastY, p_lastX + p_width - s_width, p_height, background);
 
-  arcada.fillRect(p_X, p_Y, p_width, p_height, p_color); // draw new pos
+  arcada.display->fillRect(p_X, p_Y, p_width, p_height, p_color); // draw new pos
   if(p_X > (s_width-1 - p_width)) // if across the edge of the screen
-    arcada.fillRect(0, p_Y, p_X + p_width - s_width, p_height, p_color);
+    arcada.display->fillRect(0, p_Y, p_X + p_width - s_width, p_height, p_color);
 }
 
 void MovePlayer(){
@@ -429,7 +432,7 @@ void CollideBorders() {
       }
     } 
     else {
-      arcada.fillRect(p_lastX, p_lastY, p_width, p_height, background);
+      arcada.display->fillRect(p_lastX, p_lastY, p_width, p_height, background);
       p_width--;
       p_height--;
       b_lives--;
@@ -439,8 +442,8 @@ void CollideBorders() {
 }
 
 void ScoreSetup(){
-  arcada.fillRect(0, s_height+2, 128, 10, background);
-  arcada.fillRect(0, s_height+1, 128, 1, w_color);
+  arcada.display->fillRect(0, s_height+2, 128, 10, background);
+  arcada.display->fillRect(0, s_height+1, 128, 1, w_color);
   // highscore = EEPROM.read(0);
   // highscore += (EEPROM.read(1)<<8);
   if(highscore > 64000){
@@ -478,11 +481,11 @@ void ScoreReset(){
 
 void flashMessage() {
    uint8_t i;
-   arcada.fillRect( 0, textline2, s_width-10, textline2+9, background);
+   arcada.display->fillRect( 0, textline2, s_width-10, textline2+9, background);
    for(i=0; i<5; i++) {
      drawString(1, textline2, "HIGHSCORE!", p_color_default, 1);
      delay(400);
-     arcada.fillRect( 0, textline2, s_width-10, textline2+9, background);
+     arcada.display->fillRect( 0, textline2, s_width-10, textline2+9, background);
      delay(400);
    }
    drawString(1, textline2, "High score:", w_color, 1);  
@@ -507,7 +510,7 @@ void ScoreAdd(){ // add to the current score lower left
 
 // transform from int to string and display it
 void drawInt(unsigned int num, byte nx, byte ny, unsigned int color, unsigned int color2) {
-  arcada.fillRect(nx, ny, 29, 7, color2);
+  arcada.display->fillRect(nx, ny, 29, 7, color2);
   drawChar(nx+24, ny, 48+(num%10), color);
 
   if(num > 9) {
@@ -593,26 +596,26 @@ void CollideWorld() {
 
 void DrawWorld() {
   for(byte i=0; i<w_size; i++) {
-    arcada.fillRect(world[i][2], world[i][3], world[i][5], 1, background);
-    arcada.fillRect(world[i][0], world[i][1], world[i][4], 1, w_color);
+    arcada.display->fillRect(world[i][2], world[i][3], world[i][5], 1, background);
+    arcada.display->fillRect(world[i][0], world[i][1], world[i][4], 1, w_color);
   }
   if(b_pendingPlatform){
-    arcada.fillRect(world[b_platformID][0], world[b_platformID][1], world[b_platformID][4], 1, b_colors[b_pendingID]);
+    arcada.display->fillRect(world[b_platformID][0], world[b_platformID][1], world[b_platformID][4], 1, b_colors[b_pendingID]);
   }
 }
 
 
 void drawString(byte x, byte y, char *text, uint16_t color, bool wrap) { // replicate tft.drawString
-  arcada.setCursor(x,y);
-  arcada.setTextColor(color);
-  arcada.setTextWrap(wrap);
-  arcada.print(text);
+  arcada.display->setCursor(x,y);
+  arcada.display->setTextColor(color);
+  arcada.display->setTextWrap(wrap);
+  arcada.display->print(text);
 }
 
 void drawChar(byte x, byte y, char text, uint16_t color) { // replicate tft.drawChar
-  arcada.setCursor(x,y);
-  arcada.setTextColor(color);  
-  arcada.print(text);
+  arcada.display->setCursor(x,y);
+  arcada.display->setTextColor(color);  
+  arcada.display->print(text);
   Serial.println(text);
 }
 
