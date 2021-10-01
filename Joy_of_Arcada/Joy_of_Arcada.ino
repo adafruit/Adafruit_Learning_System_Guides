@@ -134,7 +134,7 @@ void setup() {
   // in which they are initialized. HID MUST be initialized before
   // Serial, which must be initialized before the display.
 
-  int status = arcada.begin(); // Save status for Serial print later
+  int status = arcada.arcadaBegin(); // Save status for Serial print later
 
   // HID (keyboard) initialization
   usb_hid.setPollInterval(2);
@@ -157,7 +157,7 @@ void setup() {
   // Display initialization. This is all part of the persnickety sequence!
   arcada.displayBegin();
   arcada.setBacklight(255);
-  arcada.fillScreen(ARCADA_BLACK);
+  arcada.display->fillScreen(ARCADA_BLACK);
 
   // Audio initialization
   AudioMemory(10);
@@ -192,10 +192,10 @@ void setup() {
   }
 
   // At start, draw the entire blank/neutral face centered on screen
-  arcada.fillScreen(ARCADA_BLACK); // Erase any warnBoxes first
-  arcada.drawRGBBitmap(
-    (arcada.width()  - FACE_WIDTH ) / 2,
-    (arcada.height() - FACE_HEIGHT) / 2,
+  arcada.display->fillScreen(ARCADA_BLACK); // Erase any warnBoxes first
+  arcada.display->drawRGBBitmap(
+    (arcada.display->width()  - FACE_WIDTH ) / 2,
+    (arcada.display->height() - FACE_HEIGHT) / 2,
     (uint16_t *)face, FACE_WIDTH, FACE_HEIGHT);
 
   // Create an offscreen framebuffer that's just the bounding
@@ -426,7 +426,7 @@ void loop() {
   // while a screen update is currently in progress. (This is assuming
   // SPI DMA is enabled in Adafruit_SPITFT.h. If it is not, that's OK,
   // this function call simply compiles to nothing in that case.)
-  arcada.dmaWait();
+  arcada.display->dmaWait();
 
   if(openRows) {
     // Draw the open section of the eyes, then draw the pupils on top
@@ -484,7 +484,7 @@ void loop() {
   // is used...this is fastest as it can continue in the background
   // (while we process input on the next frame).
   arcada.blitFrameBuffer(
-    (arcada.width()  - FACE_WIDTH ) / 2 + 13,
-    (arcada.height() - FACE_HEIGHT) / 2 + 25,
+    (arcada.display->width()  - FACE_WIDTH ) / 2 + 13,
+    (arcada.display->height() - FACE_HEIGHT) / 2 + 25,
     false, true); // Non-blocking, big-endian
 }
