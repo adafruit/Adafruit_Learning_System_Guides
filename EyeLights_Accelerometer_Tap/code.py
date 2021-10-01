@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Phil Burgess for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 ACCELEROMETER INPUT DEMO: while the LED Glasses Driver has a perfectly
 good clicky button for input, this code shows how one might instead use
