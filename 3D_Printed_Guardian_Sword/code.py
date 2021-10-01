@@ -1,14 +1,17 @@
+# SPDX-FileCopyrightText: 2018 Mikey Sklar for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # 3D_Printed_Guardian_Sword
 # https://learn.adafruit.com/breath-of-the-wild-guardian-sword-led-3d-printed
 
 import time
-
 import board
 import neopixel
 
-pin = board.D4  # DIGITAL IO pin for NeoPixel OUTPUT from GEMMA
+pin = board.D4    # DIGITAL IO pin for NeoPixel OUTPUT from GEMMA
 pixel_count = 93  # number of neopixels
-delayval = .01  # 10 ms delay
+delayval = .01    # 10 ms delay
 
 APIXELS = 14  # number of first orange pixels
 BPIXELS = 84  # number of blue pixels

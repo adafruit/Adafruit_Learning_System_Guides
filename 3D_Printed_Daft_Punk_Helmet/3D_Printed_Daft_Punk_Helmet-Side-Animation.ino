@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2018 Mikey Sklar for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
 // Adafruit Trinket+NeoPixel animation for Daft Punk-inspired helmet.
 // Contains some ATtiny85-specific stuff; won't run as-is on Uno, etc.
 
