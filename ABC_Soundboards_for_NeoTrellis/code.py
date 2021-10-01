@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Anne Barela for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+#
 # Talking A, B, Cs Soundboards: Animal ABCs and "E is for Electronics" ABCs
 
 import time
