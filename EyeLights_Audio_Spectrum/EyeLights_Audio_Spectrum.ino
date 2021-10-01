@@ -1,4 +1,6 @@
 /*
+AUDIO SPECTRUM LIGHT SHOW for Adafruit EyeLights (LED Glasses + Driver).
+Uses onboard microphone and a lot of math to react to music.
 */
 
 #include <Adafruit_IS31FL3741.h> // For LED driver
@@ -6,19 +8,22 @@
 #include <Adafruit_ZeroFFT.h>    // For math
 
 Adafruit_EyeLights_buffered glasses; // Buffered for smooth animation
-extern PDMClass             PDM;
+extern PDMClass             PDM;     // Mic
 
-#define NUM_SAMPLES 512 // FFT size, MUST be a power of two
+#define NUM_SAMPLES   512               // Audio & FFT buffer, MUST be a power of two
+#define SPECTRUM_SIZE (NUM_SAMPLES / 2) // Output spectrum is 1/2 of FFT output
+
+
 short sampleBuffer[NUM_SAMPLES];  // buffer to read samples into, each sample is 16-bits
+
+//short sbuf[2][NUM_SAMPLES];
+//uint8_t sbuf_idx = 0;
+
 volatile int samplesRead; // number of samples read (set in interrupt)
 
-#define SPECTRUM_SIZE (NUM_SAMPLES / 2) // Output spectrum is 1/2 of FFT result
 
 // Bottom of spectrum tends to be noisy, while top often exceeds musical
 // range and is just harmonics, so clip both ends off:
-//#define LOW_BIN  10  // Lowest bin of spectrum that contributes to graph
-//#define HIGH_BIN 75 // Highest bin "
-
 #define LOW_BIN  3   // Lowest bin of spectrum that contributes to graph
 #define HIGH_BIN 180 // Highest bin "
 
@@ -47,7 +52,7 @@ void setup() { // Runs once at program start...
 
   // Initialize hardware
   Serial.begin(115200);
-//while(!Serial);
+while(!Serial);
   if (! glasses.begin()) err("IS3741 not found", 2);
 
   uint8_t spectrum_bits = (int)log2f((float)SPECTRUM_SIZE);
@@ -121,6 +126,7 @@ void loop() { // Repeat forever...
   while (samplesRemaining) {
     if(samplesRead) { // Set in onPDMdata()
       samplesRemaining -= samplesRead;
+      samplesRead = 0;
     }
     yield();
   }
@@ -131,21 +137,11 @@ void loop() { // Repeat forever...
   ZeroFFT(sampleBuffer, NUM_SAMPLES);
 
 
-
   // Convert FFT output to spectrum
   for(int i=0; i<SPECTRUM_SIZE; i++) {
 //    data[i] = (data[i] * 0.25) + ((float)sampleBuffer[i] * 0.75);
     data[i] = (data[i] * 0.2) + ((sampleBuffer[i] ? log((float)sampleBuffer[i]) : 0.0) * 0.8);
 //    data[i] = (float)sampleBuffer[i];
-#if 0
-    uint32_t mag2 = fr[i] * fr[i] + fi[i] * fi[i];
-    if (mag2) {
-      data[i] = log(sqrt((float)mag2));
-//      data[i] = sqrt((float)mag2);
-    } else {
-      data[i] = 0.0;
-    }
-#endif
   }
 
   float lower = data[0], upper = data[0];
@@ -204,16 +200,30 @@ void loop() { // Repeat forever...
 //  Serial.println(frames * 1000 / elapsed);
 }
 
-
+int16_t bitbucket[512];
 void onPDMdata() {
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, (millis() * 2 / 500) & 1);
+
+  int bytesAvailable = PDM.available();
   if (mic_on) {
-    // query the number of bytes available
-    int bytesAvailable = PDM.available();
-  
-    // read into the sample buffer
-    PDM.read(sampleBuffer, bytesAvailable);
-  
-    // 16-bit, 2 bytes per sample
-    samplesRead = bytesAvailable / 2;
+// wait, what? shouldn't this increment until full?
+// yes it should. No wonder.
+    if (bytesAvailable) {
+      int maxbytes = (NUM_SAMPLES - samplesRead) * 2;
+      if (bytesAvailable > maxbytes) bytesAvailable = maxbytes;
+      PDM.read(&sampleBuffer[samplesRead], bytesAvailable);
+ //     PDM.read(sampleBuffer, bytesAvailable);
+      samplesRead = bytesAvailable / 2;
+    }
+  } else {
+    if (bytesAvailable) {
+      PDM.read(bitbucket, bytesAvailable);
+    }
   }
+// When buffer is full...
+// indicate to calling code that it's ready
+// stop recording
+// calling code will indicate that next buffer is ready
+
 }
