@@ -1,6 +1,7 @@
 /*
 AUDIO SPECTRUM LIGHT SHOW for Adafruit EyeLights (LED Glasses + Driver).
 Uses onboard microphone and a lot of math to react to music.
+REQUIRES Adafruit_ZeroFFT LIBRARY, install via Arduino Library manager.
 */
 
 #include <Adafruit_IS31FL3741.h> // For LED driver

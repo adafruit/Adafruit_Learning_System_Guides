@@ -23,7 +23,7 @@ public:
     // so rings don't spin in perfect lockstep.
     angle = random(1000);
     momentum = 0.0;
-    friction = 0.9 + random(500) * 0.0001; // Inverse friction, really
+    friction = 0.94 + random(300) * 0.0001; // Inverse friction, really
   }
 
   // Given a pixel index (0-23) and a scaling factor (0.0-1.0),
@@ -41,9 +41,9 @@ public:
   // physics simulation and render the corresponding LED ring.
   void iterate(sensors_event_t &event) {
     // Minus here is because LED pixel indices run clockwise vs. trigwise.
-    // 0.004 is just an empirically-derived scaling fudge factor that looks
+    // 0.006 is just an empirically-derived scaling fudge factor that looks
     // good; smaller values for more sluggish rings, higher = more twitch.
-    momentum =  momentum * friction - 0.004 *
+    momentum =  momentum * friction - 0.006 *
       (cos(angle) * event.acceleration.z +
        sin(angle) * event.acceleration.x);
     angle += momentum;
