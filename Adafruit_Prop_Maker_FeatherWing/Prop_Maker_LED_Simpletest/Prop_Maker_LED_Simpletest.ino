@@ -5,7 +5,7 @@
 * Rainbow swirl example for 3W LED.
 */
 
-#if defined(__SAMD21G18A__) || defined(__AVR_ATmega32U4__)
+#if defined(__SAMD21G18A__) || defined(__AVR_ATmega32U4__) || defined(NRF52840)
   // No green PWM on 32u4
   #define POWER_PIN    10
   #define RED_LED      11

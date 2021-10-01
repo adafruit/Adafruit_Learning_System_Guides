@@ -5,7 +5,7 @@
 * Print to the Serial Montior when a switch is pressed.
 */
 
-#if defined(__SAMD21G18A__) || defined(__AVR_ATmega32U4__)
+#if defined(__SAMD21G18A__) || defined(__AVR_ATmega32U4__) || defined(NRF52840)
   #define SWITCH_PIN   9
 #elif defined(__AVR_ATmega328P__)
   #define SWITCH_PIN   9
