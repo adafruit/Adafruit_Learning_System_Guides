@@ -5,7 +5,11 @@
 * Print to the Serial Montior when a switch is pressed.
 */
 
-#if defined(__SAMD21G18A__) || defined(__AVR_ATmega32U4__) || defined(NRF52840)
+#ifdef USE_TINYUSB  // For Serial when selecting TinyUSB
+#include <Adafruit_TinyUSB.h>
+#endif
+
+#if defined(__SAMD21G18A__) || defined(__AVR_ATmega32U4__) || defined(NRF52840_XXAA)
   #define SWITCH_PIN   9
 #elif defined(__AVR_ATmega328P__)
   #define SWITCH_PIN   9
