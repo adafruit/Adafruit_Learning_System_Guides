@@ -26,7 +26,7 @@ struct {
 long fade; // Decreases brightness as wave moves
 
 // Gamma correction improves appearance of midrange colors
-uint8_t gamma[] PROGMEM = {
+const uint8_t gamma[] PROGMEM = {
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  1,  1,  1,
     1,  1,  1,  1,  1,  1,  1,  1,  1,  2,  2,  2,  2,  2,  2,  2,
