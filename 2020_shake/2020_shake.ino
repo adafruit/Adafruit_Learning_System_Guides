@@ -1,6 +1,6 @@
-# SPDX-FileCopyrightText: 2020 Limor Fried for Adafruit Industries
-#
-# SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2020 Limor Fried for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
 
 #include <Adafruit_LIS3DH.h>      // For accelerometer
 #include <Adafruit_PixelDust.h>   // For simulation
