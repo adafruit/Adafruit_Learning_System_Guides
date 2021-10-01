@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2021 Phil Burgess for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /*
 AUDIO SPECTRUM LIGHT SHOW for Adafruit EyeLights (LED Glasses + Driver).
 Uses onboard microphone and a lot of math to react to music.
