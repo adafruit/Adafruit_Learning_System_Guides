@@ -101,9 +101,12 @@ key3_pressed = False
 #  array for button states
 key_states = [key0_pressed, key1_pressed, key2_pressed, key3_pressed]
 
+last_p = p
 while True:
     #  default tile grid position
-    parrot0_grid[a] = p
+    if last_p != p:
+        parrot0_grid[a] = p
+        last_p = p
 
     #  iterate through 4 buttons
     for i in range(4):
