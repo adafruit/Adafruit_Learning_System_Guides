@@ -1,6 +1,6 @@
-# SPDX-FileCopyrightText: 2017 John Park for Adafruit Industries
-#
-# SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2017 John Park for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
 
 #include "Arduino.h"
 #include "Keypad.h"

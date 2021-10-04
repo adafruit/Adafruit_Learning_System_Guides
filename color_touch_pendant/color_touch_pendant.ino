@@ -1,6 +1,6 @@
-# SPDX-FileCopyrightText: 2018 Erin St. Blaine for Adafruit Industries
-#
-# SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2018 Erin St. Blaine for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
 
 // Code by Erin St. Blaine for Adafruit Industries
 // Color Touch Pendant Tutorial: https://learn.adafruit.com/color-touch-pendant-necklace/introduction

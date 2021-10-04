@@ -1,6 +1,6 @@
-# SPDX-FileCopyrightText: 2019 Brent Rubell for Adafruit Industries
-#
-# SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2019 Brent Rubell for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
 
 #include <SPI.h>
 #include <SD.h>
