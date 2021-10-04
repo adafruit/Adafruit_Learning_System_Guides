@@ -1,6 +1,6 @@
-# SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
-#
-# SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
 
 // NeXT non-ADB Keyboard to USB converter
 // This will take an older NeXT keyboard, talk to it, and turn the keycodes into a USB keyboard

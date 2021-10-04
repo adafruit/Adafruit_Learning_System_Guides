@@ -1,6 +1,6 @@
-# SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
-#
-# SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
 
 #define REPEATRATE 100  // milliseconds
 

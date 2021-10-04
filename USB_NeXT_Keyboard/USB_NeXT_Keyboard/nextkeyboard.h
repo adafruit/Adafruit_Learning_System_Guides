@@ -1,6 +1,6 @@
-# SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
-#
-# SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 1997 Juergen Hannken-Illjes for The NetBSD Foundation
+//
+// SPDX-License-Identifier: Berkeley
 
 #include "wsksymdef.h"
 

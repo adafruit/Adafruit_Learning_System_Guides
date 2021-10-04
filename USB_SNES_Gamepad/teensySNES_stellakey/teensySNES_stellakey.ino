@@ -1,6 +1,6 @@
-# SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
-#
-# SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
 
 #define KEYREPEAT 85 // delay when repeating characters
 #define KEYDELAY 200 // delay from first to second character

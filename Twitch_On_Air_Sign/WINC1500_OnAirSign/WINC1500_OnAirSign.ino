@@ -1,6 +1,6 @@
-# SPDX-FileCopyrightText: 2018 Limor Fried for Adafruit Industries
-#
-# SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2018 Limor Fried for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
 
 #include <SPI.h>
 #include <WiFi101.h>

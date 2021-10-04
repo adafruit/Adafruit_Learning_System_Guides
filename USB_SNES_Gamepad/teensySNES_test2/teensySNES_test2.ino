@@ -1,6 +1,6 @@
-# SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
-#
-# SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
 
 const int pinAnalogXInput = 3;
 const int pinAnalogYInput = 1;
