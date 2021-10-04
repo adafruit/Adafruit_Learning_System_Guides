@@ -1,6 +1,6 @@
-/* SPDX-FileCopyrightText: 2017 Erin St. Blaine for Adafruit Industries
-
-SPDX-License-Identifier: MIT */
+// SPDX-FileCopyrightText: 2017 Erin St. Blaine for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
 
 
 #include "FastLED.h"
