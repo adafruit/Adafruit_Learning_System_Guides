@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Phil Burgess and Mikey Sklar for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Fiery demon horns (rawr!) for Adafruit Trinket/Gemma.
 # Adafruit invests time and resources providing this open source code,
 # please support Adafruit and open-source hardware by purchasing
