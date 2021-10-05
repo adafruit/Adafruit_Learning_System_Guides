@@ -1,8 +1,8 @@
 #include <bluefruit.h>
 
-// Holds inbound data
+// packetbuffer holds inbound data
 #define READ_BUFSIZE 20
-uint8_t packetbuffer[READ_BUFSIZE + 1]; // +1 for NUL string terminator
+uint8_t packetbuffer[READ_BUFSIZE + 1]; // +1 is for NUL string terminator
 
 /**************************************************************************/
 /*!
@@ -12,9 +12,9 @@ uint8_t packetbuffer[READ_BUFSIZE + 1]; // +1 for NUL string terminator
 */
 /**************************************************************************/
 float parsefloat(uint8_t *ptr) {
-  float f;
-  memcpy(&f, ptr, 4); // Suitably-aligned, can't always parse in-place.
-  return f;
+  float f;            // Make a suitably-aligned float variable,
+  memcpy(&f, ptr, 4); // because in-buffer instance might be misaligned!
+  return f;           // (You can't always safely parse in-place)
 }
 
 /**************************************************************************/
@@ -34,7 +34,7 @@ void printHex(const uint8_t *buf, const uint32_t len) {
   Serial.println();
 }
 
-static const struct { // A set of special data packet types from app...
+static const struct { // Special payloads from Bluefruit Connect app...
   char    id;         // Packet type identifier
   uint8_t len;        // Size of complete, well-formed packet of this type
 } _app_packet[] = {
@@ -51,7 +51,8 @@ static const struct { // A set of special data packet types from app...
 
 /**************************************************************************/
 /*!
-    @brief    Given packet data, identify as one of the known packet types.
+    @brief    Given packet data, identify if it's one of the known
+              Bluefruit Connect app packet types.
     @param    buf  Pointer to packet data.
     @param    len  Size of packet in bytes.
     @returns  Packet type index (0 to NUM_PACKET_TYPES-1) if recognized,
@@ -73,7 +74,7 @@ int8_t packetType(uint8_t *buf, uint8_t len) {
 /**************************************************************************/
 /*!
     @brief    Wait for incoming data and determine if it's one of the
-              special packet types.
+              special Bluefruit Connect app packet types.
     @param    ble      Pointer to BLE UART object.
               timeout  Character read timeout in milliseconds.
     @returns  Length of data, or 0 if checksum is invalid for the type of
