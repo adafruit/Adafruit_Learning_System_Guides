@@ -7,7 +7,6 @@ import ssl
 import gc
 import wifi
 import socketpool
-import terminalio
 import adafruit_requests as requests
 from adafruit_magtag.magtag import MagTag
 
