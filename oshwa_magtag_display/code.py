@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Dylan Herrada for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import random
 import ssl
 import gc
@@ -28,7 +32,11 @@ socket = socketpool.SocketPool(wifi.radio)
 https = requests.Session(socket, ssl.create_default_context())
 
 # Paste your API token below
+<<<<<<< HEAD
 TOKEN = "YOUR_API_TOKEN"
+=======
+TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwYTdlYmZiZjk2N2U2MDAxNzNmNWY0MCIsImlhdCI6MTYzMzM2NzM5NiwiZXhwIjoxNjQyMDA3Mzk2fQ.vJsMVR_b8QMl7APrqoEFNPXIq-jeLKXB8yUeQPIDK_o" # pylint: disable=line-too-long
+>>>>>>> cf5a141b83ab60b15b4c9546acb726ec595eab7b
 
 def font_width_to_dict(font):
     # Reads the font file to determine how wide each character is
