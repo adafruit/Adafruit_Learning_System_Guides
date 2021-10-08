@@ -54,14 +54,6 @@ target_color = (255, 255, 255) if looking_down else colors[color_index]
 interpolated_color = (0, 0, 0)  # LEDs off at startup, they'll ramp up
 
 
-def fill_color(color):
-    """Given an (R,G,B) tuple, fill both LED rings with this color."""
-    # Convert tuple to a 'packed' 24-bit value
-    packed = (int(color[0]) << 16) | (int(color[1]) << 8) | int(color[2])
-    for i in range(24):
-        glasses.left_ring[i] = glasses.right_ring[i] = packed
-
-
 while True:  # Loop forever...
 
     # The try/except here is because VERY INFREQUENTLY the I2C bus will
@@ -79,7 +71,14 @@ while True:  # Loop forever...
             interpolated_color[2] * 0.85 + target_color[2] * 0.15,
         )
         # Fill both rings with interpolated_color, then refresh the LEDs.
-        fill_color(interpolated_color)
+        # fill_color(interpolated_color)
+        packed = (
+            (int(interpolated_color[0]) << 16)
+            | (int(interpolated_color[1]) << 8)
+            | int(interpolated_color[2])
+        )
+        glasses.left_ring.fill(packed)
+        glasses.right_ring.fill(packed)
         glasses.show()
 
         # The look-down detection only needs the accelerometer's Y axis.
