@@ -47,6 +47,26 @@ jobs:
             build/*.bin
             build/*.uf2
 
+    - name: Zip release files
+      if: startsWith(github.ref, 'refs/tags/')
+      run: |
+        if [ -d build ]; then
+            (
+            echo "Built from Adafruit Learning System Guides `git describe --tags` for ${{ matrix.arduino-platform }}"
+            echo "Source code: https://github.com/adafruit/"
+            echo "Adafruit Learning System: https://learn.adafruit.com/"
+            ) > build/README.txt
+            cd build && zip -9 -o ${{ matrix.arduino-platform }}.zip *.hex *.bin *.uf2 *.txt
+        fi
+
+    - name: Create release
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v1
+      with:
+        files: build/${{ matrix.arduino-platform }}.zip
+        fail_on_unmatched_files: false
+        body: "Select the zip file corresponding to your board from the list below."
+
   pylint:
     runs-on: ubuntu-latest
     steps:
