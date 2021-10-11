@@ -60,6 +60,7 @@ jobs:
       with:
         files: build/${{ matrix.arduino-platform }}.zip
         fail_on_unmatched_files: false
+        body: "Select the zip file corresponding to your board from the list below."
 
   pylint:
     runs-on: ubuntu-latest
