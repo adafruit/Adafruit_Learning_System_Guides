@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2017 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+//
 /* Adafruit Trinket/Gemma Example: Simple Theramin
 
   Read the voltage from a Cadmium Sulfide (CdS) photocell voltage
