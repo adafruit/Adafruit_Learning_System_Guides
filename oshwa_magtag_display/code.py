@@ -33,6 +33,7 @@ https = requests.Session(socket, ssl.create_default_context())
 # Paste your API token below
 TOKEN = "YOUR_API_TOKEN"
 
+
 def font_width_to_dict(font):
     # Reads the font file to determine how wide each character is
     # Used to avoid bad wrapping breaking the QR code
@@ -85,7 +86,6 @@ def wrap(text, max_width, max_lines, font):
 
     lines.append(line.strip())
     return "\n".join(lines[:max_lines])
-
 
 
 # Get first 300 items, saving only the OSHWA UIDs. The first 300 are also used to find the
@@ -155,16 +155,16 @@ selected["projectDescription"] = (
 
 # Add the two text fields
 magtag.add_text(
-    text_font="fonts/Arial-12.bdf",
-    text_position=(5, -2),
+    text_font="fonts/Arial-Bold-12.bdf",
+    text_position=(5, 0),
     text_scale=1,
-    line_spacing=0.6,
+    line_spacing=0.7,
     text_anchor_point=(0, 0),
 )
 
 magtag.add_text(
     text_font="fonts/ArialMT-9.bdf",
-    text_position=(5, 30),
+    text_position=(5, 38),
     text_scale=1,
     line_spacing=0.6,
     text_anchor_point=(0, 0),
@@ -175,15 +175,15 @@ url = f"https://certification.oshwa.org/{selected['oshwaUid'].lower()}.html"
 magtag.graphics.qrcode(url, qr_size=4, x=173, y=3)
 
 # Prepare to wrap the text correctly by getting the width of each character for every font
-arial_12 = font_width_to_dict("fonts/Arial-12.bdf")
+arial_12 = font_width_to_dict("fonts/Arial-Bold-12.bdf")
 arial_9 = font_width_to_dict("fonts/ArialMT-9.bdf")
 
 # Set the text. On some characters, this fails. If so, run the whole file again in 5 seconds
 try:
-    magtag.set_text(wrap(selected["projectName"], 530, 2, arial_12), 0, False)
-    magtag.set_text(wrap(selected["projectDescription"], 530, 10, arial_9), 1)
+    magtag.set_text(wrap(selected["projectName"], 545, 2, arial_12), 0, False)
+    magtag.set_text(wrap(selected["projectDescription"], 530, 19, arial_9), 1)
     magtag.exit_and_deep_sleep(3600)
-except Exception: # pylint: disable=broad-except
+except Exception:  # pylint: disable=broad-except
     print("Could not set title or description: unsupported glyphs.")
     print("Trying again in 10 seconds.")
     magtag.exit_and_deep_sleep(10)
