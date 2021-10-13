@@ -31,8 +31,9 @@ socket = socketpool.SocketPool(wifi.radio)
 https = requests.Session(socket, ssl.create_default_context())
 
 # Paste your API token below
-#TOKEN = "YOUR_API_TOKEN"
-TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwYTdlYmZiZjk2N2U2MDAxNzNmNWY0MCIsImlhdCI6MTYzMzM2NzM5NiwiZXhwIjoxNjQyMDA3Mzk2fQ.vJsMVR_b8QMl7APrqoEFNPXIq-jeLKXB8yUeQPIDK_o" # pylint: disable=line-too-long
+TOKEN = "YOUR_API_TOKEN"
+
+
 def font_width_to_dict(font):
     # Reads the font file to determine how wide each character is
     # Used to avoid bad wrapping breaking the QR code
@@ -85,7 +86,6 @@ def wrap(text, max_width, max_lines, font):
 
     lines.append(line.strip())
     return "\n".join(lines[:max_lines])
-
 
 
 # Get first 300 items, saving only the OSHWA UIDs. The first 300 are also used to find the
@@ -183,7 +183,7 @@ try:
     magtag.set_text(wrap(selected["projectName"], 545, 2, arial_12), 0, False)
     magtag.set_text(wrap(selected["projectDescription"], 530, 19, arial_9), 1)
     magtag.exit_and_deep_sleep(3600)
-except Exception: # pylint: disable=broad-except
+except Exception:  # pylint: disable=broad-except
     print("Could not set title or description: unsupported glyphs.")
     print("Trying again in 10 seconds.")
     magtag.exit_and_deep_sleep(10)
