@@ -10,6 +10,7 @@ but unfortunately the resolution is such that the pupils just look like
 circles regardless. I'm keeping it in despite the added complexity,
 because this WILL look great later on a bigger matrix or a TFT/OLED,
 and this way the hard parts won't require a re-write at such time.
+It's a really adorable effect with enough pixels.
 */
 
 #include <Adafruit_IS31FL3741.h> // For LED driver
@@ -18,11 +19,17 @@ and this way the hard parts won't require a re-write at such time.
 
 #define RADIUS 3.4 // Size of pupil (3X because of downsampling later)
 
+uint8_t eye_color[3] = { 255, 128, 0 };      // Amber pupils
+uint8_t ring_open_color[3] = { 75, 75, 75 }; // Color of LED rings when eyes open
+uint8_t ring_blink_color[3] = { 50, 25, 0 }; // Color of LED ring "eyelid" when blinking
+
 // Some boards have just one I2C interface, but some have more...
 TwoWire *i2c = &Wire; // e.g. change this to &Wire1 for QT Py RP2040
 
-Adafruit_EyeLights_buffered glasses(true); // Buffered + 3X canvas
-GFXcanvas16 *canvas; // Pointer to canvas object
+// GLOBAL VARIABLES ---------------------
+
+Adafruit_EyeLights_buffered glasses(true); // Buffered spex + 3X canvas
+GFXcanvas16 *canvas;                       // Pointer to canvas object
 
 // Reading through the code, you'll see a lot of references to this "3X"
 // space. This is referring to the glasses' optional "offscreen" drawing
@@ -31,32 +38,33 @@ GFXcanvas16 *canvas; // Pointer to canvas object
 // antialiasing. It's why the pupils have soft edges and can make
 // fractional-pixel motions.
 
-uint32_t frames = 0;
-uint32_t start_time;
-
-#define GAMMA 2.6
-
-float y_pos[13];
-// Initialize eye position and move/blink animation timekeeping
 float cur_pos[2] = { 9.0, 7.5 };  // Current position of eye in canvas space
 float next_pos[2] = { 9.0, 7.5 }; // Next position "
-bool in_motion = false;           // true = eyes moving, False = eyes paused
+bool in_motion = false;           // true = eyes moving, false = eyes paused
 uint8_t blink_state = 0;          // 0, 1, 2 = unblinking, closing, opening
-uint32_t move_start_time = 0;
+uint32_t move_start_time = 0;     // For animation timekeeping
 uint32_t move_duration = 0;
 uint32_t blink_start_time = 0;
 uint32_t blink_duration = 0;
+float y_pos[13];                 // Coords of LED ring pixels in canvas space
+uint32_t ring_open_color_packed; // ring_open_color[] as packed RGB integer
+uint16_t eye_color565;           // eye_color[] as a GFX packed '565' value
+uint32_t frames = 0;             // For frames-per-second calculation
+uint32_t start_time;
 
+// These offsets position each pupil on the canvas grid and make them
+// fixate slightly (converge on a point) so they're not always aligned
+// the same on the pixel grid, which would be conspicuously pixel-y.
 float x_offset[2] = { 5.0, 31.0 };
+// These help perform x-axis clipping on the rasterized ellipses,
+// so they don't "bleed" outside the rings and require erasing.
+int box_x_min[2] = { 3, 33 };
+int box_x_max[2] = { 21, 51 };
 
-uint16_t eye_color = glasses.color565(255, 128, 0);
-//uint8_t eye_color[3] = { 255, 128, 0 };      // Amber pupils
-uint8_t ring_open_color[3] = { 75, 75, 75 }; // Color of LED rings when eyes open
-uint8_t ring_blink_color[3] = { 50, 25, 0 }; // Color of LED ring "eyelid" when blinking
+#define GAMMA  2.6 // For color correction, shouldn't need changing
 
-// Pre-compute color of LED ring in fully open (unblinking) state
-uint32_t ring_open_color_packed;
 
+// HELPER FUNCTIONS ---------------------
 
 // Crude error handler, prints message to Serial console, flashes LED
 void err(char *str, uint8_t hz) {
@@ -84,37 +92,6 @@ uint32_t interp(uint8_t color1[3], uint8_t color2[3], float blend) {
     rgb[i] = (int)((float)color1[i] * blend + (float)color2[i] * inv);
   }
   return gammify(rgb);
-}
-
-
-void setup() { // Runs once at program start...
-
-  // Initialize hardware
-  Serial.begin(115200);
-  if (! glasses.begin(IS3741_ADDR_DEFAULT, i2c)) err("IS3741 not found", 2);
-
-  canvas = glasses.getCanvas();
-  if (!canvas) err("Can't allocate canvas", 5);
-
-  i2c->setClock(1000000);
-
-  // Configure glasses for reduced brightness, enable output
-  glasses.setLEDscaling(0xFF);
-  glasses.setGlobalCurrent(20);
-  glasses.enable(true);
-
-  // INITIALIZE TABLES & OTHER GLOBALS ----
-
-  // Pre-compute the Y position of 1/2 of the LEDs in a ring, relative
-  // to the 3X canvas resolution, so ring & matrix animation can be aligned.
-  for (uint8_t i=0; i<13; i++) {
-    float angle = (float)i / 24.0 * M_PI * 2.0;
-    y_pos[i] = 10.0 - cos(angle) * 12.0;
-  }
-
-  ring_open_color_packed = gammify(ring_open_color);
-
-  start_time = millis();
 }
 
 // Rasterize an arbitrary ellipse into the offscreen 3X canvas, given
@@ -154,26 +131,62 @@ void rasterize(float point1[2], float point2[2], int rect[4]) {
 
   // Like I'm sure there's a way to rasterize this by spans rather than
   // all these square roots on every pixel, but for now...
-  for (int y=rect[1]; y<rect[3]; y++) {     // For each row...
-    float y5 = (float)y + 0.5;              // Pixel center
-    float dy1 = y5 - point1[1];             // Y distance from pixel to first point
-    float dy2 = y5 - point2[1];             // " to second
-    dy1 *= dy1;                             // Y1^2
-    dy2 *= dy2;                             // Y2^2
-    for (int x=rect[0]; x<rect[2]; x++) {   // For each column...
-      float x5 = (float)x + 0.5;            // Pixel center
-      float dx1 = x5 - point1[0];           // X distance from pixel to first point
-      float dx2 = x5 - point2[0];           // " to second
-      float d1 = sqrt(dx1 * dx1 + dy1);     // 2D distance to first point
-      float d2 = sqrt(dx2 * dx2 + dy2);     // " to second
-      if ((d1 + d2 + d) <= perimeter) {
-        canvas->drawPixel(x, y, eye_color); // Point is inside ellipse
+  for (int y=rect[1]; y<rect[3]; y++) {   // For each row...
+    float y5 = (float)y + 0.5;            // Pixel center
+    float dy1 = y5 - point1[1];           // Y distance from pixel to first point
+    float dy2 = y5 - point2[1];           // " to second
+    dy1 *= dy1;                           // Y1^2
+    dy2 *= dy2;                           // Y2^2
+    for (int x=rect[0]; x<rect[2]; x++) { // For each column...
+      float x5 = (float)x + 0.5;          // Pixel center
+      float dx1 = x5 - point1[0];         // X distance from pixel to first point
+      float dx2 = x5 - point2[0];         // " to second
+      float d1 = sqrt(dx1 * dx1 + dy1);   // 2D distance to first point
+      float d2 = sqrt(dx2 * dx2 + dy2);   // " to second
+      if ((d1 + d2 + d) <= perimeter) {   // Point inside ellipse?
+        canvas->drawPixel(x, y, eye_color565);
       }
     }
   }
 }
 
-void loop() { // Repeat forever...
+
+// ONE-TIME INITIALIZATION --------------
+
+void setup() {
+  // Initialize hardware
+  Serial.begin(115200);
+  if (! glasses.begin(IS3741_ADDR_DEFAULT, i2c)) err("IS3741 not found", 2);
+
+  canvas = glasses.getCanvas();
+  if (!canvas) err("Can't allocate canvas", 5);
+
+  i2c->setClock(1000000); // 1 MHz I2C for extra butteriness
+
+  // Configure glasses for reduced brightness, enable output
+  glasses.setLEDscaling(0xFF);
+  glasses.setGlobalCurrent(20);
+  glasses.enable(true);
+
+  // INITIALIZE TABLES & OTHER GLOBALS ----
+
+  // Pre-compute the Y position of 1/2 of the LEDs in a ring, relative
+  // to the 3X canvas resolution, so ring & matrix animation can be aligned.
+  for (uint8_t i=0; i<13; i++) {
+    float angle = (float)i / 24.0 * M_PI * 2.0;
+    y_pos[i] = 10.0 - cos(angle) * 12.0;
+  }
+
+  // Convert some colors from [R,G,B] (easier to specify) to packed integers
+  ring_open_color_packed = gammify(ring_open_color);
+  eye_color565 = glasses.color565(eye_color[0], eye_color[1], eye_color[2]);
+
+  start_time = millis(); // For frames-per-second math
+}
+
+// MAIN LOOP ----------------------------
+
+void loop() {
   canvas->fillScreen(0);
 
   // The eye animation logic is a carry-over from like a billion
@@ -259,51 +272,30 @@ void loop() { // Repeat forever...
   // Draw the raster part of each eye...
   for (uint8_t e=0; e<2; e++) {
     // Each eye's foci are offset slightly, to fixate toward center
-#if 0
-    float p1a[2] = { p1[0] + x_offset[e], p1[1] };
-    float p2a[2] = { p2[0] + x_offset[e], p2[1] };
-#else
     float p1a[2], p2a[2];
     p1a[0] = p1[0] + x_offset[e];
     p2a[0] = p2[0] + x_offset[e];
     p1a[1] = p2a[1] = p1[1];
-#endif
     // Compute bounding rectangle (in 3X space) of ellipse
     // (min X, min Y, max X, max Y). Like the ellipse rasterizer,
     // this isn't optimal, but will suffice.
     int bounds[4];
-    bounds[0] = max(int(min(p1a[0], p2a[0]) - RADIUS), 0);
-    bounds[1] = max(int(min(p1a[1], p2a[1]) - RADIUS), 0);
-//    bounds[1] = max(bounds[1], (int)upper);
-    bounds[2] = min(int(max(p1a[0], p2a[0]) + RADIUS + 1), 18);
+    bounds[0] = max(int(min(p1a[0], p2a[0]) - RADIUS), box_x_min[e]);
+    bounds[1] = max(max(int(min(p1a[1], p2a[1]) - RADIUS), 0), (int)upper);
+    bounds[2] = min(int(max(p1a[0], p2a[0]) + RADIUS + 1), box_x_max[e]);
     bounds[3] = min(int(max(p1a[1], p2a[1]) + RADIUS + 1), 15);
-//    bounds[2] = min(bounds[3], (int)lower);
-bounds[0] = 0;
-bounds[1] = 0;
-bounds[2] = 18 * 3;
-bounds[3] = 5 * 3;
-
-#if 0
-      bounds = (
-          max(int(min(p1a[0], p2a[0]) - radius), 0),
-          max(int(min(p1a[1], p2a[1]) - radius), 0, int(upper)),
-          min(int(max(p1a[0], p2a[0]) + radius + 1), 18),
-          min(int(max(p1a[1], p2a[1]) + radius + 1), 15, int(lower) + 1),
-      )
-#endif
     rasterize(p1a, p2a, bounds); // Render ellipse into buffer
   }
 
-  // If the eye is currently blinking, and if the top edge of the
-  // eyelid overlaps the bitmap, draw a scanline across the bitmap
-  // and update the bounds rect so the whole width of the bitmap
-  // is scaled.
+  // If the eye is currently blinking, and if the top edge of the eyelid
+  // overlaps the bitmap, draw lines across the bitmap as if eyelids.
   if (blink_state and upper >= 0.0) {
-    canvas->fillRect(0, 0, canvas->width(), (int)upper + 1, 0x0004);
+    int iu = (int)upper;
+    canvas->drawLine(box_x_min[0], iu, box_x_max[0] - 1, iu, eye_color565);
+    canvas->drawLine(box_x_min[1], iu, box_x_max[1] - 1, iu, eye_color565);
   }
 
-
-  glasses.scale();
+  glasses.scale(); // Smooth filter 3X canvas to LED grid
 
   // Matrix and rings share a few pixels. To make the rings take
   // precedence, they're drawn later. So blink state is revisited now...
@@ -332,12 +324,3 @@ bounds[3] = 5 * 3;
   elapsed = millis() - start_time;
   Serial.println(frames * 1000 / elapsed);
 }
-
-
-#if 0
-# Two eye objects. The first starts at column 1 of the matrix with its
-# pupil offset by +2 (in 3X space), second at column 11 with -2 offset.
-# The offsets make the pupils fixate slightly (converge on a point), so
-# the two pupils aren't always aligned the same on the pixel grid, which
-# would be conspicuously pixel-y.
-#endif // 0

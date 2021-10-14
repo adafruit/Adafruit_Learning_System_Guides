@@ -10,7 +10,7 @@ but unfortunately the resolution and frame rate are such that the pupils
 just look like circles regardless. I'm keeping it in despite the added
 complexity, because CircuitPython devices WILL get faster, LED matrix
 densities WILL improve, and this way the code won't require a re-write
-at such a later time.
+at such a later time. It's a really adorable effect with enough pixels.
 """
 
 import math
