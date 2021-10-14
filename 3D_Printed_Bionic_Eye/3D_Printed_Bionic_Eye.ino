@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2018 Bill Earl and Mikey Sklar for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
 /*******************************************************************
   Bionic Eye sketch for Adafruit Trinket.  
 

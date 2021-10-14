@@ -29,6 +29,10 @@ def get_unique_pins():
             "LED",
             "SWITCH",
             "BUTTON",
+            "ACCELEROMETER_INTERRUPT",
+            "VOLTAGE_MONITOR",
+            "MICROPHONE_CLOCK",
+            "MICROPHONE_DATA",
         ]
         if p in dir(board)
     ]

@@ -44,7 +44,7 @@ rainbow_bitmap = displayio.Bitmap(
 rainbow_palette = displayio.Palette(255)
 
 for i in range(0, 255):
-    rainbow_palette[i] = int("".join("%02x" % i for i in colorwheel(i)), 16)
+    rainbow_palette[i] = colorwheel(i)
 
 for y in range(rainbow_bitmap.height):
     for x in range(rainbow_bitmap.width):

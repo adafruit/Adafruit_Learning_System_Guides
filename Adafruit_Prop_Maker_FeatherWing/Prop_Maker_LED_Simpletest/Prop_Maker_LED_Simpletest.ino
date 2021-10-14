@@ -5,7 +5,11 @@
 * Rainbow swirl example for 3W LED.
 */
 
-#if defined(__SAMD21G18A__) || defined(__AVR_ATmega32U4__)
+#ifdef USE_TINYUSB  // For Serial when selecting TinyUSB
+#include <Adafruit_TinyUSB.h>
+#endif
+
+#if defined(__SAMD21G18A__) || defined(__AVR_ATmega32U4__) || defined(NRF52840_XXAA)
   // No green PWM on 32u4
   #define POWER_PIN    10
   #define RED_LED      11

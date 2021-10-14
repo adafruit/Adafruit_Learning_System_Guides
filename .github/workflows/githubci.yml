@@ -7,8 +7,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arduino-platform: ["uno", "nrf52832", "cpx_ada", "pyportal", "protrinket_3v", "protrinket_5v", "metro_m0", "esp8266", "esp32", "trinket_3v", "gemma", "flora", "feather32u4", "feather_m0_express", "gemma_m0", "trinket_m0", "hallowing_m0", "monster_m4sk", "hallowing_m4", "hallowing_m4_tinyusb", "neotrellis_m4", "pybadge", "cpb", "cpc", "funhouse", "magtag"]
-    # "trinket_5v", was removed
+        arduino-platform: ["cpb", "cpc", "cpx_ada", "esp32", "esp8266", "feather32u4", "feather_m0_express", "feather_m4_express", "feather_rp2040", "flora", "funhouse", "gemma", "gemma_m0", "hallowing_m0", "hallowing_m4_tinyusb", "magtag", "metro_m0", "metro_m0_tinyusb", "metro_m4", "metro_m4_tinyusb", "monster_m4sk", "monster_m4sk_tinyusb", "neokeytrinkey_m0", "neotrellis_m4", "nrf52832", "nrf52840", "protrinket_5v", "proxlighttrinkey_m0", "pybadge", "pygamer", "pyportal", "qt2040_trinkey", "qtpy_m0", "rotarytrinkey_m0", "slidetrinkey_m0", "trinket_m0", "uno", "trinket_5v", "ledglasses_nrf52840" ]
     runs-on: ubuntu-18.04
 
     steps:
@@ -39,6 +38,34 @@ jobs:
     - name: test platforms
       run: python3 ci/build_platform.py ${{ matrix.arduino-platform }}
 
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ github.event.repository.name }}.${{ github.sha }}
+        path: |
+            build/*.hex
+            build/*.bin
+            build/*.uf2
+
+    - name: Zip release files
+      if: startsWith(github.ref, 'refs/tags/')
+      run: |
+        if [ -d build ]; then
+            (
+            echo "Built from Adafruit Learning System Guides `git describe --tags` for ${{ matrix.arduino-platform }}"
+            echo "Source code: https://github.com/adafruit/"
+            echo "Adafruit Learning System: https://learn.adafruit.com/"
+            ) > build/README.txt
+            cd build && zip -9 -o ${{ matrix.arduino-platform }}.zip *.hex *.bin *.uf2 *.txt
+        fi
+
+    - name: Create release
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v1
+      with:
+        files: build/${{ matrix.arduino-platform }}.zip
+        fail_on_unmatched_files: false
+        body: "Select the zip file corresponding to your board from the list below."
 
   pylint:
     runs-on: ubuntu-latest
