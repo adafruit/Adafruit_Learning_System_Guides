@@ -1,4 +1,3 @@
-# SPDX-FileCopyrightText: 2019 Kattni Rembor for Adafruit Industries
 # SPDX-FileCopyrightText: 2019 Dave Astels for Adafruit Industries
 #
 # SPDX-License-Identifier: MIT
