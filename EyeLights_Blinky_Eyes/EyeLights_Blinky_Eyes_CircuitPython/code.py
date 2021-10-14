@@ -33,7 +33,7 @@ radius = 3.4  # Size of pupil (3X because of downsampling later)
 
 # Reading through the code, you'll see a lot of references to this "3X"
 # space. What it's referring to is a bitmap that's 3 times the resolution
-# of the LED matrix (e.g. 15 pixels tall instead of 5), which gets scaled
+# of the LED matrix (i.e. 15 pixels tall instead of 5), which gets scaled
 # down to provide some degree of antialiasing. It's why the pupils have
 # soft edges and can make fractional-pixel motions.
 # Because of the way the downsampling is done, the eyelid edge when drawn
@@ -127,13 +127,15 @@ def rasterize(data, point1, point2, rect):
     # Like I'm sure there's a way to rasterize this by spans rather than
     # all these square roots on every pixel, but for now...
     for y in range(rect[1], rect[3]):  # For each row...
-        dy1 = y - point1[1]  # Y distance from pixel to first point
-        dy2 = y - point2[1]  # " to second
+        y5 = y + 0.5  #         Pixel center
+        dy1 = y5 - point1[1]  # Y distance from pixel to first point
+        dy2 = y5 - point2[1]  # " to second
         dy1 *= dy1  # Y1^2
         dy2 *= dy2  # Y2^2
         for x in range(rect[0], rect[2]):  # For each column...
-            dx1 = x - point1[0]  # X distance from pixel to first point
-            dx2 = x - point2[0]  # " to second
+            x5 = x + 0.5  #         Pixel center
+            dx1 = x5 - point1[0]  # X distance from pixel to first point
+            dx2 = x5 - point2[0]  # " to second
             d1 = (dx1 * dx1 + dy1) ** 0.5  # 2D distance to first point
             d2 = (dx2 * dx2 + dy2) ** 0.5  # " to second
             if (d1 + d2 + d) <= perimeter:
@@ -255,20 +257,20 @@ while True:
                 # Determine p1, p2 position in time
                 delta = (next_pos[0] - cur_pos[0], next_pos[1] - cur_pos[1])
                 ratio = elapsed / move_duration
-                if ratio < 0.7:  # First 70% of move time
+                if ratio < 0.6:  # First 60% of move time
                     # p1 is in motion
                     # Easing function: 3*e^2-2*e^3 0.0 to 1.0
-                    e = ratio / 0.7  # 0.0 to 1.0
+                    e = ratio / 0.6  # 0.0 to 1.0
                     e = 3 * e * e - 2 * e * e * e
                     p1 = (cur_pos[0] + delta[0] * e, cur_pos[1] + delta[1] * e)
-                else:  # Last 30% of move time
+                else:  # Last 40% of move time
                     p1 = next_pos  # p1 has reached end position
-                if ratio > 0.2:  # Last 80% of move time
+                if ratio > 0.3:  # Last 60% of move time
                     # p2 is in motion
-                    e = (ratio - 0.2) / 0.8  #       0.0 to 1.0
+                    e = (ratio - 0.3) / 0.7  #       0.0 to 1.0
                     e = 3 * e * e - 2 * e * e * e  # Easing func.
                     p2 = (cur_pos[0] + delta[0] * e, cur_pos[1] + delta[1] * e)
-                else:  # First 20% of move time
+                else:  # First 40% of move time
                     p2 = cur_pos  # p2 waits at start position
         else:  # Eye is stopped
             p1 = p2 = cur_pos  # Both foci at current eye position

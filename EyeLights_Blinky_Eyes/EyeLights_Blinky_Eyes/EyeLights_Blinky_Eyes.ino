@@ -8,8 +8,8 @@ MOVE-AND-BLINK EYES for Adafruit EyeLights (LED Glasses + Driver).
 I'd written a very cool squash-and-stretch effect for the eye movement,
 but unfortunately the resolution is such that the pupils just look like
 circles regardless. I'm keeping it in despite the added complexity,
-because LED matrix densities WILL improve, and this way the code won't
-require a re-write at such a later time.
+because this WILL look great later on a bigger matrix or a TFT/OLED,
+and this way the hard parts won't require a re-write at such time.
 */
 
 #include <Adafruit_IS31FL3741.h> // For LED driver
@@ -23,6 +23,13 @@ TwoWire *i2c = &Wire; // e.g. change this to &Wire1 for QT Py RP2040
 
 Adafruit_EyeLights_buffered glasses(true); // Buffered + 3X canvas
 GFXcanvas16 *canvas; // Pointer to canvas object
+
+// Reading through the code, you'll see a lot of references to this "3X"
+// space. This is referring to the glasses' optional "offscreen" drawing
+// canvas that's 3 times the resolution of the LED matrix (i.e. 15 pixels
+// tall instead of 5), which gets scaled down to provide some degree of
+// antialiasing. It's why the pupils have soft edges and can make
+// fractional-pixel motions.
 
 uint32_t frames = 0;
 uint32_t start_time;
@@ -84,21 +91,17 @@ void setup() { // Runs once at program start...
 
   // Initialize hardware
   Serial.begin(115200);
-  while(!Serial);
-Serial.println("HEY!"); yield();
   if (! glasses.begin(IS3741_ADDR_DEFAULT, i2c)) err("IS3741 not found", 2);
 
   canvas = glasses.getCanvas();
   if (!canvas) err("Can't allocate canvas", 5);
 
-Serial.println("A");
   i2c->setClock(1000000);
 
   // Configure glasses for reduced brightness, enable output
   glasses.setLEDscaling(0xFF);
   glasses.setGlobalCurrent(20);
   glasses.enable(true);
-Serial.println("B"); yield();
 
   // INITIALIZE TABLES & OTHER GLOBALS ----
 
@@ -110,7 +113,6 @@ Serial.println("B"); yield();
   }
 
   ring_open_color_packed = gammify(ring_open_color);
-Serial.println("C"); yield();
 
   start_time = millis();
 }
@@ -152,16 +154,18 @@ void rasterize(float point1[2], float point2[2], int rect[4]) {
 
   // Like I'm sure there's a way to rasterize this by spans rather than
   // all these square roots on every pixel, but for now...
-  for (int y=rect[1]; y<rect[3]; y++) { // For each row...
-    float dy1 = (float)y - point1[1]; // Y distance from pixel to first point
-    float dy2 = (float)y - point2[1]; // " to second
-    dy1 *= dy1; // Y1^2
-    dy2 *= dy2; // Y2^2
-    for (int x=rect[0]; x<rect[2]; x++) { // For each column...
-      float dx1 = (float)x - point1[0]; // X distance from pixel to first point
-      float dx2 = (float)x - point2[0]; // " to second
-      float d1 = sqrt(dx1 * dx1 + dy1); // 2D distance to first point
-      float d2 = sqrt(dx2 * dx2 + dy2); // " to second
+  for (int y=rect[1]; y<rect[3]; y++) {     // For each row...
+    float y5 = (float)y + 0.5;              // Pixel center
+    float dy1 = y5 - point1[1];             // Y distance from pixel to first point
+    float dy2 = y5 - point2[1];             // " to second
+    dy1 *= dy1;                             // Y1^2
+    dy2 *= dy2;                             // Y2^2
+    for (int x=rect[0]; x<rect[2]; x++) {   // For each column...
+      float x5 = (float)x + 0.5;            // Pixel center
+      float dx1 = x5 - point1[0];           // X distance from pixel to first point
+      float dx2 = x5 - point2[0];           // " to second
+      float d1 = sqrt(dx1 * dx1 + dy1);     // 2D distance to first point
+      float d2 = sqrt(dx2 * dx2 + dy2);     // " to second
       if ((d1 + d2 + d) <= perimeter) {
         canvas->drawPixel(x, y, eye_color); // Point is inside ellipse
       }
@@ -170,10 +174,7 @@ void rasterize(float point1[2], float point2[2], int rect[4]) {
 }
 
 void loop() { // Repeat forever...
- yield();
-Serial.println("1"); yield();
   canvas->fillScreen(0);
-
 
   // The eye animation logic is a carry-over from like a billion
   // prior eye projects, so this might be comment-light.
@@ -202,7 +203,6 @@ Serial.println("1"); yield();
     upper = ratio * 15.0 - 4.0; // Upper eyelid pos. in 3X space
     lower = 23.0 - ratio * 8.0; // Lower eyelid pos. in 3X space
   }
-Serial.println("2"); yield();
 
   // Eye movement logic. Two points, 'p1' and 'p2', are the foci of an
   // ellipse. p1 moves from current to next position a little faster
@@ -224,23 +224,21 @@ Serial.println("2"); yield();
       delta[0] = next_pos[0] - cur_pos[0];
       delta[1] = next_pos[1] - cur_pos[1];
       ratio = (float)elapsed / (float)move_duration;
-      if (ratio < 0.7) { // First 70% of move time
-        // p1 is in motion
+      if (ratio < 0.6) { // First 60% of move time, p1 is in motion
         // Easing function: 3*e^2-2*e^3 0.0 to 1.0
-        float e = ratio / 0.7; // 0.0 to 1.0
+        float e = ratio / 0.6; // 0.0 to 1.0
         e = 3 * e * e - 2 * e * e * e;
         p1[0] = cur_pos[0] + delta[0] * e;
         p1[1] = cur_pos[1] + delta[1] * e;
-      } else { // Last 30% of move time
+      } else {                                   // Last 40% of move time
         memcpy(&p1, &next_pos, sizeof next_pos); // p1 has reached end position
       }
-      if (ratio > 0.2) { // Last 80% of move time
-        // p2 is in motion
-        float e = (ratio - 0.2) / 0.8; // 0.0 to 1.0
+      if (ratio > 0.3) { // Last 70% of move time, p2 is in motion
+        float e = (ratio - 0.3) / 0.7; // 0.0 to 1.0
         e = 3 * e * e - 2 * e * e * e; // Easing func.
         p2[0] = cur_pos[0] + delta[0] * e;
         p2[1] = cur_pos[1] + delta[1] * e;
-      } else { // First 20% of move time
+      } else {                                 // First 30% of move time
         memcpy(&p2, &cur_pos, sizeof cur_pos); // p2 waits at start position
       }
     }
@@ -257,7 +255,6 @@ Serial.println("2"); yield();
       next_pos[1] = 7.5 + sin(angle) * dist * 0.8;
     }
   }
-Serial.println("3"); yield();
 
   // Draw the raster part of each eye...
   for (uint8_t e=0; e<2; e++) {
@@ -297,8 +294,6 @@ bounds[3] = 5 * 3;
     rasterize(p1a, p2a, bounds); // Render ellipse into buffer
   }
 
-Serial.println("4"); yield();
-
   // If the eye is currently blinking, and if the top edge of the
   // eyelid overlaps the bitmap, draw a scanline across the bitmap
   // and update the bounds rect so the whole width of the bitmap
@@ -307,10 +302,8 @@ Serial.println("4"); yield();
     canvas->fillRect(0, 0, canvas->width(), (int)upper + 1, 0x0004);
   }
 
-Serial.println("5"); yield();
 
   glasses.scale();
-Serial.println("6"); yield();
 
   // Matrix and rings share a few pixels. To make the rings take
   // precedence, they're drawn later. So blink state is revisited now...
@@ -333,11 +326,7 @@ Serial.println("6"); yield();
     glasses.right_ring.fill(ring_open_color_packed);
   }
 
-Serial.println("7"); yield();
-
-
   glasses.show();
-Serial.println("8"); yield();
 
   frames += 1;
   elapsed = millis() - start_time;
