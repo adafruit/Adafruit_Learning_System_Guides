@@ -1,6 +1,6 @@
 // SPDX-FileCopyrightText: 2019 Limor Fried/ladyada for Adafruit Industries
 //
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: BSD
 
 // NeXT non-ADB Keyboard to USB converter
 // This will take an older NeXT keyboard, talk to it, and turn the keycodes into a USB keyboard
