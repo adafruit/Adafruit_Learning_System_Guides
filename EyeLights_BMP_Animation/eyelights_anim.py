@@ -62,13 +62,10 @@ class EyeLightsAnim:
             self.matrix_bitmap, self.matrix_palette = adafruit_imageload.load(
                 matrix_filename, bitmap=displayio.Bitmap, palette=displayio.Palette
             )
-            # pylint and black can't agree on formatting this statement, so...
-            # pylint: disable=bad-continuation
             if (self.matrix_bitmap.width < glasses.width) or (
                 self.matrix_bitmap.height < glasses.height
             ):
                 raise ValueError("Matrix bitmap must be at least 18x5 pixels")
-            # pylint: enable=bad-continuation
             gamma_adjust(self.matrix_palette)
             self.tiles_across = self.matrix_bitmap.width // glasses.width
             self.tiles_down = self.matrix_bitmap.height // glasses.height
