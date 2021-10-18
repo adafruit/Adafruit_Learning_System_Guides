@@ -2,7 +2,7 @@
 # Coded for Circuit Playground Express but it may be
 # modified for any CircuitPython board with changes to
 # button, thermister and audio board definitions.
-# Mike Barela for Adafruit Industries, MIT License
+# Anne Barela for Adafruit Industries, MIT License
 
 import time
 import board
