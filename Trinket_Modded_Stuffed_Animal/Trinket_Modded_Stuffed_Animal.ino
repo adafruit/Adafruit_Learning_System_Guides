@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2018 Mikey Sklar for Adafruit Industries
+// SPDX-FileCopyrightText: 2018 Phillip Burgess/paintyourdragon for Adafruit Industries
 //
 // SPDX-License-Identifier: MIT
 
