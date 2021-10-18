@@ -1,6 +1,6 @@
 // SPDX-FileCopyrightText: 2018 Mikey Sklar for Adafruit Industries
 //
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: GPLv3
 
 /* 
 Name: Blinking Eyes  - based on code by Brad Blumenthal, MAKE Magazine  
