@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Data derived from Free Stock Video by user 'dietolog' on Videezy.com
 
 const uint8_t PROGMEM anim[] = {

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 Mikey Sklar for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /* -----------------------------------------------------------------------
    Super Mario Bros-inspired coin sound for Adafruit Trinket & Gemma.
 

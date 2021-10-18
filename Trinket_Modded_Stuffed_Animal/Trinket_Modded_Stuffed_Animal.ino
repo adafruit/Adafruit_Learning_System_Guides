@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 Mikey Sklar for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /*******************************************************************
   Adafruit Animal - control code for toy animal animation
  

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 Mikey Sklar for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /* Trinket/Gemma compatible Raw IR decoder sketch
 This sketch/program uses an Adafruit Trinket or Gemma
 ATTiny85 based mini microcontroller and a PNA4602 to

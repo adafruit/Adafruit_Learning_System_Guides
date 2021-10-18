@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 FoamyGuy for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import board
 import displayio
 import adafruit_imageload

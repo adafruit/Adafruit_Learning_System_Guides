@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 FoamyGuy for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # pylint: disable=line-too-long
 # Fun facts to be read to the player by Minerva
 FACTS = [

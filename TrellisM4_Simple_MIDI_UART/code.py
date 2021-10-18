@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 John Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Simple example of sending MIDI via UART to classic DIN-5 (not USB) synth
 
 import adafruit_trellism4

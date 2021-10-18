@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 FoamyGuy for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 from tilegame_assets.states import (
     STATE_MAPWIN,
     STATE_LOST_SPARKY,

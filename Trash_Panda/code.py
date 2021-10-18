@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Anne Barela for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Code for the Trash Panda tutorial with Adafruit Crickit and Circuit Playground Express
 import time
 import board

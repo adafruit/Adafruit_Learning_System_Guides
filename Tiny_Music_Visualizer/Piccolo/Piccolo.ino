@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /*
 PICCOLO is a tiny Arduino-based audio visualizer.
 Hardware requirements:

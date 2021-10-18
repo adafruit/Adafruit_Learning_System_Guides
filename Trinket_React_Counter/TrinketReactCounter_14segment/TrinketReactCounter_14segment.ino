@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Adafruit Trinket React Counter Sketch - 14-segment quad alpha display
 //
 // Use a 14-segment quad alphanumeric LED backpack to display the 

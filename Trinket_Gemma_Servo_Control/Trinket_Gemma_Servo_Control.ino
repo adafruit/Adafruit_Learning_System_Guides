@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 Mikey Sklar for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /*******************************************************************
   SoftServo sketch for Adafruit Trinket.  Turn the potentiometer knob
   to set the corresponding position on the servo 

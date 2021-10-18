@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #ifndef FFT_N
 #define FFT_N 128 /* Number of samples (64,128,256,512). */
 #endif	/* FFT_N */
