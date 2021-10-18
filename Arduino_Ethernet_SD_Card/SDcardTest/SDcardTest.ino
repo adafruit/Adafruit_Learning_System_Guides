@@ -14,7 +14,7 @@
 
  created  28 Mar 2011 by Limor Fried
  modified 9 Apr 2012 by Tom Igoe
- modified 12 Apr 2018 by Mike Barela
+ modified 12 Apr 2018 by Anne Barela
  */
 // include the SD library:
 #include <SPI.h>

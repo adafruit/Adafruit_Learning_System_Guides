@@ -8,7 +8,7 @@ Adafruit invests time and resources providing this open source code,
 please support Adafruit and open-source hardware by purchasing
 products from [Adafruit](https://www.adafruit.com)!
  
-MIT license, code by Mike Barela, project by the Ruiz Brothers
+MIT license, code by Anne Barela, project by the Ruiz Brothers
 
 All text above, and the splash screen below must be included in any redistribution
 

@@ -18,7 +18,7 @@
    by Bruce Allen and Bill Gentles
 
  Version 2.0 Adds Arduino IDE 1.6.7 and greater Wire support 
-             Mike Barela for Adafruit Industries
+             Anne Barela for Adafruit Industries
 */
 
 // include the library code

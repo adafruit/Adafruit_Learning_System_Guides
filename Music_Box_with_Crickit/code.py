@@ -1,4 +1,4 @@
-# Music Box code in CircuitPython - Dano Wall and Mike Barela
+# Music Box code in CircuitPython - Dano Wall and Anne Barela
 # Revised by Ladyada 2019-01-16
 
 from adafruit_crickit import crickit

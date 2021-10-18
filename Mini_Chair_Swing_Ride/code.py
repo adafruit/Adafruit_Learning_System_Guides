@@ -1,5 +1,5 @@
 # Isaac Wellish
-# Code adapted from Mike Barela's Hello World of Robotics and
+# Code adapted from Anne Barela's Hello World of Robotics and
 # Make it Move with Crickit guides at learn.adafruit.com
 # Power must be plugged into right side of motor 1 on CRICKIT
 #  to turn counter clock wise

@@ -1,6 +1,6 @@
 # main.py - code to test the Adafruit CRICKIT board with
 # the BBC micro:bit and MicroPython (NOT CircuitPython)
-# MIT License by Limor Fried and Mike Barela, 2019
+# MIT License by Limor Fried and Anne Barela, 2019
 # This code requires the seesaw.py module as a driver
 import time
 import seesaw

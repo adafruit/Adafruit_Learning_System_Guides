@@ -1,5 +1,5 @@
 # Lucky Cat Maneki-neko with Circuit Playground Express
-# Mike Barela for Adafruit Industries, MIT License
+# Anne Barela for Adafruit Industries, MIT License
 
 import time
 import board
