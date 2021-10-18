@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 John Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Circuit Playground Bluefruit Rover
 # Use with the Adafruit BlueFruit LE Connect app
 # Works with CircuitPython 5.0.0-beta.0 and later

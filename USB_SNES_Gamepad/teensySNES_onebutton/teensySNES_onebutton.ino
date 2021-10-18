@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Limor Fried/ladyada for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 const int pinBtnUp = 0;
 
 const int pinLEDOutput = 11;
