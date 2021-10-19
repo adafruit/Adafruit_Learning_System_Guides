@@ -1,4 +1,5 @@
-# SPDX-FileCopyrightText: 2014, 2018 Phil Burgess and Mikey Sklar for Adafruit Industries
+# SPDX-FileCopyrightText: 2014 Phil Burgess for Adafruit Industries
+# SPDX-FileCopyrightText: 2018 Phil Burgess for Adafruit Industries
 #
 # SPDX-License-Identifier: MIT
 #
