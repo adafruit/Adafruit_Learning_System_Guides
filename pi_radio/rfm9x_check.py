@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Brent Rubell for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Wiring Check, Pi Radio w/RFM9x
 
