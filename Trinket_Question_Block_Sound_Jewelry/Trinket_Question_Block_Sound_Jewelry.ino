@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 Phillip Burgess/paintyourdragon for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /* -----------------------------------------------------------------------
    Super Mario Bros-inspired coin sound for Adafruit Trinket & Gemma.
 

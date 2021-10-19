@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Tony DiCola for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Adafruit Trinket React Counter Sketch - 7-segment display
 //
 // Use a 7-segment LED backpack to display the number of times a 

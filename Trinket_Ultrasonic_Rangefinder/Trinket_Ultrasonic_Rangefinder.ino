@@ -1,3 +1,8 @@
+// SPDX-FileCopyrightText: 2018 Mikey Sklar for Adafruit Industries
+// SPDX-FileCopyrightText: 2018 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /*
  Demonstration sketch for Adafruit LCD backpack
  using MCP23008 I2C expander and Maxbotic LV-EZ1 Ultrasonic Sensor

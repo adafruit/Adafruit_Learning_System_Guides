@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 FoamyGuy for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # State machine constants
 
 # playing the game: draw the map, listen for D-pad buttons to move player
