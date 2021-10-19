@@ -1,4 +1,5 @@
-# SPDX-FileCopyrightText: 2013, 2017 Phil Burgess and Mikey Sklar for Adafruit Industries
+# SPDX-FileCopyrightText: 2013 Phil Burgess for Adafruit Industries
+# SPDX-FileCopyrightText: 2017 Mikey Sklar for Adafruit Industries
 #
 # SPDX-License-Identifier: BSD
 
