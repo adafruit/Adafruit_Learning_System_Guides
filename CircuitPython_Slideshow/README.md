@@ -10,7 +10,7 @@ Adafruit invests time and resources providing this open source code,
 please support Adafruit and open-source hardware by purchasing
 products from [Adafruit](https://www.adafruit.com)!
  
-MIT license, guide written by Mike Barela, code by Limor Fried
+MIT license, guide written by Anne Barela, code by Limor Fried
 
 All text above, and the splash screen below must be included in any redistribution
 

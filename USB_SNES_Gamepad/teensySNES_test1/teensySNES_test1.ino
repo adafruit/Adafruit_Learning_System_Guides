@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Limor Fried/ladyada for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #define REPEATRATE 100  // milliseconds
 
 const int pinBtnUp = 0;

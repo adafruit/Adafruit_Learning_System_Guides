@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Brent Rubell for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Adafruit IO - Analog Devices ADT7410 + ADXL343 Example
 //
 // Adafruit invests time and resources providing this open source code.

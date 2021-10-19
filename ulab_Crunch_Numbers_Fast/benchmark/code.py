@@ -1,3 +1,8 @@
+# SPDX-FileCopyrightText: 2020 Jeff Epler for Adafruit Industries
+# SPDX-FileCopyrightText: 2020 Zoltán Vörös for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import time
 import math
 from ulab import numpy as np

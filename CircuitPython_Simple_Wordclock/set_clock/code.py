@@ -1,5 +1,5 @@
 # Write the time for the Adafruit DS3231 real-time clock.
-# Limor Fried/Mike Barela for Adafruit Industries
+# Limor Fried/Anne Barela for Adafruit Industries
 
 import time
 import board

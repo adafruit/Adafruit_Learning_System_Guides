@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Phil Burgess for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 GOOGLY EYES for Adafruit EyeLight LED glasses + driver. Pendulum physics
 simulation using accelerometer and math. This uses only the rings, not the

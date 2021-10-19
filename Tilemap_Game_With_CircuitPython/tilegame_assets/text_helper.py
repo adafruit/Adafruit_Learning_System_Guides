@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 FoamyGuy for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 def wrap_nicely(string, max_chars):
     """ From: https://www.richa1.com/RichardAlbritton/circuitpython-word-wrap-for-label-text/
     A helper that will return the string with word-break wrapping.

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 Limor Fried/ladyada for Adafruit Industries
+//
+// SPDX-License-Identifier: CC-BY-SA-3.0
+
 /* Trinket/Gemma compatible Raw IR decoder sketch
 This sketch/program uses an Adafruit Trinket or Gemma
 ATTiny85 based mini microcontroller and a PNA4602 to

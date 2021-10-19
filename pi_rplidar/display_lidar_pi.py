@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Dave Astels for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Consume LIDAR measurement file and create an image for display.
 

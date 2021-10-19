@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 1997 Juergen Hannken-Illjes for The NetBSD Foundation
+//
+// SPDX-License-Identifier: Berkeley
+
 #include "wsksymdef.h"
 
 /*	$NetBSD: wskbdmap_next.c,v 1.5 2008/04/28 20:23:30 martin Exp $	*/

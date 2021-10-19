@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Dan Halbert for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import time
 
 import board

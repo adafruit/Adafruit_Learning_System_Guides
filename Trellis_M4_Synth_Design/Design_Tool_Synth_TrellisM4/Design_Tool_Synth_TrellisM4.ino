@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 John Park for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /* Audio library demonstration - pocket synth with C major scale and 4 wave types */
 //each row is a different waveform, envelope, and effect set in major scale
 // row 0 sine, soft attack, long release ADSR

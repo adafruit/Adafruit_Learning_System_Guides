@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 John Park for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /*
   Audio Library on Trellis M4
   Demo of the audio sweep function.

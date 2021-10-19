@@ -1,5 +1,5 @@
 # Adafruit Grand Central Robot Xylophone Demo Program
-# Dano Wall and Mike Barela for Adafruit Industries
+# Dano Wall and Anne Barela for Adafruit Industries
 # MIT License
 
 import time

@@ -124,9 +124,7 @@ def fscale(originalmin, originalmax, newbegin, newend, inputvalue, curve):
 
 def drawLine(fromhere, to):
     if fromhere > to:
-        fromheretemp = fromhere
-        fromhere = to
-        to = fromheretemp
+        to, fromhere = fromhere, to
 
     for index in range(fromhere, to):
         strip[index] = (0, 0, 0)

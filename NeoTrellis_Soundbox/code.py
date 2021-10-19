@@ -1,5 +1,5 @@
 # NeoTrellis Soundbox Remix - CircuitPython
-# Noe and Pedro Ruiz, code by Mike Barela
+# Noe and Pedro Ruiz, code by Anne Barela
 # for Adafruit Industries, MIT License
 
 import time

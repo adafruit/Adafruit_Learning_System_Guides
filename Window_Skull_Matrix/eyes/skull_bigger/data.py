@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 John Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """ Configuration data for the skull eyes """
 # Photo by Lina White on Unsplash: https://unsplash.com/photos/K9nxgkYf-RI
 EYE_PATH = __file__[:__file__.rfind('/') + 1]

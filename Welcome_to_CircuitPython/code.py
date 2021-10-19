@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Kattni Rembor for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Blink example for boards with ONLY a NeoPixel LED (e.g. without a built-in red LED).
 Includes QT Py and various Trinkeys.
