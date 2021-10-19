@@ -1,4 +1,7 @@
-
+// SPDX-FileCopyrightText: 2014 HerrRausB https://github.com/HerrRausB
+//
+// SPDX-License-Identifier: LGPL-3.0-or-later
+//
 /******************************************************************************
  *
  * this file is part of the gemma hoop animator example sketch

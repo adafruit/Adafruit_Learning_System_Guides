@@ -1,3 +1,8 @@
+// SPDX-FileCopyrightText: 2014 Phil Burgess for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+//
+
 #include <Adafruit_NeoPixel.h>
 
 #define PIN       0

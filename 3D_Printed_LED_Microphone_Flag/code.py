@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2013, 2017 Phil Burgess and Mikey Sklar for Adafruit Industries
+#
+# SPDX-License-Identifier: BSD
+
 # LED VU meter for Arduino and Adafruit NeoPixel LEDs.
 
 # Hardware requirements:
