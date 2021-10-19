@@ -4,7 +4,7 @@ https://learn.adafruit.com/no-solder-papercraft-crystal-light-strand
 
 Circuit Playground Bluetooth with LED strand attached runs 4 different variable animation modes.
 
-Code by Roy Hooper using Adafruit's LED Animation Library:
+Code by Rose Hooper using Adafruit's LED Animation Library:
  https://learn.adafruit.com/circuitpython-led-animations/overview
 """
 # pylint: disable=attribute-defined-outside-init

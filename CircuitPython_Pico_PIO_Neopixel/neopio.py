@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2016 Damien P. George
 # SPDX-FileCopyrightText: 2017 Scott Shawcroft for Adafruit Industries
 # SPDX-FileCopyrightText: 2019 Carter Nelson
-# SPDX-FileCopyrightText: 2019 Roy Hooper
+# SPDX-FileCopyrightText: 2019 Rose Hooper
 # SPDX-FileCopyrightText: 2020 Jeff Epler
 #
 # SPDX-License-Identifier: MIT
@@ -10,7 +10,7 @@
 `neopio` - Neopixel strip driver using RP2040's PIO
 ===================================================
 
-* Author(s): Damien P. George, Scott Shawcroft, Carter Nelson, Roy Hooper, Jeff Epler
+* Author(s): Damien P. George, Scott Shawcroft, Carter Nelson, Rose Hooper, Jeff Epler
 """
 
 import adafruit_pioasm
