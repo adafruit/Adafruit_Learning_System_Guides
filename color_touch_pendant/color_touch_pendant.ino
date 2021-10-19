@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 Erin St. Blaine for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Code by Erin St. Blaine for Adafruit Industries
 // Color Touch Pendant Tutorial: https://learn.adafruit.com/color-touch-pendant-necklace/introduction
 // Two neopixel rings connected on pin 1 will cycle through gradient colors when the pendant is touched.  For Gemma M0.
