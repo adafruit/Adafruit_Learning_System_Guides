@@ -1,3 +1,8 @@
+# SPDX-FileCopyrightText: 2017 Limor Fried/ladyada for Adafruit Industries
+# SPDX-FileCopyrightText: 2018 Mikey Sklar for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import time
 import board
 import simpleio

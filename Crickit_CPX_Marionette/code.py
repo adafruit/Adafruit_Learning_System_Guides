@@ -1,6 +1,6 @@
 # CircuitPython for the Adafruit Learning System Tutorial
 # Universal Marionette Kit
-# Project by Dano Wall, code by Mike Barela for Adafruit Industries
+# Project by Dano Wall, code by Anne Barela for Adafruit Industries
 # MIT License
 import time
 from adafruit_crickit import crickit

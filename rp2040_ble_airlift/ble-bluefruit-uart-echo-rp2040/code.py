@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Brent Rubell for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import board
 from adafruit_ble import BLERadio
 from adafruit_ble.advertising.standard import ProvideServicesAdvertisement

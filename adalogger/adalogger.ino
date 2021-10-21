@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Limor Fried/ladyada for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #include <SPI.h>
 #include <SD.h>
 

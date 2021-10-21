@@ -1,7 +1,7 @@
 # Simple paint program for Trellis M4 Express
 # Press any button it will cycle through a palette of colors!
 #
-# Mike Barela for Adafruit Industries   November, 2018
+# Anne Barela for Adafruit Industries   November, 2018
 #
 import time
 import adafruit_trellism4

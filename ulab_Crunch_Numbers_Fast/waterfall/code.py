@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Jeff Epler for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """Waterfall FFT demo adapted from
 https://teaandtechtime.com/fft-circuitpython-library/
 to work with ulab on Adafruit CLUE"""

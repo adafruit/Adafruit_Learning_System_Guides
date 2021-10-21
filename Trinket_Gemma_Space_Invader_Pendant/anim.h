@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 Mikey Sklar for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Animation data for Trinket/Gemma + LED matrix backpack jewelry.
 // Edit this file to change the animation; it's unlikely you'll need
 // to edit the source code.

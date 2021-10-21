@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 John Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Matrix Weather display
 # For Metro M4 Airlift with RGB Matrix shield, 64 x 32 RGB LED Matrix display
 

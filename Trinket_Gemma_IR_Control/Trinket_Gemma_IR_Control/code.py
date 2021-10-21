@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Mikey Sklar for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 IR codes for button 0, 1, 2, 3 these were acquired from the
 Adafruit Mini Remote Control #389

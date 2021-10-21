@@ -1,6 +1,6 @@
 # Stumble bot, coded in CircuitPython
 # Using an Adafruit Circuit Playground Express, Crickit, and 2 servos
-# Dano Wall, Mike Barela for Adafruit Industries, MIT License, May, 2018
+# Dano Wall, Anne Barela for Adafruit Industries, MIT License, May, 2018
 #
 import time
 import board

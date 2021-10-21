@@ -13,7 +13,7 @@ Then you should be able to see the **CIRCUITPY** drive when connected via USB.
 
 CircuitPython resources are at https://CircuitPython.Org/
 
-Code written by Dano Wall and Mike Barela for Adafruit Industries. 
+Code written by Dano Wall and Anne Barela for Adafruit Industries.
 
 MIT License, please attribute.
 

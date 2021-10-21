@@ -12,7 +12,7 @@
  created   Nov 2010 by David A. Mellis
  modified 9 Apr 2012 by Tom Igoe
  modified 2 Feb 2014 by Scott Fitzgerald
- modified 12 Apr 2018 by Mike Barela 
+ modified 12 Apr 2018 by Anne Barela
 
  This example code is in the public domain.
  

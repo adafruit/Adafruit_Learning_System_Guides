@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Erin St. Blaine for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Read the barometric reading in the air
 Visualize air reading changes over time as a color animation on a NeoPixel strip

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2017 John Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 UFO Flying Saucer with Circuit Playground Express
 https://learn.adafruit.com/ufo-circuit-playground-express/

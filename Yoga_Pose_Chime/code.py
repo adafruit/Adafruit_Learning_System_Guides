@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 John Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Yoga pose timer
 # Requires CLUE with solenoid transistor driver circuit
 

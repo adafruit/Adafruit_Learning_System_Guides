@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 John Park for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Trellis M4 Audio Workshop
 // shows how to alter pitch with accelerometer
 // Waveform Mod
