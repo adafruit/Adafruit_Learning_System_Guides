@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2017 Phil Burgess for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+#
 import time
 
 import board

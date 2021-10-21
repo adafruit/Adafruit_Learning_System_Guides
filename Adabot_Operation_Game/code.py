@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 John Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+#
 # Adabot Operation Game
 #  CPX, alligator clips, copper tape, tweezers, surgery, and fun!
 

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2014 HerrRausB https://github.com/HerrRausB
+# SPDX-FileCopyrightText: 2017 Mikey Sklar for Adafruit Industries
+#
+# SPDX-License-Identifier: LGPL-3.0-or-later
 #
 # 3D_Printed_NeoPixel_Ring_Hair_Dress.py
 #

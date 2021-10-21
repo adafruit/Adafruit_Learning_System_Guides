@@ -1,4 +1,8 @@
-      // Animation data for Trinket/Gemma + LED matrix backpack jewelry. 
+// SPDX-FileCopyrightText: 2014 Phil Burgess for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+//
+// Animation data for Trinket/Gemma + LED matrix backpack jewelry. 
 #define REPS 255 // Number of times to repeat the animation loop (1-255)
 const uint8_t PROGMEM anim[] = {
   

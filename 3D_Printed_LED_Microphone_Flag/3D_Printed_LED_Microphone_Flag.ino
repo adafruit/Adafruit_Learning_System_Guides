@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2013 Phil Burgess for Adafruit Industries
+//
+// SPDX-License-Identifier: BSD
 /*
 LED VU meter for Arduino and Adafruit NeoPixel LEDs.
  

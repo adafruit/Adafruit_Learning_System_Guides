@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Collin Cunningham for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+#
 """ACTIVITY GENERATOR for Adafruit CLUE"""
 
 import time
