@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2019 Kattni Rembor for Adafruit Industries
 #
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: MIT 
 #
 import time
 import analogio

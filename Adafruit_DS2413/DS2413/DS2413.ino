@@ -1,6 +1,6 @@
 // SPDX-FileCopyrightText: 2014 Bill Earl for Adafruit Industries
 //
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: MIT 
 
 #include <OneWire.h>
 

@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2018 Arduino SA
-//
+// 
 // SPDX-License-Identifier: GPL-2.1-or-later
 /*
   ESP32BootROM - part of the Firmware Updater for the 
