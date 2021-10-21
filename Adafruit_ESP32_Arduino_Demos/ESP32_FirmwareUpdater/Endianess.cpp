@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2015 Arduino LLC 
+//
+// SPDX-License-Identifier: GPL-2.1-or-later
+
 /*
   Endianess.ino - Network byte order conversion functions.
   Copyright (c) 2015 Arduino LLC.  All right reserved.
