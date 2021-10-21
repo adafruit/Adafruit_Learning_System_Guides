@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Limor Fried/Ladyada for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+//
 // Stream MP3s over WiFi on Metro M4 Express and play via music maker shield
 
 //#define DEBUG_OUTPUT
