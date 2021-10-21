@@ -1,3 +1,8 @@
+// SPDX-FileCopyrightText: 2019 Erin St. Blaine for Adafruit Industries
+// SPDX-FileCopyrightText: 2019 John Edgar Park for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+//
 //Ada_remoteFXTrigger_NeoTrellis_TX
 //Remote Effects Trigger Box Transmitter
 //by John Park
