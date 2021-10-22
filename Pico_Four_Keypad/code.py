@@ -11,37 +11,42 @@ from adafruit_hid.keycode import Keycode
 
 kpd = Keyboard(usb_hid.devices)
 
+# Choose the correct modifier key for Windows or Mac.
+# Comment one line and uncomment the other.
+# MODIFIER = Keycode.CONTROL  # For Windows
+MODIFIER = Keycode.COMMAND  # For Mac
+
 # define buttons
-num_keys = 4
-pins = (
+NUM_KEYS = 4
+PINS = (
     board.GP0,
     board.GP1,
     board.GP2,
-    board.GP3
+    board.GP3,
+)
+
+KEYMAP = (
+    ("Select all", [MODIFIER, Keycode.A]),
+    ("Cut", [MODIFIER, Keycode.X]),
+    ("Copy", [MODIFIER, Keycode.C]),
+    ("Paste", [MODIFIER, Keycode.V]),
 )
 
 keys = []
-for pin in pins:
-    tmp_pin = DigitalInOut(pin)
-    tmp_pin.pull = Pull.UP
-    keys.append(Debouncer(tmp_pin))
-
-keymap = {
-    (0): ("Select all", [Keycode.GUI, Keycode.A]),
-    (1): ("Cut", [Keycode.GUI, Keycode.X]),
-    (2): ("Copy", [Keycode.GUI, Keycode.C]),
-    (3): ("Paste", [Keycode.GUI, Keycode.V])
-}
+for pin in PINS:
+    dio = DigitalInOut(pin)
+    dio.pull = Pull.UP
+    keys.append(Debouncer(dio))
 
 print("\nWelcome to keypad")
 print("keymap:")
-for k in range(num_keys):
-    print("\t", (keymap[k][0]))
+for k in range(NUM_KEYS):
+    print("\t", (KEYMAP[k][0]))
 
 
 while True:
-    for i in range(num_keys):
+    for i in range(NUM_KEYS):
         keys[i].update()
         if keys[i].fell:
-            print(keymap[i][0])
-            kpd.send(*keymap[i][1])
+            print(KEYMAP[i][0])
+            kpd.send(*KEYMAP[i][1])
