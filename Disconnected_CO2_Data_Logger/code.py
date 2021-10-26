@@ -30,7 +30,11 @@ spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
 cs = digitalio.DigitalInOut(SD_CS)
 sdcard = adafruit_sdcard.SDCard(spi, cs)
 vfs = storage.VfsFat(sdcard)
-storage.mount(vfs, "/sd")
+try:
+    storage.mount(vfs, "/sd")
+    print("sd card mounted")
+except ValueError:
+    print("no SD card")
 
 #  to update the RTC, change set_clock to True
 #  otherwise RTC will remain set
@@ -52,24 +56,32 @@ t = rtc.datetime
 time.sleep(1)
 
 #  initial write to the SD card on startup
-with open("/sd/co2.txt", "a") as f:
-    #  writes the date
-    f.write('The date is {} {}/{}/{}\n'.format(days[t.tm_wday], t.tm_mday, t.tm_mon, t.tm_year))
-    #  writes the start time
-    f.write('Start time: {}:{}:{}\n'.format(t.tm_hour, t.tm_min, t.tm_sec))
-    #  headers for data, comma-delimited
-    f.write('CO2,Time\n')
-    #  debug statement for REPL
-    print("initial write to SD card complete, starting to log")
+try:
+    with open("/sd/co2.txt", "a") as f:
+        #  writes the date
+        f.write('The date is {} {}/{}/{}\n'.format(days[t.tm_wday], t.tm_mday, t.tm_mon, t.tm_year))
+        #  writes the start time
+        f.write('Start time: {}:{}:{}\n'.format(t.tm_hour, t.tm_min, t.tm_sec))
+        #  headers for data, comma-delimited
+        f.write('CO2,Time\n')
+        #  debug statement for REPL
+        print("initial write to SD card complete, starting to log")
+except ValueError:
+    print("initial write to SD card failed - check card")
 
 while True:
-    #  variable for RTC datetime
-    t = rtc.datetime
-    #  append SD card text file
-    with open("/sd/co2.txt", "a") as f:
-        #  read co2 data from SCD40
-        co2 = scd4x.CO2
-        #  write co2 data followed by the time, comma-delimited
-        f.write('{},{}:{}:{}\n'.format(co2, t.tm_hour, t.tm_min, t.tm_sec))
-    #  repeat every 30 seconds
-    time.sleep(30)
+    try:
+        #  variable for RTC datetime
+        t = rtc.datetime
+        #  append SD card text file
+        with open("/sd/co2.txt", "a") as f:
+            #  read co2 data from SCD40
+            co2 = scd4x.CO2
+            #  write co2 data followed by the time, comma-delimited
+            f.write('{},{}:{}:{}\n'.format(co2, t.tm_hour, t.tm_min, t.tm_sec))
+            print("data written to sd card")
+        #  repeat every 30 seconds
+        time.sleep(30)
+    except ValueError:
+        print("data error - cannot write to SD card")
+        time.sleep(10)
