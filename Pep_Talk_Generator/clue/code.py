@@ -1,5 +1,9 @@
-from adafruit_clue import clue
+# SPDX-FileCopyrightText: 2021 Dylan Herrada for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import random
+from adafruit_clue import clue
 import displayio
 from adafruit_display_text import label, wrap_text_to_pixels
 from adafruit_bitmap_font import bitmap_font

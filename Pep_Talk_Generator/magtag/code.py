@@ -1,5 +1,9 @@
-from adafruit_magtag.magtag import MagTag
+# SPDX-FileCopyrightText: 2021 Dylan Herrada for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import random
+from adafruit_magtag.magtag import MagTag
 
 magtag = MagTag(default_bg="/bmps/background.bmp")
 
@@ -96,7 +100,6 @@ magtag.add_text(
     line_spacing=0.7,
 )
 
-# magtag.set_text(max(column_1, key=len) + max(column_2, key=len) + max(column_3, key=len) + max(column_4, key=len), 0, False)
 magtag.set_text(
     random.choice(column_1)
     + random.choice(column_2)
