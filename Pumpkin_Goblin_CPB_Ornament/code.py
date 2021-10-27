@@ -4,7 +4,7 @@
 
 """
 This example shows different ways to use AnimationGroup: syncing four animations across two separate
-pixel objects such as the built-in NeoPixels on a Circuit Playground Bluefruit and a 16x NeoPixel Ring.
+pixel objects such as the built-in NeoPixels on a Circuit Playground Bluefruit and a NeoPixel Ring.
 
 This example is written for Circuit Playground Bluefruit and a 16-pixel NeoPixel ring connected to
 pad A1. It does not work on Circuit Playground Express.
@@ -15,7 +15,6 @@ from adafruit_circuitplayground import cp
 
 from adafruit_led_animation.animation.blink import Blink
 from adafruit_led_animation.animation.comet import Comet
-from adafruit_led_animation.animation.chase import Chase
 from adafruit_led_animation.animation.pulse import Pulse
 from adafruit_led_animation.animation.sparkle import Sparkle
 
