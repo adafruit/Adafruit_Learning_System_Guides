@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2011 Limor Fried/ladyada for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Thermistor Example #3 from the Adafruit Learning System guide on Thermistors 
 // https://learn.adafruit.com/thermistor/overview by Limor Fried, Adafruit Industries
 // MIT License - please keep attribution and consider buying parts from Adafruit

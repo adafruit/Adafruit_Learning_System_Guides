@@ -1,3 +1,8 @@
+# SPDX-FileCopyrightText: 2018 Mikey Sklar for Adafruit Industries
+# SPDX-FileCopyrightText: 2020 Erin St. Blaine for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import time
 import board
 import neopixel
