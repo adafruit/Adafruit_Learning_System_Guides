@@ -53,7 +53,7 @@ except RequestError: # if we don't, create and assign them.
     altitude_feed = aio.create_feed(Feed(name='altitude'))
 
 # Create busio I2C
-i2c = busio.I2C(board.SCL, board.SDA, frequency=100000)
+i2c = busio.I2C(board.SCL, board.SDA)
 # Create VEML6070 object.
 uv = adafruit_veml6070.VEML6070(i2c)
 # Create BME280 object.
