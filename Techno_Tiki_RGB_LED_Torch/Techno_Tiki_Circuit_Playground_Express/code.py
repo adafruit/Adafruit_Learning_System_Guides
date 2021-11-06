@@ -1,3 +1,8 @@
+# SPDX-FileCopyrightText: 2018 Tony DiCola for Adafruit Industries
+# SPDX-FileCopyrightText: 2018 Mikey Sklar for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Techno-Tiki RGB LED Torch with IR Remote Control
 # Created by Tony DiCola for Arduino
 # Ported to CircuitPython by Mikey Sklar

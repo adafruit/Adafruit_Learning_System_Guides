@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Brent Rubell for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """Using TinyLoRa with a Si7021 Sensor.
 """
 import time

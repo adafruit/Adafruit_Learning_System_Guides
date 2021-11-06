@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Phillip Burgess for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Speak & Spell sound board for the Adafruit NeoTrellis M4.
 // Requires the following libraries, install with Arduino Library Manager:
 //  - Adafruit_NeoTrellisM4
