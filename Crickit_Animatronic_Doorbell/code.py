@@ -1,11 +1,10 @@
-# SPDX-FileCopyrightText: Animated Eyeball Doorbell 2021 John Park for Adafruit Industries
+# SPDX-FileCopyrightText: 2021 John Park for Adafruit Industries
 # SPDX-License-Identifier: MIT
-# Feather RP2040 + Crickit to control Gemmy Animated Eyeball Doorbell
 import time
+import random
 import board
 import audiomp3
 import audiopwmio
-import random
 from adafruit_crickit import crickit
 
 ss = crickit.seesaw  # Crickit seesaw setup
