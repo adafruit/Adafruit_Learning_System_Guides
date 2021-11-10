@@ -1,7 +1,7 @@
-from adafruit_circuitplayground.express import cpx
+from adafruit_circuitplayground import cp
 
 while True:
-    if cpx.switch:
+    if cp.switch:
         print("Slide switch off!")
     else:
         print("Slide switch on!")

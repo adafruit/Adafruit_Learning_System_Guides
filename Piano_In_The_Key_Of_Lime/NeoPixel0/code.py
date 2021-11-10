@@ -1,3 +1,3 @@
-from adafruit_circuitplayground.express import cpx
+from adafruit_circuitplayground import cp
 
-cpx.pixels[0] = ((0, 0, 3))
+cp.pixels[0] = ((0, 0, 3))
