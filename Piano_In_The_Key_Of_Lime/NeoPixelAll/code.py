@@ -1,3 +1,4 @@
-from adafruit_circuitplayground.express import cpx
+from adafruit_circuitplayground import cp
 
-cpx.pixels.fill((0, 0, 3))
+while True:
+    cp.pixels.fill((0, 0, 3))

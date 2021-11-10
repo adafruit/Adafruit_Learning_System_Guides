@@ -1,5 +1,5 @@
-from adafruit_circuitplayground.express import cpx
+from adafruit_circuitplayground import cp
 
 while True:
-    if cpx.touch_A1:
+    if cp.touch_A1:
         print('Touched 1!')
