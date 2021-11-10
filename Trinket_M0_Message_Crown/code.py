@@ -10,7 +10,8 @@ import neopixel
 pixel_pin = board.D4
 num_pixels = 13
 
-pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=0.3, auto_write=False)
+pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=0.3,
+                           auto_write=False)
 
 # Lights up the message letter by letter
 def spell(color, wait):
@@ -32,8 +33,8 @@ def show_word(startIndex, endIndex, color, wait):
     pixels.show()
     time.sleep(wait)
 
-# Lights up every even-numbered index of neopixel
-def alternate(p1, color, wait):
+# Lights up every even-numbered index
+def alternate(color, wait):
     for i in range(num_pixels):
         if i % 2 == 0:
             pixels[i] = color
@@ -42,8 +43,8 @@ def alternate(p1, color, wait):
     pixels.show()
     time.sleep(wait)
 
-# Lights up every odd-numbered index of neopixel
-def alternate_reverse(p1, color, wait):
+# Lights up every odd-numbered index
+def alternate_reverse(color, wait):
     for i in range(num_pixels):
         if i % 2 == 1:
             pixels[i] = color
@@ -70,7 +71,7 @@ BLUE = (0, 0, 255)
 PURPLE = (180, 0, 255)
 MAGENTA = (255, 0, 20)
 JADE = (0, 255, 40)
-OFF = (0,0,0)
+OFF = (0, 0, 0)
 
 ALT_WAIT = 0.5
 CHASE_WAIT = 0.1
@@ -91,17 +92,17 @@ while True:
     spell(CYAN, CHASE_WAIT)
     spell(PURPLE, CHASE_WAIT)
 
-    alternate(pixels, JADE, ALT_WAIT)
-    alternate_reverse(pixels, ORANGE, ALT_WAIT)
+    alternate(JADE, ALT_WAIT)
+    alternate_reverse(ORANGE, ALT_WAIT)
 
-    alternate(pixels, MAGENTA, ALT_WAIT)
-    alternate_reverse(pixels, BLUE, ALT_WAIT)
+    alternate(MAGENTA, ALT_WAIT)
+    alternate_reverse(BLUE, ALT_WAIT)
 
-    alternate(pixels, PURPLE, ALT_WAIT)
-    alternate_reverse(pixels, GREEN, ALT_WAIT)
+    alternate(PURPLE, ALT_WAIT)
+    alternate_reverse(GREEN, ALT_WAIT)
 
-    alternate(pixels, CYAN, ALT_WAIT)
-    alternate_reverse(pixels, MAGENTA, ALT_WAIT)
+    alternate(CYAN, ALT_WAIT)
+    alternate_reverse(MAGENTA, ALT_WAIT)
 
     rainbow_cycle(0)
-    rainbow_cycle(0) # higher number, slower rainbow
+    rainbow_cycle(0)  # higher number, slower rainbow
