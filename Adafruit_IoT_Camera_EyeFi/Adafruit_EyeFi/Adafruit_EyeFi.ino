@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2015 Limor Fried/ladyada for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
 /*
 This Arduino sketch combines a serial JPEG camera, data logging shield
 and an Eye-Fi wireless SD card in order to provide remote monitoring.
