@@ -1,7 +1,6 @@
 # SPDX-FileCopyrightText: 2021 Ruiz Brothers for Adafruit Industries
 # SPDX-License-Identifier: MIT
 
-import time
 import board
 import neopixel
 from adafruit_led_animation.animation.pulse import Pulse
