@@ -29,13 +29,13 @@ while True:
     elif cp.touch_A5:
         cp.pixels.fill((0, 255, 255))
         cp.start_tone(392)
-    elif cp.touch_A6 and not cp.touch_A7:
+    elif cp.touch_A6 and not cp.touch_TX:
         cp.pixels.fill((0, 0, 255))
         cp.start_tone(440)
-    elif cp.touch_A7 and not cp.touch_A6:
+    elif cp.touch_TX and not cp.touch_A6:
         cp.pixels.fill((100, 0, 255))
         cp.start_tone(494)
-    elif cp.touch_A6 and cp.touch_A7:
+    elif cp.touch_A6 and cp.touch_TX:
         cp.pixels.fill((255, 0, 255))
         cp.start_tone(523)
     else:
