@@ -25,8 +25,6 @@ pulse = Pulse(pixels, speed=0.05, color=AMBER, period=5)
 sparkle = Sparkle(pixels, speed=0.15, color=AMBER, num_sparkles=10)
 chase = Chase(pixels, speed=0.1, color=AMBER, size=1, spacing=8)
 
-from adafruit_led_animation.animation.solid import Solid
-
 animations = AnimationSequence(
     chase,
     pulse,
@@ -38,4 +36,3 @@ animations = AnimationSequence(
 
 while True:
     animations.animate()
-
