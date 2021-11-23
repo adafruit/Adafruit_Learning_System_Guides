@@ -1,38 +1,72 @@
-# SPDX-FileCopyrightText: 2021 Noe Ruiz for Adafruit Industries
+# SPDX-FileCopyrightText: 2021 Liz Clark for Adafruit Industries
 # SPDX-License-Identifier: MIT
 
-"""
-NeoPixel Menorah using QT Py RP2040.
-"""
+import time
 import board
 import neopixel
-from adafruit_led_animation.animation.pulse import Pulse
-from adafruit_led_animation.animation.solid import Solid
-from adafruit_led_animation.animation.sparkle import Sparkle
-from adafruit_led_animation.animation.chase import Chase
+from digitalio import DigitalInOut, Direction, Pull
+from adafruit_led_animation.animation.rainbow import Rainbow
 from adafruit_led_animation.sequence import AnimationSequence
+from adafruit_led_animation import helper
 from adafruit_led_animation.color import AMBER
 
-# Update to match the pin connected to your NeoPixels
+#  button setup
+button = DigitalInOut(board.D1)
+button.direction = Direction.INPUT
+button.pull = Pull.UP
+
+#  neopixel setup
 pixel_pin = board.D0
-# Update to match the number of NeoPixels you have connected
 pixel_num = 9
 
-pixels = neopixel.NeoPixel(pixel_pin, pixel_num, brightness=1, auto_write=False)
+pixels = neopixel.NeoPixel(pixel_pin, pixel_num, brightness=0.3, auto_write=False)
 
-solid = Solid(pixels, color=AMBER)
-pulse = Pulse(pixels, speed=0.05, color=AMBER, period=5)
-sparkle = Sparkle(pixels, speed=0.15, color=AMBER, num_sparkles=10)
-chase = Chase(pixels, speed=0.1, color=AMBER, size=1, spacing=8)
+#  variable for number of pixels in the pixelmap helper
+num = 1
 
-animations = AnimationSequence(
-    chase,
-    pulse,
-    sparkle,
-    solid,
-    advance_interval=5,
-    auto_clear=True,
+#  pixel map helper
+#  allows you to light each candle up one by one
+#  begins with one being lit (num)
+candles = helper.PixelMap.horizontal_lines(
+    pixels, num, 1, helper.horizontal_strip_gridmap(pixel_num, alternating=False)
 )
 
+#  rainbow animation
+rainbow = Rainbow(candles, speed=0.1, period=5)
+
+animations = AnimationSequence(rainbow)
+
+#  turn on center candle
+pixels[4] = AMBER
+pixels.show()
+
 while True:
+
+    #  if only one candle is lit, don't rewrite center neopixel
+    if num == 1:
+        pass
+    #  otherwise write data to center neopixel
+    else:
+        pixels[4] = AMBER
+        pixels.show()
+    #  animation the rainbow animation
     animations.animate()
+
+    #  if you press the button...
+    if not button.value:
+        #  if all of the candles are not lit up yet...
+        if num < 9:
+            #  increase value of num by one
+            num += 1
+        #  skip the center candle so that it stays amber
+        if num == 4:
+            num = 5
+        #  recreate the pixel helper to increase the size of the horizontal grid
+        #  this is how the next neopixel is lit up in the sequence
+        candles = helper.PixelMap.horizontal_lines(
+            pixels, num, 1, helper.horizontal_strip_gridmap(pixel_num, alternating=False)
+        )
+        rainbow = Rainbow(candles, speed=0.1, period=5)
+        animations = AnimationSequence(rainbow)
+        #  quick delay so that everything flows well
+        time.sleep(0.5)
