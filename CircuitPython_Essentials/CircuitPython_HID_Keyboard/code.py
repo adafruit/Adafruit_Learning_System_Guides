@@ -18,11 +18,6 @@ key_pin_array = []
 keys_pressed = [Keycode.A, "Hello World!\n"]
 control_key = Keycode.SHIFT
 
-# The keyboard object!
-time.sleep(1)  # Sleep for a bit to avoid a race condition on some systems
-keyboard = Keyboard(usb_hid.devices)
-keyboard_layout = KeyboardLayoutUS(keyboard)  # We're in the US :)
-
 # Make all pin objects inputs with pullups
 for pin in keypress_pins:
     key_pin = digitalio.DigitalInOut(pin)
@@ -36,29 +31,46 @@ led = digitalio.DigitalInOut(board.LED)
 # led = digitalio.DigitalInOut(board.SCK)
 led.direction = digitalio.Direction.OUTPUT
 
-print("Waiting for key pin...")
-
 while True:
-    # Check each pin
-    for key_pin in key_pin_array:
-        if not key_pin.value:  # Is it grounded?
-            i = key_pin_array.index(key_pin)
-            print("Pin #%d is grounded." % i)
+    # main loops for connection and key presses
 
-            # Turn on the red LED
-            led.value = True
+    while True:
+        # stay in this loop until a connection is available
+        try:
+            # The keyboard object!
+            keyboard = Keyboard(usb_hid.devices)
+            keyboard_layout = KeyboardLayoutUS(keyboard)  # We're in the US :)
+            break  # successfully connected, leave the connection loop
+        except:
+            time.sleep(1.0)
 
-            while not key_pin.value:
-                pass  # Wait for it to be ungrounded!
-            # "Type" the Keycode or string
-            key = keys_pressed[i]  # Get the corresponding Keycode or string
-            if isinstance(key, str):  # If it's a string...
-                keyboard_layout.write(key)  # ...Print the string
-            else:  # If it's not a string...
-                keyboard.press(control_key, key)  # "Press"...
-                keyboard.release_all()  # ..."Release"!
+    try:  # catch exceptions due to terminated connection, e.g. when the PC is shut down
+        print("Waiting for key pin...")
 
-            # Turn off the red LED
-            led.value = False
+        while True:
+            # Check each pin
+            for key_pin in key_pin_array:
+                if not key_pin.value:  # Is it grounded?
+                    i = key_pin_array.index(key_pin)
+                    print("Pin #%d is grounded." % i)
 
-    time.sleep(0.01)
+                    # Turn on the red LED
+                    led.value = True
+
+                    while not key_pin.value:
+                        pass  # Wait for it to be ungrounded!
+                    # "Type" the Keycode or string
+                    key = keys_pressed[i]  # Get the corresponding Keycode or string
+                    if isinstance(key, str):  # If it's a string...
+                        keyboard_layout.write(key)  # ...Print the string
+                    else:  # If it's not a string...
+                        keyboard.press(control_key, key)  # "Press"...
+                        keyboard.release_all()  # ..."Release"!
+
+                    # Turn off the red LED
+                    led.value = False
+
+            time.sleep(0.01)
+    except:
+        # connection lost, go back to the first loop where Keyboard is instantiated
+        pass
