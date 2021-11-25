@@ -35,6 +35,10 @@ class App:
         """ Activate application settings; update OLED labels and LED
             colors. """
         group[13].text = self.name   # Application name
+        if self.name:
+            rect.fill = 0xFFFFFF
+        else: # empty app name indicates blank screen for which we dimm header
+            rect.fill = 0x000000
         for i in range(12):
             if i < len(self.macros): # Key in use, set label + LED color
                 macropad.pixels[i] = self.macros[i][0]
@@ -66,7 +70,8 @@ for key_index in range(12):
                                                 macropad.display.height - 1 -
                                                 (3 - y) * 12),
                              anchor_point=(x / 2, 1.0)))
-group.append(Rect(0, 0, macropad.display.width, 12, fill=0xFFFFFF))
+rect = Rect(0, 0, macropad.display.width, 12, fill=0xFFFFFF)
+group.append(rect)
 group.append(label.Label(terminalio.FONT, text='', color=0x000000,
                          anchored_position=(macropad.display.width//2, -2),
                          anchor_point=(0.5, 0.0)))
