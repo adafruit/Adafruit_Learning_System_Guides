@@ -39,10 +39,11 @@ while True:
         try:
             # The keyboard object!
             keyboard = Keyboard(usb_hid.devices)
-            keyboard_layout = KeyboardLayoutUS(keyboard)  # We're in the US :)
             break  # successfully connected, leave the connection loop
         except:
             time.sleep(1.0)
+
+    keyboard_layout = KeyboardLayoutUS(keyboard)  # We're in the US :)
 
     try:  # catch exceptions due to terminated connection, e.g. when the PC is shut down
         print("Waiting for key pin...")
