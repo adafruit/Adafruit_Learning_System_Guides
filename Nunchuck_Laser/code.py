@@ -26,15 +26,21 @@ laser = wing.channels[2]
 
 nc = adafruit_nunchuk.Nunchuk(i2c)
 
+# Pre-calculate the angles
+min_yaw_angle = YAW_RANGE / 2
+max_yaw_angle = 180 - (YAW_RANGE / 2)
+min_pitch_angle = PITCH_OFFSET + (PITCH_RANGE / 2)
+max_pitch_angle = PITCH_OFFSET + 180 - (PITCH_RANGE / 2)
+
 while True:
     x, y = nc.joystick
-    servo_yaw.angle = simpleio.map_range(255 - x, 0, 255, (YAW_RANGE / 2), 180 - (YAW_RANGE / 2))
-    servo_pitch.angle = simpleio.map_range(y, 0, 255, PITCH_OFFSET + (PITCH_RANGE / 2), PITCH_OFFSET + 180 - (PITCH_RANGE / 2))
+    servo_yaw.angle = simpleio.map_range(255 - x, 0, 255, min_yaw_angle, max_yaw_angle)
+    servo_pitch.angle = simpleio.map_range(y, 0, 255, min_pitch_angle, max_pitch_angle)
     ax = nc.acceleration[0]
 
     if nc.buttons.Z: # Z-Button sets laser to full brightness
         laser.duty_cycle = 0xFFFF
-    elif nc.buttons.C: # C-Button sets laser to brightness depending on the roll position of your hand
+    elif nc.buttons.C: # C-Button sets laser brightness depending on the roll position of your hand
         laser.duty_cycle = int(simpleio.map_range(ax, 240, 750, 0, 0xFFFF))
     else: # No button pressed sets laser to off
         laser.duty_cycle = 0
