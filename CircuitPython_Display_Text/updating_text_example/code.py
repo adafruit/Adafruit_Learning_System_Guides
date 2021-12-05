@@ -19,9 +19,7 @@ display.show(main_group)
 
 # create the label
 updating_label = label.Label(
-    font=terminalio.FONT,
-    text="Time Is:\n{}".format(time.monotonic()),
-    scale=2
+    font=terminalio.FONT, text="Time Is:\n{}".format(time.monotonic()), scale=2
 )
 
 # set label position on the display
