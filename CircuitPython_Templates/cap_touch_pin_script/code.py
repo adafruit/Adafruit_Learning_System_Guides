@@ -52,15 +52,15 @@ def get_pin_names():
         if isinstance(pin, Pin)
     ]
     pin_names = []
-    for p in pins:
-        if p not in pin_names:
-            pin_names.append(p)
+    for pin_object in pins:
+        if pin_object not in pin_names:
+            pin_names.append(pin_object)
     return pin_names
 
 
 for possible_touch_pin in get_pin_names():  # Get the pin name.
     try:
-        p = touchio.TouchIn(
+        touch_pin_object = touchio.TouchIn(
             possible_touch_pin
         )  # Attempt to create the touch object on each pin.
         # Print the touch-capable pins that do not need, or already have, an external pulldown.
