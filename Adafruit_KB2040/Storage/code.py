@@ -2,16 +2,13 @@
 # SPDX-License-Identifier: Unlicense
 """
 CircuitPython Essentials Storage CP Filesystem code.py file
-
-For use with boards with a built-in red LED.
 """
 import time
 import board
-import digitalio
 import microcontroller
+import neopixel
 
-led = digitalio.DigitalInOut(board.LED)
-led.switch_to_output()
+pixel = neopixel.NeoPixel(board.NEOPIXEL, 1)
 
 try:
     with open("/temperature.txt", "a") as temp_log:
@@ -24,16 +21,18 @@ try:
             temp_log.write('{0:.2f}\n'.format(temperature))
             temp_log.flush()
 
-            # Blink the LED on every write...
-            led.value = True
+            # Blink the NeoPixel on every write...
+            pixel.fill((255, 0, 0))
             time.sleep(1)  # ...for one second.
-            led.value = False  # Then turn it off...
+            pixel.fill((0, 0, 0))  # Then turn it off...
             time.sleep(9)  # ...for the other 9 seconds.
 
 except OSError as e:  # When the filesystem is NOT writable by CircuitPython...
-    delay = 0.5  # ...blink the LED every half second.
+    delay = 0.5  # ...blink the NeoPixel every half second.
     if e.args[0] == 28:  # If the file system is full...
-        delay = 0.15  # ...blink the LED every 0.15 seconds!
+        delay = 0.15  # ...blink the NeoPixel every 0.15 seconds!
     while True:
-        led.value = not led.value
+        pixel.fill((255, 0, 0))
+        time.sleep(delay)
+        pixel.fill((0, 0, 0))
         time.sleep(delay)

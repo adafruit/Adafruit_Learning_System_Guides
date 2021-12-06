@@ -1,32 +1,56 @@
-"""CircuitPython Touch-Compatible Pin Identification Script"""
+# SPDX-FileCopyrightText: 2021 Kattni Rembor for Adafruit Industries
+# SPDX-License-Identifier: Unlicense
+"""
+CircuitPython Touch-Compatible Pin Identification Script
+
+Depending on the order of the pins in the CircuitPython pin definition, some inaccessible pins
+may be returned in the script results. Consult the board schematic and use your best judgement.
+
+In some cases, such as LED, the associated pin, such as D13, may be accessible. The LED pin
+name is first in the list in the pin definition, and is therefore printed in the results. The
+pin name "LED" will work in code, but "D13" may be more obvious. Use the schematic to verify.
+"""
 import board
 import touchio
 from microcontroller import Pin
 
 
-def is_touch_capable(pin_name):
-    """Attempts to create touchio.TouchIn() object on all available pins. Returns True if valid."""
-    try:
-        _ = touchio.TouchIn(pin_name)
-        # Print the touch-capable pins that do not need, or already have, an external pulldown.
-        return True
-    except ValueError as e:  # A ValueError is raised when a pin is invalid or needs a pulldown.
-        x = getattr(e, "message", str(e))  # Obtain the message associated with the ValueError.
-        if "pulldown" in x:  # If the ValueError is regarding needing a pulldown...
-            return True  # ...the pin is valid.
-        else:
-            return False  # Otherwise, the pins are invalid.
-    except TypeError:  # Error returned when checking a non-pin object in dir(board).
-        return False  # Invalid if non-pin objects in dir(board).
-
-
 def get_pin_names():
-    """Gets all unique pin names available in the board module, excluding a defined list."""
-    exclude = ["NEOPIXEL", "APA102_MOSI", "APA102_SCK", "LED", "NEOPIXEL_POWER", "BUTTON",
-               "BUTTON_UP", "BUTTON_DOWN", "BUTTON_SELECT", "DOTSTAR_CLOCK", "DOTSTAR_DATA",
-               "IR_PROXIMITY"]
-    pins = [pin for pin in [getattr(board, p) for p in dir(board) if p not in exclude]
-            if isinstance(pin, Pin)]
+    """
+    Gets all unique pin names available in the board module, excluding a defined list.
+    This list is not exhaustive, and depending on the order of the pins in the CircuitPython
+    pin definition, some of the pins in the list may still show up in the script results.
+    """
+    exclude = [
+        "NEOPIXEL",
+        "APA102_MOSI",
+        "APA102_SCK",
+        "LED",
+        "NEOPIXEL_POWER",
+        "BUTTON",
+        "BUTTON_UP",
+        "BUTTON_DOWN",
+        "BUTTON_SELECT",
+        "DOTSTAR_CLOCK",
+        "DOTSTAR_DATA",
+        "IR_PROXIMITY",
+        "SPEAKER_ENABLE",
+        "BUTTON_A",
+        "BUTTON_B",
+        "POWER_SWITCH",
+        "SLIDE_SWITCH",
+        "TEMPERATURE",
+        "ACCELEROMETER_INTERRUPT",
+        "ACCELEROMETER_SDA",
+        "ACCELEROMETER_SCL",
+        "MICROPHONE_CLOCK",
+        "MICROPHONE_DATA",
+    ]
+    pins = [
+        pin
+        for pin in [getattr(board, p) for p in dir(board) if p not in exclude]
+        if isinstance(pin, Pin)
+    ]
     pin_names = []
     for p in pins:
         if p not in pin_names:
@@ -35,5 +59,22 @@ def get_pin_names():
 
 
 for possible_touch_pin in get_pin_names():  # Get the pin name.
-    if is_touch_capable(possible_touch_pin):  # Check if the pin is touch-capable.
-        print("Touch on:", str(possible_touch_pin).replace("board.", ""))  # Print the valid list.
+    try:
+        p = touchio.TouchIn(
+            possible_touch_pin
+        )  # Attempt to create the touch object on each pin.
+        # Print the touch-capable pins that do not need, or already have, an external pulldown.
+        print("Touch on:", str(possible_touch_pin).replace("board.", ""))
+    except ValueError as error:  # A ValueError is raised when a pin is invalid or needs a pulldown.
+        # Obtain the message associated with the ValueError.
+        error_message = getattr(error, "message", str(error))
+        if (
+            "pulldown" in error_message  # If the ValueError is regarding needing a pulldown...
+        ):
+            print(
+                "Touch (no pulldown) on:", str(possible_touch_pin).replace("board.", "")
+            )
+        else:
+            print("No touch on:", str(possible_touch_pin).replace("board.", ""))
+    except TypeError:  # Error returned when checking a non-pin object in dir(board).
+        pass  # Passes over non-pin objects in dir(board).
