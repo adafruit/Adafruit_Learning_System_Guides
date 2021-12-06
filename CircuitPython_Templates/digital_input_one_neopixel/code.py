@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2021 Kattni Rembor for Adafruit Industries
+# SPDX-License-Identifier: Unlicense
 """CircuitPython Digital Input example - Blinking a built-in NeoPixel LED using a button switch.
 
 Update BUTTON_PIN to the pin to which you have connected the button (in the case of an external
