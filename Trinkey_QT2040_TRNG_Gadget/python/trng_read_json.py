@@ -5,6 +5,7 @@ import serial
 ss = serial.Serial("/dev/ttyACM0")
 
 # read string
+_ = ss.readline() # first read may be incomplete, just toss it
 raw_string = ss.readline().strip().decode()
 
 # load JSON
