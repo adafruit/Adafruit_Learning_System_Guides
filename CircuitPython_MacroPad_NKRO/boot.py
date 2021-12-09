@@ -1,6 +1,6 @@
 import usb_hid
 
-REPORT_ID =0x4
+REPORT_ID = 0x4
 REPORT_BYTES = 16
 bitmap_keyboard_descriptor = bytes((
         0x05, 0x01,                     # Usage Page (Generic Desktop),
