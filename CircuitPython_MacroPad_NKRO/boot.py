@@ -1,12 +1,12 @@
 import usb_hid
 
-BITMAP_KEYBOARD_DESCRIPTOR_REPORT_ID = 7
+REPORT_ID =0x4
 REPORT_BYTES = 16
 bitmap_keyboard_descriptor = bytes((
         0x05, 0x01,                     # Usage Page (Generic Desktop),
         0x09, 0x06,                     # Usage (Keyboard),
         0xA1, 0x01,                     # Collection (Application),
-        0x85, 0x04,                     #   6,7 Report ID
+        0x85, REPORT_ID,                #   Report ID
         # bitmap of modifiers
         0x75, 0x01,                     #   Report Size (1),
         0x95, 0x08,                     #   Report Count (8),
@@ -42,8 +42,8 @@ bitmap_keyboard = usb_hid.Device(
     report_descriptor=bitmap_keyboard_descriptor,
     usage_page=0x1,
     usage=0x6,
-    report_ids=(4,),
-    in_report_lengths=(16,),
+    report_ids=(REPORT_ID,),
+    in_report_lengths=(REPORT_BYTES,),
     out_report_lengths=(1,),
 )
 
