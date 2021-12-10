@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2021 Kattni Rembor for Adafruit Industries
+// SPDX-License-Identifier: MIT
 /*
  * This example shows how read the potentiometer on the I2C QT Slide Potentiometer
  * and make the NeoPixels change too!
