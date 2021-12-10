@@ -21,5 +21,6 @@ def potentiometer_to_color(value):
 
 
 while True:
+    print(potentiometer.value)
     # Fill the pixels a color based on the position of the potentiometer.
     pixels.fill(colorwheel(potentiometer_to_color(potentiometer.value)))
