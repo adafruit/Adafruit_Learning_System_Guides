@@ -240,6 +240,7 @@ def show_hilo():
         ampm = "A" if h < 12 else "P"
         h = h if h < 13 else h - 12
         hilo_times[i].text = "{:>2}:{:02} {}".format(h, m, ampm)
+        hilo_times[i].hidden = False
 
 
 def time_to_sleep():
@@ -255,6 +256,7 @@ def time_to_sleep():
         remaining += 24 * 60 * 60  # wrap around to the next day
     # return it
     return remaining
+
 
 # ===========
 #  M A I N
