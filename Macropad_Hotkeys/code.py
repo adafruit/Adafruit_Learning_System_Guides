@@ -83,7 +83,9 @@ for filename in files:
             apps.append(App(module.app))
         except (SyntaxError, ImportError, AttributeError, KeyError, NameError,
                 IndexError, TypeError) as err:
-            pass
+            print("ERROR in", filename)
+            import traceback
+            traceback.print_exception(err, err, err.__traceback__)
 
 if not apps:
     group[13].text = 'NO MACRO FILES FOUND'
