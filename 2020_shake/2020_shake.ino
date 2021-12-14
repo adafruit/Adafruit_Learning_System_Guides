@@ -7,8 +7,18 @@
 #include <Adafruit_Protomatter.h> // For LED matrix
 #include "2020.h"                 // 2020 bitmap data
 #include "2021.h"                 // 2021 bitmap data
+#include "2022.h"                 // etc.
+#include "2023.h"
+#include "2024.h"
+#include "2025.h"
+#include "2026.h"
 
-bool show_2021 = true;
+#define BITMAP_WIDTH  64 // All the year bitmaps are a fixed size
+#define BITMAP_HEIGHT 32
+#define THIS_YEAR_BITMAP bitmap_2021 // Name of current/next year bitmap
+#define NEXT_YEAR_BITMAP bitmap_2022 // arrays in header files
+
+bool show_new_year = true;
 
 #define SHAKE_ACCEL_G   2.9                                 // Force (in Gs) to trigger shake
 #define SHAKE_ACCEL_MS2 (SHAKE_ACCEL_G * 9.8)               // Convert to m/s^2
@@ -54,10 +64,10 @@ void setup(void) {
   ProtomatterStatus status = matrix.begin();
   Serial.printf("Protomatter begin() status: %d\n", status);
 
-  // Count number of 'on' pixels (sand grains) in bitmap_2020
-  for (int i=0; i<sizeof(bitmap_2020); i++) {
+  // Count number of 'on' pixels (sand grains) in THIS_YEAR_BITMAP
+  for (int i=0; i<sizeof(THIS_YEAR_BITMAP); i++) {
     for (int b=0; b<8; b++) {
-      if (bitmap_2020[i] & (1 << b)) {
+      if (THIS_YEAR_BITMAP[i] & (1 << b)) {
         n_grains++;
       }
     }
@@ -81,15 +91,15 @@ void setup(void) {
 
 void loop() {
   Serial.print("Tick");
-  uint16_t sandColor = show_2021 ? 0xF800 : 0xFFFF; // Red or white
+  uint16_t sandColor = show_new_year ? 0xF800 : 0xFFFF; // Red or white
 
   // Set initial sand pixel positions and draw initial matrix state
   sand->clear();
   matrix.fillScreen(0);
   int grain = 0, pixel = 0; // Sand grain and pixel indices
-  for (int i=0; i<sizeof(bitmap_2020); i++) {
+  for (int i=0; i<sizeof(THIS_YEAR_BITMAP); i++) {
     for (int b=0; b<8; b++, pixel++) {
-      if (bitmap_2020[i] & (1 << (7-b))) {
+      if (THIS_YEAR_BITMAP[i] & (1 << (7-b))) {
         int x = pixel % BITMAP_WIDTH;
         int y = pixel / BITMAP_WIDTH;
         //Serial.printf("Set pixel %d @ (%d, %d)\n", grain, x, y);
@@ -147,7 +157,7 @@ void loop() {
       scale = pow(scale, 2.6);
       uint16_t rb = (int)(31.0 * scale + 0.5);
       uint16_t g = (int)(63.0 * scale + 0.5);
-      if (show_2021)
+      if (show_new_year)
         sandColor = (rb * 0b100000000000); // Just show red
       else
         sandColor = (rb * 0b100000000001) + (g << 5);
@@ -163,16 +173,16 @@ void loop() {
     matrix.show();
   }
 
-  // If the show_2021 flag is set, don't return to 2020 shake detect,
-  // instead switch to sparkly '2021' display forever (reset to start over)
-  if (show_2021) {
-uint16_t frame = 0;
+  // If the show_new_year flag is set, don't return to shake detect,
+  // instead switch to sparkly display forever (reset to start over)
+  if (show_new_year) {
+    uint16_t frame = 0;
     matrix.fillScreen(0);
     for(;;) {
       int pixel = 0;
-      for (int i=0; i<sizeof(bitmap_2021); i++) {
+      for (int i=0; i<sizeof(NEXT_YEAR_BITMAP); i++) {
         for (int b=0; b<8; b++, pixel++) {
-          if (bitmap_2021[i] & (1 << (7-b))) {
+          if (NEXT_YEAR_BITMAP[i] & (1 << (7-b))) {
             int x = pixel % BITMAP_WIDTH;
             int y = pixel / BITMAP_WIDTH;
             matrix.drawPixel(x, y, (random() & 1) ? ((((x - y + frame) / 8) & 1) ? 0xFFFF : 0x001F) : 0);
