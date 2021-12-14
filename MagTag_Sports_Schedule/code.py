@@ -25,12 +25,12 @@ TIME_ZONE_NAME = "PST"
 SPORTS = [
     {
         "name": "NCAA Men's Basketball",
-        #pylint: disable=line-too-long
+        # pylint: disable=line-too-long
         "url": "http://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard",
     },
     {
         "name": "NCAA Wmn's Basketball",
-        #pylint: disable=line-too-long
+        # pylint: disable=line-too-long
         "url": "http://site.api.espn.com/apis/site/v2/sports/basketball/womens-college-basketball/scoreboard",
     },
     {
@@ -185,7 +185,7 @@ def update_labels():
 
 def fetch_sports_data(reset_game_number=True):
     # Fetches and parses data for all games for the current sport
-    #pylint: disable=global-statement
+    # pylint: disable=global-statement
     global sports_data, current_game, current_sport
     magtag.url = SPORTS[current_sport]["url"]
     sports_data.clear()
@@ -229,12 +229,12 @@ magtag.add_text(text_font="/fonts/Arial-12.bdf", text_position=(10, 40), is_data
 
 # Broadcast Information
 magtag.add_text(
-    text_font="/fonts/Arial-Italic-12.bdf", text_position=(10, 100), is_data=False
+    text_font="/fonts/Arial-Italic-12.bdf", text_position=(10, 98), is_data=False
 )
 
 # Game Status
 magtag.add_text(
-    text_font="/fonts/Arial-Italic-12.bdf", text_position=(10, 120), is_data=False
+    text_font="/fonts/Arial-Italic-12.bdf", text_position=(10, 116), is_data=False
 )
 
 # Game Number

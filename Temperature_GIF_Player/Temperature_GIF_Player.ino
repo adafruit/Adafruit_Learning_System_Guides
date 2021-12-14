@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2020 Limor Fried/ladyada for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // please read credits at the bottom of file
 
 #include <Adafruit_Arcada.h>

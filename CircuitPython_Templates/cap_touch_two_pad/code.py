@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2021 Kattni Rembor for Adafruit Industries
+# SPDX-License-Identifier: Unlicense
 """
 CircuitPython Capacitive Two Touch Pad Example - Print to the serial console when a pad is touched.
 

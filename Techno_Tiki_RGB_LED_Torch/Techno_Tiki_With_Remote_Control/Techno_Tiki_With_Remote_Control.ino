@@ -1,3 +1,8 @@
+// SPDX-FileCopyrightText: 2018 Tony DiCola for Adafruit Industries
+// SPDX-FileCopyrightText: 2020 Erin St. Blaine for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Techno-Tiki RGB LED Torch with IR Remote Control
 // Created by Tony DiCola
 //

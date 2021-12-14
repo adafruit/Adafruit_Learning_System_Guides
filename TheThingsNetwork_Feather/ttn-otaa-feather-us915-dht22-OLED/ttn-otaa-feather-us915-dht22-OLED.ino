@@ -1,3 +1,10 @@
+// SPDX-FileCopyrightText: 2015 Thomas Telkamp
+// SPDX-FileCopyrightText: 2015 Matthijs Kooijman
+// SPDX-FileCopyrightText: 2018 Terry Moore for MCCI
+// SPDX-FileCopyrightText: 2018 Brent Rubell for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /*******************************************************************************
  * The Things Network - Sensor Data Example with OLED
  * 

@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2021 Kattni Rembor for Adafruit Industries
+# SPDX-License-Identifier: Unlicense
 """
 CircuitPython Capacitive Two Touch Pin Example - Print to the serial console when a pin is touched.
 

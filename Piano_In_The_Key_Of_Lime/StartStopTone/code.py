@@ -1,9 +1,9 @@
-from adafruit_circuitplayground.express import cpx
+from adafruit_circuitplayground import cp
 
 while True:
-    if cpx.touch_A1:
-        cpx.start_tone(262)
-    elif cpx.touch_A2:
-        cpx.start_tone(294)
+    if cp.touch_A1:
+        cp.start_tone(262)
+    elif cp.touch_A2:
+        cp.start_tone(294)
     else:
-        cpx.stop_tone()
+        cp.stop_tone()

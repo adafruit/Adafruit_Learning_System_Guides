@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2021 Kattni Rembor for Adafruit Industries
+# SPDX-License-Identifier: Unlicense
 """CircuitPython Blink Example - the CircuitPython 'Hello, World!'"""
 import time
 import board

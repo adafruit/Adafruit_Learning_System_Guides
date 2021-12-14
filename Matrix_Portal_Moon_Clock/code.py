@@ -52,13 +52,13 @@ def parse_time(timestring, is_dst=-1):
     date_time = timestring.split('T')        # Separate into date and time
     year_month_day = date_time[0].split('-') # Separate time into Y/M/D
     hour_minute_second = date_time[1].split('+')[0].split('-')[0].split(':')
-    return time.struct_time(int(year_month_day[0]),
+    return time.struct_time((int(year_month_day[0]),
                             int(year_month_day[1]),
                             int(year_month_day[2]),
                             int(hour_minute_second[0]),
                             int(hour_minute_second[1]),
                             int(hour_minute_second[2].split('.')[0]),
-                            -1, -1, is_dst)
+                            -1, -1, is_dst))
 
 
 def update_time(timezone=None):
@@ -126,14 +126,14 @@ class MoonData():
             # Can't change attribute in datetime struct, need to create
             # a new one which will roll the date ahead as needed. Convert
             # to epoch seconds and back for the offset to work
-            datetime = time.localtime(time.mktime(time.struct_time(
+            datetime = time.localtime(time.mktime(time.struct_time((
                 datetime.tm_year,
                 datetime.tm_mon,
                 datetime.tm_mday,
                 datetime.tm_hour + hours_ahead,
                 datetime.tm_min,
                 datetime.tm_sec,
-                -1, -1, -1)))
+                -1, -1, -1))))
         # strftime() not available here
         url = ('https://api.met.no/weatherapi/sunrise/2.0/.json?lat=' +
                str(LATITUDE) + '&lon=' + str(LONGITUDE) +

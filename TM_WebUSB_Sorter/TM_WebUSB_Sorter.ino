@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2020 Limor Fried/ladyada for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /* This sketch demonstrates WebUSB as web serial with browser with WebUSB support (e.g Chrome).
  * For use with the Teachable Machine Tiny Sorter (and others!) project
  * See https://learn.adafruit.com/using-webusb-with-arduino-and-tinyusb for

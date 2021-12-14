@@ -231,6 +231,7 @@ def show_hilo():
     for i, data in enumerate(hilo_data):
         # make it visible
         hilo_icons[i].hidden = False
+        hilo_times[i].hidden = False
         # icon
         hilo_icons[i][0] = 0 if data["type"] == "H" else 1
         # time
@@ -255,6 +256,7 @@ def time_to_sleep():
         remaining += 24 * 60 * 60  # wrap around to the next day
     # return it
     return remaining
+
 
 # ===========
 #  M A I N

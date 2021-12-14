@@ -1,3 +1,3 @@
-from adafruit_circuitplayground.express import cpx
+from adafruit_circuitplayground import cp
 
-cpx.play_tone(440, 1)
+cp.play_tone(440, 1)

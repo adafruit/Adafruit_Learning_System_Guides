@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Noe Ruiz for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Guardian Egg Shoulder Robot with servo and NeoPixel ring
 """
