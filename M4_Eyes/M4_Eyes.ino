@@ -39,6 +39,8 @@
 // right. From an observer's point of view, looking AT the monster, the
 // "right eye" is on the left.
 
+#include <Adafruit_SleepyDog.h>
+
 #if !defined(USE_TINYUSB)
   #error "Please select Tools->USB Stack->TinyUSB before compiling"
 #endif
@@ -146,6 +148,169 @@ uint32_t availableRAM(void) {
 
 // SETUP FUNCTION - CALLED ONCE AT PROGRAM START ---------------------------
 
+void LoadEyeModel(char *filename)
+{
+   if(Sequence[0].model != NULL && Sequence[activeSequence].model != NULL)
+   {
+      char *s0((char *)calloc(strlen(Sequence[activeSequence].model) + 12, sizeof(char)));
+      sprintf(s0, "%s/config.eye", Sequence[activeSequence].model);
+      loadConfig(s0);
+      Serial.println(s0);
+      free(s0);
+   }
+   else
+   {
+      loadConfig(filename);
+   }
+   // LOAD EYELIDS AND TEXTURE MAPS -----------------------------------------
+
+   // Experiencing a problem with MEMORY FRAGMENTATION when loading texture
+   // maps. These images only occupy RAM temporarily -- they're copied to
+   // internal flash memory and then freed. However, something is preventing
+   // the freed memory from restoring to a contiguous block. For example,
+   // if a texture image equal to about 50% of RAM is loaded/copied/freed,
+   // following this with a larger texture (or trying to allocate a larger
+   // polar lookup array) fails because RAM is fragmented into two segments.
+   // I've been through this code, Adafruit_ImageReader and Adafruit_GFX
+   // pretty carefully and they appear to be freeing RAM in the reverse order
+   // that they allocate (which should avoid fragmentation), but I'm likely
+   // overlooking something there or additional allocations are occurring
+   // in other libraries -- perhaps the filesystem and/or mass storage code.
+   // SO, here is the DIRTY WORKAROUND...
+   // Adafruit_ImageReader provides a bmpDimensions() function to determine
+   // the pixel size of an image without actually loading it. We can use this
+   // to estimate the RAM requirements for loading the image, then allocate
+   // a "booster seat" which makes the subsequent image load occur in higher
+   // memory, and the fragmenting part a bit beyond that. When the image and
+   // booster are both freed, that should restore a large contiguous chunk,
+   // leaving the fragments in high memory. Not TOO high though, we need to
+   // leave some RAM for the stack to operate over the lifetime of this
+   // program and to handle small heap allocations.
+
+   uint32_t maxRam = availableRAM() - stackReserve;
+
+   Serial.print("XX");
+   // Load texture maps for eyes
+   uint8_t e(0);
+   uint8_t e2;
+   for(e=0; e<NUM_EYES; e++) { // For each eye...
+     yield();
+     for(e2=0; e2<e; e2++) {    // Compare against each prior eye...
+       // If both eyes have the same iris filename...
+       if((eye[e].iris.filename && eye[e2].iris.filename) &&
+          (!strcmp(eye[e].iris.filename, eye[e2].iris.filename))) {
+         // Then eye 'e' can share the iris graphics from 'e2'
+         // rotate & mirror are kept distinct, just share image
+         eye[e].iris.data   = eye[e2].iris.data;
+         eye[e].iris.width  = eye[e2].iris.width;
+         eye[e].iris.height = eye[e2].iris.height;
+         break;
+       }
+     }
+     if((!e) || (e2 >= e)) { // If first eye, or no match found...
+       // If no iris filename was specified, or if file fails to load...
+       if((eye[e].iris.filename == NULL) || (loadTexture(eye[e].iris.filename,
+         &eye[e].iris.data, &eye[e].iris.width, &eye[e].iris.height,
+         maxRam) != IMAGE_SUCCESS)) {
+         // Point iris data at the color variable and set image size to 1px
+         eye[e].iris.data  = &eye[e].iris.color;
+         eye[e].iris.width = eye[e].iris.height = 1;
+       }
+       // Huh. The booster seat idea STILL doesn't always work right,
+       // something leaking in upper memory. Keep shrinking down the
+       // booster seat size a bit each time we load a texture. Feh.
+       maxRam -= 20;
+     }
+     // Repeat for sclera...
+     for(e2=0; e2<e; e2++) {    // Compare against each prior eye...
+       // If both eyes have the same sclera filename...
+       if((eye[e].sclera.filename && eye[e2].sclera.filename) &&
+          (!strcmp(eye[e].sclera.filename, eye[e2].sclera.filename))) {
+         // Then eye 'e' can share the sclera graphics from 'e2'
+         // rotate & mirror are kept distinct, just share image
+         eye[e].sclera.data   = eye[e2].sclera.data;
+         eye[e].sclera.width  = eye[e2].sclera.width;
+         eye[e].sclera.height = eye[e2].sclera.height;
+         break;
+       }
+     }
+     if((!e) || (e2 >= e)) { // If first eye, or no match found...
+       // If no sclera filename was specified, or if file fails to load...
+       if((eye[e].sclera.filename == NULL) || (loadTexture(eye[e].sclera.filename,
+         &eye[e].sclera.data, &eye[e].sclera.width, &eye[e].sclera.height,
+         maxRam) != IMAGE_SUCCESS)) {
+         // Point sclera data at the color variable and set image size to 1px
+         eye[e].sclera.data  = &eye[e].sclera.color;
+         eye[e].sclera.width = eye[e].sclera.height = 1;
+       }
+       maxRam -= 20; // See note above
+     }
+   }
+
+   // Load eyelid graphics.
+   yield();
+   ImageReturnCode status;
+
+   status = loadEyelid(upperEyelidFilename ?
+     upperEyelidFilename : (char *)"upper.bmp",
+     upperClosed, upperOpen, DISPLAY_SIZE-1, maxRam);
+
+   status = loadEyelid(lowerEyelidFilename ?
+     lowerEyelidFilename : (char *)"lower.bmp",
+     lowerOpen, lowerClosed, 0, maxRam);
+
+   // Filenames are no longer needed...
+   for(e=0; e<NUM_EYES; e++) {
+     if(eye[e].sclera.filename) free(eye[e].sclera.filename);
+     if(eye[e].iris.filename)   free(eye[e].iris.filename);
+   }
+   if(lowerEyelidFilename) free(lowerEyelidFilename);
+   if(upperEyelidFilename) free(upperEyelidFilename);
+
+   // Note that calls to availableRAM() at this point will return something
+   // close to reserveSpace, suggesting very little RAM...but that function
+   // really just returns the space between the heap and stack, and we've
+   // established above that the top of the heap is something of a mirage.
+   // Large allocations CAN still take place in the lower heap!
+
+   calcMap();
+   calcDisplacement();
+   Serial.printf("Free RAM: %d\n", availableRAM());
+
+   randomSeed(SysTick->VAL + analogRead(A2));
+   eyeOldX = eyeNewX = eyeOldY = eyeNewY = mapRadius; // Start in center
+   for(e=0; e<NUM_EYES; e++) { // For each eye...
+     eye[e].display->setRotation(eye[e].rotation);
+     eye[e].eyeX = eyeOldX; // Set up initial position
+     eye[e].eyeY = eyeOldY;
+   }
+}
+
+void RampBacklight(uint32_t rampLength, bool up)
+{
+   uint8_t finalVal(up ? 255 : 0);
+   if(rampLength > 0)
+   {
+      uint32_t elapsed(0);
+      uint32_t startTime(millis());
+         // Ramp up backlight over 1/2 sec duration
+         while ((elapsed = (millis() - startTime)) <= rampLength)
+         {
+            yield();
+            
+            if(up == true)
+            {
+               arcada.setBacklight(255 * elapsed / rampLength);
+            }
+            else
+            {
+               arcada.setBacklight(255 - (255 * elapsed / 500));
+            }
+         }
+   }
+   arcada.setBacklight(finalVal); // To the max
+}
+
 void setup() {
   if(!arcada.arcadaBegin())     fatal("Arcada init fail!", 100);
 #if defined(USE_TINYUSB)
@@ -154,12 +319,12 @@ void setup() {
   if(!arcada.filesysBegin())    fatal("No filesystem found!", 250);
 #endif
 
-  user_setup();
 
   arcada.displayBegin();
-
   // Backlight(s) off ASAP, they'll switch on after screen(s) init & clear
   arcada.setBacklight(0);
+  
+  user_setup();
 
   DISPLAY_SIZE = min(ARCADA_TFT_WIDTH, ARCADA_TFT_HEIGHT);
 
@@ -185,6 +350,44 @@ void setup() {
   } else if((buttonState & ARCADA_BUTTONMASK_DOWN) && arcada.exists("config3.eye")) {
     filename = (char *)"config3.eye";
   }
+  
+  if(arcada.exists("/sequence.eye"))
+  {
+     Serial.println("Yes");
+    if((buttonState & ARCADA_BUTTONMASK_A))
+    {
+       loadSequence("/sequence.eye");
+    }
+    else if(Watchdog.resetCause() & RESET_WDT)
+    {
+       Serial.println("WD Reset!");
+       // read active sequence from NVM
+       loadSequence("/sequence.eye");
+       showSplashScreen = false;
+       activeSequence = getActiveSequence("/sequence.eye");
+       Serial.print("Active sequence: ");Serial.println(activeSequence);
+       if(activeSequence == 0xFF)
+       {
+          // Maybe there was an error.
+          activeSequence = 0;
+       }
+       Serial.print("Active sequence: ");Serial.println(activeSequence);
+    }
+    if(Sequence[activeSequence].model != NULL)
+    {
+       Serial.print("Found Model: ");Serial.println(Sequence[activeSequence].model);
+       filename = Sequence[activeSequence].model;
+    }
+    else
+    {
+       Serial.println("Failed Model");
+    }
+  }
+   else
+   {
+     Serial.println("No");
+   }
+   Serial.print("FILENAME: ");Serial.println(filename);
 
   yield();
   // Initialize display(s)
@@ -268,161 +471,29 @@ void setup() {
         arcada.drawBMP((char *)"/splash.bmp", 0, 0, eye[1].display);
       }
       // Ramp up backlight over 1/2 sec duration
-      startTime = millis();
-      while ((elapsed = (millis() - startTime)) <= 500) {
-        yield();
-        arcada.setBacklight(255 * elapsed / 500);
-      }
-      arcada.setBacklight(255); // To the max
+      RampBacklight(500, true);
       startTime = millis();     // Note current time for backlight hold later
     }
   }
 
   // If no splash, or load failed, turn backlight on early so user gets a
   // little feedback, that the board is not locked up, just thinking.
-  if (!showSplashScreen) arcada.setBacklight(255);
+  if (!showSplashScreen && sequenceCount == 0) arcada.setBacklight(255);
 
   // LOAD CONFIGURATION FILE -----------------------------------------------
+  LoadEyeModel(filename);
 
-  loadConfig(filename);
-
-  // LOAD EYELIDS AND TEXTURE MAPS -----------------------------------------
-
-  // Experiencing a problem with MEMORY FRAGMENTATION when loading texture
-  // maps. These images only occupy RAM temporarily -- they're copied to
-  // internal flash memory and then freed. However, something is preventing
-  // the freed memory from restoring to a contiguous block. For example,
-  // if a texture image equal to about 50% of RAM is loaded/copied/freed,
-  // following this with a larger texture (or trying to allocate a larger
-  // polar lookup array) fails because RAM is fragmented into two segments.
-  // I've been through this code, Adafruit_ImageReader and Adafruit_GFX
-  // pretty carefully and they appear to be freeing RAM in the reverse order
-  // that they allocate (which should avoid fragmentation), but I'm likely
-  // overlooking something there or additional allocations are occurring
-  // in other libraries -- perhaps the filesystem and/or mass storage code.
-  // SO, here is the DIRTY WORKAROUND...
-  // Adafruit_ImageReader provides a bmpDimensions() function to determine
-  // the pixel size of an image without actually loading it. We can use this
-  // to estimate the RAM requirements for loading the image, then allocate
-  // a "booster seat" which makes the subsequent image load occur in higher
-  // memory, and the fragmenting part a bit beyond that. When the image and
-  // booster are both freed, that should restore a large contiguous chunk,
-  // leaving the fragments in high memory. Not TOO high though, we need to
-  // leave some RAM for the stack to operate over the lifetime of this
-  // program and to handle small heap allocations.
-
-  uint32_t maxRam = availableRAM() - stackReserve;
-
-  // Load texture maps for eyes
-  uint8_t e2;
-  for(e=0; e<NUM_EYES; e++) { // For each eye...
-    yield();
-    for(e2=0; e2<e; e2++) {    // Compare against each prior eye...
-      // If both eyes have the same iris filename...
-      if((eye[e].iris.filename && eye[e2].iris.filename) &&
-         (!strcmp(eye[e].iris.filename, eye[e2].iris.filename))) {
-        // Then eye 'e' can share the iris graphics from 'e2'
-        // rotate & mirror are kept distinct, just share image
-        eye[e].iris.data   = eye[e2].iris.data;
-        eye[e].iris.width  = eye[e2].iris.width;
-        eye[e].iris.height = eye[e2].iris.height;
-        break;
-      }
-    }
-    if((!e) || (e2 >= e)) { // If first eye, or no match found...
-      // If no iris filename was specified, or if file fails to load...
-      if((eye[e].iris.filename == NULL) || (loadTexture(eye[e].iris.filename,
-        &eye[e].iris.data, &eye[e].iris.width, &eye[e].iris.height,
-        maxRam) != IMAGE_SUCCESS)) {
-        // Point iris data at the color variable and set image size to 1px
-        eye[e].iris.data  = &eye[e].iris.color;
-        eye[e].iris.width = eye[e].iris.height = 1;
-      }
-      // Huh. The booster seat idea STILL doesn't always work right,
-      // something leaking in upper memory. Keep shrinking down the
-      // booster seat size a bit each time we load a texture. Feh.
-      maxRam -= 20;
-    }
-    // Repeat for sclera...
-    for(e2=0; e2<e; e2++) {    // Compare against each prior eye...
-      // If both eyes have the same sclera filename...
-      if((eye[e].sclera.filename && eye[e2].sclera.filename) &&
-         (!strcmp(eye[e].sclera.filename, eye[e2].sclera.filename))) {
-        // Then eye 'e' can share the sclera graphics from 'e2'
-        // rotate & mirror are kept distinct, just share image
-        eye[e].sclera.data   = eye[e2].sclera.data;
-        eye[e].sclera.width  = eye[e2].sclera.width;
-        eye[e].sclera.height = eye[e2].sclera.height;
-        break;
-      }
-    }
-    if((!e) || (e2 >= e)) { // If first eye, or no match found...
-      // If no sclera filename was specified, or if file fails to load...
-      if((eye[e].sclera.filename == NULL) || (loadTexture(eye[e].sclera.filename,
-        &eye[e].sclera.data, &eye[e].sclera.width, &eye[e].sclera.height,
-        maxRam) != IMAGE_SUCCESS)) {
-        // Point sclera data at the color variable and set image size to 1px
-        eye[e].sclera.data  = &eye[e].sclera.color;
-        eye[e].sclera.width = eye[e].sclera.height = 1;
-      }
-      maxRam -= 20; // See note above
-    }
-  }
-
-  // Load eyelid graphics.
-  yield();
-  ImageReturnCode status;
-
-  status = loadEyelid(upperEyelidFilename ?
-    upperEyelidFilename : (char *)"upper.bmp",
-    upperClosed, upperOpen, DISPLAY_SIZE-1, maxRam);
-
-  status = loadEyelid(lowerEyelidFilename ?
-    lowerEyelidFilename : (char *)"lower.bmp",
-    lowerOpen, lowerClosed, 0, maxRam);
-
-  // Filenames are no longer needed...
-  for(e=0; e<NUM_EYES; e++) {
-    if(eye[e].sclera.filename) free(eye[e].sclera.filename);
-    if(eye[e].iris.filename)   free(eye[e].iris.filename);
-  }
-  if(lowerEyelidFilename) free(lowerEyelidFilename);
-  if(upperEyelidFilename) free(upperEyelidFilename);
-
-  // Note that calls to availableRAM() at this point will return something
-  // close to reserveSpace, suggesting very little RAM...but that function
-  // really just returns the space between the heap and stack, and we've
-  // established above that the top of the heap is something of a mirage.
-  // Large allocations CAN still take place in the lower heap!
-
-  calcMap();
-  calcDisplacement();
-  Serial.printf("Free RAM: %d\n", availableRAM());
-
-  randomSeed(SysTick->VAL + analogRead(A2));
-  eyeOldX = eyeNewX = eyeOldY = eyeNewY = mapRadius; // Start in center
-  for(e=0; e<NUM_EYES; e++) { // For each eye...
-    eye[e].display->setRotation(eye[e].rotation);
-    eye[e].eyeX = eyeOldX; // Set up initial position
-    eye[e].eyeY = eyeOldY;
-  }
-
-  if (showSplashScreen) { // Image(s) loaded above?
-    // Hold backlight on for up to 2 seconds (minus other initialization time)
-    if ((elapsed = (millis() - startTime)) < 2000) {
-      delay(2000 - elapsed);
-    }
-    // Ramp down backlight over 1/2 sec duration
-    startTime = millis();
-    while ((elapsed = (millis() - startTime)) <= 500) {
-      yield();
-      arcada.setBacklight(255 - (255 * elapsed / 500));
-    }
-    arcada.setBacklight(0);
-    for(e=0; e<NUM_EYES; e++) {
-      eye[e].display->fillScreen(0);
-    }
-  }
+   if (showSplashScreen) { // Image(s) loaded above?
+     // Hold backlight on for up to 2 seconds (minus other initialization time)
+     if ((elapsed = (millis() - startTime)) < 2000) {
+       delay(2000 - elapsed);
+     }
+     // Ramp down backlight over 1/2 sec duration
+     RampBacklight(500, false);
+     for(e=0; e<NUM_EYES; e++) {
+       eye[e].display->fillScreen(0);
+     }
+   }
 
 #if defined(ADAFRUIT_MONSTER_M4SK_EXPRESS)
   if(voiceOn) {
@@ -438,8 +509,6 @@ void setup() {
   }
 #endif
 
-  arcada.setBacklight(255); // Back on, impending graphics
-
   yield();
   if(boopPin >= 0) {
     boopThreshold = 0;
@@ -450,6 +519,9 @@ void setup() {
   }
 
   lastLightReadTime = micros() + 2000000; // Delay initial light reading
+   sequenceTimeout = millis();
+  
+  arcada.setBacklight(255); // Back on, impending graphics
 }
 
 
@@ -646,10 +718,10 @@ void loop() {
       // eyeballs drawn." If there are two eyes, the overall refresh rate
       // of both screens is about 1/2 this.
       frames++;
-      if(((t - lastFrameRateReportTime) >= 1000000) && t) { // Once per sec.
-        Serial.println((frames * 1000) / (t / 1000));
-        lastFrameRateReportTime = t;
-      }
+      //if(((t - lastFrameRateReportTime) >= 1000000) && t) { // Once per sec.
+      //  Serial.println((frames * 1000) / (t / 1000));
+      //  lastFrameRateReportTime = t;
+      //}
 
       // Once per frame (of eye #0), reset boopSum...
       if((eyeNum == 0) && (boopPin >= 0)) {
@@ -991,4 +1063,38 @@ void loop() {
   }
   eye[eyeNum].colIdx       ^= 1;    // Alternate 0/1 line structs
   eye[eyeNum].column_ready = false; // OK to render next line
+
+   if(Sequence[activeSequence].model != NULL)
+   {
+      if((millis() - sequenceTimeout) >= (Sequence[activeSequence].hold * 1000) &&
+          // Wait until the eyelids close.
+          eye[eyeNum].blink.state == DEBLINK)
+      {
+         sequenceTimeout = millis();
+         activeSequence++;
+         if(activeSequence >= sequenceCount)
+         {
+            activeSequence = 0;
+         }
+         Serial.print("Load:");Serial.println(Sequence[activeSequence].model);
+         saveActiveSequence(activeSequence, "/sequence.eye");
+         RampBacklight(500, false);
+         // Close eyelids, load next model, open eyelids.
+         // Can't just reset silly... there's a bunch of stuff
+         // that needs to be stopped before reloading the next
+         // set of eyes...
+         //LoadEyeModel(Sequence[activeSequence].model);
+         // Until then, quickly reset the controller
+         // and reload on setup.
+         Watchdog.enable(1, false);
+      }
+   }
+   else
+   {
+      //uint32_t buttonState = arcada.readButtons();
+      //if(buttonState & (ARCADA_BUTTONMASK_UP | ARCADA_BUTTONMASK_A | ARCADA_BUTTONMASK_DOWN))
+      //{
+      //   //Watchdog.enable(1, false);
+      //}
+   }
 }

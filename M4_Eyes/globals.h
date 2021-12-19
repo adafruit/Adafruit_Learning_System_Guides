@@ -132,6 +132,7 @@ typedef struct {
   uint32_t duration;    // Duration of blink state (micros)
   uint32_t startTime;   // Time (micros) of last state change
 } eyeBlink;
+GLOBAL_VAR bool unequalBlink GLOBAL_INIT(false);
 
 // Data for iris and sclera texture maps
 typedef struct {
@@ -199,6 +200,34 @@ typedef struct {
   extern eyeStruct eye[];
 #endif
 
+// Eye sequence states
+#define MAX_SEQUENCE_COUNT 10
+typedef struct
+{
+   // Path to the eye configuration file (config.eye).
+   char *model = NULL;
+   // Time to keep an animation (seconds)
+   uint8_t hold = 10; // Possibly promote it to 16 bit to allow larger hold times.
+} SequenceItem;
+// The index of the eye model to load in the sequence.
+GLOBAL_VAR uint8_t activeSequence GLOBAL_INIT(0);
+// The number of eye models in the sequence.
+GLOBAL_VAR uint8_t sequenceCount GLOBAL_INIT(0);
+// Counter used to track the amount of time the model
+// has been displaying.
+GLOBAL_VAR uint32_t sequenceTimeout GLOBAL_INIT(0);
+// The structure holding the sequence information.
+GLOBAL_VAR SequenceItem Sequence[MAX_SEQUENCE_COUNT];
+
+// SAMD51 reset causes
+#define RESET_POR   (1 << 0)
+#define RESET_BOD12 (1 << 1)
+#define RESET_BOD33 (1 << 2)
+#define RESET_NVM   (1 << 3)
+#define RESET_EXT   (1 << 4)  // Pulling reset pin low
+#define RESET_WDT   (1 << 5)  // Watchdog timer reset
+#define RESET_SYST  (1 << 6)
+#define RESET_BACKUP (1 << 7)
 // FUNCTION PROTOTYPES -----------------------------------------------------
 
 // Functions in file.cpp
@@ -207,6 +236,9 @@ extern void            handle_filesystem_change();
 // This is set true when filesystem contents have changed.
 // Set true initially so the program starts with the "changed" task.
 extern bool            filesystem_change_flag GLOBAL_INIT(true);
+extern uint8_t getActiveSequence(char *filename);
+extern void saveActiveSequence(uint8_t as, char *filename);
+extern void            loadSequence(char *filename);
 extern void            loadConfig(char *filename);
 extern ImageReturnCode loadEyelid(char *filename, uint8_t *minArray, uint8_t *maxArray, uint8_t init, uint32_t maxRam);
 extern ImageReturnCode loadTexture(char *filename, uint16_t **data, uint16_t *width, uint16_t *height, uint32_t maxRam);

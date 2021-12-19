@@ -77,6 +77,115 @@ static void getFilename(JsonVariant v, char **ptr) {
 }
 */
 
+uint8_t getActiveSequence(char *filename)
+{
+   File file;
+   uint8_t as = 0xFF;
+   if(file = arcada.open(filename, FILE_READ))
+   {
+      StaticJsonDocument<2048> doc;
+      yield();
+      DeserializationError error = deserializeJson(doc, file);
+      yield();
+      if(error)
+      {
+        Serial.println("Get sequence error.");
+        Serial.println(error.c_str());
+      }
+      else
+      {
+        as = doc["activeSequence"];
+      }
+      file.close();
+   }
+   return(as);
+}
+
+void saveActiveSequence(uint8_t as, char *filename)
+{
+   File file;
+   if(file = arcada.open(filename, FILE_READ))
+   {
+      StaticJsonDocument<2048> doc;
+      yield();
+        Serial.println(1);
+      DeserializationError error = deserializeJson(doc, file);
+      yield();
+        serializeJson(doc, Serial);
+        Serial.println(2);
+      if(error)
+      {
+        Serial.println("Sequence read error.");
+        Serial.println(error.c_str());
+      }
+      else
+      {
+        file.close();
+        file = arcada.open(filename, O_RDWR | O_TRUNC);
+        Serial.print("Storing: ");Serial.println(as);
+        doc["activeSequence"] = as;
+
+        size_t serror = serializeJson(doc, Serial);Serial.println();
+        serror = serializeJsonPretty(doc, file);
+        if(serror == 0)
+        {
+           Serial.println("Failed to write to file.");
+        }
+        else
+        {
+           Serial.print("Saved: ");Serial.println(serror);
+        }
+      }
+      file.close();
+   }
+}
+
+void loadSequence(char *filename)
+{
+   File file;
+   if(file = arcada.open(filename, FILE_READ))
+   {
+      StaticJsonDocument<2048> doc;
+      yield();
+      DeserializationError error = deserializeJson(doc, file);
+      yield();
+      if(error)
+      {
+         Serial.println("Sequence file error");
+         Serial.println(error.c_str());
+      }
+      else
+      {
+        uint8_t e(0);
+        JsonObject root = doc.as<JsonObject>();
+        const JsonArray &eyes = root["eyes"];
+        sequenceCount = eyes.size();
+        if(sequenceCount > MAX_SEQUENCE_COUNT)
+        {
+           Serial.print("Sequence exceeds capacity. Found ");Serial.print(sequenceCount);Serial.print(" but loading only the first ");Serial.println(MAX_SEQUENCE_COUNT);
+           sequenceCount = MAX_SEQUENCE_COUNT;
+        }
+        for(e = 0; e < sequenceCount; ++e)
+        {
+          const JsonObject &eye = eyes[e];
+          for(JsonObject::iterator it = eye.begin(); it != eye.end(); ++it)
+          {
+             char model[strlen(it->key().c_str()) + 2] = { '\0' };
+             if(it->key().c_str()[0] != '/')
+             {
+                strcpy(model, "/");
+             }
+             strcat(model, it->key().c_str());
+             Sequence[e].model = strdup(model);
+             Sequence[e].hold = it->value().as<uint8_t>();
+             Serial.print("Found: ");Serial.print(Sequence[e].model);Serial.print(":");Serial.println(Sequence[e].hold);
+          }
+        }
+      }
+      file.close();
+   }
+}
+
 void loadConfig(char *filename) {
   File    file;
   uint8_t rotation = 3;
