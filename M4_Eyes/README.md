@@ -18,3 +18,24 @@ All text above must be included in any redistribution
 
 -----------------------
 If you are looking to make changes/additions, please use the GitHub Issues and Pull Request mechanisms.
+
+-----------------------
+### The sequence
+This feature allows the user to define a list of eye models that can be shown in a sequence.
+
+A file called **sequence.eye** can be placed on the root directory. If the **A** button is held down during reset AND the
+sequence file exists, then it will be loaded and the eye switching sequence will begin immediately. The contents of the file is as follows:
+
+>{
+>   "eyes":[
+>      { "/hazel", 30},
+>      { "/fish_eyes", 90},
+>      { "/demon", 300 }
+>   ]
+>}
+
+The code will always start the sequence at index 0 in the eyes array, in the above example that would be the hazel eye model. The code expects to find all the files needed to define the eye model in the directory specified, such as the config.eye, iris, sclera, eyelid shapes, etc.
+
+Unfortunately the eye models cannot be easily swapped in run time given the complexity of the operations being performed to draw them. What the sequence code does is take advantage of the watchdog timer to monitor the timeout for each model and rebooting the board to flush the memory and load the next model in the sequence. To achieve this the code writes back to the sequence file and stores the index of the model that should be loaded on next reboot. On reboot, the sequence logic recognizes that the reset was prompted by the watchdog timer and thus tries to load the contents of the sequence file again. This time it searches the file for the index of the model to load that was stored before reboot and uses it to load the next model. The cycle repeats itself indefinitely. To exit the sequence logic simply reset the board manually without holding down the **A** button. The functionality will return to normal operation. The only downside is that the config2.eye file will not load if it exists and a sequence.eye file also exists as the code will pick the latter in that case.
+
+It is not perfect but demonstrates that it is possible to switch models "automatically". It should serve as a guide to enable a mechanism that switches out the eye models on an event instead of a timeout. That is left for a later time :).
