@@ -26,13 +26,16 @@ This feature allows the user to define a list of eye models that can be shown in
 A file called **sequence.eye** can be placed on the root directory. If the **A** button is held down during reset AND the
 sequence file exists, then it will be loaded and the eye switching sequence will begin immediately. The contents of the file is as follows:
 
->{  
->   "eyes":[  
->      { "/hazel", 30},  
->      { "/fish_eyes", 90},  
->      { "/demon", 240 }  
->   ]  
->}  
+```JSON
+{  
+   "eyes":[  
+      { "/hazel", 30},  
+      { "/fish_eyes", 90},  
+      { "/demon", 240 }  
+   ]  
+}  
+
+```
 
 There is currently a limit on the number of models, it is defined by the MAX_SEQUENCE_COUNT variable and is arbitrarily set to 10 as of this writing. The seconds field is currently defined as a uint8_t and is in seconds so the maximum timeout is currently 255 seconds. This should be an easy change to increase the values at the expense of a bit more memory usage.
 
