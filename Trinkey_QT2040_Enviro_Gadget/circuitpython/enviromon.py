@@ -29,16 +29,16 @@ bme = adafruit_bme280.Adafruit_BME280_I2C(board.I2C())
 pixel = neopixel.NeoPixel(board.NEOPIXEL, 1)
 
 # CSV output
-def send_csv_data(data):
-    usb_cdc.data.write("{}, {}, {}, {}\n".format(*data).encode())
+def send_csv_data(values):
+    usb_cdc.data.write("{}, {}, {}, {}\n".format(*values).encode())
 
 # JSON output
-def send_json_data(data):
+def send_json_data(values):
     usb_cdc.data.write('{'.encode())
-    usb_cdc.data.write('"CO2" : {},'.format(data[0]).encode())
-    usb_cdc.data.write('"pressure" : {},'.format(data[1]).encode())
-    usb_cdc.data.write('"temperature" : {},'.format(data[2]).encode())
-    usb_cdc.data.write('"humidity" : {}'.format(data[3]).encode())
+    usb_cdc.data.write('"CO2" : {},'.format(values[0]).encode())
+    usb_cdc.data.write('"pressure" : {},'.format(values[1]).encode())
+    usb_cdc.data.write('"temperature" : {},'.format(values[2]).encode())
+    usb_cdc.data.write('"humidity" : {}'.format(values[3]).encode())
     usb_cdc.data.write('}\n'.encode())
 
 # init time tracking
@@ -62,7 +62,7 @@ while True:
 
     # heart beat
     if BEAT_RATE and current_time - last_beat > BEAT_RATE:
-        if (pixel[0][0]):
+        if pixel[0][0]:
             pixel.fill(0)
         else:
             pixel.fill(BEAT_COLOR)
