@@ -1,12 +1,13 @@
 # SPDX-FileCopyrightText: 2021 Jan Goolsbey for Adafruit Industries
 # SPDX-License-Identifier: MIT
 
-# Thermal_Cam_v60_PyBadge_code.py
-# 2021-06-07 v6.0
+# Thermal_Cam_v70_PyBadge_code.py
+# 2021-12-21 v7.0  # CircuitPython v7.x compatible
 
 import time
 import board
 import busio
+import gc
 import ulab
 import displayio
 import neopixel
@@ -61,28 +62,18 @@ panel = GamePadShift(
 i2c = busio.I2C(board.SCL, board.SDA, frequency=400000)
 amg8833 = adafruit_amg88xx.AMG88XX(i2c)
 
-# CircuitPython 6 & 7 compatible
 # Display splash graphics
-with open("/thermal_cam_splash.bmp", "rb") as bitmap_file:
-    bitmap = displayio.OnDiskBitmap(bitmap_file)
-    splash = displayio.Group(scale=display.width // 160)
-    splash.append(displayio.TileGrid(bitmap, pixel_shader=getattr(bitmap, 'pixel_shader', displayio.ColorConverter())))
-    display.show(splash)
-    time.sleep(0.1)  # Give the splash graphic some time to display
-
-# # CircuitPython 7+ compatible
-# Display splash graphics
-# splash = displayio.Group(scale=display.width // 160)
-# bitmap = displayio.OnDiskBitmap("/thermal_cam_splash.bmp")
-# splash.append(displayio.TileGrid(bitmap, pixel_shader=bitmap.pixel_shader))
-# board.DISPLAY.show(splash)
-# time.sleep(0.1)  # Allow the splash to display
+splash = displayio.Group(scale=display.width // 160)
+bitmap = displayio.OnDiskBitmap("/thermal_cam_splash.bmp")
+splash.append(displayio.TileGrid(bitmap, pixel_shader=bitmap.pixel_shader))
+board.DISPLAY.show(splash)
+time.sleep(0.1)  # Allow the splash to display
 
 # Set up ulab arrays
 n = 8  # Thermal sensor grid axis size; AMG8833 sensor is 8x8
-sensor_data = ulab.array(range(n * n)).reshape((n, n))  # Color index narray
-grid_data = ulab.zeros(((2 * n) - 1, (2 * n) - 1))  # 15x15 color index narray
-histogram = ulab.zeros((2 * n) - 1)  # Histogram accumulation narray
+sensor_data = ulab.numpy.array(range(n * n)).reshape((n, n))  # Color index narray
+grid_data = ulab.numpy.zeros(((2 * n) - 1, (2 * n) - 1))  # 15x15 color index narray
+histogram = ulab.numpy.zeros((2 * n) - 1)  # Histogram accumulation narray
 
 # Convert default alarm and min/max range values from config file
 ALARM_C = fahrenheit_to_celsius(ALARM_F)
@@ -151,13 +142,13 @@ def update_histo_frame():  # Calculate and display histogram
     min_histo.text = str(MIN_RANGE_F)  # Display histogram legend
     max_histo.text = str(MAX_RANGE_F)
 
-    histogram = ulab.zeros(GRID_AXIS)  # Clear histogram accumulation array
+    histogram = ulab.numpy.zeros(GRID_AXIS)  # Clear histogram accumulation array
     for row in range(0, GRID_AXIS):  # Collect camera data and calculate histo
         for col in range(0, GRID_AXIS):
             histo_index = int(map_range(grid_data[col, row], 0, 1, 0, GRID_AXIS - 1))
             histogram[histo_index] = histogram[histo_index] + 1
 
-    histo_scale = ulab.numerical.max(histogram) / (GRID_AXIS - 1)
+    histo_scale = ulab.numpy.max(histogram) / (GRID_AXIS - 1)
     if histo_scale <= 0:
         histo_scale = 1
 
@@ -373,6 +364,7 @@ image_group.append(range_histo)  # image_group[236]
 
 # ###--- PRIMARY PROCESS SETUP ---###
 t1 = time.monotonic()  # Time marker: Primary Process Setup
+fm1 = gc.mem_free()  # Monitor free memory
 display_image = True  # Image display mode; False for histogram
 display_hold = False  # Active display mode; True to hold display
 display_focus = False  # Standard display range; True to focus display range
@@ -393,7 +385,7 @@ while True:
         flash_status("-HOLD-", 0.25)
     else:
         sensor = amg8833.pixels  # Get sensor_data data
-    sensor_data = ulab.array(sensor)  # Copy to narray
+    sensor_data = ulab.numpy.array(sensor)  # Copy to narray
 
     t3 = time.monotonic()  # Time marker: Constrain Sensor Values
     for row in range(0, 8):
@@ -402,9 +394,9 @@ while True:
 
     # Update and display alarm setting and max, min, and ave stats
     t4 = time.monotonic()  # Time marker: Display Statistics
-    v_max = ulab.numerical.max(sensor_data)
-    v_min = ulab.numerical.min(sensor_data)
-    v_ave = ulab.numerical.mean(sensor_data)
+    v_max = ulab.numpy.max(sensor_data)
+    v_min = ulab.numpy.min(sensor_data)
+    v_ave = ulab.numpy.mean(sensor_data)
 
     alarm_value.text = str(ALARM_F)
     max_value.text = str(celsius_to_fahrenheit(v_max))
@@ -495,13 +487,17 @@ while True:
         MAX_RANGE_C = fahrenheit_to_celsius(MAX_RANGE_F)
 
     t7 = time.monotonic()  # Time marker: End of Primary Process
+    gc.collect()
+    fm7 = gc.mem_free()
     print("*** PyBadge/Gamer Performance Stats ***")
-    print(f"    define displayio: {(t1 - t0):6.3f}")
+    print(f"    define displayio:      {(t1 - t0):6.3f} sec")
+    print(f"    startup free memory: {fm1/1000:6.3} Kb")
     print("")
-    print(f" 1) data acquisition: {(t4 - t2):6.3f}    rate: {(1 / (t4 - t2)):5.1f}")
+    print(f" 1) data acquisition: {(t4 - t2):6.3f}      rate:  {(1 / (t4 - t2)):5.1f} /sec")
     print(f" 2) display stats:    {(t5 - t4):6.3f}")
     print(f" 3) interpolate:      {(t6 - t5):6.3f}")
     print(f" 4) display image:    {(t7 - t6):6.3f}")
     print(f"                     =======")
-    print(f"total frame:          {(t7 - t2):6.3f}    rate: {(1 / (t7 - t2)):5.1f}")
+    print(f"total frame:          {(t7 - t2):6.3f} sec  rate:  {(1 / (t7 - t2)):5.1f} /sec")
+    print(f"                           free memory: {fm7/1000:6.3} Kb")
     print("")
