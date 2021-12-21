@@ -493,11 +493,15 @@ while True:
     print(f"    define displayio:      {(t1 - t0):6.3f} sec")
     print(f"    startup free memory: {fm1/1000:6.3} Kb")
     print("")
-    print(f" 1) data acquisition: {(t4 - t2):6.3f}      rate:  {(1 / (t4 - t2)):5.1f} /sec")
+    print(
+        f" 1) data acquisition: {(t4 - t2):6.3f}      rate:  {(1 / (t4 - t2)):5.1f} /sec"
+    )
     print(f" 2) display stats:    {(t5 - t4):6.3f}")
     print(f" 3) interpolate:      {(t6 - t5):6.3f}")
     print(f" 4) display image:    {(t7 - t6):6.3f}")
     print(f"                     =======")
-    print(f"total frame:          {(t7 - t2):6.3f} sec  rate:  {(1 / (t7 - t2)):5.1f} /sec")
+    print(
+        f"total frame:          {(t7 - t2):6.3f} sec  rate:  {(1 / (t7 - t2)):5.1f} /sec"
+    )
     print(f"                           free memory: {fm7/1000:6.3} Kb")
     print("")
