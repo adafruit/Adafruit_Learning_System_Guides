@@ -120,7 +120,7 @@ void saveActiveSequence(uint8_t as, char *filename)
       {
         file.close();
         file = arcada.open(filename, O_RDWR | O_TRUNC);
-        Serial.print("Storing: ");Serial.println(as);
+        //Serial.print("Storing: ");Serial.println(as);
         doc["activeSequence"] = as;
 
         size_t serror = 0;
@@ -132,7 +132,7 @@ void saveActiveSequence(uint8_t as, char *filename)
         }
         else
         {
-           Serial.print("Saved: ");Serial.println(serror);
+           //Serial.print("Saved: ");Serial.println(serror);
         }
       }
       file.close();
