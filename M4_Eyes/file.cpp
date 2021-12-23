@@ -108,11 +108,9 @@ void saveActiveSequence(uint8_t as, char *filename)
    {
       StaticJsonDocument<2048> doc;
       yield();
-        Serial.println(1);
       DeserializationError error = deserializeJson(doc, file);
       yield();
-        serializeJson(doc, Serial);
-        Serial.println(2);
+      //serializeJson(doc, Serial);
       if(error)
       {
         Serial.println("Sequence read error.");
@@ -125,7 +123,8 @@ void saveActiveSequence(uint8_t as, char *filename)
         Serial.print("Storing: ");Serial.println(as);
         doc["activeSequence"] = as;
 
-        size_t serror = serializeJson(doc, Serial);Serial.println();
+        size_t serror = 0;
+        //serror = serializeJson(doc, Serial);Serial.println();
         serror = serializeJsonPretty(doc, file);
         if(serror == 0)
         {
@@ -178,7 +177,7 @@ void loadSequence(char *filename)
              strcat(model, it->key().c_str());
              Sequence[e].model = strdup(model);
              Sequence[e].hold = it->value().as<uint8_t>();
-             Serial.print("Found: ");Serial.print(Sequence[e].model);Serial.print(":");Serial.println(Sequence[e].hold);
+             //Serial.print("Found: ");Serial.print(Sequence[e].model);Serial.print(":");Serial.println(Sequence[e].hold);
           }
         }
       }

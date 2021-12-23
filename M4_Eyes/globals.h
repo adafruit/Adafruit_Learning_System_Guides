@@ -201,6 +201,7 @@ typedef struct {
 #endif
 
 // Eye sequence states
+#define SEQUENCE_FILE "/sequence.eye"
 #define MAX_SEQUENCE_COUNT 10
 typedef struct
 {

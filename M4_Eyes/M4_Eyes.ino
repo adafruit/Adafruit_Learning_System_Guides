@@ -150,12 +150,12 @@ uint32_t availableRAM(void) {
 
 void LoadEyeModel(char *filename)
 {
-   if(Sequence[0].model != NULL && Sequence[activeSequence].model != NULL)
+   if(sequenceCount > 0 && Sequence[activeSequence].model != NULL)
    {
       char *s0((char *)calloc(strlen(Sequence[activeSequence].model) + 12, sizeof(char)));
       sprintf(s0, "%s/config.eye", Sequence[activeSequence].model);
       loadConfig(s0);
-      Serial.println(s0);
+      //Serial.println(s0);
       free(s0);
    }
    else
@@ -189,7 +189,6 @@ void LoadEyeModel(char *filename)
 
    uint32_t maxRam = availableRAM() - stackReserve;
 
-   Serial.print("XX");
    // Load texture maps for eyes
    uint8_t e(0);
    uint8_t e2;
@@ -350,44 +349,47 @@ void setup() {
   } else if((buttonState & ARCADA_BUTTONMASK_DOWN) && arcada.exists("config3.eye")) {
     filename = (char *)"config3.eye";
   }
-  
-  if(arcada.exists("/sequence.eye"))
+
+  if (arcada.exists(SEQUENCE_FILE))
   {
-     Serial.println("Yes");
-    if((buttonState & ARCADA_BUTTONMASK_A))
+    if ((buttonState & ARCADA_BUTTONMASK_A))
     {
-       loadSequence("/sequence.eye");
+      loadSequence(SEQUENCE_FILE);
     }
-    else if(Watchdog.resetCause() & RESET_WDT)
+    else if (Watchdog.resetCause() & RESET_WDT)
     {
-       Serial.println("WD Reset!");
-       // read active sequence from NVM
-       loadSequence("/sequence.eye");
-       showSplashScreen = false;
-       activeSequence = getActiveSequence("/sequence.eye");
-       Serial.print("Active sequence: ");Serial.println(activeSequence);
-       if(activeSequence == 0xFF)
-       {
-          // Maybe there was an error.
-          activeSequence = 0;
-       }
-       Serial.print("Active sequence: ");Serial.println(activeSequence);
+      Serial.println("WD Reset!");
+      // read active sequence from NVM
+      loadSequence(SEQUENCE_FILE);
+      showSplashScreen = false;
+      activeSequence = getActiveSequence(SEQUENCE_FILE);
+      //Serial.print("Active sequence: ");
+      //Serial.println(activeSequence);
+      if (activeSequence == 0xFF)
+      {
+        // Maybe there was an error.
+        activeSequence = 0;
+      }
+      //Serial.print("Active sequence: ");
+      //Serial.println(activeSequence);
     }
-    if(Sequence[activeSequence].model != NULL)
+
+    if (Sequence[activeSequence].model != NULL)
     {
-       Serial.print("Found Model: ");Serial.println(Sequence[activeSequence].model);
-       filename = Sequence[activeSequence].model;
+      //Serial.print("Found Model: ");
+      //Serial.println(Sequence[activeSequence].model);
+      filename = Sequence[activeSequence].model;
     }
     else
     {
-       Serial.println("Failed Model");
+      Serial.println("Failed Model");
     }
   }
-   else
-   {
-     Serial.println("No");
-   }
-   Serial.print("FILENAME: ");Serial.println(filename);
+  else
+  {
+    //Serial.println("No");
+  }
+  //Serial.print("FILENAME: ");Serial.println(filename);
 
   yield();
   // Initialize display(s)
@@ -1064,20 +1066,20 @@ void loop() {
   eye[eyeNum].colIdx       ^= 1;    // Alternate 0/1 line structs
   eye[eyeNum].column_ready = false; // OK to render next line
 
-   if(Sequence[activeSequence].model != NULL)
+   if(sequenceCount > 0)//Sequence[activeSequence].model != NULL)
    {
       if((millis() - sequenceTimeout) >= (Sequence[activeSequence].hold * 1000) &&
           // Wait until the eyelids close.
           eye[eyeNum].blink.state == DEBLINK)
       {
-         sequenceTimeout = millis();
+         sequenceTimeout = millis(); // Not really needed here any more since the model loads on reboot.
          activeSequence++;
          if(activeSequence >= sequenceCount)
          {
             activeSequence = 0;
          }
-         Serial.print("Load:");Serial.println(Sequence[activeSequence].model);
-         saveActiveSequence(activeSequence, "/sequence.eye");
+         //Serial.print("Load:");Serial.println(Sequence[activeSequence].model);
+         saveActiveSequence(activeSequence, SEQUENCE_FILE);
          RampBacklight(500, false);
          // Close eyelids, load next model, open eyelids.
          // Can't just reset silly... there's a bunch of stuff
@@ -1088,13 +1090,5 @@ void loop() {
          // and reload on setup.
          Watchdog.enable(1, false);
       }
-   }
-   else
-   {
-      //uint32_t buttonState = arcada.readButtons();
-      //if(buttonState & (ARCADA_BUTTONMASK_UP | ARCADA_BUTTONMASK_A | ARCADA_BUTTONMASK_DOWN))
-      //{
-      //   //Watchdog.enable(1, false);
-      //}
    }
 }
