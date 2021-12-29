@@ -19,6 +19,7 @@ static const int pulseDelayTime = 6;
 #define TRK0_PIN    A4
 
 #define MAX_FLUX_PULSE_PER_TRACK (500000 / 5) // 500khz / 5 hz per track rotation
+#define MAX_TRACKS 80
 #define STEP_OUT HIGH
 #define STEP_IN LOW
 
@@ -81,14 +82,13 @@ void setup() {
   // Select drive
   digitalWrite(SELECT_PIN, LOW);
   delay(1000);
-  /*
+
   Serial.print("Seeking track 00...");
   if (! goto_track(0)) {
-    Serial.println("Failed to get to track 0");
-    while (1);
+    Serial.println("Failed to seek to track");
+    while (1) yield();
   }
   Serial.println("done!");
-*/
 }
 uint32_t time_stamp = 0;
 
@@ -104,6 +104,51 @@ void wait_for_index_pulse_low(void) {
       return;
     }
     last_index_state = index_state;
+  }
+}
+
+void print_pulses(uint8_t *pulses, uint32_t num_pulses) {
+  for (uint32_t i=0; i<num_pulses; i++) {
+    Serial.print(pulses[i]);
+    Serial.print(", ");
+  }
+  Serial.println();
+}
+
+void print_pulse_bins(uint8_t *pulses, uint32_t num_pulses) {
+  // lets bin em!
+  uint8_t bins[32][2];
+  memset(bins, 0, 32*2);
+
+  // we'll add each pulse to a bin so we can figure out the 3 buckets
+  for (uint32_t i=0; i<num_pulses; i++) {
+    uint8_t p = pulses[i];
+    // find a bin for this pulse
+    uint8_t bin = 0;
+    for (bin=0; bin<32; bin++) {
+      // bin already exists? increment the count!
+      if (bins[bin][0] == p) {
+        bins[bin][1] ++;
+        break;
+      }
+      if (bins[bin][0] == 0) {
+        // ok we never found the bin, so lets make it this one!
+        bins[bin][0] = p;
+        bins[bin][1] = 1;
+        break;
+      }
+    }
+    if (bin == 32) Serial.println("oof we ran out of bins but we'll keep going");
+  }
+  // this is a very lazy way to print the bins sorted
+  for (uint8_t pulse_w=1; pulse_w<255; pulse_w++) {
+    for (uint8_t b=0; b<32; b++) {
+      if (bins[b][0] == pulse_w) {
+        Serial.print(bins[b][0]);
+        Serial.print(": ");
+        Serial.println(bins[b][1]);
+      }
+    }
   }
 }
 
@@ -148,11 +193,8 @@ void capture_track(void) {
   Serial.print(num_pulses);
   Serial.println(" flux transitions");
 
-  for (uint32_t i=0; i<num_pulses; i++) {
-    Serial.print(pulses[i]);
-    Serial.print(", ");
-  }
-  Serial.println();
+  //print_pulses(pulses, num_pulses);
+  //print_pulse_bins(pulses, num_pulses);
 }
 
 void loop() {
@@ -167,13 +209,7 @@ void loop() {
     Serial.println(digitalRead(TRK0_PIN) ? "No" : "Yes");
     time_stamp = millis();
   }
-  
 }
-
-
-
-
-
 
 
 
@@ -183,21 +219,25 @@ void step(bool dir, uint8_t times) {
   
   while (times--) {
     digitalWrite(STEP_PIN, HIGH);
-    delay(2); // 3ms min per step
+    delay(3); // 3ms min per step
     digitalWrite(STEP_PIN, LOW);
-    delay(2); // 3ms min per step
+    delay(3); // 3ms min per step
     digitalWrite(STEP_PIN, HIGH); // end high
   }
 }
 
 bool goto_track(uint8_t track_num) {
+  // track 0 is a very special case because its the only one we actually know we got to
   if (track_num == 0) {
-    uint8_t max_steps = 30;
-    while (max_steps-- && digitalRead(TRK0_PIN)) {
+    uint8_t max_steps = MAX_TRACKS;
+    while (max_steps--) {
+      if (!digitalRead(TRK0_PIN)) 
+        return true;
       step(STEP_OUT, 1);
     }
-    return (max_steps == 0);
+    return false; // we 'timed' out!
   }
   if (!goto_track(0)) return false;
-  step(STEP_IN, max(track_num, 159));
+  step(STEP_IN, max(track_num, MAX_TRACKS-1));
+  return true;
 }
