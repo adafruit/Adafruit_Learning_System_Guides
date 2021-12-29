@@ -84,7 +84,7 @@ void setup() {
   delay(1000);
 
   Serial.print("Seeking track 00...");
-  if (! goto_track(0)) {
+  if (! goto_track(1)) {
     Serial.println("Failed to seek to track");
     while (1) yield();
   }
@@ -117,8 +117,8 @@ void print_pulses(uint8_t *pulses, uint32_t num_pulses) {
 
 void print_pulse_bins(uint8_t *pulses, uint32_t num_pulses) {
   // lets bin em!
-  uint8_t bins[32][2];
-  memset(bins, 0, 32*2);
+  uint32_t bins[32][2];
+  memset(bins, 0, 32*2*sizeof(uint32_t));
 
   // we'll add each pulse to a bin so we can figure out the 3 buckets
   for (uint32_t i=0; i<num_pulses; i++) {
