@@ -4,15 +4,14 @@
 """
 PyPortal implementation of Busy Simulator notification sound looper.
 """
+import time
 import board
 import displayio
 import adafruit_touchscreen
 from adafruit_displayio_layout.layouts.grid_layout import GridLayout
 from adafruit_displayio_layout.widgets.icon_widget import IconWidget
-import time
 from audiocore import WaveFile
 from audioio import AudioOut
-from vectorio import Circle
 
 # How many seconds to wait between playing samples
 # Lower time means it will play faster
@@ -128,16 +127,17 @@ def check_for_touch(_now):
 
     :param int _now: The current time in seconds. Used for cool down enforcement
     """
+    # pylint: disable=global-statement, too-many-nested-blocks, consider-using-enumerate
     global CUR_LOOP_INDEX
     global LOOP
     global LAST_PRESS_TIME
     global WAS_TOUCHED
 
     # read the touch data
-    p = ts.touch_point
+    touch_point = ts.touch_point
 
     # if anything is touched
-    if p:
+    if touch_point:
         # if the touch just began. We ignore further events until
         # after the touch has been lifted
         if not WAS_TOUCHED:
@@ -152,16 +152,16 @@ def check_for_touch(_now):
                 LAST_PRESS_TIME = time.monotonic()
 
                 # loop over the icons
-                for i in range(len(_icons)):
+                for _ in range(len(_icons)):
                     # lookup current icon in the grid layout
-                    icon = layout.get_cell((i % 4, i // 4))
+                    cur_icon = layout.get_cell((_ % 4, _ // 4))
 
                     # check if it's being touched
-                    if icon.contains(p):
-                        print("icon {} touched".format(i))
+                    if cur_icon.contains(touch_point):
+                        print("icon {} touched".format(_))
 
                         # if it's the stop icon
-                        if _icons[i][0] == "Stop":
+                        if _icons[_][0] == "Stop":
 
                             # empty out the loop
                             LOOP = []
@@ -171,7 +171,7 @@ def check_for_touch(_now):
 
                         else:  # any other icon
                             # insert the touched icons sample index into the loop
-                            LOOP.insert(CUR_LOOP_INDEX, i)
+                            LOOP.insert(CUR_LOOP_INDEX, _)
 
                         # print(LOOP)
 
