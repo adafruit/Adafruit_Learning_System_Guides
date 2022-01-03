@@ -27,7 +27,7 @@ DISPLAY_TIMEOUT = 60   # screen saver timeout in seconds
 DISPLAY_RATE = 1       # screen refresh rate
 #-------------------------------------------------------------------------
 
-# Get sekrets from a secrets.py file
+# Get secrets from a secrets.py file
 try:
     from secrets import secrets
     totp_keys = secrets["totp_keys"]
