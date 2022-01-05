@@ -29,9 +29,9 @@ sequence file exists, then it will be loaded and the eye switching sequence will
 ```JSON
 {  
    "eyes":[  
-      { "/hazel", 30},  
-      { "/fish_eyes", 90},  
-      { "/demon", 240 }  
+      { "/hazel": 30},  
+      { "/fish_eyes": 90},  
+      { "/demon": 240 }  
    ]  
 }  
 
