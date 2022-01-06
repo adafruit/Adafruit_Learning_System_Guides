@@ -1,6 +1,11 @@
+# SPDX-FileCopyrightText: 2022 Dan Halbert for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
+import time
+
 import board
 import digitalio
-import time
 
 
 def blink(pin, interval, count):
