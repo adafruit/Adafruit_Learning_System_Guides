@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2021 Dylan Herrada for Adafruit Industries
+# SPDX-FileCopyrightText: 2021 Eva Herrada for Adafruit Industries
 # SPDX-License-Identifier: MIT
 
 import ssl
