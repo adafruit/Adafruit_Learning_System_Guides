@@ -35,6 +35,7 @@ jobs:
         git clone --quiet https://github.com/me-no-dev/ESPAsyncTCP /home/runner/Arduino/libraries/ESPAsyncTCP
         git clone --quiet https://github.com/adafruit/Talkie /home/runner/Arduino/libraries/Talkie
         git clone --quiet https://github.com/Infineon/arduino-optiga-trust-m /home/runner/Arduino/libraries/arduinoOptigaTrustM
+        git clone --quiet https://github.com/adafruit/HID /home/runner/Arduino/libraries/HID_Project
 
     - name: test platforms
       run: python3 ci/build_platform.py ${{ matrix.arduino-platform }}
