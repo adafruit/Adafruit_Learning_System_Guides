@@ -285,4 +285,5 @@ bool splitURL(String url, char **host, int *port, char **path){
   }
   *path = (char *)malloc(url.length()+1);
   url.toCharArray(*path, url.length()+1);
+  return true;
 }
