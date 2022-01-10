@@ -116,4 +116,5 @@ uint16_t mode(uint16_t *x,int n){
     }
     return mode;
   }
+  return 0;
 }
