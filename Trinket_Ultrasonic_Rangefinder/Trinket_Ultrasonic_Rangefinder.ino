@@ -100,7 +100,7 @@ uint16_t mode(uint16_t *x,int n){
       count++;
       i++;
     }
-    if( count > prevCount & count > maxCount) {
+    if( count > prevCount && count > maxCount) {
       mode=x[i];
       maxCount=count;
       bimodal=0;
