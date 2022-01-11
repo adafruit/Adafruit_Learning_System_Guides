@@ -10,7 +10,7 @@ from adafruit_seesaw.analoginput import AnalogInput
 from adafruit_seesaw import neopixel
 
 # NeoSlider Setup
-neoslider = Seesaw(board.I2C(), 0x31)
+neoslider = Seesaw(board.I2C(), 0x30)
 potentiometer = AnalogInput(neoslider, 18)
 pixels = neopixel.NeoPixel(neoslider, 14, 4)
 
