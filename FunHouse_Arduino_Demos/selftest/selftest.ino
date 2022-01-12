@@ -265,8 +265,8 @@ void loop() {
 }
 
 
-void tone(uint8_t pin, float frequecy, float duration) {
-  ledcSetup(1, frequecy * 80, 8);
+void tone(uint8_t pin, float frequency, float duration) {
+  ledcSetup(1, frequency, 8);
   ledcAttachPin(pin, 1);
   ledcWrite(1, 128);
   delay(duration);
