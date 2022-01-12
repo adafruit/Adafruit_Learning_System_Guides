@@ -1,4 +1,6 @@
 """
+SPDX-FileCopyrightText: 2022 Isaac Wellish for Adafruit Industries
+SPDX-License-Identifier: MIT
 Circuit Playground Bluefruit BLE Heart Rate Display
 Read heart rate data from a heart rate peripheral using
 the standard BLE heart rate service.
@@ -110,7 +112,6 @@ while True:
                 # Blink leds at the given BPM
                 pixels.fill(RED)
                 pixels.show()
-                # Increase or decrease to change the speed of the solid color change.
                 time.sleep(time_on)
                 pixels.fill(LIGHTRED)
                 pixels.show()
