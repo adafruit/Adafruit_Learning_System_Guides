@@ -19,6 +19,7 @@ uint8_t LED_dutycycle = 0;
 uint16_t firstPixelHue = 0;
 
 void setup() {
+  //while (!Serial);
   Serial.begin(115200);
   delay(100);
   
@@ -73,10 +74,10 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(SPEAKER, OUTPUT);
 
-  ledcSetup(0, 2000 * 80, 8);
+  ledcSetup(0, 2000, 8);
   ledcAttachPin(LED_BUILTIN, 0);
 
-  ledcSetup(1, 2000 * 80, 8);
+  ledcSetup(1, 2000, 8);
   ledcAttachPin(SPEAKER, 1);
   ledcWrite(1, 0);
 }
@@ -264,8 +265,8 @@ void loop() {
 }
 
 
-void tone(uint8_t pin, float frequecy, float duration) {
-  ledcSetup(1, frequecy * 80, 8);
+void tone(uint8_t pin, float frequency, float duration) {
+  ledcSetup(1, frequency, 8);
   ledcAttachPin(pin, 1);
   ledcWrite(1, 128);
   delay(duration);
