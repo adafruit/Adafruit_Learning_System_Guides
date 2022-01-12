@@ -8,7 +8,7 @@ layout = KeyboardLayoutUS(kbd)
 
 while True:
     if cpx.button_a:
-        # Type 'abc' followed by Enter (a newline).
+        # Type 'Jane Doe' followed by Enter (a newline).
         layout.write('Jane Doe\n')
         while cpx.button_a:
             pass
