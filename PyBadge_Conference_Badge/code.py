@@ -155,9 +155,9 @@ while True:
             last_read = time.monotonic()
         if latest_event.pressed and latest_event.key_number != last_event.key_number:
             # Respond to the buttons
-            if (latest_event.key_number == BUTTON_RIGHT):
+            if latest_event.key_number == BUTTON_RIGHT:
                 direction = -1
-            elif (latest_event.key_number == BUTTON_LEFT):
+            elif latest_event.key_number == BUTTON_LEFT:
                 direction = 1
             elif (latest_event.key_number == BUTTON_UP) and speed < 10:
                 speed += 1
@@ -169,3 +169,4 @@ while True:
                 brightness -= 0.025
             last_event = latest_event
             latest_event = Event(key_number=8) # An imaginary key number that doesn't exist!
+    
