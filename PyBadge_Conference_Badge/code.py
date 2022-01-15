@@ -8,7 +8,6 @@ from math import sqrt, cos, sin, radians
 import board
 from micropython import const
 import displayio
-import digitalio
 import neopixel
 from keypad import ShiftRegisterKeys, Event
 from adafruit_display_shapes.rect import Rect
@@ -46,13 +45,14 @@ neopixels = neopixel.NeoPixel(board.NEOPIXEL, NEOPIXEL_COUNT, brightness=brightn
                               auto_write=False, pixel_order=neopixel.GRB)
 
 latest_event = Event()
-last_press = None
+last_event = Event()
 
 pad = ShiftRegisterKeys(clock=board.BUTTON_CLOCK,
                    data=board.BUTTON_OUT,
                    latch=board.BUTTON_LATCH,
                    key_count=8,
                    value_when_pressed=True,
+                   interval=0.1,
                    max_events=1)
 
 # Make the Display Background
@@ -153,9 +153,7 @@ while True:
         if (last_read + 0.1) < time.monotonic():
             pad.events.get_into(latest_event)
             last_read = time.monotonic()
-        #print()
-        #print("latest keynumber:", latest_event.key_number)
-        if latest_event is not None and latest_event.key_number != last_press:
+        if latest_event.pressed and latest_event.key_number != last_event.key_number:
             # Respond to the buttons
             if (latest_event.key_number == BUTTON_RIGHT):
                 direction = -1
@@ -169,6 +167,5 @@ while True:
                 brightness += 0.025
             elif (latest_event.key_number == BUTTON_B) and brightness > 0.025:
                 brightness -= 0.025
-            last_press = latest_event.key_number
-        else:
-            last_press = None
+            last_event = latest_event
+            latest_event = Event(key_number=8) # An imaginary key number that doesn't exist!
