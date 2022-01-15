@@ -10,20 +10,20 @@ from micropython import const
 import displayio
 import digitalio
 import neopixel
-from gamepadshift import GamePadShift
+from keypad import ShiftRegisterKeys, Event
 from adafruit_display_shapes.rect import Rect
 from adafruit_display_text.label import Label
 from adafruit_bitmap_font import bitmap_font
 
 # Button Constants
-BUTTON_LEFT = const(128)
-BUTTON_UP = const(64)
-BUTTON_DOWN = const(32)
-BUTTON_RIGHT = const(16)
-BUTTON_SEL = const(8)
-BUTTON_START = const(4)
-BUTTON_A = const(2)
-BUTTON_B = const(1)
+BUTTON_LEFT = const(7)
+BUTTON_UP = const(6)
+BUTTON_DOWN = const(5)
+BUTTON_RIGHT = const(4)
+BUTTON_SEL = const(3)
+BUTTON_START = const(2)
+BUTTON_A = const(1)
+BUTTON_B = const(0)
 
 # Customizations
 HELLO_STRING = "HELLO"
@@ -45,9 +45,15 @@ speed = 1
 neopixels = neopixel.NeoPixel(board.NEOPIXEL, NEOPIXEL_COUNT, brightness=brightness,
                               auto_write=False, pixel_order=neopixel.GRB)
 
-pad = GamePadShift(digitalio.DigitalInOut(board.BUTTON_CLOCK),
-                   digitalio.DigitalInOut(board.BUTTON_OUT),
-                   digitalio.DigitalInOut(board.BUTTON_LATCH))
+latest_event = Event()
+last_press = None
+
+pad = ShiftRegisterKeys(clock=board.BUTTON_CLOCK,
+                   data=board.BUTTON_OUT,
+                   latch=board.BUTTON_LATCH,
+                   key_count=8,
+                   value_when_pressed=True,
+                   max_events=1)
 
 # Make the Display Background
 splash = displayio.Group()
@@ -131,7 +137,6 @@ for x in range(0, NEOPIXEL_COUNT):
     pixels.append(x * 360 // NEOPIXEL_COUNT)
 
 # Main Loop
-current_buttons = pad.get_pressed()
 last_read = 0
 while True:
     for color in range(0, 360, speed):
@@ -146,20 +151,24 @@ while True:
         neopixels.brightness = brightness
         # Reading buttons too fast returns 0
         if (last_read + 0.1) < time.monotonic():
-            buttons = pad.get_pressed()
+            pad.events.get_into(latest_event)
             last_read = time.monotonic()
-        if current_buttons != buttons:
+        #print()
+        #print("latest keynumber:", latest_event.key_number)
+        if latest_event is not None and latest_event.key_number != last_press:
             # Respond to the buttons
-            if (buttons & BUTTON_RIGHT) > 0:
+            if (latest_event.key_number == BUTTON_RIGHT):
                 direction = -1
-            elif (buttons & BUTTON_LEFT) > 0:
+            elif (latest_event.key_number == BUTTON_LEFT):
                 direction = 1
-            elif (buttons & BUTTON_UP) > 0 and speed < 10:
+            elif (latest_event.key_number == BUTTON_UP) and speed < 10:
                 speed += 1
-            elif (buttons & BUTTON_DOWN) > 0 and speed > 1:
+            elif (latest_event.key_number == BUTTON_DOWN) and speed > 1:
                 speed -= 1
-            elif (buttons & BUTTON_A) > 0 and brightness < 0.5:
+            elif (latest_event.key_number == BUTTON_A) and brightness < 0.5:
                 brightness += 0.025
-            elif (buttons & BUTTON_B) > 0 and brightness > 0.025:
+            elif (latest_event.key_number == BUTTON_B) and brightness > 0.025:
                 brightness -= 0.025
-            current_buttons = buttons
+            last_press = latest_event.key_number
+        else:
+            last_press = None
