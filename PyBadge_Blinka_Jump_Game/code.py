@@ -7,24 +7,27 @@ import displayio
 import adafruit_imageload
 import digitalio
 import simpleio
-from gamepadshift import GamePadShift
+from keypad import ShiftRegisterKeys, Event
 from adafruit_display_text import label
 
 #  setup for PyBadge buttons
-BUTTON_LEFT = const(128)
-BUTTON_UP = const(64)
-BUTTON_DOWN = const(32)
-BUTTON_RIGHT = const(16)
-BUTTON_SEL = const(8)
-BUTTON_START = const(4)
-BUTTON_A = const(2)
-BUTTON_B = const(1)
+BUTTON_LEFT = const(7)
+BUTTON_UP = const(6)
+BUTTON_DOWN = const(5)
+BUTTON_RIGHT = const(4)
+BUTTON_SEL = const(3)
+BUTTON_START = const(2)
+BUTTON_A = const(1)
+BUTTON_B = const(0)
 
-pad = GamePadShift(digitalio.DigitalInOut(board.BUTTON_CLOCK),
-                   digitalio.DigitalInOut(board.BUTTON_OUT),
-                   digitalio.DigitalInOut(board.BUTTON_LATCH))
+pad = ShiftRegisterKeys(clock=board.BUTTON_CLOCK,
+                   data=board.BUTTON_OUT,
+                   latch=board.BUTTON_LATCH,
+                   key_count=8,
+                   value_when_pressed=True,
+                   max_events=1)
 
-current_buttons = pad.get_pressed()
+latest_event = Event(key_number=8)
 last_read = 0
 
 #  enables speaker
@@ -201,12 +204,14 @@ slither = 0
 blue = 0
 smoke = 0
 monster = 0
+# jump button press state
+jump_pressed = False
 
 while True:
 
     #  checks if button has been pressed
     if (last_read + 0.01) < time.monotonic():
-        buttons = pad.get_pressed()
+        pad.events.get_into(latest_event)
         last_read = time.monotonic()
     #  new game
     if new_game and not game_over:
@@ -221,8 +226,8 @@ while True:
         new_game_text.text = "BLINKA JUMP"
         life()
         #  if start is pressed...
-        if current_buttons != buttons:
-            if buttons & BUTTON_START:
+        if latest_event:
+            if  latest_event.key_number == BUTTON_START:
                 #  prepares display for gameplay
                 print("start game")
                 new_game_text.text = "        "
@@ -302,9 +307,13 @@ while True:
 
         #  if the A button is pressed then Blinka is no longer in the default
         #  slither animation aka she jumps
-        if current_buttons != buttons:
-            if buttons & BUTTON_A:
+        if latest_event.key_number == BUTTON_A:
+            if latest_event.pressed:
+                jump_pressed = True
                 snake = False
+            else:
+                jump_pressed = False
+                snake = True
 
         #  heart sprites are displayed to show life count
         life()
@@ -350,10 +359,12 @@ while True:
                     #  special victory tone is played
                     simpleio.tone(board.SPEAKER, 523.25, 0.005)
                     simpleio.tone(board.SPEAKER, 783.99, 0.005)
-        #  resets back to Blinka animation
-        snake = True
-        #  resets that Blinka has not jumped over a Sparky
-        cleared = False
+
+        if not jump_pressed:
+            #  resets back to Blinka animation
+            snake = True
+            #  resets that Blinka has not jumped over a Sparky
+            cleared = False
 
     #  if there are no more lives, the game is over
     if game_over and not new_game:
@@ -370,8 +381,8 @@ while True:
             end = True
 
         #  if the start button is pressed...
-        if (current_buttons != buttons) and game_over:
-            if buttons & BUTTON_START:
+        if latest_event and game_over:
+            if latest_event.key_number == BUTTON_START:
                 #  display, states and score are reset for gameplay
                 game_over_text.text = "        "
                 life_count = 3
