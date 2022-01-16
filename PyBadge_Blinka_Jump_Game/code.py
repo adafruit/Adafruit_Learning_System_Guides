@@ -222,7 +222,7 @@ while True:
         sparky0_grid.x = 5
         sparky1_grid.x = 40
         sparky2_grid.x = 65
-        score_area.text = 300
+        score_area.text = str(300)
         new_game_text.text = "BLINKA JUMP"
         life()
         #  if start is pressed...
@@ -246,7 +246,7 @@ while True:
         #  adds 10 points every time a Sparky is cleared
         total_score = score + jump_score
         #  displays score as text
-        score_area.text = int(total_score)
+        score_area.text = str(int(total_score))
 
         #  puts Sparky states and x location into callable arrays
         for s in range(3):
