@@ -172,6 +172,9 @@ class NekoAnimatedSprite(displayio.TileGrid):
             tile_height=32,
         )
 
+        self.x = 0
+        self.y = 0
+
         # set the animation time into a private field
         self._animation_time = animation_time
 
