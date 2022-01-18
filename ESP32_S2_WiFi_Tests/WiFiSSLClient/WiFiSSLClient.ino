@@ -51,6 +51,8 @@ void setup() {
   Serial.println("Connected to WiFi");
   printWifiStatus();
 
+  client.setInsecure(); // don't use a root cert
+
   Serial.println("\nStarting connection to server...");
   // if you get a connection, report back via serial:
   if (client.connect(SERVER, 443)) {

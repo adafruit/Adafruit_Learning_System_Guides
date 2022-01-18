@@ -85,7 +85,7 @@ void setup() {
   #endif
 
   printWifiStatus();
-
+  client.setInsecure(); // don't use a root cert
 }
 
 uint32_t bytes = 0;
