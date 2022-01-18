@@ -7,6 +7,7 @@ If you can find something that spits out text, we can display it!
 import time
 import board
 from adafruit_pyportal import PyPortal
+from adafruit_portalbase.network import CONTENT_TEXT
 
 # Set up where we'll be fetching data from
 DATA_SOURCE = "https://img.shields.io/discord/327254708534116352.svg"
@@ -22,7 +23,7 @@ pyportal = PyPortal(url=DATA_SOURCE, regexp_path=DATA_LOCATION,
 
 while True:
     try:
-        value = pyportal.fetch()
+        value = pyportal.fetch(force_content_type=CONTENT_TEXT)
         print("Response is", value)
     except RuntimeError as e:
         print("Some error occured, retrying! -", e)
