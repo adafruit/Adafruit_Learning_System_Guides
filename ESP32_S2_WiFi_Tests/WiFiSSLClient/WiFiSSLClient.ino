@@ -32,7 +32,7 @@ WiFiClientSecure client;
 
 void setup() {
   //Initialize serial and wait for port to open:
-  Serial.begin(9600);
+  Serial.begin(115200);
   while (!Serial) {
     ; // wait for serial port to connect. Needed for native USB port only
   }
@@ -50,6 +50,8 @@ void setup() {
   Serial.println("");
   Serial.println("Connected to WiFi");
   printWifiStatus();
+
+  client.setInsecure(); // don't use a root cert
 
   Serial.println("\nStarting connection to server...");
   // if you get a connection, report back via serial:

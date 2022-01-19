@@ -35,14 +35,10 @@ int status = WL_IDLE_STATUS;
 #define SERVER "cdn.syndication.twimg.com"
 #define PATH   "/widgets/followbutton/info.json?screen_names=adafruit"
 
-// Initialize the SSL client library
-// with the IP address and port of the server
-// that you want to connect to (port 443 is default for HTTPS):
-WiFiClientSecure client;
 
 void setup() {
   //Initialize serial and wait for port to open:
-  Serial.begin(9600);
+  Serial.begin(115200);
 
   #if defined(USE_OLED)
     if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { // Address 0x3C for 128x32
@@ -85,12 +81,14 @@ void setup() {
   #endif
 
   printWifiStatus();
-
 }
 
 uint32_t bytes = 0;
 
 void loop() {
+  WiFiClientSecure client;
+  client.setInsecure(); // don't use a root cert
+
   Serial.println("\nStarting connection to server...");
   #if defined(USE_OLED)
     display.clearDisplay(); display.setCursor(0,0);
