@@ -3,6 +3,7 @@
 """
 CircuitPython Essentials Storage CP Filesystem boot.py file
 
+REMOVE THIS LINE AND ALL TEXT BELOW BEFORE SUBMITTING TO GITHUB.
 There are three things to be updated in this file to match your board:
 * Update OBJECT_NAME to match the physical thing you are using, e.g. button or pin.
 * Update OBJECT_PIN to match the pin name to which the button or pin is attached.
