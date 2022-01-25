@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2022 TimCocks for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
 import time
 import random
 import board
