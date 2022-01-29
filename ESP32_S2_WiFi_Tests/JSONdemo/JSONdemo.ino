@@ -15,6 +15,8 @@ last revision November 2015
 
 // uncomment the next line if you have a 128x32 OLED on the I2C pins
 //#define USE_OLED
+// uncomment the next line to deep sleep between requests
+//#define USE_DEEPSLEEP
 
 #if defined(USE_OLED)
 // Some boards have TWO I2C ports, how nifty. We should use the second one sometimes
@@ -168,11 +170,22 @@ void loop() {
     display.setTextSize(1);
   #endif
 
-  
   // Disconnect
   client.stop();
+  delay(1000);
 
-  delay(10000);
+#if defined(USE_DEEPSLEEP)
+#if defined(USE_OLED)
+  display.clearDisplay();
+  display.display();
+#endif // OLED
+  digitalWrite(NEOPIXEL_POWER, LOW); // off
+  // wake up 1 second later and then go into deep sleep
+  esp_sleep_enable_timer_wakeup(10 * 1000UL * 1000UL); // 10 sec
+  esp_deep_sleep_start(); 
+#else
+  delay(10 * 1000);
+#endif
 }
 
 
