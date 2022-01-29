@@ -17,8 +17,16 @@ last revision November 2015
 //#define USE_OLED
 
 #if defined(USE_OLED)
+// Some boards have TWO I2C ports, how nifty. We should use the second one sometimes
+#if defined(ARDUINO_ADAFRUIT_QTPY_ESP32S2) \
+    || defined(ARDUINO_ADAFRUIT_QTPY_ESP32_PICO)
+  #define OLED_I2C_PORT &Wire1
+#else
+  #define OLED_I2C_PORT &Wire
+#endif
+
   #include <Adafruit_SSD1306.h>
-  Adafruit_SSD1306 display = Adafruit_SSD1306(128, 32, &Wire);
+  Adafruit_SSD1306 display = Adafruit_SSD1306(128, 32, OLED_I2C_PORT);
 #endif
 
 // Enter your WiFi SSID and password
@@ -41,6 +49,13 @@ void setup() {
   Serial.begin(115200);
 
   #if defined(USE_OLED)
+  #if defined(ARDUINO_ADAFRUIT_QTPY_ESP32S2) \
+    || defined(ARDUINO_ADAFRUIT_QTPY_ESP32_PICO)
+  // ESP32 is kinda odd in that secondary ports must be manually
+  // assigned their pins with setPins()!
+  Wire1.setPins(SDA1, SCL1);
+  #endif
+  
     if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { // Address 0x3C for 128x32
         Serial.println(F("SSD1306 allocation failed"));
         for(;;); // Don't proceed, loop forever
