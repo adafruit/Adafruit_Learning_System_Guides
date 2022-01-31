@@ -34,14 +34,14 @@ MESSAGE_COLORS = (
 display = board.DISPLAY
 
 # Load the candy heart BMP
-bitmap, palette = adafruit_imageload.load("/heart_bw.bmp",
+bitmap, palette = adafruit_imageload.load("/images/heart_bw.bmp",
                                           bitmap=displayio.Bitmap,
                                           palette=displayio.Palette)
 
 heart = displayio.TileGrid(bitmap, pixel_shader=palette)
 
 # Set up message text
-font = bitmap_font.load_font("/Multicolore_36.bdf")
+font = bitmap_font.load_font("/fonts/Multicolore_36.bdf")
 line1 = label.Label(font, text="?"*9)
 line2 = label.Label(font, text="?"*5)
 line1.anchor_point = (0.5, 0)    # middle top
