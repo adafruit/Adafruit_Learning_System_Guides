@@ -77,6 +77,9 @@ void setup(void) {
   delay(1000);
 #endif
 
+  // turn on TFT by default
+  pinMode(TFT_I2C_POWER, OUTPUT);
+  digitalWrite(TFT_I2C_POWER, HIGH);
   pinMode(TFT_BACKLITE, OUTPUT);
   digitalWrite(TFT_BACKLITE, LOW);
   delay(10);
