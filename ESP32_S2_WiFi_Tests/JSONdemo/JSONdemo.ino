@@ -50,13 +50,12 @@ void setup() {
   //Initialize serial and wait for port to open:
   Serial.begin(115200);
 
+  // Connect to WPA/WPA2 network
+  WiFi.begin(ssid, pass);
+
   #if defined(USE_OLED)
-  #if defined(ARDUINO_ADAFRUIT_QTPY_ESP32S2) \
-    || defined(ARDUINO_ADAFRUIT_QTPY_ESP32_PICO)
-  // ESP32 is kinda odd in that secondary ports must be manually
-  // assigned their pins with setPins()!
-  Wire1.setPins(SDA1, SCL1);
-  #endif
+    setupI2C();
+    delay(200); // wait for OLED to reset
   
     if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { // Address 0x3C for 128x32
         Serial.println(F("SSD1306 allocation failed"));
@@ -67,11 +66,12 @@ void setup() {
     display.setTextColor(WHITE);
     display.clearDisplay();
     display.setCursor(0,0);
-    #else
-      // Don't wait for serial if we have an OLED  
-      while (!Serial) {
-        delay(10); // wait for serial port to connect. Needed for native USB port only
-      }
+  #else
+    // Don't wait for serial if we have an OLED  
+    while (!Serial) {
+      // wait for serial port to connect. Needed for native USB port only
+      delay(10); 
+    }
   #endif
   // attempt to connect to Wifi network:
   Serial.print("Attempting to connect to SSID: ");
@@ -82,8 +82,7 @@ void setup() {
     display.display();
   #endif
 
-  // Connect to WPA/WPA2 network. Change this line if using open or WEP network:
-  WiFi.begin(ssid, pass);
+
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
@@ -179,7 +178,11 @@ void loop() {
   display.clearDisplay();
   display.display();
 #endif // OLED
+#if defined(NEOPIXEL_POWER)
   digitalWrite(NEOPIXEL_POWER, LOW); // off
+#elif defined(NEOPIXEL_I2C_POWER)
+  digitalWrite(NEOPIXEL_I2C_POWER, LOW); // off
+#endif
   // wake up 1 second later and then go into deep sleep
   esp_sleep_enable_timer_wakeup(10 * 1000UL * 1000UL); // 10 sec
   esp_deep_sleep_start(); 
@@ -188,6 +191,17 @@ void loop() {
 #endif
 }
 
+void setupI2C() {
+  #if defined(ARDUINO_ADAFRUIT_QTPY_ESP32S2) || defined(ARDUINO_ADAFRUIT_QTPY_ESP32_PICO)
+    // ESP32 is kinda odd in that secondary ports must be manually
+    // assigned their pins with setPins()!
+    Wire1.setPins(SDA1, SCL1);
+  #endif
+  #if defined(NEOPIXEL_I2C_POWER)
+    pinMode(NEOPIXEL_I2C_POWER, OUTPUT);
+    digitalWrite(NEOPIXEL_I2C_POWER, HIGH); // on
+  #endif
+}
 
 void printWifiStatus() {
   // print the SSID of the network you're attached to:
