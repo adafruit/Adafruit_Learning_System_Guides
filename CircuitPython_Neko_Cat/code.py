@@ -45,6 +45,9 @@ class NekoAnimatedSprite(displayio.TileGrid):
     # Minimum time to stop and scratch in seconds. larger time means scratch for longer
     CONFIG_MIN_SCRATCH_TIME = 2
 
+    TILE_WIDTH = 32
+    TILE_HEIGHT = 32
+
     # State object indexes
     _ID = 0
     _ANIMATION_LIST = 1
@@ -234,23 +237,23 @@ class NekoAnimatedSprite(displayio.TileGrid):
             _clamped_y = new_moving_to[1]
 
             # if x location of new value is within 1/2 tile size of left edge of display
-            if new_moving_to[0] < self.tile_width // 2 + 1:
+            if new_moving_to[0] < self.TILE_WIDTH // 2 + 1:
                 # override x to 1/2 tile size away from the left edge of display
-                _clamped_x = self.tile_width // 2 + 1
+                _clamped_x = self.TILE_WIDTH // 2 + 1
 
             # if x location of new value is within 1/2 tile size of right edge of display
-            if new_moving_to[0] > self._display_size[0] - self.tile_width // 2 - 1:
+            if new_moving_to[0] > self._display_size[0] - self.TILE_WIDTH // 2 - 1:
                 # override x to 1/2 tile size away from right edge of display
-                _clamped_x = self._display_size[0] - self.tile_width // 2 - 1
+                _clamped_x = self._display_size[0] - self.TILE_WIDTH // 2 - 1
 
             # if y location of new value is within 1/2 tile size of top edge of display
-            if new_moving_to[1] < self.tile_height // 2 + 1:
+            if new_moving_to[1] < self.TILE_HEIGHT // 2 + 1:
                 # override y to 1/2 tile size away from top edge
-                _clamped_y = self.tile_height // 2 + 1
+                _clamped_y = self.TILE_HEIGHT // 2 + 1
             # if y location of new value is within 1/2 tile size of bottom edge of display
-            if new_moving_to[1] > self._display_size[1] - self.tile_height // 2 - 1:
+            if new_moving_to[1] > self._display_size[1] - self.TILE_HEIGHT // 2 - 1:
                 # override y to 1/2 tile size away from bottom edge
-                _clamped_y = self._display_size[1] - self.tile_height // 2 - 1
+                _clamped_y = self._display_size[1] - self.TILE_HEIGHT // 2 - 1
 
             # update the moving to target location
             self._moving_to = (_clamped_x, _clamped_y)
@@ -335,7 +338,7 @@ class NekoAnimatedSprite(displayio.TileGrid):
 
         :return tuple: x/y location of Neko's current center point:
         """
-        return (self.x + self.tile_width // 2, self.y + self.tile_height // 2)
+        return (self.x + self.TILE_WIDTH // 2, self.y + self.TILE_HEIGHT // 2)
 
     def update(self):
         # pylint: disable=too-many-branches,too-many-statements
@@ -353,9 +356,9 @@ class NekoAnimatedSprite(displayio.TileGrid):
         if self.moving_to:
 
             # if the x of the target location is between the left and right edges of Neko
-            if self.x < self.moving_to[0] < self.x + self.tile_width:
+            if self.x < self.moving_to[0] < self.x + self.TILE_WIDTH:
                 # if the y of the target location is between top and bottom edges of Neko
-                if self.y < self.moving_to[1] < self.y + self.tile_height:
+                if self.y < self.moving_to[1] < self.y + self.TILE_HEIGHT:
                     # change to either sleeping or cleaning states
                     self.current_state = random.choice(
                         (self.STATE_CLEANING, self.STATE_SLEEPING)
@@ -480,7 +483,7 @@ class NekoAnimatedSprite(displayio.TileGrid):
             if (
                 0
                 <= (self.x + self.current_state[self._MOVEMENT_STEP][0])
-                < (self._display_size[0] - self.tile_width)
+                < (self._display_size[0] - self.TILE_WIDTH)
             ):
 
                 # move the cat horizontally by current state step size x
@@ -489,7 +492,7 @@ class NekoAnimatedSprite(displayio.TileGrid):
             else:  # we ran into a side wall
                 if self.x > self.CONFIG_STEP_SIZE:
                     # ran into right wall
-                    self.x = self._display_size[0] - self.tile_width - 1
+                    self.x = self._display_size[0] - self.TILE_WIDTH - 1
                     # change state to scratching right
                     self.current_state = self.STATE_SCRATCHING_RIGHT
                 else:
@@ -503,7 +506,7 @@ class NekoAnimatedSprite(displayio.TileGrid):
             if (
                 0
                 <= (self.y + self.current_state[self._MOVEMENT_STEP][1])
-                < (self._display_size[1] - self.tile_height)
+                < (self._display_size[1] - self.TILE_HEIGHT)
             ):
 
                 # move the cat vertically by current state step size y
@@ -512,7 +515,7 @@ class NekoAnimatedSprite(displayio.TileGrid):
             else:  # ran into top or bottom wall
                 if self.y > self.CONFIG_STEP_SIZE:
                     # ran into bottom wall
-                    self.y = self._display_size[1] - self.tile_height - 1
+                    self.y = self._display_size[1] - self.TILE_HEIGHT - 1
                     # change state to scratching down
                     self.current_state = self.STATE_SCRATCHING_DOWN
                 else:
@@ -570,8 +573,8 @@ main_group.append(background_group)
 neko = NekoAnimatedSprite(animation_time=ANIMATION_TIME)
 
 # put Neko in center of display
-neko.x = display.width // 2 - neko.tile_width // 2
-neko.y = display.height // 2 - neko.tile_height // 2
+neko.x = display.width // 2 - neko.TILE_WIDTH // 2
+neko.y = display.height // 2 - neko.TILE_HEIGHT // 2
 
 # add neko to main_group
 main_group.append(neko)
