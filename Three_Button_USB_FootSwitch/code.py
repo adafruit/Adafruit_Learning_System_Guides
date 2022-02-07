@@ -19,7 +19,7 @@ buttonkeys = [
 ]
 
 # the keyboard object!
-cc = ConsumerControl(usb_hid.devices) # List of available controls https://circuitpython.readthedocs.io/projects/hid/en/latest/api.html#adafruit-hid-keycode-keycode
+cc = ConsumerControl(usb_hid.devices)
 # our array of button objects
 buttons = []
 
