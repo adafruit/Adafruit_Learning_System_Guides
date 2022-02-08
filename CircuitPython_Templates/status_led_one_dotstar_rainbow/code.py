@@ -1,18 +1,20 @@
 # SPDX-FileCopyrightText: 2021 Kattni Rembor for Adafruit Industries
 # SPDX-License-Identifier: Unlicense
-"""CircuitPython status NeoPixel rainbow example."""
+"""
+CircuitPython DotStar red, green, blue, brightness control example.
+"""
 import time
 import board
 from rainbowio import colorwheel
-import neopixel
+import adafruit_dotstar
 
-pixel = neopixel.NeoPixel(board.NEOPIXEL, 1)
-pixel.brightness = 0.3
+dot = adafruit_dotstar.DotStar(board.DOTSTAR_CLOCK, board.DOTSTAR_DATA, 1)
+dot.brightness = 0.3
 
 
 def rainbow(delay):
     for color_value in range(255):
-        pixel[0] = colorwheel(color_value)
+        dot[0] = colorwheel(color_value)
         time.sleep(delay)
 
 

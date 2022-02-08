@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2021 Anne Barela for Adafruit Industries
 # SPDX-License-Identifier: Unlicense
 """
-CircuitPython DotStar red, green, blue, brightness control example - single DotStar.
+CircuitPython DotStar red, green, blue, brightness control example.
 """
 import time
 import board
