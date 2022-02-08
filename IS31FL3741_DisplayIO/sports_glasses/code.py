@@ -54,7 +54,7 @@ def ScrollMessage(text, color, repeat):
 
             # Update the switch and if it has been pressed abort scrolling this message
             switch.update()
-            if switch.value is False:
+            if not switch.value:
                 return
 
             time.sleep(0.025) # adjust to change scrolling speed
@@ -145,7 +145,7 @@ while True:
     switch.update()
 
     # If the switch has been pressed interrupt start a special message
-    if switch.value is False:  # False means the switch has been pressed
+    if not switch.value:
         Score("SCORE!", YELLOW_TEXT, BLUE_RING, 2)
 
     # If the switch is not pressed pick a random message and scroll it
