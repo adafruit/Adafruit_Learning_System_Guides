@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2022 Liz Clark for Adafruit Industries
+# SPDX-License-Identifier: MIT
+
 from adafruit_crickit import crickit
 
 #  crickit setup
