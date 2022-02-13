@@ -5,11 +5,10 @@
 PyPortal winamp displayio widget classes.
 """
 import time
-
+import json
 import board
 import displayio
 import terminalio
-import json
 from audioio import AudioOut
 from audiomp3 import MP3Decoder
 from adafruit_display_text import bitmap_label, scrolling_label
@@ -25,12 +24,16 @@ class WinampApplication(displayio.Group):
     :param skin_image: BMP image file for skin background
     :param skin_config_file: json file containing color values
     """
+
     STATE_PLAYING = 0
     STATE_PAUSED = 1
 
-    def __init__(self, playlist_file="playlist.json",
-                 skin_image="/base_240x320.bmp",
-                 skin_config_file="base_config.json"):
+    def __init__(
+        self,
+        playlist_file="playlist.json",
+        skin_image="/base_240x320.bmp",
+        skin_config_file="base_config.json",
+    ):
         self.SKIN_IMAGE = skin_image
         self.SKIN_CONFIG_FILE = skin_config_file
         self.PLAYLIST_FILE = playlist_file
@@ -51,7 +54,9 @@ class WinampApplication(displayio.Group):
         self.clock_display.y = 22
 
         # initialize playlist display
-        self.playlist_display = PlaylistDisplay(text_color=self.CONFIG_DATA["text_color"])
+        self.playlist_display = PlaylistDisplay(
+            text_color=self.CONFIG_DATA["text_color"]
+        )
         self.playlist_display.x = 13
         self.playlist_display.y = 234
 
@@ -60,12 +65,17 @@ class WinampApplication(displayio.Group):
         self.playlist_display.current_track_number = 1
 
         # get name of current song
-        self.current_song_file_name = self.PLAYLIST["playlist"]["files"][self.playlist_display.current_track_number - 1]
+        self.current_song_file_name = self.PLAYLIST["playlist"]["files"][
+            self.playlist_display.current_track_number - 1
+        ]
 
         # initialize ScrollingLabel for track name
-        self.current_song_lbl = scrolling_label.ScrollingLabel(terminalio.FONT,
-                                                               text=self.playlist_display.current_track_title,
-                                                               color=self.CONFIG_DATA["text_color"], max_characters=22)
+        self.current_song_lbl = scrolling_label.ScrollingLabel(
+            terminalio.FONT,
+            text=self.playlist_display.current_track_title,
+            color=self.CONFIG_DATA["text_color"],
+            max_characters=22,
+        )
         self.current_song_lbl.anchor_point = (0, 0)
         self.current_song_lbl.anchored_position = (98, 19)
 
@@ -73,8 +83,9 @@ class WinampApplication(displayio.Group):
         self.background_bitmap = displayio.OnDiskBitmap(self.SKIN_IMAGE)
 
         # Create a TileGrid to hold the bitmap
-        self.background_tilegrid = displayio.TileGrid(self.background_bitmap,
-                                                      pixel_shader=self.background_bitmap.pixel_shader)
+        self.background_tilegrid = displayio.TileGrid(
+            self.background_bitmap, pixel_shader=self.background_bitmap.pixel_shader
+        )
 
         # initialize parent displayio.Group
         super().__init__()
@@ -116,7 +127,6 @@ class WinampApplication(displayio.Group):
         if self.CURRENT_STATE == self.STATE_PLAYING:
             # if it's time to increase the time on the ClockDisplay
             if self._cur_time >= self._last_increment_time + 1:
-
                 # increase ClockDisplay by 1 second
                 self._seconds_elapsed += 1
                 self._last_increment_time = self._cur_time
@@ -124,7 +134,6 @@ class WinampApplication(displayio.Group):
 
         # update the track label (scrolling)
         self.current_song_lbl.update()
-
 
         if self.CURRENT_STATE == self.STATE_PLAYING:
             # if we are supposed to be playing but aren't
@@ -135,7 +144,6 @@ class WinampApplication(displayio.Group):
 
         # store time for comparison later
         self._prev_time = self._cur_time
-
 
     def play_current_track(self):
         """
@@ -159,7 +167,9 @@ class WinampApplication(displayio.Group):
         self.current_song_file.close()
 
         # open new song file
-        self.current_song_file_name = self.PLAYLIST["playlist"]["files"][self.playlist_display.current_track_number - 1]
+        self.current_song_file_name = self.PLAYLIST["playlist"]["files"][
+            self.playlist_display.current_track_number - 1
+        ]
         self.current_song_file = open(self.current_song_file_name, "rb")
         self.decoder.file = self.current_song_file
 
@@ -170,7 +180,6 @@ class WinampApplication(displayio.Group):
         if self.CURRENT_STATE == self.STATE_PAUSED:
             # pause so it's loaded, and ready to resume
             self.audio.pause()
-
 
     def next_track(self):
         """
@@ -186,7 +195,6 @@ class WinampApplication(displayio.Group):
 
         # start playing track
         self.play_current_track()
-
 
     def previous_track(self):
         """
@@ -204,7 +212,6 @@ class WinampApplication(displayio.Group):
         # start playing track
         self.play_current_track()
 
-
     def pause(self):
         """
         Stop playing song and wait until resume function.
@@ -214,7 +221,6 @@ class WinampApplication(displayio.Group):
         if self.audio.playing:
             self.audio.pause()
         self.CURRENT_STATE = self.STATE_PAUSED
-
 
     def resume(self):
         """
@@ -240,9 +246,12 @@ class PlaylistDisplay(displayio.Group):
     :param song_list: Song names in the list
     :param current_track_number: initial track number shown at the top of the list.
     """
-    def __init__(self, text_color, song_list=[], current_track_number=0):
+
+    def __init__(self, text_color, song_list=None, current_track_number=0):
         super().__init__()
 
+        if song_list is None:
+            song_list = []
         self._song_list = song_list
         self._current_track_number = current_track_number
 
@@ -265,7 +274,9 @@ class PlaylistDisplay(displayio.Group):
         """
 
         # get the current track plus the following 2
-        _showing_songs = self.song_list[self.current_track_number - 1:self.current_track_number + 3 - 1]
+        _showing_songs = self.song_list[
+            self.current_track_number - 1 : self.current_track_number + 3 - 1
+        ]
 
         # format the track titles into a single string with newlines
         _showing_string = ""
@@ -335,7 +346,9 @@ class PlaylistDisplay(displayio.Group):
         if self.current_track_number == 0:
             return "1. {}".format(self.song_list[0])
         else:
-            return "{}. {}".format(self.current_track_number, self.song_list[self.current_track_number - 1])
+            return "{}. {}".format(
+                self.current_track_number, self.song_list[self.current_track_number - 1]
+            )
 
 
 class ClockDisplay(displayio.Group):
@@ -346,6 +359,7 @@ class ClockDisplay(displayio.Group):
 
     :param text_color: Hex color code for the clock text
     """
+
     def __init__(self, text_color):
         super().__init__()
 
@@ -411,8 +425,8 @@ class ClockDisplay(displayio.Group):
         _seconds = self.seconds % 60
 
         # zero pad the values and format into strings
-        _minutes_str = f'{_minutes:02}'
-        _seconds_str = f'{_seconds:02}'
+        _minutes_str = f"{_minutes:02}"
+        _seconds_str = f"{_seconds:02}"
 
         # update the text in the minutes labels
         if self.first_digit.text != _minutes_str[0]:

@@ -5,9 +5,8 @@
 PyPortal winamp player
 """
 import time
-import storage
 import sys
-import os
+import storage
 import board
 import busio
 import digitalio
@@ -62,7 +61,7 @@ storage.mount(vfs, "/sd")
 sys.path.append("/sd")
 
 # debugging, print files that exist on SDCard
-#print(os.listdir("/sd"))
+# print(os.listdir("/sd"))
 
 # get reference to the display
 display = board.DISPLAY
@@ -74,7 +73,7 @@ display.rotation = ORIENTATION
 winamp_application = WinampApplication(
     playlist_file=PLAYLIST_FILE,
     skin_image=SKIN_IMAGE,
-    skin_config_file=SKIN_CONFIG_FILE
+    skin_config_file=SKIN_CONFIG_FILE,
 )
 
 # Add the Group to the Display
@@ -110,7 +109,7 @@ while True:
                 else:
                     winamp_application.previous_track()
             # if touch is on top half
-            elif p[1] <= 240 //2:
+            elif p[1] <= 240 // 2:
                 # if currently playing song
                 if winamp_application.CURRENT_STATE == winamp_application.STATE_PLAYING:
                     print("pausing")

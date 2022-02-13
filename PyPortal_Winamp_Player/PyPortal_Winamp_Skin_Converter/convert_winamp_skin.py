@@ -4,9 +4,9 @@
 """
 PyPortal winamp skin converter.
 """
-from PIL import Image, ImageDraw
 import sys
 import json
+from PIL import Image, ImageDraw
 
 # get input filename from terminal args
 if len(sys.argv) >= 2:
@@ -34,7 +34,7 @@ highest_pixel_count = None
 
 # scan pixel for backdrop color
 back_drop_color = im.getpixel((120, 29))
-for color in find_text_color_dict.keys():
+for color in find_text_color_dict:
     if not highest_pixel_count:
         highest_pixel_count = find_text_color_dict[color]
         text_color = color
@@ -42,12 +42,9 @@ for color in find_text_color_dict.keys():
         highest_pixel_count = find_text_color_dict[color]
         text_color = color
 
-#print("backdrop: {}".format(back_drop_color))
+# print("backdrop: {}".format(back_drop_color))
 time_color = text_color
-config_data = {
-    "text_color": text_color,
-    "time_color": time_color
-}
+config_data = {"text_color": text_color, "time_color": time_color}
 
 find_text_color_dict = {}
 for i in range(21):
@@ -68,7 +65,12 @@ time_shape_x_locs = (48, 60, 78, 90)
 for x_loc in time_shape_x_locs:
     _cur_time_shape_loc = (x_loc, 26)
     _cur_time_shape = (
-        _cur_time_shape_loc, (_cur_time_shape_loc[0] + time_shape_size[0], _cur_time_shape_loc[1] + time_shape_size[1]))
+        _cur_time_shape_loc,
+        (
+            _cur_time_shape_loc[0] + time_shape_size[0],
+            _cur_time_shape_loc[1] + time_shape_size[1],
+        ),
+    )
     img_draw.rectangle(_cur_time_shape, fill=back_drop_color)
 
 # rectangle cutout for playlist display
@@ -76,7 +78,11 @@ playlist_shape_size = (244, 48)
 playlist_shape_loc = (12, 257)
 playlist_shape = (
     playlist_shape_loc,
-    (playlist_shape_loc[0] + playlist_shape_size[0], playlist_shape_loc[1] + playlist_shape_size[1]))
+    (
+        playlist_shape_loc[0] + playlist_shape_size[0],
+        playlist_shape_loc[1] + playlist_shape_size[1],
+    ),
+)
 
 img_draw.rectangle(playlist_shape, fill=back_drop_color)
 
