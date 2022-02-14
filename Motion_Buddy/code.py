@@ -82,7 +82,7 @@ while radio.connected:
             try:
                 xf, yf, zf = lis3dh.acceleration
 
-                if (not_enough_movement(xf, yf, zf)):
+                if not_enough_movement(xf, yf, zf):
                     # Keep pausing.
                     print("pause!")
                     paused = True
