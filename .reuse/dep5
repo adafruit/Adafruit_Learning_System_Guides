@@ -1,0 +1,3465 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Adafruit Learning System Guides
+Upstream-Contact: Adafruit Industries <support@adafruit.com>
+Source: https://github.com/adafruit/Adafruit_Learning_System_Guides
+
+Files: 2020_shake/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: 3D_Printed_Bionic_Eye/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: 3D_Printed_Daft_Punk_Helmet/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: 3D_Printed_Guardian_Sword/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: 3D_Printed_LED-Animation_BMO/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: 3D_Printed_LED_Fire_Horns/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: 3D_Printed_LED_Microphone_Flag/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: 3D_Printed_NeoPixel_Gas_Mask/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: 3D_Printed_NeoPixel_Ring_Hair_Dress/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: 3D_Printed_Unicorn_Horn/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: ABC_Soundboards_for_NeoTrellis/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Activity_Generator/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Ada_BLE_RC/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Adabot_Operation_Game/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Adafruit_4_Channel_ADC_Breakouts/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Adafruit_AD8495_Guide/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Adafruit_BME280/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Adafruit_BME680/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Adafruit_BMP280/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Adafruit_BNO055/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Adafruit_Crickit/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Adafruit_DS2413/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Adafruit_ESP32_Arduino_Demos/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Adafruit_ESP32S2_TFT_WebServer/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Adafruit_Feather_ESP32-S2/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Adafruit_Feather_RP2040/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Adafruit_Feather_Sense/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Adafruit_FunHouse/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Adafruit_Grand_Central_M4_Express/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Adafruit_INA219/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: adafruitio-adt7410/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Adafruit_IO_Air_Quality/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Adafruit_IO_Power_Relay/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Adafruit_IO_Schedule_Trigger/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Adafruit_IO_Stepper_Control/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Adafruit_IoT_Camera_EyeFi/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: adafruitio-temp-motion-wing/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Adafruit_ItsyBitsy_RP2040/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Adafruit_KB2040/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Adafruit_LED_Sequins/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Adafruit_MacroPad/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Adafruit_MAX31855/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Adafruit_MAX98357/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Adafruit_MCP9808/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Adafruit_MTK3329_GPS/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Adafruit_NeoSlider/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Adafruit_Neo_Trinkey/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Adafruit_pIRKey/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Adafruit_Prop_Maker_FeatherWing/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Adafruit_Proximity_Trinkey/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Adafruit_QT_Py_ESP32-S2/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Adafruit_Si7021/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Adafruit_STEMMA_Relay/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Adafruit_STEMMA_Speaker/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Adafruit_TPL5111_Breakout/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Adafruit_TSL2561/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Adafruit_Tweet_Receipt/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Adafruit_UDA1334A/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Adafruit_Ultimate_GPS_Module/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Adafruit_X2_Time_Ball/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: adalogger/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Ada_remoteFXTrigger_NeoTrellis_FastLED_RX/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Ada_remoteFXTrigger_NeoTrellis_FastLED_TX/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: AdaVoice/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: AHT20_OLED/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: AIO_Environmental_Monitor/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Airlift_ePaper_Calendar/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: All_Seeing_Skull/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Ambient_Color_Control_Pad/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: AM_Radio_Morse/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Analog_Inputs_for_Raspberry_Pi_Using_the_MCP3008/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Animated_NeoPixel_Glow_Fur_Scarf/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Animatronic_Hand/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Annoy_O_Matic/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: ANO_encoder_demo/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: ANO_Rotary_Encoder/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Arcade_Button_Control_Box/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Arcade_Synth_Controller/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Arduino_Ethernet_SD_Card/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: ArduinoISP/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Arduino_Nano_RP2040_Connect/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Arduino_Phone/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Astrophotography_Tracker/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: AtariFruit_Joystick/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: AutoSunglasses/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: BalanceBot/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Basic_Resistor_Sensor_Reading_on_Raspberry_Pi/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Baudot_TTY/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Big_Switch_KB2040/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Bitcoin_Matrix/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Black_Lives_Matter_Kit/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Bladesaw/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: BLE_Buzzy_Box/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: BLE_Candy_Claw/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: BLE_Client_Server/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: BLE_Colorific/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: BLE_CPB_Color_Picker/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: BLE_Crickit_Light_Switch/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: BLE_Gesture_Mouse/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: BLE_Heart_Rate_Trainer/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: BLE_Host_Computer/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: BLE_MIDI_Robot_Xylophone/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: BLE_Robot_Rover/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: BLE_Sensornet/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: BLE_Synth/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: BLE_Vibration_Bracelet/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Blues_Playground/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Bluetooth_Luminaries/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Bluetooth_NeoMatrix_Snowflake/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Bluetooth_Remote_for_Lego_Droid_Kit/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Bluetooth_Restroom_Keys/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Bluetooth_Room_Lights/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Bluetooth_Talking_Dog_Collar/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: BME680_BSEC_OLED_Demo/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Bonsai_Buckaroo/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: BowsetteCrown/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: BrainCraft_Google_Assistant/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Breath_Mask/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Breath_Tester/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: BTTF_Clock/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Buckaroo_Plant_Care_Bot/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Burning_Fire_Wizard_Staff/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: BusyBox_Sign/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Buzzing_Mindfulness_Bracelet/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Capacitive_Touch_Sensors_on_the_Raspberry_Pi/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Cat_Treat_Dispenser/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Character_LCDs/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Chilled_Drinkibot/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Chirping_Plush_Owl_Toy/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Christmas_Soundboard/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Chromakey_Light_Ring/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Circadian_Pi_Desk_Light/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Circuit_Playground_Bluefruit_Color_Remote/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Circuit_Playground_Bluefruit_Jeopardy_Controller/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Circuit_Playground_Bluefruit_NeoPixel_Controller/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Circuit_Playground_Bluefruit_Pumpkin/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Circuit_Playground_Brake_Light/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPlayground_Christmas_Tree/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Circuit_Playground_Classic_Fruit_Drums/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Circuit_Playground_Express_and_IR/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Circuit_Playground_Express_IR_Treasure_Hunt/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Circuit_Playground_Express_IR_Zombie_Game/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Circuit_Playground_Express_LuckyCat/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Circuit_Playground_Express_MIDI_Stomping_Pads/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Circuit_Playground_Express_Rocket_Lamp/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Circuit_Playground_Express_USB_MIDI/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Circuit_Playground_Jack_o_Lantern/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPlaygroundMakeBelieve/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Circuit_Playground_O_Phonor/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Circuit_Playground_Papercrafts/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Circuit_Playground_Sailor_Moon_Star_Locket/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPy_OTP/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPython_101/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPython_AT_Hand_Raiser/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPython_BLE_Darksaber/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPython_BLE_Rover/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPython_BLEThermalPrinter/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPython_Darksaber/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPython_displayio/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPython_Display_Text/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPython_Essentials/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPython_Flying_Toasters/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPython_Goggles/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPython_Hardware_SD_Cards/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPython_Heart_Sculpture/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPython_JEplayer_mp3/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPython_KeyPad_Calculator/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPython_Knob_Sketcher/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPython_LED_Sand_Hourglass/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPython_Library_Screenshot_Maker/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPython_Logger/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPython_MacroPad_NKRO/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPython_Made_Easy_On_CPX/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPython_Neko_Cat/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPython_OLED_Watch/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPython_on_Linux_and_Raspberry_Pi/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPython_Painter/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPython_Pico_PIO_Neopixel/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPython_Pyloton/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPython_PyPaint/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPython_qrio/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPython_Quick_Starts/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPython_RGBMatrix/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPython_RPN_Calculator/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPython_Scrolling_Clouds/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPython_sdcardio_sdioio/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPython_SharpDisplay_Displayio/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPython_Simple_Wordclock/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPython_Sip_and_Puff/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPython_Slider/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPython_Slideshow/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPython_Star_Gazer/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPython_Templates/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPython_ThermalPrinter/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPython_Touch_Deck/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPython_TVBGone/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitPython_WeatherCloud/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircuitStonks/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CircusPython_BLE/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Cirecuit_Playground_Express_Pinata/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Close_Encounters_Hat/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CLUE_Altimeter/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CLUE_BBQ/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CLUE_Beacon/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CLUE_BLE_Morse_Code/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CLUE_Cycling_Simple/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CLUE_Dice_Roller/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CLUE_Egg_Drop/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CLUE_Hand_Wash_Timer/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CLUE_Heart_Rate_Trainer/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CLUE_I_Ching/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CLUE_Light_Painter/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CLUE_Metal_Detector/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CLUE_Metronome/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CLUE_Milk_Checker/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CLUE_plenbit_demo/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CLUE_Purse_Slideshow/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CLUE_Rock_Paper_Scissors/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CLUE_Sensor_Plotter/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Clue_Step_Counter/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: color_touch_pendant/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Combo_Dial_Safe/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Compost_Friend/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Cooperative_Multitasking/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CP101_StateMachines/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CPB_AMS_Gizmo_BLE/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CPB_ANCS/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CPB_Cauldron/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CPB_heart_rate_display/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CPB_Keybutton_BLE/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CPB_Magic_Light_Mixer/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CPB_NeoPixel_Wooden_Xmas_Tree/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CPB_Ornament_Proximity/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CPB_Quick_Draw_Duo/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CPB_Volume_BLE/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CPX_Compass/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CPX_DAC_Guide/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CPX_GBoard/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CPX_Marble_Maze/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CPX_Serial/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CPX_Simon_Game/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CPX_Simple_Simon/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CPX_Snapfit_Mount/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CPX_Sound_Box/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: CPX_Walking_Stick/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Crank_USB_HID/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Crickit_AdafruitIO/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Crickit_Animatronic_Doorbell/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Crickit_CPX_Marionette/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Crickit_Exhibit/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Crickit_FlippyBot/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Crickit_Hello_World/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Crickit_Lab_Shaker/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Crickit_microbit_MicroPython/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Crickit_MicroBit_Robot/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Crickit_Mounts/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Crickits/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Crickit_Sparky_Automaton/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Crickit_Stumblebot/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Crickit_WobblyBot/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Custom_Magstripe_Swiper/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Cyber_Flower/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Cyberpunk_Spikes/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Daily_Cheer_Automaton/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Dashblock_API/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Data_Logging_with_Feather_and_CircuitPython/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Deco_Keypad/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: DHT_Google_Spreadsheet/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: DigiKey_IoT_Home/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Digital_Sand_Dotstar_Circuitpython_Edition/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Disconnected_CO2_Data_Logger/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Disco_Tie/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Disc_Step_Sequencer/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: DIY_Thermal_Light_Painting/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Drive_a_16x2_LCD_with_the_Raspberry_Pi/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: DSP-G1_Synth_Parameters_Demo/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: DSP-G1_Trellis_Synth/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: DYP_ultrasonics/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: EInk_Autostereograms/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: EInk_Bonnet/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: EInk_Bonnet_Event_Calendar/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: EInk_Bonnet_Weather_Station/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: EInk_CircuitPython_Quickstart/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: EInk_EPaper_Maze/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: eink_FeatherWing_stand/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: EInk_Weather_Station/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: EPROM_Emulator/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: ESP32_S2_WiFi_Tests/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: ESP8266_MicroPython_Holiday_Lights/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: ESP8266_Weather_Pixels/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Ever_Burning_Flame_Painting/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: EyeLights_Accelerometer_Tap/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: EyeLights_Audio_Spectrum/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: EyeLights_Blinky_Eyes/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: EyeLights_Bluetooth_Scroller/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: EyeLights_BMP_Animation/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: EyeLights_Fire/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: EyeLights_Googly_Rings/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: EyeLights_LED_Glasses_and_Driver/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Factory_Tests/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: fauxmo_guide/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: FeatherCAN_CircuitPython/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Feather_Crickit_Accelerometer/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Feather_ePaper_Quotes/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Feather_Holiday_Lights/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Feather_Power_Gauntlet/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Feather_Sense_Audio_Visualizer_13x9_RGB_LED_Matrix/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Feedback_Servo_Record_and_Play/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Fiber_Optic_Pixie_Skirt/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Flora_Brakelight_Backpack/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Flora_Citi_Bike_Helmet/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Flora_Demos/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Flora_Game_Controller/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Flora_GPS_Jacket/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Flora_NeoGeo_Watch/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Flora_Piano_Glove/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Flora_Sparkle_Skirt/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Flora_TV_B_Gone/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Fluttering_Fairy_Wings/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: FONA_SMS_Sensor/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Foul_Fowl/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: FruitBox_Sequencer/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: FunHouse_Arduino_Demos/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Funhouse_Door_Alert/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: FunHouse_Fume_Extractor/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: FunHouse_HA_Companion/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: FunHouse_IOT_Hub/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: FunHouse_LIFX/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: FunHouse_Mailslot/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: FunHouse_Motion_Outlet/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: FunHouse_Parking/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: FunHouse_Pet_Bowl_Sensor/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Garmin_LidarLite_Range_Finder/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Gemma_3D_Printed_Tree_Topper/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Gemma_Firewalker_AnimLite/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Gemma_Firewalker_Lite_Sneakers/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Gemma_Hoop_Earrings/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Gemma_LightTouch/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: GemmaM0_Band_Jacket/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: GemmaM0_Clockwork_Goggles/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: GemmaM0_Headband/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Gemma_M0_NeoPixel_Dress/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: GemmaM0_Password_Vault/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: GemmaM0_Radio_Tuning_Knob/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: GemmaM0_Vibration_Switch_Motion_Alarm/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Gemma_Nano_Ring/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Getting_Started_With_BLE_and_CP/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Getting_Started_With_Raspberry_Pi_Pico/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Giant_Mechanical_Keyboard/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Glowing_Beehive_Hairdo_Wig/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Glowing_Bottle_Castle/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Glowing_Mirror_Mask/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Glowing_Scale_Armor/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Gmailbox_Adafruit_IO/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Google_Sheet_Sensor_Logging/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Gordon_Cole_MP3_Player/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: GP2Y1014AU0F_demos/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: GPS_Dog_Collar/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: GPStest_RMC/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Grand_Central_MIDI_Knobs/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Grand_Central_Robot_Xylophone/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Grand_Central_Soundboard/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Guardian_Robot_Zelda_BOTW/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Guitar_Hero_MIDI/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Hacking_Ikea_Lamps_With_CPX/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: HAL-9000/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Halloween_Countdown_Matrix/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Hallowing/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Hallowing_Case/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: HalloWing_Cat_Toy/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Hallowing_Googly_Eye/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: HalloWing_Jump_Scare_Trap/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Hallowing_Jump_Sound/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Hallowing_Lightsaber/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Hallowing_Mac/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Hallowing_Minotaur_Maze/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Hallowing_Spirit_Board/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: HalloWing_Tour_Guide/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Hand_Turkey/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Head_Tilt_Ears/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Heat_Insert_Press/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: home-assistant-io/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Home_Assistant_Sensor/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Hue_Controller/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Humidity_Alarm/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: IFTTT_Door_Detector/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Interactive_Map_with_CPX/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Interior_Purse_Light/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Introducing_CircuitPlaygroundExpress/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Introducing_Feather_M0_Express/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Introducing_Gemma_M0/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Introducing_Trinket_M0/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: IO_House_Series/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: IoT_Environment_Sensor/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: IoT_NeoPixel_Sign/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: IoT_Party_Parrot/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: IoT_Printer/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: IrRobotControl/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: IR_Sensor/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: IS31FL3741_DisplayIO/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: ItsyBitsy_DotStar_Necklace/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: ItsyBitsy_Heart_Necklace/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: ItsyBitsy_Infinity_Collar/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: ItsyBitsy_Infinity_Cube/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: ItsyBitsy_Infinity_Mirror/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: ItsyBitsy_Keybow/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: I_Voted_Pin/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Jack_O_LED_trix/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Jar_Minder_v2/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Jewel_Hair_Stick/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Joy_game_controller/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Joy_of_Arcada/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Jupyter_USB/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Kaleidoscope_Eyes_NeoPixel_LED_Goggles/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Kegomatic/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Keyblade_3DKit/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Keypad_4x4_Clocked/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Kinetic_POV/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Kitty_Paw_Keypad/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Labo_Piano_Light_FX/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Labo_RC_Car_Light_FX/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Large-Pi-Based-Thermometer-Clock/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Larson_Scanner_Shades/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Laser_Dog_Goggles/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Launch_Deck_Trellis_M4/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: LED_Ampli_Tie/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: LED_Bullwhip/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: LED_Candles/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: LED_Harness_Bra/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: LED_Masquerade_Masks/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: LED_Matrix_Scoreboard/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: LED_Sand/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: LED_Snowboard/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: LED_Trampoline/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: LEGO_battery/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: LEGO_Head_CPX_Lamp/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: LICENSES/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Light_Activated_Pixel_Heart/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: lightbox/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Light_Paintstick_HalloWing/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Lobe_Cat_Detector/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Logans_Run_Hand_Jewel_LED/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: lorawan_sensing_network/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: LSM303/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Lucio_Blaster_2020/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: M4_Eyes/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Macropad_2FA_TOTP/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Macropad_Ableton/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: MacroPad_Braille_Keycaps/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Macropad_Dragon_Drop/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Macropad_Hotkeys/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Macropad_MIDI_Tester/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Macropad_Olympic_Hotkeys/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: MacroPad_RPC_Home_Assistant/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: MacroPad_Scramble_Lock/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Magic_Nine_Ball/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Magic_Wand/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: MagTag_AdafruitQuotes/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: MagTag_Arduino_Demos/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: MagTag_Cat_Fed_Clock/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: MagTag_Cheerlights/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: MagTag_Cheerlights_LED_Animations/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: MagTag_Christmas_Countdown/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: MagTag_CircuitPython_Smart_Holiday_Lights/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: MagTag_CountdownCelebration/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: MagTag_CovidTracking/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: MagTag_Covid_Vaccination/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: MagTag_Dishwasher_Status/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: MagTag_Flashcards/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: MagTag_Google_Calendar/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: MagTag_Google_Sheets/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: MagTag_Killed_By_Google/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: MagTag_Kitchen_Timer/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: MagTag_NextBus/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: MagTag_NYC_Positivity/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: MagTag_Progress_Displays/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: MagTag_Project_Selector/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: MagTag_Quote_Board/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: MagTag_Seasonal_Produce/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: MagTag_Showerthoughts/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: MagTag_Showtimes/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: MagTag_SimpleClock/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Magtag_Slideshow/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: MagTag_SpaceX/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: MagTag_Sports_Schedule/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: MagTag_Tides/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: MagTag_Twitter/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: MagTag_Weather/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: MagTag_Webb_Telescope_Status/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Make_It_A_Keyboard/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Make_It_A-Mouse/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Make_It_Bubble/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Make_It_Glow_With_Crickit/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Make_It_Hot_Cold/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Make_It_Log/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Make_It_Sense/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Make_It_Talk/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Make_It_Twist_Potentiometer/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Mask_Efficacy/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Matrix_7-Segment_LED_Backpack_Raspberry_Pi/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Matrix_On_Air/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Matrix_Portal_CO2_Monitor/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Matrix_Portal_ExpressivePixels/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Matrix_Portal_Eyes/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Matrix_Portal_Flow_Viewer/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Matrix_Portal_Handbag/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Matrix_Portal_Learn_Stats/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Matrix_Portal_Moon_Clock/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Matrix_Portal_Scoreboard/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Matrix_Portal_Tip_Jar/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Matrix_Quote_Board/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Matrix_Sprite_Animation_Player/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: may_pad/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Metro_Matrix_Clock/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: MetroX_CircuitPython/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Microcontroller_Benchmarking/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: MIDI_CLUE_BLE_Glove/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: MIDI_FeatherWing/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: MIDI_Melody_Maker/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: MIDI_Modal_Keyboard/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: MIDI_Solenoid_Drum_Kit/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: MIDI_Solenoid_Drummer/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Milk_Jug_Glow_Skull/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Minecraft_Gesture_Controller/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Minecraft_Turbopad/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Minesweep/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Mini_Chair_Swing_Ride/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Mini_LED_Gamer/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Mini_Smart_Home_with_Huzzah/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: MIT_AppInventor_Particle/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Monster_M4sk_Watching_You/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: MonsterMaskVoiceChanger/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Morse_Code_Flasher/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Motion_Buddy/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Motion_Gift_Box/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Motorized_Turntable/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: MP3_Playback_RP2040/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: MP3_Tap_Player/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Multitasking_with_CircuitPython/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Munny_Lamp/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Munny_Lamp_CircuitPython/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Music_Box_with_Crickit/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: MX_MIDI_Guitar/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Mystical_LED_Halloween_Hood/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Navi10/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: NeoController/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: NeoKey_5x6_Ortho_Snap-Apart/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: NeoKey_Emoji_Keyboard/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: NeoKey_Trinkey/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: NeoKey_Trinkey_Centipede/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: neoMatrixMkI/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Neopixel_Aquarium/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: NeoPixel_Badge_Lanyard/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: NeoPixel_Basketball_Hoop/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: NeoPixel_Blinkendisc/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: NeoPixel_Crystal_Chandelier/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: NeoPixel_Cyber_Falls_Wig/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: NeoPixel_Dialer/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: NeoPixel_Frankenstein/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: NeoPixel_Gemma_Torch/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: NeoPixel_GoPro_Lens_Light/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: NeoPixel_Headlight/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: NeoPixel_Jewel_10_Minute_Necklace/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: NeoPixel_Menorah/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: NeoPixel_Mini_VU_Meter/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: NeoPixel_Punk_Collar/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: NeoPixel_Ring_Bangle_Bracelet/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: NeoPixel_Rings_Lamp/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: NeoPixel_Tiara/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: NeoPixie_Dust_Bag/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: NeoTrellis_Color_Game/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: NeoTrellis_M4_Bumper/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: NeoTrellisM4_Dice/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: NeoTrellis_M4_Grains_of_Sand/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Neotrellis_M4_Live_Launcher/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: NeoTrellis_M4_Memory_Game/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: NeoTrellis_M4_MIDI_Synth/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: NeoTrellis_M4_RPG_Sound_Board/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: NeoTrellis_M4_Sand/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: NeoTrellis_M4_Simple_Drum_Machine/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: NeoTrellis_M4_Sound_Board/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: NeoTrellis_Paint/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: NeoTrellis_Soundbox/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: NeoTrinkey_Zoom_Shortcuts/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Nextmind_Unity_Control/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Nightlight/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Numpad_4000/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Nunchuck_Laser/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Nunchuck_Ring/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: NY_Ball_Drop/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: NY_Tower_Light/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Ocean_Resin_Lightbox/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: OozeMaster3000/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Open_Sesame_SMS_Lock/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: oshwa_magtag_display/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: OSHWA_Submitter/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Owl_Robot/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PaperCraft_Gems/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Party_Parrot_Zoetrope/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Pathfinder/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PB_Gherkin/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PDM_Microphone/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Pedal_For_Youtube/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Pep_Talk_Generator/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Pi400_Knobs/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Piano_In_The_Key_Of_Lime/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Pico_Four_Keypad/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Pico_MIDI_Fighter/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Pico_RP2040_Mech_Keyboard/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Pico_RP2040_Motor_Party/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Pico_RP2040_Servo/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Pico_RP2040_Solenoid/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Pico_RP2040_Stepper/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Pi_Hole_Ad_Blocker/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PipBoy_2040/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Pi_Processing_GPIO/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: pi_radio/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: pi_rplidar/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Pixel_Art_Slideshow/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Pixel_Chase_Game/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Pi_Zero_Stand/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Playa_Bike/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Playing_Sounds_and_Using_Buttons_with_Raspberry_Pi/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PMS5003_Air_Quality_Sensor/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Pomodoro_Timer/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Portable_Trellis_Soundboard/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PowerGlove_BLE_MIDI/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Programmable_Piggy_Bank/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PropMaker_KeyBlade/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PropMaker_Lightsaber/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PropMaker_Light_Up_Prop/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Propmaker_Master_Sword/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Proximity_Light/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Pulse_Oximeter_Logger/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Pumpkin_Goblin_CPB_Ornament/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Pumpkin_Theremin/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Purple_Air_Display/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyBadge_Blinka_Jump_Game/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyBadge_Case/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyBadge_Conference_Badge/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Pybadge_Thermal_Image_Recording/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyGamer_Bounce_Game/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyGamer_Improved_Thermal_Camera/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyGamer_NeoPixel_Strip_Control/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyGamer_Thermal_Camera/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyLeap_Bluefruit_Light_Meter/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyLeap_Bluefruit_MP3/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyLeap_Bluefruit_Sound_Meter/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyLeap_Bluefruit_Tone_Piano/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyLeap_Bluefruit_Touch_NeoPixel_Rainbow/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyLeap_Bluefruit_WAV/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyLeap_Button_Half_NeoPixel_Control/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyLeap_CPB_EyeLights_LED_Glasses_RainbowSwirl/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyLeap_CPB_EyeLights_LED_Glasses_Sparkle/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyLeap_CPB_NeoPixel_Blinky_demo/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyLeap_NeoPixel_Blinky_demo/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyLeap_NeoPixel_demo/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Pylint_and_CircuitPython/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_AdafruitIO/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_AdafruitIO_Logger/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_AirQuality/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_Alarm_Clock/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_ArduinoSelfTest/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_Astronauts/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_AWS_IOT_Planter/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_Azure_Plant_Monitor/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_Bitcoin/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_BusySimulator/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_Calculator/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_Case/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_CircuitPython_2020/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_CMA_Art_Frame/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_Cutefuzz/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_Discord/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_Electioncal_US/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_Email_Display/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_EventCountdown/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_EventCountup/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_EZ_Make_Oven/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_GCP_IOT_Planter/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_GithubStars/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_Google_Calendar/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_Guitar_Tuner/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_Hackster/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_HacksterStream/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_HaDSkulls/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_Halloween_Countdown/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_Hurricane_Tracker/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_IOT_Scale/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_ISS_Tracker/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_LastFM/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_LeagueLevel/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_LIFX_Controller/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_MogwaiClock/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_MQTT_Control/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_NASA/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_NeoPixel_Color_Picker/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_NewNewNew/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_ObliqueStrategies/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_on_this_day/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_OpenWeather/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: pyportal_pet_planter/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_Philips_Hue_Controller/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_Quarantine_Clock/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_Quotes/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_Reddit/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_Remote/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_Smart_Switch/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_Smart_Thermometer/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_Stand/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_Thingiverse/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_Tides/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_Titano_ArduinoSelfTest/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_Titano_Weather_Station/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_TOTP_Friend/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_Trivia_Time/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_Twin_Peaks/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_TwitterFollowers/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_TwitterPlayer/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_User_Interface/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_UV_Index/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_ViewMaster/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_Wakeup_Light/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_WallMount/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: pyportal_weather_station/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_WeeklyCountdown/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_Winamp_Player/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_Word_of_the_Day/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyPortal_Youtube/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyRuler_Simon_Game/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: PyRuler_Video_Panic/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: QT2040_Trinkey/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: QT_Py_Acrylic_Lamp/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: QT_Py_Bracelet/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: QTPy_Heart/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: QT_Py_NeoPixels/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: QT_Py_RP2040/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: QT_Py_RP2040_Lemon_Keypad/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: QT_Py_Timer/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Rack_Pinion_Bot/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Raspberry_Pi_9DoF_Sensor_Calibration/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Raspberry_Pi_Animated_Gif_Player/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Raspberry_Pi_Braincraft_Radio/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Raspberry_Pi_DS18B20_Temperature_Sensing/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Raspberry_Pi_E-mail_Notifier_Using_LEDs/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Raspberry_Pi_On_Air_Sign/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Raspberry_Pi_Power_Control/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Raspberry_Pi_Sensing_Movement/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Raspberry_Pi_Stepper_Motors/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: RasPi_Low_Light_Camera/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Ratcatcher_CPX/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: raver_bandolier/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: RBG_Matrix/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Reflowduino/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Remote_Tree_Ornament/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Resin_table_circuitplayground_modes/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Rezz_Goggles/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: RGB_LED_Strips/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: RGB_Matrix_Dreidel_Game/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: RGB_Matrix_Protest_Sign/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: RGB_Matrix_Slot_Machine/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: ROB_Control/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Rotary_Encoder/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Rotary_Phone_Keypad/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Rotary_Trinkey/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Rotary_Trinkey_Brightness_Crank/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: rp2040_ble_airlift/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Say_Their_Names_LEDMatrix/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: ScreamingCauldron/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Screaming_Painting/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: SD_Basic_GPS_Logger/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: SD_Card_Testing_Jig/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: seesaw/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Seesaw_QT_Rotary_Encoder_Multiples/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Sensor_Plotting_With_Mu_CircuitPython/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Servo_Tester/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Shadow_Box/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: SHARP_BadApple/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: simple_strand_palettes/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Single_Button_Footswitch/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Sitcom_SFX_Door_Trigger/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Slider_Trinkey/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Slideshows_Soundtrack/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Smart_Alarm_Clock/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Smart_Toilet_Light/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: SnakeBot/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: SnowGlobe/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Snow_Globe_BLE_CPB/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Solar_Charger_Tracker/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Sound_Reactive_Ears/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Sound_Reactive_NeoPixel_Peace_Pendant/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Space_Face_LED_Galaxy_Makeup/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Speech_Synthesis_on_the_Raspberry_Pi/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Spy_Theme_Songs/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Starduino_8bit_Super_Mario_Tree_Topper/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Starry_Night/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: ST_Combo_Boards/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Stream_Deck_Message_Panel/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Stumblebot/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Sunflower_Mobile/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Superhero_Power_Plant/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: TalkieTrellis/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Techno_Tiki_RGB_LED_Torch/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Temperature_GIF_Player/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Terrako_Robot/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Textile_Potentiometer_Hoodie/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: TFT_Gizmo_Candy_Hearts/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: TFT_Gizmo_Dreidel/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: TFT_Gizmo_Snowglobe/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: TFT_Gizmo_Turtle_Graphics/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: TFT_Sidekick_With_FT232H/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Themistor/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: TheThingsNetwork_Feather/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Three_Button_USB_FootSwitch/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Tightrope_Unicycle_Bot/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Tilemap_Game_With_CircuitPython/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Tilt_Controlled_Servo_Driver/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Time_Tracking_Cube/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Tiny_Music_Visualizer/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: TM_WebUSB_Sorter/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Track_Your_Treats/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Trash_Panda/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Trek_Kzinti_Prop/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: TrelliBird/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: TrellisM4_Simple_MIDI_UART/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Trellis_M4_Synth_Design/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Trinket_Gemma_Blinky_Eyes/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Trinket_Gemma_IR_Control/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Trinket_Gemma_Mini_Theramin/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Trinket_Gemma_Servo_Control/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Trinket_Gemma_Space_Invader_Pendant/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Trinket_M0_Message_Crown/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Trinket_Modded_Stuffed_Animal/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Trinket_Pro_Fire_Pendant/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Trinket_Question_Block_Sound_Jewelry/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Trinket_React_Counter/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Trinket_Ultrasonic_Rangefinder/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Trinkey_QT2040_Enviro_Gadget/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Trinkey_QT2040_TRNG_Gadget/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Trinkey_Rubber_Ducky/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: TTL_Serial_Camera/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Turtle_BLE_CPB_Crickit_Rover/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: TVA_Time_Baton_PropMaker/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Twitch_On_Air_Sign/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Twitter_API/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: UART-Between-Boards/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: uf2_flash_erasers/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: ufo/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Ukulele/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: ulab_Crunch_Numbers_Fast/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: UnicornHorn_CapacitiveTouch/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: USB_NeXT_Keyboard/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: USB_SNES_Gamepad/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Vertical_Garden_Barometer/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Visualizer_Touch_Control/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Voice2Json_Edge_Detection/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: VOTE_Keyboard/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Wave_Freq_Generator/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Wearable_BLE_Temperature_Monitor/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Weather_Display_Matrix/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Webhook_Plant_Sensor/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Welcome_to_CircuitPython/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Window_Skull_Matrix/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Wire_Wrap_Necklace/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
+Files: Yoga_Pose_Chime/*
+Copyright: 2017-2022 Adafruit Learning System Authors
+License: MIT
+
