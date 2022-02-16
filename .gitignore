@@ -1,7 +1,8 @@
 *~
-Hue_Controller/secrets.h
+/Hue_Controller/secrets.h
 .idea
 *.DS_Store
-CircuitPython_Logger/secrets\.py
+/CircuitPython_Logger/secrets\.py
+/CircuitPython_Library_Screenshot_Maker
 .python-version
 __pycache__
