@@ -131,7 +131,7 @@ right_eye = IS31FL3741_PixelBuf(
 is31_framebuffer.brightness = 0.2
 
 # Load the font to be used - scrolly only has upper case letters
-font = bitmap_font.load_font("scrolly.bdf")
+font = bitmap_font.load_font("/fonts/scrolly.bdf")
 
 # Set up the display elements
 text_area = label.Label(font, text="", color=(0, 0, 0))
