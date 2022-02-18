@@ -16,6 +16,14 @@ with open('../missing.txt', 'r') as F:
 todo = [f[:-1] for f in todo]
 print(todo)
 
+replace = {"firepixie": "Erin St Blaine",
+           "ladyada": "Limor Fried",
+           "lady ada": "Limor Fried",
+           "dherrada": "Eva Herrada",
+           "blitzcitydiy": "Liz Clark",
+           "caternuson": "Carter Nelson",
+           "siddacious": "Bryan Siepert",
+           "brentru": "Brent Rubell"}
 
 def log_format(file):
     cmd = f'git log --shortstat --follow --pretty=format:"%n%H%n%Cred%an%Creset (%ae) %Cblue%as%Creset%n%s%n" {file}'
@@ -60,6 +68,9 @@ for file in todo:
     year = input(f"Year [{default_year}]: ")
     if not year:
         year = default_year
+    if default_author.lower() in replace:
+        default_author = replace[default_author.lower()]
+
     author = input(f"Author [{default_author}]: ")
     if not author:
         author = default_author
@@ -87,4 +98,4 @@ for i in todo:
 
 with open('../missing.txt', 'w') as F:
     for line in write:
-        F.write(write)
+        F.write(line)
