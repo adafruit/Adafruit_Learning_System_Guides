@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Kevin J Walters for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Copyright (c) 2015 Hubert Kario (code from tlslite-ng library)
 # Copyright (c) 2020 Kevin J. Walters (very minor CP tweaks)
 

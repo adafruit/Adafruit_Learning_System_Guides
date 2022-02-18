@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Kevin J Walters for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # clue-multi-rpsgame v1.20
 # CircuitPython massively multiplayer rock paper scissors game over Bluetooth LE
 

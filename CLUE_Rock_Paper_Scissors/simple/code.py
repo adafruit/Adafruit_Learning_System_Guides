@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Kevin J Walters for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # clue-simple-rpsgame v1.3
 # CircuitPython rock paper scissors game over Bluetooth LE
 
