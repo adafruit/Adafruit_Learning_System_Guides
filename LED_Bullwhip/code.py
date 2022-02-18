@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Erin St Blaine for Adafruit Industries
+# SPDX-FileCopyrightText: 2020 Limor Fried for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
 """
 Prop-Maker based LED Bullwhip
 Adafruit invests time and resources providing this open source code.
