@@ -32,7 +32,7 @@ group = displayio.Group()
 group.append(tile_grid)
 font = bitmap_font.load_font("/fonts/Arial-Bold-36.bdf")
 text_area = bitmap_label.Label(font, text="----", color=0xFFFFFF)
-text_area.x = 125
+text_area.x = 135
 text_area.y = 90
 group.append(text_area)
 display.show(group)
