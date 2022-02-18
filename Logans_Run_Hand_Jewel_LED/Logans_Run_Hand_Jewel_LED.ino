@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2017 Mikey Sklar for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #ifdef __AVR__
   #include <avr/power.h>
 #endif
