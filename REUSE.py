@@ -34,5 +34,7 @@ with open('has.txt', 'w') as F:
     for i in has:
         F.write(i+'\n')
 
+"""
 for file in missing:
     os.system(f"grep -irHn 'author' {file}")
+"""

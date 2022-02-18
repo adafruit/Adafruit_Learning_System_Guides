@@ -2,12 +2,13 @@ import subprocess
 import os
 import re
 
+
 l2 = "#\n"
 l2_ = "//\n"
 l3 = "# SPDX-License-Identifier: MIT\n\n"
 l3_ = "// SPDX-License-Identifier: MIT\n\n"
 
-with open('missing.txt', 'r') as F:
+with open('../missing.txt', 'r') as F:
     lines = F.readlines()
     todo = lines[0:20]
     write = lines[20:]
@@ -15,10 +16,6 @@ with open('missing.txt', 'r') as F:
 todo = [f[:-1] for f in todo]
 print(todo)
 
-"""
-with open('missing.txt', 'w') as F:
-    f.write(write)
-"""
 
 def log_format(file):
     cmd = f'git log --shortstat --follow --pretty=format:"%n%H%n%Cred%an%Creset (%ae) %Cblue%as%Creset%n%s%n" {file}'
@@ -87,3 +84,7 @@ for file in todo:
 
 for i in todo:
     print(i)
+
+with open('../missing.txt', 'w') as F:
+    for line in write:
+        F.write(write)
