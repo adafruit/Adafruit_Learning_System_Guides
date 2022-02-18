@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Liz Clark for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 '''Adapted from the FFT Example: Waterfall Spectrum Analyzer
 by Jeff Epler
 https://learn.adafruit.com/ulab-crunch-numbers-fast-with-circuitpython/overview '''

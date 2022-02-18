@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Random HAL demo; adapted from PiSpeak sketch.  When button
 // on A0 is pressed, plays a random WAV file from a list.
  
