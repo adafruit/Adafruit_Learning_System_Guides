@@ -18,11 +18,7 @@ for r, d, f in os.walk("."):
 for file in files:
     with open(file, "r") as F:
         lines = F.readlines()[0:3]
-        if len(lines) == 3 and (
-            "SPDX-FileCopyrightText:" not in lines[0]
-            or lines[1] not in ("#\n", "//\n")
-            or "SPDX-License-Identifier:" not in lines[2]
-        ):
+        if len(lines) == 3 and "SPDX-FileCopyrightText:" not in lines[0]:
             missing.append(file)
         else:
             has.append(file)

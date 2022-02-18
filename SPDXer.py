@@ -83,7 +83,7 @@ for file in todo:
         F.write(text)
 
     os.system(f'vi {file}')
-    input()
+    input("Next")
 
 for i in todo:
     print(i)
