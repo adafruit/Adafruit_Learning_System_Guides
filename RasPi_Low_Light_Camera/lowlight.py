@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Anne Barela for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 from picamera import PiCamera
 import time
 from fractions import Fraction
