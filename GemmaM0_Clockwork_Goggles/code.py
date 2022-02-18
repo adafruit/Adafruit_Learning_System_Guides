@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2017 John Edgar Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # CircuitPython Gemma Gear goggles
 # uses two 16 NeoPixel rings (RGBW)
 # connected to Gemma M0 powered by LiPo battery

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Phillip Burgess for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """Glorified button class with debounced tap, double-tap, hold and release"""
 
 # pylint: disable=import-error
