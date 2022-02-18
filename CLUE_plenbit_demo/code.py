@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Limor Fried for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import busio
 import board
 from digitalio import DigitalInOut, Direction

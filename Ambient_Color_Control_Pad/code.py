@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 John Edgar Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Ambient Color Control Pad
 # NeoTrellis to select colors of NeoPixel strip
 # NeoTrellis connected to Feather M4 (need the extra memory vs. M0) SCL, SDA
