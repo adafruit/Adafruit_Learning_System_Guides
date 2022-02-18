@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2021 Melissa LeBlanc-Williams for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #include <Adafruit_DotStar.h>
 
 #define NUM_DOTSTAR 5

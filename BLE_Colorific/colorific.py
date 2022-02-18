@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Tony DiCola for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Smart Bulb Colorific! Control With Bluez
 # Author: Tony DiCola
 #

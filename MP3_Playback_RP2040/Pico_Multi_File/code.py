@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Kattni Rembor for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 CircuitPython multiple MP3 playback example for Raspberry Pi Pico.
 Plays two MP3 files consecutively, once time each.

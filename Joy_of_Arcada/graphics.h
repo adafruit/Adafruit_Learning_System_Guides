@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Phillip Burgess for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #define FACE_WIDTH   128
 #define FACE_HEIGHT  128
 #define EYES_WIDTH   102

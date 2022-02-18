@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Phillip Burgess for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // This table maps key name strings (e.g. "RETURN") to
 // numeric HID key codes in the TinyUSB hid.h header file.
 
