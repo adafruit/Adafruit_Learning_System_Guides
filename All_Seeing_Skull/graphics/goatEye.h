@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 John Edgar Park for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #define SCLERA_WIDTH  128
 #define SCLERA_HEIGHT 128
 

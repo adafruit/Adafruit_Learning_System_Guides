@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 FoamyGuy for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Using time.monotonic() to blink the built-in LED.
 
