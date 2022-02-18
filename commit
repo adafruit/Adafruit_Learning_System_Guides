@@ -1,0 +1,7 @@
+#!/bin/bash
+
+git checkout main
+git checkout -b $1
+git add .
+git commit -m "Added SPDX to 20 more files - $1"
+git push -u origin $1
