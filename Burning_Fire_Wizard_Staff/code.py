@@ -1,3 +1,9 @@
+# SPDX-FileCopyrightText: 2019 Kattni Rembor Adafruit Industries
+# SPDX-FileCopyrightText: 2019 Erin St Blaine for Adafruit Industries
+# SPDX-FileCopyrightText: 2019 Limor Fried for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Prop-Maker based Burning Wizard Staff
 Adafruit invests time and resources providing this open source code.
