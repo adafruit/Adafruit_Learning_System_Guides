@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2017 Mikey Sklar for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #include <Adafruit_NeoPixel.h>
 
 #define PIN 1

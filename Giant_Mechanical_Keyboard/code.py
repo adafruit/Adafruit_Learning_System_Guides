@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Collin Cunningham for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Big Control Alt Delete Board
 # Code is written for the Circuit Playground Express board:
 #   https://www.adafruit.com/product/3333

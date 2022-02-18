@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Limor Fried for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Simple NEC remote decode-and-type keyboard example
 # When used with the Adafruit NEC remote will act like a keyboard and
 # type out keypresses.
