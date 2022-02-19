@@ -28,7 +28,7 @@ showcolor = 0  # color mode for cycling
 # initialize external capacitive touch pad (active high)
 button = digitalio.DigitalInOut(touch_pin)
 button.direction = digitalio.Direction.INPUT
-button.pull = digitalio.Pull.DOWN
+button.pull = digitalio.Pull.UP
 
 while True:
 
