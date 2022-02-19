@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 John Edgar Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """This demo shows the latest notification from a connected Apple device on the REPL and Gizmo"""
 import time
 import adafruit_ble

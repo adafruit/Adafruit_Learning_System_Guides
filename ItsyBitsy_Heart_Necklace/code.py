@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Noe Ruiz for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import time
 import board
 from rainbowio import colorwheel

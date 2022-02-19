@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Phillip Burgess for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Light painting project for Adafruit CLUE using DotStar LED strip.
 Images should be in 24-bit BMP format, with width matching the length

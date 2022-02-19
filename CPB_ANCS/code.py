@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Melissa LeBlanc-Williams for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 This demo shows the latest icons from a connected Apple device on a TFT Gizmo screen.
 
