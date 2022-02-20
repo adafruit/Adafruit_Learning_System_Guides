@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Eva Herrada for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import time
 import terminalio
 from adafruit_magtag.magtag import MagTag

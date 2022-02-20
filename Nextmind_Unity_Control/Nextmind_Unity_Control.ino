@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2021 Collin Cunningham for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #include <Servo.h>
 
 Servo servo;
