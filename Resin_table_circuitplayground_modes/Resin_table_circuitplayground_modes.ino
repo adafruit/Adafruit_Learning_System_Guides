@@ -1,3 +1,8 @@
+// SPDX-FileCopyrightText: 2013 FastLED
+// SPDX-FileCopyrightText: 2018 Erin St Blaine for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Code by Erin St Blaine for Adafruit.com, based on FastLED animations by Mark Kriegsman
 
 #include <Adafruit_CircuitPlayground.h>
