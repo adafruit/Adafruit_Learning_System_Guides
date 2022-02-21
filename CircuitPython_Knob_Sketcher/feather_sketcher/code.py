@@ -94,9 +94,9 @@ def read_knobs(reads, delay):
         time.sleep(delay)
     avg_x /= reads
     avg_y /= reads
-    x = map_range(avg_x, 0, 65535, 0, SKETCH_WIDTH - 1)
-    y = map_range(avg_y, 0, 65535, 0, SKETCH_HEIGHT - 1)
-    return int(x), int(y)
+    xx = map_range(avg_x, 0, 65535, 0, SKETCH_WIDTH - 1)
+    yy = map_range(avg_y, 0, 65535, 0, SKETCH_HEIGHT - 1)
+    return int(xx), int(yy)
 
 #-------
 # MAIN
@@ -114,3 +114,4 @@ while True:
             # PEN UP
             pen_palette[1] = PEN_UP_COLOR
     sketch_bitmap.fill(0)
+
