@@ -114,4 +114,3 @@ while True:
             # PEN UP
             pen_palette[1] = PEN_UP_COLOR
     sketch_bitmap.fill(0)
-
