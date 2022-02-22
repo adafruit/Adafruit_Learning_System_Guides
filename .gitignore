@@ -5,5 +5,5 @@ Hue_Controller/secrets.h
 CircuitPython_Logger/secrets\.py
 .python-version
 __pycache__
-#has.txt
-#missing.txt
+has.txt
+missing.txt

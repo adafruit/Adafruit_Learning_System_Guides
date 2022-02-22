@@ -10,8 +10,8 @@ l3_ = "// SPDX-License-Identifier: MIT\n\n"
 
 with open('../missing.txt', 'r') as F:
     lines = F.readlines()
-    todo = lines[0:20]
-    write = lines[20:]
+    todo = lines[0:30]
+    write = lines[30:]
 
 todo = [f[:-1] for f in todo]
 print(todo)
@@ -20,12 +20,14 @@ replace = {"firepixie": "Erin St Blaine",
            "ladyada": "Limor Fried",
            "lady ada": "Limor Fried",
            "dherrada": "Eva Herrada",
+           "mike barela": "Anne Barela",
            "blitzcitydiy": "Liz Clark",
            "caternuson": "Carter Nelson",
            "siddacious": "Bryan Siepert",
+           "kattni": "Kattni Rembor",
            "brentru": "Brent Rubell"}
 
-def log_format(file):
+def log_format(file, i):
     cmd = f'git log --shortstat --follow --pretty=format:"%n%H%n%Cred%an%Creset (%ae) %Cblue%as%Creset%n%s%n" {file}'
     log = str(subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE).stdout.read())[2:-1].replace("\\t", "\t").replace("\\n\\n", "\n").replace("\\n", "\n").split("\n")
 
@@ -34,8 +36,11 @@ def log_format(file):
     long = max(log, key=len)
     long = len(long)
     print("┌" + "─" * (long + 4) + "┐")
+    line = f"{i}/30 files"
+    print("│ ", line, " " * (long - len(line)), "│")
     for line in log:
         start = len(line)
+
         if re.search(r"\d\d\d\d-\d\d-\d\d", line):
             line = re.split(r'\s[(]|[)]\s', line)
             default_year = line[2].split('-')[0]
@@ -60,10 +65,12 @@ def log_format(file):
     print("└" + "─" * (long + 4) + "┘")
     return default_year, default_author
 
+i = 0
 for file in todo:
+    i += 1
     os.system('clear')
 
-    default_year, default_author = log_format(file)
+    default_year, default_author = log_format(file, i)
 
     year = input(f"Year [{default_year}]: ")
     if not year:
