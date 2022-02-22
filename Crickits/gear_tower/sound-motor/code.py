@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 phillip torrone for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import time
 import array
 import math

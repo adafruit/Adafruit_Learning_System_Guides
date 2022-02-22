@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Phillip Burgess for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Jump & touch sound example for Adafruit Hallowing. Plays different sounds
 in response to jumping and capacitive touch pads.

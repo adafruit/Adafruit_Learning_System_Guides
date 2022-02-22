@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 Phillip Burgess for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Embedded graphics for the spirit board sketch.  These tables were generated
 // using a Python script to process PNG images into packed 32-bit integers,
 // 2 bits per pixel, with the leftmost pixel in the least significant bits --

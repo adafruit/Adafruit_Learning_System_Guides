@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2017 Limor Fried for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Dotstar painter! Can handle up to ~2300 pixel size image (e.g. 36 x 64)
 
 import gc

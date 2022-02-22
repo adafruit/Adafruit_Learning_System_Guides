@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 Phillip Burgess for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // These are the messages that are randomly selected for a "spirit reading"
 // by touching Hallowing's capacitive touch pads.  Only letters A-Z and
 // numbers 0-9 are supported.  Space character introduces a brief pause
