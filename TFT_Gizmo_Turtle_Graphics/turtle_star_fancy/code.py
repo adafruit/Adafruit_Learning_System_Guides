@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 John Edgar Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Turtle Gizmo Star Fancy
 #==| Turtle Gizmo Setup start |========================================
 import board

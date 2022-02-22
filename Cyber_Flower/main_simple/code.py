@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Tony DiCola for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Cyber Flower: Digital Valentine
 #
 # 'Roses are red,
