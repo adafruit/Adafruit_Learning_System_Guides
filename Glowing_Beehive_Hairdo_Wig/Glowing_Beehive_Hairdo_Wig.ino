@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2017 Erin St Blaine for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Code by Erin St Blaine for Adafruit.com
 // Full tutorial at https://learn.adafruit.com/glowing-beehive-hairdo-wig/
 

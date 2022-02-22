@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2017 Phillip Burgess for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Sound level sketch for Adafruit microphone amplifier.
 // For the GEMMA sequin masquerade mask.
 
