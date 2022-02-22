@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Anne Barela for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # SpaceX Launch Display, by Anne Barela November 2020
 # MIT License - for Adafruit Industries LLC
 # See https://github.com/r-spacex/SpaceX-API for API info

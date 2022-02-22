@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Brent Rubell for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # -*- coding: utf-8 -*-
 # Import Python System Libraries
 import time
