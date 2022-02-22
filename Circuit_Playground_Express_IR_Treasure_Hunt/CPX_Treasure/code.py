@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Carter Nelson for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import time
 import board
 import pulseio

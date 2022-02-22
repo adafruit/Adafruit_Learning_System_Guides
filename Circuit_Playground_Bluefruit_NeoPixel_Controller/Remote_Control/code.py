@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Kattni Rembor for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Remote Control code for Circuit Playground Bluefruit NeoPixel Animation and Color Remote Control.
 To be used with another Circuit Playground Bluefruit running the NeoPixel Animator code.

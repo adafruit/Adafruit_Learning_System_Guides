@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Jeff Epler for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 #!/usr/bin/env python3
 from enum import Enum
 import time

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Melissa LeBlanc-Williams for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 SHTC3 Temperature/Humidity Sensor Example for
 using CircuitPython with Home Assistant
