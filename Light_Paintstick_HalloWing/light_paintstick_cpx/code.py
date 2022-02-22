@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 John Edgar Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """Circuit Playground Express Light Paintbrush"""
 # Single images only. Filename is set in code,
 # CPX buttons A&B are used to increase and decrease playback speed

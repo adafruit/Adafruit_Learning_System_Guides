@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2020 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /*
   ThermalImager_009b - Collect thermal image values from a MLX90640 sensor array,
                        display them as color-mapped pixels on a TFT screen,

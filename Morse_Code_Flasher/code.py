@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2017 Collin Cunningham for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Circuit Playground Express CircuitPython Morse Code Flasher
 # This is meant to work with the Circuit Playground Express board:
 #   https://www.adafruit.com/product/3333

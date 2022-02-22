@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Phillip Burgess for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """ Produce class -- handles server queries and generates seasonal produce
     lists for a time and place. See notes at end of file regarding data
     format and some design decisions.
