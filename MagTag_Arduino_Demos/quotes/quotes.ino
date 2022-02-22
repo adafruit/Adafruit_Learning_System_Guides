@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2017 Evandro Copercini
+//
+// SPDX-License-Identifier: Apache-2.0
+
 /*
   Wifi secure connection example for ESP32
   Running on TLS 1.2 using mbedTLS
