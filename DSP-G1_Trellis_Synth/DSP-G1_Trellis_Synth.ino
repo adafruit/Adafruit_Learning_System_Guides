@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 John Edgar Park for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #include <MIDI.h>
 #include "Adafruit_Trellis.h"
 //use Trellis 0-11 and 16-27 as input for notes.

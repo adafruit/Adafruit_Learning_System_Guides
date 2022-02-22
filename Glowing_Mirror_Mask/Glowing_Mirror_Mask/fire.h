@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 Erin St Blaine for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Fire animation by lilu330, licensed from 123RF.com for use in a single
 // not-for-sale project (Glowing Mirror Mask on Adafruit Learning System).
 

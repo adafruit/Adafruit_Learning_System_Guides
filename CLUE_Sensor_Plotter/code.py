@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Kevin J Walters for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # clue-plotter v1.14
 # Sensor and input plotter for Adafruit CLUE in CircuitPython
 # This plots the sensors and three of the analogue inputs on
