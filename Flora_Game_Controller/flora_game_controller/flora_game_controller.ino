@@ -1,3 +1,8 @@
+// SPDX-FileCopyrightText: 2019 Limor Fried for Adafruit Industries
+// SPDX-FileCopyrightText: 2019 Becky Stern for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /*
 Example code for a Flora game controller with capacitive touch sensing! Full tutorial and video:
 http://learn.adafruit.com/plush-game-controller/

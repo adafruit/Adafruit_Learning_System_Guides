@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Vertical Word Clock using the Adafruit Feather M4 and
 #   the Adafruit DS3231 real-time clock FeatherWing
 

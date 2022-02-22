@@ -1,3 +1,9 @@
+// SPDX-FileCopyrightText: 2014 Benoit Blanchon
+// SPDX-FileCopyrightText: 2014 Arturo Guadalupi
+// SPDX-FileCopyrightText: 2020 Brent Rubell for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /*
 This example creates a client object that connects and transfers
 data using always SSL, then shows how to parse a JSON document in an HTTP response.

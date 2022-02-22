@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Limor Fried for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 #import time
 from busio import I2C
 from adafruit_seesaw.seesaw import Seesaw

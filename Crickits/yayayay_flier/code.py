@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Limor Fried for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # pylint: disable=wrong-import-position
 import time
 import gc
