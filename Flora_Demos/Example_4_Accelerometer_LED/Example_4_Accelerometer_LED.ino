@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Tony DiCola for Adafruit Industries
+//
+// SPDX-License-Identifier: Unlicense
+
 // Example of rotating accelerometer to change NeoPixel color.
 // Author: Tony DiCola
 // License: Public Domain
