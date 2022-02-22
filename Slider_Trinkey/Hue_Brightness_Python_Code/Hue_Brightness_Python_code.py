@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Kattni Rembor for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Slider Trinkey Hue Brightness Python Example
 (Requires Hue and Monitor Brightness CircuitPython example to be running on the Slider Trinkey)
