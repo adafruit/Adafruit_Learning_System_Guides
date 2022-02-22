@@ -1,3 +1,8 @@
+// SPDX-FileCopyrightText: 2020 Limor Fried for Adafruit Industries
+// SPDX-FileCopyrightText: 2020 Kevin Townsend for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /***************************************************************************
   This is a library for the BME680 gas, humidity, temperature & pressure sensor
 

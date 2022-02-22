@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #include "HT16K33.h"
 #include "Tetris.h"
 #include "Snake.h"

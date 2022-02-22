@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 John Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Quote board matrix display
 # uses AdafruitIO to serve up a quote text feed and color feed
 # random quotes are displayed, updates periodically to look for new quotes

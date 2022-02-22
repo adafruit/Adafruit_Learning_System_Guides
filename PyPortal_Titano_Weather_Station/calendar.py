@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Liz Clark for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 alarms = {
     'bed' : '10:00 PM',
     'breakfast' : '8:00 AM',
