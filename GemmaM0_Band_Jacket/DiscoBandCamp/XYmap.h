@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 //  Helper functions for a two-dimensional XY matrix of pixels.
 //  Special credit to Mark Kriegsman for RGB Shades Kickstarter 2014-10-18
 //  https://www.kickstarter.com/projects/macetech/rgb-led-shades

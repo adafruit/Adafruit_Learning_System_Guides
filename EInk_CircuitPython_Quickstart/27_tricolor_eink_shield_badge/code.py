@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Simple Badge script for a 2.7" 264x176 Tri-Color eInk display shield
   Supported products:

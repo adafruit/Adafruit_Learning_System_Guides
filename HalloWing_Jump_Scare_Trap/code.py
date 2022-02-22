@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 John Edgar Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # HalloWing Jump Scare Trap
 # use PIR sensor, speaker, and servo
 import time

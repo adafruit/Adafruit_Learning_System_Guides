@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Anne Barela for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import time
 import json
 import terminalio

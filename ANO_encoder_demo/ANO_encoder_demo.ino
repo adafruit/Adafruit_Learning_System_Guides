@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2021 Limor Fried for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #include <Adafruit_NeoPixel.h>
 #include <RotaryEncoder.h>
 
