@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 Mikey Sklar for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /*******************************************************************
   SoftServo sketch for Adafruit Trinket. Increments values to change position on the servo 
   (0 = zero degrees, full = 180 degrees)

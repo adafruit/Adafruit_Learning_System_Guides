@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 Erin St Blaine for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #define IMG_WIDTH  105
 #define IMG_HEIGHT 92
 #define IMG_FRAMES 7

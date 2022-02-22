@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 John Edgar Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Motion Sensor Alarm
 # uses Gemma M0, vibration sensor on A0/GND, & piezo on D0/GND
 import time

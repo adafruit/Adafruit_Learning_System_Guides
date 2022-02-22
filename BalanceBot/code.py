@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Dave Astels for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Self balancing 2 wheeled bot using a PID controller.
 See https://en.wikipedia.org/wiki/PID_controller
