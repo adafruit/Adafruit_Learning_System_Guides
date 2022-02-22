@@ -1,3 +1,10 @@
+// SPDX-FileCopyrightText: 1988 Reinhold P. Weicker
+// SPDX-FileCopyrightText: Gareth Halfacree
+// SPDX-FileCopyrightText: Ken Boak
+// SPDX-FileCopyrightText: 2018 Limor Fried for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 
 /* Dhrystone benchmark, modified for use with Arduinos and compatibles.
  * Based on work by Ken Boak.

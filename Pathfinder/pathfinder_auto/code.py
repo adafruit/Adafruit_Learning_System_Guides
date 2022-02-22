@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 John Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Pathfinder Auto Mode
 # automatically advances to new image/sound
 # press and hold the touch screen to toggle sound on and off

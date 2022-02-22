@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Bryan Siepert for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #include <Servo.h> 
 Servo servo;  
 

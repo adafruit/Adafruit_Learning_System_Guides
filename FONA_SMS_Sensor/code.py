@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Brent Rubell for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # pylint: disable=unused-import
 import time
 import board

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Bill Earl for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // **********************************************
 // Zax-O-Meter Sketch 
 // for the Adafruit LSM303 Magnetometer Breakout
