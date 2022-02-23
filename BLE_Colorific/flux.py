@@ -1,3 +1,8 @@
+# SPDX-FileCopyrightText: Jeremy Plichta
+# SPDX-FileCopyrightText: 2019 Tony DiCola for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Smart Bulb Flux Bulb Control With Bluez
 # Author: Tony DiCola
 # Author: (Flux Bulb modifications) Jeremy Plichta

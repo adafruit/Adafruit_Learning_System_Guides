@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Phillip Burgess for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Audio data converted from WAV file by wav2sketch
 
 // Converted from pew1.wav, using 44100 Hz, u-law encoding
