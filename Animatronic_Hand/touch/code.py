@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 John Edgar Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 #  Animatronic Hand
 #  CPX with CRICKIT and four servos
 #  touch four cap pads to close the fingers

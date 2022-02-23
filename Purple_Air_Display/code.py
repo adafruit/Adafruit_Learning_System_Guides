@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 John Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Purple Air AQI Display
 # for Metro M4 Airlift with RGB Matrix Shield
 # or Matrix Portal

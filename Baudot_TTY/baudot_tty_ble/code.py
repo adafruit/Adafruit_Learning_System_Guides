@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 John Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 ### Baudot TTY Message Transmitter
 ### Bluefruit Connect UART mode to send messages to CLUE for audio
 ### tramsission to TTY machine.

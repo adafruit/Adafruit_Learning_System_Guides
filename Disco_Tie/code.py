@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Collin Cunningham for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 LED Disco Tie with Bluetooth
 =========================================================
