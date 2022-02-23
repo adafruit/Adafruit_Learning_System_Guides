@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Andy Doro for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """ Example for using the AHT20 and OLED with CircuitPython and the Adafruit library"""
 
 import time

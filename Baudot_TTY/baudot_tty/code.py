@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 John Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 ### Baudot TTY Message Transmitter
 
 ### The 5-bit mode is defined in ANSI TIA/EIA-825 (2000)

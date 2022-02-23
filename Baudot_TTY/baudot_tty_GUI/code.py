@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 John Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 ### Baudot TTY Message Transmitter with CLUE GUI
 ### Pick from four phrases to send from the CLUE screen with buttons
 

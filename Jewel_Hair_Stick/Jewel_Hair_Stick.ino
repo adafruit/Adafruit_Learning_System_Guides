@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2017 Leslie Birch for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /* 
 Jewel Hairstick by Leslie Birch for Adafruit Industries
 Based on NeoPixel Library by Adafruit

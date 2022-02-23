@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 Mikey Sklar for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #include <FastLED.h>
 
 #define LED_PIN      1   // which pin your pixels are connected to

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /*
 This is a mash-up of the adavoice and wavface sketches.
 Using an Arduino, Wave Shield and some supporting components,

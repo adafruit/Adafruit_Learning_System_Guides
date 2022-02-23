@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /*
 Dalek voice effect using Wave Shield.  This is based on the adavoice sketch
 with a lot of code & comments ripped out, so see that code for more insight,

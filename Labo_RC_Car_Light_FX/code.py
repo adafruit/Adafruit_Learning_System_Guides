@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Collin Cunningham for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import board
 import neopixel
 from adafruit_circuitplayground.express import cpx
