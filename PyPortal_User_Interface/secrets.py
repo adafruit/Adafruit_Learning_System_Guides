@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Anne Barela for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 secrets = {
     'ssid' : '_your_wifi_ssid_',
     'password' : '_your_wifi_password_',

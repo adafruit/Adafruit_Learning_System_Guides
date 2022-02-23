@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Jeff Epler for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Minimal example displaying an image tiled across multiple RGB LED matrices.
 # This is written for MatrixPortal and four 64x32 pixel matrices, but could
 # be adapted to different boards and matrix combinations.
