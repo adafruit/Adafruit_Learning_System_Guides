@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Anne Barela for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Simple paint program for Trellis M4 Express
 # Press any button it will cycle through a palette of colors!
 #

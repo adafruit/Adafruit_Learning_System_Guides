@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2017 John Edgar Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """Snow Globe for Adafruit Circuit Playground express with CircuitPython """
 
 import math

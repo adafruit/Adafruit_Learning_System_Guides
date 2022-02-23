@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Tony DiCola for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Smart Toilet Light with ESP8266
 //
 // Use a feed in Adafruit IO to control the color and animation of a neopixel

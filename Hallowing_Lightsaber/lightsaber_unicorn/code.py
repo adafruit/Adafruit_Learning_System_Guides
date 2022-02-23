@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 John Edgar Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """UNICORN SWORD example for Adafruit Hallowing & NeoPixel strip"""
 # pylint: disable=bare-except
 

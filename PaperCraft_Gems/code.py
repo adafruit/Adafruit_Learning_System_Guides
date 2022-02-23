@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Erin St Blaine for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Crystal Gem Light Strand Project By Erin St Blaine for Adafruit Industries
 https://learn.adafruit.com/no-solder-papercraft-crystal-light-strand
