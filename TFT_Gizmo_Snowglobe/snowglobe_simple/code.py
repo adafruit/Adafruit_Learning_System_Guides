@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Carter Nelson for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 from random import randrange
 import board
 import busio

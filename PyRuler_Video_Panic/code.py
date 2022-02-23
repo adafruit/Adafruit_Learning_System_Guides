@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 John Thurmond for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import os
 import board
 from digitalio import DigitalInOut, Direction

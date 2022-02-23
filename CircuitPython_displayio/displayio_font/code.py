@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Carter Nelson for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import board
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text import label

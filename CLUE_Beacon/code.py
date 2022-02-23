@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 John Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Eddystone Beacon for CLUE
 This example broadcasts our Mac Address as our Eddystone ID and a link to a URL of your choice.
