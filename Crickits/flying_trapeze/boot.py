@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2017 Limor Fried for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Save as boot.py to turn on/off datalogging capability
 
 import digitalio

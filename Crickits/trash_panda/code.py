@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Limor Fried for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import time
 from digitalio import DigitalInOut, Direction
 from adafruit_seesaw.seesaw import Seesaw

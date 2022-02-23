@@ -1,3 +1,8 @@
+// SPDX-FileCopyrightText: 2015 Arturo Guadalupi
+// SPDX-FileCopyrightText: 2020 Brent Rubell for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /*
 This example creates a client object that connects and transfers
 data using always SSL.

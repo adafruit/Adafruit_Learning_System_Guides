@@ -1,3 +1,8 @@
+# SPDX-FileCopyrightText: 2019 Limor Fried for Adafruit Industries
+# SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Write the time for the Adafruit DS3231 real-time clock.
 # Limor Fried/Anne Barela for Adafruit Industries
 
