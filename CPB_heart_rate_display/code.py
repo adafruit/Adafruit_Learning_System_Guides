@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2022 Isaac Wellish for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 SPDX-FileCopyrightText: 2022 Isaac Wellish for Adafruit Industries
 SPDX-License-Identifier: MIT

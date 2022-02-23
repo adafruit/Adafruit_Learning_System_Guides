@@ -1,3 +1,8 @@
+# SPDX-FileCopyrightText: Prof. John Gallaugher
+# SPDX-FileCopyrightText: 2019 Noe Ruiz for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Code written by Prof. John Gallaugher, modified by Noe Ruiz for Adafruit Industries
 # Adafruit Circuit Playground Express Bluefruit
 

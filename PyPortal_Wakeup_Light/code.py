@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Isaac Wellish for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 This example uses a PyPortal and rgbw leds for a simple "wake up" light.
 The strip starts to brighten 30 minutes before set wake up time.
