@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Limor Fried for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # MagTag Shower Thoughts
 # Be sure to put WiFi access point info in secrets.py file to connect
 

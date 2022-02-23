@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Bryan Siepert for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keycode import Keycode
 import usb_hid
