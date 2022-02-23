@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Phillip Burgess for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """ Configuration data for the werewolf eyes """
 EYE_PATH = __file__[:__file__.rfind('/') + 1]
 EYE_DATA = {

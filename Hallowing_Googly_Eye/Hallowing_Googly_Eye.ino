@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 Phillip Burgess for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // "Googly eye" demo for Adafruit Hallowing.  Uses accelerometer for
 // motion plus DMA and related shenanigans for smooth animation.
 

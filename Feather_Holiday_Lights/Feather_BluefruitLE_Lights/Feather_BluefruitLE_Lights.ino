@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Tony DiCola for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Adafruit Bluefruit LE Feather Holiday Lights
 // See the full guide at:
 //   https://learn.adafruit.com/feather-holiday-lights/overview

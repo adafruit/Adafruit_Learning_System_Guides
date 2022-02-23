@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Test code for Adafruit Flora GPS modules
 //
 // This code shows how to listen to the GPS module in an interrupt
