@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2020 Limor Fried for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #include <Adafruit_NeoPixel.h>
 
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(4, PIN_NEOPIXEL, NEO_GRB + NEO_KHZ800);
