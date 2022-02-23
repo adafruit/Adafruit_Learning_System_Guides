@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Phillip Burgess for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # pylint: disable=import-error
 
 """

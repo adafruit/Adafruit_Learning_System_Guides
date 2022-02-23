@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // VCNL4000 code adapted from:
 //   https://github.com/adafruit/VCNL4000
 #ifndef ADAFRUIT_VCNL4000_H

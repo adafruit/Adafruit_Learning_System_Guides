@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2017 Dave Astels for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Humidity Monitor
 // Copyright (C) 2017 Dave Astels
 // Released until the MIT license
