@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Henry Gabryjelski for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # MACROPAD Hotkeys example: Minecraft Messaging
 
 # NOTE: There appears to be a line length limit. Exceeding that limit appears

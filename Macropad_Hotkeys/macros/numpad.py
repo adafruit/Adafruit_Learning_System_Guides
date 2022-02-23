@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Emma Humphries for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # MACROPAD Hotkeys example: Universal Numpad
 
 from adafruit_hid.keycode import Keycode # REQUIRED if using Keycode.* values

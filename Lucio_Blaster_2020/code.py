@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 John Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Lucio 2020
 # Feather M4 + Propmaker + amps + lots of neopixels
 import board

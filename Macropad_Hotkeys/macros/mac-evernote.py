@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Phillip Burgess for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # MACROPAD Hotkeys: Evernote web application for Mac
 # Contributed by Redditor s010sdc
 

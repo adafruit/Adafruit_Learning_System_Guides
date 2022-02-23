@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Phillip Burgess for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # MACROPAD Hotkeys example: Consumer Control codes (media keys)
 
 # The syntax for Consumer Control macros is a little peculiar, in order to

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Phillip Burgess for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # MACROPAD Hotkeys example: Tones
 
 # The syntax for Tones in macros is highly peculiar, in order to maintain
