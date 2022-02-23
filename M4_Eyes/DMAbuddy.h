@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Phillip Burgess for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Very infrequently the jobStatus member in Adafruit_ZeroDMA gets out of
 // sync and the screen DMA updates lock up. This is a hacky workaround.
 // jobStatus is a protected member of Adafruit_ZeroDMA, we can't reset it

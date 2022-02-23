@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 teejaydub for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /* Read the IR sensor and try to figure out where the heat is located. 
 
     Orientation: Looking into the sensor, the window is on the bottom of the silver package,

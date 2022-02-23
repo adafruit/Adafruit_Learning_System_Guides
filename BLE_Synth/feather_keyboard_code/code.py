@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Liz Clark for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 '''BLE Synth
 File for the Feather nFR52840
 Keyboard Portion'''

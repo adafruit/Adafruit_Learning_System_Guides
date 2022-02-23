@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2014 Roger Light
+#
+# SPDX-License-Identifier: EPL-1.0
+
 # Copyright (c) 2014 Roger Light <roger@atchoo.org>
 #
 # All rights reserved. This program and the accompanying materials

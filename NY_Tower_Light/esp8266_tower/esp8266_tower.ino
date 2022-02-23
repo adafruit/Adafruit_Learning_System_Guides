@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Tony DiCola for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /***************************************************
   Adafruit MQTT Library ESP8266 Example
   Must use ESP8266 Arduino from:

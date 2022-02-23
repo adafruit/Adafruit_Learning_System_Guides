@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 John Edgar Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # RGB Color Picker demo - wire up RGB LEDs and set their color
 # using Adafruit Bluefruit Connect App on your phone
 # runs on Feather M0 Bluefruit LE running the Feather M0 Adalogger build

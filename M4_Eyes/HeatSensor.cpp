@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 teejaydub for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #if 0 // Change to 1 to enable this code (referenced by user_watch.cpp)
 // CORRESPONDING LINE IN user_watch.cpp MUST ALSO BE ENABLED!
 
