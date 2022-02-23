@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Dan Cogliano for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import time
 import storage
 

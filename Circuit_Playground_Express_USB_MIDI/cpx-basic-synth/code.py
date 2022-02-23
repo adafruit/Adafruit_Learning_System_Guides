@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Kevin J. Walters for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 ### cpx-basic-synth v1.4
 ### CircuitPython (on CPX) synth module using internal speaker
 ### Velocity sensitive monophonic synth
