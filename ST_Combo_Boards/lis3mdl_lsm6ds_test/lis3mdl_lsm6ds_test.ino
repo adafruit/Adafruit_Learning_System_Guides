@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2020 Kattni Rembor for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Basic demo for accelerometer, gyro, and magnetometer readings
 // from the following Adafruit ST Sensor combo boards:
 // * LSM6DSOX + LIS3MDL FeatherWing : https://www.adafruit.com/product/4565

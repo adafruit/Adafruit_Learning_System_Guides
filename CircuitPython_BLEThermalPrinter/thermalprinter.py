@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Jeff Epler for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Protocol information from Thermal_Printer Arduino library
 # https://github.com/bitbank2/Thermal_Printer/
 from adafruit_ble.uuid import StandardUUID
