@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Phillip Burgess for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Gemma "Firewalker Lite" sneakers
 #  - Uses the following Adafruit parts (X2 for two shoes):
 #    * Gemma M0 3V microcontroller (#3501)

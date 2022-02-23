@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /*****************************************************************************
 Sketch for testing WS2801 LED strands - lights one LED along length of strand.
 Because only one LED is lit at a time, can safely be powered from Arduino +5V.

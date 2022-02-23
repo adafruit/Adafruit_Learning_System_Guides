@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Test code for Adafruit GPS modules using MTK driver
 // such as www.adafruit.com/products/660 (discontinued)
 // For new use see www.adafruit.com/products/746 (needs different code)

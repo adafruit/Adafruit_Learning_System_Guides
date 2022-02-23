@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Mikey Sklar for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import board
 import neopixel
 import adafruit_fancyled.adafruit_fancyled as fancy

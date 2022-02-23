@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2021 Carter Nelson for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #include <Adafruit_NeoPixel.h>
 #include "OPTIGATrustM.h"
 
