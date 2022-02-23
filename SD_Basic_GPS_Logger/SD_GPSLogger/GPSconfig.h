@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /* EXAMPLE
 $PSRF103,<msg>,<mode>,<rate>,<cksumEnable>*CKSUM<CR><LF>
 <msg> 00=GGA,01=GLL,02=GSA,03=GSV,04=RMC,05=VTG

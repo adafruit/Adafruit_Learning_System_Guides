@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /* Raw IR commander
  
  This sketch/program uses the Arduno and a PNA4602 to 

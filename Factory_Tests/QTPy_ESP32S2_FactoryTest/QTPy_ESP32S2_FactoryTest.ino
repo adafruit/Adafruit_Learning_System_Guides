@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2021 Limor Fried for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #include "WiFi.h"
 #include <Adafruit_TestBed.h>
 extern Adafruit_TestBed TB;
