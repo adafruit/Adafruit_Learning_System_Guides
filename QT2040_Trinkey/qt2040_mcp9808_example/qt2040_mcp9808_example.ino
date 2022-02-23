@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2021 Kattni Rembor for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /**************************************************************************/
 /*!
 This is a demo for the Adafruit QT2040 Trinkey and the MCP9808 temperature

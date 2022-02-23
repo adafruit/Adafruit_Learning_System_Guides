@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Kattni Rembor for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 NeoPixel example for Pico. Turns the NeoPixels red, green, and blue in sequence.
 

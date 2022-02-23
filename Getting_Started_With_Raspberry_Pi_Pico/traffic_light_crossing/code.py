@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Kattni Rembor for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """Traffic light with pedestrian crossing simulator example for Pico. Turns on red, amber and green
 LEDs in traffic light-like sequence. When button is pressed, upon light sequence completion, the
 red LED turns on and the buzzer beeps to indicate pedestrian crossing is active.
