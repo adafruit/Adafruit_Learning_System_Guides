@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // This library provides the high-level functions needed to use the I2C
 // serial interface supported by the hardware of several AVR processors.
 #ifndef i2c_h
