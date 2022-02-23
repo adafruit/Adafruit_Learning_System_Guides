@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Melissa LeBlanc-Williams for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 This is a Conference Badge type Name Tag that is intended to be displayed on
 the PyBadge. Feel free to customize it to your heart's content.

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2015 Hristo Gochkov
+//
+// SPDX-License-Identifier: LGPL-2.1-or-later
+
 /*
   TFT SPI Flash Server - Example WebServer with internal SPI flash storage
     for Adafruit ESP32-S2 TFT Feather

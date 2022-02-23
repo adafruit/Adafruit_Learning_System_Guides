@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2021 Kattni Rembor for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #include <Adafruit_NeoPixel.h>
 #include "Adafruit_FreeTouch.h"
 #include "Adafruit_APDS9960.h"

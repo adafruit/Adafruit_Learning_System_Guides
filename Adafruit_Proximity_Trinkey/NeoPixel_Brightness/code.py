@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Kattni Rembor for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 NeoPixel brightness proximity example. Increases the brightness of the NeoPixels as you move closer
 to the proximity sensor.
