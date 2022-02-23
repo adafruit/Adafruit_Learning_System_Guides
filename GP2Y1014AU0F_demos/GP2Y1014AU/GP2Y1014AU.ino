@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2020 Limor Fried for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #define dustPin A0 // Black wire
 #define ledPin 5  // White wire
 

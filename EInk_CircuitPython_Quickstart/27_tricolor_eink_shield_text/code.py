@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
   Simple text script for 2.7" 264x176 Tri-Color display shield
   Supported products:

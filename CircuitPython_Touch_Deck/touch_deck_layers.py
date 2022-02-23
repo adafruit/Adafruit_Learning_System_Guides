@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 foamyguy for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 from adafruit_hid.keycode import Keycode
 from adafruit_hid.consumer_control_code import ConsumerControlCode
 

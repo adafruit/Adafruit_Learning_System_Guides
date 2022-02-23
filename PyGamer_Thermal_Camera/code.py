@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Jan Goolsbey for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Thermal_Cam_v32.py
 # 2020-01-29 v3.2
 # (c) 2020 Jan Goolsbey for Adafruit Industries
