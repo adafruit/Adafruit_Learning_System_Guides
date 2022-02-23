@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Eva Herrada for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import requests
 
 token = "TOKEN_GOES_HERE"

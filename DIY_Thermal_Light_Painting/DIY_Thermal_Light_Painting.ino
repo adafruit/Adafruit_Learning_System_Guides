@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 Limor Fried for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /*************************************************** 
 This is a library for the MLX90614 temperature sensor SPECIFICALLY
 FOR USE WITH TINYWIREM ON TRINKET/GEMMA

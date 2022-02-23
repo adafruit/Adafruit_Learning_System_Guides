@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Eva Herrada for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 A library for completing the Pyloton bike computer learn guide utilizing the Adafruit CLUE.
 """

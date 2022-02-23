@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Liz Clark for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import time
 import random
 import board
