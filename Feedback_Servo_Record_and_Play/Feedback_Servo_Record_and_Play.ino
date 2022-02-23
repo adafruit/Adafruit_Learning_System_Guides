@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 Limor Fried for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Example code for recording and playing back servo motion with a 
 // analog feedback servo
 // http://www.adafruit.com/products/1404

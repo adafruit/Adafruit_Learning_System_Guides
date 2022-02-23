@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 jenfoxbot@gmail.com
+#
+# SPDX-License-Identifier: MIT
+
 # Minecraft Gesture Controller
 #
 # Written by <jenfoxbot@gmail.com>

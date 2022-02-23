@@ -1,6 +1,10 @@
+// SPDX-FileCopyrightText: 2019 Tony DiCola for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Example of buttons generating keyboard presses
 // Author: Tony DiCola
-// License: Public Domain
+// License: MIT
 #include <Keyboard.h>
 
 

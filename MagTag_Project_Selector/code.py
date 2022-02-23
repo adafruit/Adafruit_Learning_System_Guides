@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Eva Herrada for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Based on code written by @DavidGlaude on Twitter
 # https://twitter.com/DavidGlaude/status/1340365817138044933
 # https://gist.github.com/dglaude/4bf8d0a13c9c8ca8b05d6c0e9176bd20
