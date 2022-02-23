@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 John Edgar Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """HalloWing Light Paintbrush"""
 # Single images only. Filename is set in code,
 # potentiometer is used to tune playback SPEED

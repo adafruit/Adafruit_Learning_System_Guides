@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Isaac Wellish for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 This example uses the Open Trivia Database API to display multiple choice trivia questions.
 Tap the screen to start, then a question will appear and a 30 second timer will start.
