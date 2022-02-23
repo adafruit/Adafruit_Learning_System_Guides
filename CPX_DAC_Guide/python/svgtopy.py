@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Kevin J. Walters for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 #!/usr/bin/python3
 
 ### svgtopy v1.0
