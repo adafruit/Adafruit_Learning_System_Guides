@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Isaac Wellish for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Dashblock API Adafruit Learn Guide Count demo
 Use Dashblock to create a custom API for learn.adafruit.com,
