@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 John Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 This example acts as a BLE HID keyboard to peer devices.
 Attach five buttons with pullup resistors to Feather nRF52840
