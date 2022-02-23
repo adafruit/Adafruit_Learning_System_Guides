@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 John Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Start a 20 second hand washing timer via proximity sensor.
 Countdown the seconds with text and beeps.

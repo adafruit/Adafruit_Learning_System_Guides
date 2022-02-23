@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 John Edgar Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # BLE Crickit Light Switch
 # Use with the Adafruit BlueFruit LE Connect app
 # Works with CircuitPython 5.0.0-beta.0 and later

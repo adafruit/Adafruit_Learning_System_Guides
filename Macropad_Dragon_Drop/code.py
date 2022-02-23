@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Phillip Burgess for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Dragon Drop: a simple game for Adafruit MACROPAD. Uses OLED display in
 portrait (vertical) orientation. Tap one of four keys across a row to

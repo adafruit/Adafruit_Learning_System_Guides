@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2017 John Edgar Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Circuit Playground AnalogIn
 # Reads the analog voltage level from a 10k potentiometer connected to GND, 3.3V, and pin A1
 # and prints the results to the serial console.

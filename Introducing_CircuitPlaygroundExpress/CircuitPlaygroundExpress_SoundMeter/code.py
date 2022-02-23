@@ -1,3 +1,9 @@
+# SPDX-FileCopyrightText: 2017 Dan Halbert for Adafruit Industries
+# SPDX-FileCopyrightText: 2017 Tony DiCola for Adafruit Industries
+# SPDX-FileCopyrightText: 2017 Kattni Rembor for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # The MIT License (MIT)
 #
 # Copyright (c) 2017 Dan Halbert for Adafruit Industries
