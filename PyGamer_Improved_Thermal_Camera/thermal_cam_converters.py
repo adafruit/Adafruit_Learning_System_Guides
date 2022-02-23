@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 CedarGroveStudios for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # thermal_cam_converters.py
 
 def celsius_to_fahrenheit(deg_c=None):  # convert C to F; round to 1 degree C

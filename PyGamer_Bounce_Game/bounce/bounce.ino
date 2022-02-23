@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Adafruit Arcada based Level Bounce Game
 //
 // Anne Barela, June 3, 2019 for Adafruit Industries
