@@ -1,3 +1,8 @@
+// SPDX-FileCopyrightText: 2017 Dano Wall for Adafruit Industries
+// SPDX-FileCopyrightText: 2017 Becky Stern for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 //Figure-Eight animation for Neopixel Ring Bangle Bracelet
 //By Dano Wall and Becky Stern for Adafruit Industries
 #include <Adafruit_NeoPixel.h>

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Anne Barela for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Bright Wearables Purse Slideshow with FancyLED
 # Anne Barela for Adafruit Industries, February 2020
 # MIT License

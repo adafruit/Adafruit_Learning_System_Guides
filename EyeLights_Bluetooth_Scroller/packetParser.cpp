@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2021 Phillip Burgess for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #include <bluefruit.h>
 
 // packetbuffer holds inbound data

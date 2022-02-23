@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Limor Fried for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # pylint: disable=multiple-statements,wrong-import-position,wrong-import-order
 import gc
 from adafruit_hid.keyboard import Keyboard; gc.collect()

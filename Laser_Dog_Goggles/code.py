@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Mikey Sklar for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Laser Dog Goggles
 # https://learn.adafruit.com/laser-dog-goggles
 

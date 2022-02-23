@@ -1,3 +1,8 @@
+# SPDX-FileCopyrightText: 2020 Melissa LeBlanc-Williams for Adafruit Industries
+# SPDX-FileCopyrightText: 2020 Erin St Blaine for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Motion-sensing Animation Example using the Matrix Portal and 64 x 32 LED matrix display
 Written by Melissa LeBlanc-Williams and Erin St Blaine for Adafruit Industries

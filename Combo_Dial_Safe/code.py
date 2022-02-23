@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2017 John Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Combo Dial Safe
 # for Adafruit Circuit Playground express
 # with CircuitPython

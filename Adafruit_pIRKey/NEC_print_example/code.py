@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Limor Fried for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Simple NEC remote decode-and-print example
 # Prints out the 4-byte code transmitted by NEC remotes
 

@@ -1,3 +1,8 @@
+// SPDX-FileCopyrightText: 2017 Dano Wall for Adafruit Industries
+// SPDX-FileCopyrightText: 2017 Becky Stern for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 //Basic sine wave animation for NeoPixel Ring Bangle Bracelet
 //by Dano Wall and Becky Stern for Adafruit Industries
 #include <Adafruit_NeoPixel.h>

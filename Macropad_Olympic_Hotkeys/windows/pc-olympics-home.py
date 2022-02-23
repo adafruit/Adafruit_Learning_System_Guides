@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Isaac Wellish for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # MACROPAD Olympic Hotkeys main page
 # pylint: disable=line-too-long
 

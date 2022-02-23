@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 //  Process button input and return button activity
 //  Retained button code from RGB Shades though just using one button
 

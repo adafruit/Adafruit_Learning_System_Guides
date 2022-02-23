@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 John Park for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 //DSP-G1_Synth_Parameters_Demo
 //Feather M0 Express connected to DSP-G1 voice chip over TX pin
 

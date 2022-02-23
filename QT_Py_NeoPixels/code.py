@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Kattni Rembor for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """Basic NeoPixel LED animations for the QT Py."""
 import time
 import board

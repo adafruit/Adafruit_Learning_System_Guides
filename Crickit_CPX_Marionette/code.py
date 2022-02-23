@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # CircuitPython for the Adafruit Learning System Tutorial
 # Universal Marionette Kit
 # Project by Dano Wall, code by Anne Barela for Adafruit Industries

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Amelia T
+//
+// SPDX-License-Identifier: MIT
+
 //    Sketch for "DiscoBandCamp" by Amelia T, 2019
 //    See Adafruit guide & XYmap.h for pixel map for more information
 //    Use Adafruit Gemma M0: 60 pixels to D0, 60 pixels to D1, & button to D2 & GND

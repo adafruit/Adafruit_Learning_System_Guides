@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 John Edgar Park for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #define IRIS_MIN 180 // Override default iris size limits in sketch
 #define IRIS_MAX 750
 

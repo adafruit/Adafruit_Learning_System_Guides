@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 Erin St Blaine for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Glowing Mirror Mask using the Adafruit Hallowing
 // Full tutorial available on the Adafruit Learning System.
 // Code by Phil Burgess & Erin St. Blaine for Adafruit Industries.  

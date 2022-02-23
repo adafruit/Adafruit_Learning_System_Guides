@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Anne Barela for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # CircuitPython Speaking Thermometer Example
 # Coded for Circuit Playground Express but it may be
 # modified for any CircuitPython board with changes to

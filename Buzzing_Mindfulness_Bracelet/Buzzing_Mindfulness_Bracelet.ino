@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 Mikey Sklar for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Mindfulness Bracelet sketch for Adafruit/Arduino Gemma.  Briefly runs
 // vibrating motor (connected through transistor) at regular intervals.
 // This code is not beginner-friendly, it does a lot of esoteric low-level

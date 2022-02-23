@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Phillip Burgess for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /*------------------------------------------------------------------------
   POV LED double staff sketch.  Uses the following Adafruit parts
   (X2 for two staffs):

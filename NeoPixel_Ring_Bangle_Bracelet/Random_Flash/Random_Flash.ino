@@ -1,3 +1,8 @@
+// SPDX-FileCopyrightText: 2017 Dano Wall for Adafruit Industries
+// SPDX-FileCopyrightText: 2017 Becky Stern for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 //Random Flash animation for Neopixel Ring Bangle Bracelet
 //by Dano Wall and Becky Stern for Adafruit Industries
 //based on the Sparkle Skirt, minus the accelerometer

@@ -1,3 +1,8 @@
+// SPDX-FileCopyrightText: 2019 Becky Stern for Adafruit Industries
+// SPDX-FileCopyrightText: 2019 Justin Cooper for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Code for the Adafruit FLora Citi Bike Helmet Tutorial
 // https://learn.adafruit.com/citi-bike-helmet
 // Becky Stern and Justin Cooper, Adafruit.com

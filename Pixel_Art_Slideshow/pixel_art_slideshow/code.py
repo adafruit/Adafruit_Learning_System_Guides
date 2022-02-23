@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 John Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Slideshow Example using the Matrix Portal and 64 x 32 LED matrix display
 Written by Melissa LeBlanc-Williams for Adafruit Industries

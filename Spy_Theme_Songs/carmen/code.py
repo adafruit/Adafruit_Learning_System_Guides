@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 John Edgar Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Plays the Carmen Sandiego theme song
 Gemma M0 with Piezo on D0 and GND

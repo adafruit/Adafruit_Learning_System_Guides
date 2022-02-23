@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Anne Barela for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Isaac Wellish
 # Code adapted from Anne Barela's Hello World of Robotics and
 # Make it Move with Crickit guides at learn.adafruit.com

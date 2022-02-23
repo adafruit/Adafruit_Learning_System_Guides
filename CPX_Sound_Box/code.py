@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Noe Ruiz for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import time
 import board
 from digitalio import DigitalInOut, Direction, Pull

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Anne Barela for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Nintendo R.O.B. control with Accelerometer, code in CircuitPython
 # Using an Adafruit Circuit Playground Express board with an IR LED
 # Anne Barela for Adafruit Industries, MIT License, May, 2018

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Kevin J Walters for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # clue-verysimple-rpsgame v1.0
 # CircuitPython rock paper scissors game simple text game
 # based on https://www.youtube.com/watch?v=dhaaZQyBP2g

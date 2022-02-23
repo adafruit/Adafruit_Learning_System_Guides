@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2017 John Edgar Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Read Adafruit Remote Codes with Circuit Playground Express
 #
 # Simplified code based on https://learn.adafruit.com/remote-

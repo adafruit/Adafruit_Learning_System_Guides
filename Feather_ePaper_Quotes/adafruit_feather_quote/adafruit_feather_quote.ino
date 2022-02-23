@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Dan Cogliano for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /***************************************************
  * Quote Display for Adafruit ePaper FeatherWings
  * For use with Adafruit tricolor and monochrome ePaper FeatherWings

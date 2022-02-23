@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2017 Phillip Burgess for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import time
 from rainbowio import colorwheel
 import board

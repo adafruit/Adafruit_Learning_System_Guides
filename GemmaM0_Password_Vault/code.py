@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 John Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Gemma M0 Password Vault
 # press cap touch pads to enter strong passwords over USB
 

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Limor Fried for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // This program does a test of all the PyPortal Titano hardware 
 // so you can get an example of how to read
 // sensors, touchscreen, and display stuff!

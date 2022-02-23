@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Limor Fried for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #define SAMPLE_RATE 16000
 
 const uint8_t audio[] = {

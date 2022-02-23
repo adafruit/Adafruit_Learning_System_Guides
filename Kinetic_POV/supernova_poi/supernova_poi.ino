@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Phillip Burgess for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /*------------------------------------------------------------------------
   POV IR Supernova Poi sketch.  Uses the following Adafruit parts
   (X2 for two poi):

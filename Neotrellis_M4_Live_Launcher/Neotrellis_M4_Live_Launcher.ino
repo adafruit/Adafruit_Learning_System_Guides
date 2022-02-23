@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 Collin Cunningham for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /* Live Launcher - Ableton Live controller for Adafruit Neotrellis M4
     by Collin Cunningham for Adafruit Industries
     https://www.adafruit.com/product/3938

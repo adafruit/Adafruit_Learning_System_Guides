@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 John Edgar Park for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Pin selections here are based on the original Adafruit Learning System
 // guide for the Teensy 3.x project.  Some of these pin numbers don't even
 // exist on the smaller SAMD M0 & M4 boards, so you may need to make other
