@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Dan Cogliano for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /***************************************************
  * ePaper Tri Color Calendar Demo
  * For use with Adafruit Metro M4 Express Airlift and tricolor e-Paper Display Shield

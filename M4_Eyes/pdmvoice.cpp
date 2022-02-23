@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Phillip Burgess for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Basic voice changer code. This version is specific to the Adafruit
 // MONSTER M4SK board using a PDM microphone.
 
