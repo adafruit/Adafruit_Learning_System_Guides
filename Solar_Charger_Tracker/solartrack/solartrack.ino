@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /* 
 Portable solar panel efficiency tracker. For testing out solar panels!
 See https://learn.adafruit.com/portable-solar-charging-tracker for more information

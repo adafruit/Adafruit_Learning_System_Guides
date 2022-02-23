@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 Phillip Burgess for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // "Spirit Board" plaything for Adafruit Hallowing.  Uses DMA and related
 // shenanigans to smoothly scroll around a large image.  Use the capacitive
 // touch pads to get a random "spirit reading."  Ooooo...spooky!
