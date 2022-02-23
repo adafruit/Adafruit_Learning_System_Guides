@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2017 Mikey Sklar for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Low power NeoPixel goggles example.  Makes a nice blinky display
 // with just a few LEDs on at any time.
 
