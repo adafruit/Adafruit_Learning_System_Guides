@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2017 Mikey Sklar for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # NeoPixie Dust Bag
 # learn.adafruit.com/neopixel-pixie-dust-bag
 

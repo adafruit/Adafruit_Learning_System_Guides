@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Flora GPS + LED Pixel Code
 // 
 // This code shows how to listen to the GPS module in an interrupt

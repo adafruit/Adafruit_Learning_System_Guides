@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2017 John Edgar Park for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 //  NeoPixie Dust Bag by John Edgar Park jpixl.net
 //   
 //     No fairy costume is complete without a glowing pixie dust bag. 
