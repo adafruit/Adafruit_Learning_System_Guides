@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2013 Limor Fried for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /*
 IMPORTANT: THIS SOFTWARE CURRENTLY DOES NOT WORK, and future
 status is uncertain.  Twitter has changed their API to require

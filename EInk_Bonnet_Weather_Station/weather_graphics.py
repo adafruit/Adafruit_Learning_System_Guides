@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Melissa LeBlanc-Williams for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 from datetime import datetime
 import json
 from PIL import Image, ImageDraw, ImageFont

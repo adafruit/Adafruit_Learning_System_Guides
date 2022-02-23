@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Melissa LeBlanc-Williams for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 This example queries the Open Weather Maps site API to find out the current
 weather for your location... and display it on a eInk Bonnet!
