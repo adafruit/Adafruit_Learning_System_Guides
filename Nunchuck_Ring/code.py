@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 John Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import time
 import board
 import adafruit_nunchuk

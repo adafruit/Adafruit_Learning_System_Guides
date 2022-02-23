@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 John Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """This uses the CLUE as a Bluetooth LE sensor node."""
 
 import time

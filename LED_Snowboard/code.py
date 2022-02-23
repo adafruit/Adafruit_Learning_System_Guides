@@ -1,3 +1,8 @@
+# SPDX-FileCopyrightText: 2021 Erin St Blaine for Adafruit Industries
+# SPDX-FileCopyrightText: 2021 Limor Fried for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 LED Snowboard with Feather M4 and PropMaker Wing
 Adafruit invests time and resources providing this open source code.

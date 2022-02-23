@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 John Edgar Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Magic Light Bulb remote color mixer
 # Sends RGB color values, read from three faders on CPB to the bulb
 # https://www.magiclightbulbs.com/collections/bluetooth-bulbs

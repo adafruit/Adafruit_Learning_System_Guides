@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2017 Noe Ruiz for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #define TEEF_WIDTH  66
 #define TEEF_HEIGHT 13
 

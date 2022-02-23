@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Weather animation is rendered procedurally based on a few parameters
 // (time of day, cloud cover, rainfall, etc.). Most of the inputs are NOT
 // real-world units...see comments for explanation of what's needed.
