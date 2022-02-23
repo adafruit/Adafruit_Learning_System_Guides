@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2017 Phillip Burgess for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #include <Adafruit_NeoPixel.h>
 
 #define NUM_LEDS              24 // 24 LED NeoPixel ring

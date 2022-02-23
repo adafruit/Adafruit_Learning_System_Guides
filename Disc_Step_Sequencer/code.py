@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Dave Astels for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Opto Mechanical Disc Step Sequencer from John Park's Workshop
  Crickit Feather M4 Express, Crickit FeatherWing, continuous servo,

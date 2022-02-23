@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 Limor Fried for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #include <string.h>
 #include <Arduino.h>
 #include <SPI.h>

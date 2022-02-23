@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 Dave Astels for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Triangular leg robot.
 
 // Bluetooth code is from Feather M0 Bluefruit controller example.
