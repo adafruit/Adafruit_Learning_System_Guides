@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Liz Clark for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import random
 import board
 import neopixel

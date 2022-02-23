@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Melissa LeBlanc-Williams for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Message Panel
 // Reads an Adafruit IO Feed, then formats and displays the message
 // Author: Melissa LeBlanc-Williams

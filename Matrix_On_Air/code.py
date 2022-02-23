@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 John Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # ON AIR sign for YouTube livestreaming
 # Runs on Airlift Metro M4 with 64x32 RGB Matrix display & shield
 

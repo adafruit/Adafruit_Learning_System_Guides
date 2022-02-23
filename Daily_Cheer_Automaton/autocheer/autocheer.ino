@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2020 Andy Doro for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /*
     AUTOCHEER DEVICE
     ---

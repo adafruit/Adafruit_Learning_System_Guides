@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 Erin St Blaine for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Code by Erin St. Blaine for Adafruit Industries
 // NeoPixel Aquarium Tutorial: https://learn.adafruit.com/neopixel-aquarium-with-submersible-lights/
 // For QT Py board
