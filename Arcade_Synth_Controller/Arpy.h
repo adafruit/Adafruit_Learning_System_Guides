@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2022 Tod Kurt for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /**
  * Arpy - a class to do arpeggios for you
  * 12 Jan 2022 - Tod Kurt @todbot

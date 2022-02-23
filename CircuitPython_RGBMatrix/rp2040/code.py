@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Jeff Epler for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import time
 from math import sin
 import board

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2022 John Park for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // GUItool: begin automatically generated code
 AudioSynthWaveform       wave0;          //xy=502.74795150756836,82.7552137374878
 AudioSynthWaveform       wave1;      //xy=504.28649139404297,117.86524295806885

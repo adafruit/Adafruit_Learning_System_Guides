@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Isaac Wellish for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 This example runs the 'Simon' game on the PyRuler.
 Memorize each led sequence and tap the corresponding

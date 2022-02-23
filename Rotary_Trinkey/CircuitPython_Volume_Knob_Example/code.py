@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Kattni Rembor for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """Rotary Trinkey Volume and Mute HID example"""
 import rotaryio
 import board
