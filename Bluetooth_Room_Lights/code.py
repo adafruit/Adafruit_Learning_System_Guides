@@ -1,3 +1,8 @@
+# SPDX-FileCopyrightText: 2020 Kattni Rembor for Adafruit Industries
+# SPDX-FileCopyrightText: 2020 Erin St Blaine for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Bluetooth Controlled Room Lights using a Circuit Playground Bluetooth
    Scroll between 7 modes and control brightness with your smartphone via Bluetooth
