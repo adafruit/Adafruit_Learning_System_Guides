@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Dave Astels for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Continuously scroll randomly generated Mario style clouds.
 Designed for an ItsyBitsy M4 Express and a 1.3" 240x240 TFT

@@ -1,3 +1,8 @@
+// SPDX-FileCopyrightText: 1988 Reinhold P. Weicker
+// SPDX-FileCopyrightText: 2018 Limor Fried for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /*
  *************************************************************************
  *

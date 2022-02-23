@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 John Edgar Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Circuit Playground Bluefruit Ornament Proximity
 This demo uses advertising to set the color of scanning devices depending on the strongest broadcast

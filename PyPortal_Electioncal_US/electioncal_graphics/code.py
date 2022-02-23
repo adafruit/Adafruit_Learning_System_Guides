@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Alvaro Figueroa for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import time
 import json
 import displayio
