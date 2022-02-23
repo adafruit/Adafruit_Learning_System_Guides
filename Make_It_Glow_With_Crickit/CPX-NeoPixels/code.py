@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Anne Barela for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Use the 10 NeoPixels on Circuit Playground Express via the
 #   Adafruit neopixel library
 import time
