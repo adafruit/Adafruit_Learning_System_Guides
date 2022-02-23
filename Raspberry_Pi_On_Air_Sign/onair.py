@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Phillip Burgess for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 #!/usr/bin/python
 
 # "ON AIR" sign controller for Raspberry Pi.  Polls Ustream and Google+

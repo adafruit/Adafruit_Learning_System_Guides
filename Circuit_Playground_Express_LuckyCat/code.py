@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Lucky Cat Maneki-neko with Circuit Playground Express
 # Anne Barela for Adafruit Industries, MIT License
 

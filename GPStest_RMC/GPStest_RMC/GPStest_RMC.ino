@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // A simple sketch to read GPS data and parse the $GPRMC string 
 // see http://www.ladyada.net/make/gpsshield for more info
 

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 foamyguy for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Rotary Trinkey gadget that forces you to crank the handle in order
 to keep the brightness up on your phone or tablet.
