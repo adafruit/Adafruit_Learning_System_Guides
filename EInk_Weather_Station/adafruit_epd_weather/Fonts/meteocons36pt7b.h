@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #pragma once
 
 const uint8_t meteocons36pt7bBitmaps[] PROGMEM = {
