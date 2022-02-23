@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 John Edgar Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Demonstration of a Bluefruit BLE Central/client. Connects to the first BLE UART peripheral it finds.
 Sends Bluefruit ColorPackets, read from three potentiometers, to the peripheral.

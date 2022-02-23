@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 John Edgar Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Used along with cpb_remote_color_client.py. Receives Bluefruit LE ColorPackets from a central,
 and updates NeoPixels to show the history of the received packets.

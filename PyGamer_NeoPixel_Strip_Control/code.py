@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Brent Rubell for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # PyGamer NeoPixel Strip Control with CusorControl
 # Adapted from PyPortal_NeoPixel_Color_Picker.py by Kattni Rembor
 import time

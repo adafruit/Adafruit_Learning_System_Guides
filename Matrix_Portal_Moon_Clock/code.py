@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Phillip Burgess for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 MOON PHASE CLOCK for Adafruit Matrix Portal: displays current time, lunar
 phase and time of next moonrise or moonset. Requires WiFi internet access.

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Carter Nelson for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 class MatrixSand:
     """Class to simulate simplified sand physics."""
 

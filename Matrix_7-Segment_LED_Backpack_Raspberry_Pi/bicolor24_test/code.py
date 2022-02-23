@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Mikey Sklar for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Basic example of using the Bi-color 24 segment bargraph display.
 # This example and library is meant to work with Adafruit CircuitPython API.
 # Author: Carter Nelson
