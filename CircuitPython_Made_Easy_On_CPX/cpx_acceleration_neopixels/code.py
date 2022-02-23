@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Kattni Rembor for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 from adafruit_circuitplayground.express import cpx
 
 # Main loop gets x, y and z axis acceleration, prints the values, and turns on
