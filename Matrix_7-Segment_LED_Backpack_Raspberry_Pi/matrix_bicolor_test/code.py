@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Mikey Sklar for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Import all pins
 import time
 import board

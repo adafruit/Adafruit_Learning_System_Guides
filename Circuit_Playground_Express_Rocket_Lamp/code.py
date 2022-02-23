@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Archie Roques for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Code for Circuit Playground Express Rocket Lamp
 
 # A fun lighting project using Circuit Playground Express and NeoPixels
