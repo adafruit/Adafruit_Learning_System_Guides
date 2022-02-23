@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Limor Fried for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 RED = 0xFF0000
 MAROON = 0x800000
 ORANGE = 0xFF8000

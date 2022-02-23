@@ -1,3 +1,9 @@
+// SPDX-FileCopyrightText: 2011 Limor Fried for Adafruit Industries
+// SPDX-FileCopyrightText: 2012 Tom Igoe
+// SPDX-FileCopyrightText: 2018 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /*
   SD card test for WIZ5500 Compatible Ethernet Boards
 

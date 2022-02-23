@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Phillip Burgess for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 NextBus class -- handles NextBus server queries and infers
 arrival times based on last-queried predictions and elapsed time.

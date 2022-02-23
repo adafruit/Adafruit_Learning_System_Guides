@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 John Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Read data from a BerryMed pulse oximeter, model BM1000C, BM1000E, etc.
 Run this on Feather nRF52840

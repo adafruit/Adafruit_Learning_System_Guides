@@ -1,3 +1,10 @@
+// SPDX-FileCopyrightText: 2010 David A. Mellis
+// SPDX-FileCopyrightText: 2012 Tom Igoe
+// SPDX-FileCopyrightText: 2014 Scott Fitzgerald
+// SPDX-FileCopyrightText: 2018 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: Unlicense
+
 /*  SDlistFiles
 
  This example shows how print out the files in a directory on a SD card

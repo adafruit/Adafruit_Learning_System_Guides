@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Anne Barela for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Demo code to generate an alternating color-gradient effect in
 # the QT Py LED cuff bracelet LEDs.
 import time

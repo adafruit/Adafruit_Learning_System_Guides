@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Kattni Rembor for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 NeoPixel Animator code for ItsyBitsy nRF52840 NeoPixel Animation and Color Remote Control.
 """

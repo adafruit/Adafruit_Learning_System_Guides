@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Phillip Burgess for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 NEXTBUS SCHEDULER for Adafruit MagTag: Shows arrival predictions for
 up to four lines/stops. Requires WiFi internet access.
