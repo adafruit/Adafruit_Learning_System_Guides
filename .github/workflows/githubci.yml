@@ -4,6 +4,7 @@ on: [pull_request, push, repository_dispatch]
 
 jobs:
   spdx:
+    runs-on: ubuntu-latest
     - uses: actions/checkout@v2
       with:
          repository: adafruit/ci-arduino
