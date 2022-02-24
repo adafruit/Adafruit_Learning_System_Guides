@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2017 Limor Fried for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """CircuitPython Essentials I2C sensor example using TSL2591"""
 import time
 import board
