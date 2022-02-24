@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: Daniel Hepper
 # SPDX-FileCopyrightText: 2019 Dave Astels
 #
-# SPDX-License-Identifier: Public Domain
+# SPDX-License-Identifier: Unlicense
 
 """
  8x8 monochrome bitmap fonts for rendering

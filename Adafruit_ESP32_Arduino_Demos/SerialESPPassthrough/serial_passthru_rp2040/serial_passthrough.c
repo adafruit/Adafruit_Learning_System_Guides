@@ -1,6 +1,6 @@
 // SPDX-FileCopyrightText: 2018 Arduino SA 
 //
-// SPDX-License-Identifier: GPL-2.1-or-later
+// SPDX-License-Identifier: LGPL-2.1-or-later
 /*
   RP2040-SerialESPPassthrough - Used for flashing ESP32 module
   with the Raspberry Pi RP2040.

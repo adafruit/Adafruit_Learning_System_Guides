@@ -1,6 +1,6 @@
 // SPDX-FileCopyrightText: 2018 Arduino SA 
 //
-// SPDX-License-Identifier: GPL-2.1-or-later
+// SPDX-License-Identifier: LGPL-2.1-or-later
 /*
   SerialNINAPassthrough - Use esptool to flash the ESP32 module
   For use with PyPortal, Metro M4 WiFi...
