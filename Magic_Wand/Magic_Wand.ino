@@ -1,6 +1,6 @@
 // SPDX-FileCopyrightText: 2018 Alex Alves for Adafruit Industries
 //
-// SPDX-License-Identifier: BSD
+// SPDX-License-Identifier: BSD-3-Clause
 
 //Written by Alex Alves for Adafruit Industries.
 //Adafruit invests time and resources providing this open source code,

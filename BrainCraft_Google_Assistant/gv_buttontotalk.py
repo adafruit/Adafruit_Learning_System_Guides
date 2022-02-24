@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2017 Google Inc.
 #
-# SPDX-License-Identifier: apache-2.0
+# SPDX-License-Identifier: Apache-2.0
 
 # Copyright (C) 2017 Google Inc.
 #

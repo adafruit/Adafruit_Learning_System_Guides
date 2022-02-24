@@ -1,6 +1,6 @@
 // SPDX-FileCopyrightText: 1997 Juergen Hannken-Illjes for The NetBSD Foundation
 //
-// SPDX-License-Identifier: Berkeley
+// SPDX-License-Identifier: BSD-2-Clause
 
 #include "wsksymdef.h"
 
