@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /*  This is the FastLED library NoisePlusPalette example code incorporating a momentary 
     push button to cycle between modes for the Jack-o-LED-trix project. 
     

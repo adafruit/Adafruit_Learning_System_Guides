@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2017 Limor Fried for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #include <Adafruit_NeoPixel.h>
 
 #define NUM_LEDS 8  // This many NeoPixels...

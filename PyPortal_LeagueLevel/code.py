@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 John Edgar Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 This project will access the League of Legends API, grab a Summoner's Level
 and display it on a screen.

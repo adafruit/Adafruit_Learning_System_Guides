@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Collin Cunningham for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import time
 from adafruit_magtag.magtag import MagTag
 
