@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Anne Barela for Adafruit Industries
+// SPDX-FileCopyrightText: Limor Fried for Adafruit Industries
 //
 // SPDX-License-Identifier: MIT
 
