@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Limor Fried for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 This example will access shields.io API, grab the SVG graphic and then use
 regular expression search to locate the number of online discord users, then

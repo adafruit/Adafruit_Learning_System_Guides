@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2020 Limor Fried for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #define TAP_THRESHOLD   7.0
 #define SWING_THRESHOLD 1.3
 

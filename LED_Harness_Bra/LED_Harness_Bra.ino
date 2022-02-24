@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 Amelia Tetterton for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /*
 HarnessBra by Amelia Tetterton as of 11/15/18
 

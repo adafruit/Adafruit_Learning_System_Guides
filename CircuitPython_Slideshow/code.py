@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # CircuitPython Slideshow - uses the adafruit_slideshow.mpy library
 import board
 from adafruit_slideshow import PlayBackOrder, SlideShow

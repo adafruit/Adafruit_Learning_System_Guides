@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Limor Fried for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # This example shows how to use text and graphics to create custom signage
 
 import time

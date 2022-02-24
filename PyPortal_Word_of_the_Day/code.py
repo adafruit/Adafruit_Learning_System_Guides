@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Isaac Wellish for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 This example uses the Wordnik API to display Wordnik's Word of the Day.
 Each day a new word, its part of speech, and definition
