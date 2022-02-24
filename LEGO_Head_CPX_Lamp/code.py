@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Noe Ruiz for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Shake Audio Lamp
 # for Adafruit Circuit Playground express
 # with CircuitPython
