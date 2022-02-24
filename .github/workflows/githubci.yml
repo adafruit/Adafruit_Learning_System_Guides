@@ -40,6 +40,9 @@ jobs:
     - name: test platforms
       run: python3 ci/build_platform.py ${{ matrix.arduino-platform }}
 
+    - name: check SPDX licensing
+      run: python3 ci/SPDX.py
+
     - name: Upload build artifacts
       uses: actions/upload-artifact@v2
       with:
