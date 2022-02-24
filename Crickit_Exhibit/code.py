@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Dano Wall for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Crickit Exhibit
 Project by Dano Wall and Isaac Wellish

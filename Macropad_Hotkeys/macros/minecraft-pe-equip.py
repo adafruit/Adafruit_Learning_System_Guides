@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Henry Gabryjelski for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # MACROPAD Hotkeys example: Minecraft Effects (Creative) for Bedrock Edition
 
 # Note: Must enable "full keyboad gameplay" to equip armor automatically.

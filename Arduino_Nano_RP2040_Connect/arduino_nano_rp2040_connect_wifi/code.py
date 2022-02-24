@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Liz Clark for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 '''Adapted from the Adafruit_CircuitPython_ESP32SPI
 library example esp32spi_simpletest.py:
 https://github.com/adafruit/Adafruit_CircuitPython_ESP32SPI/

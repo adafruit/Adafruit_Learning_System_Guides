@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Phillip Burgess for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # MACROPAD Hotkeys example: Safari web browser for Mac
 
 from adafruit_hid.keycode import Keycode # REQUIRED if using Keycode.* values

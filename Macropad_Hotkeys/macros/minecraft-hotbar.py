@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Emma Humphries for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # MACROPAD Hotkeys example: Minecraft hotbar (inventory)
 
 # Note: Must enable "full keyboad gameplay" for Prev/Next buttons to work.
