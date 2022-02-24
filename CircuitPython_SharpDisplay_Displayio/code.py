@@ -1,3 +1,8 @@
+# SPDX-FileCopyrightText: 2020 Limor Fried for Adafruit Industries
+# SPDX-FileCopyrightText: 2020 Jeff Epler for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import random
 import time
 

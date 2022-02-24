@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Dan Cogliano for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /* Program to automatically generate maze puzzles
  *
  * For use with Adafruit Metro M4 Express Airlift or Metro M4 and tricolor e-Paper Display Shield
