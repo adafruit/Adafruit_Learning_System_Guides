@@ -5,6 +5,10 @@ on: [pull_request, push, repository_dispatch]
 jobs:
   spdx:
     runs-on: ubuntu-latest
+    steps:
+    - uses: actions/setup-python@v2
+      with:
+        python-version: "3.x"
     - uses: actions/checkout@v2
       with:
          repository: adafruit/ci-arduino
