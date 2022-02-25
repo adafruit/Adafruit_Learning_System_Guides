@@ -29,7 +29,7 @@ TOUCH_COOLDOWN = 0.5  # seconds
 # display orientation. Must be 90 or 270.
 ORIENTATION = 90
 
-PYPORTAL_TITANO = True
+PYPORTAL_TITANO = False
 
 if not PYPORTAL_TITANO:
     SIZE = (240, 320)
