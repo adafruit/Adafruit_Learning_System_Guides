@@ -23,16 +23,18 @@ class WinampApplication(displayio.Group):
     :param playlist_file: json file containing the playlist of songs
     :param skin_image: BMP image file for skin background
     :param skin_config_file: json file containing color values
+    :param pyportal_titano: boolean value. True if using Titano, False otherwise.
     """
 
     STATE_PLAYING = 0
     STATE_PAUSED = 1
-
+    # pylint: disable=too-many-statements
     def __init__(
         self,
         playlist_file="playlist.json",
         skin_image="/base_240x320.bmp",
         skin_config_file="base_config.json",
+        pyportal_titano=False,
     ):
         self.SKIN_IMAGE = skin_image
         self.SKIN_CONFIG_FILE = skin_config_file
@@ -50,15 +52,35 @@ class WinampApplication(displayio.Group):
 
         # initialize clock display
         self.clock_display = ClockDisplay(text_color=self.CONFIG_DATA["time_color"])
-        self.clock_display.x = 44
-        self.clock_display.y = 22
+        if not pyportal_titano:
+            # standard PyPortal and pynt clock display location
+            # and playlist display parameters
+            self.clock_display.x = 44
+            self.clock_display.y = 22
+            _max_playlist_display_chars = 30
+            _rows = 3
+        else:
+            # PyPortal Titano clock display location
+            # and playlist display parameters
+            self.clock_display.x = 65
+            self.clock_display.y = 37
+            _max_playlist_display_chars = 42
+            _rows = 4
 
         # initialize playlist display
         self.playlist_display = PlaylistDisplay(
-            text_color=self.CONFIG_DATA["text_color"]
+            text_color=self.CONFIG_DATA["text_color"],
+            max_chars=_max_playlist_display_chars,
+            rows=_rows,
         )
-        self.playlist_display.x = 13
-        self.playlist_display.y = 234
+        if not pyportal_titano:
+            # standard PyPortal and pynt playlist display location
+            self.playlist_display.x = 13
+            self.playlist_display.y = 234
+        else:
+            # PyPortal Titano playlist display location
+            self.playlist_display.x = 20
+            self.playlist_display.y = 354
 
         # set playlist into playlist display
         self.playlist_display.from_files_list(self.PLAYLIST["playlist"]["files"])
@@ -69,15 +91,26 @@ class WinampApplication(displayio.Group):
             self.playlist_display.current_track_number - 1
         ]
 
+        if not pyportal_titano:
+            # standard PyPortal and pynt max characters for track title
+            _max_chars = 22
+        else:
+            # PyPortal Titano max characters for track title
+            _max_chars = 29
         # initialize ScrollingLabel for track name
         self.current_song_lbl = scrolling_label.ScrollingLabel(
             terminalio.FONT,
             text=self.playlist_display.current_track_title,
             color=self.CONFIG_DATA["text_color"],
-            max_characters=22,
+            max_characters=_max_chars,
         )
         self.current_song_lbl.anchor_point = (0, 0)
-        self.current_song_lbl.anchored_position = (98, 19)
+        if not pyportal_titano:
+            # standard PyPortal and pynt track title location
+            self.current_song_lbl.anchored_position = (98, 19)
+        else:
+            # PyPortal Titano track title location
+            self.current_song_lbl.anchored_position = (130, 33)
 
         # Setup the skin image file as the bitmap data source
         self.background_bitmap = displayio.OnDiskBitmap(self.SKIN_IMAGE)
@@ -193,8 +226,15 @@ class WinampApplication(displayio.Group):
         # increment current track number
         self.playlist_display.current_track_number += 1
 
-        # start playing track
-        self.play_current_track()
+        try:
+            # start playing track
+            self.play_current_track()
+        except OSError as e:
+            # file not found
+            print("Error playing: {}".format(self.current_song_file_name))
+            print(e)
+            self.next_track()
+            return
 
     def previous_track(self):
         """
@@ -209,8 +249,15 @@ class WinampApplication(displayio.Group):
         # decrement current track number
         self.playlist_display.current_track_number -= 1
 
-        # start playing track
-        self.play_current_track()
+        try:
+            # start playing track
+            self.play_current_track()
+        except OSError as e:
+            # file not found
+            print("Error playing: {}".format(self.current_song_file_name))
+            print(e)
+            self.previous_track()
+            return
 
     def pause(self):
         """
@@ -244,16 +291,23 @@ class PlaylistDisplay(displayio.Group):
 
     :param text_color: Hex color code for the text in the list
     :param song_list: Song names in the list
-    :param current_track_number: initial track number shown at the top of the list.
+    :param current_track_number: initial track number shown at the top of the list.l
+    :param max_chars: int max number of characters to show in a row. Excess characters are cut.
+    :param rows: how many rows to show. One track per row. Default 3 rows
     """
 
-    def __init__(self, text_color, song_list=None, current_track_number=0):
+    def __init__(
+        self, text_color, song_list=None, current_track_number=0, max_chars=30, rows=3
+    ):
         super().__init__()
 
+        self._rows = rows
         if song_list is None:
             song_list = []
         self._song_list = song_list
         self._current_track_number = current_track_number
+
+        self._max_chars = max_chars
 
         # the label to show track titles inside of
         self._label = bitmap_label.Label(terminalio.FONT, color=text_color)
@@ -275,13 +329,15 @@ class PlaylistDisplay(displayio.Group):
 
         # get the current track plus the following 2
         _showing_songs = self.song_list[
-            self.current_track_number - 1 : self.current_track_number + 3 - 1
+            self.current_track_number - 1 : self.current_track_number + self._rows - 1
         ]
 
         # format the track titles into a single string with newlines
         _showing_string = ""
         for index, song in enumerate(_showing_songs):
-            _cur_line = "{}. {}".format(self.current_track_number + index, song[:30])
+            _cur_line = "{}. {}".format(
+                self.current_track_number + index, song[: self._max_chars]
+            )
             _showing_string = "{}{}\n".format(_showing_string, _cur_line)
 
         # put it into the label
