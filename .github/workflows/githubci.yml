@@ -10,7 +10,7 @@ jobs:
       with:
         python-version: "3.x"
     - name: check SPDX licensing
-      run: python3 ./SPDX.py
+      run: python3 SPDX.py
 
 #  arduino:
 #    strategy:
