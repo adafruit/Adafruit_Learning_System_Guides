@@ -22,6 +22,8 @@ PEN_UP_COLOR      = 0xFF0000
 PEN_DOWN_COLOR    = 0x00FF00
 KNOB_READS        = 10
 KNOB_DELAY        = 0.001
+REVERSE_X         = True
+REVERSE_Y         = True
 #--| User Config |---------------------------------------------------
 
 # Feather M4 + 2.4" TFT FeatherWing setup
@@ -94,9 +96,13 @@ def read_knobs(reads, delay):
         time.sleep(delay)
     avg_x /= reads
     avg_y /= reads
-    xx = map_range(avg_x, 0, 65535, 0, SKETCH_WIDTH - 1)
-    yy = map_range(avg_y, 0, 65535, 0, SKETCH_HEIGHT - 1)
-    return int(xx), int(yy)
+    xx = int(map_range(avg_x, 0, 65535, 0, SKETCH_WIDTH - 1))
+    yy = int(map_range(avg_y, 0, 65535, 0, SKETCH_HEIGHT - 1))
+    if REVERSE_X:
+        xx = SKETCH_WIDTH - xx
+    if REVERSE_Y:
+        yy = SKETCH_HEIGHT - yy
+    return xx, yy
 
 #-------
 # MAIN
