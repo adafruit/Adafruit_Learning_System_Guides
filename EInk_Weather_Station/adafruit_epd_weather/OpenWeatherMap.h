@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Dan Cogliano for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #pragma once
 #include "secrets.h"
 #include <ArduinoJson.h>          //https://github.com/bblanchon/ArduinoJson

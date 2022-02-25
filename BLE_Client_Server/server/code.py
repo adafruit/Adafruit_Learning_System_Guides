@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 from time import sleep
 from adafruit_ble.uart_server import UARTServer
 from adafruit_bluefruit_connect.packet import Packet

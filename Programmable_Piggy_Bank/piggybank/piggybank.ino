@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /*********************
 * connect the COIN wire to digital 2
 * set the side switches to "FAST" "NC"
