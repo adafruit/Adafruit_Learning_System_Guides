@@ -5,15 +5,15 @@
 # The third item for each macro is a list in brackets, and each value within
 # is normally an integer (Keycode), float (delay) or string (typed literally).
 # Consumer Control codes were added as list-within-list, and then mouse and
-# tone and midinote further complicate this by adding dicts-within-list. Each 
+# tone and midinote further complicate this by adding dicts-within-list. Each
 # midinote related item is the key 'midinote' with an integer  value between
-# 0 and 127 as per the MIDI spec.  
-# Unlike the Tone macro the midinote is momentarily played and also stopped 
+# 0 and 127 as per the MIDI spec.
+# Unlike the Tone macro the midinote is momentarily played and also stopped
 # once for keypress.  This is useful for triggering functions within a DAW.
 # (but less useful for playing in instrument directly)
 #
 # The midicc syntax further complicates the syntax by taking a list within
-# brackets containing a CC number and a value between 0 and 127 as per the 
+# brackets containing a CC number and a value between 0 and 127 as per the
 # MIDI spec.
 
 # Helpful: https://en.wikipedia.org/wiki/Piano_key_frequencies
