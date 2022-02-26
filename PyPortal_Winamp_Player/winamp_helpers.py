@@ -29,7 +29,7 @@ class WinampApplication(displayio.Group):
 
     STATE_PLAYING = 0
     STATE_PAUSED = 1
-    # pylint: disable=too-many-statements
+    # pylint: disable=too-many-statements,too-many-branches
     def __init__(
         self,
         playlist_file="playlist.json",
