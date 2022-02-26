@@ -1,16 +1,24 @@
-# MACROPAD Hotkeys example: Tones
+# MACROPAD Hotkeys example: MIDI
 
-# The syntax for Tones in macros is highly peculiar, in order to maintain
+# The syntax for MIDI is based off of Tones in macros, in order to maintain
 # backward compatibility with the original keycode-only macro files.
 # The third item for each macro is a list in brackets, and each value within
 # is normally an integer (Keycode), float (delay) or string (typed literally).
 # Consumer Control codes were added as list-within-list, and then mouse and
-# tone further complicate this by adding dicts-within-list. Each tone-related
-# item is the key 'tone' with either an integer frequency value, or 0 to stop
-# the tone mid-macro (tone is also stopped when key is released).
+# tone and midinote further complicate this by adding dicts-within-list. Each 
+# midinote related item is the key 'midinote' with an integer  value between
+# 0 and 127 as per the MIDI spec.  
+# Unlike the Tone macro the midinote is momentarily played and also stopped 
+# once for keypress.  This is useful for triggering functions within a DAW.
+# (but less useful for playing in instrument directly)
+#
+# The midicc syntax further complicates the syntax by taking a list within
+# brackets containing a CC number and a value between 0 and 127 as per the 
+# MIDI spec.
+
 # Helpful: https://en.wikipedia.org/wiki/Piano_key_frequencies
 
-# This example ONLY shows tones (and delays), but really they can be mixed
+# This example ONLY shows midinote and midicc, but really they can be mixed
 # with other elements (keys, codes, mouse) to provide auditory feedback.
 
 app = {               # REQUIRED dict, must be named 'app'
