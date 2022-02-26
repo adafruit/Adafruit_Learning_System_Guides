@@ -1,7 +1,3 @@
-# SPDX-FileCopyrightText: 2021 Phillip Burgess for Adafruit Industries
-#
-# SPDX-License-Identifier: MIT
-
 """
 A macro/hotkey program for Adafruit MACROPAD. Macro setups are stored in the
 /macros folder (configurable below), load up just the ones you're likely to
@@ -181,6 +177,12 @@ while True:
                         macropad.stop_tone()
                 elif 'play' in item:
                     macropad.play_file(item['play'])
+                elif 'midinote' in item:
+                    macropad.midi.send(macropad.NoteOn(item['midinote'], 127))
+                    time.sleep(0.15)
+                    macropad.midi.send(macropad.NoteOff(item['midinote'], 0))
+                elif 'midicc' in item:
+                    macropad.midi.send(macropad.ControlChange(item['midicc'][0],item['midicc'][1]))
     else:
         # Release any still-pressed keys, consumer codes, mouse buttons
         # Keys and mouse buttons are individually released this way (rather
