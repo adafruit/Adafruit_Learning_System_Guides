@@ -4,6 +4,7 @@
 """
 PyPortal winamp displayio widget classes.
 """
+import os
 import time
 import json
 import board
@@ -45,10 +46,29 @@ class WinampApplication(displayio.Group):
         self.CONFIG_DATA = json.loads(f.read())
         f.close()
 
-        # read the playlist data into variable
-        f = open(self.PLAYLIST_FILE, "r")
-        self.PLAYLIST = json.loads(f.read())
-        f.close()
+        if self.PLAYLIST_FILE:
+            try:
+                # read the playlist data into variable
+                f = open(self.PLAYLIST_FILE, "r")
+                self.PLAYLIST = json.loads(f.read())
+                f.close()
+            except OSError:
+                # file not found
+                self.auto_find_tracks()
+            except ValueError:
+                # json parse error
+                self.auto_find_tracks()
+        else:
+            # playlist file argument was None
+            self.auto_find_tracks()
+
+        if self.PLAYLIST:
+            try:
+                if len(self.PLAYLIST["playlist"]["files"]) == 0:
+                    # valid playlist json data, but no tracks
+                    self.auto_find_tracks()
+            except KeyError:
+                self.auto_find_tracks()
 
         # initialize clock display
         self.clock_display = ClockDisplay(text_color=self.CONFIG_DATA["time_color"])
@@ -147,6 +167,80 @@ class WinampApplication(displayio.Group):
         self._prev_time = None
         self._seconds_elapsed = 0
         self._last_increment_time = 0
+
+    def auto_find_tracks(self):
+        """
+        Initialize the song_list by searching for all MP3's within
+        two layers of directories on the SDCard.
+
+        e.g. It will find all of:
+        /sd/Amazing Song.mp3
+        /sd/[artist_name]/Amazing Song.mp3
+        /sd/[artist_name]/[album_name]/Amazing Song.mp3
+
+        but won't find:
+        /sd/my_music/[artist_name]/[album_name]/Amazing Song.mp3
+
+        :return: None
+        """
+        # list that holds all files in the root of SDCard
+        _root_sd_all_files = os.listdir("/sd/")
+
+        # list that will hold all directories in the root of the SDCard.
+        _root_sd_dirs = []
+
+        # list that will hold all subdirectories inside of root level directories
+        _second_level_dirs = []
+
+        # list that will hold all MP3 file songs that we find
+        _song_list = []
+
+        # loop over all files found on SDCard
+        for _file in _root_sd_all_files:
+            try:
+                # Check if the current file is a directory
+                os.listdir("/sd/{}".format(_file))
+
+                # add it to a list to look at later
+                _root_sd_dirs.append(_file)
+            except OSError:
+                # current file was not a directory, nothing to do.
+                pass
+
+            # if current file is an MP3 file
+            if _file.endswith(".mp3"):
+                # we found an MP3 file, add it to the list that will become our playlist
+                _song_list.append("/sd/{}".format(_file))
+
+        # loop over root level directories
+        for _dir in _root_sd_dirs:
+            # loop over all files inside of root level directory
+            for _file in os.listdir("/sd/{}".format(_dir)):
+
+                # check if current file is a directory
+                try:
+                    # if it is a directory, loop over all files inside of it
+                    for _inner_file in os.listdir("/sd/{}/{}".format(_dir, _file)):
+                        # check if inner file is an MP3
+                        if _inner_file.endswith(".mp3"):
+                            # we found an MP3 file, add it to the list that will become our playlist
+                            _song_list.append(
+                                "/sd/{}/{}/{}".format(_dir, _file, _inner_file)
+                            )
+                except OSError:
+                    # current file is not a directory
+                    pass
+                # if the current file is an MP3 file
+                if _file.endswith(".mp3"):
+                    # we found an MP3 file, add it to the list that will become our playlist
+                    _song_list.append("/sd/{}/{}".format(_dir, _file))
+
+        # format the songs we found into the PLAYLIST data structure
+        self.PLAYLIST = {"playlist": {"files": _song_list}}
+
+        # print message to user letting them know we auto-generated the playlist
+        print("Auto Generated Playlist from MP3's found on SDCard:")
+        print(json.dumps(self.PLAYLIST))
 
     def update(self):
         """
@@ -359,7 +453,7 @@ class PlaylistDisplay(displayio.Group):
     def from_files_list(self, files_list):
         """
         Initialize the song_list from a list of filenames.
-        Directories and mp3 file extension will be removed.
+        Directories and MP3 file extension will be removed.
 
         :param files_list: list of strings containing filenames
         :return: None
