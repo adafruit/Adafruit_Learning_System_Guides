@@ -99,9 +99,9 @@ def read_knobs(reads, delay):
     xx = int(map_range(avg_x, 0, 65535, 0, SKETCH_WIDTH - 1))
     yy = int(map_range(avg_y, 0, 65535, 0, SKETCH_HEIGHT - 1))
     if REVERSE_X:
-        xx = SKETCH_WIDTH - xx
+        xx = SKETCH_WIDTH - xx - 1
     if REVERSE_Y:
-        yy = SKETCH_HEIGHT - yy
+        yy = SKETCH_HEIGHT - yy - 1
     return xx, yy
 
 #-------
