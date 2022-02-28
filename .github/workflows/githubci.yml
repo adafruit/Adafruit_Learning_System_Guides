@@ -9,8 +9,11 @@ jobs:
     - uses: actions/setup-python@v2
       with:
         python-version: "3.x"
+    - name: Checkout Current Repo
+      uses: actions/checkout@v2
+
     - name: check SPDX licensing
-      run: python SPDX.py
+      run: python ./SPDX.py
 
 #  arduino:
 #    strategy:
