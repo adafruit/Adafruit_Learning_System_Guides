@@ -1,5 +1,7 @@
 import os
 
+print("Starting SPDX Check")
+
 # add user bin to path!
 BUILD_DIR = ''
 # add user bin to path!
@@ -15,6 +17,7 @@ except KeyError:
         BUILD_DIR = os.path.abspath(".")
         pass
 
+print(f"Running in {BUILD_DIR}")
 files = []
 missing_file = []
 
