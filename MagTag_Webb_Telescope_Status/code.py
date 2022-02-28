@@ -31,7 +31,9 @@ SLEEP_TIME = 60 * 60  # seconds
 # SLEEP_TIME = 60 * 60 * 24 # seconds
 
 # URL to fetch the data from
-JSON_GET_URL = "https://jwst.nasa.gov/content/webbLaunch/flightCurrentState2.0.json?unique={}"
+JSON_GET_URL = (
+    "https://jwst.nasa.gov/content/webbLaunch/flightCurrentState2.0.json?unique={}"
+)
 
 # Whether to fetch live data or use cached
 TEST_RUN = True
@@ -99,11 +101,17 @@ def make_name_text(text, anchor_point, anchored_position, bg_color=LBL_BACKGROUN
         padding_right=4,
         padding_bottom=3,
         padding_top=3,
-        line_spacing=1.0
+        line_spacing=1.0,
     )
 
 
-def make_value_text(anchor_point, anchored_position, custom_font=True, bg_color=0x000000, font_color=0xFFFFF):
+def make_value_text(
+    anchor_point,
+    anchored_position,
+    custom_font=True,
+    bg_color=0x000000,
+    font_color=0xFFFFF,
+):
     """
     Create label object for showing data values.
 
@@ -117,9 +125,17 @@ def make_value_text(anchor_point, anchored_position, custom_font=True, bg_color=
     else:
         _font = terminalio.FONT
     return bitmap_label.Label(
-        _font, text="", anchor_point=anchor_point, anchored_position=anchored_position,
-        line_spacing=1.0, padding_top=3, background_color=bg_color, color=font_color,
-        padding_right=4, padding_left=4, padding_bottom=4
+        _font,
+        text="",
+        anchor_point=anchor_point,
+        anchored_position=anchored_position,
+        line_spacing=1.0,
+        padding_top=3,
+        background_color=bg_color,
+        color=font_color,
+        padding_right=4,
+        padding_left=4,
+        padding_bottom=4,
     )
 
 
@@ -132,11 +148,17 @@ font = bitmap_font.load_font("fonts/LeagueSpartan-Light.bdf")
 # value text initializations
 
 # top left. Hot side | Cold side temperature values
-top_left_value = make_value_text(anchor_point=(0, 0), anchored_position=(0, 6), bg_color=0xBBBBBB, font_color=0x000000)
+top_left_value = make_value_text(
+    anchor_point=(0, 0),
+    anchored_position=(0, 6),
+    bg_color=0xBBBBBB,
+    font_color=0x000000,
+)
 
 # top right. Instrument temperature values
 top_right_value = make_value_text(
-    anchor_point=(1.0, 0), anchored_position=(display.width - 6, 6),
+    anchor_point=(1.0, 0),
+    anchored_position=(display.width - 6, 6),
 )
 
 # bottom left timestamp
@@ -159,7 +181,9 @@ middle_left_name = make_name_text(
 # center. Instrument temp labels
 inst_temp_labels = "NIRCam Bench\nNIRSpec Bench\nFGS Bench\nMIRI Bench\nFSM"
 top_center_name = make_name_text(
-    text=inst_temp_labels, anchor_point=(1.0, 0.0), anchored_position=(top_right_value.x - 2, 6)
+    text=inst_temp_labels,
+    anchor_point=(1.0, 0.0),
+    anchored_position=(top_right_value.x - 2, 6),
 )
 
 main_group.append(middle_left_name)
