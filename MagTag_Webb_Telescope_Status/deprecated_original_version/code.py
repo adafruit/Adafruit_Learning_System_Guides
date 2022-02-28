@@ -31,13 +31,13 @@ SLEEP_TIME = 60 * 60  # seconds
 # SLEEP_TIME = 60 * 60 * 24 # seconds
 
 # URL to fetch the data from
-JSON_GET_URL = "https://jwst.nasa.gov/content/webbLaunch/flightCurrentState2.0.json?unique={}"
+JSON_GET_URL = "https://api.jwst-hub.com/track"
 
 # Whether to fetch live data or use cached
-TEST_RUN = True
+TEST_RUN = False
 # Cached data, helpful when developing interface
 # pylint: disable=line-too-long
-FAKE_DATA = '{"currentState": {"STEPS": "MirrorAlignSteps, TempBlurb, MirrorBlurb, ArraysForPlots, Plots", "launchDateTimeString": "2021-12-25T12:20Z", "currentDeployTableIndex": 34, "tempWarmSide1C": 37.1, "tempWarmSide2C": 12.0, "tempCoolSide1C": -229.1, "tempCoolSide2C": -233.0, "---INST TEMPS IN KELVIN----": "", "tempInstNirCamK": 42.7, "tempInstNirSpecK": 39.9, "tempInstFgsNirissK": 47.3, "tempInstMiriK": 108.7, "tempInstFsmK": 37.1, "tempsShow": true, "last": ""}}'
+FAKE_DATA = '{"distanceEarthKm":"1103975.4","launchElapsedTime":"15:03:47:44","distanceL2Km":342356.2,"percentageCompleted":76.3291,"speedKmS":0.3778,"deploymentImgURL":"https://webb.nasa.gov/content/webbLaunch/assets/images/deployment/1000pxWide/123Crop.png","currentDeploymentStep":"WEBB IS FULLY DEPLOYED! - The largest, most complex telescope ever launched into space is fully deployed.","tempC":{"tempWarmSide1C":55,"tempWarmSide2C":11,"tempCoolSide1C":-178,"tempCoolSide2C":-200},"timestamp":"2022-01-09T16:07:44.147Z"}'
 
 # Background Color for the label texts
 LBL_BACKGROUND = 0x444444
@@ -75,11 +75,7 @@ if not TEST_RUN:
         supervisor.reload()
 
 
-def get_time_str():
-    return str(time.monotonic()).replace(".", "")
-
-
-def make_name_text(text, anchor_point, anchored_position, bg_color=LBL_BACKGROUND):
+def make_label_text(text, anchor_point, anchored_position):
     """
     Create label object for labeling data values.
     It will get a background color box and appropriate padding.
@@ -94,16 +90,15 @@ def make_name_text(text, anchor_point, anchored_position, bg_color=LBL_BACKGROUN
         text=text,
         anchor_point=anchor_point,
         anchored_position=anchored_position,
-        background_color=bg_color,
+        background_color=LBL_BACKGROUND,
         padding_left=4,
         padding_right=4,
         padding_bottom=3,
         padding_top=3,
-        line_spacing=1.0
     )
 
 
-def make_value_text(anchor_point, anchored_position, custom_font=True, bg_color=0x000000, font_color=0xFFFFF):
+def make_value_text(anchor_point, anchored_position, custom_font=True):
     """
     Create label object for showing data values.
 
@@ -117,9 +112,7 @@ def make_value_text(anchor_point, anchored_position, custom_font=True, bg_color=
     else:
         _font = terminalio.FONT
     return bitmap_label.Label(
-        _font, text="", anchor_point=anchor_point, anchored_position=anchored_position,
-        line_spacing=1.0, padding_top=3, background_color=bg_color, color=font_color,
-        padding_right=4, padding_left=4, padding_bottom=4
+        _font, text="", anchor_point=anchor_point, anchored_position=anchored_position
     )
 
 
@@ -129,46 +122,84 @@ main_group = displayio.Group()
 # initialize custom font
 font = bitmap_font.load_font("fonts/LeagueSpartan-Light.bdf")
 
-# value text initializations
+# value text initialization
 
-# top left. Hot side | Cold side temperature values
-top_left_value = make_value_text(anchor_point=(0, 0), anchored_position=(0, 6), bg_color=0xBBBBBB, font_color=0x000000)
+# top left
+elapsed_time_val = make_value_text(anchor_point=(0, 0), anchored_position=(6, 6))
 
-# top right. Instrument temperature values
-top_right_value = make_value_text(
-    anchor_point=(1.0, 0), anchored_position=(display.width - 6, 6),
+# top right
+distance_from_earth_val = make_value_text(
+    anchor_point=(1.0, 0), anchored_position=(display.width - 6, 6)
 )
 
-# bottom left timestamp
+# middle right
+distance_to_l2_val = make_value_text(
+    anchor_point=(1.0, 0), anchored_position=(display.width - 6, 56)
+)
+
+# bottom right
+percent_complete_val = make_value_text(
+    anchor_point=(1.0, 1.0), anchored_position=(display.width - 6, display.height - 6)
+)
+
+# middle left
+speed_val = make_value_text(anchor_point=(0, 0), anchored_position=(6, 56))
+
+# bottom left
 timestamp_val = make_value_text(
-    anchor_point=(0, 1.0), anchored_position=(0, display.height - 6), custom_font=False
+    anchor_point=(0, 1.0), anchored_position=(6, display.height - 6), custom_font=False
 )
 
-main_group.append(top_left_value)
-main_group.append(top_right_value)
+# center
+temperature_val = make_value_text(
+    anchor_point=(0.5, 0.0), anchored_position=(display.width // 2, 6)
+)
 
+main_group.append(elapsed_time_val)
+main_group.append(distance_from_earth_val)
+main_group.append(distance_to_l2_val)
+main_group.append(percent_complete_val)
+main_group.append(speed_val)
 main_group.append(timestamp_val)
 
 # label text initialization
 
-# middle left. Hot side | Cold side temps label
-middle_left_name = make_name_text(
-    text="Temperature", anchor_point=(0.0, 0), anchored_position=(0, 51)
+# top left
+elapsed_time_lbl = make_label_text(
+    text="Elapsed", anchor_point=(0.0, 0), anchored_position=(6, 26)
 )
 
-# center. Instrument temp labels
-inst_temp_labels = "NIRCam Bench\nNIRSpec Bench\nFGS Bench\nMIRI Bench\nFSM"
-top_center_name = make_name_text(
-    text=inst_temp_labels, anchor_point=(1.0, 0.0), anchored_position=(top_right_value.x - 2, 6)
+# top right
+distance_from_earth_lbl = make_label_text(
+    text="From Earth", anchor_point=(1.0, 0), anchored_position=(display.width - 6, 26)
 )
 
-main_group.append(middle_left_name)
-main_group.append(top_center_name)
+# middle right
+distance_to_l2_lbl = make_label_text(
+    text="To L2 Orbit", anchor_point=(1.0, 0), anchored_position=(display.width - 6, 76)
+)
+
+# center
+temperature_lbl = make_label_text(
+    text="Temp", anchor_point=(0.5, 0.0), anchored_position=(display.width // 2, 54)
+)
+
+# middle left
+speed_lbl = make_label_text(
+    text="Speed", anchor_point=(0, 0), anchored_position=(6, 76)
+)
+
+main_group.append(elapsed_time_lbl)
+main_group.append(distance_from_earth_lbl)
+main_group.append(distance_to_l2_lbl)
+main_group.append(temperature_lbl)
+main_group.append(speed_lbl)
+main_group.append(temperature_val)
 
 if not TEST_RUN:
     try:
-        print("Fetching JSON data from {}".format(JSON_GET_URL.format(get_time_str())))
-        response = requests.get(JSON_GET_URL.format(get_time_str()), timeout=30)
+        print("Fetching JSON data from %s" % JSON_GET_URL)
+        response = requests.get(JSON_GET_URL, timeout=30)
     except (RuntimeError, OSError) as e:
         print(e)
         print("Failed GET request. Rebooting in 3 seconds...")
@@ -176,42 +207,32 @@ if not TEST_RUN:
         supervisor.reload()
 
     print("-" * 40)
-    print(response.headers)
-    json_data = response.json()
-    _time_parts = response.headers["date"].split(" ")
-    _time_str = "{}\n{}".format(" ".join(_time_parts[:4]), " ".join(_time_parts[4:]))
+    text_data = response.text
+    text_data = text_data.replace('"distanceEarthKm":', '"distanceEarthKm":"').replace(
+        ',"launchElapsedTime"', '","launchElapsedTime"'
+    )
+
+    json_data = json.loads(text_data)
 
     print("JSON Response: ", json_data)
     print("-" * 40)
     response.close()
 else:
     json_data = json.loads(FAKE_DATA)
-    _time_parts = ["Mon,", "28", "Feb", "2022", "17:17:54 GMT"]
-    _time_str = "{}\n{}".format(" ".join(_time_parts[:4]), " ".join(_time_parts[4:]))
 
-# Date/Time
-timestamp_val.text = _time_str
-
-# instrument temps
-top_right_value.text = "{}K\n{}K\n{}K\n{}K\n{}K".format(
-    json_data["currentState"]["tempInstNirCamK"],
-    json_data["currentState"]["tempInstNirSpecK"],
-    json_data["currentState"]["tempInstFgsNirissK"],
-    json_data["currentState"]["tempInstMiriK"],
-    json_data["currentState"]["tempInstFsmK"],
+# update the labels to display values
+elapsed_time_val.text = json_data["launchElapsedTime"]
+distance_from_earth_val.text = "{}km".format(json_data["distanceEarthKm"])
+distance_to_l2_val.text = "{}km".format(str(json_data["distanceL2Km"]))
+percent_complete_val.text = "{}%".format(str(json_data["percentageCompleted"]))
+speed_val.text = "{}km/s".format(str(json_data["speedKmS"]))
+timestamp_val.text = str(json_data["timestamp"])
+temperature_val.text = "{}c | {}c\n{}c | {}c".format(
+    json_data["tempC"]["tempWarmSide1C"],
+    json_data["tempC"]["tempCoolSide1C"],
+    json_data["tempC"]["tempWarmSide2C"],
+    json_data["tempC"]["tempCoolSide2C"],
 )
-
-# hot side | cold site temps
-top_left_value.text = "{}C | {}C\n{}C | {}C".format(
-    json_data["currentState"]["tempWarmSide1C"],
-    json_data["currentState"]["tempCoolSide1C"],
-    json_data["currentState"]["tempWarmSide2C"],
-    json_data["currentState"]["tempCoolSide2C"],
-)
-
-# Set the name position after the instrument temps are in the value
-# label, so that it's x will be in the proper position.
-top_center_name.anchored_position = (top_right_value.x - 2, 6)
 
 # show the group
 display.show(main_group)
