@@ -17,7 +17,7 @@ except ImportError:
     print("WiFi and Adafruit IO credentials are kept in secrets.py - please add them there!")
     raise
 
-# Set your Adafruit IO Username and Key in secrets.py
+# Add your Adafruit IO Username and Key to secrets.py
 # (visit io.adafruit.com if you need to create an account,
 # or if you need your Adafruit IO key.)
 aio_username = secrets["aio_username"]
@@ -70,16 +70,14 @@ io.on_message = message
 print("Connecting to Adafruit IO...")
 io.connect()
 
-last = 0
+timestamp = 0
 while True:
     # Explicitly pump the message loop.
     io.loop()
 
-    # Obtain the CPU temperature.
-    temperature = "{:.2f}".format(microcontroller.cpu.temperature)
-
-    # Print and publish the CPU temperature every 10 seconds.
-    if (time.monotonic() - last) >= 10:
+    # Obtain the CPU temperature, print it and publish it to Adafruit IO every 10 seconds.
+    if (time.monotonic() - timestamp) >= 10:
+        temperature = "{:.2f}".format(microcontroller.cpu.temperature)
         print("Current CPU temperature: {0} C".format(temperature))
         io.publish("cpu-temperature", temperature)
-        last = time.monotonic()
+        timestamp = time.monotonic()
