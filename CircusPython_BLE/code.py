@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Dan Halbert for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # CircusPython!
 # For use with the Adafruit BlueFruit LE Connect app.
 # Works with CircuitPython 5.0.0-beta.0 and later running on an nRF52840 board.

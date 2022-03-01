@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2021 John Park for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 //Wii Guitar Hero MIDI Controller
 // by John Park for Adafruit Industries
 #include <WiiChuck.h>
