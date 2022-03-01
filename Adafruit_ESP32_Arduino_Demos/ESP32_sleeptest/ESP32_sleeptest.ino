@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2022 Limor Fried for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #include <Adafruit_NeoPixel.h>
 
 #if defined(PIN_NEOPIXEL)
