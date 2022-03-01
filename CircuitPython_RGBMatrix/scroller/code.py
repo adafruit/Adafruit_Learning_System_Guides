@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Jeff Epler for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # This example implements a rainbow colored scroller, in which each letter
 # has a different color. This is not possible with
 # Adafruit_Circuitpython_Display_Text, where each letter in a label has the

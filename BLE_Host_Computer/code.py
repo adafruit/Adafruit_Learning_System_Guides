@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Dan Halbert for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Provide an "eval()" service over BLE UART.
 
 from adafruit_ble import BLERadio

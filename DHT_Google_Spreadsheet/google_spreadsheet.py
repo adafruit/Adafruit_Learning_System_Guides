@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Tony DiCola for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Google Spreadsheet DHT Sensor Data-logging Example
 
