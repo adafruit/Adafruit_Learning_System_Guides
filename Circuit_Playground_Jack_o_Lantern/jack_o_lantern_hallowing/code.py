@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Phillip Burgess for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """Jack-o'-Lantern flame example Adafruit Hallowing"""
 
 import math

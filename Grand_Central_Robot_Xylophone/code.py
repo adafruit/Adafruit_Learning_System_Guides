@@ -1,3 +1,8 @@
+# SPDX-FileCopyrightText: 2019 Dano Wall for Adafruit Industries
+# SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Adafruit Grand Central Robot Xylophone Demo Program
 # Dano Wall and Anne Barela for Adafruit Industries
 # MIT License

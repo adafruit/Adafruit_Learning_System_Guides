@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 John Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Heart Rate Trainer
 Read heart rate data from a heart rate peripheral using the standard BLE
