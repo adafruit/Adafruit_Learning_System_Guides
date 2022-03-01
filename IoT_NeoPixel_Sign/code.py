@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Noe Ruiz for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import ssl
 import board
 import neopixel
