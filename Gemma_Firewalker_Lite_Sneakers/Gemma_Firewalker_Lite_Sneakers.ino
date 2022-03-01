@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 Mikey Sklar for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /*------------------------------------------------------------------------
   Gemma "Firewalker Lite" sneakers sketch.
   Uses the following Adafruit parts (X2 for two shoes):

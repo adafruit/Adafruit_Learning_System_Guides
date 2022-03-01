@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Carter Nelson for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import serial
 
 # how many bytes to read?

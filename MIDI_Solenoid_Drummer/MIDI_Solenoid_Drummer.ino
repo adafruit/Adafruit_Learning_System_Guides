@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 Collin Cunningham for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /*  MIDI Solenoid Drummer
  *  for use with Adafruit Feather + Crickit Featherwing
  *  assumes a 5V solenoid connected to each of Crickit's four Drive ports
