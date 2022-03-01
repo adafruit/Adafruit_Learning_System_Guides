@@ -3,11 +3,11 @@
 # SPDX-License-Identifier: MIT
 import time
 import ssl
+from random import randint
 import socketpool
 import wifi
 import board
 import neopixel
-import microcontroller
 import adafruit_minimqtt.adafruit_minimqtt as MQTT
 from adafruit_io.adafruit_io import IO_MQTT
 
@@ -28,7 +28,7 @@ print("Connecting to %s" % secrets["ssid"])
 wifi.radio.connect(secrets["ssid"], secrets["password"])
 print("Connected to %s!" % secrets["ssid"])
 
-# Initialize NeoPixel
+# Initialise NeoPixel
 pixel = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.3)
 
 
@@ -75,9 +75,9 @@ while True:
     # Explicitly pump the message loop.
     io.loop()
 
-    # Obtain the CPU temperature, print it and publish it to Adafruit IO every 10 seconds.
+    # Obtain the "random" value, print it and publish it to Adafruit IO every 10 seconds.
     if (time.monotonic() - timestamp) >= 10:
-        temperature = "{:.2f}".format(microcontroller.cpu.temperature)
-        print("Current CPU temperature: {0} C".format(temperature))
-        io.publish("cpu-temperature", temperature)
+        random_number = "{}".format(randint(0, 255))
+        print("Current 'random' number: {}".format(random_number))
+        io.publish("random", random_number)
         timestamp = time.monotonic()
