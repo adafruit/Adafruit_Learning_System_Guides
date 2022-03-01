@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Kattni Rembor for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """Rotary Trinkey NeoPixel color picker example"""
 import rotaryio
 import digitalio
