@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 import os
+import sys
 
 print("Starting SPDX Check")
 
@@ -19,7 +20,6 @@ except KeyError:
     except KeyError:
         # If we're running on local machine
         BUILD_DIR = os.path.abspath(".")
-        pass
 
 print(f"Running in {BUILD_DIR}")
 files = []
@@ -70,5 +70,5 @@ for file in files:
 if fail:
     if missing_file:
         print("Missing files:", missing_file)
-    exit(-1)
-exit(0)
+    sys.exit(-1)
+sys.exit(0)
