@@ -1,7 +1,12 @@
+# SPDX-FileCopyrightText: 2022 Liz Clark for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import board
 import displayio
-import digitalio
+import keypad
 from adafruit_st7789 import ST7789
+import adafruit_imageload
 import usb_hid
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keycode import Keycode
@@ -52,23 +57,16 @@ display_bus = displayio.FourWire(
 #  display setup
 display = ST7789(display_bus, width=240, height=240, rowstart=80)
 
-# CircuitPython 6 & 7 compatible
-#  bitmap setup
-bitmap = displayio.OnDiskBitmap(open("/parrot-240-sheet.bmp", "rb"))
+bitmap, palette = adafruit_imageload.load("/partyParrotsSmol.bmp",
+                                          bitmap=displayio.Bitmap,
+                                          palette=displayio.Palette)
 
 # Create a TileGrid to hold the bitmap
-parrot0_grid = displayio.TileGrid(bitmap, pixel_shader=getattr(bitmap, 'pixel_shader', displayio.ColorConverter()),
-                                 tile_height=240, tile_width=240)
-
-# # CircuitPython 7+ compatible
-# bitmap = displayio.OnDiskBitmap("/parrot-240-sheet.bmp")
-
-# Create a TileGrid to hold the bitmap
-# parrot0_grid = displayio.TileGrid(bitmap, pixel_shader=bitmap.pixel_shader,
-#                                tile_height=240, tile_width=240)
+parrot0_grid = displayio.TileGrid(bitmap, pixel_shader=palette,
+                                 tile_height=32, tile_width=32)
 
 # Create a Group to hold the TileGrid
-group = displayio.Group()
+group = displayio.Group(scale=4, x = 64, y = 32)
 
 # Add the TileGrid to the Group
 group.append(parrot0_grid)
@@ -76,65 +74,45 @@ group.append(parrot0_grid)
 # Add the Group to the Display
 display.show(group)
 
-#  digital pins for the buttons
-key_pins = [board.A0, board.A1, board.A2, board.A3]
+#  setup button pins
+key_pins = (
+    board.A0,
+    board.A1,
+    board.A2,
+    board.A3,
+)
 
-#  array for buttons
-keys = []
-
-#  setup buttons as inputs
-for key in key_pins:
-    key_pin = digitalio.DigitalInOut(key)
-    key_pin.direction = digitalio.Direction.INPUT
-    key_pin.pull = digitalio.Pull.UP
-    keys.append(key_pin)
+#  create keypad
+keys = keypad.Keys(key_pins, value_when_pressed=False, pull=True)
 
 p = 0 #  variable for tilegrid index
-a = 0 #  variable for tile position
 
-#  states for buttons
-key0_pressed = False
-key1_pressed = False
-key2_pressed = False
-key3_pressed = False
-
-#  array for button states
-key_states = [key0_pressed, key1_pressed, key2_pressed, key3_pressed]
-
-last_p = p
 while True:
-    #  default tile grid position
-    if last_p != p:
-        parrot0_grid[a] = p
-        last_p = p
+    #  update parrot sprite
+    parrot0_grid[0] = p
 
-    #  iterate through 4 buttons
-    for i in range(4):
-        inputs = keys[i]
-        #  if button is pressed...
-        if not inputs.value and key_states[i] is False:
-            #  tile grid advances by 1 frame
+    #  get keypad inputs
+    event = keys.events.get()
+    if event:
+        #  if a key is pressed..
+        if event.pressed:
+            #  increase sprite index by 1
             p += 1
-            #  update button state
-            key_states[i] = True
-            #  if a midi keyboard...
+            #  if a midi keyboard
             if midi_mode:
-                #  send NoteOn for corresponding MIDI note
-                midi.send(NoteOn(midi_notes[i], 120))
-            #  if an HID keyboard...
+                #  send note number
+                midi.send(NoteOn(midi_notes[event.key_number], 120))
+            #  if hid keyboard
             if keyboard_mode:
-                #  send keyboard output for corresponding keycode
-                #  the default includes a modifier along with the keycode
-                keyboard.send(ctrl, shortcuts[i])
-            #  if the tile grid's index is at 9...
-            if p > 9:
-                #  reset the index to 0
-                p = 0
-        #  if the button is released...
-        if inputs.value and key_states[i] is True:
-            #  update button state
-            key_states[i] = False
-            #  if a midi keyboard...
+                #  send hid keyboard shortcut
+                keyboard.send(ctrl, shortcuts[event.key_number])
+        #  if a key is released
+        if event.released:
+            #  if a midi keyboard
             if midi_mode:
-                #  send NoteOff for corresponding MIDI note
-                midi.send(NoteOff(midi_notes[i], 120))
+                #  send note off message
+                midi.send(NoteOff(midi_notes[event.key_number], 120))
+    #  if sprite index is at end of tilegrid
+    if p > 9:
+        #  reset the index to 0
+        p = 0
