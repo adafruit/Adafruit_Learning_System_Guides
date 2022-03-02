@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Anne Barela for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Scramblepad - a random scramble keypad simulation for Adafruit MACROPAD.
 """

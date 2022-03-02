@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Bill Greiman for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Ladyada's logger modified by Bill Greiman to use the SdFat library
 
 // this is a generic logger that does checksum testing so the data written should be always good

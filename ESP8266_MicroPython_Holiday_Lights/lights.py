@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Tony DiCola for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # ESP8266 MicroPython smart holiday lights project code.
 # This will animate NeoPixels that can be controlled from the included
 # lights.html web page.
