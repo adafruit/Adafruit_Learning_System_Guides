@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Phillip Burgess for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Google Sheets to MagTag example: Weekly Planner.
 Gets tab-separated-value (TSV) spreadsheet from Google, displays task list
