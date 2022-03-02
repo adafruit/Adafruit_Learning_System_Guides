@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2022 Eva Herrada for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import os
 
 print("Starting SPDX Check")
