@@ -88,16 +88,12 @@ keys = keypad.Keys(key_pins, value_when_pressed=False, pull=True)
 p = 0 #  variable for tilegrid index
 
 while True:
-    #  update parrot sprite
-    parrot0_grid[0] = p
 
     #  get keypad inputs
     event = keys.events.get()
     if event:
         #  if a key is pressed..
         if event.pressed:
-            #  increase sprite index by 1
-            p += 1
             #  if a midi keyboard
             if midi_mode:
                 #  send note number
@@ -106,13 +102,13 @@ while True:
             if keyboard_mode:
                 #  send hid keyboard shortcut
                 keyboard.send(ctrl, shortcuts[event.key_number])
+            #  advance parrot index
+            p = (p + 1) % 10
+            #  update parrot bitmap
+            parrot0_grid[0] = p
         #  if a key is released
         if event.released:
             #  if a midi keyboard
             if midi_mode:
                 #  send note off message
                 midi.send(NoteOff(midi_notes[event.key_number], 120))
-    #  if sprite index is at end of tilegrid
-    if p > 9:
-        #  reset the index to 0
-        p = 0
