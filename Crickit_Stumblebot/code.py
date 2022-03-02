@@ -1,6 +1,11 @@
+# SPDX-FileCopyrightText: 2018 Dano Wall for Adafruit Industries
+# SPDX-FileCopyrightText: 2018 Anne Barela for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Stumble Bot, coded in CircuitPython
 # Using an Adafruit Circuit Playground Express, Crickit, and 2 servos
-# Dano Wall, Mike Barela for Adafruit Industries, MIT License, May, 2018
+# Dano Wall, Anne Barela for Adafruit Industries, MIT License, May, 2018
 #
 import time
 from digitalio import DigitalInOut, Direction, Pull

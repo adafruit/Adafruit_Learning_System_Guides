@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Collin Cunningham for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import board
 from rainbowio import colorwheel
 import neopixel

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #define PIEZO 3
 #define CLOCK2 10
 #define DATA2 9

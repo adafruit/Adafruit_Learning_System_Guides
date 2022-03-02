@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Kattni Rembor for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """Simple rainbow example for 30-pixel NeoPixel strip"""
 import digitalio
 import board

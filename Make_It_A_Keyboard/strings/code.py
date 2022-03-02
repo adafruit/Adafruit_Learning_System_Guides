@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Anne Barela for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import usb_hid
 from adafruit_circuitplayground.express import cpx
 from adafruit_hid.keyboard import Keyboard
@@ -8,7 +12,7 @@ layout = KeyboardLayoutUS(kbd)
 
 while True:
     if cpx.button_a:
-        # Type 'abc' followed by Enter (a newline).
+        # Type 'Jane Doe' followed by Enter (a newline).
         layout.write('Jane Doe\n')
         while cpx.button_a:
             pass

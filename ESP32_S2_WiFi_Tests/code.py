@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Brent Rubell for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import ipaddress
 import ssl
 import wifi

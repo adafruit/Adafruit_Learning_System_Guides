@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2021 Kattni Rembor for Adafruit Industries
+# SPDX-License-Identifier: Unlicense
 """
 CircuitPython Capacitive Two Touch Pin Example - Print to the serial console when a pin is touched.
 
@@ -5,7 +7,7 @@ Update TOUCH_PIN_ONE to the first touch-capable pin name for the board you're us
 Update TOUCH_PIN_TWO to the pin name for the second touch-capable pin.
 
 For example:
-If you are using A0 and A1 on a Feather RP2040, update TOUCH_PIN_ONE to A0 and TOUCH_PIN_TWO to A2.
+If you are using A0 and A1 on a Feather RP2040, update TOUCH_PIN_ONE to A0 and TOUCH_PIN_TWO to A1.
 """
 import time
 import board

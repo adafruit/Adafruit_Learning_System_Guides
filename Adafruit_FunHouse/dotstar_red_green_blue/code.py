@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Kattni Rembor for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+#
 """CircuitPython DotStar red, green, blue example for FunHouse"""
 import time
 import board

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 John Edgar Park for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Logo helps with screen orientation & positioning
 
 #define LOGO_TOP_WIDTH  59

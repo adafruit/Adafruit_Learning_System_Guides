@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Phillip Burgess for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /*
    JOY: Adafruit PyGamer or PyBadge as a friendly USB HID game controller.
    Requires Arcada, ArduinoJSON and Audio libraries.

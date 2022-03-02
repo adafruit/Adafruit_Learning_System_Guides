@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Erin St Blaine for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Fluttering Fairy Wings
 Adafruit invests time and resources providing this open source code.

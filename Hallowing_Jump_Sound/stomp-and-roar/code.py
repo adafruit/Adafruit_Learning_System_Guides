@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Phillip Burgess for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Stomp & roar sound example for Adafruit Hallowing. Functions as a crude
 pedometer, plays different sounds in response to steps & jumps. Step

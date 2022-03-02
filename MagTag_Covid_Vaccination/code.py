@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Eva Herrada for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 from adafruit_magtag.magtag import MagTag
 from adafruit_progressbar.progressbar import ProgressBar
 

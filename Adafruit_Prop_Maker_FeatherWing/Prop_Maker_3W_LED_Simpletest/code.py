@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Kattni Rembor for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """Simple rainbow swirl example for 3W LED"""
 import pwmio
 import board

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Anne Barela for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """Bluetooth Key Tracker."""
 from adafruit_ble import BLERadio
 from adafruit_led_animation.animation import Pulse, Solid

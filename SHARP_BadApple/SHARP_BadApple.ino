@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2020 Melissa LeBlanc-Williams for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Bad Apple for ESP32 with OLED SSD1306 | 2018 by Hackerspace-FFM.de | MIT-License.
 // Adapted for Sharp Memory display + Itsy Bitsy M4 - put video.hs on QSPI storage using CircuitPython
 #include "heatshrink_decoder.h"

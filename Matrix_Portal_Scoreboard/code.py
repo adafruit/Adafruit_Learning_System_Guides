@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 John Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Scoreboard matrix display
 # uses AdafruitIO to set scores and team names for a scoreboard
 # Perfect for cornhole, ping pong, and other games

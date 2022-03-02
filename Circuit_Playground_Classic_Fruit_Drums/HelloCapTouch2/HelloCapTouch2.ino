@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2020 Carter Nelson for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #include <Adafruit_CircuitPlayground.h>
 
 #define CAP_THRESHOLD   50

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2017 Phillip Burgess for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 //--------------------------------------------------------------------------
 // Animated 'sand' for Adafruit Feather.  Uses the following parts:
 //   - Feather 32u4 Basic Proto (adafruit.com/product/2771)

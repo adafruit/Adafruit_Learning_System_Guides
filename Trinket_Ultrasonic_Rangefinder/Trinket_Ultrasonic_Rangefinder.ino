@@ -1,3 +1,8 @@
+// SPDX-FileCopyrightText: 2018 Mikey Sklar for Adafruit Industries
+// SPDX-FileCopyrightText: 2018 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /*
  Demonstration sketch for Adafruit LCD backpack
  using MCP23008 I2C expander and Maxbotic LV-EZ1 Ultrasonic Sensor
@@ -18,7 +23,7 @@
    by Bruce Allen and Bill Gentles
 
  Version 2.0 Adds Arduino IDE 1.6.7 and greater Wire support 
-             Mike Barela for Adafruit Industries
+             Anne Barela for Adafruit Industries
 */
 
 // include the library code
@@ -95,7 +100,7 @@ uint16_t mode(uint16_t *x,int n){
       count++;
       i++;
     }
-    if( count > prevCount & count > maxCount) {
+    if( count > prevCount && count > maxCount) {
       mode=x[i];
       maxCount=count;
       bimodal=0;
@@ -111,4 +116,5 @@ uint16_t mode(uint16_t *x,int n){
     }
     return mode;
   }
+  return 0;
 }

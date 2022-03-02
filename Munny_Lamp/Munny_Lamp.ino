@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 John Edgar Park for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // MUNNY BLUEFRUIT LAMP
 // Feather M0 Bluefruit + Prop-Maker Wing and 3W RDB LED
 #include <string.h>

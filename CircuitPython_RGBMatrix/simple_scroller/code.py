@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Jeff Epler for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # This example implements a simple two line scroller using
 # Adafruit_CircuitPython_Display_Text. Each line has its own color
 # and it is possible to modify the example to use other fonts and non-standard

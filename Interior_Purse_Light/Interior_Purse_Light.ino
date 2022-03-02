@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2017 Mikey Sklar for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // constants won't change. They're used here to 
 // set pin numbers:
 const int buttonPin = 1;     // the number of the pushbutton pin

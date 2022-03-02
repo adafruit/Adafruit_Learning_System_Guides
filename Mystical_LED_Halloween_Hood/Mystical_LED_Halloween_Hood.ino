@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2017 Tony Sherwood for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 //fades all pixels subtly
 //code by Tony Sherwood for Adafruit Industries
 

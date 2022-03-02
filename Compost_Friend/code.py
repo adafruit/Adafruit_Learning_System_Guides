@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Isaac Wellish for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Author: Isaac Wellish
 # Code adapted from Tony Dicola's CircuitPython code using the DS18x20 temp sensor
 # as well as John Park's CircuitPython code determining soil moisture from nails

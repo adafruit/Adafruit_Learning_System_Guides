@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   update-images:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
     - name: Dump GitHub context
       env:
@@ -22,10 +22,10 @@ jobs:
 
     - uses: actions/checkout@v2.2.0
 
-    - name: Set up Python 3.9
+    - name: Set up Python 3.x
       uses: actions/setup-python@v1
       with:
-        python-version: 3.9
+        python-version: "3.x"
 
     - name: Checkout screenshot maker
       run: git clone --depth=1 https://github.com/circuitpython/CircuitPython_Library_Screenshot_Maker
@@ -49,4 +49,3 @@ jobs:
         git add *.png index.html
         git remote add origin https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
         if git commit -m"update images"; then git push -f origin HEAD:folder-images; fi
-

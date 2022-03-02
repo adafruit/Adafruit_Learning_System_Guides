@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2020 Carter Nelson for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+//
 #include <Adafruit_APDS9960.h>
 #include <Adafruit_BMP280.h>
 #include <Adafruit_LIS3MDL.h>

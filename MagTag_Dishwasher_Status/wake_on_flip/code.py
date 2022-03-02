@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Carter Nelson for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import time
 import board
 import alarm
@@ -33,12 +37,12 @@ _, y, _ = lis.acceleration
 # update based on orientation
 if y > 0:
     # upside up
-    bmp_file = "clean.bmp"
+    bmp_file = "/images/clean.bmp"
     rotation = 270
     irq_config = 0b01000100
 else:
     # upside down
-    bmp_file = "dirty.bmp"
+    bmp_file = "/images/dirty.bmp"
     rotation = 90
     irq_config = 0b01001000
 

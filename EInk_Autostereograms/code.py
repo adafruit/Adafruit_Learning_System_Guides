@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Mike Cogliano for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import os
 import time
 import json

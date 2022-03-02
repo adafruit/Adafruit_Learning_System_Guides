@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Anne Barela for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import time
 import adafruit_dotstar
 import board

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Kattni Rembor for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+#
 """Sensor demo for Adafruit Feather Sense. Prints data from each of the sensors."""
 import time
 import array

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Noe Ruiz for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 A CircuitPython 'multimedia' dial demo
 Uses a ItsyBitsy M0 + Rotary Encoder -> HID keyboard out with neopixel ring

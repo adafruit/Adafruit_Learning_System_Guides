@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Cedar Grove Studios for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # grayscale_spectrum.py
 # 2021-05-19 version 1.1
 # Copyright 2021 Cedar Grove Studios

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Limor Fried/ladyada for Adafruit Industries
+//
+// SPDX-License-Identifier: BSD-3-Clause
+
 // NeXT non-ADB Keyboard to USB converter
 // This will take an older NeXT keyboard, talk to it, and turn the keycodes into a USB keyboard
 // Requires an Arduino Micro for the USB portion - but could be ported to another micro fairly easily

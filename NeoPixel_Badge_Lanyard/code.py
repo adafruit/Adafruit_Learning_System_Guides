@@ -1,3 +1,9 @@
+# SPDX-FileCopyrightText: 2019 Phillip Burgess for Adafruit Industries
+# SPDX-FileCopyrightText: 2019 Dan Halbert for Adafruit Industries
+# SPDX-FileCopyrightText: 2019 Erin St Blaine for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """ FancyLED Palette and Color Picker Control with BlueFruit App
     Code by Phil Burgess, Dan Halbert & Erin St Blaine for Adafruit Industries
 """

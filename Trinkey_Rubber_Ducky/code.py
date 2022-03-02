@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: Copyright (c) 2021 Dylan Herrada for Adafruit Industries
+# SPDX-FileCopyrightText: Copyright (c) 2021 Eva Herrada for Adafruit Industries
 #
 # SPDX-License-Identifier: Unlicense
 import time

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Liz Clark for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Adafruit PyPortal display of Twin Peaks
 # Liz (BlitzCityDIY) for Adafruit Industries  MIT License
 # Tutorial: https://learn.adafruit.com/twin-peaks-light-reactive-pyportal-picture-frame

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Phillip Burgess for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Image converter script for POV LED poi project.  Reads one or more images
 # as input, generates tables which can be copied-and-pasted or redirected
 # to a .h file, e.g.:

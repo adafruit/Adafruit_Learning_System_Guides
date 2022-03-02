@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Kattni Rembor for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Drive NeoPixels on the NeoPixels Block on Crickit FeatherWing
 import time
 from rainbowio import colorwheel

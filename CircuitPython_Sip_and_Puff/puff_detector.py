@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Bryan Siepert for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import time
 import os
 import json

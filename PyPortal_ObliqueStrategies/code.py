@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Collin Cunningham for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 This code will display a random strategy from strategies.py when the
 PyPortal screen is pressed. See the original Oblique Strategies

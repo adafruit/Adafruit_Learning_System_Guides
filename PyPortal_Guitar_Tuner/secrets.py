@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Liz Clark for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 secrets = {
     'ssid' : 'your-ssid-here',
     'password' : 'your-password-here',

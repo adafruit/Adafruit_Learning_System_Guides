@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Kattni Rembor for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import time
 import board
 import adafruit_lis3dh

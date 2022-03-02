@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 Phillip Burgess for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // "Minotaur Maze" plaything for Adafruit Hallowing. Uses ray casting,
 // DMA and related shenanigans to smoothly move about a 3D maze.
 // Tilt Hallowing to turn right/left and move forward/back.

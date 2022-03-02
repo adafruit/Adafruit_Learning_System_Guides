@@ -1,3 +1,10 @@
+// SPDX-FileCopyrightText: 2009 David A. Mellis
+// SPDX-FileCopyrightText: 2009 Randall Bohn
+// SPDX-FileCopyrightText: 2012 William Phelps
+// SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // this sketch turns the Arduino into a AVRISP
 // using the following pins:
 // 10: slave reset

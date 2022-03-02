@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Mikey Sklar for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # 'Cyber falls' sketch
 # Creates a fiery rain-like effect on multiple NeoPixel strips.
 # Requires Adafruit Trinket and NeoPixel strips.  Strip length is

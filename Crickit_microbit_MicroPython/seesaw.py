@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Limor Fried for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Adafruit Seesaw / CRICKIT driver for MicroPython
 # MIT License by Adafruit Industries Limor Fried
 # Copy onto the micro:bit with main.py using Mu Files icon

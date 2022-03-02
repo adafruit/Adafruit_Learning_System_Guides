@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2021 Melissa LeBlanc-Williams for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #include <Adafruit_DotStar.h>
 #include <Adafruit_GFX.h>    // Core graphics library
 #include <Adafruit_ST7789.h> // Hardware-specific library for ST7789

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Jeff Epler for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # pylint: disable=redefined-outer-name,no-self-use,broad-except,try-except-raise,too-many-branches,too-many-statements,unused-import
 
 import gc

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Kattni Rembor for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import pulseio
 import board
 import adafruit_irremote

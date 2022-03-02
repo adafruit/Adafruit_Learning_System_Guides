@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Adafruit 32u4 Feather Color Sensing Holiday Lights
 // See the full guide at:
 //   https://learn.adafruit.com/feather-holiday-lights/overview

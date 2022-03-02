@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Brent Rubell for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 'mib_photo_sensor_night_light_sensor.py'.
 

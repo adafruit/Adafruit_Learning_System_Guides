@@ -1,43 +1,47 @@
-from adafruit_circuitplayground.express import cpx
+# SPDX-FileCopyrightText: 2017 Kattni Rembor for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
+from adafruit_circuitplayground import cp
 
 while True:
-    if cpx.switch:
+    if cp.switch:
         print("Slide switch off!")
-        cpx.pixels.fill((0, 0, 0))
-        cpx.stop_tone()
+        cp.pixels.fill((0, 0, 0))
+        cp.stop_tone()
         continue
-    if cpx.touch_A4:
+    if cp.touch_A4:
         print('Touched A4!')
-        cpx.pixels.fill((15, 0, 0))
-        cpx.start_tone(262)
-    elif cpx.touch_A5:
+        cp.pixels.fill((15, 0, 0))
+        cp.start_tone(262)
+    elif cp.touch_A5:
         print('Touched A5!')
-        cpx.pixels.fill((15, 5, 0))
-        cpx.start_tone(294)
-    elif cpx.touch_A6:
+        cp.pixels.fill((15, 5, 0))
+        cp.start_tone(294)
+    elif cp.touch_A6:
         print('Touched A6!')
-        cpx.pixels.fill((15, 15, 0))
-        cpx.start_tone(330)
-    elif cpx.touch_A7:
+        cp.pixels.fill((15, 15, 0))
+        cp.start_tone(330)
+    elif cp.touch_A7:
         print('Touched A7!')
-        cpx.pixels.fill((0, 15, 0))
-        cpx.start_tone(349)
-    elif cpx.touch_A1:
+        cp.pixels.fill((0, 15, 0))
+        cp.start_tone(349)
+    elif cp.touch_A1:
         print('Touched A1!')
-        cpx.pixels.fill((0, 15, 15))
-        cpx.start_tone(392)
-    elif cpx.touch_A2 and not cpx.touch_A3:
+        cp.pixels.fill((0, 15, 15))
+        cp.start_tone(392)
+    elif cp.touch_A2 and not cp.touch_A3:
         print('Touched A2!')
-        cpx.pixels.fill((0, 0, 15))
-        cpx.start_tone(440)
-    elif cpx.touch_A3 and not cpx.touch_A2:
+        cp.pixels.fill((0, 0, 15))
+        cp.start_tone(440)
+    elif cp.touch_A3 and not cp.touch_A2:
         print('Touched A3!')
-        cpx.pixels.fill((5, 0, 15))
-        cpx.start_tone(494)
-    elif cpx.touch_A2 and cpx.touch_A3:
+        cp.pixels.fill((5, 0, 15))
+        cp.start_tone(494)
+    elif cp.touch_A2 and cp.touch_A3:
         print('Touched "8"!')
-        cpx.pixels.fill((15, 0, 15))
-        cpx.start_tone(523)
+        cp.pixels.fill((15, 0, 15))
+        cp.start_tone(523)
     else:
-        cpx.pixels.fill((0, 0, 0))
-        cpx.stop_tone()
+        cp.pixels.fill((0, 0, 0))
+        cp.stop_tone()

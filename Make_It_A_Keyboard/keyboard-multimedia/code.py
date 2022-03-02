@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Anne Barela for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import usb_hid
 from adafruit_circuitplayground.express import cpx
 from adafruit_hid.consumer_control import ConsumerControl

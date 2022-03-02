@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Dan Halbert for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # CircuitPython NeoPixel Color Picker Example
 
 import board

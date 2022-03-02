@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2017 Noe Ruiz for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #include <Keyboard.h>
 #include <Adafruit_ST7735.h>
 #include <SPI.h>

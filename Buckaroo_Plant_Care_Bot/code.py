@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 John Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Bonsai Buckaroo + CLUE Plant Care Bot
 
 import time

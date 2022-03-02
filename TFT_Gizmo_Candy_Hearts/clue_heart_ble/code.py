@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Carter Nelson for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Display stuff
 import board
 import displayio
@@ -27,7 +31,7 @@ ble._adapter.name = BLE_NAME #pylint: disable=protected-access
 display = board.DISPLAY
 
 # Load the candy heart BMP
-bitmap, palette = adafruit_imageload.load("/heart_bw.bmp",
+bitmap, palette = adafruit_imageload.load("/images/heart_bw.bmp",
                                           bitmap=displayio.Bitmap,
                                           palette=displayio.Palette)
 
@@ -36,7 +40,7 @@ heart = displayio.TileGrid(bitmap, pixel_shader=palette)
 # Set up message text
 LINE1_MAX = 9
 LINE2_MAX = 5
-font = bitmap_font.load_font("/Multicolore_36.bdf")
+font = bitmap_font.load_font("/fonts/Multicolore_36.bdf")
 line1 = label.Label(font, text="?"*LINE1_MAX)
 line2 = label.Label(font, text="?"*LINE2_MAX)
 line1.anchor_point = (0.5, 0)    # middle top

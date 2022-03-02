@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 FoamyGuy for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 This example script shows the usage of servos, LEDs, and buttons all
 used simultaneously without interrupting each other.

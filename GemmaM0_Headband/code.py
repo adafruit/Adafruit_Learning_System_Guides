@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Gemma M0 Onchip Temperature Sensor
 # Project by Kathy Ceceri
 # CircuitPython by Anne Barela

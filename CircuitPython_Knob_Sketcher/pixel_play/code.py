@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Carter Nelson for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Import the needed libraries
 import time
 import random

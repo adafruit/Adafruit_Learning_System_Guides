@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Phillip Burgess for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Animated eyes for Adafruit MONSTER M4SK and HALLOWING M4 dev boards.
 // This code is pretty tightly coupled to the resources of these boards
 // (one or two ST7789 240x240 pixel TFTs on separate SPI buses, and a

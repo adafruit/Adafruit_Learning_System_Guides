@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /*********************************************************************
  This is an example for our nRF51822 based Bluefruit LE modules
  Pick one up today in the adafruit shop! adafruit.com

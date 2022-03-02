@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Phillip Burgess for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #if 1 // Change to 0 to disable this code (must enable ONE user*.cpp only!)
 
 #include "globals.h"

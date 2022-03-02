@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Phillip Burgess for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /*-----------------------------------------------------------------------
   POV LED bike wheel sketch.  Uses the following Adafruit parts:
 

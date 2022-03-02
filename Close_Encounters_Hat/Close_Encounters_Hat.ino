@@ -1,7 +1,14 @@
+// SPDX-FileCopyrightText: 2017 Becky Stern for Adafruit Industries
+// SPDX-FileCopyrightText: 2017 Anne Barela for Adafruit Industries
+// SPDX-FileCopyrightText: 2017 T Main for Adafruit Industries
+// SPDX-FileCopyrightText: 2017 Leslie Birch for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /* 
 Close Encounters hat with 10 neopixels by Leslie Birch for Adafruit Industries.
 Notes play with each corresponding light. 
-Based on code by Becky Stern, Mike Barela and T Main for Adafruit Industries
+Based on code by Becky Stern, Anne Barela and T Main for Adafruit Industries
 http://learn.adafruit.com/adafruit-trinket-modded-stuffed-animal/animal-sounds
 */
 

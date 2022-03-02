@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Carter Nelson for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 #======
 # NOTE: Run this on your PC, not the Matrix Portal.
 #======

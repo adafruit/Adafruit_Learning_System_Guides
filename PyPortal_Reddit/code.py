@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Limor Fried for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 This example will access the reddit API, grab a number like subreddit followers
 and display it on a screen

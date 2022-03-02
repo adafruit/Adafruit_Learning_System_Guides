@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2017 Limor Fried for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # CircuitPython IO demo #1 - General Purpose I/O
 
 import time

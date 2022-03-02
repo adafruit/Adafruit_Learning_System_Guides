@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 John Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Run on Metro M4 Airlift w RGB Matrix shield and 64x32 matrix display
 # show current value of Bitcoin in USD
 

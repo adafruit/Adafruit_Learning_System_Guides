@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Mikey Sklar for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # This script requires a Raspberry Pi 2, 3 or Zero. Circuit Python must
 # be installed and it is strongly recommended that you use the latest
 # release of Raspbian.

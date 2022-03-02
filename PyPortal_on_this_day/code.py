@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Isaac Wellish for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 'of this day' demo
 Display notable info about famous electronics-related peoples

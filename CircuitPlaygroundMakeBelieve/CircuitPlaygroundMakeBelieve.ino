@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2020 Limor Fried for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // "Make-Believe" sketch for Adafruit Circuit Playground.
 // Lights and sounds react to motion and taps.
 

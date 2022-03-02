@@ -1,7 +1,8 @@
 """
 Google Sheets to MagTag example: Weekly Planner.
-Gets JSON spreadsheet from Google, displays task list from today's column.
-This example does NOT deep sleep, a USB power connection is recommended.
+Gets tab-separated-value (TSV) spreadsheet from Google, displays task list
+from today's column. This example does NOT deep sleep, a USB power connection
+is recommended.
 Fonts from Xorg project.
 """
 
@@ -14,7 +15,7 @@ from adafruit_magtag.magtag import MagTag
 
 # CONFIGURABLE SETTINGS and ONE-TIME INITIALIZATION ------------------------
 
-JSON_URL = 'https://spreadsheets.google.com/feeds/cells/1vk6jE1-6CMV-hjDgBk-PuFLgG64YemyDoREhGrA6uGI/1/public/full?alt=json'
+TSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR1WjUKz35-ek6SiR5droDfvPp51MTds4wUs57vEZNh2uDfihSTPhTaiiRovLbNe1mkeRgurppRJ_Zy/pub?output=tsv'
 TWELVE_HOUR = True # If set, show 12-hour vs 24-hour (e.g. 3:00 vs 15:00)
 DD_MM = False      # If set, show DD/MM instead of MM/DD dates
 DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday',
@@ -91,21 +92,22 @@ while True:
         NOW = rtc.RTC().datetime
 
         print('Updating tasks')
-        RESPONSE = MAGTAG.network.fetch(JSON_URL)
+        RESPONSE = MAGTAG.network.fetch(TSV_URL)
         if RESPONSE.status_code == 200:
-            JSON_DATA = RESPONSE.json()
+            TSV_DATA = RESPONSE.text
             print('OK')
 
-        ENTRIES = JSON_DATA['feed']['entry'] # List of cell data
+        # Split text response into separate lines
+        LINES = TSV_DATA.split('\r\n')
 
         # tm_wday uses 0-6 for Mon-Sun, we want 1-7 for Sun-Sat
         COLUMN = (NOW.tm_wday + 1) % 7 + 1
 
         TASK_LIST = '' # Clear task list string
-        for entry in ENTRIES:
-            cell = entry['gs$cell']
-            if int(cell['row']) > 1 and int(cell['col']) is COLUMN:
-                TASK_LIST += cell['$t'] + '\n' # Task + newline character
+        for line in LINES[1:]: # Skip first line -- days of week in sheet
+            cells = line.split("\t") # Tab-separated!
+            if len(cells) >= COLUMN:
+                TASK_LIST += cells[COLUMN - 1] + '\n'
 
         # Refreshing the display is jarring, so only do it if the task list
         # or day has changed. This requires preserving state between passes,

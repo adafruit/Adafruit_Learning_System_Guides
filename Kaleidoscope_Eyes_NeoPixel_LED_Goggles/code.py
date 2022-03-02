@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2017 Mikey Sklar for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 #
 # Kaleidoscope_Eyes_NeoPixel_LED_Goggles.py
 #

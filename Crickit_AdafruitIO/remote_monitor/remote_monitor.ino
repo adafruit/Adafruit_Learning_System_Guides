@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 Dave Astels for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Crickit + Adafruit IO Publish Example
 //
 // Adafruit invests time and resources providing this open source code.

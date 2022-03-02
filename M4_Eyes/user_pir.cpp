@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2020 Phillip Burgess for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #if 0 // Change to 1 to enable this code (must enable ONE user*.cpp only!)
 
 // PIR motion sensor on pin 3 makes eyes open when motion is detected.

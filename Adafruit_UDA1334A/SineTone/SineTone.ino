@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2017 Limor Fried for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /*
  This example generates a sine wave based tone at a specified frequency
  and sample rate. Then outputs the data using the I2S interface.

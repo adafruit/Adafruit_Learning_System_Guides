@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Carter Nelson for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Example code for using analog feedback value to seek a position
 import board
 import pwmio

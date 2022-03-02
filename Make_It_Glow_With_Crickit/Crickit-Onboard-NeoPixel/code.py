@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Anne Barela for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Using Crickit's onboard NeoPixel
 # See http://www.color-hex.com/ for more colors and find your fav!
 from adafruit_crickit import crickit

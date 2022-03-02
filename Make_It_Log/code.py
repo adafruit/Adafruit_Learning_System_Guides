@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Anne Barela for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Circuit Playground Express Data Time/Light Intensity/Temp
 # Log data to a spreadsheet on-screen
 # Open Spreadsheet beforehand and position to start (A,1)

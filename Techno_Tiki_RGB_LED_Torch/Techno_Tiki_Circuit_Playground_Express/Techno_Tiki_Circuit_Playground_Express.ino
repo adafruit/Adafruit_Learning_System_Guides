@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 Tony DiCola for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Techno-Tiki RGB LED Torch with IR Remote Control for Circuit Playground Express
 // This version ONLY works with Circuit Playground Express boards:
 //   https://www.adafruit.com/product/3333

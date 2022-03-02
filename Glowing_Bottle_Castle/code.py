@@ -1,3 +1,8 @@
+# SPDX-FileCopyrightText: 2020 Erin St Blaine for Adafruit Industries
+# SPDX-FileCopyrightText: 2020 Limor Fried for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Bottle Piano with Capacitive Touch
 Adafruit invests time and resources providing this open source code.

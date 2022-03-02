@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2016 James DeVito for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+//
 // COMMON SETTINGS
 // ----------------------------------------------------------------------------------------------
 // These settings are used in both SW UART, HW UART and SPI mode

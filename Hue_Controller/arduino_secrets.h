@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Limor Fried for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #define WIFI_SSID "ssid"
 #define WIFI_PASS "password"
 #define HUE_USER "foobar"

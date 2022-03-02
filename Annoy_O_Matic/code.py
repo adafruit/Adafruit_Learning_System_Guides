@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 John Edgar Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Annoy-O-Matic Sound Prank Device
 # choose from a variety of sounds and timings to drive your victim bonkers
 import time

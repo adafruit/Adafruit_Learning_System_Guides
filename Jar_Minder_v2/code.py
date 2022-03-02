@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Dave Astels for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import digitalio
 import board
 

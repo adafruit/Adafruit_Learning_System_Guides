@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Kattni Rembor for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+//
 #define TC_PIN A0          // set to ADC pin used
 #define AREF 3.3           // set to AREF, typically board voltage like 3.3 or 5.0
 #define ADC_RESOLUTION 10  // set to ADC bit resolution, 10 is default

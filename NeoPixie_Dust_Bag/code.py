@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2017 Mikey Sklar for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # NeoPixie Dust Bag
 # learn.adafruit.com/neopixel-pixie-dust-bag
 
@@ -22,10 +26,10 @@ delay_mult = 8  # Randomization multiplier, delay speed of the effect
 pixels = neopixel.NeoPixel(
     neo_pin, pixel_count, brightness=.4, auto_write=False)
 
-oldstate = True  # counting touch sensor button pushes
+oldstate = False  # counting touch sensor button pushes
 showcolor = 0  # color mode for cycling
 
-# initialize capacitive touch input
+# initialize external capacitive touch pad (active high)
 button = digitalio.DigitalInOut(touch_pin)
 button.direction = digitalio.Direction.INPUT
 button.pull = digitalio.Pull.UP
@@ -83,19 +87,17 @@ while True:
     # get the current button state
     newstate = button.value
 
-    # Check if state changed from high to low (button press).
+    # Check if state changed from low to high (button/touchpad press).
     if newstate and not oldstate:
-        # Short delay to debounce button.
-        time.sleep(0.020)
-
-        # Check if button is still low after debounce.
-        newstate = button.value
-
-    if not newstate:
+        # cycle to next color
         showcolor += 1
 
-    if showcolor > 4:
-        showcolor = 0
+        # limit the cycle to the 5 colors
+        if showcolor > 4:
+            showcolor = 0
+
+        # give feedback to the REPL to debug the touch pad
+        # print("Color:", showcolor)
 
     # Set the last button state to the old state.
     oldstate = newstate

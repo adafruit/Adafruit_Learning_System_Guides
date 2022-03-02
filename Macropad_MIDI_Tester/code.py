@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2021 John Park for Adafruit Industries
+# SPDX-FileCopyrightText: 2022 John Park for Adafruit Industries
 # SPDX-License-Identifier: MIT
 # Macropad MIDI Tester
 # Play MIDI notes with keys
@@ -10,6 +10,7 @@ from rainbowio import colorwheel
 CC_NUM = 74  # select your CC number
 
 macropad = MacroPad(rotation=180)  # create the macropad object, rotate orientation
+macropad.display.auto_refresh = False  # avoid lag
 
 # --- Pixel setup --- #
 key_color = colorwheel(120)  # fill with cyan to start
@@ -38,20 +39,20 @@ last_knob_pos = macropad.encoder  # store knob position state
 
 
 while True:
+    while macropad.keys.events:  # check for key press or release
+        key_event = macropad.keys.events.get()
+        if key_event:
+            if key_event.pressed:
+                key = key_event.key_number
+                macropad.midi.send(macropad.NoteOn(midi_notes[key], 120))  # send midi noteon
+                macropad.pixels[key] = colorwheel(90)  # light up green
+                text_lines[1].text = "NoteOn:{}".format(midi_notes[key])
 
-    key_event = macropad.keys.events.get()  # check for key press or release
-    if key_event:
-        if key_event.pressed:
-            key = key_event.key_number
-            macropad.midi.send(macropad.NoteOn(midi_notes[key], 120))  # send midi noteon
-            macropad.pixels[key] = colorwheel(90)  # light up green
-            text_lines[1].text = "NoteOn:{}".format(midi_notes[key])
-
-        if key_event.released:
-            key = key_event.key_number
-            macropad.midi.send(macropad.NoteOff(midi_notes[key], 0))
-            macropad.pixels[key] = key_color  # return to color set by encoder bank value
-            text_lines[1].text = "NoteOff:{}".format(midi_notes[key])
+            if key_event.released:
+                key = key_event.key_number
+                macropad.midi.send(macropad.NoteOff(midi_notes[key], 0))
+                macropad.pixels[key] = key_color  # return to color set by encoder bank value
+                text_lines[1].text = "NoteOff:{}".format(midi_notes[key])
 
     macropad.encoder_switch_debounced.update()  # check the knob switch for press or release
     if macropad.encoder_switch_debounced.pressed:
@@ -91,3 +92,5 @@ while True:
             text_lines[0].text = ("Mode: %s %d" % (mode_text[mode], midi_values[mode]-8))
 
         last_knob_pos = macropad.encoder
+
+    macropad.display.refresh()

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Limor Fried for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 This example will access the twitter follow button API, grab a number like
 the number of followers... and display it on a screen!

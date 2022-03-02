@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Tony DiCola for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Track Your Treats - Ultimate GPS Shield Halloween Candy Route Tracker
 // Author: Tony DiCola
 //

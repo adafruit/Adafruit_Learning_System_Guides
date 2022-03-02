@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Carter Nelson for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Example code for calibrating analog feedback values to servo range
 
 import time

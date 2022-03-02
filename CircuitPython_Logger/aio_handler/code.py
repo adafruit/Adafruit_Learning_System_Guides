@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Dave Astels for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Adafruit IO based message handler for CircuitPython logging.
 

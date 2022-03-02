@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 John Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # MP3 playback with tap trigger
 # Works on Feather M4 (or other M4 based boards) with Propmaker
 import time

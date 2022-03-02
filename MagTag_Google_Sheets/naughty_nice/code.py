@@ -1,6 +1,7 @@
 """
 Google Sheets to MagTag example: Naughty or Nice?
-Gets JSON spreadsheet from Google, displays names from one column or other.
+Gets tab-separated-value (TSV) spreadsheet from Google, displays names from
+one column or other.
 "Smart cursive" font by Thomas A. Fine, helvB12 from Xorg fonts.
 """
 
@@ -13,7 +14,7 @@ from adafruit_magtag.magtag import MagTag
 
 # CONFIGURABLE SETTINGS and ONE-TIME INITIALIZATION ------------------------
 
-JSON_URL = 'https://spreadsheets.google.com/feeds/cells/1Tk943egFNDV7TmXGL_VspYyWKELeJO8gguAmNSgLDbk/1/public/full?alt=json'
+TSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTA8pXQodbEiz5idGT21YkL1Vy8waW0aAHM1uX7D4TqBq6DrUU8qXVlON1QVaWSlmoC3OBL4Iokyiyy/pub?output=tsv'
 NICE = True        # Use 'True' for nice list, 'False' for naughty
 TWELVE_HOUR = True # If set, show 12-hour vs 24-hour (e.g. 3:00 vs 15:00)
 DD_MM = False      # If set, show DD/MM instead of MM/DD dates
@@ -85,9 +86,9 @@ try:
     print(NOW)
 
     print('Updating names')
-    RESPONSE = MAGTAG.network.fetch(JSON_URL)
+    RESPONSE = MAGTAG.network.fetch(TSV_URL)
     if RESPONSE.status_code == 200:
-        JSON_DATA = RESPONSE.json()
+        TSV_DATA = RESPONSE.text
         print('OK')
 
     # Set the "Updated" date and time label
@@ -98,26 +99,26 @@ try:
     MAGTAG.set_text('Updated %s %s' % (DATE, hh_mm(NOW, TWELVE_HOUR)), 1,
                     auto_refresh=False)
 
-    ENTRIES = JSON_DATA['feed']['entry'] # List of cell data
+    # Split text response into separate lines
+    LINES = TSV_DATA.split('\r\n')
 
     # Scan cells in row #1 to find the column number for naughty vs nice.
     # This allows the order of columns in the spreadsheet to be changed,
     # though they still must have a "Naughty" or "Nice" heading at top.
-    for entry in ENTRIES:
-        cell = entry['gs$cell']
-        if int(cell['row']) == 1:     # Only look at top row
-            head = cell['$t'].lower() # Case-insensitive compare
-            if ((NICE and head == 'nice') or (not NICE and head == 'naughty')):
-                NAME_COLUMN = int(cell['col'])
+    cells = LINES[0].split("\t") # Tab-separated values
+    for column, entry in enumerate(cells):
+        head = entry.lower() # Case-insensitive compare
+        if ((NICE and head == 'nice') or (not NICE and head == 'naughty')):
+            NAME_COLUMN = column
 
     # Now that we know which column number contains the names we want,
     # a second pass is made through all the cells. Items where row > 1
     # and column is equal to NAME_COLUMN are joined in a string.
     NAME_LIST = '' # Clear name list
-    for entry in ENTRIES:
-        cell = entry['gs$cell']
-        if int(cell['row']) > 1 and int(cell['col']) is NAME_COLUMN:
-            NAME_LIST += cell['$t'] + '\n' # Name + newline character
+    for line in LINES[1:]: # Skip first line -- naughty/nice/notes in sheet
+        cells = line.split("\t") # Tab-separated
+        if len(cells) >= NAME_COLUMN and cells[NAME_COLUMN] != "":
+            NAME_LIST += cells[NAME_COLUMN] + '\n' # Name + newline character
 
     MAGTAG.set_text(NAME_LIST) # Update list on the display
 

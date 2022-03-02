@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Mikey Sklar for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Example for RC timing reading for Raspberry Pi
 # using CircuitPython Libraries
 

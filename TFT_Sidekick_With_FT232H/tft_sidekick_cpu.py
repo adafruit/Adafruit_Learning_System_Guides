@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Carter Nelson for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 from collections import deque
 import psutil
 # Blinka CircuitPython

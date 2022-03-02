@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2017 Phillip Burgess for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # NeoPixel earrings example.  Makes a nice blinky display with just a
 # few LEDs on at any time...uses MUCH less juice than rainbow display!
 

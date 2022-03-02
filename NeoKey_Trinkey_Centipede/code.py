@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Eva Herrada for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import time
 import math
 import board

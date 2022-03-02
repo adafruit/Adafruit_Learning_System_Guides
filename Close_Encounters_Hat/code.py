@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2017 Mikey Sklar for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Close Encounters Hat with 10 NeoPixels
 # ported from Leslie Birch's Arduino to CircuitPython
 #

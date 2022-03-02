@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Jeff Epler for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import random
 from adafruit_led_animation.animation.rainbowcomet import RainbowComet
 from adafruit_led_animation.helper import PixelMap

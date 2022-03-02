@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Smartphone-activated audio gizmo (e.g. talking dog collar).
 // Uses the following Adafruit parts:
 //

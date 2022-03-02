@@ -1,4 +1,10 @@
-# Music Box code in CircuitPython - Dano Wall and Mike Barela
+# SPDX-FileCopyrightText: 2019 Dano Wall for Adafruit Industries
+# SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+# SPDX-FileCopyrightText: 2019 Limor Fried for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
+# Music Box code in CircuitPython - Dano Wall and Anne Barela
 # Revised by Ladyada 2019-01-16
 
 from adafruit_crickit import crickit

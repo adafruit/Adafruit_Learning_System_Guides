@@ -1,3 +1,8 @@
+# SPDX-FileCopyrightText: 2019 Limor Fried for Adafruit Industries
+# SPDX-FileCopyrightText: 2020 Liz Clark for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import time
 import json
 from calendar import holidays

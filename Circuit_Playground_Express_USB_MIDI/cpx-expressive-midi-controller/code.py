@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Kevin J. Walters for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 ### cpx-expressive-midi-controller v1.2
 ### CircuitPython (on CPX) MIDI controller using the seven touch pads
 ### and accelerometer for modulation (cc1) and pitch bend

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Kattni Rembor for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """Simple example to play a wave file"""
 # This example only works on Feathers that have analog audio out!
 import digitalio

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Mikey Sklar for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # 3D_Printed_Guardian_Sword
 # https://learn.adafruit.com/breath-of-the-wild-guardian-sword-led-3d-printed
 

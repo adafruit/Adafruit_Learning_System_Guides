@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 Dave Astels for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /************************ Adafruit IO Config *******************************/
 
 // visit io.adafruit.com if you need to create an account,

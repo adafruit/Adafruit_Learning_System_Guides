@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2011 Limor Fried/ladyada for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // thermistor-1.ino Simple test program for a thermistor for Adafruit Learning System
 // https://learn.adafruit.com/thermistor/using-a-thermistor by Limor Fried, Adafruit Industries
 // MIT License - please keep attribution and consider buying parts from Adafruit

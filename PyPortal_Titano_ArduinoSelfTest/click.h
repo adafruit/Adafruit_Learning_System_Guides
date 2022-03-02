@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2020 gmeader for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #define SAMPLE_RATE 16000
 
 const uint8_t clickaudio[] = {

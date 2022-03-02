@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 John Edgar Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Turtle Gizmo Snowflakes
 #==| Turtle Gizmo Setup start |========================================
 import time

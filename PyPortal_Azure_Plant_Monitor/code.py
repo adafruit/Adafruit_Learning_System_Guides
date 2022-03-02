@@ -1,3 +1,8 @@
+# SPDX-FileCopyrightText: 2019 Brent Rubell for Adafruit Industries
+# SPDX-FileCopyrightText: 2020 Jim Bennett for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 PyPortal Azure IoT Plant Monitor
 ====================================================

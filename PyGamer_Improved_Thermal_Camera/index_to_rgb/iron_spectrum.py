@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Cedar Grove Studios for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # iron_spectrum.py
 # 2021-05-27 version 1.2
 # Copyright 2021 Cedar Grove Studios

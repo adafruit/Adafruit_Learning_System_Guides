@@ -1,3 +1,9 @@
+// SPDX-FileCopyrightText: 2011 Limor Fried for Adafruit Industries
+// SPDX-FileCopyrightText: 2012 Tom Igoe
+// SPDX-FileCopyrightText: 2018 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /*
   SD card test for WIZ5500 Compatible Ethernet Boards
 
@@ -14,7 +20,7 @@
 
  created  28 Mar 2011 by Limor Fried
  modified 9 Apr 2012 by Tom Igoe
- modified 12 Apr 2018 by Mike Barela
+ modified 12 Apr 2018 by Anne Barela
  */
 // include the SD library:
 #include <SPI.h>

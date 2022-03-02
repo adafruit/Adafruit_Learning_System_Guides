@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #include "Paint.h"
 
 Paint::Paint(int8_t x, int8_t y){

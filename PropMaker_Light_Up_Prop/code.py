@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Kattni Rembor for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Prop-Maker based Light Up Prop.
 Adafruit invests time and resources providing this open source code.

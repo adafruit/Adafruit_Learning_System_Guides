@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 John Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Pathfinder Touch Screen
 # press screen to advance to new image/sound
 # by John Park for Adafruit and Sugru

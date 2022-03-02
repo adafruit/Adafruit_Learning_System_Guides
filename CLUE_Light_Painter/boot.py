@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Phillip Burgess for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Check for connection between pin and GND on hard boot (power-on or reset).
 If NO connection: storage is remounted as read/write so the light painter

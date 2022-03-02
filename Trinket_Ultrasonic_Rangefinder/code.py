@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Mikey Sklar for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 This Code uses the:
 * Adafruit LCD backpack using MCP23008 I2C expander

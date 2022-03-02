@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Emma Humphries for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # MACROPAD Hotkeys example: Firefox web browser for Linux
 
 from adafruit_hid.keycode import Keycode # REQUIRED if using Keycode.* values

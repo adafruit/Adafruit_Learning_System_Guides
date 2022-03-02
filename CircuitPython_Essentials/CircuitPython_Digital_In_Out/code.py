@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Kattni Rembor for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """CircuitPython Essentials Digital In Out example"""
 import time
 import board

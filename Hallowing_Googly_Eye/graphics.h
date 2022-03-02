@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 Phillip Burgess for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #define EYE_RADIUS 64.0  // Radius of eye, floating-point pixel units
 
 const uint8_t borderData[128][128] = {

@@ -14,7 +14,7 @@ Adafruit invests time and resources providing this open source code,
 please support Adafruit and open-source hardware by purchasing
 products from [Adafruit](https://www.adafruit.com)!
  
-MIT license, designed and guide written by Dano Wall, code by Mike Barela
+MIT license, designed and guide written by Dano Wall, code by Anne Barela
 
 All text above, and the splash screen below must be included in any redistribution
 

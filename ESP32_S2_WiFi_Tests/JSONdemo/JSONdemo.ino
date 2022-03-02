@@ -1,3 +1,9 @@
+// SPDX-FileCopyrightText: 2014 Benoit Blanchon
+// SPDX-FileCopyrightText: 2014 Arturo Guadalupi
+// SPDX-FileCopyrightText: 2020 Brent Rubell for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /*
 This example creates a client object that connects and transfers
 data using always SSL, then shows how to parse a JSON document in an HTTP response.
@@ -15,10 +21,20 @@ last revision November 2015
 
 // uncomment the next line if you have a 128x32 OLED on the I2C pins
 //#define USE_OLED
+// uncomment the next line to deep sleep between requests
+//#define USE_DEEPSLEEP
 
 #if defined(USE_OLED)
+// Some boards have TWO I2C ports, how nifty. We should use the second one sometimes
+#if defined(ARDUINO_ADAFRUIT_QTPY_ESP32S2) \
+    || defined(ARDUINO_ADAFRUIT_QTPY_ESP32_PICO)
+  #define OLED_I2C_PORT &Wire1
+#else
+  #define OLED_I2C_PORT &Wire
+#endif
+
   #include <Adafruit_SSD1306.h>
-  Adafruit_SSD1306 display = Adafruit_SSD1306(128, 32, &Wire);
+  Adafruit_SSD1306 display = Adafruit_SSD1306(128, 32, OLED_I2C_PORT);
 #endif
 
 // Enter your WiFi SSID and password
@@ -35,16 +51,18 @@ int status = WL_IDLE_STATUS;
 #define SERVER "cdn.syndication.twimg.com"
 #define PATH   "/widgets/followbutton/info.json?screen_names=adafruit"
 
-// Initialize the SSL client library
-// with the IP address and port of the server
-// that you want to connect to (port 443 is default for HTTPS):
-WiFiClientSecure client;
 
 void setup() {
   //Initialize serial and wait for port to open:
-  Serial.begin(9600);
+  Serial.begin(115200);
+
+  // Connect to WPA/WPA2 network
+  WiFi.begin(ssid, pass);
 
   #if defined(USE_OLED)
+    setupI2C();
+    delay(200); // wait for OLED to reset
+  
     if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { // Address 0x3C for 128x32
         Serial.println(F("SSD1306 allocation failed"));
         for(;;); // Don't proceed, loop forever
@@ -54,11 +72,12 @@ void setup() {
     display.setTextColor(WHITE);
     display.clearDisplay();
     display.setCursor(0,0);
-    #else
-      // Don't wait for serial if we have an OLED  
-      while (!Serial) {
-        delay(10); // wait for serial port to connect. Needed for native USB port only
-      }
+  #else
+    // Don't wait for serial if we have an OLED  
+    while (!Serial) {
+      // wait for serial port to connect. Needed for native USB port only
+      delay(10); 
+    }
   #endif
   // attempt to connect to Wifi network:
   Serial.print("Attempting to connect to SSID: ");
@@ -69,8 +88,7 @@ void setup() {
     display.display();
   #endif
 
-  // Connect to WPA/WPA2 network. Change this line if using open or WEP network:
-  WiFi.begin(ssid, pass);
+
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
@@ -85,12 +103,14 @@ void setup() {
   #endif
 
   printWifiStatus();
-
 }
 
 uint32_t bytes = 0;
 
 void loop() {
+  WiFiClientSecure client;
+  client.setInsecure(); // don't use a root cert
+
   Serial.println("\nStarting connection to server...");
   #if defined(USE_OLED)
     display.clearDisplay(); display.setCursor(0,0);
@@ -155,13 +175,49 @@ void loop() {
     display.setTextSize(1);
   #endif
 
-  
   // Disconnect
   client.stop();
+  delay(1000);
 
-  delay(10000);
+#if defined(USE_DEEPSLEEP)
+#if defined(USE_OLED)
+  display.clearDisplay();
+  display.display();
+#endif // OLED
+#if defined(NEOPIXEL_POWER)
+  digitalWrite(NEOPIXEL_POWER, LOW); // off
+#elif defined(NEOPIXEL_I2C_POWER)
+  digitalWrite(NEOPIXEL_I2C_POWER, LOW); // off
+#endif
+  // wake up 1 second later and then go into deep sleep
+  esp_sleep_enable_timer_wakeup(10 * 1000UL * 1000UL); // 10 sec
+  esp_deep_sleep_start(); 
+#else
+  delay(10 * 1000);
+#endif
 }
 
+void setupI2C() {
+  #if defined(ARDUINO_ADAFRUIT_QTPY_ESP32S2) || defined(ARDUINO_ADAFRUIT_QTPY_ESP32_PICO)
+  // ESP32 is kinda odd in that secondary ports must be manually
+  // assigned their pins with setPins()!
+  Wire1.setPins(SDA1, SCL1);
+  #endif
+  
+  #if defined(NEOPIXEL_I2C_POWER)
+  pinMode(NEOPIXEL_I2C_POWER, OUTPUT);
+  digitalWrite(NEOPIXEL_I2C_POWER, HIGH); // on
+  #endif
+  
+  #if defined(ARDUINO_ADAFRUIT_FEATHER_ESP32S2)
+  // turn on the I2C power by setting pin to opposite of 'rest state'
+  pinMode(PIN_I2C_POWER, INPUT);
+  delay(1);
+  bool polarity = digitalRead(PIN_I2C_POWER);
+  pinMode(PIN_I2C_POWER, OUTPUT);
+  digitalWrite(PIN_I2C_POWER, !polarity);
+  #endif
+}
 
 void printWifiStatus() {
   // print the SSID of the network you're attached to:

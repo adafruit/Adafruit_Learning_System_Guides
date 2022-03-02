@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Mikey Sklar for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 #  Designed specifically to work with the MLX90614 sensors in the
 #  adafruit shop
 #  ----> https://www.adafruit.com/product/1747

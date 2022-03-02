@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Melissa LeBlanc-Williams for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 This example is for use on (Linux) computers that are using CPython with
 Adafruit Blinka to support CircuitPython libraries. CircuitPython does

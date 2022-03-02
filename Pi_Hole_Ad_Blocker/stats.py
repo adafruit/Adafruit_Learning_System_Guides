@@ -1,3 +1,9 @@
+# SPDX-FileCopyrightText: 2017 Limor Fried for Adafruit Industries
+# SPDX-FileCopyrightText: 2017 Tony DiCola for Adafruit Industries
+# SPDX-FileCopyrightText: 2017 James DeVito for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Copyright (c) 2017 Adafruit Industries
 # Author: Ladyada, Tony DiCola & James DeVito
 #

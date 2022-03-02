@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Carter Nelson for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import time
 import board
 import alarm
@@ -15,7 +19,7 @@ pin_alarms = [alarm.pin.PinAlarm(pin=pin, value=False, pull=True) for pin in but
 alarm.sleep_memory[0] = not alarm.sleep_memory[0]
 
 # set bitmap
-bmp_file = "clean.bmp" if alarm.sleep_memory[0] else "dirty.bmp"
+bmp_file = "/images/clean.bmp" if alarm.sleep_memory[0] else "/images/dirty.bmp"
 
 # show bitmap
 

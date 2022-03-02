@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Phillip Burgess for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 A macro/hotkey program for Adafruit MACROPAD. Macro setups are stored in the
 /macros folder (configurable below), load up just the ones you're likely to
@@ -83,7 +87,9 @@ for filename in files:
             apps.append(App(module.app))
         except (SyntaxError, ImportError, AttributeError, KeyError, NameError,
                 IndexError, TypeError) as err:
-            pass
+            print("ERROR in", filename)
+            import traceback
+            traceback.print_exception(err, err, err.__traceback__)
 
 if not apps:
     group[13].text = 'NO MACRO FILES FOUND'

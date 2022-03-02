@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 John Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Adafruit BBQ display works with ibbq protocol-based BLE temperature probes
 
 import time

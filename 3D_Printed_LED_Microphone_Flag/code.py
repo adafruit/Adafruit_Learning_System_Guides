@@ -1,3 +1,8 @@
+# SPDX-FileCopyrightText: 2013 Phil Burgess for Adafruit Industries
+# SPDX-FileCopyrightText: 2017 Mikey Sklar for Adafruit Industries
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
 # LED VU meter for Arduino and Adafruit NeoPixel LEDs.
 
 # Hardware requirements:
@@ -120,9 +125,7 @@ def fscale(originalmin, originalmax, newbegin, newend, inputvalue, curve):
 
 def drawLine(fromhere, to):
     if fromhere > to:
-        fromheretemp = fromhere
-        fromhere = to
-        to = fromheretemp
+        to, fromhere = fromhere, to
 
     for index in range(fromhere, to):
         strip[index] = (0, 0, 0)

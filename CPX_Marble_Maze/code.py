@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # CircuitPython code for the Gyroscopic Marble Maze
 # Adafruit Industries, 2019. MIT License
 import time

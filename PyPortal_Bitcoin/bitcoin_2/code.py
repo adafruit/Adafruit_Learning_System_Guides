@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Limor Fried for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 This example will access the coindesk API, grab a number like bitcoin value in
 USD, multiply it by your # of bitcoins and display it on a screen

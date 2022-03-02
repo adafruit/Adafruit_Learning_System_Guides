@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2018 Arduino SA 
+//
+// SPDX-License-Identifier: LGPL-2.1-or-later
 /*
   SerialNINAPassthrough - Use esptool to flash the ESP32 module
   For use with PyPortal, Metro M4 WiFi...
@@ -30,7 +33,8 @@ unsigned long baud = 115200;
   defined(ADAFRUIT_ITSYBITSY_M0) || \
   defined(ADAFRUIT_ITSYBITSY_M4_EXPRESS) || \
   defined(ARDUINO_AVR_ITSYBITSY32U4_3V) || \
-  defined(ARDUINO_NRF52_ITSYBITSY)
+  defined(ARDUINO_NRF52_ITSYBITSY) || \
+  defined(ARDUINO_PYGAMER_M4_EXPRESS)
   // Configure the pins used for the ESP32 connection
   #define SerialESP32   Serial1
   #define SPIWIFI       SPI  // The SPI port

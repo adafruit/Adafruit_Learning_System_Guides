@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Limor Fried for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Digital sand demo uses the accelerometer to move sand particles in a
 # realistic way.  Tilt the board to see the sand grains tumble around and light
 # up LEDs.  Based on the code created by Phil Burgess and Dave Astels, see:

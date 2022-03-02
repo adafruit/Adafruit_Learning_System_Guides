@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2018 Arduino SA
+// 
+// SPDX-License-Identifier: LGPL-2.1-or-later
 /*
   ESP32BootROM - part of the Firmware Updater for the 
   Arduino MKR WiFi 1010, Arduino MKR Vidor 4000, and Arduino UNO WiFi Rev.2.

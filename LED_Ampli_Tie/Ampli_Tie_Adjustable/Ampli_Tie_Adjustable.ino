@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2017 Mikey Sklar for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /*
  LED VU meter for Arduino and Adafruit NeoPixel LEDs. More info: http://learn.adafruit.com/led-ampli-tie/
  

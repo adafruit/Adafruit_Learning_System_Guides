@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Jeff Epler for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """CircuitPython Essentials Audio Out MP3 Example"""
 import board
 import digitalio

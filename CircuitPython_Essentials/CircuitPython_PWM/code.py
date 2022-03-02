@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Kattni Rembor for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """CircuitPython Essentials: PWM with Fixed Frequency example."""
 import time
 import board

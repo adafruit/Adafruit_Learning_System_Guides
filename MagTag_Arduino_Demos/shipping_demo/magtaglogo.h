@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2020 Limor Fried for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #define MAGTAGLOGO_WIDTH 297
 #define MAGTAGLOGO_HEIGHT 52
 

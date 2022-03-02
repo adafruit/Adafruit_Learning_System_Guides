@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Brent Rubell for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /*
 * Adafruit Prop-Maker Featherwing
 * LED Example
@@ -36,12 +40,21 @@
   #define RED_LED      9
   #define GREEN_LED    6
   #define BLUE_LED     5
+#elif defined(ARDUINO_ADAFRUIT_FEATHER_ESP32S2)
+  #define POWER_PIN    10
+  #define RED_LED       0
+  #define GREEN_LED     1
+  #define BLUE_LED      2
+  #define RED_PIN      11
+  #define GREEN_PIN    12
+  #define BLUE_PIN     13
+  #define analogWrite ledcWrite
 #elif defined(ESP32)
   #define POWER_PIN    33
-  #define RED_LED 0
-  #define GREEN_LED 1
-  #define BLUE_LED 2
-  #define RED_PIN  27
+  #define RED_LED       0
+  #define GREEN_LED     1
+  #define BLUE_LED      2
+  #define RED_PIN      27
   #define GREEN_PIN    12
   #define BLUE_PIN     13
   #define analogWrite ledcWrite
@@ -59,16 +72,17 @@ void setup() {
   digitalWrite(POWER_PIN, LOW);
 
   // Set up the LED Pins
-  pinMode(RED_LED, OUTPUT);
-  pinMode(GREEN_LED, OUTPUT);
-  pinMode(BLUE_LED, OUTPUT);
-  #if defined(ESP32)
+  #if defined(ESP32) // and ESP32-S2!
     ledcSetup(RED_LED, 5000, 8);
     ledcAttachPin(RED_PIN, RED_LED);
     ledcSetup(GREEN_LED, 5000, 8);
     ledcAttachPin(GREEN_PIN, GREEN_LED);
     ledcSetup(BLUE_LED, 5000, 8);
     ledcAttachPin(BLUE_PIN, BLUE_LED);
+  #else
+    pinMode(RED_LED, OUTPUT);
+    pinMode(GREEN_LED, OUTPUT);
+    pinMode(BLUE_LED, OUTPUT);
   #endif
   
   analogWrite(RED_LED, 0);
@@ -104,5 +118,5 @@ void loop()
   analogWrite(RED_LED, red);
   analogWrite(GREEN_LED, green);
   analogWrite(BLUE_LED, blue);
-  delay(100);
+  delay(2);
 }

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Limor Fried for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 This example will access the github API, grab a number like
 the number of stars for a repository... and display it on a screen!

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Kevin J Walters for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # clue-metal-detector v1.6
 # A simple metal detector using a minimum number of external components
 

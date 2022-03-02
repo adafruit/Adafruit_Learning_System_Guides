@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Liz Clark for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 '''BLE Synth
 File for the Circuit Playground Bluefruit
 Amp Portion'''

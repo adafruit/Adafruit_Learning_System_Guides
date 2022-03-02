@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /*
 ADAVOICE is an Arduino-based voice pitch changer plus WAV playback.
 Fun for Halloween costumes, comic convention getups and other shenanigans!

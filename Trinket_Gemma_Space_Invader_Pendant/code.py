@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Phillip Burgess/paintyourdragon for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import time
 
 import adafruit_ht16k33.matrix

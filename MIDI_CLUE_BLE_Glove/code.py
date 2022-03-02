@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 John Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 CLUE BLE MIDI
 Sends MIDI CC values based on accelerometer x & y and proximity sensor

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Carter Nelson for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Circuit Playground Express Simple Simon
 #
 # Game play based on information provided here:

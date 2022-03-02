@@ -1,5 +1,10 @@
+# SPDX-FileCopyrightText: 2019 Dano Wall for Adafruit Industries
+# SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Circuit Playground Express Piñata by Dano Wall for Adafruit Industries
-# CircuitPython code by Mike Barela for Adafruit Industries, MIT License
+# CircuitPython code by Anne Barela for Adafruit Industries, MIT License
 import time
 import random
 import board

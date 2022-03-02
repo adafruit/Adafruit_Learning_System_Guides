@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Liz Clark for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Prop-Maker based Darksaber
 Adapted from the Prop-Maker based Master Sword code

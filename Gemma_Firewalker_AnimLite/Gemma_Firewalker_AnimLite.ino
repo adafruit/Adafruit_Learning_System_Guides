@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2020 Phillip Burgess for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // 'Firewalker' LED sneakers sketch for Adafruit NeoPixels by Phillip Burgess
 
 #include <Adafruit_NeoPixel.h>

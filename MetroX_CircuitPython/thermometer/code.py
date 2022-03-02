@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Brent Rubell for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 'thermometer.py'.
 

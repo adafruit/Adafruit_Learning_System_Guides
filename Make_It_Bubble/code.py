@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Anne Barela for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # CircuitPython 3.0 CRICKIT dMake It Bubble
 import time
 from adafruit_crickit import crickit

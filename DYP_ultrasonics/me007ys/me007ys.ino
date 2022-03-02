@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2020 Limor Fried for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Example code for DYP-ME007YS sensor
 
 #if defined(__AVR__) || defined(ESP8266)

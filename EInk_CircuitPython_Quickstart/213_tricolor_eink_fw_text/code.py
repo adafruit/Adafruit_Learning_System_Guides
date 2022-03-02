@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Simple text script for Adafruit 2.13" 212x104 tri-color display
 Supported products:

@@ -1,3 +1,8 @@
+# SPDX-FileCopyrightText: 2014 Phil Burgess for Adafruit Industries
+# SPDX-FileCopyrightText: 2018 Phil Burgess for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+#
 # Trinket/Gemma + LED matrix backpack jewelry.  Plays animated
 # sequence on LED matrix. Press reset button to display again.
 

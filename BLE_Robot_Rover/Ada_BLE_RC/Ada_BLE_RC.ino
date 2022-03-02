@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 Limor Fried for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /*********************************************************************
  This is an example for our nRF51822 based Bluefruit LE modules
   

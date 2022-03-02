@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 Limor Fried for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /*
 TV-B-Gone for Arduino version 0.001
 Ported to Arduino by Ken Shirriff, Dec 3, 2009

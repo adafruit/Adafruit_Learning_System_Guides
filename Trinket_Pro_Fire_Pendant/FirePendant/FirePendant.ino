@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Phillip Burgess/paintyourdragon for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 //--------------------------------------------------------------------------
 // Animated flame for Adafruit Pro Trinket.  Uses the following parts:
 //   - Pro Trinket microcontroller (adafruit.com/product/2010 or 2000)

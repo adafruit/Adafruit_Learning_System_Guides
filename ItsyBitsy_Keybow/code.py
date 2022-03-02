@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 John Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # ItsyBitsy Keypad
 # Uses ItsyBitsy M4/M0 plus Pimoroni Keybow
 # To build a customizable USB keypad

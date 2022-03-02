@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Anne Barela for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # thermal_cam_config.py
 # ### Alarm and range default values in Farenheit ###
 ALARM_F     = 120

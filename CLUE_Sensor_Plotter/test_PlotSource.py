@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Kevin J Walters for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # The MIT License (MIT)
 #
 # Copyright (c) 2020 Kevin J. Walters

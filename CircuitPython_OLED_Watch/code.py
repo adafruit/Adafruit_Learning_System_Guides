@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Kattni Rembor for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import board
 import displayio
 import adafruit_displayio_ssd1306

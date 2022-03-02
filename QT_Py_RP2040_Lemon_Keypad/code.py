@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Noe Ruiz for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import time
 import digitalio
 import board

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Brent Rubell for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import time
 from random import randrange
 import board

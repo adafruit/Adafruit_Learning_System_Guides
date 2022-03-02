@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Melissa LeBlanc-Williams for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 In this Demo we will drive two servos based on the Tilt along the Y and Z axis
 of the BNO055 9-Degrees of Freedom IMU Sensor. This could easily be extended

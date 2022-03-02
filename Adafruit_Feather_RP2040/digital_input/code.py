@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Kattni Rembor for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+#
 """CircuitPython Digital Input example for Feather RP2040"""
 import board
 import digitalio

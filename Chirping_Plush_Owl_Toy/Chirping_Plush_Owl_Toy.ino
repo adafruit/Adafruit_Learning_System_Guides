@@ -1,8 +1,13 @@
+// SPDX-FileCopyrightText: 2018 Becky Stern for Adafruit Industries
+// SPDX-FileCopyrightText: 2018 T Main for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /* 
 Chirp Owl written by Becky Stern and T Main for Adafruit Industries
 Tutorial: http://learn.adafruit.com/chirping-plush-owl-toy/
 
-Includes animal sounds by Mike Barela
+Includes animal sounds by Anne Barela
 http://learn.adafruit.com/adafruit-trinket-modded-stuffed-animal/animal-sounds
 
 based in part on Debounce

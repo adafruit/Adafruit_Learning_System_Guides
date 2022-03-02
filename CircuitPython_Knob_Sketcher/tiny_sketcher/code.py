@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Carter Nelson for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import board
 import busio
 import adafruit_ssd1306

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 John Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Magtag Slideshow
 # auto plays .bmp images in /slides folder
 # press left and right buttons to go back or forward one slide

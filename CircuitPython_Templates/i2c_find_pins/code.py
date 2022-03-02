@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2021 Kattni Rembor for Adafruit Industries
+# SPDX-License-Identifier: Unlicense
 """CircuitPython I2C possible pin-pair identifying script"""
 import board
 import busio
@@ -29,6 +31,10 @@ def get_unique_pins():
             "LED",
             "SWITCH",
             "BUTTON",
+            "ACCELEROMETER_INTERRUPT",
+            "VOLTAGE_MONITOR",
+            "MICROPHONE_CLOCK",
+            "MICROPHONE_DATA",
         ]
         if p in dir(board)
     ]

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 Tod Treece for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Adafruit IO IFTTT Door Detector
 // 
 // Learn Guide: https://learn.adafruit.com/using-ifttt-with-adafruit-io

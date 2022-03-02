@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Kattni Rembor for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Proximity spacebar dino game example. Sends a space when you move your hand close to the proximity
 sensor and turns the LEDs on to let you know you're in the right range. For use with the Chrome

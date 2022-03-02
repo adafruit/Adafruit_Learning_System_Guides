@@ -1,8 +1,12 @@
+# SPDX-FileCopyrightText: 2020 John Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import time
 import board
 from adafruit_matrixportal.matrixportal import MatrixPortal
 
-EVENT_YEAR = 2020
+EVENT_YEAR = 2021
 EVENT_MONTH = 10
 EVENT_DAY = 31
 EVENT_HOUR = 17

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Carter Nelson for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import time
 import terminalio
 import displayio
@@ -155,8 +159,9 @@ def go_to_sleep(current_time):
     # compute current time offset in seconds
     hour, minutes, seconds = time.localtime(current_time)[3:6]
     seconds_since_midnight = 60 * (hour * 60 + minutes) + seconds
-    # wake up 15 minutes after midnite
-    seconds_to_sleep = (24 * 60 * 60 - seconds_since_midnight) + 15 * 60
+    three_fifteen = (3 * 60 + 15) * 60
+    # wake up 15 minutes after 3am
+    seconds_to_sleep = (24 * 60 * 60 - seconds_since_midnight) + three_fifteen
     print(
         "Sleeping for {} hours, {} minutes".format(
             seconds_to_sleep // 3600, (seconds_to_sleep // 60) % 60

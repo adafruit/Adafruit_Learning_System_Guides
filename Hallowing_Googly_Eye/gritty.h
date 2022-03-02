@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 Phillip Burgess for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // CREEPY SPORTS MASCOT EYE
 
 #define COLOR_EYE

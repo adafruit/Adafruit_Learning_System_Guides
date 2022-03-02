@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 John Edgar Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 #  Launch Deck Trellis M4
 #  USB HID button box for launching applications, media control, camera switching and more
 #  Use it with your favorite keyboard controlled launcher, such as Quicksilver and AutoHotkey

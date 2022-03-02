@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Erin St Blaine for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Clock & sky colorbox for Adafruit MagTag: displays current time while
 NeoPixels provide theme lighting for the time of day. Requires WiFi

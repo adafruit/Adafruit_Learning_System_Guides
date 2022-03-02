@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Anne Barela for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Code for the LED Infinity Mirror Collar. Allows the animation sequence 
 and color to be controlled by input from the Adafruit Bluefruit App

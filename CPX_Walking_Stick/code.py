@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Talking Cane
 # for Adafruit Circuit Playground Express with CircuitPython
 from adafruit_circuitplayground.express import cpx

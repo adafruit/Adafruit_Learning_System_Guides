@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Phillip Burgess for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Seasonal produce finder for Adafruit MagTag w/CircuitPython 6.1 or later.
 Lists in-season fruits and vegetables for a user's location and season.
