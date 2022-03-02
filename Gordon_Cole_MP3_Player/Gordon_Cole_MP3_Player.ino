@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2017 Carter Nelson for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 //
 // Gordon Cole MP3 Player
 //
