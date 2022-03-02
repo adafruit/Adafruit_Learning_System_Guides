@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 John Edgar Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Gemma Radio Tuning Knob
 # for fine tuning Software Defined Radio CubicSDR software
 # 10k pot hooked to 3v, A2, and D2 acting as GND

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Richard Albritton for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import time
 import board
 import microcontroller

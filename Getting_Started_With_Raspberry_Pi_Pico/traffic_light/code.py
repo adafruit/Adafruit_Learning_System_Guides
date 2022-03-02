@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Kattni Rembor for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """Traffic light simulator example for Pico. Turns on red, amber and green LEDs in traffic
 light-like sequence.
 

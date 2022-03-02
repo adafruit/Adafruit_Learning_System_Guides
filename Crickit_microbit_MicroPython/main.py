@@ -1,3 +1,8 @@
+# SPDX-FileCopyrightText: 2019 Limor Fried for Adafruit Industries
+# SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # main.py - code to test the Adafruit CRICKIT board with
 # the BBC micro:bit and MicroPython (NOT CircuitPython)
 # MIT License by Limor Fried and Anne Barela, 2019

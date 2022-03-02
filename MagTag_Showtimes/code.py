@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 John Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # MagTag Showtimes Event Viewer
 # Uses the events.json file to display next or current event
 # Be sure to put WiFi access point info in secrets.py file to connect

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Erin St Blaine for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """ Simple FancyLED example for NeoPixel strip
 """
 

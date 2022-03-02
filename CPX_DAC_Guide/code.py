@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Kevin J. Walters for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 ### scope-xy-adafruitlogo v1.0
 
 """Output a logo to an oscilloscope in X-Y mode on an Adafruit M4

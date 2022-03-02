@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Limor Fried for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 This example will access an API, grab a number like hackaday skulls, github
 stars, price of bitcoin, twitter followers... if you can find something that

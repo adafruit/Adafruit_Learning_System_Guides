@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Simple read analog potentiometer on Circuit Playground Express or other board with pin change
 // Anne Barela for Adafruit Industries 9/2018
 

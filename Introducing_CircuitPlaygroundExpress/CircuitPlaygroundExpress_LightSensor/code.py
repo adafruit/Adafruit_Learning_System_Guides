@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2017 John Edgar Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Circuit Playground Light Sensor
 # Reads the on-board light sensor and graphs the brightness with NeoPixels
 

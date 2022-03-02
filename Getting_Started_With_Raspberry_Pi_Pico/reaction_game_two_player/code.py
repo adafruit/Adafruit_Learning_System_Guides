@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Kattni Rembor for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Two-player reaction game example for Pico. LED turns on for between 5 and 10 seconds. Once it
 turns off, try to press the button faster than the other player to see who wins.

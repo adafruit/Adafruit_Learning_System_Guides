@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Phillip Burgess for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // OOZE MASTER 3000: NeoPixel simulated liquid physics. Up to 7 NeoPixel
 // strands dribble light, while an 8th strand "catches the drips."
 // Designed for the Adafruit Feather M0 or M4 with matching version of

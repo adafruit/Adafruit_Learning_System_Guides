@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # NeoTrellis Soundbox Remix - CircuitPython
 # Noe and Pedro Ruiz, code by Anne Barela
 # for Adafruit Industries, MIT License

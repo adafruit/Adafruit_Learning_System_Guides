@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Time Circuit sketch for Adafruit 4-Digit 7-Segment Display w/I2C Backpack.
 // Modeled after Doc Brown's DeLorean time circuit from the "Back to the
 // Future" movies.  Uses three (3) each of the following displays:

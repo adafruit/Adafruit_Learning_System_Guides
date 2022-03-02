@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Dan Cogliano for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #include <time.h>
 #include <Adafruit_GFX.h>    // Core graphics library
 #include <Adafruit_EPD.h>

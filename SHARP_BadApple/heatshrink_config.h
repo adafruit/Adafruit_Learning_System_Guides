@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2020 Melissa LeBlanc-Williams for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #ifndef HEATSHRINK_CONFIG_H
 #define HEATSHRINK_CONFIG_H
 

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Anne Barela for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # cpx-reaction-timer v1.0.1
 # A human reaction timer using light and sound
 

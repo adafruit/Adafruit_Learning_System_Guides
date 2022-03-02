@@ -199,13 +199,23 @@ void loop() {
 
 void setupI2C() {
   #if defined(ARDUINO_ADAFRUIT_QTPY_ESP32S2) || defined(ARDUINO_ADAFRUIT_QTPY_ESP32_PICO)
-    // ESP32 is kinda odd in that secondary ports must be manually
-    // assigned their pins with setPins()!
-    Wire1.setPins(SDA1, SCL1);
+  // ESP32 is kinda odd in that secondary ports must be manually
+  // assigned their pins with setPins()!
+  Wire1.setPins(SDA1, SCL1);
   #endif
+  
   #if defined(NEOPIXEL_I2C_POWER)
-    pinMode(NEOPIXEL_I2C_POWER, OUTPUT);
-    digitalWrite(NEOPIXEL_I2C_POWER, HIGH); // on
+  pinMode(NEOPIXEL_I2C_POWER, OUTPUT);
+  digitalWrite(NEOPIXEL_I2C_POWER, HIGH); // on
+  #endif
+  
+  #if defined(ARDUINO_ADAFRUIT_FEATHER_ESP32S2)
+  // turn on the I2C power by setting pin to opposite of 'rest state'
+  pinMode(PIN_I2C_POWER, INPUT);
+  delay(1);
+  bool polarity = digitalRead(PIN_I2C_POWER);
+  pinMode(PIN_I2C_POWER, OUTPUT);
+  digitalWrite(PIN_I2C_POWER, !polarity);
   #endif
 }
 

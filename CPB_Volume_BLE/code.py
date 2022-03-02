@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 John Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 A CircuitPython 'multimedia' dial demo
 Uses a Circuit Playground Bluefruit + Rotary Encoder -> BLE out

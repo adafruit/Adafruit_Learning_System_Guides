@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Kattni Rembor for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 A burglar alarm example for Pico. Quick flashing LED indicates alarm has been triggered.
 

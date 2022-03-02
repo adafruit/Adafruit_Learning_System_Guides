@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Limor Fried for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // This sketch will send out a Nikon D50 trigger signal (probably works with most Nikons)
 // See the full tutorial at https://learn.adafruit.com/ir-sensor/making-an-intervalometer
 // MIT License, attribution appreciated    Limor Fried, Adafruit Industries

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Read analog potentiometer on Circuit Playground Express or other board with changes
 // Anne Barela for Adafruit Industries 9/2018 based on
 // NeoPixel Ring simple sketch (c) 2013 Shae Erisson

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 Limor Fried for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Trinket Servo Monster sketch
 // Hardware: Adafruit Trinket (3V or 5V), micro servo, LED + resistor
 // Libraries: uses Adafruit_TiCoServo library to manage servo pulses,

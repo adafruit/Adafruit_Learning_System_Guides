@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Kattni Rembor for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Read the potentiometer value. Prints the value to the serial console every two seconds.
 

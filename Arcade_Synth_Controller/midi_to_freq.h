@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2022 John Park for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // from Audio/examples/Synthesis/PlaySynthMusic
 // This is for the Teensy Audio library which specifies
 // frequencies as floating point. See make_notetab.xlsx

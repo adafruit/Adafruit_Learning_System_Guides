@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2017 Kattni Rembor for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # CircuitPlaygroundExpress_LightSensor
 # reads the on-board light sensor and graphs the brighness with NeoPixels
 

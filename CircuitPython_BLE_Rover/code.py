@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 John Edgar Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # CircuitPython BLE Rover
 # Use with the Adafruit BlueFruit LE Connect app
 # Works with CircuitPython 4.0.0-beta.1 and later

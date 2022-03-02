@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Arduino "bridge" code between host computer and WS2801-based digital
 // RGB LED pixels (e.g. Adafruit product ID #322).  Intended for use
 // with USB-native boards such as Teensy or Adafruit 32u4 Breakout;

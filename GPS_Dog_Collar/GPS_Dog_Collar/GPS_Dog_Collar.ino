@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #define OLED_DC 6     //Atmega32u4 Breakout Pin D7
 #define OLED_CS 9     //Atmega32u4 Breakout Pin B5
 #define OLED_CLK 5    //Atmega32u4 Breakout Pin C6

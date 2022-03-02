@@ -14,10 +14,15 @@ if len(sys.argv) >= 2:
 else:
     input_filename = "base.png"
 
+if "-t" in sys.argv or "--titano" in sys.argv:
+    newsize = (320, 480)
+else:
+    newsize = (240, 320)
+
 # Opens a image in RGB mode
 im = Image.open(input_filename)
 
-newsize = (240, 320)
+
 
 find_text_color_dict = {}
 
@@ -97,4 +102,4 @@ im = im.resize(newsize)
 # convert to indexed color
 im = im.convert(mode="P", palette=Image.WEB)
 # save output BMP file
-im.save(input_filename.replace(".png", "_240x320.bmp"))
+im.save(input_filename.replace(".png", "_{}x{}.bmp".format(newsize[0], newsize[1])))

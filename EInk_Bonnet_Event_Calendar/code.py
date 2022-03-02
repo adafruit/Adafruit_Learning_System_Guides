@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Melissa LeBlanc-Williams for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 from __future__ import print_function
 from datetime import datetime
 import time

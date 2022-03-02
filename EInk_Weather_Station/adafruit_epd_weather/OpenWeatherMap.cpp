@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Dan Cogliano for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #include "OpenWeatherMap.h"
 
 String AirliftOpenWeatherMap::buildUrlCurrent(String appId, String location) {

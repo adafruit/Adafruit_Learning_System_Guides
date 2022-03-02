@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Carter Nelson for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import time
 from datetime import datetime
 import board

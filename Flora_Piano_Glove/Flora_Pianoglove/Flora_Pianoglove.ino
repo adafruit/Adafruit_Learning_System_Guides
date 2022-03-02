@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 Anne Barela for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #include <Wire.h>
 #include "Adafruit_TCS34725.h"
 #include <Adafruit_NeoPixel.h>

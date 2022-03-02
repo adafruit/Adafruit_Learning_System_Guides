@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 John Edgar Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Magic 9 Ball
 # Turn HalloWing face down and then face up to change images at random
 # place 128 x 128 pixel 24-bit .bmp images at root level of HalloWing

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Limor Fried for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /* Raw IR decoder sketch!
  
  This sketch/program uses the Arduno and a PNA4602 to 
@@ -6,8 +10,7 @@
  or transmitter (by pulsing an IR LED at ~38KHz for the
  durations detected 
  
- Code is public domain, check out www.ladyada.net and adafruit.com
- for more tutorials! 
+ Check out www.ladyada.net and adafruit.com for more tutorials! 
  */
  
 // We need to use the 'raw' pin reading methods
