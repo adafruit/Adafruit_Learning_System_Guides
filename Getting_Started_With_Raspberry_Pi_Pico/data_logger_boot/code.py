@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Kattni Rembor for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 boot.py file for Pico data logging example. If pin GP0 is connected to GND when
 the pico starts up, make the filesystem writeable by CircuitPython.

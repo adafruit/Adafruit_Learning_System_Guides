@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Phillip Burgess for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 Google Sheets to MagTag example: Naughty or Nice?
 Gets tab-separated-value (TSV) spreadsheet from Google, displays names from

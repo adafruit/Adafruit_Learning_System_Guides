@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Kattni Rembor for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
 A burglar alarm example for Pico. Slow flashing LED indicates alarm is ready. Quick flashing LED
 and beeping buzzer indicate alarm has been triggered.
