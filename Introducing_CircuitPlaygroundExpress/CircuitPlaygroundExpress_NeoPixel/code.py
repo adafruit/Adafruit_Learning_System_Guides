@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2017 John Edgar Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Circuit Playground NeoPixel
 import time
 import board
