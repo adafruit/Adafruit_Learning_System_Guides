@@ -19,7 +19,13 @@ displayio.release_displays()
 oled_reset = board.D1
 
 # I2C setup for display
+
+# STEMMA I2C setup pre-CP 7.2
 i2c = busio.I2C(board.SCL1, board.SDA1)
+
+#  STEMMA I2C setup for CP 7.2+
+#  i2c = board.STEMMA_I2C()
+
 display_bus = displayio.I2CDisplay(i2c, device_address=0x3D, reset=oled_reset)
 
 #  midi setup
@@ -32,7 +38,7 @@ msg = midi.receive()
 
 #  display width and height setup
 WIDTH = 128
-HEIGHT = 32
+HEIGHT = 64
 BORDER = 5
 
 #  display setup
@@ -44,7 +50,7 @@ display.show(splash)
 # text area setup
 text = "MIDI Messages"
 text_area = label.Label(
-    terminalio.FONT, text=text, color=0xFFFFFF, x=28, y=HEIGHT // 2+1)
+    terminalio.FONT, text=text, color=0xFFFFFF, x=30, y=HEIGHT // 2+1)
 splash.append(text_area)
 
 while True:
