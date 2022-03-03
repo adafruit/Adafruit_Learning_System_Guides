@@ -1,6 +1,3 @@
-# SPDX-FileCopyrightText: 2021 Eva Herrada for Adafruit Industries
-# SPDX-License-Identifier: MIT
-
 # General imports
 import gc
 import time
