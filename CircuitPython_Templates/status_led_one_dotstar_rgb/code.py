@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: 2021 Anne Barela for Adafruit Industries
-# SPDX-License-Identifier: Unlicense
+# SPDX-License-Identifier: MIT
 """
 CircuitPython DotStar red, green, blue, brightness control example.
 """

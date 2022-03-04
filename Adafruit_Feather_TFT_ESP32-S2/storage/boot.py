@@ -14,7 +14,7 @@ pixel = neopixel.NeoPixel(board.NEOPIXEL, 1)
 button = digitalio.DigitalInOut(board.BUTTON)
 button.switch_to_input(pull=digitalio.Pull.UP)
 
-# Turn the NeoPixel blue for one second to indicate when to press the boot button.
+# Turn the NeoPixel white for one second to indicate when to press the boot button.
 pixel.fill((255, 255, 255))
 time.sleep(1)
 
