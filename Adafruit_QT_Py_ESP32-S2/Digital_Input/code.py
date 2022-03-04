@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: 2021 Kattni Rembor for Adafruit Industries
-# SPDX-License-Identifier: Unlicense
+# SPDX-License-Identifier: MIT
 """
 CircuitPython Digital Input example - Blinking a built-in NeoPixel LED using a button switch.
 """
