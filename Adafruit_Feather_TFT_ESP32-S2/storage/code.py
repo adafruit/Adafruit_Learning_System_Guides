@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: MIT
 """
 CircuitPython Essentials Storage CP Filesystem code.py file
-
 For use with boards with a built-in red LED.
 """
 import time

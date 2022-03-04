@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: 2021 Kattni Rembor for Adafruit Industries
-# SPDX-License-Identifier: Unlicense
+# SPDX-License-Identifier: MIT
 """CircuitPython status NeoPixel rainbow example."""
 import time
 import board

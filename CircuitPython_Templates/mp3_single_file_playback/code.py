@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: 2021 Kattni Rembor for Adafruit Industries
-# SPDX-License-Identifier: Unlicense
+# SPDX-License-Identifier: MIT
 """
 CircuitPython single MP3 playback example.
 Plays a single MP3 once.

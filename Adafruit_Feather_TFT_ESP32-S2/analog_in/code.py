@@ -1,6 +1,6 @@
-# SPDX-FileCopyrightText: 2021 Kattni Rembor for Adafruit Industries
+# SPDX-FileCopyrightText: 2022 Kattni Rembor for Adafruit Industries
 # SPDX-License-Identifier: MIT
-"""CircuitPython analog voltage value example"""
+"""CircuitPython Analog In Voltage Example"""
 import time
 import board
 import analogio
@@ -9,7 +9,7 @@ analog_pin = analogio.AnalogIn(board.A0)
 
 
 def get_voltage(pin):
-    return (pin.value * 3.3) / 65535
+    return (pin.value * 2.64) / 52507
 
 
 while True:
