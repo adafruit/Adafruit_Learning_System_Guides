@@ -4,6 +4,7 @@
 
 import os
 import sys
+import subprocess
 
 print("Starting SPDX Check")
 
@@ -27,6 +28,19 @@ missing_file = []
 
 fail = False
 
+def compare(file, line, correct)
+        old = line[:-1]
+        new = f"{correct}{line.split(':')[1][:-1].strip()}"
+        command = f'CMD="diff <(echo \\"{old}\\") <(echo \\"{new}\\")"; /bin/bash -c "$CMD"'
+        output = subprocess.getoutput(command).split('\n')
+        if output:
+            print(f"{file.split('Adafruit_Learning_System_Guides/')[1]} appears to have a SPDX formatting typo:")
+            print("Change this:")
+            print(output[1])
+            print("To this:")
+            print(output[3])
+            return True
+
 for r, d, f in os.walk(BUILD_DIR):
     for file in f:
         if file.split('.')[-1] in ("py", "cpp", "ino", "h"):
@@ -45,9 +59,24 @@ for file in files:
         for line in lines:
             if "SPDX-FileCopyrightText:" in line:
                 status["copyright"] = True
-            if "SPDX-License-Identifier:" in line:
+                if "# SPDX-FileCopyrightText: " not in line and "// SPDX-FileCopyrightText: " not in line:
+                    if file.endswith(".py"):
+                        if compare(file, line, "# SPDX-FileCopyrightText: "):
+                            fail = True
+                    else:
+                        if compare(file, line, "// SPDX-FileCopyrightText: "):
+                            fail = True
+
+            if "SPDX-License-Identifier" in line:
                 license_name = line.split("SPDX-License-Identifier: ")[1][:-1]
                 status["license"] = True
+                if "# SPDX-License-Identifier: " not in line and "// SPDX-License-Identifier: " not in line:
+                    if file.endswith(".py"):
+                        if compare(file, line, "# SPDX-License-Identifier: "):
+                            fail = True
+                    else:
+                        if compare(file, line, "// SPDX-License-Identifier: "):
+                            fail = True
                 if os.path.isfile(BUILD_DIR+f"/LICENSES/{license_name}.txt"):
                     status["licensefile"] = True
                 elif license_name not in missing_file:
