@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText:2017 Dave Astels for Adafruit Industries
+// SPDX-FileCopyrightText: 2017 Dave Astels for Adafruit Industries
 //
 // SPDX-License-Identifier: MIT
 
