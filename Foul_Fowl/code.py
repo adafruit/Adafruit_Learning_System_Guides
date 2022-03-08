@@ -1,6 +1,6 @@
-# SPDX-FileCopyrightText: 2018 John Edgar Park for Adafruit Industries
+# SPDX-FileCopyrightText:2018 John Edgar Park for Adafruit Industries
 #
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier MIT
 
 # Foul Fowl
 # Keystroke Injection Payload for Adafruit Gemma M0
