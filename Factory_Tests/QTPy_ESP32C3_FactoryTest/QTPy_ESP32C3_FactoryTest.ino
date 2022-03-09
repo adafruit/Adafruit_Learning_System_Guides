@@ -16,7 +16,7 @@ void setup() {
 
   Serial.println("QT Py ESP32 C3!");
 
-  TB.neopixelPin = NEOPIXEL_PIN;
+  TB.neopixelPin = PIN_NEOPIXEL;
   TB.neopixelNum = 1; 
   TB.begin();
   TB.setColor(0xFF0000);
