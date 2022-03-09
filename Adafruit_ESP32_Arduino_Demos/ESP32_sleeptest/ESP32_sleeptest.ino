@@ -4,6 +4,17 @@
 
 #include <Adafruit_NeoPixel.h>
 
+// While we wait for Feather ESP32 V2 to get added to the Espressif BSP,
+// we have to select PICO D4 and UNCOMMENT this line!
+//#define ADAFRUIT_FEATHER_ESP32_V2
+
+// then these pins will be defined for us 
+#if defined(ADAFRUIT_FEATHER_ESP32_V2)
+#define PIN_NEOPIXEL 0
+#define NEOPIXEL_I2C_POWER 2
+#endif
+
+
 #if defined(PIN_NEOPIXEL)
   Adafruit_NeoPixel pixel(1, PIN_NEOPIXEL, NEO_GRB + NEO_KHZ800);
 #endif
@@ -47,9 +58,14 @@ void LEDoff() {
 }
 
 void enableInternalPower() {
-#if defined(ARDUINO_ADAFRUIT_QTPY_ESP32_PICO)
+#if defined(NEOPIXEL_POWER)
   pinMode(NEOPIXEL_POWER, OUTPUT);
   digitalWrite(NEOPIXEL_POWER, HIGH);
+#endif
+
+#if defined(NEOPIXEL_I2C_POWER)
+  pinMode(NEOPIXEL_I2C_POWER, OUTPUT);
+  digitalWrite(NEOPIXEL_I2C_POWER, HIGH);
 #endif
 
 #if defined(ARDUINO_ADAFRUIT_FEATHER_ESP32S2)
@@ -65,9 +81,14 @@ void enableInternalPower() {
 }
 
 void disableInternalPower() {
-#if defined(ARDUINO_ADAFRUIT_QTPY_ESP32_PICO)
+#if defined(NEOPIXEL_POWER)
   pinMode(NEOPIXEL_POWER, OUTPUT);
   digitalWrite(NEOPIXEL_POWER, LOW);
+#endif
+
+#if defined(NEOPIXEL_I2C_POWER)
+  pinMode(NEOPIXEL_I2C_POWER, OUTPUT);
+  digitalWrite(NEOPIXEL_I2C_POWER, LOW);
 #endif
 
 #if defined(ARDUINO_ADAFRUIT_FEATHER_ESP32S2)
