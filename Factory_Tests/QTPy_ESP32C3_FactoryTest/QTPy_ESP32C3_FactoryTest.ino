@@ -8,7 +8,7 @@
 #include <WiFi.h>
 extern Adafruit_TestBed TB;
 
-#define NEOPIXEL_PIN 2
+#define PIN_NEOPIXEL 2
 
 void setup() {
   Serial.begin(115200);
