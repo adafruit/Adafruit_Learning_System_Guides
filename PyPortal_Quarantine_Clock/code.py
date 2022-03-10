@@ -52,8 +52,7 @@ requests.set_socket(socket, esp)
 
 # initialize pyportal
 pyportal = PyPortal(esp=esp,
-                    external_spi=spi,
-                    default_bg = None)
+                    external_spi=spi)
 
 # set pyportal's backlight brightness
 pyportal.set_backlight(0.7)
@@ -62,14 +61,6 @@ if esp.status == adafruit_esp32spi.WL_IDLE_STATUS:
     print("ESP32 found and in idle mode")
     print("Firmware vers.", esp.firmware_version)
     print("MAC addr:", [hex(i) for i in esp.MAC_address])
-
-print("Connecting to AP...")
-while not esp.is_connected:
-    try:
-        esp.connect_AP(secrets['ssid'], secrets['password'])
-    except RuntimeError as e:
-        print("could not connect to AP, retrying: ", e)
-        continue
 
 # Set the font and preload letters
 font_large = bitmap_font.load_font("/fonts/Helvetica-Bold-44.bdf")
