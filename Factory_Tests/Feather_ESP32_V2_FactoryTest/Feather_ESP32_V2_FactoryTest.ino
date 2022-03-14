@@ -21,6 +21,11 @@ void setup() {
   TB.neopixelPin = NEOPIXEL_PIN;
   TB.neopixelNum = 1;
   TB.begin();
+  TB.setColor(0xFF0000); 
+  delay(50);
+  TB.setColor(0x00FF00); 
+  delay(50);
+  TB.setColor(0x0000FF); 
 
   // Set WiFi to station mode and disconnect from an AP if it was previously connected
   WiFi.mode(WIFI_STA);

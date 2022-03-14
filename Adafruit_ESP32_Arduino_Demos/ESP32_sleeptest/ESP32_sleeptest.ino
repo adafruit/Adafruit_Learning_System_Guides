@@ -31,6 +31,7 @@ void loop() {
   delay(1000);
   
   disableInternalPower();
+  LEDoff();
   esp_sleep_enable_timer_wakeup(1000000); // 1 sec
   esp_light_sleep_start();
   // we'll wake from light sleep here
