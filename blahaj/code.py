@@ -5,7 +5,6 @@
 import time
 
 import board
-import busio
 from adafruit_lc709203f import LC709203F
 import adafruit_pcf8523
 from simpleio import tone
