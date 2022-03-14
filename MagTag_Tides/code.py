@@ -164,7 +164,7 @@ def get_tide_data():
     raw_data = magtag.fetch()
 
     # Results will be stored in a list that is PLOT_WIDTH long
-    new_tide_data = [PLOT_HEIGHT] * PLOT_WIDTH
+    new_tide_data = [PLOT_HEIGHT - 1] * PLOT_WIDTH
 
     # Convert raw data to display coordinates
     for data in raw_data:
