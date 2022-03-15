@@ -57,12 +57,11 @@ magtag = MagTag()
 r = rtc.RTC()
 
 magtag.network.connect()
-requests = magtag.network.requests
 
 # Initialize an OAuth2 object with GCal API scope
 scopes = ["https://www.googleapis.com/auth/calendar.readonly"]
 google_auth = OAuth2(
-    requests,
+    magtag.network.requests,
     secrets["google_client_id"],
     secrets["google_client_secret"],
     scopes,
@@ -121,7 +120,7 @@ def get_calendar_events(calendar_id, max_events, time_min):
         "/events?maxResults={1}&timeMin={2}&timeMax={3}&orderBy=startTime"
         "&singleEvents=true".format(calendar_id, max_events, time_min, time_max)
     )
-    resp = requests.get(url, headers=headers)
+    resp = magtag.network.requests.get(url, headers=headers)
     resp_json = resp.json()
     if "error" in resp_json:
         raise RuntimeError("Error:", resp_json)
