@@ -1,15 +1,10 @@
 # SPDX-FileCopyrightText: 2021 Brent Rubell, written for Adafruit Industries
 #
 # SPDX-License-Identifier: Unlicense
-import ssl
-import board
-import wifi
-import socketpool
-import adafruit_requests as requests
 from adafruit_oauth2 import OAuth2
 from adafruit_display_text.label import Label
 from adafruit_bitmap_font import bitmap_font
-from adafruit_magtag.magtag import Graphics
+from adafruit_magtag.magtag import Graphics, Network
 from adafruit_display_shapes.rect import Rect
 
 # Add a secrets.py to your filesystem that has a dictionary called secrets with "ssid" and
@@ -22,12 +17,8 @@ except ImportError:
     print("Credentials and tokens are kept in secrets.py, please add them there!")
     raise
 
-print("Connecting to %s" % secrets["ssid"])
-wifi.radio.connect(secrets["ssid"], secrets["password"])
-print("Connected to %s!" % secrets["ssid"])
-
-pool = socketpool.SocketPool(wifi.radio)
-requests = requests.Session(pool, ssl.create_default_context())
+network = Network()
+network.connect()
 
 # DisplayIO setup
 font_small = bitmap_font.load_font("/fonts/Arial-12.pcf")
@@ -49,14 +40,10 @@ label_overview_text = Label(
 )
 graphics.splash.append(label_overview_text)
 
-label_verification_url = Label(
-    font_small, x=0, y=40, line_spacing=0.75, color=0x000000
-)
+label_verification_url = Label(font_small, x=0, y=40, line_spacing=0.75, color=0x000000)
 graphics.splash.append(label_verification_url)
 
-label_user_code = Label(
-    font_small, x=0, y=80, color=0x000000, line_spacing=0.75
-)
+label_user_code = Label(font_small, x=0, y=80, color=0x000000, line_spacing=0.75)
 graphics.splash.append(label_user_code)
 
 label_qr_code = Label(
@@ -69,7 +56,10 @@ scopes = ["https://www.googleapis.com/auth/calendar.readonly"]
 
 # Initialize an OAuth2 object
 google_auth = OAuth2(
-    requests, secrets["google_client_id"], secrets["google_client_secret"], scopes
+    network.requests,
+    secrets["google_client_id"],
+    secrets["google_client_secret"],
+    scopes,
 )
 
 # Request device and user codes
@@ -91,7 +81,7 @@ label_verification_url.text = (
 label_user_code.text = "2. Enter code: %s" % google_auth.user_code
 
 graphics.qrcode(google_auth.verification_url.encode(), qr_size=2, x=240, y=70)
-board.DISPLAY.show(graphics.splash)
+graphics.display.show(graphics.splash)
 display.refresh()
 
 # Poll Google's authorization server

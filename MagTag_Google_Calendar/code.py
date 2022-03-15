@@ -2,16 +2,9 @@
 #
 # SPDX-License-Identifier: Unlicense
 import time
-import ssl
-import board
 import rtc
-import wifi
-import socketpool
-import adafruit_requests as requests
 from adafruit_oauth2 import OAuth2
 from adafruit_display_shapes.line import Line
-from adafruit_bitmap_font import bitmap_font
-from adafruit_display_text import label
 from adafruit_magtag.magtag import MagTag
 
 # Calendar ID
@@ -59,17 +52,16 @@ except ImportError:
     print("Credentials and tokens are kept in secrets.py, please add them there!")
     raise
 
-print("Connecting to %s" % secrets["ssid"])
-wifi.radio.connect(secrets["ssid"], secrets["password"])
-print("Connected to %s!" % secrets["ssid"])
+# Create a new MagTag object
+magtag = MagTag()
+r = rtc.RTC()
 
-pool = socketpool.SocketPool(wifi.radio)
-requests = requests.Session(pool, ssl.create_default_context())
+magtag.network.connect()
 
 # Initialize an OAuth2 object with GCal API scope
 scopes = ["https://www.googleapis.com/auth/calendar.readonly"]
 google_auth = OAuth2(
-    requests,
+    magtag.network.requests,
     secrets["google_client_id"],
     secrets["google_client_secret"],
     scopes,
@@ -86,15 +78,17 @@ def get_current_time(time_max=False):
     cur_time = r.datetime
     if time_max:  # maximum time to fetch events is midnight (4:59:59UTC)
         cur_time_max = time.struct_time(
-            cur_time[0],
-            cur_time[1],
-            cur_time[2] + 1,
-            4,
-            59,
-            59,
-            cur_time[6],
-            cur_time[7],
-            cur_time[8],
+            (
+                cur_time[0],
+                cur_time[1],
+                cur_time[2] + 1,
+                4,
+                59,
+                59,
+                cur_time[6],
+                cur_time[7],
+                cur_time[8],
+            )
         )
         cur_time = cur_time_max
     cur_time = "{:04d}-{:02d}-{:02d}T{:02d}:{:02d}:{:02d}{:s}".format(
@@ -126,7 +120,7 @@ def get_calendar_events(calendar_id, max_events, time_min):
         "/events?maxResults={1}&timeMin={2}&timeMax={3}&orderBy=startTime"
         "&singleEvents=true".format(calendar_id, max_events, time_min, time_max)
     )
-    resp = requests.get(url, headers=headers)
+    resp = magtag.network.requests.get(url, headers=headers)
     resp_json = resp.json()
     if "error" in resp_json:
         raise RuntimeError("Error:", resp_json)
@@ -186,29 +180,20 @@ def display_calendar_events(resp_events):
         print("Event Time:", format_datetime(event_start))
         print("-" * 40)
         # Generate labels holding event info
-        label_event_time = label.Label(
-            font_event,
-            x=7,
-            y=40 + (event_idx * 35),
-            color=0x000000,
+        magtag.add_text(
+            text_font=font_event,
+            text_position=(7, 40 + (event_idx * 35)),
+            text_color=0x000000,
             text=format_datetime(event_start),
         )
-        magtag.splash.append(label_event_time)
-
-        label_event_desc = label.Label(
-            font_event,
-            x=88,
-            y=40 + (event_idx * 35),
-            color=0x000000,
+        magtag.add_text(
+            text_font=font_event,
+            text_position=(88, 40 + (event_idx * 35)),
+            text_color=0x000000,
             text=event_name,
             line_spacing=0.65,
         )
-        magtag.splash.append(label_event_desc)
 
-
-# Create a new MagTag object
-magtag = MagTag()
-r = rtc.RTC()
 
 # DisplayIO Setup
 magtag.set_background(0xFFFFFF)
@@ -217,45 +202,44 @@ magtag.set_background(0xFFFFFF)
 line_header = Line(0, 30, 320, 30, color=0x000000)
 magtag.splash.append(line_header)
 
-font_h1 = bitmap_font.load_font("fonts/Arial-18.pcf")
-label_header = label.Label(font_h1, x=5, y=15, color=0x000000)
-magtag.splash.append(label_header)
+label_header = magtag.add_text(
+    text_font="fonts/Arial-18.pcf",
+    text_position=(5, 15),
+    text_color=0x000000,
+)
 
 # Set up calendar event fonts
-font_event = bitmap_font.load_font("fonts/Arial-12.pcf")
+font_event = "fonts/Arial-12.pcf"
 
 if not google_auth.refresh_access_token():
     raise RuntimeError("Unable to refresh access token - has the token been revoked?")
 access_token_obtained = int(time.monotonic())
 
-while True:
-    # check if we need to refresh token
-    if (
-        int(time.monotonic()) - access_token_obtained
-        >= google_auth.access_token_expiration
-    ):
-        print("Access token expired, refreshing...")
-        if not google_auth.refresh_access_token():
-            raise RuntimeError(
-                "Unable to refresh access token - has the token been revoked?"
-            )
-        access_token_obtained = int(time.monotonic())
+# check if we need to refresh token
+if int(time.monotonic()) - access_token_obtained >= google_auth.access_token_expiration:
+    print("Access token expired, refreshing...")
+    if not google_auth.refresh_access_token():
+        raise RuntimeError(
+            "Unable to refresh access token - has the token been revoked?"
+        )
+    access_token_obtained = int(time.monotonic())
 
-    # fetch calendar events!
-    print("fetching local time...")
-    now = get_current_time()
+# fetch calendar events!
+print("fetching local time...")
+now = get_current_time()
 
-    # setup header label
-    label_header.text = format_datetime(now, pretty_date=True)
+# setup header label
+magtag.set_text(
+    format_datetime(now, pretty_date=True), label_header, auto_refresh=False
+)
 
-    print("fetching calendar events...")
-    events = get_calendar_events(CALENDAR_ID, MAX_EVENTS, now)
+print("fetching calendar events...")
+events = get_calendar_events(CALENDAR_ID, MAX_EVENTS, now)
 
-    print("displaying events")
-    display_calendar_events(events)
+print("displaying events")
+display_calendar_events(events)
 
-    board.DISPLAY.show(magtag.splash)
-    board.DISPLAY.refresh()
+magtag.graphics.display.refresh()
 
-    print("Sleeping for %d minutes" % REFRESH_TIME)
-    magtag.exit_and_deep_sleep(REFRESH_TIME * 60)
+print("Sleeping for %d minutes" % REFRESH_TIME)
+magtag.exit_and_deep_sleep(REFRESH_TIME * 60)
