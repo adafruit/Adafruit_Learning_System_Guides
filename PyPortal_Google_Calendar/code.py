@@ -2,16 +2,8 @@
 #
 # SPDX-License-Identifier: Unlicense
 import time
-import board
-import busio
-from digitalio import DigitalInOut
-import adafruit_esp32spi.adafruit_esp32spi_socket as socket
-from adafruit_esp32spi import adafruit_esp32spi
-import adafruit_requests as requests
 from adafruit_oauth2 import OAuth2
 from adafruit_display_shapes.line import Line
-from adafruit_bitmap_font import bitmap_font
-from adafruit_display_text import label
 from adafruit_pyportal import PyPortal
 import rtc
 
@@ -60,35 +52,17 @@ except ImportError:
     print("WiFi secrets are kept in secrets.py, please add them there!")
     raise
 
-# If you are using a board with pre-defined ESP32 Pins:
-esp32_cs = DigitalInOut(board.ESP_CS)
-esp32_ready = DigitalInOut(board.ESP_BUSY)
-esp32_reset = DigitalInOut(board.ESP_RESET)
-
-spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
-esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset)
-
-print("Connecting to AP...")
-while not esp.is_connected:
-    try:
-        esp.connect_AP(secrets["ssid"], secrets["password"])
-    except RuntimeError as e:
-        print("could not connect to AP, retrying: ", e)
-        continue
-print("Connected to", str(esp.ssid, "utf-8"), "\tRSSI:", esp.rssi)
-
 # Create the PyPortal object
-pyportal = PyPortal(esp=esp, external_spi=spi)
+pyportal = PyPortal()
 r = rtc.RTC()
 
-# Initialize a requests object with a socket and esp32spi interface
-socket.set_interface(esp)
-requests.set_socket(socket, esp)
+pyportal.network.connect()
+
 
 # Initialize an OAuth2 object with GCal API scope
 scopes = ["https://www.googleapis.com/auth/calendar.readonly"]
 google_auth = OAuth2(
-    requests,
+    pyportal.network.requests,
     secrets["google_client_id"],
     secrets["google_client_secret"],
     scopes,
@@ -105,15 +79,17 @@ def get_current_time(time_max=False):
     cur_time = r.datetime
     if time_max:  # maximum time to fetch events is midnight (4:59:59UTC)
         cur_time_max = time.struct_time(
-            cur_time[0],
-            cur_time[1],
-            cur_time[2] + 1,
-            4,
-            59,
-            59,
-            cur_time[6],
-            cur_time[7],
-            cur_time[8],
+            (
+                cur_time[0],
+                cur_time[1],
+                cur_time[2] + 1,
+                4,
+                59,
+                59,
+                cur_time[6],
+                cur_time[7],
+                cur_time[8],
+            )
         )
         cur_time = cur_time_max
     cur_time = "{:04d}-{:02d}-{:02d}T{:02d}:{:02d}:{:02d}{:s}".format(
@@ -145,7 +121,7 @@ def get_calendar_events(calendar_id, max_events, time_min):
         "/events?maxResults={1}&timeMin={2}&timeMax={3}&orderBy=startTime"
         "&singleEvents=true".format(calendar_id, max_events, time_min, time_max)
     )
-    resp = requests.get(url, headers=headers)
+    resp = pyportal.network.requests.get(url, headers=headers)
     resp_json = resp.json()
     if "error" in resp_json:
         raise RuntimeError("Error:", resp_json)
@@ -191,6 +167,22 @@ def format_datetime(datetime, pretty_date=False):
     return formatted_time
 
 
+def create_event_labels():
+    for event_idx in range(MAX_EVENTS):
+        event_start_label = pyportal.add_text(
+            text_font=font_events,
+            text_position=(7, 70 + (event_idx * 40)),
+            text_color=0x000000,
+        )
+        event_text_label = pyportal.add_text(
+            text_font=font_events,
+            text_position=(88, 70 + (event_idx * 40)),
+            text_color=0x000000,
+            line_spacing=0.75,
+        )
+        event_labels.append((event_start_label, event_text_label))
+
+
 def display_calendar_events(resp_events):
     # Display all calendar events
     for event_idx in range(len(resp_events)):
@@ -203,39 +195,31 @@ def display_calendar_events(resp_events):
         print("Event Description: ", event_name)
         print("Event Time:", format_datetime(event_start))
         print("-" * 40)
-        # Generate labels holding event info
-        label_event_time = label.Label(
-            font_events,
-            x=7,
-            y=70 + (event_idx * 40),
-            color=0x000000,
-            text=format_datetime(event_start),
-        )
-        pyportal.splash.append(label_event_time)
+        pyportal.set_text(format_datetime(event_start), event_labels[event_idx][0])
+        pyportal.set_text(event_name, event_labels[event_idx][1])
 
-        label_event_desc = label.Label(
-            font_events,
-            x=88,
-            y=70 + (event_idx * 40),
-            color=0x000000,
-            text=event_name,
-            line_spacing=0.75,
-        )
-        pyportal.splash.append(label_event_desc)
+    # Clear any unused labels
+    for event_idx in range(len(resp_events), MAX_EVENTS):
+        pyportal.set_text("", event_labels[event_idx][0])
+        pyportal.set_text("", event_labels[event_idx][1])
 
 
 pyportal.set_background(0xFFFFFF)
+
+# Set up calendar event fonts
+font_events = "fonts/Arial-14.pcf"
 
 # Add the header
 line_header = Line(0, 50, 320, 50, color=0x000000)
 pyportal.splash.append(line_header)
 
-font_h1 = bitmap_font.load_font("fonts/Arial-18.pcf")
-label_header = label.Label(font_h1, x=10, y=30, color=0x000000)
-pyportal.splash.append(label_header)
-
-# Set up calendar event fonts
-font_events = bitmap_font.load_font("fonts/Arial-14.pcf")
+label_header = pyportal.add_text(
+    text_font="fonts/Arial-18.pcf",
+    text_position=(10, 30),
+    text_color=0x000000,
+)
+event_labels = []
+create_event_labels()
 
 if not google_auth.refresh_access_token():
     raise RuntimeError("Unable to refresh access token - has the token been revoked?")
@@ -260,20 +244,13 @@ while True:
     now = get_current_time()
 
     # setup header label
-    label_header.text = format_datetime(now, pretty_date=True)
-
-    # remove previous event time labels and event description labels
-    for _ in range(len(events * 2)):
-        print("removing event label...")
-        pyportal.splash.pop()
+    pyportal.set_text(format_datetime(now, pretty_date=True), label_header)
 
     print("fetching calendar events...")
     events = get_calendar_events(CALENDAR_ID, MAX_EVENTS, now)
 
     print("displaying events")
     display_calendar_events(events)
-
-    board.DISPLAY.show(pyportal.splash)
 
     print("Sleeping for %d minutes" % REFRESH_TIME)
     time.sleep(REFRESH_TIME * 60)
