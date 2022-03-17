@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2022 Limor Fried for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #include "Adafruit_TestBed.h"
 
 extern Adafruit_TestBed TB;
