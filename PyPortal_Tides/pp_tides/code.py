@@ -25,7 +25,7 @@ DATA_SOURCE = (
 DATA_LOCATION = ["predictions"]
 
 # gotta have one of these
-pyportal = PyPortal(status_neopixel=board.NEOPIXEL, default_bg="/tides_bg.bmp")
+pyportal = PyPortal(status_neopixel=board.NEOPIXEL, default_bg="/images/tides_bg.bmp")
 
 # Connect to the internet and get local time
 pyportal.get_local_time()

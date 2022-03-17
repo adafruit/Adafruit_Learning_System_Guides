@@ -33,7 +33,7 @@ WIDTH = board.DISPLAY.width
 HEIGHT = board.DISPLAY.height
 
 # gotta have one of these
-pyportal = PyPortal(status_neopixel=board.NEOPIXEL, default_bg="/tides_bg_graph.bmp")
+pyportal = PyPortal(status_neopixel=board.NEOPIXEL, default_bg="/images/tides_bg_graph.bmp")
 
 # Connect to the internet and get local time
 pyportal.get_local_time()

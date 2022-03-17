@@ -33,7 +33,7 @@ pyportal = PyPortal(url=DATA_SOURCE,
                     headers={"Ocp-Apim-Subscription-Key":secrets['Ocp-Apim-Subscription-Key']},
                     json_path=DATA_LOCATION,
                     status_neopixel=board.NEOPIXEL,
-                    default_bg=cwd+"/tides_bg.bmp")
+                    default_bg=cwd+"/images/tides_bg.bmp")
 
 # Connect to the internet and get local time
 pyportal.get_local_time()
