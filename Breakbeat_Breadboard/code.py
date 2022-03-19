@@ -23,7 +23,7 @@ wav_files = (
     ('wav/dnb21580_22k16b_160bpm.wav', 0.9),
     ('wav/drumloopA_22k16b_160bpm.wav', 1.0),
     ('wav/femvoc_330662_22k16b_160bpm.wav', 0.8),
-    ('wav/scratch.wav', 0.5),
+    ('wav/scratch3667_4bar_22k16b_160bpm.wav', 0.5),
     ('wav/pt_limor_modem_vox_01.wav', 0.4),
     ('wav/snowpeaks_22k_s16.wav', 0.8),
     ('wav/dnb21580_22k16b_160bpm_rev.wav', 1.0)
@@ -54,8 +54,6 @@ def handle_mixer(num, pressed):
     else: # released
         voice.level = 0  # mute it
 
-keys_pressed = []  # list of keys currently being pressed down
-
 
 while True:
     event = km.events.get()
@@ -63,8 +61,6 @@ while True:
         if event.key_number < len(wav_files):
             if event.pressed:
                 handle_mixer(event.key_number, True)
-                keys_pressed.append( event.key_number )
 
             if event.released:
                 handle_mixer( event.key_number, False )
-                keys_pressed.remove( event.key_number )
