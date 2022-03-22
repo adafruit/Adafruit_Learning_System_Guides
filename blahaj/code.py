@@ -22,7 +22,7 @@ rainbow = Rainbow(LEDs, speed=0.1, period=2)
 days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 sleep = {
     0: (22, 50),
-    1: (23, 08),
+    1: (23, 8),
     2: (22, 50),
     3: (22, 50),
     4: (22, 50),
