@@ -5,7 +5,6 @@ CircuitPython Simple Example for BME280 and LC709203 Sensors
 """
 import time
 import board
-import digitalio
 from adafruit_bme280 import basic as adafruit_bme280
 from adafruit_lc709203f import LC709203F, PackSize
 
