@@ -33,11 +33,6 @@ battery_pack_size = PackSize.MAH400
 led = digitalio.DigitalInOut(board.LED)
 led.switch_to_output()
 
-# Pull the I2C power pin low
-i2c_power = digitalio.DigitalInOut(board.I2C_POWER_INVERTED)
-i2c_power.switch_to_output()
-i2c_power.value = False
-
 # Set up the BME280 and LC709203 sensors
 bme280 = adafruit_bme280.Adafruit_BME280_I2C(board.I2C())
 battery_monitor = LC709203F(board.I2C())
@@ -53,6 +48,10 @@ battery_percent = "{:.1f}".format(battery_monitor.cell_percent)
 
 
 def go_to_sleep(sleep_period):
+    # Turn off I2C power by setting it to input
+    i2c_power = digitalio.DigitalInOut(board.I2C_POWER)
+    i2c_power.switch_to_input()
+
     # Create a an alarm that will trigger sleep_period number of seconds from now.
     time_alarm = alarm.time.TimeAlarm(monotonic_time=time.monotonic() + sleep_period)
     # Exit and deep sleep until the alarm wakes us.
