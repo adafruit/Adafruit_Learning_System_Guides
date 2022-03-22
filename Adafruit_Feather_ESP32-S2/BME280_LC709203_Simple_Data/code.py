@@ -9,11 +9,6 @@ import digitalio
 from adafruit_bme280 import basic as adafruit_bme280
 from adafruit_lc709203f import LC709203F, PackSize
 
-# Pull the I2C power pin low
-i2c_power = digitalio.DigitalInOut(board.I2C_POWER_INVERTED)
-i2c_power.switch_to_output()
-i2c_power.value = False
-
 # Create sensor objects, using the board's default I2C bus.
 i2c = board.I2C()
 bme280 = adafruit_bme280.Adafruit_BME280_I2C(i2c)
