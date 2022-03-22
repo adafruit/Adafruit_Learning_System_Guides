@@ -9,15 +9,20 @@ from adafruit_lc709203f import LC709203F
 import adafruit_pcf8523
 from simpleio import tone
 import neopixel
+from adafruit_led_animation.animation.rainbow import Rainbow
 
 rtc = adafruit_pcf8523.PCF8523(board.I2C())
 battery = LC709203F(board.I2C())
 indicator = neopixel.NeoPixel(board.A1, 1)
 
+LEDs = neopixel.NeoPixel(board.A2, 20)
+LEDs.fill((0, 0, 0))
+rainbow = Rainbow(LEDs, speed=0.1, period=2)
+
 days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 sleep = {
     0: (22, 50),
-    1: (22, 50),
+    1: (23, 08),
     2: (22, 50),
     3: (22, 50),
     4: (22, 50),
@@ -52,49 +57,76 @@ ringtone = [
     (220, 2),
 ]
 
-SET_DATE = True
+SET_DATE = False  # Set this to True on first run and False for subsequent runs
 if SET_DATE:
     # Make sure to set this to the current date and time before using
     YEAR = 2022
     MONTH = 3
-    DAY = 10
-    HOUR = 22
-    MINUTE = 49
-    SEC = 55
-    WDAY = 0  # 0 Sunday, 1 Monday, etc.
+    DAY = 21
+    HOUR = 16
+    MINUTE = 54
+    SEC = 0
+    WDAY = 1  # 0 Sunday, 1 Monday, etc.
     t = time.struct_time((YEAR, MONTH, DAY, HOUR, MINUTE, SEC, WDAY, -1, -1))
 
     print("Setting time to:", t)  # uncomment for debugging
     rtc.datetime = t
     print()
 
+on_always = True  # Set to False for animation only to be on when alarm rings
+
+indicate = True
+
+start = time.monotonic()
+wait = 1
+
 while True:
-    t = rtc.datetime
-    bat = min(max(int(battery.cell_percent), 0), 100)
+    if on_always:
+        rainbow.animate()
+    if time.monotonic() - start > wait:
+        start = time.monotonic()
+        wait = 1
+        t = rtc.datetime
+        bat = min(max(int(battery.cell_percent), 0), 100)
 
-    g = int((bat / 100) * 255)
-    r = int((1 - (bat / 100)) * 255)
-    indicator.fill([r, g, 0])
+        g = int((bat / 100) * 255)
+        r = int((1 - (bat / 100)) * 255)
+        if bat >= 15:
+            indicator.fill([r, g, 0])
 
-    print(f"The date is {days[t.tm_wday]} {t.tm_mday}/{t.tm_mon}/{t.tm_year}")
-    print(f"The time is {t.tm_hour}:{t.tm_min}:{t.tm_sec}")
-    print(f"Battery: {bat}%")
+        if bat < 15:
+            if indicate:
+                indicator.fill([0, 0, 0])
+                indicate = False
+            else:
+                indicator.fill([r, g, 0])
+                indicate = True
 
-    night = sleep[t.tm_wday]
-    morning = wake[t.tm_wday]
+        print(f"Date: {days[t.tm_wday]} {t.tm_mday}/{t.tm_mon}/{t.tm_year}")
+        print(f"Time: {t.tm_hour}:{t.tm_min}:{t.tm_sec}")
+        print(f"Batt: {bat}%\n")
 
-    if night:
-        if night[0] == t.tm_hour and night[1] == t.tm_min:
-            for i in ringtone:
-                print(i[0])
-                tone(board.A0, i[0], i[1] * (60 / BPM))
-            time.sleep(60)
+        night = sleep[t.tm_wday]
+        morning = wake[t.tm_wday]
 
-    if morning:
-        if morning[0] == t.tm_hour and morning[1] == t.tm_min:
-            for i in ringtone:
-                print(i[0])
-                tone(board.A0, i[0], i[1] * (60 / BPM))
-            time.sleep(60)
+        if night:
+            if night[0] == t.tm_hour and night[1] == t.tm_min:
+                for i in ringtone:
+                    print(i[0])
+                    tone(board.A0, i[0], i[1] * (60 / BPM))
+                wait = 60
+                if not on_always:
+                    while time.monotonic() - start < 5:
+                        rainbow.animate()
+                    rainbow.fill([0, 0, 0])
 
-    time.sleep(1)
+        if morning:
+            if morning[0] == t.tm_hour and morning[1] == t.tm_min:
+                for i in ringtone:
+                    print(i[0])
+                    tone(board.A0, i[0], i[1] * (60 / BPM))
+                wait = 60
+                if not on_always:
+                    while time.monotonic() - start < 5:
+                        rainbow.animate()
+                    rainbow.fill([0, 0, 0])
