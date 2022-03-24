@@ -4,6 +4,7 @@
 import time
 import ssl
 from random import randint
+import microcontroller
 import socketpool
 import wifi
 import board
@@ -19,29 +20,33 @@ except ImportError:
 
 # Add your Adafruit IO Username and Key to secrets.py
 # (visit io.adafruit.com if you need to create an account,
-# or if you need your Adafruit IO key.)
+# or if you need to obtain your Adafruit IO key.)
 aio_username = secrets["aio_username"]
 aio_key = secrets["aio_key"]
 
 # WiFi
-print("Connecting to %s" % secrets["ssid"])
-wifi.radio.connect(secrets["ssid"], secrets["password"])
-print("Connected to %s!" % secrets["ssid"])
+try:
+    print("Connecting to %s" % secrets["ssid"])
+    wifi.radio.connect(secrets["ssid"], secrets["password"])
+    print("Connected to %s!" % secrets["ssid"])
+# Wi-Fi connectivity fails with error messages, not specific errors, so this except is broad.
+except Exception as e:  # pylint: disable=broad-except
+    print("Failed to connect to WiFi. Error:", e, "\nBoard will hard reset in 30 seconds.")
+    time.sleep(30)
+    microcontroller.reset()
 
 # Initialise NeoPixel
 pixel = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.3)
 
 
 # Define callback functions which will be called when certain events happen.
-# pylint: disable=unused-argument
 def connected(client):
     print("Connected to Adafruit IO!  Listening for NeoPixel changes...")
     # Subscribe to Adafruit IO feed called "neopixel"
     client.subscribe("neopixel")
 
 
-# pylint: disable=unused-argument
-def message(client, feed_id, payload):
+def message(client, feed_id, payload):  # pylint: disable=unused-argument
     print("Feed {0} received new value: {1}".format(feed_id, payload))
     if feed_id == "neopixel":
         pixel.fill(int(payload[1:], 16))
@@ -66,18 +71,28 @@ io = IO_MQTT(mqtt_client)
 io.on_connect = connected
 io.on_message = message
 
-# Connect the client to the MQTT broker.
-print("Connecting to Adafruit IO...")
-io.connect()
-
 timestamp = 0
 while True:
-    # Explicitly pump the message loop.
-    io.loop()
+    try:
+        # If Adafruit IO is not connected...
+        if not io.is_connected:
+            # Connect the client to the MQTT broker.
+            print("Connecting to Adafruit IO...")
+            io.connect()
 
-    # Obtain the "random" value, print it and publish it to Adafruit IO every 10 seconds.
-    if (time.monotonic() - timestamp) >= 10:
-        random_number = "{}".format(randint(0, 255))
-        print("Current 'random' number: {}".format(random_number))
-        io.publish("random", random_number)
-        timestamp = time.monotonic()
+        # Explicitly pump the message loop.
+        io.loop()
+        # Obtain the "random" value, print it and publish it to Adafruit IO every 10 seconds.
+        if (time.monotonic() - timestamp) >= 10:
+            random_number = "{}".format(randint(0, 255))
+            print("Current 'random' number: {}".format(random_number))
+            io.publish("random", random_number)
+            timestamp = time.monotonic()
+
+    # Adafruit IO fails with internal error types and WiFi fails with specific messages.
+    # This except is broad to handle any possible failure.
+    except Exception as e:  # pylint: disable=broad-except
+        print("Failed to get or send data, or connect. Error:", e,
+              "\nBoard will hard reset in 30 seconds.")
+        time.sleep(30)
+        microcontroller.reset()
