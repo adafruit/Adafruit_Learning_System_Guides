@@ -2,9 +2,9 @@
 # SPDX-FileCopyrightText: 2022 Kattni Rembor for Adafruit Industries
 # SPDX-License-Identifier: MIT
 import time
+import microcontroller
 import ssl
 from random import randint
-import microcontroller
 import socketpool
 import wifi
 import board
@@ -71,21 +71,17 @@ io = IO_MQTT(mqtt_client)
 io.on_connect = connected
 io.on_message = message
 
-# Connect to Adafruit IO
-try:
-    io.connect()
-# connect() fails with an internal error type, so this except is broad.
-except Exception as e:  # pylint: disable=broad-except
-    print("Failed to connect to Adafruit IO. Error:", e, "\nBoard will hard reset in 30 seconds.")
-    time.sleep(30)
-    microcontroller.reset()
-
 timestamp = 0
 while True:
     try:
+        # If Adafruit IO is not connected...
+        if not io.is_connected:
+            # Connect the client to the MQTT broker.
+            print("Connecting to Adafruit IO...")
+            io.connect()
+
         # Explicitly pump the message loop.
         io.loop()
-
         # Obtain the "random" value, print it and publish it to Adafruit IO every 10 seconds.
         if (time.monotonic() - timestamp) >= 10:
             random_number = "{}".format(randint(0, 255))
