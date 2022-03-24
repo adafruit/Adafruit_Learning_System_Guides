@@ -2,9 +2,9 @@
 # SPDX-FileCopyrightText: 2022 Kattni Rembor for Adafruit Industries
 # SPDX-License-Identifier: MIT
 import time
-import microcontroller
 import ssl
 from random import randint
+import microcontroller
 import socketpool
 import wifi
 import board
