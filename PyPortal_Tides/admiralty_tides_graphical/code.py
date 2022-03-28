@@ -18,7 +18,7 @@ except ImportError:
     raise
 
 #--| USER CONFIG |--------------------------
-STATION_ID = "0245"   # tide location, find yours from admiralty website
+STATION_ID = "0245"      # tide location, find yours from admiralty website
 PLOT_SIZE = 2            # tide plot thickness
 PLOT_COLOR = 0x00FF55    # tide plot color
 MARK_SIZE = 6            # current time marker size
@@ -37,11 +37,17 @@ HEIGHT = board.DISPLAY.height
 
 # determine the current working directory needed so we know where to find files
 cwd = ("/"+__file__).rsplit('/', 1)[0]
+
+if board.board_id == "pyportal_titano":
+    bg_image_path = "/images/tides_bg_graph_480-320.bmp"
+else:
+    bg_image_path = "/images/tides_bg_graph.bmp"
+
 pyportal = PyPortal(url=DATA_SOURCE,
                     headers={"Ocp-Apim-Subscription-Key":secrets['Ocp-Apim-Subscription-Key']},
                     json_path=DATA_LOCATION,
                     status_neopixel=board.NEOPIXEL,
-                    default_bg=cwd+"/images/tides_bg_graph.bmp")
+                    default_bg=cwd+bg_image_path)
 
 # Connect to the internet and get local time
 pyportal.get_local_time()
@@ -65,8 +71,13 @@ date_font.load_glyphs(b'1234567890-')
 date_label = Label(date_font, text="0000-00-00", color=DATE_COLOR, x=7, y=14)
 pyportal.splash.append(date_label)
 
+if board.board_id == "pyportal_titano":
+    x_pos = 394
+else:
+    x_pos = 234
+
 # Setup time label
-time_label = Label(date_font, text="00:00:00", color=TIME_COLOR, x=234, y=14)
+time_label = Label(date_font, text="00:00:00", color=TIME_COLOR, x=x_pos, y=14)
 pyportal.splash.append(time_label)
 
 # Setup current time marker
