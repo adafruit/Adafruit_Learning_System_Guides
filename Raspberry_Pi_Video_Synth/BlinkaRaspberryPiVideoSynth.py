@@ -72,6 +72,9 @@ c, addr = s.accept()
 print('got connected', addr)
 
 while True:
+    #  reset the VL53L4CD
+    vl53.clear_interrupt()
+
     #  rotary encoder position read
     position = -rot_encoder.position
 
@@ -88,6 +91,11 @@ while True:
     g_pot = int(g_mapped)
     b_pot = int(b_mapped)
 
+    #  set neopixels on neosliders to match background color of Processing animations
+    r_pix.fill((r_pot, g_pot, b_pot))
+    g_pix.fill((r_pot, g_pot, b_pot))
+    b_pix.fill((r_pot, g_pot, b_pot))
+
     #  rotary encoder position check
     if position != last_position:
         #  rotary encoder is ranged to 0-3
@@ -102,40 +110,37 @@ while True:
         last_position = position
     #  sliders only update data for changes >15 to avoid flooding socket
     #  red neoslider position check
-    if abs(r_pot - last_r) > 15:
+    if abs(r_pot - last_r) > 2:
         #  send red neoslider data over socket
         #  identifying string is "red"
         c.send(str.encode(' '.join(["red", str(r_pot)])))
         #  reset last_r
         last_r = r_pot
     #  green neoslider position check
-    if abs(g_pot - last_g) > 15:
+    if abs(g_pot - last_g) > 2:
         #  send green neoslider data over socket
         #  identifying string is "green"
         c.send(str.encode(' '.join(["green", str(g_pot)])))
         #  reset last_g
         last_g = g_pot
     #  blue neoslider position check
-    if abs(b_pot - last_b) > 15:
+    if abs(b_pot - last_b) > 2:
         #  send blue neoslider data over socket
         #  identifying string is "blue"
         c.send(str.encode(' '.join(["blue", str(b_pot)])))
         #  reset last_b
         last_b = b_pot
     #  VL53L4CD value check
+
+    #  setting max value of 45
+    if flight > 45:
+        flight = 45
+        last_flight = flight
     if abs(flight - last_flight) > 2:
-        #  setting max value of 45
-        if flight > 45:
-            flight = 45
+        print(flight)
         #  send VL53L4CD data over socket
         #  identifying string is "flight"
         c.send(str.encode(' '.join(["flight", str(flight)])))
-        #  reset last_flight
+            #  reset last_flight
         last_flight = flight
-    #  set neopixels on neosliders to match background color of Processing animations
-    r_pix.fill((r_pot, g_pot, b_pot))
-    g_pix.fill((r_pot, g_pot, b_pot))
-    b_pix.fill((r_pot, g_pot, b_pot))
-    #  reset the VL53L4CD
-    vl53.clear_interrupt()
- 
+    

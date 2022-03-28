@@ -54,16 +54,22 @@ int xdirection = 1;
 int ydirection = 1;  
 
 // variables for pizzaCat animation
-float pizza_speed = 20;  
-float cat_speed = 30;  
+int pizzaCount = 32;
+int catCount = 32;
+int emojiCount = 32;
 
-float pizza_pos, cat_pos;
+PImage[] cats = new PImage[catCount];
+PImage[] pizzas = new PImage[pizzaCount];
 
-int img_w = 10;
+float[] moveX = new float[emojiCount];
+float[] moveY = new float[emojiCount];
 
-int pizza_dir = 1;
-int cat_dir = 1;
-int num_cats;
+float last_speed;
+
+float[] x_dir = new float[emojiCount];
+float[] y_dir = new float[emojiCount];
+float[] x_speeds = new float[emojiCount];
+float[] y_speeds = new float[emojiCount];
 
 // variables for dancingTriangles animation
 int x1;
@@ -98,6 +104,23 @@ void setup()
   cat_img = loadImage("cat.png");
   pizza_img = loadImage("pizza.png");
   
+  // adding pizza and cat emojis to their arrays
+  for (int slice = 0; slice  < 15; slice ++) {
+    pizzas[slice] = pizza_img;
+  }
+  for (int claw = 16; claw< catCount; claw++) {
+    cats[claw] = cat_img;
+  }
+  // creating arrays of coordinates and speed for pizzaCat
+  for (int z = 0; z < emojiCount; z ++) {
+    x_dir[z] = random(width);
+    y_dir[z] = random(height);
+    x_speeds[z] = random(5, 20);
+    y_speeds[z] = random(5, 20);
+    moveX[z] = x_speeds[z];
+    moveY[z] = y_speeds[z];
+  }
+  
   // connecting to socket to communicate with Blinka script
   myClient = new Client(this, "127.0.0.1", 12345);
 
@@ -116,6 +139,7 @@ void draw()
       // the encoder pos is stored in index
       String[] q = splitTokens(inString);
       index = int(q[1]);
+      println(index);
     }
     //if the string begins with 'red'
     //aka is from the red neoslider
@@ -123,6 +147,7 @@ void draw()
       //the red value is stored in red
       String[] r = splitTokens(inString);
       red = int(r[1]);
+      println(red);
     }
     //if the string begins with 'green'
     //aka is from the green neoslider
@@ -130,6 +155,7 @@ void draw()
       // the green value is stored in green
       String[] g = splitTokens(inString);
       green = int(g[1]);
+      println(green);
     }
     //if the string begins with 'blue'
     //aka is from the blue neoslider
@@ -137,6 +163,7 @@ void draw()
       //the blue value is stored in blue
       String[] b = splitTokens(inString);
       blue = int(b[1]);
+      println(blue);
     }
     //if the string begins with flight
     //aka is from the VL53L4CD
@@ -147,7 +174,7 @@ void draw()
     }
   }
   //the encoder's position corresponds with which animation plays
-  if (index == 0) {
+  if (index == 3) {
     circles();
     }
 
@@ -157,7 +184,7 @@ void draw()
   if (index == 2) {
     dancingTriangles();
     }
-  if (index == 3) {
+  if (index == 0) {
     pizzaCat();
     }
   }
@@ -208,29 +235,77 @@ void cube() {
 }
 
 //the Pizza Cat animation
-//pizza and cat face emojis go back and forth across the screen
+//pizza and cat face emojis bounce around the screen
 //emojis are from the OpenMoji emoji library (https://openmoji.org/)
 //the background color is affected by the sliders
-//the speed of the cat emojis are affected by the V53L4CD
+//the speed of the emojis are affected by the V53L4CD
+//green slider affects # of cats
+//blue slider affects # of pizzas
 void pizzaCat() { 
   background(red, green, blue);
-  int num_cats = int(map(flight, 0, 45, 65, 15));
-
-  pizza_pos = pizza_pos + ( pizza_speed * pizza_dir );
-  cat_pos = cat_pos + ( num_cats * cat_dir );
-
-  if (pizza_pos + img_w > width || pizza_pos < img_w) {
-    pizza_dir *= -1;
-  }
-  if (cat_pos + img_w > height || cat_pos < img_w) {
-    cat_dir *= -1;
-  }
+  float meow = map(green, 0, 255, 32, 16);
+  float pie = map(blue, 0, 255, 15, 0);
+  float speed = map(flight, 0, 45, 0, 25);
   
-  for (int p = 0; p < 25; p++) {
-    image(cat_img, pizza_pos-10, cat_pos*p);
-    image(pizza_img, pizza_pos*p, cat_pos+10);
-  }
+    for (int e = 16; e < meow; e++) {
+      if (last_speed != speed) {
+        moveX[e] = x_speeds[e] + speed;
+        moveY[e] = y_speeds[e] + speed;
+      }
+      else {
+        moveX[e] = moveX[e];
+        moveY[e] = moveY[e];
+      }
+      x_dir[e] += moveX[e];
+      if (x_dir[e] < 0 || x_dir[e] > width) {
+        moveX[e] *= -1;
+        
+      }
+      if (x_dir[e] > width) {
+        x_dir[e] = (width - 2);
+      }
+      y_dir[e] += moveY[e];
+      if(y_dir[e] < 0 || y_dir[e] > height) {
+        moveY[e] *= -1;
+        
+      }
+      if (y_dir[e] > height) {
+        y_dir[e] = (height - 2);
+      }
+
+    image(cats[e], x_dir[e], y_dir[e]);
+    
+    }
+    for (int p = 1; p < pie; p++) {
+      if (last_speed != speed) {
+        moveX[p] = x_speeds[p] + speed;
+        moveY[p] = y_speeds[p] + speed;
+      }
+      else {
+        moveX[p] = moveX[p];
+        moveY[p] = moveY[p];
+      }
+      x_dir[p] += moveX[p];
+      if (x_dir[p] < 0 || x_dir[p] > width) {
+          moveX[p] *= -1;
+      }
+      if (x_dir[p] > width) {
+        x_dir[p] = (width - 2);
+      }
+      y_dir[p] += moveY[p];
+      if(y_dir[p] < 0 || y_dir[p] > height) {
+        moveY[p] *= -1;
+      }
+      if (y_dir[p] > height) {
+        y_dir[p] = (height - 2);
+      }
+
+    image(pizzas[p], x_dir[p], y_dir[p]);
+    }
+    last_speed = speed;
 }
+
+
 
 // the dancingTriangles animation
 // triangles are randomly generated in the center of the screen
