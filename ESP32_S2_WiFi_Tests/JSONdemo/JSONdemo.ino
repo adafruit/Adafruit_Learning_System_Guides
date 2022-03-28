@@ -26,8 +26,9 @@ last revision November 2015
 
 #if defined(USE_OLED)
 // Some boards have TWO I2C ports, how nifty. We should use the second one sometimes
-#if defined(ARDUINO_ADAFRUIT_QTPY_ESP32S2) \
-    || defined(ARDUINO_ADAFRUIT_QTPY_ESP32_PICO)
+#if defined(ARDUINO_ADAFRUIT_QTPY_ESP32S2) || \
+    defined(ARDUINO_ADAFRUIT_QTPY_ESP32S3_NOPSRAM) || \
+    defined(ARDUINO_ADAFRUIT_QTPY_ESP32_PICO)
   #define OLED_I2C_PORT &Wire1
 #else
   #define OLED_I2C_PORT &Wire
@@ -198,10 +199,12 @@ void loop() {
 }
 
 void setupI2C() {
-  #if defined(ARDUINO_ADAFRUIT_QTPY_ESP32S2) || defined(ARDUINO_ADAFRUIT_QTPY_ESP32_PICO)
-  // ESP32 is kinda odd in that secondary ports must be manually
-  // assigned their pins with setPins()!
-  Wire1.setPins(SDA1, SCL1);
+  #if defined(ARDUINO_ADAFRUIT_QTPY_ESP32S2) || \
+    defined(ARDUINO_ADAFRUIT_QTPY_ESP32S3_NOPSRAM) || \
+    defined(ARDUINO_ADAFRUIT_QTPY_ESP32_PICO)
+    // ESP32 is kinda odd in that secondary ports must be manually
+    // assigned their pins with setPins()!
+    Wire1.setPins(SDA1, SCL1);
   #endif
   
   #if defined(NEOPIXEL_I2C_POWER)
