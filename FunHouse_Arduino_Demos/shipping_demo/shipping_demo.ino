@@ -9,7 +9,8 @@
 #include <Adafruit_AHTX0.h>
 
 #define NUM_DOTSTAR 5
-#define BG_COLOR ST77XX_BLACK
+#define BG_COLOR ST77XX_BLACK  // Set background to black
+#define ST77XX_GREY 0x8410     // define mid-grey in RGB565
 
 // display!
 Adafruit_ST7789 tft = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RESET);
@@ -124,7 +125,7 @@ void loop() {
   tft.setTextColor(ST77XX_YELLOW);
   tft.print("Buttons: ");
   if (! digitalRead(BUTTON_DOWN)) {  
-    tft.setTextColor(0x808080);
+    tft.setTextColor(ST77XX_GREY);
   } else {
     Serial.println("DOWN pressed");
     tft.setTextColor(ST77XX_WHITE);
@@ -132,7 +133,7 @@ void loop() {
   tft.print("DOWN ");
 
   if (! digitalRead(BUTTON_SELECT)) {  
-    tft.setTextColor(0x808080);
+    tft.setTextColor(ST77XX_GREY);
   } else {
     Serial.println("SELECT pressed");
     tft.setTextColor(ST77XX_WHITE);
@@ -140,7 +141,7 @@ void loop() {
   tft.print("SEL ");
   
   if (! digitalRead(BUTTON_UP)) {  
-    tft.setTextColor(0x808080);
+    tft.setTextColor(ST77XX_GREY);
   } else {
     Serial.println("UP pressed");
     tft.setTextColor(ST77XX_WHITE);
@@ -155,7 +156,7 @@ void loop() {
   tft.print("Captouch 6: ");
   touchread = touchRead(6);
   if (touchread < 10000 ) {  
-    tft.setTextColor(0x808080, BG_COLOR);
+    tft.setTextColor(ST77XX_GREY, BG_COLOR);
   } else {
     tft.setTextColor(ST77XX_WHITE, BG_COLOR);
   }
@@ -168,7 +169,7 @@ void loop() {
   tft.print("Captouch 7: ");
   touchread = touchRead(7);
   if (touchread < 20000 ) {  
-    tft.setTextColor(0x808080, BG_COLOR);
+    tft.setTextColor(ST77XX_GREY, BG_COLOR);
   } else {
     tft.setTextColor(ST77XX_WHITE, BG_COLOR);
   }
@@ -182,7 +183,7 @@ void loop() {
   tft.print("Captouch 8: ");
   touchread = touchRead(8);
   if (touchread < 20000 ) {  
-    tft.setTextColor(0x808080, BG_COLOR);
+    tft.setTextColor(ST77XX_GREY, BG_COLOR);
   } else {
     tft.setTextColor(ST77XX_WHITE, BG_COLOR);
   }
@@ -247,10 +248,10 @@ void loop() {
   /************************** Beep! */
   if (digitalRead(BUTTON_SELECT)) {  
      Serial.println("** Beep! ***");
-     tone(SPEAKER, 988, 100);  // tone1 - B5
-     tone(SPEAKER, 1319, 200); // tone2 - E6
+     fhtone(SPEAKER, 988.0, 100.0);  // tone1 - B5
+     fhtone(SPEAKER, 1319.0, 200.0); // tone2 - E6
      delay(100);
-     //tone(SPEAKER, 2000, 100);
+     //fhtone(SPEAKER, 2000.0, 100.0);
   }
   
   /************************** LEDs */
@@ -268,7 +269,7 @@ void loop() {
 }
 
 
-void tone(uint8_t pin, float frequecy, float duration) {
+void fhtone(uint8_t pin, float frequecy, float duration) {
   ledcSetup(1, frequecy * 80, 8);
   ledcAttachPin(pin, 1);
   ledcWrite(1, 128);
