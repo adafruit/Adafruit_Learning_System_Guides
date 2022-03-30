@@ -9,8 +9,8 @@
 #include <Adafruit_AHTX0.h>
 
 #define NUM_DOTSTAR 5
-#define BG_COLOR ST77XX_BLACK
-#define ST77XX_GREY 0x8410   // define mid-grey in RGB565
+#define BG_COLOR ST77XX_BLACK  // Set background to black
+#define ST77XX_GREY 0x8410     // define mid-grey in RGB565
 
 // display!
 Adafruit_ST7789 tft = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RESET);
