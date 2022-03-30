@@ -63,7 +63,7 @@ for spot in spots:
                     style=Button.SHADOWROUNDRECT,
                     fill_color=spot['color'], outline_color=0x222222,
                     name=spot['label'])
-    pyportal.splash.append(button.group)
+    pyportal.splash.append(button)
     buttons.append(button)
 
 mode = 0
