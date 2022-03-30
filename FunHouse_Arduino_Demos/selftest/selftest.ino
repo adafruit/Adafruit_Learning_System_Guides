@@ -10,6 +10,7 @@
 
 #define NUM_DOTSTAR 5
 #define BG_COLOR ST77XX_BLACK
+#define ST77XX_GREY 0x8410   // Colors are in RGB565 format
 
 // display!
 Adafruit_ST7789 tft = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RESET);
@@ -125,7 +126,7 @@ void loop() {
   tft.setTextColor(ST77XX_YELLOW);
   tft.print("Buttons: ");
   if (! digitalRead(BUTTON_DOWN)) {  
-    tft.setTextColor(0x808080);
+    tft.setTextColor(ST77XX_GREY);
   } else {
     Serial.println("DOWN pressed");
     tft.setTextColor(ST77XX_WHITE);
@@ -133,7 +134,7 @@ void loop() {
   tft.print("DOWN ");
 
   if (! digitalRead(BUTTON_SELECT)) {  
-    tft.setTextColor(0x808080);
+    tft.setTextColor(ST77XX_GREY);
   } else {
     Serial.println("SELECT pressed");
     tft.setTextColor(ST77XX_WHITE);
@@ -141,7 +142,7 @@ void loop() {
   tft.print("SEL ");
   
   if (! digitalRead(BUTTON_UP)) {  
-    tft.setTextColor(0x808080);
+    tft.setTextColor(ST77XX_GREY);
   } else {
     Serial.println("UP pressed");
     tft.setTextColor(ST77XX_WHITE);
@@ -156,7 +157,7 @@ void loop() {
   tft.print("Captouch 6: ");
   touchread = touchRead(6);
   if (touchread < 10000 ) {  
-    tft.setTextColor(0x808080, BG_COLOR);
+    tft.setTextColor(ST77XX_GREY, BG_COLOR);
   } else {
     tft.setTextColor(ST77XX_WHITE, BG_COLOR);
   }
@@ -169,7 +170,7 @@ void loop() {
   tft.print("Captouch 7: ");
   touchread = touchRead(7);
   if (touchread < 20000 ) {  
-    tft.setTextColor(0x808080, BG_COLOR);
+    tft.setTextColor(ST77XX_GREY, BG_COLOR);
   } else {
     tft.setTextColor(ST77XX_WHITE, BG_COLOR);
   }
@@ -183,7 +184,7 @@ void loop() {
   tft.print("Captouch 8: ");
   touchread = touchRead(8);
   if (touchread < 20000 ) {  
-    tft.setTextColor(0x808080, BG_COLOR);
+    tft.setTextColor(ST77XX_GREY, BG_COLOR);
   } else {
     tft.setTextColor(ST77XX_WHITE, BG_COLOR);
   }
