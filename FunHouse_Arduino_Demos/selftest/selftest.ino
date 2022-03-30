@@ -249,10 +249,10 @@ void loop() {
   /************************** Beep! */
   if (digitalRead(BUTTON_SELECT)) {  
      Serial.println("** Beep! ***");
-     tone(SPEAKER, 988, 100);  // tone1 - B5
-     tone(SPEAKER, 1319, 200); // tone2 - E6
+     fhtone(SPEAKER, 988.0, 100.0);  // tone1 - B5
+     fhtone(SPEAKER, 1319.0, 200.0); // tone2 - E6
      delay(100);
-     //tone(SPEAKER, 2000, 100);
+     //fhtone(SPEAKER, 2000.0, 100.0);
   }
   
   /************************** LEDs */
@@ -270,7 +270,7 @@ void loop() {
 }
 
 
-void tone(uint8_t pin, float frequency, float duration) {
+void fhtone(uint8_t pin, float frequency, float duration) {
   ledcSetup(1, frequency, 8);
   ledcAttachPin(pin, 1);
   ledcWrite(1, 128);
