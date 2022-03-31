@@ -58,9 +58,12 @@ async def rainbow_cycle(animation_controls):
 async def blink(animation_controls):
     """Blink animation on ring two."""
     while True:
-        ring_two[:] = [(0, 0, abs(ring_two[0][2] - 255))] * num_pixels
-        await asyncio.sleep(animation_controls.delay)
+        ring_two.fill((0, 0, 255))
         ring_two.show()
+        await asyncio.sleep(animation_controls.delay)
+        ring_two.fill((0, 0, 0))
+        ring_two.show()
+        await asyncio.sleep(animation_controls.delay)
         await asyncio.sleep(animation_controls.wait)
 
 
