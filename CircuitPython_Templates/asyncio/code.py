@@ -5,11 +5,21 @@
 """
 CircuitPython asyncio example for two NeoPixel rings and one button.
 REMOVE THIS LINE AND THE REST OF THIS DOCSTRING BEFORE SUBMITTING TO LEARN
+THERE ARE TWO POSSIBLE THINGS IN THE CODE TO UPDATE.
 
-Update BUTTON to the pin that matches the pin to which the button is connected.
+One: Update BUTTON to the pin that matches the pin to which the button is connected.
 
 For example, on the QT Py RP2040, you would leave it as BUTTON to use the built-in Boot button.
+On the FunHouse, you would update BUTTON to BUTTON_UP to use the built-in up button.
 On the Feather M4 Express, you would wire the external button to A0, and update BUTTON to A0.
+
+Two: THIS IS ONLY NECESSARY IF THE BUILT-IN BUTTON IS ACTIVE HIGH. For example the built-in
+buttons on the Circuit Playground Bluefruit and the MagTag are active high.
+If your button is ACTIVE HIGH, under "async def monitor_button(button, animation_controls)",
+update the following line of code:
+    with keypad.Keys((button,), value_when_pressed=False, pull=True) as key:
+To the following:
+    with keypad.Keys((button,), value_when_pressed=True, pull=True) as key:
 """
 import asyncio
 import board
