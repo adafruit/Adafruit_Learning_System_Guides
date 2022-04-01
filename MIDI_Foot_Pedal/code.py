@@ -7,7 +7,6 @@ import adafruit_midi
 import simpleio
 from analogio import AnalogIn
 from adafruit_midi.control_change import ControlChange
-from adafruit_midi.pitch_bend import PitchBend
 
 #  midi setup
 midi = adafruit_midi.MIDI(
@@ -44,4 +43,3 @@ while True:
         modWheel = ControlChange(1, modulation)
         #  send CC message
         midi.send(modWheel)
-
