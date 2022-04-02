@@ -64,12 +64,20 @@ def set_backlight(val):
     board.DISPLAY.brightness = val
 
 # Set the Backlight
-set_backlight(0.3)
+if board.board_id == "pyportal_titano":
+    # 0.3 brightness does not cause the display to be visible on the Titano
+    set_backlight(1)
+else:
+    set_backlight(0.3)
 
 # Touchscreen setup
 # ------Rotate 270:
-screen_width = 240
-screen_height = 320
+if board.board_id == "pyportal_titano":
+    screen_width = 320
+    screen_height = 480
+else:
+    screen_width = 240
+    screen_height = 320
 ts = adafruit_touchscreen.Touchscreen(board.TOUCH_YD, board.TOUCH_YU,
                                       board.TOUCH_XR, board.TOUCH_XL,
                                       calibration=((5200, 59000),
