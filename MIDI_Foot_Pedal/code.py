@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2022 Liz Clark for Adafruit Industries
 # SPDX-License-Identifier: MIT
 
+import time
 import board
 import usb_midi
 import adafruit_midi
@@ -22,16 +23,16 @@ def val(pin):
 
 #  variables for last read value
 #  defaults to 0
-#  no pitchbend is 8192
 mod_val2 = 0
 
 while True:
 
-    #  uncomment below to print potentiometer values in the REPL
-    #  print("{}".format(mod_pot.value))
+    #  Print out the min/max values from potentiometer to the serial monitor and plotter
+    print((mod_pot.value,))
+    time.sleep(0.05)
 
-    #  map range of potentiometer input to midi values
-    mod_val1 = round(simpleio.map_range(val(mod_pot), 41200, 58500, 0, 127))
+    #  map range of potentiometer input to midi values - update the min/max values below
+    mod_val1 = round(simpleio.map_range(val(mod_pot), 0, 65535, 0, 127))
 
     #  if modulation value is updated...
     if abs(mod_val1 - mod_val2) > 2:
