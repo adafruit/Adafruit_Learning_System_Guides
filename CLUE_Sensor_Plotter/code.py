@@ -43,44 +43,56 @@ import gc
 import board
 
 from plotter import Plotter
-from plot_source import PlotSource, TemperaturePlotSource, PressurePlotSource, \
-                        HumidityPlotSource, ColorPlotSource, ProximityPlotSource, \
-                        IlluminatedColorPlotSource, VolumePlotSource, \
-                        AccelerometerPlotSource, GyroPlotSource, \
-                        MagnetometerPlotSource, PinPlotSource
+from plot_source import (
+    TemperaturePlotSource,
+    PressurePlotSource,
+    HumidityPlotSource,
+    ColorPlotSource,
+    ProximityPlotSource,
+    IlluminatedColorPlotSource,
+    VolumePlotSource,
+    AccelerometerPlotSource,
+    GyroPlotSource,
+    MagnetometerPlotSource,
+    PinPlotSource,
+)
 from adafruit_clue import clue
-
 
 debug = 1
 
-
 # A list of all the data sources for plotting
-sources = [TemperaturePlotSource(clue, mode="Celsius"),
-           TemperaturePlotSource(clue, mode="Fahrenheit"),
-           PressurePlotSource(clue, mode="Metric"),
-           PressurePlotSource(clue, mode="Imperial"),
-           HumidityPlotSource(clue),
-           ColorPlotSource(clue),
-           ProximityPlotSource(clue),
-           IlluminatedColorPlotSource(clue, mode="Red"),
-           IlluminatedColorPlotSource(clue, mode="Green"),
-           IlluminatedColorPlotSource(clue, mode="Blue"),
-           IlluminatedColorPlotSource(clue, mode="Clear"),
-           VolumePlotSource(clue),
-           AccelerometerPlotSource(clue),
-           GyroPlotSource(clue),
-           MagnetometerPlotSource(clue),
-           PinPlotSource([board.P0, board.P1, board.P2])
-          ]
+# NOTE: Due to memory contraints, the total number of data sources
+# is limited. Can try adding more until a memory limit is hit. At that
+# point, decide what to keep and what to toss. Can comment/uncomment lines
+# below as desired.
+sources = [
+    TemperaturePlotSource(clue, mode="Celsius"),
+    #   TemperaturePlotSource(clue, mode="Fahrenheit"),
+    PressurePlotSource(clue, mode="Metric"),
+    #   PressurePlotSource(clue, mode="Imperial"),
+    HumidityPlotSource(clue),
+    ColorPlotSource(clue),
+    ProximityPlotSource(clue),
+    #   IlluminatedColorPlotSource(clue, mode="Red"),
+    #   IlluminatedColorPlotSource(clue, mode="Green"),
+    #   IlluminatedColorPlotSource(clue, mode="Blue"),
+    #   IlluminatedColorPlotSource(clue, mode="Clear"),
+    #   VolumePlotSource(clue),
+    AccelerometerPlotSource(clue),
+    #   GyroPlotSource(clue),
+    #   MagnetometerPlotSource(clue),
+    #   PinPlotSource([board.P0, board.P1, board.P2])
+]
 # The first source to select when plotting starts
 current_source_idx = 0
 
 # The various plotting styles - scroll is currently a jump scroll
-stylemodes = (("lines", "scroll"),  # draws lines between points
-              ("lines", "wrap"),
-              ("dots", "scroll"),   # just points - slightly quicker
-              ("dots", "wrap")
-             )
+stylemodes = (
+    ("lines", "scroll"),  # draws lines between points
+    ("lines", "wrap"),
+    ("dots", "scroll"),  # just points - slightly quicker
+    ("dots", "wrap"),
+)
 current_sm_idx = 0
 
 
@@ -94,7 +106,7 @@ def d_print(level, *args, **kwargs):
 
 def select_colors(plttr, src, def_palette):
     """Choose the colours based on the particular PlotSource
-       or forcing use of default palette."""
+    or forcing use of default palette."""
     # otherwise use defaults
     channel_colidx = []
     palette = plttr.get_colors()
@@ -109,7 +121,7 @@ def select_colors(plttr, src, def_palette):
 
 def ready_plot_source(plttr, srcs, def_palette, index=0):
     """Select the plot source by index from srcs list and then setup the
-       plot parameters by retrieving meta-data from the PlotSource object."""
+    plot parameters by retrieving meta-data from the PlotSource object."""
     src = srcs[index]
     # Put the description of the source on screen at the top
     source_name = str(src)
@@ -132,12 +144,12 @@ def ready_plot_source(plttr, srcs, def_palette, index=0):
 
 def wait_release(func, menu):
     """Calls func repeatedly waiting for it to return a false value
-       and goes through menu list as time passes.
+    and goes through menu list as time passes.
 
-       The menu is a list of menu entries where each entry is a
-       two element list of time passed in seconds and text to display
-       for that period.
-       The entries must be in ascending time order."""
+    The menu is a list of menu entries where each entry is a
+    two element list of time passed in seconds and text to display
+    for that period.
+    The entries must be in ascending time order."""
 
     start_t_ns = time.monotonic_ns()
     menu_option = None
@@ -162,7 +174,7 @@ def wait_release(func, menu):
 
 def popup_text(plttr, text, duration=1.0):
     """Place some text on the screen using info property of Plotter object
-       for duration seconds."""
+    for duration seconds."""
     plttr.info = text
     time.sleep(duration)
     plttr.info = None
@@ -175,13 +187,15 @@ initial_title = "CLUE Plotter"
 # displayio has some static limits on text - pre-calculate the maximum
 # length of all of the different PlotSource objects
 max_title_len = max(len(initial_title), max([len(str(so)) for so in sources]))
-plotter = Plotter(board.DISPLAY,
-                  style=stylemodes[current_sm_idx][0],
-                  mode=stylemodes[current_sm_idx][1],
-                  title=initial_title,
-                  max_title_len=max_title_len,
-                  mu_output=mu_plotter_output,
-                  debug=debug)
+plotter = Plotter(
+    board.DISPLAY,
+    style=stylemodes[current_sm_idx][0],
+    mode=stylemodes[current_sm_idx][1],
+    title=initial_title,
+    max_title_len=max_title_len,
+    mu_output=mu_plotter_output,
+    debug=debug,
+)
 
 # If set to true this forces use of colour blindness friendly colours
 use_def_pal = False
@@ -190,21 +204,28 @@ clue.pixel[0] = clue.BLACK  # turn off the NeoPixel on the back of CLUE board
 
 plotter.display_on()
 # Using left and right here in case the CLUE is cased hiding A/B labels
-popup_text(plotter,
-           "\n".join(["Button Guide",
-                      "Left: next source",
-                      "  2secs: palette",
-                      "  4s: Mu plot",
-                      "  6s: range lock",
-                      "Right: style change"]), duration=10)
+popup_text(
+    plotter,
+    "\n".join(
+        [
+            "Button Guide",
+            "Left: next source",
+            "  2secs: palette",
+            "  4s: Mu plot",
+            "  6s: range lock",
+            "Right: style change",
+        ]
+    ),
+    duration=10,
+)
 
 count = 0
 
 while True:
     # Set the source and start items
-    (source, channels) = ready_plot_source(plotter, sources,
-                                           use_def_pal,
-                                           current_source_idx)
+    (source, channels) = ready_plot_source(
+        plotter, sources, use_def_pal, current_source_idx
+    )
 
     while True:
         # Read data from sensor or voltage from pad
@@ -213,25 +234,22 @@ while True:
         # Check for left (A) and right (B) buttons
         if clue.button_a:
             # Wait for button release with time-based menu
-            opt, _ = wait_release(lambda: clue.button_a,
-                                  [(2, "Next\nsource"),
-                                   (4,
-                                    ("Source" if use_def_pal else "Default")
-                                    + "\npalette"),
-                                   (6,
-                                    "Mu output "
-                                    + ("off" if mu_plotter_output else "on")),
-                                   (8,
-                                    "Range lock\n" + ("off" if range_lock else "on"))
-                                  ])
+            opt, _ = wait_release(
+                lambda: clue.button_a,
+                [
+                    (2, "Next\nsource"),
+                    (4, ("Source" if use_def_pal else "Default") + "\npalette"),
+                    (6, "Mu output " + ("off" if mu_plotter_output else "on")),
+                    (8, "Range lock\n" + ("off" if range_lock else "on")),
+                ],
+            )
             if opt == 0:  # change plot source
                 current_source_idx = (current_source_idx + 1) % len(sources)
                 break  # to leave inner while and select the new source
 
             elif opt == 1:  # toggle palette
                 use_def_pal = not use_def_pal
-                plotter.channel_colidx = select_colors(plotter, source,
-                                                       use_def_pal)
+                plotter.channel_colidx = select_colors(plotter, source, use_def_pal)
 
             elif opt == 2:  # toggle Mu output
                 mu_plotter_output = not mu_plotter_output
@@ -244,8 +262,7 @@ while True:
         if clue.button_b:  # change plot style and mode
             current_sm_idx = (current_sm_idx + 1) % len(stylemodes)
             (new_style, new_mode) = stylemodes[current_sm_idx]
-            wait_release(lambda: clue.button_b,
-                         [(2, new_style + "\n" + new_mode)])
+            wait_release(lambda: clue.button_b, [(2, new_style + "\n" + new_mode)])
             d_print(1, "Graph change", new_style, new_mode)
             plotter.change_stylemode(new_style, new_mode)
 
@@ -256,7 +273,7 @@ while True:
             plotter.data_add(all_data)
 
         # An occasional print of free heap
-        if debug >=3 and count % 15 == 0:
+        if debug >= 3 and count % 15 == 0:
             gc.collect()  # must collect() first to measure free memory
             print("Free memory:", gc.mem_free())
 
