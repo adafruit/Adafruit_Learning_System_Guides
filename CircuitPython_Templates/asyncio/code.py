@@ -15,7 +15,7 @@ On the Feather M4 Express, you would wire the external button to A0, and update 
 
 Two: THIS IS ONLY NECESSARY IF THE BUILT-IN BUTTON IS ACTIVE HIGH. For example the built-in
 buttons on the Circuit Playground Bluefruit and the MagTag are active high.
-If your button is ACTIVE HIGH, under "async def monitor_button(button, animation_controls)",
+If your button is ACTIVE HIGH, under "async def monitor_button(button, controls)",
 update the following line of code:
     with keypad.Keys((button,), value_when_pressed=False, pull=True) as key:
 To the following:
@@ -44,30 +44,30 @@ class AnimationControls:
         self.delay = 0.5
 
 
-async def rainbow_cycle(animation_controls):
+async def rainbow_cycle(controls):
     """Rainbow cycle animation on ring one."""
     while True:
-        for j in range(255, -1, -1) if animation_controls.reverse else range(0, 256, 1):
+        for j in range(255, -1, -1) if controls.reverse else range(0, 256, 1):
             for i in range(num_pixels):
                 rc_index = (i * 256 // num_pixels) + j
                 ring_one[i] = colorwheel(rc_index & 255)
             ring_one.show()
-            await asyncio.sleep(animation_controls.wait)
+            await asyncio.sleep(controls.wait)
 
 
-async def blink(animation_controls):
+async def blink(controls):
     """Blink animation on ring two."""
     while True:
         ring_two.fill((0, 0, 255))
         ring_two.show()
-        await asyncio.sleep(animation_controls.delay)
+        await asyncio.sleep(controls.delay)
         ring_two.fill((0, 0, 0))
         ring_two.show()
-        await asyncio.sleep(animation_controls.delay)
-        await asyncio.sleep(animation_controls.wait)
+        await asyncio.sleep(controls.delay)
+        await asyncio.sleep(controls.wait)
 
 
-async def monitor_button(button, animation_controls):
+async def monitor_button(button, controls):
     """Monitor button that reverses rainbow direction and changes blink speed.
     Assume button is active low.
     """
@@ -76,22 +76,21 @@ async def monitor_button(button, animation_controls):
             key_event = key.events.get()
             if key_event:
                 if key_event.pressed:
-                    animation_controls.reverse = True
-                    animation_controls.delay = 0.1
+                    controls.reverse = True
+                    controls.delay = 0.1
                 elif key_event.released:
-                    animation_controls.reverse = False
-                    animation_controls.delay = 0.5
-            # Let another task run.
+                    controls.reverse = False
+                    controls.delay = 0.5
             await asyncio.sleep(0)
 
 
 async def main():
     animation_controls = AnimationControls()
-    buttons_task = asyncio.create_task(monitor_button(button_pin, animation_controls))
+    button_task = asyncio.create_task(monitor_button(button_pin, animation_controls))
     animation_task = asyncio.create_task(rainbow_cycle(animation_controls))
     blink_task = asyncio.create_task(blink(animation_controls))
 
     # This will run forever, because no tasks ever finish.
-    await asyncio.gather(buttons_task, animation_task, blink_task)
+    await asyncio.gather(button_task, animation_task, blink_task)
 
 asyncio.run(main())
