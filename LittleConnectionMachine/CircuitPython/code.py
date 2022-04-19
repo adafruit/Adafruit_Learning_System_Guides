@@ -28,10 +28,10 @@ PERCENT = 33  # CONFIGURABLE: amount of 'on' LEDs, 0 (none) to 100 (all)
 # IS31FL3731 can have one of four addresses, so to run eight of them we
 # need *two* I2C buses, and not all boards can provide that. Here's where
 # you'd define the pin numbers for a board...
-I2C1_SDA = board.GP4  # First I2C bus
-I2C1_SCL = board.GP5
-I2C2_SDA = board.GP26  # Second I2C bus
-I2C2_SCL = board.GP27
+I2C1_SDA = board.GP18  # First I2C bus
+I2C1_SCL = board.GP19
+I2C2_SDA = board.GP16  # Second I2C bus
+I2C2_SCL = board.GP17
 
 # pylint: disable=too-few-public-methods
 class FakePILImage:
