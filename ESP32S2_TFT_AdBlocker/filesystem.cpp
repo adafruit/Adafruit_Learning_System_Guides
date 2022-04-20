@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2022 ladyada
+// SPDX-License-Identifier: GPL
+
 #include "config.h"
 #include "SdFat.h"
 #include "Adafruit_SPIFlash.h"

@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2022 s60sc with changes by ladyada
+// SPDX-License-Identifier: GPL
+
 #ifndef DNSServer_h
 #define DNSServer_h
 #include <WiFiUdp.h>

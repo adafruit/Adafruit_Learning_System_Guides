@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2022 s60sc with changes by ladyada
+// SPDX-License-Identifier: GPL
+
 #include <Arduino.h>
 
 #define DEFAULT_SSID "MY_SSID"

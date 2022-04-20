@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2022 s60sc with changes by ladyada
+// SPDX-License-Identifier: GPL
+
 #include "AdBlockerDNSServer.h"
 #include <lwip/def.h>
 #include <Arduino.h>
