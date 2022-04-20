@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2022 s60sc with changes by ladyada
-// SPDX-License-Identifier: GPL
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 #ifndef DNSServer_h
 #define DNSServer_h
