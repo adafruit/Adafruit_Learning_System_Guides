@@ -38,7 +38,7 @@
 #include <Fonts/FreeSans9pt7b.h>
 
 #include "AdBlockerDNSServer.h" // customised
-#include "AdBlockerWebPage.h"
+
 
 #include "config.h"
 
@@ -153,13 +153,12 @@ void loop() {
     timestamp = millis();
 #if !defined(DEBUG_ESP_DNS)
     display.setFont(&FreeSans9pt7b);
-    display.setTextSize(1);
+    display.setTextSize(2);
     display.setTextColor(ST77XX_RED);
     display.fillRect(0, 90, 240, 55, ST77XX_BLACK);
-    display.setCursor(0, 105);
-    display.print("Blocked ");
+    display.setCursor(0, 118);
     display.print(blockCnt);
-    display.println(" ads!");
+    display.println(" Nahs!");
 #endif
 
   }
@@ -282,7 +281,7 @@ static bool loadBlocklist() {
       delay(100);
       ESP.restart();
     }
-    display.print("Blocking ");
+    display.print("Checking ");
     display.print(itemsLoaded);
     display.println(" domains");
       
