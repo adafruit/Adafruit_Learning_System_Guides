@@ -81,7 +81,7 @@ apps = []
 files = os.listdir(MACRO_FOLDER)
 files.sort()
 for filename in files:
-    if filename.endswith('.py'):
+    if filename.endswith('.py') and not filename.startswith('._'):
         try:
             module = __import__(MACRO_FOLDER + '/' + filename[:-3])
             apps.append(App(module.app))
