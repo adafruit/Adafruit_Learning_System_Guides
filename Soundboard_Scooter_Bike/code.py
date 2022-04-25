@@ -9,7 +9,6 @@ import keypad
 import audiocore
 import audiomixer
 import audiobusio
-from audiopwmio import PWMAudioOut as AudioOut
 
 # wait a little bit so USB can stabilize and not glitch audio
 time.sleep(3)
