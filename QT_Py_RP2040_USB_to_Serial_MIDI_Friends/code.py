@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2022 Liz Clark for Adafruit Industries
+# SPDX-License-Identifier: MIT
+
 import board
 import busio
 import usb_midi
