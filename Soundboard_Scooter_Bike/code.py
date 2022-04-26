@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2022 John Park for Adafruit Industries
 # SPDX-License-Identifier: MIT
 
-# put samples in "/wav" folder
+# Convert files to appropriate WAV format (mono, 22050 Hz, 16-bit signed)
 
 import time
 import board
@@ -15,9 +15,10 @@ time.sleep(3)
 
 # list of (samples to play, mixer gain level)
 wav_files = (
-    ('wav/airhorn.wav', 1.0),
-    ('wav/bike-horn.wav', 1.0),
-    ('wav/chime.wav', 1.0)
+    ('wav/airhorn.wav', 1.0), #Honk sound 1
+    ('wav/bike-horn.wav', 1.0), #Honk around 2
+    ('wav/chime.wav', 1.0), #Honk sound 3
+    ('wav/idle.wav', 1.0) #Looping Engine Sound Effect
 )
 
 # pins used by keyboard
@@ -47,6 +48,7 @@ def handle_mixer(num, pressed):
 
 
 while True:
+    mixer.voice[3].level = 1 #Looping Engine Sound Effect
     event = km.events.get()
     if event:
         if event.key_number < len(wav_files):
