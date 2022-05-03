@@ -17,10 +17,10 @@ tca = adafruit_tca9548a.TCA9548A(i2c)
 # NOTE!!! This is the "special" part of the code
 #
 # Create each BME280 using the TCA9548A channel instead of the I2C object
-bme1 = adafruit_bme280.Adafruit_BME280_I2C(tca[0])
-bme2 = adafruit_bme280.Adafruit_BME280_I2C(tca[1])
-bme3 = adafruit_bme280.Adafruit_BME280_I2C(tca[2])
-bme4 = adafruit_bme280.Adafruit_BME280_I2C(tca[3])
+bme1 = adafruit_bme280.Adafruit_BME280_I2C(tca[0])   # TCA Channel 0
+bme2 = adafruit_bme280.Adafruit_BME280_I2C(tca[1])   # TCA Channel 1
+bme3 = adafruit_bme280.Adafruit_BME280_I2C(tca[2])   # TCA Channel 2
+bme4 = adafruit_bme280.Adafruit_BME280_I2C(tca[3])   # TCA Channel 3
 #--------------------------------------------------------------------
 
 print("Four BME280 Example")

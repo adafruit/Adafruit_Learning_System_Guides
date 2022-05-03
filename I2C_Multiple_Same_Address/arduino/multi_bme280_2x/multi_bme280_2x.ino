@@ -18,8 +18,9 @@ void setup() {
   
   // In the call to begin, pass in the I2C address.
   // If left out, the default address is used.
-  bme1.begin();      // use the default address of 0x77
-  bme2.begin(0x76);  // specify the alternate address of 0x76
+  // But also OK to just be explicit and specify.
+  bme1.begin(0x77);  // address = 0x77 (default)
+  bme2.begin(0x76);  // address = 0x76 
 }
 
 
