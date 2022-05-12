@@ -115,13 +115,13 @@ while True:
             if timestamp.startswith(current_time.text[0 : 10]):
                 print("match")
                 #  grabs the hour of the tweet timestamp
-                tweet_hour = int(timestamp[11:12])
+                tweet_hour = int(timestamp[11:13])
                 print(tweet_hour)
                 #  grabs the current hour
-                current_hour = int(current_time.text[11:12])
+                current_hour = int(current_time.text[11:13])
                 print(current_hour)
                 #  if it's been less than an hour since the tweet...
-                if abs(current_hour - tweet_hour) < 2:
+                if abs(current_hour - tweet_hour) < 1:
                     print("in the last hour")
                     #  displays tweet text and time on screen
                     text_area.text = "\n".join(wrap_text_to_lines(stock_check, 21))
@@ -131,13 +131,15 @@ while True:
                     alarm_out.value = True
 
                 else:
-                    pass
-            #  if the tweet wasn't today
-            else:
-                #  if it's not new, then the wait continues
-                no_tweet_text = ("No stock in last hour :( Last stock: %s" % (timestamp))
-                text_area.text = "\n".join(wrap_text_to_lines(no_tweet_text, 21))
-                print("no new in stock notifications :(")
-
+                    #  if it's not new, then the wait continues
+                    no_tweet_text = ("No stock in last hour :( Last stock: %s" % (timestamp))
+                    text_area.text = "\n".join(wrap_text_to_lines(no_tweet_text, 21))
+                    print("no new in stock notifications :(")
             #  updates tweet ID
             last_value = value
+        #  if the tweet wasn't today
+        else:
+            #  if it's not new, then the wait continues
+            no_tweet_text = ("No stock in last hour :( Last stock: %s" % (timestamp))
+            text_area.text = "\n".join(wrap_text_to_lines(no_tweet_text, 21))
+            print("no new in stock notifications :(")
