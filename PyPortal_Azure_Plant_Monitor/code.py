@@ -20,7 +20,7 @@ from digitalio import DigitalInOut
 from adafruit_esp32spi import adafruit_esp32spi, adafruit_esp32spi_wifimanager
 import adafruit_esp32spi.adafruit_esp32spi_socket as socket
 import neopixel
-from adafruit_ntp import NTP
+import rtc
 from adafruit_azureiot import IoTCentralDevice
 from adafruit_seesaw.seesaw import Seesaw
 
@@ -52,11 +52,15 @@ wifi.connect()
 print("WiFi connected!")
 
 # Time setup, needed to authenticate with Azure IoT Central
-ntp = NTP(esp)
-while not ntp.valid_time:
-    print("Failed to obtain time, retrying in 5 seconds...")
-    time.sleep(5)
-    ntp.set_time()
+# get_time will raise ValueError if the time isn't available yet so loop until
+# it works.
+now_utc = None
+while now_utc is None:
+    try:
+        now_utc = time.localtime(esp.get_time()[0])
+    except ValueError:
+        pass
+rtc.RTC().datetime = now_utc
 
 # Soil Sensor Setup
 i2c_bus = busio.I2C(board.SCL, board.SDA)
