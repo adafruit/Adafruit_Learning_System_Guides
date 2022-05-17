@@ -16,8 +16,8 @@ from adafruit_button import Button
 from adafruit_progressbar.progressbar import ProgressBar
 from adafruit_display_text.label import Label
 from adafruit_esp32spi import adafruit_esp32spi
-from adafruit_ntp import NTP
 from adafruit_pyportal import PyPortal
+import rtc
 
 
 # Background Color
@@ -207,15 +207,15 @@ while not esp.is_connected:
 
 print("Connected to ", secrets['ssid'])
 
-# Initialize the NTP object
-ntp = NTP(esp)
-
-# Fetch and set the microcontroller's current UTC time
-# keep retrying until a valid time is returned
-while not ntp.valid_time:
-    ntp.set_time()
-    print("Could not obtain NTP, re-fetching in 5 seconds...")
-    time.sleep(5)
+# get_time will raise ValueError if the time isn't available yet so loop until
+# it works.
+now_utc = None
+while now_utc is None:
+    try:
+        now_utc = time.localtime(esp.get_time()[0])
+    except ValueError:
+        pass
+rtc.RTC().datetime = now_utc
 
 # Get the current time in seconds since Jan 1, 1970
 t = time.time()
