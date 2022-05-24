@@ -1,0 +1,11 @@
+ESP_8_BIT_composite	KEYWORD1
+ESP_8_BIT_GFX	KEYWORD1
+begin	KEYWORD2
+waitForFrame	KEYWORD2
+getFrameBufferLines	KEYWORD2
+convertRGB565toRGB332	KEYWORD2
+drawPixel	KEYWORD2
+fillScreen	KEYWORD2
+getWaitFraction	KEYWORD2
+newPerformanceTrackingSession	KEYWORD2
+copyAfterSwap	KEYWORD2
