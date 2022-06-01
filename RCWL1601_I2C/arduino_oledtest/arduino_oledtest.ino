@@ -41,12 +41,9 @@ void setup() {
 }
 
 void loop() {
-  delay(50);
   uint32_t distance = ping_mm();
-  delay(50);
-  
-  display.clearDisplay();
 
+  display.clearDisplay();
   display.setCursor(0, 30);
   display.print("I2C Sonar");
   display.setCursor(0, 50);
@@ -60,6 +57,7 @@ void loop() {
   
   yield();
   display.display();
+  delay(50);
 }
 
 uint32_t ping_mm()
