@@ -10,7 +10,6 @@ Adafruit_I2CDevice sonar_dev = Adafruit_I2CDevice(SR04_I2CADDR);
 
 
 void setup() {
-  Wire.begin();
   Serial.begin(115200);
   while (!Serial);
 
