@@ -36,7 +36,7 @@
 #define NEOPIXELPIN   40
 
 // This is for the 2.7" tricolor EPD
-ThinkInk_270_Tricolor_C44 gfx(264, 176 ,EPD_DC, EPD_RESET, EPD_CS, SRAM_CS, EPD_BUSY);
+ThinkInk_270_Tricolor_C44 gfx(EPD_DC, EPD_RESET, EPD_CS, SRAM_CS, EPD_BUSY);
 
 AirliftOpenWeatherMap owclient(&Serial);
 OpenWeatherMapCurrentData owcdata;
