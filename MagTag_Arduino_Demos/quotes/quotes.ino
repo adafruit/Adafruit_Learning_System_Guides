@@ -88,6 +88,7 @@ void setup() {
   intneo.show();
   
   Serial.println("\nStarting connection to server...");
+  client.setInsecure();
   if (!client.connect(server, 443)) {
     Serial.println("Connection failed!");
     deepSleep();
