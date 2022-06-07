@@ -18,6 +18,7 @@ last revision November 2015
 
 #include <WiFiClientSecure.h>
 #include <ArduinoJson.h>
+#include <Wire.h>
 
 // uncomment the next line if you have a 128x32 OLED on the I2C pins
 //#define USE_OLED
