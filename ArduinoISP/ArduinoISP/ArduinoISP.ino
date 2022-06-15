@@ -552,7 +552,7 @@ char eeprom_read_page(int length) {
   int start = _addr*2;
   for (int x = 0; x < length; x++) {
     int addr = start +x;
-    byte ee = spi_transaction(0xA0, (addr >> 8) && 0xFF, addr && 0xFF, 0xFF);
+    byte ee = spi_transaction(0xA0, (addr >> 8) & 0xFF, addr & 0xFF, 0xFF);
     Serial.write( ee);
   }
   return STK_OK;
