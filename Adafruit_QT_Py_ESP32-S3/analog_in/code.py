@@ -9,7 +9,7 @@ analog_pin = analogio.AnalogIn(board.A0)
 
 
 def get_voltage(pin):
-    return (pin.value * 3.53) / 61285
+    return (pin.value * 3.09) / 61285
 
 
 while True:
