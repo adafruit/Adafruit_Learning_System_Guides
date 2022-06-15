@@ -549,8 +549,10 @@ char flash_read_page(int length) {
 
 char eeprom_read_page(int length) {
   // here again we have a word address
+  int start = _addr*2;
   for (int x = 0; x < length; x++) {
-    byte ee = spi_transaction(0xA0, 0x00, _addr*2+x, 0xFF);
+    int addr = start +x;
+    byte ee = spi_transaction(0xA0, (addr >> 8) && 0xFF, addr && 0xFF, 0xFF);
     Serial.write( ee);
   }
   return STK_OK;
