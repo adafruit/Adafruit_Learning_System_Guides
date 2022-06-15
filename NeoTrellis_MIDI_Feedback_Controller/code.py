@@ -36,8 +36,8 @@ midi_usb = adafruit_midi.MIDI( midi_in=usb_midi.ports[0],
 
 i2c = busio.I2C(board.SCL, board.SDA)
 trelli = [  # adjust these to match your jumper settings if needed
-     [NeoTrellis(i2c, False, addr=0x2E), NeoTrellis(i2c, False, addr=0x30)],
-     [NeoTrellis(i2c, False, addr=0x32), NeoTrellis(i2c, False, addr=0x36)]
+     [NeoTrellis(i2c, False, addr=0x2E), NeoTrellis(i2c, False, addr=0x2F)],
+     [NeoTrellis(i2c, False, addr=0x30), NeoTrellis(i2c, False, addr=0x31)]
 ]
 trellis = MultiTrellis(trelli)
 
