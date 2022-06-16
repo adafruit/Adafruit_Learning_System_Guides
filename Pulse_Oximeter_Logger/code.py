@@ -17,10 +17,9 @@ Log data to SD card on Autologger FeatherWing
 # The sensor updates the readings at 100Hz.
 
 import time
-import adafruit_sdcard
+import sdcardio
 import board
 import busio
-import digitalio
 import storage
 import adafruit_pcf8523
 import _bleio
@@ -32,8 +31,7 @@ from adafruit_ble_berrymed_pulse_oximeter import BerryMedPulseOximeterService
 # Logging setup
 SD_CS = board.D10
 spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
-cs = digitalio.DigitalInOut(SD_CS)
-sd_card = adafruit_sdcard.SDCard(spi, cs)
+sd_card = sdcardio.SDCard(spi, SD_CS)
 vfs = storage.VfsFat(sd_card)
 storage.mount(vfs, "/sd_card")
 

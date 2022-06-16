@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 import time
-import adafruit_sdcard
+import sdcardio
 import microcontroller
 import board
 import busio
@@ -16,8 +16,7 @@ led.direction = digitalio.Direction.OUTPUT
 
 # Connect to the card and mount the filesystem.
 spi = busio.SPI(board.SD_SCK, board.SD_MOSI, board.SD_MISO)
-cs = digitalio.DigitalInOut(board.SD_CS)
-sdcard = adafruit_sdcard.SDCard(spi, cs)
+sdcard = sdcardio.SDCard(spi, board.SD_CS)
 vfs = storage.VfsFat(sdcard)
 storage.mount(vfs, "/sd")
 

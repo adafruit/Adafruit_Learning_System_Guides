@@ -9,9 +9,8 @@ import sys
 import storage
 import board
 import busio
-import digitalio
 import adafruit_touchscreen
-import adafruit_sdcard
+import sdcardio
 from winamp_helpers import WinampApplication
 
 # which playlist to play
@@ -80,8 +79,7 @@ else:  # PyPortal Titano
 
 # Initializations for SDCard
 spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
-cs = digitalio.DigitalInOut(board.SD_CS)
-sdcard = adafruit_sdcard.SDCard(spi, cs)
+sdcard = sdcardio.SDCard(spi, board.SD_CS)
 vfs = storage.VfsFat(sdcard)
 storage.mount(vfs, "/sd")
 sys.path.append("/sd")

@@ -39,7 +39,7 @@ import time
 import adafruit_bitmap_font.bitmap_font
 import adafruit_display_text.label
 from adafruit_progressbar.progressbar import ProgressBar
-import adafruit_sdcard
+import sdcardio
 import analogjoy
 import audioio
 import audiomp3
@@ -317,8 +317,7 @@ buttons = gamepadshift.GamePadShift(digitalio.DigitalInOut(board.BUTTON_CLOCK),
 def mount_sd():
     """Mount the SD card"""
     spi = busio.SPI(board.SCK, MOSI=board.MOSI, MISO=board.MISO)
-    sd_cs = digitalio.DigitalInOut(board.SD_CS)
-    sdcard = adafruit_sdcard.SDCard(spi, sd_cs, baudrate=6000000)
+    sdcard = sdcardio.SDCard(spi, board.SD_CS)
     vfs = storage.VfsFat(sdcard)
     storage.mount(vfs, "/sd")
 

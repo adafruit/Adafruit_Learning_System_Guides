@@ -7,7 +7,7 @@ import board
 import busio
 import digitalio
 import storage
-import adafruit_sdcard
+import sdcardio
 from adafruit_slideshow import PlayBackOrder, SlideShow, PlayBackDirection
 
 # Default location to look is in internal memory
@@ -18,9 +18,8 @@ switch.direction = digitalio.Direction.INPUT
 switch.pull = digitalio.Pull.UP
 
 spi = busio.SPI(board.SCK, MOSI=board.MOSI, MISO=board.MISO)
-cs = digitalio.DigitalInOut(board.SD_CS)
 try:
-    sdcard = adafruit_sdcard.SDCard(spi, cs)
+    sdcard = sdcardio.SDCard(spi, board.SD_CS)
     vfs = storage.VfsFat(sdcard)
     storage.mount(vfs, "/sd")
     IMAGE_DIRECTORY = "/sd/images"

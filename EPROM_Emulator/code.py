@@ -33,7 +33,7 @@ Targeted for the SAMD51 boards.
 by Dave Astels
 """
 
-import adafruit_sdcard
+import sdcardio
 import adafruit_ssd1306
 import board
 import busio
@@ -78,8 +78,7 @@ oled.show()
 # SD_CS = board.D10
 # Connect to the card and mount the filesystem.
 spi = busio.SPI(board.D13, board.D11, board.D12)  # SCK, MOSI, MISO
-cs = digitalio.DigitalInOut(board.D10)
-sdcard = adafruit_sdcard.SDCard(spi, cs)
+sdcard = sdcardio.SDCard(spi, board.D10)
 vfs = storage.VfsFat(sdcard)
 storage.mount(vfs, "/sd")
 
