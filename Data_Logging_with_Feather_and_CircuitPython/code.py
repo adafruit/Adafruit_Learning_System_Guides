@@ -20,7 +20,7 @@ spi = board.SPI()
 try:
     import sdcardio
 
-    sdcard = sdcardio.SDCard(spi, SD_CS)
+    sd_card = sdcardio.SDCard(spi, SD_CS)
 except ImportError:
     import adafruit_sdcard
     import digitalio
