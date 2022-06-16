@@ -6,10 +6,8 @@ import time
 
 import analogio
 import board
-import digitalio
 import storage
 import adafruit_am2320
-import adafruit_sdcard
 
 vbat_voltage = analogio.AnalogIn(board.D9)
 
@@ -18,8 +16,18 @@ am2320 = adafruit_am2320.AM2320(i2c)
 
 SD_CS = board.D10
 spi = board.SPI()
-cs = digitalio.DigitalInOut(SD_CS)
-sd_card = adafruit_sdcard.SDCard(spi, cs)
+
+try:
+    import sdcardio
+
+    sdcard = sdcardio.SDCard(spi, SD_CS)
+except ImportError:
+    import adafruit_sdcard
+    import digitalio
+
+    cs = digitalio.DigitalInOut(SD_CS)
+    sd_card = adafruit_sdcard.SDCard(spi, cs)
+
 vfs = storage.VfsFat(sd_card)
 storage.mount(vfs, "/sd_card")
 
@@ -45,10 +53,11 @@ while True:
             print("Humidity:", humidity)
             print("VBat voltage: {:.2f}".format(battery_voltage))
             print()
-            sdc.write("{}, {}, {}, {:.2f}\n".format(
-                int(time_stamp), temperature,
-                humidity, battery_voltage)
-                     )
+            sdc.write(
+                "{}, {}, {}, {:.2f}\n".format(
+                    int(time_stamp), temperature, humidity, battery_voltage
+                )
+            )
         time.sleep(3)
     except OSError:
         pass

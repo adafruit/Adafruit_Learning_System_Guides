@@ -4,9 +4,8 @@
 
 import time
 import board
-import digitalio
 import adafruit_scd4x
-import adafruit_sdcard
+import sdcardio
 import busio
 import storage
 import adafruit_pcf8523
@@ -27,8 +26,7 @@ SD_CS = board.D10
 
 #  SPI setup for SD card
 spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
-cs = digitalio.DigitalInOut(SD_CS)
-sdcard = adafruit_sdcard.SDCard(spi, cs)
+sdcard = sdcardio.SDCard(spi, SD_CS)
 vfs = storage.VfsFat(sdcard)
 try:
     storage.mount(vfs, "/sd")
