@@ -39,7 +39,6 @@ class UartHandler(Handler):
         """Create an instance.
 
         :param uart: the busio.UART instance to which to write messages
-
         """
         self._uart = uart
 
