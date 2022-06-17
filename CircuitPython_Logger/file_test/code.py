@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2019 Dave Astels for Adafruit Industries
+# SPDX-FileCopyrightText: 2022 Alec Delaney for Adafruit Industries
 #
 # SPDX-License-Identifier: MIT
 
