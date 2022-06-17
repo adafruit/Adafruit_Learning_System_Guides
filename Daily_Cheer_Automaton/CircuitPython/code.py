@@ -11,7 +11,7 @@
 #
 # REQUIREMENTS:
 # should use M4 (or higher)
-# use CircuitPython 5.3.0+
+# use CircuitPython 6.0.0+
 #
 #
 # HARDWARE:
@@ -39,15 +39,15 @@ import busio as io
 # Or for software I2C (ESP8266) use this line instead:
 # import bitbangio as io
 
-#import adafruit_ds3231
+# import adafruit_ds3231
 import adafruit_pcf8523
 
 # SD card
-import adafruit_sdcard
+import sdcardio
 import storage
 
 # NeoPixel
-#import neopixel
+# import neopixel
 
 
 # Use any pin that is not taken by SPI
@@ -60,18 +60,18 @@ import storage
 #    On Atmel M0, M4, 328p or 32u4 it's on GPIO 10
 #    On Teensy 3.x it's on GPIO 10
 
-SD_CS = board.D10 # for M4
+SD_CS = board.D10  # for M4
 
 # Connect to the card and mount the filesystem.
 spi = io.SPI(board.SCK, board.MOSI, board.MISO)
-cs = digitalio.DigitalInOut(SD_CS)
-sdcard = adafruit_sdcard.SDCard(spi, cs)
+sdcard = sdcardio.SDCard(spi, SD_CS)
 vfs = storage.VfsFat(sdcard)
 storage.mount(vfs, "/sd")
 
 
 # Use the filesystem as normal! Our files are under /sd
 # This helper function will print the contents of the SD
+
 
 def print_directory(path, tabs=0):
     for file in os.listdir(path):
@@ -92,7 +92,7 @@ def print_directory(path, tabs=0):
         prettyprintname += file
         if isdir:
             prettyprintname += "/"
-        print('{0:<40} Size: {1:>10}'.format(prettyprintname, sizestr))
+        print("{0:<40} Size: {1:>10}".format(prettyprintname, sizestr))
 
         # recursively print directory contents
         if isdir:
@@ -106,15 +106,15 @@ print_directory("/sd")
 
 data = open("/sd/cheer.mp3", "rb")
 mp3 = audiomp3.MP3Decoder(data)
-#a = audioio.AudioOut(board.A0) # mono
-a = audioio.AudioOut(board.A0, right_channel=board.A1) # stereo sound through A0 & A1
+# a = audioio.AudioOut(board.A0) # mono
+a = audioio.AudioOut(board.A0, right_channel=board.A1)  # stereo sound through A0 & A1
 
 
 i2c = io.I2C(board.SCL, board.SDA)  # Change to the appropriate I2C clock & data
 # pins here!
 
 # Create the RTC instance:
-#rtc = adafruit_ds3231.DS3231(i2c)
+# rtc = adafruit_ds3231.DS3231(i2c)
 rtc = adafruit_pcf8523.PCF8523(i2c)
 
 # Lookup table for names of days (nicer printing).
@@ -141,7 +141,7 @@ if False:  # change to True if you want to set the time!
 # pylint: enable-msg=bad-whitespace
 
 # setup NeoPixel
-#pixel = neopixel.NeoPixel(board.NEOPIXEL, 1)
+# pixel = neopixel.NeoPixel(board.NEOPIXEL, 1)
 
 
 # Main loop:
@@ -159,7 +159,7 @@ while True:
     if t.tm_hour == playhour and t.tm_min == playmin:
         print("it is time!")
         # turn NeoPixel green
-        #pixel[0] = (0, 255, 0)
+        # pixel[0] = (0, 255, 0)
         # play the file
         print("playing")
         a.play(mp3)
@@ -167,6 +167,6 @@ while True:
             pass
         print("stopped")
         # turn NeoPixel off
-        #pixel[0] = (0, 0, 0)
+        # pixel[0] = (0, 0, 0)
 
     time.sleep(1)  # wait a second
