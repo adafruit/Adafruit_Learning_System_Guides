@@ -19,7 +19,7 @@ rtc = adafruit_pcf8523.PCF8523(i2c)
 #  start measuring co2 with SCD40
 scd4x.start_periodic_measurement()
 #  list of days to print to the text file on boot
-days = ("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday")
+days = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
 
 # SPI SD_CS pin
 SD_CS = board.D10
