@@ -118,7 +118,7 @@ i2c = io.I2C(board.SCL, board.SDA)  # Change to the appropriate I2C clock & data
 rtc = adafruit_pcf8523.PCF8523(i2c)
 
 # Lookup table for names of days (nicer printing).
-days = ("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday")
+days = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
 
 
 # selected time

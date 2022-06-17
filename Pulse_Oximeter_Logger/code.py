@@ -43,7 +43,7 @@ log_interval = 2  # you can adjust this to log at a different rate
 I2C = busio.I2C(board.SCL, board.SDA)
 rtc = adafruit_pcf8523.PCF8523(I2C)
 
-days = ("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday")
+days = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
 
 set_time = False
 if set_time:  # change to True if you want to write the time!
