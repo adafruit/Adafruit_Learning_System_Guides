@@ -25,13 +25,13 @@ from adafruit_portalbase import PortalBase
 # l = logging.getLogger('aio')
 # # Pass in the device object based on portal_base
 # # (Funhouse, PyPortal, MagTag, etc) as the 2nd parameter
-# l.addHandler(AIOHandler('test'), portal_device)
+# l.addHandler(AIOHandler('test', portal_device))
 # l.level = logging.ERROR
 # l.error("test")
 
-from adafruit_logging import LoggingHandler
+from adafruit_logging import Handler
 
-class AIOHandler(LoggingHandler):
+class AIOHandler(Handler):
 
     def __init__(self, name, portal_device):
         """Create an instance."""
@@ -41,11 +41,11 @@ class AIOHandler(LoggingHandler):
         self._portal_device = portal_device
 
 
-    def emit(self, level, msg):
+    def emit(self, record):
         """Generate the message and write it to the AIO Feed.
 
         :param level: The level at which to log
         :param msg: The core message
 
         """
-        self._portal_device.push_to_io(self._log_feed_name, self.format(level, msg))
+        self._portal_device.push_to_io(self._log_feed_name, self.format(record))
