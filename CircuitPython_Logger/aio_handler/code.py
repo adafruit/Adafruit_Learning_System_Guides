@@ -44,8 +44,6 @@ class AIOHandler(Handler):
     def emit(self, record):
         """Generate the message and write it to the AIO Feed.
 
-        :param level: The level at which to log
-        :param msg: The core message
-
+        :param record: The record (message object) to be logged
         """
         self._portal_device.push_to_io(self._log_feed_name, self.format(record))
