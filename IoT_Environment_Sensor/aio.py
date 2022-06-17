@@ -27,6 +27,8 @@ import adafruit_logging as logging
 import rtc
 
 logger = logging.getLogger('main')
+if not logger.hasHandlers():
+    logger.addHandler(logging.StreamHandler())
 
 TIME_SERVICE = "https://io.adafruit.com/api/v2/%s/integrations/time/strftime?x-aio-key=%s"
 # our strftime is %Y-%m-%d %H:%M:%S.%L %j %u %z %Z see http://strftime.net/ for decoding details
