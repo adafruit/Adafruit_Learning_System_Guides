@@ -27,7 +27,6 @@ class BLEHandler(Handler):
         """Create an instance.
 
         :param uart: the busio.UART instance to which to write messages
-
         """
         self._advertising_now = False
         self._uart = UARTServer()
