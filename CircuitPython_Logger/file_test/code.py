@@ -2,11 +2,11 @@
 #
 # SPDX-License-Identifier: MIT
 
+import time
+import random
 import board
 import busio
 from digitalio import DigitalInOut
-import time
-import random
 import storage
 import adafruit_sdcard
 import adafruit_logging as logging
