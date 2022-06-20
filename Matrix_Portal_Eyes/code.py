@@ -53,7 +53,6 @@ class Sprite(displayio.TileGrid):
         elif isinstance(transparent, int):
             palette.make_transparent(transparent)
         super(Sprite, self).__init__(bitmap, pixel_shader=palette)
-        self.height = bitmap.height
 
 
 # ONE-TIME INITIALIZATION --------------------------------------------------
