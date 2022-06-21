@@ -57,9 +57,13 @@ def getVoltage(pin):
 #  timer for updating onscreen clock
 clock = time.monotonic()
 #  timer for keeping backlight on
-light = time.monotonic()
-#  light sensor threshold value
-threshold = 0.085
+light_clock = time.monotonic()
+#  timer for checking the light sensor
+switch_clock = time.monotonic()
+#  variable to scale light sensor reading
+ratio = 0
+#  storing last light sensor ratio reading
+last_ratio = 0
 
 while True:
     # only query the online time once per hour (and on first run)
@@ -71,6 +75,7 @@ while True:
         except RuntimeError as e:
             print("Some error occured, retrying! -", e)
             continue
+
     # only query the weather every 10 minutes (and on first run)
     if (not weather_refresh) or (time.monotonic() - weather_refresh) > 600:
         try:
@@ -81,14 +86,34 @@ while True:
         except RuntimeError as e:
             print("Some error occured, retrying! -", e)
             continue
-    #  check light sensor
-    if getVoltage(analogin) < threshold:
-        #  if its blocked then turn on backlight
-        pyportal.set_backlight(1)
-        #  reset light timer
-        light = time.monotonic()
+    #  every 0.1 seconds check the light sensor value
+    if (time.monotonic() - switch_clock) > 0.1:
+        #  read the light sensor and scale it 0 to 3.3
+        reading = getVoltage(analogin)
+        #  calculate the % of light out of the maximum light
+        ratio = ((ratio + pow(1.0 - reading / 3.3, 4.0)) / 2.0)
+        #  create a comparison ratio with the last reading
+        power_ratio = last_ratio + pow(last_ratio, 2.0)
+        #  if the comparison ratio is less than 1
+        if power_ratio < 1:
+            #  and the current ratio is larger
+            if ratio > power_ratio:
+                #  turn on the backlight
+                pyportal.set_backlight(1)
+                light_clock = time.monotonic()
+        #  otherwise (if in a darker room)
+        else:
+            #  if there's a difference greater than 0.003
+            #  between the current ratio and the last ratio
+            if ratio - last_ratio > 0.003:
+                #  turn on the backlight
+                pyportal.set_backlight(1)
+                light_clock = time.monotonic()
+        #  update last_ratio
+        last_ratio = ratio
+        switch_clock = time.monotonic()
     #  after 10 seconds, turn off the backlight
-    if (time.monotonic() - light) > 10:
+    if (time.monotonic() - light_clock) > 10:
         pyportal.set_backlight(0)
     #  every 30 seconds update time on screen
     if (time.monotonic() - clock) > 30:
