@@ -28,7 +28,6 @@ class OpenWeather_Graphics(displayio.Group):
 
         self._icon_sprite = None
         self._icon_file = None
-        self.set_icon(cwd+"/weather_background.bmp")
 
         self.small_font = bitmap_font.load_font(small_font)
         self.medium_font = bitmap_font.load_font(medium_font)
@@ -130,16 +129,11 @@ class OpenWeather_Graphics(displayio.Group):
         if not filename:
             return  # we're done, no icon desired
 
-        # CircuitPython 6 & 7 compatible
         if self._icon_file:
             self._icon_file.close()
         self._icon_file = open(filename, "rb")
-        icon = displayio.OnDiskBitmap(self._icon_file)
-        self._icon_sprite = displayio.TileGrid(
-            icon, pixel_shader=getattr(icon, 'pixel_shader', displayio.ColorConverter()))
 
-        # # CircuitPython 7+ compatible
-        # icon = displayio.OnDiskBitmap(filename)
-        # self._icon_sprite = displayio.TileGrid(icon, pixel_shader=background.pixel_shader)
+        icon = displayio.OnDiskBitmap(self._icon_file)
+        self._icon_sprite = displayio.TileGrid(icon, pixel_shader=icon.pixel_shader)
 
         self._icon_group.append(self._icon_sprite)
