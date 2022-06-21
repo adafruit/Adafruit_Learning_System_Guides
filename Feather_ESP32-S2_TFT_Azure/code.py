@@ -137,21 +137,13 @@ group.append(rect)
 font_file = "/roundedHeavy-26.bdf"
 font = bitmap_font.load_font(font_file)
 #  text elements
-temp_text = bitmap_label.Label(font, text="%0.1f° F" % temp, color=0xFFFFFF)
-temp_text.x = 20
-temp_text.y = 80
-humid_text = bitmap_label.Label(font, text="%0.1f %%" % humidity, color=0xFFFFFF)
-humid_text.x = 95
-humid_text.y = 80
-press_text = bitmap_label.Label(font, text="%0.2f" % pressure, color=0xFFFFFF)
-press_text.x = 170
-press_text.y = 80
+temp_text = bitmap_label.Label(font, text="%0.1f° F" % temp, x=20, y=80, color=0xFFFFFF)
+humid_text = bitmap_label.Label(font, text="%0.1f %%" % humidity, x=95, y=80, color=0xFFFFFF)
+press_text = bitmap_label.Label(font, text="%0.2f" % pressure, x=170, y=80, color=0xFFFFFF)
 time_text = bitmap_label.Label(terminalio.FONT,
             text="\n".join(wrap_text_to_lines
             ("Data sent on %s/%s/%s at %s:%s" % (mon,day,year,hour,minute), 20)),
-            color=0xFFFFFF)
-time_text.x = 125
-time_text.y = 105
+            x=125, y=105, color=0xFFFFFF)
 group.append(temp_text)
 group.append(humid_text)
 group.append(press_text)
