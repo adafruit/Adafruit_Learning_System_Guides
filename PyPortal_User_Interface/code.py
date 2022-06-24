@@ -162,9 +162,9 @@ else:
     set_backlight(0.3)
 
 # We want three buttons across the top of the screen
-TAPS_Y = 0
-TAPS_HEIGHT = 40
-TAPS_WIDTH = int(screen_width / 3)
+TAB_BUTTON_Y = 0
+TAB_BUTTON_HEIGHT = 40
+TAB_BUTTON_WIDTH = int(screen_width / 3)
 
 # We want two big buttons at the bottom of the screen
 BIG_BUTTON_HEIGHT = int(screen_height / 3.2)
@@ -232,8 +232,8 @@ buttons = []
 button_view1 = Button(
     x=0,  # Start at furthest left
     y=0,  # Start at top
-    width=TAPS_WIDTH,  # Calculated width
-    height=TAPS_HEIGHT,  # Static height
+    width=TAB_BUTTON_WIDTH,  # Calculated width
+    height=TAB_BUTTON_HEIGHT,  # Static height
     label="View 1",
     label_font=font,
     label_color=0xFF7E00,
@@ -246,10 +246,10 @@ button_view1 = Button(
 buttons.append(button_view1)  # adding this button to the buttons group
 
 button_view2 = Button(
-    x=TAPS_WIDTH,  # Start after width of a button
+    x=TAB_BUTTON_WIDTH,  # Start after width of a button
     y=0,
-    width=TAPS_WIDTH,
-    height=TAPS_HEIGHT,
+    width=TAB_BUTTON_WIDTH,
+    height=TAB_BUTTON_HEIGHT,
     label="View 2",
     label_font=font,
     label_color=0xFF7E00,
@@ -262,10 +262,10 @@ button_view2 = Button(
 buttons.append(button_view2)  # adding this button to the buttons group
 
 button_view3 = Button(
-    x=TAPS_WIDTH * 2,  # Start after width of 2 buttons
+    x=TAB_BUTTON_WIDTH * 2,  # Start after width of 2 buttons
     y=0,
-    width=TAPS_WIDTH,
-    height=TAPS_HEIGHT,
+    width=TAB_BUTTON_WIDTH,
+    height=TAB_BUTTON_HEIGHT,
     label="View 3",
     label_font=font,
     label_color=0xFF7E00,
@@ -383,7 +383,7 @@ def switch_view(what_view):
 
     # Set global button state
     view_live = what_view
-    print("View %d On" % what_view)
+    print("View {view_num:.0f} On".format(view_num=what_view))
 
 
 # pylint: enable=global-statement
@@ -444,7 +444,7 @@ while True:
         # loop with buttons using enumerate() to number each button group as i
         for i, b in enumerate(buttons):
             if b.contains(touch):  # Test each button to see if it was pressed
-                print("button%d pressed" % i)
+                print("button{} pressed".format(i))
                 if i == 0 and view_live != 1:  # only if view1 is visible
                     pyportal.play_file(soundTab)
                     switch_view(1)
