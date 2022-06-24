@@ -28,6 +28,8 @@ cassette = motor.DCMotor(pwm_a, pwm_b)
 #  variables for warble switch
 i = 0.4
 last_i = 0.4
+pos = False
+neg = False
 
 while True:
     #  map range of pot to range of motor speed
