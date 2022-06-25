@@ -1,12 +1,13 @@
 from boardFunc import funcTest
 
+
 def GameLogic(theBoard, event, onColor, offColor):
     #
     # get the 1d event button mapping for grid
-    row, col = funcTest.arrayMap(event,4)
+    row, col = funcTest.arrayMap(event, 4)
     #
     # algorithm corresponding 8 neighbor cell calc
-    neighbors = funcTest.neighbors(theBoard, row,col)
+    neighbors = funcTest.neighbors(theBoard, row, col)
     #
     #  unpack the column and row values calc from neighbors y,x orientation to match how board is drawn.
     for y, x in neighbors:
@@ -23,28 +24,29 @@ def GameLogic(theBoard, event, onColor, offColor):
     # return the new board
     return theBoard
 
-def NewGameLogic(theBoard:set, event:tuple, onColor:tuple, offColor:tuple):
+
+def NewGameLogic(theBoard: set, event: tuple, onColor: tuple, offColor: tuple):
     numOff = 0
     numOn = 0
     # get the 1d event button mapping for grid
     row, col = event
     # algorithm corresponding 8 neighbor cell calc
-    neighbors = funcTest.neighbors(theBoard, row,col)
+    neighbors = funcTest.neighbors(theBoard, row, col)
     #  unpack the column and row values calc from neighbors y,x orientation to match how board is drawn.
-    for x ,y in neighbors:
+    for x, y in neighbors:
         # first check if the neighbor in the list is off on the game board
         if theBoard[x][y] == offColor:
             # if its not turned on turn y=the light on
-            numOff +=1
+            numOff += 1
         # elif the neighbor cell is not eqaul to the off color thens its turned on
         elif theBoard[x][y] != offColor:
             # so we turn it off it the prevouis isnt true
             numOn += 1
     # turn off the pressed key
-    for x ,y in neighbors:
-        if numOff <  1 and  numOn > 3:
+    for x, y in neighbors:
+        if numOff < 1 and numOn > 3:
             theBoard[x][y] = offColor
-        elif numOn < 4 and numOff >2:
+        elif numOn < 4 and numOff > 2:
             theBoard[x][y] = onColor
     return theBoard
 
