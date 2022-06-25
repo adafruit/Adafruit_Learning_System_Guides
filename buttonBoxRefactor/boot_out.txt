@@ -1,0 +1,1 @@
+Adafruit CircuitPython 6.3.0 on 2021-06-01; Adafruit Trinket M0 with samd21e18
