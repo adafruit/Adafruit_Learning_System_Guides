@@ -3,6 +3,7 @@
 
 import time
 import json
+import supervisor
 import simpleio
 import vectorio
 import board
@@ -173,6 +174,14 @@ while True:
             rect.color_index = 1
 		#  when the azure clock runs out
         if azure_clock > 500:
+            print("getting ntp date/time")
+            cal = ntp.datetime
+            year = cal[0]
+            mon = cal[1]
+            day = cal[2]
+            hour = cal[3]
+            minute = cal[4]
+            time.sleep(2)
             print("getting msg")
 			#  pack message
             message = {"Temperature": temp,
@@ -182,14 +191,6 @@ while True:
             print("sending json")
             device.send_telemetry(json.dumps(message))
             print("data sent")
-            print("getting ntp date/time")
-            cal = ntp.datetime
-            year = cal[0]
-            mon = cal[1]
-            day = cal[2]
-            hour = cal[3]
-            minute = cal[4]
-            time.sleep(2)
             clock_view = "%s:%s" % (hour, minute)
             if minute < 10:
                 clock_view = "%s:0%s" % (hour, minute)
@@ -217,10 +218,7 @@ while True:
     # pylint: disable=broad-except
     except (ValueError, RuntimeError, OSError, Exception) as e:
         print("Connection error, reconnecting\n", str(e))
-        wifi.radio.enabled = False
-        wifi.radio.enabled = True
-        wifi.radio.connect(secrets["ssid"], secrets["password"])
-        device.reconnect()
+        supervisor.reload()
         continue
 	#  delay
     time.sleep(1)
