@@ -59,7 +59,10 @@ class TouchscreenPoller(object):
     """Get 'pressed' and location updates from a touch screen device."""
 
     def __init__(self, splash, cursor_bmp):
-        logging.getLogger("Paint").debug("Creating a TouchscreenPoller")
+        logger = logging.getLogger("Paint")
+        if not logger.hasHandlers():
+            logger.addHandler(logging.StreamHandler())
+        logger.debug("Creating a TouchscreenPoller")
         self._display_grp = splash
         self._touchscreen = adafruit_touchscreen.Touchscreen(
             board.TOUCH_XL, board.TOUCH_XR,
@@ -118,14 +121,16 @@ class CursorPoller(object):
     """Get 'pressed' and location updates from a D-Pad/joystick device."""
 
     def __init__(self, splash, cursor_bmp):
-        logging.getLogger("Paint").debug("Creating a CursorPoller")
+        self._logger = logging.getLogger("Paint")
+        if not self._logger.hasHandlers():
+            self._logger.addHandler(logging.StreamHandler())
+        self._logger.debug("Creating a CursorPoller")
         self._mouse_cursor = Cursor(
             board.DISPLAY, display_group=splash, bmp=cursor_bmp, cursor_speed=2
         )
         self._x_offset = cursor_bmp.width // 2
         self._y_offset = cursor_bmp.height // 2
         self._cursor = DebouncedCursorManager(self._mouse_cursor)
-        self._logger = logging.getLogger("Paint")
 
     def poll(self):
         """Check for input. Returns press of A (a bool), B,
@@ -160,6 +165,8 @@ class CursorPoller(object):
 class Paint(object):
     def __init__(self, display=board.DISPLAY):
         self._logger = logging.getLogger("Paint")
+        if not self._logger.hasHandlers():
+            self._logger.addHandler(logging.StreamHandler())
         self._logger.setLevel(logging.DEBUG)
         self._display = display
         self._w = self._display.width

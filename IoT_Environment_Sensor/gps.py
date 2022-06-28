@@ -22,6 +22,8 @@ import adafruit_logging as logging
 
 
 logger = logging.getLogger('main')
+if not logger.hasHandlers():
+    logger.addHandler(logging.StreamHandler())
 
 class Gps(object):
 

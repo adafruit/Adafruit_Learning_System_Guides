@@ -26,6 +26,8 @@ import aio
 import adafruit_logging as logging
 
 logger = logging.getLogger('main')
+if not logger.hasHandlers():
+    logger.addHandler(logging.StreamHandler())
 logger.setLevel(logging.INFO)
 
 gps_uart = busio.UART(board.TX, board.RX, baudrate=9600, timeout=3.000)

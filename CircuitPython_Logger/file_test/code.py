@@ -1,17 +1,28 @@
-# SPDX-FileCopyrightText: 2019 Dave Astels for Adafruit Industries
+# SPDX-FileCopyrightText: 2022 Alec Delaney for Adafruit Industries
 #
 # SPDX-License-Identifier: MIT
 
 import time
 import random
-from adafruit_pyportal import PyPortal
-from aio_handler import AIOHandler
+import board
+import busio
+from digitalio import DigitalInOut
+import storage
+import adafruit_sdcard
 import adafruit_logging as logging
 
-device=PyPortal()
+# Get chip select pin depending on the board, this one is for the Feather M4 Express
+sd_cs = board.D10
 
-l = logging.getLogger('aio')
-l.addHandler(AIOHandler('test', device))
+# Set up an SD card to write to
+spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
+cs = DigitalInOut(sd_cs)
+sdcard = adafruit_sdcard.SDCard(spi, cs)
+vfs = storage.VfsFat(sdcard)
+storage.mount(vfs, "/sd")
+
+l = logging.getLogger('file')
+l.addHandler(logging.FileHandler('/sd/test.txt'))
 
 def go():
     while True:
