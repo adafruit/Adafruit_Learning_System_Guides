@@ -12,7 +12,7 @@ from adafruit_seesaw import neopixel
 # NeoSlider Setup
 neoslider = Seesaw(board.I2C(), 0x30)
 potentiometer = AnalogInput(neoslider, 18)
-pixels = neopixel.NeoPixel(neoslider, 14, 4)
+pixels = neopixel.NeoPixel(neoslider, 14, 4, pixel_order=neopixel.GRB)
 
 
 def potentiometer_to_color(value):
