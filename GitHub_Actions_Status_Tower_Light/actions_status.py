@@ -85,60 +85,66 @@ if ENABLE_USB_LIGHT_MESSAGES:
     print("Opening serial port.")
     mSerial = serial.Serial(serial_port, baud_rate)
 
-print("Starting Github Actions Status Watcher")
+print("Starting Github Actions Status Watcher.")
 print("Press Ctrl-C to Exit")
-while True:
-    print("Fetching workflow run status.")
-    response = requests.get(f"{REPO_WORKFLOW_URL}?per_page=1", headers=headers)
-    response_json = response.json()
-    with open("action_status_result.json", "w") as f:
-        f.write(json.dumps(response_json))
+try:
+    while True:
+        print("Fetching workflow run status.")
+        response = requests.get(f"{REPO_WORKFLOW_URL}?per_page=1", headers=headers)
+        response_json = response.json()
+        with open("action_status_result.json", "w") as f:
+            f.write(json.dumps(response_json))
 
-    workflow_run_id = response_json['workflow_runs'][0]['id']
-    if workflow_run_id not in already_shown_ids:
-        status = response_json['workflow_runs'][0]['status']
-        conclusion = response_json['workflow_runs'][0]['conclusion']
-        print(f"Status - Conclusion: {status} - {conclusion}")
+        workflow_run_id = response_json['workflow_runs'][0]['id']
+        if workflow_run_id not in already_shown_ids:
+            status = response_json['workflow_runs'][0]['status']
+            conclusion = response_json['workflow_runs'][0]['conclusion']
+            print(f"Status - Conclusion: {status} - {conclusion}")
 
-        if status == "queued":
-            print("Actions run status: Queued.")
-            if ENABLE_USB_LIGHT_MESSAGES:
-                print("Sending serial command 'YELLOW_BLINK'.")
-                send_command(mSerial, YELLOW_BLINK)
-
-        if status == "in_progress":
-            print("Actions run status: In progress.")
-            if ENABLE_USB_LIGHT_MESSAGES:
-                print("Sending serial command 'YELLOW_ON'.")
-                send_command(mSerial, YELLOW_ON)
-
-        if status == "completed":
-            print(f"Adding {workflow_run_id} to shown workflow IDs.")
-            already_shown_ids.append(workflow_run_id)
-
-            if conclusion == "success":
-                print("Actions run status: Completed - successful.")
+            if status == "queued":
+                print("Actions run status: Queued.")
                 if ENABLE_USB_LIGHT_MESSAGES:
-                    send_command(mSerial, YELLOW_OFF)
-                    print("Sending serial command 'GREEN_ON'.")
-                    send_command(mSerial, GREEN_ON)
-                    buzzer_on_completion()
-                time.sleep(COMPLETION_LIGHT_TIME - COMPLETION_BUZZER_TIME)
-                if ENABLE_USB_LIGHT_MESSAGES:
-                    print("Sending serial command 'GREEN_OFF'.")
-                    send_command(mSerial, GREEN_OFF)
+                    print("Sending serial command 'YELLOW_BLINK'.")
+                    send_command(mSerial, YELLOW_BLINK)
 
-            if conclusion == "failure":
-                print("Actions run status: Completed - failed.")
+            if status == "in_progress":
+                print("Actions run status: In progress.")
                 if ENABLE_USB_LIGHT_MESSAGES:
-                    send_command(mSerial, YELLOW_OFF)
-                    print("Sending serial command 'RED_ON'.")
-                    send_command(mSerial, RED_ON)
-                    buzzer_on_completion()
-                time.sleep(COMPLETION_LIGHT_TIME - COMPLETION_BUZZER_TIME)
-                if ENABLE_USB_LIGHT_MESSAGES:
-                    print("Sending serial command 'RED_OFF'.")
-                    send_command(mSerial, RED_OFF)
-    else:
-        print("Already followed the current run.")
-    time.sleep(POLL_DELAY)
+                    print("Sending serial command 'YELLOW_ON'.")
+                    send_command(mSerial, YELLOW_ON)
+
+            if status == "completed":
+                print(f"Adding {workflow_run_id} to shown workflow IDs.")
+                already_shown_ids.append(workflow_run_id)
+
+                if conclusion == "success":
+                    print("Actions run status: Completed - successful.")
+                    if ENABLE_USB_LIGHT_MESSAGES:
+                        send_command(mSerial, YELLOW_OFF)
+                        print("Sending serial command 'GREEN_ON'.")
+                        send_command(mSerial, GREEN_ON)
+                        buzzer_on_completion()
+                    time.sleep(COMPLETION_LIGHT_TIME - COMPLETION_BUZZER_TIME)
+                    if ENABLE_USB_LIGHT_MESSAGES:
+                        print("Sending serial command 'GREEN_OFF'.")
+                        send_command(mSerial, GREEN_OFF)
+
+                if conclusion == "failure":
+                    print("Actions run status: Completed - failed.")
+                    if ENABLE_USB_LIGHT_MESSAGES:
+                        send_command(mSerial, YELLOW_OFF)
+                        print("Sending serial command 'RED_ON'.")
+                        send_command(mSerial, RED_ON)
+                        buzzer_on_completion()
+                    time.sleep(COMPLETION_LIGHT_TIME - COMPLETION_BUZZER_TIME)
+                    if ENABLE_USB_LIGHT_MESSAGES:
+                        print("Sending serial command 'RED_OFF'.")
+                        send_command(mSerial, RED_OFF)
+
+        else:
+            print("Already followed the current run.")
+        time.sleep(POLL_DELAY)
+
+except KeyboardInterrupt:
+    print("\nExiting Github Actions Status Watcher.")
+    reset_state()
