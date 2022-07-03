@@ -7,8 +7,9 @@ from board import SCL, SDA
 from adafruit_neotrellis.neotrellis import NeoTrellis
 import busio
 import boardStateDriver
+
 # let users connected via serial know the script started and libs import success
-print('started')
+print("started")
 # create the i2c object for the trellis
 i2c_bus = busio.I2C(SCL, SDA)
 # create the trellis object with the given i2c object
@@ -17,7 +18,7 @@ theTrellis = NeoTrellis(i2c_bus)
 # instantiate it with a blank board
 boardDriver = boardStateDriver.boardState(16)
 #
-# assign what function should be called when the rising edge 
+# assign what function should be called when the rising edge
 # of a pushed button event occurs by adding it to the callbacks list
 # this will always automatically pass an event object created by the board to the assigned function
 for i in range(16):
@@ -30,7 +31,7 @@ while True:
     # the trellis can only update every 17 milliseconds i.e. sleep(0.2) every loop
     # however i researched and used debouncing for the driver,
     # Please refer to boardStateDriver.boardLogic() & .debounce()
-    if boardDriver.mode == 'sim':
+    if boardDriver.mode == "sim":
         boardDriver.animation()
     # redraw the physical board by reading from the logical board
     for i in range(16):

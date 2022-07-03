@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 from . import funcTest
 
+
 def GameLogic(theBoard, event, onColor, offColor):
     #
     # get the 1d event button mapping for grid
