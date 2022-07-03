@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2022 Cameron Kerley
+#
+# SPDX-License-Identifier: MIT
 def neighbors(matrix, rowNumber, colNumber):
     result = []
     # search the grid by the cords given
