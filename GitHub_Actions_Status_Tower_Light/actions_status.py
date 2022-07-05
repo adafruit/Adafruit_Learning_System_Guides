@@ -11,7 +11,7 @@ import requests
 
 # Customisations for this program
 # Update with the URL from any repo running Actions to get the status. Defaults to CircuitPython.
-REPO_WORKFLOW_URL = "https://api.github.com/repos/adafruit/circuitpython/actions/workflows/build.yml/runs"  # pylint: disable=line-too-long
+REPO_WORKFLOW_URL = "https://api.github.com/repos/kattni/circuitpython/actions/workflows/build.yml/runs"  # pylint: disable=line-too-long
 # The rate at which the program will query GitHub for an updated status. You can increase or
 # decrease the delay time to fit the duration and frequency of Actions runs on your repo.
 # Defaults to 3 minutes.
@@ -135,6 +135,18 @@ try:
                         send_command(mSerial, YELLOW_OFF)
                         print("Sending serial command 'RED_ON'.")
                         send_command(mSerial, RED_ON)
+                        buzzer_on_completion()
+                    time.sleep(COMPLETION_LIGHT_TIME - COMPLETION_BUZZER_TIME)
+                    if ENABLE_USB_LIGHT_MESSAGES:
+                        print("Sending serial command 'RED_OFF'.")
+                        send_command(mSerial, RED_OFF)
+
+                if conclusion == "cancelled":
+                    print("Actions run status: Completed - cancelled.")
+                    if ENABLE_USB_LIGHT_MESSAGES:
+                        send_command(mSerial, YELLOW_OFF)
+                        print("Sending serial command 'RED_BLINK'.")
+                        send_command(mSerial, RED_BLINK)
                         buzzer_on_completion()
                     time.sleep(COMPLETION_LIGHT_TIME - COMPLETION_BUZZER_TIME)
                     if ENABLE_USB_LIGHT_MESSAGES:
