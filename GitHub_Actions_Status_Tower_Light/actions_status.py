@@ -141,6 +141,18 @@ try:
                         print("Sending serial command 'RED_OFF'.")
                         send_command(mSerial, RED_OFF)
 
+                if conclusion == "cancelled":
+                    print("Actions run status: Completed - cancelled.")
+                    if ENABLE_USB_LIGHT_MESSAGES:
+                        send_command(mSerial, YELLOW_OFF)
+                        print("Sending serial command 'RED_BLINK'.")
+                        send_command(mSerial, RED_BLINK)
+                        buzzer_on_completion()
+                    time.sleep(COMPLETION_LIGHT_TIME - COMPLETION_BUZZER_TIME)
+                    if ENABLE_USB_LIGHT_MESSAGES:
+                        print("Sending serial command 'RED_OFF'.")
+                        send_command(mSerial, RED_OFF)
+
         else:
             print("Already followed the current run.")
         time.sleep(POLL_DELAY)
