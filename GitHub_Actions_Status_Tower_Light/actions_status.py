@@ -11,7 +11,7 @@ import requests
 
 # Customisations for this program
 # Update with the URL from any repo running Actions to get the status. Defaults to CircuitPython.
-REPO_WORKFLOW_URL = "https://api.github.com/repos/kattni/circuitpython/actions/workflows/build.yml/runs"  # pylint: disable=line-too-long
+REPO_WORKFLOW_URL = "https://api.github.com/repos/adafruit/circuitpython/actions/workflows/build.yml/runs"  # pylint: disable=line-too-long
 # The rate at which the program will query GitHub for an updated status. You can increase or
 # decrease the delay time to fit the duration and frequency of Actions runs on your repo.
 # Defaults to 3 minutes.
