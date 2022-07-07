@@ -40,7 +40,7 @@ void setup() {
   digitalWrite(NEOPIXEL_POWER, LOW); // on
 
   display.begin(THINKINK_MONO);
-  
+
   if (! lis.begin(0x19)) {
     Serial.println("Couldnt start LIS3DH");
     display.clearBuffer();
@@ -81,7 +81,7 @@ void loop() {
   if (j % 10 == 0) {
       sensors_event_t event;
       lis.getEvent(&event);
-    
+
       /* Display the results (acceleration is measured in m/s^2) */
       Serial.print("X: "); Serial.print(event.acceleration.x);
       Serial.print(" \tY: "); Serial.print(event.acceleration.y);
@@ -99,11 +99,11 @@ void loop() {
       if ((abs(event.acceleration.x) < 5) && (event.acceleration.y < -5)) {
         rotation = 2;
       }
-      
+
       int light = analogRead(LIGHT_SENSOR);
       Serial.print("Light sensor: ");
       Serial.println(light);
-  
+
       Serial.print("I2C scanner: ");
       for (int i = 0x07; i <= 0x77; i++) {
         Wire.beginTransmission(i);
@@ -118,12 +118,12 @@ void loop() {
   if (! digitalRead(BUTTON_A)) {
     Serial.println("Button A pressed");
     intneo.fill(0xFF0000);
-    intneo.show();    
+    intneo.show();
   }
   else if (! digitalRead(BUTTON_B)) {
     Serial.println("Button B pressed");
     intneo.fill(0x00FF00);
-    intneo.show();    
+    intneo.show();
   }
   else if (! digitalRead(BUTTON_C)) {
     Serial.println("Button C pressed");
@@ -142,7 +142,7 @@ void loop() {
     for (int i = 0; i < intneo.numPixels(); i++) {
       intneo.setPixelColor(i, Wheel(((i * 256 / intneo.numPixels()) + j) & 255));
     }
-    intneo.show(); 
+    intneo.show();
   }
 
   // Red LED off
@@ -155,7 +155,8 @@ void loop() {
 void play_tune(const uint8_t *audio, uint32_t audio_length) {
   uint32_t t;
   uint32_t prior, usec = 1000000L / SAMPLE_RATE;
-  
+
+  prior = micros();
   for (uint32_t i=0; i<audio_length; i++) {
     while((t = micros()) - prior < usec);
     dacWrite(A0, audio[i]);
