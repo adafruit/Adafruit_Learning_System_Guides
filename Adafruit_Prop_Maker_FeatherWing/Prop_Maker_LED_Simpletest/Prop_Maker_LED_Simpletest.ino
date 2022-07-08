@@ -5,7 +5,7 @@
 /*
 * Adafruit Prop-Maker Featherwing
 * LED Example
-* 
+*
 * Rainbow swirl example for 3W LED.
 */
 
@@ -65,7 +65,7 @@ uint8_t i=0;
 void setup() {
   Serial.begin(115200);
   Serial.println("\nProp-Maker Wing: LED Example");
-  
+
   // set up the power pin
   pinMode(POWER_PIN, OUTPUT);
   // disable the power pin, we're not writing to the LEDs
@@ -84,23 +84,27 @@ void setup() {
     pinMode(GREEN_LED, OUTPUT);
     pinMode(BLUE_LED, OUTPUT);
   #endif
-  
+
   analogWrite(RED_LED, 0);
   analogWrite(GREEN_LED, 0);
   analogWrite(BLUE_LED, 0);
 }
 
+uint32_t Color(uint8_t r, uint8_t g, uint8_t b) {
+  return ((uint32_t)r << 16) | ((uint32_t)g << 8) | b;
+}
+
 uint32_t Wheel(byte WheelPos) {
   WheelPos = 255 - WheelPos;
   if(WheelPos < 85) {
-    return (255 - WheelPos * 3, 0, WheelPos * 3);
+    return Color(255 - WheelPos * 3, 0, WheelPos * 3);
   }
   if(WheelPos < 170) {
     WheelPos -= 85;
-    return (0, WheelPos * 3, 255 - WheelPos * 3);
+    return Color(0, WheelPos * 3, 255 - WheelPos * 3);
   }
   WheelPos -= 170;
-  return (WheelPos * 3, 255 - WheelPos * 3, 0);
+  return Color(WheelPos * 3, 255 - WheelPos * 3, 0);
 }
 
 void loop()
