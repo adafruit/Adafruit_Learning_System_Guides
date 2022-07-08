@@ -9,7 +9,7 @@
 #include <seesaw_servo.h>
 #include <seesaw_motor.h>
 #include <seesaw_neopixel.h>
- 
+
 #define NEOPIX_PIN (20)                  /* Neopixel pin */
 #define NEOPIX_NUMBER_OF_PIXELS (7)
 #define LUX CRICKIT_SIGNAL1
@@ -49,14 +49,14 @@ seesaw_NeoPixel strip = seesaw_NeoPixel(NEOPIX_NUMBER_OF_PIXELS, NEOPIX_PIN, NEO
 #define MQTTled5 "house/led/five"
 #define MQTTled5Bright "house/led/five/brightness"
 #define MQTTled5Color "house/led/five/color"
-//***** Light Level Sensor 
+//***** Light Level Sensor
 #define MQTTlux "house/lux"
-//***** Temperature and Humidity Sensor 
+//***** Temperature and Humidity Sensor
 #define MQTTtemp "house/temperature"
 #define MQTThumid "house/humidity"
-//***** Motion Sensor 
+//***** Motion Sensor
 #define MQTTpir "house/motion"
-//***** Door Sensor 
+//***** Door Sensor
 #define MQTTdoor "house/door"
 
 //****************************** Connection Settings
@@ -100,7 +100,7 @@ void setup() {
   crickit.pinMode(LUX, INPUT);
   crickit.pinMode(PIR, INPUT_PULLUP);
   crickit.pinMode(DOOR, INPUT_PULLUP);
-  
+
   myservo.attach(CRICKIT_SERVO1);  // attaches the servo to CRICKIT_SERVO1 pin
   motor_a.attach(CRICKIT_MOTOR_A1, CRICKIT_MOTOR_A2);
   strip.begin();           // INITIALIZE NeoPixel strip object (REQUIRED)
@@ -153,7 +153,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
   StrPayload = String(message_buff);
   int IntPayload = StrPayload.toInt();
   Serial.print(StrPayload);
-  
+
   if (String(topic) == MQTTlock) {
     if (StrPayload == "UNLOCK") {
       myservo.write(180);
@@ -236,7 +236,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     strip.setPixelColor(1, strip.Color(R[1], G[1], B[1]));
   }
   strip.show();
-  
+
   //.................. Light 3 ......................//
   if (String(topic) == MQTTled3) {
     if (StrPayload == "OFF") {
@@ -263,7 +263,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     strip.setPixelColor(2, strip.Color(R[2], G[2], B[2]));
   }
   strip.show();
-  
+
 //.................. Light 4 ......................//
   if (String(topic) == MQTTled4) {
     if (StrPayload == "OFF") {
@@ -290,7 +290,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     strip.setPixelColor(3, strip.Color(R[3], G[3], B[3]));
   }
   strip.show();
-  
+
 //.................. Light 5 ......................//
   if (String(topic) == MQTTled5) {
     if (StrPayload == "OFF") {
@@ -359,7 +359,7 @@ void reconnect() {
       client.subscribe(MQTTled5);
       client.subscribe(MQTTled5Bright);
       client.subscribe(MQTTled5Color);
-      
+
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
@@ -384,9 +384,9 @@ void loop() {
   if (!client.connected()) {
     reconnect();
   }
-  
+
   //************** Lux Smoothing
-  
+
   total = total - lux_R[readIndex]; //            subtract the last reading
   lux_R[readIndex] = crickit.analogRead(LUX);  // read from the sensor
   total = total + lux_R[readIndex];  //           add the reading to the total
@@ -400,7 +400,7 @@ void loop() {
     Serial.print("Lux = ");
     Serial.println(Lux_A);
 
-    snprintf (msg, 75, "%ld", Lux_A);
+    snprintf (msg, 75, "%d", Lux_A);
     Serial.println(msg);
     client.publish(MQTTlux, msg);
 
@@ -412,7 +412,7 @@ void loop() {
       Serial.println("Motion Sensor = STILL");
       client.publish(MQTTpir, "STILL");
     }
-    delay(10); 
+    delay(10);
     if (crickit.digitalRead(DOOR)){
       Serial.println("Door = OPEN");
       client.publish(MQTTdoor, "OPEN");
@@ -421,7 +421,7 @@ void loop() {
       client.publish(MQTTdoor, "CLOSED");
     }
   }
-  delay(10);        // delay in between reads for stability 
+  delay(10);        // delay in between reads for stability
   client.loop();
 }
 
