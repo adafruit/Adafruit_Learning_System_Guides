@@ -3,10 +3,10 @@
 # SPDX-License-Identifier: MIT
 
 import time
+import ssl
 import board
 import rtc
 import wifi
-import ssl
 import socketpool
 import adafruit_requests
 import neopixel
