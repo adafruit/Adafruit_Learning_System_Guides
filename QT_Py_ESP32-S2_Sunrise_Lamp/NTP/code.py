@@ -12,7 +12,7 @@ import neopixel
 
 # --| User Config |--------------------------------
 TZ_OFFSET = -7  # time zone offset in hours from UTC
-WAKE_UP_HOUR = 07  # alarm time hour (24hr)
+WAKE_UP_HOUR = 7  # alarm time hour (24hr)
 WAKE_UP_MIN = 30  # alarm time minute
 SLEEP_COLOR = (0, 25, 150)  # sleepy time color as tuple
 WAKEUP_COLOR = (255, 100, 0)  # wake up color as tuple
