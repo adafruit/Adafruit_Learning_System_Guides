@@ -6,7 +6,7 @@
 'fading_led.py'.
 
 =================================================
-fades a LED using pulseio's PWM
+fades a LED using pwmio's PWM
 """
 
 import time
