@@ -9,7 +9,7 @@ import time
 import board
 from digitalio import DigitalInOut, Direction
 
-# vibrating disc mini motor disc connected on D2
+# vibrating disc mini motor disc connected on D1
 vibrating_disc = DigitalInOut(board.D1)
 vibrating_disc.direction = Direction.OUTPUT
 
