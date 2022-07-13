@@ -6,25 +6,25 @@ import board
 from digitalio import DigitalInOut, Direction, Pull
 from adafruit_ht16k33.segments import Seg14x4
 from cedargrove_nau7802 import NAU7802
-from callibration import callibration
+from calibration import calibration
 
 #  I2C setup with STEMMA port
 i2c = board.STEMMA_I2C()
 #  alphanumeric segment displpay setup
 #  using two displays together
-display = Seg14x4(i2c, address=(0x71, 0x70))
+display = Seg14x4(i2c, address=(0x70, 0x71))
 #  start-up text
 display.print("*HELLO* ")
 #  button LEDs
-blue = DigitalInOut(board.A0)
+blue = DigitalInOut(board.A1)
 blue.direction = Direction.OUTPUT
-green = DigitalInOut(board.A2)
+green = DigitalInOut(board.A3)
 green.direction = Direction.OUTPUT
 #  buttons setup
-blue_btn = DigitalInOut(board.A1)
+blue_btn = DigitalInOut(board.A0)
 blue_btn.direction = Direction.INPUT
 blue_btn.pull = Pull.UP
-green_btn = DigitalInOut(board.A3)
+green_btn = DigitalInOut(board.A2)
 green_btn.direction = Direction.INPUT
 green_btn.pull = Pull.UP
 # nau7802 setup
@@ -70,15 +70,15 @@ def find_average(num):
         count = count + n
     average = count / len(num)
     return average
-#  callibration function
-def calculateCallibration(array):
+#  calibration function
+def calculateCalibration(array):
     for _ in range(10):
         blue.value = True
         green.value = False
         nau7802.channel = 1
         #value = read_raw_value()
-        print("channel %1.0f raw value: %7.0f" % (nau7802.channel, read_raw_value()))
-        array.append(read_raw_value())
+        print("channel %1.0f raw value: %7.0f" % (nau7802.channel, abs(read_raw_value())))
+        array.append(abs(read_raw_value()))
         blue.value = False
         green.value = True
         time.sleep(1)
@@ -103,26 +103,44 @@ time.sleep(3)
 #  zeroing each channel
 nau7802.channel = 1
 zero_channel()  # Calibrate and zero channel
-nau7802.channel = 2
-zero_channel()  # Calibrate and zero channel
 display.fill(0)
 display.print("STARTING")
 
 #  variables and states
 clock = time.monotonic() #  time.monotonic() device
+reset_clock = time.monotonic()
+long_clock = time.monotonic()
 mode = "run"
 mode_names = ["SHOW OZ?", "   GRAMS?", "   ZERO?", "CALIBRTE", " OFFSET?"]
-#offset_val = callibration['offset_val']
 stage = 0
+zero_stage = 0
 weight_avg = 0
 zero_avg = 0
 show_oz = True
 show_grams = False
 zero_out = False
-callibrate_mode = False
+calibrate_mode = False
 blue_btn_pressed = False
 green_btn_pressed = False
 run_mode = True
+avg_read = []
+values = []
+val_offset = 0
+avg_values = []
+
+for w in range(5):
+    nau7802.channel = 1
+    value = read_raw_value()
+    #  takes value reading and divides with by the offset value
+    #  to get the weight in grams
+    grams = value / calibration['offset_val']
+    avg_read.append(grams)
+    if len(avg_read) > 4:
+        the_avg = find_average(avg_read)
+        oz = the_avg / 28.35
+        display.print("   %0.1f oz" % oz)
+        avg_read.clear()
+    time.sleep(1)
 
 while True:
     #  button debouncing
@@ -136,22 +154,35 @@ while True:
     if run_mode is True and (time.monotonic() - clock) > 2:
         nau7802.channel = 1
         value = read_raw_value()
+        print(value)
+        value = abs(value) - val_offset
+        print(value)
+        #value = abs(value)
+        values.append(value)
         #  takes value reading and divides with by the offset value
         #  to get the weight in grams
-        grams = value / callibration['offset_val']
-        #  convert grams to ounces
+        grams = value / calibration['offset_val']
         oz = grams / 28.35
-        #  display in ounces (default)
         if show_oz is True:
-            if oz < 0:
-                oz = 0
-            display.print("  %0.2f oz" % oz)
-        #  display in grams
+            #  append reading
+            avg_read.append(oz)
+            label = "oz"
         if show_grams is True:
-            if grams < 0:
-                grams = 0
-            display.print("   %0.2f g" % grams)
+            avg_read.append(grams)
+            label = "g"
+        print(avg_read)
+        if len(avg_read) > 10:
+            the_avg = find_average(avg_read)
+            display.print("   %0.1f %s" % (the_avg, label))
+            avg_read.clear()
+            val_offset += 10
         clock = time.monotonic()
+    if (time.monotonic() - reset_clock) > 43200:
+        run_mode = False
+        show_oz = False
+        show_grams = False
+        zero_out = True
+        reset_clock = time.monotonic()
     #  if you press the change mode button
     if (not green_btn.value and not green_btn_pressed) and run_mode:
         green.value = True
@@ -177,33 +208,37 @@ while True:
     if (not blue_btn.value and not blue_btn_pressed) and mode == 0:
         #  show_oz is set as the state
         show_oz = True
+        label = "oz"
         blue.value = False
         #  goes back to weighing mode
-        run_mode = True
         mode = "run"
         blue_btn_pressed = True
+        display.print("   %0.1f %s" % (the_avg, label))
+        run_mode = True
     #  if you select show_grams
     if (not blue_btn.value and not blue_btn_pressed) and mode == 1:
         #  show_grams is set as the state
         show_grams = True
+        label = "g"
         blue.value = False
         #  goes back to weighing mode
-        run_mode = True
         mode = "run"
         blue_btn_pressed = True
+        display.print("   %0.1f %s" % (the_avg, label))
+        run_mode = True
     #  if you select zero_out
     if (not blue_btn.value and not blue_btn_pressed) and mode == 2:
         #  zero_out is set as the state
-        #  can zero out the scale without full recallibration
+        #  can zero out the scale without full recalibration
         zero_out = True
         blue.value = False
         mode = "run"
         blue_btn_pressed = True
-    #  if you select callibrate_mode
+    #  if you select calibrate_mode
     if (not blue_btn.value and not blue_btn_pressed) and mode == 3:
-        #  callibrate_mode is set as the state
-        #  starts up the callibration process
-        callibrate_mode = True
+        #  calibrate_mode is set as the state
+        #  starts up the calibration process
+        calibrate_mode = True
         blue.value = False
         mode = "run"
         blue_btn_pressed = True
@@ -212,15 +247,26 @@ while True:
         #  displays the curren offset value stored in the code
         blue.value = False
         display.fill(0)
-        display.print("%0.4f" % callibration['offset_val'])
+        display.print("%0.4f" % calibration['offset_val'])
         time.sleep(5)
         mode = "run"
         #  goes back to weighing mode
-        run_mode = True
         show_oz = True
+        label = "oz"
+        display.print("   %0.1f %s" % (the_avg, label))
+        run_mode = True
         blue_btn_pressed = True
     #  if the zero_out state is true
-    if zero_out and mode == "run":
+    if zero_out and zero_stage == 0:
+        blue_btn_pressed = True
+        #  clear the scale for zeroing
+        display.fill(0)
+        display.print("REMOVE ")
+        zero_stage = 1
+        blue.value = True
+        green.value = True
+    if (not blue_btn.value and not blue_btn_pressed) and zero_stage == 1:
+        green.value = False
         #  updates display
         display.fill(0)
         display.print("ZEROING")
@@ -228,18 +274,20 @@ while True:
         #  runs zero_channel() function on both channels
         nau7802.channel = 1
         zero_channel()
-        nau7802.channel = 2
-        zero_channel()
         display.fill(0)
         display.print("ZEROED ")
         zero_out = False
+        zero_stage = 0
         #  goes into weighing mode
+        val_offset = 0
         run_mode = True
         show_oz = True
-    #  the callibration process
+        label = "oz"
+        display.print("   %0.1f %s" % (the_avg, label))
+    #  the calibration process
     #  each step is counted in stage
     #  blue button is pressed to advance to the next stage
-    if callibrate_mode is True and stage == 0:
+    if calibrate_mode is True and stage == 0:
         blue_btn_pressed = True
         #  clear the scale for zeroing
         display.fill(0)
@@ -255,8 +303,6 @@ while True:
         blue.value = False
         nau7802.channel = 1
         zero_channel()
-        nau7802.channel = 2
-        zero_channel()
         display.fill(0)
         display.print("ZEROED ")
         stage = 2
@@ -271,7 +317,7 @@ while True:
         display.print("AVG ZERO")
         #  runs the calculateCallibration function
         #  takes 10 raw readings, stores them into an array and gets an average
-        zero_avg = calculateCallibration(zero_readings)
+        zero_avg = calculateCalibration(zero_readings)
         stage = 3
         display.fill(0)
         display.print("DONE")
@@ -279,7 +325,7 @@ while True:
     #  stage 4
     if (not blue_btn.value and not blue_btn_pressed) and stage == 3:
         #  place the known weight item
-        #  item's weight matches callibration['weight'] in grams
+        #  item's weight matches calibration['weight'] in grams
         blue_btn_pressed = True
         blue.value = False
         display.fill(0)
@@ -294,10 +340,10 @@ while True:
         display.print("WEIGHING")
         weight_readings = []
         #  weighs the item 10 times, stores the readings in an array & averages them
-        weight_avg = calculateCallibration(weight_readings)
+        weight_avg = calculateCalibration(weight_readings)
         #  calculates the new offset value
-        callibration['offset_val'] = (weight_avg-zero_avg) / callibration['weight']
-        display.marquee("%0.2f - CALLIBRATED " % callibration['offset_val'], 0.5, False)
+        calibration['offset_val'] = (weight_avg-zero_avg) / calibration['weight']
+        display.marquee("%0.2f - CALIBRATED " % calibration['offset_val'], 0.3, False)
         stage = 5
         display.fill(0)
         display.print("DONE")
@@ -305,10 +351,15 @@ while True:
     #  final stage
     if (not blue_btn.value and not blue_btn_pressed) and stage == 5:
         blue_btn_pressed = True
-        callibrate_mode = False
+        zero_readings.clear()
+        weight_readings.clear()
+        calibrate_mode = False
         blue.value = False
         #  goes back into weighing mode
         show_oz = True
+        label = "oz"
+        display.print("   %0.1f %s" % (the_avg, label))
+        val_offset = 0
         run_mode = True
         #  resets stage
         stage = 0
