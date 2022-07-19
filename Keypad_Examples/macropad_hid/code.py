@@ -5,6 +5,9 @@
 import board
 import keypad
 import neopixel
+import usb_hid
+from adafruit_hid.keyboard import Keyboard
+from adafruit_hid.keycode import Keycode
 
 KEY_PINS = (
     board.KEY1,
@@ -21,21 +24,38 @@ KEY_PINS = (
     board.KEY12,
 )
 
-keys = keypad.Keys(KEY_PINS, value_when_pressed=False, pull=True)
+KEYCODES = (
+    Keycode.SEVEN,
+    Keycode.EIGHT,
+    Keycode.NINE,
+    Keycode.FOUR,
+    Keycode.FIVE,
+    Keycode.SIX,
+    Keycode.ONE,
+    Keycode.TWO,
+    Keycode.THREE,
+    Keycode.BACKSPACE,
+    Keycode.ZERO,
+    Keycode.ENTER,
+)
 
+ON_COLOR = (0, 0, 255)
+OFF_COLOR = (0, 20, 0)
+
+keys = keypad.Keys(KEY_PINS, value_when_pressed=False, pull=True)
 neopixels = neopixel.NeoPixel(board.NEOPIXEL, 12, brightness=0.4)
+neopixels.fill(OFF_COLOR)
+kbd = Keyboard(usb_hid.devices)
 
 while True:
     event = keys.events.get()
     if event:
+        key_number = event.key_number
         # A key transition occurred.
-        print(event)
-
         if event.pressed:
-            # Turn the key blue when pressed
-            neopixels[event.key_number] = (0, 0, 255)
+            kbd.press(KEYCODES[key_number])
+            neopixels[key_number] = ON_COLOR
 
-        # This could just be `else:`,
-        # since event.pressed and event.released are opposites.
         if event.released:
-            neopixels[event.key_number] = (0, 0, 0)
+            kbd.release(KEYCODES[key_number])
+            neopixels[key_number] = OFF_COLOR
