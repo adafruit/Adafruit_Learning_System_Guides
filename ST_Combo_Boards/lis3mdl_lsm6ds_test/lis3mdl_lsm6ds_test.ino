@@ -22,6 +22,11 @@ Adafruit_LSM6DSOX lsm6ds;
 //#include <Adafruit_ISM330DHCX.h>
 //Adafruit_ISM330DHCX lsm6ds;
 
+// To use with the LSM6D3TR-C+LIS3MDL breakout, uncomment these two lines
+// and comment out the lines referring to the LSM6DSOX above
+//#include <Adafruit_LSM6DS3TRC.h>
+//Adafruit_LSM6DS3TRC lsm6ds;
+
 #include <Adafruit_LIS3MDL.h>
 Adafruit_LIS3MDL lis3mdl;
 
