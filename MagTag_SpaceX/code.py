@@ -84,7 +84,7 @@ magtag.add_text(
 magtag.add_text(
     text_font=terminalio.FONT,
     text_position=(10, 94),
-    line_spacing=0.8, 
+    line_spacing=0.8,
     text_wrap=47,     # wrap text at this count
     text_transform=details_transform
 )
@@ -95,7 +95,7 @@ try:
     # This statement gets the JSON data and displays it automagically
     value = magtag.fetch()
     print("Response is", value)
-except (ValueError, RuntimeError) as e:
+except (ValueError, RuntimeError, ConnectionError, OSError) as e:
     print("Some error occured, retrying! -", e)
 
 # wait 2 seconds for display to complete

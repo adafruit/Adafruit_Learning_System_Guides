@@ -60,7 +60,7 @@ while True:
             seconds = int(datetime_str[17:19])
             rtc.RTC().datetime = time.struct_time((year, month, mday, hours, minutes, seconds, 0, 0, False))
             lasttimefetch_stamp = time.monotonic()
-        except (ValueError, RuntimeError) as e:
+        except (ValueError, RuntimeError, ConnectionError, OSError) as e:
             print("Some error occured, retrying! -", e)
             continue
 

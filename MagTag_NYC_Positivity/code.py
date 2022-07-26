@@ -43,7 +43,7 @@ while True:
             qn_idx = header.index("Queens")
             si_idx = header.index("Staten Island")
             nyc_idx = header.index("Citywide")
-        except (ValueError, RuntimeError) as e:
+        except (ValueError, RuntimeError, ConnectionError, OSError) as e:
             print("Some error occured, retrying! -", e)
             continue
 

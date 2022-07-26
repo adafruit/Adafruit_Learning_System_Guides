@@ -137,7 +137,7 @@ while True:
                 )
 
             timestamp = time.monotonic()
-        except (ValueError, RuntimeError) as e:
+        except (ValueError, RuntimeError, ConnectionError, OSError) as e:
             # Catch any random errors so the code will continue running.
             print("Some error occured, retrying! -", e)
     try:

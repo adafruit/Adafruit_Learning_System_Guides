@@ -112,7 +112,7 @@ try:
 
     SECONDS_TO_SLEEP = 24 * 60 * 60  # Sleep for one day
 
-except (ValueError, RuntimeError) as e:
+except (ValueError, RuntimeError, ConnectionError, OSError) as e:
     print("Some error occured, retrying in one hour! -", e)
     seconds_to_sleep = 60 * 60  # Sleep for one hour
 

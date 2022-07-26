@@ -105,7 +105,7 @@ while True:
             gfx.display_io_status('Data sent!')
         except AdafruitIO_RequestError as e:
             raise AdafruitIO_RequestError('IO Error: ', e)
-    except (ValueError, RuntimeError) as e: # WiFi Connection Failure
+    except (ValueError, RuntimeError, ConnectionError, OSError) as e:
         print("Failed to get data, retrying\n", e)
         wifi.reset()
         continue

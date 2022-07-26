@@ -48,7 +48,7 @@ try:
     magtag.network.connect()
     value = magtag.fetch()
     print("Response is", value)
-except (ValueError, RuntimeError) as e:
+except (ValueError, RuntimeError, ConnectionError, OSError) as e:
     magtag.set_text(e)
     print("Some error occured, retrying later -", e)
 # wait 2 seconds for display to complete

@@ -90,7 +90,7 @@ while True:
             refresh_time = time.monotonic()
             # set the_time
             the_time = time.localtime()
-        except (ValueError, RuntimeError) as e:
+        except (ValueError, RuntimeError, ConnectionError, OSError) as e:
             print("Failed to get data, retrying\n", e)
             esp.reset()
             continue

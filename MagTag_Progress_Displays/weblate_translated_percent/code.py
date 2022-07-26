@@ -85,6 +85,6 @@ try:
     progress_bar.progress = value[1] / 100.0
     magtag.refresh()
     magtag.exit_and_deep_sleep(24 * 60 * 60)  # one day
-except (ValueError, RuntimeError) as e:
+except (ValueError, RuntimeError, ConnectionError, OSError) as e:
     print("Some error occurred, retrying! -", e)
     magtag.exit_and_deep_sleep(60)  # one minute

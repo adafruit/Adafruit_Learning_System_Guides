@@ -172,6 +172,6 @@ while True:
             # Reset timer
             initial = now
         aws_iot.loop()
-    except (ValueError, RuntimeError) as e:
+    except (ValueError, RuntimeError, ConnectionError, OSError) as e:
         print("Failed to get data, retrying", e)
         wifi.reset()

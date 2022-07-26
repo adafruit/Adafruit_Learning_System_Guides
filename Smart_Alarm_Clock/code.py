@@ -439,7 +439,7 @@ while True:
         else:
             pass
         gc.collect()
-    except (ValueError, RuntimeError) as err:
+    except (ValueError, RuntimeError, ConnectionError, OSError) as err:
         print("Failed to get data, retrying\n", err)
         wifi.reset()
         mqtt_client.reconnect()

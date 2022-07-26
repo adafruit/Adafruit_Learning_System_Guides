@@ -189,7 +189,7 @@ while True:
             # Reset timer
             initial = now
         google_mqtt.loop()
-    except (ValueError, RuntimeError) as e:
+    except (ValueError, RuntimeError, OSError, ConnectionError) as e:
         print("Failed to get data, retrying", e)
         wifi.reset()
         google_mqtt.reconnect()
