@@ -36,6 +36,6 @@ while True:
         try:
             value = magtag.fetch()
             print("Response is", value)
-        except (ValueError, RuntimeError) as e:
+        except (ValueError, RuntimeError, ConnectionError, OSError) as e:
             print("Some error occured, retrying! -", e)
         timestamp = time.monotonic()

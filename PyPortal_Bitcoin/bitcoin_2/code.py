@@ -46,7 +46,7 @@ while True:
     try:
         value = pyportal.fetch()
         print("Response is", value)
-    except (ValueError, RuntimeError) as e:
+    except (ValueError, RuntimeError, ConnectionError, OSError) as e:
         print("Some error occured, retrying! -", e)
 
     time.sleep(3*60)  # wait 3 minutes

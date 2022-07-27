@@ -67,6 +67,6 @@ try:
     print(now)
     magtag.exit_and_deep_sleep(24 * 60 * 60)  # one day
 
-except (ValueError, RuntimeError) as e:
+except (ValueError, RuntimeError, ConnectionError, OSError) as e:
     print("Some error occurred, retrying after 1 minute! -", e)
     magtag.exit_and_deep_sleep(60)  # one  minute

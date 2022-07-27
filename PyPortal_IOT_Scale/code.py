@@ -104,7 +104,7 @@ while True:
             text_label.text = 'sending...'
             # send data to Adafruit IO (rounded to one decimal place)
             io.send_data(weight_feed['key'], round(reading.weight, 1))
-        except (ValueError, RuntimeError) as e:
+        except (ValueError, RuntimeError, ConnectionError, OSError) as e:
             print("failed to send data..retrying...")
             wifi.reset()
             continue

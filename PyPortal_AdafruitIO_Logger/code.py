@@ -88,7 +88,7 @@ while True:
         io.send_data(light_feed['key'], light_value)
         io.send_data(temperature_feed['key'], temperature, precision=2)
         print('Sent to Adafruit IO!')
-    except (ValueError, RuntimeError) as e:
+    except (ValueError, RuntimeError, ConnectionError, OSError) as e:
         print("Failed to get data, retrying\n", e)
         wifi.reset()
         continue

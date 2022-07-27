@@ -169,7 +169,7 @@ while True:
                     print("Published!")
                 prv_sensor_value = sensor_value
             start_time = now
-    except (ValueError, RuntimeError) as e:
+    except (ValueError, RuntimeError, ConnectionError, OSError) as e:
         print("Failed to get data, retrying\n", e)
         wifi.reset()
         client.reconnect()

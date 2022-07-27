@@ -88,7 +88,7 @@ def getchannels():
             channel_dict[name] = chan_id
         response.close()
         return channel_dict
-    except (ValueError, RuntimeError) as e:
+    except (ValueError, RuntimeError, ConnectionError, OSError) as e:
         print("Failed to get data\n", e)
         wifi.reset()
         return None
@@ -104,7 +104,7 @@ def sendkey(key):
         if response:
             response.close()
             print("OK")
-    except (ValueError, RuntimeError) as e:
+    except (ValueError, RuntimeError, ConnectionError, OSError) as e:
         print("Failed to get data\n", e)
         wifi.reset()
         return
@@ -119,7 +119,7 @@ def sendletter(letter):
         if response:
             response.close()
             print("OK")
-    except (ValueError, RuntimeError) as e:
+    except (ValueError, RuntimeError, ConnectionError, OSError) as e:
         print("Failed to get data\n", e)
         wifi.reset()
         return
@@ -135,8 +135,8 @@ def openchannel(channel):
             response.close()
             print("OK")
         response = None
-    except (ValueError, RuntimeError):
-        print("Probably worked")
+    except (ValueError, RuntimeError, ConnectionError, OSError) as e:
+        print("Probably worked, but got error\n", e)
         wifi.reset()
     response = None
 

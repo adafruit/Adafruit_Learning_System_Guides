@@ -168,7 +168,7 @@ while True:
         # Hourly reset
         if cur_time.tm_min == 0:
             prv_mins = 0
-    except (ValueError, RuntimeError) as e:
+    except (ValueError, RuntimeError, ConnectionError, OSError) as e:
         print("Failed to fetch time, retrying\n", e)
         wifi.reset()
         wifi.connect()
@@ -200,7 +200,7 @@ while True:
             io.send_data(feed_temperature["key"], str(temperature))
             io.send_data(feed_humidity["key"], str(humidity))
             print("Published!")
-        except (ValueError, RuntimeError) as e:
+        except (ValueError, RuntimeError, ConnectionError, OSError) as e:
             print("Failed to send data to IO, retrying\n", e)
             wifi.reset()
             wifi.connect()

@@ -43,6 +43,6 @@ while True:
             magtag.peripherals.neopixels.fill(color)
             external_pixels.fill(color)
             timestamp = time.monotonic()
-        except (ValueError, RuntimeError) as e:
+        except (ValueError, RuntimeError, ConnectionError, OSError) as e:
             print("Some error occured, retrying! -", e)
     time.sleep(1)

@@ -52,7 +52,7 @@ while True:
             print("New level!")
             pyportal.play_file(cwd+"/triode_low_fade.wav")
         last_value = value
-    except (ValueError, RuntimeError) as e:
+    except (ValueError, RuntimeError, ConnectionError, OSError) as e:
         print("Some error occurred, retrying! -", e)
     #check again in two minutes
     time.sleep(60*2)

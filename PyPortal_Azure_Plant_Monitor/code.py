@@ -97,7 +97,7 @@ while True:
 
         gfx.display_azure_status("Data sent!")
         print("Data sent!")
-    except (ValueError, RuntimeError) as e:
+    except (ValueError, RuntimeError, ConnectionError, OSError) as e:
         print("Failed to get data, retrying\n", e)
         wifi.reset()
         wifi.connect()

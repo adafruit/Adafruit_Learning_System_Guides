@@ -82,7 +82,7 @@ while True:
     try:
         json_payload = pyportal.fetch()
         raw_data = json.loads(json_payload)
-    except (ValueError, RuntimeError) as ex:
+    except (ValueError, RuntimeError, ConnectionError, OSError) as ex:
         print('Error: ', ex)
         if isinstance(ex, ValueError):
             print('JSON:', json_payload)

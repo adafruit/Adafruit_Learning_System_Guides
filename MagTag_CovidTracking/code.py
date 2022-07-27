@@ -95,7 +95,7 @@ try:
 
     # OK we're done!
     magtag.peripherals.neopixels.fill(0x000F00) # greten
-except (ValueError, RuntimeError) as e:
+except (ValueError, RuntimeError, ConnectionError, OSError) as e:
     print("Some error occured, trying again later -", e)
 
 time.sleep(2) # let screen finish updating

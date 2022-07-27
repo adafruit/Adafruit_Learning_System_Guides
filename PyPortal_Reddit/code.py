@@ -42,7 +42,7 @@ while True:
             print("New subscriber!")
             pyportal.play_file(cwd+"/coin.wav")
         last_value = value
-    except (ValueError, RuntimeError) as e:
+    except (ValueError, RuntimeError, ConnectionError, OSError) as e:
         print("Some error occured, retrying! -", e)
 
     time.sleep(60)

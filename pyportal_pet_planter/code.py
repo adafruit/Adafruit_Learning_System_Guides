@@ -23,7 +23,8 @@ from simpleio import map_range
 #---| User Config |---------------
 
 # How often to poll the soil sensor, in seconds
-DELAY_SENSOR = 30
+# Polling every 30 seconds or more may cause connection timeouts
+DELAY_SENSOR = 15
 
 # How often to send data to adafruit.io, in minutes
 DELAY_PUBLISH = 5
@@ -179,7 +180,7 @@ label_status.text = "Connecting..."
 while not esp.is_connected:
     try:
         wifi.connect()
-    except RuntimeError as e:
+    except (RuntimeError, ConnectionError) as e:
         print("could not connect to AP, retrying: ",e)
         wifi.reset()
         continue
@@ -269,7 +270,7 @@ while True:
     # to keep the connection active
     try:
         io.loop()
-    except (ValueError, RuntimeError) as e:
+    except (ValueError, RuntimeError, ConnectionError, OSError) as e:
         print("Failed to get data, retrying...\n", e)
         wifi.reset()
         continue
@@ -314,7 +315,7 @@ while True:
 
             # reset timer
             initial = now
-        except (ValueError, RuntimeError) as e:
+        except (ValueError, RuntimeError, ConnectionError, OSError) as e:
             label_status.text = "ERROR!"
             print("Failed to get data, retrying...\n", e)
             wifi.reset()

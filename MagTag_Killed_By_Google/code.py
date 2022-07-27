@@ -95,5 +95,5 @@ while True:
         PAUSE = alarm.time.TimeAlarm(monotonic_time=time.monotonic() + 60 * 60)
         alarm.exit_and_deep_sleep_until_alarms(PAUSE)
 
-    except (ValueError, RuntimeError) as e:
+    except (ValueError, RuntimeError, ConnectionError, OSError) as e:
         print("Some error occured, retrying! -", e)

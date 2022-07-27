@@ -216,8 +216,8 @@ while True:
         device.loop()
 	#  if something disrupts the loop, reconnect
     # pylint: disable=broad-except
-    except (ValueError, RuntimeError, OSError, Exception) as e:
-        print("Connection error, reconnecting\n", str(e))
+    except (ValueError, RuntimeError, OSError, ConnectionError) as e:
+        print("Network error, reconnecting\n", str(e))
         supervisor.reload()
         continue
 	#  delay
