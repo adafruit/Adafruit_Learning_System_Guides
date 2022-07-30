@@ -7,7 +7,12 @@ import adafruit_imageload
 import terminalio
 from displayio import TileGrid, Group, OnDiskBitmap
 from adafruit_display_text.bitmap_label import Label
-import foamyguy_nvm_helper as nvm_helper
+
+try:
+    import foamyguy_nvm_helper as nvm_helper
+except ImportError:
+    nvm_helper = None
+    print("Warning: missing foamyguy_nvm_helper, will not be able to use NVM for highscore")
 
 
 class OctopusGame(Group):
@@ -34,6 +39,8 @@ class OctopusGame(Group):
     GAME_MODE_A_LBL_Y = 128 - 14
     GAME_MODE_B_LBL_Y = 128 - 4
 
+    # speed adjustment values. Value in seconds will be subtracted from game speed.
+    # larger values will equate to faster game speed.
     GAME_MODE_A_SPEED_ADJUSTMENT = 0.0
     GAME_MODE_B_SPEED_ADJUSTMENT = 0.2
 
@@ -42,8 +49,7 @@ class OctopusGame(Group):
     HIGH_SCORE_SDCARD = 1
     HIGH_SCORE_NVM = 2
 
-    # State machine constant variables:
-
+    # -- State machine constant variables --
     STATE_WAITING_TO_PLAY = -1  # Before game begins
 
     STATE_NORMAL_GAMEPLAY = 0  # Standard game behavior
@@ -65,11 +71,13 @@ class OctopusGame(Group):
     # Seconds between game Octopus movements, will get faster as score increases
     SCORE_SPEED_FACTOR = 0.5
 
+    # name of the file on the SDCard where high score data will be stored
     SDCARD_HIGH_SCORE_FILE = "octopus_high_score.json"
 
     def __init__(self, display=None, high_score_type=HIGH_SCORE_DISABLED):
         super().__init__()
 
+        # if user did not pass display argument try to use built-in display.
         if not display and "DISPLAY" in dir(board):
             display = board.DISPLAY
 
@@ -95,6 +103,7 @@ class OctopusGame(Group):
         self.current_game_mode = OctopusGame.GAME_MODE_A
 
         # Set up Background
+        self.bg_with_sadow = True
         self.bg_bmp = OnDiskBitmap("bg_with_shadow.bmp")
         self.bg_tilegrid = TileGrid(self.bg_bmp, pixel_shader=self.bg_bmp.pixel_shader)
         self.append(self.bg_tilegrid)
@@ -175,25 +184,26 @@ class OctopusGame(Group):
 
         # if we're using any highscore system
         if self.high_score_type:
+            # set up the high score label to show scores to user
             self.high_score_label = Label(font=terminalio.FONT, scale=2, background_color=0xF9E8C2,
                                           anchor_point=(0.5, 0.5), color=0x000000,
                                           anchored_position=(display.width // 2, display.height // 2),
                                           padding_left=16, padding_right=16, line_spacing=0.75)
-            # self.high_score_label.text = "67\n33\n21\n13\n11"
+
+            self.high_score_label.hidden = True
             self.append(self.high_score_label)
             # if we're using SDCard high score system
-            if self.high_score_type == self.HIGH_SCORE_SDCARD:
+            if self.high_score_type == OctopusGame.HIGH_SCORE_SDCARD:
                 # setup the high score system with SDCard data
                 import sdcardio
                 import storage
                 sd = sdcardio.SDCard(board.SPI(), board.SD_CS)
                 vfs = storage.VfsFat(sd)
                 storage.mount(vfs, '/sd')
-                print(os.listdir('/sd'))
 
-            if self.high_score_type == self.HIGH_SCORE_NVM:
-                pass
-            # set up nvm highscore
+            elif self.high_score_type == OctopusGame.HIGH_SCORE_NVM:
+                if not nvm_helper:
+                    raise ImportError("Cannot use NVM High Score system without foamyguy_nvm_helper library.")
 
     @property
     def score(self):
@@ -210,6 +220,10 @@ class OctopusGame(Group):
         :param new_score: new score value
         :return: None
         """
+        if new_score == 200 or new_score == 500:
+            self.extra_lives = 2
+            self.update_extra_lives()
+
         self._score = new_score
         self.score_speed_factor = self._score / 500
         self.score_lbl.text = str(self.score)
@@ -311,19 +325,27 @@ class OctopusGame(Group):
                     self.player.move_backward()
 
         else:  # we're in game over, or waiting to play state
-            # if high score is enabled
-            if self.high_score_type:
-                # get the current high score data
-                self.read_high_score_data()
-                # toggle the high score visibility
-                self.high_score_label.hidden = not self.high_score_label.hidden
+
+            # swap to the alternate background image
+            if not self.bg_with_sadow:
+                self.remove(self.bg_tilegrid)
+                self.bg_bmp = OnDiskBitmap("bg_with_shadow.bmp")
+                self.bg_tilegrid = TileGrid(self.bg_bmp, pixel_shader=self.bg_bmp.pixel_shader)
+
+                self.insert(0, self.bg_tilegrid)
+            else:
+                self.remove(self.bg_tilegrid)
+                self.bg_bmp = OnDiskBitmap("bg.bmp")
+                self.bg_tilegrid = TileGrid(self.bg_bmp, pixel_shader=self.bg_bmp.pixel_shader)
+                self.insert(0, self.bg_tilegrid)
+            self.bg_with_sadow = not self.bg_with_sadow
 
     def right_button_press(self):
         """
         Right movement button action function. code.py will poll the hardware and call this.
         :return: None
         """
-        # check which state we're in to determin the appropriate action(s)
+        # check which state we're in to determine the appropriate action(s)
         if self.current_state not in (
                 OctopusGame.STATE_GAME_OVER, OctopusGame.STATE_WAITING_TO_PLAY):
 
@@ -348,6 +370,7 @@ class OctopusGame(Group):
                     if self.player.treasure_count != self._before_move_treasure_count:
                         # increment the score
                         self.score += 1
+
 
         else:  # we're in game over, or waiting to play state
             # if high score is enabled
@@ -560,7 +583,7 @@ class OctopusGame(Group):
                 f.close()
         elif self.high_score_type == OctopusGame.HIGH_SCORE_NVM:
             try:
-                read_data = nvm_helper.read_data(verbose=True)
+                read_data = nvm_helper.read_data()
             except EOFError:
                 read_data = None
 
@@ -587,7 +610,7 @@ class OctopusGame(Group):
 
         elif self.high_score_type == OctopusGame.HIGH_SCORE_NVM:
             try:
-                read_data = nvm_helper.read_data(verbose=True)
+                read_data = nvm_helper.read_data()
                 if "highscore_list" in read_data.keys():
                     self.update_high_score_text(read_data)
                     return read_data
@@ -690,7 +713,7 @@ class Octopus(Group):
 
     # maximum action speed delay value
     # larger value means slower speed
-    MAX_TICK_SPEED = BASE_TICK_DELAY - 0.2  # seconds
+    MAX_TICK_SPEED = BASE_TICK_DELAY - 0.35  # seconds
 
     # order that the tentacles will take actions
     TENTACLE_ORDER = [0, 2, 1, 3]
