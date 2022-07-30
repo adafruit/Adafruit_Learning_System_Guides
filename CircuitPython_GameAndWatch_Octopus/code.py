@@ -15,7 +15,7 @@ display.brightness = 0.3
 main_group = Group()
 
 # create instance of OctopusGame
-octopus_game = OctopusGame()
+octopus_game = OctopusGame(high_score_type=OctopusGame.HIGH_SCORE_NVM)
 
 # add octopus game to main group
 main_group.append(octopus_game)

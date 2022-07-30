@@ -1,10 +1,13 @@
 import math
+import os
 import time
-
+import board
+import json
 import adafruit_imageload
 import terminalio
 from displayio import TileGrid, Group, OnDiskBitmap
 from adafruit_display_text.bitmap_label import Label
+import foamyguy_nvm_helper as nvm_helper
 
 
 class OctopusGame(Group):
@@ -25,11 +28,19 @@ class OctopusGame(Group):
 
     # Game mode state variables
     GAME_MODE_A = 0
-    GAME_MODE_B = 0
+    GAME_MODE_B = 1
 
     # Vertical position of game mode labels (near bottom left)
     GAME_MODE_A_LBL_Y = 128 - 14
     GAME_MODE_B_LBL_Y = 128 - 4
+
+    GAME_MODE_A_SPEED_ADJUSTMENT = 0.0
+    GAME_MODE_B_SPEED_ADJUSTMENT = 0.2
+
+    # Highscore type contants
+    HIGH_SCORE_DISABLED = 0
+    HIGH_SCORE_SDCARD = 1
+    HIGH_SCORE_NVM = 2
 
     # State machine constant variables:
 
@@ -54,8 +65,13 @@ class OctopusGame(Group):
     # Seconds between game Octopus movements, will get faster as score increases
     SCORE_SPEED_FACTOR = 0.5
 
-    def __init__(self):
+    SDCARD_HIGH_SCORE_FILE = "octopus_high_score.json"
+
+    def __init__(self, display=None, high_score_type=HIGH_SCORE_DISABLED):
         super().__init__()
+
+        if not display and "DISPLAY" in dir(board):
+            display = board.DISPLAY
 
         # current score variable
         self._score = 0
@@ -79,12 +95,12 @@ class OctopusGame(Group):
         self.current_game_mode = OctopusGame.GAME_MODE_A
 
         # Set up Background
-        self.bg_bmp = OnDiskBitmap("sprites/bg_with_shadow.bmp")
+        self.bg_bmp = OnDiskBitmap("bg_with_shadow.bmp")
         self.bg_tilegrid = TileGrid(self.bg_bmp, pixel_shader=self.bg_bmp.pixel_shader)
         self.append(self.bg_tilegrid)
 
         # Set up Extra Life indicator images
-        self.extra_life_bmp = OnDiskBitmap("sprites/diver_extra_life.bmp")
+        self.extra_life_bmp = OnDiskBitmap("diver_extra_life.bmp")
         self.extra_life_bmp.pixel_shader.make_transparent(0)
         self.extra_life_tilegrid_1 = TileGrid(self.extra_life_bmp,
                                               pixel_shader=self.extra_life_bmp.pixel_shader)
@@ -110,7 +126,7 @@ class OctopusGame(Group):
 
         # Set up caught flailing diver
         self.caught_diver_bmp, self.caught_diver_palette = adafruit_imageload.load(
-            "sprites/diver_caught_small.bmp")
+            "diver_caught_small.bmp")
         self.caught_diver_tilegrid = TileGrid(self.caught_diver_bmp,
                                               pixel_shader=self.caught_diver_palette,
                                               height=1, width=1, tile_width=31, tile_height=40)
@@ -124,7 +140,7 @@ class OctopusGame(Group):
 
         # Set up treasure depositing boat diver sprite
         self.boat_diver_bmp, self.boat_diver_palette = adafruit_imageload.load(
-            "sprites/diver_boat_small.bmp"
+            "diver_boat_small.bmp"
         )
         self.boat_diver_tilegrid = TileGrid(self.boat_diver_bmp,
                                             pixel_shader=self.boat_diver_palette,
@@ -153,6 +169,31 @@ class OctopusGame(Group):
 
         # Treasure that the diver had before moving
         self._before_move_treasure_count = 0
+
+        # store the high score type on self to access later
+        self.high_score_type = high_score_type
+
+        # if we're using any highscore system
+        if self.high_score_type:
+            self.high_score_label = Label(font=terminalio.FONT, scale=2, background_color=0xF9E8C2,
+                                          anchor_point=(0.5, 0.5), color=0x000000,
+                                          anchored_position=(display.width // 2, display.height // 2),
+                                          padding_left=16, padding_right=16, line_spacing=0.75)
+            # self.high_score_label.text = "67\n33\n21\n13\n11"
+            self.append(self.high_score_label)
+            # if we're using SDCard high score system
+            if self.high_score_type == self.HIGH_SCORE_SDCARD:
+                # setup the high score system with SDCard data
+                import sdcardio
+                import storage
+                sd = sdcardio.SDCard(board.SPI(), board.SD_CS)
+                vfs = storage.VfsFat(sd)
+                storage.mount(vfs, '/sd')
+                print(os.listdir('/sd'))
+
+            if self.high_score_type == self.HIGH_SCORE_NVM:
+                pass
+            # set up nvm highscore
 
     @property
     def score(self):
@@ -212,10 +253,6 @@ class OctopusGame(Group):
         self.octopus.t1as3_tilegrid.hidden = True
         self.octopus.t1as4_tilegrid.hidden = True
 
-        # self.octopus.t2s3_tilegrid.hidden = True
-        # self.octopus.t2s0_tilegrid.hidden = True
-        # self.octopus.t2s1_tilegrid.hidden = True
-
         # set the appropriate tentacle index segment for tentacle 1
         self.octopus.tentacle_cur_indexes[1] = 1
 
@@ -270,9 +307,16 @@ class OctopusGame(Group):
             else:  # player did not just move out of the water into the boat
 
                 if not self.player.hidden:
-
                     # tell the player object to move and let it handle the specific details
                     self.player.move_backward()
+
+        else:  # we're in game over, or waiting to play state
+            # if high score is enabled
+            if self.high_score_type:
+                # get the current high score data
+                self.read_high_score_data()
+                # toggle the high score visibility
+                self.high_score_label.hidden = not self.high_score_label.hidden
 
     def right_button_press(self):
         """
@@ -305,6 +349,14 @@ class OctopusGame(Group):
                         # increment the score
                         self.score += 1
 
+        else:  # we're in game over, or waiting to play state
+            # if high score is enabled
+            if self.high_score_type:
+                # get the current high score data
+                self.read_high_score_data()
+                # toggle the high score visibility
+                self.high_score_label.hidden = not self.high_score_label.hidden
+
     def reset(self):
         """
         Reset the game back to beginning state.
@@ -313,6 +365,9 @@ class OctopusGame(Group):
         self.score = 0
         self.extra_lives = 2
         self.update_extra_lives()
+
+        # hide the high score label
+        self.high_score_label.hidden = True
 
     def a_button_press(self):
         """
@@ -387,6 +442,10 @@ class OctopusGame(Group):
             # set current state to game over
             self.current_state = OctopusGame.STATE_GAME_OVER
 
+            if self.high_score_type:
+                print("need to evaluate high score")
+                self.evaluate_high_score()
+
         # update the extra lives indicators
         self.update_extra_lives()
 
@@ -438,7 +497,6 @@ class OctopusGame(Group):
 
                     # if it's been long enough since the previously shown frame
                     if now >= OctopusGame.CAUGHT_DIVER_ANIMATION_DELAY + self.caught_diver_last_anim_time:
-
                         # show the next animation frame by swaping indexes in the spritesheet
                         self.caught_diver_tilegrid[0, 0] = 0 if self.caught_diver_tilegrid[
                                                                     0, 0] == 1 else 1
@@ -488,6 +546,125 @@ class OctopusGame(Group):
                 # store the timestamp to comapre with next time
                 self.caught_diver_last_anim_time = now
 
+    def initialize_high_score(self):
+        """
+        Check if the high score file or NVM object exists, and create it with an empty list if it doesn't
+        :return: None
+        """
+        if self.high_score_type == OctopusGame.HIGH_SCORE_SDCARD:
+            if OctopusGame.SDCARD_HIGH_SCORE_FILE not in os.listdir("/sd/"):
+                f = open(f"/sd/{OctopusGame.SDCARD_HIGH_SCORE_FILE}", "w")
+                f.write(json.dumps({
+                    "highscore_list": []
+                }))
+                f.close()
+        elif self.high_score_type == OctopusGame.HIGH_SCORE_NVM:
+            try:
+                read_data = nvm_helper.read_data(verbose=True)
+            except EOFError:
+                read_data = None
+
+            if not read_data or "highscore_list" not in read_data.keys():
+                nvm_helper.save_data({
+                    "highscore_list": []
+                }, test_run=False)
+
+    def read_high_score_data(self):
+        """
+        Read the high score data object from the SDCard or NVM and populate the
+        high score label with the data.
+
+        :return: Dictionary object with highscore_list key containing list of high score values.
+        """
+        self.initialize_high_score()
+        if self.high_score_type == OctopusGame.HIGH_SCORE_SDCARD:
+            f = open(f"/sd/{OctopusGame.SDCARD_HIGH_SCORE_FILE}", "r")
+            data_obj = json.loads(f.read())
+            f.close()
+            self.update_high_score_text(data_obj)
+
+            return data_obj
+
+        elif self.high_score_type == OctopusGame.HIGH_SCORE_NVM:
+            try:
+                read_data = nvm_helper.read_data(verbose=True)
+                if "highscore_list" in read_data.keys():
+                    self.update_high_score_text(read_data)
+                    return read_data
+            except EOFError:
+                # no high score data stored yet
+                pass
+
+        return None
+
+    def write_high_score_data(self, new_data_obj):
+        """
+        write the given high score object into the storage system, either SDcard or NVM.
+        :param new_data_obj: the data
+        :return: None
+        """
+        self.initialize_high_score()
+        if self.high_score_type == OctopusGame.HIGH_SCORE_SDCARD:
+
+            f = open(f"/sd/{OctopusGame.SDCARD_HIGH_SCORE_FILE}", "w")
+            f.write(json.dumps(new_data_obj))
+            f.close()
+        elif self.high_score_type == OctopusGame.HIGH_SCORE_NVM:
+            nvm_helper.save_data(
+                new_data_obj, test_run=False
+            )
+
+    def update_high_score_text(self, data_obj):
+        """
+        update the high score text label to show the high score values currently
+        stored in the data file or NVM.
+
+        :param data_obj: the dictionary data object to write. Should contain "highscore_list" key with
+        list of highscore values
+
+        :return: None
+        """
+        if self.high_score_type:
+            self.high_score_label.text = "\n".join(data_obj["highscore_list"])
+
+    def evaluate_high_score(self):
+        """
+        Check if the current score is higher than the existing high scores in the list,
+        if it is then insert the current score into the list in the appropriate position.
+        :return: None
+        """
+
+        print("inside evaluate high score")
+
+        saved_score_data = self.read_high_score_data()
+
+        added_score = False
+        if len(saved_score_data["highscore_list"]) > 0:
+            for i, score in enumerate(saved_score_data["highscore_list"]):
+                if int(score) < self.score and str(self.score) not in saved_score_data["highscore_list"]:
+                    added_score = True
+                    saved_score_data["highscore_list"].insert(i, str(self.score))
+                    if len(saved_score_data["highscore_list"]) > 4:
+                        saved_score_data["highscore_list"].pop()
+
+                    self.write_high_score_data(saved_score_data)
+                    break
+
+            if not added_score and len(saved_score_data["highscore_list"]) < 4 and \
+                    str(self.score) not in saved_score_data["highscore_list"]:
+                saved_score_data["highscore_list"].append(str(self.score))
+                self.write_high_score_data(saved_score_data)
+        else:
+            saved_score_data["highscore_list"].append(str(self.score))
+            self.write_high_score_data(saved_score_data)
+
+    @property
+    def game_mode_speed_adjustment(self):
+        if self.current_game_mode == OctopusGame.GAME_MODE_A:
+            return OctopusGame.GAME_MODE_A_SPEED_ADJUSTMENT
+        elif self.current_game_mode == OctopusGame.GAME_MODE_B:
+            return OctopusGame.GAME_MODE_B_SPEED_ADJUSTMENT
+
 
 class Octopus(Group):
     """
@@ -508,10 +685,12 @@ class Octopus(Group):
     TENTACLE_0_PATH_B = 1
 
     # action speed starting point, will be modified by score
+    # larger value means slower speed
     BASE_TICK_DELAY = 0.75
 
     # maximum action speed delay value
-    MAX_TICK_SPEED = BASE_TICK_DELAY - 0.1  # seconds
+    # larger value means slower speed
+    MAX_TICK_SPEED = BASE_TICK_DELAY - 0.2  # seconds
 
     # order that the tentacles will take actions
     TENTACLE_ORDER = [0, 2, 1, 3]
@@ -526,115 +705,115 @@ class Octopus(Group):
         self.current_tentacle_index = 0
 
         # --- Set up tentacle segment images ---
-        self.t0s0_bmp, self.t0s0_palette = adafruit_imageload.load("sprites/tentacle_0_seg_0.bmp")
+        self.t0s0_bmp, self.t0s0_palette = adafruit_imageload.load("tentacle_0_seg_0.bmp")
         self.t0s0_tilegrid = TileGrid(self.t0s0_bmp, pixel_shader=self.t0s0_palette)
         self.t0s0_palette.make_transparent(0)
         self.t0s0_tilegrid.x = 57
         self.t0s0_tilegrid.y = 40
 
-        self.t0as1_bmp, self.t0as1_palette = adafruit_imageload.load("sprites/tentacle_0a_seg_1.bmp")
+        self.t0as1_bmp, self.t0as1_palette = adafruit_imageload.load("tentacle_0a_seg_1.bmp")
         self.t0as1_tilegrid = TileGrid(self.t0as1_bmp, pixel_shader=self.t0as1_palette)
         self.t0as1_palette.make_transparent(0)
         self.t0as1_tilegrid.x = 47
         self.t0as1_tilegrid.y = 43
 
-        self.t0as2_bmp, self.t0as2_palette = adafruit_imageload.load("sprites/tentacle_0a_seg_2.bmp")
+        self.t0as2_bmp, self.t0as2_palette = adafruit_imageload.load("tentacle_0a_seg_2.bmp")
         self.t0as2_tilegrid = TileGrid(self.t0as2_bmp, pixel_shader=self.t0as2_palette)
         self.t0as2_palette.make_transparent(0)
         self.t0as2_tilegrid.x = 33
         self.t0as2_tilegrid.y = 36
 
-        self.t0bs1_bmp, self.t0bs1_palette = adafruit_imageload.load("sprites/tentacle_0b_seg_1.bmp")
+        self.t0bs1_bmp, self.t0bs1_palette = adafruit_imageload.load("tentacle_0b_seg_1.bmp")
         self.t0bs1_tilegrid = TileGrid(self.t0bs1_bmp, pixel_shader=self.t0bs1_palette)
         self.t0bs1_palette.make_transparent(0)
         self.t0bs1_tilegrid.x = 53
         self.t0bs1_tilegrid.y = 50
 
-        self.t0bs2_bmp, self.t0bs2_palette = adafruit_imageload.load("sprites/tentacle_0b_seg_2.bmp")
+        self.t0bs2_bmp, self.t0bs2_palette = adafruit_imageload.load("tentacle_0b_seg_2.bmp")
         self.t0bs2_tilegrid = TileGrid(self.t0bs2_bmp, pixel_shader=self.t0bs2_palette)
         self.t0bs2_palette.make_transparent(0)
         self.t0bs2_tilegrid.x = 49
         self.t0bs2_tilegrid.y = 56
 
-        self.t0bs3_bmp, self.t0bs3_palette = adafruit_imageload.load("sprites/tentacle_0b_seg_3.bmp")
+        self.t0bs3_bmp, self.t0bs3_palette = adafruit_imageload.load("tentacle_0b_seg_3.bmp")
         self.t0bs3_tilegrid = TileGrid(self.t0bs3_bmp, pixel_shader=self.t0bs3_palette)
         self.t0bs3_palette.make_transparent(0)
         self.t0bs3_tilegrid.x = 36
         self.t0bs3_tilegrid.y = 69
 
-        self.t1s0_bmp, self.t1s0_palette = adafruit_imageload.load("sprites/tentacle_1_seg_0.bmp")
+        self.t1s0_bmp, self.t1s0_palette = adafruit_imageload.load("tentacle_1_seg_0.bmp")
         self.t1s0_tilegrid = TileGrid(self.t1s0_bmp, pixel_shader=self.t1s0_palette)
         self.t1s0_palette.make_transparent(0)
         self.t1s0_tilegrid.x = 72
         self.t1s0_tilegrid.y = 51
 
-        self.t1s1_bmp, self.t1s1_palette = adafruit_imageload.load("sprites/tentacle_1_seg_1.bmp")
+        self.t1s1_bmp, self.t1s1_palette = adafruit_imageload.load("tentacle_1_seg_1.bmp")
         self.t1s1_tilegrid = TileGrid(self.t1s1_bmp, pixel_shader=self.t1s1_palette)
         self.t1s1_palette.make_transparent(0)
         self.t1s1_tilegrid.x = 71
         self.t1s1_tilegrid.y = 61
 
-        self.t1as2_bmp, self.t1as2_palette = adafruit_imageload.load("sprites/tentacle_1a_seg_2.bmp")
+        self.t1as2_bmp, self.t1as2_palette = adafruit_imageload.load("tentacle_1a_seg_2.bmp")
         self.t1as2_tilegrid = TileGrid(self.t1as2_bmp, pixel_shader=self.t1as2_palette)
         self.t1as2_palette.make_transparent(0)
         self.t1as2_tilegrid.x = 70
         self.t1as2_tilegrid.y = 69
 
-        self.t1as3_bmp, self.t1as3_palette = adafruit_imageload.load("sprites/tentacle_1a_seg_3.bmp")
+        self.t1as3_bmp, self.t1as3_palette = adafruit_imageload.load("tentacle_1a_seg_3.bmp")
         self.t1as3_tilegrid = TileGrid(self.t1as3_bmp, pixel_shader=self.t1as3_palette)
         self.t1as3_palette.make_transparent(0)
         self.t1as3_tilegrid.x = 70
         self.t1as3_tilegrid.y = 78
 
-        self.t1as4_bmp, self.t1as4_palette = adafruit_imageload.load("sprites/tentacle_1a_seg_4.bmp")
+        self.t1as4_bmp, self.t1as4_palette = adafruit_imageload.load("tentacle_1a_seg_4.bmp")
         self.t1as4_tilegrid = TileGrid(self.t1as4_bmp, pixel_shader=self.t1as4_palette)
         self.t1as4_palette.make_transparent(0)
         self.t1as4_tilegrid.x = 65
         self.t1as4_tilegrid.y = 87
 
-        self.t1bs2_bmp, self.t1bs2_palette = adafruit_imageload.load("sprites/tentacle_1b_seg_2.bmp")
+        self.t1bs2_bmp, self.t1bs2_palette = adafruit_imageload.load("tentacle_1b_seg_2.bmp")
         self.t1bs2_tilegrid = TileGrid(self.t1bs2_bmp, pixel_shader=self.t1bs2_palette)
         self.t1bs2_palette.make_transparent(0)
         self.t1bs2_tilegrid.x = 79
         self.t1bs2_tilegrid.y = 71
 
-        self.t2s0_bmp, self.t2s0_palette = adafruit_imageload.load("sprites/tentacle_2_seg_0.bmp")
+        self.t2s0_bmp, self.t2s0_palette = adafruit_imageload.load("tentacle_2_seg_0.bmp")
         self.t2s0_tilegrid = TileGrid(self.t2s0_bmp, pixel_shader=self.t2s0_palette)
         self.t2s0_palette.make_transparent(0)
         self.t2s0_tilegrid.x = 94
         self.t2s0_tilegrid.y = 66
 
-        self.t2s1_bmp, self.t2s1_palette = adafruit_imageload.load("sprites/tentacle_2_seg_1.bmp")
+        self.t2s1_bmp, self.t2s1_palette = adafruit_imageload.load("tentacle_2_seg_1.bmp")
         self.t2s1_tilegrid = TileGrid(self.t2s1_bmp, pixel_shader=self.t2s1_palette)
         self.t2s1_palette.make_transparent(0)
         self.t2s1_tilegrid.x = 95
         self.t2s1_tilegrid.y = 75
 
-        self.t2s2_bmp, self.t2s2_palette = adafruit_imageload.load("sprites/tentacle_2_seg_2.bmp")
+        self.t2s2_bmp, self.t2s2_palette = adafruit_imageload.load("tentacle_2_seg_2.bmp")
         self.t2s2_tilegrid = TileGrid(self.t2s2_bmp, pixel_shader=self.t2s2_palette)
         self.t2s2_palette.make_transparent(0)
         self.t2s2_tilegrid.x = 98
         self.t2s2_tilegrid.y = 80
 
-        self.t2s3_bmp, self.t2s3_palette = adafruit_imageload.load("sprites/tentacle_2_seg_3.bmp")
+        self.t2s3_bmp, self.t2s3_palette = adafruit_imageload.load("tentacle_2_seg_3.bmp")
         self.t2s3_tilegrid = TileGrid(self.t2s3_bmp, pixel_shader=self.t2s3_palette)
         self.t2s3_palette.make_transparent(0)
         self.t2s3_tilegrid.x = 99
         self.t2s3_tilegrid.y = 88
 
-        self.t3s0_bmp, self.t3s0_palette = adafruit_imageload.load("sprites/tentacle_3_seg_0.bmp")
+        self.t3s0_bmp, self.t3s0_palette = adafruit_imageload.load("tentacle_3_seg_0.bmp")
         self.t3s0_tilegrid = TileGrid(self.t3s0_bmp, pixel_shader=self.t3s0_palette)
         self.t3s0_palette.make_transparent(0)
         self.t3s0_tilegrid.x = 119
         self.t3s0_tilegrid.y = 72
 
-        self.t3s1_bmp, self.t3s1_palette = adafruit_imageload.load("sprites/tentacle_3_seg_1.bmp")
+        self.t3s1_bmp, self.t3s1_palette = adafruit_imageload.load("tentacle_3_seg_1.bmp")
         self.t3s1_tilegrid = TileGrid(self.t3s1_bmp, pixel_shader=self.t3s1_palette)
         self.t3s1_palette.make_transparent(0)
         self.t3s1_tilegrid.x = 119
         self.t3s1_tilegrid.y = 80
 
-        self.t3s2_bmp, self.t3s2_palette = adafruit_imageload.load("sprites/tentacle_3_seg_2.bmp")
+        self.t3s2_bmp, self.t3s2_palette = adafruit_imageload.load("tentacle_3_seg_2.bmp")
         self.t3s2_tilegrid = TileGrid(self.t3s2_bmp, pixel_shader=self.t3s2_palette)
         self.t3s2_palette.make_transparent(0)
         self.t3s2_tilegrid.x = 120
@@ -711,7 +890,6 @@ class Octopus(Group):
         # loop over all segments in every tentacle
         for segment in self.tentacle_0a_list + self.tentacle_0b_list + self.tentacle_1_list + \
                        self.tentacle_2_list + self.tentacle_3_list:
-
             # hide the current segment
             segment.hidden = True
 
@@ -720,7 +898,6 @@ class Octopus(Group):
 
         # reset all tentacle directions to extending
         self.tentacle_directions[:] = [Octopus.TENTACLE_DIRECTION_EXTENDING] * 4
-
 
     def tick(self, game_obj):
         """
@@ -734,10 +911,14 @@ class Octopus(Group):
         # timestamp to determine if it's time for an action to occur
         now = time.monotonic()
 
-        # Check if it's time for an acction
-        if self.last_action_time + (
-                Octopus.BASE_TICK_DELAY - min(game_obj.score_speed_factor,
-                                              Octopus.MAX_TICK_SPEED)) <= now:
+        _cur_tick_speed_delay = (Octopus.BASE_TICK_DELAY -
+                                 min(game_obj.score_speed_factor, Octopus.MAX_TICK_SPEED)) - \
+                                game_obj.game_mode_speed_adjustment
+
+        print(f"cur tick speed: {_cur_tick_speed_delay} ajd: {game_obj.game_mode_speed_adjustment} mode: {game_obj.current_game_mode}")
+
+        # Check if it's time for an action
+        if self.last_action_time + _cur_tick_speed_delay <= now:
 
             # store the timestamp to compare against next iteration
             self.last_action_time = now
@@ -821,7 +1002,6 @@ class Octopus(Group):
                     # if it's the last segment in the tentacle
                     if self.tentacle_cur_indexes[self.current_tentacle] >= len(
                             _cur_tentacle_list) - 1:
-
                         # change the direction to retracting
                         self.tentacle_directions[
                             self.current_tentacle] = Octopus.TENTACLE_DIRECTION_RETRACTING
@@ -838,7 +1018,6 @@ class Octopus(Group):
 
                     # if all segments have been retracted
                     if self.tentacle_cur_indexes[self.current_tentacle] <= -1:
-
                         # change direction to extending
                         self.tentacle_directions[
                             self.current_tentacle] = Octopus.TENTACLE_DIRECTION_EXTENDING
@@ -888,7 +1067,7 @@ class DiverPlayer(TileGrid):
     def __init__(self):
         # set up diver sprite sheet
         self._sprite_sheet_bmp, self._sprite_sheet_palette = adafruit_imageload.load(
-            "sprites/diver_sprite_sheet_v2.bmp")
+            "diver_sprite_sheet_v2.bmp")
 
         # initialize super instance of TileGrid
         super().__init__(self._sprite_sheet_bmp, pixel_shader=self._sprite_sheet_palette,
