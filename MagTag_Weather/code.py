@@ -54,25 +54,34 @@ icons_small_bmp, icons_small_pal = adafruit_imageload.load(ICONS_SMALL_FILE)
 
 def get_data_source_url(api="onecall", location=None):
     """Build and return the URL for the OpenWeather API."""
-    if api.upper() == "FORECAST5":
-        URL = "https://api.openweathermap.org/data/2.5/forecast?"
-        URL += "q=" + location
+    if api.upper() == "GEO":
+        URL = "https://api.openweathermap.org/geo/1.0/direct?q="
+        URL += location
+    elif api.upper() == "GEOREV":
+        URL = "https://api.openweathermap.org/geo/1.0/reverse?limit=1"
+        URL += "&lat={}".format(location[0])
+        URL += "&lon={}".format(location[1])
     elif api.upper() == "ONECALL":
         URL = "https://api.openweathermap.org/data/2.5/onecall?exclude=minutely,hourly,alerts"
         URL += "&lat={}".format(location[0])
         URL += "&lon={}".format(location[1])
     else:
         raise ValueError("Unknown API type: " + api)
-
     return URL + "&appid=" + secrets["openweather_token"]
 
 
-def get_latlon():
-    """Use the Forecast5 API to determine lat/lon for given city."""
-    magtag.url = get_data_source_url(api="forecast5", location=secrets["openweather_location"])
-    magtag.json_path = ["city"]
-    raw_data = magtag.fetch()
-    return raw_data["coord"]["lat"], raw_data["coord"]["lon"]
+def get_latlon(city_name):
+    """Use the Geolocation API to determine lat/lon for given city."""
+    magtag.url = get_data_source_url(api="geo", location=city_name)
+    raw_data = eval(magtag.fetch())[0]
+    return raw_data["lat"], raw_data["lon"]
+
+
+def get_city(latlon_location):
+    """Use the Geolocation API to determine city for given lat/lon."""
+    magtag.url = get_data_source_url(api="georev", location=latlon_location)
+    raw_data = eval(magtag.fetch())[0]
+    return raw_data["name"] + ", " + raw_data["country"]
 
 
 def get_forecast(location):
@@ -171,15 +180,32 @@ def go_to_sleep(current_time):
 
 
 # ===========
+# Location
+# ===========
+if isinstance(secrets["openweather_location"], str):
+    # Get lat/lon using city name
+    city = secrets["openweather_location"]
+    print("Getting lat/lon for city:", city)
+    latlon = get_latlon(city)
+elif isinstance(secrets["openweather_location"], tuple):
+    # Get city name using lat/lon
+    latlon = secrets["openweather_location"]
+    print("Getting city name for lat/lon:", latlon)
+    city = get_city(latlon)
+else:
+    raise ValueError("Unknown location:", secrets["openweather_location"])
+
+print("City =", city)
+print("Lat/Lon = ", latlon)
+
+# ===========
 # U I
 # ===========
 today_date = label.Label(terminalio.FONT, text="?" * 30, color=0x000000)
 today_date.anchor_point = (0, 0)
 today_date.anchored_position = (15, 13)
 
-city_name = label.Label(
-    terminalio.FONT, text=secrets["openweather_location"], color=0x000000
-)
+city_name = label.Label(terminalio.FONT, text=city, color=0x000000)
 city_name.anchor_point = (0, 0)
 city_name.anchored_position = (15, 24)
 
@@ -249,11 +275,6 @@ for future_banner in future_banners:
 # ===========
 #  M A I N
 # ===========
-print("Getting Lat/Lon...")
-latlon = get_latlon()
-print(secrets["openweather_location"])
-print(latlon)
-
 print("Fetching forecast...")
 forecast_data, utc_time, local_tz_offset = get_forecast(latlon)
 
@@ -271,4 +292,3 @@ print("Sleeping...")
 go_to_sleep(utc_time + local_tz_offset)
 #  entire code will run again after deep sleep cycle
 #  similar to hitting the reset button
-
