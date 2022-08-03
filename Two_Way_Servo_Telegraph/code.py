@@ -101,7 +101,7 @@ clock = 5
 
 while True:
     #  check IO for new data every 5 seconds
-    if (time.monotonic() - clock) > 2:
+    if (time.monotonic() - clock) > 5:
         #  get data
         received_data = io.receive_data(in_feed["key"])
         #  reset clock
