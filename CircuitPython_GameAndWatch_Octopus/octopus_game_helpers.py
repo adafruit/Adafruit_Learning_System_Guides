@@ -37,7 +37,7 @@ class OctopusGame(Group):
 
     # Vertical position of game mode labels (near bottom left)
     GAME_MODE_A_LBL_Y = 128 - 14
-    GAME_MODE_B_LBL_Y = 128 - 4
+    GAME_MODE_B_LBL_Y = 128 - 7
 
     # speed adjustment values. Value in seconds will be subtracted from game speed.
     # larger values will equate to faster game speed.
@@ -104,12 +104,12 @@ class OctopusGame(Group):
 
         # Set up Background
         self.bg_with_sadow = True
-        self.bg_bmp = OnDiskBitmap("bg_with_shadow.bmp")
+        self.bg_bmp = OnDiskBitmap("octopus_game_sprites/bg_with_shadow.bmp")
         self.bg_tilegrid = TileGrid(self.bg_bmp, pixel_shader=self.bg_bmp.pixel_shader)
         self.append(self.bg_tilegrid)
 
         # Set up Extra Life indicator images
-        self.extra_life_bmp = OnDiskBitmap("diver_extra_life.bmp")
+        self.extra_life_bmp = OnDiskBitmap("octopus_game_sprites/diver_extra_life.bmp")
         self.extra_life_bmp.pixel_shader.make_transparent(0)
         self.extra_life_tilegrid_1 = TileGrid(self.extra_life_bmp,
                                               pixel_shader=self.extra_life_bmp.pixel_shader)
@@ -135,7 +135,7 @@ class OctopusGame(Group):
 
         # Set up caught flailing diver
         self.caught_diver_bmp, self.caught_diver_palette = adafruit_imageload.load(
-            "diver_caught_small.bmp")
+            "octopus_game_sprites/diver_caught_small.bmp")
         self.caught_diver_tilegrid = TileGrid(self.caught_diver_bmp,
                                               pixel_shader=self.caught_diver_palette,
                                               height=1, width=1, tile_width=31, tile_height=40)
@@ -149,7 +149,7 @@ class OctopusGame(Group):
 
         # Set up treasure depositing boat diver sprite
         self.boat_diver_bmp, self.boat_diver_palette = adafruit_imageload.load(
-            "diver_boat_small.bmp"
+            "octopus_game_sprites/diver_boat_small.bmp"
         )
         self.boat_diver_tilegrid = TileGrid(self.boat_diver_bmp,
                                             pixel_shader=self.boat_diver_palette,
@@ -329,13 +329,13 @@ class OctopusGame(Group):
             # swap to the alternate background image
             if not self.bg_with_sadow:
                 self.remove(self.bg_tilegrid)
-                self.bg_bmp = OnDiskBitmap("bg_with_shadow.bmp")
+                self.bg_bmp = OnDiskBitmap("octopus_game_sprites/bg_with_shadow.bmp")
                 self.bg_tilegrid = TileGrid(self.bg_bmp, pixel_shader=self.bg_bmp.pixel_shader)
 
                 self.insert(0, self.bg_tilegrid)
             else:
                 self.remove(self.bg_tilegrid)
-                self.bg_bmp = OnDiskBitmap("bg.bmp")
+                self.bg_bmp = OnDiskBitmap("octopus_game_sprites/bg.bmp")
                 self.bg_tilegrid = TileGrid(self.bg_bmp, pixel_shader=self.bg_bmp.pixel_shader)
                 self.insert(0, self.bg_tilegrid)
             self.bg_with_sadow = not self.bg_with_sadow
@@ -728,115 +728,115 @@ class Octopus(Group):
         self.current_tentacle_index = 0
 
         # --- Set up tentacle segment images ---
-        self.t0s0_bmp, self.t0s0_palette = adafruit_imageload.load("tentacle_0_seg_0.bmp")
+        self.t0s0_bmp, self.t0s0_palette = adafruit_imageload.load("octopus_game_sprites/tentacle_0_seg_0.bmp")
         self.t0s0_tilegrid = TileGrid(self.t0s0_bmp, pixel_shader=self.t0s0_palette)
         self.t0s0_palette.make_transparent(0)
         self.t0s0_tilegrid.x = 57
         self.t0s0_tilegrid.y = 40
 
-        self.t0as1_bmp, self.t0as1_palette = adafruit_imageload.load("tentacle_0a_seg_1.bmp")
+        self.t0as1_bmp, self.t0as1_palette = adafruit_imageload.load("octopus_game_sprites/tentacle_0a_seg_1.bmp")
         self.t0as1_tilegrid = TileGrid(self.t0as1_bmp, pixel_shader=self.t0as1_palette)
         self.t0as1_palette.make_transparent(0)
         self.t0as1_tilegrid.x = 47
         self.t0as1_tilegrid.y = 43
 
-        self.t0as2_bmp, self.t0as2_palette = adafruit_imageload.load("tentacle_0a_seg_2.bmp")
+        self.t0as2_bmp, self.t0as2_palette = adafruit_imageload.load("octopus_game_sprites/tentacle_0a_seg_2.bmp")
         self.t0as2_tilegrid = TileGrid(self.t0as2_bmp, pixel_shader=self.t0as2_palette)
         self.t0as2_palette.make_transparent(0)
         self.t0as2_tilegrid.x = 33
         self.t0as2_tilegrid.y = 36
 
-        self.t0bs1_bmp, self.t0bs1_palette = adafruit_imageload.load("tentacle_0b_seg_1.bmp")
+        self.t0bs1_bmp, self.t0bs1_palette = adafruit_imageload.load("octopus_game_sprites/tentacle_0b_seg_1.bmp")
         self.t0bs1_tilegrid = TileGrid(self.t0bs1_bmp, pixel_shader=self.t0bs1_palette)
         self.t0bs1_palette.make_transparent(0)
         self.t0bs1_tilegrid.x = 53
         self.t0bs1_tilegrid.y = 50
 
-        self.t0bs2_bmp, self.t0bs2_palette = adafruit_imageload.load("tentacle_0b_seg_2.bmp")
+        self.t0bs2_bmp, self.t0bs2_palette = adafruit_imageload.load("octopus_game_sprites/tentacle_0b_seg_2.bmp")
         self.t0bs2_tilegrid = TileGrid(self.t0bs2_bmp, pixel_shader=self.t0bs2_palette)
         self.t0bs2_palette.make_transparent(0)
         self.t0bs2_tilegrid.x = 49
         self.t0bs2_tilegrid.y = 56
 
-        self.t0bs3_bmp, self.t0bs3_palette = adafruit_imageload.load("tentacle_0b_seg_3.bmp")
+        self.t0bs3_bmp, self.t0bs3_palette = adafruit_imageload.load("octopus_game_sprites/tentacle_0b_seg_3.bmp")
         self.t0bs3_tilegrid = TileGrid(self.t0bs3_bmp, pixel_shader=self.t0bs3_palette)
         self.t0bs3_palette.make_transparent(0)
         self.t0bs3_tilegrid.x = 36
         self.t0bs3_tilegrid.y = 69
 
-        self.t1s0_bmp, self.t1s0_palette = adafruit_imageload.load("tentacle_1_seg_0.bmp")
+        self.t1s0_bmp, self.t1s0_palette = adafruit_imageload.load("octopus_game_sprites/tentacle_1_seg_0.bmp")
         self.t1s0_tilegrid = TileGrid(self.t1s0_bmp, pixel_shader=self.t1s0_palette)
         self.t1s0_palette.make_transparent(0)
         self.t1s0_tilegrid.x = 72
         self.t1s0_tilegrid.y = 51
 
-        self.t1s1_bmp, self.t1s1_palette = adafruit_imageload.load("tentacle_1_seg_1.bmp")
+        self.t1s1_bmp, self.t1s1_palette = adafruit_imageload.load("octopus_game_sprites/tentacle_1_seg_1.bmp")
         self.t1s1_tilegrid = TileGrid(self.t1s1_bmp, pixel_shader=self.t1s1_palette)
         self.t1s1_palette.make_transparent(0)
         self.t1s1_tilegrid.x = 71
         self.t1s1_tilegrid.y = 61
 
-        self.t1as2_bmp, self.t1as2_palette = adafruit_imageload.load("tentacle_1a_seg_2.bmp")
+        self.t1as2_bmp, self.t1as2_palette = adafruit_imageload.load("octopus_game_sprites/tentacle_1a_seg_2.bmp")
         self.t1as2_tilegrid = TileGrid(self.t1as2_bmp, pixel_shader=self.t1as2_palette)
         self.t1as2_palette.make_transparent(0)
         self.t1as2_tilegrid.x = 70
         self.t1as2_tilegrid.y = 69
 
-        self.t1as3_bmp, self.t1as3_palette = adafruit_imageload.load("tentacle_1a_seg_3.bmp")
+        self.t1as3_bmp, self.t1as3_palette = adafruit_imageload.load("octopus_game_sprites/tentacle_1a_seg_3.bmp")
         self.t1as3_tilegrid = TileGrid(self.t1as3_bmp, pixel_shader=self.t1as3_palette)
         self.t1as3_palette.make_transparent(0)
         self.t1as3_tilegrid.x = 70
         self.t1as3_tilegrid.y = 78
 
-        self.t1as4_bmp, self.t1as4_palette = adafruit_imageload.load("tentacle_1a_seg_4.bmp")
+        self.t1as4_bmp, self.t1as4_palette = adafruit_imageload.load("octopus_game_sprites/tentacle_1a_seg_4.bmp")
         self.t1as4_tilegrid = TileGrid(self.t1as4_bmp, pixel_shader=self.t1as4_palette)
         self.t1as4_palette.make_transparent(0)
         self.t1as4_tilegrid.x = 65
         self.t1as4_tilegrid.y = 87
 
-        self.t1bs2_bmp, self.t1bs2_palette = adafruit_imageload.load("tentacle_1b_seg_2.bmp")
+        self.t1bs2_bmp, self.t1bs2_palette = adafruit_imageload.load("octopus_game_sprites/tentacle_1b_seg_2.bmp")
         self.t1bs2_tilegrid = TileGrid(self.t1bs2_bmp, pixel_shader=self.t1bs2_palette)
         self.t1bs2_palette.make_transparent(0)
         self.t1bs2_tilegrid.x = 79
         self.t1bs2_tilegrid.y = 71
 
-        self.t2s0_bmp, self.t2s0_palette = adafruit_imageload.load("tentacle_2_seg_0.bmp")
+        self.t2s0_bmp, self.t2s0_palette = adafruit_imageload.load("octopus_game_sprites/tentacle_2_seg_0.bmp")
         self.t2s0_tilegrid = TileGrid(self.t2s0_bmp, pixel_shader=self.t2s0_palette)
         self.t2s0_palette.make_transparent(0)
         self.t2s0_tilegrid.x = 94
         self.t2s0_tilegrid.y = 66
 
-        self.t2s1_bmp, self.t2s1_palette = adafruit_imageload.load("tentacle_2_seg_1.bmp")
+        self.t2s1_bmp, self.t2s1_palette = adafruit_imageload.load("octopus_game_sprites/tentacle_2_seg_1.bmp")
         self.t2s1_tilegrid = TileGrid(self.t2s1_bmp, pixel_shader=self.t2s1_palette)
         self.t2s1_palette.make_transparent(0)
         self.t2s1_tilegrid.x = 95
         self.t2s1_tilegrid.y = 75
 
-        self.t2s2_bmp, self.t2s2_palette = adafruit_imageload.load("tentacle_2_seg_2.bmp")
+        self.t2s2_bmp, self.t2s2_palette = adafruit_imageload.load("octopus_game_sprites/tentacle_2_seg_2.bmp")
         self.t2s2_tilegrid = TileGrid(self.t2s2_bmp, pixel_shader=self.t2s2_palette)
         self.t2s2_palette.make_transparent(0)
         self.t2s2_tilegrid.x = 98
         self.t2s2_tilegrid.y = 80
 
-        self.t2s3_bmp, self.t2s3_palette = adafruit_imageload.load("tentacle_2_seg_3.bmp")
+        self.t2s3_bmp, self.t2s3_palette = adafruit_imageload.load("octopus_game_sprites/tentacle_2_seg_3.bmp")
         self.t2s3_tilegrid = TileGrid(self.t2s3_bmp, pixel_shader=self.t2s3_palette)
         self.t2s3_palette.make_transparent(0)
         self.t2s3_tilegrid.x = 99
         self.t2s3_tilegrid.y = 88
 
-        self.t3s0_bmp, self.t3s0_palette = adafruit_imageload.load("tentacle_3_seg_0.bmp")
+        self.t3s0_bmp, self.t3s0_palette = adafruit_imageload.load("octopus_game_sprites/tentacle_3_seg_0.bmp")
         self.t3s0_tilegrid = TileGrid(self.t3s0_bmp, pixel_shader=self.t3s0_palette)
         self.t3s0_palette.make_transparent(0)
         self.t3s0_tilegrid.x = 119
         self.t3s0_tilegrid.y = 72
 
-        self.t3s1_bmp, self.t3s1_palette = adafruit_imageload.load("tentacle_3_seg_1.bmp")
+        self.t3s1_bmp, self.t3s1_palette = adafruit_imageload.load("octopus_game_sprites/tentacle_3_seg_1.bmp")
         self.t3s1_tilegrid = TileGrid(self.t3s1_bmp, pixel_shader=self.t3s1_palette)
         self.t3s1_palette.make_transparent(0)
         self.t3s1_tilegrid.x = 119
         self.t3s1_tilegrid.y = 80
 
-        self.t3s2_bmp, self.t3s2_palette = adafruit_imageload.load("tentacle_3_seg_2.bmp")
+        self.t3s2_bmp, self.t3s2_palette = adafruit_imageload.load("octopus_game_sprites/tentacle_3_seg_2.bmp")
         self.t3s2_tilegrid = TileGrid(self.t3s2_bmp, pixel_shader=self.t3s2_palette)
         self.t3s2_palette.make_transparent(0)
         self.t3s2_tilegrid.x = 120
@@ -1090,7 +1090,7 @@ class DiverPlayer(TileGrid):
     def __init__(self):
         # set up diver sprite sheet
         self._sprite_sheet_bmp, self._sprite_sheet_palette = adafruit_imageload.load(
-            "diver_sprite_sheet_v2.bmp")
+            "octopus_game_sprites/diver_sprite_sheet_v2.bmp")
 
         # initialize super instance of TileGrid
         super().__init__(self._sprite_sheet_bmp, pixel_shader=self._sprite_sheet_palette,
