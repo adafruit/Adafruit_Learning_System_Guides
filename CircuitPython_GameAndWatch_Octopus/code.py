@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2022 Tim C, written for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
 import gc
 import time
 import board
