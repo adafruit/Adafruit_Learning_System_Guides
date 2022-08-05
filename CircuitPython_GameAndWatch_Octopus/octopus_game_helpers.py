@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2022 Tim C, written for Adafruit Industries
 #
 # SPDX-License-Identifier: MIT
-# pylint: disable=too-many-lines, import-outside-toplevel, consider-using-with, too-many-statements, too-many-branches
+# pylint: disable=too-many-lines, import-outside-toplevel, too-many-statements, too-many-branches
 import os
 import time
 import json
