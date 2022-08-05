@@ -9,7 +9,7 @@ from octopus_game_helpers import DiverPlayer, OctopusGame
 # built-in display
 display = board.DISPLAY
 
-display.brightness = 0.3
+#display.brightness = 0.3
 
 # main group that we'll show in the display
 main_group = Group()
