@@ -1,24 +1,28 @@
 # SPDX-FileCopyrightText: 2022 Tim C, written for Adafruit Industries
 #
 # SPDX-License-Identifier: MIT
-import gc
-import time
 import board
 import keypad
-from displayio import OnDiskBitmap, TileGrid, Group
-import adafruit_imageload
-from octopus_game_helpers import DiverPlayer, OctopusGame
+from displayio import Group
+from octopus_game_helpers import OctopusGame
 
 # built-in display
 display = board.DISPLAY
 
-#display.brightness = 0.3
+# display.brightness = 0.3
 
 # main group that we'll show in the display
 main_group = Group()
 
 # create instance of OctopusGame
-octopus_game = OctopusGame(high_score_type=OctopusGame.HIGH_SCORE_NVM)
+octopus_game = OctopusGame()
+
+# uncomment this instead, to use NVM highscore
+#octopus_game = OctopusGame(high_score_type=OctopusGame.HIGH_SCORE_NVM)
+
+# uncomment this instead, to use SDCard highscore
+#octopus_game = OctopusGame(high_score_type=OctopusGame.HIGH_SCORE_NVM)
+
 
 # add octopus game to main group
 main_group.append(octopus_game)
