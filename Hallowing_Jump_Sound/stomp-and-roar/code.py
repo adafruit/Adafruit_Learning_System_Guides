@@ -48,7 +48,10 @@ except AttributeError:
 
 AUDIO = audioio.AudioOut(board.SPEAKER)  # Speaker
 
-board.DISPLAY.auto_brightness = False
+try:
+    board.DISPLAY.auto_brightness = False
+except AttributeError:
+    pass
 
 # Set up accelerometer on I2C bus, 4G range:
 I2C = board.I2C()
