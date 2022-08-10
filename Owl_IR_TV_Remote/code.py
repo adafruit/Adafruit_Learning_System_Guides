@@ -3,7 +3,6 @@
 
 import array
 import pulseio
-import pwmio
 import board
 from digitalio import DigitalInOut, Direction, Pull
 from adafruit_debouncer import Debouncer
@@ -25,9 +24,10 @@ num_pixels = 1
 pixel = neopixel.NeoPixel(pix, num_pixels, brightness=0.8, auto_write=False)
 
 #  PWM setup for IR LEDs
-pwm = pwmio.PWMOut(board.TX, frequency=38000, duty_cycle=2**15)
-remote = pulseio.PulseOut(pwm)
+remote = pulseio.PulseOut(board.TX, frequency=38000, duty_cycle=2**15)
 #  power on pulse array
+# Prevent black from reformatting the arrays.
+# fmt: off
 power_on = array.array('H', [9027, 4490, 577, 563, 549, 1677, 579, 1674, 582, 558,
                              554, 559, 553, 561, 551, 562, 551, 1675, 580, 1674, 572,
                              567, 555, 1672, 573, 567, 556, 558, 554, 559, 553, 560,
@@ -43,6 +43,7 @@ power_off = array.array('H', [9028, 4491, 576, 563, 549, 1678, 578, 1701, 554, 5
                               566, 546, 1707, 549, 1704, 551, 562, 550, 1703, 553, 1699,
                               556, 1697, 548, 1705, 551, 1701, 554, 560, 553, 560, 552,
                               1701, 554])
+# fmt: on
 #  array of the pulses
 signals = [power_on, power_off]
 #  neopixel colors
