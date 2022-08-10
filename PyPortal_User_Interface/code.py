@@ -51,7 +51,10 @@ switch_state = 0
 # Value between 0 and 1 where 0 is OFF, 0.5 is 50% and 1 is 100% brightness.
 def set_backlight(val):
     val = max(0, min(1.0, val))
-    board.DISPLAY.auto_brightness = False
+    try:
+        board.DISPLAY.auto_brightness = False
+    except AttributeError:
+        pass
     board.DISPLAY.brightness = val
 
 

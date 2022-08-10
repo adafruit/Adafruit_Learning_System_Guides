@@ -61,7 +61,10 @@ except AttributeError:
 
 AUDIO = audioio.AudioOut(board.SPEAKER)  # Speaker
 
-board.DISPLAY.auto_brightness = False
+try:
+    board.DISPLAY.auto_brightness = False
+except AttributeError:
+    pass
 TOUCH1 = touchio.TouchIn(board.TOUCH1)  # Capacitive touch pads
 TOUCH2 = touchio.TouchIn(board.TOUCH2)
 TOUCH3 = touchio.TouchIn(board.TOUCH3)
