@@ -432,7 +432,6 @@ class OctopusGame(Group):
             # high score is disabled
             pass
 
-
     def a_button_press(self):
         """
         (A) Button action function. code.py will poll hardware and call this as needed
