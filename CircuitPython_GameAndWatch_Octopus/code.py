@@ -14,14 +14,14 @@ display = board.DISPLAY
 # main group that we'll show in the display
 main_group = Group()
 
-# create instance of OctopusGame
+# create instance of OctopusGame, high score disabled
 octopus_game = OctopusGame()
 
 # uncomment this instead, to use NVM highscore
 #octopus_game = OctopusGame(high_score_type=OctopusGame.HIGH_SCORE_NVM)
 
 # uncomment this instead, to use SDCard highscore
-#octopus_game = OctopusGame(high_score_type=OctopusGame.HIGH_SCORE_NVM)
+#octopus_game = OctopusGame(high_score_type=OctopusGame.HIGH_SCORE_SDCARD)
 
 
 # add octopus game to main group
