@@ -1,8 +1,8 @@
-#!/usr/bin/env python3
-
-#SPDX-FileCopyrightText: 2022 Liz Clark for Adafruit Industries
+# SPDX-FileCopyrightText: 2022 Liz Clark for Adafruit Industries
 #
-#SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: MIT
+
+#!/usr/bin/env python3
 
 # pylint: disable=unused-import
 import json
