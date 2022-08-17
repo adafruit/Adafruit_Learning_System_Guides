@@ -21,10 +21,11 @@ import audiobusio
 
 audio = audiobusio.I2SOut(board.BIT_CLOCK_PIN, board.WORD_SELECT_PIN, board.DATA_PIN)
 
-mp3 = audiomp3.MP3Decoder(open("slow.mp3", "rb"))
+with open("slow.mp3", "rb") as mp3_file:
+    mp3 = audiomp3.MP3Decoder(mp3_file)
 
-audio.play(mp3)
-while audio.playing:
-    pass
+    audio.play(mp3)
+    while audio.playing:
+        pass
 
 print("Done playing!")

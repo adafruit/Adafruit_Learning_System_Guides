@@ -71,10 +71,11 @@ audio = audioio.AudioOut(board.A0)
 #
 # audio = audioio.AudioOut(board.SPEAKER)
 
-decoder = audiomp3.MP3Decoder(open("slow.mp3", "rb"))
+with open("slow.mp3", "rb") as mp3_file:
+    decoder = audiomp3.MP3Decoder(mp3_file)
 
-audio.play(decoder)
-while audio.playing:
-    pass
+    audio.play(decoder)
+    while audio.playing:
+        pass
 
 print("Done playing!")
