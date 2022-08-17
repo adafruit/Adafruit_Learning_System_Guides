@@ -4,7 +4,7 @@
 CircuitPython Essentials Storage CP Filesystem boot.py file
 
 REMOVE THIS LINE AND ALL TEXT BELOW BEFORE SUBMITTING TO GITHUB.
-This file is specific to boards like ESP32-S2 where the boot button is used for bootloader and
+This file is specific to boards like ESP32-S2/S3 where the boot button is used for bootloader and
 safe mode, and therefore the button must be pressed at the right time to get into readonly mode.
 
 There are two things to be updated in this file to match your board:

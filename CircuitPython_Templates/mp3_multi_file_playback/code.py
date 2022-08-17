@@ -24,15 +24,15 @@ of imports and the hardware setup. For example, a generic SAMD51 example should 
 
     mp3files = ["slow.mp3", "happy.mp3"]
 
-    mp3 = open(mp3files[0], "rb")
-    decoder = audiomp3.MP3Decoder(mp3)
+    with open(mp3files[0], "rb") as mp3:
+        decoder = audiomp3.MP3Decoder(mp3)
 
-    for filename in mp3files:
-        decoder.file = open(filename, "rb")
-        audio.play(decoder)
-        print("Playing:", filename)
-        while audio.playing:
-            pass
+        for filename in mp3files:
+            with open(filename, "rb") as decoder.file:
+                audio.play(decoder)
+                print("Playing:", filename)
+                while audio.playing:
+                    pass
 
 The example content, as above, should contain NO commented out code, NO setup comment labels, and
 NO other commented out setup code.
@@ -79,14 +79,14 @@ audio = audioio.AudioOut(board.A0)
 
 mp3files = ["slow.mp3", "happy.mp3"]
 
-mp3 = open(mp3files[0], "rb")
-decoder = audiomp3.MP3Decoder(mp3)
+with open(mp3files[0], "rb") as mp3:
+    decoder = audiomp3.MP3Decoder(mp3)
 
-for filename in mp3files:
-    decoder.file = open(filename, "rb")
-    audio.play(decoder)
-    print("Playing:", filename)
-    while audio.playing:
-        pass
+    for filename in mp3files:
+        with open(filename, "rb") as decoder.file:
+            audio.play(decoder)
+            print("Playing:", filename)
+            while audio.playing:
+                pass
 
 print("Done playing!")
