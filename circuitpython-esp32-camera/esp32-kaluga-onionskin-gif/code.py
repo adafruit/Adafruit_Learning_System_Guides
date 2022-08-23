@@ -24,7 +24,9 @@ Insert an SD card and power on.
 
 Set up the first frame using the viewfinder. Click the REC button to take a frame.
 
-Set up the next frame using the viewfinder. The previous and current frames are blended together on the display, which is called an "onionskin".  Click the REC button to take the next frame.
+Set up the next frame using the viewfinder. The previous and current frames are
+blended together on the display, which is called an "onionskin".  Click the REC
+button to take the next frame.
 
 After 10 frames are recorded, the GIF is complete and you can begin recording another.
 
@@ -45,14 +47,12 @@ the one which usually uses rotation=90 to get a landscape display.
 
 import os
 import struct
-import time
 
 import esp32_camera
 import analogio
 import board
 import busio
 import bitmaptools
-import digitalio
 import displayio
 import sdcardio
 import storage
@@ -145,7 +145,7 @@ def next_filename(extension="jpg"):
 
 # Pre-cache the next image number
 next_filename("gif")
-    
+
 # Blank the whole display
 g = displayio.Group()
 display.show(g)
@@ -170,33 +170,34 @@ oh = (display.height - onionskin.height) // 2
 display_bus.send(42, struct.pack(">hh", ow, onionskin.width + ow - 1))
 display_bus.send(43, struct.pack(">hh", oh, onionskin.height + ow - 1))
 
-def wait_record_pressed_update_display(first_frame, cam):
+def wait_record_pressed_update_display(first_frame, camera):
     while record_pressed():
         pass
     while True:
-        frame = cam.take(1)
+        frame = camera.take(1)
         print(type(frame))
         if record_pressed():
             return frame
-        
+
         if first_frame:
             # First frame -- display as-is
             display_bus.send(44, frame)
         else:
             bitmaptools.alphablend(onionskin, old_frame, frame, displayio.Colorspace.RGB565_SWAPPED)
             display_bus.send(44, onionskin)
-            
+
 def take_stop_motion_gif(n_frames=10, replay_frame_time=.3):
     print(f"0/{n_frames}")
     frame = wait_record_pressed_update_display(True, cam)
-    with open_next_image("gif") as f, gifio.GifWriter(f, cam.width, cam.height, displayio.Colorspace.RGB565_SWAPPED, dither=True) as g:
-        g.add_frame(frame, replay_frame_time)
+    with open_next_image("gif") as f, gifio.GifWriter(f, cam.width, cam.height,
+                displayio.Colorspace.RGB565_SWAPPED, dither=True) as writer:
+        writer.add_frame(frame, replay_frame_time)
         for i in range(1, n_frames):
             print(f"{i}/{n_frames}")
             old_frame.blit(0, 0, frame, x1=0, y1=0, x2=cam.width, y2=cam.height)
             frame = wait_record_pressed_update_display(False, cam)
-            g.add_frame(frame, replay_frame_time)
-        print(f"done")
+            writer.add_frame(frame, replay_frame_time)
+        print("done")
 
 while True:
     take_stop_motion_gif()

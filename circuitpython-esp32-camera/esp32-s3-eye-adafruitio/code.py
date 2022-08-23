@@ -11,26 +11,23 @@ This example requires:
 
 To use:
  * On io.adafruit.com, create a feed named "image" and turn OFF history
- * On io.adafruit.com, create a dashboard and add an "image" block using the feed "image" as its data
+ * On io.adafruit.com, create a dashboard and add an "image" block
+   using the feed "image" as its data
  * Set up CIRCUITPY/.env with WiFI and Adafruit IO credentials
  * Copy the project bundle to CIRCUITPY
 """
 
-import os
-import time
-
-import dotenv
-import io
-import sys
 import binascii
-import esp32_camera
-import board
-import socketpool
-import wifi
+import io
 import ssl
-
+import time
 import adafruit_minimqtt.adafruit_minimqtt as MQTT
 from adafruit_io.adafruit_io import IO_MQTT
+import board
+import dotenv
+import esp32_camera
+import socketpool
+import wifi
 
 aio_username = dotenv.get_key('/.env', 'AIO_USERNAME')
 aio_key = dotenv.get_key('/.env', 'AIO_KEY')
@@ -53,15 +50,15 @@ cam.vflip = True
 
 pool = socketpool.SocketPool(wifi.radio)
 
-print("Connecting to Adafruit IO")                                              
-mqtt_client = MQTT.MQTT(                                                        
-    broker="io.adafruit.com",                                                   
+print("Connecting to Adafruit IO")
+mqtt_client = MQTT.MQTT(
+    broker="io.adafruit.com",
     username=aio_username,
     password=aio_key,
-    socket_pool=pool,                                                           
-    ssl_context=ssl.create_default_context(),                                   
-)                                                                               
-mqtt_client.connect()                                                           
+    socket_pool=pool,
+    ssl_context=ssl.create_default_context(),
+)
+mqtt_client.connect()
 io = IO_MQTT(mqtt_client)
 
 while True:

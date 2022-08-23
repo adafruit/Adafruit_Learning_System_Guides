@@ -7,13 +7,10 @@ This demo is designed for the Kaluga development kit version 1.3 with the
 ILI9341 display.
 """
 
-import esp32_camera
-from terminalio import FONT
-import board
-import qrio
-import displayio
-import busio
 import struct
+import board
+import esp32_camera
+import qrio
 
 print("Initializing camera")
 cam = esp32_camera.Camera(

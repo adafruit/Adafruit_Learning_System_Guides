@@ -14,15 +14,12 @@ To use:
 Copy the project bundle to CIRCUITPY.
 """
 
-import os
 import struct
-import time
 
 import adafruit_ticks
-import esp32_camera
 import board
 import displayio
-from adafruit_st7789 import ST7789
+import esp32_camera
 
 cam = esp32_camera.Camera(
     data_pins=board.CAMERA_DATA,
