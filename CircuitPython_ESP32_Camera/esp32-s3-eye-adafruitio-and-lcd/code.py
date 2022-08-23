@@ -3,23 +3,22 @@
 # SPDX-License-Identifier: Unlicense
 
 """
-Show the live camera image on the viewfinder, then upload to adafruit IO when the 'BOOT' button is pressed.
+Show the live camera image on the viewfinder, then upload to adafruit IO when
+the 'BOOT' button is pressed.
 """
 
-import esp32_camera
-from terminalio import FONT
-import board
-import displayio
-import busio
-import struct
-import adafruit_requests
-import wifi
+import binascii
 import ssl
-import socketpool
-import keypad
+import struct
+
+from adafruit_io.adafruit_io import IO_MQTT
+import adafruit_minimqtt.adafruit_minimqtt as MQTT
 import board
 import dotenv
-import binascii
+import esp32_camera
+import keypad
+import socketpool
+import wifi
 
 shutter_button = keypad.Keys((board.BOOT,), value_when_pressed=False)
 
@@ -29,9 +28,6 @@ aio_key = dotenv.get_key("/.env", "AIO_KEY")
 image_feed = "image"
 
 pool = socketpool.SocketPool(wifi.radio)
-
-import adafruit_minimqtt.adafruit_minimqtt as MQTT
-from adafruit_io.adafruit_io import IO_MQTT
 
 print("Connecting to Adafruit IO")
 mqtt_client = MQTT.MQTT(
