@@ -1,6 +1,6 @@
-# SPDX-FileCopyrightText: Copyright (c) 2021 Jeff Epler for Adafruit Industries
+# SPDX-FileCopyrightText: Copyright (c) 2022 Jeff Epler for Adafruit Industries
 #
-# SPDX-License-Identifier: Unlicense
+# SPDX-License-Identifier: MIT
 
 """
 Show the live camera image on the viewfinder, then upload to adafruit IO when
