@@ -8,13 +8,13 @@ the 'BOOT' button is pressed.
 """
 
 import binascii
+import os
 import ssl
 import struct
 
 from adafruit_io.adafruit_io import IO_MQTT
 import adafruit_minimqtt.adafruit_minimqtt as MQTT
 import board
-import dotenv
 import esp32_camera
 import keypad
 import socketpool
@@ -22,8 +22,8 @@ import wifi
 
 shutter_button = keypad.Keys((board.BOOT,), value_when_pressed=False)
 
-aio_username = dotenv.get_key("/.env", "AIO_USERNAME")
-aio_key = dotenv.get_key("/.env", "AIO_KEY")
+aio_username = os.getenv("AIO_USERNAME")
+aio_key = os.getenv("AIO_KEY")
 
 image_feed = "image"
 
