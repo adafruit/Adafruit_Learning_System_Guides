@@ -3,19 +3,15 @@
 # Pico Four Step Switch Keypad Demo
 import time
 import board
-from digitalio import Direction, DigitalInOut, Pull
-from adafruit_debouncer import Debouncer
+import keypad
+from digitalio import Direction, DigitalInOut
 
 board_led = DigitalInOut(board.LED)
 board_led.direction = Direction.OUTPUT
 board_led.value = True
 
 switch_pins = (board.GP6, board.GP7, board.GP8, board.GP9)
-step_switches = []
-for switch_pin in switch_pins:
-    tmp_switch_pin = DigitalInOut(switch_pin)
-    tmp_switch_pin.pull = Pull.UP
-    step_switches.append(Debouncer(tmp_switch_pin))
+keys = keypad.Keys(switch_pins, value_when_pressed=False, pull=True)
 
 led_pins = (board.GP2, board.GP3, board.GP4, board.GP5)
 leds = []
@@ -44,14 +40,15 @@ mode_choice = 0  # MIDI mode, desk switcher mode, etc.
 modes = (0, 1, 2, 3)
 mode_names = ("MIDI", "DESK", "SELECTOR", "COPY-PASTE")
 
-print("Select the mode by pressing a button...")
+print("Select the mode by pressing a button: MIDI, DESK, SELECTOR, or COPY-PASTE")
 while not mode_picked:  # program waits for a mode to be picked
-    for i in range(len(step_switches)):
-        step_switches[i].update()
-        if step_switches[i].fell:
-            mode_choice = i
+    key = keys.events.get()
+    if key:
+        if key.pressed:
+            mode_choice = key.key_number
             print(mode_names[mode_choice], "mode")
             mode_picked = True
+
 
 if mode_choice == 0:  # MIDI mode
     import usb_midi
@@ -97,19 +94,19 @@ if mode_choice == 3:  # Copy/Paste mode
     # MODIFIER = Keycode.CONTROL  # For Windows
     MODIFIER = Keycode.COMMAND
     KEYMAP = (
-        ("wire 1", [MODIFIER, Keycode.A]),  # select all
-        ("wire 2", [MODIFIER, Keycode.X]),  # cut
-        ("wire 3", [MODIFIER, Keycode.C]),  # copy
-        ("wire 4", [MODIFIER, Keycode.V]),  # paste
+        ("Copy/Paste 1", [MODIFIER, Keycode.A]),  # select all
+        ("Copy/Paste 2", [MODIFIER, Keycode.X]),  # cut
+        ("Copy/Paste 3", [MODIFIER, Keycode.C]),  # copy
+        ("Copy/Paste 4", [MODIFIER, Keycode.V]),  # paste
     )
 
 blink_led(mode_choice, 0.1, 3)
 
-
 while True:
-    for i in range(len(step_switches)):
-        step_switches[i].update()
-        if step_switches[i].fell:
+    key = keys.events.get()
+    if key:
+        if key.pressed:
+            i = key.key_number
             print(i, "pressed")
             if mode_choice == 0:
                 leds[i].value = not leds[i].value
