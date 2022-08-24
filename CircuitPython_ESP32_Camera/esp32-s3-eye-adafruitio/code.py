@@ -18,18 +18,18 @@ To use:
 
 import binascii
 import io
+import os
 import ssl
 import time
 import adafruit_minimqtt.adafruit_minimqtt as MQTT
 from adafruit_io.adafruit_io import IO_MQTT
 import board
-import dotenv
 import esp32_camera
 import socketpool
 import wifi
 
-aio_username = dotenv.get_key('/.env', 'AIO_USERNAME')
-aio_key = dotenv.get_key('/.env', 'AIO_KEY')
+aio_username = os.getenv('AIO_USERNAME')
+aio_key = os.getenv('AIO_KEY')
 
 image_feed = "image"
 
