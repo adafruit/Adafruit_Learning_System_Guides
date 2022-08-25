@@ -19,6 +19,9 @@ import adafruit_ticks
 import board
 import displayio
 import esp32_camera
+import keypad
+
+button = keypad.Keys((board.BOOT,), value_when_pressed=False)
 
 cam = esp32_camera.Camera(
     data_pins=board.CAMERA_DATA,
@@ -43,6 +46,8 @@ display_bus.send(42, struct.pack(">hh", 0, 239))
 display_bus.send(43, struct.pack(">hh", 0, 80+239))
 t0 = adafruit_ticks.ticks_ms()
 while True:
+    if (event := button.events.get()) and event.pressed:
+        cam.colorbar = not cam.colorbar
     frame = cam.take(1)
     if isinstance(frame, displayio.Bitmap):
         display_bus.send(44, frame)
