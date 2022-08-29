@@ -1,15 +1,12 @@
 # SPDX-FileCopyrightText: 2021 ladyada for Adafruit Industries
 # SPDX-License-Identifier: MIT
 
-import time
 import subprocess
 import board
-import terminalio
 import displayio
 from adafruit_display_text import label
 from adafruit_bitmap_font import bitmap_font
 from adafruit_st7789 import ST7789
-import gpiozero as gz
 
 BORDER_WIDTH = 4
 TEXT_SCALE = 1
