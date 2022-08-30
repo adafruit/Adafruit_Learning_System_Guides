@@ -10,27 +10,14 @@ using UnityEngine.UI;
 
 public class arduinoCtrl : MonoBehaviour
 {
+    // replace with your board's COM port
     SerialPort stream = new SerialPort("COM52", 9600);
-    //public float sensitivity;
 
     public Transform t;
-
-    private float posX;
-    private float posY;
-    private float posZ;
-
-    private float sensX;
-    private float sensY;
-    private float sensZ;
-
-    public float Xcal;
-    public float Ycal;
-    public float Zcal;
 
     void Start()
     {
         stream.Open();
-        //stream.ReadTimeout = 20;
     }
 
     void Update()
@@ -47,27 +34,6 @@ public class arduinoCtrl : MonoBehaviour
 
         lastData = new Vector3(AccX, AccY, AccZ);
 
-        //Vector3 ParseAccelerometerData(string stream);
-        /*string Temp = SplitData[4];
-        string GyroX = (float.Parse(SplitData[5]) / 10000).ToString();
-        string GyroY = (float.Parse(SplitData[6]) / 10000).ToString();
-        string GyroZ = (float.Parse(SplitData[7]) / 10000).ToString();*/
-
-        /*Acceleration.text = "X: " + AccX + "\nY: " + AccY + "\nZ: " + AccZ;
-        Gyroscope.text = "X: " + GyroX + "\nY: " + GyroY + "\nZ: " + GyroZ;
-        Magnetometer.text = "X: " + MagX + "\nY: " + MagY + "\nZ: " + MagZ;
-        Temperature.text = Temp + "`C";
-
-        posX += float.Parse(GyroX);
-        posY += float.Parse(GyroY);
-        posZ += float.Parse(GyroZ);
-
-        sensX += float.Parse(AccX);
-        sensY += float.Parse(AccY);
-        sensZ += float.Parse(AccZ);*/
-
-        //Vector3 accl = ParseAccelerometerData(stream);
-        //Smoothly rotate to the new rotation position.
         t.transform.rotation = Quaternion.Slerp(t.transform.rotation, Quaternion.Euler(lastData), Time.deltaTime * 2f);
 
     }
