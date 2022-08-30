@@ -21,13 +21,9 @@ void setup() {
   }
   lsm6ds.setAccelRange(LSM6DS_ACCEL_RANGE_2_G);
   lsm6ds.setGyroRange(LSM6DS_GYRO_RANGE_250_DPS);
-  lis3mdl.setRange(LIS3MDL_RANGE_4_GAUSS);
 
   lsm6ds.setAccelDataRate(LSM6DS_RATE_104_HZ);
   lsm6ds.setGyroDataRate(LSM6DS_RATE_104_HZ);
-  lis3mdl.setDataRate(LIS3MDL_DATARATE_1000_HZ);
-  lis3mdl.setPerformanceMode(LIS3MDL_MEDIUMMODE);
-  lis3mdl.setOperationMode(LIS3MDL_CONTINUOUSMODE);
 
 }
 
