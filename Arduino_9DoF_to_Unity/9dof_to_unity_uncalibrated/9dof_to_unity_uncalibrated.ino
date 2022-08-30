@@ -8,7 +8,7 @@ int x;
 int y;
 int z;
 
-Adafruit_LSM6DS3TRC lsm6ds3trc;
+Adafruit_LSM6DS3TRC lsm6ds;
 
 void setup() {
   // put your setup code here, to run once:
@@ -37,7 +37,7 @@ void loop() {
   sensors_event_t accel;
   sensors_event_t gyro;
   sensors_event_t temp;
-  lsm6ds3trc.getEvent(&accel, &gyro, &temp);
+  lsm6ds.getEvent(&accel, &gyro, &temp);
 
   x = map(accel.acceleration.x, -12, 11, 180, -180); 
   y = map(accel.acceleration.y, -19, 20, -180, 180); 
