@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2022 Melissa LeBlanc-Williams for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import os
 import storage
 import microcontroller
