@@ -1,2 +1,3 @@
 import microcontroller
-print(f"USB Mass Storage is {'enabled' if microcontroller.nvm[0] == 1 else 'disabled'} on this device")
+status = 'enabled' if microcontroller.nvm[0] == 1 else 'disabled'
+print(f"USB Mass Storage is {status} on this device")
