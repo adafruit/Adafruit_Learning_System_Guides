@@ -44,7 +44,7 @@ display_bus.send(43, struct.pack(">hh", oh, cam.height + ow - 1))
 while True:
     frame = cam.take(1)
     display_bus.send(44, frame)
-    for row in qrdecoder.decode(memoryview(frame), qrio.PixelPolicy.RGB565_SWAPPED):
+    for row in qrdecoder.decode(frame, qrio.PixelPolicy.RGB565_SWAPPED):
         payload = row.payload
         try:
             payload = payload.decode("utf-8")
