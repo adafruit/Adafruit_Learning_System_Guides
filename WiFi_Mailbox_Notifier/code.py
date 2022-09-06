@@ -12,6 +12,7 @@ import digitalio
 import analogio
 import wifi
 import socketpool
+import supervisor
 import microcontroller
 import adafruit_requests
 from adafruit_io.adafruit_io import IO_HTTP
@@ -25,6 +26,16 @@ except ImportError:
 
 # Update to True if you want metadata sent to Adafruit IO. Defaults to False.
 METADATA = False
+
+# If the reason the board started up is not the standard CircuitPython reset-type start up...
+if supervisor.runtime.run_reason is not supervisor.RunReason.STARTUP:
+    alarm.sleep_memory[3] += 1  # Increment reload number by 1.
+    print(f"Reload number {alarm.sleep_memory[3]}")  # Print current reload number.
+    if alarm.sleep_memory[3] > 5:  # If reload number exceeds 5...
+        # Print the following...
+        print("Reload not resolving the issue. \nBoard will hard reset in 20 seconds. ")
+        time.sleep(20)  # ...wait 20 seconds...
+        microcontroller.reset()  # ...and hard reset the board. This will clear alarm.sleep_memory.
 
 # Initialise metadata.
 if alarm.wake_alarm:
@@ -75,9 +86,10 @@ try:
     requests = adafruit_requests.Session(pool, ssl.create_default_context())
 # WiFi connectivity fails with error messages, not specific errors, so this except is broad.
 except Exception as e:  # pylint: disable=broad-except
-    print("Failed to connect to WiFi. Error:", e, "\nBoard will hard reset in 30 seconds.")
-    time.sleep(30)
-    microcontroller.reset()
+    print("Failed to connect to WiFi. Error:", e, "\nBoard will reload in 15 seconds.")
+    alarm.sleep_memory[2] += 1  # Increment error count by one.
+    time.sleep(15)
+    supervisor.reload()
 
 # Set your Adafruit IO Username and Key in secrets.py
 # (visit io.adafruit.com if you need to create an account,
@@ -122,10 +134,10 @@ while not switch_pin.value:
 
     # Adafruit IO can fail with multiple errors depending on the situation, so this except is broad.
     except Exception as e:  # pylint: disable=broad-except
-        print("Failed to send to Adafruit IO. Error:", e, "\nBoard will hard reset in 30 seconds.")
+        print("Failed to send to Adafruit IO. Error:", e, "\nBoard will reload in 15 seconds.")
         alarm.sleep_memory[2] += 1  # Increment error count by one.
-        time.sleep(30)
-        microcontroller.reset()
+        time.sleep(15)
+        supervisor.reload()
 
 # Deinitialise the alarm pin.
 switch_pin.deinit()
