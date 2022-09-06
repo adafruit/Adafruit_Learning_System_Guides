@@ -1,11 +1,12 @@
 # SPDX-FileCopyrightText: 2022 Charlyn Gonda for Adafruit Industries
 #
 # SPDX-License-Identifier: MIT
+from secrets import secrets
+import ssl
 import busio
 import board
 import adafruit_lis3dh
 import wifi
-import ssl
 import socketpool
 import adafruit_requests
 
@@ -14,7 +15,6 @@ from adafruit_led_animation.color import (
 from adafruit_io.adafruit_io import IO_HTTP
 
 from cube import Cube
-from secrets import secrets
 
 # Specify pins
 top_cin = board.A0
@@ -74,6 +74,7 @@ CUBE_WORD = "... ..."
 
 
 def update_data():
+    # pylint: disable=global-statement
     global CUBE_WORD, TOP_PIXELS_ON, TOP_PIXELS_COLOR
     if connected:
         print("Updating data from Adafruit IO")
@@ -88,8 +89,8 @@ def update_data():
             TOP_PIXELS_ON = pixels_list.split(",")
             TOP_PIXELS_COLOR = TOP_PIXELS_COLOR_MAP[color]
         # pylint: disable=broad-except
-        except Exception as error:
-            print(error)
+        except Exception as update_error:
+            print(update_error)
 
 
 orientations = [
@@ -101,30 +102,31 @@ orientations = [
     "BACK"
 ]
 
+# pylint: disable=inconsistent-return-statements
 
-def orientation(x, y, z):
-    absX = abs(x)
-    absY = abs(y)
-    absZ = abs(z)
+
+def orientation(curr_x, curr_y, curr_z):
+    absX = abs(curr_x)
+    absY = abs(curr_y)
+    absZ = abs(curr_z)
 
     if absX > absY and absX > absZ:
         if x >= 0:
             return orientations[1]  # up
-        else:
-            return orientations[0]  # down
+
+        return orientations[0]  # down
 
     if absZ > absY and absZ > absX:  # when "down" is "up"
         if z >= 0:
             return orientations[2]  # left
-        else:
-            return orientations[3]  # right
-        return orientations[2]
+
+        return orientations[3]  # right
 
     if absY > absX and absY > absZ:
         if y >= 0:
             return orientations[4]  # front
-        else:
-            return orientations[5]  # back
+
+        return orientations[5]  # back
 
 
 upside_down = False

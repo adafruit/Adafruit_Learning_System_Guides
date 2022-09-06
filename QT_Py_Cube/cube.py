@@ -9,7 +9,7 @@ from adafruit_led_animation.color import AMBER, JADE, CYAN, GOLD, PINK
 from adafruit_pixel_framebuf import PixelFramebuffer
 
 
-class Cube(object):
+class Cube():
     def __init__(
             self,
             top_cin,
@@ -70,7 +70,7 @@ class Cube(object):
         # scrolling word state vars
         self.last_color_time = -1
         self.color_wait = 1
-        self.current_scroll_word = ''
+        self.word = ''
         self.total_scroll_len = 0
         self.scroll_x_pos = -self.pixel_width
         self.color_idx = 0
@@ -110,7 +110,7 @@ class Cube(object):
         self.__display_top_pixels()
         self.scroll_x_pos = self.scroll_x_pos + 1
 
-    def clear_cube(self, clearTop=False):
+    def clear_cube(self, clear_top=False):
         if not self.clear:
             self.pixel_framebuf_sides.fill(0)
             self.pixel_framebuf_sides.display()
@@ -118,7 +118,7 @@ class Cube(object):
             self.side_pixels.show()
             self.pixel_framebuf_bottom.fill(0)
             self.pixel_framebuf_bottom.display()
-            if (clearTop):
+            if clear_top:
                 self.pixel_framebuf_top.fill(0)
                 self.pixel_framebuf_top.display()
             self.clear = True
@@ -180,5 +180,6 @@ class Cube(object):
 
         return result
 
-    def __convert_to_hex(self, color):
+    @staticmethod
+    def __convert_to_hex(color):
         return int('0x%02x%02x%02x' % color, 16)
