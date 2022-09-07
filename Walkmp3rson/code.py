@@ -55,7 +55,7 @@ keys = [
 key_states = [False, False, False, False]
 
 # STEMMA QT Rotary encoder setup
-rotary_seesaw = seesaw.Seesaw(i2c, addr=0x37)  # default address is 0x36
+rotary_seesaw = seesaw.Seesaw(i2c, addr=0x36)  # default address is 0x36
 encoder = rotaryio.IncrementalEncoder(rotary_seesaw)
 last_encoder_pos = 0
 
@@ -77,12 +77,14 @@ mp3stream = audiomp3.MP3Decoder(mp3_file)
 
 def tracktext(full_path_name, position):
     return full_path_name.split('_')[position].split('.')[0]
-
-audio = audiobusio.I2SOut(bit_clock=board.D1, word_select=board.D10, data=board.D11)
+# LRC is word_select, BCLK is bit_clock, DIN is data_pin.
+# Feather RP2040
+audio = audiobusio.I2SOut(bit_clock=board.D24, word_select=board.D25, data=board.A3)
+# Feather M4
+# audio = audiobusio.I2SOut(bit_clock=board.D1, word_select=board.D10, data=board.D11)
 mixer = audiomixer.Mixer(voice_count=1, sample_rate=22050, channel_count=1,
                          bits_per_sample=16, samples_signed=True)
 mixer.voice[0].level = 0.15
-audio.play(mixer)
 
 # Colors
 blue_bright = 0x17afcf
@@ -147,8 +149,6 @@ def change_track(tracknum):
     mp3_file_fc = open(mp3_filename, "rb")
     mp3stream_fc = audiomp3.MP3Decoder(mp3_file_fc)
     mp3_bytes_fc = os.stat(mp3_filename)[6]  # size in bytes is position 6
-    # print(mp3_bytes)
-    # print("Now playing: '{}'".format(mp3_filename))
     return (mp3_file_fc, mp3stream_fc, song_name_fc, artist_name_fc, mp3_bytes_fc)
 
 print("Walkmp3rson")
@@ -156,7 +156,7 @@ play_state = False  # so we know if we're auto advancing when mixer finishes a s
 last_debug_time = 0  # for timing track position
 reels_anim_frame = 0
 last_percent_done = 0.01
-
+audio.play(mixer)
 while True:
     encoder_pos = -encoder.position
     if encoder_pos != last_encoder_pos:
@@ -167,7 +167,7 @@ while True:
         last_encoder_pos = encoder_pos
         volume_bar.value = mixer.voice[0].level * 100
 
-    if play_state is True:  # if not stopped, auto play next mp3_filename
+    if play_state is True:  # if not stopped, auto play next song
         if time.monotonic() - last_debug_time > 0.2:  # so we can check track progress
             last_debug_time = time.monotonic()
             bytes_played = mp3_file.tell()
@@ -176,11 +176,14 @@ while True:
 
         if not mixer.playing:
             print("next song")
+            audio.pause()
             track_number = ((track_number + 1) % len(mp3s))
             mp3_file, mp3stream, song_name, artist_name, mp3_bytes = change_track(track_number)
             song_name_label.text = song_name
             artist_name_label.text = artist_name
             mixer.voice[0].play(mp3stream, loop=False)
+            time.sleep(.1)
+            audio.resume()
 
     # Use the NeoKeys as transport controls
     for k in range(len(keys)):
@@ -190,13 +193,15 @@ while True:
             neokey.pixels[key_number] = color
 
             if key_number == 0:  # previous track
+                audio.pause()
                 track_number = ((track_number - 1) % len(mp3s) )
                 mp3_file, mp3stream, song_name, artist_name, mp3_bytes = change_track(track_number)
                 song_name_label.text = song_name
                 artist_name_label.text = artist_name
-                audio.resume()
                 mixer.voice[0].play(mp3stream, loop=False)
                 play_state = True
+                time.sleep(.1)
+                audio.resume()
 
             if key_number == 1:  # Play/pause
                 if play_state:
@@ -207,20 +212,24 @@ while True:
                     play_state = True
 
             if key_number == 2:  # Play track from beginning
-                audio.resume()
+                audio.pause()
                 mixer.voice[0].play(mp3stream, loop=False)
                 song_name_label.text = tracktext(mp3_filename, 2)
                 artist_name_label.text = tracktext(mp3_filename, 1)
                 play_state = True
+                time.sleep(.1)
+                audio.resume()
 
             if key_number == 3:  # next track
+                audio.pause()
                 track_number = ((track_number + 1) % len(mp3s))
                 mp3_file, mp3stream, song_name, artist_name, mp3_bytes = change_track(track_number)
                 song_name_label.text = song_name
                 artist_name_label.text = artist_name
-                audio.resume()
                 mixer.voice[0].play(mp3stream, loop=False)
                 play_state = True
+                time.sleep(.1)
+                audio.resume()
 
         if not neokey[key_number] and key_states[key_number]:
             neokey.pixels[key_number] = amber
