@@ -36,30 +36,34 @@ IO_PINS = None # [board.D0, board.D1]
 values = [True] # [True, False]
 
 def discover_io():
-    return [pin_maybe for name in dir(microcontroller.pin) if isinstance(pin_maybe := getattr(microcontroller.pin, name), microcontroller.Pin)]
+    return [pin_maybe for name in dir(microcontroller.pin)
+            if isinstance(pin_maybe := getattr(microcontroller.pin, name), microcontroller.Pin)]
 
 def pin_lookup(pin):
     for i in dir(board):
-        if getattr(board, i) is pin: return i
+        if getattr(board, i) is pin:
+            return i
     for i in dir(microcontroller.pin):
-        if getattr(microcontroller.pin, i) is pin: return i
+        if getattr(microcontroller.pin, i) is pin:
+            return i
+    return str(pin)
 
 # Find all I/O pins, if IO_PINS is not explicitly set above
 if IO_PINS is None:
     IO_PINS = discover_io()
 
 # Initialize all pins as inputs, make a lookup table to get the name from the pin
-ios_lookup = dict([(pin_lookup(pin), DigitalInOut(pin)) for pin in IO_PINS])
+ios_lookup = dict([(pin_lookup(pin), DigitalInOut(pin)) for pin in IO_PINS]) # pylint: disable=consider-using-dict-comprehension
 ios = ios_lookup.values()
 ios_items = ios_lookup.items()
 for io in ios:
     io.switch_to_input(pull=Pull.UP)
 
-# Partial implementation of 'defaultdict' class from standard Python
-# from https://github.com/micropython/micropython-lib/blob/master/python-stdlib/collections.defaultdict/collections/defaultdict.py
+# Partial implementation of 'defaultdict' class from standard Python from
+# https://github.com/micropython/micropython-lib/blob/master/python-stdlib/collections.defaultdict/collections/defaultdict.py
 class defaultdict:
     @staticmethod
-    def __new__(cls, default_factory=None, **kwargs):
+    def __new__(cls, default_factory=None, **kwargs): # pylint: disable=unused-argument
         # Some code (e.g. urllib.urlparse) expects that basic defaultdict
         # functionality will be available to subclasses without them
         # calling __init__().
@@ -115,13 +119,15 @@ while True:
         for name1, io1 in ios_items:
             io1.switch_to_output(value)
             for name2, io2 in ios_items:
-                if io2 is io1: continue
+                if io2 is io1:
+                    continue
                 if io2.value == value:
                     if first_run:
                         pressed_or_junk[name1].add(name2)
                         pressed_or_junk[name2].add(name1)
                     elif name2 not in pressed_or_junk[name1]:
-                        if row_arbitrarily is None: row_arbitrarily = name1
+                        if row_arbitrarily is None:
+                            row_arbitrarily = name1
                         pressed_or_junk[name1].add(name2)
                         pressed_or_junk[name2].add(name1)
                         if name2 not in pressed[name1]:
@@ -131,7 +137,8 @@ while True:
                     if name2 in pressed[name1]:
                         last_pressed = (name1, name2)
                         print("Key registered. Release to continue")
-                        while io2.value == value: pass
+                        while io2.value == value:
+                            pass
             io1.switch_to_input(pull=pull)
     if first_run:
         print("Press keys now")
@@ -142,12 +149,13 @@ while True:
         to_check = [row_arbitrarily]
         for check in to_check:
             for other in pressed[check]:
-                if other in rows or other in cols: continue
+                if other in rows or other in cols:
+                    continue
                 if check in rows:
                     cols.add(other)
                 else:
                     rows.add(other)
-                to_check.append(other)
+                to_check.append(other) # pylint: disable=modified-iterating-list
 
         rows = sorted(rows)
         cols = sorted(cols)
