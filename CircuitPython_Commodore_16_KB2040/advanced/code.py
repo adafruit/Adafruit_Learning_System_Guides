@@ -8,7 +8,7 @@
 #  * There are no diodes, not even on modifiers, so there's only 2-key rollover.
 
 import asyncio.core
-from board import * # pylint: disable=wildcard-import,unused-wildcard-import
+import board
 import keypad
 from adafruit_hid.keycode import Keycode as K
 from adafruit_hid.keyboard import Keyboard
@@ -22,10 +22,9 @@ POSITIONAL = True
 # 1  3  6  7  8  9  10 11 12  13   14   15  16 17 18 19  # connector pins
 # R5 C7 R7 C4 R1 C5 C6 R3 R2  R4   C2   C1  R6 C3 C0 R0  # row/column in schematic
 # D2 D3 D4 D5 D6 D7 D8 D9 D10 MOSI MISO SCK A0 A1 A2 A3  # conencted to kb2040 at
-# pylint: disable=undefined-variable
-rows = [A3, D6, D10, D9, MOSI, D2, A0, D4]  # give the following ...
-cols = [A2, SCK, MISO, A1, D5, D7, D8, D3]
-# pylint: enable=undefined-variable
+# results in the the following assignment of rows and columns:
+rows = [board.A3, board.D6, board.D10, board.D9, board.MOSI, board.D2, board.A0, board.D4]
+cols = [board.A2, board.SCK, board.MISO, board.A1, board.D5, board.D7, board.D8, board.D3]
 
 # ROM listing of key values from ed7.src in
 # http://www.zimmers.net/anonftp/pub/cbm/src/plus4/ted_kernal_basic_src.tar.gz
