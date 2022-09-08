@@ -22,8 +22,10 @@ POSITIONAL = True
 # 1  3  6  7  8  9  10 11 12  13   14   15  16 17 18 19  # connector pins
 # R5 C7 R7 C4 R1 C5 C6 R3 R2  R4   C2   C1  R6 C3 C0 R0  # row/column in schematic
 # D2 D3 D4 D5 D6 D7 D8 D9 D10 MOSI MISO SCK A0 A1 A2 A3  # conencted to kb2040 at
+# pylint: disable=undefined-variable
 rows = [A3, D6, D10, D9, MOSI, D2, A0, D4]  # give the following ...
 cols = [A2, SCK, MISO, A1, D5, D7, D8, D3]
+# pylint: enable=undefined-variable
 
 # ROM listing of key values from ed7.src in
 # http://www.zimmers.net/anonftp/pub/cbm/src/plus4/ted_kernal_basic_src.tar.gz
