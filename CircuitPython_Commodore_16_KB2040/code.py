@@ -7,9 +7,9 @@
 #  * This matrix is different than the (more common) Commodore 64 matrix
 #  * There are no diodes, not even on modifiers, so there's only 2-key rollover.
 
-from board import *
-import keypad
 import asyncio.core
+from board import * # pylint: disable=wildcard-import,unused-wildcard-import
+import keypad
 from adafruit_hid.keycode import Keycode as K
 from adafruit_hid.keyboard import Keyboard
 import usb_hid
@@ -17,7 +17,8 @@ import usb_hid
 # True to use a more POSITIONAL mapping, False to use a more PC-style mapping
 POSITIONAL = True
 
-# Keyboard schematic https://archive.org/details/SAMS_Computerfacts_Commodore_C16_1984-12_Howard_W_Sams_Co_CC8/page/n9/mode/2up
+# Keyboard schematic from
+# https://archive.org/details/SAMS_Computerfacts_Commodore_C16_1984-12_Howard_W_Sams_Co_CC8/page/n9/mode/2up
 # 1  3  6  7  8  9  10 11 12  13   14   15  16 17 18 19  # connector pins
 # R5 C7 R7 C4 R1 C5 C6 R3 R2  R4   C2   C1  R6 C3 C0 R0  # row/column in schematic
 # D2 D3 D4 D5 D6 D7 D8 D9 D10 MOSI MISO SCK A0 A1 A2 A3  # conencted to kb2040 at
@@ -161,7 +162,6 @@ A key matrix without diodes can support 2-key rollover.
         self._ghost = [0] * 64
 
     def __call__(self, event):
-        old_count = self._count
         self._ghost[event.key_number] = event.pressed
         if event.pressed:
             if self._count < self._rollover:
@@ -181,7 +181,7 @@ async def key_task():
 
     with keypad.KeyMatrix(rows, cols) as keys, AsyncEventQueue(keys.events) as q:
         while True:
-            ev = await q 
+            ev = await q
             for ev in twokey_filter(ev):
                 keycode = keycodes[ev.key_number]
                 if callable(keycode):
