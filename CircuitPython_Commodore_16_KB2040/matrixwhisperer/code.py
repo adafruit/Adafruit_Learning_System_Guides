@@ -155,7 +155,7 @@ while True:
                     cols.add(other)
                 else:
                     rows.add(other)
-                to_check.append(other) # pylint: disable=modified-iterating-list
+                to_check.append(other)
 
         rows = sorted(rows)
         cols = sorted(cols)
