@@ -27,23 +27,23 @@ except ImportError:
 # Update to True if you want metadata sent to Adafruit IO. Defaults to False.
 METADATA = False
 
-# If the reason the board started up is not the standard CircuitPython reset-type start up...
-if supervisor.runtime.run_reason is not supervisor.RunReason.STARTUP:
+# If the reason the board started up is due to a supervisor.reload()...
+if supervisor.runtime.run_reason is supervisor.RunReason.SUPERVISOR_RELOAD:
     alarm.sleep_memory[3] += 1  # Increment reload number by 1.
-    print(f"Reload number {alarm.sleep_memory[3]}")  # Print current reload number.
-    if alarm.sleep_memory[3] > 5:  # If reload number exceeds 5...
+    print(f"Reload number: {alarm.sleep_memory[3]}")  # Print current supervisor reload number.
+    if alarm.sleep_memory[3] > 5:  # If supervisor reload number exceeds 5...
         # Print the following...
-        print("Reload not resolving the issue. \nBoard will hard reset in 20 seconds. ")
+        print("Reload is not resolving the issue. \nBoard will hard reset in 20 seconds. ")
         time.sleep(20)  # ...wait 20 seconds...
         microcontroller.reset()  # ...and hard reset the board. This will clear alarm.sleep_memory.
 
 # Initialise metadata.
 if alarm.wake_alarm:
-    print("Awake", alarm.wake_alarm)
+    print("Awake! Alarm type:", alarm.wake_alarm)
     # Increment wake count by 1.
     alarm.sleep_memory[0] += 1
 else:
-    print("No wake up alarm")
+    print("Wakeup not caused by alarm.")
     # Set wake count to 0.
     alarm.sleep_memory[0] = 0
     # Set error count to 0.
@@ -91,41 +91,50 @@ except Exception as e:  # pylint: disable=broad-except
     time.sleep(15)
     supervisor.reload()
 
+# No data has been sent yet, so the send-count is 0.
+alarm.sleep_memory[1] = 0
+
 # Set your Adafruit IO Username and Key in secrets.py
 # (visit io.adafruit.com if you need to create an account,
 # or if you need your Adafruit IO key.)
 aio_username = secrets["aio_username"]
 aio_key = secrets["aio_key"]
-
 # Initialize an Adafruit IO HTTP API object
 io = IO_HTTP(aio_username, aio_key, requests)
-
-# Print battery voltage to the serial console. Not necessary for Adafruit IO.
-print(f"Current battery voltage: {voltage:.2f}")
-
-# No data has been sent yet, so the send-count is 0.
-alarm.sleep_memory[1] = 0
 
 # Turn on the LED to indicate data is being sent.
 led.value = True
 
-# While the switch is open...
+# Print battery voltage to the serial console and send it to Adafruit IO.
+print(f"Current battery voltage: {voltage:.2f}V")
+# Adafruit IO can run into issues if the network fails!
+# This ensures your code will continue to run.
+try:
+    send_io_data(io.create_and_get_feed("battery-voltage"), f"{voltage:.2f}V")
+# Adafruit IO can fail with multiple errors depending on the situation, so this except is broad.
+except Exception as e:  # pylint: disable=broad-except
+    print("Failed to send to Adafruit IO. Error:", e, "\nBoard will reload in 15 seconds.")
+    alarm.sleep_memory[2] += 1  # Increment error count by one.
+    time.sleep(15)
+    supervisor.reload()
+
+# While the door is open...
 while not switch_pin.value:
     # Adafruit IO sending can run into issues if the network fails!
     # This ensures the code will continue to run.
     try:
         # Send data to Adafruit IO
-        print("Sending new mail alert and battery voltage to Adafruit IO.")
+        print("Sending new mail alert to Adafruit IO.")
         send_io_data(io.create_and_get_feed("new-mail"), "New mail!")
-        send_io_data(io.create_and_get_feed("battery-voltage"), f"{voltage:.2f}V")
         print("Data sent!")
+        # If METADATA = True at the beginning of the code, send more data.
         if METADATA:
             print("Sending metadata to AdafruitIO.")
             # The number of times the board has awakened in the current cycle.
             send_io_data(io.create_and_get_feed("wake-count"), alarm.sleep_memory[0])
-            # The number of times the mailbox/battery data has been sent.
+            # The number of times the mailbox data has been sent.
             send_io_data(io.create_and_get_feed("send-count"), alarm.sleep_memory[1])
-            # The number of Adafruit IO errors that has occurred.
+            # The number of WiFi or Adafruit IO errors that have occurred.
             send_io_data(io.create_and_get_feed("error-count"), alarm.sleep_memory[2])
             print("Metadata sent!")
         time.sleep(30)  # Delay included to avoid data limit throttling on Adafruit IO.
@@ -149,10 +158,13 @@ power_pin.switch_to_output(False)
 # Turn off LED for deep sleep.
 led.value = False
 
-# Create an alarm on pin D27.
+# Create a timer alarm to be triggered every 12 hours (43200 seconds).
+time_alarm = alarm.time.TimeAlarm(monotonic_time=(time.monotonic() + 43200))
+
+# Create a pin alarm on pin D27.
 pin_alarm = alarm.pin.PinAlarm(pin=board.D27, value=False, pull=True)
 
 print("Entering deep sleep.")
 
 # Exit and set the alarm.
-alarm.exit_and_deep_sleep_until_alarms(pin_alarm)
+alarm.exit_and_deep_sleep_until_alarms(pin_alarm, time_alarm)
