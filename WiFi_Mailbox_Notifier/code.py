@@ -49,10 +49,16 @@ else:
     # Set error count to 0.
     alarm.sleep_memory[2] = 0
 
+# Print wake count to serial console.
+print("Alarm wake count:", alarm.sleep_memory[0])
+
+# No data has been sent yet, so the send-count is 0.
+alarm.sleep_memory[1] = 0
+
 # Set up battery monitoring.
 voltage_pin = analogio.AnalogIn(board.VOLTAGE_MONITOR)
 # Take the raw voltage pin value, and convert it to voltage.
-voltage = ((voltage_pin.value * 2) * 3.3) / 65536
+voltage = (voltage_pin.value / 65536) * 2 * 3.3
 
 # Set up red LED.
 led = digitalio.DigitalInOut(board.LED)
@@ -64,17 +70,14 @@ switch_pin.pull = digitalio.Pull.UP
 
 
 # Send the data. Requires a feed name and a value to send.
-def send_io_data(feed, value):
+def send_io_data(feed_name, value):
     """
     Send data to Adafruit IO.
-
     Provide an Adafruit IO feed name, and the value you wish to send.
     """
+    feed = io.create_and_get_feed(feed_name)
     return io.send_data(feed["key"], value)
 
-
-# Print wake count to serial console.
-print("Wake count:", alarm.sleep_memory[0])
 
 # Connect to WiFi
 try:
@@ -85,65 +88,60 @@ try:
     pool = socketpool.SocketPool(wifi.radio)
     requests = adafruit_requests.Session(pool, ssl.create_default_context())
 # WiFi connectivity fails with error messages, not specific errors, so this except is broad.
-except Exception as e:  # pylint: disable=broad-except
-    print("Failed to connect to WiFi. Error:", e, "\nBoard will reload in 15 seconds.")
+except Exception as error:  # pylint: disable=broad-except
+    print("Failed to connect to WiFi. Error:", error, "\nBoard will reload in 15 seconds.")
     alarm.sleep_memory[2] += 1  # Increment error count by one.
     time.sleep(15)
     supervisor.reload()
 
-# No data has been sent yet, so the send-count is 0.
-alarm.sleep_memory[1] = 0
-
-# Set your Adafruit IO Username and Key in secrets.py
-# (visit io.adafruit.com if you need to create an account,
-# or if you need your Adafruit IO key.)
+# Pull your Adafruit IO username and key from secrets.py
 aio_username = secrets["aio_username"]
 aio_key = secrets["aio_key"]
 # Initialize an Adafruit IO HTTP API object
 io = IO_HTTP(aio_username, aio_key, requests)
 
-# Turn on the LED to indicate data is being sent.
-led.value = True
-
 # Print battery voltage to the serial console and send it to Adafruit IO.
 print(f"Current battery voltage: {voltage:.2f}V")
 # Adafruit IO can run into issues if the network fails!
-# This ensures your code will continue to run.
+# This try/except ensures your code will continue to run.
 try:
-    send_io_data(io.create_and_get_feed("battery-voltage"), f"{voltage:.2f}V")
+    led.value = True  # Turn on the LED to indicate data is being sent.
+    send_io_data("battery-voltage", f"{voltage:.2f}V")
+    led.value = False  # Turn off the LED to indicate data sending is complete.
 # Adafruit IO can fail with multiple errors depending on the situation, so this except is broad.
-except Exception as e:  # pylint: disable=broad-except
-    print("Failed to send to Adafruit IO. Error:", e, "\nBoard will reload in 15 seconds.")
+except Exception as error:  # pylint: disable=broad-except
+    print("Failed to send to Adafruit IO. Error:", error, "\nBoard will reload in 15 seconds.")
     alarm.sleep_memory[2] += 1  # Increment error count by one.
     time.sleep(15)
     supervisor.reload()
 
 # While the door is open...
 while not switch_pin.value:
-    # Adafruit IO sending can run into issues if the network fails!
-    # This ensures the code will continue to run.
+    # Adafruit IO sending can run into various issues which cause errors.
+    # This try/except ensures the code will continue to run.
     try:
+        led.value = True  # Turn on the LED to indicate data is being sent.
         # Send data to Adafruit IO
         print("Sending new mail alert to Adafruit IO.")
-        send_io_data(io.create_and_get_feed("new-mail"), "New mail!")
+        send_io_data("new-mail", "New mail!")
         print("Data sent!")
         # If METADATA = True at the beginning of the code, send more data.
         if METADATA:
-            print("Sending metadata to AdafruitIO.")
-            # The number of times the board has awakened in the current cycle.
-            send_io_data(io.create_and_get_feed("wake-count"), alarm.sleep_memory[0])
+            print("Sending metadata to Adafruit IO.")
+            # The number of times the board has awakened by an alarm since the last reset.
+            send_io_data("wake-count", alarm.sleep_memory[0])
             # The number of times the mailbox data has been sent.
-            send_io_data(io.create_and_get_feed("send-count"), alarm.sleep_memory[1])
+            send_io_data("send-count", alarm.sleep_memory[1])
             # The number of WiFi or Adafruit IO errors that have occurred.
-            send_io_data(io.create_and_get_feed("error-count"), alarm.sleep_memory[2])
+            send_io_data("error-count", alarm.sleep_memory[2])
             print("Metadata sent!")
         time.sleep(30)  # Delay included to avoid data limit throttling on Adafruit IO.
         alarm.sleep_memory[1] += 1  # Increment data send count by 1.
         led.value = False  # Turn off the LED to indicate data sending is complete.
 
     # Adafruit IO can fail with multiple errors depending on the situation, so this except is broad.
-    except Exception as e:  # pylint: disable=broad-except
-        print("Failed to send to Adafruit IO. Error:", e, "\nBoard will reload in 15 seconds.")
+    except Exception as error:  # pylint: disable=broad-except
+        print("Failed to send to Adafruit IO. Error:", error, "\nBoard will reload in 15 seconds.")
         alarm.sleep_memory[2] += 1  # Increment error count by one.
         time.sleep(15)
         supervisor.reload()
