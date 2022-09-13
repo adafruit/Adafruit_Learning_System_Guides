@@ -382,13 +382,13 @@ class Plotter:
             color=self._y_lab_color,
         )
         self._displayio_title.x = self._screen_width - self._plot_width
-        self._displayio_title.y = font_h // 2
+        self._displayio_title.y = font_h // 1
 
         self._displayio_y_axis_lab = Label(
             self._font, text=self._y_axis_lab, line_spacing=1, color=self._y_lab_color
         )
         self._displayio_y_axis_lab.x = 0  # 0 works here because text is ""
-        self._displayio_y_axis_lab.y = font_h // 2
+        self._displayio_y_axis_lab.y = font_h // 1
 
         plot_y_labels = []
         # y increases top to bottom of screen
@@ -798,8 +798,8 @@ class Plotter:
             self._displayio_graph.pop()
 
         if value is not None and value != "":
-            font_scale = 3
-            line_spacing = 1.25
+            font_scale = 2
+            line_spacing = 1
 
             font_w, font_h = self._font.get_bounding_box()
             text_lines = value.split("\n")
@@ -824,7 +824,7 @@ class Plotter:
             self._displayio_info.x = (
                 self._screen_width - font_scale * font_w * max_word_chars
             ) // 2
-            self._displayio_info.y = self._screen_height // 2
+            self._displayio_info.y = self._screen_height // 3
             self._displayio_graph.append(self._displayio_info)
 
         else:
