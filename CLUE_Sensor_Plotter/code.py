@@ -42,8 +42,12 @@ import time
 import gc
 import board
 
+from adafruit_clue import clue
+
 from plotter import Plotter
+# pylint: disable=unused-import
 from plot_source import (
+    PlotSource,
     TemperaturePlotSource,
     PressurePlotSource,
     HumidityPlotSource,
@@ -56,7 +60,6 @@ from plot_source import (
     MagnetometerPlotSource,
     PinPlotSource,
 )
-from adafruit_clue import clue
 
 debug = 1
 
@@ -243,6 +246,7 @@ while True:
                     (8, "Range lock\n" + ("off" if range_lock else "on")),
                 ],
             )
+            # pylint: disable=no-else-break
             if opt == 0:  # change plot source
                 current_source_idx = (current_source_idx + 1) % len(sources)
                 break  # to leave inner while and select the new source
