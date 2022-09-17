@@ -63,10 +63,10 @@ KEYPAD_NUMLOCK_LOOKUP = [
 # D12 = green  = CN3 = CLOCK
 # D13 = yellow = CN4 = /BUSY
 
-KBD_NRESET = board.D10
-KBD_DATA = board.D11
-KBD_CLOCK = board.D12
-KBD_NBUSY = board.D13
+KBD_NRESET = board.MISO
+KBD_DATA = board.RX
+KBD_CLOCK = board.SCK # Note that KBD_CLOCK must be 1 GPIO above KBD_DATA
+KBD_NBUSY = board.MOSI
 
 # Assert busy
 busy_out = digitalio.DigitalInOut(KBD_NBUSY)
