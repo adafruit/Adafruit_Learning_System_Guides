@@ -10,6 +10,11 @@ import adafruit_pioasm
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keycode import Keycode as K
 
+KBD_NRESET = board.MISO
+KBD_DATA = board.RX
+KBD_CLOCK = board.SCK # Note that KBD_CLOCK must be 1 GPIO# above KBD_DATA
+KBD_NBUSY = board.MOSI
+
 tandy1000_keycodes = [
     None, K.ESCAPE, K.ONE, K.TWO, K.THREE, K.FOUR, K.FIVE, K.SIX, K.SEVEN,
     K.EIGHT, K.NINE, K.ZERO, K.MINUS, K.EQUALS, K.BACKSPACE, K.TAB, K.Q, K.W,
@@ -71,11 +76,6 @@ KEYPAD_NUMLOCK_LOOKUP = [
     }
 ]
 
-KBD_NRESET = board.MISO
-KBD_DATA = board.RX
-KBD_CLOCK = board.SCK # Note that KBD_CLOCK must be 1 GPIO above KBD_DATA
-KBD_NBUSY = board.MOSI
-
 # Assert busy
 busy_out = digitalio.DigitalInOut(KBD_NBUSY)
 busy_out.switch_to_output(False, digitalio.DriveMode.OPEN_DRAIN)
@@ -116,6 +116,13 @@ while True:
     val = buf[0]
     pressed = (val & 0x80) == 0
     key_number = val & 0x7f
+
+    if key_number > len(tandy1000_keycodes):
+        # invalid keycode -- reset the keyboard
+        reset_out.switch_to_output(False, digitalio.DriveMode.OPEN_DRAIN)
+        time.sleep(.1)
+        reset_out.value = True
+        continue
 
     keycode = tandy1000_keycodes[key_number]
     if keycode is None:
