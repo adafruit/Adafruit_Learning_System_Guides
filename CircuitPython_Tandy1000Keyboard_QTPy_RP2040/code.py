@@ -58,11 +58,6 @@ KEYPAD_NUMLOCK_LOOKUP = [
     }
 ]
 
-# D10 = blue   = CN2 = RESET
-# D11 = white  = CN1 = DATA
-# D12 = green  = CN3 = CLOCK
-# D13 = yellow = CN4 = /BUSY
-
 KBD_NRESET = board.MISO
 KBD_DATA = board.RX
 KBD_CLOCK = board.SCK # Note that KBD_CLOCK must be 1 GPIO above KBD_DATA
@@ -139,5 +134,3 @@ while True:
             pass
         else:
             kbd.release(keycode)
-
-    print(kbd.report)
