@@ -1,15 +1,28 @@
 import time
-import digitalio
 import array
+
 import board
+import digitalio
 import rp2pio
+import usb_hid
+
 import adafruit_pioasm
 from adafruit_hid.keyboard import Keyboard
-import usb_hid
 from adafruit_hid.keycode import Keycode as K
 
 tandy1000_keycodes = [
-None, K.ESCAPE, K.ONE, K.TWO, K.THREE, K.FOUR, K.FIVE, K.SIX, K.SEVEN, K.EIGHT, K.NINE, K.ZERO, K.MINUS, K.EQUALS, K.BACKSPACE, K.TAB, K.Q, K.W, K.E, K.R, K.T, K.Y, K.U, K.I, K.O, K.P, K.LEFT_BRACKET, K.RIGHT_BRACKET, K.ENTER, K.LEFT_CONTROL, K.A, K.S, K.D, K.F, K.G, K.H, K.J, K.K, K.L, K.SEMICOLON, K.QUOTE, K.UP_ARROW, K.LEFT_SHIFT, K.LEFT_ARROW, K.Z, K.X, K.C, K.V, K.B, K.N, K.M, K.COMMA, K.PERIOD, K.FORWARD_SLASH, K.RIGHT_SHIFT, K.PRINT_SCREEN, K.LEFT_ALT, K.SPACE, K.CAPS_LOCK, K.F1, K.F2, K.F3, K.F4, K.F5, K.F6, K.F7, K.F8, K.F9, K.F10, K.KEYPAD_NUMLOCK, K.PAUSE, K.KEYPAD_SEVEN, K.KEYPAD_EIGHT, K.KEYPAD_NINE, K.DOWN_ARROW, K.KEYPAD_FOUR, K.KEYPAD_FIVE, K.KEYPAD_SIX, K.RIGHT_ARROW, K.KEYPAD_ONE, K.KEYPAD_TWO, K.KEYPAD_THREE, K.KEYPAD_ZERO, K.KEYPAD_MINUS, (K.LEFT_CONTROL, K.PAUSE), K.KEYPAD_PLUS, K.KEYPAD_PERIOD, K.KEYPAD_ENTER, K.HOME, K.F11, K.F12
+    None, K.ESCAPE, K.ONE, K.TWO, K.THREE, K.FOUR, K.FIVE, K.SIX, K.SEVEN,
+    K.EIGHT, K.NINE, K.ZERO, K.MINUS, K.EQUALS, K.BACKSPACE, K.TAB, K.Q, K.W,
+    K.E, K.R, K.T, K.Y, K.U, K.I, K.O, K.P, K.LEFT_BRACKET, K.RIGHT_BRACKET,
+    K.ENTER, K.LEFT_CONTROL, K.A, K.S, K.D, K.F, K.G, K.H, K.J, K.K, K.L,
+    K.SEMICOLON, K.QUOTE, K.UP_ARROW, K.LEFT_SHIFT, K.LEFT_ARROW, K.Z, K.X,
+    K.C, K.V, K.B, K.N, K.M, K.COMMA, K.PERIOD, K.FORWARD_SLASH, K.RIGHT_SHIFT,
+    K.PRINT_SCREEN, K.LEFT_ALT, K.SPACE, K.CAPS_LOCK, K.F1, K.F2, K.F3, K.F4,
+    K.F5, K.F6, K.F7, K.F8, K.F9, K.F10, K.KEYPAD_NUMLOCK, K.PAUSE,
+    K.KEYPAD_SEVEN, K.KEYPAD_EIGHT, K.KEYPAD_NINE, K.DOWN_ARROW, K.KEYPAD_FOUR,
+    K.KEYPAD_FIVE, K.KEYPAD_SIX, K.RIGHT_ARROW, K.KEYPAD_ONE, K.KEYPAD_TWO,
+    K.KEYPAD_THREE, K.KEYPAD_ZERO, K.KEYPAD_MINUS, (K.LEFT_CONTROL, K.PAUSE),
+    K.KEYPAD_PLUS, K.KEYPAD_PERIOD, K.KEYPAD_ENTER, K.HOME, K.F11, K.F12
 ]
 
 LOCK_KEYS = (K.CAPS_LOCK, K.KEYPAD_NUMLOCK)
@@ -27,8 +40,8 @@ KEYPAD_NUMLOCK_LOOKUP = [
         K.KEYPAD_NINE: K.PAGE_UP,
 
         K.KEYPAD_FOUR: (K.LEFT_SHIFT, K.BACKSLASH),
-        #K.KEYPAD_FIVE: 
-        #K.KEYPAD_SIX: 
+        #K.KEYPAD_FIVE:
+        #K.KEYPAD_SIX:
 
         K.KEYPAD_ONE: K.END,
         K.KEYPAD_TWO: K.GRAVE_ACCENT,
@@ -101,7 +114,7 @@ busy_out.value = True
 while True:
     sm.readinto(buf, swap=False)
     val = buf[0]
-    pressed = not (val & 0x80)
+    pressed = (val & 0x80) == 0
     key_number = val & 0x7f
 
     keycode = tandy1000_keycodes[key_number]
