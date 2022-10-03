@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2020 Carter Nelson for Adafruit Industries
 #
 # SPDX-License-Identifier: MIT
+# pylint: disable=redefined-outer-name, eval-used, wrong-import-order
 
 import time
 import terminalio
