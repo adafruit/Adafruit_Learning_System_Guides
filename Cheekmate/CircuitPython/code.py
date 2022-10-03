@@ -49,7 +49,7 @@ CHARACTER_GAP = DOT_LENGTH * 3  # Duration of gap between characters
 MEDIUM_GAP = DOT_LENGTH * 7  #    Duraction of gap between words
 
 # Morse code symbol-to-mark conversion dictionary. This contains the
-# standard A-Z and 0-9, and one extra symbol "+" that's sometimes used
+# standard A-Z and 0-9, and extra symbols "+" and "=" sometimes used
 # in chess. If other symbols are needed for this or other games, they
 # can be added to the end of the list.
 MORSE = {
@@ -90,6 +90,7 @@ MORSE = {
     "8": "---..",
     "9": "----.",
     "+": ".-.-.",
+    "=": "-...-",
 }
 
 # SOME FUNCTIONS -----------------------------------------------------------
