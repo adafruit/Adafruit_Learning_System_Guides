@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2020 Carter Nelson for Adafruit Industries
 #
 # SPDX-License-Identifier: MIT
+# pylint: disable=redefined-outer-name, eval-used, wrong-import-order
 
 import time
 import terminalio
@@ -52,8 +53,10 @@ icons_small_bmp, icons_small_pal = adafruit_imageload.load(ICONS_SMALL_FILE)
 # /////////////////////////////////////////////////////////////////////////
 
 
-def get_data_source_url(api="onecall", location=None):
+def get_data_source_url(api="forecast", location=None):
     """Build and return the URL for the OpenWeather API."""
+    if location is None:
+        raise ValueError("Must specify location.")
     if api.upper() == "GEO":
         URL = "https://api.openweathermap.org/geo/1.0/direct?q="
         URL += location
@@ -61,8 +64,12 @@ def get_data_source_url(api="onecall", location=None):
         URL = "https://api.openweathermap.org/geo/1.0/reverse?limit=1"
         URL += "&lat={}".format(location[0])
         URL += "&lon={}".format(location[1])
-    elif api.upper() == "ONECALL":
-        URL = "https://api.openweathermap.org/data/2.5/onecall?exclude=minutely,hourly,alerts"
+    elif api.upper() == "FORECAST":
+        URL = "https://api.openweathermap.org/data/2.5/forecast?"
+        URL += "&lat={}".format(location[0])
+        URL += "&lon={}".format(location[1])
+    elif api.upper() == "CURRENT":
+        URL = "https://api.openweathermap.org/data/2.5/weather?"
         URL += "&lat={}".format(location[0])
         URL += "&lon={}".format(location[1])
     else:
@@ -84,11 +91,67 @@ def get_city(latlon_location):
     return raw_data["name"] + ", " + raw_data["country"]
 
 
+def get_approx_time(latlon_location):
+    magtag.url = get_data_source_url(api="current", location=latlon_location)
+    raw_data = eval(magtag.fetch())
+    return raw_data["dt"] + raw_data["timezone"]
+
+
 def get_forecast(location):
-    """Use OneCall API to fetch forecast and timezone data."""
-    resp = magtag.network.fetch(get_data_source_url(api="onecall", location=location))
+    """Use Forecast API to fetch weather data and return a "daily" forecast.
+    NOTE: The data query is assumed to have been done at ~2AM local time so that
+    the forecast data results are (also approx):
+                0  3AM
+                1  6AM
+                2  9AM
+                3 12PM
+                4  3PM
+                5  6PM
+                6  9PM
+                7 12AM
+                :   :
+                (etc.)
+    """
+    resp = magtag.network.fetch(get_data_source_url(api="forecast", location=location))
     json_data = resp.json()
-    return json_data["daily"], json_data["current"]["dt"], json_data["timezone_offset"]
+    # build "daily" forecast data (similar to Onecall API)
+    # it is assumed the first entry in the list is for ~3AM local
+    # and the list is 40 entries at 3 hours intervals
+    #     index  local_time
+    #       0        3AM
+    #       1        6AM
+    #       2        9AM
+    #       3       12PM
+    #       4        3PM
+    #       5        6PM
+    #       6        9PM
+    #       7       12AM
+    #      etc.     etc.
+    if json_data["cnt"] != 40:
+        raise RuntimeError("Unexpected forecast response length.")
+    timezone_offset = json_data["city"]["timezone"]
+    daily_data = []
+    # use the 12PM values from each day, access via direct indexing (slice)
+    for data in json_data["list"][3::8]:
+        daily_data.append(
+            {
+                "dt": data["dt"] + timezone_offset,
+                "weather": data["weather"],
+                "temp": {"day": data["main"]["temp"]},
+            }
+        )
+    # add extra data for day 0 (current day)
+    daily_data[0]["sunrise"] = json_data["city"]["sunrise"] + timezone_offset
+    daily_data[0]["sunset"] = json_data["city"]["sunset"] + timezone_offset
+    daily_data[0]["temp"] = {
+        "morn": json_data["list"][2]["main"]["temp"],
+        "day": json_data["list"][4]["main"]["temp"],
+        "night": json_data["list"][6]["main"]["temp"],
+    }
+    daily_data[0]["humidity"] = json_data["list"][3]["main"]["humidity"]
+    daily_data[0]["wind_speed"] = json_data["list"][3]["wind"]["speed"]
+
+    return daily_data
 
 
 def make_banner(x=0, y=0):
@@ -141,11 +204,11 @@ def update_banner(banner, data):
     banner[2].text = temperature_text(data["temp"]["day"])
 
 
-def update_today(data, tz_offset=0):
+def update_today(data):
     """Update today info banner."""
     date = time.localtime(data["dt"])
-    sunrise = time.localtime(data["sunrise"] + tz_offset)
-    sunset = time.localtime(data["sunset"] + tz_offset)
+    sunrise = time.localtime(data["sunrise"])
+    sunset = time.localtime(data["sunset"])
 
     today_date.text = "{} {} {}, {}".format(
         DAYS[date.tm_wday].upper(),
@@ -168,9 +231,9 @@ def go_to_sleep(current_time):
     # compute current time offset in seconds
     hour, minutes, seconds = time.localtime(current_time)[3:6]
     seconds_since_midnight = 60 * (hour * 60 + minutes) + seconds
-    three_fifteen = (3 * 60 + 15) * 60
-    # wake up 15 minutes after 3am
-    seconds_to_sleep = (24 * 60 * 60 - seconds_since_midnight) + three_fifteen
+    two_fifteen = (2 * 60 + 15) * 60
+    # wake up 15 minutes after 2am
+    seconds_to_sleep = (24 * 60 * 60 - seconds_since_midnight) + two_fifteen
     print(
         "Sleeping for {} hours, {} minutes".format(
             seconds_to_sleep // 3600, (seconds_to_sleep // 60) % 60
@@ -265,7 +328,6 @@ future_banners = [
     make_banner(x=210, y=39),
     make_banner(x=210, y=60),
     make_banner(x=210, y=81),
-    make_banner(x=210, y=102),
 ]
 
 magtag.splash.append(today_banner)
@@ -276,11 +338,11 @@ for future_banner in future_banners:
 #  M A I N
 # ===========
 print("Fetching forecast...")
-forecast_data, utc_time, local_tz_offset = get_forecast(latlon)
+forecast_data = get_forecast(latlon)
 
 print("Updating...")
-update_today(forecast_data[0], local_tz_offset)
-for day, forecast in enumerate(forecast_data[1:6]):
+update_today(forecast_data[0])
+for day, forecast in enumerate(forecast_data[1:5]):
     update_banner(future_banners[day], forecast)
 
 print("Refreshing...")
@@ -289,6 +351,6 @@ magtag.display.refresh()
 time.sleep(magtag.display.time_to_refresh + 1)
 
 print("Sleeping...")
-go_to_sleep(utc_time + local_tz_offset)
+go_to_sleep(get_approx_time(latlon))
 #  entire code will run again after deep sleep cycle
 #  similar to hitting the reset button
