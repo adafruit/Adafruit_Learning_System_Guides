@@ -87,7 +87,7 @@ void play(char *str) {
     for (; i<NUM_SYMBOLS && morse[i].symbol != c; i++);
     if (i < NUM_SYMBOLS) { // Found one!
       char mark;
-      for (int j=0; mark = morse[i].mark[j]; j++) {
+      for (int j=0; (mark = morse[i].mark[j]); j++) {
         buzz_on();
         delay(mark == '-' ? DASH_LENGTH : DOT_LENGTH);
         buzz_off();
