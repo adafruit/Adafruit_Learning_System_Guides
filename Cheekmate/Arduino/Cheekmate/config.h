@@ -32,7 +32,7 @@
 // standard A-Z and 0-9, and one extra symbol "+" that's sometimes used
 // in chess. If other symbols are needed for this or other games, they
 // can be added to the end of the list.
-const struct {
+struct {
   char symbol;
   char *mark;
 } morse[] = {
