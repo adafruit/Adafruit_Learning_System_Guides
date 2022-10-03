@@ -104,7 +104,7 @@ starrynight = AnimationGroup(
     name = "starrynight")
 
 fire = AnimationGroup(
-    Comet(pixels, speed=0, tail_length=1, color=BLACK),
+    Comet(pixels, speed=0.1, tail_length=1, color=BLACK),
     Sparkle(pixels, speed=0.1, num_sparkles=10, color=AMBER),
     Sparkle(pixels, speed=0.1, num_sparkles=10, color=RED),
     Sparkle(pixels, speed=0.1, num_sparkles=20, color=ORANGE),
