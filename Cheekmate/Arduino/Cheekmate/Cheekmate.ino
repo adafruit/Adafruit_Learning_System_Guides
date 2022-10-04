@@ -4,8 +4,8 @@
 
 /*
 CHEEKMATE: secret message receiver using WiFi, Adafruit IO and
-a haptic buzzer. Periodically polls an Adafruit IO dashboard,
-converting new messages to Morse code.
+a haptic buzzer. Monitors an Adafruit IO feed, converting new
+messages to Morse code.
 
 WiFi & Adafruit IO credentials are in the accompanying config.h file.
 */
