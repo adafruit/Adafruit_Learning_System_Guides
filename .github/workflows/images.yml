@@ -13,6 +13,7 @@ concurrency:
 
 jobs:
   update-images:
+    if: github.repository_owner == 'adafruit'
     runs-on: ubuntu-latest
     steps:
     - name: Dump GitHub context
