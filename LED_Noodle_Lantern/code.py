@@ -10,7 +10,7 @@ import board
 import pwmio
 from digitalio import DigitalInOut, Direction, Pull
 
-PINS = (board.SCK, board.MOSI, board.A1, board.A3, board.MISO, board.A2) # List of pins, one per nOOd
+PINS = (board.SCK, board.MOSI, board.A1, board.A3, board.MISO, board.A2) # List of pins
 GAMMA = 2.6  # For perceptually-linear brightness
 
 # Convert pin number list to PWMOut object list
