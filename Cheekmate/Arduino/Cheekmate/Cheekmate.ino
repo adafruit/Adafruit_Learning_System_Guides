@@ -34,6 +34,7 @@ void setup() {
   // STEMMA connector. If adapting to a different board, you might
   // want &Wire for the sole or primary I2C interface.
   drv.begin(&Wire1);
+  drv.writeRegister8(0x1D, 0xA8); // Amplitude will be unsigned
   drv.setRealtimeValue(BUZZ);
 
   feed->onMessage(handleMessage); // Set up message handler for feed
