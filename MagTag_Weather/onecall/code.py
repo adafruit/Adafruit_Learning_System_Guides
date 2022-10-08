@@ -63,7 +63,7 @@ def get_data_source_url(api="onecall", location=None):
         URL += "&lat={}".format(location[0])
         URL += "&lon={}".format(location[1])
     elif api.upper() == "ONECALL":
-        URL = "https://api.openweathermap.org/data/2.5/onecall?exclude=minutely,hourly,alerts"
+        URL = "https://api.openweathermap.org/data/3.0/onecall?exclude=minutely,hourly,alerts"
         URL += "&lat={}".format(location[0])
         URL += "&lon={}".format(location[1])
     else:
