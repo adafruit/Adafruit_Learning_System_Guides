@@ -112,9 +112,6 @@ except Exception as e:  # pylint: disable=broad-except
     microcontroller.reset()
 io.publish(alarmfeed, 0)
 io.publish(resolvedfeed, 0)
-#io.publish(reconnectedfeed, 1)
-#time.sleep(.25)
-#io.publish(reconnectedfeed, 0)
 
 while True:
     try:
@@ -192,7 +189,7 @@ while True:
                     io.publish(resolvedfeed, 0)
 
         #check motion sensor if there is no alarm
-        if(alarm1 is False and alarm2 is False and prealarm is False):
+        if(not alarm1 and not alarm2 and not prealarm):
             #update pir sensor
             motion.update()
             #if motion stopped
@@ -219,7 +216,7 @@ while True:
 
         print("\n")
 
-        # Explicitly pump the message loop.
+        # Explicitly pump the message loop to avoid MQTT timeouts.
         io.loop()
 
         #check difference between time now and start times if more than N seconds start beeping
