@@ -8,12 +8,10 @@ import microcontroller
 import socketpool
 import wifi
 import board
-import neopixel
 import adafruit_minimqtt.adafruit_minimqtt as MQTT
 from adafruit_io.adafruit_io import IO_MQTT
 import digitalio
 from adafruit_debouncer import Debouncer
-import supervisor
 
 #setup buzzer1
 buzzer1 = digitalio.DigitalInOut(board.D13)
@@ -76,7 +74,7 @@ mqtt_client = MQTT.MQTT(
 )
 
 # Define callback functions which will be called when certain events happen.
-def connected(client):
+def connected():
     print("Connected to Adafruit IO!  Listening for Freezer changes...")
 
 # Initialize Adafruit IO MQTT "helper"
@@ -177,7 +175,7 @@ while True:
             if not rightswitch.value and not leftswitch.value:
                 print('doors just closed')
                 #if prelarm is true then set it to False
-                if(prealarm == True):
+                if prealarm is True:
                     buzzer1.value = False
                 #if an alarm is true then upload to IO alarm resolved
                 if alarm1 or alarm2:
@@ -194,7 +192,7 @@ while True:
                     io.publish(resolvedfeed, 0)
 
         #check motion sensor if there is no alarm
-        if(alarm1 == False and alarm2 == False and prealarm == False):
+        if(alarm1 is False and alarm2 is False and prealarm is False):
             #update pir sensor
             motion.update()
             #if motion stopped
@@ -233,14 +231,14 @@ while True:
             buzzer1.value = False
 
         #check if difference between time now and start1 if more than X seconds turn on buzzer2
-        if (alarm1 == False and ((time.monotonic() - start1) >= 600)):
+        if (alarm1 is False and ((time.monotonic() - start1) >= 600)):
             alarm1 = True
             buzzer2.value = True
             #publish 1 to alarm feed
             io.publish(alarmfeed, 1)
 
         #check if difference between time now and start2 if more than X seconds turn on buzzer2
-        if (alarm2 == False and ((time.monotonic() - start2) >= 600)):
+        if (alarm2 is False and ((time.monotonic() - start2) >= 600)):
             alarm2 = True
             buzzer2.value = True
             #publish 1 to alarm feed
@@ -249,7 +247,7 @@ while True:
         print(str(time.time()))
         print(str(int(time.time()/300)))
         #check if 300 seconds have passed compared to start time, if so publish values
-        if(int(time.time()/300) > start):
+        if int(time.time()/300) > start:
             print("PUBLISH EVERY FIVE MINUTES")
             start = int(time.time()/300)
             io.publish(door1feed, int(leftswitch.value))
