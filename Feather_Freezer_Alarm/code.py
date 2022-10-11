@@ -241,8 +241,6 @@ while True:
             #publish 1 to alarm feed
             io.publish(alarmfeed, 1)
 
-        print(str(time.time()))
-        print(str(int(time.time()/300)))
         #check if 300 seconds have passed compared to start time, if so publish values
         if int(time.time()/300) > start:
             print("PUBLISH EVERY FIVE MINUTES")
