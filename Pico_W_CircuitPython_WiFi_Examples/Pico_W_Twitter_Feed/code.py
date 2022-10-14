@@ -10,7 +10,7 @@ import socketpool
 import microcontroller
 import adafruit_requests
 
-#  query URL for tweets. looking for hashtag partyparrot sent to a specific username
+#  query URL for tweets. looking for tweets from Adafruit that have the text "NEW GUIDE"
 #  disabling line-too-long because queries for tweet_query & TIME_URL cannot have line breaks
 #  pylint: disable=line-too-long
 tweet_query = 'https://api.twitter.com/2/tweets/search/recent?query=NEW GUIDE from:adafruit&tweet.fields=created_at'
@@ -24,8 +24,6 @@ requests = adafruit_requests.Session(pool, ssl.create_default_context())
 
 last_id = 0 #  checks last tweet's ID
 check = 0 #  time.monotonic() holder
-
-print(time.monotonic())
 
 while True:
     try:
