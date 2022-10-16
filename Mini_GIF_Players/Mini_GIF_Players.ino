@@ -57,7 +57,7 @@ FatFileSystem fatfs;
 
 Adafruit_ST7789 tft = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
 AnimatedGIF gif;
-File f, root;
+File32 f, root;
 
 void * GIFOpenFile(const char *fname, int32_t *pSize)
 {
@@ -72,7 +72,7 @@ void * GIFOpenFile(const char *fname, int32_t *pSize)
 
 void GIFCloseFile(void *pHandle)
 {
-  File *f = static_cast<File *>(pHandle);
+  File32 *f = static_cast<File32 *>(pHandle);
   if (f != NULL)
      f->close();
 } /* GIFCloseFile() */
@@ -81,7 +81,7 @@ int32_t GIFReadFile(GIFFILE *pFile, uint8_t *pBuf, int32_t iLen)
 {
     int32_t iBytesRead;
     iBytesRead = iLen;
-    File *f = static_cast<File *>(pFile->fHandle);
+    File32 *f = static_cast<File32 *>(pFile->fHandle);
     // Note: If you read a file all the way to the last byte, seek() stops working
     if ((pFile->iSize - pFile->iPos) < iLen)
        iBytesRead = pFile->iSize - pFile->iPos - 1; // <-- ugly work-around
@@ -95,7 +95,7 @@ int32_t GIFReadFile(GIFFILE *pFile, uint8_t *pBuf, int32_t iLen)
 int32_t GIFSeekFile(GIFFILE *pFile, int32_t iPosition)
 { 
   int i = micros();
-  File *f = static_cast<File *>(pFile->fHandle);
+  File32 *f = static_cast<File32 *>(pFile->fHandle);
   f->seek(iPosition);
   pFile->iPos = (int32_t)f->position();
   i = micros() - i;
