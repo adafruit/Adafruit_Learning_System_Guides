@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Dave Briccetti
+#
+# SPDX-License-Identifier: MIT
+
 """A shorter CapTouch program, for those comfortable with list
 comprehensions and the enumerate function"""
 
