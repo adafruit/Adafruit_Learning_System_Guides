@@ -48,15 +48,15 @@ class Robot:
         self.set_speed(STOP)
 
     @classmethod
-    def _init_motor(cls, pin):
-        pwm = pwmio.PWMOut(pin, frequency=50)
-        return adafruit_motor.servo.ContinuousServo(pwm, min_pulse=600, max_pulse=2400)
-
-    @classmethod
     def _make_palette(cls, color):
         palette = displayio.Palette(1)
         palette[0] = color
         return palette
+
+    @classmethod
+    def _init_motor(cls, pin):
+        pwm = pwmio.PWMOut(pin, frequency=50)
+        return adafruit_motor.servo.ContinuousServo(pwm, min_pulse=600, max_pulse=2400)
 
     def _init_ble(self):
         self.ble = BLERadio()
@@ -89,6 +89,10 @@ class Robot:
 
     def is_connected(self):
         return self.ble.connected
+
+    def check_for_packets(self):
+        if self.uart_service.in_waiting:
+            self._process_packet(Packet.from_stream(self.uart_service))
 
     def set_underglow(self, color, save_release_color = False):
         if save_release_color:
@@ -157,14 +161,6 @@ class Robot:
         self.set_throttle(STOP)
         time.sleep(0.5)
         self.set_underglow(color)
-
-    def check_for_packets(self):
-        if self.uart_service.in_waiting:
-            self._process_packet(Packet.from_stream(self.uart_service))
-
-    def _handle_color_packet(self, packet):
-        # Change the color
-        self.set_underglow(packet.color)
 
     def _remove_shapes(self):
         while len(self.display_group) > 1:
@@ -259,6 +255,20 @@ class Robot:
         self._remove_shapes()
         self._add_centered_rect(100, 100)
 
+    def _process_packet(self, packet):
+        if isinstance(packet, ColorPacket):
+            self._handle_color_packet(packet)
+        elif isinstance(packet, ButtonPacket) and packet.pressed:
+            # do this when buttons are pressed
+            self._handle_button_press_packet(packet)
+        elif isinstance(packet, ButtonPacket) and not packet.pressed:
+            # do this when some buttons are released
+            self._handle_button_release_packet(packet)
+
+    def _handle_color_packet(self, packet):
+        # Change the color
+        self.set_underglow(packet.color)
+
     def _handle_button_press_packet(self, packet):
         if packet.button == ButtonPacket.UP:  # UP button pressed
             self.set_throttle(FWD)
@@ -285,13 +295,3 @@ class Robot:
             self.set_throttle(self.direction)
         if packet.button == ButtonPacket.LEFT:
             self.set_throttle(self.direction)
-
-    def _process_packet(self, packet):
-        if isinstance(packet, ColorPacket):
-            self._handle_color_packet(packet)
-        elif isinstance(packet, ButtonPacket) and packet.pressed:
-            # do this when buttons are pressed
-            self._handle_button_press_packet(packet)
-        elif isinstance(packet, ButtonPacket) and not packet.pressed:
-            # do this when some buttons are released
-            self._handle_button_release_packet(packet)
