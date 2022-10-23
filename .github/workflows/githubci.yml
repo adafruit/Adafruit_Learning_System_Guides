@@ -6,7 +6,7 @@ jobs:
   spdx:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/setup-python@v2
+    - uses: actions/setup-python@v4
       with:
         python-version: "3.x"
     - name: Checkout Current Repo
@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/setup-python@v2
+    - uses: actions/setup-python@v4
       with:
         python-version: "3.x"
     - uses: actions/checkout@v2
@@ -88,7 +88,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Set up Python 3.x
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v4
       with:
         python-version: "3.x"
     - name: Versions
