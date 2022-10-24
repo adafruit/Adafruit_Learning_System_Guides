@@ -9,8 +9,10 @@ from adafruit_led_animation.group import AnimationGroup
 from adafruit_led_animation.sequence import AnimationSequence
 from adafruit_led_animation import color
 
-knife_leds = neopixel.NeoPixel(board.SDA, 48, brightness=0.8, auto_write=False, pixel_order=neopixel.RGB)
-repear_leds = neopixel.NeoPixel(board.SCL, 60, brightness=0.8, auto_write=False, pixel_order=neopixel.RGB)
+knife_leds = neopixel.NeoPixel(board.SDA, 48, brightness=0.8,
+    auto_write=False, pixel_order=neopixel.RGB)
+repear_leds = neopixel.NeoPixel(board.SCL, 60, brightness=0.8,
+    auto_write=False, pixel_order=neopixel.RGB)
 
 animations = AnimationSequence(
 

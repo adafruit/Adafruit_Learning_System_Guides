@@ -10,8 +10,10 @@ from adafruit_led_animation.group import AnimationGroup
 from adafruit_led_animation.sequence import AnimationSequence
 from adafruit_led_animation import color
 
-moon_leds = neopixel.NeoPixel(board.SDA, 60, brightness=0.8, auto_write=False, pixel_order=neopixel.RGB)
-wolf_leds = neopixel.NeoPixel(board.SCL, 57, brightness=0.8, auto_write=False, pixel_order=neopixel.RGB)
+moon_leds = neopixel.NeoPixel(board.SDA, 60, brightness=0.8,
+    auto_write=False, pixel_order=neopixel.RGB)
+wolf_leds = neopixel.NeoPixel(board.SCL, 57, brightness=0.8,
+    auto_write=False, pixel_order=neopixel.RGB)
 
 animations = AnimationSequence(
     Blink(wolf_leds, speed=0.07, color=color.BLUE),

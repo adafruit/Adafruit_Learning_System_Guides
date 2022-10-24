@@ -11,8 +11,10 @@ from adafruit_led_animation.group import AnimationGroup
 from adafruit_led_animation.sequence import AnimationSequence
 from adafruit_led_animation import color
 
-ghost_pixels = neopixel.NeoPixel(board.SDA, 90, brightness=0.5, auto_write=False, pixel_order=neopixel.RGB)
-glasses_pixels = neopixel.NeoPixel(board.SCL, 33, brightness=0.5, auto_write=False, pixel_order=neopixel.RGB)
+ghost_pixels = neopixel.NeoPixel(board.SDA, 90, brightness=0.5,
+    auto_write=False, pixel_order=neopixel.RGB)
+glasses_pixels = neopixel.NeoPixel(board.SCL, 33, brightness=0.5,
+    auto_write=False, pixel_order=neopixel.RGB)
 
 animations = AnimationSequence(
     # Synchronized animations
