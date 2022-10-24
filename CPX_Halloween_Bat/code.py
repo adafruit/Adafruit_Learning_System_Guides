@@ -37,21 +37,29 @@ animations = AnimationSequence(comet)
 #  beginning angles for each wing
 left_angle = 100
 right_angle = 30
+#  minimum range for the servos
+min_range = 30
+#  maximum range for the servos
+max_range = 100
+#  the change in degrees for the servos
+degree_change = 10
+#  it's not recommended to go faster than 0.05
+speed = 0.05
 
 while True:
 	#  run comet animation while servos move
     animations.animate()
 
 	#  left angle decreases by 10
-    left_angle = left_angle - 10
+    left_angle = left_angle - degree_change
 	#  once it's less than 30 degrees, reset to 100
-    if left_angle < 30:
-        left_angle = 100
+    if left_angle < min_range:
+        left_angle = max_range
 	#  right angle increases by 10
-    right_angle = right_angle + 10
+    right_angle = right_angle + degree_change
 	#  once it's greater than 100, reset to 30
-    if right_angle > 100:
-        right_angle = 30
+    if right_angle > max_range:
+        right_angle = min_range
 	#  move left wing
     left_servo.angle = left_angle
 	#  move right wing
