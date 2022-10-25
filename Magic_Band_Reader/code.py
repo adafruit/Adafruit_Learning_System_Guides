@@ -1,27 +1,16 @@
 # SPDX-FileCopyrightText: 2022 Noe Ruiz for Adafruit Industries
 # SPDX-License-Identifier: MIT
 # Magic Band Reader with Wiz Kit RFID
-import time
 import random
 import board
 import digitalio
 import audiobusio
 from audiocore import WaveFile
-
-try:
-    from audioio import AudioOut
-except ImportError:
-    try:
-        from audiopwmio import PWMAudioOut as AudioOut
-    except ImportError:
-        pass  # not always supported by every board!
-
 import neopixel
 from adafruit_led_animation.animation.chase import Chase
 from adafruit_led_animation.animation.solid import Solid
 from adafruit_led_animation.color import (
     GREEN,
-    PINK,
     BLACK,
 )
 
@@ -59,10 +48,8 @@ sounds = [
 while True:
     print("Waiting for button press to continue!")
     while button.value:
-        pass
         solid.animate()
     play_wav(random.choice(sounds))
     while audio.playing:
-        pass
         chase.animate()
     print("Done!")
