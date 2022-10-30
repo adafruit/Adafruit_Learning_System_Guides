@@ -4,33 +4,32 @@
 
 # pylint: disable=import-error
 
-"""
-NeoPixel goggles code for CircuitPython
 
-With a rotary encoder attached (pins are declred in the "Initialize
-hardware" section of the code), you can select animation modes and
-configurable attributes (color, brightness, etc.). TAP the encoder
-button to switch between modes/settings, HOLD the encoder button to
-toggle between PLAY and CONFIGURE states.
-
-With no rotary encoder attached, you can select an animation mode
-and configure attributes in the "Configurable defaults" section
-(including an option to auto-cycle through the animation modes).
-
-Things to Know:
-- FancyLED library is NOT used here because it's a bit too much for the
-  Trinket M0 to handle (animation was very slow).
-- Animation modes are all monochromatic (single color, varying only in
-  brightness). More a design decision than a technical one...of course
-  NeoPixels can be individual colors, but folks like customizing and the
-  monochromatic approach makes it easier to select a color. Also keeps the
-  code a bit simpler, since Trinket space & performance is limited.
-- Animation is monotonic time driven; there are no sleep() calls. This
-  ensures that animation is constant-time regardless of the hardware or
-  CircuitPython performance over time, or other goings on (e.g. garbage
-  collection), only the frame rate (smoothness) varies; overall timing
-  remains consistent.
-"""
+# NeoPixel goggles code for CircuitPython
+#
+# With a rotary encoder attached (pins are declred in the "Initialize
+# hardware" section of the code), you can select animation modes and
+# configurable attributes (color, brightness, etc.). TAP the encoder
+# button to switch between modes/settings, HOLD the encoder button to
+# toggle between PLAY and CONFIGURE states.
+#
+# With no rotary encoder attached, you can select an animation mode
+# and configure attributes in the "Configurable defaults" section
+# (including an option to auto-cycle through the animation modes).
+#
+# Things to Know:
+# - FancyLED library is NOT used here because it's a bit too much for the
+#   Trinket M0 to handle (animation was very slow).
+# - Animation modes are all monochromatic (single color, varying only in
+#   brightness). More a design decision than a technical one...of course
+#   NeoPixels can be individual colors, but folks like customizing and the
+#   monochromatic approach makes it easier to select a color. Also keeps the
+#   code a bit simpler, since Trinket space & performance is limited.
+# - Animation is monotonic time driven; there are no sleep() calls. This
+#   ensures that animation is constant-time regardless of the hardware or
+#   CircuitPython performance over time, or other goings on (e.g. garbage
+#   collection), only the frame rate (smoothness) varies; overall timing
+#   remains consistent.
 
 from math import modf, pi, sin
 from random import getrandbits
