@@ -38,12 +38,12 @@ def play_wav(name):
 
 #List of audio files
 sounds = [
-    'electrons',
+    'chime',
+    'excellent',
+    'foolish',
     'hello',
-    'meetyou',
-    'excellent22',
-    'whhaatt',
-    'uhoh-adabot'
+    'operational',
+    'startours'
 ]
 while True:
     print("Waiting for button press to continue!")
