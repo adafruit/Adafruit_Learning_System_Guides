@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2022 Liz Clark for Adafruit Industries
 #
 # SPDX-License-Identifier: MIT
+#  Pico W CircuitPython HTTP Server
 
 import os
 import time
