@@ -48,8 +48,11 @@ kbd = Keyboard(usb_hid.devices)
 while True:
     sm.readinto(buf, swap=False)
     val = buf[0]
-    pressed = not (val & 0x8000)
+    pressed = not val & 0x8000
     key_number = (val >> 8) & 0x7f
+    if key_number > len(xt_keycodes):
+        print(f"invalid key number {key_number} pressed")
+        continue
     keycode = xt_keycodes[key_number]
     print(f"{keycode} {'PRESSED' if pressed else 'released'}")
     if keycode is None:
