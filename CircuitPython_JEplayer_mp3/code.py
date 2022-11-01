@@ -38,7 +38,7 @@ import time
 
 import adafruit_bitmap_font.bitmap_font
 import adafruit_display_text.label
-from adafruit_progressbar.progressbar import ProgressBar
+from adafruit_progressbar import ProgressBar
 import sdcardio
 import analogjoy
 import audioio
@@ -48,7 +48,7 @@ import busio
 import digitalio
 import displayio
 import terminalio
-import gamepadshift
+from keypad import ShiftRegisterKeys
 import icons
 import neopixel
 import repeat
@@ -83,7 +83,7 @@ class PlaybackDisplay:
         for i in range(5, 8):
             self.iconbar.icons[i].x += 32
         self.label = adafruit_display_text.label.Label(font, line_spacing=1.0)
-        self.label.y = 6
+        self.label.y = 4
         self._bitmap_filename = None
         self._fallback_bitmap = ["/rsrc/background.bmp"]
         self._rms = 0.
@@ -256,7 +256,8 @@ class PlaybackDisplay:
     @staticmethod
     def has_any_mp3s(folder):
         """True if the folder contains at least one item ending in .mp3"""
-        return any(not fn.startswith(".") and fn.lower().endswith(".mp3") for fn in os.listdir(folder))
+        return any(not fn.startswith(".") and fn.lower().endswith(".mp3")
+                for fn in os.listdir(folder))
 
     def choose_folder(self, base='/sd'):
         """Let the user choose a folder within a base directory"""
@@ -269,7 +270,6 @@ class PlaybackDisplay:
             idx = self.next_choice
         else:
             idx = menu_choice(choices,
-                              BUTTON_START | BUTTON_A | BUTTON_B | BUTTON_SEL,
                               sel_idx=self.next_choice,
                               text_font=terminalio.FONT)
         clear_display()
@@ -291,16 +291,10 @@ speaker = audioio.AudioOut(board.SPEAKER, right_channel=board.A1)
 mp3stream = audiomp3.MP3Decoder(open("/rsrc/splash.mp3", "rb"))
 speaker.play(mp3stream)
 
-font = adafruit_bitmap_font.bitmap_font.load_font("rsrc/5x8.bdf")
+font = adafruit_bitmap_font.bitmap_font.load_font("rsrc/5x8.pcf")
 playback_display = PlaybackDisplay()
 board.DISPLAY.show(playback_display.group)
 font.load_glyphs(range(32, 128))
-
-BUTTON_SEL = const(8)
-BUTTON_START = const(4)
-BUTTON_A = const(2)
-BUTTON_B = const(1)
-
 
 joystick = analogjoy.AnalogJoystick()
 
@@ -309,9 +303,9 @@ down_key = repeat.KeyRepeat(lambda: joystick.down, rate=0.2)
 left_key = repeat.KeyRepeat(lambda: joystick.left, rate=0.2)
 right_key = repeat.KeyRepeat(lambda: joystick.right, rate=0.2)
 
-buttons = gamepadshift.GamePadShift(digitalio.DigitalInOut(board.BUTTON_CLOCK),
-                                    digitalio.DigitalInOut(board.BUTTON_OUT),
-                                    digitalio.DigitalInOut(board.BUTTON_LATCH))
+buttons = ShiftRegisterKeys(clock=board.BUTTON_CLOCK,
+                                    data=board.BUTTON_OUT,
+                                    latch=board.BUTTON_LATCH, key_count=4, value_when_pressed=True)
 # pylint: enable=invalid-name
 
 def mount_sd():
@@ -332,7 +326,7 @@ def shuffle(seq):
         seq[i], seq[j] = seq[j], seq[i]
 
 # pylint: disable=too-many-locals,too-many-statements
-def menu_choice(seq, button_ok, button_cancel=0, *, sel_idx=0, text_font=font):
+def menu_choice(seq, *, sel_idx=0, text_font=font):
     """Display a menu and allow a choice from it"""
     gc.collect()
     board.DISPLAY.auto_refresh = True
@@ -365,16 +359,14 @@ def menu_choice(seq, button_ok, button_cancel=0, *, sel_idx=0, text_font=font):
     last_scroll_idx = max(0, len(seq) - num_rows)
 
     board.DISPLAY.show(scene)
-    buttons.get_pressed() # Clear out anything from before now
+    buttons.events.clear()
     i = 0
     old_scroll_idx = None
 
     while True:
         enable.value = speaker.playing
-        pressed = buttons.get_pressed()
-        if button_cancel and (pressed & button_cancel):
-            return -1
-        if pressed & button_ok:
+        event = buttons.events.get()
+        if event and event.pressed:
             return sel_idx
 
         joystick.poll()
@@ -410,11 +402,6 @@ def isdir(x):
     """Return True if 'x' is a directory"""
     return os.stat(x)[0] & S_IFDIR
 
-def wait_no_button_pressed():
-    """Wait until no button is pressed"""
-    while buttons.get_pressed():
-        time.sleep(1/20)
-
 def change_stream(filename):
     """Change the global MP3Decoder object to play a new file"""
     old_stream = mp3stream.file
@@ -437,12 +424,10 @@ def play_one_file(idx, filename, folder, title, playlist_size):
     board.DISPLAY.refresh()
 
     result = None
-    wait_no_button_pressed()
     file_size = os.stat(filename)[6]
     mp3file = change_stream(filename)
     playback_display.play(mp3stream)
     board.DISPLAY.auto_refresh = True
-    last_pressed = buttons.get_pressed()
 
     while speaker.playing:
 
@@ -459,13 +444,9 @@ def play_one_file(idx, filename, folder, title, playlist_size):
         if right_key.value:
             playback_display.move(1)
 
-        pressed = buttons.get_pressed()
-        rising_edge = pressed & ~last_pressed
-        last_pressed = pressed
-
-        if rising_edge:
+        event = buttons.events.get()
+        if event and event.pressed:
             return_now = playback_display.press(idx)
-            wait_no_button_pressed()
             if return_now:
                 result = return_now[0]
                 break
@@ -514,7 +495,8 @@ def longest_common_prefix(seq):
 
 def play_folder(location):
     """Play everything within a given folder"""
-    playlist = [d for d in os.listdir(location) if not d.startswith('.') and d.lower().endswith('.mp3')]
+    playlist = [d for d in os.listdir(location)
+            if not d.startswith('.') and d.lower().endswith('.mp3')]
     if not playlist:
         # hmm, no mp3s in a folder?  Well, don't crash okay?
         del playlist
