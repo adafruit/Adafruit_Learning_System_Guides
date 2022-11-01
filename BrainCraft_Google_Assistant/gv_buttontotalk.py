@@ -27,8 +27,9 @@ import pathlib2 as pathlib
 import sys
 import time
 import uuid
+import glob
 
-sys.path.append("env/lib/python3.7/site-packages/googlesamples/assistant/grpc")
+sys.path.extend(glob.glob("env/lib/python3*/site-packages/googlesamples/assistant/grpc"))
 
 import click
 import grpc
