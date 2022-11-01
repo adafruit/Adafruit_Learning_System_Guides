@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2022 Jeff Epler for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+# IBM Keyboard to USB Adapter
 import array
 import board
 import rp2pio
