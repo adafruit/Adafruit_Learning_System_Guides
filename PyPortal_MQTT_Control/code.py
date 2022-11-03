@@ -233,7 +233,7 @@ print("Connected to WiFi!")
 MQTT.set_socket(socket, esp)
 
 # Set up a MiniMQTT Client
-client = MQTT(
+client = MQTT.MQTT(
     broker=secrets["broker"],
     port=1883,
     username=secrets["user"],
