@@ -1,0 +1,8 @@
+# SPDX-FileCopyrightText: 2018 Jaap Meijers
+# SPDX-FileCopyrightText: 2022 Johannes Enevoldsen
+# SPDX-FileCopyrightText: 2022 Eva Herrada for Adafruit Industries
+# SPDX-License-Identifier: CC-BY-NC-SA 2.5
+
+This file was modified by Eva Herrada. The original was obtained here: https://github.com/JohannesNE/literature-clock/blob/master/litclock_annotated.csv
+
+The main changes made were the filtering of the quotes so that the ones used were shorter than a certain length, the annotation of the quotes so that the time was padded with a ^.
