@@ -26,8 +26,6 @@ from index_to_rgb.iron import index_to_rgb
 from thermalcamera_converters import celsius_to_fahrenheit, fahrenheit_to_celsius
 from thermalcamera_config import ALARM_F, MIN_RANGE_F, MAX_RANGE_F, SELFIE
 
-__version__ = "0.0.0+auto.0"
-__repo__ = "https://github.com/CedarGroveStudios/ThermalCamera.git"
 
 # Instantiate the integral display and define its size
 display = board.DISPLAY
