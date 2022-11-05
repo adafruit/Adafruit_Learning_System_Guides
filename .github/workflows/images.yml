@@ -8,7 +8,7 @@ on:
     branches: [main]
 
 concurrency:
-  group: folder-images
+  group: folder-images-concurrency # https://github.com/adafruit/Adafruit_Learning_System_Guides/issues/2327
   cancel-in-progress: true
 
 jobs:
@@ -21,7 +21,7 @@ jobs:
         GITHUB_CONTEXT: ${{ toJson(github) }}
       run: echo "$GITHUB_CONTEXT"
 
-    - uses: actions/checkout@v2.2.0
+    - uses: actions/checkout@v3
 
     - name: Set up Python 3.x
       uses: actions/setup-python@v4
