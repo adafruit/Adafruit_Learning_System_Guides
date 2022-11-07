@@ -1,7 +1,6 @@
 # SPDX-FileCopyrightText: 2022 Liz Clark for Adafruit Industries
 #
 # SPDX-License-Identifier: MIT
-#  Pico W CircuitPython HTTP Server
 
 import os
 import time
@@ -90,7 +89,6 @@ temp_test = str(c_to_f(ds18.temperature))
 unit = "F"
 #  font for HTML
 font_family = "monospace"
-party_state = "Party?"
 
 #  the HTML script
 #  setup as an f string
@@ -107,30 +105,32 @@ def webpage():
     <style>
     html{{font-family: {font_family}; background-color: lightgrey;
     display:inline-block; margin: 0px auto; text-align: center;}}
-      h1{{color: deeppink; padding: 2vh; font-size: 35px;}}
-      p{{font-size: 1.5rem;}}
+      h1{{color: deeppink; width: 200; word-wrap: break-word; padding: 2vh; font-size: 35px;}}
+      p{{font-size: 1.5rem; width: 200; word-wrap: break-word;}}
       .button{{font-family: {font_family};display: inline-block;
       background-color: black; border: none;
       border-radius: 4px; color: white; padding: 16px 40px;
       text-decoration: none; font-size: 30px; margin: 2px; cursor: pointer;}}
-      p.dotted {{margin: auto; height: 50px;
+      p.dotted {{margin: auto;
       width: 75%; font-size: 25px; text-align: center;}}
     </style>
     </head>
     <body>
     <title>Pico W HTTP Server</title>
     <h1>Pico W HTTP Server</h1>
+    <br>
     <p class="dotted">This is a Pico W running an HTTP server with CircuitPython.</p>
-    <p class="dotted">The current ambient temperature near the Pico W is 
-    <span style="color: deeppink;">{temp_test}°{unit}</span></p>
-    <h1>Control the LED on the Pico W with these buttons:</h1>
+    <br>
+    <p class="dotted">The current ambient temperature near the Pico W is
+    <span style="color: deeppink;">{temp_test}°{unit}</span></p><br>
+    <h1>Control the LED on the Pico W with these buttons:</h1><br>
     <form accept-charset="utf-8" method="POST">
     <button class="button" name="LED ON" value="ON" type="submit">LED ON</button></a></p></form>
     <p><form accept-charset="utf-8" method="POST">
     <button class="button" name="LED OFF" value="OFF" type="submit">LED OFF</button></a></p></form>
     <h1>Party?</h>
     <p><form accept-charset="utf-8" method="POST">
-    <button class="button" name="party" type="submit">PARTY!</button></a></p></form>
+    <button class="button" name="party" value="party" type="submit">PARTY!</button></a></p></form>
     </body></html>
     """
     return html
