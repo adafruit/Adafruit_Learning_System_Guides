@@ -2,16 +2,20 @@
 #
 # SPDX-License-Identifier: MIT
 
-'''Adapted from the FFT Example: Waterfall Spectrum Analyzer
+"""Adapted from the FFT Example: Waterfall Spectrum Analyzer
 by Jeff Epler
-https://learn.adafruit.com/ulab-crunch-numbers-fast-with-circuitpython/overview '''
+https://learn.adafruit.com/ulab-crunch-numbers-fast-with-circuitpython/overview """
 
 import array
 import board
 import audiobusio
 import busio
 from ulab import numpy as np
-from ulab.scipy.signal import spectrogram
+
+try:
+    from ulab.utils import spectrogram
+except ImportError:
+    from ulab.scipy.signal import spectrogram
 import adafruit_is31fl3741
 from adafruit_is31fl3741.adafruit_rgbmatrixqt import Adafruit_RGBMatrixQT
 
@@ -30,34 +34,79 @@ is31.enable = True
 #  array of colors for the LEDs
 #  goes from purple to red
 #  gradient generated using https://colordesigner.io/gradient-generator
-heatmap = [0xb000ff,0xa600ff,0x9b00ff,0x8f00ff,0x8200ff,
-           0x7400ff,0x6500ff,0x5200ff,0x3900ff,0x0003ff,
-           0x0003ff,0x0047ff,0x0066ff,0x007eff,0x0093ff,
-           0x00a6ff,0x00b7ff,0x00c8ff,0x00d7ff,0x00e5ff,
-           0x00e0ff,0x00e6fd,0x00ecf6,0x00f2ea,0x00f6d7,
-           0x00fac0,0x00fca3,0x00fe81,0x00ff59,0x00ff16,
-           0x00ff16,0x45ff08,0x62ff00,0x78ff00,0x8bff00,
-           0x9bff00,0xaaff00,0xb8ff00,0xc5ff00,0xd1ff00,
-           0xedff00,0xf5eb00,0xfcd600,0xffc100,0xffab00,
-           0xff9500,0xff7c00,0xff6100,0xff4100,0xff0000,
-           0xff0000,0xff0000]
+heatmap = [
+    0xB000FF,
+    0xA600FF,
+    0x9B00FF,
+    0x8F00FF,
+    0x8200FF,
+    0x7400FF,
+    0x6500FF,
+    0x5200FF,
+    0x3900FF,
+    0x0003FF,
+    0x0003FF,
+    0x0047FF,
+    0x0066FF,
+    0x007EFF,
+    0x0093FF,
+    0x00A6FF,
+    0x00B7FF,
+    0x00C8FF,
+    0x00D7FF,
+    0x00E5FF,
+    0x00E0FF,
+    0x00E6FD,
+    0x00ECF6,
+    0x00F2EA,
+    0x00F6D7,
+    0x00FAC0,
+    0x00FCA3,
+    0x00FE81,
+    0x00FF59,
+    0x00FF16,
+    0x00FF16,
+    0x45FF08,
+    0x62FF00,
+    0x78FF00,
+    0x8BFF00,
+    0x9BFF00,
+    0xAAFF00,
+    0xB8FF00,
+    0xC5FF00,
+    0xD1FF00,
+    0xEDFF00,
+    0xF5EB00,
+    0xFCD600,
+    0xFFC100,
+    0xFFAB00,
+    0xFF9500,
+    0xFF7C00,
+    0xFF6100,
+    0xFF4100,
+    0xFF0000,
+    0xFF0000,
+    0xFF0000,
+]
 
 #  size of the FFT data sample
 fft_size = 64
 
 #  setup for onboard mic
-mic = audiobusio.PDMIn(board.MICROPHONE_CLOCK, board.MICROPHONE_DATA,
-                       sample_rate=16000, bit_depth=16)
+mic = audiobusio.PDMIn(
+    board.MICROPHONE_CLOCK, board.MICROPHONE_DATA, sample_rate=16000, bit_depth=16
+)
 
 #  use some extra sample to account for the mic startup
-samples_bit = array.array('H', [0] * (fft_size+3))
+samples_bit = array.array("H", [0] * (fft_size + 3))
 
 #  sends visualized data to the RGB matrix with colors
 def waves(data, y):
-    offset = max(0, (13-len(data))//2)
+    offset = max(0, (13 - len(data)) // 2)
 
     for x in range(min(13, len(data))):
-        is31.pixel(x+offset, y, heatmap[int(data[x])])
+        is31.pixel(x + offset, y, heatmap[int(data[x])])
+
 
 # main loop
 def main():
@@ -78,7 +127,7 @@ def main():
         # spectrum() is always nonnegative, but add a tiny value
         # to change any zeros to nonzero numbers
         spectrogram1 = np.log(spectrogram1 + 1e-7)
-        spectrogram1 = spectrogram1[1:(fft_size//2)-1]
+        spectrogram1 = spectrogram1[1 : (fft_size // 2) - 1]
         #  sets range of the spectrogram
         min_curr = np.min(spectrogram1)
         max_curr = np.max(spectrogram1)
@@ -86,10 +135,10 @@ def main():
         if max_curr > max_all:
             max_all = max_curr
         else:
-            max_curr = max_curr-1
+            max_curr = max_curr - 1
         min_curr = max(min_curr, 3)
         # stores spectrogram in data
-        data = (spectrogram1 - min_curr) * (51. / (max_all - min_curr))
+        data = (spectrogram1 - min_curr) * (51.0 / (max_all - min_curr))
         # sets negative numbers to zero
         data = data * np.array((data > 0))
         #  resets y
@@ -100,5 +149,6 @@ def main():
         scroll_offset = (y + 1) % 9
         #  writes data to the RGB matrix
         is31.show()
+
 
 main()

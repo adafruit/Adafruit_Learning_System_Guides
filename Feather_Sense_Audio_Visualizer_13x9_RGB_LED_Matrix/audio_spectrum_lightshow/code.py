@@ -18,11 +18,11 @@ import adafruit_is31fl3741
 from adafruit_is31fl3741.adafruit_rgbmatrixqt import Adafruit_RGBMatrixQT
 from rainbowio import colorwheel
 from ulab import numpy as np
-#  if using CP7 and below:
-from ulab.scipy.signal import spectrogram
-#  if using CP8 and above:
-#  from ulab.utils import spectrogram
 
+try:
+    from ulab.utils import spectrogram
+except ImportError:
+    from ulab.scipy.signal import spectrogram
 
 # FFT/SPECTRUM CONFIG ----
 
@@ -40,7 +40,7 @@ high_bin = 75  # Highest bin "
 i2c = I2C(board.SCL, board.SDA, frequency=1000000)
 
 # Initialize the IS31 LED driver, buffered for smoother animation
-#glasses = LED_Glasses(i2c, allocate=adafruit_is31fl3741.MUST_BUFFER)
+# glasses = LED_Glasses(i2c, allocate=adafruit_is31fl3741.MUST_BUFFER)
 glasses = Adafruit_RGBMatrixQT(i2c, allocate=adafruit_is31fl3741.MUST_BUFFER)
 
 glasses.show()  # Clear any residue on startup
@@ -152,7 +152,7 @@ while True:
 
         # Apply vertical scale to spectrum data. Results may exceed
         # matrix height...that's OK, adds impact!
-        #data = (spectrum - lower) * (7 / (dynamic_level - lower))
+        # data = (spectrum - lower) * (7 / (dynamic_level - lower))
         data = (spectrum - lower) * ((glasses.height + 2) / (dynamic_level - lower))
 
         for column, element in enumerate(column_table):
