@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2022 Jeff Epler for Adafruit Industries
+# SPDX-License-Identifier: MIT
 from adafruit_hid.consumer_control_code import ConsumerControlCode as C
 from adafruit_hid.keycode import Keycode as K
 

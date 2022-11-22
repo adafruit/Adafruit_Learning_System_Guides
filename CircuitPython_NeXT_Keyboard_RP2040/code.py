@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2022 Jeff Epler for Adafruit Industries
+# SPDX-License-Identifier: MIT
 import array
 import time
 
@@ -70,8 +72,6 @@ def set_leds(i):
     return pack_message_str(f"0000000001110{i:02b}0000000")
 
 
-TEST1 = pack_message_str("010100")
-TEST2 = pack_message_str("001010")
 QUERY = pack_message_str("000001000", 1)
 RESET = pack_message_str("0111101111110000000000")
 
@@ -84,7 +84,7 @@ def is_make(report):
 
 
 def is_mod_report(report):
-    return not report & 1
+    return not bool(report & BIT_MOD)
 
 
 # keycode bits are backwards compared to other information sources
