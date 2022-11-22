@@ -5,7 +5,7 @@ MASK_CC = 1 << 15
 
 
 def is_cc(value):
-    return value & MASK_CC
+    return isinstance(value, int) and (value & MASK_CC)
 
 
 def cc_value(value):
@@ -21,6 +21,8 @@ next_modifiers = [
     K.SHIFT,
     K.CONTROL,
 ]
+
+shift_modifiers = (1<<4) | (1<<5)
 
 next_scancodes = {
     3: K.BACKSLASH,
@@ -100,4 +102,9 @@ next_scancodes = {
     2: C.VOLUME_DECREMENT | MASK_CC,
     25: C.BRIGHTNESS_INCREMENT | MASK_CC,
     1: C.BRIGHTNESS_DECREMENT | MASK_CC,
+}
+
+shifted_codes = {
+    39: K.BACKSLASH, # already shifted
+    40: (K.BACKSLASH,), # will temporarily undo shift
 }

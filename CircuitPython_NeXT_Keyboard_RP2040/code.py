@@ -5,12 +5,18 @@ import board
 import rp2pio
 import usb_hid
 from adafruit_hid.consumer_control import ConsumerControl
-from adafruit_hid.consumer_control_code import ConsumerControlCode
 from adafruit_hid.keyboard import Keyboard
 from adafruit_pioasm import Program
 from adafruit_ticks import ticks_add, ticks_less, ticks_ms
 
-from next_keycode import cc_value, is_cc, next_modifiers, next_scancodes
+from next_keycode import (
+    cc_value,
+    is_cc,
+    next_modifiers,
+    next_scancodes,
+    shifted_codes,
+    shift_modifiers,
+)
 
 NEXT_SERIAL_BUS_FREQUENCY = (
     18958  # 455kHz/24 https://journal.spencerwnelson.com/entries/nextkb.html
@@ -19,18 +25,19 @@ NEXT_SERIAL_BUS_FREQUENCY = (
 pio_program = Program(
     """
 top:
+    set pins, 1
     pull block             ; wait for send request
     out x, 1               ; trigger receive?
     out y, 7               ; get count of bits to transmit (minus 1)
 
-    set pins, 1
-bitloop:              
+bitloop:
     out pins, 1        [7] ; send next bit
     jmp y--, bitloop   [7] ; loop if bits left to send
 
     set pins, 1            ; idle the bus after last bit
     jmp !x, top            ; to top if no scancode expected
 
+    set pins, 1            ; mark bus as idle so keyboard will send
     set y, 19              ; 20 bits to receive
 
     wait 0, pin 0 [7]      ; wait for falling edge plus half bit time
@@ -41,6 +48,7 @@ recvloop:
     push                   ; send report to CircuitPython
 """
 )
+
 
 def pack_message(bitcount, data, trigger_receive=False):
     if bitcount > 24:
@@ -76,7 +84,7 @@ def is_make(report):
 
 
 def is_mod_report(report):
-    return not (report & 1)
+    return not report & 1
 
 
 # keycode bits are backwards compared to other information sources
@@ -107,6 +115,7 @@ sm = rp2pio.StateMachine(
     **pio_program.pio_kwargs,
 )
 
+
 class KeyboardHandler:
     def __init__(self):
         self.old_modifiers = 0
@@ -114,57 +123,77 @@ class KeyboardHandler:
         self.kbd = Keyboard(usb_hid.devices)
 
     def set_key_state(self, key, state):
-        print("set_key_state", key, state)
         if state:
-            self.kbd.press(key)
+            if isinstance(key, tuple):
+                old_report_modifier = self.kbd.report_modifier[0]
+                self.kbd.report_modifier[0] = 0
+                self.kbd.press(*key)
+                self.kbd.release_all()
+                self.kbd.report_modifier[0] = old_report_modifier
+            else:
+                self.kbd.press(key)
         else:
-            self.kbd.release(key)
+            if isinstance(key, tuple):
+                pass
+            else:
+                self.kbd.release(key)
 
-    def handle_report(self, value):
-        if value == 1536:
+    def handle_report(self, report_value):
+        if report_value == 1536: # the "nothing happened" report
             return
 
-        if is_mod_report(value):
-            mods = modifiers(value)
-            changes = self.old_modifiers ^ mods
-            self.old_modifiers = mods
-            for i in range(7):
-                bit = 1 << i
-                if changes & bit:  # Modifier key pressed or released
-                    self.set_key_state(next_modifiers[i], mods & bit)
-        else:
-            code = next_scancodes.get(keycode(value))
-            make = is_make(value)
-            if code:
-                if is_cc(code):
-                    if make:
-                        self.cc.send(cc_value(code))
-                else:
-                    self.set_key_state(code, make)
+        # Handle modifier changes
+        mods = modifiers(report_value)
+        changes = self.old_modifiers ^ mods
+        self.old_modifiers = mods
+        for i in range(7):
+            bit = 1 << i
+            if changes & bit:  # Modifier key pressed or released
+                self.set_key_state(next_modifiers[i], mods & bit)
+
+        # Handle key press/release
+        code = next_scancodes.get(keycode(report_value))
+        if mods & shift_modifiers:
+            code = shifted_codes.get(keycode(report_value), code)
+        make = is_make(report_value)
+        if code:
+            if is_cc(code):
+                if make:
+                    self.cc.send(cc_value(code))
+            else:
+                self.set_key_state(code, make)
 
 
 handler = KeyboardHandler()
 
 recv_buf = array.array("I", [0])
 
+time.sleep(0.1)
 sm.write(RESET)
 time.sleep(0.1)
-sm.write(set_leds(0))
-time.sleep(0.1)
+
+for _ in range(4):
+    sm.write(set_leds(3))
+    time.sleep(0.1)
+    sm.write(set_leds(0))
+    time.sleep(0.1)
 
 print("Keyboard ready!")
 
-while True:
-    sm.write(QUERY)
-    deadline = ticks_add(ticks_ms(), 100)
-    while ticks_less(ticks_ms(), deadline):
-        if sm.in_waiting:
-            sm.readinto(recv_buf)
-            value = recv_buf[0]
-            handler.handle_report(value)
-            break
-    else:
-        print("keyboard did not respond - resetting")
-        sm.restart()
-        sm.write(RESET)
-        time.sleep(0.1)
+try:
+    while True:
+        sm.write(QUERY)
+        deadline = ticks_add(ticks_ms(), 100)
+        while ticks_less(ticks_ms(), deadline):
+            if sm.in_waiting:
+                sm.readinto(recv_buf)
+                value = recv_buf[0]
+                handler.handle_report(value)
+                break
+        else:
+            print("keyboard did not respond - resetting")
+            sm.restart()
+            sm.write(RESET)
+            time.sleep(0.1)
+finally:  # Release all keys before e.g., code is reloaded
+    handler.kbd.release_all()
