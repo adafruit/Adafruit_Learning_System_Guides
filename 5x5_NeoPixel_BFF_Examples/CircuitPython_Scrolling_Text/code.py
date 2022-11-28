@@ -13,7 +13,7 @@ font = bitmap_font.load_font("tom-thumb.pcf", Bitmap)
 label = Label(text="Hello World!!  Adafruit QT Py RP2040 + NeoPixel BFF  ", font=font)
 bitmap = label.bitmap
 
-pixels = neopixel.NeoPixel(board.A2, 5*5, brightness=.07, auto_write=False)
+pixels = neopixel.NeoPixel(board.A3, 5*5, brightness=.07, auto_write=False)
 pixels.fill(0)
 pixels.show()
 colors = [0, 0]
