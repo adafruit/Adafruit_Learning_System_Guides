@@ -16,7 +16,8 @@ from adafruit_display_text import label
 import adafruit_displayio_ssd1306
 import adafruit_imageload
 from digitalio import DigitalInOut, Direction
-from adafruit_httpserver import HTTPServer, HTTPResponse
+from adafruit_httpserver.server import HTTPServer
+from adafruit_httpserver.response import HTTPResponse
 from adafruit_onewire.bus import OneWireBus
 from adafruit_ds18x20 import DS18X20
 
@@ -249,5 +250,6 @@ while True:
         #  poll the server for incoming/outgoing requests
         server.poll()
     # pylint: disable=broad-except
-    except Exception:
+    except Exception as e:
+        print(e)
         continue
