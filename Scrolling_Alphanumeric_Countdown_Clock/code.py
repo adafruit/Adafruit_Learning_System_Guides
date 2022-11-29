@@ -88,15 +88,22 @@ while True:
             # print(now)
             # print(event_time)
             remaining = time.mktime(event_time) - time.mktime(now)
+            # if it's the day of the event...
             if remaining < 0:
+                # scroll the event message on a loop
                 display.marquee(EVENT_MSG, scroll_speed, loop=True)
+            # calculate the seconds remaining
             secs_remaining = remaining % 60
             remaining //= 60
+            # calculate the minutes remaining
             mins_remaining = remaining % 60
             remaining //= 60
+            # calculate the hours remaining
             hours_remaining = remaining % 24
             remaining //= 24
+            # calculate the days remaining
             days_remaining = remaining
+            # pack the calculated times into a string to scroll
             countdown_string = (
                 "* %d Days, %d Hours, %d Minutes & %s Seconds until %s *"
                 % (
@@ -107,11 +114,15 @@ while True:
                     EVENT_NAME,
                 )
             )
+            # get the length of the packed string
             display_length = len(countdown_string)
             # print(display_length)
+            # calculate the amount of time needed to scroll the string
             scroll_time = display_length * scroll_speed
             # print(scroll_time)
+            # reset the clock
             clock = time.monotonic()
+            # scroll the string once
             display.marquee(countdown_string, scroll_speed, loop=False)
 
     # any errors, reset MCU
