@@ -101,12 +101,11 @@ def modifiers(report):
 
 sm = rp2pio.StateMachine(
     pio_program.assembled,
-    first_sideset_pin=board.D11,
-    first_in_pin=board.D12,
+    first_in_pin=board.MISO,
     pull_in_pin_up=1,
-    first_set_pin=board.D13,
+    first_set_pin=board.MOSI,
     set_pin_count=1,
-    first_out_pin=board.D13,
+    first_out_pin=board.MOSI,
     out_pin_count=1,
     frequency=16 * NEXT_SERIAL_BUS_FREQUENCY,
     in_shift_right=False,
