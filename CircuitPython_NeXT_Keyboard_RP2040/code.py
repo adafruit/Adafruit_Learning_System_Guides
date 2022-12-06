@@ -12,11 +12,6 @@ from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keyboard import Keycode
 from adafruit_pioasm import Program
 from adafruit_ticks import ticks_add, ticks_less, ticks_ms
-
-# Customize the power key's keycode. You can change it to `Keycode.POWER` if
-# you really want to accidentally power off your computer!
-POWER_KEY_SENDS = Keycode.F1
-
 from next_keycode import (
     cc_value,
     is_cc,
@@ -25,6 +20,10 @@ from next_keycode import (
     shifted_codes,
     shift_modifiers,
 )
+
+# Customize the power key's keycode. You can change it to `Keycode.POWER` if
+# you really want to accidentally power off your computer!
+POWER_KEY_SENDS = Keycode.F1
 
 # according to https://journal.spencerwnelson.com/entries/nextkb.html the
 # keyboard's timing source is a 455MHz crystal, and the serial data rate is
