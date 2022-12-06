@@ -6,10 +6,16 @@ import time
 import board
 import rp2pio
 import usb_hid
+from keypad import Keys
 from adafruit_hid.consumer_control import ConsumerControl
 from adafruit_hid.keyboard import Keyboard
+from adafruit_hid.keyboard import Keycode
 from adafruit_pioasm import Program
 from adafruit_ticks import ticks_add, ticks_less, ticks_ms
+
+# Customize the power key's keycode. You can change it to `Keycode.POWER` if
+# you really want to accidentally power off your computer!
+POWER_KEY_SENDS = Keycode.F1
 
 from next_keycode import (
     cc_value,
@@ -20,9 +26,11 @@ from next_keycode import (
     shift_modifiers,
 )
 
-NEXT_SERIAL_BUS_FREQUENCY = (
-    18958  # 455kHz/24 https://journal.spencerwnelson.com/entries/nextkb.html
-)
+# according to https://journal.spencerwnelson.com/entries/nextkb.html the
+# keyboard's timing source is a 455MHz crystal, and the serial data rate is
+# 1/24 the crystal frequency. This differs by a few percent from the "50us" bit
+# time reported in other sources.
+NEXT_SERIAL_BUS_FREQUENCY = round(455_000 / 24)
 
 pio_program = Program(
     """
@@ -162,6 +170,7 @@ class KeyboardHandler:
             else:
                 self.set_key_state(code, make)
 
+keys = Keys([board.SCK], value_when_pressed=False)
 
 handler = KeyboardHandler()
 
@@ -181,6 +190,9 @@ print("Keyboard ready!")
 
 try:
     while True:
+        if (event := keys.events.get()):
+            handler.set_key_state(POWER_KEY_SENDS, event.pressed)
+
         sm.write(QUERY)
         deadline = ticks_add(ticks_ms(), 100)
         while ticks_less(ticks_ms(), deadline):
