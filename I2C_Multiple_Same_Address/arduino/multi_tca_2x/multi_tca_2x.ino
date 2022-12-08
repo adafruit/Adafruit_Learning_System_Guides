@@ -22,12 +22,13 @@ void tcaselect(uint8_t tca, uint8_t channel) {
   // loop over all TCA's
   for (uint8_t i=0; i<TCA_COUNT; i++) {
     Wire.beginTransmission(TCA_ADDRESSES[i]);
-    if (i == tca)
+    if (i == tca) {
       // set output channel for selected TCA
       Wire.write(1 << channel);
-    else
+    } else {
       // for others, turn off all channels
       Wire.write(0);
+    }
     Wire.endTransmission();
   }
 }
