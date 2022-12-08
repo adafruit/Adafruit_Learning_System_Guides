@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2022 Phillip Burgess for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Graphics example for EYESPI-capable color displays. This code:
 // - Functions as a "Hello World" to verify that microcontroller and screen
 //   are communicating.
