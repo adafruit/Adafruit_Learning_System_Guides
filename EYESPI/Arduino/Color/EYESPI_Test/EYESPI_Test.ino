@@ -57,7 +57,7 @@ void setup() {
 #elif (SCREEN_PRODUCT_ID == 5206) // 1.69" 280x240 round-rect TFT
 #define CORNER_RADIUS 22
   display.init(240, 280);
-#elif (SCREEN_PRODUCT_ID == 5206) // 1.9" 320x170 TFT
+#elif (SCREEN_PRODUCT_ID == 5394) // 1.9" 320x170 TFT
   display.init(170, 320);
 #else                             // All ILI9341 TFTs (320x240)
   display.begin();
