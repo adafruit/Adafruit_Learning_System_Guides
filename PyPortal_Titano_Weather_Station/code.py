@@ -20,7 +20,7 @@ except ImportError:
 LOCATION = secrets['location']
 
 # Set up where we'll be fetching data from
-DATA_SOURCE = "http://api.openweathermap.org/data/2.5/weather?q="+LOCATION
+DATA_SOURCE = "https://api.openweathermap.org/data/2.5/weather?q="+LOCATION
 DATA_SOURCE += "&appid="+secrets['openweather_token']
 # You'll need to get a token from openweather.org, looks like 'b6907d289e10d714a6e88b30761fae22'
 DATA_LOCATION = []
