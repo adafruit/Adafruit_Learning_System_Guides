@@ -28,9 +28,9 @@
 // - Check the comments in setup() later that reference various screens.
 
 // **** EDIT PINS TO MATCH YOUR WIRING ****
-#define TFT_CS  A1 // To display chip-select pin
-#define TFT_RST A2 // To display reset pin
-#define TFT_DC  A3 // To display data/command pin
+#define TFT_CS  10 // To display chip-select pin
+#define TFT_RST  9 // To display reset pin
+#define TFT_DC   8 // To display data/command pin
 // For the remaining pins, this code assumes display is wired to hardware SPI
 // on the dev board's primary SPI interface. The display libraries can support
 // secondary SPI (if present) or bitbang (software) SPI, but that's not
@@ -54,12 +54,12 @@ uint8_t rotate = 0; // Current screen orientation (0-3)
 void setup() {
   // Initialize display hardware
 #if (SCREEN_PRODUCT_ID == 5393)   // 1.47" 320x172 round-rect TFT
-#define CORNER_RADIUS 43
+#define CORNER_RADIUS 22
   display.init(172, 320);
 #elif (SCREEN_PRODUCT_ID == 3787) // 1.54" 240x240 TFT
   display.init(240, 240);
 #elif (SCREEN_PRODUCT_ID == 5206) // 1.69" 280x240 round-rect TFT
-#define CORNER_RADIUS 22
+#define CORNER_RADIUS 43
   display.init(240, 280);
 #elif (SCREEN_PRODUCT_ID == 5394) // 1.9" 320x170 TFT
   display.init(170, 320);
