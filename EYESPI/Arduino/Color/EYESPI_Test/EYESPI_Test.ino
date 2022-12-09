@@ -596,6 +596,7 @@ void show_canvas() {
   // and descenders on digits, and in some locales a comma (extending below
   // the baseline) is the decimal separator. Feed ALL the numeric chars into
   // getTextBounds() for a cumulative height:
+  display.setTextWrap(false); // Keep on one line
   display.getTextBounds(F("0123456789.,-"), 0, 0, &x, &y, &w, &h);
 
   // Now declare a GFXcanvas16 object based on the computed width & height:
