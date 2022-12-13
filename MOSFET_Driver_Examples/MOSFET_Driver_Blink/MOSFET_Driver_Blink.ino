@@ -2,15 +2,18 @@
 //
 // SPDX-License-Identifier: MIT
 
-const int driverPin = 3;
+#define driverPin 3
 
 void setup() {
+  while (!Serial);
+  delay(1000);
   Serial.begin(115200);
   Serial.println("Basic MOSFET Driver Test");
   pinMode(driverPin, OUTPUT);
 }
 
 void loop() {
+  
   digitalWrite(driverPin, HIGH);
   Serial.println("The MOSFET driver is triggered.");
   delay(1000);
