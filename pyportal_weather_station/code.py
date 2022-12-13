@@ -24,7 +24,7 @@ from adafruit_io.adafruit_io import IO_HTTP, AdafruitIO_RequestError
 # sensor libs
 import adafruit_veml6075
 import adafruit_sgp30
-import adafruit_bme280
+from adafruit_bme280 import basic as adafruit_bme280
 
 # weatherstation graphics helper
 import weatherstation_helper
