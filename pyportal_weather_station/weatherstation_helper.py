@@ -29,12 +29,10 @@ class WeatherStation_GFX(displayio.Group):
 
         # create background icon group
         self._icon_group = displayio.Group()
-        self.append(self._icon_group)
         board.DISPLAY.show(self._icon_group)
 
         # create text object group
         self._text_group = displayio.Group()
-        self.append(self._text_group)
 
         self._icon_sprite = None
         self._icon_file = None
@@ -51,38 +49,31 @@ class WeatherStation_GFX(displayio.Group):
         self.title_text = Label(self.c_font, text = "PyPortal Weather Station")
         self.title_text.x = 50
         self.title_text.y = 10
-        self._text_group.append(self.title_text)
 
         self.io_status_text = Label(self.c_font)
         self.io_status_text.x = 65
         self.io_status_text.y = 190
-        self._text_group.append(self.io_status_text)
 
         # Set up Labels to label sensor data
         self.veml_text = Label(self.medium_font)
         self.veml_text.x = 3
         self.veml_text.y = 40
-        self._text_group.append(self.veml_text)
 
         self.bme_temp_humid_text = Label(self.medium_font)
         self.bme_temp_humid_text.x = 0
         self.bme_temp_humid_text.y = 70
-        self._text_group.append(self.bme_temp_humid_text)
 
         self.wind_speed_text = Label(self.medium_font)
         self.wind_speed_text.x = 0
         self.wind_speed_text.y = 100
-        self._text_group.append(self.wind_speed_text)
 
         self.bme_pres_alt_text = Label(self.medium_font)
         self.bme_pres_alt_text.x = 0
         self.bme_pres_alt_text.y = 130
-        self._text_group.append(self.bme_pres_alt_text)
 
         self.sgp_text = Label(self.medium_font)
         self.sgp_text.x = 0
         self.sgp_text.y = 155
-        self._text_group.append(self.sgp_text)
 
         board.DISPLAY.show(self._text_group)
 
@@ -91,11 +82,7 @@ class WeatherStation_GFX(displayio.Group):
         :param str status_text: Description of Adafruit IO status
         """
         self.io_status_text.text = status_text
-        try:
-            board.DISPLAY.refresh(target_frames_per_second=60)
-        except AttributeError:
-            board.DISPLAY.refresh_soon()
-            board.DISPLAY.wait_for_frame()
+        board.DISPLAY.refresh(target_frames_per_second=60)
 
 
     def display_data(self, uv_index, bme_data, sgp_data, wind_speed):
@@ -131,11 +118,7 @@ class WeatherStation_GFX(displayio.Group):
         print("eCO2 = %d ppm \t TVOC = %d ppb"%(sgp_data[0], sgp_data[1]))
         self.sgp_text.text = "eCO2: %d ppm, TVOC: %d ppb"%(sgp_data[0], sgp_data[1])
 
-        try:
-            board.DISPLAY.refresh(target_frames_per_second=60)
-        except AttributeError:
-            board.DISPLAY.refresh_soon()
-            board.DISPLAY.wait_for_frame()
+        board.DISPLAY.refresh(target_frames_per_second=60)
 
 
     def set_icon(self, filename):
@@ -163,10 +146,4 @@ class WeatherStation_GFX(displayio.Group):
         # self._icon_sprite = displayio.TileGrid(
         #     icon,
         #     pixel_shader=icon.pixel_shader)
-
-        self._icon_group.append(self._icon_sprite)
-        try:
-            board.DISPLAY.refresh(target_frames_per_second=60)
-        except AttributeError:
-            board.DISPLAY.refresh_soon()
-            board.DISPLAY.wait_for_frame()
+        board.DISPLAY.refresh(target_frames_per_second=60)
