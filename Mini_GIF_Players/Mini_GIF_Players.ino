@@ -9,8 +9,8 @@
 #include <Adafruit_ST7735.h> // Hardware-specific library for ST7735
 #include <Adafruit_ST7789.h> // Hardware-specific library for ST7789
 
-#define TFT_CS         5
-#define TFT_DC         6
+#define TFT_CS         7
+#define TFT_DC         8
 #define TFT_RST        9
 
 #define DISPLAY_WIDTH 320
