@@ -165,6 +165,7 @@ while True:
         # checks if it's day or night based on hour
         # & returns day or night version of sprite
         img = day_or_night(new_time)
+        label.text = "   %s°%s   " % (temp, temp_unit)
         # reset clock
         clock = ticks_add(clock, weather_check)
     # draw bitmap sprite
