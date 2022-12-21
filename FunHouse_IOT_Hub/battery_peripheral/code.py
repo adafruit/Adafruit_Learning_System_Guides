@@ -97,7 +97,9 @@ io.on_message = message
 print("Connecting to Adafruit IO...")
 io.connect()
 
-display_bus = displayio.I2CDisplay(board.I2C(), device_address=0x3C)
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
+display_bus = displayio.I2CDisplay(i2c, device_address=0x3C)
 
 WIDTH = 128
 HEIGHT = 32

@@ -20,7 +20,9 @@ from adafruit_is31fl3741.adafruit_ledglasses import LED_Glasses
 
 # HARDWARE SETUP ----
 
-i2c = board.I2C()  # Shared by both the accelerometer and LED controller
+# Shared by both the accelerometer and LED controller
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
 
 # Initialize the accelerometer
 lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c)

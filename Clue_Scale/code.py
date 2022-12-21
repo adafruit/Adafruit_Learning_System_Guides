@@ -38,7 +38,9 @@ FYI: A US dime coin weighs 2.268 grams or 0.079 ounces."""
 CALIB_RATIO = 100 / 215300  # load cell serial#4540-02
 
 # Instantiate the Sensor and Display
-nau7802 = NAU7802(board.I2C(), address=0x2A, active_channels=1)
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
+nau7802 = NAU7802(i2c, address=0x2A, active_channels=1)
 
 display = board.DISPLAY
 scale_group = displayio.Group()
