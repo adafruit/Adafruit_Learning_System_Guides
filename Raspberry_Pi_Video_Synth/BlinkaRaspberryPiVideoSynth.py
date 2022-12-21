@@ -145,4 +145,3 @@ while True:
         c.send(str.encode(' '.join(["flight", str(flight)])))
             #  reset last_flight
         last_flight = flight
-    
