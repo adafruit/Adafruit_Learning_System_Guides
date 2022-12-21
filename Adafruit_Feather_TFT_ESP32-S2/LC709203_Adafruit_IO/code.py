@@ -33,7 +33,9 @@ led = digitalio.DigitalInOut(board.LED)
 led.switch_to_output()
 
 # Set up the LC709203 sensor
-battery_monitor = LC709203F(board.I2C())
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
+battery_monitor = LC709203F(i2c)
 battery_monitor.pack_size = battery_pack_size
 
 # Collect the sensor data values and format the data

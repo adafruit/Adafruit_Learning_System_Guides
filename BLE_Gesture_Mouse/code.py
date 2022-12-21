@@ -17,7 +17,8 @@ from adafruit_ble.services.standard.hid import HIDService
 from adafruit_ble.services.standard.device_info import DeviceInfoService
 
 #  setup I2C
-i2c = board.I2C()
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
 
 #  setup accelerometer
 lsm6ds33 = adafruit_lsm6ds.lsm6ds33.LSM6DS33(i2c)

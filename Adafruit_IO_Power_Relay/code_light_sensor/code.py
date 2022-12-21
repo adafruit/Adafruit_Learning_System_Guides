@@ -61,7 +61,8 @@ power_pin = DigitalInOut(board.D3)
 power_pin.switch_to_output()
 
 # Set up the light sensor
-i2c = board.I2C()
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
 sensor = adafruit_bh1750.BH1750(i2c)
 
 ### Feeds ###

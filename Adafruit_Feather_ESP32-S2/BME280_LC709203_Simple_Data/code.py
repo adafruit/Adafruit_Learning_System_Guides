@@ -9,9 +9,10 @@ from adafruit_bme280 import basic as adafruit_bme280
 from adafruit_lc709203f import LC709203F, PackSize
 
 # Create sensor objects, using the board's default I2C bus.
-i2c = board.I2C()
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
 bme280 = adafruit_bme280.Adafruit_BME280_I2C(i2c)
-battery_monitor = LC709203F(board.I2C())
+battery_monitor = LC709203F(i2c)
 battery_monitor.pack_size = PackSize.MAH400
 
 # change this to match your location's pressure (hPa) at sea level

@@ -83,7 +83,8 @@ audio = AudioOut(board.A0)  # Speaker
 wave_file = None
 
 # Set up accelerometer on I2C bus, 4G range:
-i2c = board.I2C()
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
 accel = adafruit_lis3dh.LIS3DH_I2C(i2c)
 accel.range = adafruit_lis3dh.RANGE_4_G
 
