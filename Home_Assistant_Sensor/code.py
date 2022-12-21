@@ -23,7 +23,9 @@ MQTT_TOPIC = "state/temp-sensor"
 USE_DEEP_SLEEP = True
 
 # Connect to the Sensor
-sht = adafruit_shtc3.SHTC3(board.I2C())
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
+sht = adafruit_shtc3.SHTC3(i2c)
 
 # Add a secrets.py to your filesystem that has a dictionary called secrets with "ssid" and
 # "password" keys with your WiFi credentials. DO NOT share that file or commit it into Git or other

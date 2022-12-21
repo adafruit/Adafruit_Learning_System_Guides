@@ -25,7 +25,8 @@ gate = DigitalInOut(board.A1)
 gate.direction = Direction.OUTPUT
 
 #  i2c setup
-i2c = board.I2C()
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
 #  dac setup over i2c
 dac = adafruit_mcp4725.MCP4725(i2c)
 
