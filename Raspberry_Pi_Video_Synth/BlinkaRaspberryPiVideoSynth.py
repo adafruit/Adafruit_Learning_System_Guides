@@ -11,10 +11,12 @@ from adafruit_seesaw import seesaw, rotaryio, neopixel
 from adafruit_seesaw.analoginput import AnalogInput
 
 #  VL53L4CD setup
-vl53 = adafruit_vl53l4cd.VL53L4CD(board.I2C())
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
+vl53 = adafruit_vl53l4cd.VL53L4CD(i2c)
 
 # rotary encoder setup
-encoder = seesaw.Seesaw(board.I2C(), addr=0x36)
+encoder = seesaw.Seesaw(i2c, addr=0x36)
 encoder.pin_mode(24, encoder.INPUT_PULLUP)
 rot_encoder = rotaryio.IncrementalEncoder(encoder)
 
@@ -22,15 +24,15 @@ rot_encoder = rotaryio.IncrementalEncoder(encoder)
 # 0x30 = red control
 # 0x31 = green control
 # 0x32 = blue control
-red_slider = seesaw.Seesaw(board.I2C(), 0x30)
+red_slider = seesaw.Seesaw(i2c, 0x30)
 red_pot = AnalogInput(red_slider, 18)
 r_pix = neopixel.NeoPixel(red_slider, 14, 4)
 
-g_slider = seesaw.Seesaw(board.I2C(), 0x31)
+g_slider = seesaw.Seesaw(i2c, 0x31)
 green_pot = AnalogInput(g_slider, 18)
 g_pix = neopixel.NeoPixel(g_slider, 14, 4)
 
-b_slider = seesaw.Seesaw(board.I2C(), 0x32)
+b_slider = seesaw.Seesaw(i2c, 0x32)
 blue_pot = AnalogInput(b_slider, 18)
 b_pix = neopixel.NeoPixel(b_slider, 14, 4)
 

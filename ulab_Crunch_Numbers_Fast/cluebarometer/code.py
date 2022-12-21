@@ -136,7 +136,8 @@ def sleep_deadline(deadline_ns):
 
 
 # Initialize our sensor
-i2c = board.I2C()
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
 sensor = adafruit_bmp280.Adafruit_BMP280_I2C(i2c)
 sensor.standby_period = adafruit_bmp280.STANDBY_TC_1000
 # Disable in-sensor filtering, because we want to show how it's done in
