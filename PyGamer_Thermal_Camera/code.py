@@ -27,7 +27,8 @@ if hasattr(board, "JOYSTICK_X"):
 else: panel.has_joystick = False  # Must be PyBadge
 
 # Establish I2C interface for the AMG8833 Thermal Camera
-i2c = board.I2C()
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
 amg8833 = adafruit_amg88xx.AMG88XX(i2c)
 
 # Load the text font from the fonts folder
