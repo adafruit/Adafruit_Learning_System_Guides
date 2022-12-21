@@ -15,7 +15,8 @@ font = terminalio.FONT
 
 displayio.release_displays()
 
-i2c = board.I2C()
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
 display_bus = displayio.I2CDisplay(i2c, device_address=0x3c)
 oled = adafruit_displayio_ssd1306.SSD1306(display_bus, width=128, height=32)
 

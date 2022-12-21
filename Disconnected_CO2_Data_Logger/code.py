@@ -11,7 +11,8 @@ import storage
 import adafruit_pcf8523
 
 #  setup for I2C
-i2c = board.I2C()
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
 #  setup for SCD40
 scd4x = adafruit_scd4x.SCD4X(i2c)
 #  setup for RTC

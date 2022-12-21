@@ -19,7 +19,9 @@ SAMPLE_AVG = 500  # Number of sample values to average
 DEFAULT_GAIN = 128  # Default gain for internal PGA
 
 # Instantiate 24-bit load sensor ADC
-nau7802 = NAU7802(board.I2C(), address=0x2A, active_channels=1)
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
+nau7802 = NAU7802(i2c, address=0x2A, active_channels=1)
 
 
 def zero_channel():

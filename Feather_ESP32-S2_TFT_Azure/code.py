@@ -84,8 +84,10 @@ minute = cal[4]
 # (https://github.com/adafruit/Adafruit_CircuitPython_Bundle):
 # * adafruit-circuitpython-minimqtt
 # * adafruit-circuitpython-requests
+
 # Create sensor object, communicating over the board's default I2C bus
 i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
 bme680 = adafruit_bme680.Adafruit_BME680_I2C(i2c, debug=False)
 
 # change this to match the location's pressure (hPa) at sea level
@@ -106,7 +108,7 @@ print("Connected to Azure IoT Central!")
 temperature_offset = -5
 
 # Create sensor object, using the board's default I2C bus.
-battery_monitor = LC709203F(board.I2C())
+battery_monitor = LC709203F(i2c)
 
 # Update to match the mAh of your battery for more accurate readings.
 # Can be MAH100, MAH200, MAH400, MAH500, MAH1000, MAH2000, MAH3000.
