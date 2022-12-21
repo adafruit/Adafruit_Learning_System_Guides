@@ -32,7 +32,8 @@ pixel = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0)
 pixel.fill((0, 0, 0))
 
 # Use for I2C for STEMMA OLED
-i2c = board.I2C()
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
 display_bus = displayio.I2CDisplay(i2c, device_address=0x3D, reset=oled_reset)
 
 #  STEMMA OLED dimensions. can have height of 64, but 32 makes text larger

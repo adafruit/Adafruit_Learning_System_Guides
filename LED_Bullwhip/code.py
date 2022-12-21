@@ -70,7 +70,8 @@ strip.show()
 
 WAVE_FILE = None
 
-i2c = board.I2C()
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
 
 #Set up accelerometer & mic
 

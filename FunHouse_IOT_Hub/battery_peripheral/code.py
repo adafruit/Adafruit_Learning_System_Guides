@@ -116,7 +116,9 @@ alarm_label = label.Label(terminalio.FONT, text="Voltage: ", color=0xFFFFFF, x=4
 splash.append(alarm_label)
 
 
-sensor = LC709203F(board.I2C())
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
+sensor = LC709203F(i2c)
 
 start = 0
 while True:

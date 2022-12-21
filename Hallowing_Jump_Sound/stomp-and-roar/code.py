@@ -54,16 +54,17 @@ except AttributeError:
     pass
 
 # Set up accelerometer on I2C bus, 4G range:
-I2C = board.I2C()
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
 if IS_HALLOWING_M4:
     import adafruit_msa301
-    ACCEL = adafruit_msa301.MSA301(I2C)
+    ACCEL = adafruit_msa301.MSA301(i2c)
 else:
     import adafruit_lis3dh
     try:
-        ACCEL = adafruit_lis3dh.LIS3DH_I2C(I2C, address=0x18) # Production board
+        ACCEL = adafruit_lis3dh.LIS3DH_I2C(i2c, address=0x18) # Production board
     except ValueError:
-        ACCEL = adafruit_lis3dh.LIS3DH_I2C(I2C, address=0x19) # Beta hardware
+        ACCEL = adafruit_lis3dh.LIS3DH_I2C(i2c, address=0x19) # Beta hardware
     ACCEL.range = adafruit_lis3dh.RANGE_4_G
 
 STEP_INTERVAL_MIN = 0.3 # Shortest interval to walk one step (seconds)

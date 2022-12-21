@@ -17,7 +17,9 @@ UPDATE_RATE = 60
 #--| User Config |-----------------------------------------------
 
 # Sensor setup
-bme = adafruit_bme280.Adafruit_BME280_I2C(board.I2C())
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
+bme = adafruit_bme280.Adafruit_BME280_I2C(i2c)
 
 # Google Sheets API setup
 SCOPES = ['https://spreadsheets.google.com/feeds',
