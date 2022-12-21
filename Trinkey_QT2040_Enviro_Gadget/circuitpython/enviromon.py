@@ -23,9 +23,11 @@ if usb_cdc.data is None:
         pass
 
 # setup stuff
-scd = adafruit_scd4x.SCD4X(board.I2C())
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
+scd = adafruit_scd4x.SCD4X(i2c)
 scd.start_periodic_measurement()
-bme = adafruit_bme280.Adafruit_BME280_I2C(board.I2C())
+bme = adafruit_bme280.Adafruit_BME280_I2C(i2c)
 pixel = neopixel.NeoPixel(board.NEOPIXEL, 1)
 
 # CSV output

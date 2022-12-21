@@ -7,10 +7,12 @@ import board
 import adafruit_scd4x
 from adafruit_bme280 import basic as adafruit_bme280
 
-scd = adafruit_scd4x.SCD4X(board.I2C())
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
+scd = adafruit_scd4x.SCD4X(i2c)
 scd.start_periodic_measurement()
 
-bme = adafruit_bme280.Adafruit_BME280_I2C(board.I2C())
+bme = adafruit_bme280.Adafruit_BME280_I2C(i2c)
 
 while True:
     time.sleep(5)
