@@ -36,7 +36,9 @@ up_threshold = 8
 number_of_pixels = 32
 
 # Set up accelerometer and LEDs.
-lis3dh = adafruit_lis3dh.LIS3DH_I2C(board.I2C())
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
+lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c)
 pixels = neopixel.NeoPixel(board.A3, number_of_pixels, brightness=led_brightness)
 pixels.fill(0)  # Turn off the LEDs if they're on.
 

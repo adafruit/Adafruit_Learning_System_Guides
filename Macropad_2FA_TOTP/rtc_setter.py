@@ -6,7 +6,9 @@ import time
 import board
 import adafruit_pcf8523
 
-pcf = adafruit_pcf8523.PCF8523(board.I2C())
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
+pcf = adafruit_pcf8523.PCF8523(i2c)
 
 # values to set
 YEAR = 2021

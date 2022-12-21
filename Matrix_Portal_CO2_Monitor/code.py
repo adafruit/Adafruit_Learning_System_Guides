@@ -15,7 +15,9 @@ UPDATE_RATE = 1
 # ---------------------
 
 # the sensor
-scd30 = adafruit_scd30.SCD30(board.I2C())
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
+scd30 = adafruit_scd30.SCD30(i2c)
 
 # optional if known (pick one)
 # scd30.ambient_pressure = 1013.25

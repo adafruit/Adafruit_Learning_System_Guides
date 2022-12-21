@@ -30,7 +30,9 @@ advertisement = ProvideServicesAdvertisement(uart_service)
 
 num_motors = 1  # up to 4 motors depending on the prop you are driving
 
-motorwing = MotorKit(i2c=board.I2C())
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
+motorwing = MotorKit(i2c=i2c)
 motorwing.frequency = 122  # tune this 50 - 200 range
 max_throttle = 0.65  # tune this 0.2 - 1 range
 

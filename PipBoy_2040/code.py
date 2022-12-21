@@ -10,8 +10,9 @@ from adafruit_st7789 import ST7789
 
 displayio.release_displays()
 
-i2c_bus = board.I2C()
-ss = Seesaw(i2c_bus)
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
+ss = Seesaw(i2c)
 
 spi = board.SPI()  # setup for display over SPI
 tft_cs = board.D5

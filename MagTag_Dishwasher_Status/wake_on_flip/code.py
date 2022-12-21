@@ -12,7 +12,9 @@ import adafruit_lis3dh
 epd = board.DISPLAY
 
 # set up accelerometer
-lis = adafruit_lis3dh.LIS3DH_I2C(board.I2C(), address=0x19)
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
+lis = adafruit_lis3dh.LIS3DH_I2C(i2c, address=0x19)
 
 # See: ST Design Tip DT0008 - Simple screen rotation using
 #      the accelerometer built-in 4D detection interrupt
