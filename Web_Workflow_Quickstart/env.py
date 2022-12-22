@@ -15,7 +15,7 @@ def enumerate_toml_files():
     for current_file in all_files:
         if (
             not current_file.startswith("._")
-            and not current_file.endswith(".toml")
+            and current_file.endswith(".toml")
             and current_file != "settings.toml"
         ):
             found_files.append(SETTINGS_FOLDER + current_file)
