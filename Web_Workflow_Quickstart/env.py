@@ -57,7 +57,7 @@ def change_toml_file(toml_file):
         print("You can't change the env file with this script while USB is mounted")
 
 
-# Return a prettier name than the env file
+# Return a prettier name than the toml filename
 def pretty_name(toml_file):
     name = toml_file.rsplit("/", 1)[1]
     name = name[:-5]
