@@ -13,7 +13,11 @@ def enumerate_toml_files():
     found_files = []
     all_files = os.listdir(SETTINGS_FOLDER)
     for current_file in all_files:
-        if current_file[:2] != "._" and current_file[-5:] == ".toml" and current_file != "settings.toml":
+        if (
+            current_file[:2] != "._"
+            and current_file[-5:] == ".toml"
+            and current_file != "settings.toml"
+        ):
             found_files.append(SETTINGS_FOLDER + current_file)
     return found_files
 
@@ -42,11 +46,11 @@ def get_current_toml_file(enumerated_files):
 def change_toml_file(toml_file):
     try:
         storage.remount("/", False)
-        open("settings.toml", "w").close()
+        with open("settings.toml", "w") as settings:
+            settings.write("")
         with open("settings.toml", "w") as settings, open(toml_file) as f:
             for line in f.readlines():
                 settings.write(line)
-        settings.close()
         print("Done. Hard resetting board...")
         microcontroller.reset()
     except RuntimeError:
@@ -59,6 +63,7 @@ def pretty_name(toml_file):
     name = name[:-5]
     name = name[0].upper() + name[1:]
     return f"{name} toml file"
+
 
 toml_files = enumerate_toml_files()
 
