@@ -3,7 +3,7 @@
 """
 CircuitPython Quad-Alphanumeric Display Holiday Countdown.
 
-This demo requires a separate file named .env (including the dot) on your CIRCUITPY drive, which
+This demo requires a separate file named settings.toml on your CIRCUITPY drive, which
 should contain your WiFi credentials and Adafruit IO credentials.
 """
 
