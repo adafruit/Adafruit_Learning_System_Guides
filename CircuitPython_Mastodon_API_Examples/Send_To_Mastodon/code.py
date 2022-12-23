@@ -7,10 +7,10 @@ import wifi
 import socketpool
 import adafruit_requests
 
-# add your mastodon token as 'mastodon_token' to your .env file
+# add your mastodon token as 'mastodon_token' to your settings.toml file
 headers = {'Authorization': 'Bearer ' + os.getenv('mastodon_token')}
 
-# add your mastodon instance to your .env file as mastodon_host
+# add your mastodon instance to your settings.toml file as mastodon_host
 url = 'https://' + os.getenv('mastodon_host') + '/api/v1/statuses'
 
 # connect to SSID

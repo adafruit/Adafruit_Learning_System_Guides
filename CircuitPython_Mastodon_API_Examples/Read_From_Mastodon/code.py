@@ -16,14 +16,15 @@ hashtag = "CircuitPython"
 #  connect to SSID
 wifi.radio.connect(os.getenv('WIFI_SSID'), os.getenv('WIFI_PASSWORD'))
 
-#  add your mastodon token as 'mastodon_token' to your .env file
+#  add your mastodon token as 'mastodon_token' to your settings.toml file
 headers = {'Authorization': 'Bearer ' + os.getenv('mastodon_token') + 'read:statuses'}
 
 pool = socketpool.SocketPool(wifi.radio)
 requests = adafruit_requests.Session(pool, ssl.create_default_context())
 
 #  initial request, gets most recent matching hashtag post
-#  add your mastodon instance (mastodon.social, tech.lgbt, etc) to your .env file as mastodon_host
+#  add your mastodon instance (mastodon.social, tech.lgbt, etc)
+#  to your settings.toml file as mastodon_host
 r = requests.get("https://%s/api/v1/timelines/tag/%s?limit=1" % (os.getenv('mastodon_host'), hashtag), headers=headers) # pylint: disable=line-too-long
 json_data = r.json()
 post_id = str(json_data[0]['id'])
