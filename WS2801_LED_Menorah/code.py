@@ -22,7 +22,7 @@ pixels = adafruit_ws2801.WS2801(board.SDA1, board.SCL1, pixel_num+pixel_offset, 
 pixel_prev = [128] * len(pixels)
 
 lit_candles = None
-night = 1
+night = 0
 timestamp = None
 
 def split(first, second, offset):
@@ -48,14 +48,17 @@ while True:
             time.sleep(0.01) # debounce
         night += 1 # next night
         if night == 9: # wrap around
-            night = 1
+            night = 0  # shamash-only mode
         lit_candles = None # reset the lights
     if not lit_candles:
         print("Current night: ", night)
         night_countup = 0
         timestamp = time.monotonic()-1
 
-    if (night_countup != night) and (time.monotonic() - timestamp >= 1):
+    if night == 0:
+        # special case of shamash-only
+        lit_candles = [False, False, False, False, True, False, False, False, False]
+    elif (night_countup != night) and (time.monotonic() - timestamp >= 1):
         # we slowly 'light' up the candles from left to right, once a second
         night_countup += 1
         lit_candles = [False] * (8-night) + [True] * night_countup + [False] * (night-night_countup)
