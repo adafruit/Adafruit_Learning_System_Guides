@@ -23,6 +23,7 @@ pixel_prev = [128] * len(pixels)
 
 lit_candles = None
 night = 1
+timestamp = None
 
 def split(first, second, offset):
     """
@@ -51,9 +52,16 @@ while True:
         lit_candles = None # reset the lights
     if not lit_candles:
         print("Current night: ", night)
-        lit_candles = [True] * night + [False] * (8-night)
+        night_countup = 0
+        timestamp = time.monotonic()-1
+
+    if (night_countup != night) and (time.monotonic() - timestamp >= 1):
+        # we slowly 'light' up the candles from left to right, once a second
+        night_countup += 1
+        lit_candles = [False] * (8-night) + [True] * night_countup + [False] * (night-night_countup)
         lit_candles.insert(4, True) # shamash always on
-        print(lit_candles)
+        print("Count up candle #", night_countup, lit_candles)
+        timestamp = time.monotonic()
 
     # animate candles
     for p in range(len(pixels)-pixel_offset):
