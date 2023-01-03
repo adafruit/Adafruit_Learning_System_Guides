@@ -17,6 +17,7 @@ import adafruit_displayio_ssd1306
 import adafruit_imageload
 from digitalio import DigitalInOut, Direction
 from adafruit_httpserver.server import HTTPServer
+from adafruit_httpserver.request import HTTPRequest
 from adafruit_httpserver.response import HTTPResponse
 from adafruit_httpserver.methods import HTTPMethod
 from adafruit_httpserver.mime_type import MIMEType
