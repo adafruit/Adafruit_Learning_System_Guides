@@ -18,6 +18,8 @@ import adafruit_imageload
 from digitalio import DigitalInOut, Direction
 from adafruit_httpserver.server import HTTPServer
 from adafruit_httpserver.response import HTTPResponse
+from adafruit_httpserver.methods import HTTPMethod
+from adafruit_httpserver.mime_type import MIMEType
 from adafruit_onewire.bus import OneWireBus
 from adafruit_ds18x20 import DS18X20
 
@@ -138,13 +140,14 @@ def webpage():
 
 #  route default static IP
 @server.route("/")
-def base(request):  # pylint: disable=unused-argument
+def base(request: HTTPRequest):  # pylint: disable=unused-argument
     #  serve the HTML f string
     #  with content type text/html
-    return HTTPResponse(content_type="text/html", body=webpage())
+    with HTTPResponse(request, content_type=MIMEType.TYPE_HTML) as response:
+        response.send(f"{webpage()}")
 
 #  if a button is pressed on the site
-@server.route("/", "POST")
+@server.route("/", method=HTTPMethod.POST)
 def buttonpress(request):
     #  get the raw text
     raw_text = request.raw_request.decode("utf8")
@@ -162,7 +165,8 @@ def buttonpress(request):
         #  toggle the parrot_pin value
         parrot_pin.value = not parrot_pin.value
     #  reload site
-    return HTTPResponse(content_type="text/html", body=webpage())
+    with HTTPResponse(request, content_type=MIMEType.TYPE_HTML) as response:
+        response.send(f"{webpage()}")
 
 print("starting server..")
 # startup the server
