@@ -19,7 +19,7 @@ i2c = busio.I2C(board.GP1, board.GP0)
 aht20 = adafruit_ahtx0.AHTx0(i2c)
 
 print("Connecting to WiFi...")
-wifi.radio.connect(os.getenv('WIFI_SSID'), os.getenv('WIFI_PASSWORD'))
+wifi.radio.connect(os.getenv('CIRCUITPY_WIFI_SSID'), os.getenv('CIRCUITPY_WIFI_PASSWORD'))
 
 print("Connected to WiFi!")
 
