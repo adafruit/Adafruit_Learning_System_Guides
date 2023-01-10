@@ -55,7 +55,7 @@ def reset_on_error(delay, error):
 
 
 try:
-    wifi.radio.connect(os.getenv("WIFI_SSID"), os.getenv("WIFI_PASSWORD"))
+    wifi.radio.connect(os.getenv("CIRCUITPY_WIFI_SSID"), os.getenv("CIRCUITPY_WIFI_PASSWORD"))
 # any errors, reset MCU
 except Exception as e:  # pylint: disable=broad-except
     reset_on_error(10, e)
