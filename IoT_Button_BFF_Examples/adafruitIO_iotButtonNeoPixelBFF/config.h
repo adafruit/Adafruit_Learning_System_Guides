@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2016 Todd Treece, Adapted 2023 Liz Clark for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
 /************************ Adafruit IO Config *******************************/
 
 // visit io.adafruit.com if you need to create an account,
