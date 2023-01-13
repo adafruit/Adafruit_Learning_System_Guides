@@ -13,6 +13,7 @@ import audioio
 import audiocore
 import displayio
 import digitalio
+import os
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text import bitmap_label as label
 from adafruit_display_shapes.circle import Circle
@@ -21,13 +22,10 @@ import adafruit_touchscreen
 from adafruit_mcp9600 import MCP9600
 
 TITLE = "EZ Make Oven Controller"
-VERSION = "1.3.2"
+VERSION = "1.3.3"
 
 print(TITLE, "version ", VERSION)
 time.sleep(2)
-
-display_group = displayio.Group()
-board.DISPLAY.show(display_group)
 
 PROFILE_SIZE = 2  # plot thickness
 GRID_SIZE = 2
@@ -63,11 +61,6 @@ GXSTART = 100
 GYSTART = 80
 GWIDTH = WIDTH - GXSTART
 GHEIGHT = HEIGHT - GYSTART
-plot = displayio.Bitmap(GWIDTH, GHEIGHT, 4)
-
-display_group.append(
-    displayio.TileGrid(plot, pixel_shader=palette, x=GXSTART, y=GYSTART)
-)
 
 ts = adafruit_touchscreen.Touchscreen(
     board.TOUCH_XL,
@@ -128,6 +121,8 @@ class Beep(object):
 
 
 class ReflowOvenControl(object):
+    global message, timediff, sgraph, timer_data
+
     states = ("wait", "ready", "start", "preheat", "soak", "reflow", "cool")
 
     def __init__(self, pin):
@@ -372,6 +367,8 @@ class Graph(object):
 
 
 def draw_profile(graph, profile):
+    global label_reflow
+
     """Update the display with current info."""
     for i in range(GWIDTH * GHEIGHT):
         plot[i] = 0
@@ -541,182 +538,352 @@ def format_time(seconds):
     return "{:02d}:{:02d}".format(minutes, seconds, width=2)
 
 
-timediff = 0
-oven = ReflowOvenControl(board.D4)
-print("melting point: ", oven.sprofile["melting_point"])
-font1 = bitmap_font.load_font("/fonts/OpenSans-9.bdf")
+def check_buttons_press_location(p, button_details):
+    """
+    Function to easily check a button press within a list of Buttons
+    """
+    for button in button_details:
+        if button.contains(p):
+            return button
+    return None
 
-font2 = bitmap_font.load_font("/fonts/OpenSans-12.bdf")
 
-font3 = bitmap_font.load_font("/fonts/OpenSans-16.bdf")
+def change_profile(oven):
+    """
+    Function added to render the available profile selections to screen and then load into memory
 
-label_reflow = label.Label(font1, text="", color=0xFFFFFF, line_spacing=0)
-label_reflow.x = 0
-label_reflow.y = -20
-display_group.append(label_reflow)
-title_label = label.Label(font3, text=TITLE)
-title_label.x = 5
-title_label.y = 14
-display_group.append(title_label)
-# version_label = label.Label(font1, text=VERSION, color=0xAAAAAA)
-# version_label.x = 300
-# version_label.y = 40
-# display_group.append(version_label)
-message = label.Label(font2, text="Wait")
-message.x = 100
-message.y = 40
-display_group.append(message)
-alloy_label = label.Label(font1, text="Alloy:", color=0xAAAAAA)
-alloy_label.x = 5
-alloy_label.y = 40
-display_group.append(alloy_label)
-alloy_data = label.Label(font1, text=str(oven.sprofile["alloy"]))
-alloy_data.x = 10
-alloy_data.y = 60
-display_group.append(alloy_data)
-profile_label = label.Label(font1, text="Profile:", color=0xAAAAAA)
-profile_label.x = 5
-profile_label.y = 80
-display_group.append(profile_label)
-profile_data = label.Label(font1, text=oven.sprofile["title"])
-profile_data.x = 10
-profile_data.y = 100
-display_group.append(profile_data)
-timer_label = label.Label(font1, text="Time:", color=0xAAAAAA)
-timer_label.x = 5
-timer_label.y = 120
-display_group.append(timer_label)
-timer_data = label.Label(font3, text=format_time(timediff))
-timer_data.x = 10
-timer_data.y = 140
-display_group.append(timer_data)
-temp_label = label.Label(font1, text="Temp(C):", color=0xAAAAAA)
-temp_label.x = 5
-temp_label.y = 160
-display_group.append(temp_label)
-temp_data = label.Label(font3, text="--")
-temp_data.x = 10
-temp_data.y = 180
-display_group.append(temp_data)
-circle = Circle(308, 12, 8, fill=0)
-display_group.append(circle)
+    Limitations: Only the first 6 profiles will be displayed to honor to the size format of the screen
+    """
+    selected_file = None
 
-sgraph = Graph()
-
-# sgraph.xstart = 100
-# sgraph.ystart = 4
-sgraph.xstart = 0
-sgraph.ystart = 0
-# sgraph.width = WIDTH - sgraph.xstart - 4  # 216 for standard PyPortal
-# sgraph.height = HEIGHT - 80  # 160 for standard PyPortal
-sgraph.width = GWIDTH  # 216 for standard PyPortal
-sgraph.height = GHEIGHT  # 160 for standard PyPortal
-sgraph.xmin = oven.sprofile["time_range"][0]
-sgraph.xmax = oven.sprofile["time_range"][1]
-sgraph.ymin = oven.sprofile["temp_range"][0]
-sgraph.ymax = oven.sprofile["temp_range"][1] * 1.1
-print("x range:", sgraph.xmin, sgraph.xmax)
-print("y range:", sgraph.ymin, sgraph.ymax)
-draw_profile(sgraph, oven.sprofile)
-buttons = []
-if oven.sensor_status:
-    button = Button(
-        x=0, y=HEIGHT - 40, width=80, height=40, label="Start", label_font=font2
-    )
-    buttons.append(button)
-
-for b in buttons:
-    display_group.append(b.group)
-
-try:
-    board.DISPLAY.refresh(target_frames_per_second=60)
-except AttributeError:
-    board.DISPLAY.refresh_soon()
-print("display complete")
-last_temp = 0
-last_state = "ready"
-last_control = False
-second_timer = time.monotonic()
-timer = time.monotonic()
-while True:
+    display_group = displayio.Group()
     gc.collect()
+
+    title_label = label.Label(font3, text=TITLE)
+    title_label.x = 5
+    title_label.y = 14
+    display_group.append(title_label)
+    profile_label = label.Label(font2, text="Profile Change")
+    profile_label.x = 5
+    profile_label.y = 45
+    display_group.append(profile_label)
+
+    selected_label_default_text = "Selected Profile: "
+    selected_label = label.Label(font1, text=selected_label_default_text)
+    selected_label.x = 5
+    selected_label.y = HEIGHT - 20
+    display_group.append(selected_label)
+
+    buttons = []
+    button_details = {}
+    button_x = 20
+    button_y = 60
+    button_y_start = 60
+    button_height = 30
+    button_width = 120
+    spacing = 10
+    profile_limit = 6
+    count = 0
+    dir_list = os.listdir("/profiles/")
+    for f in dir_list:
+        f = f.split('.')[0]
+        button = Button(
+            x=button_x, y=button_y, width=button_width, height=button_height, label=f, label_font=font1
+        )
+        button_details[f] = [button_x, button_y, button_width, button_height]
+        buttons.append(button)
+        button_y += button_height + spacing
+
+        count+=1
+
+        if count == 3:
+            button_x += button_width + spacing
+            button_y = button_y_start
+
+        if count >= 6:
+            break
+
+    save_button = Button(x=WIDTH-70, y=HEIGHT-50, width=60, height=40, label="Save", label_font=font2)
+    button_details["Save"] = [WIDTH-70, HEIGHT-50, 60, 40]
+    buttons.append(save_button)
+
+    for b in buttons:
+        display_group.append(b)
+
+    board.DISPLAY.show(display_group)
+
     try:
         board.DISPLAY.refresh(target_frames_per_second=60)
     except AttributeError:
         board.DISPLAY.refresh_soon()
-    oven.beep.refresh()  # this allows beeps less than one second in length
-    try:
-        oven_temp = int(oven.sensor.temperature)
-    except AttributeError:
-        oven_temp = 32  # testing
-        oven.sensor_status = False
-        message.text = "Bad/missing temp sensor"
-    if oven.control != last_control:
-        last_control = oven.control
-        if oven.control:
-            circle.fill = 0xFF0000
-        else:
-            circle.fill = 0x0
-    p = ts.touch_point
-    status = ""
-    last_status = ""
+    print("Profile change display complete")
 
-    if p:
-        if p[0] >= 0 and p[0] <= 80 and p[1] >= HEIGHT - 40 and p[1] <= HEIGHT:
-            print("touch!")
-            if oven.state == "ready":
-                button.label = "Stop"
-                oven.set_state("start")
+    while True:
+        gc.collect()
+        try:
+            board.DISPLAY.refresh(target_frames_per_second=60)
+        except AttributeError:
+            board.DISPLAY.refresh_soon()
 
-            else:
-                # cancel operation
-                message.text = "Wait"
-                button.label = "Wait"
-                oven.set_state("wait")
-            time.sleep(1)  # for debounce
+        p = ts.touch_point
+
+        if p:
+            button_pressed = check_buttons_press_location(p, buttons)
+            if button_pressed:
+                print(f"{button_pressed.label} button pressed")
+                if button_pressed.label == "Save":
+                    with open("/profiles/" + selected_file + ".json", mode="r") as fpr:
+                        oven.sprofile = json.load(fpr)
+                        fpr.close()
+                        oven.reset()
+                    return
+                else:
+                    selected_file = button_pressed.label
+                    print(f"Profile selected: {selected_file}")
+                    selected_label.text = selected_label_default_text + " " + button_pressed.label
+
+                time.sleep(1)  # for debounce
+
+
+def default_view():
+    """
+    The below code was wrapped into this fucntion to give execution back and forth between this the default view
+    of the EZ Make Oven and the alternative profile selection view.
+
+    As such there were numerous global variables that have been declared as needed in the various other functions
+    that use them.
+    """
+
+    global label_reflow, oven, message, timediff, plot, sgraph, timer_data
+
+    display_group = displayio.Group()
+    board.DISPLAY.show(display_group)
+
+    plot = displayio.Bitmap(GWIDTH, GHEIGHT, 4)
+
+    display_group.append(
+        displayio.TileGrid(plot, pixel_shader=palette, x=GXSTART, y=GYSTART)
+    )
+
+    timediff = 0
+
+    print("melting point: ", oven.sprofile["melting_point"])
+
+    label_reflow = label.Label(font1, text="", color=0xFFFFFF, line_spacing=0)
+    label_reflow.x = 0
+    label_reflow.y = -20
+    display_group.append(label_reflow)
+    title_label = label.Label(font3, text=TITLE)
+    title_label.x = 5
+    title_label.y = 14
+    display_group.append(title_label)
+    # version_label = label.Label(font1, text=VERSION, color=0xAAAAAA)
+    # version_label.x = 300
+    # version_label.y = 40
+    # display_group.append(version_label)
+    message = label.Label(font2, text="Wait")
+    message.x = 100
+    message.y = 40
+    display_group.append(message)
+    alloy_label = label.Label(font1, text="Alloy:", color=0xAAAAAA)
+    alloy_label.x = 5
+    alloy_label.y = 40
+    display_group.append(alloy_label)
+    alloy_data = label.Label(font1, text=str(oven.sprofile["alloy"]))
+    alloy_data.x = 10
+    alloy_data.y = 60
+    display_group.append(alloy_data)
+    profile_label = label.Label(font1, text="Profile:", color=0xAAAAAA)
+    profile_label.x = 5
+    profile_label.y = 80
+    display_group.append(profile_label)
+    profile_data = label.Label(font1, text=oven.sprofile["title"])
+    profile_data.x = 10
+    profile_data.y = 100
+    display_group.append(profile_data)
+    timer_label = label.Label(font1, text="Time:", color=0xAAAAAA)
+    timer_label.x = 5
+    timer_label.y = 120
+    display_group.append(timer_label)
+    timer_data = label.Label(font3, text=format_time(timediff))
+    timer_data.x = 10
+    timer_data.y = 140
+    display_group.append(timer_data)
+    temp_label = label.Label(font1, text="Temp(C):", color=0xAAAAAA)
+    temp_label.x = 5
+    temp_label.y = 160
+    display_group.append(temp_label)
+    temp_data = label.Label(font3, text="--")
+    temp_data.x = 10
+    temp_data.y = 180
+    display_group.append(temp_data)
+    circle = Circle(308, 12, 8, fill=0)
+    display_group.append(circle)
+
+    sgraph = Graph()
+
+    # sgraph.xstart = 100
+    # sgraph.ystart = 4
+    sgraph.xstart = 0
+    sgraph.ystart = 0
+    # sgraph.width = WIDTH - sgraph.xstart - 4  # 216 for standard PyPortal
+    # sgraph.height = HEIGHT - 80  # 160 for standard PyPortal
+    sgraph.width = GWIDTH  # 216 for standard PyPortal
+    sgraph.height = GHEIGHT  # 160 for standard PyPortal
+    sgraph.xmin = oven.sprofile["time_range"][0]
+    sgraph.xmax = oven.sprofile["time_range"][1]
+    sgraph.ymin = oven.sprofile["temp_range"][0]
+    sgraph.ymax = oven.sprofile["temp_range"][1] * 1.1
+    print("x range:", sgraph.xmin, sgraph.xmax)
+    print("y range:", sgraph.ymin, sgraph.ymax)
+    draw_profile(sgraph, oven.sprofile)
+    buttons = []
     if oven.sensor_status:
-        if oven.state == "ready":
-            status = "Ready"
-            if last_state != "ready":
-                oven.beep.refresh()
-                oven.reset()
-                draw_profile(sgraph, oven.sprofile)
-                timer_data.text = format_time(0)
-            if button.label != "Start":
-                button.label = "Start"
-        if oven.state == "start":
-            status = "Starting"
-            if last_state != "start":
-                timer = time.monotonic()
-        if oven.state == "preheat":
-            if last_state != "preheat":
-                timer = time.monotonic()  # reset timer when preheat starts
-            status = "Preheat"
-        if oven.state == "soak":
-            status = "Soak"
-        if oven.state == "reflow":
-            status = "Reflow"
-        if oven.state == "cool" or oven.state == "wait":
-            status = "Cool Down, Open Door"
-        if last_status != status:
-            message.text = status
-            last_status = status
+        button = Button(
+            x=0, y=HEIGHT - 40, width=80, height=40, label="Start", label_font=font2
+        )
+        buttons.append(button)
+        profile_button = Button(
+            x=WIDTH - 100, y=40, width=100, height=30, label="Profile Change", label_font=font1
+        )
+        buttons.append(profile_button)
 
-        if oven_temp != last_temp and oven.sensor_status:
-            last_temp = oven_temp
-            temp_data.text = str(oven_temp)
-        # update once per second when oven is active
-        if oven.state != "ready" and time.monotonic() - second_timer >= 1.0:
-            second_timer = time.monotonic()
-            oven.check_state()
-            if oven.state == "preheat" and last_state != "preheat":
-                timer = time.monotonic()  # reset timer at start of preheat
-            timediff = int(time.monotonic() - timer)
-            timer_data.text = format_time(timediff)
-            print(oven.state)
-            if oven_temp >= 50:
-                sgraph.draw_graph_point(
-                    int(timediff), oven_temp, size=TEMP_SIZE, color=TEMP_COLOR
-                )
+    for b in buttons:
+        display_group.append(b)
 
-        last_state = oven.state
+    try:
+        board.DISPLAY.refresh(target_frames_per_second=60)
+    except AttributeError:
+        board.DISPLAY.refresh_soon()
+    print("display complete")
+    last_temp = 0
+    last_state = "ready"
+    last_control = False
+    second_timer = time.monotonic()
+    timer = time.monotonic()
+
+    display_profile_button = True
+    is_Running = True
+    while is_Running:
+        gc.collect()
+        try:
+            board.DISPLAY.refresh(target_frames_per_second=60)
+        except AttributeError:
+            board.DISPLAY.refresh_soon()
+        oven.beep.refresh()  # this allows beeps less than one second in length
+        try:
+            oven_temp = int(oven.sensor.temperature)
+        except AttributeError:
+            oven_temp = 32  # testing
+            oven.sensor_status = False
+            message.text = "Bad/missing temp sensor"
+        if oven.control != last_control:
+            last_control = oven.control
+            if oven.control:
+                circle.fill = 0xFF0000
+            else:
+                circle.fill = 0x0
+        p = ts.touch_point
+        status = ""
+        last_status = ""
+
+        if p:
+            if button.contains(p):
+                print("touch!")
+                if oven.state == "ready":
+                    button.label = "Stop"
+                    oven.set_state("start")
+                else:
+                    # cancel operation
+                    message.text = "Wait"
+                    button.label = "Wait"
+                    oven.set_state("wait")
+                time.sleep(1)  # for debounce
+
+            elif profile_button.contains(p):
+                if message.text == "Ready":  # only allow profile change when NOT running
+                    print("Profile change button pressed")
+                    is_Running = False
+                    change_profile(oven)
+
+        if oven.sensor_status:
+            if oven.state == "ready":
+                status = "Ready"
+                display_profile_button = True
+                if last_state != "ready":
+                    oven.beep.refresh()
+                    oven.reset()
+                    draw_profile(sgraph, oven.sprofile)
+                    timer_data.text = format_time(0)
+                if button.label != "Start":
+                    button.label = "Start"
+            if oven.state == "start":
+                status = "Starting"
+                display_profile_button = False
+                if last_state != "start":
+                    timer = time.monotonic()
+            if oven.state == "preheat":
+                if last_state != "preheat":
+                    timer = time.monotonic()  # reset timer when preheat starts
+                status = "Preheat"
+                display_profile_button = False
+            if oven.state == "soak":
+                status = "Soak"
+                display_profile_button = False
+            if oven.state == "reflow":
+                status = "Reflow"
+                display_profile_button = False
+            if oven.state == "cool" or oven.state == "wait":
+                status = "Cool Down, Open Door"
+            if last_status != status:
+                message.text = status
+                last_status = status
+
+            if oven_temp != last_temp and oven.sensor_status:
+                last_temp = oven_temp
+                temp_data.text = str(oven_temp)
+            # update once per second when oven is active
+            if oven.state != "ready" and time.monotonic() - second_timer >= 1.0:
+                second_timer = time.monotonic()
+                oven.check_state()
+                if oven.state == "preheat" and last_state != "preheat":
+                    timer = time.monotonic()  # reset timer at start of preheat
+                timediff = int(time.monotonic() - timer)
+                timer_data.text = format_time(timediff)
+                print(oven.state)
+                if oven_temp >= 50:
+                    sgraph.draw_graph_point(
+                        int(timediff), oven_temp, size=TEMP_SIZE, color=TEMP_COLOR
+                    )
+
+            last_state = oven.state
+
+        # Manage whether the Profile Button should be displayed or not
+        if display_profile_button == True:
+            try:
+                display_group.append(profile_button)
+            except ValueError:
+                # profile_button already in the display_group
+                pass
+        else:
+            try:
+                display_group.remove(profile_button)
+            except ValueError:
+                # profile_button is missing, handle gracefully
+                pass
+
+# Global variables that are used in numerous of the supporting functions
+font1 = bitmap_font.load_font("/fonts/OpenSans-9.bdf")
+font2 = bitmap_font.load_font("/fonts/OpenSans-12.bdf")
+font3 = bitmap_font.load_font("/fonts/OpenSans-16.bdf")
+label_reflow = None
+oven = ReflowOvenControl(board.D4)
+message = None
+timediff = 0
+plot = None
+sgraph = None
+timer_data = None
+
+# Essentially the main function of the entire codebase
+while True:
+    default_view()
