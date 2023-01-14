@@ -236,7 +236,7 @@ while True:
             #  comment/uncomment for desired units
             #  temp_test = str(ds18.temperature)
             temp_test = str(c_to_f(ds18.temperature))
-            temp_text_area.text = "Temperature: %d F" % temp_test
+            temp_text_area.text = "Temperature: %s F" % temp_test
 
         #if parrot is True:
         if parrot_pin.value is True:
