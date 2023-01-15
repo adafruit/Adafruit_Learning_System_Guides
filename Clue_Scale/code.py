@@ -1,8 +1,8 @@
-# SPDX-FileCopyrightText: 2022 Jan Goolsbey for Adafruit Industries
+# SPDX-FileCopyrightText: 2023 Jan Goolsbey for Adafruit Industries
 # SPDX-License-Identifier: MIT
 #
 # clue_scale_code.py
-# 2022-07-29 v1.2.0
+# 2023-01-13 v1.2.1
 #
 # Clue Scale - Single Channel Version
 # Adafruit NAU7802 Stemma breakout example
@@ -25,7 +25,7 @@ clue.pixel[0] = clue.YELLOW  # Set status indicator to yellow (initializing)
 # Set Scale Defaults
 MAX_GR = 100  # Maximum (full-scale) display range in grams
 DEFAULT_GAIN = 128  # Default gain for internal PGA
-SAMPLE_AVG = 100  # Number of sample values to average
+SAMPLE_AVG = 5  # Number of sample values to average
 SCALE_NAME_1 = "COFFEE"  # 6 characters maximum
 SCALE_NAME_2 = "SCALE"  # 6 characters maximum
 
@@ -128,12 +128,12 @@ def zero_channel():
     nau7802.calibrate("OFFSET")
 
 
-def read(samples=100):
+def read(samples=1):
     """Read and average consecutive raw samples; return averaged value."""
     sample_sum = 0
     sample_count = samples
     while sample_count > 0:
-        if nau7802.available:
+        if nau7802.available():
             sample_sum = sample_sum + nau7802.read()
             sample_count -= 1
     return int(sample_sum / samples)
