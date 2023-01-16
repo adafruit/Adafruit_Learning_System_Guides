@@ -20,7 +20,7 @@ from PIL import Image, ImageDraw, ImageFont
 import adafruit_rgb_display.st7789 as st7789
 
 API_TOKEN = "YOUR_API_TOKEN_HERE"
-api_url = "http://pi-hole.local/admin/api.php?summaryRaw&auth="+API_TOKEN
+api_url = "http://localhost/admin/api.php?summaryRaw&auth="+API_TOKEN
 
 # Configuration for CS and DC pins (these are FeatherWing defaults on M0/M4):
 cs_pin = digitalio.DigitalInOut(board.CE0)

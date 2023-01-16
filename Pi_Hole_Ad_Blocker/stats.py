@@ -46,7 +46,7 @@ import adafruit_ssd1306
 from PIL import Image, ImageDraw, ImageFont
 
 API_TOKEN = "YOUR_API_TOKEN_HERE"
-api_url = "http://pi-hole.local/admin/api.php?summaryRaw&auth="+API_TOKEN
+api_url = "http://localhost/admin/api.php?summaryRaw&auth="+API_TOKEN
 
 # Create the I2C interface.
 i2c = busio.I2C(SCL, SDA)
