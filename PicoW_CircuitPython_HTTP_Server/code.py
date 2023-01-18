@@ -149,7 +149,7 @@ def base(request: HTTPRequest):  # pylint: disable=unused-argument
 
 #  if a button is pressed on the site
 @server.route("/", method=HTTPMethod.POST)
-def buttonpress(request):
+def buttonpress(request: HTTPRequest):
     #  get the raw text
     raw_text = request.raw_request.decode("utf8")
     print(raw_text)
