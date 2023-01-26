@@ -1,7 +1,8 @@
 # SPDX-FileCopyrightText: 2018 Mikey Sklar for Adafruit Industries
 #
 # SPDX-License-Identifier: MIT
-# Modified by Jonathan Seyfert, 2022-01-22, to keep code from crashing when WiFi or IP is unavailable
+# Modified by Jonathan Seyfert, 2022-01-22 
+# to keep code from crashing when WiFi or IP is unavailable
 from subprocess import Popen, PIPE
 from time import sleep, perf_counter
 from datetime import datetime
@@ -41,7 +42,7 @@ def find_interface():
 # find an active IP on the first LIVE network device
 def parse_ip():
     if interface == 1: # if true, no device is in "state UP", skip IP check
-        return "not assigned " # display "IP not assigned" 
+        return "not assigned " # display "IP not assigned"
     ip = "0"
     find_ip = "ip addr show %s" % interface
     ip_parse = run_cmd(find_ip)
