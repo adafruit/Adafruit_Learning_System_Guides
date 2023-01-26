@@ -31,7 +31,7 @@ display[2] = 'A'
 display[3] = 'B'
 time.sleep(1)
 
-numbers = [0.0, 1.0, 0.55, 10.23, 100.5] 
+numbers = [0.0, 1.0, 0.55, 10.23, 100.5]
 
 # print floating point numbers
 for i in numbers:
