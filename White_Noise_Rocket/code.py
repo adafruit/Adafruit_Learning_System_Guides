@@ -19,6 +19,11 @@ enable = digitalio.DigitalInOut(board.D10)
 enable.direction = digitalio.Direction.OUTPUT
 enable.value = True
 
+# enable fan pin
+fan_pin = digitalio.DigitalInOut(board.D11)
+fan_pin.direction = digitalio.Direction.OUTPUT
+fan_pin.value = True
+
 # speaker pin on the propmaker
 audio = AudioOut(board.A0)
 # create mixer instance
