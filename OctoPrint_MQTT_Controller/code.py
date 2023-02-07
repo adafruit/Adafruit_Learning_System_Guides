@@ -7,12 +7,12 @@ import os
 import json
 import socketpool
 import wifi
-import adafruit_requests
-from adafruit_io.adafruit_io import IO_HTTP, AdafruitIO_RequestError
 import board
 import digitalio
-import displayio
 import terminalio
+import adafruit_requests
+from adafruit_io.adafruit_io import IO_HTTP, AdafruitIO_RequestError
+import displayio
 from adafruit_progressbar.horizontalprogressbar import (
     HorizontalProgressBar,
     HorizontalFillDirection,
@@ -32,10 +32,12 @@ wifi.radio.connect(os.getenv('CIRCUITPY_WIFI_SSID'), os.getenv('CIRCUITPY_WIFI_P
 splash = displayio.Group()
 board.DISPLAY.show(splash)
 
-width = 165
+# set progress bar width and height relative to board's display
+width = 183
 height = 30
 
-x = 70
+x = 50
+#y = board.DISPLAY.height // 3
 y = 100
 
 # Create a new progress_bar object at (x, y)
@@ -51,23 +53,22 @@ progress_bar = HorizontalProgressBar(
 # Append progress_bar to the splash group
 splash.append(progress_bar)
 
-rect = Rect(60, 0, 2, 135, fill=0xFFFFFF)
+rect = Rect(40, 0, 2, 135, fill=0xFFFFFF)
 splash.append(rect)
 
 img = displayio.OnDiskBitmap("octoprint_logo.bmp")
+idle_icons = displayio.OnDiskBitmap("idle_icons.bmp")
+printing_icons = displayio.OnDiskBitmap("printing_icons.bmp")
+finished_icon = displayio.OnDiskBitmap("finished_icon.bmp")
 
 tile_grid = displayio.TileGrid(bitmap=img, pixel_shader=img.pixel_shader, x = 185, y=5)
 splash.append(tile_grid)
 
-text = bitmap_label.Label(terminalio.FONT, text="Connecting", scale=2, x=75, y=45)
-splash.append(text)
+icon_grid = displayio.TileGrid(bitmap=idle_icons, pixel_shader=idle_icons.pixel_shader, x = 0, y=0)
+splash.append(icon_grid)
 
-d0_text = bitmap_label.Label(terminalio.FONT, text="Cooldown", scale=1, x=5, y=10)
-splash.append(d0_text)
-d1_text = bitmap_label.Label(terminalio.FONT, text="Heat up", scale=1, x=5, y=65)
-splash.append(d1_text)
-d2_text = bitmap_label.Label(terminalio.FONT, text="Reboot", scale=1, x=5, y=125)
-splash.append(d2_text)
+text = bitmap_label.Label(terminalio.FONT, text="Connecting", scale=2, x=55, y=45)
+splash.append(text)
 
 led = digitalio.DigitalInOut(board.LED)
 led.direction = digitalio.Direction.OUTPUT
@@ -83,16 +84,18 @@ button1.pull = digitalio.Pull.DOWN
 button2 = digitalio.DigitalInOut(board.D2)
 button2.direction = digitalio.Direction.INPUT
 button2.pull = digitalio.Pull.DOWN
-
+# Our array of key objects
 button0_state = False
 button1_state = False
 button2_state = False
 
 pixel = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness = 0.6)
 
+# Create a socket pool
 pool = socketpool.SocketPool(wifi.radio)
 
 requests = adafruit_requests.Session(pool, ssl.create_default_context())
+# Initialize an Adafruit IO HTTP API object
 io = IO_HTTP(aio_username, aio_key, requests)
 
 try:
@@ -127,6 +130,7 @@ last_feed_msg = ["none","none","none"]
 msg_json = [{"path": "none"}, {"state_id": "NONE"}, {"path": "none"}]
 print_progress = 0
 current_state = 0
+last_state = None
 state_value = 0
 current_file = None
 finished_file = None
@@ -185,9 +189,8 @@ while True:
                 progress_bar.value = 100
                 progress_bar.bar_color = colors[state_value]
                 text.text = "\n".join(wrap_text_to_lines("Status: %s" % current_state, 11))
-                d0_text.text = "Cooldown"
-                d1_text.text = "Heat up"
-                d2_text.text = "Reboot"
+                icon_grid.bitmap = idle_icons
+                icon_grid.pixel_shader = idle_icons.pixel_shader
                 button0_state = True
             else:
                 led.value = True
@@ -213,10 +216,12 @@ while True:
                 #  assign value to new_msg
                 new_feed_msg[feed] = data["value"]
                 msg_json[feed] = json.loads(data["value"])
+                #  set servo angle
                 print(read_feeds[feed]["key"])
                 print()
                 print(new_feed_msg[feed])
                 print()
+                #time.sleep(1)
                 print_progress = int(msg_json[0]['progress'])
                 current_file = str(msg_json[0]['path'])
                 current_state = str(msg_json[1]['state_id'])
@@ -224,36 +229,34 @@ while True:
                 state_value = printer_state_options.index(current_state)
                 #  log msg
                 last_feed_msg[feed] = new_feed_msg[feed]
+            #time.sleep(1)
         if current_state == "PRINTING":
+            #print_progress = int(msg_json[0]['progress'])
             progress_bar.value = print_progress
             #octoprint green
             progress_bar.bar_color = 0x13c100
             text.text = "\n".join(wrap_text_to_lines("%d%% Printed" % print_progress, 7))
-            d0_text.text = "Pause"
-            d1_text.text = "Resume"
-            d2_text.text = "Cancel"
+            icon_grid.bitmap = printing_icons
+            icon_grid.pixel_shader = printing_icons.pixel_shader
         elif current_state in ("PAUSED", "PAUSING"):
             progress_bar.value = print_progress
             progress_bar.bar_color = colors[state_value]
             text.text = "\n".join(wrap_text_to_lines("Status: %s" % current_state, 11))
-            d0_text.text = "Pause"
-            d1_text.text = "Resume"
-            d2_text.text = "Cancel"
+            icon_grid.bitmap = printing_icons
+            icon_grid.pixel_shader = printing_icons.pixel_shader
         # when a print is finished:
         elif finished_file == current_file and print_progress == 100:
             progress_bar.value = 100
             progress_bar.bar_color = purple
             text.text = "\n".join(wrap_text_to_lines("Print Finished!", 11))
-            d0_text.text = "Confirm"
-            d1_text.text = " "
-            d2_text.text = " "
+            icon_grid.bitmap = finished_icon
+            icon_grid.pixel_shader = finished_icon.pixel_shader
         # when printer is idle, display status
         else:
             progress_bar.value = 100
             progress_bar.bar_color = colors[state_value]
             text.text = "\n".join(wrap_text_to_lines("Status: %s" % current_state, 11))
-            d0_text.text = "Cooldown"
-            d1_text.text = "Heat up"
-            d2_text.text = "Reboot"
+            icon_grid.bitmap = idle_icons
+            icon_grid.pixel_shader = idle_icons.pixel_shader
         #  reset clock
         clock = time.monotonic()
