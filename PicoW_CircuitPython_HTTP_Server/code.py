@@ -17,7 +17,10 @@ import adafruit_displayio_ssd1306
 import adafruit_imageload
 from digitalio import DigitalInOut, Direction
 from adafruit_httpserver.server import HTTPServer
+from adafruit_httpserver.request import HTTPRequest
 from adafruit_httpserver.response import HTTPResponse
+from adafruit_httpserver.methods import HTTPMethod
+from adafruit_httpserver.mime_type import MIMEType
 from adafruit_onewire.bus import OneWireBus
 from adafruit_ds18x20 import DS18X20
 
@@ -75,7 +78,7 @@ netmask =  ipaddress.IPv4Address("255.255.255.0")
 gateway =  ipaddress.IPv4Address("192.168.1.1")
 wifi.radio.set_ipv4_address(ipv4=ipv4,netmask=netmask,gateway=gateway)
 #  connect to your SSID
-wifi.radio.connect(os.getenv('WIFI_SSID'), os.getenv('WIFI_PASSWORD'))
+wifi.radio.connect(os.getenv('CIRCUITPY_WIFI_SSID'), os.getenv('CIRCUITPY_WIFI_PASSWORD'))
 
 print("Connected to WiFi")
 pool = socketpool.SocketPool(wifi.radio)
@@ -138,14 +141,15 @@ def webpage():
 
 #  route default static IP
 @server.route("/")
-def base(request):  # pylint: disable=unused-argument
+def base(request: HTTPRequest):  # pylint: disable=unused-argument
     #  serve the HTML f string
     #  with content type text/html
-    return HTTPResponse(content_type="text/html", body=webpage())
+    with HTTPResponse(request, content_type=MIMEType.TYPE_HTML) as response:
+        response.send(f"{webpage()}")
 
 #  if a button is pressed on the site
-@server.route("/", "POST")
-def buttonpress(request):
+@server.route("/", method=HTTPMethod.POST)
+def buttonpress(request: HTTPRequest):
     #  get the raw text
     raw_text = request.raw_request.decode("utf8")
     print(raw_text)
@@ -162,7 +166,8 @@ def buttonpress(request):
         #  toggle the parrot_pin value
         parrot_pin.value = not parrot_pin.value
     #  reload site
-    return HTTPResponse(content_type="text/html", body=webpage())
+    with HTTPResponse(request, content_type=MIMEType.TYPE_HTML) as response:
+        response.send(f"{webpage()}")
 
 print("starting server..")
 # startup the server
@@ -231,7 +236,7 @@ while True:
             #  comment/uncomment for desired units
             #  temp_test = str(ds18.temperature)
             temp_test = str(c_to_f(ds18.temperature))
-            temp_text_area.text = "Temperature: %d F" % temp_test
+            temp_text_area.text = "Temperature: %s F" % temp_test
 
         #if parrot is True:
         if parrot_pin.value is True:

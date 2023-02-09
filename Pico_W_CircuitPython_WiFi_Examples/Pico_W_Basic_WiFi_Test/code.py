@@ -11,7 +11,7 @@ print()
 print("Connecting to WiFi")
 
 #  connect to your SSID
-wifi.radio.connect(os.getenv('WIFI_SSID'), os.getenv('WIFI_PASSWORD'))
+wifi.radio.connect(os.getenv('CIRCUITPY_WIFI_SSID'), os.getenv('CIRCUITPY_WIFI_PASSWORD'))
 
 print("Connected to WiFi")
 

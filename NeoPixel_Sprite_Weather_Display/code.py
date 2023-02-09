@@ -43,7 +43,7 @@ weather_url += "latitude=%d&longitude=%d&timezone=auto" % (lat, long)
 weather_url += "&current_weather=true&temperature_unit=%s&windspeed_unit=mph" % temperature_unit
 
 #  connect to SSID
-wifi.radio.connect(os.getenv('WIFI_SSID'), os.getenv('WIFI_PASSWORD'))
+wifi.radio.connect(os.getenv('CIRCUITPY_WIFI_SSID'), os.getenv('CIRCUITPY_WIFI_PASSWORD'))
 
 pool = socketpool.SocketPool(wifi.radio)
 requests = adafruit_requests.Session(pool, ssl.create_default_context())

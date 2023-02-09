@@ -31,11 +31,11 @@ display[2] = 'A'
 display[3] = 'B'
 time.sleep(1)
 
-numbers = [0.0, 1.0, -1.0, 0.55, -0.55, 10.23, -10.2, 100.5, -100.5]
+numbers = [0.0, 1.0, 0.55, 10.23, 100.5]
 
-# print negative and positive floating point numbers
+# print floating point numbers
 for i in numbers:
-    display.print(i)
+    display.print(str(i))
     time.sleep(0.5)
 
 # print hex values, enable colon

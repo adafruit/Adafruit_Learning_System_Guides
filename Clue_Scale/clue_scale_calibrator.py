@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 #
 # clue_scale_calibrator.py
-# 2022-07-29 v1.1.0
+# 2023-01-13 v1.1.1
 #
 # Clue Scale Calibrator - Single Channel Version
 # Adafruit NAU7802 Stemma breakout example
@@ -15,7 +15,7 @@ from cedargrove_nau7802 import NAU7802
 clue.pixel.brightness = 0.2  # Set NeoPixel brightness
 clue.pixel[0] = clue.YELLOW  # Set status indicator to yellow (initializing)
 
-SAMPLE_AVG = 500  # Number of sample values to average
+SAMPLE_AVG = 3  # Number of sample values to average
 DEFAULT_GAIN = 128  # Default gain for internal PGA
 
 # Instantiate 24-bit load sensor ADC
@@ -37,7 +37,7 @@ def read(samples=100):
     sample_sum = 0
     sample_count = samples
     while sample_count > 0:
-        if nau7802.available:
+        if nau7802.available():
             sample_sum = sample_sum + nau7802.read()
             sample_count -= 1
     return int(sample_sum / samples)

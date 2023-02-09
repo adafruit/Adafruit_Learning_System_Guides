@@ -14,7 +14,7 @@ import adafruit_requests
 hashtag = "CircuitPython"
 
 #  connect to SSID
-wifi.radio.connect(os.getenv('WIFI_SSID'), os.getenv('WIFI_PASSWORD'))
+wifi.radio.connect(os.getenv('CIRCUITPY_WIFI_SSID'), os.getenv('CIRCUITPY_WIFI_PASSWORD'))
 
 #  add your mastodon token as 'mastodon_token' to your settings.toml file
 headers = {'Authorization': 'Bearer ' + os.getenv('mastodon_token') + 'read:statuses'}
