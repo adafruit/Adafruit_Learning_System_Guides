@@ -20,3 +20,14 @@ This is a work in progress.
 
 [learn]: https://learn.adafruit.com/
 
+## Running pylint locally
+Install a specific version of pylint under the name "pylint-learn":
+```
+pip instal pipx
+pipx install --suffix -learn pylint==2.7.1
+```
+Then use the `pylint_check` script to run pylint on the files or directories
+of your choice:
+```
+./pylint_check CircuitPython_Cool_Project
+```

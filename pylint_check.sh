@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PYLINT="`type -p pylint3 2>/dev/null || type -p pylint`"
+PYLINT="`type -p pylint-learn 2>/dev/null || type -p pylint3 2>/dev/null || type -p pylint`"
 echo "Using pylint bin at $PYLINT"
 
 # Use * as the default argument to avoid descending into hidden directories like .git
