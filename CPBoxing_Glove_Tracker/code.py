@@ -23,17 +23,6 @@ except ImportError:
 aio_username = secrets["aio_username"]
 aio_key = secrets["aio_key"]
 
-# Wi-Fi
-try:
-    print("Connecting to %s" % secrets["ssid"])
-    wifi.radio.connect(secrets["ssid"], secrets["password"])
-    print("Connected to %s!" % secrets["ssid"])
-# Wi-Fi connectivity fails with error messages, not specific errors, so this except is broad.
-except Exception as e:  # pylint: disable=broad-except
-    print("Failed to connect to WiFi. Error:", e, "\nBoard will hard reset in 5 seconds.")
-    time.sleep(5)
-    microcontroller.reset()
-
 # Create a socket pool
 pool = socketpool.SocketPool(wifi.radio)
 
