@@ -17,7 +17,8 @@ button.pull = Pull.UP
 # pixel setup
 pixel_num = 9
 pixel_offset = 2
-pixels = adafruit_ws2801.WS2801(board.SDA1, board.SCL1, pixel_num+pixel_offset, brightness=1, auto_write=False)
+pixels = adafruit_ws2801.WS2801(board.SDA1, board.SCL1, pixel_num+pixel_offset, brightness=1, 
+                                auto_write=False)
 
 pixel_prev = [128] * len(pixels)
 
@@ -33,14 +34,16 @@ def split(first, second, offset):
     @param1 second: Ending brightness value.
     @param1 offset: Midpoint offset range is +/- this amount max.
     """
+    thelevel = 0
     if offset != 0:
         mid = ((first + second + 1) / 2 + random.randint(-offset, offset))
         offset = int(offset / 2)
         split(first, mid, offset)
         split(mid, second, offset)
     else:
-        level = math.pow(first / 255.0, 2.7) * 255.0 + 0.5
-        return level
+        thelevel = math.pow(first / 255.0, 2.7) * 255.0 + 0.5
+        return thelevel
+    return thelevel
 
 while True:
     if not button.value:
