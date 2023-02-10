@@ -13,11 +13,10 @@ from adafruit_io.adafruit_io import IO_MQTT
 from adafruit_adxl34x import ADXL345
 from adafruit_lc709203f import LC709203F, PackSize
 
-
 try:
     from secrets import secrets
 except ImportError:
-    print("WiFi and Adafruit IO credentials are kept in secrets.py - please add them there!")
+    print("Adafruit IO credentials are kept in secrets.py - please add them there!")
     raise
 
 aio_username = secrets["aio_username"]
@@ -51,7 +50,7 @@ except Exception as e:  # pylint: disable=broad-except
     time.sleep(30)
     microcontroller.reset()
 
-threshold = 25 # set threshold value here
+threshold = 20 # set threshold value here
 time_interval = 0.5 # set the time interval in seconds
 
 # create the I2C bus object
