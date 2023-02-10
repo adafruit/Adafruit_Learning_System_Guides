@@ -17,7 +17,7 @@ button.pull = Pull.UP
 # pixel setup
 pixel_num = 9
 pixel_offset = 2
-pixels = adafruit_ws2801.WS2801(board.SDA1, board.SCL1, pixel_num+pixel_offset, brightness=1, 
+pixels = adafruit_ws2801.WS2801(board.SDA1, board.SCL1, pixel_num+pixel_offset, brightness=1,
                                 auto_write=False)
 
 pixel_prev = [128] * len(pixels)
