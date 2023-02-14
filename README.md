@@ -24,7 +24,7 @@ This is a work in progress.
 Install a specific version of pylint under the name "pylint-learn":
 ```
 pip instal pipx
-pipx install --suffix -learn pylint==2.7.1
+pipx install --suffix=-learn pylint==2.7.1
 ```
 Then use the `pylint_check` script to run pylint on the files or directories
 of your choice:
