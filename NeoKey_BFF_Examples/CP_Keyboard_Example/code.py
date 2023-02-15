@@ -44,8 +44,9 @@ while True:
 
     # if the button is pressed..
     if not switch.value and not switch_state:
-        # neopixel brightness is 0.3 and rainbow animation is visible
         pixels.fill(pixel_color)
         pixels.show()
         keyboard.press(modifier_key, key)
         switch_state = True
+        
+    time.sleep(0.05)
