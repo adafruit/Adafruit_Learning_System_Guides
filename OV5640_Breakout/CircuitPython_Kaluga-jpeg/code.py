@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: Copyright (c) 2021 Jeff Epler for Adafruit Industries
+# SPDX-FileCopyrightText: Copyright (c) 2023 Jeff Epler for Adafruit Industries
 #
 # SPDX-License-Identifier: Unlicense
 
@@ -6,21 +6,30 @@
 This demo is designed for the Kaluga development kit version 1.3 with the
 ILI9341 display. It requires CircuitPython 8.
 
-To fix the MemoryError when creating a Camera object, Place the line
-```toml
+This demo needs reserved psram properly configured in settings.toml:
 CIRCUITPY_RESERVED_PSRAM=1048576
-```
-in the file **CIRCUITPY/settings.toml** and restart.
+
+This example also requires an SD card breakout wired as follows:
+ * IO18: SD Clock Input
+ * IO17: SD Serial Output (MISO)
+ * IO14: SD Serial Input (MOSI)
+ * IO12: SD Chip Select
+
+Insert a CircuitPython-compatible SD card before powering on the Kaluga.
+Press the "BOOT" button to take a photo in BMP format.
 """
 
+import os
 import struct
 
 import board
 import busio
-import keypad
 import displayio
 import espcamera
 import espidf
+import keypad
+import sdcardio
+import storage
 
 print("Initializing display")
 displayio.release_displays()
@@ -62,12 +71,16 @@ display = displayio.Display(display_bus, _INIT_SEQUENCE, width=320, height=240)
 
 if espidf.get_reserved_psram() < 1047586:
     print("""Place the following line in CIRCUITPY/settings.toml, then hard-reset the board:
-```
-CIRCUITPY_RESERVED_PSRAM
-```
+CIRCUITPY_RESERVED_PSRAM=1048576
 """)
     raise SystemExit
 
+print("Initializing SD card")
+sd_spi = busio.SPI(clock=board.IO18, MOSI=board.IO14, MISO=board.IO17)
+sd_cs = board.IO12
+sdcard = sdcardio.SDCard(sd_spi, sd_cs)
+vfs = storage.VfsFat(sdcard)
+storage.mount(vfs, "/sd")
 
 print("Initializing camera")
 cam = espcamera.Camera(
@@ -80,20 +93,54 @@ cam = espcamera.Camera(
     frame_size=espcamera.FrameSize.QVGA,
     i2c=board.I2C(),
     external_clock_frequency=20_000_000,
-    framebuffer_count=2)
-print(cam.width, cam.height)
+    framebuffer_count=1)
+print("initialized")
 display.auto_refresh = False
 
-k = keypad.Keys([board.IO0], value_when_pressed=False)
+def exists(filename):
+    try:
+        os.stat(filename)
+        return True
+    except OSError:
+        return False
+
+
+_image_counter = 0
+
+
+def open_next_image(extension="jpg"):
+    global _image_counter  # pylint: disable=global-statement
+    while True:
+        filename = f"/sd/img{_image_counter:04d}.{extension}"
+        _image_counter += 1
+        if exists(filename):
+            continue
+        print("#", filename)
+        return open(filename, "wb")
 
 ow = (display.width - cam.width) // 2
 oh = (display.height - cam.height) // 2
-display_bus.send(42, struct.pack(">hh", ow, cam.width + ow - 1))
-display_bus.send(43, struct.pack(">hh", oh, cam.height + ow - 1))
+
+k = keypad.Keys([board.IO0], value_when_pressed=False)
 
 while True:
-    if (e := k.events.get()) is not None and e.pressed:
-        cam.colorbar = not cam.colorbar
-
     frame = cam.take(1)
+    display_bus.send(42, struct.pack(">hh", ow, cam.width + ow - 1))
+    display_bus.send(43, struct.pack(">hh", oh, cam.height + ow - 1))
     display_bus.send(44, frame)
+    if (e := k.events.get()) is not None and e.pressed:
+        cam.reconfigure(
+            pixel_format=espcamera.PixelFormat.JPEG,
+            frame_size=espcamera.FrameSize.SVGA,
+        )
+        frame = cam.take(1)
+        if isinstance(frame, memoryview):
+            jpeg = frame
+            print(f"Captured {len(jpeg)} bytes of jpeg data")
+
+            with open_next_image() as f:
+                f.write(jpeg)
+        cam.reconfigure(
+            pixel_format=espcamera.PixelFormat.RGB565,
+            frame_size=espcamera.FrameSize.QVGA,
+        )
