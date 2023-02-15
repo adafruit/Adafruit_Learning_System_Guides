@@ -48,5 +48,5 @@ while True:
         pixels.show()
         keyboard.press(modifier_key, key)
         switch_state = True
-        
+
     time.sleep(0.05)
