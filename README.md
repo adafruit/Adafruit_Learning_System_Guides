@@ -23,11 +23,12 @@ This is a work in progress.
 ## Running pylint locally
 Install a specific version of pylint under the name "pylint-learn":
 ```
-pip instal pipx
+pip install pipx
 pipx install --suffix=-learn pylint==2.7.1
 ```
 Then use the `pylint_check` script to run pylint on the files or directories
-of your choice:
+of your choice (note that your terminal *must* be in the top directory of
+Adafruit_Learning_System_Guides, not a sub-directory):
 ```
 ./pylint_check CircuitPython_Cool_Project
 ```
