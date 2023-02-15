@@ -62,9 +62,7 @@ display = displayio.Display(display_bus, _INIT_SEQUENCE, width=320, height=240)
 
 if espidf.get_reserved_psram() < 1047586:
     print("""Place the following line in CIRCUITPY/settings.toml, then hard-reset the board:
-```
-CIRCUITPY_RESERVED_PSRAM
-```
+CIRCUITPY_RESERVED_PSRAM=1048576
 """)
     raise SystemExit
 
