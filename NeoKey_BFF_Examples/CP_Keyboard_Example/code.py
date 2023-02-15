@@ -43,7 +43,7 @@ while True:
         switch_state = False
 
     # if the button is pressed..
-    if not switch.value and not switch_state:
+    elif not switch.value and not switch_state:
         pixels.fill(pixel_color)
         pixels.show()
         keyboard.press(modifier_key, key)
