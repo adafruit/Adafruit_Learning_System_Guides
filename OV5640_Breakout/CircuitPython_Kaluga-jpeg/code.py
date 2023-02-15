@@ -20,7 +20,6 @@ Press the "BOOT" button to take a photo in BMP format.
 """
 
 import os
-import ssl
 import struct
 
 import board
@@ -30,7 +29,6 @@ import espcamera
 import espidf
 import keypad
 import sdcardio
-import socketpool
 import storage
 
 print("Initializing display")
@@ -118,7 +116,7 @@ def open_next_image(extension="jpg"):
         if exists(filename):
             continue
         print("#", filename)
-        return open(filename, "wb")  # pylint: disable=consider-using-with
+        return open(filename, "wb")
 
 ow = (display.width - cam.width) // 2
 oh = (display.height - cam.height) // 2
@@ -146,4 +144,3 @@ while True:
             pixel_format=espcamera.PixelFormat.RGB565,
             frame_size=espcamera.FrameSize.QVGA,
         )
-
