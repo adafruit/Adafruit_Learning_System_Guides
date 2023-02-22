@@ -30,6 +30,7 @@ def get_files(base):
                     file_names.append((filetext, True))
                 else:
                     file_names.append((filetext, False))
+         j = 0
     return filenames
 
 def get_touch(screen):
@@ -152,11 +153,11 @@ while True:
         else:
             # Blank out more and extra icon spaces
             moresprite[0] = BLANK
-        if PAGE > 1:  # Need to display the less than touch sprite    
+        if PAGE > 1:  # Need to display the less than touch sprite
             lesssprite[0] = LEFT
         else:
             lesssprite[0] = BLANK
-        
+
         # Time to check for user touch of screen (BLOCKING)
         touch_x = get_touch(ts)
         print("Touch Registered ")
@@ -189,7 +190,7 @@ while True:
     else:
         currentfile += 1             # Increment file counter
         spot += 1                    # Increment icon space counter
-        if spot == PAGEMAXFILES:     # Last page ended with 
+        if spot == PAGEMAXFILES:     # Last page ended with
             print("hit")
         # calculate next icon location
         if spot % ICONSACROSS:       # not at end of icon row
@@ -204,4 +205,3 @@ while True:
             sprites[i][0] = BLANK
             labels[i].text = " "
 # End while
-
