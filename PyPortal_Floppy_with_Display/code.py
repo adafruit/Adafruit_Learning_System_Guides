@@ -21,17 +21,18 @@ from adafruit_display_shapes.rect import Rect
 def get_files(base):
     files = os.listdir(base)
     file_names = []
-    for file in enumerate(files):
-        if not file.startswith("."):
-            if file not in ('boot_out.txt', 'System Volume Information'):
-                stats = os.stat(base + file)
+    for j, filetext in enumerate(files):
+        if not filetext.startswith("."):
+            if filetext not in ('boot_out.txt', 'System Volume Information'):
+                stats = os.stat(base + filetext)
                 isdir = stats[0] & 0x4000
                 if isdir:
-                    file_names.append((file, True))
+                    file_names.append((filetext, True))
                 else:
-                    file_names.append((file, False))
+                    file_names.append((filetext, False))
     return filenames
 
+# Get a touch from the touchscreen (blocking function)
 def get_touch(screen):
     p = None
     while p is None:
@@ -124,6 +125,88 @@ while True:
         if dirfile:
             filetype = DIR
         elif filename.endswith(".bmp"):
+            filetype = BMP
+        elif filename.endswith(".wav"):
+            filetype = WAV
+        elif filename.endswith(".py"):
+            filetype = PY
+        else:
+            filetype = FILE
+        # Set icon location information and icon type
+        sprites[spot].x = xpos
+        sprites[spot].y = ypos
+        sprites[spot][0] = filetype
+        #
+        # Set filename
+        labels[spot].x = xpos
+        labels[spot].y = ypos + ICONSIZE + TEXTSPACE
+        # The next line gets the filename without the extension, first 11 chars
+        labels[spot].text = filename.rsplit('.', 1)[0][0:10]
+
+    currentpage = PAGE
+
+    # Pagination Handling
+    if spot >= PAGEMAXFILES - 1:
+        if currentfile < (len(filenames) + 1):
+            # Need to display the greater than touch sprite
+            moresprite[0] = RIGHT
+        else:
+            # Blank out more and extra icon spaces
+            moresprite[0] = BLANK
+        if PAGE > 1:  # Need to display the less than touch sprite    
+            lesssprite[0] = LEFT
+        else:
+            lesssprite[0] = BLANK
+        
+        # Time to check for user touch of screen (BLOCKING)
+        touch_x = get_touch(ts)
+        print("Touch Registered ")
+        # Check if touch_x is around the LEFT or RIGHT arrow
+        currentpage = PAGE
+        if touch_x >= int(WIDTH - ICONSIZE):    # > Touched
+            if moresprite[0] != BLANK:          # Ensure there are more
+                if spot == (PAGEMAXFILES - 1):  # Page full
+                    if currentfile < (len(filenames)):  # and more files
+                        PAGE = PAGE + 1         # Increment page
+        if touch_x <= ICONSIZE:                 # < Touched
+            if PAGE > 1:
+                PAGE = PAGE - 1                 # Decrement page
+            else:
+                lesssprite[0] = BLANK        # Not show < for first page
+        print("Page ", PAGE)
+    # Icon Positioning
+
+    if PAGE != currentpage:  # We have a page change
+        # Reset icon locations to upper left
+        xpos = LEFTSPACE
+        ypos = TOPSPACE
+        spot = 0
+        if currentpage > PAGE:
+            # Decrement files by a page (current page & previous page)
+            currentfile = currentfile - (PAGEMAXFILES * 2) + 1
+        else:
+            # Forward go to the next file
+            currentfile = currentfile + 1
+    else:
+        currentfile += 1             # Increment file counter
+        spot += 1                    # Increment icon space counter
+        if spot == PAGEMAXFILES:     # Last page ended with 
+            print("hit")
+        # calculate next icon location
+        if spot % ICONSACROSS:       # not at end of icon row
+            xpos += SPACING + ICONSIZE
+        else:                        # start new icon row
+            ypos += ICONSIZE + SPACING + TEXTSPACE
+            xpos = LEFTSPACE
+    # End If Changed Page
+    # Blank out rest if needed
+    if currentfile == len(filenames):
+        for i in range(spot, PAGEMAXFILES):
+            sprites[i][0] = BLANK
+            labels[i].text = " "
+# End while
+
+
             filetype = BMP
         elif filename.endswith(".wav"):
             filetype = WAV
