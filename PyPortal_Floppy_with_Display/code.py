@@ -21,15 +21,15 @@ from adafruit_display_shapes.rect import Rect
 def get_files(base):
     files = os.listdir(base)
     file_names = []
-    for file in enumerate(files):
-        if not file.startswith("."):
-            if file not in ('boot_out.txt', 'System Volume Information'):
-                stats = os.stat(base + file)
+    for isdir, filetext in enumerate(files):
+        if not filetext.startswith("."):
+            if filetext not in ('boot_out.txt', 'System Volume Information'):
+                stats = os.stat(base + filetext)
                 isdir = stats[0] & 0x4000
                 if isdir:
-                    file_names.append((file, True))
+                    file_names.append((filetext, True))
                 else:
-                    file_names.append((file, False))
+                    file_names.append((filetext, False))
     return filenames
 
 def get_touch(screen):
