@@ -30,7 +30,7 @@ def get_files(base):
                     file_names.append((filetext, True))
                 else:
                     file_names.append((filetext, False))
-         j = 0
+        j = 0
     return filenames
 
 def get_touch(screen):
