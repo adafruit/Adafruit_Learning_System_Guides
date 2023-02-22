@@ -6,8 +6,8 @@
 # Display file icons on screen
 
 import os
-import board
 import time
+import board
 import displayio
 import adafruit_imageload
 import terminalio
@@ -20,24 +20,23 @@ from adafruit_display_shapes.rect import Rect
 #    means the filename is a directory, else false.
 def get_files(base):
     files = os.listdir(base)
-    filenames = []
-    for i, file in enumerate(files):
+    file_names = []
+    for file in enumerate(files):
         if not file.startswith("."):
-            if (file != "boot_out.txt") and (file != "System Volume Information"):
+            if file not in ('boot_out.txt', 'System Volume Information'):
                 stats = os.stat(base + file)
                 isdir = stats[0] & 0x4000
                 if isdir:
-                    filenames.append((file, True))
+                    file_names.append((file, True))
                 else:
-                    filenames.append((file, False))
-    print("Files found = ", len(filenames))
+                    file_names.append((file, False))
     return filenames
 
-def get_touch(ts):
+def get_touch(screen):
     p = None
     while p is None:
         time.sleep(0.05)
-        p = ts.touch_point
+        p = screen.touch_point
     return p[0]
 
 # Icon Positions
@@ -112,8 +111,8 @@ filecount = 0
 xpos = LEFTSPACE
 ypos = TOPSPACE
 
-base = "/"  # Get file names in base directory
-filenames = get_files(base)
+displaybase = "/"  # Get file names in base directory
+filenames = get_files(displaybase)
 
 currentfile = 0  # Which file is being processed in all files
 spot = 0  # Which spot on the screen is getting a file icon
@@ -121,28 +120,27 @@ PAGE = 1  # Which page of icons is displayed on screen, 1 is first
 
 while True:
     if currentfile < len(filenames) and spot < PAGEMAXFILES:
-        filename, dir = filenames[currentfile]
-        if dir:
-            type = DIR
+        filename, dirfile = filenames[currentfile]
+        if dirfile:
+            filetype = DIR
         elif filename.endswith(".bmp"):
-            type = BMP
+            filetype = BMP
         elif filename.endswith(".wav"):
-            type = WAV
+            filetype = WAV
         elif filename.endswith(".py"):
-            type = PY
+            filetype = PY
         else:
-            type = FILE
+            filetype = FILE
         # Set icon location information and icon type
         sprites[spot].x = xpos
         sprites[spot].y = ypos
-        sprites[spot][0] = type
+        sprites[spot][0] = filetype
         #
         # Set filename
         labels[spot].x = xpos
         labels[spot].y = ypos + ICONSIZE + TEXTSPACE
         # The next line gets the filename without the extension, first 11 chars
         labels[spot].text = filename.rsplit('.', 1)[0][0:10]
-        # labels[spot].anchor_point = (0.5, 1.0)
 
     currentpage = PAGE
 
@@ -169,18 +167,14 @@ while True:
                 if spot == (PAGEMAXFILES - 1):  # Page full
                     if currentfile < (len(filenames)):  # and more files
                         PAGE = PAGE + 1         # Increment page
-                print("> Touched! ")
         if touch_x <= ICONSIZE:                 # < Touched
             if PAGE > 1:
                 PAGE = PAGE - 1                 # Decrement page
-                print("< Touched! ")
             else:
                 lesssprite[0] = BLANK        # Not show < for first page
         print("Page ", PAGE)
-    # print("currentfile after page =", currentfile)
     # Icon Positioning
-    # print("currentpage = ", currentpage)
-    # print("PAGE = ", PAGE)
+
     if PAGE != currentpage:  # We have a page change
         # Reset icon locations to upper left
         xpos = LEFTSPACE
@@ -206,13 +200,7 @@ while True:
     # End If Changed Page
     # Blank out rest if needed
     if currentfile == len(filenames):
-        print("blanking")
         for i in range(spot, PAGEMAXFILES):
-            print("blanking spot ", i)
             sprites[i][0] = BLANK
             labels[i].text = " "
 # End while
-
-print("At end of program")
-while True:
-    pass
