@@ -4,7 +4,8 @@
 
 # Example code for recording and playing back servo motion with a
 # analog feedback servo
-
+# pylint: disable=redefined-outer-name
+ 
 import time
 import board
 import pwmio
@@ -12,7 +13,7 @@ import keypad
 from simpleio import map_range
 from adafruit_motor import servo
 from analogio import AnalogIn
-from digitalio import DigitalInOut, Direction, Pull
+from digitalio import DigitalInOut, Direction
 
 # Pin setup
 RECORD_PIN = board.D10

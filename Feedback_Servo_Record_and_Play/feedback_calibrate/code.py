@@ -58,4 +58,3 @@ print("="*20)
 
 # Deactivate servo
 servo.angle = None
-
