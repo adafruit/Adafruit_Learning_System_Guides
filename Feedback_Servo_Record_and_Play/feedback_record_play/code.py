@@ -5,7 +5,7 @@
 # Example code for recording and playing back servo motion with a
 # analog feedback servo
 # pylint: disable=redefined-outer-name
- 
+
 import time
 import board
 import pwmio
