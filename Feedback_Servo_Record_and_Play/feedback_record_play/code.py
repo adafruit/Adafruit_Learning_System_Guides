@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2019 Carter Nelson for Adafruit Industries
+# SPDX-FileCopyrightText: 2023 Carter Nelson for Adafruit Industries
 #
 # SPDX-License-Identifier: MIT
 
@@ -8,6 +8,7 @@
 import time
 import board
 import pwmio
+import keypad
 from simpleio import map_range
 from adafruit_motor import servo
 from analogio import AnalogIn
@@ -18,25 +19,26 @@ RECORD_PIN = board.D10
 PLAY_PIN = board.D9
 LED_PIN = board.D13
 SERVO_PIN = board.A1
-FEEDBACK_PIN = board.A5
+FEEDBACK_PIN = board.A3
 
 # Record setup
-CALIB_MIN = 2816
-CALIB_MAX = 49632
+CALIB_MIN = 15377
+CALIB_MAX = 42890
 ANGLE_MIN = 0
 ANGLE_MAX = 180
 SAMPLE_COUNT = 512
 SAMPLE_DELAY = 0.025
 
-# Setup record button
-record_button = DigitalInOut(RECORD_PIN)
-record_button.direction = Direction.INPUT
-record_button.pull = Pull.UP
+# # Setup record button
+# record_button = DigitalInOut(RECORD_PIN)
+# record_button.direction = Direction.INPUT
+# record_button.pull = Pull.UP
 
-# Setup play button
-play_button = DigitalInOut(PLAY_PIN)
-play_button.direction = Direction.INPUT
-play_button.pull = Pull.UP
+# # Setup play button
+# play_button = DigitalInOut(PLAY_PIN)
+# play_button.direction = Direction.INPUT
+# play_button.pull = Pull.UP
+buttons = keypad.Keys((RECORD_PIN, PLAY_PIN), value_when_pressed=False, pull=True)
 
 # Setup LED
 led = DigitalInOut(LED_PIN)
@@ -59,8 +61,12 @@ print("Servo RecordPlay")
 def play_servo():
     print("Playing...", end="")
     count = 0
-    while play_button.value:
+    while True:
         print(".", end="")
+        event = buttons.events.get()
+        if event:
+            if event.pressed and event.key_number == 1:
+                break
         angle = position[count]
         if angle is None:
             break
@@ -80,8 +86,12 @@ def record_servo():
     led.value = True
     print("Recording...", end="")
     count = 0
-    while record_button.value:
+    while True:
         print(".", end='')
+        event = buttons.events.get()
+        if event:
+            if event.pressed and event.key_number == 0:
+                break
         position[count] = map_range(feedback.value, CALIB_MIN, CALIB_MAX, ANGLE_MIN, ANGLE_MAX)
         count += 1
         if count >= SAMPLE_COUNT:
@@ -92,20 +102,10 @@ def record_servo():
     time.sleep(0.250)
 
 while True:
-    if not record_button.value:
-        time.sleep(0.01)
-        # wait for released
-        while not record_button.value:
-            pass
-        time.sleep(0.02)
-        # OK released!
-        record_servo()
-
-    if not play_button.value:
-        time.sleep(0.01)
-        # wait for released
-        while not play_button.value:
-            pass
-        time.sleep(0.02)
-        # OK released!
-        play_servo()
+    event = buttons.events.get()
+    if event:
+        if event.pressed:
+            if event.key_number == 0:
+                record_servo()
+            elif event.key_number == 1:
+                play_servo()
