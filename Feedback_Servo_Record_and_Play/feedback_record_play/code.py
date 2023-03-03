@@ -29,15 +29,7 @@ ANGLE_MAX = 180
 SAMPLE_COUNT = 512
 SAMPLE_DELAY = 0.025
 
-# # Setup record button
-# record_button = DigitalInOut(RECORD_PIN)
-# record_button.direction = Direction.INPUT
-# record_button.pull = Pull.UP
-
-# # Setup play button
-# play_button = DigitalInOut(PLAY_PIN)
-# play_button.direction = Direction.INPUT
-# play_button.pull = Pull.UP
+# Setup buttons
 buttons = keypad.Keys((RECORD_PIN, PLAY_PIN), value_when_pressed=False, pull=True)
 
 # Setup LED
