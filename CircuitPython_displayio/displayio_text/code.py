@@ -20,8 +20,11 @@ text_area = label.Label(font, text=text, color=color)
 text_area.x = 100
 text_area.y = 80
 
-# Show it
-display.show(text_area)
+# Show the group. displayio API for versions <= 7.3.3
+# display.show(text_area)
+
+# Show the group. displayio API for versions >= 8.0.0
+display.root_group = text_area
 
 # Loop forever so you can enjoy your image
 while True:
