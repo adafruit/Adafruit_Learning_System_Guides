@@ -46,8 +46,8 @@ def get_request(tries, ping):
     for i in range(tries):
         try:
             n = ping
-        except RuntimeError as e:
-            print(e)
+        except Exception as error:
+            print(error)
             time.sleep(10)
             if i < tries - 1:
                 continue
@@ -82,7 +82,8 @@ def divide_time(z):
     clock_time = string_time[2].split("T")
     int_time = clock_time[1].split(":")
     event_time = time.struct_time(
-    (int(string_time[0]), int(string_time[1]), int(clock_time[0]), int(int_time[0]), int(int_time[1]), 0, -1, -1, False)
+    (int(string_time[0]), int(string_time[1]), int(clock_time[0]), int(int_time[0]),
+    int(int_time[1]), 0, -1, -1, False)
     )
     # print(event_time)
     return event_time
@@ -96,7 +97,7 @@ def sun_countdown(sun_event):
     remaining = time.mktime(sun_event) - time.mktime(n)
     # print(remaining)
     # calculate the seconds remaining
-    secs_remaining = remaining % 60
+    secs_remaining = remaining % 60 # pylint: disable=unused-variable
     remaining //= 60
     # calculate the minutes remaining
     minutes_until = remaining % 60
@@ -143,10 +144,10 @@ while True:
         if not star_glow:
             # every 15 minutes...
             if first_run or ticks_diff(ticks_ms(), clock) > time_check:
-                first_run = False
                 print("pinging Open-Meteo")
                 sunrise, sunset = sun_clock()
-                total_until_set, hours_until_sunset, mins_until_sunset, now = sun_countdown(set_time)
+                (total_until_set, hours_until_sunset,
+                mins_until_sunset, now) = sun_countdown(set_time)
                 print("%d hour(s) until sunset" % hours_until_sunset)
                 print("%d minutes(s) until sunset" % mins_until_sunset)
                 print(sunset)
@@ -170,20 +171,23 @@ while True:
                     time_check = 900000
                     percent_red = 0
                     percent_yellow = 0
-                # reset clock
-                clock = ticks_add(clock, time_check)
+                if first_run:
+                    first_run = False
+                else:
+                    # reset clock
+                    clock = ticks_add(clock, time_check)
         # if it's nighttime...
         else:
             if first_run or ticks_diff(ticks_ms(), clock) > time_check:
-                first_run = False
                 if today != now.tm_mday or (first_run and now.tm_hour < rise_time.tm_hour):
                     today = now.tm_mday
                     looking_for_sunrise = True
                 # begin tracking the incoming sunrise
-                if looking_for_sunrise:
+                elif looking_for_sunrise:
                     print("pinging Open-Meteo")
                     sunrise, sunset = sun_clock()
-                    total_until_set, hours_until_sunset, mins_until_sunset, now = sun_countdown(rise_time)
+                    (total_until_set, hours_until_sunset,
+                    mins_until_sunset, now) = sun_countdown(rise_time)
                     print("%d hour(s) until sunrise" % hours_until_sunrise)
                     print("%d minutes(s) until sunrise" % mins_until_sunrise)
                     print(sunrise)
@@ -220,9 +224,11 @@ while True:
                     time_check = 900000
                     percent_red = 255
                     percent_yellow = 125
-                first_run = False
-                # reset clock
-                clock = ticks_add(clock, time_check)
+                if first_run:
+                    first_run = False
+                else:
+                    # reset clock
+                    clock = ticks_add(clock, time_check)
         # turn neopixels on using RGB values
         pixels.fill((percent_red, percent_yellow, 0))
         pixels.show()
