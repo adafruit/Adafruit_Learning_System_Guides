@@ -153,7 +153,7 @@ while True:
                 print(sunset)
                 print()
                 # less than an hour until sunset...
-                if hours_until_sunset == 0:
+                if hours_until_sunset == 0 or hours_until_sunset == 23:
                     # check every minute
                     time_check = 60000
                     # map color to ramp up in brightness over the course of the final hour
@@ -183,18 +183,18 @@ while True:
                     today = now.tm_mday
                     looking_for_sunrise = True
                 # begin tracking the incoming sunrise
-                elif looking_for_sunrise:
+                if looking_for_sunrise:
                     print("pinging Open-Meteo")
                     sunrise, sunset = sun_clock()
-                    (total_until_set, hours_until_sunset,
-                    mins_until_sunset, now) = sun_countdown(rise_time)
+                    (total_until_rise, hours_until_sunrise,
+                    mins_until_sunrise, now) = sun_countdown(rise_time)
                     print("%d hour(s) until sunrise" % hours_until_sunrise)
                     print("%d minutes(s) until sunrise" % mins_until_sunrise)
                     print(sunrise)
                     print(now)
                     print()
                     # less than an hour until sunset...
-                    if hours_until_sunrise == 0:
+                    if hours_until_sunrise == 0 or hours_until_sunrise == 23:
                         # check every minute
                         time_check = 60000
                         # map color to decrease brightness over the course of the final hour
