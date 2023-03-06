@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 Liz Clark for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 const int _MISO = 16;
 const int _MOSI = 19;
 const int _CS = 17;
