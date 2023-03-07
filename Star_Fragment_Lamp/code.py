@@ -111,10 +111,7 @@ set_time = divide_time(sunset)
 def sun_countdown(sun_event):
     n = get_request(5, io.receive_time())
     remaining = time.mktime(sun_event) - time.mktime(n)
-<<<<<<< Updated upstream
-=======
     r = remaining
->>>>>>> Stashed changes
     # print(remaining)
     # calculate the seconds remaining
     secs_remaining = remaining % 60 # pylint: disable=unused-variable
@@ -125,12 +122,6 @@ def sun_countdown(sun_event):
     # calculate the hours remaining
     hours_until = remaining % 24
     remaining //= 24
-<<<<<<< Updated upstream
-    return remaining, hours_until, minutes_until, n
-
-total_until_rise, hours_until_sunrise, mins_until_sunrise, now = sun_countdown(rise_time)
-total_until_set, hours_until_sunset, mins_until_sunset, now = sun_countdown(set_time)
-=======
     return r, hours_until, minutes_until, n
 try:
     total_until_rise, hours_until_sunrise, mins_until_sunrise, now = sun_countdown(rise_time)
@@ -140,7 +131,6 @@ try:
     total_until_set, hours_until_sunset, mins_until_sunset, now = sun_countdown(set_time)
 except Exception as e:
     reset_on_error(10, e)
->>>>>>> Stashed changes
 
 # red and yellow color percentage for neopixels
 percent_red = 0
@@ -156,10 +146,7 @@ pixels = neopixel.NeoPixel(PIN, NUMPIXELS, brightness=BRIGHTNESS, auto_write=Fal
 print(total_until_set)
 # check to see if the star fragment should be lit up on start-up
 if total_until_set < 0:
-<<<<<<< Updated upstream
-=======
     print("star glow true")
->>>>>>> Stashed changes
     star_glow = True
     percent_red = 255
     percent_yellow = 125
@@ -196,33 +183,21 @@ while True:
                 sunrise, sunset = sun_clock()
                 (total_until_set, hours_until_sunset,
                 mins_until_sunset, now) = sun_countdown(set_time)
-<<<<<<< Updated upstream
-=======
                 print(now)
->>>>>>> Stashed changes
                 print("%d hour(s) until sunset" % hours_until_sunset)
                 print("%d minutes(s) until sunset" % mins_until_sunset)
                 print(sunset)
+                print(percent_red)
                 print()
                 # less than an hour until sunset...
-<<<<<<< Updated upstream
-                if hours_until_sunset == 0 or hours_until_sunset == 23:
-                    # check every minute
-                    time_check = 60000
-=======
                 if hours_until_sunset in (0, 23):
                     # check every minute
                     time_check = 300000
->>>>>>> Stashed changes
                     # map color to ramp up in brightness over the course of the final hour
                     percent_red = simpleio.map_range(mins_until_sunset, 59, 0, 0, 255)
                     percent_yellow = simpleio.map_range(mins_until_sunset, 59, 0, 0, 125)
                     # if the sun has set..
-<<<<<<< Updated upstream
-                    if mins_until_sunset < 1:
-=======
                     if total_until_set < 0:
->>>>>>> Stashed changes
                         percent_red = 255
                         percent_yellow = 125
                         time_check = 900000
@@ -250,36 +225,21 @@ while True:
                     sunrise, sunset = sun_clock()
                     (total_until_rise, hours_until_sunrise,
                     mins_until_sunrise, now) = sun_countdown(rise_time)
-<<<<<<< Updated upstream
-                    print("%d hour(s) until sunrise" % hours_until_sunrise)
-                    print("%d minutes(s) until sunrise" % mins_until_sunrise)
-                    print(sunrise)
-                    print(now)
-                    print()
-                    # less than an hour until sunset...
-                    if hours_until_sunrise == 0 or hours_until_sunrise == 23:
-                        # check every minute
-                        time_check = 60000
-=======
                     print(now)
                     print("%d hour(s) until sunrise" % hours_until_sunrise)
                     print("%d minutes(s) until sunrise" % mins_until_sunrise)
                     print(sunrise)
+                    print(now)
                     print()
                     # less than an hour until sunset...
                     if hours_until_sunrise in (0, 23):
                         # check every minute
                         time_check = 300000
->>>>>>> Stashed changes
                         # map color to decrease brightness over the course of the final hour
                         percent_red = simpleio.map_range(mins_until_sunrise, 59, 0, 255, 0)
                         percent_yellow = simpleio.map_range(mins_until_sunrise, 59, 0, 125, 0)
                         # if the sun has risen..
-<<<<<<< Updated upstream
-                        if mins_until_sunrise < 1:
-=======
                         if total_until_rise < 0:
->>>>>>> Stashed changes
                             percent_red = 0
                             percent_yellow = 0
                             time_check = 900000
@@ -310,14 +270,5 @@ while True:
         # turn neopixels on using RGB values
         pixels.fill((percent_red, percent_yellow, 0))
         pixels.show()
-<<<<<<< Updated upstream
-    # pylint: disable=broad-except
-    except Exception as e:
-        print("Error:\n", str(e))
-        print("Resetting microcontroller in 10 seconds")
-        time.sleep(10)
-        microcontroller.reset()
-=======
     except Exception as e:
         reset_on_error(10, e)
->>>>>>> Stashed changes
