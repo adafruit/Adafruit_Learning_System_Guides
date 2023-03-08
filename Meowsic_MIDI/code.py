@@ -75,15 +75,15 @@ def send_pc(bank, folder, patch):
     midi_usb.send(ProgramChange(patch))
     midi_serial.send(ProgramChange(patch))
 
-def send_bend(bend_start, bend_val, rate, dir):
+def send_bend(bend_start, bend_val, rate, bend_dir):
     b = bend_start
-    if dir is 0:
+    if bend_dir == 0:
         while b > bend_val + rate:
             print(b)
             b = b - rate
             midi_usb.send(PitchBend(b))
             midi_serial.send(PitchBend(b))
-    if dir is 1:
+    if bend_dir == 1:
         while b < bend_val - rate:
             print(b)
             b = b + rate
