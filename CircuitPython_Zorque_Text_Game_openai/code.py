@@ -1,12 +1,14 @@
 # SPDX-FileCopyrightText: 2023 Jeff Epler for Adafruit Industries
 # SPDX-License-Identifier: MIT
 import os
+import traceback
 
 import adafruit_esp32spi.adafruit_esp32spi_socket as socket
 import adafruit_requests as requests
 import adafruit_touchscreen
 import board
 import displayio
+import supervisor
 import terminalio
 from adafruit_esp32spi import adafruit_esp32spi
 from digitalio import DigitalInOut
@@ -254,5 +256,9 @@ try:
     run_game_step("New game")
     while True:
         run_game_step()
-except (EOFError, KeyboardInterrupt) as e:
-    raise SystemExit from e
+except Exception as e: # pylint: disable=broad-except
+    traceback.print_exception(e)
+    terminal.write(f"{clear}An error occurred (more details on REPL).\r\nTouch the screen to re-load")
+    board.DISPLAY.refresh()
+    get_touchscreen_choice()
+    supervisor.reload()
