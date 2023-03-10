@@ -139,7 +139,8 @@ class WrappedTextDisplay:
 
     def refresh(self):
         text = '\n'.join(self.lines[self.line_offset : self.line_offset + max_lines])
-        while '\n\n' in text: 
+        # Work around https://github.com/adafruit/Adafruit_CircuitPython_Display_Text/issues/183
+        while '\n\n' in text:
             text = text.replace('\n\n', '\n \n')
         terminal.text = text
         board.DISPLAY.refresh()
@@ -162,10 +163,20 @@ def record_game_step(action, response):
 
 def get_one_completion(full_prompt):
     if not use_openai:
-        return f"""This is a canned response in offline mode. The player's last choice was as follows:
+        return f"""\
+This is a canned response in offline mode. The player's last choice was as follows:
     {full_prompt[-1]['content']}
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nulla aliquet enim tortor at auctor urna. Arcu ac tortor dignissim convallis aenean et tortor at. Dapibus ultrices in iaculis nunc sed augue. Enim nec dui nunc mattis enim ut tellus elementum sagittis. Sit amet mattis vulputate enim nulla. Ultrices in iaculis nunc sed augue lacus. Pulvinar neque laoreet suspendisse interdum consectetur libero id faucibus nisl. Aenean pharetra magna ac placerat vestibulum lectus mauris ultrices eros. Imperdiet nulla malesuada pellentesque elit eget. Tellus at urna condimentum mattis pellentesque id nibh tortor. Velit dignissim sodales ut eu sem integer vitae. Id ornare arcu odio ut sem nulla pharetra diam sit.
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor \
+incididunt ut labore et dolore magna aliqua. Nulla aliquet enim tortor at \
+auctor urna. Arcu ac tortor dignissim convallis aenean et tortor at. Dapibus \
+ultrices in iaculis nunc sed augue. Enim nec dui nunc mattis enim ut tellus \
+elementum sagittis. Sit amet mattis vulputate enim nulla. Ultrices in iaculis \
+nunc sed augue lacus. Pulvinar neque laoreet suspendisse interdum consectetur \
+libero id faucibus nisl. Aenean pharetra magna ac placerat vestibulum lectus \
+mauris ultrices eros. Imperdiet nulla malesuada pellentesque elit eget. Tellus \
+at urna condimentum mattis pellentesque id nibh tortor. Velit dignissim sodales \
+ut eu sem integer vitae. Id ornare arcu odio ut sem nulla pharetra diam sit.
 
 1: Stand in the place where you live
 2: Now face West
@@ -209,7 +220,8 @@ def get_touchscreen_choice():
             if wrapped_text_display.max_offset() > 0 and ticks_less(deadline, ticks_ms()):
                 wrapped_text_display.scroll_next_line()
                 wrapped_text_display.refresh()
-                deadline = ticks_add(deadline, 5000 if wrapped_text_display.on_last_line() else 1000)
+                deadline = ticks_add(deadline, 
+                        5000 if wrapped_text_display.on_last_line() else 1000)
 
     # Depending on the quadrant of the screen, make a choice
     x, y, _ = t
@@ -269,8 +281,17 @@ use_height = board.DISPLAY.height - 4
 use_width = board.DISPLAY.width - 4
 
 # Game text is displayed on this wdget
-terminal = Label(font=nice_font, color=0xffffff, background_color=0, line_spacing=line_spacing, anchor_point=(0,0), anchored_position=(0,glyph_height+1))
-max_lines = (use_height - 2 * glyph_height) // int(nice_font.get_bounding_box()[1] * terminal.line_spacing)
+terminal = Label(
+    font=nice_font,
+    color=0xFFFFFF,
+    background_color=0,
+    line_spacing=line_spacing,
+    anchor_point=(0, 0),
+    anchored_position=(0, glyph_height + 1),
+)
+max_lines = (use_height - 2 * glyph_height) // int(
+    nice_font.get_bounding_box()[1] * terminal.line_spacing
+)
 main_group.append(terminal)
 
 # Indicate what each quadrant of the screen does when tapped
@@ -298,8 +319,8 @@ try:
     while True:
         run_game_step()
 except Exception as e: # pylint: disable=broad-except
-    traceback.print_exception(e)
-    print_wrapped(f"An error occurred (more details on REPL).\nTouch the screen to re-load")
+    traceback.print_exception(e) # pylint: disable=no-value-for-parameter
+    print_wrapped("An error occurred (more details on REPL).\nTouch the screen to re-load")
     board.DISPLAY.refresh()
     get_touchscreen_choice()
     supervisor.reload()
