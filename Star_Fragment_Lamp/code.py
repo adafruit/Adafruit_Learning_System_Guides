@@ -19,6 +19,17 @@ lat = 42.36
 # longitude
 long = -71.06
 
+# neopixel setup
+NUMPIXELS = 30  # number of neopixels
+BRIGHTNESS = 0.5  # A number between 0.0 and 1.0, where 0.0 is off, and 1.0 is max.
+PIN = board.A3  # This is the default pin on the NeoPixel Driver BFF.
+
+pixels = neopixel.NeoPixel(PIN, NUMPIXELS, brightness=BRIGHTNESS, auto_write=False)
+
+# turn on NeoPixels on boot to check wiring
+pixels.fill((255, 125, 0))
+pixels.show()
+
 # API request to open-meteo
 weather_url = "https://api.open-meteo.com/v1/forecast?"
 # pass latitude and longitude
@@ -135,13 +146,6 @@ except Exception as e:
 # red and yellow color percentage for neopixels
 percent_red = 0
 percent_yellow = 0
-
-# neopixel setup
-NUMPIXELS = 30  # number of neopixels
-BRIGHTNESS = 0.05  # A number between 0.0 and 1.0, where 0.0 is off, and 1.0 is max.
-PIN = board.A3  # This is the default pin on the NeoPixel Driver BFF.
-
-pixels = neopixel.NeoPixel(PIN, NUMPIXELS, brightness=BRIGHTNESS, auto_write=False)
 
 print(total_until_set)
 # check to see if the star fragment should be lit up on start-up
