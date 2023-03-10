@@ -220,7 +220,7 @@ def get_touchscreen_choice():
             if wrapped_text_display.max_offset() > 0 and ticks_less(deadline, ticks_ms()):
                 wrapped_text_display.scroll_next_line()
                 wrapped_text_display.refresh()
-                deadline = ticks_add(deadline, 
+                deadline = ticks_add(deadline,
                         5000 if wrapped_text_display.on_last_line() else 1000)
 
     # Depending on the quadrant of the screen, make a choice
