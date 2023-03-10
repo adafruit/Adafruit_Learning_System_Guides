@@ -6,6 +6,9 @@ import traceback
 import adafruit_esp32spi.adafruit_esp32spi_socket as socket
 import adafruit_requests as requests
 import adafruit_touchscreen
+from adafruit_bitmap_font.bitmap_font import load_font
+from adafruit_display_text.bitmap_label import Label
+from adafruit_display_text import wrap_text_to_pixels
 import board
 import displayio
 import supervisor
@@ -25,6 +28,9 @@ use_openai = True
 
 # Place the key in your settings.toml file
 openai_api_key = os.getenv("OPENAI_API_KEY")
+
+nice_font = load_font("helvR10.pcf")
+line_spacing = 0.75
 
 # Customize this prompt as you see fit to create a different experience
 base_prompt = """
@@ -99,23 +105,13 @@ def terminal_palette(fg=0xffffff, bg=0):
     return p
 
 def print_wrapped(text):
-    print(text)
-    maxwidth = main_text.width
-    for line in text.split("\n"):
-        col = 0
-        sp = ''
-        for word in line.split():
-            newcol = col + len(sp) + len(word)
-            if newcol < maxwidth:
-                terminal.write(sp + word)
-                col = newcol
-            else:
-                terminal.write('\r\n')
-                terminal.write(word)
-                col = len(word)
-            sp = ' '
-        if sp or not line:
-            terminal.write('\r\n')
+    lines = wrap_text_to_pixels(text, use_width, nice_font)
+    del lines[max_lines:]
+    #del lines[:-max_lines]
+    text = '\n'.join(lines)
+    while '\n\n' in text: 
+        text = text.replace('\n\n', '\n \n')
+    terminal.text = text
     board.DISPLAY.refresh()
 
 def make_full_prompt(action):
@@ -131,8 +127,8 @@ def record_game_step(action, response):
 
 def get_one_completion(full_prompt):
     if not use_openai:
-        return f"""This is a canned response in offline mode. The player's last
-choice was as follows: {full_prompt[-1]['content']}""".strip()
+        return f"""This is a canned response in offline mode. The player's last choice was as follows:
+    {full_prompt[-1]['content']}""".strip()
     try:
         response = requests.post(
             "https://api.openai.com/v1/chat/completions",
@@ -181,7 +177,7 @@ def run_game_step(forced_choice=None):
         choice = forced_choice
     else:
         choice = get_touchscreen_choice()
-    print_wrapped(f"\n\nPLAYER: {choice}")
+    print_wrapped(f"PLAYER: {choice}")
     prompt = make_full_prompt(choice)
     for _ in range(3):
         result = get_one_completion(prompt)
@@ -190,7 +186,6 @@ def run_game_step(forced_choice=None):
     else:
         raise ValueError("Error getting completion from OpenAI")
     print(result)
-    terminal.write(clear)
     print_wrapped(result)
 
     record_game_step(choice, result)
@@ -218,19 +213,13 @@ main_group.y = 4
 
 # Determine the size of everything
 glyph_width, glyph_height = terminalio.FONT.get_bounding_box()
-use_height = board.DISPLAY.height - 8
-use_width = board.DISPLAY.width - 8
-terminal_width = use_width // glyph_width
-terminal_height = use_height // glyph_height - 4
+use_height = board.DISPLAY.height - 4
+use_width = board.DISPLAY.width - 4
 
 # Game text is displayed on this wdget
-main_text = displayio.TileGrid(terminalio.FONT.bitmap, pixel_shader=terminal_palette(),
-    width=terminal_width, height=terminal_height, tile_width=glyph_width,
-    tile_height=glyph_height)
-main_text.x = 4
-main_text.y = 4 + glyph_height
-terminal = terminalio.Terminal(main_text, terminalio.FONT)
-main_group.append(main_text)
+terminal = Label(font=nice_font, color=0xffffff, background_color=0, line_spacing=line_spacing, anchor_point=(0,0), anchored_position=(0,glyph_height+1))
+max_lines = (use_height - 2 * glyph_height) // int(nice_font.get_bounding_box()[1] * terminal.line_spacing)
+main_group.append(terminal)
 
 # Indicate what each quadrant of the screen does when tapped
 label_width = use_width // (glyph_width * 2)
@@ -238,9 +227,9 @@ main_group.append(terminal_label('1', label_width, terminal_palette(0, 0xffff00)
 main_group.append(terminal_label('2', label_width, terminal_palette(0, 0x00ffff),
     use_width - label_width*glyph_width, 0))
 main_group.append(terminal_label('3', label_width, terminal_palette(0, 0xff00ff),
-    0, use_height-2*glyph_height))
+    0, use_height-glyph_height))
 main_group.append(terminal_label('4', label_width, terminal_palette(0, 0x00ff00),
-    use_width - label_width*glyph_width, use_height-2*glyph_height))
+    use_width - label_width*glyph_width, use_height-glyph_height))
 
 # Show our stuff on the screen
 board.DISPLAY.auto_refresh = False
@@ -258,7 +247,7 @@ try:
         run_game_step()
 except Exception as e: # pylint: disable=broad-except
     traceback.print_exception(e)
-    terminal.write(f"{clear}An error occurred (more details on REPL).\r\nTouch the screen to re-load")
+    print_wrapped(f"An error occurred (more details on REPL).\nTouch the screen to re-load")
     board.DISPLAY.refresh()
     get_touchscreen_choice()
     supervisor.reload()
