@@ -30,7 +30,11 @@ use_openai = True
 # Place the key in your settings.toml file
 openai_api_key = os.getenv("OPENAI_API_KEY")
 
-nice_font = load_font("helvR10.pcf")
+# Select a 14-point font for the PyPortal titano, 10-point for original & Pynt
+if board.DISPLAY.width > 320:
+    nice_font = load_font("helvR14.pcf")
+else:
+    nice_font = load_font("helvR10.pcf")
 line_spacing = 0.75
 
 # Customize this prompt as you see fit to create a different experience
