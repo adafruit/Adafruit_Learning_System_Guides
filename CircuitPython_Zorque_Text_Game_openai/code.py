@@ -1,12 +1,18 @@
 # SPDX-FileCopyrightText: 2023 Jeff Epler for Adafruit Industries
 # SPDX-License-Identifier: MIT
 import os
+import traceback
 
 import adafruit_esp32spi.adafruit_esp32spi_socket as socket
 import adafruit_requests as requests
 import adafruit_touchscreen
+from adafruit_ticks import ticks_ms, ticks_add, ticks_less
+from adafruit_bitmap_font.bitmap_font import load_font
+from adafruit_display_text.bitmap_label import Label
+from adafruit_display_text import wrap_text_to_pixels
 import board
 import displayio
+import supervisor
 import terminalio
 from adafruit_esp32spi import adafruit_esp32spi
 from digitalio import DigitalInOut
@@ -24,15 +30,23 @@ use_openai = True
 # Place the key in your settings.toml file
 openai_api_key = os.getenv("OPENAI_API_KEY")
 
+# Select a 14-point font for the PyPortal titano, 10-point for original & Pynt
+if board.DISPLAY.width > 320:
+    nice_font = load_font("helvR14.pcf")
+else:
+    nice_font = load_font("helvR10.pcf")
+line_spacing = 0.75
+
 # Customize this prompt as you see fit to create a different experience
 base_prompt = """
 You are an AI helping the player play an endless text adventure game. You will stay in character as the GM.
 
-The goal of the game is to save the Zorque mansion from being demolished. The
-game starts outside the abandonded Zorque mansion.
+The goal of the game is to save the Zorque mansion from being demolished. The \
+game starts outside the abandoned Zorque mansion.
 
-As GM, never let the player die; they always survive a situation, no matter how
+As GM, never let the player die; they always survive a situation, no matter how \
 harrowing.
+
 At each step:
     * Offer a short description of my surroundings (1 paragraph)
     * List the items I am carrying, if any
@@ -96,25 +110,45 @@ def terminal_palette(fg=0xffffff, bg=0):
     p[1] = fg
     return p
 
+class WrappedTextDisplay:
+    def __init__(self):
+        self.line_offset = 0
+        self.lines = []
+
+    def add_text(self, text):
+        self.lines.extend(wrap_text_to_pixels(text, use_width, nice_font))
+
+    def set_text(self, text):
+        self.lines = wrap_text_to_pixels(text, use_width, nice_font)
+        self.line_offset = 0
+
+    def scroll_to_end(self):
+        self.line_offset = self.max_offset()
+
+    def scroll_next_line(self):
+        max_offset = self.max_offset()
+        if max_offset > 0:
+            line_offset = self.line_offset + 1
+            self.line_offset = line_offset % (max_offset + 1)
+
+    def max_offset(self):
+        return max(0, len(self.lines) - max_lines)
+
+    def on_last_line(self):
+        return self.line_offset == self.max_offset()
+
+    def refresh(self):
+        text = '\n'.join(self.lines[self.line_offset : self.line_offset + max_lines])
+        # Work around https://github.com/adafruit/Adafruit_CircuitPython_Display_Text/issues/183
+        while '\n\n' in text:
+            text = text.replace('\n\n', '\n \n')
+        terminal.text = text
+        board.DISPLAY.refresh()
+wrapped_text_display = WrappedTextDisplay()
+
 def print_wrapped(text):
-    print(text)
-    maxwidth = main_text.width
-    for line in text.split("\n"):
-        col = 0
-        sp = ''
-        for word in line.split():
-            newcol = col + len(sp) + len(word)
-            if newcol < maxwidth:
-                terminal.write(sp + word)
-                col = newcol
-            else:
-                terminal.write('\r\n')
-                terminal.write(word)
-                col = len(word)
-            sp = ' '
-        if sp or not line:
-            terminal.write('\r\n')
-    board.DISPLAY.refresh()
+    wrapped_text_display.set_text(text)
+    wrapped_text_display.refresh()
 
 def make_full_prompt(action):
     return session + [{"role": "user", "content": f"PLAYER: {action}"}]
@@ -129,8 +163,26 @@ def record_game_step(action, response):
 
 def get_one_completion(full_prompt):
     if not use_openai:
-        return f"""This is a canned response in offline mode. The player's last
-choice was as follows: {full_prompt[-1]['content']}""".strip()
+        return f"""\
+This is a canned response in offline mode. The player's last choice was as follows:
+    {full_prompt[-1]['content']}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor \
+incididunt ut labore et dolore magna aliqua. Nulla aliquet enim tortor at \
+auctor urna. Arcu ac tortor dignissim convallis aenean et tortor at. Dapibus \
+ultrices in iaculis nunc sed augue. Enim nec dui nunc mattis enim ut tellus \
+elementum sagittis. Sit amet mattis vulputate enim nulla. Ultrices in iaculis \
+nunc sed augue lacus. Pulvinar neque laoreet suspendisse interdum consectetur \
+libero id faucibus nisl. Aenean pharetra magna ac placerat vestibulum lectus \
+mauris ultrices eros. Imperdiet nulla malesuada pellentesque elit eget. Tellus \
+at urna condimentum mattis pellentesque id nibh tortor. Velit dignissim sodales \
+ut eu sem integer vitae. Id ornare arcu odio ut sem nulla pharetra diam sit.
+
+1: Stand in the place where you live
+2: Now face West
+3: Think about the place where you live
+4: Wonder why you haven't before
+    """.strip()
     try:
         response = requests.post(
             "https://api.openai.com/v1/chat/completions",
@@ -156,6 +208,7 @@ def get_touchscreen_choice():
 
     # Wait for screen to be pressed
     touch_count = 0
+    deadline = ticks_add(ticks_ms(), 1000)
     while True:
         t = ts.touch_point
         if t is not None:
@@ -164,6 +217,11 @@ def get_touchscreen_choice():
                 break
         else:
             touch_count = 0
+            if wrapped_text_display.max_offset() > 0 and ticks_less(deadline, ticks_ms()):
+                wrapped_text_display.scroll_next_line()
+                wrapped_text_display.refresh()
+                deadline = ticks_add(deadline,
+                        5000 if wrapped_text_display.on_last_line() else 1000)
 
     # Depending on the quadrant of the screen, make a choice
     x, y, _ = t
@@ -179,7 +237,10 @@ def run_game_step(forced_choice=None):
         choice = forced_choice
     else:
         choice = get_touchscreen_choice()
-    print_wrapped(f"\n\nPLAYER: {choice}")
+    wrapped_text_display.add_text(f"\nPLAYER: {choice}")
+    wrapped_text_display.scroll_to_end()
+    wrapped_text_display.refresh()
+
     prompt = make_full_prompt(choice)
     for _ in range(3):
         result = get_one_completion(prompt)
@@ -188,8 +249,8 @@ def run_game_step(forced_choice=None):
     else:
         raise ValueError("Error getting completion from OpenAI")
     print(result)
-    terminal.write(clear)
-    print_wrapped(result)
+    wrapped_text_display.set_text(result)
+    wrapped_text_display.refresh()
 
     record_game_step(choice, result)
 
@@ -216,19 +277,22 @@ main_group.y = 4
 
 # Determine the size of everything
 glyph_width, glyph_height = terminalio.FONT.get_bounding_box()
-use_height = board.DISPLAY.height - 8
-use_width = board.DISPLAY.width - 8
-terminal_width = use_width // glyph_width
-terminal_height = use_height // glyph_height - 4
+use_height = board.DISPLAY.height - 4
+use_width = board.DISPLAY.width - 4
 
 # Game text is displayed on this wdget
-main_text = displayio.TileGrid(terminalio.FONT.bitmap, pixel_shader=terminal_palette(),
-    width=terminal_width, height=terminal_height, tile_width=glyph_width,
-    tile_height=glyph_height)
-main_text.x = 4
-main_text.y = 4 + glyph_height
-terminal = terminalio.Terminal(main_text, terminalio.FONT)
-main_group.append(main_text)
+terminal = Label(
+    font=nice_font,
+    color=0xFFFFFF,
+    background_color=0,
+    line_spacing=line_spacing,
+    anchor_point=(0, 0),
+    anchored_position=(0, glyph_height + 1),
+)
+max_lines = (use_height - 2 * glyph_height) // int(
+    nice_font.get_bounding_box()[1] * terminal.line_spacing
+)
+main_group.append(terminal)
 
 # Indicate what each quadrant of the screen does when tapped
 label_width = use_width // (glyph_width * 2)
@@ -236,9 +300,9 @@ main_group.append(terminal_label('1', label_width, terminal_palette(0, 0xffff00)
 main_group.append(terminal_label('2', label_width, terminal_palette(0, 0x00ffff),
     use_width - label_width*glyph_width, 0))
 main_group.append(terminal_label('3', label_width, terminal_palette(0, 0xff00ff),
-    0, use_height-2*glyph_height))
+    0, use_height-glyph_height))
 main_group.append(terminal_label('4', label_width, terminal_palette(0, 0x00ff00),
-    use_width - label_width*glyph_width, use_height-2*glyph_height))
+    use_width - label_width*glyph_width, use_height-glyph_height))
 
 # Show our stuff on the screen
 board.DISPLAY.auto_refresh = False
@@ -254,5 +318,9 @@ try:
     run_game_step("New game")
     while True:
         run_game_step()
-except (EOFError, KeyboardInterrupt) as e:
-    raise SystemExit from e
+except Exception as e: # pylint: disable=broad-except
+    traceback.print_exception(e) # pylint: disable=no-value-for-parameter
+    print_wrapped("An error occurred (more details on REPL).\nTouch the screen to re-load")
+    board.DISPLAY.refresh()
+    get_touchscreen_choice()
+    supervisor.reload()
