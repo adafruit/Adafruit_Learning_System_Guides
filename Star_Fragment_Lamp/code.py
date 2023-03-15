@@ -62,7 +62,7 @@ def reset_on_error(delay, error):
 def get_request(tries, ping):
     for i in range(tries):
         try:
-            n = ping
+            n = ping()
         except Exception as error:
             print(error)
             time.sleep(10)
@@ -75,7 +75,7 @@ def get_request(tries, ping):
 # get the time on start-up
 # pylint: disable=broad-except
 try:
-    now = get_request(5, io.receive_time())
+    now = get_request(5, io.receive_time)
 except Exception as e:
     reset_on_error(10, e)
 print(now)
@@ -84,7 +84,7 @@ today = now.tm_mday
 # function to make a request to open-meteo
 def sun_clock():
     # make the API request
-    response = get_request(5, requests.get(weather_url))
+    response = get_request(5, lambda : requests.get(weather_url))
     # packs the response into a JSON
     response_as_json = response.json()
     # gets sunrise
@@ -120,7 +120,7 @@ set_time = divide_time(sunset)
 
 # function that tracks how many hours/minutes until sunrise or sunset
 def sun_countdown(sun_event):
-    n = get_request(5, io.receive_time())
+    n = get_request(5, io.receive_time)
     remaining = time.mktime(sun_event) - time.mktime(n)
     r = remaining
     # print(remaining)
@@ -259,7 +259,7 @@ while True:
                 # otherwise just keep checking every 15 minutes
                 # and keep neopixels on
                 else:
-                    now = get_request(5, io.receive_time())
+                    now = get_request(5, io.receive_time)
                     print("not looking for sunrise")
                     print(now)
                     print()
