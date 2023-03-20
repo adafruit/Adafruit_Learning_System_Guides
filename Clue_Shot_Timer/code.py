@@ -16,24 +16,23 @@ from adafruit_display_shapes.rect import Rect
 
 import board
 import digitalio
-import microcontroller
 
 settings = {}
 
 with open("/settings.txt", "r") as F:
     for line in F:
-        k, v = line.replace("\n","").split(',')
+        k, v = line.replace("\n", "").split(",")
         print(k, v)
         settings[k] = v
 
-MODE = settings['mode']
-if settings['delay'] == 'RNDM':
-    DELAY_TIME = settings['delay']
+MODE = settings["mode"]
+if settings["delay"] == "RNDM":
+    DELAY_TIME = settings["delay"]
 else:
-    DELAY_TIME = int(settings['delay'])
-PB = float(settings['pb'])
-PAR = float(settings['par'])
-SENSITIVITY = int(settings['sensitivity'])
+    DELAY_TIME = int(settings["delay"])
+PB = float(settings["pb"])
+PAR = float(settings["par"])
+SENSITIVITY = int(settings["sensitivity"])
 
 
 gc.enable()
@@ -102,9 +101,8 @@ mode_label = label.Label(
 group.append(mode_label)
 
 
-
 def normalized_rms(values):
-    """ Gets the normalized RMS of the mic samples """
+    """Gets the normalized RMS of the mic samples"""
     minbuf = int(sum(values) / len(values))
     samples_sum = sum(float(sample - minbuf) * (sample - minbuf) for sample in values)
 
@@ -112,7 +110,7 @@ def normalized_rms(values):
 
 
 def picker(current):
-    """ Displays screen allowing user to set a time """
+    """Displays screen allowing user to set a time"""
     pick[0].text, pick[1].text, pick[2].text, pick[3].text = list(
         current.replace(".", "")
     )
@@ -164,7 +162,8 @@ def rect_maker(shots):
         rects.append(rectangle)
     return rects
 
-def shot_label_maker(shots, grp):
+
+def shot_label_maker(grp):
     txt = ""
 
     for i, j in enumerate(shot_list):
@@ -173,15 +172,25 @@ def shot_label_maker(shots, grp):
         else:
             split = j - shot_list[i - 1]
         txt = txt + f"{i+1:02}\t{j:05.2f}\t{split:05.2f}\n"
-    grp.append(label.Label(font=arial18, anchored_position=(120, 3), text=txt[:-1], color=0xFFFFFF, line_spacing=0.82, anchor_point=(0.5, 0)))
+    grp.append(
+        label.Label(
+            font=arial18,
+            anchored_position=(120, 3),
+            text=txt[:-1],
+            color=0xFFFFFF,
+            line_spacing=0.82,
+            anchor_point=(0.5, 0),
+        )
+    )
     gc.collect()
     return grp
+
 
 def show_shot_list(shots, disp):
     done = False
 
     shot_group = rect_maker(shots)
-    shot_group = shot_label_maker(shots, shot_group)
+    shot_group = shot_label_maker(shot_group)
     disp.show(shot_group)
 
     tracker = 10
@@ -213,7 +222,9 @@ def show_shot_list(shots, disp):
     gc.collect()
 
 
-def menu_mode(mode, delay_time, sensitivity, pb, par, length, submenus):
+def menu_mode(
+    mode, delay_time, sensitivity_, pb, par, length_, submenus_
+):  # pylint: disable=too-many-branches,too-many-statements
     selected = int(menu[0].y / 40) + 1
     display.show(menu)
     display.refresh()
@@ -222,7 +233,7 @@ def menu_mode(mode, delay_time, sensitivity, pb, par, length, submenus):
         pass
     done = False
     while not done:
-        if not button_a.value and selected < length:
+        if not button_a.value and selected < length_:
             started = time.monotonic()
             while not button_a.value:
                 if time.monotonic() - started > 1:
@@ -233,9 +244,9 @@ def menu_mode(mode, delay_time, sensitivity, pb, par, length, submenus):
                     else:
                         page_ = menu
                         selected = int(page_[0].y / 40) + 1
-                        length = len(page_) - 1
+                        length_ = len(page_) - 1
                         display.show(page_)
-                        submenus = main_menu_opts
+                        submenus_ = main_menu_opts
                         display.refresh()
                         break
             else:
@@ -261,7 +272,7 @@ def menu_mode(mode, delay_time, sensitivity, pb, par, length, submenus):
             while not button_a.value:
                 pass
 
-        if not button_a.value and selected == length and not done:
+        if not button_a.value and selected == length_ and not done:
             started = time.monotonic()
             while not button_a.value:
                 if time.monotonic() - started > 1:
@@ -272,9 +283,9 @@ def menu_mode(mode, delay_time, sensitivity, pb, par, length, submenus):
                     else:
                         page_ = menu
                         selected = int(page_[0].y / 40) + 1
-                        length = len(page_) - 1
+                        length_ = len(page_) - 1
                         display.show(page_)
-                        submenus = main_menu_opts
+                        submenus_ = main_menu_opts
                         display.refresh()
                         break
             else:
@@ -301,10 +312,10 @@ def menu_mode(mode, delay_time, sensitivity, pb, par, length, submenus):
                 pass
 
         if not button_b.value:
-            if isinstance(submenus[1], list):
-                if submenus[0] == mode:
-                    mode = submenus[1][selected - 1]
-                    submenus[0] = mode
+            if isinstance(submenus_[1], list):
+                if submenus_[0] == mode:
+                    mode = submenus_[1][selected - 1]
+                    submenus_[0] = mode
                     if mode == "PB":
                         pb = picker(f"{PB:05.2f}")
                         mode_label.text = f"{mode} {pb}"
@@ -319,28 +330,28 @@ def menu_mode(mode, delay_time, sensitivity, pb, par, length, submenus):
                         display.refresh()
                     else:
                         mode_label.text = mode
-                if submenus[0] == delay_time and len(submenus[1]) == 5:
-                    delay_time = submenus[1][selected - 1]
-                    submenus[0] = delay_time
+                if submenus_[0] == delay_time and len(submenus_[1]) == 5:
+                    delay_time = submenus_[1][selected - 1]
+                    submenus_[0] = delay_time
                     delay.text = f"Delay: {delay_time}"
-                if submenus[0] == sensitivity and len(submenus[1]) == 6:
-                    sensitivity = submenus[1][selected - 1]
-                    submenus[0] = sensitivity
-                    sens.text = f"{sensitivity}"
+                if submenus_[0] == sensitivity_ and len(submenus_[1]) == 6:
+                    sensitivity_ = submenus_[1][selected - 1]
+                    submenus_[0] = sensitivity_
+                    sens.text = f"{sensitivity_}"
                 for i in page_:
                     i.color = 0xFFFFFF
                 page_[selected].color = 0x00FF00
             else:
-                page_ = submenus[selected - 1]
-                submenus = page_opts[selected - 1]
+                page_ = submenus_[selected - 1]
+                submenus_ = page_opts[selected - 1]
                 selected = int(page_[0].y / 40) + 1
-                length = len(page_) - 1
+                length_ = len(page_) - 1
                 display.show(page_)
             while not button_b.value:
                 pass
 
         display.refresh()
-    return mode, delay_time, sensitivity, pb, par
+    return mode, delay_time, sensitivity_, pb, par
 
 
 def label_maker(txt, grp, font, x, y, x_step=0, y_step=0, anchor=None, padding=0):
@@ -365,6 +376,7 @@ def label_maker(txt, grp, font, x, y, x_step=0, y_step=0, anchor=None, padding=0
                 )
             )
     return grp
+
 
 mode_opts = [MODE, ["Default", "PB", "Par"]]
 
@@ -445,11 +457,11 @@ page = menu
 length = len(page) - 1
 
 mic = audiobusio.PDMIn(
-            board.MICROPHONE_CLOCK,
-            board.MICROPHONE_DATA,
-            sample_rate=16000,
-            bit_depth=16,
-        )
+    board.MICROPHONE_CLOCK,
+    board.MICROPHONE_DATA,
+    sample_rate=16000,
+    bit_depth=16,
+)
 
 sensitivity_settings = [8000, 10000, 15000, 20000, 25000, 30000]
 
@@ -491,7 +503,9 @@ while True:
                     print("SHOT")
                     shot_time = round(time.monotonic() - start, 2)
                     if len(shot_list) != 0:
-                        shot_num.text = f"#{SHOTS}   SPL {shot_time - shot_list[-1]:05.2f}"
+                        shot_num.text = (
+                            f"#{SHOTS}   SPL {shot_time - shot_list[-1]:05.2f}"
+                        )
                     else:
                         shot_num.text = f"#{SHOTS}   SPL {shot_time:05.2f}"
                     main_time.text = f"{shot_time:05.2f}"
