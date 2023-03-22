@@ -18,27 +18,9 @@ pca = PCA9685(i2c)
 
 pca.frequency = 50
 
-servo0 = servo.Servo(pca.channels[0])
-servo1 = servo.Servo(pca.channels[1])
-servo2 = servo.Servo(pca.channels[2])
-servo3 = servo.Servo(pca.channels[3])
-servo4 = servo.Servo(pca.channels[4])
-servo5 = servo.Servo(pca.channels[5])
-servo6 = servo.Servo(pca.channels[6])
-servo7 = servo.Servo(pca.channels[7])
-servo8 = servo.Servo(pca.channels[8])
-servo9 = servo.Servo(pca.channels[9])
-servo10 = servo.Servo(pca.channels[10])
-servo11 = servo.Servo(pca.channels[11])
-servo12 = servo.Servo(pca.channels[12])
-servo13 = servo.Servo(pca.channels[13])
-servo14 = servo.Servo(pca.channels[14])
-servo15 = servo.Servo(pca.channels[15])
+# create the servo objects and add them to the servos array
+servos = [servo.Servo(pca.channels[i]) for i in range(16)]
 
-# array of servos
-servos = [servo0, servo1, servo2, servo3, servo4, servo5,
-          servo6, servo7, servo8, servo9, servo10, servo11,
-          servo12, servo13, servo14, servo15]
 # array of midi notes, high to low
 midi_notes = [83, 81, 79, 77, 76, 74, 72, 71, 69, 67, 65, 64, 62, 60, 59, 57]
 angle0 = 20
