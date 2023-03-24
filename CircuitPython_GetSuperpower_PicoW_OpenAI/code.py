@@ -47,8 +47,10 @@ from adafruit_ticks import ticks_add, ticks_less, ticks_ms
 #
 # Invent an alien animal or plant, name it, and vividly describe it in 1
 # sentence
+#
+# Write 1 setence starting "you can" about an unconventional but useful superpower 
 prompt=os.getenv("MY_PROMPT", """
-Write 1 setence starting "you can" about an unconventional but useful superpower 
+Invent and vividly describe an alien species. write one paragraph
 """).strip()
 please_wait=os.getenv("PLEASE_WAIT", """
 Finding superpower
@@ -57,7 +59,7 @@ Finding superpower
 openai_api_key = os.getenv("OPENAI_API_KEY")
 
 nice_font = load_font("helvR08.pcf")
-line_spacing = 0.68
+line_spacing = 9 # in pixels
 
 #  i2c display setup
 displayio.release_displays()
@@ -69,7 +71,6 @@ display_bus = displayio.I2CDisplay(i2c, device_address=0x3D, reset=oled_reset)
 
 WIDTH = 128
 HEIGHT = 64
-offset_y = 5
 
 display = adafruit_displayio_ssd1306.SSD1306(
     display_bus, width=WIDTH, height=HEIGHT
@@ -77,35 +78,42 @@ display = adafruit_displayio_ssd1306.SSD1306(
 if openai_api_key is None:
     input("Place your\nOPENAI_API_KEY\nin settings.toml")
 display.auto_refresh = False
-main_group = displayio.Group()
-display.root_group = main_group
 
-terminal = Label(
-    font=nice_font,
-    color=0xFFFFFF,
-    background_color=0,
-    line_spacing=line_spacing,
-    anchor_point=(0, 0),
-    anchored_position=(0, 0),
-)
-max_lines = display.height // int(nice_font.get_bounding_box()[1] * terminal.line_spacing)
-main_group.append(terminal)
-
-class WrappedTextDisplay:
+class WrappedTextDisplay(displayio.Group):
     def __init__(self):
-        self.line_offset = 0
-        self.lines = []
+        super().__init__()
+        self.offset = 0
+        self.max_lines = display.height // line_spacing
+        for i in range(self.max_lines):
+            self.make_label("", i * line_spacing)
+        self.lines = [""]
         self.text = ""
 
+    def make_label(self, text, y):
+        result = Label(
+            font=nice_font,
+            color=0xFFFFFF,
+            background_color=None,
+            line_spacing=line_spacing,
+            anchor_point=(0, 0),
+            anchored_position=(0, y),
+            text=text)
+        self.append(result)
+
     def add_text(self, new_text):
-        self.set_text(self.text + new_text)
+        print(end=new_text)
+        if self.lines:
+            text = self.lines[-1] + new_text
+        else:
+            text = new_text
+        self.lines[-1:] = wrap_text_to_pixels(text, display.width, nice_font)
         self.scroll_to_end()
 
     def set_text(self, text):
         print("\033[H\033[2J", end=text)
         self.text = text
         self.lines = wrap_text_to_pixels(text, display.width, nice_font)
-        self.line_offset = 0
+        self.offset = 0
 
     def show(self, text):
         self.set_text(text)
@@ -116,25 +124,34 @@ class WrappedTextDisplay:
         self.refresh()
 
     def scroll_to_end(self):
-        self.line_offset = self.max_offset()
+        self.offset = self.max_offset()
 
     def scroll_next_line(self):
         max_offset = self.max_offset()
-        if max_offset > 0:
-            line_offset = self.line_offset + 1
-            self.line_offset = line_offset % (max_offset + 1)
+        self.offset = (self.offset + 1) % (max_offset + 1)
 
     def max_offset(self):
-        return max(0, len(self.lines) - max_lines)
+        return max(0, len(self.lines) - self.max_lines)
 
     def on_last_line(self):
-        return self.line_offset == self.max_offset()
+        return self.offset == self.max_offset()
 
     def refresh(self):
-        text = '\n'.join(self.lines[self.line_offset : self.line_offset + max_lines])
-        terminal.text = text
+        lines = self.lines
+        # update labels from wrapped text, accounting for scroll offset
+        for i in range(len(self)):
+            line = i + self.offset
+            if line >= len(lines):
+                content = ""
+            else:
+                content = lines[line]
+            if content != self[i].text:
+                self[i].text = content
+
+        # Actually update the display all at once
         display.refresh()
-wrapped_text = WrappedTextDisplay()
+
+display.root_group = wrapped_text = WrappedTextDisplay()
 
 def wait_button_scroll_text():
     led.switch_to_output(True)
@@ -189,8 +206,6 @@ while True:
         else:
             wrapped_text.show("")
             for line in iter_lines(response):
-        #        print(line)
-        #        continue
                 if line.startswith("data: [DONE]"):
                     break
                 if line.startswith("data:"):
