@@ -23,18 +23,22 @@ from adafruit_ticks import ticks_add, ticks_less, ticks_ms
 # the """triple quoted""" string, or by putting it in your settings.toml file,
 # like so:
 #
-# MY_PROMPT="Give me an idea for a plant-based dinner. Write one sentence"
+# MY_PROMPT="Give me an idea for a gluten free, keto dinner. Write one sentence"
 # PLEASE_WAIT="Cooking something up just for you"
+#
+# Experiementation is best to figure out what works. Usually you'll want to ask
+# for just one sentence or paragraph, since the 128x32 pixel screen can't hold
+# much text!
 
-# Here are some prompts you might want to try:
+# Here are some that the author found worked reasonably well:
 
 # Give me an idea for a plant-based dinner. Write one sentence
 #
-# Give jepler a description as a comic book supervillain. write one sentence.
+# Give jepler (they/them) a cliched and flowery description as a comic book supervillain. write one sentence.
 #
 # Invent and describe an alien species. write one sentence
 #
-# Invent a zany "as seen on TV product" that can't possibly work. One sentence
+# Invent a zany 'as seen on' product that can't possibly work. One sentence
 #
 # Tell a 1-sentence story about a kitten and a funny mishap
 #
@@ -48,9 +52,10 @@ from adafruit_ticks import ticks_add, ticks_less, ticks_ms
 # Invent an alien animal or plant, name it, and vividly describe it in 1
 # sentence
 #
-# Write 1 setence starting "you can" about an unconventional but useful superpower
+# Invent and vividly describe an alien species. write one paragraph
+
 prompt=os.getenv("MY_PROMPT", """
-Invent and vividly describe an alien species. write one paragraph
+Write 1 setence starting "you can" about an unconventional but useful superpower
 """).strip()
 please_wait=os.getenv("PLEASE_WAIT", """
 Finding superpower
