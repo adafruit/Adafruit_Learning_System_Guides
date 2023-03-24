@@ -34,7 +34,8 @@ from adafruit_ticks import ticks_add, ticks_less, ticks_ms
 
 # Give me an idea for a plant-based dinner. Write one sentence
 #
-# Give jepler (they/them) a cliched and flowery description as a comic book supervillain. write one sentence.
+# Give jepler (they/them) a cliched and flowery description as a comic book
+# supervillain. write one sentence.
 #
 # Invent and describe an alien species. write one sentence
 #
