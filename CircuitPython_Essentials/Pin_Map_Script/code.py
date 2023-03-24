@@ -12,7 +12,7 @@ except ImportError:
 
 board_pins = []
 for pin in dir(microcontroller.pin):
-    if (isinstance(getattr(microcontroller.pin, pin), microcontroller.Pin) or 
+    if (isinstance(getattr(microcontroller.pin, pin), microcontroller.Pin) or
         (cyw43 and isinstance(getattr(microcontroller.pin, pin), cyw43.CywPin))):
         pins = []
         # uncomment to show microcontroller pins
