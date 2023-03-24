@@ -48,7 +48,7 @@ from adafruit_ticks import ticks_add, ticks_less, ticks_ms
 # Invent an alien animal or plant, name it, and vividly describe it in 1
 # sentence
 #
-# Write 1 setence starting "you can" about an unconventional but useful superpower 
+# Write 1 setence starting "you can" about an unconventional but useful superpower
 prompt=os.getenv("MY_PROMPT", """
 Invent and vividly describe an alien species. write one paragraph
 """).strip()
@@ -93,7 +93,7 @@ class WrappedTextDisplay(displayio.Group):
         result = Label(
             font=nice_font,
             color=0xFFFFFF,
-            background_color=None,
+            background_color=0,
             line_spacing=line_spacing,
             anchor_point=(0, 0),
             anchored_position=(0, y),
@@ -140,13 +140,13 @@ class WrappedTextDisplay(displayio.Group):
         lines = self.lines
         # update labels from wrapped text, accounting for scroll offset
         for i in range(len(self)):
-            line = i + self.offset
-            if line >= len(lines):
-                content = ""
+            offset_i = i + self.offset
+            if offset_i >= len(lines):
+                text = ""
             else:
-                content = lines[line]
-            if content != self[i].text:
-                self[i].text = content
+                text = lines[offset_i]
+            if text != self[i].text:
+                self[i].text = text
 
         # Actually update the display all at once
         display.refresh()
