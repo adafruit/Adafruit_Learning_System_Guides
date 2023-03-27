@@ -89,7 +89,6 @@ sensor_texts = [pm2_text, co2_text, temp_text, humid_text]
 sensor_data = [pm2, co2, temp, humidity]
 
 sensor_clock = ticks_ms()
-io_clock = ticks_ms()
 
 sensor_check = 5000
 first_run = True
@@ -113,5 +112,4 @@ while True:
 
     if first_run:
         sensor_clock = ticks_ms()
-        io_clock = ticks_ms()
         first_run = False
