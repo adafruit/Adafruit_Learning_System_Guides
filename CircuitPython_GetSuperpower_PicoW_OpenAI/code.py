@@ -3,12 +3,14 @@
 import json
 import os
 import ssl
+import traceback
 
 import board
 import displayio
 import digitalio
 import keypad
 import socketpool
+import supervisor
 from wifi import radio
 
 import adafruit_requests
@@ -26,7 +28,7 @@ from adafruit_ticks import ticks_add, ticks_less, ticks_ms
 # MY_PROMPT="Give me an idea for a gluten free, keto dinner. Write one sentence"
 # PLEASE_WAIT="Cooking something up just for you"
 #
-# Experiementation is best to figure out what works. Usually you'll want to ask
+# Experimentation is best to figure out what works. Usually you'll want to ask
 # for just one sentence or paragraph, since the 128x32 pixel screen can't hold
 # much text!
 
@@ -116,7 +118,7 @@ class WrappedTextDisplay(displayio.Group):
         self.scroll_to_end()
 
     def set_text(self, text):
-        print("\033[H\033[2J", end=text)
+        print("\n\n", end=text)
         self.text = text
         self.lines = wrap_text_to_pixels(text, display.width, nice_font)
         self.offset = 0
@@ -161,6 +163,7 @@ display.root_group = wrapped_text = WrappedTextDisplay()
 
 def wait_button_scroll_text():
     led.switch_to_output(True)
+    keys.events.clear()
     deadline = ticks_add(ticks_ms(),
             5000 if wrapped_text.on_last_line() else 1000)
     while True:
@@ -194,32 +197,45 @@ full_prompt = [
 ]
 
 keys = keypad.Keys((board.GP14,), value_when_pressed=False)
-led = digitalio.DigitalInOut(board.LED)
+led = digitalio.DigitalInOut(board.GP10)
+led.switch_to_output(False)
 
-while True:
-    wrapped_text.show(please_wait)
+try:
+    while True:
+        wrapped_text.show(please_wait)
 
-    with requests.post("https://api.openai.com/v1/chat/completions",
-        json={"model": "gpt-3.5-turbo", "messages": full_prompt, "stream": True},
-        headers={
-            "Authorization": f"Bearer {openai_api_key}",
-        },
-        ) as response:
+        with requests.post("https://api.openai.com/v1/chat/completions",
+            json={"model": "gpt-3.5-turbo", "messages": full_prompt, "stream": True},
+            headers={
+                "Authorization": f"Bearer {openai_api_key}",
+            },
+            ) as response:
 
-        wrapped_text.set_text("")
-        if response.status_code != 200:
-            wrapped_text.show(f"Uh oh! {response.status_code}: {response.reason}")
-        else:
-            wrapped_text.show("")
-            for line in iter_lines(response):
-                if line.startswith("data: [DONE]"):
-                    break
-                if line.startswith("data:"):
-                    content = json.loads(line[5:])
-                    try:
-                        token = content['choices'][0]['delta'].get('content', '')
-                    except (KeyError, IndexError) as e:
-                        token = None
-                    if token:
-                        wrapped_text.add_show(token)
-            wait_button_scroll_text()
+            wrapped_text.set_text("")
+            if response.status_code != 200:
+                wrapped_text.show(f"Uh oh! {response.status_code}: {response.reason}")
+            else:
+                wrapped_text.show("")
+                for line in iter_lines(response):
+                    led.switch_to_output(True)
+                    if line.startswith("data: [DONE]"):
+                        break
+                    if line.startswith("data:"):
+                        content = json.loads(line[5:])
+                        try:
+                            token = content['choices'][0]['delta'].get('content', '')
+                        except (KeyError, IndexError) as e:
+                            token = None
+                        led.value = False
+                        if token:
+                            wrapped_text.add_show(token)
+                wait_button_scroll_text()
+except Exception as e: # pylint: disable=broad-except
+    traceback.print_exception(e) # pylint: disable=no-value-for-parameter
+    print(end="\n\n\nAn error occurred\n\nPress button\nto reload")
+    display.root_group = displayio.CIRCUITPYTHON_TERMINAL
+    display.auto_refresh = True
+    while True:
+        if (event1 := keys.events.get()) and event1.pressed:
+            break
+    supervisor.reload()
