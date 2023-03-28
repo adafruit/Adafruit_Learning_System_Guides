@@ -230,13 +230,12 @@ try:
                         if token:
                             wrapped_text.add_show(token)
                 wait_button_scroll_text()
-except Exception as e:
+except Exception as e: # pylint: disable=broad-except
     traceback.print_exception(e) # pylint: disable=no-value-for-parameter
     print(end="\n\n\nAn error occurred\n\nPress button\nto reload")
     display.root_group = displayio.CIRCUITPYTHON_TERMINAL
     display.auto_refresh = True
     while True:
-        if (event := keys.events.get()) and event.pressed:
+        if (event1 := keys.events.get()) and event1.pressed:
             break
     supervisor.reload()
-
