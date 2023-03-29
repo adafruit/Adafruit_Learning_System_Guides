@@ -7,10 +7,11 @@
 # Documentation:
 #   https://docs.circuitpython.org/en/latest/shared-bindings/gifio/
 # Updated 3/29/2023
-import board
-import struct
-import gifio
+
 import time
+import struct
+import board
+import gifio
 
 display = board.DISPLAY
 # Take over display to drive directly
@@ -19,7 +20,7 @@ display_bus = display.bus
 
 try:
     odg = gifio.OnDiskGif('/sample.gif')
-except OSError:  # pylint: disable=broad-except
+except OSError:  # pylint: disable=broad-except, raise-missing-from
     raise Exception("sample.gif was not found\n")
 start = time.monotonic()
 next_delay = odg.next_frame()  # Load the first frame
