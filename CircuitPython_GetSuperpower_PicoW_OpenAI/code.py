@@ -58,7 +58,7 @@ from adafruit_ticks import ticks_add, ticks_less, ticks_ms
 # Invent and vividly describe an alien species. write one paragraph
 
 prompt=os.getenv("MY_PROMPT", """
-Write 1 setence starting "you can" about an unconventional but useful superpower
+Write 1 sentence starting "you can" about an unconventional but useful superpower
 """).strip()
 please_wait=os.getenv("PLEASE_WAIT", """
 Finding superpower
