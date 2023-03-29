@@ -4,10 +4,10 @@
 # Documentation:
 #   https://docs.circuitpython.org/en/latest/shared-bindings/gifio/
 # Updated 3/29/2023
+import time
 import board
 import gifio
 import displayio
-import time
 
 display = board.DISPLAY
 splash = displayio.Group()
@@ -15,7 +15,7 @@ display.root_group = splash
 
 try:
     odg = gifio.OnDiskGif('/sample.gif')
-except OSError:  # pylint: disable=broad-except
+except OSError:  # pylint: disable=broad-except, raise-missing-from
     raise Exception("sample.gif was not found\n")
 start = time.monotonic()
 next_delay = odg.next_frame()  # Load the first frame
