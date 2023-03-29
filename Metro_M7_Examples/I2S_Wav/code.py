@@ -3,17 +3,6 @@
 """
 CircuitPython I2S WAV file playback.
 Plays a WAV file once.
-
-Remove this line and all of the following docstring content before submitting to the Learn repo.
-
-Update the three I2S pins to match the wiring chosen for the microcontroller. If you are unsure of
-a proper I2S pin combination, run the pin combination script found here:
-https://adafru.it/i2s-pin-combo-finder
-
-Update the following pin names to a viable pin combination:
-* BIT_CLOCK_PIN
-* WORD_SELECT_PIN
-* DATA_PIN
 """
 import audiocore
 import board
