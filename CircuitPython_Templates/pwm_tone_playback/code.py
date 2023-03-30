@@ -9,7 +9,7 @@ second off, in a loop.
 
 Remove this line and all of the following docstring content before submitting to the Learn repo.
 
-Update the audio out pin to match the wiring chosen for the microcontroller. 
+Update the audio out pin to match the wiring chosen for the microcontroller.
 Update the following pin name to a viable pin:
 * AUDIO_OUTPUT_PIN
 """
@@ -18,16 +18,7 @@ import array
 import math
 import board
 from audiocore import RawSample
-
-try:
-    from audioio import AudioOut
-    print("Using AudioOut")
-except ImportError:
-    try:
-        from audiopwmio import PWMAudioOut as AudioOut
-        print("Using PWMAudioOut")
-    except ImportError:
-        pass
+from audiopwmio import PWMAudioOut as AudioOut
 
 audio = AudioOut(board.AUDIO_OUTPUT_PIN)
 
