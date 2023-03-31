@@ -46,7 +46,7 @@ clue.display.show(splash)
 
 # background
 bg_bmp, bg_pal = adafruit_imageload.load(
-    "/network23.bmp", bitmap=displayio.Bitmap, palette=displayio.Palette
+    "images/network23.bmp", bitmap=displayio.Bitmap, palette=displayio.Palette
 )
 for i, color in enumerate(bg_pal):
     if color == 0xFF0000:
