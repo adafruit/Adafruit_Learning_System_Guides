@@ -204,7 +204,6 @@ class Bear:
         print("Starting mouth movement thread")
         while True:
             if self.do_mouth_movement:
-                print("Moving mouth")
                 self._move_mouth_motor(dir_open=True)
                 self._move_mouth_motor(dir_open=False)
 
@@ -254,7 +253,6 @@ def main():
                         print("Got response from ChatGPT. Beginning speech synthesis.")
                         bear.move_arms(hide=False)
                         bear.speak(chat_response)
-                        print("Done speaking.")
                     else:
                         print("Partial Phrase...")
                         transcription[-1] = text
