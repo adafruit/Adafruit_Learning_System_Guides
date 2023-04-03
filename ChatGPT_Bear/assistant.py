@@ -4,6 +4,7 @@
 
 import threading
 import os
+import sys
 
 from datetime import datetime, timedelta
 from queue import Queue
@@ -47,6 +48,12 @@ MOTOR_DUTY_CYCLE = 1.0  # Lower provides less power to the motors
 openai.api_key = os.environ.get("OPENAI_API_KEY")
 speech_key = os.environ.get("SPEECH_KEY")
 service_region = os.environ.get("SPEECH_REGION")
+
+if openai.api_key is None or speech_key is None or service_region is None:
+    print(
+        "Please set the OPENAI_API_KEY, SPEECH_KEY, and SPEECH_REGION environment variables first."
+    )
+    sys.exit(1)
 
 speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=service_region)
 speech_config.speech_synthesis_voice_name = AZURE_SPEECH_VOICE
