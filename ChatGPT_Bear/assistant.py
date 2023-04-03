@@ -228,12 +228,13 @@ def main():
     bear = Bear(speech_config)
 
     transcription = [""]
-
+    bear.speak(
+        "Hello there! Just give my left foot a squeeze if you would like to get my attention."
+    )
     while True:
         try:
             # If button is pressed, start listening
             if bear.foot_pressed():
-                print("How may I help you?")
                 bear.speak("How may I help you?")
                 listener.listen()
 
