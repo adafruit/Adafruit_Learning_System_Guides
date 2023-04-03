@@ -29,6 +29,7 @@ WHISPER_MODEL = "whisper-1"
 
 # Azure Parameters
 AZURE_SPEECH_VOICE = "en-GB-OliverNeural"
+DEVICE_ID = None
 
 # Speech Recognition Parameters
 ENERGY_THRESHOLD = 1000  # Energy level for mic to detect
@@ -157,10 +158,14 @@ class Bear:
         self.do_mouth_movement = False
         self._mouth_thread = threading.Thread(target=self.move_mouth, daemon=True)
         self._mouth_thread.start()
-
+        if DEVICE_ID is None:
+            audio_config = speechsdk.audio.AudioOutputConfig(use_default_speaker=True)
+        else:
+            audio_config = speechsdk.audio.AudioOutputConfig(device_name=DEVICE_ID)
         self._speech_synthesizer = speechsdk.SpeechSynthesizer(
-            speech_config=azure_speech_config
+            speech_config=azure_speech_config, audio_config=audio_config
         )
+
         self._speech_synthesizer.synthesizing.connect(self.start_moving_mouth)
         self._speech_synthesizer.synthesis_completed.connect(self.stop_moving_mouth)
 
