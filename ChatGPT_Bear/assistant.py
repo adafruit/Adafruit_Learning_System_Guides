@@ -4,6 +4,7 @@
 
 import threading
 import os
+import sys
 
 from datetime import datetime, timedelta
 from queue import Queue
@@ -29,6 +30,7 @@ WHISPER_MODEL = "whisper-1"
 
 # Azure Parameters
 AZURE_SPEECH_VOICE = "en-GB-OliverNeural"
+DEVICE_ID = None
 
 # Speech Recognition Parameters
 ENERGY_THRESHOLD = 1000  # Energy level for mic to detect
@@ -46,6 +48,12 @@ MOTOR_DUTY_CYCLE = 1.0  # Lower provides less power to the motors
 openai.api_key = os.environ.get("OPENAI_API_KEY")
 speech_key = os.environ.get("SPEECH_KEY")
 service_region = os.environ.get("SPEECH_REGION")
+
+if openai.api_key is None or speech_key is None or service_region is None:
+    print(
+        "Please set the OPENAI_API_KEY, SPEECH_KEY, and SPEECH_REGION environment variables first."
+    )
+    sys.exit(1)
 
 speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=service_region)
 speech_config.speech_synthesis_voice_name = AZURE_SPEECH_VOICE
@@ -157,10 +165,14 @@ class Bear:
         self.do_mouth_movement = False
         self._mouth_thread = threading.Thread(target=self.move_mouth, daemon=True)
         self._mouth_thread.start()
-
+        if DEVICE_ID is None:
+            audio_config = speechsdk.audio.AudioOutputConfig(use_default_speaker=True)
+        else:
+            audio_config = speechsdk.audio.AudioOutputConfig(device_name=DEVICE_ID)
         self._speech_synthesizer = speechsdk.SpeechSynthesizer(
-            speech_config=azure_speech_config
+            speech_config=azure_speech_config, audio_config=audio_config
         )
+
         self._speech_synthesizer.synthesizing.connect(self.start_moving_mouth)
         self._speech_synthesizer.synthesis_completed.connect(self.stop_moving_mouth)
 
