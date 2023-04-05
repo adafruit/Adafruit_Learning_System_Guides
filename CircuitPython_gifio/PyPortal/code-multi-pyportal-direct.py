@@ -16,9 +16,9 @@ import adafruit_touchscreen
 
 # Get a dictionary of GIF filenames at the passed base directory
 def get_files(base):
-    files = os.listdir(base)
+    allfiles = os.listdir(base)
     file_names = []
-    for _, filetext in enumerate(files):
+    for _, filetext in enumerate(allfiles):
         if not filetext.startswith("."):
             if filetext not in ('boot_out.txt', 'System Volume Information'):
                 if filetext.endswith(".gif"):
