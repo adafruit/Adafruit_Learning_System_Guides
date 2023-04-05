@@ -22,7 +22,6 @@ GFXcanvas16 canvas(240, 135);
 void setup() {
   Serial.begin(115200);
   //while (! Serial) delay(10);
-  
   delay(100);
   
   TB.neopixelPin = PIN_NEOPIXEL;
@@ -69,9 +68,22 @@ void setup() {
 uint8_t j = 0;
 
 void loop() {
+  bool valid_i2c[128];
   Serial.println("**********************");
 
-  TB.printI2CBusScan();
+  if (j == 0) {
+    Serial.print("I2C scan: ");
+    for (int i=0; i< 128; i++) {
+      if (TB.scanI2CBus(i, 0)) {
+        Serial.print("0x");
+        Serial.print(i, HEX);
+        Serial.print(", ");
+        valid_i2c[i] = true;
+      } else {
+        valid_i2c[i] = false;
+      }
+    }
+  }
 
   if (j % 2 == 0) {
     canvas.fillScreen(ST77XX_BLACK);
@@ -91,7 +103,7 @@ void loop() {
     canvas.print("I2C: ");
     canvas.setTextColor(ST77XX_WHITE);
     for (uint8_t a=0x01; a<=0x7F; a++) {
-      if (TB.scanI2CBus(a, 0))  {
+      if (valid_i2c[a])  {
         canvas.print("0x");
         canvas.print(a, HEX);
         canvas.print(", ");
