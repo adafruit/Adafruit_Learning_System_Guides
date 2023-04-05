@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 Limor Fried for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // rf69 demo tx rx.pde
 // -*- mode: C++ -*-
 // Example sketch showing how to create a simple messageing client
