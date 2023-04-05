@@ -5,19 +5,20 @@
 # Play Multiple GIF files on a n ESP32-S2 Feather TFT
 # Requires CircuitPython 8.1.0-beta.1 or later
 # Updated 4/4/2023
+
+import time
+import gc
 import os
 import struct
 import board
 import gifio
 import digitalio
-import time
-import gc
 
 # Get a dictionary of GIF filenames at the passed base directory
 def get_files(base):
-    files = os.listdir(base)
+    allfiles = os.listdir(base)
     file_names = []
-    for j, filetext in enumerate(files):
+    for _, filetext in enumerate(allfiles):
         if not filetext.startswith("."):
             if filetext not in ('boot_out.txt', 'System Volume Information'):
                 if filetext.endswith(".gif"):
@@ -41,7 +42,7 @@ for i in range(len(files)):
     # Skip PyPortal GIFs if put on ESP32-S2 Feather TFT
     if odg.width != board.DISPLAY.width:
         print("File "+files[i]+" not right width, skipping\n")
-        pass
+        continue
 
     start = time.monotonic()
     next_delay = odg.next_frame()  # Load the first frame
