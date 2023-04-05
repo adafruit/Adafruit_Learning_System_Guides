@@ -7,12 +7,13 @@
 # Documentation:
 #   https://docs.circuitpython.org/en/latest/shared-bindings/gifio/
 # Updated 4/5/2023
+
+import time
+import gc
 import board
 import gifio
 import digitalio
 import displayio
-import time
-import gc
 
 display = board.DISPLAY
 splash = displayio.Group()
