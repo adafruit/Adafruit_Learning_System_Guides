@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 #
-# Play Multiple GIF files on a n ESP32-S2 Feather TFT
+# Play Multiple GIF files on an ESP32-S2 Feather TFT
 # Requires CircuitPython 8.1.0-beta.1 or later
 # Updated 4/4/2023
 
@@ -30,10 +30,10 @@ button = digitalio.DigitalInOut(board.BUTTON)
 button.switch_to_input(pull=digitalio.Pull.UP)
 
 display = board.DISPLAY
-
-# Take over display to drive directly
 display.auto_refresh = False
-display_bus = display.bus
+
+COL_OFFSET = 40  # The Feather TFT needs to have the display
+ROW_OFFSET = 53  # offset by these values for direct writes
 
 files = get_files("/")
 for i in range(len(files)):
@@ -58,9 +58,11 @@ for i in range(len(files)):
             print("Button Press, Advance\n")
             break
         next_delay = odg.next_frame()
-        display_bus.send(42, struct.pack(">hh", 0, odg.bitmap.width - 1))
-        display_bus.send(43, struct.pack(">hh", 0, odg.bitmap.height - 1))
-        display_bus.send(44, odg.bitmap)
+        display.bus.send(42, struct.pack(">hh", COL_OFFSET,
+                         odg.bitmap.width - 1 + COL_OFFSET))
+        display.bus.send(43, struct.pack(">hh", ROW_OFFSET,
+                         odg.bitmap.height - 1 + ROW_OFFSET))
+        display.bus.send(44, odg.bitmap)
     # End while
     # Clean up memory
     odg.deinit()
