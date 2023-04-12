@@ -80,7 +80,7 @@ for possible_touch_pin in get_pin_names():  # Get the pin name.
             "pulldown" in error_message  # If the ValueError is regarding needing a pulldown...
         ):
             print(
-                "Touch (no pulldown) on:", str(possible_touch_pin).replace("board.", "")
+                "Touch on:", str(possible_touch_pin).replace("board.", "")
             )
         else:
             print("No touch on:", str(possible_touch_pin).replace("board.", ""))
