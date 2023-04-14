@@ -11,7 +11,7 @@ import signal
 
 import openai
 
-#from listener import Listener
+# from listener import Listener
 from book import Book
 
 STORY_WORD_LENGTH = 800
@@ -34,8 +34,8 @@ RECORD_TIMEOUT = 30
 
 # TODO: Tweak this to fix the issue of missing words
 STORY_PROMPT = (
-    f'Write a complete story with a title and a body of approximately '
-    f'{STORY_WORD_LENGTH} words long and a happy ending. The specific '
+    f"Write a complete story with a title and a body of approximately "
+    f"{STORY_WORD_LENGTH} words long and a happy ending. The specific "
     f'story request is "{STORY_REQUEST}". '
 )
 

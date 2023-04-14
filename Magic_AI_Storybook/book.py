@@ -5,6 +5,7 @@
 import sys
 import os
 import time
+import math
 from enum import Enum
 import pygame
 
@@ -27,10 +28,10 @@ TEXT_COLOR = (0, 0, 0)
 
 # Delays to control the speed of the text
 #   Default
-CHARACTER_DELAY = 0.03
-WORD_DELAY = 0.2
-SENTENCE_DELAY = 1
-PARAGRAPH_DELAY = 2
+#CHARACTER_DELAY = 0.03
+#WORD_DELAY = 0.2
+#SENTENCE_DELAY = 1
+#PARAGRAPH_DELAY = 2
 
 #   Letter by Letter
 # CHARACTER_DELAY = 0.1
@@ -45,10 +46,10 @@ PARAGRAPH_DELAY = 2
 # PARAGRAPH_DELAY = 0
 
 #   No Delays
-# CHARACTER_DELAY = 0
-# WORD_DELAY = 0
-# SENTENCE_DELAY = 0
-# PARAGRAPH_DELAY = 0
+CHARACTER_DELAY = 0
+WORD_DELAY = 0
+SENTENCE_DELAY = 0
+PARAGRAPH_DELAY = 0
 
 
 # Whitespace Settings in Pixels
@@ -182,14 +183,25 @@ class Book:
                 raise SystemExit
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
-                    # If clicked in text area and book is still rendering, skip to the end
-                    print(f"Left mouse button pressed at {event.pos}")
                     # If button pressed while visible, trigger action
-                    if self.back_button.is_in_bounds(event.pos):
-                        self.back_button.action()
-            elif event.type == pygame.MOUSEBUTTONUP:
-                # Not sure if we will need this
-                print("Mouse button has been released")
+                    coords = self.rotate_mouse_pos(event.pos)
+                    for button in [self.back_button, self.next_button]:
+                        if button.is_in_bounds(coords):
+                            button.action()
+
+    def rotate_mouse_pos(self, point):
+        # Recalculate the mouse position based on the rotation of the screen
+        # So that we have the coordinates relative to the upper left corner of the screen
+        angle = 360 - self.rotation
+        y, x = point
+        x -= self.width // 2
+        y -= self.height // 2
+        x, y = x * math.sin(math.radians(angle)) + y * math.cos(
+            math.radians(angle)
+        ), x * math.cos(math.radians(angle)) - y * math.sin(math.radians(angle))
+        x += self.width // 2
+        y += self.height // 2
+        return (round(x), round(y))
 
     def add_page(self, paragraph=0, word=0):
         # Add rendered page information to make flipping between them easier
