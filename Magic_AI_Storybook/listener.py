@@ -1,14 +1,15 @@
+# SPDX-FileCopyrightText: 2023 Melissa LeBlanc-Williams for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 from datetime import datetime, timedelta
 from queue import Queue
 
 import speech_recognition as sr
 
+
 class Listener:
-    def __init__(self,
-                 energy_threshold=1000,
-                 phrase_timeout=3.0,
-                 record_timeout=30
-                ):
+    def __init__(self, energy_threshold=1000, phrase_timeout=3.0, record_timeout=30):
         self.listener_handle = None
         self.recognizer = sr.Recognizer()
         self.recognizer.energy_threshold = energy_threshold
