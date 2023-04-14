@@ -77,7 +77,8 @@ class Button:
         self._width = self.image.get_width()
         self._height = self.image.get_height()
 
-    def is_in_bounds(self, x, y):
+    def is_in_bounds(self, position):
+        x, y = position
         return (
             self.x <= x <= self.x + self.width and self.y <= y <= self.y + self.height
         )
@@ -184,6 +185,8 @@ class Book:
                     # If clicked in text area and book is still rendering, skip to the end
                     print(f"Left mouse button pressed at {event.pos}")
                     # If button pressed while visible, trigger action
+                    if self.back_button.is_in_bounds(event.pos):
+                        self.back_button.action()
             elif event.type == pygame.MOUSEBUTTONUP:
                 # Not sure if we will need this
                 print("Mouse button has been released")
@@ -345,7 +348,8 @@ class Book:
                 self.add_page(paragraph_number, word_number)
                 return
 
-    def create_transparent_buffer(self, size):
+    @staticmethod
+    def create_transparent_buffer(size):
         if isinstance(size, (tuple, list)):
             (width, height) = size
         elif isinstance(size, dict):
@@ -374,7 +378,8 @@ class Book:
 
         return new_buffer
 
-    def wrap_text(self, text, font, width):
+    @staticmethod
+    def wrap_text(text, font, width):
         lines = []
         line = ""
         for word in text.split(" "):
