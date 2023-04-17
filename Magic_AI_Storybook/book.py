@@ -28,29 +28,13 @@ TEXT_COLOR = (0, 0, 0)
 
 # Delays to control the speed of the text
 #   Default
-#CHARACTER_DELAY = 0.03
-#WORD_DELAY = 0.2
-#SENTENCE_DELAY = 1
-#PARAGRAPH_DELAY = 2
-
-#   Letter by Letter
-# CHARACTER_DELAY = 0.1
-# WORD_DELAY = 0
-# SENTENCE_DELAY = 0
-# PARAGRAPH_DELAY = 0
-
-#   Word by Word
-# CHARACTER_DELAY = 0
-# WORD_DELAY = 0.3
-# SENTENCE_DELAY = 0.5
-# PARAGRAPH_DELAY = 0
-
-#   No Delays
-CHARACTER_DELAY = 0
-WORD_DELAY = 0
-SENTENCE_DELAY = 0
-PARAGRAPH_DELAY = 0
-
+WORD_DELAY = 0.1
+TITLE_FADE_TIME = 0.05
+TITLE_FADE_STEPS = 25
+TEXT_FADE_TIME = 0.25
+TEXT_FADE_STEPS = 51
+BUTTON_FADE_TIME = 0.10
+BUTTON_FADE_STEPS = 11
 
 # Whitespace Settings in Pixels
 PAGE_TOP_MARGIN = 20
@@ -70,13 +54,15 @@ class Position(Enum):
 
 
 class Button:
-    def __init__(self, x, y, image, action):
+    def __init__(self, x, y, image, action, draw_function):
         self.x = x
         self.y = y
         self.image = image
         self.action = action
         self._width = self.image.get_width()
         self._height = self.image.get_height()
+        self._visible = False
+        self._draw_function = draw_function
 
     def is_in_bounds(self, position):
         x, y = position
@@ -84,8 +70,11 @@ class Button:
             self.x <= x <= self.x + self.width and self.y <= y <= self.y + self.height
         )
 
-    def is_pressed(self):
-        pass
+    def show(self):
+        self._draw_function(
+            self.image, self.x, self.y, BUTTON_FADE_TIME, BUTTON_FADE_STEPS
+        )
+        self._visible = True
 
     @property
     def width(self):
@@ -94,6 +83,10 @@ class Button:
     @property
     def height(self):
         return self._height
+
+    @property
+    def visible(self):
+        return self._visible
 
 
 class Textarea:
@@ -124,7 +117,8 @@ class Book:
         self.next_button = None
         self.textarea = None
         self.screen = None
-        self.cursor = None
+        # Use a cursor to keep track of where we are in the text area
+        self.cursor = {"x": 0, "y": 0}
 
     def init(self):
         # Output to the LCD instead of the console
@@ -157,13 +151,18 @@ class Book:
             + (PAGE_NAV_HEIGHT - next_button_image.get_height()) // 2
         )
         self.back_button = Button(
-            button_spacing, button_ypos, back_button_image, self.previous_page
+            button_spacing,
+            button_ypos,
+            back_button_image,
+            self.previous_page,
+            self.fade_in_surface,
         )
         self.next_button = Button(
             self.width - button_spacing - next_button_image.get_width(),
             button_ypos,
             next_button_image,
             self.next_page,
+            self.fade_in_surface,
         )
 
         # Add Text Area
@@ -186,7 +185,7 @@ class Book:
                     # If button pressed while visible, trigger action
                     coords = self.rotate_mouse_pos(event.pos)
                     for button in [self.back_button, self.next_button]:
-                        if button.is_in_bounds(coords):
+                        if button.visible and button.is_in_bounds(coords):
                             button.action()
 
     def rotate_mouse_pos(self, point):
@@ -202,15 +201,6 @@ class Book:
         x += self.width // 2
         y += self.height // 2
         return (round(x), round(y))
-
-    def add_page(self, paragraph=0, word=0):
-        # Add rendered page information to make flipping between them easier
-        self.pages.append(
-            {
-                "paragraph": paragraph,
-                "word": word,
-            }
-        )
 
     def load_image(self, name, filename):
         try:
@@ -244,121 +234,63 @@ class Book:
         return (x, y)
 
     # Display a surface either positionally or with a specific x,y coordinate
-    def display_image(self, image, x=Position.CENTER, y=Position.CENTER, surface=None):
-        buffer = pygame.Surface((self.width, self.height), pygame.SRCALPHA, 32)
-        buffer = buffer.convert_alpha()
-        buffer.blit(image, self.get_position(image, x, y))
-        if surface is None:
+    def display_surface(
+        self, surface, x=Position.CENTER, y=Position.CENTER, target_surface=None
+    ):
+        buffer = self.create_transparent_buffer((self.width, self.height))
+        buffer.blit(surface, self.get_position(surface, x, y))
+        if target_surface is None:
             buffer = pygame.transform.rotate(buffer, self.rotation)
             self.screen.blit(buffer, (0, 0))
         else:
-            surface.blit(buffer, (0, 0))
+            target_surface.blit(buffer, (0, 0))
+
+    def fade_in_surface(self, surface, x, y, fade_time, fade_steps=50):
+        background = self.create_transparent_buffer((self.width, self.height))
+        self.display_surface(
+            self.images["background"], Position.CENTER, Position.CENTER, background
+        )
+
+        buffer = self.create_transparent_buffer(surface.get_size())
+        fade_delay = round(
+            fade_time / fade_steps * 1000
+        )  # Time to delay in ms between each fade step
+
+        for alpha in range(0, 255, round(255 / fade_steps)):
+            buffer.blit(background, (-x, -y))
+            surface.set_alpha(alpha)
+            buffer.blit(surface, (0, 0))
+            self.display_surface(buffer, x, y)
+            pygame.display.update()
+            pygame.time.wait(fade_delay)
 
     def display_current_page(self):
-        self.display_image(self.images["background"], Position.CENTER, Position.CENTER)
-        pygame.display.update()
-
-        # Use a cursor to keep track of where we are on the page
-        # These values are relative to the text area
-        self.cursor = {"x": 0, "y": 0}
-
-        # Display the title
-        if self.page == 0:
-            title = self.render_title()
-            self.display_image(
-                title,
-                self.cursor["x"] + self.textarea.x,
-                self.cursor["y"] + self.textarea.y,
-            )
-            pygame.display.update()
-            self.cursor["y"] += title.get_height() + PARAGRAPH_SPACING
-            time.sleep(PARAGRAPH_DELAY)
-
-        self.display_page_text()
-
-        # Display the navigation buttons
-        if self.page > 0:
-            self.display_image(
-                self.back_button.image, self.back_button.x, self.back_button.y
-            )
-
-        # TODO: If we are on the last page, don't display the next button
-        self.display_image(
-            self.next_button.image, self.next_button.x, self.next_button.y
+        self.display_surface(
+            self.images["background"], Position.CENTER, Position.CENTER
         )
         pygame.display.update()
 
-    def render_character(self, character):
-        return self.fonts["text"].render(character, True, (0, 0, 0))
+        page_data = self.pages[self.page]
 
-    def display_page_text(self):
-        # TODO: We need an accurate way to determine when a
-        # previous page has already been added so we don't add it again
+        # Display the title
+        if page_data["title"]:
+            self.display_title()
 
-        paragraph_number = self.pages[self.page]["paragraph"]
-        word_number = self.pages[self.page]["word"]
+        self.fade_in_surface(
+            page_data["buffer"],
+            self.textarea.x,
+            page_data["text_position"],
+            TEXT_FADE_TIME,
+            TEXT_FADE_STEPS,
+        )
 
-        # Display a paragraph at a time
-        while self.paragraph_number < len(self.paragraphs):
-            paragraph = self.paragraphs[paragraph_number]
-            while word_number < len(paragraph):
-                word = paragraph[word_number]
-                # Check if there is enough space to display the word
-                if (
-                    self.cursor["x"] + self.fonts["text"].size(word)[0]
-                    > self.textarea.width
-                ):
-                    # If not, move to the next line
-                    self.cursor["x"] = 0
-                    self.cursor["y"] += (
-                        self.fonts["text"].get_height() + EXTRA_LINE_SPACING
-                    )
-                    # If we have reached the end of the page, stop displaying paragraphs
-                    if (
-                        self.cursor["y"] + self.fonts["text"].get_height()
-                        > self.textarea.height
-                    ):
-                        self.add_page(paragraph_number, word_number)
-                        return
+        # Display the navigation buttons
+        if self.page > 0:
+            self.back_button.show()
 
-                # Display the word one character at a time
-                for character in word:
-                    character_surface = self.render_character(character)
-                    self.display_image(
-                        character_surface,
-                        self.cursor["x"] + self.textarea.x,
-                        self.cursor["y"] + self.textarea.y,
-                    )
-                    pygame.display.update()
-                    self.cursor["x"] += character_surface.get_width() + 1
-                    if character != " ":
-                        time.sleep(CHARACTER_DELAY)
-
-                # Advance the cursor by a spaces width
-                self.cursor["x"] += self.render_character(" ").get_width() + 1
-
-                # Look at last character only to avoid long delays on stuff
-                # like "!!!" or "?!" or "..."
-                if word[-1:] in [".", "!", "?"]:
-                    time.sleep(SENTENCE_DELAY)
-                else:
-                    time.sleep(WORD_DELAY)
-                word_number += 1
-
-            # We have reached the end of the paragraph, so we need to move to the next line
-            time.sleep(PARAGRAPH_DELAY)
-            self.cursor["x"] = 0
-            self.cursor["y"] += self.fonts["text"].get_height() + PARAGRAPH_SPACING
-            word_number = 0
-            paragraph_number += 1
-
-            # If we have reached the end of the page, stop displaying paragraphs
-            if (
-                self.cursor["y"] + self.fonts["text"].get_height()
-                > self.textarea.height
-            ):
-                self.add_page(paragraph_number, word_number)
-                return
+        if self.page < len(self.pages) - 1:
+            self.next_button.show()
+        pygame.display.update()
 
     @staticmethod
     def create_transparent_buffer(size):
@@ -367,28 +299,41 @@ class Book:
         elif isinstance(size, dict):
             width = size["width"]
             height = size["height"]
+        else:
+            raise ValueError(f"Invalid size {size}. Should be tuple, list, or dict.")
         buffer = pygame.Surface((width, height), pygame.SRCALPHA, 32)
         buffer = buffer.convert_alpha()
         return buffer
 
-    def render_title(self):
-        # The title should be centered and wrapped if it is too wide for the screen
-        buffer = self.create_transparent_buffer(self.textarea.size)
-
+    def display_title(self):
         # Render the title as multiple lines if too big
         lines = self.wrap_text(self.title, self.fonts["title"], self.textarea.width)
-        text_height = 0
+        self.cursor["y"] = 0
         for line in lines:
-            text = self.fonts["title"].render(line, True, TITLE_COLOR)
-            buffer.blit(
-                text, (buffer.get_width() // 2 - text.get_width() // 2, text_height)
+            words = line.split(" ")
+            self.cursor["x"] = (
+                self.textarea.width // 2 - self.fonts["title"].size(line)[0] // 2
             )
-            text_height += text.get_height()
+            for word in words:
+                text = self.fonts["title"].render(word + " ", True, TITLE_COLOR)
+                self.fade_in_surface(
+                    text,
+                    self.cursor["x"] + self.textarea.x,
+                    self.cursor["y"] + self.textarea.y,
+                    TITLE_FADE_TIME,
+                    TITLE_FADE_STEPS,
+                )
+                pygame.display.update()
+                self.cursor["x"] += text.get_width()
+                time.sleep(WORD_DELAY)
+            self.cursor["y"] += self.fonts["title"].size(line)[1]
 
-        new_buffer = self.create_transparent_buffer((self.textarea.width, text_height))
-        new_buffer.blit(buffer, (0, 0))
-
-        return new_buffer
+    def title_height(self):
+        lines = self.wrap_text(self.title, self.fonts["title"], self.textarea.width)
+        height = 0
+        for line in lines:
+            height += self.fonts["title"].size(line)[1]
+        return height
 
     @staticmethod
     def wrap_text(text, font, width):
@@ -414,20 +359,49 @@ class Book:
             self.display_current_page()
 
     def display_loading(self):
-        self.display_image(self.images["loading"], Position.CENTER, Position.CENTER)
+        self.display_surface(self.images["loading"], Position.CENTER, Position.CENTER)
         pygame.display.update()
 
     def display_welcome(self):
-        self.display_image(self.images["welcome"], Position.CENTER, Position.CENTER)
+        self.display_surface(self.images["welcome"], Position.CENTER, Position.CENTER)
         pygame.display.update()
 
     # Parse out the title and story and separage into pages
     def parse_story(self, story):
         self.title = story.split("Title: ")[1].split("\n\n")[0]
         paragraphs = story.split("\n\n")[1:]
+        page = self.add_page()
         for paragraph in paragraphs:
-            self.paragraphs.append(paragraph.split(" "))
-        self.add_page()
+            lines = self.wrap_text(paragraph, self.fonts["text"], self.textarea.width)
+            for line in lines:
+                self.cursor["x"] = 0
+                text = self.fonts["text"].render(line, True, TEXT_COLOR)
+                self.display_surface(
+                    text, self.cursor["x"], self.cursor["y"], page["buffer"]
+                )
+                self.cursor["y"] += self.fonts["text"].size(line)[1]
+                if (
+                    self.cursor["y"] + self.fonts["text"].get_height()
+                    > page["buffer"].get_height()
+                ):
+                    page = self.add_page()
+            if self.cursor["y"] > 0:
+                self.cursor["y"] += PARAGRAPH_SPACING
 
-    # save settings
-    # load settings
+    def add_page(self):
+        page = {
+            "title": False,
+            "text_position": 0,
+        }
+        if len(self.pages) == 0:
+            page["title"] = True
+            page["text_position"] = self.title_height() + PARAGRAPH_SPACING
+        page["buffer"] = self.create_transparent_buffer(
+            (self.textarea.width, self.textarea.height - page["text_position"])
+        )
+        self.cursor["y"] = 0
+        self.pages.append(page)
+        return page
+
+    # save settings?
+    # load settings?
