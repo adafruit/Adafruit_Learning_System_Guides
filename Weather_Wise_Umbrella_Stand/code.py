@@ -120,10 +120,9 @@ while True:
                     color = (0, 0, 0)
             if first_run:
                 first_run = False
-            else:
-                pixels.fill(color)
-                pixels.show()
-                # reset clock
-                clock = ticks_add(clock, time_check)
+            pixels.fill(color)
+            pixels.show()
+            # reset clock
+            clock = ticks_add(clock, time_check)
     except Exception as e:
         reset_on_error(10, e)
