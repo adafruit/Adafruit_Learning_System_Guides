@@ -285,7 +285,6 @@ class Book:
         )
 
         while self._running:
-            print(self._busy, self._sleeping, reed_switch.value)
             if self._sleeping and reed_switch.value:  # Book Open
                 self._wake()
             elif (
