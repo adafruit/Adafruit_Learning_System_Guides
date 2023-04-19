@@ -24,14 +24,42 @@ class Listener:
         self.data_queue = Queue()
         self.mic_dev_index = None
 
-    def listen(self):
+    def listen(self, ready_callback=None):
+        self.phrase_complete = False
+        start = datetime.utcnow()
+        self.start_listening()
+        if ready_callback:
+            ready_callback()
+        while (
+            self.listener_handle
+            and not self.speech_waiting()
+            or not self.phrase_complete
+        ):
+            if self.phrase_time and start - self.phrase_time > timedelta(
+                seconds=self.phrase_timeout
+            ):
+                self.last_sample = bytes()
+                self.phrase_complete = True
+            self.phrase_time = start
+        self.stop_listening()
+
+    def start_listening(self):
         if not self.listener_handle:
             with sr.Microphone() as source:
-                print(source.stream)
                 self.recognizer.adjust_for_ambient_noise(source)
-                audio = self.recognizer.listen(source, timeout=self.record_timeout)
-            data = audio.get_raw_data()
-            self.data_queue.put(data)
+            self.listener_handle = self.recognizer.listen_in_background(
+                sr.Microphone(),
+                self.record_callback,
+                phrase_time_limit=self.record_timeout,
+            )
+
+    def stop_listening(self, wait_for_stop=False):
+        if self.listener_handle:
+            self.listener_handle(wait_for_stop=wait_for_stop)
+            self.listener_handle = None
+
+    def is_listening(self):
+        return self.listener_handle is not None
 
     def record_callback(self, _, audio: sr.AudioData) -> None:
         # Grab the raw bytes and push it into the thread safe queue.
