@@ -1,0 +1,3 @@
+Write a complete story with a title and a body of approximately
+{STORY_WORD_LENGTH} words long and a happy ending. The specific
+story request is "{STORY_REQUEST}".
