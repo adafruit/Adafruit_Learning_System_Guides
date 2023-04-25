@@ -82,7 +82,7 @@ wifi.radio.connect(os.getenv('CIRCUITPY_WIFI_SSID'), os.getenv('CIRCUITPY_WIFI_P
 
 print("Connected to WiFi")
 pool = socketpool.SocketPool(wifi.radio)
-server = HTTPServer(pool)
+server = HTTPServer(pool, "/static")
 
 #  variables for HTML
 #  comment/uncomment desired temp unit
