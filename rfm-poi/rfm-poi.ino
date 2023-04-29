@@ -86,9 +86,14 @@ uint8_t          *linebuf            = NULL; // Data for ALL images
 #define RFM69_INT   21                 // Interrupt pin
 #define NETWORKID   1
 #define NODEID      255
+#define INTERVAL    250000             // Broadcast interval, microseconds
 
 RH_RF69 *radio;
 bool     sender = false; // Radio send vs receive
+
+volatile uint16_t imgnum      = 0;
+volatile uint32_t last_change = 0;
+uint32_t          last_xmit   = 0;
 
 // The PRIMARY CORE runs all the non-deterministic grunt work --
 // Filesystem/config init, talking to the radio and infrared,
@@ -247,6 +252,8 @@ void setup() { // Core 0 start-up code
   imglist[0].height     = 1;
   imglist[0].reps_sec   = 1.0;
   imglist[0].total_usec = 1000000;
+  imgnum      = 0;
+  last_change = micros();
 
   core1_wait = false; // Done reading config, core 1 can proceed
 
@@ -270,48 +277,63 @@ void setup() { // Core 0 start-up code
   radio->setEncryptionKey((uint8_t *)ENCRYPTKEY);
 }
 
+uint8_t buf[RH_RF69_MAX_MESSAGE_LEN];
 
 void loop() {
-  uint8_t buf[RH_RF69_MAX_MESSAGE_LEN];
-  uint8_t len = sizeof(buf);
+  uint32_t now = micros();
 
-  if (radio->waitAvailableTimeout(500)) { 
-    // Should be a reply message for us now   
-    if (radio->recv(buf, &len)) {
-      Serial.print("got reply: ");
-      Serial.println((char*)buf);
-    } else {
-      Serial.println("recv failed");
+  if (sender) {
+    bool     xmit    = false; // Will be set true if it's time to send
+    uint32_t elapsed = now - last_change;
+
+    if (elapsed >= imglist[imgnum].total_usec) {
+      elapsed -= imglist[imgnum].total_usec; // Partly into new image
+      if (++imgnum >= num_images) imgnum = 1;
+      last_change = now;
+      xmit        = true;
+    } else if ((now - last_xmit) >= INTERVAL) {
+      xmit = true;
+    }
+    if (xmit) {
+      radio->waitPacketSent();
+      memcpy(&buf[0], (void *)&imgnum , 2);
+      memcpy(&buf[2], &elapsed, 2);
+      memcpy(&buf[6], &buf[0] , 6); // Rather than checksum, send data 2X
+      last_xmit = now;
+      radio->send((uint8_t *)buf, 12);
     }
   } else {
-    Serial.println("No reply, is rf69_server running?");
+    if (radio->waitAvailableTimeout(250)) { 
+      uint8_t len;
+      if (radio->recv(buf, &len)) {
+        Serial.print("got reply: ");
+        Serial.println((char*)buf);
+        if ((len == 12) && !memcmp(&buf[0], &buf[6], 6)) {
+          uint16_t n = *(uint16_t *)(&buf[0]);
+          if (n != imgnum) {
+            imgnum = n;
+            last_change = now - *(uint32_t *)(&buf[2]);
+          }
+        }
+      } else {
+        Serial.println("recv failed");
+      }
+    } else {
+      Serial.println("No reply, is rf69_server running?");
+    }
   }
-  delay(1000);
 }
 
 // The SECOND CORE is then FULLY DEDICATED to keeping the LEDs
 // continually refreshed, does not have to pause for other tasks.
 
-int      imgnum;
-uint32_t last_change;
-
 void setup1() {
   while (core1_wait); // Wait for setup() to complete before going to loop1()
-  // Force initial rollover for first image, first line
-  imgnum      = num_images;
-  last_change = -imglist[imgnum].total_usec;
 }
 
 
 void loop1() {
-  strip->show();
-  uint32_t now = micros();
-  uint32_t elapsed_usec = now - last_change;
-  if (elapsed_usec >= imglist[imgnum].total_usec) {
-    elapsed_usec -= imglist[imgnum].total_usec; // Partly into new image
-    if (++imgnum >= num_images) imgnum = 1;
-    last_change = now;
-  }
-  uint32_t row = (uint32_t)((float)elapsed_usec / 1000000.0 * imglist[imgnum].reps_sec * (float)imglist[imgnum].height) % imglist[imgnum].height;
+  uint32_t row = (uint32_t)((float)(micros() - last_change) / 1000000.0 * imglist[imgnum].reps_sec * (float)imglist[imgnum].height) % imglist[imgnum].height;
   memcpy(strip->getPixels(), imglist[imgnum].data + row * dotstar_length * 3, dotstar_length * 3);
+  strip->show();
 }
