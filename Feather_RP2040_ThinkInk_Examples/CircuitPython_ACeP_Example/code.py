@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Unlicense
 
-'''Simple test for a 5.65" ACeP eInk Display 
+'''Simple test for a 5.65" ACeP eInk Display
 with the Feather RP2040 ThinkInk'''
 
 import board

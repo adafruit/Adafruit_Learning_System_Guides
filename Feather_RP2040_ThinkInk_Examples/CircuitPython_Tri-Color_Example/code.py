@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Unlicense
 
-'''Simple test for the Adafruit 2.13" Tri-Color eInk Display 
+'''Simple test for the Adafruit 2.13" Tri-Color eInk Display
 with the Feather RP2040 ThinkInk'''
 
 import time
