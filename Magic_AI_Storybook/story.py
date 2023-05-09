@@ -8,7 +8,6 @@ import os
 import time
 import argparse
 import math
-import pickle
 import configparser
 from enum import Enum
 from tempfile import NamedTemporaryFile
@@ -226,7 +225,12 @@ class Book:
         next_button_image = pygame.image.load(IMAGES_PATH + BUTTON_NEXT_IMAGE)
         new_button_image = pygame.image.load(IMAGES_PATH + BUTTON_NEW_IMAGE)
         button_spacing = (
-            self.width - (back_button_image.get_width() + next_button_image.get_width() + new_button_image.get_width())
+            self.width
+            - (
+                back_button_image.get_width()
+                + next_button_image.get_width()
+                + new_button_image.get_width()
+            )
         ) // 4
         button_ypos = (
             self.height
@@ -254,7 +258,9 @@ class Book:
 
         self._load_button(
             "next",
-            button_spacing * 3 + back_button_image.get_width() + new_button_image.get_width(),
+            button_spacing * 3
+            + back_button_image.get_width()
+            + new_button_image.get_width(),
             button_ypos,
             next_button_image,
             self.next_page,
