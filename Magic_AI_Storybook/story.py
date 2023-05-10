@@ -8,7 +8,6 @@ import os
 import time
 import argparse
 import math
-import pickle
 import configparser
 from enum import Enum
 from tempfile import NamedTemporaryFile
@@ -44,6 +43,7 @@ BACKGROUND_IMAGE = "paper_background.png"
 LOADING_IMAGE = "loading.png"
 BUTTON_BACK_IMAGE = "button_back.png"
 BUTTON_NEXT_IMAGE = "button_next.png"
+BUTTON_NEW_IMAGE = "button_new.png"
 
 # Asset Paths
 IMAGES_PATH = os.path.dirname(sys.argv[0]) + "images/"
@@ -167,10 +167,9 @@ class Book:
         self.rotation = rotation
         self.images = {}
         self.fonts = {}
+        self.buttons = {}
         self.width = 0
         self.height = 0
-        self.back_button = None
-        self.next_button = None
         self.textarea = None
         self.screen = None
         self.saved_screen = None
@@ -224,23 +223,44 @@ class Book:
         # Add buttons
         back_button_image = pygame.image.load(IMAGES_PATH + BUTTON_BACK_IMAGE)
         next_button_image = pygame.image.load(IMAGES_PATH + BUTTON_NEXT_IMAGE)
+        new_button_image = pygame.image.load(IMAGES_PATH + BUTTON_NEW_IMAGE)
         button_spacing = (
-            self.width - (back_button_image.get_width() + next_button_image.get_width())
-        ) // 3
+            self.width
+            - (
+                back_button_image.get_width()
+                + next_button_image.get_width()
+                + new_button_image.get_width()
+            )
+        ) // 4
         button_ypos = (
             self.height
             - PAGE_NAV_HEIGHT
             + (PAGE_NAV_HEIGHT - next_button_image.get_height()) // 2
         )
-        self.back_button = Button(
+
+        self._load_button(
+            "back",
             button_spacing,
             button_ypos,
             back_button_image,
             self.previous_page,
             self._display_surface,
         )
-        self.next_button = Button(
-            self.width - button_spacing - next_button_image.get_width(),
+
+        self._load_button(
+            "new",
+            button_spacing * 2 + back_button_image.get_width(),
+            button_ypos,
+            new_button_image,
+            self.new_story,
+            self._display_surface,
+        )
+
+        self._load_button(
+            "next",
+            button_spacing * 3
+            + back_button_image.get_width()
+            + new_button_image.get_width(),
             button_ypos,
             next_button_image,
             self.next_page,
@@ -254,8 +274,6 @@ class Book:
             self.width - PAGE_SIDE_MARGIN * 2,
             self.height - PAGE_NAV_HEIGHT - PAGE_TOP_MARGIN - PAGE_BOTTOM_MARGIN,
         )
-
-        self.load_settings()
 
         # Start the sleep check thread after everything is initialized
         self._sleep_check_thread = threading.Thread(target=self._handle_sleep)
@@ -309,7 +327,7 @@ class Book:
         if event.button == 1:
             # If button pressed while visible, trigger action
             coords = self._rotate_mouse_pos(event.pos)
-            for button in [self.back_button, self.next_button]:
+            for button in self.buttons.values():
                 if button.visible and button.is_in_bounds(coords):
                     button.action()
 
@@ -333,6 +351,9 @@ class Book:
             self.images[name] = image
         except pygame.error:
             pass
+
+    def _load_button(self, name, x, y, image, action, display_surface):
+        self.buttons[name] = Button(x, y, image, action, display_surface)
 
     def _load_font(self, name, details):
         self.fonts[name] = pygame.font.Font(details[0], details[1])
@@ -369,6 +390,7 @@ class Book:
         self._display_surface(self.images["background"], 0, 0)
         pygame.display.update()
 
+        print(f"Loading page {self.page} of {len(self.pages)}")
         page_data = self.pages[self.page]
 
         # Display the title
@@ -385,8 +407,9 @@ class Book:
 
         # Display the navigation buttons
         if self.page > 0 or self.story > 0:
-            self.back_button.show()
-        self.next_button.show()
+            self.buttons["back"].show()
+        self.buttons["next"].show()
+        self.buttons["new"].show()
         pygame.display.update()
         self._busy = False
 
@@ -463,7 +486,11 @@ class Book:
                 self.load_story(self.stories[self.story])
                 self.page = 0
             else:
-                self.new_story()
+                self.generate_new_story()
+        self.display_current_page()
+
+    def new_story(self):
+        self.generate_new_story()
         self.display_current_page()
 
     def display_loading(self):
@@ -485,10 +512,13 @@ class Book:
         # Parse out the title and story and render into pages
         self._busy = True
         self.pages = []
-        title = story.split("Title: ")[1].split("\n\n")[0]
+        if not story.startswith("Title: "):
+            print("Unexpected story format from ChatGPT. Missing Title.")
+            title = "A Story"
+        else:
+            title = story.split("Title: ")[1].split("\n\n")[0]
         page = self._add_page(title)
         paragraphs = story.split("\n\n")[1:]
-        paragraphs.append("The End.")
         for paragraph in paragraphs:
             lines = self._wrap_text(paragraph, self.fonts["text"], self.textarea.width)
             for line in lines:
@@ -524,47 +554,9 @@ class Book:
         self.pages.append(page)
         return page
 
-    def load_settings(self):
-        storydata = {
-            "history": [],
-            "settings": {
-                "story": 0,
-                "page": 0,
-            },
-        }
-        # Load the story data if it exists
-        if os.path.exists(os.path.dirname(sys.argv[0]) + "storydata.bin"):
-            print("Loading previous story data")
-            with open(os.path.dirname(sys.argv[0]) + "storydata.bin", "rb") as f:
-                storydata = pickle.load(f)
-                self.stories = storydata["history"]
-                self.story = storydata["settings"]["story"]
-
-        if storydata["history"] and storydata["settings"]["story"] < len(
-            storydata["history"]
-        ):
-            # Load the last story
-            self.load_story(storydata["history"][storydata["settings"]["story"]])
-            self.page = storydata["settings"]["page"]
-            # If something changed and caused the current page to be too
-            # large, just go to the last page of the story
-            if self.page >= len(self.pages):
-                self.page = len(self.pages) - 1
-
-    def save_settings(self):
-        storydata = {
-            "history": self.stories,
-            "settings": {
-                "story": self.story,
-                "page": self.page,
-            },
-        }
-        with open(os.path.dirname(sys.argv[0]) + "storydata.bin", "wb") as f:
-            pickle.dump(storydata, f)
-
-    def new_story(self):
+    def generate_new_story(self):
         self._busy = True
-        self.display_message("What story would you like to hear today?")
+        self.display_message("Speak aloud the story you wish to read.")
 
         if self._sleep_request:
             self._busy = False
@@ -604,10 +596,9 @@ class Book:
         self.stories.append(response)
         self.story = len(self.stories) - 1
         self.page = 0
-        self.save_settings()
+        self._busy = False
 
         self.load_story(response)
-        self._busy = False
 
     def _sleep(self):
         # Set a sleep request flag so that any busy threads know to finish up
@@ -699,11 +690,7 @@ def main(args):
     book = Book(args.rotation)
     try:
         book.start()
-
-        # If no stories, start a new one
-        if not book.stories:
-            book.new_story()
-
+        book.generate_new_story()
         book.display_current_page()
 
         while True:
@@ -711,7 +698,6 @@ def main(args):
     except KeyboardInterrupt:
         pass
     finally:
-        book.save_settings()
         book.deinit()
         pygame.quit()
 
@@ -721,4 +707,4 @@ if __name__ == "__main__":
 
 # TODO:
 # * Figure out how to get the script to start on boot
-# * Play with prompt parameters
+# * Play with chatgpt prompt parameters
