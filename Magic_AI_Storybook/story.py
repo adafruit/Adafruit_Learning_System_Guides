@@ -5,6 +5,7 @@
 import threading
 import sys
 import os
+import re
 import time
 import argparse
 import math
@@ -102,6 +103,10 @@ if not os.path.isfile(PROMPT_FILE):
     print("Please make sure PROMPT_FILE points to a valid file.")
     sys.exit(1)
 
+def strip_fancy_quotes(text):
+    text = re.sub(r"[\u2018\u2019]", "'", text)
+    text = re.sub(r"[\u201C\u201D]", '"', text)
+    return text
 
 class Position(Enum):
     TOP = 0
@@ -668,7 +673,7 @@ class Book:
                 return None
 
         # Send the heard text to ChatGPT and return the result
-        return response  # completion.choices[0].message.content
+        return strip_fancy_quotes(response)
 
 
 def parse_args():
