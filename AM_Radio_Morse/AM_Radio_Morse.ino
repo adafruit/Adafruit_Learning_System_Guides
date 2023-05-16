@@ -40,22 +40,20 @@ void loop() {
   buttonDotState = digitalRead(buttonDotPin);
   buttonDashState = digitalRead(buttonDashPin);
   
-  if (buttonDotState == HIGH) {    // not pressed
+  if (buttonDotState == HIGH || buttonDashState == HIGH) {
     digitalWrite(ledPin, LOW);   // light is off
-  }
-  else {                        // pressed
+  } else {
     digitalWrite(ledPin, HIGH);  // light on
-    radio.tone(PITCH, DOT);
-    delay(GAP);
-  }
-  if (buttonDashState == HIGH) {    // not pressed
-    digitalWrite(ledPin, LOW);   // light is off
-  }
-  else {                        // pressed
-    digitalWrite(ledPin, HIGH);  // light on
-    radio.tone(PITCH, DASH);
+    
+    if (buttonDotState == LOW) {
+      radio.tone(PITCH, DOT);
+    } else if (buttonDashState == LOW) {
+      radio.tone(PITCH, DASH);
+    }
+    
     delay(GAP);
   }
   
   delay(15);
 }
+
