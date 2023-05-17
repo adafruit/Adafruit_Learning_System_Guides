@@ -50,7 +50,6 @@ pool = socketpool.SocketPool(wifi.radio)
 # adafruit IO info
 aio_username = os.getenv('aio_username')
 aio_key = os.getenv('aio_key')
-location = "America/Los Angeles"
 
 # io HTTP for getting the time from the internet
 io = IO_HTTP(aio_username, aio_key, requests)
