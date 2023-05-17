@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2023 Carter N. for Adafruit Industries
+// SPDX-License-Identifier: MIT
+
 import time
 import board
 import digitalio
@@ -130,5 +133,3 @@ while True:
     if now - last_update > UPDATE_RATE:
         update_display()
         last_update = now
-
-
