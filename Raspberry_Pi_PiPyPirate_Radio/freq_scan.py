@@ -1,5 +1,5 @@
-// SPDX-FileCopyrightText: 2023 Carter N. for Adafruit Industries
-// SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: 2023 Carter N. for Adafruit Industries
+# SPDX-License-Identifier: MIT
 
 import board
 import digitalio
