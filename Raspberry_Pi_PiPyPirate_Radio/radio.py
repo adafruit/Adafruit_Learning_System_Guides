@@ -12,6 +12,7 @@ import mpd
 #--| User Config |-----------------------------------
 FREQ = 89.00
 PLAYLIST = "test"
+STATION_NAME = "PiPyPirate Radio"
 UPDATE_RATE = 0.5
 #----------------------------------------------------
 
@@ -56,6 +57,7 @@ radio = adafruit_si4713.SI4713(
 )
 radio.tx_frequency_khz = int(FREQ * 1000)
 radio.tx_power = 115
+radio.configure_rds(0xADAF, station=STATION_NAME.encode())
 
 # MPD
 mpc = mpd.MPDClient()
@@ -103,6 +105,8 @@ def update_display():
     draw.text( (5, 150), artist, font=INFO_FNT, fill=ARTS_CLR )
     draw.text( (5, 170), album, font=INFO_FNT, fill=ALBM_CLR)
     draw.text( (5, 190), song, font=INFO_FNT, fill=TITL_CLR)
+    rds_info = "{}:{}:{}".format(artist, album, song)
+    radio.rds_buffer = rds_info.encode()
 
     perc = float(status['elapsed']) / float(status['duration'])
     draw.rectangle( (5, 215, 235, 230), outline=PROG_CLR)
@@ -114,6 +118,8 @@ def update_display():
     disp.image(image)
 
 last_update = time.monotonic()
+
+print("Now broadcasting {} on {}FM".format(STATION_NAME, FREQ))
 
 while True:
     now = time.monotonic()
