@@ -199,7 +199,7 @@ def send_note_off(note_num):
         midi_usb.send(NoteOff(note_num+12, 0))
     else:
         note_num = root_notes[note_num] + (12*octv)
-        midi_usb.send(NoteOff(note, 0))
+        midi_usb.send(NoteOff(note_num, 0))
 
 def send_midi_panic():
     for x in range(128):
