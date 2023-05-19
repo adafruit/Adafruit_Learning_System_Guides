@@ -15,7 +15,7 @@ from adafruit_display_text import bitmap_label as label
 # Make the display context. Change size if you want
 display = board.DISPLAY
 
-background = displayio.Bitmap(320, 240, 1)
+background = displayio.Bitmap(display.width, display.height, 1)
 bg_palette = displayio.Palette(1)
 bg_palette[0] = 0xDDDD00
 

@@ -83,7 +83,7 @@ audio = audiobusio.I2SOut(bit_clock=board.D24, word_select=board.D25, data=board
 # Feather M4
 # audio = audiobusio.I2SOut(bit_clock=board.D1, word_select=board.D10, data=board.D11)
 mixer = audiomixer.Mixer(voice_count=1, sample_rate=22050, channel_count=1,
-                         bits_per_sample=16, samples_signed=True)
+                         bits_per_sample=16, samples_signed=True, buffer_size=32768)
 mixer.voice[0].level = 0.15
 
 # Colors
