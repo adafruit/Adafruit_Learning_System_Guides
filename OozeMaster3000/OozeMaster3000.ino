@@ -5,30 +5,34 @@
 // OOZE MASTER 3000: NeoPixel simulated liquid physics. Up to 7 NeoPixel
 // strands dribble light, while an 8th strand "catches the drips."
 // Designed for the Adafruit Feather M0 or M4 with matching version of
-// NeoPXL8 FeatherWing. This can be adapted for other M0 or M4 boards but
-// you will need to do your own "pin sudoku" and level shifting
-// (e.g. NeoPXL8 Friend breakout or similar).
+// NeoPXL8 FeatherWing, or for RP2040 boards including SCORPIO. This can be
+// adapted for other M0, M4, RP2040 or ESP32-S3 boards but you will need to
+// do your own "pin sudoku" & level shifting (e.g. NeoPXL8 Friend breakout).
 // See here: https://learn.adafruit.com/adafruit-neopxl8-featherwing-and-library
 // Requires Adafruit_NeoPixel, Adafruit_NeoPXL8 and Adafruit_ZeroDMA libraries.
 
 #include <Adafruit_NeoPXL8.h>
 
-uint8_t dripColor[] = { 0, 255, 0 }; // Bright green ectoplasm
-#define PIXEL_PITCH (1.0 / 150.0)    // 150 pixels/m
-#define ICE_BRIGHTNESS 0             // Icycle effect Brightness (0 to <100%)
+#define PIXEL_PITCH (1.0 / 150.0) // 150 pixels/m
+#define ICE_BRIGHTNESS 0          // Icycle effect Brightness (0 to <100%)
+#define COLOR_ORDER NEO_GRB       // NeoPixel color format (see Adafruit_NeoPixel)
 
-#define GAMMA   2.6
+#define GAMMA   2.6   // For linear brightness correction
 #define G_CONST 9.806 // Standard acceleration due to gravity
 // While the above G_CONST is correct for "real time" drips, you can dial it back
 // for a more theatric effect / to slow down the drips like they've still got a
 // syrupy "drool string" attached (try much lower values like 2.0 to 3.0).
 
-// NeoPXL8 pin numbers (these are default connections on NeoPXL8 M0 FeatherWing)
+// NeoPXL8 pin numbers
+#if defined(ARDUINO_ADAFRUIT_FEATHER_RP2040_SCORPIO)
+#define USE_HDR // RP2040 has enough "oomph" for HDR color!
+int8_t pins[8] = { 16, 17, 18, 19, 20, 21, 22, 23 };
+#else
+// These are default connections on NeoPXL8 M0 FeatherWing:
 int8_t pins[8] = { PIN_SERIAL1_RX, PIN_SERIAL1_TX, MISO, 13, 5, SDA, A4, A3 };
-
 // If using an M4 Feather & NeoPXL8 FeatherWing, use these values instead:
 //int8_t pins[8] = { 13, 12, 11, 10, SCK, 5, 9, 6 };
-
+#endif
 
 typedef enum {
   MODE_IDLE,
@@ -38,10 +42,35 @@ typedef enum {
   MODE_DRIPPING
 } dropState;
 
+// A color palette allows one to "theme" a project. By default there's just
+// one color, and all drips use only that. Setting up a color list, and then
+// declaring a range of indices in the drip[] table later, allows some
+// randomization while still keeping appearance within a predictable range.
+// Each drip could be its own fixed color, or each could be randomly picked
+// from a set of colors. Explained further in Adafruit Learning System guide.
+// Q: WHY NOT JUST PICK RANDOM RGB COLORS?
+// Because that would pick a lot of ugly or too-dark RGB combinations.
+// WHY NOT RANDOM FULL-BRIGHTNESS HUES FROM THE ColorHSV() FUNCTION?
+// Two reasons: First, to apply a consistent color theme to a project;
+// Halloween, Christmas, fire, water, etc. Second, because NeoPixels
+// have been around for over a decade and it's time we mature past the
+// Lisa Frank stage of all-rainbows-all-the-time and consider matters of
+// taste and restraint. If you WANT all rainbows, that's still entirely
+// possile just by setting up a palette of bright colors!
+uint8_t palette[][3] = {
+  { 0, 255, 0 }, // Bright green ectoplasm
+};
+// Note that color randomization does not pair well with the ICE_BRIGHTNESS
+// effect; you'll probably want to pick one or the other: random colors
+// (from palette) and no icicles, or fixed color (per strand or overall)
+// with ice. Otherwise the color jump of the icicle looks bad and wrong.
+
 struct {
   uint16_t  length;            // Length of NeoPixel strip IN PIXELS
   uint16_t  dribblePixel;      // Index of pixel where dribble pauses before drop (0 to length-1)
   float     height;            // Height IN METERS of dribblePixel above ground
+  uint16_t  palette_min;       // Lower color palette index for this strip
+  uint16_t  palette_max;       // Upper color palette index for this strip
   dropState mode;              // One of the above states (MODE_IDLE, etc.)
   uint32_t  eventStartUsec;    // Starting time of current event
   uint32_t  eventDurationUsec; // Duration of current event, in microseconds
@@ -49,26 +78,32 @@ struct {
   uint32_t  splatStartUsec;    // Starting time of most recent "splat"
   uint32_t  splatDurationUsec; // Fade duration of splat
   float     pos;               // Position of drip on prior frame
+  uint8_t   color[3];          // RGB color (randomly picked from from palette[])
+  uint8_t   splatColor[3];     // RGB color of "splat" (may be from prior drip)
 } drip[] = {
   // THIS TABLE CONTAINS INFO FOR UP TO 8 NEOPIXEL DRIPS
-  { 16,  7, 0.157 }, // NeoPXL8 output 0: 16 pixels long, drip pauses at index 7, 0.157 meters above ground
-  { 19,  6, 0.174 }, // NeoPXL8 output 1: 19 pixels long, pause at index 6, 0.174 meters up
-  { 18,  5, 0.195 }, // NeoPXL8 output 2: etc.
-  { 17,  6, 0.16  }, // NeoPXL8 output 3
-  { 16,  1, 0.21  }, // NeoPXL8 output 4
-  { 16,  1, 0.21  }, // NeoPXL8 output 5
-  { 21, 10, 0.143 }, // NeoPXL8 output 6
+  { 16,  7, 0.157, 0, 0 }, // NeoPXL8 output 0: 16 pixels long, drip pauses at index 7, 0.157 meters above ground, use palette colors 0-0
+  { 19,  6, 0.174, 0, 0 }, // NeoPXL8 output 1: 19 pixels long, pause at index 6, 0.174 meters up
+  { 18,  5, 0.195, 0, 0 }, // NeoPXL8 output 2: etc.
+  { 17,  6, 0.16 , 0, 0 }, // NeoPXL8 output 3
+  { 16,  1, 0.21 , 0, 0 }, // NeoPXL8 output 4
+  { 16,  1, 0.21 , 0, 0 }, // NeoPXL8 output 5
+  { 21, 10, 0.143, 0, 0 }, // NeoPXL8 output 6
   // NeoPXL8 output 7 is normally reserved for ground splats
   // You CAN add an eighth drip here, but then will not get splats
 };
 
-#define N_DRIPS   (sizeof drip / sizeof drip[0])
-int               longestStrand = (N_DRIPS < 8) ? N_DRIPS : 0;
-Adafruit_NeoPXL8 *pixels;
+#ifdef USE_HDR
+Adafruit_NeoPXL8HDR *pixels = NULL;
+#else
+Adafruit_NeoPXL8    *pixels = NULL;
+#endif
+#define N_DRIPS      (sizeof drip / sizeof drip[0])
+int                  longestStrand = (N_DRIPS < 8) ? N_DRIPS : 0;
 
 void setup() {
   Serial.begin(9600);
-  randomSeed(analogRead(A0) + analogRead(A5));
+  randomSeed(analogRead(A0) + analogRead(A3));
 
   for(int i=0; i<N_DRIPS; i++) {
     drip[i].mode              = MODE_IDLE; // Start all drips in idle mode
@@ -78,16 +113,29 @@ void setup() {
     drip[i].splatStartUsec    = 0;
     drip[i].splatDurationUsec = 0;
     if(drip[i].length > longestStrand) longestStrand = drip[i].length;
+    // Randomize initial color:
+    memcpy(drip[i].color, palette[random(drip[i].palette_min, drip[i].palette_max + 1)], sizeof palette[0]);
+    memcpy(drip[i].splatColor, drip[i].color, sizeof palette[0]);
   }
 
-  pixels = new Adafruit_NeoPXL8(longestStrand, pins, NEO_GRB);
+#ifdef USE_HDR
+  pixels = new Adafruit_NeoPXL8HDR(longestStrand, pins, COLOR_ORDER);
+  if (!pixels->begin(true, 4, true)) {
+    // HDR requires inordinate RAM! Blink onboard LED if there's trouble:
+    pinMode(LED_BUILTIN, OUTPUT);
+    for (;;) digitalWrite(LED_BUILTIN, (millis() / 500) & 1);
+  }
+  pixels->setBrightness(65535, GAMMA); // NeoPXL8HDR handles gamma correction
+#else
+  pixels = new Adafruit_NeoPXL8(longestStrand, pins, COLOR_ORDER);
   pixels->begin();
+#endif
 }
 
 void loop() {
   uint32_t t = micros(); // Current time, in microseconds
 
-  float x; // multipurpose interim result
+  float x = 0.0; // multipurpose interim result
   pixels->clear();
 
   for(int i=0; i<N_DRIPS; i++) {
@@ -104,6 +152,8 @@ void loop() {
           drip[i].mode              = MODE_OOZING; // Idle to oozing transition
           drip[i].eventDurationUsec = random(800000, 1200000); // 0.8 to 1.2 sec ooze
           drip[i].eventDurationReal = (float)drip[i].eventDurationUsec / 1000000.0;
+          // Randomize next drip color from palette settings:
+          memcpy(drip[i].color, palette[random(drip[i].palette_min, drip[i].palette_max + 1)], sizeof palette[0]);
           break;
         case MODE_OOZING:
           if(drip[i].dribblePixel) { // If dribblePixel is nonzero...
@@ -135,6 +185,7 @@ void loop() {
           drip[i].eventDurationReal = (float)drip[i].eventDurationUsec / 1000000.0;
           drip[i].splatStartUsec    = drip[i].eventStartUsec; // Splat starts now!
           drip[i].splatDurationUsec = random(900000, 1100000);
+          memcpy(drip[i].splatColor, drip[i].color, sizeof palette[0]); // Save color for splat
           break;
       }
     }
@@ -142,9 +193,9 @@ void loop() {
     // Render drip state to NeoPixels...
 #if ICE_BRIGHTNESS > 0
       // Draw icycles if ICE_BRIGHTNESS is set
-      x = pow((float)ICE_BRIGHTNESS * 0.01, GAMMA);
+      x = (float)ICE_BRIGHTNESS * 0.01;
       for(int d=0; d<=drip[i].dribblePixel; d++) {
-        set(i, d, x);
+        set(i, i, d, x);
       }
 #endif
     switch(drip[i].mode) {
@@ -158,8 +209,7 @@ void loop() {
         x = ((float)ICE_BRIGHTNESS * 0.01) +
             x * (float)(100 - ICE_BRIGHTNESS) * 0.01;
 #endif
-        x = pow(x, GAMMA);
-        set(i, 0, x);
+        set(i, i, 0, x);
         break;
       case MODE_DRIBBLING_1:
         // Point b moves from first to second pixel over event time
@@ -185,8 +235,7 @@ void loop() {
       dtUsec = t - drip[i].splatStartUsec; // Elapsed time, in microseconds, since start of splat
       if(dtUsec < drip[i].splatDurationUsec) {
         x = 1.0 - sqrt((float)dtUsec / (float)drip[i].splatDurationUsec);
-        x = pow(x, GAMMA);
-        set(7, i, x);
+        set(7, i, i, x);
       }
     }
   }
@@ -235,15 +284,68 @@ void dripDraw(uint8_t dNum, float a, float b, bool fade) {
           x * (float)(100 - ICE_BRIGHTNESS) * 0.01;
     }
 #endif
-    x = pow(x, GAMMA);
-    set(dNum, i, x);
+    set(dNum, dNum, i, x);
   }
 }
 
-// Set one pixel to a given brightness level (0.0 to 1.0)
-void set(uint8_t strand, uint8_t pixel, float brightness) {
-  pixels->setPixelColor(pixel + strand * longestStrand,
-    (int)((float)dripColor[0] * brightness + 0.5),
-    (int)((float)dripColor[1] * brightness + 0.5),
-    (int)((float)dripColor[2] * brightness + 0.5));
+// Set one pixel to a given brightness level (0.0 to 1.0).
+// Strand # and drip # are BOTH passed in because "splats" are always
+// on drip 7 but colors come from drip indices.
+void set(uint8_t strand, uint8_t d, uint8_t pixel, float brightness) {
+#if !defined(USE_HDR) // NeoPXL8HDR does its own gamma correction, else...
+  brightness = pow(brightness, GAMMA);
+#endif
+  if ((strand < 7) || (N_DRIPS >= 8)) {
+    pixels->setPixelColor(pixel + strand * longestStrand,
+      (int)((float)drip[d].color[0] * brightness + 0.5),
+      (int)((float)drip[d].color[1] * brightness + 0.5),
+      (int)((float)drip[d].color[2] * brightness + 0.5));
+  } else {
+    pixels->setPixelColor(pixel + strand * longestStrand,
+      (int)((float)drip[d].splatColor[0] * brightness + 0.5),
+      (int)((float)drip[d].splatColor[1] * brightness + 0.5),
+      (int)((float)drip[d].splatColor[2] * brightness + 0.5));
+  }
 }
+
+// NeoPXL8HDR requires some background processing in a second thread.
+// See NeoPXL8 library examples (NeoPXL8HDR/strandtest) for explanation.
+// Currently this sketch only enables HDR if using Feather SCORPIO,
+// but it could be useful for other RP2040s and for ESP32S3too.
+#ifdef USE_HDR
+
+#if defined(ARDUINO_ARCH_RP2040)
+
+void loop1() {
+  if (pixels) pixels->refresh();
+}
+
+void setup1() {
+}
+
+#elif defined(CONFIG_IDF_TARGET_ESP32S3)
+
+void loop0(void *param) {
+  for(;;) {
+    yield();
+    if (pixels) pixels->refresh();
+  }
+}
+
+#else // SAMD
+
+#include "Adafruit_ZeroTimer.h"
+
+Adafruit_ZeroTimer zerotimer = Adafruit_ZeroTimer(3);
+
+void TC3_Handler() {
+  Adafruit_ZeroTimer::timerHandler(3);
+}
+
+void timerCallback(void) {
+  if (pixels) pixels->refresh();
+}
+
+#endif // end SAMD
+
+#endif // end USE_HDR
