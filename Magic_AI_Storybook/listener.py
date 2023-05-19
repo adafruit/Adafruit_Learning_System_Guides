@@ -14,7 +14,9 @@ class Listener:
         self.recognizer = sr.Recognizer()
         self.recognizer.energy_threshold = energy_threshold
         with self.microphone as source:
-            self.recognizer.adjust_for_ambient_noise(source)  # we only need to calibrate once, before we start listening
+            self.recognizer.adjust_for_ambient_noise(
+                source
+            )  # we only need to calibrate once, before we start listening
         self.record_timeout = record_timeout
         self.listener_handle = None
         self.audio = None
@@ -24,10 +26,7 @@ class Listener:
         self._start_listening()
         if ready_callback:
             ready_callback()
-        while (
-            self.listener_handle
-            and self.audio is None
-        ):
+        while self.listener_handle and self.audio is None:
             time.sleep(0.1)
         self.stop_listening()
 
@@ -35,7 +34,9 @@ class Listener:
         self.audio = audio
 
     def _start_listening(self):
-        self.listener_handle = self.recognizer.listen_in_background(self.microphone, self._save_audio_callback)
+        self.listener_handle = self.recognizer.listen_in_background(
+            self.microphone, self._save_audio_callback
+        )
 
     def stop_listening(self, wait_for_stop=False):
         if self.listener_handle:
@@ -60,7 +61,7 @@ class Listener:
                     )
 
                     return result.strip()
-                except sr.RequestError as e:
+                except sr.RequestError:
                     time.sleep(3)
                 attempts += 1
                 print("I wasn't able to understand you. Please repeat that.")

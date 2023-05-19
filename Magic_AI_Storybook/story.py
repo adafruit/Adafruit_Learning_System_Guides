@@ -31,16 +31,16 @@ PROMPT_FILE = "/boot/bookprompt.txt"
 
 # Quit Settings (Close book QUIT_CLOSES within QUIT_TIME_PERIOD to quit)
 QUIT_CLOSES = 3
-QUIT_TIME_PERIOD = 5 # Time period in Seconds
+QUIT_TIME_PERIOD = 5  # Time period in Seconds
 
 # Neopixel Settings
 NEOPIXEL_COUNT = 10
 NEOPIXEL_BRIGHTNESS = 0.2
 NEOPIXEL_ORDER = neopixel.GRBW
-NEOPIXEL_LOADING_COLOR = (0, 255, 0, 0)     # Loading/Dreaming (Green)
-NEOPIXEL_SLEEP_COLOR = (0, 0, 0, 0)         # Sleeping (Off)
-NEOPIXEL_WAITING_COLOR = (255, 255, 0, 0)   # Waiting for Input (Yellow)
-NEOPIXEL_READING_COLOR = (0, 0, 255, 0)     # Reading (Blue)
+NEOPIXEL_LOADING_COLOR = (0, 255, 0, 0)  # Loading/Dreaming (Green)
+NEOPIXEL_SLEEP_COLOR = (0, 0, 0, 0)  # Sleeping (Off)
+NEOPIXEL_WAITING_COLOR = (255, 255, 0, 0)  # Waiting for Input (Yellow)
+NEOPIXEL_READING_COLOR = (0, 0, 255, 0)  # Reading (Blue)
 NEOPIXEL_PULSE_SPEED = 0.1
 
 # Image Names
@@ -116,10 +116,12 @@ if not os.path.isfile(PROMPT_FILE):
     print("Please make sure PROMPT_FILE points to a valid file.")
     sys.exit(1)
 
+
 def strip_fancy_quotes(text):
     text = re.sub(r"[\u2018\u2019]", "'", text)
     text = re.sub(r"[\u201C\u201D]", '"', text)
     return text
+
 
 class Position(Enum):
     TOP = 0
@@ -237,7 +239,7 @@ class Book:
         with open(PROMPT_FILE, "r") as f:
             self._prompt = f.read()
 
-        #Initialize the Listener
+        # Initialize the Listener
         self.listener = Listener(openai.api_key, ENERGY_THRESHOLD, RECORD_TIMEOUT)
 
         # Preload remaining images
@@ -348,7 +350,12 @@ class Book:
         self.pixels.show()
 
     def _set_status_color(self, status_color):
-        if status_color not in [NEOPIXEL_READING_COLOR, NEOPIXEL_WAITING_COLOR, NEOPIXEL_SLEEP_COLOR, NEOPIXEL_LOADING_COLOR]:
+        if status_color not in [
+            NEOPIXEL_READING_COLOR,
+            NEOPIXEL_WAITING_COLOR,
+            NEOPIXEL_SLEEP_COLOR,
+            NEOPIXEL_LOADING_COLOR,
+        ]:
             raise ValueError(f"Invalid status color {status_color}.")
 
         # Handle loading color by setting the loading flag
@@ -712,6 +719,7 @@ class Book:
     @property
     def running(self):
         return self._running
+
 
 def parse_args():
     parser = argparse.ArgumentParser()
