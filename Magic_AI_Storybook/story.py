@@ -1,7 +1,6 @@
 # SPDX-FileCopyrightText: 2023 Melissa LeBlanc-Williams for Adafruit Industries
 #
 # SPDX-License-Identifier: MIT
-# Desktop Icon from <a href="https://www.flaticon.com/free-icons/book" title="book icons">Book icons created by Freepik - Flaticon</a>
 
 import threading
 import sys
@@ -747,7 +746,3 @@ def main(args):
 
 if __name__ == "__main__":
     main(parse_args())
-
-# TODO:
-# * Figure out how to get the script to start on boot
-# * Play with chatgpt prompt parameters
