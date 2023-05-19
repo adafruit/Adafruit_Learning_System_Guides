@@ -2,56 +2,40 @@
 #
 # SPDX-License-Identifier: MIT
 
-from datetime import datetime, timedelta
-from queue import Queue
+import time
 
 import speech_recognition as sr
 
 
 class Listener:
-    def __init__(self, energy_threshold=1000, phrase_timeout=3.0, record_timeout=30):
+    def __init__(self, api_key, energy_threshold=300, record_timeout=30):
         self.listener_handle = None
+        self.microphone = sr.Microphone()
         self.recognizer = sr.Recognizer()
         self.recognizer.energy_threshold = energy_threshold
-        self.recognizer.dynamic_energy_threshold = False
-        self.recognizer.pause_threshold = 1
-        self.last_sample = bytes()
-        self.phrase_time = datetime.utcnow()
-        self.phrase_timeout = phrase_timeout
+        with self.microphone as source:
+            self.recognizer.adjust_for_ambient_noise(source)  # we only need to calibrate once, before we start listening
         self.record_timeout = record_timeout
-        self.phrase_complete = False
-        # Thread safe Queue for passing data from the threaded recording callback.
-        self.data_queue = Queue()
-        self.mic_dev_index = None
+        self.listener_handle = None
+        self.audio = None
+        self.api_key = api_key
 
     def listen(self, ready_callback=None):
-        self.phrase_complete = False
-        start = datetime.utcnow()
-        self.start_listening()
+        self._start_listening()
         if ready_callback:
             ready_callback()
         while (
             self.listener_handle
-            and not self.speech_waiting()
-            or not self.phrase_complete
+            and self.audio is None
         ):
-            if self.phrase_time and start - self.phrase_time > timedelta(
-                seconds=self.phrase_timeout
-            ):
-                self.last_sample = bytes()
-                self.phrase_complete = True
-            self.phrase_time = start
+            time.sleep(0.1)
         self.stop_listening()
 
-    def start_listening(self):
-        if not self.listener_handle:
-            with sr.Microphone() as source:
-                self.recognizer.adjust_for_ambient_noise(source)
-            self.listener_handle = self.recognizer.listen_in_background(
-                sr.Microphone(),
-                self.record_callback,
-                phrase_time_limit=self.record_timeout,
-            )
+    def _save_audio_callback(self, _recognizer, audio):
+        self.audio = audio
+
+    def _start_listening(self):
+        self.listener_handle = self.recognizer.listen_in_background(self.microphone, self._save_audio_callback)
 
     def stop_listening(self, wait_for_stop=False):
         if self.listener_handle:
@@ -61,40 +45,24 @@ class Listener:
     def is_listening(self):
         return self.listener_handle is not None
 
-    def record_callback(self, _, audio: sr.AudioData) -> None:
-        # Grab the raw bytes and push it into the thread safe queue.
-        data = audio.get_raw_data()
-        self.data_queue.put(data)
-
     def speech_waiting(self):
-        return not self.data_queue.empty()
+        return self.audio is not None
 
-    def get_speech(self):
-        if self.speech_waiting():
-            return self.data_queue.get()
-        return None
+    def recognize(self):
+        if self.audio:
+            # Transcribe the audio data to text using Whisper
+            print("Recognizing...")
+            attempts = 0
+            while attempts < 3:
+                try:
+                    result = self.recognizer.recognize_whisper_api(
+                        self.audio, api_key=self.api_key
+                    )
 
-    def get_audio_data(self):
-        now = datetime.utcnow()
-        if self.speech_waiting():
-            self.phrase_complete = False
-            if self.phrase_time and now - self.phrase_time > timedelta(
-                seconds=self.phrase_timeout
-            ):
-                self.last_sample = bytes()
-                self.phrase_complete = True
-            self.phrase_time = now
-
-            # Concatenate our current audio data with the latest audio data.
-            while self.speech_waiting():
-                data = self.get_speech()
-                self.last_sample += data
-
-            # Use AudioData to convert the raw data to wav data.
-            with sr.Microphone() as source:
-                audio_data = sr.AudioData(
-                    self.last_sample, source.SAMPLE_RATE, source.SAMPLE_WIDTH
-                )
-            return audio_data
-
+                    return result.strip()
+                except sr.RequestError as e:
+                    time.sleep(3)
+                attempts += 1
+                print("I wasn't able to understand you. Please repeat that.")
+            return None
         return None

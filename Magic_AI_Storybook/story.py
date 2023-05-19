@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2023 Melissa LeBlanc-Williams for Adafruit Industries
 #
 # SPDX-License-Identifier: MIT
+# Desktop Icon from <a href="https://www.flaticon.com/free-icons/book" title="book icons">Book icons created by Freepik - Flaticon</a>
 
 import threading
 import sys
@@ -26,7 +27,7 @@ from listener import Listener
 STORY_WORD_LENGTH = 800
 REED_SWITCH_PIN = board.D17
 NEOPIXEL_PIN = board.D18
-API_KEYS_FILE = "/home/pi/keys.txt"
+API_KEYS_FILE = "~/keys.txt"
 PROMPT_FILE = "/boot/bookprompt.txt"
 
 # Neopixel Settings
@@ -47,8 +48,11 @@ BUTTON_NEXT_IMAGE = "button_next.png"
 BUTTON_NEW_IMAGE = "button_new.png"
 
 # Asset Paths
-IMAGES_PATH = os.path.dirname(sys.argv[0]) + "images/"
-FONTS_PATH = os.path.dirname(sys.argv[0]) + "fonts/"
+BASE_PATH = os.path.dirname(sys.argv[0])
+if BASE_PATH != "":
+    BASE_PATH += "/"
+IMAGES_PATH = BASE_PATH + "images/"
+FONTS_PATH = BASE_PATH + "fonts/"
 
 # Font Path, Size
 TITLE_FONT = (FONTS_PATH + "Desdemona Black Regular.otf", 48)
@@ -58,7 +62,7 @@ TEXT_COLOR = (0, 0, 0)
 
 # Delays to control the speed of the text
 WORD_DELAY = 0.1
-WELCOME_IMAGE_DELAY = 3
+WELCOME_IMAGE_DELAY = 0
 TITLE_FADE_TIME = 0.05
 TITLE_FADE_STEPS = 25
 TEXT_FADE_TIME = 0.25
@@ -84,6 +88,12 @@ RECORD_TIMEOUT = 30
 
 # Do some checks and Import API keys from API_KEYS_FILE
 config = configparser.ConfigParser()
+
+username = os.environ["SUDO_USER"]
+user_homedir = os.path.expanduser(f"~{username}")
+API_KEYS_FILE = API_KEYS_FILE.replace("~", user_homedir)
+
+print(os.path.expanduser(API_KEYS_FILE))
 config.read(os.path.expanduser(API_KEYS_FILE))
 if not config.has_section("openai"):
     print("Please make sure API_KEYS_FILE points to a valid file.")
@@ -186,7 +196,7 @@ class Book:
         self._busy = False
         # Use a cursor to keep track of where we are in the text area
         self.cursor = {"x": 0, "y": 0}
-        self.listener = Listener(ENERGY_THRESHOLD, PHRASE_TIMEOUT, RECORD_TIMEOUT)
+        self.listener = None
         self.backlight = Backlight()
         self.pixels = neopixel.NeoPixel(
             NEOPIXEL_PIN,
@@ -202,7 +212,7 @@ class Book:
 
     def start(self):
         # Output to the LCD instead of the console
-        os.putenv("DISPLAY", ":0")
+        #os.putenv("DISPLAY", ":0")
 
         # Initialize the display
         pygame.init()
@@ -216,6 +226,9 @@ class Book:
         self._load_image("welcome", WELCOME_IMAGE)
         self.display_welcome()
         start_time = time.monotonic()
+
+        #Initialize the Listener
+        self.listener = Listener(openai.api_key, ENERGY_THRESHOLD, RECORD_TIMEOUT)
 
         # Preload remaining images
         self._load_image("background", BACKGROUND_IMAGE)
@@ -585,9 +598,7 @@ class Book:
             # No response from user, so return
             return
 
-        audio_data = self.listener.get_audio_data()
-
-        story_request = self._transcribe(audio_data.get_wav_data())
+        story_request = self.listener.recognize()
 
         story_prompt = self._make_story_prompt(story_request)
         self.display_loading()
@@ -635,23 +646,6 @@ class Book:
         return self._prompt.format(
             STORY_WORD_LENGTH=STORY_WORD_LENGTH, STORY_REQUEST=request
         )
-
-    @staticmethod
-    def _transcribe(wav_data):
-        # Transcribe the audio data to text using Whisper
-        print("Transcribing...")
-        attempts = 0
-        while attempts < 3:
-            try:
-                with NamedTemporaryFile(suffix=".wav") as temp_file:
-                    result = openai.Audio.translate_raw(
-                        WHISPER_MODEL, wav_data, temp_file.name
-                    )
-                    return result["text"].strip()
-            except (openai.error.ServiceUnavailableError, openai.error.APIError):
-                time.sleep(3)
-            attempts += 1
-        return "I wasn't able to understand you. Please repeat that."
 
     def _sendchat(self, prompt):
         response = ""
