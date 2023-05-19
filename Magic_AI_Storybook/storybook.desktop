@@ -2,6 +2,6 @@
 Comment=Run Magic Storybook
 Terminal=true
 Name=Magic Storybook
-Exec=sudo python -E /home/pi/Magic_AI_Storybook/story.py
+Exec=sudo python /home/pi/Magic_AI_Storybook/story.py
 Type=Application
 Icon=/home/pi/Magic_AI_Storybook/images/magic_book_icon.png
