@@ -11,7 +11,7 @@ import argparse
 import math
 import configparser
 from enum import Enum
-from tempfile import NamedTemporaryFile
+from collections import deque
 
 import board
 import digitalio
@@ -26,16 +26,21 @@ from listener import Listener
 STORY_WORD_LENGTH = 800
 REED_SWITCH_PIN = board.D17
 NEOPIXEL_PIN = board.D18
-API_KEYS_FILE = "/home/pi/keys.txt"
+API_KEYS_FILE = "~/keys.txt"
 PROMPT_FILE = "/boot/bookprompt.txt"
+
+# Quit Settings (Close book QUIT_CLOSES within QUIT_TIME_PERIOD to quit)
+QUIT_CLOSES = 3
+QUIT_TIME_PERIOD = 5  # Time period in Seconds
 
 # Neopixel Settings
 NEOPIXEL_COUNT = 10
 NEOPIXEL_BRIGHTNESS = 0.2
 NEOPIXEL_ORDER = neopixel.GRBW
-NEOPIXEL_SLEEP_COLOR = (0, 0, 255, 0)
-NEOPIXEL_WAITING_COLOR = (255, 255, 0, 0)
-NEOPIXEL_READY_COLOR = (0, 255, 0, 0)
+NEOPIXEL_LOADING_COLOR = (0, 255, 0, 0)  # Loading/Dreaming (Green)
+NEOPIXEL_SLEEP_COLOR = (0, 0, 0, 0)  # Sleeping (Off)
+NEOPIXEL_WAITING_COLOR = (255, 255, 0, 0)  # Waiting for Input (Yellow)
+NEOPIXEL_READING_COLOR = (0, 0, 255, 0)  # Reading (Blue)
 NEOPIXEL_PULSE_SPEED = 0.1
 
 # Image Names
@@ -47,8 +52,11 @@ BUTTON_NEXT_IMAGE = "button_next.png"
 BUTTON_NEW_IMAGE = "button_new.png"
 
 # Asset Paths
-IMAGES_PATH = os.path.dirname(sys.argv[0]) + "images/"
-FONTS_PATH = os.path.dirname(sys.argv[0]) + "fonts/"
+BASE_PATH = os.path.dirname(sys.argv[0])
+if BASE_PATH != "":
+    BASE_PATH += "/"
+IMAGES_PATH = BASE_PATH + "images/"
+FONTS_PATH = BASE_PATH + "fonts/"
 
 # Font Path, Size
 TITLE_FONT = (FONTS_PATH + "Desdemona Black Regular.otf", 48)
@@ -58,7 +66,6 @@ TEXT_COLOR = (0, 0, 0)
 
 # Delays to control the speed of the text
 WORD_DELAY = 0.1
-WELCOME_IMAGE_DELAY = 3
 TITLE_FADE_TIME = 0.05
 TITLE_FADE_STEPS = 25
 TEXT_FADE_TIME = 0.25
@@ -84,6 +91,12 @@ RECORD_TIMEOUT = 30
 
 # Do some checks and Import API keys from API_KEYS_FILE
 config = configparser.ConfigParser()
+
+username = os.environ["SUDO_USER"]
+user_homedir = os.path.expanduser(f"~{username}")
+API_KEYS_FILE = API_KEYS_FILE.replace("~", user_homedir)
+
+print(os.path.expanduser(API_KEYS_FILE))
 config.read(os.path.expanduser(API_KEYS_FILE))
 if not config.has_section("openai"):
     print("Please make sure API_KEYS_FILE points to a valid file.")
@@ -103,10 +116,12 @@ if not os.path.isfile(PROMPT_FILE):
     print("Please make sure PROMPT_FILE points to a valid file.")
     sys.exit(1)
 
+
 def strip_fancy_quotes(text):
     text = re.sub(r"[\u2018\u2019]", "'", text)
     text = re.sub(r"[\u201C\u201D]", '"', text)
     return text
+
 
 class Position(Enum):
     TOP = 0
@@ -184,9 +199,12 @@ class Book:
         self._sleep_request = False
         self._running = True
         self._busy = False
+        self._loading = False
+        # Use a Double Ended Queue to handle the heavy lifting
+        self._closing_times = deque(maxlen=QUIT_CLOSES)
         # Use a cursor to keep track of where we are in the text area
         self.cursor = {"x": 0, "y": 0}
-        self.listener = Listener(ENERGY_THRESHOLD, PHRASE_TIMEOUT, RECORD_TIMEOUT)
+        self.listener = None
         self.backlight = Backlight()
         self.pixels = neopixel.NeoPixel(
             NEOPIXEL_PIN,
@@ -196,13 +214,14 @@ class Book:
             auto_write=False,
         )
         self._prompt = ""
-        # Load the prompt file
-        with open(PROMPT_FILE, "r") as f:
-            self._prompt = f.read()
+        self._load_thread = threading.Thread(target=self._handle_loading_status)
+        self._load_thread.start()
 
     def start(self):
         # Output to the LCD instead of the console
         os.putenv("DISPLAY", ":0")
+
+        self._set_status_color(NEOPIXEL_LOADING_COLOR)
 
         # Initialize the display
         pygame.init()
@@ -215,7 +234,13 @@ class Book:
         # Preload welcome image and display it
         self._load_image("welcome", WELCOME_IMAGE)
         self.display_welcome()
-        start_time = time.monotonic()
+
+        # Load the prompt file
+        with open(PROMPT_FILE, "r") as f:
+            self._prompt = f.read()
+
+        # Initialize the Listener
+        self.listener = Listener(openai.api_key, ENERGY_THRESHOLD, RECORD_TIMEOUT)
 
         # Preload remaining images
         self._load_image("background", BACKGROUND_IMAGE)
@@ -284,28 +309,18 @@ class Book:
         self._sleep_check_thread = threading.Thread(target=self._handle_sleep)
         self._sleep_check_thread.start()
 
-        # Light the neopixels to indicate the book is ready
-        self.pixels.fill(NEOPIXEL_READY_COLOR)
-        self.pixels.show()
-
-        # Continue showing the image until the minimum amount of time has passed
-        time.sleep(max(0, WELCOME_IMAGE_DELAY - (time.monotonic() - start_time)))
+        self._set_status_color(NEOPIXEL_READING_COLOR)
 
     def deinit(self):
         self._running = False
         self._sleep_check_thread.join()
+        self._load_thread.join()
         self.backlight.power = True
 
     def _handle_sleep(self):
         reed_switch = digitalio.DigitalInOut(REED_SWITCH_PIN)
         reed_switch.direction = digitalio.Direction.INPUT
         reed_switch.pull = digitalio.Pull.UP
-        pulse = Pulse(
-            self.pixels,
-            speed=NEOPIXEL_PULSE_SPEED,
-            color=NEOPIXEL_SLEEP_COLOR,
-            period=3,
-        )
 
         while self._running:
             if self._sleeping and reed_switch.value:  # Book Open
@@ -315,9 +330,41 @@ class Book:
             ):  # Book Closed
                 self._sleep()
 
-            if self._sleeping:
-                pulse.animate()
             time.sleep(self.sleep_check_delay)
+
+    def _handle_loading_status(self):
+        pulse = Pulse(
+            self.pixels,
+            speed=NEOPIXEL_PULSE_SPEED,
+            color=NEOPIXEL_LOADING_COLOR,
+            period=3,
+        )
+
+        while self._running:
+            if self._loading:
+                pulse.animate()
+                time.sleep(0.1)
+
+        # Turn off the Neopixels
+        self.pixels.fill(0)
+        self.pixels.show()
+
+    def _set_status_color(self, status_color):
+        if status_color not in [
+            NEOPIXEL_READING_COLOR,
+            NEOPIXEL_WAITING_COLOR,
+            NEOPIXEL_SLEEP_COLOR,
+            NEOPIXEL_LOADING_COLOR,
+        ]:
+            raise ValueError(f"Invalid status color {status_color}.")
+
+        # Handle loading color by setting the loading flag
+        self._loading = status_color == NEOPIXEL_LOADING_COLOR
+
+        # Handle other status colors by setting the neopixels
+        if status_color != NEOPIXEL_LOADING_COLOR:
+            self.pixels.fill(status_color)
+            self.pixels.show()
 
     def handle_events(self):
         if not self._sleeping:
@@ -501,6 +548,7 @@ class Book:
     def display_loading(self):
         self._display_surface(self.images["loading"], 0, 0)
         pygame.display.update()
+        self._set_status_color(NEOPIXEL_LOADING_COLOR)
 
     def display_welcome(self):
         self._display_surface(self.images["welcome"], 0, 0)
@@ -543,6 +591,7 @@ class Book:
             if self.cursor["y"] > 0:
                 self.cursor["y"] += PARAGRAPH_SPACING
         print(f"Loaded story at index {self.story} with {len(self.pages)} pages")
+        self._set_status_color(NEOPIXEL_READING_COLOR)
         self._busy = False
 
     def _add_page(self, title=None):
@@ -570,13 +619,12 @@ class Book:
         def show_waiting():
             # Pause for a beat because the listener doesn't
             # immediately start listening sometimes
-            time.sleep(2)
+            time.sleep(1)
             self.pixels.fill(NEOPIXEL_WAITING_COLOR)
             self.pixels.show()
 
         self.listener.listen(ready_callback=show_waiting)
-        self.pixels.fill(NEOPIXEL_READY_COLOR)
-        self.pixels.show()
+
         if self._sleep_request:
             self._busy = False
             return
@@ -585,9 +633,7 @@ class Book:
             # No response from user, so return
             return
 
-        audio_data = self.listener.get_audio_data()
-
-        story_request = self._transcribe(audio_data.get_wav_data())
+        story_request = self.listener.recognize()
 
         story_prompt = self._make_story_prompt(story_request)
         self.display_loading()
@@ -612,7 +658,20 @@ class Book:
         while self._busy:
             time.sleep(0.1)
         self._sleep_request = False
+
+        self._closing_times.append(time.monotonic())
+
+        # Check if we've closed the book a certain number of times
+        # within a certain number of seconds
+        if (
+            len(self._closing_times) == QUIT_CLOSES
+            and self._closing_times[-1] - self._closing_times[0] < QUIT_TIME_PERIOD
+        ):
+            self._running = False
+            return
+
         self._sleeping = True
+        self._set_status_color(NEOPIXEL_SLEEP_COLOR)
         self.sleep_check_delay = 0
         self.saved_screen = self.screen.copy()
         self.screen.fill((0, 0, 0))
@@ -627,31 +686,13 @@ class Book:
             pygame.display.update()
             self.saved_screen = None
         self.sleep_check_delay = 0.1
-        self.pixels.fill(NEOPIXEL_READY_COLOR)
-        self.pixels.show()
+        self._set_status_color(NEOPIXEL_READING_COLOR)
         self._sleeping = False
 
     def _make_story_prompt(self, request):
         return self._prompt.format(
             STORY_WORD_LENGTH=STORY_WORD_LENGTH, STORY_REQUEST=request
         )
-
-    @staticmethod
-    def _transcribe(wav_data):
-        # Transcribe the audio data to text using Whisper
-        print("Transcribing...")
-        attempts = 0
-        while attempts < 3:
-            try:
-                with NamedTemporaryFile(suffix=".wav") as temp_file:
-                    result = openai.Audio.translate_raw(
-                        WHISPER_MODEL, wav_data, temp_file.name
-                    )
-                    return result["text"].strip()
-            except (openai.error.ServiceUnavailableError, openai.error.APIError):
-                time.sleep(3)
-            attempts += 1
-        return "I wasn't able to understand you. Please repeat that."
 
     def _sendchat(self, prompt):
         response = ""
@@ -674,6 +715,10 @@ class Book:
 
         # Send the heard text to ChatGPT and return the result
         return strip_fancy_quotes(response)
+
+    @property
+    def running(self):
+        return self._running
 
 
 def parse_args():
@@ -698,7 +743,7 @@ def main(args):
         book.generate_new_story()
         book.display_current_page()
 
-        while True:
+        while book.running:
             book.handle_events()
     except KeyboardInterrupt:
         pass
@@ -709,7 +754,3 @@ def main(args):
 
 if __name__ == "__main__":
     main(parse_args())
-
-# TODO:
-# * Figure out how to get the script to start on boot
-# * Play with chatgpt prompt parameters
