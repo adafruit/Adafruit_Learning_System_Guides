@@ -220,7 +220,7 @@ ping_fail_count = 0
 
 # ============ LOOP ============
 while True:
-    # Resets current_time to the current time.time() value every time through the loop.
+    # Resets current_time to the current second every time through the loop.
     current_time = time.time()
     # WiFi and IO connections can fail arbitrarily. The bulk of the loop is included in a
     # try/except block to ensure the project will continue to run unattended if any
