@@ -16,11 +16,7 @@ from adafruit_display_text import label
 import adafruit_displayio_ssd1306
 import adafruit_imageload
 from digitalio import DigitalInOut, Direction
-from adafruit_httpserver.server import HTTPServer
-from adafruit_httpserver.request import HTTPRequest
-from adafruit_httpserver.response import HTTPResponse
-from adafruit_httpserver.methods import HTTPMethod
-from adafruit_httpserver.mime_type import MIMEType
+from adafruit_httpserver import Server, Request, Response, MIMETypes, POST
 from adafruit_onewire.bus import OneWireBus
 from adafruit_ds18x20 import DS18X20
 
@@ -82,7 +78,7 @@ wifi.radio.connect(os.getenv('CIRCUITPY_WIFI_SSID'), os.getenv('CIRCUITPY_WIFI_P
 
 print("Connected to WiFi")
 pool = socketpool.SocketPool(wifi.radio)
-server = HTTPServer(pool, "/static")
+server = Server(pool, "/static")
 
 #  variables for HTML
 #  comment/uncomment desired temp unit
@@ -141,15 +137,14 @@ def webpage():
 
 #  route default static IP
 @server.route("/")
-def base(request: HTTPRequest):  # pylint: disable=unused-argument
+def base(request: Request):  # pylint: disable=unused-argument
     #  serve the HTML f string
     #  with content type text/html
-    with HTTPResponse(request, content_type=MIMEType.TYPE_HTML) as response:
-        response.send(f"{webpage()}")
+    return Response(request, body=webpage(), content_type=MIMETypes.REGISTERED['.html'])
 
 #  if a button is pressed on the site
-@server.route("/", method=HTTPMethod.POST)
-def buttonpress(request: HTTPRequest):
+@server.route("/", POST)
+def buttonpress(request: Request):
     #  get the raw text
     raw_text = request.raw_request.decode("utf8")
     print(raw_text)
@@ -166,8 +161,8 @@ def buttonpress(request: HTTPRequest):
         #  toggle the parrot_pin value
         parrot_pin.value = not parrot_pin.value
     #  reload site
-    with HTTPResponse(request, content_type=MIMEType.TYPE_HTML) as response:
-        response.send(f"{webpage()}")
+    return Response(request, body=webpage(), content_type=MIMETypes.REGISTERED['.html'])
+
 
 print("starting server..")
 # startup the server
