@@ -253,7 +253,7 @@ while True:
 
         # If the ping has failed, and it's been one second, continue with this code.
         if wifi_ping is None and current_time - ping_fail_time > 1:
-            ping_fail_time = (time.monotonic())  # Reset the ping fail time to continue tracking.
+            ping_fail_time = time.monotonic()  # Reset the ping fail time to continue tracking.
             ping_fail_count += 1  # Add one to the fail count tracking.
             print(f"Ping failed {ping_fail_count} times")
             # If network down detection is enabled, run the following code.
