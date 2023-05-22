@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 Phillip Burgess for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // BMP-reading code. Much of this is adapted from the Adafruit_ImageReader
 // library, which is extremely LCD-display-centric and turned out to be
 // neither workable nor easily extensible into what was needed here. That's

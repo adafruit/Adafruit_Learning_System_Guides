@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2023 Phillip Burgess for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
 
 /*
 DotStar POV poi using Adafruit Feather RP2040 RFM. Unlike prior POV poi
