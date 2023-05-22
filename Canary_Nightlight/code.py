@@ -213,22 +213,22 @@ except Exception as error:  # pylint: disable=broad-except
 # Initialise various time tracking variables.
 ping_time = 0
 check_time = 0
-ping_fail_time = time.monotonic()
+ping_fail_time = time.time()
 
 # Initialise ping fail count tracking.
 ping_fail_count = 0
 
 # ============ LOOP ============
 while True:
-    # Resets current_time to the current time.monotonic() value every time through the loop.
-    current_time = time.monotonic()
+    # Resets current_time to the current time.time() value every time through the loop.
+    current_time = time.time()
     # WiFi and IO connections can fail arbitrarily. The bulk of the loop is included in a
     # try/except block to ensure the project will continue to run unattended if any
     # failures do occur.
     try:
         # If this is the first run of the code or `UP_PING_INTERVAL` time has passed, continue.
         if not ping_time or current_time - ping_time > UP_PING_INTERVAL:
-            ping_time = time.monotonic()
+            ping_time = time.time()
             # Ping to verify network connection.
             wifi_ping = wifi.radio.ping(ip=ip_address)
             if wifi_ping is not None:
@@ -240,7 +240,7 @@ while True:
             ping_fail_count = 0
             # If this is the first run of the code or `TIME_CHECK_INTERVAL` has passed, continue.
             if not check_time or current_time - check_time > TIME_CHECK_INTERVAL:
-                check_time = time.monotonic()
+                check_time = time.time()
                 # Retrieve the time and save it to sundial.
                 sundial = io.receive_time()
                 # Print the current date and time to the serial console.
@@ -253,7 +253,7 @@ while True:
 
         # If the ping has failed, and it's been one second, continue with this code.
         if wifi_ping is None and current_time - ping_fail_time > 1:
-            ping_fail_time = time.monotonic()  # Reset the ping fail time to continue tracking.
+            ping_fail_time = time.time()  # Reset the ping fail time to continue tracking.
             ping_fail_count += 1  # Add one to the fail count tracking.
             print(f"Ping failed {ping_fail_count} times")
             # If network down detection is enabled, run the following code.
