@@ -23,6 +23,12 @@ from adafruit_led_animation.animation.pulse import Pulse
 
 from listener import Listener
 
+# Base Path is the folder the script resides in
+BASE_PATH = os.path.dirname(sys.argv[0])
+if BASE_PATH != "":
+    BASE_PATH += "/"
+
+# General Settings
 STORY_WORD_LENGTH = 800
 REED_SWITCH_PIN = board.D17
 NEOPIXEL_PIN = board.D18
@@ -32,9 +38,10 @@ PROMPT_FILE = "/boot/bookprompt.txt"
 # Quit Settings (Close book QUIT_CLOSES within QUIT_TIME_PERIOD to quit)
 QUIT_CLOSES = 3
 QUIT_TIME_PERIOD = 5  # Time period in Seconds
+QUIT_DEBOUNCE_DELAY = 0.25  # Time to wait before counting next closeing
 
 # Neopixel Settings
-NEOPIXEL_COUNT = 10
+NEOPIXEL_COUNT = 1
 NEOPIXEL_BRIGHTNESS = 0.2
 NEOPIXEL_ORDER = neopixel.GRBW
 NEOPIXEL_LOADING_COLOR = (0, 255, 0, 0)  # Loading/Dreaming (Green)
@@ -43,7 +50,7 @@ NEOPIXEL_WAITING_COLOR = (255, 255, 0, 0)  # Waiting for Input (Yellow)
 NEOPIXEL_READING_COLOR = (0, 0, 255, 0)  # Reading (Blue)
 NEOPIXEL_PULSE_SPEED = 0.1
 
-# Image Names
+# Image Settings
 WELCOME_IMAGE = "welcome.png"
 BACKGROUND_IMAGE = "paper_background.png"
 LOADING_IMAGE = "loading.png"
@@ -52,26 +59,25 @@ BUTTON_NEXT_IMAGE = "button_next.png"
 BUTTON_NEW_IMAGE = "button_new.png"
 
 # Asset Paths
-BASE_PATH = os.path.dirname(sys.argv[0])
-if BASE_PATH != "":
-    BASE_PATH += "/"
 IMAGES_PATH = BASE_PATH + "images/"
 FONTS_PATH = BASE_PATH + "fonts/"
 
-# Font Path, Size
+# Font Path & Size
 TITLE_FONT = (FONTS_PATH + "Desdemona Black Regular.otf", 48)
 TITLE_COLOR = (0, 0, 0)
 TEXT_FONT = (FONTS_PATH + "times new roman.ttf", 24)
 TEXT_COLOR = (0, 0, 0)
 
-# Delays to control the speed of the text
+# Delays Settings
+# Used to control the speed of the text
 WORD_DELAY = 0.1
 TITLE_FADE_TIME = 0.05
 TITLE_FADE_STEPS = 25
 TEXT_FADE_TIME = 0.25
 TEXT_FADE_STEPS = 51
+ALSA_ERROR_DELAY = 1.0  # Delay to wait after an ALSA errors
 
-# Whitespace Settings in Pixels
+# Whitespace Settings (in Pixels)
 PAGE_TOP_MARGIN = 20
 PAGE_SIDE_MARGIN = 20
 PAGE_BOTTOM_MARGIN = 0
@@ -85,13 +91,15 @@ CHATGPT_MODEL = "gpt-3.5-turbo"
 WHISPER_MODEL = "whisper-1"
 
 # Speech Recognition Parameters
-ENERGY_THRESHOLD = 1000  # Energy level for mic to detect
-PHRASE_TIMEOUT = 3.0  # Space between recordings for sepating phrases
-RECORD_TIMEOUT = 30
+ENERGY_THRESHOLD = 300  # Energy level for mic to detect
+RECORD_TIMEOUT = 30  # Maximum time in seconds to wait for speech
 
 # Do some checks and Import API keys from API_KEYS_FILE
 config = configparser.ConfigParser()
 
+if os.geteuid() != 0:
+    print("Please run this script as root.")
+    sys.exit(1)
 username = os.environ["SUDO_USER"]
 user_homedir = os.path.expanduser(f"~{username}")
 API_KEYS_FILE = API_KEYS_FILE.replace("~", user_homedir)
@@ -325,11 +333,8 @@ class Book:
         while self._running:
             if self._sleeping and reed_switch.value:  # Book Open
                 self._wake()
-            elif (
-                not self._busy and not self._sleeping and not reed_switch.value
-            ):  # Book Closed
+            elif not self._sleeping and not reed_switch.value:
                 self._sleep()
-
             time.sleep(self.sleep_check_delay)
 
     def _handle_loading_status(self):
@@ -429,13 +434,19 @@ class Book:
             fade_time / fade_steps * 1000
         )  # Time to delay in ms between each fade step
 
-        for alpha in range(0, 255, round(255 / fade_steps)):
+        def draw_alpha(alpha):
             buffer.blit(background, (-x, -y))
             surface.set_alpha(alpha)
             buffer.blit(surface, (0, 0))
             self._display_surface(buffer, x, y)
             pygame.display.update()
+
+        for alpha in range(0, 255, round(255 / fade_steps)):
+            draw_alpha(alpha)
             pygame.time.wait(fade_delay)
+            if self._sleep_request:
+                draw_alpha(255)  # Finish up quickly
+                return
 
     def display_current_page(self):
         self._busy = True
@@ -482,6 +493,7 @@ class Book:
         # Render the title as multiple lines if too big
         lines = self._wrap_text(text, self.fonts["title"], self.textarea.width)
         self.cursor["y"] = y
+        delay_value = WORD_DELAY
         for line in lines:
             words = line.split(" ")
             self.cursor["x"] = (
@@ -489,16 +501,25 @@ class Book:
             )
             for word in words:
                 text = self.fonts["title"].render(word + " ", True, TITLE_COLOR)
-                self._fade_in_surface(
-                    text,
-                    self.cursor["x"] + self.textarea.x,
-                    self.cursor["y"] + self.textarea.y,
-                    TITLE_FADE_TIME,
-                    TITLE_FADE_STEPS,
-                )
+                if self._sleep_request:
+                    delay_value = 0
+                    self._display_surface(
+                        text,
+                        self.cursor["x"] + self.textarea.x,
+                        self.cursor["y"] + self.textarea.y,
+                    )
+                else:
+                    self._fade_in_surface(
+                        text,
+                        self.cursor["x"] + self.textarea.x,
+                        self.cursor["y"] + self.textarea.y,
+                        TITLE_FADE_TIME,
+                        TITLE_FADE_STEPS,
+                    )
+
                 pygame.display.update()
                 self.cursor["x"] += text.get_width()
-                time.sleep(WORD_DELAY)
+                time.sleep(delay_value)
             self.cursor["y"] += self.fonts["title"].size(line)[1]
 
     def _title_text_height(self, text):
@@ -614,12 +635,14 @@ class Book:
 
         if self._sleep_request:
             self._busy = False
+            time.sleep(0.2)
+            print("Not busy anymore")
             return
 
         def show_waiting():
             # Pause for a beat because the listener doesn't
             # immediately start listening sometimes
-            time.sleep(1)
+            time.sleep(ALSA_ERROR_DELAY)
             self.pixels.fill(NEOPIXEL_WAITING_COLOR)
             self.pixels.show()
 
@@ -654,12 +677,18 @@ class Book:
     def _sleep(self):
         # Set a sleep request flag so that any busy threads know to finish up
         self._sleep_request = True
-        self.listener.stop_listening()
+        if self.listener.is_listening():
+            self.listener.stop_listening()
         while self._busy:
+            print("Still busy")
             time.sleep(0.1)
         self._sleep_request = False
 
-        self._closing_times.append(time.monotonic())
+        if (
+            len(self._closing_times) == 0
+            or (time.monotonic() - self._closing_times[-1]) > QUIT_DEBOUNCE_DELAY
+        ):
+            self._closing_times.append(time.monotonic())
 
         # Check if we've closed the book a certain number of times
         # within a certain number of seconds
@@ -720,6 +749,10 @@ class Book:
     def running(self):
         return self._running
 
+    @property
+    def sleeping(self):
+        return self._sleeping
+
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -740,7 +773,9 @@ def main(args):
     book = Book(args.rotation)
     try:
         book.start()
-        book.generate_new_story()
+        while len(book.pages) == 0:
+            if not book.sleeping:
+                book.generate_new_story()
         book.display_current_page()
 
         while book.running:

@@ -61,9 +61,11 @@ class Listener:
                     )
 
                     return result.strip()
-                except sr.RequestError:
+                except sr.RequestError as e:
+                    print(f"Error: {e}")
                     time.sleep(3)
                 attempts += 1
-                print("I wasn't able to understand you. Please repeat that.")
+                print("Retry attempt: ", attempts)
+            print("Failed to recognize")
             return None
         return None
