@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2021 Kattni Rembor for Adafruit Industries
+# SPDX-FileCopyrightText: 2021-2023 Kattni Rembor for Adafruit Industries
 # SPDX-License-Identifier: MIT
 """
 CircuitPython Touch-Compatible Pin Identification Script
@@ -45,6 +45,14 @@ def get_pin_names():
         "ACCELEROMETER_SCL",
         "MICROPHONE_CLOCK",
         "MICROPHONE_DATA",
+        "RFM_RST",
+        "RFM_CS",
+        "RFM_IO0",
+        "RFM_IO1",
+        "RFM_IO2",
+        "RFM_IO3",
+        "RFM_IO4",
+        "RFM_IO5",
     ]
     pins = [
         pin
@@ -72,7 +80,7 @@ for possible_touch_pin in get_pin_names():  # Get the pin name.
             "pulldown" in error_message  # If the ValueError is regarding needing a pulldown...
         ):
             print(
-                "Touch (no pulldown) on:", str(possible_touch_pin).replace("board.", "")
+                "Touch on:", str(possible_touch_pin).replace("board.", "")
             )
         else:
             print("No touch on:", str(possible_touch_pin).replace("board.", ""))

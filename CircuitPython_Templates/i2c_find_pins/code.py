@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2021 Kattni Rembor for Adafruit Industries
+# SPDX-FileCopyrightText: 2021-2023 Kattni Rembor for Adafruit Industries
 # SPDX-License-Identifier: MIT
 """CircuitPython I2C possible pin-pair identifying script"""
 import board
@@ -35,6 +35,14 @@ def get_unique_pins():
             "VOLTAGE_MONITOR",
             "MICROPHONE_CLOCK",
             "MICROPHONE_DATA",
+            "RFM_RST",
+            "RFM_CS",
+            "RFM_IO0",
+            "RFM_IO1",
+            "RFM_IO2",
+            "RFM_IO3",
+            "RFM_IO4",
+            "RFM_IO5",
         ]
         if p in dir(board)
     ]
