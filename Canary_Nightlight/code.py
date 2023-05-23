@@ -39,39 +39,6 @@ NETWORK_DOWN_DETECTION = True
 SLEEP_COLOR = (255, 0, 0)  # Red
 WAKE_COLOR = (0, 0, 255)  # Blue
 
-# The blink color.
-# This is the color that the canary will blink to notify you that the network is down.
-# Defaults to red.
-BLINK_COLOR = (255, 0, 0)
-
-# Canary brightness customisation.
-# Both the options below must be a float between 0.0 and 1.0, where 0.0 is off, and 1.0 is max.
-# This is the brightness of the canary during sleep time. It defaults to 0.2, or "20%".
-# Increase or decrease this value to change the brightness.
-SLEEP_BRIGHTNESS = 0.2
-# This is the brightness of the canary during wake time. It defaults to 0.7, or "70%".
-# Increase or decrease this value to change the brightness.
-WAKE_BRIGHTNESS = 0.7
-
-# Consecutive ping fail to blink.
-# This value is the number of times ping will consecutively fail before the canary begins blinking.
-# If the blinking is happening too often, or if the network is often flaky, this value can be
-# increased to extend the number of failures it takes to begin blinking.
-# Defaults to 10. Must be an integer greater than 1.
-CONSECUTIVE_PING_FAIL_TO_BLINK = 10
-
-# Ping interval while ping is successful.
-# This is the interval at which the code will send a ping while the network is up and the pings
-# are successful. If for any reason you would prefer to slow down the ping interval, this value
-# can be updated. Defaults to 1 second. Must be a float greater than 1. Increase this value to
-# increase the ping interval time. Do not decrease this value!
-UP_PING_INTERVAL = 1
-
-# Checks whether the successful ping interval is below the minimum value.
-if UP_PING_INTERVAL < 1:
-    # If is below the minimum, raise this error and stop the code.
-    raise ValueError("UP_PING_INTERVAL must be a float greater than 1!")
-
 # Sleep time.
 # This is the hour in 24-hour time at which the light should change to the
 # desired color for the time you intend to sleep.
@@ -84,18 +51,58 @@ SLEEP_TIME = 20
 # Must be an integer between 0 and 23. Defaults to 6 (6am).
 WAKE_TIME = 6
 
+# Canary brightness customisation.
+# Brightness must be a float or integer between 0.0 and 1.0, where 0.0 is off, and 1.0 is max.
+# This is the brightness of the canary during sleep time. It defaults to 0.2, or "20%".
+# Increase or decrease this value to change the brightness.
+SLEEP_BRIGHTNESS = 0.2
+# This is the brightness of the canary during wake time. It defaults to 0.7, or "70%".
+# Increase or decrease this value to change the brightness.
+WAKE_BRIGHTNESS = 0.7
+
 # Time check interval.
 # This sets the time interval at which the code checks Adafruit IO for the current time.
 # This is included because Adafruit IO has rate limiting. It ensures that you do not
 # hit the rate limit, and the time check does not get throttled.
-# Defaults to 300 seconds (5 minutes). Must be a float greater than 300. Increase
-# this value to increase the time check interval. Do not decrease this value!
+# Defaults to 300 seconds (5 minutes). Must be an integer equal to or greater than 300.
+# Increase this value to increase the time check interval. Do not decrease this value!
 TIME_CHECK_INTERVAL = 300
 
-# Checks whether the time check interval is below the minimum value.
-if TIME_CHECK_INTERVAL < 300:
-    # If is below the minimum, raise this error and stop the code.
-    raise ValueError("TIME_CHECK_INTERVAL must be a float greater than 300!")
+# Checks whether the time check interval is below the minimum value and an integer.
+if TIME_CHECK_INTERVAL < 300 or isinstance(TIME_CHECK_INTERVAL, float):
+    # If is below the minimum or a float, raise this error and stop the code.
+    raise ValueError("TIME_CHECK_INTERVAL must be a integer, and greater than 300!")
+
+# Ping interval while ping is successful.
+# This is the interval at which the code will send a ping while the network is up and the pings
+# are successful. If for any reason you would prefer to slow down the ping interval, this value
+# can be updated. Defaults to 1 second. Must be an integer equal to or greater than 1. Increase
+# this value to increase the ping interval time. Do not decrease this value!
+UP_PING_INTERVAL = 1
+
+# Checks whether the successful ping interval is below the minimum value and an integer.
+if UP_PING_INTERVAL < 1 or isinstance(UP_PING_INTERVAL, float):
+    # If is below the minimum or a float, raise this error and stop the code.
+    raise ValueError("UP_PING_INTERVAL must be a integer, and greater than 1!")
+
+# The blink color.
+# This is the color that the canary will blink to notify you that the network is down.
+# Defaults to red.
+BLINK_COLOR = (255, 0, 0)
+
+# Consecutive ping fail to blink.
+# This value is the number of times ping will consecutively fail before the canary begins blinking.
+# If the blinking is happening too often, or if the network is often flaky, this value can be
+# increased to extend the number of failures it takes to begin blinking.
+# Defaults to 10. Must be an integer greater than 1.
+CONSECUTIVE_PING_FAIL_TO_BLINK = 10
+
+# The amount of time in seconds that needs to pass while the network is down AND
+# NETWORK_DOWN_DETECTION is DISABLED before the board resets to try again.
+# Defaults to 900 seconds, or 20 minutes. Must be an integer. Increase or decrease
+# this value to alter how long the network should be down in this specific case
+# before the board resets.
+NETWORK_DOWN_RELOAD_TIME = 900
 
 # IP address.
 # This is the IP address used to ping to verify that network connectivity is still present.
@@ -189,11 +196,13 @@ ip_address = ipaddress.IPv4Address(PING_IP)
 wifi_ping = wifi.radio.ping(ip=ip_address)
 # If the initial ping is unsuccessful, print the message.
 if wifi_ping is None:
-    print("Setup test-ping failed.")
+    print("Set up test-ping failed.")
     # Set `initial_ping` to False to indicate the failure.
     initial_ping = False
 else:
-    # Otherwise, set `initial_ping` to True to indicate success.
+    # Otherwise, print this message.
+    print("Set up test-ping successful.")
+    # Set `initial_ping` to True to indicate success.
     initial_ping = True
 
 # Set up Adafruit IO. This will provide the current time through `io.receive_time()`.
@@ -211,9 +220,13 @@ except Exception as error:  # pylint: disable=broad-except
     reload_on_error(5, error)
 
 # Initialise various time tracking variables.
-ping_time = 0
 check_time = 0
+network_down_time = time.time()
+ping_time = 0
 ping_fail_time = time.time()
+
+# Initialise network check variable.
+network_check = 1
 
 # Initialise ping fail count tracking.
 ping_fail_count = 0
@@ -226,38 +239,54 @@ while True:
     # try/except block to ensure the project will continue to run unattended if any
     # failures do occur.
     try:
-        # If this is the first run of the code or `UP_PING_INTERVAL` time has passed, continue.
-        if not ping_time or current_time - ping_time > UP_PING_INTERVAL:
-            ping_time = time.time()
-            # Ping to verify network connection.
-            wifi_ping = wifi.radio.ping(ip=ip_address)
-            if wifi_ping is not None:
-                # If the ping is successful, print IP address and ping time.
-                print(f"Pinging {ip_address}: {wifi_ping} ms")
-
-        # If the ping is successful, continue with this code.
-        if wifi_ping is not None:
-            ping_fail_count = 0
-            # If this is the first run of the code or `TIME_CHECK_INTERVAL` has passed, continue.
-            if not check_time or current_time - check_time > TIME_CHECK_INTERVAL:
+        # If this is the first run of the code or the time check interval has passed, continue.
+        if not check_time or current_time - check_time >= TIME_CHECK_INTERVAL:
+            # Send a single ping to test for network connectivity.
+            network_check = wifi.radio.ping(ip=ip_address)
+            # If there is network connectivity, run the time check code.
+            if network_check is not None:
+                # Reset `check_time` to continue tracking.
                 check_time = time.time()
-                # Retrieve the time and save it to sundial.
+                # Retrieve the time and save it to `sundial`.
                 sundial = io.receive_time()
                 # Print the current date and time to the serial console.
                 print(f"LED color time-check. Date and time: {sundial.tm_year}-{sundial.tm_mon}-" +
                       f"{sundial.tm_mday} {sundial.tm_hour}:{sundial.tm_min:02}")
-                # Provides the current hour to the color_time function. This verifies the
-                # current color based on time and returns that color, which is provided
-                # to `fill()` to set the LED color.
+                # Provide the current hour to the `color_time` function. The returned color is
+                # provided to `pixels.fill()` to set the LED color.
                 pixels.fill(color_time(sundial.tm_hour))
+            else:
+                print("Network check ping failed.")
 
-        # If the ping has failed, and it's been one second, continue with this code.
-        if wifi_ping is None and current_time - ping_fail_time > 1:
-            ping_fail_time = time.time()  # Reset the ping fail time to continue tracking.
-            ping_fail_count += 1  # Add one to the fail count tracking.
-            print(f"Ping failed {ping_fail_count} times")
-            # If network down detection is enabled, run the following code.
-            if NETWORK_DOWN_DETECTION:
+        # If network down detection is disabled AND the network check ping failed
+        # AND the specified network down reload time passed: print the message,
+        # wait 3 seconds, and hard reset the board.
+        if not NETWORK_DOWN_DETECTION and network_check is None and \
+                current_time - network_down_time > NETWORK_DOWN_RELOAD_TIME:
+            print(f"Network check ping has failed for over {NETWORK_DOWN_RELOAD_TIME} seconds.")
+            reload_on_error(3, reload_type="reset")
+
+        # If network down detection is enabled, run the rest of the code.
+        if NETWORK_DOWN_DETECTION:
+            # If this is the first run of the code or up ping interval` time has passed, continue.
+            if not ping_time or current_time - ping_time >= UP_PING_INTERVAL:
+                # Reset `ping_time` to continue tracking.
+                ping_time = time.time()
+                # Ping to verify network connection.
+                wifi_ping = wifi.radio.ping(ip=ip_address)
+                # If the ping is successful, set the fail count to 0, and print IP and ping time.
+                if wifi_ping is not None:
+                    ping_fail_count = 0
+                    print(f"Pinging {ip_address}: {wifi_ping} ms")
+
+            # If the ping has failed, and it's been one second, continue with this code.
+            if wifi_ping is None and current_time - ping_fail_time >= 1:
+                # Reset `ping_fail_time` to continue tracking.
+                ping_fail_time = time.time()
+                # Add one to the failure count tracking.
+                ping_fail_count += 1
+                # Print the ping failure count.
+                print(f"Ping failed {ping_fail_count} times")
                 # If the ping fail count exceeds the value defined above, begin blinking the LED
                 # to indicate that the network is down.
                 if ping_fail_count > CONSECUTIVE_PING_FAIL_TO_BLINK:
