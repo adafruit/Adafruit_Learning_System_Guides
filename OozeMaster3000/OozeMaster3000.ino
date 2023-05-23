@@ -60,10 +60,22 @@ typedef enum {
 uint8_t palette[][3] = {
   { 0, 255, 0 }, // Bright green ectoplasm
 };
+#define NUM_COLORS (sizeof palette / sizeof palette[0])
 // Note that color randomization does not pair well with the ICE_BRIGHTNESS
 // effect; you'll probably want to pick one or the other: random colors
 // (from palette) and no icicles, or fixed color (per strand or overall)
 // with ice. Otherwise the color jump of the icicle looks bad and wrong.
+
+// Optional "Carrie mode" -- if a pin is defined here, and a switch or button
+// added between this pin and ground -- when active, each new drip is drawn
+// using the last color in the palette table (and slowly returns to original
+// color scheme when released). i.e. there might normally be pleasant wintry
+// colors in the palette, then plop pure red at the end of the list and watch
+// the fun unfold!
+//#define CARRIE_PIN    A2
+// If you could use an extra ground pin for that, define that here; this
+// is a signal ground only, for the switch, NOT for powering anything.
+//#define CARRIE_GROUND A3
 
 struct {
   uint16_t  length;            // Length of NeoPixel strip IN PIXELS
@@ -103,7 +115,15 @@ int                  longestStrand = (N_DRIPS < 8) ? N_DRIPS : 0;
 
 void setup() {
   Serial.begin(9600);
-  randomSeed(analogRead(A0) + analogRead(A3));
+  randomSeed(analogRead(A0) + analogRead(A1));
+
+#ifdef CARRIE_PIN
+  pinMode(CARRIE_PIN, INPUT_PULLUP);
+#endif
+#ifdef CARRIE_GROUND
+  pinMode(CARRIE_GROUND, OUTPUT);
+  digitalWrite(CARRIE_GROUND, LOW);
+#endif
 
   for(int i=0; i<N_DRIPS; i++) {
     drip[i].mode              = MODE_IDLE; // Start all drips in idle mode
@@ -116,6 +136,12 @@ void setup() {
     // Randomize initial color:
     memcpy(drip[i].color, palette[random(drip[i].palette_min, drip[i].palette_max + 1)], sizeof palette[0]);
     memcpy(drip[i].splatColor, drip[i].color, sizeof palette[0]);
+#ifdef CARRIE_PIN
+    // If "Carrie" switch is on, override above color with last palette entry
+    if (!digitalRead(CARRIE_PIN)) {
+      memcpy(drip[i].color, palette[NUM_COLORS - 1], sizeof palette[0]);
+    }
+#endif
   }
 
 #ifdef USE_HDR
@@ -154,6 +180,12 @@ void loop() {
           drip[i].eventDurationReal = (float)drip[i].eventDurationUsec / 1000000.0;
           // Randomize next drip color from palette settings:
           memcpy(drip[i].color, palette[random(drip[i].palette_min, drip[i].palette_max + 1)], sizeof palette[0]);
+#ifdef CARRIE_PIN
+          // If "Carrie" switch is on, override color with last palette entry
+          if (!digitalRead(CARRIE_PIN)) {
+            memcpy(drip[i].color, palette[NUM_COLORS - 1], sizeof palette[0]);
+          }
+#endif
           break;
         case MODE_OOZING:
           if(drip[i].dribblePixel) { // If dribblePixel is nonzero...
