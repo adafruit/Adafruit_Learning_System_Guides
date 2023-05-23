@@ -75,7 +75,7 @@ TITLE_FADE_TIME = 0.05
 TITLE_FADE_STEPS = 25
 TEXT_FADE_TIME = 0.25
 TEXT_FADE_STEPS = 51
-ALSA_ERROR_DELAY = 1.0  # Delay to wait after an ALSA errors
+ALSA_ERROR_DELAY = 0.5  # Delay to wait after an ALSA errors
 
 # Whitespace Settings (in Pixels)
 PAGE_TOP_MARGIN = 20
@@ -92,7 +92,7 @@ WHISPER_MODEL = "whisper-1"
 
 # Speech Recognition Parameters
 ENERGY_THRESHOLD = 300  # Energy level for mic to detect
-PHRASE_TIMEOUT = 3.0  # Space between recordings for separating phrases
+PHRASE_TIMEOUT = 1.0  # Space between recordings for separating phrases
 RECORD_TIMEOUT = 30  # Maximum time in seconds to wait for speech
 
 # Do some checks and Import API keys from API_KEYS_FILE
@@ -641,14 +641,14 @@ class Book:
             time.sleep(0.2)
             return
 
-        def show_waiting():
+        def show_listening():
             # Pause for a beat because the listener doesn't
             # immediately start listening sometimes
             time.sleep(ALSA_ERROR_DELAY)
             self.pixels.fill(NEOPIXEL_WAITING_COLOR)
             self.pixels.show()
 
-        self.listener.listen(ready_callback=show_waiting)
+        self.listener.listen(ready_callback=show_listening)
 
         if self._sleep_request:
             self._busy = False
@@ -656,10 +656,11 @@ class Book:
 
         if not self.listener.speech_waiting():
             # No response from user, so return
+            print("No response from user.")
             return
 
         story_request = self.listener.recognize()
-
+        print(f"Whisper heard: {story_request}")
         story_prompt = self._make_story_prompt(story_request)
         self.display_loading()
         response = self._sendchat(story_prompt)
