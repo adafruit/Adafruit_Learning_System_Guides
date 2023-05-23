@@ -39,10 +39,8 @@ class Listener:
         if ready_callback:
             ready_callback()
         while (
-            (self.listener_handle
-            and not self.speech_waiting())
-            or not self.phrase_complete
-        ):
+            self.listener_handle and not self.speech_waiting()
+        ) or not self.phrase_complete:
             if self.phrase_time and time.monotonic() > start + self.phrase_timeout:
                 self.last_sample = bytes()
                 self.phrase_complete = True
