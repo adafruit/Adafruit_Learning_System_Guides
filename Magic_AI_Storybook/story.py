@@ -92,6 +92,7 @@ WHISPER_MODEL = "whisper-1"
 
 # Speech Recognition Parameters
 ENERGY_THRESHOLD = 300  # Energy level for mic to detect
+PHRASE_TIMEOUT = 3.0  # Space between recordings for separating phrases
 RECORD_TIMEOUT = 30  # Maximum time in seconds to wait for speech
 
 # Do some checks and Import API keys from API_KEYS_FILE
@@ -248,7 +249,9 @@ class Book:
             self._prompt = f.read()
 
         # Initialize the Listener
-        self.listener = Listener(openai.api_key, ENERGY_THRESHOLD, RECORD_TIMEOUT)
+        self.listener = Listener(
+            openai.api_key, ENERGY_THRESHOLD, PHRASE_TIMEOUT, RECORD_TIMEOUT
+        )
 
         # Preload remaining images
         self._load_image("background", BACKGROUND_IMAGE)
@@ -636,7 +639,6 @@ class Book:
         if self._sleep_request:
             self._busy = False
             time.sleep(0.2)
-            print("Not busy anymore")
             return
 
         def show_waiting():
@@ -680,7 +682,6 @@ class Book:
         if self.listener.is_listening():
             self.listener.stop_listening()
         while self._busy:
-            print("Still busy")
             time.sleep(0.1)
         self._sleep_request = False
 
