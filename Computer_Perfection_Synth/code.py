@@ -4,7 +4,7 @@
 #  * 10 numbered buttons play notes
 #  * SET button to increase LFO rate, long press to decrease LFO rate
 #  * SCORE button to add lower octave
-#  * MODE switch changes LFO depth?
+#  * MODE switch changes wavetable set
 #  * SKILL switch toggles sustain
 #  * GAME switch must stay in position 1 or it messes with the other switches
 
