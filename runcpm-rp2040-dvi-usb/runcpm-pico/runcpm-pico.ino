@@ -77,41 +77,43 @@ int lst_open = FALSE;
 
 void setup(void) {
   pinMode(LED, OUTPUT);
-  digitalWrite(LED, LOW^LEDinv);
+  digitalWrite(LED, LOW ^ LEDinv);
 
 
-// =========================================================================================
-// Serial Port Definition
-// =========================================================================================
-//   Serial =USB / Serial1 =UART0/COM1 / Serial2 =UART1/COM2
+  // =========================================================================================
+  // Serial Port Definition
+  // =========================================================================================
+  //   Serial =USB / Serial1 =UART0/COM1 / Serial2 =UART1/COM2
 
-   Serial1.setRX(1); // Pin 2
-   Serial1.setTX(0); // Pin 1
-   Serial1.begin(SERIALSPD);
+  Serial1.setRX(1); // Pin 2
+  Serial1.setTX(0); // Pin 1
+  Serial1.begin(SERIALSPD);
 
-   Serial2.setRX(5); // Pin 7
-   Serial2.setTX(4); // Pin 6
-   Serial2.begin(SERIALSPD);
+  Serial2.setRX(5); // Pin 7
+  Serial2.setTX(4); // Pin 6
+  Serial2.begin(SERIALSPD);
 
-// or
+  // or
 
-//   Serial1.setRX(17); // Pin 22
-//   Serial1.setTX(16); // Pin 21
+  //   Serial1.setRX(17); // Pin 22
+  //   Serial1.setTX(16); // Pin 21
 
-//   Serial2.setRX(21); // Pin 27
-//   Serial2.setTX(20); // Pin 26
-// =========================================================================================
+  //   Serial2.setRX(21); // Pin 27
+  //   Serial2.setTX(20); // Pin 26
+  // =========================================================================================
 
-  if (!port_init_early()) { return; }
+  if (!port_init_early()) {
+    return;
+  }
 
 #if defined(WAIT_SERIAL)
   // _clrscr();
-  // _puts("Opening serial-port...\r\n");  
+  // _puts("Opening serial-port...\r\n");
   Serial.begin(SERIALSPD);
   while (!Serial) {	// Wait until serial is connected
-    digitalWrite(LED, HIGH^LEDinv);
+    digitalWrite(LED, HIGH ^ LEDinv);
     delay(sDELAY);
-    digitalWrite(LED, LOW^LEDinv);
+    digitalWrite(LED, LOW ^ LEDinv);
     delay(DELAY);
   }
 #endif
@@ -120,96 +122,96 @@ void setup(void) {
   _sys_deletefile((uint8 *)LogName);
 #endif
 
-  
-// =========================================================================================  
-// Printing the Startup-Messages
-// =========================================================================================
+
+  // =========================================================================================
+  // Printing the Startup-Messages
+  // =========================================================================================
 
   _clrscr();
 
   // if (bootup_press == 1)
   //   { _puts("Recognized " TEXT_BOLD "#" TEXT_NORMAL " key as pressed! :)\r\n\r\n");
   //   }
-  
+
   _puts("CP/M Emulator " TEXT_BOLD "v" VERSION "" TEXT_NORMAL "   by   " TEXT_BOLD "Marcelo  Dantas\e[0m\r\n");
-  _puts("----------------------------------------------\r\n");  
+  _puts("----------------------------------------------\r\n");
   _puts("    running on [" TEXT_BOLD BOARD_TEXT TEXT_NORMAL "]\r\n");
   _puts("----------------------------------------------\r\n");
 
-	_puts("BIOS              at [" TEXT_BOLD "0x");
-	_puthex16(BIOSjmppage);
-//	_puts(" - ");
-	_puts("" TEXT_NORMAL "]\r\n");
+  _puts("BIOS              at [" TEXT_BOLD "0x");
+  _puthex16(BIOSjmppage);
+  //	_puts(" - ");
+  _puts("" TEXT_NORMAL "]\r\n");
 
-	_puts("BDOS              at [" TEXT_BOLD "0x");
-	_puthex16(BDOSjmppage);
-	_puts("" TEXT_NORMAL "]\r\n");
+  _puts("BDOS              at [" TEXT_BOLD "0x");
+  _puthex16(BDOSjmppage);
+  _puts("" TEXT_NORMAL "]\r\n");
 
-	_puts("CCP " CCPname " at [" TEXT_BOLD "0x");
-	_puthex16(CCPaddr);
-	_puts("" TEXT_NORMAL "]\r\n");
+  _puts("CCP " CCPname " at [" TEXT_BOLD "0x");
+  _puthex16(CCPaddr);
+  _puts("" TEXT_NORMAL "]\r\n");
 
-  #if BANKS > 1
-	_puts("Banked Memory        [" TEXT_BOLD "");
-	_puthex8(BANKS);
-    _puts("" TEXT_NORMAL "]banks\r\n");
-  #endif
+#if BANKS > 1
+  _puts("Banked Memory        [" TEXT_BOLD "");
+  _puthex8(BANKS);
+  _puts("" TEXT_NORMAL "]banks\r\n");
+#endif
 
-   // Serial.printf("Free Memory          [" TEXT_BOLD "%d bytes" TEXT_NORMAL "]\r\n", freeMemory());
+  // Serial.printf("Free Memory          [" TEXT_BOLD "%d bytes" TEXT_NORMAL "]\r\n", freeMemory());
 
   _puts("CPU-Clock            [" TEXT_BOLD);
   _putdec((clock_get_hz( clk_sys ) + 500'000) / 1'000'000);
-  _puts(TEXT_NORMAL "] MHz\r\n");
+           _puts(TEXT_NORMAL "] MHz\r\n");
 
-  _puts("Init Storage         [ " TEXT_BOLD "");
-  if (port_flash_begin()) {
-    _puts("OK " TEXT_NORMAL "]\r\n");
-    _puts("----------------------------------------------");
+           _puts("Init Storage         [ " TEXT_BOLD "");
+           if (port_flash_begin()) {
+           _puts("OK " TEXT_NORMAL "]\r\n");
+           _puts("----------------------------------------------");
 
-    if (VersionCCP >= 0x10 || SD.exists(CCPname)) {
-      while (true) {
-        _puts(CCPHEAD);
-        _PatchCPM();
-	Status = 0;
+           if (VersionCCP >= 0x10 || SD.exists(CCPname)) {
+           while (true) {
+           _puts(CCPHEAD);
+           _PatchCPM();
+           Status = 0;
 #ifndef CCP_INTERNAL
-        if (!_RamLoad((char *)CCPname, CCPaddr)) {
-          _puts("Unable to load the CCP.\r\nCPU halted.\r\n");
-          break;
-        }
-        Z80reset();
-        SET_LOW_REGISTER(BC, _RamRead(DSKByte));
-        PC = CCPaddr;
-        Z80run();
+           if (!_RamLoad((char *)CCPname, CCPaddr)) {
+           _puts("Unable to load the CCP.\r\nCPU halted.\r\n");
+           break;
+         }
+           Z80reset();
+           SET_LOW_REGISTER(BC, _RamRead(DSKByte));
+           PC = CCPaddr;
+           Z80run();
 #else
-        _ccp();
+           _ccp();
 #endif
-        if (Status == 1)
-          break;
+           if (Status == 1)
+           break;
 #ifdef USE_PUN
-        if (pun_dev)
-          _sys_fflush(pun_dev);
+           if (pun_dev)
+           _sys_fflush(pun_dev);
 #endif
 #ifdef USE_LST
-        if (lst_dev)
-          _sys_fflush(lst_dev);
+           if (lst_dev)
+           _sys_fflush(lst_dev);
 #endif
-      }
-    } else {
-      _puts("Unable to load CP/M CCP.\r\nCPU halted.\r\n");
-    }
-  } else {
-    _puts("ERR " TEXT_NORMAL "]\r\nUnable to initialize SD card.\r\nCPU halted.\r\n");
-  }
-}
+         }
+         } else {
+           _puts("Unable to load CP/M CCP.\r\nCPU halted.\r\n");
+         }
+         } else {
+           _puts("ERR " TEXT_NORMAL "]\r\nUnable to initialize SD card.\r\nCPU halted.\r\n");
+         }
+         }
 
-// if loop is reached, blink LED forever to signal error
-void loop(void) {
-  digitalWrite(LED, HIGH^LEDinv);
-  delay(DELAY);
-  digitalWrite(LED, LOW^LEDinv);
-  delay(DELAY);
-  digitalWrite(LED, HIGH^LEDinv);
-  delay(DELAY);
-  digitalWrite(LED, LOW^LEDinv);
-  delay(DELAY * 4);
-}
+           // if loop is reached, blink LED forever to signal error
+           void loop(void) {
+           digitalWrite(LED, HIGH^LEDinv);
+           delay(DELAY);
+           digitalWrite(LED, LOW^LEDinv);
+           delay(DELAY);
+           digitalWrite(LED, HIGH^LEDinv);
+           delay(DELAY);
+           digitalWrite(LED, LOW^LEDinv);
+           delay(DELAY * 4);
+         }
