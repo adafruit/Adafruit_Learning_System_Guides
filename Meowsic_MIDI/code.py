@@ -45,7 +45,7 @@ key_matrix = keypad.KeyMatrix(
     row_pins=(board.D10, board.MOSI, board.MISO, board.CLK, board.A0, board.A1)
 )
 
-midi_uart = busio.UART(board.TX, None, baudrate=31250)
+midi_uart = busio.UART(board.TX, None, baudrate=31250, timeout=0.001)
 
 midi_usb_channel = 1
 midi_usb = adafruit_midi.MIDI(midi_out=usb_midi.ports[1], out_channel=midi_usb_channel-1)
