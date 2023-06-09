@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 Kattni Rembor for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #include <Adafruit_NeoPixel.h>
 
 #define NEOPIXEL_PIN A3
