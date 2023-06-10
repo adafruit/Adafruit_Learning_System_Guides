@@ -55,11 +55,6 @@ void msc_flush_cb(void) {
   msc_changed = true;
 }
 
-void _puthex32(uint32_t x) {
-    _puthex16(x >> 16);
-    _puthex16(x & 0xffff);
-}
-
 #if USE_DISPLAY
 uint16_t underCursor = ' ';
 
