@@ -13,7 +13,7 @@
 #define USE_DISPLAY (1)
 
 #if USE_DISPLAY
-DVItext1 display(DVI_RES_800x240p60, adafruit_feather_dvi_cfg);
+DVItext1 display(DVI_RES_800x240p30, adafruit_feather_dvi_cfg);
 #endif
 #define SPI_CLOCK (20'000'000)
 #define SD_CS_PIN (10)
