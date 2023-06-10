@@ -14,7 +14,6 @@
 
 #include <SdFat.h>        // One SD library to rule them all - Greinman SdFat from Library Manager
 #include <Adafruit_SPIFlash.h>
-#include <Adafruit_TinyUSB.h>
 
 #ifndef USE_VT100
 #define USE_VT100 (0)
