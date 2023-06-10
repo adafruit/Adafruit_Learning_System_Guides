@@ -104,7 +104,8 @@ bool port_init_early() {
   _getch_hook = getch_serial1;
   _kbhit_hook = kbhit_serial1;
   // USB mass storage / filesystem setup (do BEFORE Serial init)
-  if (!blockdevice.begin(SD_CONFIG)) { _puts("!blockdevice.begin()"); return false; }
+  if (!blockdevice.begin(SD_CONFIG)) { _puts("Failed to initialize SD card"); return false; }
+#if USE_MSC
   // Set disk vendor id, product id and revision
   usb_msc.setID("Adafruit", "Internal Flash", "1.0");
   // Set disk size, block size is 512 regardless of blockdevice page size
@@ -112,7 +113,7 @@ bool port_init_early() {
   usb_msc.setReadWriteCallback(msc_read_cb, msc_write_cb, msc_flush_cb);
   usb_msc.setUnitReady(true); // MSC is ready for read/write
   if (!usb_msc.begin()) {
-      _puts("!usb_msc.begin()"); return false;
+      _puts("Failed to initialize USB MSC"); return false;
   }
   return true;
 }
