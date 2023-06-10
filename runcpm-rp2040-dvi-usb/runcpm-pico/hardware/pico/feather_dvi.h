@@ -4,13 +4,16 @@
 // SPDX-License-Identifier: MIT
 
 #include <SdFat.h> // SDFat - Adafruit Fork
-#include <Adafruit_TinyUSB.h>
 #include <PicoDVI.h>
 #include "../../console.h"
 #include "../../arduino_hooks.h"
 
 #undef USE_DISPLAY
 #define USE_DISPLAY (1)
+
+#ifndef USE_MSC
+#define USE_MSC (0)
+#endif
 
 #if USE_DISPLAY
 DVItext1 display(DVI_RES_800x240p30, adafruit_feather_dvi_cfg);
@@ -20,7 +23,6 @@ DVItext1 display(DVI_RES_800x240p30, adafruit_feather_dvi_cfg);
 #define SD_CONFIG SdSpiConfig(SD_CS_PIN, DEDICATED_SPI, SPI_CLOCK)
 DedicatedSpiCard blockdevice;
 FatFileSystem SD;     // Filesystem object from SdFat
-Adafruit_USBD_MSC usb_msc; // USB mass storage object
 
 // =========================================================================================
 // Define Board-Data
@@ -34,6 +36,8 @@ Adafruit_USBD_MSC usb_msc; // USB mass storage object
 
 // FUNCTIONS REQUIRED FOR USB MASS STORAGE ---------------------------------
 
+#if USE_MSC
+Adafruit_USBD_MSC usb_msc; // USB mass storage object
 static bool msc_changed = true; // Is set true on filesystem changes
 
 // Callback on READ10 command.
@@ -54,6 +58,7 @@ void msc_flush_cb(void) {
   digitalWrite(LED_BUILTIN, LOW);
   msc_changed = true;
 }
+#endif
 
 #if USE_DISPLAY
 uint16_t underCursor = ' ';
@@ -110,6 +115,7 @@ bool port_init_early() {
   if (!usb_msc.begin()) {
       _puts("Failed to initialize USB MSC"); return false;
   }
+#endif
   return true;
 }
 
