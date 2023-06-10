@@ -98,7 +98,8 @@ bool kbhit_serial1(void) {
 
 bool port_init_early() {
 #if USE_DISPLAY
-  // vreg_set_voltage(VREG_VOLTAGE_1_30);
+  vreg_set_voltage(VREG_VOLTAGE_1_20);
+  delay(10);
   if (!display.begin()) { return false; }
   _putch_hook = putch_display;
 #endif
