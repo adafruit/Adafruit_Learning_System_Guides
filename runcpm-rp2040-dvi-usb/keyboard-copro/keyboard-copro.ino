@@ -133,7 +133,7 @@ const char * const lut[] = {
   "!@#$%^&*()",                              /* 0 - shifted numeric keys */
   "\r\x1b\10\t -=[]\\#;'`,./",               /* 1 - symbol keys */
   "\n\x1b\177\t _+{}|~:\"~<>?",              /* 2 - shifted */
-  "\3\4\2\1",                                /* 3 - arrow keys RLDU */
+  "\12\13\10\22",                            /* 3 - arrow keys RLDU */
   "/*-+\n1234567890.",                       /* 4 - keypad w/numlock */
   "/*-+\n\xff\2\xff\4\xff\3\xff\1\xff\xff.", /* 5 - keypad w/o numlock */
 };
