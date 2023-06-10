@@ -8,8 +8,9 @@
 #include "../../console.h"
 #include "../../arduino_hooks.h"
 
-#undef USE_DISPLAY
+#ifndef USE_DISPLAY
 #define USE_DISPLAY (1)
+#endif
 
 #ifndef USE_MSC
 #define USE_MSC (0)
