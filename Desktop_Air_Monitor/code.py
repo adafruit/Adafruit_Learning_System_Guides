@@ -26,18 +26,21 @@ i2c = board.STEMMA_I2C()
 reset_pin = None
 
 pm25 = PM25_I2C(i2c, reset_pin)
-aqdata = pm25.read()
 
 scd4x = adafruit_scd4x.SCD4X(i2c)
 scd4x.start_periodic_measurement()
 
 time.sleep(5)
 
+try:
+    aqdata = pm25.read()
+    pm2 = int(aqdata["pm25 standard"])
+except RuntimeError:
+    pm2 = 0
+
 co2 = scd4x.CO2
 temp = scd4x.temperature
 humidity = scd4x.relative_humidity
-
-pm2 = int(aqdata["pm25 standard"])
 
 def rate_pm25(pm25_data):
     if pm25_data <= 12:
@@ -98,8 +101,12 @@ while True:
         co2 = scd4x.CO2
         temp = c_to_f(scd4x.temperature)
         humidity = scd4x.relative_humidity
-        aqdata = pm25.read()
-        pm2 = int(aqdata["pm25 standard"])
+        try:
+            aqdata = pm25.read()
+            pm2 = int(aqdata["pm25 standard"])
+        except RuntimeError:
+            print("Unable to read from PM2.5 sensor, no new data..")
+            continue
         pm2_color, pm2_outline.x = rate_pm25(pm2)
         sensor_data = [pm2, co2, temp, humidity]
         pixels.fill(pm2_color)
