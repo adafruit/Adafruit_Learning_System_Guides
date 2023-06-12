@@ -71,6 +71,6 @@ while True:
     # If there is a key released event, run this block.
     if event and event.released:
         # Turn off the LEDs.
-        pixels.fill((0, 0, 0))
+        pixels[event.key_number] = (0, 0, 0)
         # Report that the key switch has been released.
         keyboard.release_all()
