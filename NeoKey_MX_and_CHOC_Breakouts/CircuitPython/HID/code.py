@@ -2,7 +2,11 @@
 #
 # SPDX-License-Identifier: MIT
 
-"""NeoKey Breakout HID Demo"""
+"""
+NeoKey Breakout HID Demo
+
+WILL NOT WORK ON RASPBERRY PI
+"""
 
 import time
 import board
@@ -41,15 +45,15 @@ KEY_PINS = (
 # therefore the number of key pins listed.
 NUM_PIXELS = len(KEY_PINS)
 
-# Create keyboard object.
-time.sleep(1)  # Delay to avoid a race condition on some systems.
-keyboard = Keyboard(usb_hid.devices)
-
 # Create NeoPixel object.
 pixels = neopixel.NeoPixel(PIXEL_PIN, NUM_PIXELS, brightness=BRIGHTNESS)
 
 # Create keypad object.
 keys = keypad.Keys(KEY_PINS, value_when_pressed=False, pull=True)
+
+# Create keyboard object.
+time.sleep(1)  # Delay to avoid a race condition on some systems.
+keyboard = Keyboard(usb_hid.devices)
 
 while True:
     # Begin getting key events.
