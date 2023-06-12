@@ -4,23 +4,26 @@
 // SPDX-License-Identifier: MIT
 
 #include <SdFat.h> // SDFat - Adafruit Fork
-#include <Adafruit_TinyUSB.h>
 #include <PicoDVI.h>
 #include "../../console.h"
 #include "../../arduino_hooks.h"
 
-#undef USE_DISPLAY
+#ifndef USE_DISPLAY
 #define USE_DISPLAY (1)
+#endif
+
+#ifndef USE_MSC
+#define USE_MSC (0)
+#endif
 
 #if USE_DISPLAY
-DVItext1 display(DVI_RES_800x240p60, adafruit_feather_dvi_cfg);
+DVItext1 display(DVI_RES_800x240p30, adafruit_feather_dvi_cfg);
 #endif
 #define SPI_CLOCK (20'000'000)
 #define SD_CS_PIN (10)
 #define SD_CONFIG SdSpiConfig(SD_CS_PIN, DEDICATED_SPI, SPI_CLOCK)
 DedicatedSpiCard blockdevice;
 FatFileSystem SD;     // Filesystem object from SdFat
-Adafruit_USBD_MSC usb_msc; // USB mass storage object
 
 // =========================================================================================
 // Define Board-Data
@@ -34,6 +37,8 @@ Adafruit_USBD_MSC usb_msc; // USB mass storage object
 
 // FUNCTIONS REQUIRED FOR USB MASS STORAGE ---------------------------------
 
+#if USE_MSC
+Adafruit_USBD_MSC usb_msc; // USB mass storage object
 static bool msc_changed = true; // Is set true on filesystem changes
 
 // Callback on READ10 command.
@@ -54,11 +59,7 @@ void msc_flush_cb(void) {
   digitalWrite(LED_BUILTIN, LOW);
   msc_changed = true;
 }
-
-void _puthex32(uint32_t x) {
-    _puthex16(x >> 16);
-    _puthex16(x & 0xffff);
-}
+#endif
 
 #if USE_DISPLAY
 uint16_t underCursor = ' ';
@@ -97,14 +98,16 @@ bool kbhit_serial1(void) {
 
 bool port_init_early() {
 #if USE_DISPLAY
-  // vreg_set_voltage(VREG_VOLTAGE_1_30);
+  vreg_set_voltage(VREG_VOLTAGE_1_20);
+  delay(10);
   if (!display.begin()) { return false; }
   _putch_hook = putch_display;
 #endif
   _getch_hook = getch_serial1;
   _kbhit_hook = kbhit_serial1;
   // USB mass storage / filesystem setup (do BEFORE Serial init)
-  if (!blockdevice.begin(SD_CONFIG)) { _puts("!blockdevice.begin()"); return false; }
+  if (!blockdevice.begin(SD_CONFIG)) { _puts("Failed to initialize SD card"); return false; }
+#if USE_MSC
   // Set disk vendor id, product id and revision
   usb_msc.setID("Adafruit", "Internal Flash", "1.0");
   // Set disk size, block size is 512 regardless of blockdevice page size
@@ -112,8 +115,9 @@ bool port_init_early() {
   usb_msc.setReadWriteCallback(msc_read_cb, msc_write_cb, msc_flush_cb);
   usb_msc.setUnitReady(true); // MSC is ready for read/write
   if (!usb_msc.begin()) {
-      _puts("!usb_msc.begin()"); return false;
+      _puts("Failed to initialize USB MSC"); return false;
   }
+#endif
   return true;
 }
 

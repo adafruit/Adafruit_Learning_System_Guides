@@ -5,6 +5,7 @@
 // pio-usb is required for rp2040 host
 #include "pio_usb.h"
 #include "Adafruit_TinyUSB.h"
+#include "pico/stdlib.h"
 
 // Pin D+ for host, D- = D+ + 1
 #ifndef PIN_USB_HOST_DP
@@ -34,19 +35,13 @@ void loop() {
 
 void setup1() {
 
+  // override tools menu CPU frequency setting
+  set_sys_clock_khz(120'000, true);
+
 #if 0
   while ( !Serial ) delay(10);   // wait for native usb
   Serial.println("Core1 setup to run TinyUSB host with pio-usb");
 #endif
-
-  // Check for CPU frequency, must be multiple of 120Mhz for bit-banging USB
-  uint32_t cpu_hz = clock_get_hz(clk_sys);
-  if ( cpu_hz != 120000000UL && cpu_hz != 240000000UL ) {
-    while ( !Serial ) delay(10);   // wait for native usb
-    Serial.printf("Error: CPU Clock = %lu, PIO USB require CPU clock must be multiple of 120 Mhz\r\n", cpu_hz);
-    Serial.printf("Change your CPU Clock to either 120 or 240 Mhz in Menu->CPU Speed \r\n");
-    while (1) delay(1);
-  }
 
 #ifdef PIN_5V_EN
   pinMode(PIN_5V_EN, OUTPUT);
@@ -68,9 +63,11 @@ void setup1() {
 
 int old_ascii = -1;
 uint32_t repeat_timeout;
-const uint32_t repeat_time = 150;
+// this matches Linux default of 500ms to first repeat, 1/20s thereafter
+const uint32_t default_repeat_time = 50;
+const uint32_t initial_repeat_time = 500;
 
-void send_ascii(uint8_t code) {
+void send_ascii(uint8_t code, uint32_t repeat_time=default_repeat_time) {
   old_ascii = code;
   repeat_timeout = millis() + repeat_time;
   if (code > 32 && code < 127) {
@@ -86,9 +83,8 @@ void loop1()
   uint32_t now = millis();
   uint32_t deadline = repeat_timeout - now;
   if (old_ascii >= 0 && deadline > INT32_MAX) {
-    repeat_timeout += repeat_time;
-    deadline = repeat_timeout - now;
     send_ascii(old_ascii);
+    deadline = repeat_timeout - now;
   } else if (old_ascii < 0) {
     deadline = UINT32_MAX;
   }
@@ -133,7 +129,7 @@ const char * const lut[] = {
   "!@#$%^&*()",                              /* 0 - shifted numeric keys */
   "\r\x1b\10\t -=[]\\#;'`,./",               /* 1 - symbol keys */
   "\n\x1b\177\t _+{}|~:\"~<>?",              /* 2 - shifted */
-  "\3\4\2\1",                                /* 3 - arrow keys RLDU */
+  "\12\13\10\22",                            /* 3 - arrow keys RLDU */
   "/*-+\n1234567890.",                       /* 4 - keypad w/numlock */
   "/*-+\n\xff\2\xff\4\xff\3\xff\1\xff\xff.", /* 5 - keypad w/o numlock */
 };
@@ -217,7 +213,7 @@ void process_event(uint8_t dev_addr, uint8_t instance, const hid_keyboard_report
         }
         if (ctrl) code &= 0x1f;
         if (alt) code ^= 0x80;
-        send_ascii(code);
+        send_ascii(code, initial_repeat_time);
         break;
       }
     }
