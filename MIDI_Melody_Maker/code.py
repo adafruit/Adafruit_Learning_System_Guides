@@ -114,7 +114,7 @@ splash.append(blinka_grid)
 #  USB MIDI:
 #  midi = adafruit_midi.MIDI(midi_out=usb_midi.ports[1], out_channel=0)
 #  UART MIDI:
-midi = adafruit_midi.MIDI(midi_out=busio.UART(board.TX, board.RX, baudrate=31250), out_channel=0)
+midi = adafruit_midi.MIDI(midi_out=busio.UART(board.TX, board.RX, baudrate=31250, timeout=0.001), out_channel=0)
 
 #  potentiometer pin setup
 key_pot = AnalogIn(board.A1)
