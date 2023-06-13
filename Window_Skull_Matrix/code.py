@@ -24,12 +24,16 @@ jaw_servo = servo.Servo(pwm)
 def jaw_wag():
     for angle in range(90, 70, -2):  # start angle, end angle, degree step size
         jaw_servo.angle = angle
+        time.sleep(0.01)
     for angle in range(70, 90, 2):
         jaw_servo.angle = angle
+        time.sleep(0.01)
     for angle in range(90, 110, 2):
         jaw_servo.angle = angle
+        time.sleep(0.01)
     for angle in range(110, 90, -2):
         jaw_servo.angle = angle
+        time.sleep(0.01)
 
 
 # TO LOAD DIFFERENT EYE DESIGNS: change the middle word here (between
@@ -76,8 +80,7 @@ class Sprite(displayio.TileGrid):
             palette.make_transparent(closest_index)
         elif isinstance(transparent, int):
             palette.make_transparent(transparent)
-        super(Sprite, self).__init__(bitmap, pixel_shader=palette)
-        self.height = bitmap.height
+        super().__init__(bitmap, pixel_shader=palette, height=bitmap.height)
 
 
 # ONE-TIME INITIALIZATION --------------------------------------------------
