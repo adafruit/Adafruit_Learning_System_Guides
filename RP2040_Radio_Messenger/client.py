@@ -96,7 +96,7 @@ def ChatBotWithHistory():  # pylint: disable=too-many-statements,too-many-branch
             print("entered")
             time.sleep(0.1)
             path = pathlib.Path("message")
-            with path.open() as file:  # pylint: disable=unspecified-encoding
+            with path.open() as file:
                 signal = file.readline().rstrip()
             print(f"< {signal}")
             ser.write(aes.encrypt(signal.encode()))

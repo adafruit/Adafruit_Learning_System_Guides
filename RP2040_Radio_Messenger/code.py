@@ -4,7 +4,6 @@
 import time
 import random
 import board
-import busio
 import usb_cdc
 import digitalio
 

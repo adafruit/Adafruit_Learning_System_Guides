@@ -10,5 +10,5 @@ while True:
         signal_msg = SIGNAL.split("Body")[1].split("\n")[0][2:]
         print(signal_msg)
         os.system("touch message")
-        with open("message", "w") as F: # pylint: disable=unspecified-encoding
+        with open("message", "w") as F:
             F.write(signal_msg)
