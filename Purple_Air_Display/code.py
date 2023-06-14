@@ -12,6 +12,13 @@ import board
 import terminalio
 from adafruit_matrixportal.matrixportal import MatrixPortal
 
+# Get wifi details and more from a secrets.py file
+try:
+    from secrets import secrets
+except ImportError:
+    print("WiFi secrets are kept in secrets.py, please add them there!")
+    raise
+
 def aqi_transform(val):
     aqi = pm_to_aqi(val)  # derive Air Quality Index from Particulate Matter 2.5 value
     return "AQI: %d" % aqi
@@ -32,16 +39,19 @@ def message_transform(val):  # picks message based on thresholds
     return "Unknown"
 
 SENSOR_ID = 3085 # Poughkeepsie  # 30183  LA outdoor  / 37823  oregon  / 21441   NYC
-SENSOR_REFRESH_PERIOD = 30  # seconds
-DATA_SOURCE = "https://www.purpleair.com/json?show=" + str(SENSOR_ID)
+SENSOR_REFRESH_PERIOD = 300  # seconds
+DATA_SOURCE = f"https://api.purpleair.com/v1/sensors/{SENSOR_ID}?fields=pm2.5_10minute"
 SCROLL_DELAY = 0.02
-DATA_LOCATION = ["results", 0, "PM2_5Value"]  # navigate the JSON response
+DATA_LOCATION = ["sensor", "stats", "pm2.5_10minute"]  # navigate the JSON response
 
 # --- Display setup ---
 matrixportal = MatrixPortal(
     status_neopixel=board.NEOPIXEL,
     debug=True,
     url=DATA_SOURCE,
+    headers={"X-API-Key": secrets["purple_air_api_key"],  # purpleair.com
+             "Accept": "application/json"
+    },
     json_path=(DATA_LOCATION, DATA_LOCATION),
 )
 
