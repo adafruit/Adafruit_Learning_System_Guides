@@ -1,9 +1,9 @@
 # SPDX-FileCopyrightText: 2023 Eva Herrada for Adafruit Industries
-# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: 2018 MikeTheWatchGuy
+# SPDX-License-Identifier: LGPL-3.0-only
 
 # Partially based on:
 # https://github.com/PySimpleGUI/PySimpleGUI/blob/master/DemoPrograms/Demo_Chat_With_History.py
-# Original has GPLV3 license
 
 import time
 import pathlib
