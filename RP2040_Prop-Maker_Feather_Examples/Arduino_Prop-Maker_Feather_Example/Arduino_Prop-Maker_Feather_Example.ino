@@ -5,13 +5,13 @@
 #include <Adafruit_NeoPixel.h>
 #include <Adafruit_LIS3DH.h>
 #include <Adafruit_Sensor.h>
-#include <107-Arduino-Servo-RP2040.h>
+#include <Servo.h>
 
 Adafruit_NeoPixel strip(60, PIN_EXTERNAL_NEOPIXELS, NEO_GRB + NEO_KHZ800);
 
 Adafruit_LIS3DH lis = Adafruit_LIS3DH();
 
-static _107_::Servo servo_0;
+Servo servo_0;
 
 uint8_t x = 0;
 
