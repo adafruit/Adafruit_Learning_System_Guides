@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 Limor Fried for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #include <Adafruit_NeoPixel.h>
 #include <Adafruit_LIS3DH.h>
 #include <Adafruit_Sensor.h>
