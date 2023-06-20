@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 Limor Fried for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #define bootSampleRate 22050
 
 const uint8_t PROGMEM bootAudioData[] = {
