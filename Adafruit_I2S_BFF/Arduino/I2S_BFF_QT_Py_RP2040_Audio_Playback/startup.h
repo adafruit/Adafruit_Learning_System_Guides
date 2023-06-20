@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2023 Ladyada for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
 #define startupSampleRate 22255
 
 const uint8_t PROGMEM startupAudioData[] = {
