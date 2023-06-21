@@ -9,10 +9,17 @@ import pwmio
 import displayio
 import adafruit_imageload
 from audiocore import WaveFile
-from audioio import AudioOut
 from adafruit_motor import servo
 from digitalio import DigitalInOut, Direction, Pull
 from adafruit_matrixportal.matrix import Matrix
+
+I2S_VERSION = False #  set to True if using I2S audio out
+
+#  import the appropriate audio module
+if I2S_VERSION:
+    from audiobusio import I2SOut
+else:
+    from audioio import AudioOut
 
 #  setup for down button on matrixportal
 switch = DigitalInOut(board.BUTTON_DOWN)
@@ -36,7 +43,10 @@ wave_file = open("dreidel_song.wav", "rb")
 wave = WaveFile(wave_file)
 
 #  setup for audio out
-audio = AudioOut(board.A0)
+if I2S_VERSION:
+    audio = I2SOut(board.A2, board.A3, board.TX)
+else:
+    audio = AudioOut(board.A0)
 
 #  setup for matrix display
 matrix = Matrix(width=32, height=32)
