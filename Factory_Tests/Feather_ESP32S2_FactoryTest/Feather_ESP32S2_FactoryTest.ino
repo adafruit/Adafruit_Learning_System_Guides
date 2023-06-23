@@ -8,8 +8,6 @@
 #include <Adafruit_NeoPixel.h>
 #include "Adafruit_TestBed.h"
 #include <Adafruit_BME280.h>
-#include <Adafruit_ST7789.h> 
-#include <Fonts/FreeSans12pt7b.h>
 
 Adafruit_BME280 bme; // I2C
 bool bmefound = false;
@@ -17,10 +15,6 @@ extern Adafruit_TestBed TB;
 
 Adafruit_LC709203F lc_bat;
 Adafruit_MAX17048 max_bat;
-
-Adafruit_ST7789 display = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
-
-GFXcanvas16 canvas(240, 135);
 
 bool maxfound = false;
 bool lcfound = false;
@@ -30,10 +24,6 @@ void setup() {
   // while (! Serial) delay(10);
   
   delay(100);
-  
-  // turn on the TFT / I2C power supply
-  pinMode(TFT_I2C_POWER, OUTPUT);
-  digitalWrite(TFT_I2C_POWER, HIGH);
 
   pinMode(NEOPIXEL_POWER, OUTPUT);
   digitalWrite(NEOPIXEL_POWER, HIGH);
@@ -44,12 +34,7 @@ void setup() {
   TB.begin();
   TB.setColor(WHITE);
 
-  display.init(135, 240);           // Init ST7789 240x135
-  display.setRotation(3);
-  canvas.setFont(&FreeSans12pt7b);
-  canvas.setTextColor(ST77XX_WHITE); 
-
-   if (lc_bat.begin()) {
+  if (lc_bat.begin()) {
     Serial.println("Found LC709203F");
     Serial.print("Version: 0x"); Serial.println(lc_bat.getICversion(), HEX);
     lc_bat.setPackSize(LC709203F_APA_500MAH);
@@ -67,7 +52,8 @@ void setup() {
     Serial.println(max_bat.getChipID(), HEX);
     maxfound = true;
     
-  } 
+  }
+  
 
   if (TB.scanI2CBus(0x77)) {
     Serial.println("BME280 address");
@@ -91,46 +77,26 @@ uint8_t j = 0;
 
 void loop() {
 
-  if (j % 5 == 0) {
+  if (j % 10 == 0) {
     Serial.println("**********************");
-
-    TB.printI2CBusScan();
-    canvas.fillScreen(ST77XX_BLACK);
-    canvas.setCursor(0, 25);
-    canvas.setTextColor(ST77XX_RED);
-    canvas.println("Adafruit Feather");
-    canvas.setTextColor(ST77XX_YELLOW);
-    canvas.println("ESP32-S2 TFT Demo");
-    canvas.setTextColor(ST77XX_GREEN); 
-    canvas.print("Battery: ");
-    canvas.setTextColor(ST77XX_WHITE);
     if (lcfound == true) {
-      canvas.print(lc_bat.cellVoltage(), 1);
-      canvas.print(" V  /  ");
-      canvas.print(lc_bat.cellPercent(), 0);
-      canvas.println("%");
+      Serial.print(F("Batt Voltage: ")); 
+      Serial.print(lc_bat.cellVoltage(), 1);
+      Serial.print(" V  /  ");
+      Serial.print(F("Batt Percent: "));
+      Serial.print(lc_bat.cellPercent(), 0);
+      Serial.println("%");
     }
     else {
-      canvas.print(max_bat.cellVoltage(), 1);
-      canvas.print(" V  /  ");
-      canvas.print(max_bat.cellPercent(), 0);
-      canvas.println("%");
+      Serial.print(F("Batt Voltage: ")); 
+      Serial.print(max_bat.cellVoltage(), 1);
+      Serial.print(" V  /  ");
+      Serial.print(F("Batt Percent: "));
+      Serial.print(max_bat.cellPercent(), 0);
+      Serial.println("%");
     }
-    canvas.setTextColor(ST77XX_BLUE); 
-    canvas.print("I2C: ");
-    canvas.setTextColor(ST77XX_WHITE);
-    for (uint8_t a=0x01; a<=0x7F; a++) {
-      if (TB.scanI2CBus(a, 0))  {
-        canvas.print("0x");
-        canvas.print(a, HEX);
-        canvas.print(", ");
-      }
-    }
-    display.drawRGBBitmap(0, 0, canvas.getBuffer(), 240, 135);
-    pinMode(TFT_BACKLITE, OUTPUT);
-    digitalWrite(TFT_BACKLITE, HIGH);
+    TB.printI2CBusScan();
   }
-  
   TB.setColor(TB.Wheel(j++));
   return;
 }

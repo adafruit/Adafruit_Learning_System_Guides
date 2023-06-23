@@ -91,7 +91,7 @@
 #define STR_HELPER(x) #x
 #define STR(x) STR_HELPER(x)
 // #define CCPHEAD		"\r\nRunCPM Version " VERSION " (CP/M " STR(TPASIZE) "K)\r\n"
-#define CCPHEAD    "\r\nRunCPM [\e[1mv" VERSION "\e[0m] => CCP:[\e[1m" CCPname "\e[0m] TPA:[\e[1m" STR(TPASIZE) "K\e[0m]\r\n"
+#define CCPHEAD    "\r\nRunCPM [" TEXT_BOLD "v" VERSION TEXT_NORMAL "] => CCP:[" TEXT_BOLD  CCPname TEXT_NORMAL "] TPA:" TEXT_BOLD STR(TPASIZE) "K" TEXT_NORMAL "\r\n"
 
 #define NOSLASH						// Will translate '/' to '_' on filenames to prevent directory errors
 

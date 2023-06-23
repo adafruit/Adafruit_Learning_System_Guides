@@ -5,8 +5,6 @@
 // only AVR and ARM CPU
 // #include <MemoryFree.h>
 
-#include "globals.h"
-
 // =========================================================================================
 // Guido Lehwalder's Code-Revision-Number
 // =========================================================================================
@@ -16,10 +14,21 @@
 
 #include <SdFat.h>        // One SD library to rule them all - Greinman SdFat from Library Manager
 #include <Adafruit_SPIFlash.h>
-#include <Adafruit_TinyUSB.h>
 
+#ifndef USE_VT100
+#define USE_VT100 (0)
+#endif
+
+#if USE_VT100
 #define TEXT_BOLD "\033[1m"
 #define TEXT_NORMAL "\033[0m"
+#else
+#define TEXT_BOLD ""
+#define TEXT_NORMAL ""
+#endif
+
+#include "globals.h"
+
 
 // =========================================================================================
 // Board definitions go into the "hardware" folder, if you use a board different than the
@@ -133,7 +142,7 @@ void setup(void) {
   //   { _puts("Recognized " TEXT_BOLD "#" TEXT_NORMAL " key as pressed! :)\r\n\r\n");
   //   }
 
-  _puts("CP/M Emulator " TEXT_BOLD "v" VERSION "" TEXT_NORMAL "   by   " TEXT_BOLD "Marcelo  Dantas\e[0m\r\n");
+  _puts("CP/M Emulator " TEXT_BOLD "v" VERSION "" TEXT_NORMAL "   by   " TEXT_BOLD "Marcelo  Dantas" TEXT_NORMAL "\r\n");
   _puts("----------------------------------------------\r\n");
   _puts("    running on [" TEXT_BOLD BOARD_TEXT TEXT_NORMAL "]\r\n");
   _puts("----------------------------------------------\r\n");

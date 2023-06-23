@@ -11,7 +11,7 @@ from adafruit_midi.note_off import NoteOff
 from adafruit_midi.note_on import NoteOn
 
 #  uart setup
-uart = busio.UART(board.TX, board.RX, baudrate=31250)
+uart = busio.UART(board.TX, board.RX, baudrate=31250, timeout=0.001)
 #  midi channel setup
 midi_in_channel = 1
 midi_out_channel = 1

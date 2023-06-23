@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 #include <Arduino.h>
+#include "Adafruit_MAX1704X.h"
 #include "Adafruit_LC709203F.h"
 #include <Adafruit_NeoPixel.h>
 #include "Adafruit_TestBed.h"
@@ -14,14 +15,19 @@ Adafruit_BME280 bme; // I2C
 bool bmefound = false;
 extern Adafruit_TestBed TB;
 
-Adafruit_LC709203F lc;
+Adafruit_LC709203F lc_bat;
+Adafruit_MAX17048 max_bat;
+
 Adafruit_ST7789 display = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
 
 GFXcanvas16 canvas(240, 135);
 
+bool maxfound = false;
+bool lcfound = false;
+
 void setup() {
   Serial.begin(115200);
- // while (! Serial) delay(10);
+  // while (! Serial) delay(10);
   
   delay(100);
   
@@ -42,15 +48,26 @@ void setup() {
   display.setRotation(3);
   canvas.setFont(&FreeSans12pt7b);
   canvas.setTextColor(ST77XX_WHITE); 
-
-  if (!lc.begin()) {
-    Serial.println(F("Couldnt find Adafruit LC709203F?\nMake sure a battery is plugged in!"));
-    while (1);
+  if (lc_bat.begin()) {
+    Serial.println("Found LC709203F");
+    Serial.print("Version: 0x"); Serial.println(lc_bat.getICversion(), HEX);
+    lc_bat.setPackSize(LC709203F_APA_500MAH);
+    lcfound = true;
   }
+  else {
+    Serial.println(F("Couldnt find Adafruit LC709203F?\nChecking for Adafruit MAX1704X.."));
+    delay(200);
+    if (!max_bat.begin()) {
+      Serial.println(F("Couldnt find Adafruit MAX1704X?\nMake sure a battery is plugged in!"));
+      while (1) delay(10);
+    }
+    Serial.print(F("Found MAX17048"));
+    Serial.print(F(" with Chip ID: 0x")); 
+    Serial.println(max_bat.getChipID(), HEX);
+    maxfound = true;
     
-  Serial.println("Found LC709203F");
-  Serial.print("Version: 0x"); Serial.println(lc.getICversion(), HEX);
-  lc.setPackSize(LC709203F_APA_500MAH); 
+  }
+  
 
   if (TB.scanI2CBus(0x77)) {
     Serial.println("BME280 address");
@@ -87,10 +104,18 @@ void loop() {
     canvas.setTextColor(ST77XX_GREEN); 
     canvas.print("Battery: ");
     canvas.setTextColor(ST77XX_WHITE);
-    canvas.print(lc.cellVoltage(), 1);
-    canvas.print(" V  /  ");
-    canvas.print(lc.cellPercent(), 0);
-    canvas.println("%");
+    if (lcfound == true) {
+      canvas.print(lc_bat.cellVoltage(), 1);
+      canvas.print(" V  /  ");
+      canvas.print(lc_bat.cellPercent(), 0);
+      canvas.println("%");
+    }
+    else {
+      canvas.print(max_bat.cellVoltage(), 1);
+      canvas.print(" V  /  ");
+      canvas.print(max_bat.cellPercent(), 0);
+      canvas.println("%");
+    }
     canvas.setTextColor(ST77XX_BLUE); 
     canvas.print("I2C: ");
     canvas.setTextColor(ST77XX_WHITE);

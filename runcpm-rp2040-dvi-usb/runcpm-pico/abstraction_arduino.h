@@ -515,7 +515,7 @@ uint8 _getch(void) {
 
 uint8 _getche(void) {
 	uint8 ch = _getch();
-	Serial.write(ch);
+	_putch(ch);
 	return(ch);
 }
 
