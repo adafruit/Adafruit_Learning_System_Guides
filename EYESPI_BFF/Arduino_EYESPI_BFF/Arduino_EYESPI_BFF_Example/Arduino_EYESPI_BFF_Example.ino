@@ -20,7 +20,7 @@
 // CONSTANTS, HEADERS and GLOBAL VARIABLES ---------------------------------
 
 // *** EDIT THIS VALUE TO MATCH THE ADAFRUIT PRODUCT ID FOR YOUR DISPLAY: ***
-#define SCREEN_PRODUCT_ID 5393
+#define SCREEN_PRODUCT_ID 3787
 // You can find the product ID several ways:
 // - "PID" accompanies each line-item on your receipt or order details page.
 // - Visit adafruit.com and search for EYESPI displays. On product pages,
@@ -28,9 +28,9 @@
 // - Check the comments in setup() later that reference various screens.
 
 // **** EDIT PINS TO MATCH YOUR WIRING ****
-#define TFT_CS  10 // To display chip-select pin
-#define TFT_RST  9 // To display reset pin
-#define TFT_DC   8 // To display data/command pin
+#define TFT_CS  PIN_SERIAL2_TX // To display chip-select pin
+#define TFT_RST  -1 // To display reset pin
+#define TFT_DC  PIN_SERIAL2_RX // To display data/command pin
 // For the remaining pins, this code assumes display is wired to hardware SPI
 // on the dev board's primary SPI interface. The display libraries can support
 // secondary SPI (if present) or bitbang (software) SPI, but that's not
