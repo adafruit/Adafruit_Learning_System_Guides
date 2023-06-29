@@ -19,9 +19,9 @@
 
 #define GAMMA   2.6   // For linear brightness correction
 #define G_CONST 9.806 // Standard acceleration due to gravity
-// While the above G_CONST is correct for "real time" drips, you can dial it back
-// for a more theatric effect / to slow down the drips like they've still got a
-// syrupy "drool string" attached (try much lower values like 2.0 to 3.0).
+// While the above G_CONST is correct for "real time" drips, you can dial it
+// back for a more theatric effect / to slow the drips like they've still got
+// a syrupy "drool string" attached (try much lower values like 2.0 to 3.0).
 
 // NeoPXL8 pin numbers
 #if defined(ARDUINO_ADAFRUIT_FEATHER_RP2040_SCORPIO)
@@ -104,6 +104,14 @@ struct {
   // NeoPXL8 output 7 is normally reserved for ground splats
   // You CAN add an eighth drip here, but then will not get splats
 };
+// There might be situations where the "splat" pixels are more easily
+// installed using a longer strand of fixed-spacing "pebble style" NeoPixels
+// rather than soldering up separate pixels for each one...and then lighting
+// up only specific pixels along that strand for splats, leaving the others
+// un-lit. This table holds indices for seven pixels along that strand
+// corresponding to the seven splats. Could also be used to reverse the
+// order of splat indices, etc.
+uint8_t splatmap[] = { 0, 1, 2, 3, 4, 5, 6 };
 
 #ifdef USE_HDR
 Adafruit_NeoPXL8HDR *pixels = NULL;
@@ -132,7 +140,8 @@ void setup() {
     drip[i].eventDurationReal = (float)drip[i].eventDurationUsec / 1000000.0;
     drip[i].splatStartUsec    = 0;
     drip[i].splatDurationUsec = 0;
-    if(drip[i].length > longestStrand) longestStrand = drip[i].length;
+    if(drip[i].length    > longestStrand) longestStrand = drip[i].length;
+    if((splatmap[i] + 1) > longestStrand) longestStrand = splatmap[i] + 1;
     // Randomize initial color:
     memcpy(drip[i].color, palette[random(drip[i].palette_min, drip[i].palette_max + 1)], sizeof palette[0]);
     memcpy(drip[i].splatColor, drip[i].color, sizeof palette[0]);
@@ -267,7 +276,7 @@ void loop() {
       dtUsec = t - drip[i].splatStartUsec; // Elapsed time, in microseconds, since start of splat
       if(dtUsec < drip[i].splatDurationUsec) {
         x = 1.0 - sqrt((float)dtUsec / (float)drip[i].splatDurationUsec);
-        set(7, i, i, x);
+        set(7, i, splatmap[i], x);
       }
     }
   }
@@ -322,7 +331,7 @@ void dripDraw(uint8_t dNum, float a, float b, bool fade) {
 
 // Set one pixel to a given brightness level (0.0 to 1.0).
 // Strand # and drip # are BOTH passed in because "splats" are always
-// on drip 7 but colors come from drip indices.
+// on strand 7 but colors come from drip indices.
 void set(uint8_t strand, uint8_t d, uint8_t pixel, float brightness) {
 #if !defined(USE_HDR) // NeoPXL8HDR does its own gamma correction, else...
   brightness = pow(brightness, GAMMA);
