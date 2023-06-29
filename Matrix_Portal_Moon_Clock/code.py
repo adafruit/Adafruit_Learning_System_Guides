@@ -140,7 +140,7 @@ class MoonData():
             lunar data), documented at:
             https://docs.api.met.no/doc/sunrise/celestial.html
         """
-        if days_ahead:
+        if days_ahead > 0:
             # Can't change attributes in struct_time, need to create a new
             # one which will roll the date ahead as needed. Convert to local
             # epoch seconds and back for the offset to work. :/
@@ -310,8 +310,8 @@ while True:
     gc.collect()
     NOW_LOCAL_SECONDS = time.time() # Current local epoch time in seconds
 
-    # Sync with time server every ~12 hours
-    if NOW_LOCAL_SECONDS - LAST_SYNC_LOCAL_SECONDS > 12 * 60 * 60:
+    # Sync with time server every ~3 hours
+    if NOW_LOCAL_SECONDS - LAST_SYNC_LOCAL_SECONDS > 3 * 60 * 60:
         try:
             DATETIME_LOCAL_STRUCT, UTC_OFFSET_STRING = update_system_time()
             LAST_SYNC_LOCAL_SECONDS = time.mktime(DATETIME_LOCAL_STRUCT)
@@ -331,7 +331,7 @@ while True:
     NOW_UTC_SECONDS = NOW_LOCAL_SECONDS - utc_offset_seconds
 
     # If PERIOD has expired, move data down and fetch new +24-hour data
-    if NOW_UTC_SECONDS >= PERIOD[1].end_utc_seconds:
+    if NOW_UTC_SECONDS >= PERIOD[0].end_utc_seconds:
         PERIOD[0] = PERIOD[1]
         PERIOD[1] = MoonData(time.localtime(), 1, UTC_OFFSET_STRING)
 
@@ -372,7 +372,7 @@ while True:
     # the future, and C) are closer than the last guess. What's left at the
     # end is the next rise or set time, and a flag whether the moon's
     # currently risen or not.
-    NEXT_EVENT_UTC_SECONDS = PERIOD[1].end_utc_seconds + 100000 # Way future
+    NEXT_EVENT_UTC_SECONDS = NOW_UTC_SECONDS + 300000 # Way future
     for DAY in PERIOD:
         if (DAY.rise_utc_seconds and
             NOW_UTC_SECONDS < DAY.rise_utc_seconds < NEXT_EVENT_UTC_SECONDS):
