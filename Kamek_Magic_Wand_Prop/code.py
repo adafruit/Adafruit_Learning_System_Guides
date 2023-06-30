@@ -26,7 +26,7 @@ external_power.direction = Direction.OUTPUT
 external_power.value = True
 
 # i2s playback
-wave_file = open("wand-mix-sfx.wav", "rb") # pylint: disable=consider-using-with
+wave_file = open("wand-mix-sfx.wav", "rb")
 wave = audiocore.WaveFile(wave_file)
 audio = audiobusio.I2SOut(board.I2S_BIT_CLOCK, board.I2S_WORD_SELECT, board.I2S_DATA)
 mixer = audiomixer.Mixer(voice_count=1, sample_rate=22050, channel_count=1,
