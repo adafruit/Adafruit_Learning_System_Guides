@@ -1,3 +1,8 @@
+// SPDX-FileCopyrightText: 2023 Kattni Rembor for Adafruit Industries
+// SPDX-FileCopyrightText: Earle F. Philhower, III
+//
+// SPDX-License-Identifier: MIT
+
 /*
   This example plays a tune through a mono amplifier using a simple sine wave.
 
