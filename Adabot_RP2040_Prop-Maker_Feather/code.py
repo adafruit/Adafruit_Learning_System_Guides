@@ -46,7 +46,6 @@ mixer = audiomixer.Mixer(voice_count=1, sample_rate=22050, channel_count=1,
 mixer.voice[0].level = 1
 track_number = 0
 wav_filename = wavs[track_number]
-# pylint: disable=consider-using-with
 wav_file = open(wav_filename, "rb")
 wave = audiocore.WaveFile(wav_file)
 audio.play(mixer)
