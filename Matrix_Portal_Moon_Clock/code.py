@@ -178,12 +178,13 @@ class MoonData():
                 interval = moon_data['when']['interval']
                 self.start_utc_seconds = parse_time_to_utc_seconds(interval[0])
                 self.end_utc_seconds = parse_time_to_utc_seconds(interval[1])
-                if 'moonrise' in properties:
+                # Thx user sandorcourane for the properties fixes!
+                if properties['moonrise']['time'] is not None:
                     self.rise_utc_seconds = parse_time_to_utc_seconds(
                         properties['moonrise']['time'])
                 else:
                     self.rise_utc_seconds = None
-                if 'moonset' in properties:
+                if properties['moonset']['time'] is not None:
                     self.set_utc_seconds = parse_time_to_utc_seconds(
                         properties['moonset']['time'])
                 else:
