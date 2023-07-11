@@ -127,7 +127,7 @@ while True:
         FRACTION = (3 * FRACTION ** 2) - (2 * FRACTION ** 3)
         SERVO.angle = POSITION + (NEXT_POSITION - POSITION) * FRACTION
     if adabot_talk:
-        wave = open_audio(random.randint(1, 7))
+        wave = open_audio(random.randint(1, 17))
         mixer.voice[0].play(wave)
         while mixer.playing:
             sparkle.animate()
