@@ -72,7 +72,7 @@ pixel.brightness = 1
 
 PIXELS = neopixel.NeoPixel(PIXEL_PIN, NUM_PIXELS, auto_write=False,
                            pixel_order=ORDER)
-LARSON = Comet(PIXELS, bounce=True, speed=0.7,
+LARSON = Comet(PIXELS, bounce=True, speed=0.07,
                tail_length=NUM_PIXELS//2,
                color=(BLUE[0] * BRIGHTNESS,
                       BLUE[1] * BRIGHTNESS,
