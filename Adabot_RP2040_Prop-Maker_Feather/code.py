@@ -16,6 +16,7 @@ from digitalio import DigitalInOut, Direction, Pull
 from adafruit_motor import servo
 from adafruit_led_animation.animation.comet import Comet
 from adafruit_led_animation.animation.pulse import Pulse
+from adafruit_led_animation.animation.sparkle import Sparkle
 from adafruit_led_animation.color import RED, BLUE, BLACK
 
 # enable external power pin
@@ -61,7 +62,7 @@ PIXEL_PIN = board.EXTERNAL_NEOPIXELS
 SERVO_PIN = board.EXTERNAL_SERVO
 NUM_PIXELS = 8
 ORDER = neopixel.GRB
-BRIGHTNESS = 0.6
+BRIGHTNESS = 0.3
 
 PWM = pwmio.PWMOut(SERVO_PIN, duty_cycle=2 ** 15, frequency=50)
 SERVO = servo.Servo(PWM)
@@ -71,12 +72,19 @@ pixel.brightness = 1
 
 PIXELS = neopixel.NeoPixel(PIXEL_PIN, NUM_PIXELS, auto_write=False,
                            pixel_order=ORDER)
-LARSON = Comet(PIXELS, bounce=True, speed=0.6/NUM_PIXELS,
+LARSON = Comet(PIXELS, bounce=True, speed=0.07,
                tail_length=NUM_PIXELS//2,
-               color=(RED[0] * BRIGHTNESS,
-                      RED[1] * BRIGHTNESS,
-                      RED[2] * BRIGHTNESS))
-pulse = Pulse(PIXELS, speed=0.1, color=BLUE, period=3)
+               color=(BLUE[0] * BRIGHTNESS,
+                      BLUE[1] * BRIGHTNESS,
+                      BLUE[2] * BRIGHTNESS))
+pulse = Pulse(PIXELS, speed=0.05,
+                color=(BLUE[0] * BRIGHTNESS,
+                       BLUE[1] * BRIGHTNESS,
+                       BLUE[2] * BRIGHTNESS), period=3)
+sparkle = Sparkle(PIXELS, speed=0.2,
+                color=(RED[0] * BRIGHTNESS,
+                       RED[1] * BRIGHTNESS,
+                       RED[2] * BRIGHTNESS), num_sparkles=10)
 
 SERVO.angle = POSITION = NEXT_POSITION = 90
 MOVING = False
@@ -101,14 +109,8 @@ while True:
         if z > 0.9:
             adabot_nap = True
             SERVO.angle = POSITION = NEXT_POSITION = 90
-            LARSON.color=(BLUE[0] * BRIGHTNESS,
-                          BLUE[1] * BRIGHTNESS,
-                          BLUE[2] * BRIGHTNESS)
         else:
             adabot_nap = False
-            LARSON.color=(RED[0] * BRIGHTNESS,
-                          RED[1] * BRIGHTNESS,
-                          RED[2] * BRIGHTNESS)
         if not adabot_nap:
             MOVING = not MOVING
             if MOVING:
@@ -125,18 +127,18 @@ while True:
         FRACTION = (3 * FRACTION ** 2) - (2 * FRACTION ** 3)
         SERVO.angle = POSITION + (NEXT_POSITION - POSITION) * FRACTION
     if adabot_talk:
-        wave = open_audio(random.randint(1, 7))
+        wave = open_audio(random.randint(1, 17))
         mixer.voice[0].play(wave)
         while mixer.playing:
-            LARSON.animate()
+            sparkle.animate()
         if not mixer.playing:
             adabot_talk = False
             PIXELS.fill(BLACK)
             PIXELS.show()
     elif adabot_nap:
-        LARSON.animate()
-    else:
         pulse.animate()
+    else:
+        LARSON.animate()
 
     if not switch.value and switch_state is False:
         PIXELS.fill(BLACK)
