@@ -24,11 +24,13 @@ if 0x0b in i2c_address_list:
     lc709203.pack_size = PackSize.MAH400
 
     device = lc709203
+    print("Battery monitor: LC709203")
 
 elif 0x36 in i2c_address_list:
     max17048 = MAX17048(board.I2C())
 
     device = max17048
+    print("Battery monitor: MAX17048")
 
 else:
     raise Exception("Battery monitor not found.")
