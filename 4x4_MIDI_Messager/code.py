@@ -177,7 +177,7 @@ async def send_midi(midi_msg):
         if midi_msg.send_msg is True:
             m = midi_msg.midi_index
             main_area.text = f"{cc_values[m]['cc_name']}"
-            msg_area.text = f"CC Msg: {cc_values[i]['cc_message']}"
+            msg_area.text = f"CC Msg: {cc_values[m]['cc_message']}"
             val_area.text = f"CC Val: {encoder_posititions[m]}"
             midi.send(ControlChange(cc_values[m]['cc_message'], encoder_posititions[m]))
             status_area.text = "Sent!"
