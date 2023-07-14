@@ -1,10 +1,9 @@
 name: Arduino Library CI
 
 on:
-  schedule:
-    - cron: 0 3 * * *
   workflow_dispatch:
   pull_request:
+  push:
 
 
 jobs:
