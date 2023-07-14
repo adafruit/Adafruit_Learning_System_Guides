@@ -53,7 +53,7 @@ display.show(splash)
 font = bitmap_font.load_font('/OCRA_small.pcf')
 # main label/MIDI message name text; centered
 main_area = label.Label(
-    font, text="4x4 MIDI Messager", color=0xFFFFFF)
+    font, text="4x4 MIDI Messenger", color=0xFFFFFF)
 main_area.anchor_point = (0.5, 0.0)
 main_area.anchored_position = (display.width / 2, 0)
 # MIDI message number text
