@@ -6,7 +6,7 @@
 # SD card. Default pinout matches the Audio BFF for QT Py S2, S3 and RP2040
 
 import os
-import time
+import random
 import audiocore
 import board
 import audiobusio
@@ -14,7 +14,6 @@ import audiomixer
 import adafruit_sdcard
 import storage
 import digitalio
-import random
 
 card_cs = digitalio.DigitalInOut(board.A0)
 card_cs.direction = digitalio.Direction.INPUT
@@ -36,6 +35,15 @@ for filename in sorted(os.listdir("/")):
     if filename.endswith(".wav") and not filename.startswith("."):
         wave_files.append(filename)
 
+def open_audio():
+    n = random.choice(wave_files)
+    print("playing", n)
+    f = open(n, "rb")
+    w = audiocore.WaveFile(f)
+    return f, w
+
+wavefile = 0
+
 while True:
     if not sdcard:
         try:
@@ -56,10 +64,7 @@ while True:
             if wavefile:
                 wavefile.close()
         else:
-            name = random.choice(wave_files)
-            print("playing", name)
-            wavefile = open(name, "rb")
-            wave = audiocore.WaveFile(wavefile)
+            wavefile, wave = open_audio()
             mixer = audiomixer.Mixer(voice_count=1,
                                      sample_rate=wave.sample_rate,
                                      channel_count=wave.channel_count,
