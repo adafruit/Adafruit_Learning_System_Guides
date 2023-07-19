@@ -18,6 +18,11 @@ from adafruit_display_text import label
 import adafruit_displayio_ssd1306
 import adafruit_midi
 from adafruit_midi.control_change import ControlChange
+import neopixel
+
+# default MIDI channel (1-16)
+midi_in_channel = 2
+midi_out_channel = 2
 
 # MIDI CC messages, values and names assigned to each encoder
 cc_values = [
@@ -32,7 +37,7 @@ cc_values = [
     {'cc_val': (1, 3), 'cc_message': (22), 'cc_name': "Mod Bank"},
     {'cc_val': (1, 3), 'cc_message': (23), 'cc_name': "Mode"},
     {'cc_val': (0, 1), 'cc_message': (102), 'cc_name': "Bypass/Engage"},
-    {'cc_val': (60, 200), 'cc_message': (93), 'cc_name': "Tap Tempo"},
+    {'cc_val': (0, 127), 'cc_message': (93), 'cc_name': "Tap Tempo"},
     {'cc_val': (0, 1), 'cc_message': (24), 'cc_name': "Loop (R Hold)"},
     {'cc_val': (0, 1), 'cc_message': (25), 'cc_name': "Scan (L Hold)"},
     {'cc_val': (0, 127), 'cc_message': (26), 'cc_name': "Clear (Both Hold)"},
@@ -78,8 +83,6 @@ splash.append(val_area)
 splash.append(status_area)
 # MIDI over UART setup for MIDI FeatherWing
 uart = busio.UART(board.TX, board.RX, baudrate=31250, timeout=0.001)
-midi_in_channel = 1
-midi_out_channel = 1
 midi = adafruit_midi.MIDI(
     midi_in=uart,
     midi_out=uart,
@@ -135,6 +138,9 @@ pix2 = adafruit_seesaw.neopixel.NeoPixel(ss2, 18, 4, auto_write = True)
 pix2.brightness = 0.5
 pix3 = adafruit_seesaw.neopixel.NeoPixel(ss3, 18, 4, auto_write = True)
 pix3.brightness = 0.5
+# onboard Feather neopixel
+pix_feather = neopixel.NeoPixel(board.NEOPIXEL, 1, auto_write = True)
+pix_feather.brightness = 0.5
 # encoder position arrays
 last_pos0 = [60, 60, 60, 60]
 last_pos1 = [60, 60, 60, 0]
@@ -155,6 +161,9 @@ for r in range(4):
     pix1[r] = colorwheel(c1[r])
     pix2[r] = colorwheel(c2[r])
     pix3[r] = colorwheel(c3[r])
+# feather neopixel color
+c_feather = 0
+pix_feather[0] = colorwheel(c_feather)
 # array of all 16 encoder positions
 encoder_posititions = [60, 60, 60, 60, 60, 60, 60, 60, 0, 0, 0, 120, 0, 0, 0, 0]
 
@@ -170,6 +179,7 @@ class NeoPixel_Attributes:
         self.color = c0
         self.index = 0
         self.strip = pix0
+        self.feather_color = c_feather
 
 async def send_midi(midi_msg):
     # sends MIDI message if send_msg is True/button pressed
@@ -191,7 +201,9 @@ async def send_midi(midi_msg):
 async def rainbows(the_color):
     # Updates colors of the neopixels to scroll through rainbow
     while True:
+        the_color.feather_color += 8
         the_color.strip[the_color.index] = colorwheel(the_color.color[the_color.index])
+        pix_feather[0] = colorwheel(the_color.feather_color)
         await asyncio.sleep(0)
 
 async def monitor_interrupts(pin0, pin1, pin2, pin3, the_color, midi_msg): #pylint: disable=too-many-statements
