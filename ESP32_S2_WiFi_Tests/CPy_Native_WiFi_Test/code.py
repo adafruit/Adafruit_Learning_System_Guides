@@ -30,12 +30,17 @@ print(f"Connected to {os.getenv('WIFI_SSID')}")
 print(f"My IP address: {wifi.radio.ipv4_address}")
 
 ping_ip = ipaddress.IPv4Address("8.8.8.8")
-ping = wifi.radio.ping(ip=ping_ip) * 1000
-if ping is not None:
-    print(f"Ping google.com: {ping} ms")
-else:
+ping = wifi.radio.ping(ip=ping_ip)
+
+# retry once if timed out
+if ping is None:
     ping = wifi.radio.ping(ip=ping_ip)
-    print(f"Ping google.com: {ping} ms")
+
+if ping is None:
+    print("Couldn't ping 'google.com' successfully")
+else:
+    # convert s to ms
+    print(f"Pinging 'google.com' took: {ping * 1000} ms")
 
 pool = socketpool.SocketPool(wifi.radio)
 requests = adafruit_requests.Session(pool, ssl.create_default_context())
