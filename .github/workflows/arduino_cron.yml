@@ -15,11 +15,11 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 2
-      - name: Check if scheduled
+      - name: Check if run by adabot
         id: check-cron
         run: |
           iscron=false
-          [[ "${{ github.event_name }}" == "schedule" ]] && iscron=true
+          [[ "${{ github.event_name }}" == "push" && "${{ github.actor }}" == "adabot" ]] && iscron=true
           echo "status=$iscron" >> "$GITHUB_OUTPUT"
       - name: Check if dispatched
         id: check-dispatch
