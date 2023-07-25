@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 import time
 import ssl
+import os
 from random import randint
 import microcontroller
 import socketpool
@@ -12,23 +13,12 @@ import neopixel
 import adafruit_minimqtt.adafruit_minimqtt as MQTT
 from adafruit_io.adafruit_io import IO_MQTT
 
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi and Adafruit IO credentials are kept in secrets.py - please add them there!")
-    raise
-
-# Add your Adafruit IO Username and Key to secrets.py
-# (visit io.adafruit.com if you need to create an account,
-# or if you need to obtain your Adafruit IO key.)
-aio_username = secrets["aio_username"]
-aio_key = secrets["aio_key"]
 
 # WiFi
 try:
-    print("Connecting to %s" % secrets["ssid"])
-    wifi.radio.connect(secrets["ssid"], secrets["password"])
-    print("Connected to %s!" % secrets["ssid"])
+    print("Connecting to %s" % os.getenv("WIFI_SSID"))
+    wifi.radio.connect(os.getenv("WIFI_SSID"), os.getenv("WIFI_PASSWORD"))
+    print("Connected to %s!" % os.getenv("WIFI_SSID"))
 # Wi-Fi connectivity fails with error messages, not specific errors, so this except is broad.
 except Exception as e:  # pylint: disable=broad-except
     print("Failed to connect to WiFi. Error:", e, "\nBoard will hard reset in 30 seconds.")
@@ -58,8 +48,8 @@ pool = socketpool.SocketPool(wifi.radio)
 # Initialize a new MQTT Client object
 mqtt_client = MQTT.MQTT(
     broker="io.adafruit.com",
-    username=secrets["aio_username"],
-    password=secrets["aio_key"],
+    username=os.getenv("AIO_USERNAME"),
+    password=os.getenv("AIO_KEY"),
     socket_pool=pool,
     ssl_context=ssl.create_default_context(),
 )
