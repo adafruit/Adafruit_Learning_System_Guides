@@ -43,6 +43,8 @@ def get_unique_pins():
             "RFM_IO3",
             "RFM_IO4",
             "RFM_IO5",
+            "TFT_I2C_POWER",
+            "NEOPIXEL_POWER",
         ]
         if p in dir(board)
     ]
