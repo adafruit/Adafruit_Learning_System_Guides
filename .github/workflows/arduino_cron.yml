@@ -19,7 +19,7 @@ jobs:
         id: check-cron
         run: |
           iscron=false
-          [[ "${{ github.event_name }}" == "push" && "${{ github.actor }}" == "adabot" ]] && iscron=true
+          [[ "${{ github.event_name }}" == "push" && "${{ github.actor }}" == "adafruit-adabot" ]] && iscron=true
           echo "status=$iscron" >> "$GITHUB_OUTPUT"
       - name: Check if dispatched
         id: check-dispatch
