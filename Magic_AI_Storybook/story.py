@@ -17,6 +17,7 @@ import board
 import digitalio
 import neopixel
 import openai
+import litellm
 import pygame
 from rpi_backlight import Backlight
 from adafruit_led_animation.animation.pulse import Pulse
@@ -729,7 +730,7 @@ class Book:
         response = ""
         print("Sending to chatGPT")
         # Package up the text to send to ChatGPT
-        completion = openai.ChatCompletion.create(
+        completion = litellm.completion(
             model=CHATGPT_MODEL,
             messages=[
                 {"role": "system", "content": SYSTEM_ROLE},

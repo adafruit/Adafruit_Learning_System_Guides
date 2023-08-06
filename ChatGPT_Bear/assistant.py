@@ -15,6 +15,7 @@ from tempfile import NamedTemporaryFile
 import azure.cognitiveservices.speech as speechsdk
 import speech_recognition as sr
 import openai
+import litellm
 
 import board
 import digitalio
@@ -60,7 +61,7 @@ speech_config.speech_synthesis_voice_name = AZURE_SPEECH_VOICE
 
 
 def sendchat(prompt):
-    completion = openai.ChatCompletion.create(
+    completion = litellm.completion(
         model=CHATGPT_MODEL,
         messages=[
             {"role": "system", "content": SYSTEM_ROLE},
