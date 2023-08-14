@@ -22,15 +22,15 @@
 
  */
 
-#include <SPI.h>
-#include <SD.h>
+#include "SdFat.h"
+SdFat sd;
 
-#define SD_FAT_TYPE 3
+#define SD_FAT_TYPE 1
 
 // default CS pin is 23 for Metro RP2040
 #define SD_CS_PIN 23
 
-File myFile;
+File32 myFile;
 
 void setup() {
   // Open serial communications and wait for port to open:
@@ -42,7 +42,7 @@ void setup() {
 
   Serial.print("Initializing SD card...");
 
-  if (!SD.begin(SD_CS_PIN)) {
+  if (!sd.begin(SD_CS_PIN)) {
     Serial.println("initialization failed!");
     return;
   }
@@ -50,7 +50,7 @@ void setup() {
 
   // open the file. note that only one file can be open at a time,
   // so you have to close this one before opening another.
-  myFile = SD.open("test.txt", FILE_WRITE);
+  myFile.open("test.txt", FILE_WRITE);
 
   // if the file opened okay, write to it:
   if (myFile) {
@@ -66,7 +66,7 @@ void setup() {
   }
 
   // re-open the file for reading:
-  myFile = SD.open("test.txt");
+  myFile.open("test.txt");
   if (myFile) {
     Serial.println("test.txt:");
 
