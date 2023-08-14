@@ -4,47 +4,45 @@
 /*
   SD card read/write
 
-  This example shows how to read and write data to and from an SD card file
-  The circuit:
-   SD card attached to SPI bus as follows:
-   ** MISO - pin 20
-   ** MOSI - pin 19
-   ** CS   - pin 23
-   ** SCK  - pin 18
+ This example shows how to read and write data to and from an SD card file
+ The circuit:
+ * SD card attached to SPI0 bus as follows:
+ ** MOSI - pin 19
+ ** MISO - pin 20
+ ** CLK - pin 18
 
-  created   Nov 2010
-  by David A. Mellis
-  modified 9 Apr 2012
-  by Tom Igoe
+ created   Nov 2010
+ by David A. Mellis
+ modified 9 Apr 2012
+ by Tom Igoe
+ modified 14 Feb 2023
+ by Liz Clark
 
-  This example code is in the public domain.
+ This example code is in the public domain.
 
-*/
-
-// SPI0 pins for Metro RP2040
-// Pins connected to onboard SD card slot
-const int _MISO = 20;
-const int _MOSI = 19;
-const int _CS = 23;
-const int _SCK = 18;
+ */
 
 #include <SPI.h>
 #include <SD.h>
+
+#define SD_FAT_TYPE 3
+
+// default CS pin is 23 for Metro RP2040
+#define SD_CS_PIN 23
 
 File myFile;
 
 void setup() {
   // Open serial communications and wait for port to open:
   Serial.begin(115200);
+  while (!Serial) {
+    ; // wait for serial port to connect. Needed for native USB port only
+  }
+
 
   Serial.print("Initializing SD card...");
 
-  // Ensure the SPI pinout the SD card is connected to is configured properly
-  SPI.setRX(_MISO);
-  SPI.setTX(_MOSI);
-  SPI.setSCK(_SCK);
-
-  if (!SD.begin(_CS)) {
+  if (!SD.begin(SD_CS_PIN)) {
     Serial.println("initialization failed!");
     return;
   }
@@ -57,6 +55,7 @@ void setup() {
   // if the file opened okay, write to it:
   if (myFile) {
     Serial.print("Writing to test.txt...");
+    myFile.println("testing 1, 2, 3.");
     myFile.println("hello metro rp2040!");
     // close the file:
     myFile.close();
