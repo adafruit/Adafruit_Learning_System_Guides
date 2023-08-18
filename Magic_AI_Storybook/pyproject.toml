@@ -20,6 +20,10 @@ dependencies = [
     "adafruit-circuitpython-neopixel>=6.3.9",
     "rpi-backlight>=2.6.0",
 ]
+
+[project.scripts]
+"magicbook-story" = "magic_ai_storybook:story.main"
+
 [build-system]
 requires = ["setuptools>=61", "wheel"]
 build-backend = "setuptools.build_meta"

@@ -51,7 +51,7 @@ def main():
 Comment=Run {APP_TITLE}
 Terminal={"true" if RUN_IN_TERMINAL else "false"}
 Name={APP_TITLE}
-Exec=sudo -E env PATH=$PATH {PYTHON_PATH} {APP_PATH}
+Exec=sudo /root/.local/bin/magicbook-story
 Type=Application
 Icon={APP_ICON}
 """
