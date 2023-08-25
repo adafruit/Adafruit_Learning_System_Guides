@@ -8,9 +8,8 @@ import board
 import audiocore
 import audiobusio
 import audiomixer
-import pwmio
 import adafruit_ds3231
-from digitalio import DigitalInOut, Direction, Pull
+from digitalio import DigitalInOut, Direction
 import neopixel
 import keypad
 
