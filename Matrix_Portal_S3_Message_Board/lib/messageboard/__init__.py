@@ -56,6 +56,10 @@ class MessageBoard:
         anim_func = getattr(animation, animation_function)
         anim_func(message, **kwargs)
 
+    def set_message_position(self, x, y):
+        """Set the position of the message on the display"""
+        self._position = (x, y)
+
     def _draw(
         self,
         image,
