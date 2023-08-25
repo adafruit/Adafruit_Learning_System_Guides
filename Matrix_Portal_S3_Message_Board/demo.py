@@ -13,13 +13,8 @@ messageboard = MessageBoard(matrix)
 messageboard.set_background("images/background.bmp")
 
 fontpool = FontPool()
-fontpool.add_font("arial", "fonts/Arial-10.pcf")
 fontpool.add_font("comic", "fonts/Comic-10.pcf")
 fontpool.add_font("dejavu", "fonts/DejaVuSans-10.pcf")
-
-message = Message(fontpool.find_font("terminal"), opacity=0.8)
-message.add_image("images/maskedstar.bmp")
-message.add_text("Hello World!", color=0xFFFF00, x_offset=2, y_offset=2)
 
 message1 = Message(fontpool.find_font("dejavu"))
 
