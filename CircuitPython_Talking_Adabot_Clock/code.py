@@ -118,7 +118,7 @@ def prep_clock(hour_num, minute_num):
         print(minute_num)
         # if it's a single digit number, bring in the "oh" wave file
         if minute_num <= 9:
-            mm = min_sounds.index(f'/clock_sounds/m0x.wav')
+            mm = min_sounds.index('/clock_sounds/m0x.wav')
             open_audio(min_sounds, mm)
         m = min_sounds.index(f'/clock_sounds/m{minute_num}.wav')
     # otherwise, for minutes 21-59 that are not divisible by 10
