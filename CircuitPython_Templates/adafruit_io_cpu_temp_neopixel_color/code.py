@@ -16,9 +16,9 @@ from adafruit_io.adafruit_io import IO_MQTT
 
 # WiFi
 try:
-    print("Connecting to %s" % os.getenv("WIFI_SSID"))
-    wifi.radio.connect(os.getenv("WIFI_SSID"), os.getenv("WIFI_PASSWORD"))
-    print("Connected to %s!" % os.getenv("WIFI_SSID"))
+    print("Connecting to %s" % os.getenv("CIRCUITPY_WIFI_SSID"))
+    wifi.radio.connect(os.getenv("CIRCUITPY_WIFI_SSID"), os.getenv("CIRCUITPY_WIFI_PASSWORD"))
+    print("Connected to %s!" % os.getenv("CIRCUITPY_WIFI_SSID"))
 # Wi-Fi connectivity fails with error messages, not specific errors, so this except is broad.
 except Exception as e:  # pylint: disable=broad-except
     print("Failed to connect to WiFi. Error:", e, "\nBoard will hard reset in 30 seconds.")
