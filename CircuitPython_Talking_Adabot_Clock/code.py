@@ -88,9 +88,11 @@ def prep_clock(hour_num, minute_num):
     # queues "the time is.."
     open_audio(bookend_sounds, 1)
     # convert 24 hour time from RTC to 12 hour
-    if hour_num > 12:
-        hour_num = hour_num - 12
-        # set PM
+    if hour_num >= 12:
+        # convert 24 hour to 12 hour
+        if hour_num > 12:
+            hour_num = hour_num - 12
+        # set to PM
         ampm_num = 3
     # otherwise its the morning
     else:
