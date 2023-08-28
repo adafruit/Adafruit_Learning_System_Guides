@@ -14,10 +14,13 @@ messageboard.set_background("images/background.bmp")
 fontpool = FontPool()
 fontpool.add_font("arial", "fonts/Arial-10.pcf")
 
+# Create the message ahead of time
+message = Message(fontpool.find_font("arial"), mask_color=0xFF00FF, opacity=0.8)
+message.add_image("images/maskedstar.bmp")
+message.add_text("Hello World!", color=0xFFFF00, x_offset=2, y_offset=2)
+
 while True:
-    message = Message(fontpool.find_font("arial"), mask_color=0xFF00FF, opacity=0.8)
-    message.add_image("images/maskedstar.bmp")
-    message.add_text("Hello World!", color=0xFFFF00, x_offset=2, y_offset=2)
+    # Animate the message
     messageboard.animate(message, "Scroll", "in_from_right")
     time.sleep(1)
     messageboard.animate(message, "Scroll", "out_to_left")

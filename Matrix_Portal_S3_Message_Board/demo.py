@@ -31,34 +31,31 @@ message4 = Message(fontpool.find_font("arial"))
 message4.add_text("Buy Electronics", color=0xFFFFFF)
 
 while True:
+    # Set message 1 content and animate
     message1.clear()
     message1.add_text("Scroll Text In", color=0xFF0000)
-
     messageboard.animate(message1, "Scroll", "in_from_left")
     time.sleep(1)
+
+    # Change message 1 content and animate
     message1.clear()
     message1.add_text("Change Messages")
     messageboard.animate(message1, "Static", "show")
     time.sleep(1)
+
+    # Change message 1 content again and animate
     message1.clear()
     message1.add_text("And Scroll Out")
-
     messageboard.animate(message1, "Static", "show")
     messageboard.animate(message1, "Scroll", "out_to_right")
     time.sleep(1)
 
+    # Change message 1 content a final time and animate
     message1.clear()
     message1.add_text("Or more effects like looping   ", color=0xFFFF00)
-    messageboard.animate(
-        message1, "Split", "in_vertically"
-    )  # Split never completely joins
-    messageboard.animate(
-        message1, "Loop", "left"
-    )  # Text too high (probably from split)
-    messageboard.animate(
-        message1, "Static", "flash", count=3
-    )  # Flashes in weird positions
-
+    messageboard.animate(message1, "Split", "in_vertically")
+    messageboard.animate(message1, "Loop", "left")
+    messageboard.animate(message1, "Static", "flash", count=3)
     messageboard.animate(message1, "Split", "out_vertically")
     time.sleep(1)
 
