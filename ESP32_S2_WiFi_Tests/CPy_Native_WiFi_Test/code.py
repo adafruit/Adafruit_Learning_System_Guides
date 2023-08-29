@@ -24,9 +24,9 @@ for network in wifi.radio.start_scanning_networks():
                                              network.rssi, network.channel))
 wifi.radio.stop_scanning_networks()
 
-print(f"Connecting to {os.getenv('WIFI_SSID')}")
-wifi.radio.connect(os.getenv("WIFI_SSID"), os.getenv("WIFI_PASSWORD"))
-print(f"Connected to {os.getenv('WIFI_SSID')}")
+print(f"Connecting to {os.getenv('CIRCUITPY_WIFI_SSID')}")
+wifi.radio.connect(os.getenv("CIRCUITPY_WIFI_SSID"), os.getenv("CIRCUITPY_WIFI_PASSWORD"))
+print(f"Connected to {os.getenv('CIRCUITPY_WIFI_SSID')}")
 print(f"My IP address: {wifi.radio.ipv4_address}")
 
 ping_ip = ipaddress.IPv4Address("8.8.8.8")
