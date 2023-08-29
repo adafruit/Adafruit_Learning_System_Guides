@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: Copyright (c) 2021 Melissa LeBlanc-Williams for Adafruit Industries
 #
 # SPDX-License-Identifier: MIT
+import os
 import time
 import json
 from adafruit_display_shapes.circle import Circle
@@ -15,12 +16,6 @@ LIGHT_STATE_TOPIC = "funhouse/light/state"
 LIGHT_COMMAND_TOPIC = "funhouse/light/set"
 INITIAL_LIGHT_COLOR = 0x008000
 USE_FAHRENHEIT = True
-
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
 
 funhouse = FunHouse(default_bg=0x0F0F00)
 funhouse.peripherals.dotstars.fill(INITIAL_LIGHT_COLOR)
@@ -73,38 +68,19 @@ funhouse.display.show(funhouse.splash)
 status = Circle(229, 10, 10, fill=0xFF0000, outline=0x880000)
 funhouse.splash.append(status)
 
-def update_enviro():
-    global environment
-
-    temp = funhouse.peripherals.temperature
-    unit = "C"
-    if USE_FAHRENHEIT:
-        temp = temp * (9 / 5) + 32
-        unit = "F"
-
-    environment["temperature"] = temp
-    environment["pressure"] = funhouse.peripherals.pressure
-    environment["humidity"] = funhouse.peripherals.relative_humidity
-    environment["light"] = funhouse.peripherals.light
-
-    funhouse.set_text("{:.1f}{}".format(environment["temperature"], unit), temp_label)
-    funhouse.set_text("{:.1f}%".format(environment["humidity"]), hum_label)
-    funhouse.set_text("{}hPa".format(environment["pressure"]), pres_label)
-
-
-def connected(client, userdata, result, payload):
+def connected(client, _userdata, _result, _payload):
     status.fill = 0x00FF00
     status.outline = 0x008800
     print("Connected to MQTT! Subscribing...")
     client.subscribe(LIGHT_COMMAND_TOPIC)
 
 
-def disconnected(client):
+def disconnected(_client):
     status.fill = 0xFF0000
     status.outline = 0x880000
 
 
-def message(client, topic, payload):
+def message(_client, topic, payload):
     print("Topic {0} received new value: {1}".format(topic, payload))
     if topic == LIGHT_COMMAND_TOPIC:
         settings = json.loads(payload)
@@ -122,29 +98,28 @@ def message(client, topic, payload):
 
 def publish_light_state():
     funhouse.peripherals.led = True
-    output = {
+    publish_output = {
         "brightness": round(funhouse.peripherals.dotstars.brightness * 255),
         "state": "on" if funhouse.peripherals.dotstars.brightness > 0 else "off",
         "color": funhouse.peripherals.dotstars[0],
     }
     # Publish the Dotstar State
     print("Publishing to {}".format(LIGHT_STATE_TOPIC))
-    funhouse.network.mqtt_publish(LIGHT_STATE_TOPIC, json.dumps(output))
+    funhouse.network.mqtt_publish(LIGHT_STATE_TOPIC, json.dumps(publish_output))
     funhouse.peripherals.led = False
-
 
 # Initialize a new MQTT Client object
 funhouse.network.init_mqtt(
-    secrets["mqtt_broker"],
-    secrets["mqtt_port"],
-    secrets["mqtt_username"],
-    secrets["mqtt_password"],
+    os.getenv("MQTT_BROKER"),
+    os.getenv("MQTT_PORT"),
+    os.getenv("MQTT_USERNAME"),
+    os.getenv("MQTT_PASSWORD"),
 )
 funhouse.network.on_mqtt_connect = connected
 funhouse.network.on_mqtt_disconnect = disconnected
 funhouse.network.on_mqtt_message = message
 
-print("Attempting to connect to {}".format(secrets["mqtt_broker"]))
+print("Attempting to connect to {}".format(os.getenv("MQTT_BROKER")))
 funhouse.network.mqtt_connect()
 
 last_publish_timestamp = None
@@ -162,7 +137,6 @@ if ENABLE_PIR:
     last_peripheral_state["pir_sensor"] = funhouse.peripherals.pir_sensor
 
 environment = {}
-update_enviro()
 last_environment_timestamp = time.monotonic()
 
 # Provide Initial light state
@@ -172,7 +146,20 @@ while True:
     if not environment or (
         time.monotonic() - last_environment_timestamp > ENVIRONMENT_CHECK_DELAY
     ):
-        update_enviro()
+        temp = funhouse.peripherals.temperature
+        unit = "C"
+        if USE_FAHRENHEIT:
+            temp = temp * (9 / 5) + 32
+            unit = "F"
+
+        environment["temperature"] = temp
+        environment["pressure"] = funhouse.peripherals.pressure
+        environment["humidity"] = funhouse.peripherals.relative_humidity
+        environment["light"] = funhouse.peripherals.light
+
+        funhouse.set_text("{:.1f}{}".format(environment["temperature"], unit), temp_label)
+        funhouse.set_text("{:.1f}%".format(environment["humidity"]), hum_label)
+        funhouse.set_text("{}hPa".format(environment["pressure"]), pres_label)
         last_environment_timestamp = time.monotonic()
     output = environment
 
