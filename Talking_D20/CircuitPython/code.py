@@ -115,7 +115,6 @@ if BATT_SENSE:
 # FUNCTIONS ----------------------------------------------------------------
 
 
-# pylint: disable=consider-using-with # (non-blocking doesn't like 'with')
 def play(index, block=True):
     """Play one WAV file from the WAV_FILES table. Pass in table index (0-n)
     and optional 'block' flag (if True, function blocks until audio is
