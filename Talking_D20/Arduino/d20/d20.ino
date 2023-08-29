@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2017 Phillip Burgess for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Talking D20 sketch.  Uses the following Adafruit parts:
 //
 // - Pro Trinket 3V or 5V (adafruit.com/product/2010 or 2000)
