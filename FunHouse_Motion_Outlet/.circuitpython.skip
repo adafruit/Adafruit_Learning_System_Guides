@@ -1,8 +1,0 @@
-FunHouse_Motion_Outlet/code.py 64: Trailing whitespace (trailing-whitespace)
-FunHouse_Motion_Outlet/code.py 113: Trailing whitespace (trailing-whitespace)
-FunHouse_Motion_Outlet/code.py 23: Using the global statement (global-statement)
-FunHouse_Motion_Outlet/code.py 43: Unused argument 'userdata' (unused-argument)
-FunHouse_Motion_Outlet/code.py 43: Unused argument 'result' (unused-argument)
-FunHouse_Motion_Outlet/code.py 43: Unused argument 'payload' (unused-argument)
-FunHouse_Motion_Outlet/code.py 49: Unused argument 'client' (unused-argument)
-FunHouse_Motion_Outlet/code.py 53: Unused argument 'client' (unused-argument)
