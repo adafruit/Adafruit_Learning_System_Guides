@@ -13,7 +13,7 @@ from adafruit_funhouse import FunHouse
 OUTLET_STATE_TOPIC = "funhouse/outlet/state"
 OUTLET_COMMAND_TOPIC = "funhouse/outlet/set"
 MOTION_TIMEOUT = 300  # Timeout in seconds
-USE_MQTT = False
+USE_MQTT = True
 
 # Use dict to avoid reassigning the variable
 timestamps = {
