@@ -4,14 +4,14 @@
 """
 Home Assistant Remote Procedure Call for MacroPad.
 """
+import os
 import time
 import displayio
 import terminalio
 from adafruit_display_shapes.rect import Rect
-from rpc import RpcClient, RpcError
 from adafruit_display_text import label
 from adafruit_macropad import MacroPad
-from secrets import secrets
+from rpc import RpcClient, RpcError
 
 macropad = MacroPad()
 rpc = RpcClient()
@@ -22,27 +22,40 @@ ENCODER_ITEM = 0
 KEY_LABELS = ("Demo", "Office")
 UPDATE_DELAY = 0.25
 NEOPIXEL_COLORS = {
-    "OFF": 0xff0000,
-    "ON": 0x00ff00,
+    "OFF": 0xFF0000,
+    "ON": 0x00FF00,
 }
 
 class MqttError(Exception):
     """For MQTT Specific Errors"""
-    pass
+
 # Set up displayio group with all the labels
 group = displayio.Group()
 for key_index in range(12):
     x = key_index % 3
     y = key_index // 3
-    group.append(label.Label(terminalio.FONT, text=(str(KEY_LABELS[key_index]) if key_index < len(KEY_LABELS) else ''), color=0xFFFFFF,
-                             anchored_position=((macropad.display.width - 1) * x / 2,
-                                                macropad.display.height - 1 -
-                                                (3 - y) * 12),
-                             anchor_point=(x / 2, 1.0)))
+    group.append(
+        label.Label(
+            terminalio.FONT,
+            text=(str(KEY_LABELS[key_index]) if key_index < len(KEY_LABELS) else ""),
+            color=0xFFFFFF,
+            anchored_position=(
+                (macropad.display.width - 1) * x / 2,
+                macropad.display.height - 1 - (3 - y) * 12,
+            ),
+            anchor_point=(x / 2, 1.0),
+        )
+    )
 group.append(Rect(0, 0, macropad.display.width, 12, fill=0xFFFFFF))
-group.append(label.Label(terminalio.FONT, text='Home Assistant', color=0x000000,
-                         anchored_position=(macropad.display.width//2, -2),
-                         anchor_point=(0.5, 0.0)))
+group.append(
+    label.Label(
+        terminalio.FONT,
+        text="Home Assistant",
+        color=0x000000,
+        anchored_position=(macropad.display.width // 2, -2),
+        anchor_point=(0.5, 0.0),
+    )
+)
 macropad.display.show(group)
 
 def rpc_call(function, *args, **kwargs):
@@ -54,16 +67,22 @@ def rpc_call(function, *args, **kwargs):
     return response["return_val"]
 
 def mqtt_init():
-    rpc_call("mqtt_init", secrets["mqtt_broker"], username=secrets["mqtt_username"], password=secrets["mqtt_password"], port=secrets["mqtt_port"])
+    rpc_call(
+        "mqtt_init",
+        os.getenv("MQTT_BROKER"),
+        username=os.getenv("MQTT_USERNAME"),
+        password=os.getenv("MQTT_PASSWORD"),
+        port=os.getenv("MQTT_PORT"),
+    )
     rpc_call("mqtt_connect")
 
-def update_key(key_number):
-    if key_number < len(SUBSCRIBE_TOPICS):
-        switch_state = rpc_call("mqtt_get_last_value", SUBSCRIBE_TOPICS[key_number])
+def update_key(key_id):
+    if key_id < len(SUBSCRIBE_TOPICS):
+        switch_state = rpc_call("mqtt_get_last_value", SUBSCRIBE_TOPICS[key_id])
         if switch_state is not None:
-            macropad.pixels[key_number] = NEOPIXEL_COLORS[switch_state]
+            macropad.pixels[key_id] = NEOPIXEL_COLORS[switch_state]
         else:
-            macropad.pixels[key_number] = 0
+            macropad.pixels[key_id] = 0
 
 server_is_running = False
 print("Waiting for server...")
@@ -93,7 +112,11 @@ while True:
         last_macropad_encoder_value = macropad.encoder
 
     macropad.encoder_switch_debounced.update()
-    if macropad.encoder_switch_debounced.pressed and "key_number" not in output and ENCODER_ITEM is not None:
+    if (
+        macropad.encoder_switch_debounced.pressed
+        and "key_number" not in output
+        and ENCODER_ITEM is not None
+    ):
         output["key_number"] = ENCODER_ITEM
 
     if output:
