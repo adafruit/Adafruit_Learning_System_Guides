@@ -11,7 +11,7 @@ import terminalio
 from adafruit_display_shapes.rect import Rect
 from adafruit_display_text import label
 from adafruit_macropad import MacroPad
-from rpc import RpcClient, RpcError
+from rpc import RpcClient, RpcError, MqttError
 
 macropad = MacroPad()
 rpc = RpcClient()
@@ -25,9 +25,6 @@ NEOPIXEL_COLORS = {
     "OFF": 0xFF0000,
     "ON": 0x00FF00,
 }
-
-class MqttError(Exception):
-    """For MQTT Specific Errors"""
 
 # Set up displayio group with all the labels
 group = displayio.Group()

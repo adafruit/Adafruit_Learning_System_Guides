@@ -25,6 +25,9 @@ DATA_TIMEOUT = 0.5
 class RpcError(Exception):
     """For RPC Specific Errors"""
 
+class MqttError(Exception):
+    """For MQTT Specific Errors"""
+
 class _Rpc:
     def __init__(self):
         self._serial = None

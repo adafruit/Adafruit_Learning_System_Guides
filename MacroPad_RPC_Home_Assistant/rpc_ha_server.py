@@ -7,7 +7,7 @@ import json
 import ssl
 import socket
 import adafruit_minimqtt.adafruit_minimqtt as MQTT
-from rpc import RpcServer
+from rpc import RpcServer, MqttError
 
 mqtt_status = {
     "connected": False,
@@ -26,9 +26,6 @@ def disconnect(_mqtt_client, _userdata, _rc):
 
 def message(_client, topic, payload):
     last_mqtt_messages[topic] = payload
-
-class MqttError(Exception):
-    """For MQTT Specific Errors"""
 
 # Default to 1883 since SSL on CPython is not currently supported
 def mqtt_init(broker, port=1883, username=None, password=None):
