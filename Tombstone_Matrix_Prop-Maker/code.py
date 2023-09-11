@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2023 Liz Clark for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import os
 import random
 import board
