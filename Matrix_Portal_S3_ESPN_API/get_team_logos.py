@@ -41,7 +41,7 @@ def process(filename, output_8_bit=True, passthrough=PASSTHROUGH):
        paletted mode after quantization/dithering. If passthrough (a list
        of 3-tuple RGB values) is provided, dithering won't be applied to
        colors in the provided list, they'll be quantized only (allows areas
-       of the image to remain clean and dither-free). 
+       of the image to remain clean and dither-free).
     """
     img = Image.open(filename).convert('RGB')
     err_next_pixel = (0, 0, 0)
