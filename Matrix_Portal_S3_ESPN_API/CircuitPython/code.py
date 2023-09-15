@@ -174,6 +174,7 @@ def convert_date_format(date, tz_information):
     # Convert 24-hour format to 12-hour format and determine AM/PM
     am_pm = "AM" if hour < 12 else "PM"
     hour_12 = hour if hour <= 12 else hour - 12
+    minute = minute if minute >= 10 else f"0{minute}"
     # Determine the timezone abbreviation based on the offset
     time_zone_str = tz_information[1]
     return f"{month}/{day} - {hour_12}:{minute} {am_pm} {time_zone_str}"
