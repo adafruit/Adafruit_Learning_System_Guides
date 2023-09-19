@@ -188,6 +188,7 @@ def get_data(data, team, logo, group):
     names = []
     scores = []
     info = []
+    index = 0
     # the team you are following's logo
     bitmap0 = displayio.OnDiskBitmap(logo)
     grid0 = displayio.TileGrid(bitmap0, pixel_shader=bitmap0.pixel_shader, x = 2)
@@ -227,11 +228,40 @@ def get_data(data, team, logo, group):
             # gets info on game
             info.append(event["status"]["type"]["shortDetail"])
         break
+    if playing and len(names) != 2:
+        print("did not get expected response, fetching full JSON..")
+        try:
+            resp.close()
+        # pylint: disable=broad-except
+        except Exception as e:
+            print(f"{e}, continuing..")
+            # pylint: disable=unnecessary-pass
+            pass
+        names.clear()
+        scores.clear()
+        info.clear()
+        resp = requests.get(data)
+        response_as_json = resp.json()
+        for e in response_as_json["events"]:
+            if team[0] in e["name"]:
+                print(index)
+                info.append(response_as_json["events"][0]["date"])
+                names.append(response_as_json["events"][0]["competitions"]
+                             [0]["competitors"][0]["team"]["abbreviation"])
+                names.append(response_as_json["events"][0]["competitions"]
+                             [0]["competitors"][1]["team"]["abbreviation"])
+                scores.append(response_as_json["events"][0]["competitions"]
+                             [0]["competitors"][0]["score"])
+                scores.append(response_as_json["events"][0]["competitions"]
+                             [0]["competitors"][1]["score"])
+                info.append(response_as_json["events"][0]["status"]["type"]["shortDetail"])
+            else:
+                index += 1
     # debug printing
     print(names)
     print(scores)
     print(info)
-    if playing:
+    if playing and len(names) == 2:
         # pull out the date
         date = info[0]
         # convert it to be readable
@@ -301,7 +331,16 @@ def get_data(data, team, logo, group):
         group.append(vs_text)
         group.append(info_text)
     # close the response
-    resp.close()
+    try:
+        # sometimes an OSError is thrown:
+        # "invalid syntax for integer with base 16"
+        # the code can continue depite it though
+        resp.close()
+    # pylint: disable=broad-except
+    except Exception as e:
+        print(f"{e}, continuing..")
+        # pylint: disable=unnecessary-pass
+        pass
     pixel.fill((0, 0, 0))
     # return that data was just fetched
     fetch_status = True
