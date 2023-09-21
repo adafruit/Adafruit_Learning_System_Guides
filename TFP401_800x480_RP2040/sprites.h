@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 PaintYourDragon for Adafruit
+//
+// SPDX-License-Identifier: MIT
+
 // Graphics data for the aquarium PicoDVI example.
 // Unlike the flying toasters demo, this one uses a larger color palette
 // and 2:1 packing as described as a possible upgrade in that code is not

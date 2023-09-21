@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 PaintYourDragon for Adafruit
+//
+// SPDX-License-Identifier: MIT
+
 // "Aquarium" example for PicoDVI library. If just starting out,
 // see the 8bit_double_buffer which explains the PicoDVI groundwork.
 // Comments in THIS file are mostly distinct & new concepts.
