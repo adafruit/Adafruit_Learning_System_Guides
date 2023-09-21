@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2023 Trevor Beaton for Adafruit Industries
 #
 # SPDX-License-Identifier: MIT
+import os
 import time
 import ssl
 import math
@@ -13,25 +14,18 @@ from adafruit_io.adafruit_io import IO_MQTT
 from adafruit_adxl34x import ADXL345
 from adafruit_lc709203f import LC709203F, PackSize
 
-
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi and Adafruit IO credentials are kept in secrets.py - please add them there!")
-    raise
-
-aio_username = secrets["aio_username"]
-aio_key = secrets["aio_key"]
+aio_username = os.getenv('aio_username')
+aio_key = os.getenv('aio_key')
 
 # Wi-Fi
 try:
-    print("Connecting to %s" % secrets["ssid"])
-    wifi.radio.connect(secrets["ssid"], secrets["password"])
-    print("Connected to %s!" % secrets["ssid"])
+    print("Connecting to %s" % os.getenv('CIRCUITPY_WIFI_SSID'))
+    wifi.radio.connect(os.getenv('CIRCUITPY_WIFI_SSID'), os.getenv('CIRCUITPY_WIFI_PASSWORD'))
+    print("Connected to %s!" % os.getenv('CIRCUITPY_WIFI_SSID'))
 # Wi-Fi connectivity fails with error messages, not specific errors, so this except is broad.
 except Exception as e:  # pylint: disable=broad-except
-    print("Failed to connect to WiFi. Error:", e, "\nBoard will hard reset in 5 seconds.")
-    time.sleep(5)
+    print("Failed to connect to WiFi. Error:", e, "\nBoard will hard reset in 30 seconds.")
+    time.sleep(30)
     microcontroller.reset()
 
 # Create a socket pool
@@ -40,8 +34,8 @@ pool = socketpool.SocketPool(wifi.radio)
 # Initialize a new MQTT Client object
 mqtt_client = MQTT.MQTT(
     broker="io.adafruit.com",
-    username=secrets["aio_username"],
-    password=secrets["aio_key"],
+    username= aio_username,
+    password= aio_key,
     socket_pool=pool,
     ssl_context=ssl.create_default_context(),
 )
@@ -50,7 +44,6 @@ mqtt_client = MQTT.MQTT(
 io = IO_MQTT(mqtt_client)
 
 try:
-    # If Adafruit IO is not connected...
     if not io.is_connected:
     # Connect the client to the MQTT broker.
         print("Connecting to Adafruit IO...")
@@ -58,18 +51,20 @@ try:
         print("Connected to Adafruit IO!")
 except Exception as e:  # pylint: disable=broad-except
     print("Failed to get or send data, or connect. Error:", e,
-    "\nBoard will hard reset in 30 seconds.")
+    "\nBoard will hard reset in 30 seconds./n")
     time.sleep(30)
     microcontroller.reset()
 
-threshold = 25 # set threshold value here
+threshold = 20 # set threshold value here
 time_interval = 0.5 # set the time interval in seconds
 
 # create the I2C bus object
 i2c = board.STEMMA_I2C()
+
 # For ADXL345
 accelerometer = ADXL345(i2c)
 
+# To monitor the battery
 battery_monitor = LC709203F(i2c)
 battery_monitor.pack_size = PackSize.MAH400
 

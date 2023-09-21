@@ -4,7 +4,8 @@
 
 """
 MOON PHASE CLOCK for Adafruit Matrix Portal: displays current time, lunar
-phase and time of next moonrise or moonset. Requires WiFi internet access.
+phase and time of next moonrise or moonset. Requires WiFi internet access
+and Adafruit IO user account (basic account is free, just needs registration).
 
 Written by Phil 'PaintYourDragon' Burgess for Adafruit Industries.
 MIT license, all text above must be included in any redistribution.
@@ -42,57 +43,47 @@ COUNTDOWN = False  # If set, show time to (vs time of) next rise/set event
 MONTH_DAY = True   # If set, use MM/DD vs DD/MM (e.g. 31/12 vs 12/31)
 BITPLANES = 6      # Ideally 6, but can set lower if RAM is tight
 
+# Moon API requres valid User-Agent header. Only maintainer should edit this.
+HEADERS = { "User-Agent" : "AdafruitMoonClock/1.1 support@adafruit.com" }
 
 # SOME UTILITY FUNCTIONS AND CLASSES ---------------------------------------
 
-def parse_time(timestring, is_dst=-1):
-    """ Given a string of the format YYYY-MM-DDTHH:MM:SS.SS-HH:MM (and
-        optionally a DST flag), convert to and return an equivalent
-        time.struct_time (strptime() isn't available here). Calling function
-        can use time.mktime() on result if epoch seconds is needed instead.
-        Time string is assumed local time; UTC offset is ignored. If seconds
-        value includes a decimal fraction it's ignored.
+# Notes to Future Self on timekeeping: times are expressed in so many
+# formats throughout this code, a variable naming system is used: local
+# times (i.e. in clock's present geographic time zone) will have _local
+# in their variable name, while UTC times (aka Greenwich or Zulu time)
+# will have _utc. Types are also explicitly stated: strings (e.g.
+# "2023-07-20T08:37-07:00") will have _string in the variable name,
+# struct_time objects will have _struct, and integer "UNIX time" epoch
+# seconds will have _seconds. Conversions (offset is signed, e.g. -700):
+# Convert UTC to local time: add UTC offset;      local = utc   + offset
+# Convert local to UTC time: subtract UTC offset; utc   = local - offset
+
+def update_system_time():
+    """ Update system clock date/time from Adafruit IO. Credentials and time
+        zone are in secrets.py. See http://worldtimeapi.org/api/timezone for
+        list of time zones. If missing, will attempt using IP geolocation.
+        Returns present local (not UTC) time as a struct_time and UTC offset
+        as string "sHH:MM". This may throw an exception on get_local_time(),
+        it is NOT CAUGHT HERE, should be handled in the calling code because
+        different behaviors may be needed for some situations (e.g.
+        reschedule later).
     """
-    date_time = timestring.split('T')        # Separate into date and time
-    year_month_day = date_time[0].split('-') # Separate time into Y/M/D
-    hour_minute_second = date_time[1].split('+')[0].split('-')[0].split(':')
-    return time.struct_time((int(year_month_day[0]),
-                            int(year_month_day[1]),
-                            int(year_month_day[2]),
-                            int(hour_minute_second[0]),
-                            int(hour_minute_second[1]),
-                            int(hour_minute_second[2].split('.')[0]),
-                            -1, -1, is_dst))
-
-
-def update_time(timezone=None):
-    """ Update system date/time from WorldTimeAPI public server;
-        no account required. Pass in time zone string
-        (http://worldtimeapi.org/api/timezone for list)
-        or None to use IP geolocation. Returns current local time as a
-        time.struct_time and UTC offset as string. This may throw an
-        exception on fetch_data() - it is NOT CAUGHT HERE, should be
-        handled in the calling code because different behaviors may be
-        needed in different situations (e.g. reschedule for later).
-    """
-    if timezone: # Use timezone api
-        time_url = 'http://worldtimeapi.org/api/timezone/' + timezone
-    else: # Use IP geolocation
-        time_url = 'http://worldtimeapi.org/api/ip'
-
-    time_data = NETWORK.fetch_data(time_url,
-                                   json_path=[['datetime'], ['dst'],
-                                              ['utc_offset']])
-    time_struct = parse_time(time_data[0], time_data[1])
-    RTC().datetime = time_struct
-    return time_struct, time_data[2]
+    local_time_string = NETWORK.get_local_time() # Sets RTC() time, but also
+    elements = local_time_string.split(" ")      # returns server response
+    utc_offset = int(elements[-2]) # Format shHMM, e.g. -700 = -7 hr, 0 min
+    # Pad UTC format shHMM to sHH:MM as needed for moon API 3.0
+    utc_offset_string = "{:+03d}:{:02d}".format(utc_offset // 100,     # Hours
+                                                abs(utc_offset) % 100) # Mins
+    return RTC().datetime, utc_offset_string
 
 
 def hh_mm(time_struct):
-    """ Given a time.struct_time, return a string as H:MM or HH:MM, either
-        12- or 24-hour style depending on global TWELVE_HOUR setting.
-        This is ONLY for 'clock time,' NOT for countdown time, which is
-        handled separately in the one spot where it's needed.
+    """ Used for clock display elements, not for delta-time calculations.
+        Given a struct_time, return a string as H:MM or HH:MM, either 12-
+        or 24-hour style depending on global TWELVE_HOUR setting. This is
+        ONLY for 'clock time,' NOT for countdown time, which is handled
+        separately in the one spot where it's needed.
     """
     if TWELVE_HOUR:
         if time_struct.tm_hour > 12:
@@ -106,67 +97,98 @@ def hh_mm(time_struct):
     return hour_string + ':' + '{0:0>2}'.format(time_struct.tm_min)
 
 
+def parse_time_to_utc_seconds(time_local_string):
+    """ Given a string of YYYY-MM-DDTHH:MMsHH:MM or YYYY-MM-DDTHH:MM:SSZ
+        return equivalent UTC epoch seconds.
+    """
+    # This could be UTC or local time, don't know yet, so no tag in var name
+    date_time = time_local_string.split('T') # Separate into date and time
+    date_str = date_time[0].split('-') # Separate date into Y/M/D
+    time_str = date_time[1]
+    # Moon API always puts 00 seconds for interval, while rise/set times
+    # include no seconds value. Thus, only first two values are referenced:
+    hour = int(time_str[0:2])        # HH:MM as encoded in string,
+    minute = int(time_str[3:5])      # still could be UTC or local...
+    if time_str[-1] != 'Z':          # If not "Zulu time" (UTC), is local, so:
+        hour -= int(time_str[-6:-3]) # convert local to UTC
+        minute -= int(time_str[-2:])
+    return time.mktime(time.struct_time((int(date_str[0]),
+                                         int(date_str[1]),
+                                         int(date_str[2]),
+                                         hour,
+                                         minute,
+                                         0, -1, -1, False)))
+
+
 # pylint: disable=too-few-public-methods
 class MoonData():
-    """ Class holding lunar data for a given day (00:00:00 to 23:59:59).
-        App uses two of these -- one for the current day, and one for the
-        following day -- then some interpolations and such can be made.
-        Elements include:
-        age      : Moon phase 'age' at midnight (start of period)
-                   expressed from 0.0 (new moon) through 0.5 (full moon)
-                   to 1.0 (next new moon).
-        midnight : Epoch time in seconds @ midnight (start of period).
-        rise     : Epoch time of moon rise within this 24-hour period.
-        set      : Epoch time of moon set within this 24-hour period.
+    """ Class holding lunar data for a given 24-hour period. App uses two
+        of these -- one for the current day, and one for the following day,
+        then some interpolations and such can be made. Elements include:
+        age               : Moon phase 'age' at start of period, expressed
+                            from 0.0 (new moon) through 0.5 (full moon) to
+                            1.0 (next new moon).
+        start_utc_seconds : Epoch time at start of period, UTC
+        end_utc_seconds   : Epoch time at end of period, "
+        rise_utc_seconds  : Epoch time of moon rise within this 24-hour period
+        set_utc_seconds   : Epoch time of moon set within this 24-hour period
     """
-    def __init__(self, datetime, hours_ahead, utc_offset):
-        """ Initialize MoonData object elements (see above) from a
-            time.struct_time, hours to skip ahead (typically 0 or 24),
-            and a UTC offset (as a string) and a query to the MET Norway
-            Sunrise API (also provides lunar data), documented at:
-            https://api.met.no/weatherapi/sunrise/2.0/documentation
+    def __init__(self, datetime_local_struct, days_ahead, utc_offset_string):
+        """ Initialize MoonData elements (see above) given a struct_time,
+            days to skip ahead (typically 0 or 1), and a UTC offset (as a
+            string) and a query to the MET Norway Sunrise API (also provides
+            lunar data), documented at:
+            https://docs.api.met.no/doc/sunrise/celestial.html
         """
-        if hours_ahead:
-            # Can't change attribute in datetime struct, need to create
-            # a new one which will roll the date ahead as needed. Convert
-            # to epoch seconds and back for the offset to work
-            datetime = time.localtime(time.mktime(time.struct_time((
-                datetime.tm_year,
-                datetime.tm_mon,
-                datetime.tm_mday,
-                datetime.tm_hour + hours_ahead,
-                datetime.tm_min,
-                datetime.tm_sec,
-                -1, -1, -1))))
-        # strftime() not available here
-        url = ('https://api.met.no/weatherapi/sunrise/2.0/.json?lat=' +
+        if days_ahead > 0:
+            # Can't change attributes in struct_time, need to create a new
+            # one which will roll the date ahead as needed. Convert to local
+            # epoch seconds and back for the offset to work. :/
+            datetime_local_struct = time.localtime(
+                time.mktime(time.struct_time((
+                    datetime_local_struct.tm_year,
+                    datetime_local_struct.tm_mon,
+                    datetime_local_struct.tm_mday + days_ahead,
+                    datetime_local_struct.tm_hour,
+                    datetime_local_struct.tm_min,
+                    datetime_local_struct.tm_sec,
+                    -1, -1, -1))))
+        # URL does not contain local or UTC time, only date. strftime() is
+        # not available in CircuitPython, manual conversion to time string
+        # is needed. Response is moon data for a 24-hour period, based on
+        # longitude and requested date. Some values within are UTC time,
+        # others are local. Anything we parse out of this will be converted
+        # to UTC epoch seconds, period.
+        url = ('https://api.met.no/weatherapi/sunrise/3.0/moon?lat=' +
                str(LATITUDE) + '&lon=' + str(LONGITUDE) +
-               '&date=' + str(datetime.tm_year) + '-' +
-               '{0:0>2}'.format(datetime.tm_mon) + '-' +
-               '{0:0>2}'.format(datetime.tm_mday) +
-               '&offset=' + utc_offset)
+               '&date=' + str(datetime_local_struct.tm_year) + '-' +
+               '{0:0>2}'.format(datetime_local_struct.tm_mon) + '-' +
+               '{0:0>2}'.format(datetime_local_struct.tm_mday) +
+               '&offset=' + utc_offset_string)
         print('Fetching moon data via', url)
         # pylint: disable=bare-except
         for _ in range(5): # Retries
             try:
-                location_data = NETWORK.fetch_data(url,
-                                                   json_path=[['location']])
-                moon_data = location_data['time'][0]
-                #print(moon_data)
-                # Reconstitute JSON data into the elements we need
-                self.age = float(moon_data['moonphase']['value']) / 100
-                self.midnight = time.mktime(parse_time(
-                    moon_data['moonphase']['time']))
-                if 'moonrise' in moon_data:
-                    self.rise = time.mktime(
-                        parse_time(moon_data['moonrise']['time']))
+                moon_data = NETWORK.fetch_data(url,
+                                               json_path=[],
+                                               headers = HEADERS)
+                properties = moon_data['properties']
+                # 0 = new moon, 90 = Q1, 180 = full moon, 270 = LQ
+                self.age = float(properties['moonphase']) / 360
+                interval = moon_data['when']['interval']
+                self.start_utc_seconds = parse_time_to_utc_seconds(interval[0])
+                self.end_utc_seconds = parse_time_to_utc_seconds(interval[1])
+                # Thx user sandorcourane for the properties fixes!
+                if properties['moonrise']['time'] is not None:
+                    self.rise_utc_seconds = parse_time_to_utc_seconds(
+                        properties['moonrise']['time'])
                 else:
-                    self.rise = None
-                if 'moonset' in moon_data:
-                    self.set = time.mktime(
-                        parse_time(moon_data['moonset']['time']))
+                    self.rise_utc_seconds = None
+                if properties['moonset']['time'] is not None:
+                    self.set_utc_seconds = parse_time_to_utc_seconds(
+                        properties['moonset']['time'])
                 else:
-                    self.set = None
+                    self.set_utc_seconds = None
                 return # Success!
             except:
                 # Moon server error (maybe), try again after 15 seconds.
@@ -262,59 +284,61 @@ except KeyError:
                                       ['geoplugin_longitude']]))
     print('Using IP geolocation: ', LATITUDE, LONGITUDE)
 
-# Load time zone string from secrets.py, else IP geolocation for this too
-# (http://worldtimeapi.org/api/timezone for list).
-try:
-    TIMEZONE = secrets['timezone'] # e.g. 'America/New_York'
-except:
-    TIMEZONE = None # IP geolocation
-
 # Set initial clock time, also fetch initial UTC offset while
 # here (NOT stored in secrets.py as it may change with DST).
 # pylint: disable=bare-except
 try:
-    DATETIME, UTC_OFFSET = update_time(TIMEZONE)
+    DATETIME_LOCAL_STRUCT, UTC_OFFSET_STRING = update_system_time()
 except:
-    DATETIME, UTC_OFFSET = time.localtime(), '+00:00'
-LAST_SYNC = time.mktime(DATETIME)
+    DATETIME_LOCAL_STRUCT, UTC_OFFSET_STRING = time.localtime(), '+00:00'
+LAST_SYNC_LOCAL_SECONDS = time.mktime(DATETIME_LOCAL_STRUCT)
 
 # Poll server for moon data for current 24-hour period and +24 ahead
 PERIOD = []
-for DAY in range(2):
-    PERIOD.append(MoonData(DATETIME, DAY * 24, UTC_OFFSET))
-# PERIOD[0] is the current 24-hour time period we're in. PERIOD[1] is the
-# following 24 hours. Data is shifted down and new data fetched as days
-# expire. Thought we might need a PERIOD[2] for certain circumstances but
-# it appears not, that's changed easily enough if needed.
+for DAY in range(2): # Today, tomorrow
+    PERIOD.append(MoonData(DATETIME_LOCAL_STRUCT, DAY, UTC_OFFSET_STRING))
+# PERIOD[0] is a current 24-hour time period we're in. PERIOD[1] is the
+# 24 hours following that. Start/end time thresholds vary by longitude.
+# Any values within the object are expressed in UTC seconds. Data is
+# shifted down and new data fetched as days expire. Thought we might need a
+# PERIOD[2] for certain circumstances but it appears not, that's changed
+# easily enough if needed.
 
 
 # MAIN LOOP ----------------------------------------------------------------
 
 while True:
     gc.collect()
-    NOW = time.time() # Current epoch time in seconds
+    NOW_LOCAL_SECONDS = time.time() # Current local epoch time in seconds
 
-    # Sync with time server every ~12 hours
-    if NOW - LAST_SYNC > 12 * 60 * 60:
+    # Sync with time server every ~3 hours
+    if NOW_LOCAL_SECONDS - LAST_SYNC_LOCAL_SECONDS > 3 * 60 * 60:
         try:
-            DATETIME, UTC_OFFSET = update_time(TIMEZONE)
-            LAST_SYNC = time.mktime(DATETIME)
-            continue # Time may have changed; refresh NOW value
+            DATETIME_LOCAL_STRUCT, UTC_OFFSET_STRING = update_system_time()
+            LAST_SYNC_LOCAL_SECONDS = time.mktime(DATETIME_LOCAL_STRUCT)
+            continue # Time may have changed; refresh NOW_LOCAL_SECONDS value
         except:
-            # update_time() can throw an exception if time server doesn't
+            # update_system_time() can throw an exception if time server doesn't
             # respond. That's OK, keep running with our current time, and
             # push sync time ahead to retry in 30 minutes (don't overwhelm
             # the server with repeated queries).
-            LAST_SYNC += 30 * 60 # 30 minutes -> seconds
+            LAST_SYNC_LOCAL_SECONDS += 30 * 60 # 30 minutes -> seconds
+
+    # NOW_LOCAL_SECONDS and DATETIME_LOCAL_STRUCT are local time, while all
+    # moon properties are UTC. Convert 'now' to UTC seconds...
+    # UTC_OFFSET_STRING is a string, like +HH:MM. Convert to integer seconds:
+    hhmm = UTC_OFFSET_STRING.split(':')
+    utc_offset_seconds = ((int(hhmm[0]) * 60 + int(hhmm[1])) * 60)
+    NOW_UTC_SECONDS = NOW_LOCAL_SECONDS - utc_offset_seconds
 
     # If PERIOD has expired, move data down and fetch new +24-hour data
-    if NOW >= PERIOD[1].midnight:
+    if NOW_UTC_SECONDS >= PERIOD[0].end_utc_seconds:
         PERIOD[0] = PERIOD[1]
-        PERIOD[1] = MoonData(time.localtime(), 24, UTC_OFFSET)
+        PERIOD[1] = MoonData(time.localtime(), 1, UTC_OFFSET_STRING)
 
     # Determine weighting of tomorrow's phase vs today's, using current time
-    RATIO = ((NOW - PERIOD[0].midnight) /
-             (PERIOD[1].midnight - PERIOD[0].midnight))
+    RATIO = ((NOW_UTC_SECONDS - PERIOD[0].start_utc_seconds) /
+             (PERIOD[1].start_utc_seconds - PERIOD[0].start_utc_seconds))
     # Determine moon phase 'age'
     # 0.0  = new moon
     # 0.25 = first quarter
@@ -344,18 +368,20 @@ while True:
     # Find next rise/set event, complicated by the fact that some 24-hour
     # periods might not have one or the other (but usually do) due to the
     # Moon rising ~50 mins later each day. This uses a brute force approach,
-    # working backwards through the time periods to locate rise/set events
-    # that A) exist in that 24-hour period (are not None), B) are still in
+    # working through the time periods to locate rise/set events that
+    # A) exist in that 24-hour period (are not None), B) are still in
     # the future, and C) are closer than the last guess. What's left at the
-    # end is the next rise or set (and the inverse of the event type tells
-    # us whether Moon's currently risen or not).
-    NEXT_EVENT = PERIOD[1].midnight + 100000 # Force first match
-    for DAY in reversed(PERIOD):
-        if DAY.rise and NEXT_EVENT >= DAY.rise >= NOW:
-            NEXT_EVENT = DAY.rise
-            RISEN = False
-        if DAY.set and NEXT_EVENT >= DAY.set >= NOW:
-            NEXT_EVENT = DAY.set
+    # end is the next rise or set time, and a flag whether the moon's
+    # currently risen or not.
+    NEXT_EVENT_UTC_SECONDS = NOW_UTC_SECONDS + 300000 # Way future
+    for DAY in PERIOD:
+        if (DAY.rise_utc_seconds and
+            NOW_UTC_SECONDS < DAY.rise_utc_seconds < NEXT_EVENT_UTC_SECONDS):
+            NEXT_EVENT_UTC_SECONDS = DAY.rise_utc_seconds
+            RISEN = False  # Current moon state; next event is inverse
+        if (DAY.set_utc_seconds and
+            NOW_UTC_SECONDS < DAY.set_utc_seconds < NEXT_EVENT_UTC_SECONDS):
+            NEXT_EVENT_UTC_SECONDS = DAY.set_utc_seconds
             RISEN = True
 
     if DISPLAY.rotation in (0, 180): # Horizontal 'landscape' orientation
@@ -380,15 +406,16 @@ while True:
     FILENAME = 'moon/moon' + '{0:0>2}'.format(FRAME) + '.bmp'
 
     # CircuitPython 6 & 7 compatible
-    BITMAP = displayio.OnDiskBitmap(open(FILENAME, 'rb'))
-    TILE_GRID = displayio.TileGrid(
-        BITMAP,
-        pixel_shader=getattr(BITMAP, 'pixel_shader', displayio.ColorConverter())
-    )
+    # BITMAP = displayio.OnDiskBitmap(open(FILENAME, 'rb'))
+    # TILE_GRID = displayio.TileGrid(
+    #     BITMAP,
+    #     pixel_shader=getattr(BITMAP, 'pixel_shader',
+    #                          displayio.ColorConverter())
+    # )
 
-    # # CircuitPython 7+ compatible
-    # BITMAP = displayio.OnDiskBitmap(FILENAME)
-    # TILE_GRID = displayio.TileGrid(BITMAP, pixel_shader=BITMAP.pixel_shader)
+    # CircuitPython 7+ compatible
+    BITMAP = displayio.OnDiskBitmap(FILENAME)
+    TILE_GRID = displayio.TileGrid(BITMAP, pixel_shader=BITMAP.pixel_shader)
 
     TILE_GRID.x = 0
     TILE_GRID.y = MOON_Y
@@ -399,7 +426,7 @@ while True:
         STRING = '100%'
     else:
         STRING = '{:.1f}'.format(PERCENT + 0.05) + '%'
-    print(NOW, STRING, 'full')
+    print(NOW_UTC_SECONDS, STRING, 'full')
     # Set element 5 first, use its size and position for setting others
     GROUP[5].text = STRING
     GROUP[5].x = 16 - GROUP[5].bounding_box[2] // 2
@@ -412,14 +439,13 @@ while True:
     GROUP[4].x, GROUP[4].y = GROUP[5].x, GROUP[5].y + 1 # Down
 
     # Update next-event time (GROUP[8] and [9])
-    # Do this before time because we need uncorrupted NOW value
-    EVENT_TIME = time.localtime(NEXT_EVENT) # Convert to struct for later
-    if COUNTDOWN: # Show NEXT_EVENT as countdown to event
-        NEXT_EVENT -= NOW # Time until (vs time of) next rise/set
-        MINUTES = NEXT_EVENT // 60
+    NEXT_EVENT_LOCAL_STRUCT = time.localtime(NEXT_EVENT_UTC_SECONDS +
+                                             utc_offset_seconds) # Need later
+    if COUNTDOWN: # Show NEXT_EVENT_UTC_SECONDS as countdown to event
+        MINUTES = (NEXT_EVENT_UTC_SECONDS - NOW_UTC_SECONDS) // 60
         STRING = str(MINUTES // 60) + ':' + '{0:0>2}'.format(MINUTES % 60)
-    else: # Show NEXT_EVENT in clock time
-        STRING = hh_mm(EVENT_TIME)
+    else: # Show NEXT_EVENT_UTC_SECONDS in clock time
+        STRING = hh_mm(NEXT_EVENT_LOCAL_STRUCT)
     GROUP[9].text = STRING
     XPOS = CENTER_X - (GROUP[9].bounding_box[2] + 6) // 2
     GROUP[8].x = XPOS
@@ -434,19 +460,22 @@ while True:
     GROUP[9].x = XPOS + 6
     GROUP[9].y = EVENT_Y
     # Show event time in green if a.m., amber if p.m.
-    GROUP[8].color = GROUP[9].color = (0x00FF00 if EVENT_TIME.tm_hour < 12
+    GROUP[8].color = GROUP[9].color = (0x00FF00 if
+                                       NEXT_EVENT_LOCAL_STRUCT.tm_hour < 12
                                        else 0xC04000)
 
     # Update time (GROUP[6]) and date (GROUP[7])
-    NOW = time.localtime()
-    STRING = hh_mm(NOW)
+    NOW_LOCAL_STRUCT = time.localtime()
+    STRING = hh_mm(NOW_LOCAL_STRUCT)
     GROUP[6].text = STRING
     GROUP[6].x = CENTER_X - GROUP[6].bounding_box[2] // 2
     GROUP[6].y = TIME_Y
     if MONTH_DAY:
-        STRING = str(NOW.tm_mon) + '/' + str(NOW.tm_mday)
+        STRING = (str(NOW_LOCAL_STRUCT.tm_mon) + '/' +
+                  str(NOW_LOCAL_STRUCT.tm_mday))
     else:
-        STRING = str(NOW.tm_mday) + '/' + str(NOW.tm_mon)
+        STRING = (str(NOW_LOCAL_STRUCT.tm_mday) + '/' +
+                  str(NOW_LOCAL_STRUCT.tm_mon))
     GROUP[7].text = STRING
     GROUP[7].x = CENTER_X - GROUP[7].bounding_box[2] // 2
     GROUP[7].y = TIME_Y + 10

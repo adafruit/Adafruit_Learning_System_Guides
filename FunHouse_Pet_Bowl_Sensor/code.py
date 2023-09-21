@@ -3,6 +3,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+import os
 import time
 import board
 import digitalio
@@ -13,13 +14,7 @@ from adafruit_funhouse import FunHouse
 BOWL_STATE_TOPIC = "funhouse/catbowl/state"
 LOW_VALUE = 4000
 EMPTY_VALUE = 2000
-UPDATE_INTERVAL = 1800	# Every 30 minutes
-
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
+UPDATE_INTERVAL = 1800  # Every 30 minutes
 
 # Text labels for the Display
 states = {
@@ -28,18 +23,18 @@ states = {
     "full": "Full",
 }
 
-def publish_bowl_state(bowl_state):
+def publish_bowl_state(state):
     funhouse.peripherals.led = True
     # Publish the Bowl Level State
     print("Publishing to {}".format(BOWL_STATE_TOPIC))
-    funhouse.network.mqtt_publish(BOWL_STATE_TOPIC, bowl_state)
+    funhouse.network.mqtt_publish(BOWL_STATE_TOPIC, state)
     funhouse.peripherals.led = False
 
-def connected(client, userdata, result, payload):
+def connected(_client, _userdata, _result, _payload):
     status.fill = 0x00FF00
     status.outline = 0x008800
 
-def disconnected(client):
+def disconnected(_client):
     status.fill = 0xFF0000
     status.outline = 0x880000
 
@@ -56,10 +51,10 @@ def get_bowl_state(level):
         return "low"
     return "full"
 
-def bowl_level_display(water_level):
+def bowl_level_display(level):
     if funhouse.peripherals.button_sel:
-        return water_level
-    return states[get_bowl_state(water_level)]
+        return level
+    return states[get_bowl_state(level)]
 
 # Set Initial States
 funhouse = FunHouse(default_bg=0x0F0F00)
@@ -88,22 +83,25 @@ funhouse.splash.append(status)
 
 # Initialize a new MQTT Client object
 funhouse.network.init_mqtt(
-    secrets["mqtt_broker"],
-    secrets["mqtt_port"],
-    secrets["mqtt_username"],
-    secrets["mqtt_password"],
+    os.getenv("MQTT_BROKER"),
+    os.getenv("MQTT_PORT"),
+    os.getenv("MQTT_USERNAME"),
+    os.getenv("MQTT_PASSWORD"),
 )
 funhouse.network.on_mqtt_connect = connected
 funhouse.network.on_mqtt_disconnect = disconnected
 
-print("Attempting to connect to {}".format(secrets["mqtt_broker"]))
+print("Attempting to connect to {}".format(os.getenv("MQTT_BROKER")))
 funhouse.network.mqtt_connect()
 
 last_reading_timestamp = None
 last_bowl_state = None
 
 while True:
-    if last_reading_timestamp is None or time.monotonic() > last_reading_timestamp + UPDATE_INTERVAL:
+    if (
+        last_reading_timestamp is None
+        or time.monotonic() > last_reading_timestamp + UPDATE_INTERVAL
+    ):
         # Take Reading
         water_level = get_bowl_reading()
         # Update Display

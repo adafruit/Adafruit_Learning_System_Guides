@@ -565,7 +565,7 @@ void show_canvas() {
   display.setFont(&FreeSansBold18pt7b); // Use a custom font
   display.setTextSize(1);               // and reset to 1:1 scale
 
-  char          *label[] = { "X:", "Y:", "Z:" };       // Labels for each axis
+  const char *label[] = { "X:", "Y:", "Z:" };       // Labels for each axis
   const uint16_t color[] = { 0xF800, 0x07E0, 0x001F }; // Colors for each value
 
   // To get the labels right-aligned, one option would be simple trial and

@@ -7,34 +7,29 @@ import json
 import ssl
 import socket
 import adafruit_minimqtt.adafruit_minimqtt as MQTT
-from rpc import RpcServer
+from rpc import RpcServer, MqttError
 
-mqtt_client = None
-mqtt_connected = False
+mqtt_status = {
+    "connected": False,
+    "client": None,
+}
 last_mqtt_messages = {}
 
 # For program flow purposes, we do not want these functions to be called remotely
 PROTECTED_FUNCTIONS = ["main", "handle_rpc"]
 
-def connect(mqtt_client, userdata, flags, rc):
-    global mqtt_connected
-    mqtt_connected = True
+def connect(_mqtt_client, _userdata, _flags, _rc):
+    mqtt_status["connected"] = True
 
-def disconnect(mqtt_client, userdata, rc):
-    global mqtt_connected
-    mqtt_connected = False
+def disconnect(_mqtt_client, _userdata, _rc):
+    mqtt_status["connected"] = False
 
-def message(client, topic, message):
-    last_mqtt_messages[topic] = message
+def message(_client, topic, payload):
+    last_mqtt_messages[topic] = payload
 
-class MqttError(Exception):
-    """For MQTT Specific Errors"""
-    pass
-
-# Default to 1883 as SSL on CPython is not currently supported
+# Default to 1883 since SSL on CPython is not currently supported
 def mqtt_init(broker, port=1883, username=None, password=None):
-    global mqtt_client, mqtt_connect_info
-    mqtt_client = MQTT.MQTT(
+    mqtt_status["client"] = MQTT.MQTT(
         broker=broker,
         port=port,
         username=username,
@@ -43,28 +38,28 @@ def mqtt_init(broker, port=1883, username=None, password=None):
         ssl_context=ssl.create_default_context(),
     )
 
-    mqtt_client.on_connect = connect
-    mqtt_client.on_disconnect = disconnect
-    mqtt_client.on_message = message
+    mqtt_status["client"].on_connect = connect
+    mqtt_status["client"].on_disconnect = disconnect
+    mqtt_status["client"].on_message = message
 
 def mqtt_connect():
-    mqtt_client.connect()
+    mqtt_status["client"].connect()
 
 def mqtt_publish(topic, payload):
-    if mqtt_client is None:
+    if mqtt_status["client"] is None:
         raise MqttError("MQTT is not initialized")
     try:
-        return_val = mqtt_client.publish(topic, json.dumps(payload))
+        return_val = mqtt_status["client"].publish(topic, json.dumps(payload))
     except BrokenPipeError:
         time.sleep(0.5)
-        mqtt_client.connect()
-        return_val = mqtt_client.publish(topic, json.dumps(payload))
+        mqtt_status["client"].connect()
+        return_val = mqtt_status["client"].publish(topic, json.dumps(payload))
     return return_val
 
 def mqtt_subscribe(topic):
-    if mqtt_client is None:
+    if mqtt_status["client"] is None:
         raise MqttError("MQTT is not initialized")
-    return mqtt_client.subscribe(topic)
+    return mqtt_status["client"].subscribe(topic)
 
 def mqtt_get_last_value(topic):
     """Return the last value we have received regarding a topic"""
@@ -80,36 +75,42 @@ def handle_rpc(packet):
     call the method with parameters, and generate a response
     packet as the return value"""
     print("Received packet")
-    func_name = packet['function']
+    func_name = packet["function"]
     if func_name in PROTECTED_FUNCTIONS:
-        return rpc.create_response_packet(error=True, message=f"{func_name}'() is a protected function and can not be called.")
+        return rpc.create_response_packet(
+            error=True,
+            message=f"{func_name}'() is a protected function and can not be called.",
+        )
     if func_name not in globals():
-        return rpc.create_response_packet(error=True, message=f"Function {func_name}() not found")
+        return rpc.create_response_packet(
+            error=True, message=f"Function {func_name}() not found"
+        )
     try:
-        return_val = globals()[func_name](*packet['args'], **packet['kwargs'])
+        return_val = globals()[func_name](*packet["args"], **packet["kwargs"])
     except MqttError as err:
-        return rpc.create_response_packet(error=True, error_type="MQTT", message=str(err))
+        return rpc.create_response_packet(
+            error=True, error_type="MQTT", message=str(err)
+        )
 
     packet = rpc.create_response_packet(return_val=return_val)
     return packet
 
 def main():
     """Command line, entry point"""
-    global mqtt_connected
     while True:
         rpc.loop(0.25)
-        if mqtt_connected and mqtt_client is not None:
+        if mqtt_status["connected"] and mqtt_status["client"] is not None:
             try:
-                mqtt_client.loop(0.5)
+                mqtt_status["client"].loop(0.5)
             except AttributeError:
-                mqtt_connected = False
+                mqtt_status["connected"] = False
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     rpc = RpcServer(handle_rpc)
     try:
-        print(f"Listening for RPC Calls, to stop press \"CTRL+C\"")
+        print('Listening for RPC Calls, to stop press "CTRL+C"')
         main()
     except KeyboardInterrupt:
         print("")
-        print(f"Caught interrupt, exiting...")
+        print("Caught interrupt, exiting...")
     rpc.close_serial()

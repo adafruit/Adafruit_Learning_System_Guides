@@ -100,26 +100,42 @@ io = IO_HTTP(aio_username, aio_key, requests)
 
 try:
     # get feed
+    # printing monitors the printer progress feed
     printing_status = io.get_feed("printing")
-    print_done = io.get_feed("printdone")
-    printer_state = io.get_feed("printerstatechanged")
-    shutdown = io.get_feed("shutdown")
-    heat_up = io.get_feed("heatup")
-    cooldown = io.get_feed("cooldown")
-    resume = io.get_feed("printresumed")
-    pause = io.get_feed("printpaused")
-    cancelled = io.get_feed("printcancelled")
-
 except AdafruitIO_RequestError:
     # if no feed exists, create one
     printing_status = io.create_new_feed("printing")
+try:
+    print_done = io.get_feed("printdone")
+except AdafruitIO_RequestError:
     print_done = io.create_new_feed("printdone")
+try:
+    printer_state = io.get_feed("printerstatechanged")
+except AdafruitIO_RequestError:
     printer_state = io.create_new_feed("printerstatechanged")
+try:
+    shutdown = io.get_feed("shutdown")
+except AdafruitIO_RequestError:
     shutdown = io.create_new_feed("shutdown")
+try:
+    heat_up = io.get_feed("heatup")
+except AdafruitIO_RequestError:
     heat_up = io.create_new_feed("heatup")
+try:
+    cooldown = io.get_feed("cooldown")
+except AdafruitIO_RequestError:
     cooldown = io.create_new_feed("cooldown")
+try:
+    resume = io.get_feed("printresumed")
+except AdafruitIO_RequestError:
     resume = io.create_new_feed("printresumed")
+try:
+    pause = io.get_feed("printpaused")
+except AdafruitIO_RequestError:
     pause = io.create_new_feed("printpaused")
+try:
+    cancelled = io.get_feed("printcancelled")
+except AdafruitIO_RequestError:
     cancelled = io.create_new_feed("printcancelled")
 
 read_feeds = [printing_status, printer_state, print_done]

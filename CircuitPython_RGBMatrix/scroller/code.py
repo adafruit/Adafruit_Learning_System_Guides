@@ -32,7 +32,7 @@ display = framebufferio.FramebufferDisplay(matrix, auto_refresh=False)
 def tilegrid(palette):
     return displayio.TileGrid(
         bitmap=terminalio.FONT.bitmap, pixel_shader=palette,
-        width=1, height=1, tile_width=6, tile_height=14, default_tile=32)
+        width=1, height=1, tile_width=6, tile_height=12, default_tile=32)
 
 g = displayio.Group()
 

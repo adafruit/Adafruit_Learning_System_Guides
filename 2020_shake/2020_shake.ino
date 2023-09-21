@@ -27,11 +27,19 @@ bool show_new_year = true;
 #define SHAKE_PERIOD    2000                                // Period (in ms) when SHAKE_EVENTS must happen
 #define SAND_TIME       6000                                // Time (in ms) to run simulation before restarting
 
+#if defined(_VARIANT_MATRIXPORTAL_M4_) // MatrixPortal M4
 uint8_t rgbPins[]  = {7, 8, 9, 10, 11, 12};
-uint8_t addrPins[] = {17, 18, 19, 20};
+uint8_t addrPins[] = {17, 18, 19, 20, 21};
 uint8_t clockPin   = 14;
 uint8_t latchPin   = 15;
 uint8_t oePin      = 16;
+#else // MatrixPortal ESP32-S3
+uint8_t rgbPins[]  = {42, 41, 40, 38, 39, 37};
+uint8_t addrPins[] = {35, 36, 48, 45, 21};
+uint8_t clockPin   = 2;
+uint8_t latchPin   = 47;
+uint8_t oePin      = 14;
+#endif
 
 // 64x32 pixel matrix, 6-bit depth
 Adafruit_Protomatter matrix(

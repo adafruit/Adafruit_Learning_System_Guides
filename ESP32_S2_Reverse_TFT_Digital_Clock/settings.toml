@@ -1,0 +1,13 @@
+# To auto-connect to WiFi
+CIRCUITPY_WIFI_SSID="YOUR-WIFI-NETWORK-NAME"
+CIRCUITPY_WIFI_PASSWORD="YOUR-WIFI-NETWORK-PASSWORD"
+
+# Current location
+TIMEZONE="YOUR-COUNTRY/YOUR-STATE"
+# example: "America/New_York"
+
+# To enable modifying files from the web. Change this too!
+# Leave the User field blank in the browser.
+CIRCUITPY_WEB_API_PASSWORD="passw0rd"
+
+CIRCUITPY_WEB_API_PORT=80

@@ -47,7 +47,7 @@ sounds = [
 ]
 while True:
     print("Waiting for button press to continue!")
-    while button.value:
+    while not button.value:
         solid.animate()
     play_wav(random.choice(sounds))
     while audio.playing:
