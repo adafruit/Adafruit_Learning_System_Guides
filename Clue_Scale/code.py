@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 #
 # clue_scale_code.py
-# 2023-01-13 v1.2.1
+# 2023-09-22 v1.3.0
 #
 # Clue Scale - Single Channel Version
 # Adafruit NAU7802 Stemma breakout example
@@ -11,7 +11,6 @@
 
 import time
 import board
-from simpleio import map_range
 from adafruit_clue import clue
 from adafruit_display_shapes.circle import Circle
 from adafruit_display_text.label import Label
@@ -118,6 +117,18 @@ display.show(scale_group)
 
 
 # Helpers
+def map_range(x, in_min, in_max, out_min, out_max):
+    """
+    Maps a number from one range to another.
+    :return: Returns value mapped to new range
+    :rtype: float
+    """
+    mapped = (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
+    if out_min <= out_max:
+        return max(min(mapped, out_max), out_min)
+
+    return min(max(mapped, out_max), out_min)
+
 def zero_channel():
     """Prepare internal amplifier settings and zero the current channel. Use
     after power-up, a new channel is selected, or to adjust for measurement
