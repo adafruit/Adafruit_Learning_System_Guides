@@ -26,7 +26,7 @@ CATEGORY = "arts"  # Change this to whatever category you want
 # theater, t-magazine, travel, upshot, us, world
 
 # --- Wi-Fi setup ---
-wifi.radio.connect(os.getenv("CIRCUITPY_WIFI_SSID"), os.getenv("CIRCUITPY_WIFI_SSID"))
+wifi.radio.connect(os.getenv("CIRCUITPY_WIFI_SSID"), os.getenv("CIRCUITPY_WIFI_PASSWORD"))
 print(f"Connected to {os.getenv('CIRCUITPY_WIFI_SSID')}")
 
 # --- Display setup ---
