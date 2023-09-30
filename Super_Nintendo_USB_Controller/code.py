@@ -4,9 +4,9 @@
 # Simple Super Nintendo controller to standard USB HID gamepad with DirectInput button mapping.
 # Tested on KB2040
 
+import time
 import board
 import digitalio
-import time
 import usb_hid
 
 # Update the SNES Controller pins based on your input
@@ -62,21 +62,21 @@ hat_map = {
 }
 
 def read_snes_controller():
-    button_states = []
+    data_bits = []
     latch.value = True
     time.sleep(0.000012)  # 12µs
     latch.value = False
 
     for _ in range(16):
         time.sleep(0.000006)  # Wait 6µs
-        button_states.append(data.value)
+        data_bits.append(data.value)
 
         clock.value = True
         time.sleep(0.000006)  # 6µs
         clock.value = False
         time.sleep(0.000006)  # 6µs
 
-    return button_states
+    return data_bits
 
 # Find the gamepad device in the usb_hid devices
 gamepad_device = None
@@ -95,20 +95,20 @@ report[2] = 0x08  # default released hat switch value
 prev_report = bytearray(report)
 
 while True:
-    button_states = read_snes_controller()
+    button_state = read_snes_controller()
     all_buttons = list(buttonmap.keys())
 
     for idx, button in enumerate(all_buttons):
         index, byte_index, button_value = buttonmap[button]
-        is_pressed = not button_states[index]  # True if button is pressed
+        is_pressed = not button_state   [index]  # True if button is pressed
 
         if button in dpad_state:  # If it's a direction button
             dpad_state[button] = 1 if is_pressed else 0
         else:
             if is_pressed:
                 report[byte_index] |= button_value
-            else:
-                report[byte_index] &= ~button_value  # Reset the button state in the report if not pressed
+            else: # not pressed, reset button state
+                report[byte_index] &= ~button_value
 
     # SOCD (up priority and neutral horizontal)
     if (dpad_state["Up"] and dpad_state["Down"]):
