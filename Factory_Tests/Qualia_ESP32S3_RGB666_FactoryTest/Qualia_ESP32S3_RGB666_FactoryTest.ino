@@ -10,7 +10,7 @@ extern Adafruit_TestBed TB;
 Arduino_XCA9554SWSPI *expander = new Arduino_XCA9554SWSPI(
     PCA_TFT_RESET, PCA_TFT_CS, PCA_TFT_SCK, PCA_TFT_MOSI,
     &Wire, 0x3F);
-    
+
 Arduino_ESP32RGBPanel *rgbpanel = new Arduino_ESP32RGBPanel(
     TFT_DE, TFT_VSYNC, TFT_HSYNC, TFT_PCLK,
     TFT_R1, TFT_R2, TFT_R3, TFT_R4, TFT_R5,
@@ -26,12 +26,12 @@ Arduino_RGB_Display *gfx = new Arduino_RGB_Display(
     expander, GFX_NOT_DEFINED /* RST */, TL021WVC02_init_operations, sizeof(TL021WVC02_init_operations));
 
 uint16_t *colorWheel;
-  
+
 void setup(void)
-{  
+{
   Serial.begin(115200);
   //while (!Serial) delay(100);
-  
+
 #ifdef GFX_EXTRA_PRE_INIT
   GFX_EXTRA_PRE_INIT();
 #endif
@@ -39,7 +39,7 @@ void setup(void)
   Serial.println("Beginning");
   // Init Display
 
-  Wire.setClock(1000000); // speed up I2C 
+  Wire.setClock(1000000); // speed up I2C
   if (!gfx->begin()) {
     Serial.println("gfx->begin() failed!");
   }
@@ -61,7 +61,7 @@ uint8_t allpins[] = {SS, SCK, MOSI, MISO, A1, A0};
 
 bool test = false;
 void loop()
-{  
+{
   if (!test) {
     gfx->draw16bitRGBBitmap(0, 0, colorWheel, 480, 480);
     delay(100);
@@ -82,9 +82,8 @@ void loop()
   gfx->println("GPIO OK!");
 
   gfx->setCursor(100, gfx->height() / 2 - 75);
-  if (! TB.scanI2CBus(0x15)) return;
   gfx->println("I2C OK!");
-  
+
   gfx->setCursor(100, gfx->height() / 2 - 25);
   gfx->setTextColor(RED);
   gfx->println("RED");
