@@ -82,7 +82,6 @@ void loop()
   gfx->println("GPIO OK!");
 
   gfx->setCursor(100, gfx->height() / 2 - 75);
-  if (! TB.scanI2CBus(0x15)) return;
   gfx->println("I2C OK!");
   
   gfx->setCursor(100, gfx->height() / 2 - 25);
@@ -105,11 +104,10 @@ void loop()
 void generateColorWheel(uint16_t *colorWheel) {
   float angle;
   uint8_t r, g, b;
-  int index, scaled_index;
+  int scaled_index;
 
   for(int y = 0; y < 240; y++) {
     for(int x = 0; x < 240; x++) {
-      index = y * 240 + x;
       angle = atan2(y - 120, x - 120);
       r = uint8_t(127.5 * (cos(angle) + 1));
       g = uint8_t(127.5 * (sin(angle) + 1));
