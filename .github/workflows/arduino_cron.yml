@@ -92,7 +92,6 @@ jobs:
         git clone --quiet https://github.com/adafruit/HID /home/runner/Arduino/libraries/HID_Project
         rm -rf /home/runner/Arduino/libraries/ArduinoHttpClient
         git clone --quiet https://github.com/arduino-libraries/ArduinoHttpClient.git /home/runner/Arduino/libraries/ArduinoHttpClient
-        git clone --quiet https://github.com/moononournation/Arduino_GFX.git /home/runner/Arduino/libraries/Arduino_GFX
 
     - name: test platforms
       run: python3 ci/build_platform.py ${{ matrix.arduino-platform }}
