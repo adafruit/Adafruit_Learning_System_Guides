@@ -92,6 +92,11 @@ else:
 
 report = bytearray(19)
 report[2] = 0x08  # default released hat switch value
+report[3] = 127  # default x center value
+report[4] = 127  # default y center value
+report[5] = 127  # default z center value
+report[6] = 127  # default rz center value
+
 prev_report = bytearray(report)
 
 while True:

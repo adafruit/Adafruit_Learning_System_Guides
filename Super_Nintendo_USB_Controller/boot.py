@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2023 Robert Dale Smith for Adafruit Industries
 #
-# SPDX-License-Identifier: Unlicense
+# SPDX-License-Identifier: MIT
+# USB HID descriptor for generic DirectInput compatible gamepad.
 
 import usb_hid
 
@@ -67,7 +68,7 @@ gamepad = usb_hid.Device(
     usage_page=0x01,           # Generic Desktop Control
     usage=0x05,                # Gamepad
     report_ids=(0,),           # Descriptor uses report ID 0.
-    in_report_lengths=(19,),    # This gamepad sends 6 bytes in its report.
+    in_report_lengths=(19,),   # This gamepad sends 19 bytes in its report.
     out_report_lengths=(0,),   # It does not receive any reports.
 )
 
