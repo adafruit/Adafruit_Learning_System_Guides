@@ -38,6 +38,17 @@ Arduino_RGB_Display *gfx = new Arduino_RGB_Display(
 //    320 /* width */, 820 /* height */, rgbpanel, 0 /* rotation */, true /* auto_flush */,
 //    expander, GFX_NOT_DEFINED /* RST */, tl032fwv01_init_operations, sizeof(tl032fwv01_init_operations));
 
+// 4.0" 720x720 square display
+//    720 /* width */, 720 /* height */, rgbpanel, 0 /* rotation */, true /* auto_flush */,
+//    expander, GFX_NOT_DEFINED /* RST */, NULL, 0);
+
+// 4.0" 720x720 round display
+//    720 /* width */, 720 /* height */, rgbpanel, 0 /* rotation */, true /* auto_flush */,
+//    expander, GFX_NOT_DEFINED /* RST */, hd40015c40_init_operations, sizeof(hd40015c40_init_operations));
+// needs also the rgbpanel to have these pulse/sync values:
+//    1 /* hync_polarity */, 46 /* hsync_front_porch */, 2 /* hsync_pulse_width */, 44 /* hsync_back_porch */,
+//    1 /* vsync_polarity */, 50 /* vsync_front_porch */, 16 /* vsync_pulse_width */, 16 /* vsync_back_porch */
+
 uint16_t *colorWheel;
   
 void setup(void)
@@ -75,7 +86,7 @@ uint8_t allpins[] = {SS, SCK, MOSI, MISO, A1, A0};
 void loop()
 {  
   gfx->draw16bitRGBBitmap(0, 0, colorWheel, gfx->width(), gfx->height());
-  delay(100);
+  delay(1000);
   return;
 }
 
