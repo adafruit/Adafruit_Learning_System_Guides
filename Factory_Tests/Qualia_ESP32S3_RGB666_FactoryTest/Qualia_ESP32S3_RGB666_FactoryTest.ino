@@ -22,8 +22,17 @@ Arduino_ESP32RGBPanel *rgbpanel = new Arduino_ESP32RGBPanel(
     );
 
 Arduino_RGB_Display *gfx = new Arduino_RGB_Display(
+// 2.1" 480x480 round display
     480 /* width */, 480 /* height */, rgbpanel, 0 /* rotation */, true /* auto_flush */,
     expander, GFX_NOT_DEFINED /* RST */, TL021WVC02_init_operations, sizeof(TL021WVC02_init_operations));
+
+// 2.8" 480x480 round display
+//    480 /* width */, 480 /* height */, rgbpanel, 0 /* rotation */, true /* auto_flush */,
+//    expander, GFX_NOT_DEFINED /* RST */, TL028WVC01_init_operations, sizeof(TL028WVC01_init_operations));
+
+// 3.4" 480x480 square display
+//    480 /* width */, 480 /* height */, rgbpanel, 0 /* rotation */, true /* auto_flush */,
+//    expander, GFX_NOT_DEFINED /* RST */, tl034wvs05_b1477a_init_operations, sizeof(tl034wvs05_b1477a_init_operations));
 
 uint16_t *colorWheel;
   
@@ -59,45 +68,11 @@ void setup(void)
 
 uint8_t allpins[] = {SS, SCK, MOSI, MISO, A1, A0};
 
-bool test = false;
 void loop()
 {  
-  if (!test) {
-    gfx->draw16bitRGBBitmap(0, 0, colorWheel, 480, 480);
-    delay(100);
-    return;
-  }
-  Serial.println("** Test Display!");
-  gfx->fillScreen(BLACK);
-  gfx->setTextSize(5);
-  gfx->setTextColor(WHITE);
-  gfx->setTextWrap(false);
-  gfx->setCursor(100, gfx->height() / 2 - 175);
-  gfx->println("Display OK!");
-
-  if (! TB.testpins(MOSI, A1, allpins, sizeof(allpins))) return;
-  if (! TB.testpins(MISO, SS, allpins, sizeof(allpins))) return;
-  if (! TB.testpins(SCK, A0, allpins, sizeof(allpins))) return;
-  gfx->setCursor(100, gfx->height() / 2 - 125);
-  gfx->println("GPIO OK!");
-
-  gfx->setCursor(100, gfx->height() / 2 - 75);
-  gfx->println("I2C OK!");
-  
-  gfx->setCursor(100, gfx->height() / 2 - 25);
-  gfx->setTextColor(RED);
-  gfx->println("RED");
-
-  gfx->setCursor(100, gfx->height() / 2 + 25);
-  gfx->setTextColor(GREEN);
-  gfx->println("GREEN");
-
-  gfx->setCursor(100, gfx->height() / 2 + 75);
-  gfx->setTextColor(BLUE);
-  gfx->println("BLUE");
-
-  Serial.println("** TEST OK!");
-  test = false;
+  gfx->draw16bitRGBBitmap(0, 0, colorWheel, 480, 480);
+  delay(100);
+  return;
 }
 
 // https://chat.openai.com/share/8edee522-7875-444f-9fea-ae93a8dfa4ec
