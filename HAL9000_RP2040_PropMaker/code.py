@@ -4,7 +4,7 @@
 
 """
 HAL 9000 demo project for Adafruit Prop Maker Feather RP2040 and "Massive
-Arade Button with LED - 100mm red." This simply monitors for button presses
+Arcade Button with LED - 100mm red." This simply monitors for button presses
 and then randomly plays one WAV file from the CIRCUITPY filesystem.
 No soldering required; using quick-connects, LED and button can be wired
 to screw terminals on the Prop Maker Feather board.
