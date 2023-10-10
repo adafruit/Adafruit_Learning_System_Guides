@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-#ifndef _SECRET_H THEN
+#ifndef _SECRET_H
 #define _SECRET_H
 
 // define your WIFI SSID and password in this file
