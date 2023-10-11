@@ -62,6 +62,10 @@
 
 uint8_t i=0;
 
+uint8_t red_out = RED_LED;
+uint8_t green_out = GREEN_LED;
+uint8_t blue_out = BLUE_LED;
+
 void setup() {
   Serial.begin(115200);
   Serial.println("\nProp-Maker Wing: LED Example");
@@ -73,21 +77,32 @@ void setup() {
 
   // Set up the LED Pins
   #if defined(ESP32) // and ESP32-S2!
-    ledcSetup(RED_LED, 5000, 8);
-    ledcAttachPin(RED_PIN, RED_LED);
-    ledcSetup(GREEN_LED, 5000, 8);
-    ledcAttachPin(GREEN_PIN, GREEN_LED);
-    ledcSetup(BLUE_LED, 5000, 8);
-    ledcAttachPin(BLUE_PIN, BLUE_LED);
+    #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 1, 1)
+      // newer LEDC API, use pins instead of channel
+      red_out = RED_PIN;
+      green_out = GREEN_PIN;
+      blue_out = BLUE_PIN;
+      ledcAttach(RED_PIN, 5000, 8);
+      ledcAttach(GREEN_PIN, 5000, 8);
+      ledcAttach(BLUE_PIN, 5000, 8);
+    #else
+      // older LEDC API, use channel, attach pin to channel
+      ledcSetup(RED_LED, 5000, 8);
+      ledcAttachPin(RED_PIN, RED_LED);
+      ledcSetup(GREEN_LED, 5000, 8);
+      ledcAttachPin(GREEN_PIN, GREEN_LED);
+      ledcSetup(BLUE_LED, 5000, 8);
+      ledcAttachPin(BLUE_PIN, BLUE_LED);
+    #endif
   #else
-    pinMode(RED_LED, OUTPUT);
-    pinMode(GREEN_LED, OUTPUT);
-    pinMode(BLUE_LED, OUTPUT);
+    pinMode(red_out, OUTPUT);
+    pinMode(green_out, OUTPUT);
+    pinMode(blue_out, OUTPUT);
   #endif
 
-  analogWrite(RED_LED, 0);
-  analogWrite(GREEN_LED, 0);
-  analogWrite(BLUE_LED, 0);
+  analogWrite(red_out, 0);
+  analogWrite(green_out, 0);
+  analogWrite(blue_out, 0);
 }
 
 uint32_t Color(uint8_t r, uint8_t g, uint8_t b) {
@@ -119,8 +134,8 @@ void loop()
   digitalWrite(POWER_PIN, HIGH);
 
   // write colors to the 3W LED
-  analogWrite(RED_LED, red);
-  analogWrite(GREEN_LED, green);
-  analogWrite(BLUE_LED, blue);
+  analogWrite(red_out, red);
+  analogWrite(green_out, green);
+  analogWrite(blue_out, blue);
   delay(2);
 }
