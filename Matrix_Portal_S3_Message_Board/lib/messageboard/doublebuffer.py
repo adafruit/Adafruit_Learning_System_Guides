@@ -37,7 +37,7 @@ class DoubleBuffer:
         self._buffer_group[1].append(buffer1_sprite)
 
     def show(self, swap=True):
-        self.display.show(self._buffer_group[self._active_buffer])
+        self.display.root_group = self._buffer_group[self._active_buffer]
         if swap:
             self.swap()
 
