@@ -21,7 +21,7 @@ text_area.x = 100
 text_area.y = 80
 
 # Show it
-display.show(text_area)
+display.root_group = text_area
 
 # Loop forever so you can enjoy your image
 while True:

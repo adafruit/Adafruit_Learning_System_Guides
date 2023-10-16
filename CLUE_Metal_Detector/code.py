@@ -468,7 +468,7 @@ if magnetometer is not None:
     magnet_circ_set(0)
 
 # Start-up splash screen
-display.show(screen_group)
+display.root_group = screen_group
 
 # Start-up splash screen
 popup_text(show_text,
@@ -662,10 +662,10 @@ while True:
         if not screen_on or opt == 2:  # Screen toggle
             screen_on = not screen_on
             if screen_on:
-                display.show(screen_group)
+                display.root_group = screen_group
                 display.brightness = 1.0
             else:
-                display.show(None)
+                display.root_group = None
                 display.brightness = 0.0
         elif opt == 0:  # Audio toggle
             audio_on = not audio_on
