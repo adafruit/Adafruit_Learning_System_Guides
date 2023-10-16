@@ -47,9 +47,9 @@ lcd.backlight = True
 puzzle_msgs = ["UNLOCK\nDOOR", "DOOR\nUNLOCKED", "UNLOCKING"]
 
 wavs = []
-for filename in os.listdir('/fraz_sounds'):
+for filename in os.listdir('/faz_sounds'):
     if filename.lower().endswith('.wav') and not filename.startswith('.'):
-        wavs.append("/fraz_sounds/"+filename)
+        wavs.append("/faz_sounds/"+filename)
 wavs.sort()
 print(wavs)
 
