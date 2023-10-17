@@ -2,10 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-#include "Adafruit_TestBed.h"
 #include <Arduino_GFX_Library.h>
-
-extern Adafruit_TestBed TB;
+#include <Adafruit_FT6206.h>
 
 Arduino_XCA9554SWSPI *expander = new Arduino_XCA9554SWSPI(
     PCA_TFT_RESET, PCA_TFT_CS, PCA_TFT_SCK, PCA_TFT_MOSI,
@@ -18,7 +16,7 @@ Arduino_ESP32RGBPanel *rgbpanel = new Arduino_ESP32RGBPanel(
     TFT_B1, TFT_B2, TFT_B3, TFT_B4, TFT_B5,
     1 /* hsync_polarity */, 50 /* hsync_front_porch */, 2 /* hsync_pulse_width */, 44 /* hsync_back_porch */,
     1 /* vsync_polarity */, 16 /* vsync_front_porch */, 2 /* vsync_pulse_width */, 18 /* vsync_back_porch */
-    //,1, 30000000
+//    ,1, 30000000
     );
 
 Arduino_RGB_Display *gfx = new Arduino_RGB_Display(
@@ -50,7 +48,13 @@ Arduino_RGB_Display *gfx = new Arduino_RGB_Display(
 //    1 /* vsync_polarity */, 50 /* vsync_front_porch */, 16 /* vsync_pulse_width */, 16 /* vsync_back_porch */
 
 uint16_t *colorWheel;
-  
+
+
+// The FTxxxx based CTP overlays uses hardware I2C (SCL/SDA)
+#define I2C_TOUCH_ADDR 0x48  // often but not always 0x38!
+Adafruit_FT6206 ctp = Adafruit_FT6206();       // this library also supports FT5336U!
+bool touchOK = false;        // we will check if the touchscreen exists
+
 void setup(void)
 {  
   Serial.begin(115200);
@@ -75,19 +79,37 @@ void setup(void)
   expander->pinMode(PCA_TFT_BACKLIGHT, OUTPUT);
   expander->digitalWrite(PCA_TFT_BACKLIGHT, HIGH);
 
-  TB.begin();
   colorWheel = (uint16_t *) ps_malloc(gfx->width() * gfx->height() * sizeof(uint16_t));
-  if (colorWheel) generateColorWheel(colorWheel);
+  if (colorWheel) {
+    generateColorWheel(colorWheel);
+    gfx->draw16bitRGBBitmap(0, 0, colorWheel, gfx->width(), gfx->height());
+  }
+
+  if (!ctp.begin(0, &Wire, I2C_TOUCH_ADDR)) {
+    Serial.println("No touchscreen found");
+    touchOK = false;
+  } else {
+    Serial.println("Touchscreen found");
+    touchOK = true;
+  }
 }
 
-
-uint8_t allpins[] = {SS, SCK, MOSI, MISO, A1, A0};
-
 void loop()
-{  
-  gfx->draw16bitRGBBitmap(0, 0, colorWheel, gfx->width(), gfx->height());
-  delay(1000);
-  return;
+{
+  if (touchOK && ctp.touched()) {
+    TS_Point p = ctp.getPoint(0);
+    Serial.printf("(%d, %d)\n", p.x, p.y);
+    gfx->fillRect(p.x, p.y, 5, 5, WHITE);
+  }
+   
+  // use the buttons to turn off
+  if (! expander->digitalRead(PCA_BUTTON_DOWN)) {
+    expander->digitalWrite(PCA_TFT_BACKLIGHT, LOW);
+  }
+  // and on the backlight
+  if (! expander->digitalRead(PCA_BUTTON_UP)) {
+    expander->digitalWrite(PCA_TFT_BACKLIGHT, HIGH);
+  }
 }
 
 // https://chat.openai.com/share/8edee522-7875-444f-9fea-ae93a8dfa4ec
