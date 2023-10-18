@@ -488,8 +488,10 @@ byte write_eeprom(int length) {
   // here is a word address, so we use here*2
   // this writes byte-by-byte,
   // page writing may be faster (4 bytes at a time)
+  int start = _addr*2;
   for (int x = 0; x < length; x++) {
-    spi_transaction(0xC0, 0x00, _addr*2+x, buff[x]);
+    int addr = start + x;
+    spi_transaction(0xC0, (addr >> 8) & 0xFF, addr & 0xFF, buff[x]);
     delay(45);
   } 
   return STK_OK;
@@ -497,8 +499,9 @@ byte write_eeprom(int length) {
 
 void program_page() {
   byte result = STK_FAILED;
-  int length = 256 * getch() + getch();
-  if (length > 256) {
+  unsigned int length = 256 * getch();
+  length += getch();
+  if (length > param.eepromsize) {
       Serial.write(STK_FAILED);
       error++;
       return;
@@ -549,8 +552,10 @@ char flash_read_page(int length) {
 
 char eeprom_read_page(int length) {
   // here again we have a word address
+  int start = _addr*2;
   for (int x = 0; x < length; x++) {
-    byte ee = spi_transaction(0xA0, 0x00, _addr*2+x, 0xFF);
+    int addr = start +x;
+    byte ee = spi_transaction(0xA0, (addr >> 8) & 0xFF, addr & 0xFF, 0xFF);
     Serial.write( ee);
   }
   return STK_OK;
