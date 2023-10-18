@@ -1,8 +1,8 @@
-# SPDX-FileCopyrightText: 2021 John Park for Adafruit Industries
+# SPDX-FileCopyrightText: 2023 John Park for Adafruit Industries
 # SPDX-License-Identifier: MIT
 
 #  Grand Central MIDI Knobs
-#  for USB MIDI
+#  for USB MIDI and optional UART MIDI
 #  Reads analog inputs, sends out MIDI CC values
 #   with Kattni Rembor and Jan Goolsbey for range and hysteresis code
 
@@ -16,18 +16,18 @@ import usb_midi
 import adafruit_midi  # MIDI protocol encoder/decoder library
 from adafruit_midi.control_change import ControlChange
 
-
-USB_MIDI_channel = 1  # pick your USB MIDI out channel here, 1-16
+# pick your USB MIDI out channel here, 1-16
+MIDI_USB_channel = 1
 # pick your classic MIDI channel for sending over UART serial TX/RX
 CLASSIC_MIDI_channel = 2
 
-usb_midi = adafruit_midi.MIDI(
-    midi_out=usb_midi.ports[1], out_channel=USB_MIDI_channel - 1
+midi_usb = adafruit_midi.MIDI(
+    midi_out=usb_midi.ports[1], out_channel=MIDI_USB_channel - 1
 )
 #  use DIN-5 or TRS MIDI jack on TX/RX for classic MIDI
-uart = busio.UART(board.TX, board.RX, baudrate=31250, timeout=0.001)  # initialize UART
+midi_uart = busio.UART(board.TX, board.RX, baudrate=31250, timeout=0.001)  # initialize UART
 classic_midi = adafruit_midi.MIDI(
-    midi_out=uart, midi_in=uart, out_channel=CLASSIC_MIDI_channel - 1, debug=False
+    midi_out=midi_uart, midi_in=midi_uart, out_channel=CLASSIC_MIDI_channel - 1, debug=False
 )
 
 led = DigitalInOut(board.D13)  # activity indicator
@@ -45,22 +45,22 @@ for k in range(knob_count):
 
 #  assignment of knobs to cc numbers
 cc_number = [
-    1,  # knob 0, mod wheel
-    2,  # knob 1, breath control
-    7,  # knob 2, volume
-    10,  # knob 3 pan
-    11,  # knob 4, expression
-    53,  # knob 5
-    54,  # knob 6
-    74,  # knob 7
-    74,  # knob 8, Filter frequency cutoff
-    71,  # knob 9, Filter resonance
-    58,  # knob 10
-    59,  # knob 11
-    60,  # knob 12
-    61,  # knob 13
-    62,  # knob 14
-    63,  # knob 15
+    1,  # knob 1, mod wheel
+    2,  # knob 2, breath control
+    7,  # knob 3, volume
+    10,  # knob 4 pan
+    11,  # knob 5, expression
+    53,  # knob 6
+    54,  # knob 7
+    73,  # knob 8
+    74,  # knob 9, Filter frequency cutoff
+    71,  # knob 10, Filter resonance
+    58,  # knob 11
+    59,  # knob 12
+    60,  # knob 13
+    61,  # knob 14
+    62,  # knob 15
+    63,  # knob 16
 ]
 
 # CC range list defines the characteristics of the potentiometers
@@ -70,15 +70,15 @@ cc_number = [
 #   36 (C2) min, 84 (B5) max: 49-note keyboard
 #   21 (A0) min, 108 (C8) max: 88-note grand piano
 cc_range = [
-    (36, 84),  # knob 0: C2 to B5: 49-note keyboard
-    (36, 84),  # knob 1
-    (36, 84),  # knob 2
-    (36, 84),  # knob 3
-    (36, 84),  # knob 4
-    (36, 84),  # knob 5
-    (36, 84),  # knob 6
-    (36, 84),  # knob 7
-    (0, 127),  # knob 8: 0 to 127: full range MIDI CC/control voltage for VCV Rack
+    (0, 127),  # knob 0: C2 to B5: 49-note keyboard
+    (0, 127),  # knob 1
+    (0, 127),  # knob 2
+    (0, 127),  # knob 3
+    (0, 127),  # knob 4
+    (0, 127),  # knob 5
+    (0, 127),  # knob 6
+    (0, 127),  # knob 7
+    (0, 127),  # knob 8
     (0, 127),  # knob 9
     (0, 127),  # knob 10
     (0, 127),  # knob 11
@@ -89,7 +89,7 @@ cc_range = [
 ]
 
 print("---Grand Central MIDI Knobs---")
-print("   USB MIDI channel: {}".format(USB_MIDI_channel))
+print("   USB MIDI channel: {}".format(MIDI_USB_channel))
 print("   TRS MIDI channel: {}".format(CLASSIC_MIDI_channel))
 
 # Initialize cc_value list with current value and offset placeholders
@@ -134,7 +134,7 @@ while True:
         )
         if cc_value[i] != last_cc_value[i]:  # only send if it changed
             # Form a MIDI CC message and send it:
-            usb_midi.send(ControlChange(cc_number[i], cc_value[i][0] + cc_range[i][0]))
+            midi_usb.send(ControlChange(cc_number[i], cc_value[i][0] + cc_range[i][0]))
             classic_midi.send(
                 ControlChange(cc_number[i], cc_value[i][0] + cc_range[i][0])
             )
