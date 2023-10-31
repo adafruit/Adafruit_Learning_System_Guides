@@ -65,7 +65,7 @@ void setup() {
   pinMode(2, INPUT_PULLDOWN);
 }
 
-uint8_t j = 0;
+int j = 0;
 
 void loop() {
   bool valid_i2c[128];
