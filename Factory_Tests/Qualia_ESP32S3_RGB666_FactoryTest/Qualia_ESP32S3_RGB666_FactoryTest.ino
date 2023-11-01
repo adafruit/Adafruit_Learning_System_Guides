@@ -4,6 +4,7 @@
 
 #include <Arduino_GFX_Library.h>
 #include <Adafruit_FT6206.h>
+#include <Adafruit_CST8XX.h>
 
 Arduino_XCA9554SWSPI *expander = new Arduino_XCA9554SWSPI(
     PCA_TFT_RESET, PCA_TFT_CS, PCA_TFT_SCK, PCA_TFT_MOSI,
@@ -49,11 +50,18 @@ Arduino_RGB_Display *gfx = new Arduino_RGB_Display(
 
 uint16_t *colorWheel;
 
+// The Capacitive touchscreen overlays uses hardware I2C (SCL/SDA)
 
-// The FTxxxx based CTP overlays uses hardware I2C (SCL/SDA)
-#define I2C_TOUCH_ADDR 0x48  // often but not always 0x38!
-Adafruit_FT6206 ctp = Adafruit_FT6206();       // this library also supports FT5336U!
+// Most touchscreens use FocalTouch with I2C Address often but not always 0x48!
+#define I2C_TOUCH_ADDR 0x48
+
+// 2.1" 480x480 round display use CST826 touchscreen with I2C Address at 0x15
+//#define I2C_TOUCH_ADDR 0x15  // often but not always 0x48!
+
+Adafruit_FT6206 focal_ctp = Adafruit_FT6206();  // this library also supports FT5336U!
+Adafruit_CST8XX cst_ctp = Adafruit_CST8XX();
 bool touchOK = false;        // we will check if the touchscreen exists
+bool isFocalTouch = false;
 
 void setup(void)
 {  
@@ -85,21 +93,36 @@ void setup(void)
     gfx->draw16bitRGBBitmap(0, 0, colorWheel, gfx->width(), gfx->height());
   }
 
-  if (!ctp.begin(0, &Wire, I2C_TOUCH_ADDR)) {
-    Serial.println("No touchscreen found");
-    touchOK = false;
+  if (!focal_ctp.begin(0, &Wire, I2C_TOUCH_ADDR)) {
+    // Try the CST826 Touch Screen
+    if (!cst_ctp.begin(&Wire, I2C_TOUCH_ADDR)) {
+      Serial.print("No Touchscreen found at address 0x");
+      Serial.println(I2C_TOUCH_ADDR, HEX);
+      touchOK = false;
+    } else {
+      Serial.println("CST826 Touchscreen found");
+      touchOK = true;
+      isFocalTouch = false;
+    }
   } else {
-    Serial.println("Touchscreen found");
+    Serial.println("Focal Touchscreen found");
     touchOK = true;
+    isFocalTouch = true;
   }
 }
 
 void loop()
 {
-  if (touchOK && ctp.touched()) {
-    TS_Point p = ctp.getPoint(0);
-    Serial.printf("(%d, %d)\n", p.x, p.y);
-    gfx->fillRect(p.x, p.y, 5, 5, WHITE);
+  if (touchOK) {
+    if (isFocalTouch && focal_ctp.touched()) {
+      TS_Point p = focal_ctp.getPoint(0);
+      Serial.printf("(%d, %d)\n", p.x, p.y);
+      gfx->fillRect(p.x, p.y, 5, 5, WHITE);
+    } else if (!isFocalTouch && cst_ctp.touched()) {
+      CST_TS_Point p = cst_ctp.getPoint(0);
+      Serial.printf("(%d, %d)\n", p.x, p.y);
+      gfx->fillRect(p.x, p.y, 5, 5, WHITE);
+    }
   }
    
   // use the buttons to turn off
