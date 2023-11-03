@@ -147,7 +147,7 @@ next_filename("gif")
 
 # Blank the whole display
 g = displayio.Group()
-display.show(g)
+display.root_group = g
 display.auto_refresh = False
 display.refresh()
 

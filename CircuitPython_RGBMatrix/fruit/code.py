@@ -111,7 +111,7 @@ for idx in range(3):
     wheel.y = -20
     g.append(wheel)
     wheels.append(wheel)
-display.show(g)
+display.root_group = g
 
 # Make a unique order of the emoji on each wheel
 orders = [shuffled(range(20)), shuffled(range(20)), shuffled(range(20))]

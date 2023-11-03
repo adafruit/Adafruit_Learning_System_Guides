@@ -580,7 +580,7 @@ neko.y = display.height // 2 - neko.TILE_HEIGHT // 2
 main_group.append(neko)
 
 # show main_group on the display
-display.show(main_group)
+display.root_group = main_group
 
 if USE_TOUCH_OVERLAY:
     # initialize laser palette
