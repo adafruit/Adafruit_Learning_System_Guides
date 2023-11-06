@@ -74,7 +74,7 @@ group.append(Rect(0, 0, macropad.display.width, 12, fill=0xFFFFFF))
 group.append(label.Label(terminalio.FONT, text='', color=0x000000,
                          anchored_position=(macropad.display.width//2, -2),
                          anchor_point=(0.5, 0.0)))
-macropad.display.show(group)
+macropad.display.root_group = group
 
 # Load all the macro key setups from .py files in MACRO_FOLDER
 apps = []

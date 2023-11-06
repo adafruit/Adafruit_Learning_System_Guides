@@ -75,7 +75,7 @@ macropad.pixels.brightness = BRIGHT
 # ---Display setup---
 display = board.DISPLAY
 screen = displayio.Group()
-display.show(screen)
+display.root_group = screen
 WIDTH = 128
 HEIGHT = 64
 FONT = terminalio.FONT

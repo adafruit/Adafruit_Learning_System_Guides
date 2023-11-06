@@ -82,7 +82,7 @@ group.append(tilegrid)
 
 
 
-display.show(group)
+display.root_group = group
 
 board_data = bytearray(b'\x00' * 300)
 

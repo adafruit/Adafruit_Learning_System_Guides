@@ -104,7 +104,7 @@ for i in range(day):
     time.sleep(0.1)
 
 #  updates display with bitmap and current circle colors
-magtag.display.show(group)
+magtag.display.root_group = group
 magtag.display.refresh()
 time.sleep(5)
 

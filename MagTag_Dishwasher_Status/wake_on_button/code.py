@@ -31,7 +31,7 @@ with open(bmp_file, "rb") as fp:
     )
     group = displayio.Group()
     group.append(tile_grid)
-    epd.show(group)
+    epd.root_group = group
     time.sleep(epd.time_to_refresh + 0.01)
     epd.refresh()
     while epd.busy:
@@ -42,7 +42,7 @@ with open(bmp_file, "rb") as fp:
 # tile_grid = displayio.TileGrid(bitmap, pixel_shader=bitmap.pixel_shader)
 # group = displayio.Group()
 # group.append(tile_grid)
-# epd.show(group)
+# epd.root_group = group
 # time.sleep(epd.time_to_refresh + 0.01)
 # epd.refresh()
 # while epd.busy:

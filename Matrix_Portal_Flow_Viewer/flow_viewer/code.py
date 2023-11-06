@@ -55,7 +55,7 @@ for row in range(len(VX)):
 matrix = Matrix(width=MATRIX_WIDTH, height=MATRIX_HEIGHT, bit_depth=6)
 display = matrix.display
 group = displayio.Group()
-display.show(group)
+display.root_group = group
 
 bitmap = displayio.Bitmap(display.width, display.height, 4)
 

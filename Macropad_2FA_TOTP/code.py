@@ -89,7 +89,7 @@ splash.append(rtc_date)
 splash.append(rtc_time)
 splash.append(progress_bar)
 
-display.show(splash)
+display.root_group = splash
 
 #-------------------------------------------------------------------------
 #                    H E L P E R    F U N C S

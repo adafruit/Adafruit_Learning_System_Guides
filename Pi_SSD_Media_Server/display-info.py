@@ -29,7 +29,7 @@ display = ST7789(display_bus, width=320, height=170, colstart=35, rotation=270)
 
 # Make the display context
 splash = displayio.Group()
-display.show(splash)
+display.root_group = splash
 
 color_bitmap = displayio.Bitmap(display.width, display.height, 1)
 color_palette = displayio.Palette(1)

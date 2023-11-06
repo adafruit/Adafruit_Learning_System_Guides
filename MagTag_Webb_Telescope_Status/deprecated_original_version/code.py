@@ -235,7 +235,7 @@ temperature_val.text = "{}c | {}c\n{}c | {}c".format(
 )
 
 # show the group
-display.show(main_group)
+display.root_group = main_group
 
 # refresh display
 try_refresh()

@@ -86,7 +86,7 @@ with open(emote_img[0], "rb") as bitmap_file:
     # Add the TileGrid to the Group
     group.append(tile_grid)
     # Add the Group to the Display
-    display.show(group)
+    display.root_group = group
     if sound_mode != 0:
         # play a sound file
         pyportal.play_file(vo_sound[10])
@@ -107,23 +107,12 @@ while True:
     pixel.show()
     time.sleep(1)
 
-    # CircuitPython 6 & 7 compatible
-    with open(emote_img[i], "rb") as bitmap_file:
-        bitmap = displayio.OnDiskBitmap(bitmap_file)
-        tile_grid = displayio.TileGrid(
-            bitmap,
-            pixel_shader=getattr(bitmap, 'pixel_shader', displayio.ColorConverter())
-        )
-        group = displayio.Group()
-        group.append(tile_grid)
-        display.show(group)
-
-    # # CircuitPython 7+ compatible
-    # bitmap = displayio.OnDiskBitmap(emote_img[i])
-    # tile_grid = displayio.TileGrid(bitmap, pixel_shader=bitmap.pixel_shader)
-    # group = displayio.Group()
-    # group.append(tile_grid)
-    # display.show(group)
+    # CircuitPython 7+ compatible
+    bitmap = displayio.OnDiskBitmap(emote_img[i])
+    tile_grid = displayio.TileGrid(bitmap, pixel_shader=bitmap.pixel_shader)
+    group = displayio.Group()
+    group.append(tile_grid)
+    display.root_group = group
 
     if sound_mode != 0:
         # play a sound file

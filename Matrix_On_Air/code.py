@@ -142,7 +142,7 @@ def startup_text():
     text_line2.x = 2
     text_line2.color = color[2]
     redraw_wings(0)
-    display.show(group)
+    display.root_group = group
 
 
 startup_text()  # display the startup text
@@ -158,7 +158,7 @@ def update_text(state):
         text_line2.color = color[1]
         redraw_wings(1)
         redraw_frame()
-        display.show(group)
+        display.root_group = group
     else:  # else, text if "OFF" at startup
         text_line1.text = "OFF"
         text_line1.x = off_x
@@ -168,7 +168,7 @@ def update_text(state):
         text_line2.color = color[3]
         redraw_wings(3)
         redraw_frame()
-        display.show(group)
+        display.root_group = group
 
 
 def get_status():

@@ -73,7 +73,7 @@ if selector:
 
     rect = Rect(4, 4, 66, 58, outline=0x000000, stroke=2)
     group.append(rect)
-    display.show(group)
+    display.root_group = group
     display.refresh()
 
     time.sleep(5)
