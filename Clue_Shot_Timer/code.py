@@ -114,7 +114,7 @@ def picker(current):
     pick[0].text, pick[1].text, pick[2].text, pick[3].text = list(
         current.replace(".", "")
     )
-    display.show(pick)
+    display.root_group = pick
     time.sleep(0.2)
     index = 0
 
@@ -150,7 +150,7 @@ def picker(current):
                     return current
         display.refresh()
 
-    display.show(None)
+    display.root_group = None
 
 
 def rect_maker(shots):
@@ -191,7 +191,7 @@ def show_shot_list(shots, disp):
 
     shot_group = rect_maker(shots)
     shot_group = shot_label_maker(shot_group)
-    disp.show(shot_group)
+    disp.root_group = shot_group
 
     tracker = 10
     while True:
@@ -226,7 +226,7 @@ def menu_mode(
     mode, delay_time, sensitivity_, pb, par, length_, submenus_
 ):  # pylint: disable=too-many-branches,too-many-statements
     selected = int(menu[0].y / 40) + 1
-    display.show(menu)
+    display.root_group = menu
     display.refresh()
     page_ = menu
     while not button_a.value:
@@ -238,14 +238,14 @@ def menu_mode(
             while not button_a.value:
                 if time.monotonic() - started > 1:
                     if page_ == menu:
-                        display.show(group)
+                        display.root_group = group
                         display.refresh()
                         done = True
                     else:
                         page_ = menu
                         selected = int(page_[0].y / 40) + 1
                         length_ = len(page_) - 1
-                        display.show(page_)
+                        display.root_group = page_
                         submenus_ = main_menu_opts
                         display.refresh()
                         break
@@ -277,14 +277,14 @@ def menu_mode(
             while not button_a.value:
                 if time.monotonic() - started > 1:
                     if page_ == menu:
-                        display.show(group)
+                        display.root_group = group
                         display.refresh()
                         done = True
                     else:
                         page_ = menu
                         selected = int(page_[0].y / 40) + 1
                         length_ = len(page_) - 1
-                        display.show(page_)
+                        display.root_group = page_
                         submenus_ = main_menu_opts
                         display.refresh()
                         break
@@ -320,13 +320,13 @@ def menu_mode(
                         pb = picker(f"{PB:05.2f}")
                         mode_label.text = f"{mode} {pb}"
                         page_[selected].text = mode_label.text
-                        display.show(page_)
+                        display.root_group = page_
                         display.refresh()
                     elif mode == "Par":
                         par = picker(f"{par:05.2f}")
                         mode_label.text = f"{mode} {par}"
                         page_[selected].text = mode_label.text
-                        display.show(page_)
+                        display.root_group = page_
                         display.refresh()
                     else:
                         mode_label.text = mode
@@ -346,7 +346,7 @@ def menu_mode(
                 submenus_ = page_opts[selected - 1]
                 selected = int(page_[0].y / 40) + 1
                 length_ = len(page_) - 1
-                display.show(page_)
+                display.root_group = page_
             while not button_b.value:
                 pass
 
@@ -465,7 +465,7 @@ mic = audiobusio.PDMIn(
 
 sensitivity_settings = [8000, 10000, 15000, 20000, 25000, 30000]
 
-display.show(group)
+display.root_group = group
 display.refresh()
 
 sensitivity = sensitivity_settings[SENSITIVITY - 1]
@@ -524,7 +524,7 @@ while True:
             gc.collect()
             if not button_b.value:
                 show_shot_list(shot_list, display)
-                display.show(group)
+                display.root_group = group
                 display.refresh()
                 while not button_b.value or not button_a.value:
                     pass

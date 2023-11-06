@@ -20,7 +20,7 @@ macropad = MacroPad()
 
 # Setup title and grid
 main_group = displayio.Group()
-macropad.display.show(main_group)
+macropad.display.root_group = main_group
 title = label.Label(
     y=4,
     font=terminalio.FONT,

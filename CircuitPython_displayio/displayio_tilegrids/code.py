@@ -67,7 +67,7 @@ sprite.x = 110
 sprite.y = 70
 
 # Add the Group to the Display
-display.show(group)
+display.root_group = grouphttps://learn.adafruit.com/circuitpython-display-support-using-displayio/tilegrid-and-group
 
 # Loop forever so you can enjoy your image
 while True:

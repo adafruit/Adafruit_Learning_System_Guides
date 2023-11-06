@@ -52,7 +52,7 @@ parrot_grid = displayio.TileGrid(parrot_bit, pixel_shader=parrot_pal,
 
 group.append(parrot_grid)
 
-display.show(group)
+display.root_group = group
 
 #  add bearer token as a header to request
 matrixportal.set_headers({'Authorization': 'Bearer ' + bear})

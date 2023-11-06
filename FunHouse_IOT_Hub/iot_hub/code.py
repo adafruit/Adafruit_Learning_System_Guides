@@ -101,11 +101,11 @@ rgb_group.append(B)
 # pylint: disable=unused-argument
 def rgb(last):
     """ Function for when the rgb screen is active """
-    display.show(None)
+    display.root_group = None
     rgb_group[3].text = "00"
     rgb_group[4].text = "00"
     rgb_group[5].text = "00"
-    display.show(rgb_group)
+    display.root_group = rgb_group
     time.sleep(0.2)
     index = 0
     colors = [00, 00, 00]
@@ -144,7 +144,7 @@ def rgb(last):
             break
         time.sleep(0.1)
 
-    display.show(None)
+    display.root_group = None
     time.sleep(0.1)
 
 def rgb_set_color(message):

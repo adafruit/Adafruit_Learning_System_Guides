@@ -114,7 +114,7 @@ bubble = Circle(120, 200, 10, fill=clue.YELLOW, outline=clue.YELLOW, stroke=3)
 indicator_group.append(bubble)
 
 scale_group.append(indicator_group)
-display.show(scale_group)
+display.root_group = scale_group
 
 
 # Helpers

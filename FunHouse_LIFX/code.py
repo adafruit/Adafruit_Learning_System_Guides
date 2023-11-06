@@ -59,7 +59,7 @@ def set_label_color(conditional, index, on_color):
 
 
 # Create the labels
-funhouse.display.show(None)
+funhouse.display.root_group = None
 up_label = funhouse.add_text(text="+", text_position=(3, 6), text_color=0x606060)
 down_label = funhouse.add_text(text="-", text_position=(3, 40), text_color=0x606060)
 running_label = funhouse.add_text(
@@ -69,7 +69,7 @@ time_label = funhouse.add_text(
     text=trip_time, text_scale=2, text_position=(30, 25), text_color=0x606060
 )
 
-funhouse.display.show(funhouse.splash)
+funhouse.display.root_group = funhouse.splash
 
 # Turn on the light
 print("Turning on light...")

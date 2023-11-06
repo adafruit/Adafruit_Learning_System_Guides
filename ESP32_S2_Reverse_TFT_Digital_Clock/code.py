@@ -47,7 +47,7 @@ main_group = displayio.Group()
 main_group.append(group)
 main_group.append(time_label)
 # Show the main group on the display
-display.show(main_group)
+display.root_group = main_group
 
 current_background_image = "/images/blanka-chan.bmp"
 

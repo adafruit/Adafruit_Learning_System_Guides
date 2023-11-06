@@ -23,13 +23,13 @@ funhouse.peripherals.dotstars.brightness = 0.05
 funhouse.peripherals.dotstars.fill(AMBER)
 
 # Create the labels
-funhouse.display.show(None)
+funhouse.display.root_group = None
 mail_label = funhouse.add_text(
     text="No Mail yet", text_position=(4, 14), text_color=AMBER
 )
 reset_label = funhouse.add_text(text="reset", text_position=(3, 70), text_color=GRAY)
 
-funhouse.display.show(funhouse.splash)
+funhouse.display.root_group = funhouse.splash
 
 
 def send_io_data(mail_value):

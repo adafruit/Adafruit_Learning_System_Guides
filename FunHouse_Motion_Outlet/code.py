@@ -68,7 +68,7 @@ funhouse = FunHouse(default_bg=0x0F0F00)
 funhouse.peripherals.dotstars.fill(0)
 outlet = digitalio.DigitalInOut(board.A0)
 outlet.direction = digitalio.Direction.OUTPUT
-funhouse.display.show(None)
+funhouse.display.root_group = None
 funhouse.add_text(
     text="Timeout Left:",
     text_position=(20, 60),
@@ -81,7 +81,7 @@ countdown_label = funhouse.add_text(
     text_color=0xFFFF00,
     text_font="fonts/Arial-Bold-24.pcf",
 )
-funhouse.display.show(funhouse.splash)
+funhouse.display.root_group = funhouse.splash
 
 status = Circle(229, 10, 10, fill=0xFF0000, outline=0x880000)
 funhouse.splash.append(status)

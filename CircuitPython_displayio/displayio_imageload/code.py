@@ -22,7 +22,7 @@ group = displayio.Group()
 group.append(tile_grid)
 
 # Add the Group to the Display
-display.show(group)
+display.root_group = group
 
 # Loop forever so you can enjoy your image
 while True:

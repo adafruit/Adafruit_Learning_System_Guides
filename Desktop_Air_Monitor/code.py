@@ -86,7 +86,7 @@ group.append(humid_text)
 pm2_outline = RoundRect(94, 19, 46, 46, 10, fill=None, outline=0xFFFFFF, stroke=3)
 group.append(pm2_outline)
 
-display.show(group)
+display.root_group = group
 
 sensor_texts = [pm2_text, co2_text, temp_text, humid_text]
 sensor_data = [pm2, co2, temp, humidity]

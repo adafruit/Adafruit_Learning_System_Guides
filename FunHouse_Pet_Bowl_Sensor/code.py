@@ -62,7 +62,7 @@ funhouse.peripherals.dotstars.fill(0)
 water_enable = digitalio.DigitalInOut(board.A0)
 water_enable.switch_to_output()
 water_level_sensor = analogio.AnalogIn(board.A1)
-funhouse.display.show(None)
+funhouse.display.root_group = None
 funhouse.add_text(
     text="Bowl Level:",
     text_position=(120, 60),
@@ -76,7 +76,7 @@ level_label = funhouse.add_text(
     text_color=0xFFFF00,
     text_font="fonts/Arial-Bold-24.pcf",
 )
-funhouse.display.show(funhouse.splash)
+funhouse.display.root_group = funhouse.splash
 
 status = Circle(229, 10, 10, fill=0xFF0000, outline=0x880000)
 funhouse.splash.append(status)

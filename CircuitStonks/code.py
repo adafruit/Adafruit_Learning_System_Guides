@@ -51,7 +51,7 @@ change_text.anchored_position = (80, 10)
 group.append(symbol_text)
 group.append(price_text)
 group.append(change_text)
-minitft.display.show(group)
+minitft.display.root_group = group
 
 refresh = None
 i = 0

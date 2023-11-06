@@ -45,7 +45,7 @@ with open("/display-ruler.bmp", "rb") as f:
 
     g.append(t)
 
-    display.show(g)
+    display.root_group = g
 
     display.refresh()
 
