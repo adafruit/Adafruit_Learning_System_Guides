@@ -67,7 +67,7 @@ _icons = [
 # Make the display context.
 display = board.DISPLAY
 main_group = displayio.Group()
-display.show(main_group)
+display.root_group = main_group
 
 # Touchscreen initialization
 ts = adafruit_touchscreen.Touchscreen(

@@ -25,7 +25,7 @@ class Thermometer_GFX(displayio.Group):
         """
         # root displayio group
         root_group = displayio.Group()
-        board.DISPLAY.show(root_group)
+        board.DISPLAY.root_group = root_group
         super().__init__()
 
         self._celsius = celsius
@@ -33,7 +33,7 @@ class Thermometer_GFX(displayio.Group):
 
         # create background icon group
         self._icon_group = displayio.Group()
-        board.DISPLAY.show(self._icon_group)
+        board.DISPLAY.root_group = self._icon_group
         # create text object group
         self._text_group = displayio.Group()
 
@@ -82,7 +82,7 @@ class Thermometer_GFX(displayio.Group):
         self.io_status_text.y = 220
         self._text_group.append(self.io_status_text)
 
-        board.DISPLAY.show(self._text_group)
+        board.DISPLAY.root_group = self._text_group
 
 
     def display_date_time(self, io_time):

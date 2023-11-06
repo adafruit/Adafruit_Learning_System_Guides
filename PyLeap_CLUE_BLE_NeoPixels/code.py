@@ -67,7 +67,7 @@ text_area.anchored_position = (240 / 2, 240 / 2)
 text_area.scale = 2
 clue_group.append(text_area)
 
-display.show(clue_group)
+display.root_group = clue_group
 
 class RainbowFade(Animation):
     ''' fades the entire strip through the whole spectrum '''

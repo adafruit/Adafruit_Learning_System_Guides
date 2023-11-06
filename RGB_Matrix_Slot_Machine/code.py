@@ -113,7 +113,7 @@ for idx in range(3):
     wheel.y = -20
     g.append(wheel)
     wheels.append(wheel)
-display.show(g)
+display.root_group = g
 
 # We want a digital input to trigger the fruit machine
 button = digitalio.DigitalInOut(board.A1)

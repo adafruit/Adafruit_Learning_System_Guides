@@ -25,7 +25,7 @@ class Azure_GFX(displayio.Group):
         """
         # root displayio group
         root_group = displayio.Group()
-        board.DISPLAY.show(root_group)
+        board.DISPLAY.root_group = root_group
         super().__init__()
 
         # temperature display option
@@ -33,7 +33,7 @@ class Azure_GFX(displayio.Group):
 
         # create background icon group
         self._icon_group = displayio.Group()
-        board.DISPLAY.show(self._icon_group)
+        board.DISPLAY.root_group = self._icon_group
         # create text object group
         self._text_group = displayio.Group()
 
@@ -83,7 +83,7 @@ class Azure_GFX(displayio.Group):
         self._text_group.append(self.azure_status_text)
 
     def show_text(self):
-        board.DISPLAY.show(self._text_group)
+        board.DISPLAY.root_group = self._text_group
 
     def display_azure_status(self, status_text):
         """Displays the system status on the PyPortal

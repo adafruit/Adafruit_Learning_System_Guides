@@ -165,7 +165,7 @@ pyportal = PyPortal(esp=esp,
 
 # Root DisplayIO
 root_group = displayio.Group()
-display.show(root_group)
+display.root_group = root_group
 
 BACKGROUND = BACKGROUND if isinstance(BACKGROUND, int) else 0x0
 bg_bitmap = displayio.Bitmap(display.width, display.height, 1)
@@ -195,7 +195,7 @@ key_group.append(label_title)
 splash.append(key_group)
 
 # Show the group
-display.show(splash)
+display.root_group = splash
 
 print("Connecting to AP...")
 while not esp.is_connected:

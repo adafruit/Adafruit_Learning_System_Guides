@@ -68,7 +68,7 @@ dreidel_grid = displayio.TileGrid(dreidel_bit, pixel_shader=dreidel_pal,
 group.append(dreidel_grid)
 
 #  show dreidel bitmap
-display.show(group)
+display.root_group = group
 
 timer = 0 #  time.monotonic() holder
 spin = 0 #  index for tilegrid

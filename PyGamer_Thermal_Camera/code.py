@@ -35,21 +35,12 @@ amg8833 = adafruit_amg88xx.AMG88XX(i2c)
 font = bitmap_font.load_font("/fonts/OpenSans-9.bdf")
 
 # Display splash graphics and play startup tones
-# CircuitPython 6 & 7 compatible
-with open("/thermal_cam_splash.bmp", "rb") as bitmap_file:
-    bitmap = displayio.OnDiskBitmap(bitmap_file)
-    splash = displayio.Group()
-    splash.append(displayio.TileGrid(bitmap,
-                                     pixel_shader=getattr(bitmap, 'pixel_shader', displayio.ColorConverter())))
-    board.DISPLAY.show(splash)
-    time.sleep(0.1)  # Allow the splash to display
 
-# # CircuitPython 7+ compatible
-# splash = displayio.Group()
-# bitmap = displayio.OnDiskBitmap("/thermal_cam_splash.bmp")
-# splash.append(displayio.TileGrid(bitmap, pixel_shader=bitmap.pixel_shader))
-# board.DISPLAY.show(splash)
-# time.sleep(0.1)  # Allow the splash to display
+splash = displayio.Group()
+bitmap = displayio.OnDiskBitmap("/thermal_cam_splash.bmp")
+splash.append(displayio.TileGrid(bitmap, pixel_shader=bitmap.pixel_shader))
+board.DISPLAY.root_group = splash
+time.sleep(0.1)  # Allow the splash to display
 
 panel.play_tone(440, 0.1)  # A4
 panel.play_tone(880, 0.1)  # A5
@@ -346,7 +337,7 @@ orig_max_range_f = 0   # There are no initial range values
 orig_min_range_f = 0
 
 # Activate display and play welcome tone
-board.DISPLAY.show(image_group)
+board.DISPLAY.root_group = image_group
 panel.play_tone(880, 0.1)  # A5; ready to start looking
 
 ###--- PRIMARY PROCESS LOOP ---###

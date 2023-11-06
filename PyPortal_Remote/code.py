@@ -212,7 +212,7 @@ pages_vals = [page_1_vals, page_2_vals, page_3_vals]
 page = page_1
 page_vals = page_1_vals
 
-board.DISPLAY.show(my_display_group)
+board.DISPLAY.root_group = my_display_group
 print("READY")
 
 

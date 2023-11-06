@@ -62,7 +62,7 @@ light_brightness = 1.0
 
 # Make the display context
 button_group = displayio.Group()
-board.DISPLAY.show(button_group)
+board.DISPLAY.root_group = button_group
 # preload the font
 print('loading font...')
 font = bitmap_font.load_font("/fonts/Arial-12.bdf")
