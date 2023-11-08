@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2023 Trevor Beaton for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import board
 import os
 import ssl
