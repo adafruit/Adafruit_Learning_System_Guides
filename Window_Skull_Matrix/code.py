@@ -96,7 +96,7 @@ SPRITES.append(Sprite(EYE_DATA["eye_image"]))  # Base image is opaque
 SPRITES.append(Sprite(EYE_DATA["lower_lid_image"], EYE_DATA["transparent"]))
 SPRITES.append(Sprite(EYE_DATA["upper_lid_image"], EYE_DATA["transparent"]))
 SPRITES.append(Sprite(EYE_DATA["stencil_image"], EYE_DATA["transparent"]))
-DISPLAY.show(SPRITES)
+DISPLAY.root_group = SPRITES
 
 EYE_CENTER = (
     (EYE_DATA["eye_move_min"][0] + EYE_DATA["eye_move_max"][0])  # Pixel coords of eye

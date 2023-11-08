@@ -79,7 +79,7 @@ sprite.x = 16 * player_loc["x"]
 sprite.y = 16 * player_loc["y"]
 
 # Add the Group to the Display
-display.show(group)
+display.root_group = group
 
 prev_btn_vals = ugame.buttons.get_pressed()
 

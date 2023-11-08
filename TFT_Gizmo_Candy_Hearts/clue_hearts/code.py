@@ -56,7 +56,7 @@ group = displayio.Group()
 group.append(heart)
 group.append(line1)
 group.append(line2)
-display.show(group)
+display.root_group = group
 
 while True:
     # turn off auto refresh while we change some things

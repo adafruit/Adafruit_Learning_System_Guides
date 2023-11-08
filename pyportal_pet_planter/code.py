@@ -91,7 +91,7 @@ pyportal.set_backlight(0.5)
 splash = displayio.Group()
 
 # show splash group
-display.show(splash)
+display.root_group = splash
 
 # Palette for water bitmap
 palette = displayio.Palette(2)

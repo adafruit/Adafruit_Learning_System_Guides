@@ -23,13 +23,13 @@ class WeatherStation_GFX(displayio.Group):
     def __init__(self, celsius=True):
         # root displayio group
         root_group = displayio.Group()
-        board.DISPLAY.show(root_group)
+        board.DISPLAY.root_group = root_group
         super().__init__()
         self._celsius = celsius
 
         # create background icon group
         self._icon_group = displayio.Group()
-        board.DISPLAY.show(self._icon_group)
+        board.DISPLAY.root_group = self._icon_group
 
         # create text object group
         self._text_group = displayio.Group()
@@ -75,7 +75,7 @@ class WeatherStation_GFX(displayio.Group):
         self.sgp_text.x = 0
         self.sgp_text.y = 155
 
-        board.DISPLAY.show(self._text_group)
+        board.DISPLAY.root_group = self._text_group
 
     def display_io_status(self, status_text):
         """Displays the current IO status.

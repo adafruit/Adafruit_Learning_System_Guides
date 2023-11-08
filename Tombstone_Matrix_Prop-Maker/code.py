@@ -68,7 +68,7 @@ def scroll(line):
 g = displayio.Group()
 g.append(line1)
 
-display.show(g)
+display.root_group = g
 
 wavs = []
 for filename in os.listdir('/tomb_sounds'):

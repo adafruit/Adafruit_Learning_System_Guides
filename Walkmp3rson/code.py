@@ -97,7 +97,7 @@ orange_dark = 0x472a16
 
 # display
 main_display_group = displayio.Group()  # everything goes in main group
-display.show(main_display_group)  # show main group (clears screen, too)
+display.root_group = main_display_group  # show main group (clears screen, too)
 
 # background bitmap w OnDiskBitmap
 tape_bitmap = displayio.OnDiskBitmap(open("mp3_tape.bmp", "rb"))

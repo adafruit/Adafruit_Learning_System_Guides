@@ -273,7 +273,7 @@ print("loading map")
 load_map(MAPS[GAME_STATE["MAP_INDEX"]])
 
 # Add the Group to the Display
-display.show(group)
+display.root_group = group
 
 # variables to store previous value of button state
 prev_up = False

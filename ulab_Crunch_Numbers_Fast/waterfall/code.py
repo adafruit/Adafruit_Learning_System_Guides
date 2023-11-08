@@ -63,7 +63,7 @@ fft_size = 256
 group.append(graph)
 
 # Add the Group to the Display
-display.show(group)
+display.root_group = group
 
 # instantiate board mic
 mic = audiobusio.PDMIn(board.MICROPHONE_CLOCK, board.MICROPHONE_DATA,
