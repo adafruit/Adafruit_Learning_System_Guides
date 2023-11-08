@@ -26,13 +26,12 @@ import microcontroller
 # Release any existing displays
 displayio.release_displays()
 
-# max - 40.702570, -73.832641
-# min - 40.677529, -74.017174
+
 
 # --- API Configuration ---
 API_URL = "http://airlabs.co/api/v9/flights?api_key="
-API_KEY = "f1880f2c-1a0e-4165-bbc7-7507cff6c936"
-TEST_API = "http://opensky-network.org/api/states/all?lamin=40.696377&lomin=-73.940979&lamax=40.699356&lomax=-73.911090"
+API_KEY = ""
+TEST_API = "http://opensky-network.org/api/states/all?"
 
 quotes_url = "https://www.adafruit.com/api/quotes.php"
 
@@ -112,17 +111,8 @@ def degrees_to_cardinal(d):
 
 seen_flight_numbers = set()  # To keep track of processed flight numbers
 
-user_lat = 40.68406917331829
-user_lng = -73.92215541728851
-user_location = (user_lat, user_lng)
 
 
-bounding_box = {
-    "min_latitude": 40.7128,
-    "max_latitude": 40.8138,
-    "min_longitude": -74.0160,
-    "max_longitude": -73.9160,
-}
 
 
 api_url = "https://aeroapi.flightaware.com/aeroapi/flights/search"
