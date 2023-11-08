@@ -22,19 +22,10 @@ from displayio import OnDiskBitmap, TileGrid, Group
 from adafruit_matrixportal.matrixportal import MatrixPortal
 import microcontroller
 
-
 # Release any existing displays
 displayio.release_displays()
 
-
-
-# --- API Configuration ---
-API_URL = "http://airlabs.co/api/v9/flights?api_key="
-API_KEY = ""
-TEST_API = "http://opensky-network.org/api/states/all?"
-
 quotes_url = "https://www.adafruit.com/api/quotes.php"
-
 
 THRESHOLD_DISTANCE = 150  # 5 miles
 
@@ -42,7 +33,6 @@ THRESHOLD_DISTANCE = 150  # 5 miles
 font = terminalio.FONT
 text_color = 0xFC6900  # e.g., Retro Orange
 colors = [0xFC6900, 0xDD8000]
-
 
 # --- Wi-Fi setup ---
 wifi.radio.connect(
@@ -53,8 +43,7 @@ print(f"Connected to {os.getenv('CIRCUITPY_WIFI_SSID')}")
 # --- Networking setup ---
 context = ssl.create_default_context()
 
-
-with open("/www.flightaware.com.cer", "rb") as certfile:
+with open("/ssl.com-root.pem", "rb") as certfile:
     context.load_verify_locations(cadata=certfile.read())
 
 pool = socketpool.SocketPool(wifi.radio)
@@ -90,16 +79,10 @@ matrix = rgbmatrix.RGBMatrix(
     doublebuffer=False,
 )
 
-
 # --- Drawing setup ---
 group = Group()
-# Create icon group
-
-
 # Associate the RGB matrix with a Display
 display = framebufferio.FramebufferDisplay(matrix, auto_refresh=False)
-
-
 # display.show(icon_group)
 
 
@@ -111,20 +94,24 @@ def degrees_to_cardinal(d):
 
 seen_flight_numbers = set()  # To keep track of processed flight numbers
 
+bounding_box = {
+    "min_latitude": 44.953469,
+    "max_latitude":  40.962321,
+    "min_longitude": -111.045360 ,
+    "max_longitude":  -104.046577,
+}
 
-
-
+# curl -X GET "https://aeroapi.flightaware.com/aeroapi/flights/search?query=-latlong+%2244.953469+-111.045360+40.962321+-104.046577%22&max_pages=1" \
+# -H "Accept: application/json; charset=UTF-8" \
+# -H "x-apikey:  -AN API KEY-"
 
 api_url = "https://aeroapi.flightaware.com/aeroapi/flights/search"
-username = "UserName"
-api_key = "API_KEY"
+username = "A-Name"
+api_key = "API-KEY"
 
-# Use CircuitPython base64 library for encoding
-headers = {"x-apikey": api_key}
 
 def construct_query_string(params):
     return "&".join(f"{key}={value}" for key, value in params.items())
-
 
 
 def fetch_flight_data():
@@ -135,7 +122,7 @@ def fetch_flight_data():
     }
     headers = {
         "Accept": "application/json; charset=UTF-8",
-        "x-apikey": "API_KEY"
+        "x-apikey": "anA5AXJkYlfC2SNgWghB27mkNO9RRaTI"  # Make sure to replace API_KEY with your actual API key
     }
 
     # Construct the full URL with the query string
@@ -144,25 +131,28 @@ def fetch_flight_data():
     # Use the requests object that was initialized with a session
     response = requests.get(full_url, headers=headers)
 
-   if response.status_code == 200:
+
+    if response.status_code == 200:
+        print("in da loop")
         flights = response.json()['flights']
         for flight in flights:
-            print("Flight Properties:")
-            print(f"Ident: {flight.get('ident', 'N/A')}")
-            print(f"FA Flight ID: {flight.get('fa_flight_id', 'N/A')}")
-            print(f"Origin: {flight.get('origin', {}).get('code', 'N/A')}")
-            print(f"Destination: {flight.get('destination', {}).get('code', 'N/A')}")
-            print(f"Altitude: {flight.get('last_position', {}).get('altitude', 'N/A')}00 ft")
-            print(f"Groundspeed: {flight.get('last_position', {}).get('groundspeed', 'N/A')} knots")
-            print(f"Heading: {flight.get('last_position', {}).get('heading', 'N/A')}")
-            print(f"Latitude: {flight.get('last_position', {}).get('latitude', 'N/A')}")
-            print(f"Longitude: {flight.get('last_position', {}).get('longitude', 'N/A')}")
-            print(f"Timestamp: {flight.get('last_position', {}).get('timestamp', 'N/A')}")
-            print("------")
-            # Print only one flight's properties for brevity; remove the break to print all
-            break
-    else:
-        print(f"Request failed with status code {response.status_code}")
+             print("Flight Properties:")
+             print(f"Ident: {flight.get('ident', 'N/A')}")
+             print(f"FA Flight ID: {flight.get('fa_flight_id', 'N/A')}")
+             print(f"Origin: {flight.get('origin', {}).get('code', 'N/A')}")
+             print(f"Destination: {flight.get('destination', {}).get('code', 'N/A')}")
+             print(f"Altitude: {flight.get('last_position', {}).get('altitude', 'N/A')}00 ft")
+             print(f"Groundspeed: {flight.get('last_position', {}).get('groundspeed', 'N/A')} knots")
+             print(f"Heading: {flight.get('last_position', {}).get('heading', 'N/A')}")
+             print(f"Latitude: {flight.get('last_position', {}).get('latitude', 'N/A')}")
+             print(f"Longitude: {flight.get('last_position', {}).get('longitude', 'N/A')}")
+             print(f"Timestamp: {flight.get('last_position', {}).get('timestamp', 'N/A')}")
+             print("------")
+             # Print only one flight's properties for brevity; remove the break to print all
+             break
+        else:
+            print(f"Request failed with status code {response.status_code}")
+
 
 def requestTest():
     try:
@@ -181,8 +171,10 @@ def requestTest():
     except Exception as e:
         print("Error:\n", str(e))
         print("Resetting microcontroller in 10 seconds")
-        time.sleep(10)
+        time.sleep(1200)
         microcontroller.reset()
+
 
 while True:
     fetch_flight_data()
+    time.sleep (1200)
