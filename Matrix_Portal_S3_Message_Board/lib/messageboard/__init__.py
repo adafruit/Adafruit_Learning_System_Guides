@@ -76,7 +76,6 @@ class MessageBoard:
         self._position = (x, y)
         buffer_x_offset = self._buffer_width - self.display.width
         buffer_y_offset = self._buffer_height - self.display.height
-
         # Image can be a message in which case its properties will be used
         if isinstance(image, Message):
             if opacity is None:
@@ -114,6 +113,7 @@ class MessageBoard:
                 y2=image.height,
             )
             x += self.display.width
+            self._position = (x, y) # Update the stored position
             image = new_image
 
         # If the image is taller than the display buffer, we need to shrink it
@@ -132,6 +132,7 @@ class MessageBoard:
                 y2=image.height,
             )
             y += self.display.height
+            self._position = (x, y) # Update the stored position
             image = new_image
 
         # Clear the foreground buffer
