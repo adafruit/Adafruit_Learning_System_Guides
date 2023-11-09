@@ -35,8 +35,8 @@ THRESHOLD_DISTANCE = 150  # 5 miles
 
 # font = bitmap_font.load_font("/tom-thumb.pcf")
 font = terminalio.FONT
-text_color = 0xFC6900  # e.g., Retro Orange
-colors = [0xFC6900, 0xDD8000]
+text_color = 0x01F9C6  # e.g., Retro Orange
+colors = [0x01F9C6, 0x01F9C6]
 
 # --- Wi-Fi setup ---
 wifi.radio.connect(
@@ -54,12 +54,16 @@ pool = socketpool.SocketPool(wifi.radio)
 requests = adafruit_requests.Session(pool, context)
 
 # --- Matrix setup ---
-DISPLAY_WIDTH = 192
-DISPLAY_HEIGHT = 64
+base_width = 64
+base_height = 32
+chain_across = 3  # 3 panels chained across
+tile_down = 2     # 2 panels tiled down
+DISPLAY_WIDTH = base_width * chain_across
+DISPLAY_HEIGHT = base_height * tile_down
 matrix = rgbmatrix.RGBMatrix(
     width=DISPLAY_WIDTH,
-    height=DISPLAY_HEIGHT,
-    bit_depth=2,
+    height=DISPLAY_HEIGHT,  # Fixed: Changed from 'width' to 'height'
+    bit_depth=1,
     rgb_pins=[
         board.MTX_R1,
         board.MTX_G1,
@@ -78,15 +82,15 @@ matrix = rgbmatrix.RGBMatrix(
     clock_pin=board.MTX_CLK,
     latch_pin=board.MTX_LAT,
     output_enable_pin=board.MTX_OE,
-    tile=1,
-    serpentine=True,
+
+    serpentine=False,
     doublebuffer=False,
 )
 
 # --- Drawing setup ---
 #font = bitmap_font.load_font("/tom-thumb.pcf")
 font = terminalio.FONT
-text_color = 0xFC6900  # e.g., Retro Orange
+text_color = 0x22ff00  # e.g., Retro Orange
 colors = [0xFC6900, 0xDD8000]
 
 group = Group()
@@ -95,7 +99,7 @@ display = framebufferio.FramebufferDisplay(matrix, auto_refresh=False)
 
 # --- Icon Positioning ---
 ICON_HEIGHT = 26  # Height of the icon
-GAP_BETWEEN_ICONS = 12  # Gap between the icons
+GAP_BETWEEN_ICONS = 15  # Gap between the icons
 NUMBER_OF_ICONS = 2  # Number of icons to display
 total_icons_height = (ICON_HEIGHT * NUMBER_OF_ICONS) + (GAP_BETWEEN_ICONS * (NUMBER_OF_ICONS - 1))
 
@@ -107,7 +111,7 @@ start_y = (DISPLAY_HEIGHT - total_icons_height) // 2
 icon_group = Group()
 
 
-gap_between_lines = 12
+gap_between_lines = 32
 
 display.show(icon_group)
 
@@ -115,10 +119,6 @@ def scroll_icons(icon_tile):
     icon_tile.x -= 1
     if icon_tile.x < -64:  # Assuming each icon is 64 pixels wide
         icon_tile.x = 128  # Reset position to the rightmost
-
-
-
-
 
 
 # Function to scroll the icons
@@ -133,19 +133,21 @@ def scroll_text_labels(text_labels):
             label.x = TEXT_RESET_X
 
 
+kbounding_box = {
+    "min_latitude": 40.671859,   # Southernmost latitude
+    "max_latitude": 40.696278,   # Northernmost latitude
+    "min_longitude":  -73.932734, # Westernmost longitude
+    "max_longitude": -73.788054, # Easternmost longitude
+}
 
-seen_flight_numbers = set()  # To keep track of processed flight numbers
 
 bounding_box = {
-    "min_latitude": 40.962321,   # Southernmost latitude
+    "min_latitude": 40.633013,   # Southernmost latitude
     "max_latitude": 44.953469,   # Northernmost latitude
     "min_longitude": -111.045360, # Westernmost longitude
     "max_longitude": -104.046570, # Easternmost longitude
 }
 
-# curl -X GET "https://aeroapi.flightaware.com/aeroapi/flights/search?query=-latlong+%2244.953469+-111.045360+40.962321+-104.046577%22&max_pages=1" \
-# -H "Accept: application/json; charset=UTF-8" \
-# -H "x-apikey:  -AN API KEY-"
 
 def degrees_to_cardinal(d):
     dirs = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
@@ -164,7 +166,6 @@ def update_flight_labels(flights_data):
 # Call this function with fetched flight data
 
 
-#anA5AXJkYlfC2SNgWghB27mkNO9RRaTI
 
 def fetch_flight_data():
     print("Running fetch_flight_data")
@@ -175,7 +176,7 @@ def fetch_flight_data():
     }
     headers = {
         "Accept": "application/json; charset=UTF-8",
-        "x-apikey": "anA5AXJkYlfC2SNgWghB27mkNO9RRaTI"  # Replace with your actual API key
+        "x-apikey": ""  # Replace with your actual API key
     }
     full_url = f"{base_url}?{construct_query_string(params)}"
     response = requests.get(full_url, headers=headers)
@@ -189,6 +190,8 @@ def fetch_flight_data():
             print(f"Response content: {response.content}")
         return []  # Return an empty list if the request failed
 
+
+
 def process_flight_data(json_data):
     # Initialize an empty list to hold processed flight data
     processed_flights = []
@@ -201,12 +204,12 @@ def process_flight_data(json_data):
             'fa_flight_id': flight.get('fa_flight_id', 'N/A'),
             'actual_off': flight.get('actual_off', 'N/A'),
             'actual_on': flight.get('actual_on', 'N/A'),
-            'origin_code': flight.get('origin', {}).get('code', 'Unknown'),
-            'origin_city': flight.get('origin', {}).get('city', 'Unknown'),
-            'origin_country': flight.get('origin', {}).get('country', 'Unknown'),
-            'destination_code': flight.get('destination', {}).get('code', 'Unknown') if flight.get('destination') else 'Unknown',
-            'destination_city': flight.get('destination', {}).get('city', 'Unknown') if flight.get('destination') else 'Unknown',
-            'destination_country': flight.get('destination', {}).get('country', 'Unknown') if flight.get('destination') else 'Unknown',
+            'origin_code': flight.get('origin', {}).get('code', 'UnknownA'),
+            'origin_city': flight.get('origin', {}).get('city', 'UnknownB'),
+            'origin_country': flight.get('origin', {}).get('country', 'UnknownC'),
+            'destination_code': flight.get('destination', {}).get('code', 'UnknownD') if flight.get('destination') else 'UnknownE',
+            'destination_city': flight.get('destination', {}).get('city', 'UnknownH') if flight.get('destination') else 'UnknownF',
+            'destination_country': flight.get('destination', {}).get('country', 'UnknownZ') if flight.get('destination') else 'UnknownG',
             'altitude': flight.get('last_position', {}).get('altitude', 'N/A'),
             'groundspeed': flight.get('last_position', {}).get('groundspeed', 'N/A'),
             'heading': flight.get('last_position', {}).get('heading', 'N/A'),
@@ -222,28 +225,18 @@ def process_flight_data(json_data):
     return processed_flights
 
 
-    
-    
-    
-def create_text_labels(flight_data, display_group):
+
+def create_text_labels(flight_data, y_positions):
     text_labels = []
     for i, flight in enumerate(flight_data):
-        y_position = i * gap_between_lines + 15
+        y_position = y_positions[i] + GAP_BETWEEN_ICONS
 
-        # Since 'country' is not present, we'll use 'origin_city' and 'destination_code' instead
-        # Construct the display text for each flight without 'country'
-        
+        # Since 'country' is not present, use 'origin_city' and 'destination_city' instead
         origin_city = flight.get('origin_city', 'Unknown City')
-        origin_country = flight.get('origin_country', 'Unknown Country')
         destination_city = flight.get('destination_city', 'Unknown City')
-        destination_country = flight.get('destination_country', 'Unknown Country')
-
-        # Format from and to locations with city and country
-        from_location = f"{origin_city}, {origin_country}"
-        to_location = f"{destination_city}, {destination_country}"
 
         # Construct the display text for each flight
-        single_line_text = f"{flight['ident']} | From: {from_location} To: {to_location}"
+        single_line_text = f"{flight['ident']} | From: {origin_city} To: {destination_city}"
 
         text_label = adafruit_display_text.label.Label(
             font,
@@ -252,9 +245,9 @@ def create_text_labels(flight_data, display_group):
             y=y_position,
             text=single_line_text
         )
-        display_group.append(text_label)
         text_labels.append(text_label)
     return text_labels
+
 
 
 def create_icon_tilegrid(ident):
@@ -262,42 +255,74 @@ def create_icon_tilegrid(ident):
     icon_path = f"/airline_logos/{airline_code}.bmp"
     try:
         icon_bitmap = OnDiskBitmap(open(icon_path, "rb"))
-        icon_tilegrid = TileGrid(icon_bitmap, pixel_shader=icon_bitmap.pixel_shader, x=0, y=0)
-        return icon_tilegrid
     except OSError:
-        print(f"Icon for {airline_code} not found.")
-        return None
+        print(f"Icon for {airline_code} not found. Using placeholder.")
+        icon_path = "/airline_logos/placeholder.bmp"  # Path to the placeholder image
+        icon_bitmap = OnDiskBitmap(open(icon_path, "rb"))  # Open the placeholder image
 
-# Update your display update function to include icon creation and text label setup
+    icon_tilegrid = TileGrid(icon_bitmap, pixel_shader=icon_bitmap.pixel_shader, x=0, y=0)
+    return icon_tilegrid
+
+
+
+
+
+
+DISPLAY_HEIGHT = 64  # Total display height in pixels
+ICON_HEIGHT = 26  # Height of each icon in pixels
+NUM_ICONS = 3  # Adjusted number of icons to display without overlap
+
+# Calculate the space needed for all icons
+total_icon_height = ICON_HEIGHT * NUM_ICONS
+
+# Calculate the remaining space after placing all icons
+remaining_space = DISPLAY_HEIGHT - total_icon_height
+
+# Calculate the gap between icons, assuming even spacing above the first icon and below the last icon
+gap_between_icons = remaining_space // (NUM_ICONS + 1)
+
+# Calculate the y position for each icon
+y_positions = [gap_between_icons + (ICON_HEIGHT + gap_between_icons) * i for i in range(NUM_ICONS)]
+
+
+
 def update_display_with_flight_data(flight_data, icon_group, display_group):
     # Clear previous display items
     while len(display_group):
         display_group.pop()
+    
+    # Clear previous icon items
+    while len(icon_group):
+        icon_group.pop()
 
+    # Limit flight data to the adjusted number of icons
+    flight_data = flight_data[:NUM_ICONS]
 
+    # Create text labels for up to NUM_ICONS flights
+    text_labels = create_text_labels(flight_data, y_positions)
 
-    # Limit flight data to only 4 flights
-    flight_data = flight_data[:4]
+    # Add text labels to the display group first so they are behind icons
+    for label in text_labels:
+        display_group.append(label)
 
-    # Load icons and create text labels for up to 4 flights
+    # Load icons and create icon tilegrids for up to NUM_ICONS flights
     for i, flight in enumerate(flight_data):
-        y_position = i * gap_between_lines + 10
+        # Calculate the y position for each icon
+        y_position = y_positions[i]
 
         # Load the icon dynamically
         icon_tilegrid = create_icon_tilegrid(flight['ident'])
         if icon_tilegrid:
             icon_tilegrid.y = y_position
             icon_group.append(icon_tilegrid)
-
-    # Append the icon group to the main display group
+    
+    # Add the icon group to the main display group after text labels
     display_group.append(icon_group)
-
-    # Create and append text labels next to the icons
-    text_labels = create_text_labels(flight_data, display_group)
 
     # Show the updated group on the display
     display.show(display_group)
     return text_labels
+
 
 
 # Initialize the main display group
@@ -305,12 +330,12 @@ main_group = Group()
 
 # Initialize the icon group (this remains static on the display)
 static_icon_group = Group()
-    
-    
-text_label = adafruit_display_text.label.Label(font, text="Label 1", color=0xFFFFFF, x=DISPLAY_WIDTH, y=1)
-text_label2 = adafruit_display_text.label.Label(font, text="Label 2", color=0xFFFFFF, x=DISPLAY_WIDTH, y=3)
-text_label3 = adafruit_display_text.label.Label(font, text="Label 3", color=0xFFFFFF, x=DISPLAY_WIDTH, y=6)
-text_label4 = adafruit_display_text.label.Label(font, text="Label 4", color=0xFFFFFF, x=DISPLAY_WIDTH, y=15)
+
+
+text_label = adafruit_display_text.label.Label(font, text="Label 1", color=0x617C58, x=DISPLAY_WIDTH, y=1)
+text_label2 = adafruit_display_text.label.Label(font, text="Label 2", color=0x617C58, x=DISPLAY_WIDTH, y=3)
+text_label3 = adafruit_display_text.label.Label(font, text="Label 3", color=0x617C58, x=DISPLAY_WIDTH, y=6)
+text_label4 = adafruit_display_text.label.Label(font, text="Label 4", color=0x617C58, x=DISPLAY_WIDTH, y=15)
 
 # Add labels to a display group
 group = displayio.Group()
@@ -321,7 +346,7 @@ group.append(text_label4)
 
 # Show the group
 display.show(group)
-    
+
 flight_data = fetch_flight_data()
 
 # Initialize text labels list
@@ -330,12 +355,12 @@ text_labels = []
 # Check if we received any flight data
 if flight_data:
     text_labels = update_display_with_flight_data(flight_data, static_icon_group, main_group)
-    
-    
+
+ 
 while True:
     scroll_text_labels(text_labels)
 
     # Refresh the display
     display.refresh(minimum_frames_per_second=0)
-    
-time.sleep (120000)
+
+time.sleep (1200)
