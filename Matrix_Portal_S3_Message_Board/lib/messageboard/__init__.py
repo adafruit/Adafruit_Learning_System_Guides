@@ -76,6 +76,7 @@ class MessageBoard:
         self._position = (x, y)
         buffer_x_offset = self._buffer_width - self.display.width
         buffer_y_offset = self._buffer_height - self.display.height
+
         # Image can be a message in which case its properties will be used
         if isinstance(image, Message):
             if opacity is None:
