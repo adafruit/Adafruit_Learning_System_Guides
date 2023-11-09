@@ -150,7 +150,7 @@ def picker(current):
                     return current
         display.refresh()
 
-    display.root_group = None
+    display.root_group = displayio.CIRCUITPYTHON_TERMINAL
 
 
 def rect_maker(shots):

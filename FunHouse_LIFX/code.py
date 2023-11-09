@@ -7,6 +7,7 @@ import socketpool
 import wifi
 import adafruit_requests
 from adafruit_funhouse import FunHouse
+from displayio import CIRCUITPYTHON_TERMINAL
 import adafruit_lifx
 
 # Get wifi details and more from a secrets.py file
@@ -59,7 +60,7 @@ def set_label_color(conditional, index, on_color):
 
 
 # Create the labels
-funhouse.display.root_group = None
+funhouse.display.root_group = CIRCUITPYTHON_TERMINAL
 up_label = funhouse.add_text(text="+", text_position=(3, 6), text_color=0x606060)
 down_label = funhouse.add_text(text="-", text_position=(3, 40), text_color=0x606060)
 running_label = funhouse.add_text(

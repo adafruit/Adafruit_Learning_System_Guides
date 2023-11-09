@@ -7,6 +7,7 @@ import os
 import time
 import board
 import digitalio
+from displayio import CIRCUITPYTHON_TERMINAL
 from adafruit_display_shapes.circle import Circle
 from adafruit_funhouse import FunHouse
 
@@ -68,7 +69,7 @@ funhouse = FunHouse(default_bg=0x0F0F00)
 funhouse.peripherals.dotstars.fill(0)
 outlet = digitalio.DigitalInOut(board.A0)
 outlet.direction = digitalio.Direction.OUTPUT
-funhouse.display.root_group = None
+funhouse.display.root_group = CIRCUITPYTHON_TERMINAL
 funhouse.add_text(
     text="Timeout Left:",
     text_position=(20, 60),

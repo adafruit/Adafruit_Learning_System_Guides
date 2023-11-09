@@ -8,6 +8,7 @@ import time
 import board
 import digitalio
 import analogio
+from displayio import CIRCUITPYTHON_TERMINAL
 from adafruit_display_shapes.circle import Circle
 from adafruit_funhouse import FunHouse
 
@@ -62,7 +63,7 @@ funhouse.peripherals.dotstars.fill(0)
 water_enable = digitalio.DigitalInOut(board.A0)
 water_enable.switch_to_output()
 water_level_sensor = analogio.AnalogIn(board.A1)
-funhouse.display.root_group = None
+funhouse.display.root_group = CIRCUITPYTHON_TERMINAL
 funhouse.add_text(
     text="Bowl Level:",
     text_position=(120, 60),

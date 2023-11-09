@@ -101,7 +101,7 @@ rgb_group.append(B)
 # pylint: disable=unused-argument
 def rgb(last):
     """ Function for when the rgb screen is active """
-    display.root_group = None
+    display.root_group = displayio.CIRCUITPYTHON_TERMINAL
     rgb_group[3].text = "00"
     rgb_group[4].text = "00"
     rgb_group[5].text = "00"
@@ -144,7 +144,7 @@ def rgb(last):
             break
         time.sleep(0.1)
 
-    display.root_group = None
+    display.root_group = displayio.CIRCUITPYTHON_TERMINAL
     time.sleep(0.1)
 
 def rgb_set_color(message):

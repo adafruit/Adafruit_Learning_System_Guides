@@ -49,7 +49,7 @@ import pwmio
 import analogio
 import ulab
 
-from displayio import Group
+from displayio import Group, CIRCUITPYTHON_TERMINAL
 import terminalio
 
 # These imports works on CLUE, CPB (and CPX on 5.x)
@@ -665,7 +665,7 @@ while True:
                 display.root_group = screen_group
                 display.brightness = 1.0
             else:
-                display.root_group = None
+                display.root_group = CIRCUITPYTHON_TERMINAL
                 display.brightness = 0.0
         elif opt == 0:  # Audio toggle
             audio_on = not audio_on

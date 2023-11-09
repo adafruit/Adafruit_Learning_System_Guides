@@ -5,8 +5,10 @@
 
 import board
 from adafruit_debouncer import Debouncer
+from displayio import CIRCUITPYTHON_TERMINAL
 from digitalio import DigitalInOut, Pull
 from adafruit_funhouse import FunHouse
+
 
 beam_sense_pin = DigitalInOut(board.A0)  # defaults to input
 beam_sense_pin.pull = Pull.UP  # turn on internal pull-up resistor
@@ -23,7 +25,7 @@ funhouse.peripherals.dotstars.brightness = 0.05
 funhouse.peripherals.dotstars.fill(AMBER)
 
 # Create the labels
-funhouse.display.root_group = None
+funhouse.display.root_group = CIRCUITPYTHON_TERMINAL
 mail_label = funhouse.add_text(
     text="No Mail yet", text_position=(4, 14), text_color=AMBER
 )
