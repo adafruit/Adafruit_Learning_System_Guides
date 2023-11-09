@@ -53,10 +53,10 @@ uint16_t *colorWheel;
 // The Capacitive touchscreen overlays uses hardware I2C (SCL/SDA)
 
 // Most touchscreens use FocalTouch with I2C Address often but not always 0x48!
-//#define I2C_TOUCH_ADDR 0x48
+#define I2C_TOUCH_ADDR 0x48
 
 // 2.1" 480x480 round display use CST826 touchscreen with I2C Address at 0x15
-#define I2C_TOUCH_ADDR 0x15
+//#define I2C_TOUCH_ADDR 0x15  // often but not always 0x48!
 
 Adafruit_FT6206 focal_ctp = Adafruit_FT6206();  // this library also supports FT5336U!
 Adafruit_CST8XX cst_ctp = Adafruit_CST8XX();
