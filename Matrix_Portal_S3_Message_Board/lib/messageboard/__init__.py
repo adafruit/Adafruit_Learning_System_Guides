@@ -99,7 +99,7 @@ class MessageBoard:
         )
 
         # If the image is wider than the display buffer, we need to shrink it
-        if x + buffer_x_offset < 0:
+        while x + buffer_x_offset < 0:
             new_image = displayio.Bitmap(
                 image.width - self.display.width, image.height, 65535
             )
@@ -118,7 +118,7 @@ class MessageBoard:
             image = new_image
 
         # If the image is taller than the display buffer, we need to shrink it
-        if y + buffer_y_offset < 0:
+        while y + buffer_y_offset < 0:
             new_image = displayio.Bitmap(
                 image.width, image.height - self.display.height, 65535
             )
