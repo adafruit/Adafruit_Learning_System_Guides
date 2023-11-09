@@ -142,7 +142,7 @@ title = label.Label(
 )
 clue_group.append(title)
 
-display.show(clue_group)
+display.root_group = clue_group
 
 while True:
     if clue.button_a or clue.button_b:

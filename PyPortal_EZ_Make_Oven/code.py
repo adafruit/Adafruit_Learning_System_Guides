@@ -610,7 +610,7 @@ def change_profile(oven):
     for b in buttons:
         display_group.append(b)
 
-    board.DISPLAY.show(display_group)
+    board.DISPLAY.root_group = display_group
 
     try:
         board.DISPLAY.refresh(target_frames_per_second=60)
@@ -657,7 +657,7 @@ def default_view():
     global label_reflow, oven, message, timediff, plot, sgraph, timer_data
 
     display_group = displayio.Group()
-    board.DISPLAY.show(display_group)
+    board.DISPLAY.root_group = display_group
 
     plot = displayio.Bitmap(GWIDTH, GHEIGHT, 4)
 

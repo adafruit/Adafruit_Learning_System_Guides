@@ -37,7 +37,7 @@ buttons = keypad.ShiftRegisterKeys(
 )
 
 # show the main group on the display
-display.show(main_group)
+display.root_group = main_group
 
 # main loop
 while True:

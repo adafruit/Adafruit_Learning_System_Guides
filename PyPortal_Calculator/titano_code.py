@@ -38,7 +38,7 @@ ts = adafruit_touchscreen.Touchscreen(board.TOUCH_XL, board.TOUCH_XR,
 
 # Make the display context
 calc_group = displayio.Group()
-board.DISPLAY.show(calc_group)
+board.DISPLAY.root_group = calc_group
 
 # Make a background color fill
 color_bitmap = displayio.Bitmap(SCREEN_WIDTH, SCREEN_HEIGHT, 1)

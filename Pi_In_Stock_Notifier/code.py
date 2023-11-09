@@ -71,7 +71,7 @@ clock_area.x = 125
 clock_area.y = 128
 group.append(text_area)
 group.append(clock_area)
-display.show(group)
+display.root_group = group
 
 last_value = 0 #  checks last tweet's ID
 check = 0 #  time.monotonic() holder

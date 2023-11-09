@@ -80,7 +80,7 @@ hexname.anchored_position = (120, 120)
 
 # Set up main display group (splash)
 splash = displayio.Group()
-display.show(splash)
+display.root_group = splash
 
 # Add background and text label
 splash.append(background)

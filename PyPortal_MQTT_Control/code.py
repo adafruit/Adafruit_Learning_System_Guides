@@ -90,7 +90,7 @@ font.load_glyphs(b"abcdefghjiklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789
 
 # Make the display context
 splash = displayio.Group()
-board.DISPLAY.show(splash)
+board.DISPLAY.root_group = splash
 
 # Make a background color fill
 color_bitmap = displayio.Bitmap(320, 240, 1)

@@ -110,7 +110,7 @@ display = ST7789(
 )
 
 splash = displayio.Group()
-display.show(splash)
+display.root_group = splash
 
 for output_line in shell_command(listen_command):
     process_output(output_line)

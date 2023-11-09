@@ -58,7 +58,7 @@ score_group.append(score_bg)
 score_group.append(score_text)
 
 #  start by showing start splash
-display.show(start_group)
+display.root_group = start_group
 
 #  setup for break beam LED pin
 break_beam = digitalio.DigitalInOut(board.A1)
@@ -97,7 +97,7 @@ while True:
         hoops = True
         button_state = False
         #  display shows scoreboard
-        display.show(score_group)
+        display.root_group = score_group
         print("start game!")
         time.sleep(0.5)
     if hoops:
@@ -138,6 +138,6 @@ while True:
         score = 0
         score_text.text = score
         #  display shows the start splash graphic
-        display.show(start_group)
+        display.root_group = start_group
         print("end game!")
         time.sleep(0.5)

@@ -67,7 +67,7 @@ main_group = displayio.Group()
 main_group.append(group)
 main_group.append(text_area)
 # Show the main group on the display
-display.show(main_group)
+display.root_group = main_group
 
 # Define function to get the appropriate weather icon
 def get_weather_condition_icon(weather_condition):

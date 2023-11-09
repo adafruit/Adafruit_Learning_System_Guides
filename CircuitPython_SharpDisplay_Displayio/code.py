@@ -166,7 +166,7 @@ font = bitmap_font.load_font("/GothamBlack-54.bdf")
 
 # Create a Group for the BLM text
 blm_group = displayio.Group()
-display.show(blm_group)
+display.root_group = blm_group
 
 # Create a 3 line set of text for BLM
 blm_font = [None, None, None]
@@ -204,7 +204,7 @@ for line in names_font:
 
 # Repeatedly show the BLM slogan and then 5 names.
 while True:
-    display.show(blm_group)
+    display.root_group = blm_group
 
     # Show the BLM slogan
     with BatchDisplayUpdate(display):
@@ -227,7 +227,7 @@ while True:
     time.sleep(2)
 
     # Show 5 names
-    display.show(name_group)
+    display.root_group = name_group
     for name in sample(names, 5):
         print(name)
         lines = name.split(" ")

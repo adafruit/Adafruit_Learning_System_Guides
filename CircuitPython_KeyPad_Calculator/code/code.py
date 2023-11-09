@@ -69,7 +69,7 @@ display.auto_refresh = False
 font = bitmap_font.load_font("/digit-16px.pcf")
 text_area = label.Label(font, text=" ", line_spacing=0.95)
 text_area.y = 8
-display.show(text_area)
+display.root_group = text_area
 
 N = float
 

@@ -35,7 +35,7 @@ LABEL_OFFSET = 290
 
 # Make the display context
 calc_group = displayio.Group()
-board.DISPLAY.show(calc_group)
+board.DISPLAY.root_group = calc_group
 
 # Make a background color fill
 color_bitmap = displayio.Bitmap(320, 240, 1)

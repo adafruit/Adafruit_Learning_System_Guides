@@ -62,7 +62,7 @@ display = adafruit_ili9341.ILI9341(display_bus, width=DISPLAY_WIDTH, height=DISP
 
 # add base UI element
 splash = displayio.Group(scale=SKETCH_SCALE)
-display.show(splash)
+display.root_group = splash
 
 # add sketch
 sketch_bitmap = displayio.Bitmap(SKETCH_WIDTH, SKETCH_HEIGHT, 2)

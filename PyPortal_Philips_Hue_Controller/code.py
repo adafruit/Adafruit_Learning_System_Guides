@@ -64,7 +64,7 @@ ts = adafruit_touchscreen.Touchscreen(board.TOUCH_XL, board.TOUCH_XR,
 
 # Make the display context
 button_group = displayio.Group()
-board.DISPLAY.show(button_group)
+board.DISPLAY.root_group = button_group
 # preload the font
 print('loading font...')
 font = bitmap_font.load_font("/fonts/Arial-12.bdf")

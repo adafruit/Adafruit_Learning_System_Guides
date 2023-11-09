@@ -25,7 +25,7 @@ class Google_GFX(displayio.Group):
         # root displayio group
         root_group = displayio.Group()
         self.display = board.DISPLAY
-        self.display.show(root_group)
+        self.display.root_group = root_group
         super().__init__()
 
         # temperature display option
@@ -33,7 +33,7 @@ class Google_GFX(displayio.Group):
 
         # create background icon group
         self._icon_group = displayio.Group()
-        self.display.show(self._icon_group)
+        self.display.root_group = self._icon_group
         # create text object group
         self._text_group = displayio.Group()
 
@@ -85,7 +85,7 @@ class Google_GFX(displayio.Group):
         status_group.append(self.gcp_status_label)
         self._text_group.append(status_group)
 
-        self.display.show(self._text_group)
+        self.display.root_group = self._text_group
 
     def show_gcp_status(self, status_text):
         """Displays the system status on the PyPortal

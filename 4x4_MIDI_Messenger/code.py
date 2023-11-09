@@ -54,7 +54,7 @@ display_bus = displayio.I2CDisplay(i2c, device_address=0x3D, reset=oled_reset)
 display = adafruit_displayio_ssd1306.SSD1306(display_bus, width=128, height=64)
 
 splash = displayio.Group()
-display.show(splash)
+display.root_group = splash
 font = bitmap_font.load_font('/OCRA_small.pcf')
 # main label/MIDI message name text; centered
 main_area = label.Label(

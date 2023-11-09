@@ -61,7 +61,7 @@ text_label.y = 200
 text_label.color = 0xFFFFFF
 root_group.append(text_label)
 
-board.DISPLAY.show(root_group)
+board.DISPLAY.root_group = root_group
 
 # PyPortal ESP32 Setup
 esp32_cs = digitalio.DigitalInOut(board.ESP_CS)

@@ -62,7 +62,7 @@ text_group.append(text_area) # Subgroup for text scaling
 splash.append(text_group)
 
 # display everything so far
-board.DISPLAY.show(splash)
+board.DISPLAY.root_group = splash
 
 # connect to the accelerometer
 i2c = board.I2C()  # uses board.SCL and board.SDA

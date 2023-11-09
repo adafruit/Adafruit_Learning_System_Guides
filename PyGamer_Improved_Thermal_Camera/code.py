@@ -81,7 +81,7 @@ amg8833 = adafruit_amg88xx.AMG88XX(i2c)
 splash = displayio.Group(scale=display.width // 160)
 bitmap = displayio.OnDiskBitmap("/thermalcamera_splash.bmp")
 splash.append(displayio.TileGrid(bitmap, pixel_shader=bitmap.pixel_shader))
-board.DISPLAY.show(splash)
+board.DISPLAY.root_group = splash
 
 # Thermal sensor grid axis size; AMG8833 sensor is 8x8
 SENSOR_AXIS = 8
@@ -381,7 +381,7 @@ orig_max_range_f = 0  # Establish temporary range variables
 orig_min_range_f = 0
 
 # Activate display, show preloaded sample spectrum, and play welcome tone
-display.show(image_group)
+display.root_group = image_group
 update_image_frame()
 flash_status("IRON", 0.75)
 play_tone(880, 0.010)  # Musical note A5

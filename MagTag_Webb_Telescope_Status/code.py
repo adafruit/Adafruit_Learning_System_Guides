@@ -238,7 +238,7 @@ top_left_value.text = "{}C | {}C\n{}C | {}C".format(
 top_center_name.anchored_position = (top_right_value.x - 2, 6)
 
 # show the group
-display.show(main_group)
+display.root_group = main_group
 
 # refresh display
 try_refresh()

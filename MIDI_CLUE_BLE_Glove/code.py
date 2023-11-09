@@ -186,7 +186,7 @@ footer_label.y = 216
 screen.append(footer_label)
 
 # show the screen
-clue.display.show(screen)
+clue.display.root_group = screen
 
 cc_num_pick_toggle = 0  # which cc to adjust w buttons
 cc_send_toggle = True  # to start and stop sending cc

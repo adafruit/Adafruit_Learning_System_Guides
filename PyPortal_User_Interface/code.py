@@ -422,7 +422,7 @@ text_box(
     28,
 )
 
-board.DISPLAY.show(splash)
+board.DISPLAY.root_group = splash
 
 
 # ------------- Code Loop ------------- #

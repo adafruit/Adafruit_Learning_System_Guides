@@ -162,7 +162,7 @@ text_group.append(new_game_text)
 group.append(text_group)
 
 #  displaying main display group
-display.show(group)
+display.root_group = group
 
 #  state for hit detection
 crash = False

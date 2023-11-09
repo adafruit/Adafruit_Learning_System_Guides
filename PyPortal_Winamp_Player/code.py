@@ -102,7 +102,7 @@ winamp_application = WinampApplication(
 )
 
 # Add the Group to the Display
-display.show(winamp_application)
+display.root_group = winamp_application
 
 # previous iteration touch events
 _previous_touch = None

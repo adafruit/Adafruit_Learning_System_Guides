@@ -65,7 +65,7 @@ tile_grid = displayio.TileGrid(bitmap, pixel_shader=palette)
 
 group = displayio.Group()
 group.append(tile_grid)
-display.show(group)
+display.root_group = group
 
 # Loop forever so you can enjoy your image
 while True:

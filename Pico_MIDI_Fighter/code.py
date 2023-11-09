@@ -214,7 +214,7 @@ switch_coordinates = [(0, 0), (1, 0), (2, 0), (3, 0),
 midi_notes = [60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75]
 
 #  show main display GUI
-display.show(splash)
+display.root_group = splash
 
 while True:
 
@@ -314,7 +314,7 @@ while True:
     #  if an arcade button is selected to change the MIDI note...
     if sub_state:
         #  display the secondary GUI menu
-        display.show(big_splash)
+        display.root_group = big_splash
         #  display the selected button's MIDI note
         big_text.text = str(midi_num)
 
@@ -368,6 +368,6 @@ while True:
             #  update new MIDI number text label
             text_labels[button_pos].text = str(midi_num)
             #  show main GUI display
-            display.show(splash)
+            display.root_group = splash
             #  turn off blinking LED
             leds[button_pos].value = False

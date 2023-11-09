@@ -85,7 +85,7 @@ dot_y = [52, 82, 112, 142]
 dot = Circle(220, 60, 8, outline=VFD_GREEN, fill=VFD_BG)
 screen.append(dot)
 
-clue.display.show(screen)
+clue.display.root_group = screen
 
 # constants for sine wave generation
 SIN_LENGTH = 100  # more is less choppy

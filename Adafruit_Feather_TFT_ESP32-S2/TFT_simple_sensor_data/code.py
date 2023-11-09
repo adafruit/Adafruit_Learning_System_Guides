@@ -27,7 +27,7 @@ sensor = LC709203F(i2c)
 
 print("IC version:", hex(sensor.ic_version))
 
-board.DISPLAY.show(main_group)
+board.DISPLAY.root_group = main_group
 
 while True:
     text_area.text = "Battery:\n{:.1f} Volts \n{}%".format(sensor.cell_voltage, sensor.cell_percent)

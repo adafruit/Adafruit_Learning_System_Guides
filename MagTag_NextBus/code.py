@@ -160,7 +160,7 @@ GROUP = displayio.Group()
 GROUP.append(fillrect(0, 0, DISPLAY.width, DISPLAY.height, 0xFFFFFF))
 # Clear the screen ASAP before populating rest of group (erase any old
 # prediction data)...
-DISPLAY.show(GROUP)
+DISPLAY.root_group = GROUP
 DISPLAY.refresh()
 time.sleep(5) # Don't allow another refresh() too soon
 
@@ -207,7 +207,7 @@ for stop_index, stop in enumerate(STOPS):
     GROUP[2 + stop_index * 3].anchored_position = (MAX_SIZE[0] + 4, baseline)
     # Third element (predictions) is NOT positioned here...see main loop
 
-DISPLAY.show(GROUP)
+DISPLAY.root_group = GROUP
 
 NETWORK.connect()
 

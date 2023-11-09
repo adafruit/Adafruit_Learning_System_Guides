@@ -108,7 +108,7 @@ BORDER = 2
 display = adafruit_displayio_ssd1306.SSD1306(display_bus, width=WIDTH, height=HEIGHT)
 
 splash = displayio.Group()
-display.show(splash)
+display.root_group = splash
 
 digital_label = label.Label(
     terminalio.FONT, text="Battery Percent: ", color=0xFFFFFF, x=4, y=4

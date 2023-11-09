@@ -123,7 +123,7 @@ try:
 except AdafruitIO_RequestError:
     neopixel_feed = io.create_new_feed("neopixel")
 
-board.DISPLAY.show(group)
+board.DISPLAY.root_group = group
 print("ready")
 last_color = 257
 last_index = 0

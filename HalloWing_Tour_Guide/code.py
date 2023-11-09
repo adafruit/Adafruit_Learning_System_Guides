@@ -49,7 +49,7 @@ backlight.direction = Direction.OUTPUT
 backlight.value = False
 
 splash = displayio.Group()
-board.DISPLAY.show(splash)
+board.DISPLAY.root_group = splash
 
 
 def play_wave(filename):

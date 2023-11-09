@@ -320,7 +320,7 @@ def sensor_values():
     clean_up(group)
     group.scale = 1
 
-display.show(group)
+display.root_group = group
 
 while True:
     show_shapes()

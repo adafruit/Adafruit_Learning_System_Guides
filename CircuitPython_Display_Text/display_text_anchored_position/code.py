@@ -15,7 +15,7 @@ display = board.DISPLAY
 
 # Make the display context
 main_group = displayio.Group()
-display.show(main_group)
+display.root_group = main_group
 DISPLAY_WIDTH = 320
 DISPLAY_HEIGHT = 240
 TEXT = "Hello"
@@ -75,7 +75,7 @@ text_group.append(text_area_bottom_middle)
 text_group.append(text_area_bottom_left)
 text_group.append(text_area_bottom_right)
 
-display.show(text_group)
+display.root_group = text_group
 
 while True:
     pass

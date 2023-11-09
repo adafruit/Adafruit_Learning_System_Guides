@@ -35,7 +35,7 @@ text_area = bitmap_label.Label(font, text="----", color=0xFFFFFF)
 text_area.x = 135
 text_area.y = 90
 group.append(text_area)
-display.show(group)
+display.root_group = group
 
 # Connect to WiFi
 print("Connecting to %s"%secrets["ssid"])

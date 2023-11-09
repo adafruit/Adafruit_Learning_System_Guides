@@ -42,7 +42,7 @@ clue.sea_level_pressure = slp if 0 < slp < 2000 else STD_SLP
 
 # create main display group
 splash = displayio.Group()
-clue.display.show(splash)
+clue.display.root_group = splash
 
 # background
 bg_bmp, bg_pal = adafruit_imageload.load(

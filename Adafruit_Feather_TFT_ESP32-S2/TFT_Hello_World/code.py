@@ -15,7 +15,7 @@ scale = 3
 text_area = bitmap_label.Label(terminalio.FONT, text=text, scale=scale)
 text_area.x = 10
 text_area.y = 10
-board.DISPLAY.show(text_area)
+board.DISPLAY.root_group = text_area
 
 while True:
     pass

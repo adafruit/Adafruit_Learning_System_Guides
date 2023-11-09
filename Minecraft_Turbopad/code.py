@@ -70,7 +70,7 @@ for i in range(12):
 
 
 main_group = displayio.Group()
-macropad.display.show(main_group)
+macropad.display.root_group = main_group
 title = label.Label(
     y=4,
     font=terminalio.FONT,

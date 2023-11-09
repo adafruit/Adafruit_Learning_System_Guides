@@ -39,7 +39,7 @@ ble._adapter.name = MY_NAME #pylint: disable=protected-access
 # Display Stuff
 display = clue.display
 disp_group = displayio.Group()
-display.show(disp_group)
+display.root_group = disp_group
 
 # Background BMP with the Morse Code cheat sheet
 bmp, pal = adafruit_imageload.load("morse_bg.bmp",

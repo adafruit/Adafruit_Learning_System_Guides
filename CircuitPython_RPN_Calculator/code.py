@@ -224,7 +224,7 @@ class Impl:
 
         g.insert(0, bg)
 
-        display.show(g)
+        display.root_group = g
 
     def getch(self):
         while True:

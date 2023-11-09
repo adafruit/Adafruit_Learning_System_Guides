@@ -54,7 +54,7 @@ splash.append(mouth)
 splash.append(message)
 splash.append(tvoc)
 splash.append(eco2)
-clue.display.show(splash)
+clue.display.root_group = splash
 
 # setup SGP30 and wait for initial warm up
 i2c = board.I2C()  # uses board.SCL and board.SDA

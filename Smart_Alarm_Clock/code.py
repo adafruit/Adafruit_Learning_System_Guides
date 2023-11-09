@@ -224,7 +224,7 @@ framebuffer = sharpdisplay.SharpMemoryFramebuffer(bus, chip_select_pin, 400, 240
 display = framebufferio.FramebufferDisplay(framebuffer)
 
 splash = displayio.Group()
-display.show(splash)
+display.root_group = splash
 
 
 # Set up PWM LEDs

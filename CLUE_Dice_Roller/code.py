@@ -53,7 +53,7 @@ group = displayio.Group()
 group.append(select_label)
 group.append(roll_label)
 
-board.DISPLAY.show(group)
+board.DISPLAY.root_group = group
 
 # Helper functions
 

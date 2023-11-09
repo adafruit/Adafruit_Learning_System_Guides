@@ -105,7 +105,7 @@ displaygroup.append(lesssprite)
 lesssprite.x = -10
 lesssprite.y = int((HEIGHT - ICONSIZE) / 2)
 
-display.show(displaygroup)
+display.root_group = displaygroup
 
 filecount = 0
 xpos = LEFTSPACE

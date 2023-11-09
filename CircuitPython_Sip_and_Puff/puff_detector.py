@@ -290,4 +290,4 @@ class PuffDetector:
         splash.append(high_pressure_label)
         splash.append(pressure_label)
 
-        self.display.show(splash)
+        self.display.root_group = splash

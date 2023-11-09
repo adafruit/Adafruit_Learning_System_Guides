@@ -91,7 +91,7 @@ tg1 = displayio.TileGrid(b1, pixel_shader=palette)
 tg2 = displayio.TileGrid(b2, pixel_shader=palette)
 g1 = displayio.Group(scale=SCALE)
 g1.append(tg1)
-display.show(g1)
+display.root_group = g1
 g2 = displayio.Group(scale=SCALE)
 g2.append(tg2)
 
@@ -108,9 +108,9 @@ while True:
     # values, 400 frames seems like a good number.  Working in this way, with
     # two bitmaps, reduces copying data and makes the animation a bit faster
     for _ in range(n):
-        display.show(g1)
+        display.root_group = g1
         apply_life_rule(b1, b2)
-        display.show(g2)
+        display.root_group = g2
         apply_life_rule(b2, b1)
 
     # After 2*n generations, fill the board with random values and
