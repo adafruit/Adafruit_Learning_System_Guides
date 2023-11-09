@@ -76,7 +76,6 @@ class MessageBoard:
         self._position = (x, y)
         buffer_x_offset = self._buffer_width - self.display.width
         buffer_y_offset = self._buffer_height - self.display.height
-
         # Image can be a message in which case its properties will be used
         if isinstance(image, Message):
             if opacity is None:
@@ -99,7 +98,7 @@ class MessageBoard:
         )
 
         # If the image is wider than the display buffer, we need to shrink it
-        if x + buffer_x_offset < 0:
+        while x + buffer_x_offset < 0:
             new_image = displayio.Bitmap(
                 image.width - self.display.width, image.height, 65535
             )
@@ -118,7 +117,7 @@ class MessageBoard:
             image = new_image
 
         # If the image is taller than the display buffer, we need to shrink it
-        if y + buffer_y_offset < 0:
+        while y + buffer_y_offset < 0:
             new_image = displayio.Bitmap(
                 image.width, image.height - self.display.height, 65535
             )
