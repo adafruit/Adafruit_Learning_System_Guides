@@ -114,6 +114,7 @@ class MessageBoard:
                 y2=image.height,
             )
             x += self.display.width
+            self._position = (x, y) # Update the stored position
             image = new_image
 
         # If the image is taller than the display buffer, we need to shrink it
@@ -132,6 +133,7 @@ class MessageBoard:
                 y2=image.height,
             )
             y += self.display.height
+            self._position = (x, y) # Update the stored position
             image = new_image
 
         # Clear the foreground buffer
