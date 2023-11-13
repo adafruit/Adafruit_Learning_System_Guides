@@ -54,16 +54,12 @@ pool = socketpool.SocketPool(wifi.radio)
 requests = adafruit_requests.Session(pool, context)
 
 # --- Matrix setup ---
-base_width = 64
-base_height = 32
-chain_across = 3  # 3 panels chained across
-tile_down = 2     # 2 panels tiled down
-DISPLAY_WIDTH = base_width * chain_across
-DISPLAY_HEIGHT = base_height * tile_down
+DISPLAY_WIDTH = 192
+DISPLAY_HEIGHT = 128
+BIT_DEPTH = 2
+AUTO_REFRESH = False
 matrix = rgbmatrix.RGBMatrix(
-    width=DISPLAY_WIDTH,
-    height=DISPLAY_HEIGHT,  # Fixed: Changed from 'width' to 'height'
-    bit_depth=1,
+    width=DISPLAY_WIDTH, height=DISPLAY_HEIGHT, bit_depth=BIT_DEPTH,
     rgb_pins=[
         board.MTX_R1,
         board.MTX_G1,
@@ -82,10 +78,9 @@ matrix = rgbmatrix.RGBMatrix(
     clock_pin=board.MTX_CLK,
     latch_pin=board.MTX_LAT,
     output_enable_pin=board.MTX_OE,
-
+    tile=2,
     serpentine=False,
-    doublebuffer=False,
-)
+    doublebuffer=False)
 
 # --- Drawing setup ---
 #font = bitmap_font.load_font("/tom-thumb.pcf")
@@ -100,7 +95,7 @@ display = framebufferio.FramebufferDisplay(matrix, auto_refresh=False)
 # --- Icon Positioning ---
 ICON_HEIGHT = 26  # Height of the icon
 GAP_BETWEEN_ICONS = 15  # Gap between the icons
-NUMBER_OF_ICONS = 2  # Number of icons to display
+NUMBER_OF_ICONS = 4  # Number of icons to display
 total_icons_height = (ICON_HEIGHT * NUMBER_OF_ICONS) + (GAP_BETWEEN_ICONS * (NUMBER_OF_ICONS - 1))
 
 # Calculate the starting y-position for the first icon to center them vertically
@@ -118,7 +113,7 @@ display.show(icon_group)
 def scroll_icons(icon_tile):
     icon_tile.x -= 1
     if icon_tile.x < -64:  # Assuming each icon is 64 pixels wide
-        icon_tile.x = 128  # Reset position to the rightmost
+        icon_tile.x = 130  # Reset position to the rightmost
 
 
 # Function to scroll the icons
@@ -129,7 +124,7 @@ TEXT_RESET_X = 170
 def scroll_text_labels(text_labels):
     for label in text_labels:
         label.x -= 1  # Move label left.
-        if label.x < -256:  # If label has moved off screen.
+        if label.x < -300:  # If label has moved off screen.
             label.x = TEXT_RESET_X
 
 
@@ -166,6 +161,7 @@ def update_flight_labels(flights_data):
 # Call this function with fetched flight data
 
 
+#anA5AXJkYlfC2SNgWghB27mkNO9RRaTI
 
 def fetch_flight_data():
     print("Running fetch_flight_data")
@@ -176,7 +172,7 @@ def fetch_flight_data():
     }
     headers = {
         "Accept": "application/json; charset=UTF-8",
-        "x-apikey": ""  # Replace with your actual API key
+        "x-apikey": "anA5AXJkYlfC2SNgWghB27mkNO9RRaTI"  # Replace with your actual API key
     }
     full_url = f"{base_url}?{construct_query_string(params)}"
     response = requests.get(full_url, headers=headers)
@@ -208,7 +204,7 @@ def process_flight_data(json_data):
             'origin_city': flight.get('origin', {}).get('city', 'UnknownB'),
             'origin_country': flight.get('origin', {}).get('country', 'UnknownC'),
             'destination_code': flight.get('destination', {}).get('code', 'UnknownD') if flight.get('destination') else 'UnknownE',
-            'destination_city': flight.get('destination', {}).get('city', 'UnknownH') if flight.get('destination') else 'UnknownF',
+            'destination_city': flight.get('destination', {}).get('city', 'UnknownH') if flight.get('destination') else 'Unknown Destination',
             'destination_country': flight.get('destination', {}).get('country', 'UnknownZ') if flight.get('destination') else 'UnknownG',
             'altitude': flight.get('last_position', {}).get('altitude', 'N/A'),
             'groundspeed': flight.get('last_position', {}).get('groundspeed', 'N/A'),
@@ -270,7 +266,7 @@ def create_icon_tilegrid(ident):
 
 DISPLAY_HEIGHT = 64  # Total display height in pixels
 ICON_HEIGHT = 26  # Height of each icon in pixels
-NUM_ICONS = 3  # Adjusted number of icons to display without overlap
+NUM_ICONS = 4  # Adjusted number of icons to display without overlap
 
 # Calculate the space needed for all icons
 total_icon_height = ICON_HEIGHT * NUM_ICONS
@@ -290,13 +286,25 @@ def update_display_with_flight_data(flight_data, icon_group, display_group):
     # Clear previous display items
     while len(display_group):
         display_group.pop()
-    
+
     # Clear previous icon items
     while len(icon_group):
         icon_group.pop()
 
     # Limit flight data to the adjusted number of icons
     flight_data = flight_data[:NUM_ICONS]
+
+    # Calculate the space needed for all icons
+    total_icon_height = ICON_HEIGHT * NUM_ICONS
+
+    # Calculate the remaining space after placing all icons
+    remaining_space = DISPLAY_HEIGHT - total_icon_height
+
+    # Calculate the gap between icons, assuming even spacing above the first icon and below the last icon
+    gap_between_icons = 5
+
+    # Calculate the y position for each icon
+    y_positions = [gap_between_icons + (ICON_HEIGHT + gap_between_icons) * i for i in range(NUM_ICONS)]
 
     # Create text labels for up to NUM_ICONS flights
     text_labels = create_text_labels(flight_data, y_positions)
@@ -308,6 +316,7 @@ def update_display_with_flight_data(flight_data, icon_group, display_group):
     # Load icons and create icon tilegrids for up to NUM_ICONS flights
     for i, flight in enumerate(flight_data):
         # Calculate the y position for each icon
+        print(y_positions[i])
         y_position = y_positions[i]
 
         # Load the icon dynamically
@@ -315,7 +324,7 @@ def update_display_with_flight_data(flight_data, icon_group, display_group):
         if icon_tilegrid:
             icon_tilegrid.y = y_position
             icon_group.append(icon_tilegrid)
-    
+
     # Add the icon group to the main display group after text labels
     display_group.append(icon_group)
 
@@ -356,11 +365,29 @@ text_labels = []
 if flight_data:
     text_labels = update_display_with_flight_data(flight_data, static_icon_group, main_group)
 
- 
-while True:
-    scroll_text_labels(text_labels)
 
+start_time = time.time()
+last_network_call_time = time.monotonic()
+
+NETWORK_CALL_INTERVAL = 400000  # 5 minutes
+
+
+while True:
+    # Scroll the text labels
+    scroll_text_labels(text_labels)
     # Refresh the display
     display.refresh(minimum_frames_per_second=0)
+    current_time = time.monotonic()
 
-time.sleep (1200)
+    # Check if 20 minutes have passed
+    if (current_time - last_network_call_time) >= NETWORK_CALL_INTERVAL:
+        #   Make network call here
+        
+        flight_data = fetch_flight_data()
+        last_network_call_time = current_time
+
+        # Reset the scroll or perform any other reset actions here
+      #  reset_scroll(text_labels)  # Assuming you have a function to reset the scroll
+
+    # Sleep for a short period to prevent maxing out your CPU
+        time.sleep(1)  # Sleep for 100 milliseconds
