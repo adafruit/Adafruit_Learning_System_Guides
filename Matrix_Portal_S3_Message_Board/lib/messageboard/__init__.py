@@ -77,7 +77,6 @@ class MessageBoard:
         """Draws a message to the buffer taking its current settings into account.
         It also sets the current position and performs a swap.
         """
-        self._position = (x, y)
         buffer_x_offset = self._buffer_width - self.display.width
         buffer_y_offset = self._buffer_height - self.display.height
 
@@ -93,6 +92,14 @@ class MessageBoard:
 
         if mask_color > 65535:
             mask_color = displayio.ColorConverter().convert(mask_color)
+
+        # New significantly shorter message, so adjust the position
+        while image.width + x < 0:
+            x += self.display.width
+        while image.height + y < 0:
+            y += self.display.height
+
+        self._position = (x, y)
 
         # Blit the background
         bitmaptools.blit(
