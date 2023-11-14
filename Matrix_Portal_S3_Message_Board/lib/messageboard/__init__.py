@@ -21,6 +21,8 @@ class MessageBoard:
         self._background = None
         self.set_background()  # Set to black
         self._position = (0, 0)
+        self._shift_count_x = 0
+        self._shift_count_y = 0
 
     def set_background(self, file_or_color=0x000000):
         """The background image to a bitmap file."""
@@ -50,7 +52,7 @@ class MessageBoard:
         anim_class = getattr(anim_class, animation_class.lower())
         anim_class = getattr(anim_class, animation_class)
         animation = anim_class(
-            self.display, self._draw, self._position
+            self.display, self._draw, self._position, (self._shift_count_x, self._shift_count_y)
         )  # Instantiate the class
         # Call the animation function and pass kwargs along with the message (positional)
         anim_func = getattr(animation, animation_function)
@@ -99,6 +101,7 @@ class MessageBoard:
         )
 
         # If the image is wider than the display buffer, we need to shrink it
+        shift_count = 0
         while x + buffer_x_offset < 0:
             new_image = displayio.Bitmap(
                 image.width - self.display.width, image.height, 65535
@@ -115,9 +118,12 @@ class MessageBoard:
             )
             x += self.display.width
             self._position = (x, y) # Update the stored position
+            shift_count += 1
             image = new_image
+        self._shift_count_x = shift_count
 
         # If the image is taller than the display buffer, we need to shrink it
+        shift_count = 0
         while y + buffer_y_offset < 0:
             new_image = displayio.Bitmap(
                 image.width, image.height - self.display.height, 65535
@@ -134,7 +140,9 @@ class MessageBoard:
             )
             y += self.display.height
             self._position = (x, y) # Update the stored position
+            shift_count += 1
             image = new_image
+        self._shift_count_y = shift_count
 
         # Clear the foreground buffer
         foreground_buffer = displayio.Bitmap(
