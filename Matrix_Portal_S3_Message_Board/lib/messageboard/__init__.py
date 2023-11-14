@@ -61,6 +61,8 @@ class MessageBoard:
     def set_message_position(self, x, y):
         """Set the position of the message on the display"""
         self._position = (x, y)
+        self._shift_count_x = 0
+        self._shift_count_y = 0
 
     def _draw(
         self,
