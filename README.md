@@ -6,8 +6,9 @@ Adafruit is an Open Source company. To support Adafruit, please consider buying 
 
 Starting in 2023, guides using a specific Adafruit board will be placed in a subdirectory with that product name to reduce the number of directories under the main directory. If you are creating a new guide, please check if your Adafruit board falls into one of these groups and make your project code directory in the appropriate subfolder.
 
-Flora/
-QT Py/
+* Flora/
+* ItsyBitsy/
+* QT Py/
 
 ## Issues
 
