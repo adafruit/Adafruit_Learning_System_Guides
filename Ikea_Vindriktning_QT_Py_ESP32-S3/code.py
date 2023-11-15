@@ -13,7 +13,7 @@ import microcontroller
 import adafruit_requests
 import neopixel
 from adafruit_ticks import ticks_ms, ticks_add, ticks_diff
-from adafruit_io.adafruit_io import IO_HTTP, AdafruitIO_RequestError
+from adafruit_io.adafruit_io import IO_HTTP
 
 pixel_pin = board.NEOPIXEL
 num_pixels = 1
@@ -32,8 +32,8 @@ except Exception as e: # pylint: disable=broad-except
     time.sleep(5)
     microcontroller.reset()
 
-aio_username = os.getenv('aio_username')
-aio_key = os.getenv('aio_key')
+aio_username = os.getenv("ADAFRUIT_IO_USERNAME")
+aio_key = os.getenv("ADAFRUIT_IO_KEY")
 
 try:
     pool = socketpool.SocketPool(wifi.radio)
@@ -52,7 +52,7 @@ except Exception as e: # pylint: disable=broad-except
 try:
 # get feed
     ikea_pm25 = io.get_feed("ikeapm25")
-except AdafruitIO_RequestError:
+except Exception: #  pylint: disable=broad-except
 # if no feed exists, create one
     ikea_pm25 = io.create_new_feed("ikeapm25")
 
