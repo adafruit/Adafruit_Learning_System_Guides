@@ -22,40 +22,30 @@ displayio.release_displays()
 DISPLAY_WIDTH = 128
 DISPLAY_HEIGHT = 64
 
-NETWORK_CALL_INTERVAL = 25920  # 432 Minutes - 7.2 Hours
+# 432 Minutes - 7.2 Hours
+NETWORK_CALL_INTERVAL = 25920
 
 # --- Icon Properties ---
-
 ICON_WIDTH = 26  # Width of the icons
 ICON_HEIGHT = 26  # Height of the icons
+# Calculate the gap between icons
+gap_between_icons = 5
 
 GAP_BETWEEN_ICONS = 15  # Gap between the icons
 NUMBER_OF_ICONS = 2  # Number of icons to display
+PLACEHOLDER_ICON_PATH = "/airline_logos/placeholder.bmp"
 
-# --- Drawing Properties ---
+# --- Text Properties ---
 TEXT_START_X = ICON_WIDTH + 4
-
-# Function to scroll the icons
 TEXT_RESET_X = 170
-
 FONT = terminalio.FONT
 TEXT_COLOR = 0x22FF00  # e.g., Green
-
-# Initialize text labels list
-
 
 # Initialize the main display group
 main_group = Group()
 
 # Initialize the icon group (this remains static on the display)
 static_icon_group = Group()
-
-kbounding_box = {
-    "min_latitude": 40.671859,  # Southernmost latitude
-    "max_latitude": 40.696278,  # Northernmost latitude
-    "min_longitude": -73.932734,  # Westernmost longitude
-    "max_longitude": -73.788054,  # Easternmost longitude
-}
 
 # Sample Bounding Box
 bounding_box = {
@@ -65,9 +55,8 @@ bounding_box = {
     "max_longitude": -104.046570,  # Easternmost longitude
 }
 
-
 # --- Matrix setup ---
-BIT_DEPTH = 3
+BIT_DEPTH = 2
 matrix = rgbmatrix.RGBMatrix(
     width=DISPLAY_WIDTH,
     height=DISPLAY_HEIGHT,
@@ -117,13 +106,6 @@ total_icons_height = (ICON_HEIGHT * NUMBER_OF_ICONS) + (
     GAP_BETWEEN_ICONS * (NUMBER_OF_ICONS - 1)
 )
 
-
-def scroll_icons(icon_tile):
-    icon_tile.x -= 1
-    if icon_tile.x < -64:  # Assuming each icon is 64 pixels wide
-        icon_tile.x = 130  # Reset position to the rightmost
-
-
 # Function to scroll objects
 def scroll_text_labels(text_labels):
     for label in text_labels:
@@ -166,9 +148,8 @@ def fetch_flight_data():
         print(f"Request failed with status code {response.status_code}")
         if response.content:
             print(f"Response content: {response.content}")
-        return []  # Return an empty list if the request failed
+        return []
 
- 
 def process_flight_data(json_data):
     # Initialize an empty list to hold processed flight data
     processed_flights = []
@@ -230,26 +211,25 @@ def create_text_labels(flight_data, Ypositions):
         local_text_labels.append(text_label)
     return local_text_labels
 
-# pylint: disable=consider-using-with
+
+
 def create_icon_tilegrid(ident):
     airline_code = ident[:3].upper()  # Use the first three characters of 'ident'
     icon_path = f"/airline_logos/{airline_code}.bmp"
+
     try:
-        icon_bitmap = OnDiskBitmap(open(icon_path, "rb"))
+        # pylint: disable=consider-using-with
+        file = open(icon_path, "rb")
+        icon_bitmap = OnDiskBitmap(file)
     except OSError:
         print(f"Icon for {airline_code} not found. Using placeholder.")
-        icon_path = "/airline_logos/placeholder.bmp"  # Path to the placeholder image
-        icon_bitmap = OnDiskBitmap(open(icon_path, "rb"))  # Open the placeholder image
+        # pylint: disable=consider-using-with
+        file = open(PLACEHOLDER_ICON_PATH, "rb")
+        icon_bitmap = OnDiskBitmap(file)
 
-    icon_tilegrid = TileGrid(
-        icon_bitmap, pixel_shader=icon_bitmap.pixel_shader, x=0, y=0
-    )
+    icon_tilegrid = TileGrid(icon_bitmap, pixel_shader=icon_bitmap.pixel_shader, x=0, y=0)
     return icon_tilegrid
 
-
-
-# Calculate the gap between icons
-gap_between_icons = 5
 
 def update_display_with_flight_data(flight_data, icon_group, display_group):
     # Clear previous display items
@@ -262,9 +242,6 @@ def update_display_with_flight_data(flight_data, icon_group, display_group):
 
     # Limit flight data to the adjusted number of icons
     flight_data = flight_data[:NUMBER_OF_ICONS]
-
-
-
 
     # Calculate the y position for each icon
     y_positions = [
@@ -297,6 +274,7 @@ def update_display_with_flight_data(flight_data, icon_group, display_group):
     display.show(display_group)
     display.refresh()
     return text_labels
+
 
 
 def display_no_flights():
