@@ -218,12 +218,10 @@ def create_icon_tilegrid(ident):
     icon_path = f"/airline_logos/{airline_code}.bmp"
 
     try:
-        # pylint: disable=consider-using-with
         file = open(icon_path, "rb")
         icon_bitmap = OnDiskBitmap(file)
     except OSError:
         print(f"Icon for {airline_code} not found. Using placeholder.")
-        # pylint: disable=consider-using-with
         file = open(PLACEHOLDER_ICON_PATH, "rb")
         icon_bitmap = OnDiskBitmap(file)
 
