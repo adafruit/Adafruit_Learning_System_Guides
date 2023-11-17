@@ -139,9 +139,6 @@ class WrappedTextDisplay:
 
     def refresh(self):
         text = '\n'.join(self.lines[self.line_offset : self.line_offset + max_lines])
-        # Work around https://github.com/adafruit/Adafruit_CircuitPython_Display_Text/issues/183
-        while '\n\n' in text:
-            text = text.replace('\n\n', '\n \n')
         terminal.text = text
         board.DISPLAY.refresh()
 wrapped_text_display = WrappedTextDisplay()
