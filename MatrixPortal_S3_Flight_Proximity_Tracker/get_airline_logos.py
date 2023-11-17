@@ -141,7 +141,7 @@ for f in range(len(chars)):
 
                     # Delete the original .png file
                 os.remove(img_path_png)
-        except Exception: # pylint: disable=broad-exception-caught
+        except Exception: # pylint: disable=broad-except
             print("file is missing, moving on..")
         for t in range(len(chars)):
             # Set the URL for ICAO
@@ -170,5 +170,5 @@ for f in range(len(chars)):
 
                     # Delete the original .png file
                     os.remove(img_path_png_0)
-            except Exception: # pylint: disable=broad-exception-caught
+            except Exception: # pylint: disable=broad-except
                 print("file is missing, moving on..")
