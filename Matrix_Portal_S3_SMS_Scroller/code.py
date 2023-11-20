@@ -1,17 +1,17 @@
 # SPDX-FileCopyrightText: 2023 Melissa-LeBlanc-Williams for Adafruit Industries
-# SPDX-FileCopyrightText: 2023 Erin St. Blaine for Adafruit Industries
 # SPDX-FileCopyrightText: 2020 John Park for Adafruit Industries
 #
 # SPDX-License-Identifier: MIT
 
-# SMS Message board matrix display
-# uses AdafruitIO to serve up a message text feed and color feed
-# messages are displayed in order, updates periodically to look for new messages
+# Quote board matrix display
+# uses AdafruitIO to serve up a quote text feed and color feed
+# random messages are displayed, updates periodically to look for new messages
+# avoids repeating the same quote twice in a row
 
-from collections import deque
 import time
-import random
 import board
+import random
+from collections import deque
 from adafruit_matrixportal.matrix import Matrix
 from adafruit_matrixportal.network import Network
 from messageboard import MessageBoard
@@ -25,11 +25,11 @@ DEFAULT_MESSAGE = "Text Adafruit IO to update"
 DEFAULT_FONT = "arial_sm"
 MESSAGES_FEED = "text"
 COLORS_FEED = "color"
-UPDATE_DELAY = 50  # Seconds between updates
-SCROLL_DURATION = 6  # Seconds to scroll entire message
+UPDATE_DELAY = 50   # Seconds between updates
+SCROLL_DURATION = 5 # Seconds to scroll entire message
 RANDOMIZE_FONTS = True  # Randomize fonts, make "False" to just use the default font
-RANDOMIZE_COLORS = True  # Randomise colors, make "False" to just use the default color
-KEEP_LATEST_MESSAGE = True  # Keep the last message in the Message Feed
+RANDOMIZE_COLORS = True # Randomise colors, make "False" to just use the default color
+KEEP_LATEST_MESSAGE = True # Keep the last message in the Message Feed
 
 # --- Display setup ---
 matrix = Matrix(width=WIDTH, height=HEIGHT, bit_depth=5)
@@ -47,7 +47,6 @@ message_fonts = ("sofia", "arial_lg")
 
 message_queue = deque((), 10000)  # Use a double-ended queue for messages
 colors = []
-
 
 def update_data():
     print("Updating data from Adafruit IO")
@@ -70,15 +69,15 @@ def update_data():
     try:
         messages_data = network.get_io_data(MESSAGES_FEED)
         message_ids = []
-        sms_messages = []  # Temporary place for messages
+        messages = [] # Temporary place for messages
         for json_data in messages_data:
             message_ids.append(network.json_traverse(json_data, ["id"]))
-            sms_messages.append(network.json_traverse(json_data, ["value"]))
+            messages.append(network.json_traverse(json_data, ["value"]))
 
         # Results are returned in reverse order, so we reverse that and add to end of queue
-        sms_messages.reverse()
-        for sms_message in sms_messages:
-            message_queue.append(sms_message)
+        messages.reverse()
+        for message in messages:
+            message_queue.append(message)
 
         # Remove any messages that have been grabbed except the latest one if setting enabled
         start_index = 1 if KEEP_LATEST_MESSAGE else 0
@@ -91,7 +90,6 @@ def update_data():
         print(error)
 
     messageboard.animate(system_message, "Static", "hide")
-
 
 def get_new_rand_item(current_index, item_list):
     if not item_list:
@@ -144,9 +142,8 @@ while True:
     message.add_text(message_text, color=message_color)
 
     # Scroll the message
-    duration = SCROLL_DURATION / 2
-    messageboard.animate(message, "Scroll", "in_from_right", duration=duration)
-    messageboard.animate(message, "Scroll", "out_to_left", duration=duration)
+    duration = SCROLL_DURATION
+    messageboard.animate(message, "Scroll", "right_to_left", duration=SCROLL_DURATION)
 
     if time.monotonic() > last_update + UPDATE_DELAY:
         update_data()
