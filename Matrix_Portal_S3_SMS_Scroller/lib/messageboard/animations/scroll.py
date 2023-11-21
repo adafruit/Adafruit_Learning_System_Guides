@@ -171,14 +171,15 @@ class Scroll(Animation):
         )
 
     def right_to_left(self, message, duration=1):
-        """Scroll a message in from the right side of the display and then out the left side over a certain period of
-        time. The final position is off-screen to the left.
+        """Scroll a message in from the right side of the display and then out the left side
+        over a certain period of time. The final position is off-screen to the left.
 
         :param message: The message to animate.
         :param float duration: (optional) The period of time to perform the animation
                                over in seconds. (default=1)
         :type message: Message
         """
+        # pylint: disable=unused-variable
         center_x, center_y = self._get_centered_position(message)
         self.scroll_from_to(
             message, duration,

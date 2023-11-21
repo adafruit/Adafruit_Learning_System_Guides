@@ -9,9 +9,9 @@
 # avoids repeating the same quote twice in a row
 
 import time
-import board
 import random
 from collections import deque
+import board
 from adafruit_matrixportal.matrix import Matrix
 from adafruit_matrixportal.network import Network
 from messageboard import MessageBoard
@@ -76,8 +76,8 @@ def update_data():
 
         # Results are returned in reverse order, so we reverse that and add to end of queue
         messages.reverse()
-        for message in messages:
-            message_queue.append(message)
+        for m in messages:
+            message_queue.append(m)
 
         # Remove any messages that have been grabbed except the latest one if setting enabled
         start_index = 1 if KEEP_LATEST_MESSAGE else 0
