@@ -33,7 +33,7 @@ gap_between_icons = 5
 
 GAP_BETWEEN_ICONS = 15  # Gap between the icons
 NUMBER_OF_ICONS = 2  # Number of icons to display
-PLACEHOLDER_ICON_PATH = "/placeholder_image/placeholder.bmp"
+PLACEHOLDER_ICON_PATH = "/airline_logos/placeholder.bmp"
 
 # --- Text Properties ---
 TEXT_START_X = ICON_WIDTH + 4
