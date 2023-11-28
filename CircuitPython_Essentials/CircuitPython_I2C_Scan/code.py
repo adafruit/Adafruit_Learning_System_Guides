@@ -2,6 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
+# pylint: disable=bare-except, eval-used, unused-import
+
 """CircuitPython I2C Device Address Scan"""
 import time
 import board
