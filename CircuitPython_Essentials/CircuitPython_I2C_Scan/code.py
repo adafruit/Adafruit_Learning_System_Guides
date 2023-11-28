@@ -2,34 +2,49 @@
 #
 # SPDX-License-Identifier: MIT
 
-"""CircuitPython I2C Device Address Scan"""
-# If you run this and it seems to hang, try manually unlocking
-# your I2C bus from the REPL with
-#  >>> import board
-#  >>> board.I2C().unlock()
+# pylint: disable=bare-except, eval-used, unused-import
 
+"""CircuitPython I2C Device Address Scan"""
 import time
 import board
+import busio
 
-# To use default I2C bus (most boards)
-i2c = board.I2C()  # uses board.SCL and board.SDA
-# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
+# List of potential I2C busses
+ALL_I2C = ("board.I2C()", "board.STEMMA_I2C()", "busio.I2C(board.GP1, board.GP0)")
 
-# To create I2C bus on specific pins
-# import busio
-# i2c = busio.I2C(board.SCL1, board.SDA1)  # QT Py RP2040 STEMMA connector
-# i2c = busio.I2C(board.GP1, board.GP0)    # Pi Pico RP2040
+# Determine which busses are valid
+found_i2c = []
+for name in ALL_I2C:
+    try:
+        print("Checking {}...".format(name), end="")
+        bus = eval(name)
+        bus.unlock()
+        found_i2c.append((name, bus))
+        print("ADDED.")
+    except:
+        print("SKIPPED.")
 
-while not i2c.try_lock():
-    pass
-
-try:
+# Scan valid busses
+if len(found_i2c):
+    print("-" * 40)
+    print("I2C SCAN")
+    print("-" * 40)
     while True:
-        print(
-            "I2C addresses found:",
-            [hex(device_address) for device_address in i2c.scan()],
-        )
-        time.sleep(2)
+        for bus_info in found_i2c:
+            name = bus_info[0]
+            bus = bus_info[1]
 
-finally:  # unlock the i2c bus when ctrl-c'ing out of the loop
-    i2c.unlock()
+            while not bus.try_lock():
+                pass
+
+            print(
+                name,
+                "addresses found:",
+                [hex(device_address) for device_address in bus.scan()],
+            )
+
+            bus.unlock()
+
+        time.sleep(2)
+else:
+    print("No valid I2C bus found.")
