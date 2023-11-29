@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 Limor Fried for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #include <Arduino_GFX_Library.h>
 #include "inits.h"
 #include "Adafruit_FT6206.h"
@@ -5,7 +9,7 @@
 Arduino_XCA9554SWSPI *expander = new Arduino_XCA9554SWSPI(
     PCA_TFT_RESET, PCA_TFT_CS, PCA_TFT_SCK, PCA_TFT_MOSI,
     &Wire, 0x3F);
-    
+
 Arduino_ESP32RGBPanel *rgbpanel = new Arduino_ESP32RGBPanel(
     TFT_DE, TFT_VSYNC, TFT_HSYNC, TFT_PCLK,
     TFT_R1, TFT_R2, TFT_R3, TFT_R4, TFT_R5,
@@ -37,9 +41,9 @@ Adafruit_FT6206 ctp = Adafruit_FT6206();  // This library also supports FT6336U!
 bool touchOK = false;
 
 void setup(void)
-{  
+{
   //while (!Serial) delay(100);
-  
+
 #ifdef GFX_EXTRA_PRE_INIT
   GFX_EXTRA_PRE_INIT();
 #endif
@@ -47,7 +51,7 @@ void setup(void)
   Serial.println("Starting touch paint");
 
   // Init Display
-  Wire.setClock(400000); // speed up I2C 
+  Wire.setClock(400000); // speed up I2C
   if (!gfx->begin()) {
     Serial.println("gfx->begin() failed!");
     while (1) yield();
@@ -100,7 +104,7 @@ void loop()
     Serial.printf("(%d, %d)\n", p.x, p.y);
     gfx->fillRect(p.x, p.y, 5, 5, WHITE);
   }
-  
+
   // use the buttons to turn off
   if (! expander->digitalRead(PCA_BUTTON_DOWN)) {
     expander->digitalWrite(PCA_TFT_BACKLIGHT, LOW);
@@ -109,5 +113,5 @@ void loop()
   if (! expander->digitalRead(PCA_BUTTON_UP)) {
     expander->digitalWrite(PCA_TFT_BACKLIGHT, HIGH);
   }
-    
+
 }
