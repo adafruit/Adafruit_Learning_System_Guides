@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MIT
 
 #include <Arduino_GFX_Library.h>
-#include "inits.h"
 #include "Adafruit_FT6206.h"
 
 Arduino_XCA9554SWSPI *expander = new Arduino_XCA9554SWSPI(
