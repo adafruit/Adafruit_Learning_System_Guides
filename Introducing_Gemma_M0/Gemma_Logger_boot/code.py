@@ -12,4 +12,4 @@ switch.pull = digitalio.Pull.UP
 
 # If the D0 is connected to ground with a wire
 # CircuitPython can write to the drive
-storage.remount("/", switch.value)
+storage.remount("/", readonly=switch.value)

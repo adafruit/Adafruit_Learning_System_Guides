@@ -20,4 +20,4 @@ switch.direction = digitalio.Direction.INPUT
 switch.pull = digitalio.Pull.UP
 
 # If the switch pin is connected to ground CircuitPython can write to the drive
-storage.remount("/", switch.value)
+storage.remount("/", readonly=switch.value)

@@ -45,7 +45,7 @@ def get_current_toml_file(enumerated_files):
 # Erase settings.toml then write the contents of the new settings.toml file
 def change_toml_file(toml_file):
     try:
-        storage.remount("/", False)
+        storage.remount("/", readonly=False)
         with open("settings.toml", "w") as settings:
             settings.write("")
         with open("settings.toml", "w") as settings, open(toml_file) as f:
