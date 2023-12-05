@@ -192,10 +192,6 @@ def time_angle(m, the_hour):
 
 clock_timer = 1 * 1000
 clock_clock = ticks_ms()
-display_timer = 10 * 1000
-display_clock = ticks_ms()
-mars_second = 88775
-mars_clock = ticks_ms()
 clock = update_time()
 hour, am_pm = convert_time(clock)
 tick = clock[5]
