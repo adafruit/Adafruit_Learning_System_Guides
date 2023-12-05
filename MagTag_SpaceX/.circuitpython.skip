@@ -1,5 +1,0 @@
-MagTag_SpaceX/code.py 83: Trailing whitespace (trailing-whitespace)
-MagTag_SpaceX/code.py 25: Comparison 'val == None' should be 'val is None' (singleton-comparison)
-MagTag_SpaceX/code.py 35: Redefining built-in 'min' (redefined-builtin)
-MagTag_SpaceX/code.py 30: Comparison 'val2 == None' should be 'val2 is None' (singleton-comparison)
-MagTag_SpaceX/code.py 47: Comparison 'val3 == None' should be 'val3 is None' (singleton-comparison)

@@ -1,3 +1,0 @@
-MagTag_Flashcards/basic/code.py 3: Unused import terminalio (unused-import)
-MagTag_Flashcards/basic/code.py 4: Unused import digitalio (unused-import)
-MagTag_Flashcards/basic/code.py 5: standard import "import random" should be placed before "import terminalio" (wrong-import-order)
