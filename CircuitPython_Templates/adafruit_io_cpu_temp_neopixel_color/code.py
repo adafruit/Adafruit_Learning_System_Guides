@@ -21,8 +21,8 @@ except ImportError:
 # Add your Adafruit IO Username and Key to secrets.py
 # (visit io.adafruit.com if you need to create an account,
 # or if you need to obtain your Adafruit IO key.)
-aio_username = secrets["aio_username"]
-aio_key = secrets["aio_key"]
+aio_username = secrets["ADAFRUIT_IO_USERNAME"]
+aio_key = secrets["ADAFRUIT_IO_KEY"]
 
 # WiFi
 try:
