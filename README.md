@@ -12,6 +12,7 @@ Starting in 2023, guides using a specific Adafruit board will be placed in a sub
 * NeoTrellis/
 * MagTag/
 * PyPortal/
+* PyLeap/
 
 ## Issues
 
