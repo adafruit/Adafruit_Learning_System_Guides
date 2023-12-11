@@ -64,11 +64,10 @@ color_a = hsv2rgb(hue_a, sat_a, val_a)
 hue_b = 127
 sat_b = 255
 val_b = 255
-color_b = hsv2rgb(hue_a, sat_a, val_a)
+color_b = hsv2rgb(hue_b, sat_b, val_b)
 
 pixels[0] = color_a
 pixels[1] = color_b
-pixels.show()
 
 while True:
     cc_val = slider.value // 512  # make 0-127 range for MIDI CC

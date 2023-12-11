@@ -1,0 +1,191 @@
+# SPDX-FileCopyrightText: 2022 Liz Clark for Adafruit Industries
+# SPDX-License-Identifier: MIT
+
+y = (255, 125, 0)
+o = (0, 0, 0)
+a = (0, 75, 125)
+w = (255, 255, 255)
+v = (127, 0, 255)
+b = (0, 0, 255)
+z = (0, 0, 25)
+g = (25, 25, 25)
+sun_bitmap = [
+    y,a,y,a,y,
+    a,y,y,y,a,
+    y,y,y,y,y,
+    a,y,y,y,a,
+    y,a,y,a,y,
+]
+cloud_bitmap = [
+    a,a,a,w,a,
+    a,w,w,w,a,
+    a,w,w,w,a,
+    a,a,w,w,a,
+    a,a,a,w,a,
+]
+partSun_bitmap = [
+    a,w,w,w,a,
+    a,w,w,w,w,
+    y,y,w,w,a,
+    a,y,y,w,a,
+    y,a,y,a,a,
+]
+rain_bitmap = [
+    z,z,v,z,b,
+    v,v,v,b,z,
+    v,v,v,z,b,
+    z,v,v,b,z,
+    z,z,v,z,b,
+]
+thunder_bitmap = [
+    z,z,v,z,b,
+    v,v,v,b,z,
+    v,v,y,z,y,
+    z,y,v,y,z,
+    z,z,v,z,b,
+]
+snow_bitmap = [
+    z,z,v,z,w,
+    v,v,v,w,z,
+    v,v,v,z,w,
+    z,v,v,w,z,
+    z,z,v,z,w,
+]
+night_bitmap = [
+    y,g,g,y,g,
+    g,g,y,g,g,
+    g,y,g,g,y,
+    y,y,y,g,g,
+    g,y,g,g,g,
+]
+nightCloud_bitmap = [
+    g,w,w,w,g,
+    g,w,w,w,g,
+    y,g,w,w,g,
+    g,g,g,w,g,
+    g,g,y,g,g,
+]
+nightRain_bitmap = [
+    g,v,v,v,b,
+    g,v,v,v,g,
+    y,g,v,v,b,
+    g,g,g,v,g,
+    g,g,y,g,g,
+]
+nightThunder_bitmap = [
+    g,v,v,v,b,
+    g,v,v,v,g,
+    g,g,y,v,y,
+    v,y,g,y,b,
+    v,v,b,g,g,
+]
+nightSnow_bitmap = [
+    g,v,v,v,w,
+    g,v,v,v,g,
+    y,g,v,v,w,
+    g,g,g,v,g,
+    g,g,y,g,g,
+]
+
+weather_codes = [
+{"code" : 0, "day_img" : sun_bitmap, "night_img" : night_bitmap},
+{"code" : 1, "day_img" : sun_bitmap, "night_img" : night_bitmap},
+{"code" : 2, "day_img" : sun_bitmap, "night_img" : night_bitmap},
+{"code" : 3, "day_img" : cloud_bitmap, "night_img" : nightCloud_bitmap},
+{"code" : 4, "day_img" : partSun_bitmap, "night_img" : nightCloud_bitmap},
+{"code" : 5, "day_img" : partSun_bitmap, "night_img" : nightCloud_bitmap},
+{"code" : 6, "day_img" : partSun_bitmap, "night_img" : nightCloud_bitmap},
+{"code" : 7, "day_img" : cloud_bitmap, "night_img" : nightCloud_bitmap},
+{"code" : 8, "day_img" : cloud_bitmap, "night_img" : nightCloud_bitmap},
+{"code" : 9, "day_img" : partSun_bitmap, "night_img" : nightCloud_bitmap},
+{"code" : 10, "day_img" : rain_bitmap, "night_img" : nightRain_bitmap},
+{"code" : 11, "day_img" : cloud_bitmap, "night_img" : nightCloud_bitmap},
+{"code" : 12, "day_img" : cloud_bitmap, "night_img" : nightCloud_bitmap},
+{"code" : 13, "day_img" : thunder_bitmap, "night_img" : nightThunder_bitmap},
+{"code" : 14, "day_img" : cloud_bitmap, "night_img" : nightCloud_bitmap},
+{"code" : 15, "day_img" : rain_bitmap, "night_img" : nightRain_bitmap},
+{"code" : 16, "day_img" : rain_bitmap, "night_img" : nightRain_bitmap},
+{"code" : 17, "day_img" : thunder_bitmap, "night_img" : nightThunder_bitmap},
+{"code" : 18, "day_img" : snow_bitmap, "night_img" : nightSnow_bitmap},
+{"code" : 19, "day_img" : thunder_bitmap, "night_img" : nightThunder_bitmap},
+{"code" : 20, "day_img" : rain_bitmap, "night_img" : nightRain_bitmap},
+{"code" : 21, "day_img" : rain_bitmap, "night_img" : nightRain_bitmap},
+{"code" : 22, "day_img" : snow_bitmap, "night_img" : nightSnow_bitmap},
+{"code" : 23, "day_img" : snow_bitmap, "night_img" : nightSnow_bitmap},
+{"code" : 24, "day_img" : snow_bitmap, "night_img" : nightSnow_bitmap},
+{"code" : 25, "day_img" : rain_bitmap, "night_img" : nightRain_bitmap},
+{"code" : 26, "day_img" : snow_bitmap, "night_img" : nightSnow_bitmap},
+{"code" : 27, "day_img" : snow_bitmap, "night_img" : nightSnow_bitmap},
+{"code" : 28, "day_img" : cloud_bitmap, "night_img" : nightCloud_bitmap},
+{"code" : 29, "day_img" : thunder_bitmap, "night_img" : nightThunder_bitmap},
+{"code" : 30, "day_img" : cloud_bitmap, "night_img" : nightCloud_bitmap},
+{"code" : 31, "day_img" : cloud_bitmap, "night_img" : nightCloud_bitmap},
+{"code" : 32, "day_img" : cloud_bitmap, "night_img" : nightCloud_bitmap},
+{"code" : 33, "day_img" : cloud_bitmap, "night_img" : nightCloud_bitmap},
+{"code" : 34, "day_img" : cloud_bitmap, "night_img" : nightCloud_bitmap},
+{"code" : 35, "day_img" : cloud_bitmap, "night_img" : nightCloud_bitmap},
+{"code" : 36, "day_img" : snow_bitmap, "night_img" : nightSnow_bitmap},
+{"code" : 37, "day_img" : snow_bitmap, "night_img" : nightSnow_bitmap},
+{"code" : 38, "day_img" : snow_bitmap, "night_img" : nightSnow_bitmap},
+{"code" : 39, "day_img" : snow_bitmap, "night_img" : nightSnow_bitmap},
+{"code" : 40, "day_img" : cloud_bitmap, "night_img" : nightCloud_bitmap},
+{"code" : 41, "day_img" : cloud_bitmap, "night_img" : nightCloud_bitmap},
+{"code" : 42, "day_img" : cloud_bitmap, "night_img" : nightCloud_bitmap},
+{"code" : 43, "day_img" : cloud_bitmap, "night_img" : nightCloud_bitmap},
+{"code" : 44, "day_img" : cloud_bitmap, "night_img" : nightCloud_bitmap},
+{"code" : 45, "day_img" : cloud_bitmap, "night_img" : nightCloud_bitmap},
+{"code" : 46, "day_img" : cloud_bitmap, "night_img" : nightCloud_bitmap},
+{"code" : 47, "day_img" : cloud_bitmap, "night_img" : nightCloud_bitmap},
+{"code" : 48, "day_img" : cloud_bitmap, "night_img" : nightCloud_bitmap},
+{"code" : 49, "day_img" : cloud_bitmap, "night_img" : nightCloud_bitmap},
+{"code" : 50, "day_img" : rain_bitmap, "night_img" : nightRain_bitmap},
+{"code" : 51, "day_img" : rain_bitmap, "night_img" : nightRain_bitmap},
+{"code" : 52, "day_img" : rain_bitmap, "night_img" : nightRain_bitmap},
+{"code" : 53, "day_img" : rain_bitmap, "night_img" : nightRain_bitmap},
+{"code" : 54, "day_img" : rain_bitmap, "night_img" : nightRain_bitmap},
+{"code" : 55, "day_img" : rain_bitmap, "night_img" : nightRain_bitmap},
+{"code" : 56, "day_img" : rain_bitmap, "night_img" : nightRain_bitmap},
+{"code" : 57, "day_img" : rain_bitmap, "night_img" : nightRain_bitmap},
+{"code" : 58, "day_img" : rain_bitmap, "night_img" : nightRain_bitmap},
+{"code" : 59, "day_img" : rain_bitmap, "night_img" : nightRain_bitmap},
+{"code" : 60, "day_img" : rain_bitmap, "night_img" : nightRain_bitmap},
+{"code" : 61, "day_img" : rain_bitmap, "night_img" : nightRain_bitmap},
+{"code" : 62, "day_img" : rain_bitmap, "night_img" : nightRain_bitmap},
+{"code" : 63, "day_img" : rain_bitmap, "night_img" : nightRain_bitmap},
+{"code" : 64, "day_img" : rain_bitmap, "night_img" : nightRain_bitmap},
+{"code" : 65, "day_img" : rain_bitmap, "night_img" : nightRain_bitmap},
+{"code" : 66, "day_img" : rain_bitmap, "night_img" : nightRain_bitmap},
+{"code" : 67, "day_img" : rain_bitmap, "night_img" : nightRain_bitmap},
+{"code" : 68, "day_img" : rain_bitmap, "night_img" : nightRain_bitmap},
+{"code" : 69, "day_img" : rain_bitmap, "night_img" : nightRain_bitmap},
+{"code" : 70, "day_img" : snow_bitmap, "night_img" : nightSnow_bitmap},
+{"code" : 71, "day_img" : snow_bitmap, "night_img" : nightSnow_bitmap},
+{"code" : 72, "day_img" : snow_bitmap, "night_img" : nightSnow_bitmap},
+{"code" : 73, "day_img" : snow_bitmap, "night_img" : nightSnow_bitmap},
+{"code" : 74, "day_img" : snow_bitmap, "night_img" : nightSnow_bitmap},
+{"code" : 75, "day_img" : snow_bitmap, "night_img" : nightSnow_bitmap},
+{"code" : 76, "day_img" : snow_bitmap, "night_img" : nightSnow_bitmap},
+{"code" : 77, "day_img" : snow_bitmap, "night_img" : nightSnow_bitmap},
+{"code" : 78, "day_img" : snow_bitmap, "night_img" : nightSnow_bitmap},
+{"code" : 79, "day_img" : snow_bitmap, "night_img" : nightSnow_bitmap},
+{"code" : 80, "day_img" : rain_bitmap, "night_img" : nightRain_bitmap},
+{"code" : 81, "day_img" : rain_bitmap, "night_img" : nightRain_bitmap},
+{"code" : 82, "day_img" : rain_bitmap, "night_img" : nightRain_bitmap},
+{"code" : 83, "day_img" : rain_bitmap, "night_img" : nightRain_bitmap},
+{"code" : 84, "day_img" : rain_bitmap, "night_img" : nightRain_bitmap},
+{"code" : 85, "day_img" : snow_bitmap, "night_img" : nightSnow_bitmap},
+{"code" : 86, "day_img" : snow_bitmap, "night_img" : nightSnow_bitmap},
+{"code" : 87, "day_img" : rain_bitmap, "night_img" : nightRain_bitmap},
+{"code" : 88, "day_img" : rain_bitmap, "night_img" : nightRain_bitmap},
+{"code" : 89, "day_img" : rain_bitmap, "night_img" : nightRain_bitmap},
+{"code" : 90, "day_img" : rain_bitmap, "night_img" : nightRain_bitmap},
+{"code" : 91, "day_img" : rain_bitmap, "night_img" : nightRain_bitmap},
+{"code" : 92, "day_img" : rain_bitmap, "night_img" : nightRain_bitmap},
+{"code" : 93, "day_img" : snow_bitmap, "night_img" : nightSnow_bitmap},
+{"code" : 94, "day_img" : snow_bitmap, "night_img" : nightSnow_bitmap},
+{"code" : 95, "day_img" : thunder_bitmap, "night_img" : nightThunder_bitmap},
+{"code" : 96, "day_img" : thunder_bitmap, "night_img" : nightThunder_bitmap},
+{"code" : 97, "day_img" : thunder_bitmap, "night_img" : nightThunder_bitmap},
+{"code" : 98, "day_img" : thunder_bitmap, "night_img" : nightThunder_bitmap},
+{"code" : 99, "day_img" : thunder_bitmap, "night_img" : nightThunder_bitmap}
+]

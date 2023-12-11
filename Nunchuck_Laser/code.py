@@ -17,7 +17,8 @@ INVERT_PITCH = False
 # STEMMA QT 3V needs to be activated
 i2c_power = digitalio.DigitalInOut(board.I2C_POWER)
 i2c_power.switch_to_output(value=False)
-i2c = board.I2C()
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
 
 wing = adafruit_pca9685.PCA9685(i2c)
 wing.frequency = 50

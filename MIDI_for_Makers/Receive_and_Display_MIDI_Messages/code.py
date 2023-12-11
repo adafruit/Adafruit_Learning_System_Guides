@@ -45,7 +45,7 @@ BORDER = 5
 display = adafruit_displayio_ssd1306.SSD1306(display_bus, width=WIDTH, height=HEIGHT)
 
 splash = displayio.Group()
-display.show(splash)
+display.root_group = splash
 
 # text area setup
 text = "MIDI Messages"

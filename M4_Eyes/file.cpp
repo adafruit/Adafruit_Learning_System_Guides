@@ -32,7 +32,7 @@ static int32_t dwim(JsonVariant v, int32_t def = 0) { // "Do What I Mean"
     return v;                            // ...return value directly
   } else if(v.is<float>()) {             // If float...
     return (int)(v.as<float>() + 0.5);   // ...return rounded integer
-  } else if(v.is<char*>()) {             // If string...
+  } else if(v.is<const char*>()) {             // If string...
     if((strlen(v) == 6) && !strncasecmp(v, "0x", 2)) { // 4-digit hex?
       uint16_t rgb = strtol(v, NULL, 0); // Probably a 16-bit RGB color,
       return __builtin_bswap16(rgb);     // convert to big-endian
@@ -47,7 +47,7 @@ static int32_t dwim(JsonVariant v, int32_t def = 0) { // "Do What I Mean"
           cc[i] = v[i].as<int>();
         } else if(v[i].is<float>()) {
           cc[i] = (int)(v[i].as<float>() * 255.999);
-        } else if(v[i].is<char*>()) {
+        } else if(v[i].is<const char*>()) {
           cc[i] = strtol(v[i], NULL, 0);
         }
         if(cc[i] > 255)    cc[i] = 255;  // Clip to 8-bit range
@@ -75,7 +75,7 @@ static void getFilename(JsonVariant v, char **ptr) {
     free(*ptr);       // delete old value...
     *ptr = NULL;
   }
-  if(v.is<char*>()) {
+  if(v.is<const char*>()) {
     *ptr = strdup(v); // Make a copy of string, save that
   }
 }
@@ -108,9 +108,9 @@ void loadConfig(char *filename) {
       v = doc["coverage"];
       if(v.is<int>() || v.is<float>()) coverage = v.as<float>();
       v = doc["upperEyelid"];
-      if(v.is<char*>())    upperEyelidFilename = strdup(v);
+      if(v.is<const char*>())    upperEyelidFilename = strdup(v);
       v = doc["lowerEyelid"];
-      if(v.is<char*>())    lowerEyelidFilename = strdup(v);
+      if(v.is<const char*>())    lowerEyelidFilename = strdup(v);
 
       lightSensorMin   = doc["lightSensorMin"] | lightSensorMin;
       lightSensorMax   = doc["lightSensorMax"] | lightSensorMax;
@@ -222,8 +222,8 @@ void loadConfig(char *filename) {
         // below when overriding one or the other and trying to do the right
         // thing with free/strdup. So this does waste a tiny bit of RAM but
         // it's only the size of the filenames and only during init. NBD.
-        if(iristv.is<char*>())   eye[e].iris.filename   = strdup(iristv);
-        if(scleratv.is<char*>()) eye[e].sclera.filename = strdup(scleratv);
+        if(iristv.is<const char*>())   eye[e].iris.filename   = strdup(iristv);
+        if(scleratv.is<const char*>()) eye[e].sclera.filename = strdup(scleratv);
         eye[e].rotation = rotation; // Might get override in per-eye code below
       }
 
@@ -258,12 +258,12 @@ void loadConfig(char *filename) {
         v = doc[eye[e].name]["scleraMirror"];
         if(v.is<bool>() || v.is<int>()) eye[e].sclera.mirror = v ? 1023 : 0;
         v = doc[eye[e].name]["irisTexture"];
-        if(v.is<char*>()) {                           // Per-eye iris texture specified?
+        if(v.is<const char*>()) {                           // Per-eye iris texture specified?
           if(eye[e].iris.filename) free(eye[e].iris.filename); // Remove old name if any
           eye[e].iris.filename = strdup(v);                    // Save new name
         }
         v = doc[eye[e].name]["scleraTexture"]; // Ditto w/sclera
-        if(v.is<char*>()) {
+        if(v.is<const char*>()) {
           if(eye[e].sclera.filename) free(eye[e].sclera.filename);
           eye[e].sclera.filename = strdup(v);
         }
@@ -278,7 +278,7 @@ void loadConfig(char *filename) {
       gain = doc["gain"] | gain;
       modulate = doc["modulate"] | modulate;
       v = doc["waveform"];
-      if(v.is<char*>()) { // If string...
+      if(v.is<const char*>()) { // If string...
         if(!strncasecmp(     v, "sq", 2)) waveform = 1;
         else if(!strncasecmp(v, "si", 2)) waveform = 2;
         else if(!strncasecmp(v, "t" , 1)) waveform = 3;

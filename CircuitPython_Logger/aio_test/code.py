@@ -11,7 +11,7 @@ import adafruit_logging as logging
 device=PyPortal()
 
 l = logging.getLogger('aio')
-l.addHandler(AIOHandler('test'), device)
+l.addHandler(AIOHandler('test', device))
 
 def go():
     while True:

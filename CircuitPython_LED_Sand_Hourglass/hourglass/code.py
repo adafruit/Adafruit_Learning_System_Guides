@@ -10,12 +10,16 @@ import matrixsand
 
 DELAY = 0.05 # overall update rate
 
+# setup i2c
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
+
 # the accelo
-accelo = adafruit_lsm6ds.lsm6ds33.LSM6DS33(board.I2C())
+accelo = adafruit_lsm6ds.lsm6ds33.LSM6DS33(i2c)
 
 # the matrices
-m1 = matrix.Matrix8x8(board.I2C(), 0x70)
-m2 = matrix.Matrix8x8(board.I2C(), 0x71)
+m1 = matrix.Matrix8x8(i2c, 0x70)
+m2 = matrix.Matrix8x8(i2c, 0x71)
 
 # the sand
 sand1 = matrixsand.MatrixSand(8, 8)

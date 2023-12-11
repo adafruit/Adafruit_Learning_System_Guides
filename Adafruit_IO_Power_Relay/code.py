@@ -129,7 +129,7 @@ client.subscribe(feed_relay)
 while True:
     try: # Poll for new messages on feed_relay
         client.loop()
-    except (ValueError, RuntimeError) as e:
+    except (ValueError, RuntimeError, ConnectionError, OSError) as e:
         print("Failed to get data, retrying\n", e)
         wifi.reset()
         client.reconnect()

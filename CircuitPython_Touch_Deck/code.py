@@ -55,7 +55,7 @@ current_layer = 0
 
 # Make the main_group to hold everything
 main_group = displayio.Group()
-display.show(main_group)
+display.root_group = main_group
 
 # loading screen
 loading_group = displayio.Group()

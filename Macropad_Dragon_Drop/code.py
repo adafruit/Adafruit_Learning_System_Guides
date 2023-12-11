@@ -40,7 +40,7 @@ def background_sound(filename):
 
 def show_screen(group):
     """ Activate a given displayio group, pause until keypress. """
-    macropad.display.show(group)
+    macropad.display.root_group = group
     macropad.display.refresh()
     # Purge any queued up key events...
     while macropad.keys.events.get():
@@ -134,7 +134,7 @@ while True:
     play_group[-1].text = '0' # Score text
     life_bar.value = 100
     audio.stop()
-    macropad.display.show(play_group)
+    macropad.display.root_group = play_group
     macropad.display.refresh()
     start = time.monotonic()
 

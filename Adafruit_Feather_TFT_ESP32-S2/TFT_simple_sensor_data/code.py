@@ -21,11 +21,13 @@ main_group.append(text_area)
 print("LC709203F test")
 print("Make sure LiPoly battery is plugged into the board!")
 
-sensor = LC709203F(board.I2C())
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
+sensor = LC709203F(i2c)
 
 print("IC version:", hex(sensor.ic_version))
 
-board.DISPLAY.show(main_group)
+board.DISPLAY.root_group = main_group
 
 while True:
     text_area.text = "Battery:\n{:.1f} Volts \n{}%".format(sensor.cell_voltage, sensor.cell_percent)

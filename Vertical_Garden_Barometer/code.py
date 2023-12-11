@@ -111,7 +111,7 @@ timer_label.y = 114
 text_group.append(timer_label)
 
 clue_display.append(text_group)
-clue.display.show(clue_display)
+clue.display.root_group = clue_display
 
 # Define color Palettes
 waterPalette = [0x00d9ff, 0x006f82, 0x43bfb9, 0x0066ff]
@@ -231,7 +231,7 @@ while True:
     reading2_label.text = "Last  {:.1f}".format(reading2)
     reading3_label.text = "Prev  {:.1f}".format(reading3)
     timer_label.text = "{}".format(counter)
-    clue.display.show(clue_display)
+    clue.display.root_group = clue_display
 
     # Is it time to update?
     if counter > timeToCheck:

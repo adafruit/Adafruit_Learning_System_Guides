@@ -12,7 +12,8 @@ import adafruit_sht31d   # humidity sensor
 import adafruit_bmp280   # barometric sensor
 import adafruit_lis3mdl  # magnetic sensor
 
-i2c = board.I2C()
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
 
 sense_accel = adafruit_lsm6ds.LSM6DS33(i2c)
 sense_humid = adafruit_sht31d.SHT31D(i2c)

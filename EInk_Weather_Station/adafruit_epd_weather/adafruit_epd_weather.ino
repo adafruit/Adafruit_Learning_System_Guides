@@ -4,7 +4,7 @@
 
 #include <time.h>
 #include <Adafruit_GFX.h>    // Core graphics library
-#include <Adafruit_EPD.h>
+#include <Adafruit_ThinkInk.h>
 #include <Adafruit_NeoPixel.h>
 #include <ArduinoJson.h>        //https://github.com/bblanchon/ArduinoJson
 #include <SPI.h>
@@ -36,7 +36,7 @@
 #define NEOPIXELPIN   40
 
 // This is for the 2.7" tricolor EPD
-Adafruit_IL91874 gfx(264, 176 ,EPD_DC, EPD_RESET, EPD_CS, SRAM_CS, EPD_BUSY);
+ThinkInk_270_Tricolor_C44 gfx(EPD_DC, EPD_RESET, EPD_CS, SRAM_CS, EPD_BUSY);
 
 AirliftOpenWeatherMap owclient(&Serial);
 OpenWeatherMapCurrentData owcdata;
@@ -672,4 +672,3 @@ void loop() {
   }
 
 }
-

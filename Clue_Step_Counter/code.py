@@ -105,7 +105,7 @@ clueGroup.append(steps_countdown)
 clueGroup.append(text_steps)
 
 #  sending display group to the display at startup
-clue_display.show(clueGroup)
+clue_display.root_group = clueGroup
 
 #  setting up the accelerometer and pedometer
 sensor.accelerometer_range = AccelRange.RANGE_2G

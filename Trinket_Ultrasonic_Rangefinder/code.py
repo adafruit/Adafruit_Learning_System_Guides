@@ -81,6 +81,12 @@ def find_mode(x):
     """
     n = len(x)
 
+    if n == 0:  # If somehow there is a null array
+        return 0
+
+    if n == 1:       # In trivial case of a one element array
+        return x[0]  # just return the element as the mode.
+
     max_count = 0
     mode = 0
     bimodal = 0

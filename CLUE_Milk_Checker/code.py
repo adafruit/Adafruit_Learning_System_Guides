@@ -54,10 +54,12 @@ splash.append(mouth)
 splash.append(message)
 splash.append(tvoc)
 splash.append(eco2)
-clue.display.show(splash)
+clue.display.root_group = splash
 
 # setup SGP30 and wait for initial warm up
-sgp30 = adafruit_sgp30.Adafruit_SGP30(board.I2C())
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
+sgp30 = adafruit_sgp30.Adafruit_SGP30(i2c)
 time.sleep(15)
 
 # loop forever

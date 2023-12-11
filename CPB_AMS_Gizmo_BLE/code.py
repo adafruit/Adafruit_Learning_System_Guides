@@ -78,7 +78,7 @@ def set_status(label, action_text, player):
 
 display = tft_gizmo.TFT_Gizmo()
 group = displayio.Group()
-display.show(group)
+display.root_group = group
 
 while True:
     if not radio.connected:

@@ -30,7 +30,7 @@ display = adafruit_displayio_ssd1306.SSD1306(display_bus, width=128, height=32)
 
 # Make the display context
 splash = displayio.Group()
-display.show(splash)
+display.root_group = splash
 
 text = "hello world"
 text_area = label.Label(terminalio.FONT, color=0xFFFF00, x=15, y=0)

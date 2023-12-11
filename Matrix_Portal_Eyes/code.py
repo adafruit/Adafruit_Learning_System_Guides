@@ -53,7 +53,6 @@ class Sprite(displayio.TileGrid):
         elif isinstance(transparent, int):
             palette.make_transparent(transparent)
         super(Sprite, self).__init__(bitmap, pixel_shader=palette)
-        self.height = bitmap.height
 
 
 # ONE-TIME INITIALIZATION --------------------------------------------------
@@ -69,7 +68,7 @@ SPRITES.append(Sprite(EYE_DATA['eye_image'])) # Base image is opaque
 SPRITES.append(Sprite(EYE_DATA['lower_lid_image'], EYE_DATA['transparent']))
 SPRITES.append(Sprite(EYE_DATA['upper_lid_image'], EYE_DATA['transparent']))
 SPRITES.append(Sprite(EYE_DATA['stencil_image'], EYE_DATA['transparent']))
-DISPLAY.show(SPRITES)
+DISPLAY.root_group = SPRITES
 
 EYE_CENTER = ((EYE_DATA['eye_move_min'][0] +           # Pixel coords of eye
                EYE_DATA['eye_move_max'][0]) / 2,       # image when centered

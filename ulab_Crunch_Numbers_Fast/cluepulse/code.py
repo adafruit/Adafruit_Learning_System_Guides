@@ -12,7 +12,7 @@ from ulab import numpy as np
 # Blank the screen.  Scrolling text causes unwanted delays.
 import displayio
 d = displayio.Group()
-board.DISPLAY.show(d)
+board.DISPLAY.root_group = d
 
 # Filter computed at https://fiiir.com/
 # Sampling rate: 8Hz

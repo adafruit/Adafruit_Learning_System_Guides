@@ -76,6 +76,6 @@ sprite.x = 16 * 4
 sprite.y = 16 * 3
 
 # Add the Group to the Display
-display.show(group)
+display.root_group = group
 while True:
     pass

@@ -34,7 +34,7 @@ THRESHOLD = 20
 # --- Display setup ---
 matrix = Matrix(bit_depth=4)
 sprite_group = displayio.Group()
-matrix.display.show(sprite_group)
+matrix.display.root_group = sprite_group
 
 # --- Button setup ---
 pin_down = DigitalInOut(board.BUTTON_DOWN)

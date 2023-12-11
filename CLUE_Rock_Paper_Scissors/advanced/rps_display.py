@@ -82,7 +82,7 @@ def blankScreen(disp, pix):
     if disp is None:
         return
 
-    disp.show(Group())
+    disp.root_group = Group()
 
 
 class RPSDisplay():
@@ -200,7 +200,7 @@ class RPSDisplay():
 
     def showGroup(self, new_group):
         self.disp_group = new_group
-        self.disp.show(new_group)
+        self.disp.root_group = new_group
 
 
     def emptyGroup(self, dio_group):

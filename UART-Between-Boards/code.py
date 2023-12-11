@@ -65,7 +65,7 @@ while True:
             pass
 
     byte_read = uart.read(1)  # Read one byte over UART lines
-    if byte_read is None:
+    if not byte_read:
         # Nothing read.
         continue
 

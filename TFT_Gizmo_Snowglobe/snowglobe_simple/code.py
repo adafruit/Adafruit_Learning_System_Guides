@@ -72,7 +72,7 @@ splash = displayio.Group()
 splash.append(background)
 splash.append(flakes)
 splash.append(snow)
-display.show(splash)
+display.root_group = splash
 
 def clear_the_snow():
     #pylint: disable=global-statement, redefined-outer-name

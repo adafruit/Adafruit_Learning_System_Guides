@@ -36,15 +36,15 @@ for i, pi in enumerate((0xff0000, 0xff0a00, 0xff1400, 0xff1e00,
 class RollingGraph(displayio.TileGrid):
     def __init__(self, scale=2):
         # Create a bitmap with heatmap colors
-        self.bitmap = displayio.Bitmap(display.width//scale,
+        self._bitmap = displayio.Bitmap(display.width//scale,
                                        display.height//scale, len(palette))
-        super().__init__(self.bitmap, pixel_shader=palette)
+        super().__init__(self._bitmap, pixel_shader=palette)
 
         self.scroll_offset = 0
 
     def show(self, data):
         y = self.scroll_offset
-        bitmap = self.bitmap
+        bitmap = self._bitmap
 
         board.DISPLAY.auto_refresh = False
         offset = max(0, (bitmap.width-len(data))//2)
@@ -63,7 +63,7 @@ fft_size = 256
 group.append(graph)
 
 # Add the Group to the Display
-display.show(group)
+display.root_group = group
 
 # instantiate board mic
 mic = audiobusio.PDMIn(board.MICROPHONE_CLOCK, board.MICROPHONE_DATA,

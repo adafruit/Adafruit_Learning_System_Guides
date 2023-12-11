@@ -37,8 +37,8 @@ void setup(void) {
   pinMode(COM_B, OUTPUT);
   digitalWrite(COM_B, LOW);
 
-  attachInterrupt(PIN_ENCODER_A, checkPosition, CHANGE);
-  attachInterrupt(PIN_ENCODER_B, checkPosition, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(PIN_ENCODER_A), checkPosition, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(PIN_ENCODER_B), checkPosition, CHANGE);
 
   pinMode(BUTTON_UP, INPUT_PULLUP);
   pinMode(BUTTON_DOWN, INPUT_PULLUP);

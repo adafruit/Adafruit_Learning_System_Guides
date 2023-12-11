@@ -21,11 +21,12 @@ import audiobusio
 
 audio = audiobusio.I2SOut(board.BIT_CLOCK_PIN, board.WORD_SELECT_PIN, board.DATA_PIN)
 
-wave_file = open("StreetChicken.wav", "rb")
-wav = audiocore.WaveFile(wave_file)
+with open("StreetChicken.wav", "rb") as wave_file:
+    wav = audiocore.WaveFile(wave_file)
 
-print("Playing wav file!")
-audio.play(wav)
-while audio.playing:
-    pass
+    print("Playing wav file!")
+    audio.play(wav)
+    while audio.playing:
+        pass
+
 print("Done!")

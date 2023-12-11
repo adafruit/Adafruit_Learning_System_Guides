@@ -53,7 +53,7 @@ title_label.x = 12
 title_label.y = 120
 homescreen_screen.append(title_label)
 
-clue.display.show(homescreen_screen)
+clue.display.root_group = homescreen_screen
 
 # Setup temperatures screen
 temp_font = bitmap_font.load_font("/font/GothamBlack-25.bdf")
@@ -94,7 +94,7 @@ ibbq_connection = None
 
 while True:
     # re-display homescreen here
-    clue.display.show(homescreen_screen)
+    clue.display.root_group = homescreen_screen
 
     print("Scanning...")
     for adv in ble.start_scan(ProvideServicesAdvertisement, timeout=5):
@@ -146,7 +146,7 @@ while True:
                                 "Probe", i + 1, "is unplugged",
                             )
                             my_labels[i].text = "  ---"
-                    clue.display.show(temperatures_screen)
+                    clue.display.root_group = temperatures_screen
 
     except _bleio.ConnectionError:
         continue

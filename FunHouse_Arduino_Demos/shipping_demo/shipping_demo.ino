@@ -26,7 +26,7 @@ uint16_t firstPixelHue = 0;
 void setup() {
   Serial.begin(115200);
   delay(100);
-  
+
   pixels.begin(); // Initialize pins for output
   pixels.show();  // Turn all LEDs off ASAP
   pixels.setBrightness(20);
@@ -36,7 +36,7 @@ void setup() {
   pinMode(BUTTON_UP, INPUT_PULLDOWN);
 
   //analogReadResolution(13);
-  
+
   tft.init(240, 240);                // Initialize ST7789 screen
   pinMode(TFT_BACKLIGHT, OUTPUT);
   digitalWrite(TFT_BACKLIGHT, HIGH); // Backlight on
@@ -51,8 +51,8 @@ void setup() {
   tft.setTextColor(ST77XX_YELLOW);
   tft.print("DP310? ");
 
-  
-  if (! dps.begin_I2C()) {  
+
+  if (! dps.begin_I2C()) {
     tft.setTextColor(ST77XX_RED);
     tft.println("FAIL!");
     while (1) delay(100);
@@ -66,8 +66,8 @@ void setup() {
   tft.setCursor(0, 20);
   tft.setTextColor(ST77XX_YELLOW);
   tft.print("AHT20? ");
-  
-  if (! aht.begin()) {  
+
+  if (! aht.begin()) {
     tft.setTextColor(ST77XX_RED);
     tft.println("FAIL!");
     while (1) delay(100);
@@ -78,12 +78,18 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(SPEAKER, OUTPUT);
 
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 1, 1)
+  ledcAttach(LED_BUILTIN, 2000, 8);
+  ledcAttach(SPEAKER, 2000, 8);
+  ledcWrite(SPEAKER, 0);
+#else
   ledcSetup(0, 2000 * 80, 8);
   ledcAttachPin(LED_BUILTIN, 0);
 
   ledcSetup(1, 2000 * 80, 8);
   ledcAttachPin(SPEAKER, 1);
   ledcWrite(1, 0);
+#endif
 }
 
 
@@ -93,11 +99,11 @@ void loop() {
 
   /********************* sensors    */
   sensors_event_t humidity, temp, pressure;
-  
+
   tft.setCursor(0, 0);
   tft.setTextColor(ST77XX_YELLOW, BG_COLOR);
   dps.getEvents(&temp, &pressure);
-  
+
   tft.print("DP310: ");
   tft.print(temp.temperature, 0);
   tft.print(" C ");
@@ -124,7 +130,7 @@ void loop() {
   tft.setCursor(0, 40);
   tft.setTextColor(ST77XX_YELLOW);
   tft.print("Buttons: ");
-  if (! digitalRead(BUTTON_DOWN)) {  
+  if (! digitalRead(BUTTON_DOWN)) {
     tft.setTextColor(ST77XX_GREY);
   } else {
     Serial.println("DOWN pressed");
@@ -132,15 +138,15 @@ void loop() {
   }
   tft.print("DOWN ");
 
-  if (! digitalRead(BUTTON_SELECT)) {  
+  if (! digitalRead(BUTTON_SELECT)) {
     tft.setTextColor(ST77XX_GREY);
   } else {
     Serial.println("SELECT pressed");
     tft.setTextColor(ST77XX_WHITE);
   }
   tft.print("SEL ");
-  
-  if (! digitalRead(BUTTON_UP)) {  
+
+  if (! digitalRead(BUTTON_UP)) {
     tft.setTextColor(ST77XX_GREY);
   } else {
     Serial.println("UP pressed");
@@ -150,12 +156,12 @@ void loop() {
 
   /************************** CAPACITIVE */
   uint16_t touchread;
-  
+
   tft.setCursor(0, 60);
   tft.setTextColor(ST77XX_YELLOW, BG_COLOR);
   tft.print("Captouch 6: ");
   touchread = touchRead(6);
-  if (touchread < 10000 ) {  
+  if (touchread < 10000 ) {
     tft.setTextColor(ST77XX_GREY, BG_COLOR);
   } else {
     tft.setTextColor(ST77XX_WHITE, BG_COLOR);
@@ -163,12 +169,12 @@ void loop() {
   tft.print(touchread);
   tft.println("          ");
   Serial.printf("Captouch #6 reading: %d\n", touchread);
-  
+
   tft.setCursor(0, 80);
   tft.setTextColor(ST77XX_YELLOW, BG_COLOR);
   tft.print("Captouch 7: ");
   touchread = touchRead(7);
-  if (touchread < 20000 ) {  
+  if (touchread < 20000 ) {
     tft.setTextColor(ST77XX_GREY, BG_COLOR);
   } else {
     tft.setTextColor(ST77XX_WHITE, BG_COLOR);
@@ -182,7 +188,7 @@ void loop() {
   tft.setTextColor(ST77XX_YELLOW, BG_COLOR);
   tft.print("Captouch 8: ");
   touchread = touchRead(8);
-  if (touchread < 20000 ) {  
+  if (touchread < 20000 ) {
     tft.setTextColor(ST77XX_GREY, BG_COLOR);
   } else {
     tft.setTextColor(ST77XX_WHITE, BG_COLOR);
@@ -199,7 +205,7 @@ void loop() {
   tft.setTextColor(ST77XX_YELLOW, BG_COLOR);
   tft.print("Analog 0: ");
   analogread = analogRead(A0);
-  if (analogread < 8000 ) {  
+  if (analogread < 8000 ) {
     tft.setTextColor(ST77XX_WHITE, BG_COLOR);
   } else {
     tft.setTextColor(ST77XX_RED, BG_COLOR);
@@ -213,7 +219,7 @@ void loop() {
   tft.setTextColor(ST77XX_YELLOW, BG_COLOR);
   tft.print("Analog 1: ");
   analogread = analogRead(A1);
-  if (analogread < 8000 ) {  
+  if (analogread < 8000 ) {
     tft.setTextColor(ST77XX_WHITE, BG_COLOR);
   } else {
     tft.setTextColor(ST77XX_RED, BG_COLOR);
@@ -222,12 +228,12 @@ void loop() {
   tft.println("    ");
   Serial.printf("Analog A1 reading: %d\n", analogread);
 
-  
+
   tft.setCursor(0, 160);
   tft.setTextColor(ST77XX_YELLOW, BG_COLOR);
   tft.print("Analog 2: ");
   analogread = analogRead(A2);
-  if (analogread < 8000 ) {  
+  if (analogread < 8000 ) {
     tft.setTextColor(ST77XX_WHITE, BG_COLOR);
   } else {
     tft.setTextColor(ST77XX_RED, BG_COLOR);
@@ -244,21 +250,25 @@ void loop() {
   tft.print(analogread);
   tft.println("    ");
   Serial.printf("Light sensor reading: %d\n", analogread);
-  
+
   /************************** Beep! */
-  if (digitalRead(BUTTON_SELECT)) {  
+  if (digitalRead(BUTTON_SELECT)) {
      Serial.println("** Beep! ***");
      fhtone(SPEAKER, 988.0, 100.0);  // tone1 - B5
      fhtone(SPEAKER, 1319.0, 200.0); // tone2 - E6
      delay(100);
      //fhtone(SPEAKER, 2000.0, 100.0);
   }
-  
+
   /************************** LEDs */
   // pulse red LED
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 1, 1)
+  ledcWrite(LED_BUILTIN, LED_dutycycle);
+#else
   ledcWrite(0, LED_dutycycle);
+#endif
   LED_dutycycle += 32;
-  
+
   // rainbow dotstars
   for (int i=0; i<pixels.numPixels(); i++) { // For each pixel in strip...
       int pixelHue = firstPixelHue + (i * 65536L / pixels.numPixels());
@@ -270,9 +280,16 @@ void loop() {
 
 
 void fhtone(uint8_t pin, float frequecy, float duration) {
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 1, 1)
+  ledcAttach(SPEAKER, frequecy, 8);
+  ledcWrite(SPEAKER, 128);
+  delay(duration);
+  ledcWrite(SPEAKER, 0);
+#else
   ledcSetup(1, frequecy * 80, 8);
   ledcAttachPin(pin, 1);
   ledcWrite(1, 128);
   delay(duration);
   ledcWrite(1, 0);
+#endif
 }

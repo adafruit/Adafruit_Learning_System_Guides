@@ -11,7 +11,8 @@ import adafruit_imageload
 from adafruit_emc2101 import EMC2101
 from adafruit_funhouse import FunHouse
 
-i2c = board.I2C()
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
 
 #  setup for SGP30 sensor
 sgp30 = adafruit_sgp30.Adafruit_SGP30(i2c)

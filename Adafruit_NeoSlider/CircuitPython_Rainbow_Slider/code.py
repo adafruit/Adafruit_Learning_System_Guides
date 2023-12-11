@@ -10,9 +10,11 @@ from adafruit_seesaw.analoginput import AnalogInput
 from adafruit_seesaw import neopixel
 
 # NeoSlider Setup
-neoslider = Seesaw(board.I2C(), 0x30)
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
+neoslider = Seesaw(i2c, 0x30)
 potentiometer = AnalogInput(neoslider, 18)
-pixels = neopixel.NeoPixel(neoslider, 14, 4)
+pixels = neopixel.NeoPixel(neoslider, 14, 4, pixel_order=neopixel.GRB)
 
 
 def potentiometer_to_color(value):

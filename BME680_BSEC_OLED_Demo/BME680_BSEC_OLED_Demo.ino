@@ -4,9 +4,9 @@
 // SPDX-License-Identifier: MIT
 
 /***************************************************************************
-  This is a library for the BME680 gas, humidity, temperature & pressure sensor
+  This is a library for the BME68X gas, humidity, temperature & pressure sensor
 
-  Designed specifically to work with the Adafruit BME680 Breakout
+  Designed specifically to work with the Adafruit BME68X Breakout
   ----> http://www.adafruit.com/products/3660
 
   These sensors use I2C or SPI to communicate, 2 or 4 pins are required
@@ -33,7 +33,7 @@ void setup() {
   Serial.begin(9600);
   //while (!Serial);
   
-  Serial.println(F("BME680 test"));
+  Serial.println(F("BME68X test"));
   
   // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
   if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3D)) { // Address 0x3D for 128x64
@@ -50,7 +50,7 @@ void setup() {
   display.setTextColor(SSD1306_WHITE);
   display.setRotation(0);
   
-  iaqSensor.begin(BME680_I2C_ADDR_SECONDARY, Wire);
+  iaqSensor.begin(BME68X_I2C_ADDR_LOW, Wire);
   output = "\nBSEC library version " + String(iaqSensor.version.major) + "." + String(iaqSensor.version.minor) + "." + String(iaqSensor.version.major_bugfix) + "." + String(iaqSensor.version.minor_bugfix);
   Serial.println(output);
   checkIaqSensorStatus();
@@ -126,30 +126,30 @@ void loop() {
 // Helper function definitions
 void checkIaqSensorStatus(void)
 {
-  if (iaqSensor.status != BSEC_OK) {
-    if (iaqSensor.status < BSEC_OK) {
-      output = "BSEC error code : " + String(iaqSensor.status);
+  if (iaqSensor.bsecStatus != BSEC_OK) {
+    if (iaqSensor.bsecStatus < BSEC_OK) {
+      output = "BSEC error code : " + String(iaqSensor.bsecStatus);
       Serial.println(output);
       display.setCursor(0,0);
       display.println(output);
       display.display();
       for (;;)  delay(10);
     } else {
-      output = "BSEC warning code : " + String(iaqSensor.status);
+      output = "BSEC warning code : " + String(iaqSensor.bsecStatus);
       Serial.println(output);
     }
   }
 
-  if (iaqSensor.bme680Status != BME680_OK) {
-    if (iaqSensor.bme680Status < BME680_OK) {
-      output = "BME680 error code : " + String(iaqSensor.bme680Status);
+  if (iaqSensor.bme68xStatus != BME68X_OK) {
+    if (iaqSensor.bme68xStatus < BME68X_OK) {
+      output = "BME68X error code : " + String(iaqSensor.bme68xStatus);
       Serial.println(output);
       display.setCursor(0,0);
       display.println(output);
       display.display();
       for (;;)  delay(10);
     } else {
-      output = "BME680 warning code : " + String(iaqSensor.bme680Status);
+      output = "BME68X warning code : " + String(iaqSensor.bme68xStatus);
       Serial.println(output);
     }
   }

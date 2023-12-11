@@ -24,8 +24,9 @@ LOW = False
 MIN = 500
 
 # Set up moisture sensor with seesaw
-i2c_bus = board.I2C()
-seesaw = Seesaw(i2c_bus, addr=0x36)
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
+seesaw = Seesaw(i2c, addr=0x36)
 
 # Get wifi details and more from a secrets.py file
 try:

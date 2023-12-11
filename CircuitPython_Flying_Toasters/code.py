@@ -81,7 +81,7 @@ def make_tilegrid():
                               x=0, y=-64,
                               default_tile=EMPTY)
     group.append(grid)
-    display.show(group)
+    display.root_group = group
     return grid
 
 

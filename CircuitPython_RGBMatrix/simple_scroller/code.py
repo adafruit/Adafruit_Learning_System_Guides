@@ -60,7 +60,7 @@ line2.y = 24
 g = displayio.Group()
 g.append(line1)
 g.append(line2)
-display.show(g)
+display.root_group = g
 
 # This function will scoot one label a pixel to the left and send it back to
 # the far right if it's gone all the way off screen. This goes in a function

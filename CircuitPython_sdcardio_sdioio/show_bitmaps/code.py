@@ -35,7 +35,7 @@ while True:
 
         group = displayio.Group()
         group.append(tile_grid)
-        display.show(group)
+        display.root_group = group
 
         # Show the image for 10 seconds
         time.sleep(10)

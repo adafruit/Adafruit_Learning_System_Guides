@@ -141,7 +141,7 @@ io.get("relay")
 while True:
     try:
         io.loop()
-    except (ValueError, RuntimeError) as e:
+    except (ValueError, RuntimeError, ConnectionError, OSError) as e:
         print("Failed to get data, retrying\n", e)
         wifi.reset()
         io.reconnect()

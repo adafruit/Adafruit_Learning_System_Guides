@@ -18,7 +18,10 @@ import adafruit_is31fl3741
 from adafruit_is31fl3741.adafruit_rgbmatrixqt import Adafruit_RGBMatrixQT
 from rainbowio import colorwheel
 from ulab import numpy as np
+#  if using CP7 and below:
 from ulab.scipy.signal import spectrogram
+#  if using CP8 and above:
+#  from ulab.utils import spectrogram
 
 
 # FFT/SPECTRUM CONFIG ----

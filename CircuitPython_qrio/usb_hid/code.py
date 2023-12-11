@@ -81,7 +81,7 @@ g1.append(tg)
 g = displayio.Group()
 g.append(g1)
 g.append(label)
-display.show(g)
+display.root_group = g
 display.auto_refresh = False
 
 i = 0

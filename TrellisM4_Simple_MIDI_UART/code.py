@@ -8,7 +8,7 @@ import adafruit_trellism4
 from rainbowio import colorwheel
 import board
 import busio
-midiuart = busio.UART(board.SDA, board.SCL, baudrate=31250)
+midiuart = busio.UART(board.SDA, board.SCL, baudrate=31250, timeout=0.001)
 print("MIDI UART EXAMPLE")
 
 trellis = adafruit_trellism4.TrellisM4Express()

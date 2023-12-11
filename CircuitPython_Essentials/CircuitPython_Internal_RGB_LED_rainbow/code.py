@@ -7,12 +7,14 @@ import time
 import board
 from rainbowio import colorwheel
 
-# For Trinket M0, Gemma M0, ItsyBitsy M0 Express and ItsyBitsy M4 Express
-import adafruit_dotstar
-led = adafruit_dotstar.DotStar(board.APA102_SCK, board.APA102_MOSI, 1)
-# For Feather M0 Express, Metro M0 Express, Metro M4 Express, Circuit Playground Express, QT Py M0
-# import neopixel
-# led = neopixel.NeoPixel(board.NEOPIXEL, 1)
+if hasattr(board, "APA102_SCK"):
+    import adafruit_dotstar
+
+    led = adafruit_dotstar.DotStar(board.APA102_SCK, board.APA102_MOSI, 1)
+else:
+    import neopixel
+
+    led = neopixel.NeoPixel(board.NEOPIXEL, 1)
 
 led.brightness = 0.3
 

@@ -1,0 +1,4 @@
+Write a complete story. It must begin with a title and have a body of approximately
+{STORY_WORD_LENGTH} words long and a happy ending. The specific
+story request is "{STORY_REQUEST}". The title should each be
+specified and the body should start on the next line.

@@ -200,9 +200,10 @@ def on_enable(client, feed_id, payload):
 
 
 # Set up rotary encoder
-i2c_bus = board.I2C()
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
 
-seesaw = Seesaw(i2c_bus, addr=0x36)
+seesaw = Seesaw(i2c, addr=0x36)
 
 seesaw_product = (seesaw.get_version() >> 16) & 0xFFFF
 print("Found product {}".format(seesaw_product))
@@ -223,7 +224,7 @@ framebuffer = sharpdisplay.SharpMemoryFramebuffer(bus, chip_select_pin, 400, 240
 display = framebufferio.FramebufferDisplay(framebuffer)
 
 splash = displayio.Group()
-display.show(splash)
+display.root_group = splash
 
 
 # Set up PWM LEDs
@@ -439,7 +440,7 @@ while True:
         else:
             pass
         gc.collect()
-    except (ValueError, RuntimeError) as err:
+    except (ValueError, RuntimeError, ConnectionError, OSError) as err:
         print("Failed to get data, retrying\n", err)
         wifi.reset()
         mqtt_client.reconnect()

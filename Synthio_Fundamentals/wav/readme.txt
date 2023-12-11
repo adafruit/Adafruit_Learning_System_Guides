@@ -1,0 +1,3 @@
+WaveEdit is the free, open-source wavetable editor developed by Synthesis Technology for the E370 Quad Morphing VCO and E352 Cloud Terrarium VCO Eurorack format wavetable oscillators. WaveEdit wavetables are also compatible with the Piston Honda Mark III from Industrial Music Electronics and the Qu-Bit Chord v2. You can download WaveEdit at http://synthtech.com/waveedit for Mac, Windows and Linux.
+
+This site presents a growing library of free wavetable banks shared by WaveEdit users via the WaveEdit Online tab within the software. All wavetables here are under CC0 1.0 Universal (CC0 1.0) Public Domain Dedication.

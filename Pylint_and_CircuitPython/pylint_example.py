@@ -12,7 +12,8 @@ import adafruit_thermistor
 
 pixels = neopixel.NeoPixel(board.NEOPIXEL, 10, brightness=0.2)
 
-i2c = board.I2C()
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
 int1 = digitalio.DigitalInOut(board.ACCELEROMETER_UNTERRUPT)
 lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c, int1=int1)
 

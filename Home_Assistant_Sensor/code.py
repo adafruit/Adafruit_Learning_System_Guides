@@ -8,6 +8,7 @@ using CircuitPython with Home Assistant
 Author: Melissa LeBlanc-Williams for Adafruit Industries
 """
 
+import os
 import time
 import ssl
 import json
@@ -23,30 +24,22 @@ MQTT_TOPIC = "state/temp-sensor"
 USE_DEEP_SLEEP = True
 
 # Connect to the Sensor
-sht = adafruit_shtc3.SHTC3(board.I2C())
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
+sht = adafruit_shtc3.SHTC3(i2c)
 
-# Add a secrets.py to your filesystem that has a dictionary called secrets with "ssid" and
-# "password" keys with your WiFi credentials. DO NOT share that file or commit it into Git or other
-# source control.
-# pylint: disable=no-name-in-module,wrong-import-order
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
-
-wifi.radio.connect(secrets["ssid"], secrets["password"])
-print("Connected to %s!" % secrets["ssid"])
+wifi.radio.connect(os.getenv("CIRCUITPY_WIFI_SSID"), os.getenv("CIRCUITPY_WIFI_PASSWORD"))
+print("Connected to %s!" % os.getenv("CIRCUITPY_WIFI_SSID"))
 
 # Create a socket pool
 pool = socketpool.SocketPool(wifi.radio)
 
 # Set up a MiniMQTT Client
 mqtt_client = MQTT.MQTT(
-    broker=secrets["mqtt_broker"],
-    port=secrets["mqtt_port"],
-    username=secrets["mqtt_username"],
-    password=secrets["mqtt_password"],
+    broker=os.getenv("MQTT_BROKER"),
+    port=os.getenv("MQTT_PORT"),
+    username=os.getenv("MQTT_USERNAME"),
+    password=os.getenv("MQTT_PASSWORD"),
     socket_pool=pool,
     ssl_context=ssl.create_default_context(),
 )

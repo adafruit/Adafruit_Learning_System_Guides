@@ -17,39 +17,34 @@ All text above must be included in any redistribution.
 """
 
 
-from adafruit_logging import LoggingHandler
+from adafruit_logging import Handler
 from adafruit_ble.uart import UARTServer
 
-class BLEHandler(LoggingHandler):
+class BLEHandler(Handler):
     """Send logging output to the BLE uart port."""
 
     def __init__(self):
         """Create an instance.
 
         :param uart: the busio.UART instance to which to write messages
-
         """
         self._advertising_now = False
         self._uart = UARTServer()
         self._uart.start_advertising()
 
-    def format(self, level, msg):
+    def format(self, record):
         """Generate a string to log.
 
-        :param level: The level at which to log
-        :param msg: The core message
-
+        :param record: The record (message object) to be logged
         """
-        return super().format(level, msg) + '\r\n'
+        return super().format(record) + '\r\n'
 
-    def emit(self, level, msg):
+    def emit(self, record):
         """Generate the message and write it to the UART.
 
-        :param level: The level at which to log
-        :param msg: The core message
-
+        :param record: The record (message object) to be logged
         """
         while not self._uart.connected:
             pass
-        data = bytes(self.format(level, msg), 'utf-8')
+        data = bytes(self.format(record), 'utf-8')
         self._uart.write(data)

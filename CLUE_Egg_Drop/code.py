@@ -62,10 +62,12 @@ text_group.append(text_area) # Subgroup for text scaling
 splash.append(text_group)
 
 # display everything so far
-board.DISPLAY.show(splash)
+board.DISPLAY.root_group = splash
 
 # connect to the accelerometer
-sensor = LSM6DS33(board.I2C())
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
+sensor = LSM6DS33(i2c)
 # highest range for impacts!
 sensor.accelerometer_range = AccelRange.RANGE_16G
 # we'll read at about 1KHz

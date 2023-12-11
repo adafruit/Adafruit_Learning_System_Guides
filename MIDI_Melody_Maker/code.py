@@ -32,7 +32,8 @@ pixel = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0)
 pixel.fill((0, 0, 0))
 
 # Use for I2C for STEMMA OLED
-i2c = board.I2C()
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
 display_bus = displayio.I2CDisplay(i2c, device_address=0x3D, reset=oled_reset)
 
 #  STEMMA OLED dimensions. can have height of 64, but 32 makes text larger
@@ -50,7 +51,7 @@ display = adafruit_displayio_ssd1306.SSD1306(display_bus, width=WIDTH, height=HE
 
 # create the displayio object
 splash = displayio.Group()
-display.show(splash)
+display.root_group = splash
 
 #  text for BPM
 bpm_text = "BPM:    "
@@ -113,7 +114,8 @@ splash.append(blinka_grid)
 #  USB MIDI:
 #  midi = adafruit_midi.MIDI(midi_out=usb_midi.ports[1], out_channel=0)
 #  UART MIDI:
-midi = adafruit_midi.MIDI(midi_out=busio.UART(board.TX, board.RX, baudrate=31250), out_channel=0)
+midi = adafruit_midi.MIDI(midi_out=busio.UART(board.TX, board.RX,
+                          baudrate=31250, timeout=0.001), out_channel=0)
 
 #  potentiometer pin setup
 key_pot = AnalogIn(board.A1)

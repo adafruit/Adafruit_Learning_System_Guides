@@ -24,6 +24,8 @@ except ImportError:
     import ustruct as struct
 
 logger = logging.getLogger('main')
+if not logger.hasHandlers():
+    logger.addHandler(logging.StreamHandler())
 
 class AirQualitySensor (object):
 

@@ -6,9 +6,9 @@ import array
 import time
 
 import board
-import pwmio
 import pulseio
 from digitalio import DigitalInOut, Direction, Pull
+
 # pylint: disable=eval-used
 # Switch to select 'stealth-mode'
 switch = DigitalInOut(board.SLIDE_SWITCH)
@@ -33,10 +33,6 @@ button_b = DigitalInOut(board.BUTTON_B)
 button_b.direction = Direction.INPUT
 button_b.pull = Pull.DOWN
 
-pwm = pwmio.PWMOut(board.REMOTEOUT, frequency=38000,
-                     duty_cycle=2 ** 15, variable_frequency=True)
-pulse = pulseio.PulseOut(pwm)
-
 while True:
     # Wait for button press!
     while not (button_a.value or button_b.value):
@@ -54,26 +50,28 @@ while True:
             spkr.value = True
         # If this is a repeating code, extract details
         try:
-            repeat = code['repeat']
-            delay = code['repeat_delay']
+            repeat = code["repeat"]
+            delay = code["repeat_delay"]
         except KeyError:  # by default, repeat once only!
             repeat = 1
             delay = 0
         # The table holds the on/off pairs
-        table = code['table']
+        table = code["table"]
         pulses = []  # store the pulses here
         # Read through each indexed element
-        for i in code['index']:
+        for i in code["index"]:
             pulses += table[i]  # and add to the list of pulses
         pulses.pop()  # remove one final 'low' pulse
 
-        pwm.frequency = code['freq']
-        for i in range(repeat):
-            pulse.send(array.array('H', pulses))
-            time.sleep(delay)
+        with pulseio.PulseOut(
+            board.REMOTEOUT, frequency=code["freq"], duty_cycle=2**15
+        ) as pulse:
+            for i in range(repeat):
+                pulse.send(array.array("H", pulses))
+                time.sleep(delay)
 
         led.value = False
         spkr.value = False
-        time.sleep(code['delay'])
+        time.sleep(code["delay"])
 
     f.close()

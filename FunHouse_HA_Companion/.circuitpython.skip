@@ -1,7 +1,0 @@
-FunHouse_HA_Companion/code.py 72: Using the global statement (global-statement)
-FunHouse_HA_Companion/code.py 90: Unused argument 'userdata' (unused-argument)
-FunHouse_HA_Companion/code.py 90: Unused argument 'result' (unused-argument)
-FunHouse_HA_Companion/code.py 90: Unused argument 'payload' (unused-argument)
-FunHouse_HA_Companion/code.py 97: Unused argument 'client' (unused-argument)
-FunHouse_HA_Companion/code.py 102: Unused argument 'client' (unused-argument)
-FunHouse_HA_Companion/code.py 120: Redefining name 'output' from outer scope (line 172) (redefined-outer-name)

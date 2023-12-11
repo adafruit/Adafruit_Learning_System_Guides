@@ -7,8 +7,11 @@
 import board
 from adafruit_seesaw import seesaw, rotaryio, digitalio, neopixel
 
-qt_enc1 = seesaw.Seesaw(board.I2C(), addr=0x36)
-qt_enc2 = seesaw.Seesaw(board.I2C(), addr=0x37)
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
+
+qt_enc1 = seesaw.Seesaw(i2c, addr=0x36)
+qt_enc2 = seesaw.Seesaw(i2c, addr=0x37)
 
 qt_enc1.pin_mode(24, qt_enc1.INPUT_PULLUP)
 button1 = digitalio.DigitalIO(qt_enc1, 24)
