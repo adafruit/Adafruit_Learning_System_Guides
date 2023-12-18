@@ -21,5 +21,5 @@ IO = digitalio.DigitalInOut(PIN)
 IO.direction = digitalio.Direction.INPUT
 IO.pull = digitalio.Pull.UP
 
-if IO.value:                    # No connection
-    storage.remount('/', False) # Remount storage as read/write for painter
+if IO.value:                             # No connection
+    storage.remount('/', readonly=False) # Remount storage as read/write for painter
