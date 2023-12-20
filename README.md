@@ -8,11 +8,12 @@ Starting in 2023, guides using a specific Adafruit board will be placed in a sub
 
 * Flora/
 * ItsyBitsy/
-* QT Py/
-* NeoTrellis/
 * MagTag/
-* PyPortal/
+* MEMENTO/
+* NeoTrellis/
 * PyLeap/
+* PyPortal/
+* QTPy/
 
 ## Issues
 
