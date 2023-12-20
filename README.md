@@ -15,6 +15,8 @@ Starting in 2023, guides using a specific Adafruit board will be placed in a sub
 * PyPortal/
 * QTPy/
 
+If a new product or project group is contemplated, contact Learn moderators for guidance.
+
 ## Issues
 
 Issues with guides should be reported in the guide itself under "Feedback? Corrections?"
