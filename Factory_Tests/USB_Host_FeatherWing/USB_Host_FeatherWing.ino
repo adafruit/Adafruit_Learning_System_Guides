@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 Limor Fried for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #include "Adafruit_TinyUSB.h"
 #include "Adafruit_ST7789.h" 
 
