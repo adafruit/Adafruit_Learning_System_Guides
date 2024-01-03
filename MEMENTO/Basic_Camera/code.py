@@ -1,7 +1,23 @@
 # SPDX-FileCopyrightText: Copyright (c) 2023 john park for Adafruit Industries
 #
 # SPDX-License-Identifier: MIT
-''' simple point-and-shoot camera example. No bells! Zero whistles! '''
+""" 
+simple point-and-shoot camera example. No bells! Zero whistles!
+
+Requires libraries from the Adafruit CircuitPython Library Bundle.
+Download the bundle from circuitpython.org/libraries and copy the
+following files/folders to your CIRCUITPY/lib folder:
+* adafruit_display_text
+* adafruit_register
+* adafruit_aw9523.mpy
+* adafruit_debouncer.mpy
+* adafruit_lis3dh.mpy
+* adafruit_ticks.mpy
+* neopixel.mpy
+
+Once the libraries are copied, save this file as code.py to your CIRCUITPY
+drive to run it.
+"""
 
 import time
 import adafruit_pycamera # pylint: disable=import-error
