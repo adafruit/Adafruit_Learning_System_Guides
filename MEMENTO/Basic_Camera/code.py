@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: Copyright (c) 2023 john park for Adafruit Industries
 #
 # SPDX-License-Identifier: MIT
-""" 
+"""
 simple point-and-shoot camera example. No bells! Zero whistles!
 
 Requires libraries from the Adafruit CircuitPython Library Bundle.
