@@ -136,7 +136,7 @@ def fetch_flight_data():
 
     headers = {
         "Accept": "application/json; charset=UTF-8",
-        "x-apikey": os.getenv("AREO_API_KEY"),  # Replace with your actual API key
+        "x-apikey": os.getenv("AERO_API_KEY"),  # Replace with your actual API key
     }
     full_url = f"{base_url}?{construct_query_string(params)}"
     response = requests.get(full_url, headers=headers)
