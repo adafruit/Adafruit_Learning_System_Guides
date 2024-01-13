@@ -10,6 +10,8 @@ Attach five buttons with pullup resistors to Feather nRF52840
 import time
 import board
 from digitalio import DigitalInOut, Direction
+# Uncomment if setting .pull below.
+# from digitalio import Pull
 
 import adafruit_ble
 from adafruit_ble.advertising import Advertisement
@@ -31,6 +33,14 @@ button_2.direction = Direction.INPUT
 button_3.direction = Direction.INPUT
 button_4.direction = Direction.INPUT
 button_5.direction = Direction.INPUT
+
+# NOTE: If you are not using buttons with built-in pullups, uncomment the five lines below,
+# and the `from digitalio import Pull` above.
+# button_1.pull = Pull.UP
+# button_2.pull = Pull.UP
+# button_3.pull = Pull.UP
+# button_4.pull = Pull.UP
+# button_5.pull = Pull.UP
 
 hid = HIDService()
 
