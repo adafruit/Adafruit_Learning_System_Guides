@@ -24,7 +24,7 @@ import time
 import adafruit_minimqtt.adafruit_minimqtt as MQTT
 from adafruit_io.adafruit_io import IO_MQTT
 import board
-import esp32_camera
+import espcamera
 import socketpool
 import wifi
 
@@ -33,17 +33,17 @@ aio_key = os.getenv('AIO_KEY')
 
 image_feed = "image"
 
-cam = esp32_camera.Camera(
+cam = espcamera.Camera(
     data_pins=board.CAMERA_DATA,
     external_clock_pin=board.CAMERA_XCLK,
     pixel_clock_pin=board.CAMERA_PCLK,
     vsync_pin=board.CAMERA_VSYNC,
     href_pin=board.CAMERA_HREF,
-    pixel_format=esp32_camera.PixelFormat.JPEG,
-    frame_size=esp32_camera.FrameSize.SVGA,
+    pixel_format=espcamera.PixelFormat.JPEG,
+    frame_size=espcamera.FrameSize.SVGA,
     i2c=board.I2C(),
     external_clock_frequency=20_000_000,
-    grab_mode=esp32_camera.GrabMode.WHEN_EMPTY)
+    grab_mode=espcamera.GrabMode.WHEN_EMPTY)
 cam.vflip = True
 
 
