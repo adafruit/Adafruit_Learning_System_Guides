@@ -18,23 +18,23 @@ import struct
 import adafruit_ticks
 import board
 import displayio
-import esp32_camera
+import espcamera
 import keypad
 
 button = keypad.Keys((board.BOOT,), value_when_pressed=False)
 
-cam = esp32_camera.Camera(
+cam = espcamera.Camera(
     data_pins=board.CAMERA_DATA,
     external_clock_pin=board.CAMERA_XCLK,
     pixel_clock_pin=board.CAMERA_PCLK,
     vsync_pin=board.CAMERA_VSYNC,
     href_pin=board.CAMERA_HREF,
-    pixel_format=esp32_camera.PixelFormat.RGB565,
-    frame_size=esp32_camera.FrameSize.R240X240,
+    pixel_format=espcamera.PixelFormat.RGB565,
+    frame_size=espcamera.FrameSize.R240X240,
     i2c=board.I2C(),
     external_clock_frequency=20_000_000,
     framebuffer_count=2,
-    grab_mode=esp32_camera.GrabMode.WHEN_EMPTY)
+    grab_mode=espcamera.GrabMode.WHEN_EMPTY)
 
 cam.vflip = True
 

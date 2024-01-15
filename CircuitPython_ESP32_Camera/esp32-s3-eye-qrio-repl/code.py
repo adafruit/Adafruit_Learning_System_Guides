@@ -9,18 +9,18 @@ ILI9341 display.
 
 import struct
 import board
-import esp32_camera
+import espcamera
 import qrio
 
 print("Initializing camera")
-cam = esp32_camera.Camera(
+cam = espcamera.Camera(
     data_pins=board.CAMERA_DATA,
     external_clock_pin=board.CAMERA_XCLK,
     pixel_clock_pin=board.CAMERA_PCLK,
     vsync_pin=board.CAMERA_VSYNC,
     href_pin=board.CAMERA_HREF,
-    pixel_format=esp32_camera.PixelFormat.RGB565,
-    frame_size=esp32_camera.FrameSize.R240X240,
+    pixel_format=espcamera.PixelFormat.RGB565,
+    frame_size=espcamera.FrameSize.R240X240,
     i2c=board.I2C(),
     external_clock_frequency=20_000_000,
     framebuffer_count=2)
