@@ -3,24 +3,17 @@
 # An open-source IoT doorbell with the Adafruit MEMENTO camera and Adafruit IO
 #
 # SPDX-License-Identifier: Unlicense
+import os
 import time
+import ssl
 import binascii
 import digitalio
-import bitmaptools
-import displayio
-import gifio
-import pwmio
-import ulab.numpy as np
 import adafruit_pycamera
-import os
 import board
-import busio
 import wifi
-import ssl
 import socketpool
 import adafruit_requests
 from adafruit_io.adafruit_io import IO_HTTP, AdafruitIO_RequestError
-from adafruit_debouncer import Debouncer
 
 print("CircuitPython Doorbell Camera")
 
@@ -93,7 +86,6 @@ def capture_send_image():
     print("DONE, waiting for next press..")
     # Turn the LED on to signal that the doorbell is ready to be pressed again
     led.value = True
-    
 
 
 while True:
