@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Erin St Blaine and ChatGPT for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 import time
 import board
 from adafruit_circuitplayground import cp
