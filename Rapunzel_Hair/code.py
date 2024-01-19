@@ -12,7 +12,7 @@ SOUND_THRESHOLD = 50  # Adjust this threshold based on your environment
 # Variables
 DELAY_AFTER_LIGHT_UP = 2.0
 COLOR = (255, 100, 0)  # Warm yellow color
-SPEED = 0.2  # Animation speed (adjust as needed, higher number moves more slowly)
+SPEED = 0.3  # Animation speed (adjust as needed, higher number moves more slowly)
 
 # Initialize NeoPixels on face
 pixels_face = cp.pixels
