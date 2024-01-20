@@ -18,8 +18,11 @@ import adafruit_is31fl3741
 from adafruit_is31fl3741.adafruit_ledglasses import LED_Glasses
 from rainbowio import colorwheel
 from ulab import numpy as np
-from ulab.scipy.signal import spectrogram
 
+try:
+    from ulab.utils import spectrogram
+except ImportError:
+    from ulab.scipy.signal import spectrogram
 
 # FFT/SPECTRUM CONFIG ----
 

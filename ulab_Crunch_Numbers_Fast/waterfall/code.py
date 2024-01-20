@@ -12,12 +12,17 @@ import board
 import audiobusio
 import displayio
 from ulab import numpy as np
-from ulab.scipy.signal import spectrogram
+
+try:
+    from ulab.utils import spectrogram
+except ImportError:
+    from ulab.scipy.signal import spectrogram
 
 display = board.DISPLAY
 
 # Create a heatmap color palette
 palette = displayio.Palette(52)
+# fmt: off
 for i, pi in enumerate((0xff0000, 0xff0a00, 0xff1400, 0xff1e00,
                         0xff2800, 0xff3200, 0xff3c00, 0xff4600,
                         0xff5000, 0xff5a00, 0xff6400, 0xff6e00,
@@ -31,6 +36,7 @@ for i, pi in enumerate((0xff0000, 0xff0a00, 0xff1400, 0xff1e00,
                         0x00a4ff, 0x0094ff, 0x0084ff, 0x0074ff,
                         0x0064ff, 0x0054ff, 0x0044ff, 0x0032ff,
                         0x0022ff, 0x0012ff, 0x0002ff, 0x0000ff)):
+    # fmt: on
     palette[51-i] = pi
 
 class RollingGraph(displayio.TileGrid):

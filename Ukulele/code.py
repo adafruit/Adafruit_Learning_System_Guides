@@ -24,7 +24,11 @@ import digitalio
 import audiobusio
 import board
 import neopixel
-from ulab.scipy.signal import spectrogram
+
+try:
+    from ulab.utils import spectrogram
+except ImportError:
+    from ulab.scipy.signal import spectrogram
 from ulab import numpy as np
 from rainbowio import colorwheel
 from adafruit_lsm6ds import lsm6ds33
@@ -46,11 +50,11 @@ from adafruit_led_animation.color import (
     WHITE,
 )
 
-MAX_BRIGHTNESS = 0.3 #set max brightness for sound reactive mode
-NORMAL_BRIGHTNESS = 0.1 #set brightness for non-reactive mode
-VOLUME_CALIBRATOR = 50 #multiplier for brightness mapping
-ROCKSTAR_TILT_THRESHOLD = 200 #shake threshold
-SOUND_THRESHOLD = 430000 #main strum or pluck threshold
+MAX_BRIGHTNESS = 0.3  # set max brightness for sound reactive mode
+NORMAL_BRIGHTNESS = 0.1  # set brightness for non-reactive mode
+VOLUME_CALIBRATOR = 50  # multiplier for brightness mapping
+ROCKSTAR_TILT_THRESHOLD = 200  # shake threshold
+SOUND_THRESHOLD = 430000  # main strum or pluck threshold
 
 # Set to the length in seconds for the animations
 POWER_ON_DURATION = 1.3
@@ -72,11 +76,11 @@ pixels.fill(0)  # NeoPixels off ASAP on startup
 pixels.show()
 
 
-#PIXEL MAPS: Used for reordering pixels so the animations can run in different configurations.
-#My LED strips inside the neck are accidentally swapped left-right,
-#so these maps also correct for that
+# PIXEL MAPS: Used for reordering pixels so the animations can run in different configurations.
+# My LED strips inside the neck are accidentally swapped left-right,
+# so these maps also correct for that
 
-
+# fmt: off
 #Bottom up along both sides at once
 pixel_map_reverse = PixelMap(pixels, [
     0, 103, 1, 102, 2, 101, 3, 100, 4, 99, 5, 98, 6, 97, 7, 96, 8, 95, 9, 94, 10,
@@ -122,6 +126,7 @@ pixel_map_skip = PixelMap(pixels, [
     83, 22, 81, 24, 79, 26, 77, 29, 74, 31, 72, 33, 70, 35, 68, 37, 66, 39, 64, 41,
     62, 43, 60, 45, 58, 47, 56, 49, 54, 51, 52,
     ], individual_pixels=True)
+# fmt: on
 
 pixel_map = [
     pixel_map_reverse,
@@ -131,15 +136,15 @@ pixel_map = [
     pixel_map_skip,
 ]
 
-#Set up accelerometer & mic
+# Set up accelerometer & mic
 sensor = lsm6ds33.LSM6DS33(i2c)
-mic = audiobusio.PDMIn(board.MICROPHONE_CLOCK,
-                       board.MICROPHONE_DATA,
-                       sample_rate=16000,
-                       bit_depth=16)
+mic = audiobusio.PDMIn(
+    board.MICROPHONE_CLOCK, board.MICROPHONE_DATA, sample_rate=16000, bit_depth=16
+)
 
 NUM_SAMPLES = 256
-samples_bit = array.array('H', [0] * (NUM_SAMPLES+3))
+samples_bit = array.array("H", [0] * (NUM_SAMPLES + 3))
+
 
 def power_on(duration):
     """
@@ -151,6 +156,7 @@ def power_on(duration):
         if elapsed > duration:  # Past duration?
             break  # Stop animating
         powerup.animate()
+
 
 def rockstar_tilt(duration):
     """
@@ -182,6 +188,7 @@ def rockstar_tilt(duration):
         pixels.show()
         time.sleep(0.03)
 
+
 # Cusomize LED Animations  ------------------------------------------------------
 powerup = RainbowComet(pixel_map[3], speed=0, tail_length=25, bounce=False)
 rainbow = Rainbow(pixel_map[4], speed=0, period=6, name="rainbow", step=2.4)
@@ -191,13 +198,13 @@ chase = Chase(pixel_map[1], speed=0.1, color=RED, size=1, spacing=6)
 rainbow_comet = RainbowComet(pixel_map[2], speed=0, tail_length=80, bounce=True)
 rainbow_comet2 = RainbowComet(
     pixel_map[0], speed=0, tail_length=104, colorwheel_offset=80, bounce=True
-    )
+)
 rainbow_comet3 = RainbowComet(
     pixel_map[1], speed=0, tail_length=25, colorwheel_offset=80, step=4, bounce=False
-    )
+)
 strum = RainbowComet(
     pixel_map[3], speed=0, tail_length=25, bounce=False, colorwheel_offset=50, step=4
-    )
+)
 lava = Comet(pixel_map[3], speed=0.01, color=ORANGE, tail_length=40, bounce=False)
 sparkle = Sparkle(pixel_map[4], speed=0.01, color=BLUE, num_sparkles=10)
 sparkle2 = Sparkle(pixel_map[1], speed=0.05, color=PURPLE, num_sparkles=4)
@@ -214,18 +221,18 @@ animations = AnimationSequence(
     AnimationGroup(
         sparkle,
         strum,
-        ),
+    ),
     AnimationGroup(
         sparkle2,
         rainbow_comet3,
-        ),
+    ),
     auto_clear=True,
     auto_reset=True,
 )
 
 
 MODE = 0
-LASTMODE = 1 # start up in sound reactive mode
+LASTMODE = 1  # start up in sound reactive mode
 i = 0
 
 # Main loop
@@ -246,9 +253,9 @@ while True:
         spectrum[1] = 0
         peak_idx = np.argmax(spectrum)
         peak_freq = peak_idx * 16000 / 256
-#        print((peak_idx, peak_freq, spectrum[peak_idx]))
+        #        print((peak_idx, peak_freq, spectrum[peak_idx]))
         magnitude = spectrum[peak_idx]
-#         time.sleep(1)
+        #         time.sleep(1)
         if peak_freq == 812.50 and magnitude > SOUND_THRESHOLD:
             animations.next()
             time.sleep(1)
@@ -263,10 +270,10 @@ while True:
                 print("mode = 1")
                 LASTMODE = 1
                 time.sleep(1)
-    # Read accelerometer
+        # Read accelerometer
         x, y, z = sensor.acceleration
-        accel_total = x * x + y * y # x=tilt, y=rotate
-#         print (accel_total)
+        accel_total = x * x + y * y  # x=tilt, y=rotate
+        #         print (accel_total)
         if accel_total > ROCKSTAR_TILT_THRESHOLD:
             MODE = 3
             print("Tilted: ", accel_total)
@@ -274,9 +281,9 @@ while True:
             VOLUME = magnitude / (VOLUME_CALIBRATOR * 100000)
             if VOLUME > MAX_BRIGHTNESS:
                 VOLUME = MAX_BRIGHTNESS
-#             print(VOLUME)
+            #             print(VOLUME)
             pixels.brightness = VOLUME
-#             time.sleep(2)
+            #             time.sleep(2)
             animations.animate()
         elif MODE == 2:
             pixels.brightness = NORMAL_BRIGHTNESS
