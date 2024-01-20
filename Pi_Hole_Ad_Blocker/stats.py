@@ -45,7 +45,8 @@ import adafruit_ssd1306
 # Import Python Imaging Library
 from PIL import Image, ImageDraw, ImageFont
 
-api_url = 'http://localhost/admin/api.php'
+API_TOKEN = "YOUR_API_TOKEN_HERE"
+api_url = "http://localhost/admin/api.php?summaryRaw&auth="+API_TOKEN
 
 # Create the I2C interface.
 i2c = busio.I2C(SCL, SDA)

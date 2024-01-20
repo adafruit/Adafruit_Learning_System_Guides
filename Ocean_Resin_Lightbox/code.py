@@ -61,7 +61,7 @@ def do_crawl_down(image_file, *,
     group = displayio.Group()
     tile_grid = displayio.TileGrid(bitmap=the_bitmap, pixel_shader=the_palette)
     group.append(tile_grid)
-    display.show(group)
+    display.root_group = group
 
     start_time = time.monotonic_ns()
     start_y = display.height   # High enough to be "off the top"
@@ -100,7 +100,7 @@ def do_pulse(image_file, *, duration=4, pulse_speed=1/8, pulse=.5):
     group.append(tile_grid)
     group.x = (display.width - the_bitmap.width) // 2
     group.y = (display.height - the_bitmap.height) // 2
-    display.show(group)
+    display.root_group = group
 
     start_time = time.monotonic_ns()
     end_time = start_time + int(duration * 1e9)

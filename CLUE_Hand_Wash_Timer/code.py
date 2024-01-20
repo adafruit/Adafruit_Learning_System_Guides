@@ -82,7 +82,7 @@ timer_label.y = 100
 text_group.append(timer_label)
 
 clue_display.append(text_group)
-clue.display.show(clue_display)
+clue.display.root_group = clue_display
 
 def countdown(seconds):
     for i in range(seconds):

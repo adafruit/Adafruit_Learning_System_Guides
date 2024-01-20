@@ -124,7 +124,7 @@ check = 0
 begin = time.monotonic()
 print(begin)
 # when feather is powered up it shows the initial graphic splash
-minitft.display.show(graphics[mode])
+minitft.display.root_group = graphics[mode]
 
 while True:
     # setup minitft featherwing buttons
@@ -153,7 +153,7 @@ while True:
             if mode > 3:
                 mode = 0
             print("Mode:,", mode)
-            minitft.display.show(graphics[mode])
+            minitft.display.root_group = graphics[mode]
     # scroll up to change slide duration and graphic
     if buttons.up and up_state == "pressed":
         # blocks the button if the slider is sliding or
@@ -167,10 +167,10 @@ while True:
             if mode < 0:
                 mode = 3
             print("Mode: ", mode)
-            minitft.display.show(graphics[mode])
+            minitft.display.root_group = graphics[mode]
     # workaround so that the menu graphics show after a slide is finished
     if mode == mode and pause == 0 and onOff == 0:
-        minitft.display.show(graphics[mode])
+        minitft.display.root_group = graphics[mode]
     # starts slide
     if buttons.select and select_state == "pressed" or z == 2:
         # blocks the button if the slider is sliding or
@@ -180,7 +180,7 @@ while True:
             select_state = None
         else:
             # shows the slider is sliding graphic
-            minitft.display.show(progBarGroup)
+            minitft.display.root_group = progBarGroup
             # gets time of button press
             press = time.monotonic()
             print(press)
@@ -230,7 +230,7 @@ while True:
                     check = 0
                 if end < 10:
                     # displays the stopping graphic for the last 10 secs.
-                    minitft.display.show(stopGroup)
+                    minitft.display.root_group = stopGroup
             # changes states after slide has completed
             kit.stepper1.release()
             pause = 1
@@ -240,7 +240,7 @@ while True:
             # delay for safety
             time.sleep(2)
             # shows choice menu
-            minitft.display.show(reverseqGroup)
+            minitft.display.root_group = reverseqGroup
     # b is defined to stop the slider
     # only active if the slider is in the 'stopped' state
     if buttons.b and b_state == "pressed" and stop == 1:
@@ -249,7 +249,7 @@ while True:
         if z == 0:
             b_state = None
             time.sleep(1)
-            minitft.display.show(backingUpGroup)
+            minitft.display.root_group = backingUpGroup
             # delay for safety
             time.sleep(2)
             # brings camera back to 'home' at double speed
@@ -286,7 +286,7 @@ while True:
             a_state = None
             # same script as the 'regular' slide loop
             time.sleep(2)
-            minitft.display.show(progBarGroup)
+            minitft.display.root_group = progBarGroup
             press = time.monotonic()
             print(press)
             text_area.text = slide_begin[mode]
@@ -322,7 +322,7 @@ while True:
                 if check > 19:
                     check = 0
                 if end < 10:
-                    minitft.display.show(stopGroup)
+                    minitft.display.root_group = stopGroup
             # state changes
             kit.stepper1.release()
             pause = 1
@@ -331,4 +331,4 @@ while True:
             z = 1
             check = 0
             time.sleep(2)
-            minitft.display.show(reverseqGroup)
+            minitft.display.root_group = reverseqGroup

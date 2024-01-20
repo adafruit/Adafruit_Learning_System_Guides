@@ -37,7 +37,8 @@ blue_led.value = False
 max_rate = 180
 
 # Seven Segment FeatherWing setup
-i2c = board.I2C()
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
 display_A = Seg7x4(i2c, address=0x70)  # this will be the BPM display
 display_A.fill(0)  # Clear the display
 # Second display has A0 address jumpered

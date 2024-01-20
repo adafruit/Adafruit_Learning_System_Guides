@@ -25,7 +25,7 @@ group = displayio.Group()
 group.append(tile_grid)
 
 # Add the Group to the Display
-display.show(group)
+display.root_group = group
 
 # Draw a pixel
 bitmap[80, 50] = 1

@@ -8,7 +8,8 @@ import adafruit_tca9548a
 from adafruit_bme280 import basic as adafruit_bme280
 
 # Create I2C bus as normal
-i2c = board.I2C()
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
 
 # Create the TCA9548A object and give it the I2C bus
 tca = adafruit_tca9548a.TCA9548A(i2c)

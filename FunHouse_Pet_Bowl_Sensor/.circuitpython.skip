@@ -1,8 +1,0 @@
-FunHouse_Pet_Bowl_Sensor/code.py 106: Line too long (101/100) (line-too-long)
-FunHouse_Pet_Bowl_Sensor/code.py 31: Redefining name 'bowl_state' from outer scope (line 112) (redefined-outer-name)
-FunHouse_Pet_Bowl_Sensor/code.py 38: Unused argument 'client' (unused-argument)
-FunHouse_Pet_Bowl_Sensor/code.py 38: Unused argument 'userdata' (unused-argument)
-FunHouse_Pet_Bowl_Sensor/code.py 38: Unused argument 'result' (unused-argument)
-FunHouse_Pet_Bowl_Sensor/code.py 38: Unused argument 'payload' (unused-argument)
-FunHouse_Pet_Bowl_Sensor/code.py 42: Unused argument 'client' (unused-argument)
-FunHouse_Pet_Bowl_Sensor/code.py 59: Redefining name 'water_level' from outer scope (line 108) (redefined-outer-name)

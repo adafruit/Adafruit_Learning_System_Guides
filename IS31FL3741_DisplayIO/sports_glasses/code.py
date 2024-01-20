@@ -138,7 +138,7 @@ text_area = label.Label(font, text="", color=(0, 0, 0))
 text_area.y = 8
 group = displayio.Group()
 group.append(text_area)
-display.show(group)
+display.root_group = group
 
 while True:
     # Run the debouncer code to get the updated switch value

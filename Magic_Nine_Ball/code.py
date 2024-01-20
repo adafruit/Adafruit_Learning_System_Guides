@@ -14,7 +14,7 @@ import displayio
 import adafruit_lis3dh
 
 splash = displayio.Group()
-board.DISPLAY.show(splash)
+board.DISPLAY.root_group = splash
 
 SENSITIVITY = 5   # reading in Z direction to trigger, adjustable
 
@@ -23,7 +23,9 @@ images = list(filter(lambda x: x.endswith("bmp"), os.listdir("/")))
 i = random.randint(0, (len(images)-1))  # initial image is randomly selected
 
 # Set up accelerometer on I2C bus, 4G range:
-ACCEL = adafruit_lis3dh.LIS3DH_I2C(board.I2C(), address=0x18)
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
+ACCEL = adafruit_lis3dh.LIS3DH_I2C(i2c, address=0x18)
 
 ACCEL.range = adafruit_lis3dh.RANGE_4_G
 

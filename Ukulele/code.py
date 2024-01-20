@@ -68,7 +68,8 @@ enable = digitalio.DigitalInOut(POWER_PIN)
 enable.direction = digitalio.Direction.OUTPUT
 enable.value = False
 
-i2c = board.I2C()
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
 
 pixels = neopixel.NeoPixel(NEOPIXEL_PIN, NUM_PIXELS, brightness=1, auto_write=False)
 pixels.fill(0)  # NeoPixels off ASAP on startup

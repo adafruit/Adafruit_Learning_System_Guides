@@ -13,7 +13,7 @@ import adafruit_requests
 import adafruit_ahtx0
 from adafruit_io.adafruit_io import IO_HTTP, AdafruitIO_RequestError
 
-wifi.radio.connect(os.getenv('WIFI_SSID'), os.getenv('WIFI_PASSWORD'))
+wifi.radio.connect(os.getenv('CIRCUITPY_WIFI_SSID'), os.getenv('CIRCUITPY_WIFI_PASSWORD'))
 
 aio_username = os.getenv('aio_username')
 aio_key = os.getenv('aio_key')

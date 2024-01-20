@@ -10,8 +10,9 @@ from adafruit_st7789 import ST7789
 
 displayio.release_displays()
 
-i2c_bus = board.I2C()
-ss = Seesaw(i2c_bus)
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
+ss = Seesaw(i2c)
 
 spi = board.SPI()  # setup for display over SPI
 tft_cs = board.D5
@@ -23,7 +24,7 @@ display_bus = displayio.FourWire(
 display = ST7789(display_bus, width=280, height=240, rowstart=20, rotation=270)
 
 screen = displayio.Group()  # Create a Group to hold content
-display.show(screen)  # Add it to the Display
+display.root_group = screen  # Add it to the Display
 
 # display image
 image = displayio.OnDiskBitmap("/img/bootpip0.bmp")
@@ -42,7 +43,7 @@ if cursor_on:
     cursor.x = 0  # hide cursor during bootup
     cursor.y = 0
 
-display.show(screen)
+display.root_group = screen
 
 boot_file_names = [
     "/img/bootpip0.bmp",

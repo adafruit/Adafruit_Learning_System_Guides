@@ -24,12 +24,16 @@ jaw_servo = servo.Servo(pwm)
 def jaw_wag():
     for angle in range(90, 70, -2):  # start angle, end angle, degree step size
         jaw_servo.angle = angle
+        time.sleep(0.01)
     for angle in range(70, 90, 2):
         jaw_servo.angle = angle
+        time.sleep(0.01)
     for angle in range(90, 110, 2):
         jaw_servo.angle = angle
+        time.sleep(0.01)
     for angle in range(110, 90, -2):
         jaw_servo.angle = angle
+        time.sleep(0.01)
 
 
 # TO LOAD DIFFERENT EYE DESIGNS: change the middle word here (between
@@ -76,8 +80,7 @@ class Sprite(displayio.TileGrid):
             palette.make_transparent(closest_index)
         elif isinstance(transparent, int):
             palette.make_transparent(transparent)
-        super(Sprite, self).__init__(bitmap, pixel_shader=palette)
-        self.height = bitmap.height
+        super().__init__(bitmap, pixel_shader=palette, height=bitmap.height)
 
 
 # ONE-TIME INITIALIZATION --------------------------------------------------
@@ -93,7 +96,7 @@ SPRITES.append(Sprite(EYE_DATA["eye_image"]))  # Base image is opaque
 SPRITES.append(Sprite(EYE_DATA["lower_lid_image"], EYE_DATA["transparent"]))
 SPRITES.append(Sprite(EYE_DATA["upper_lid_image"], EYE_DATA["transparent"]))
 SPRITES.append(Sprite(EYE_DATA["stencil_image"], EYE_DATA["transparent"]))
-DISPLAY.show(SPRITES)
+DISPLAY.root_group = SPRITES
 
 EYE_CENTER = (
     (EYE_DATA["eye_move_min"][0] + EYE_DATA["eye_move_max"][0])  # Pixel coords of eye

@@ -1,0 +1,5 @@
+mode,Default
+delay,3
+pb,13.12
+par,5.1
+sensitivity,3

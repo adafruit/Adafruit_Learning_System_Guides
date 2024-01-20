@@ -45,7 +45,7 @@ backlight.direction = digitalio.Direction.OUTPUT
 backlight.value = False
 
 splash = displayio.Group()
-board.DISPLAY.show(splash)
+board.DISPLAY.root_group = splash
 
 
 # setup neopixel ring
@@ -54,7 +54,8 @@ pixels.fill((0, 0, 0))
 pixels.show()
 
 # setup accelerometer
-# i2c = board.I2C()
+# i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
 # lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c)
 
 

@@ -14,7 +14,8 @@ from pythonosc import udp_client
 sender = udp_client.SimpleUDPClient("127.0.0.1", 4560)
 sender.send_message("/trigger/prophet", [43, 110, 1, 0.7])
 
-i2c = board.I2C()
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
 pcf = PCF.PCF8591(i2c)
 
 pcf_in_0 = AnalogIn(pcf, PCF.A0)

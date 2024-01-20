@@ -97,7 +97,9 @@ io.on_message = message
 print("Connecting to Adafruit IO...")
 io.connect()
 
-display_bus = displayio.I2CDisplay(board.I2C(), device_address=0x3C)
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
+display_bus = displayio.I2CDisplay(i2c, device_address=0x3C)
 
 WIDTH = 128
 HEIGHT = 32
@@ -106,7 +108,7 @@ BORDER = 2
 display = adafruit_displayio_ssd1306.SSD1306(display_bus, width=WIDTH, height=HEIGHT)
 
 splash = displayio.Group()
-display.show(splash)
+display.root_group = splash
 
 digital_label = label.Label(
     terminalio.FONT, text="Battery Percent: ", color=0xFFFFFF, x=4, y=4
@@ -116,7 +118,9 @@ alarm_label = label.Label(terminalio.FONT, text="Voltage: ", color=0xFFFFFF, x=4
 splash.append(alarm_label)
 
 
-sensor = LC709203F(board.I2C())
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
+sensor = LC709203F(i2c)
 
 start = 0
 while True:

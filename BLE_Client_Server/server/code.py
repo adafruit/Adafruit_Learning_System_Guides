@@ -3,7 +3,9 @@
 # SPDX-License-Identifier: MIT
 
 from time import sleep
-from adafruit_ble.uart_server import UARTServer
+from adafruit_ble import BLERadio
+from adafruit_ble.advertising.standard import ProvideServicesAdvertisement
+from adafruit_ble.services.nordic import UARTService
 from adafruit_bluefruit_connect.packet import Packet
 from adafruit_bluefruit_connect.button_packet import ButtonPacket
 from adafruit_bluefruit_connect.color_packet import ColorPacket
@@ -17,15 +19,16 @@ solenoid = DigitalInOut(D13)  # Initialize solenoid
 solenoid.direction = Direction.OUTPUT
 solenoid.value = False
 
-uart_server = UARTServer()
+ble = BLERadio()
+uart_server = UARTService()
+advertisement = ProvideServicesAdvertisement(uart_server)
 
 while True:
-    uart_server.start_advertising()  # Advertise when not connected.
-
-    while not uart_server.connected:  # Wait for connection
+    ble.start_advertising(advertisement)  # Advertise when not connected.
+    while not ble.connected:
         pass
 
-    while uart_server.connected:  # Connected
+    while ble.connected:  # Connected
         if uart_server.in_waiting:  # Check BLE commands
             packet = Packet.from_stream(uart_server)
             if isinstance(packet, ButtonPacket):

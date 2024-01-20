@@ -38,7 +38,7 @@ matrixportal.add_text(
     text_font=FONT,
     text_position=(
         (matrixportal.graphics.display.width // 12) - 1,
-        (matrixportal.graphics.display.height // 2) - 4,
+        (matrixportal.graphics.display.height // 2) - 8,
     ),
     text_color=0x800000,
 )

@@ -57,7 +57,7 @@ from micropython import const
 
 def clear_display():
     """Display nothing"""
-    board.DISPLAY.show(displayio.Group())
+    board.DISPLAY.root_group = displayio.Group()
 
 clear_display()
 
@@ -293,7 +293,7 @@ speaker.play(mp3stream)
 
 font = adafruit_bitmap_font.bitmap_font.load_font("rsrc/5x8.pcf")
 playback_display = PlaybackDisplay()
-board.DISPLAY.show(playback_display.group)
+board.DISPLAY.root_group = playback_display.group
 font.load_glyphs(range(32, 128))
 
 joystick = analogjoy.AnalogJoystick()
@@ -358,7 +358,7 @@ def menu_choice(seq, *, sel_idx=0, text_font=font):
 
     last_scroll_idx = max(0, len(seq) - num_rows)
 
-    board.DISPLAY.show(scene)
+    board.DISPLAY.root_group = scene
     buttons.events.clear()
     i = 0
     old_scroll_idx = None
@@ -472,7 +472,7 @@ def play_all(playlist, *, folder='', trim=0, location='/sd'):
 
     'folder' is a display name for the user."""
     i = 0
-    board.DISPLAY.show(playback_display.group)
+    board.DISPLAY.root_group = playback_display.group
     playback_display.iconbar.group.y = 112
     while 0 <= i < len(playlist):
         filename = playlist[i]
@@ -520,7 +520,7 @@ def main():
         error_text.y = board.DISPLAY.height // 2
         g = displayio.Group()
         g.append(error_text)
-        board.DISPLAY.show(g)
+        board.DISPLAY.root_group = g
 
         while True:
             time.sleep(1)

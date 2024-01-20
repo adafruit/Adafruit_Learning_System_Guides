@@ -123,7 +123,7 @@ try:
 except AdafruitIO_RequestError:
     neopixel_feed = io.create_new_feed("neopixel")
 
-board.DISPLAY.show(group)
+board.DISPLAY.root_group = group
 print("ready")
 last_color = 257
 last_index = 0
@@ -136,7 +136,7 @@ while True:
         # Used to prevent the touchscreen sending incorrect results
         if last_index == index:
             color = colors[index]
-            if colors[index]:
+            if colors[index] is not None:
                 group[1].fill = color
                 if last_color != color:
                     color_str = "#{:06x}".format(color)

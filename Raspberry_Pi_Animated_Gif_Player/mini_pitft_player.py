@@ -15,7 +15,9 @@ import numpy  # pylint: disable=unused-import
 from adafruit_seesaw import seesaw, rotaryio, digitalio as ss_digitalio
 from adafruit_rgb_display import st7789
 
-seesaw = seesaw.Seesaw(board.I2C(), addr=0x36)
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
+seesaw = seesaw.Seesaw(i2c, addr=0x36)
 
 seesaw_product = (seesaw.get_version() >> 16) & 0xFFFF
 print("Found product {}".format(seesaw_product))

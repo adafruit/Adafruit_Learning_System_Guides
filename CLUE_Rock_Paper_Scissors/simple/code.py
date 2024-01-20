@@ -223,7 +223,7 @@ setCursor(my_choice_idx, "your")
 opp_cursor_dob.y = top_y_pos
 screen_group.append(opp_cursor_dob)
 
-display.show(screen_group)
+display.root_group = screen_group
 
 # From adafruit_ble.advertising
 MANUFACTURING_DATA_ADT = 0xFF

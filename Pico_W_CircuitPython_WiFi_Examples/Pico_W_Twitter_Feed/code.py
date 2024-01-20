@@ -17,7 +17,7 @@ tweet_query = 'https://api.twitter.com/2/tweets/search/recent?query=NEW GUIDE fr
 
 headers = {'Authorization': 'Bearer ' + os.getenv('bearer_token')}
 
-wifi.radio.connect(os.getenv('WIFI_SSID'), os.getenv('WIFI_PASSWORD'))
+wifi.radio.connect(os.getenv('CIRCUITPY_WIFI_SSID'), os.getenv('CIRCUITPY_WIFI_PASSWORD'))
 
 pool = socketpool.SocketPool(wifi.radio)
 requests = adafruit_requests.Session(pool, ssl.create_default_context())

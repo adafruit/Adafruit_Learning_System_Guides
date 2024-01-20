@@ -71,7 +71,7 @@ motor_label.y = 74
 text_group.append(motor_label)
 
 clue_display.append(text_group)
-board.DISPLAY.show(clue_display)
+board.DISPLAY.root_group = clue_display
 
 motor = DigitalInOut(board.P2)
 motor.direction = Direction.OUTPUT

@@ -18,7 +18,8 @@ import adafruit_lsm6ds.lsm6ds33  # accelerometer
 import simpleio
 from analogio import AnalogIn
 
-i2c = board.I2C()
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
 sense_accel = adafruit_lsm6ds.lsm6ds33.LSM6DS33(i2c)
 
 analog_in_thumb = AnalogIn(board.A3)

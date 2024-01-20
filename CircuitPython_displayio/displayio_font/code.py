@@ -21,7 +21,7 @@ text_area.x = 20
 text_area.y = 20
 
 # Show it
-display.show(text_area)
+display.root_group = text_area
 
 # Loop forever so you can enjoy your text
 while True:

@@ -28,7 +28,7 @@ group = displayio.Group(scale=1)
 group.append(sprite)
 
 # Add the Group to the Display
-display.show(group)
+display.root_group = group
 
 # Set sprite location
 group.x = 120

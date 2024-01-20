@@ -106,7 +106,7 @@ def wrap_in_tilegrid(filename:str):
 display = tft_gizmo.TFT_Gizmo()
 group = displayio.Group()
 group.append(wrap_in_tilegrid("/ancs_connect.bmp"))
-display.show(group)
+display.root_group = group
 
 current_notification = None
 current_notifications = {}

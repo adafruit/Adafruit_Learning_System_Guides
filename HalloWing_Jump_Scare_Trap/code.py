@@ -90,7 +90,7 @@ def blink(count, speed):
 # display setup
 backlight = pwmio.PWMOut(board.TFT_BACKLIGHT)
 splash = displayio.Group()
-board.DISPLAY.show(splash)
+board.DISPLAY.root_group = splash
 max_brightness = 2 ** 15
 backlight.duty_cycle = 0
 # Image list

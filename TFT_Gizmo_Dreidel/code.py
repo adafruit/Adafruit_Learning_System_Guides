@@ -33,7 +33,7 @@ melody_tempo = 0.02
 # setup TFT Gizmo and main display group (splash)
 display = tft_gizmo.TFT_Gizmo()
 splash = displayio.Group()
-display.show(splash)
+display.root_group = splash
 
 # load dreidel background image
 dreidel_bmp, dreidel_pal = adafruit_imageload.load("/dreidel_background.bmp",

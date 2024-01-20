@@ -55,7 +55,8 @@ displayio.release_displays()
 # oled_reset = board.D9
 
 # Use for I2C
-i2c = board.I2C()
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
 display_bus = displayio.I2CDisplay(i2c, device_address=0x3C)
 
 # SH1107 is vertically oriented 64x128
@@ -68,7 +69,7 @@ display.auto_refresh = False
 font = bitmap_font.load_font("/digit-16px.pcf")
 text_area = label.Label(font, text=" ", line_spacing=0.95)
 text_area.y = 8
-display.show(text_area)
+display.root_group = text_area
 
 N = float
 

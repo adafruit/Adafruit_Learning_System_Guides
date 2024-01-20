@@ -30,7 +30,7 @@ g.append(t)
 l = Label(text="Feather\nRP2040", font=terminalio.FONT, color=0xffffff, line_spacing=.7)
 g.append(l)
 
-display.show(g)
+display.root_group = g
 
 target_fps = 50
 ft = 1/target_fps

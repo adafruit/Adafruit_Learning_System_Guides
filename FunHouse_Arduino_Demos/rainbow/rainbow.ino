@@ -14,24 +14,31 @@ uint8_t LED_dutycycle = 0;
 
 void setup() {
   Serial.begin(115200);
-  
+
   pinMode(LED_BUILTIN, OUTPUT);
-  
+
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 1, 1)
+  ledcAttach(LED_BUILTIN, 5000, 8);
+#else
   ledcSetup(0, 5000, 8);
   ledcAttachPin(LED_BUILTIN, 0);
-  
+#endif
+
   pixels.begin(); // Initialize pins for output
   pixels.show();  // Turn all LEDs off ASAP
   pixels.setBrightness(20);
 }
 
 
-
 void loop() {
   Serial.println("Hello!");
 
   // pulse red LED
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 1, 1)
+  ledcWrite(LED_BUILTIN, LED_dutycycle++);
+#else
   ledcWrite(0, LED_dutycycle++);
+#endif
 
   // rainbow dotstars
   for (int i=0; i<pixels.numPixels(); i++) { // For each pixel in strip...

@@ -47,7 +47,7 @@ void loop() {
   int curr_rotary = encoder.getPosition();
   RotaryEncoder::Direction direction = encoder.getDirection();
   // read switch
-  bool curr_button = !digitalRead(PIN_ENCODER_SWITCH);
+  bool curr_button = digitalRead(PIN_ENCODER_SWITCH);
   
   if (direction != RotaryEncoder::Direction::NOROTATION) {
     Serial.print("Encoder value: ");

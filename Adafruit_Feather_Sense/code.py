@@ -14,7 +14,8 @@ import adafruit_lis3mdl
 import adafruit_lsm6ds.lsm6ds33
 import adafruit_sht31d
 
-i2c = board.I2C()
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
 
 apds9960 = adafruit_apds9960.apds9960.APDS9960(i2c)
 bmp280 = adafruit_bmp280.Adafruit_BMP280_I2C(i2c)

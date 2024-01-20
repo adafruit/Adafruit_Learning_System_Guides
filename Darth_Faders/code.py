@@ -12,7 +12,9 @@ from adafruit_seesaw import seesaw, rotaryio, digitalio
 
 num_faders = 3
 
-motorwing = MotorKit(i2c=board.I2C())
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
+motorwing = MotorKit(i2c=i2c)
 motorwing.frequency = 122  # tune this 50 - 200 range
 max_throttle = 0.18  # tune this 0.2 - 1 range
 
@@ -32,7 +34,7 @@ for i in range(num_faders):
     motors[i].throttle = None
 
 # STEMMA QT Rotary encoder setup
-seesaw = seesaw.Seesaw(board.I2C(), addr=0x36)  # default address is 0x36
+seesaw = seesaw.Seesaw(i2c, addr=0x36)  # default address is 0x36
 seesaw.pin_mode(24, seesaw.INPUT_PULLUP)
 button_in = digitalio.DigitalIO(seesaw, 24)
 button = Debouncer(button_in)

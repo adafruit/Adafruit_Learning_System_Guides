@@ -17,7 +17,8 @@ from adafruit_ble.advertising.standard import SolicitServicesAdvertisement
 from adafruit_ble_apple_media import AppleMediaService, UnsupportedCommand
 
 # Initialize the accelerometer
-i2c = board.I2C()
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
 lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c)
 
 #  Initialize BLE radio

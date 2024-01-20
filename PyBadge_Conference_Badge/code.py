@@ -65,7 +65,7 @@ pad = ShiftRegisterKeys(
 
 # Make the Display Background
 splash = displayio.Group()
-board.DISPLAY.show(splash)
+board.DISPLAY.root_group = splash
 
 color_bitmap = displayio.Bitmap(160, 128, 1)
 color_palette = displayio.Palette(1)

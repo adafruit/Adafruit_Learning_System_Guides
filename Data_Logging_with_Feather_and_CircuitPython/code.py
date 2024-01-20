@@ -12,6 +12,7 @@ import adafruit_am2320
 vbat_voltage = analogio.AnalogIn(board.D9)
 
 i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
 am2320 = adafruit_am2320.AM2320(i2c)
 
 SD_CS = board.D10

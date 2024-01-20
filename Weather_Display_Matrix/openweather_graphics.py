@@ -58,7 +58,7 @@ class OpenWeather_Graphics(displayio.Group):
         # bg_sprite = displayio.TileGrid(background, pixel_shader=background.pixel_shader)
 
         splash.append(bg_sprite)
-        display.show(splash)
+        display.root_group = splash
 
         self.root_group = displayio.Group()
         self.root_group.append(self)
@@ -155,7 +155,7 @@ class OpenWeather_Graphics(displayio.Group):
         else:
             self.wind_text.text = "%d mph" % wind
 
-        self.display.show(self.root_group)
+        self.display.root_group = self.root_group
 
     def set_icon(self, icon_name):
         """Use icon_name to get the position of the sprite and update

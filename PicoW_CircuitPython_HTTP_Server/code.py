@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2022 Liz Clark for Adafruit Industries
+# SPDX-FileCopyrightText: 2023 Liz Clark for Adafruit Industries
 #
 # SPDX-License-Identifier: MIT
 
@@ -16,7 +16,7 @@ from adafruit_display_text import label
 import adafruit_displayio_ssd1306
 import adafruit_imageload
 from digitalio import DigitalInOut, Direction
-from adafruit_httpserver import HTTPServer, HTTPResponse
+from adafruit_httpserver import Server, Request, Response, POST
 from adafruit_onewire.bus import OneWireBus
 from adafruit_ds18x20 import DS18X20
 
@@ -57,7 +57,7 @@ display = adafruit_displayio_ssd1306.SSD1306(display_bus, width=WIDTH, height=HE
 
 # default display group
 splash = displayio.Group()
-display.show(splash)
+display.root_group = splash
 
 #  connect to network
 print()
@@ -74,18 +74,18 @@ netmask =  ipaddress.IPv4Address("255.255.255.0")
 gateway =  ipaddress.IPv4Address("192.168.1.1")
 wifi.radio.set_ipv4_address(ipv4=ipv4,netmask=netmask,gateway=gateway)
 #  connect to your SSID
-wifi.radio.connect(os.getenv('WIFI_SSID'), os.getenv('WIFI_PASSWORD'))
+wifi.radio.connect(os.getenv('CIRCUITPY_WIFI_SSID'), os.getenv('CIRCUITPY_WIFI_PASSWORD'))
 
 print("Connected to WiFi")
 pool = socketpool.SocketPool(wifi.radio)
-server = HTTPServer(pool)
+server = Server(pool, "/static", debug=True)
 
 #  variables for HTML
 #  comment/uncomment desired temp unit
 
 #  temp_test = str(ds18.temperature)
 #  unit = "C"
-temp_test = str(c_to_f(ds18.temperature))
+temp_test = c_to_f(ds18.temperature)
 unit = "F"
 #  font for HTML
 font_family = "monospace"
@@ -122,7 +122,7 @@ def webpage():
     <p class="dotted">This is a Pico W running an HTTP server with CircuitPython.</p>
     <br>
     <p class="dotted">The current ambient temperature near the Pico W is
-    <span style="color: deeppink;">{temp_test}°{unit}</span></p><br>
+    <span style="color: deeppink;">{temp_test:.2f}°{unit}</span></p><br>
     <h1>Control the LED on the Pico W with these buttons:</h1><br>
     <form accept-charset="utf-8" method="POST">
     <button class="button" name="LED ON" value="ON" type="submit">LED ON</button></a></p></form>
@@ -137,14 +137,14 @@ def webpage():
 
 #  route default static IP
 @server.route("/")
-def base(request):  # pylint: disable=unused-argument
+def base(request: Request):  # pylint: disable=unused-argument
     #  serve the HTML f string
     #  with content type text/html
-    return HTTPResponse(content_type="text/html", body=webpage())
+    return Response(request, f"{webpage()}", content_type='text/html')
 
 #  if a button is pressed on the site
-@server.route("/", "POST")
-def buttonpress(request):
+@server.route("/", POST)
+def buttonpress(request: Request):
     #  get the raw text
     raw_text = request.raw_request.decode("utf8")
     print(raw_text)
@@ -161,7 +161,7 @@ def buttonpress(request):
         #  toggle the parrot_pin value
         parrot_pin.value = not parrot_pin.value
     #  reload site
-    return HTTPResponse(content_type="text/html", body=webpage())
+    return Response(request, f"{webpage()}", content_type='text/html')
 
 print("starting server..")
 # startup the server
@@ -178,19 +178,19 @@ ping_address = ipaddress.ip_address("8.8.4.4")
 #  text objects for screen
 #  connected to SSID text
 connect_text_area.text = "Connected to:"
-ssid_text = "%s" % os.getenv('WIFI_SSID')
+ssid_text = f"{os.getenv('CIRCUITPY_WIFI_SSID')}"
 ssid_text_area = label.Label(
     terminalio.FONT, text=ssid_text, color=0xFFFFFF, x=0, y=offset_y+15
 )
 splash.append(ssid_text_area)
 #  display ip address
-ip_text = "IP: %s" % wifi.radio.ipv4_address
+ip_text = f"IP: {wifi.radio.ipv4_address}"
 ip_text_area = label.Label(
     terminalio.FONT, text=ip_text, color=0xFFFFFF, x=0, y=offset_y+30
 )
 splash.append(ip_text_area)
 #  display temp reading
-temp_text = "Temperature: %.02f F" % float(temp_test)
+temp_text = f"Temperature: {temp_test:.2f} F"
 temp_text_area = label.Label(
     terminalio.FONT, text=temp_text, color=0xFFFFFF, x=0, y=offset_y+45
 )
@@ -224,18 +224,18 @@ while True:
                 print("lost connection")
             else:
                 connect_text_area.text = "Connected to:"
-                ssid_text_area.text = "%s" % os.getenv('WIFI_SSID')
+                ssid_text_area.text = f"{os.getenv('CIRCUITPY_WIFI_SSID')}"
                 print("connected")
             clock = time.monotonic()
             #  comment/uncomment for desired units
-            #  temp_test = str(ds18.temperature)
-            temp_test = str(c_to_f(ds18.temperature))
-            temp_text_area.text = "Temperature: %d F" % temp_test
+            #  temp_test = ds18.temperature
+            temp_test = c_to_f(ds18.temperature)
+            temp_text_area.text = f"Temperature: {temp_test:.2f} F"
 
         #if parrot is True:
         if parrot_pin.value is True:
             #  switch to party parrot display group
-            display.show(parrot_group)
+            display.root_group = parrot_group
             if (party + 0.1) < time.monotonic():
                 #  the party parrot animation cycles
                 parrot_grid[0] = p
@@ -245,9 +245,10 @@ while True:
         #  if it isn't a party
         else:
             #  show default display with info
-            display.show(splash)
+            display.root_group = splash
         #  poll the server for incoming/outgoing requests
         server.poll()
     # pylint: disable=broad-except
-    except Exception:
+    except Exception as e:
+        print(e)
         continue

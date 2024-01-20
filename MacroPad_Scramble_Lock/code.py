@@ -69,7 +69,7 @@ def keys_clear():  # Set display in the Start mode, key LEDs off
         group[i].text = " "
     macropad.pixels.show()
     group[9].text = "START"
-    macropad.display.show(group)
+    macropad.display.root_group = group
     macropad.display.refresh()
 
 def scramble():  # Scramble values of the keys and display on screen
@@ -177,7 +177,7 @@ while True:
             if password_guess == PASSWORD:  # Success
                 group[9].text = " "
                 group[11].text = "OPEN"
-                macropad.display.show(group)
+                macropad.display.root_group = group
                 macropad.display.refresh()
                 macropad.pixels[11] = GREEN
                 macropad.pixels.show()
@@ -193,7 +193,7 @@ while True:
             else:  # fail!
                 group[11].text = "FAIL"
                 group[9].text = " "
-                macropad.display.show(group)
+                macropad.display.root_group = group
                 macropad.display.refresh()
                 for _ in range(3):  # Flash lower right 3 times red with beeps
                     macropad.pixels[11] = RED
