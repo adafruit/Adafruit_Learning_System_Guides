@@ -249,6 +249,12 @@ void user_setup(void) {
   changeBehavior(0, micros());
 }
 
+// Called once after the processing of the configuration file. This allows
+// user configuration to also be done based on the config file.
+#include <ArduinoJson.h>          // JSON config file functions
+void user_setup(StaticJsonDocument<2048> &doc) {
+}
+
 void user_loop(void) {
   uint32_t elapsedSince = micros();
   if(elapsedSince - lastTouchSample > TOUCH_SAMPLE_TIME) {

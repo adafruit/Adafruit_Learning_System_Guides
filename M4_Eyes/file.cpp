@@ -288,6 +288,7 @@ void loadConfig(char *filename) {
 #endif // ADAFRUIT_MONSTER_M4SK_EXPRESS
     }
     file.close();
+    user_setup(doc);
   } else {
     Serial.println("Can't open config file, using default settings");
   }
@@ -462,4 +463,16 @@ ImageReturnCode loadTexture(char *filename, uint16_t **data,
   // image destructor will handle dealloc of that object's data
 
   return status;
+}
+
+// Utility functions for use by user functions to grab an integer value from the config file 
+// using dwim() and providing a default value.
+int32_t getDocInt(StaticJsonDocument<2048> &doc, const char *nm, int32_t def) {
+  return dwim(doc[nm], def);
+}
+int32_t getDocInt(StaticJsonDocument<2048> &doc, const char *nm, const char *nm2, int32_t def) {
+  return dwim(doc[nm][nm2], def);
+}
+int32_t getDocInt(StaticJsonDocument<2048> &doc, const char *nm, const char *nm2, const char *nm3, int32_t def) {
+  return dwim(doc[nm][nm2][nm3], def);
 }

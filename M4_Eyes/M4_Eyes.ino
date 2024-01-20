@@ -148,6 +148,33 @@ uint32_t availableRAM(void) {
   return &top - (char *)sbrk(0); // Top of stack minus end of heap
 }
 
+// USER CALLABLE FUNCTIONS
+
+// set the booped flag
+void eyesWide(bool t) {
+  booped = t;
+}
+
+// start a blink
+void eyesBlink() {
+     timeToNextBlink = 0;
+}
+
+// force the eyes to a position on the screen
+void eyesToCorner(float x, float y, bool immediate) {
+  moveEyesRandomly = false;
+  eyeTargetX = x;
+  eyeTargetY = y;
+  if (immediate) 
+    eyeMoveDuration = 0;
+}
+
+// return the eyes to normal random movement
+void eyesNormal() {
+  moveEyesRandomly = true;
+}
+
+
 // SETUP FUNCTION - CALLED ONCE AT PROGRAM START ---------------------------
 
 void setup() {
@@ -933,7 +960,8 @@ void loop() {
               lightSensorPin = -1; // Stop trying to use the light sensor
             } else {
               lastLightReadTime = t - LIGHT_INTERVAL + 30000; // Try again in 30 ms
-            } }
+            }
+	  }
         }
         irisValue = (irisValue * 0.97) + (lastLightValue * 0.03); // Filter response for smooth reaction
       } else {
