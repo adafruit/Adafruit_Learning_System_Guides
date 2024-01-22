@@ -42,6 +42,7 @@ def snap_jpeg():
         pycam.display_message("Snap!", color=0x0000FF)
         pycam.capture_jpeg()
         pycam.live_preview_mode()
+    # pylint: disable=unused-variable
     except TypeError as e:
         pycam.display_message("Failed", color=0xFF0000)
         time.sleep(0.5)
@@ -55,6 +56,7 @@ def snap_gboy():
     try:
         f = pycam.open_next_image("gif")
         pycam.display_message("Snap!", color=0x00ff44)
+    # pylint: disable=unused-variable
     except RuntimeError as e:
         pycam.display_message("Error\nNo SD Card", color=0xFF0000)
         time.sleep(0.5)
@@ -72,6 +74,7 @@ def snap_gif():
     pycam.tone(600, 0.1)
     try:
         f = pycam.open_next_image("gif")
+    # pylint: disable=unused-variable
     except RuntimeError as e:
         pycam.display_message("Error\nNo SD Card", color=0xFF0000)
         time.sleep(0.5)
@@ -112,6 +115,7 @@ def snap_stop():
     try:
         pycam.display_message("Snap!", color=0x0000FF)
         pycam.capture_jpeg()
+    # pylint: disable=unused-variable
     except TypeError as e:
         pycam.display_message("Failed", color=0xFF0000)
         time.sleep(0.5)
