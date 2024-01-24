@@ -95,7 +95,7 @@ void loop(void) {
   sensors_event_t accel;
   sensors_event_t gyro;
   sensors_event_t temp;
-  if (new_rev == true) {
+  if (new_rev) {
     lsm6ds3trc.getEvent(&accel, &gyro, &temp);
   }
   else {
