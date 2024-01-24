@@ -22,6 +22,7 @@ print("connecting to WiFi", ssid)
 wifi.radio.connect(ssid, password)
 print("my ip address:", wifi.radio.ipv4_address)
 socket_pool = socketpool.SocketPool(wifi.radio)
+time.sleep(10)  # delay so people can get the IP address
 
 pycam = adafruit_pycamera.PyCamera()
 pycam.autofocus_init()
