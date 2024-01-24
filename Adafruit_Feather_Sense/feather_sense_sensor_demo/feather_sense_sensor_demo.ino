@@ -62,9 +62,7 @@ void setup(void) {
   for (int i =0; i < 5; i++) {
     if (accel_array[i] != check_array[i]) {
       new_rev = false;
-    }
-    else {
-      new_rev = true;
+      break
     }
   }
   // and we need to instantiate the LSM6DS3TRC
