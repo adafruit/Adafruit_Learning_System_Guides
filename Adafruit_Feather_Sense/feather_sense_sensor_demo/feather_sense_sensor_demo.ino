@@ -68,7 +68,7 @@ void setup(void) {
     }
   }
   // and we need to instantiate the LSM6DS3TRC
-  if (new_rev = true) {
+  if (new_rev == true) {
     lsm6ds3trc.begin_I2C();
   }
   sht30.begin();
@@ -95,7 +95,7 @@ void loop(void) {
   sensors_event_t accel;
   sensors_event_t gyro;
   sensors_event_t temp;
-  if (new_rev = true) {
+  if (new_rev == true) {
     lsm6ds3trc.getEvent(&accel, &gyro, &temp);
   }
   else {
