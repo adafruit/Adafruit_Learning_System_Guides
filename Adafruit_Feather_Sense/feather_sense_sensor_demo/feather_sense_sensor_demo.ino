@@ -68,7 +68,7 @@ void setup(void) {
     }
   }
   // and we need to instantiate the LSM6DS3TRC
-  if (new_rev == true) {
+  if (new_rev) {
     lsm6ds3trc.begin_I2C();
   }
   sht30.begin();
