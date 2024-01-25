@@ -6,7 +6,6 @@
 
 Circuitpython based 1 dimensional pacman style game inspired by Paku Paku.
 """
-import time
 import board
 from adafruit_qualia import Qualia
 from adafruit_qualia.graphics import Displays

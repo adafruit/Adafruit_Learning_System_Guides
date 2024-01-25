@@ -112,11 +112,11 @@ class Entity:
         half_width_other = _other_entity.width / 2
 
         gap_between = length_x - half_width_self - half_width_other
-        if (gap_between > 0):
+        if gap_between > 0:
             pass
-        elif (gap_between == 0):
+        elif gap_between == 0:
             pass
-        elif (gap_between < 0):
+        elif gap_between < 0:
             _colliding_x = True
 
         length_y = abs(self.y - _other_entity.y)
@@ -124,11 +124,11 @@ class Entity:
         half_height_other = _other_entity.height / 2
 
         gap_between = length_y - half_height_self - half_height_other
-        if (gap_between > 0):
+        if gap_between > 0:
             pass
-        elif (gap_between == 0):
+        elif gap_between == 0:
             pass
-        elif (gap_between < 0):
+        elif gap_between < 0:
             _colliding_y = True
 
         # print("colliding x: {} - y: {}".format(_colliding_x, _colliding_y))
@@ -237,14 +237,16 @@ class Ghost(Entity):
         :param game_obj: The ChomperGame object to access variables and update things
         :return: True if the action resulted in display needing to be refreshed, otherwise False
         """
-        # now = ticks_ms()
+        # pylint: disable=too-many-branches
         now = time.monotonic_ns() // 1000000
         need_refresh = False
 
         # Top level if statements to check current state within the state machine
 
         # process movement for normal, edible, and blinking states
-        if self.current_state in (Ghost.STATE_NORMAL, Ghost.STATE_EDIBLE, Ghost.STATE_EDIBLE_WARNING):
+        if self.current_state in (Ghost.STATE_NORMAL,
+                                  Ghost.STATE_EDIBLE,
+                                  Ghost.STATE_EDIBLE_WARNING):
 
             # if it's been long enough since the last movement
             if now > self.last_move_time + Ghost.MOVE_DELAY:
@@ -252,7 +254,8 @@ class Ghost(Entity):
                 self.last_move_time = now
 
                 # Check direction and prevent Ghost from moving thru the edges
-                if self.x < (game_obj.display_size[0] // 3) - 16 and self.direction == Entity.DIRECTION_RIGHT:
+                if self.x < (game_obj.display_size[0] // 3) - 16 and \
+                        self.direction == Entity.DIRECTION_RIGHT:
                     # we're moving right, increase x position
                     self.x += 1
                 if self.x > 0 and self.direction == Entity.DIRECTION_LEFT:
@@ -309,7 +312,8 @@ class Ghost(Entity):
                 self.last_move_time = now
 
                 # check direction and move. Stopping at the edge
-                if self.x < game_obj.display_size[0] // 3 and self.direction == Entity.DIRECTION_RIGHT:
+                if self.x < game_obj.display_size[0] // 3 and \
+                        self.direction == Entity.DIRECTION_RIGHT:
                     self.x += 2
                 if self.x > 0 and self.direction == Entity.DIRECTION_LEFT:
                     self.x -= 2
@@ -431,7 +435,7 @@ class ChomperGame(displayio.Group):
     added to another Group to be shown. Also supports Group scaling which
     is used by default at scale=3.
     """
-
+    # pylint: disable=too-many-statements
     EMPTY_MAP_TILE = 17
     PLAYER_TILE = 0
 
@@ -469,7 +473,8 @@ class ChomperGame(displayio.Group):
 
         # Create the background TileGrid. It will be flat black
         # with everything else drawn on top.
-        self._background_tilegrid = displayio.TileGrid(self._sprite_sheet, pixel_shader=self._palette,
+        self._background_tilegrid = displayio.TileGrid(self._sprite_sheet,
+                                                       pixel_shader=self._palette,
                                                        width=21,
                                                        height=3,
                                                        tile_width=self._tile_width,
@@ -549,7 +554,8 @@ class ChomperGame(displayio.Group):
         # Gameover, bottom middle
         self.gameover_lbl = Label(terminalio.FONT, text="Game Over")
         self.gameover_lbl.anchor_point = (0.5, 1.0)
-        self.gameover_lbl.anchored_position = ((self.display_size[0] // 2) // 3, self.display_size[1] // 3 - 5)
+        self.gameover_lbl.anchored_position = ((self.display_size[0] // 2) // 3,
+                                               self.display_size[1] // 3 - 5)
 
         # Highscore, top right.
         # Doesn't need separate label and value because it doesn't update during the game loop
@@ -564,7 +570,7 @@ class ChomperGame(displayio.Group):
             read_data = nvm_helper.read_data()
 
             # if we found data check if it's a highscore value
-            if type(read_data) == list and read_data[0] == "1dc_hs":
+            if isinstance(read_data, list) and read_data[0] == "1dc_hs":
                 # it is a highscore so populate the label with its value
                 self.highscore_value_lbl.text = f"HI: {read_data[1]}"
                 self.highscore = read_data[1]
@@ -620,6 +626,7 @@ class ChomperGame(displayio.Group):
         self.pellets_in_play = 21
 
     def game_tick(self):
+        # pylint:disable=too-many-branches
         """
         Main "heartbeat" function of the game. This will get called over and over from the
         main code.py file. game_tick() is responsible for carrying out all game logic and
@@ -686,7 +693,9 @@ class ChomperGame(displayio.Group):
             # if it was a big pellet
             if current_tile_type == 9:
                 # if the ghost is currently normal state, it becomes edible
-                if self.ghost.current_state in (Ghost.STATE_NORMAL, Ghost.STATE_EDIBLE, Ghost.STATE_EDIBLE_WARNING):
+                if self.ghost.current_state in (Ghost.STATE_NORMAL,
+                                                Ghost.STATE_EDIBLE,
+                                                Ghost.STATE_EDIBLE_WARNING):
                     # set the state and edible property
                     self.ghost.current_state = Ghost.STATE_EDIBLE
                     self.ghost.edible = True
@@ -727,7 +736,9 @@ class ChomperGame(displayio.Group):
                 self.ghost.current_state = Ghost.STATE_DESPAWN_FLYOFF
 
                 # change ghost's direction
-                self.ghost.direction = Entity.DIRECTION_LEFT if self.ghost.direction == Entity.DIRECTION_RIGHT else Entity.DIRECTION_RIGHT
+                self.ghost.direction = Entity.DIRECTION_LEFT if \
+                    self.ghost.direction == Entity.DIRECTION_RIGHT else \
+                    Entity.DIRECTION_RIGHT
 
                 # set the ghost sprite to eyes only
                 self.ghost.tilegrid[0, 0] = 23
@@ -763,6 +774,8 @@ class ChomperGame(displayio.Group):
         for i in range(21):
             if self._map_tilegrid[i, 1] == 9:
                 return True
+
+        return False
 
     def find_pellets(self):
         """
