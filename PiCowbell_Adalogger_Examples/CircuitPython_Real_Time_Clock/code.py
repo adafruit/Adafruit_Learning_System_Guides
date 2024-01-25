@@ -4,10 +4,10 @@
 import time
 import board
 import busio
-import adafruit_pcf8523
+from adafruit_pcf8523.pcf8523 import PCF8523
 
 I2C = busio.I2C(board.GP5, board.GP4)
-rtc = adafruit_pcf8523.PCF8523(I2C)
+rtc = PCF8523(I2C)
 
 days = ("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday")
 

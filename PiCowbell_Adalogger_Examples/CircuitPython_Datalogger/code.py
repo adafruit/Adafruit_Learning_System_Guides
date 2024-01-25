@@ -8,14 +8,14 @@ import sdcardio
 import busio
 import storage
 import adafruit_mcp9808
-import adafruit_pcf8523
+from adafruit_pcf8523.pcf8523 import PCF8523
 
 #  setup for Pico I2C
 i2c = busio.I2C(board.GP5, board.GP4)
 # setup for mcp9808 temp monitor
 mcp9808 = adafruit_mcp9808.MCP9808(i2c)
 # setup for RTC
-rtc = adafruit_pcf8523.PCF8523(i2c)
+rtc = PCF8523(i2c)
 
 #  list of days to print to the text file on boot
 days = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
