@@ -14,7 +14,7 @@ class Entity:
     """
     Entity helper class holds a TileGrid and keeps track of direction and a set of current sprites.
     Includes functions for iterating through the sprites to make animations and
-    for checking on collissions with other Entities. 
+    for checking on collissions with other Entities.
     """
 
     # Direction Constants
@@ -769,7 +769,7 @@ class ChomperGame(displayio.Group):
     def big_pellet_exists(self):
         """
         Check if any big pellets exist
-        :return: True if there is at least one big pellet on the map 
+        :return: True if there is at least one big pellet on the map
         """
         for i in range(21):
             if self._map_tilegrid[i, 1] == 9:
