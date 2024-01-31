@@ -142,7 +142,7 @@ class AsyncEventQueue:
         self._events = events
 
     async def __await__(self):
-        yield asyncio.core._io_queue.queue_read(self._events)
+        await asyncio.core._io_queue.queue_read(self._events)
         return self._events.get()
 
     def __enter__(self):
