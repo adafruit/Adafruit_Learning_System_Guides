@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2024 Tim Cocks
+#
+# SPDX-License-Identifier: MIT
 import usb_cdc
 import board
 import digitalio
