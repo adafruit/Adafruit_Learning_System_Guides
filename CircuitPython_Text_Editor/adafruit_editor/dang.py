@@ -4,6 +4,7 @@
 
 import select
 import sys
+# pylint: disable=no-self-use
 
 try:
     import termios

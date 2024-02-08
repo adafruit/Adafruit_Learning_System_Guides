@@ -8,7 +8,7 @@ import terminalio
 import displayio
 from adafruit_display_text.bitmap_label import Label
 import usb_cdc
-#pylint: disable=redefined-builtin,broad-exception-caught
+#pylint: disable=redefined-builtin,broad-except
 
 def print(message):
     usb_cdc.data.write(f"{message}\r\n".encode("utf-8"))
