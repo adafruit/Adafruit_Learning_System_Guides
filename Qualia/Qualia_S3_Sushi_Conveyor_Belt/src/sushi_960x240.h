@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2024 Liz Clark for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // 'sushi_1', 135x146px
 const uint16_t myBitmapsushi_1 [] PROGMEM = {
 	0x2903, 0x2903, 0x2903, 0x2903, 0x2903, 0x2903, 0x2903, 0x2903, 0x2903, 0x2903, 0x2903, 0x2903, 0x2903, 0x2903, 0x2903, 0x2903, 
