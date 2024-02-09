@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: ladyada for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
 #include "Adafruit_PyCamera.h"
 
 static uint16_t *jpeg_buffer = NULL;

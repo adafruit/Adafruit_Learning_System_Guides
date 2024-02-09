@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: ladyada for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
 #include "TJpg_Decoder.h"
 #include "esp_camera.h"
 #include <Adafruit_AW9523.h>

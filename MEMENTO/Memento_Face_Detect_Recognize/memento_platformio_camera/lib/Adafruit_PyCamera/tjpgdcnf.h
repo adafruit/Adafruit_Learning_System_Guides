@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: ChaN, Bodmer
+//
+// SPDX-License-Identifier: FreeBSD
 /*----------------------------------------------*/
 /* TJpgDec System Configurations R0.03          */
 /*----------------------------------------------*/

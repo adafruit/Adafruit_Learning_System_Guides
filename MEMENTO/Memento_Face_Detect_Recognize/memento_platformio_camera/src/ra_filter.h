@@ -1,3 +1,9 @@
+// SPDX-FileCopyrightText: 2018 me-no-dev for Espressif Systems
+//
+// SPDX-License-Identifier: LGPL 2.1
+//
+// Modified by Brent Rubell for Adafruit Industries
+
 // RA Filtering
 typedef struct {
   size_t size;  // number of values used for filtering

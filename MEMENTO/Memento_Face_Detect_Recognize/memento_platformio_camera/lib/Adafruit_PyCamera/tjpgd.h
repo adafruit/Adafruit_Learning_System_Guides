@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: ChaN, Bodmer
+//
+// SPDX-License-Identifier: FreeBSD
 /*----------------------------------------------------------------------------/
 / TJpgDec - Tiny JPEG Decompressor R0.03 include file         (C)ChaN, 2021
 /----------------------------------------------------------------------------*/
