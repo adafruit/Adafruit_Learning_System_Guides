@@ -89,16 +89,16 @@ while True:
     # Wait until the doorbell is pressed
     if not pin_button.value:
         print("Doorbell pressed!")
-        
+
         # Turn the doorbell LED off to signal that it has been pressed
         led.value = False
-        
+
         # Play a doorbell tone using the speaker
         pycam.tone(95, 0.5)
         pycam.tone(70, 0.5)
-        
+
         capture_send_image()
-        
+
         print("DONE, waiting for next press..")
 
         # Turn the LED on to signal that the doorbell is ready to be pressed again
