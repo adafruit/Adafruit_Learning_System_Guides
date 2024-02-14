@@ -1,6 +1,6 @@
 // SPDX-FileCopyrightText: ChaN, Bodmer
 //
-// SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+// SPDX-License-Identifier: BSD-2-Clause
 /*----------------------------------------------*/
 /* TJpgDec System Configurations R0.03          */
 /*----------------------------------------------*/

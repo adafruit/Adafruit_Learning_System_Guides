@@ -1,6 +1,6 @@
 // SPDX-FileCopyrightText: 2018 me-no-dev for Espressif Systems
 //
-// SPDX-License-Identifier: LGPL-2.1-only
+// SPDX-License-Identifier: LGPL-2.1-or-later
 //
 // Modified by Brent Rubell for Adafruit Industries
 #include "TJpg_Decoder.h"
