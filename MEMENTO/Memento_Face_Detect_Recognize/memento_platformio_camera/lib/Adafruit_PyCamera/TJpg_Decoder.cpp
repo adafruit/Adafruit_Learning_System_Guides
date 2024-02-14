@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: ChaN, Bodmer
+//
+// SPDX-License-Identifier: BSD-2-Clause
 /*
 TJpg_Decoder.cpp
 
