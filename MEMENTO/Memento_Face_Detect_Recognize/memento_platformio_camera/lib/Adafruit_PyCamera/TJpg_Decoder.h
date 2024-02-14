@@ -1,6 +1,6 @@
 // SPDX-FileCopyrightText: ChaN, Bodmer
 //
-// SPDX-License-Identifier: FreeBSD
+// SPDX-License-Identifier: BSD-2-Clause-FreeBSD
 /*
 TJpg_Decoder.h
 
