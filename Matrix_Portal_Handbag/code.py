@@ -101,7 +101,7 @@ while True:
         MODE = 1
     elif time.monotonic() > last_movement + SLEEP_DURATION:
         MODE = 0
-        display.show(empty_group)
+        display.root_group = empty_group
     if MODE == 1:
         if auto_advance and time.monotonic() > LAST_ADVANCE + IMAGE_DURATION[i]:
             advance()

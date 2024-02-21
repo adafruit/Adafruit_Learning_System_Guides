@@ -28,4 +28,4 @@ if readonly:
     print("OS has write access to CircuitPython drive")
 else:
     print("CircuitPython has write access to drive")
-storage.remount("/", readonly)
+storage.remount("/", readonly=readonly)

@@ -122,7 +122,7 @@ group.append(temp_text)
 group.append(humid_text)
 group.append(press_text)
 group.append(time_text)
-display.show(group)
+display.root_group = group
 
 #  clock to count down to sending data to Azure
 azure_clock = 500

@@ -36,7 +36,7 @@ with open(fn, "rb") as f:
     t = displayio.TileGrid(pic, pixel_shader=pic.pixel_shader)
     g.append(t)
 
-    display.show(g)
+    display.root_group = g
 
     display.refresh()
 

@@ -14,7 +14,7 @@ import displayio
 import adafruit_lis3dh
 
 splash = displayio.Group()
-board.DISPLAY.show(splash)
+board.DISPLAY.root_group = splash
 
 SENSITIVITY = 5   # reading in Z direction to trigger, adjustable
 

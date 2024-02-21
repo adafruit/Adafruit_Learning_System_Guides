@@ -161,7 +161,7 @@ for line in blm_font:
     g.append(line)
 for line in names_font:
     g.append(line)
-display.show(g)
+display.root_group = g
 
 
 while True:

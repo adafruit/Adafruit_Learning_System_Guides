@@ -122,7 +122,7 @@ class ClueLightPainter:
         if not self.images:
             group = displayio.Group()
             group.append(centered_label('NO IMAGES', 40, 3))
-            board.DISPLAY.show(group)
+            board.DISPLAY.root_group = group
             while True:
                 pass
 
@@ -206,7 +206,7 @@ class ClueLightPainter:
         #self.rect = Rect(-board.DISPLAY.width, 120,
         #                 board.DISPLAY.width, 40, fill=0x00B000)
         #group.append(self.rect)
-        board.DISPLAY.show(group)
+        board.DISPLAY.root_group = group
 
         # pylint: disable=eval-used
         # (It's cool, is a 'trusted string' in the code)
@@ -227,7 +227,7 @@ class ClueLightPainter:
         except (MemoryError, BMPError):
             group = displayio.Group()
             group.append(centered_label('TOO BIG', 40, 3))
-            board.DISPLAY.show(group)
+            board.DISPLAY.root_group = group
             sleep(4)
 
         board.DISPLAY.show(displayio.Group()) # Clear display
@@ -330,7 +330,7 @@ class ClueLightPainter:
         # Config label always appears as last item in group
         # so calling func can pop() and replace it if need be.
         group.append(centered_label(config_label, 30 if rect_val else 40, 3))
-        board.DISPLAY.show(group)
+        board.DISPLAY.root_group = group
         return group
 
 
@@ -365,7 +365,7 @@ class ClueLightPainter:
                 if paint:
                     break # Exit loop, resume paint
                 else:
-                    board.DISPLAY.show(group) # Put config UI back up
+                    board.DISPLAY.root_group = group # Put config UI back up
             elif action_right is RichButton.HOLD:
                 break
             elif action_left is RichButton.TAP:

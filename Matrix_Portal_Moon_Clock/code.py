@@ -264,7 +264,7 @@ GROUP.append(adafruit_display_text.label.Label(SYMBOL_FONT, color=0x00FF00,
 # Element 9 is the time of (or time to) next rise/set event
 GROUP.append(adafruit_display_text.label.Label(SMALL_FONT, color=0x00FF00,
                                                text='12:00', y=-99))
-DISPLAY.show(GROUP)
+DISPLAY.root_group = GROUP
 
 NETWORK = Network(status_neopixel=board.NEOPIXEL, debug=False)
 NETWORK.connect()

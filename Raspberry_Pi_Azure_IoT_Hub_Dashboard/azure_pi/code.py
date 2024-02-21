@@ -102,7 +102,7 @@ main_group = displayio.Group()
 for x in display_objects:
     main_group.append(x)
 
-display.show(main_group)
+display.root_group = main_group
 
 #  convert UTC time to local timezone
 def utc_to_local(utc_dt):

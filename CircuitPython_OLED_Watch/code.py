@@ -73,4 +73,4 @@ while True:
     watch_group.append(date)
     watch_group.append(text)
 
-    oled.show(watch_group)
+    oled.root_group = watch_group

@@ -12,7 +12,7 @@ blinka_img = OnDiskBitmap("images/adafruit_blinka.bmp")
 tile_grid = TileGrid(bitmap=blinka_img, pixel_shader=blinka_img.pixel_shader)
 main_group.append(tile_grid)
 
-board.DISPLAY.show(main_group)
+board.DISPLAY.root_group = main_group
 
 tile_grid.x = board.DISPLAY.width // 2 - blinka_img.width // 2
 

@@ -75,7 +75,7 @@ splash.append(label)
 splash.append(co2_value)
 
 # and show em
-display.show(splash)
+display.root_group = splash
 
 
 def update_display(value):

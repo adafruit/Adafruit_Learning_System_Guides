@@ -149,7 +149,7 @@ def sport_startup(logo):
         group.append(grid2)
         group.append(grid3)
         group.append(grid4)
-        display.show(group)
+        display.root_group = group
     # pylint: disable=broad-except
     except Exception:
         print("Can't find bitmap. Did you run the get_team_logos.py script?")
@@ -361,7 +361,7 @@ for z in range(5):
                  teams[z],
                  logos[z],
                  groups[z])
-        display.show(groups[z])
+        display.root_group = groups[z]
     # pylint: disable=broad-except
     except Exception as Error:
         print(Error)
@@ -392,7 +392,7 @@ while True:
         # update display seperate from API request
         if ticks_diff(ticks_ms(), display_clock) >= display_timer:
             print("updating display")
-            display.show(groups[display_index])
+            display.root_group = groups[display_index]
             display_index = (display_index + 1) % len(teams)
             display_clock = ticks_add(display_clock, display_timer)
         # cleared for fetching after time has passed

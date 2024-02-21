@@ -38,7 +38,7 @@ i2c = board.I2C()  # uses board.SCL and board.SDA
 display_bus = displayio.I2CDisplay(i2c, device_address=0x3C)
 display = adafruit_displayio_ssd1306.SSD1306(display_bus, width=128, height=32)
 group = displayio.Group()
-display.show(group)
+display.root_group = group
 
 # Add content to group
 default_text = "I VOTE  !"
@@ -63,4 +63,4 @@ while True:
         text_area.text = "DID U?"
         text_area.x = 18
 
-    display.show(group)
+    display.root_group = group

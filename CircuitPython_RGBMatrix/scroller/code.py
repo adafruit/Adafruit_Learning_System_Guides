@@ -44,7 +44,7 @@ l1 = displayio.Group()
 l2 = displayio.Group()
 g.append(l1)
 g.append(l2)
-display.show(g)
+display.root_group = g
 
 l1.y = 1
 l2.y = 16

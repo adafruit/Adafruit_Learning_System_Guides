@@ -57,7 +57,7 @@ display = adafruit_displayio_ssd1306.SSD1306(display_bus, width=WIDTH, height=HE
 
 # default display group
 splash = displayio.Group()
-display.show(splash)
+display.root_group = splash
 
 #  connect to network
 print()
@@ -235,7 +235,7 @@ while True:
         #if parrot is True:
         if parrot_pin.value is True:
             #  switch to party parrot display group
-            display.show(parrot_group)
+            display.root_group = parrot_group
             if (party + 0.1) < time.monotonic():
                 #  the party parrot animation cycles
                 parrot_grid[0] = p
@@ -245,7 +245,7 @@ while True:
         #  if it isn't a party
         else:
             #  show default display with info
-            display.show(splash)
+            display.root_group = splash
         #  poll the server for incoming/outgoing requests
         server.poll()
     # pylint: disable=broad-except

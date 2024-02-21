@@ -98,7 +98,7 @@ increment_label.y = 220
 screen.append(increment_label)
 
 # show the screen
-clue.display.show(screen)
+clue.display.root_group = screen
 
 
 def metronome(accent):  # Play metronome sound and flash display

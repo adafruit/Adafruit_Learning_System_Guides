@@ -16,7 +16,7 @@ display = board.DISPLAY
 
 # Make the display context
 main_group = displayio.Group()
-display.show(main_group)
+display.root_group = main_group
 
 font = bitmap_font.load_font("fonts/LeagueSpartan-Bold-16.bdf")
 # font = terminalio.FONT

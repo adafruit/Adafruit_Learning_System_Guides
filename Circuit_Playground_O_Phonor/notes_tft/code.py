@@ -72,7 +72,7 @@ splash = displayio.Group()
 splash.append(note_text)
 splash.append(oct_text)
 splash.append(freq_text)
-display.show(splash)
+display.root_group = splash
 
 while True:
     # Get raw mic data

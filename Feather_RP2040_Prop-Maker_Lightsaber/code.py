@@ -77,6 +77,7 @@ pixels.brightness = 0.8
 i2c = board.I2C()
 int1 = DigitalInOut(board.ACCELEROMETER_INTERRUPT)
 lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c, int1=int1)
+# Accelerometer Range (can be 2_G, 4_G, 8_G, 16_G)
 lis3dh.range = adafruit_lis3dh.RANGE_2_G
 lis3dh.set_tap(1, HIT_THRESHOLD)
 

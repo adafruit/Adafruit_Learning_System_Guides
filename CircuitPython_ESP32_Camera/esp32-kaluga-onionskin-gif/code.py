@@ -47,7 +47,7 @@ the one which usually uses rotation=90 to get a landscape display.
 import os
 import struct
 
-import esp32_camera
+import espcamera
 import analogio
 import board
 import busio
@@ -109,14 +109,14 @@ sdcard = sdcardio.SDCard(sd_spi, sd_cs, baudrate=24_000_000)
 vfs = storage.VfsFat(sdcard)
 storage.mount(vfs, "/sd")
 
-cam = esp32_camera.Camera(
+cam = espcamera.Camera(
     data_pins=board.CAMERA_DATA,
     external_clock_pin=board.CAMERA_XCLK,
     pixel_clock_pin=board.CAMERA_PCLK,
     vsync_pin=board.CAMERA_VSYNC,
     href_pin=board.CAMERA_HREF,
-    pixel_format=esp32_camera.PixelFormat.RGB565,
-    frame_size=esp32_camera.FrameSize.QVGA,
+    pixel_format=espcamera.PixelFormat.RGB565,
+    frame_size=espcamera.FrameSize.QVGA,
     i2c=board.I2C(),
     external_clock_frequency=20_000_000,
     framebuffer_count=2)
@@ -147,7 +147,7 @@ next_filename("gif")
 
 # Blank the whole display
 g = displayio.Group()
-display.show(g)
+display.root_group = g
 display.auto_refresh = False
 display.refresh()
 

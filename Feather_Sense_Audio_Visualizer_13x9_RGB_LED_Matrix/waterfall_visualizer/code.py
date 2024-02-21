@@ -2,16 +2,20 @@
 #
 # SPDX-License-Identifier: MIT
 
-'''Adapted from the FFT Example: Waterfall Spectrum Analyzer
+"""Adapted from the FFT Example: Waterfall Spectrum Analyzer
 by Jeff Epler
-https://learn.adafruit.com/ulab-crunch-numbers-fast-with-circuitpython/overview '''
+https://learn.adafruit.com/ulab-crunch-numbers-fast-with-circuitpython/overview """
 
 import array
 import board
 import audiobusio
 import busio
 from ulab import numpy as np
-from ulab.scipy.signal import spectrogram
+
+try:
+    from ulab.utils import spectrogram
+except ImportError:
+    from ulab.scipy.signal import spectrogram
 import adafruit_is31fl3741
 from adafruit_is31fl3741.adafruit_rgbmatrixqt import Adafruit_RGBMatrixQT
 
@@ -27,6 +31,7 @@ is31.set_led_scaling(0x19)
 is31.global_current = 0x03
 is31.enable = True
 
+# fmt: off
 #  array of colors for the LEDs
 #  goes from purple to red
 #  gradient generated using https://colordesigner.io/gradient-generator
@@ -41,23 +46,26 @@ heatmap = [0xb000ff,0xa600ff,0x9b00ff,0x8f00ff,0x8200ff,
            0xedff00,0xf5eb00,0xfcd600,0xffc100,0xffab00,
            0xff9500,0xff7c00,0xff6100,0xff4100,0xff0000,
            0xff0000,0xff0000]
+# fmt: on
 
 #  size of the FFT data sample
 fft_size = 64
 
 #  setup for onboard mic
-mic = audiobusio.PDMIn(board.MICROPHONE_CLOCK, board.MICROPHONE_DATA,
-                       sample_rate=16000, bit_depth=16)
+mic = audiobusio.PDMIn(
+    board.MICROPHONE_CLOCK, board.MICROPHONE_DATA, sample_rate=16000, bit_depth=16
+)
 
 #  use some extra sample to account for the mic startup
-samples_bit = array.array('H', [0] * (fft_size+3))
+samples_bit = array.array("H", [0] * (fft_size + 3))
 
 #  sends visualized data to the RGB matrix with colors
 def waves(data, y):
-    offset = max(0, (13-len(data))//2)
+    offset = max(0, (13 - len(data)) // 2)
 
     for x in range(min(13, len(data))):
-        is31.pixel(x+offset, y, heatmap[int(data[x])])
+        is31.pixel(x + offset, y, heatmap[int(data[x])])
+
 
 # main loop
 def main():
@@ -78,7 +86,7 @@ def main():
         # spectrum() is always nonnegative, but add a tiny value
         # to change any zeros to nonzero numbers
         spectrogram1 = np.log(spectrogram1 + 1e-7)
-        spectrogram1 = spectrogram1[1:(fft_size//2)-1]
+        spectrogram1 = spectrogram1[1 : (fft_size // 2) - 1]
         #  sets range of the spectrogram
         min_curr = np.min(spectrogram1)
         max_curr = np.max(spectrogram1)
@@ -86,10 +94,10 @@ def main():
         if max_curr > max_all:
             max_all = max_curr
         else:
-            max_curr = max_curr-1
+            max_curr = max_curr - 1
         min_curr = max(min_curr, 3)
         # stores spectrogram in data
-        data = (spectrogram1 - min_curr) * (51. / (max_all - min_curr))
+        data = (spectrogram1 - min_curr) * (51.0 / (max_all - min_curr))
         # sets negative numbers to zero
         data = data * np.array((data > 0))
         #  resets y
@@ -100,5 +108,6 @@ def main():
         scroll_offset = (y + 1) % 9
         #  writes data to the RGB matrix
         is31.show()
+
 
 main()

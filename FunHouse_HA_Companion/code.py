@@ -5,8 +5,10 @@
 import os
 import time
 import json
+from displayio import CIRCUITPYTHON_TERMINAL
 from adafruit_display_shapes.circle import Circle
 from adafruit_funhouse import FunHouse
+
 
 PUBLISH_DELAY = 60
 ENVIRONMENT_CHECK_DELAY = 5
@@ -22,7 +24,7 @@ funhouse.peripherals.dotstars.fill(INITIAL_LIGHT_COLOR)
 
 # Don't display the splash yet to avoid
 # redrawing labels after each one is added
-funhouse.display.show(None)
+funhouse.display.root_group = CIRCUITPYTHON_TERMINAL
 
 # Add the labels
 funhouse.add_text(
@@ -63,7 +65,7 @@ pres_label = funhouse.add_text(
 )
 
 # Now display the splash to draw all labels at once
-funhouse.display.show(funhouse.splash)
+funhouse.display.root_group = funhouse.splash
 
 status = Circle(229, 10, 10, fill=0xFF0000, outline=0x880000)
 funhouse.splash.append(status)

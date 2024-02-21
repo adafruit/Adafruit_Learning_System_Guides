@@ -60,7 +60,7 @@ main_group.append(moon_group)
 main_group.append(jewel_splash)
 
 #  showing the main group on the display
-display.show(main_group)
+display.root_group = main_group
 
 #  tracks the tilegrid index location for the crescent moon
 moon = 0

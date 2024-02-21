@@ -82,7 +82,7 @@ mouse_cursor = Cursor(display, display_group=splash)
 cursor = DebouncedCursorManager(mouse_cursor)
 
 # Show splash group
-display.show(splash)
+display.root_group = splash
 
 prev_btn = None
 while True:

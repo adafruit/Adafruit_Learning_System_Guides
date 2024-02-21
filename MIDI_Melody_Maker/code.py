@@ -51,7 +51,7 @@ display = adafruit_displayio_ssd1306.SSD1306(display_bus, width=WIDTH, height=HE
 
 # create the displayio object
 splash = displayio.Group()
-display.show(splash)
+display.root_group = splash
 
 #  text for BPM
 bpm_text = "BPM:    "

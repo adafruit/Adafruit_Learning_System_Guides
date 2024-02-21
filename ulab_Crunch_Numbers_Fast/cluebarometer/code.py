@@ -11,7 +11,7 @@ from ulab import numpy as np
 
 # Blank the screen.  Scrolling text causes unwanted delays.
 d = displayio.Group()
-board.DISPLAY.show(d)
+board.DISPLAY.root_group = d
 
 # Sampling rate: 16Hz
 # Cutoff frequency: 0.16Hz

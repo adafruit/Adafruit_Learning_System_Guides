@@ -66,7 +66,7 @@ TILEGRID = displayio.TileGrid(
 
 GROUP = displayio.Group()
 GROUP.append(TILEGRID)
-DISPLAY.show(GROUP)
+DISPLAY.root_group = GROUP
 DISPLAY.refresh()
 
 # Nothing interactive, just hold the image there

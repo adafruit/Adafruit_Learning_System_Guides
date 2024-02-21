@@ -15,7 +15,7 @@ display = board.DISPLAY
 
 # Make the display context
 main_group = displayio.Group()
-display.show(main_group)
+display.root_group = main_group
 
 
 # Font definition. You can choose any two fonts available in your system
@@ -70,7 +70,7 @@ right_text_aligned = label.Label(
 )
 
 main_group.append(right_text_aligned)
-display.show(main_group)
+display.root_group = main_group
 
 while True:
     pass

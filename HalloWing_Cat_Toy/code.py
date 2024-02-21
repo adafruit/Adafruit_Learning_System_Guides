@@ -45,7 +45,7 @@ backlight.direction = digitalio.Direction.OUTPUT
 backlight.value = False
 
 splash = displayio.Group()
-board.DISPLAY.show(splash)
+board.DISPLAY.root_group = splash
 
 
 # setup neopixel ring

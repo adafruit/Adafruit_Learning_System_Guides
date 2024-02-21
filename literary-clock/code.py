@@ -27,7 +27,7 @@ with open("quotes.csv", "r", encoding="UTF-8") as F:
 
 display = board.DISPLAY
 splash = displayio.Group()
-display.show(splash)
+display.root_group = splash
 
 arial = bitmap_font.load_font("fonts/Arial-12.pcf")
 bold = bitmap_font.load_font("fonts/Arial-Bold-12.pcf")

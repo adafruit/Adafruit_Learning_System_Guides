@@ -53,7 +53,7 @@ group.append(
         anchor_point=(0.5, 0.0),
     )
 )
-macropad.display.show(group)
+macropad.display.root_group = group
 
 def rpc_call(function, *args, **kwargs):
     response = rpc.call(function, *args, **kwargs)

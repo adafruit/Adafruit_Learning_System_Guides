@@ -72,7 +72,7 @@ group = displayio.Group(scale=4, x = 64, y = 32)
 group.append(parrot0_grid)
 
 # Add the Group to the Display
-display.show(group)
+display.root_group = group
 
 #  setup button pins
 key_pins = (

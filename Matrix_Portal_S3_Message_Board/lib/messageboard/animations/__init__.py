@@ -6,8 +6,12 @@ import time
 
 
 class Animation:
-    def __init__(self, display, draw_callback, starting_position=(0, 0)):
+    def __init__(self, display, draw_callback, starting_position=(0, 0), shift_count=(0, 0)):
         self._display = display
+        starting_position = (
+            starting_position[0] - shift_count[0] * self._display.width,
+            starting_position[1] - shift_count[1] * self._display.height
+        )
         self._position = starting_position
         self._draw = draw_callback
 

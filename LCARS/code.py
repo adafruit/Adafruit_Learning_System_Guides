@@ -25,7 +25,7 @@ brightness = 15  # ### Integer value from 0 to 15
 # --- Display setup ---
 matrix = Matrix(bit_depth=4, width=128, height=64)
 sprite_group = displayio.Group()
-matrix.display.show(sprite_group)
+matrix.display.root_group = sprite_group
 
 # --- Button setup ---
 pin_down = DigitalInOut(board.BUTTON_DOWN)
