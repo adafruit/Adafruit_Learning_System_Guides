@@ -13,8 +13,8 @@ from adafruit_ble.advertising.standard import ProvideServicesAdvertisement
 from adafruit_ble.services.nordic import UARTService
 
 #--| User Config |---------------------------------------------------
-MY_NAME = "ME"
-FRIENDS_NAME = "FRIEND"
+MY_NAME = "CENTRAL"
+FRIENDS_NAME = "PERIPHERAL"
 #--| User Config |---------------------------------------------------
 
 WAIT_FOR_DOUBLE = 0.05
@@ -73,55 +73,60 @@ def scan_and_connect():
     Advertise self while scanning for friend. If friend is found, can
     connect by pressing A+B buttons. If friend connects first, then
     just stop.
-
-    Return is a UART object that can be used for read/write.
     '''
 
-    print("Advertising.")
-    central = False
-    ble.start_advertising(advertisement)
+# peripheral
+    if MY_NAME == "PERIPHERAL":
+        print("Advertising.")
+        central = False
+        ble.start_advertising(advertisement)
 
-    print("Waiting.")
-    friend = None
-    while not ble.connected:
+        while not ble.connected:
+            if ble.connected:
+                break
 
-        if friend is None:
-            print("Scanning.")
-            in_label.text = out_label.text = "Scanning..."
-            for adv in ble.start_scan():
-                if ble.connected:
-                    # Friend connected with us, we're done
-                    ble.stop_scan()
-                    break
-                if adv.complete_name == FRIENDS_NAME:
-                    # Found friend, can stop scanning
-                    ble.stop_scan()
-                    friend = adv
-                    print("Found", friend.complete_name)
-                    in_label.text = "Found {}".format(friend.complete_name)
-                    out_label.text = "A+B to connect"
-                    break
-        else:
-            if clue.button_a and clue.button_b:
-                # Connect to friend
-                print("Connecting to", friend.complete_name)
-                ble.connect(friend)
-                central = True
+        # We're now connected, one way or the other
+        print("Stopping advertising.")
+        ble.stop_advertising()
 
-    # We're now connected, one way or the other
-    print("Stopping advertising.")
-    ble.stop_advertising()
-
-    # Return a UART object to use
-    if central:
-        print("Central - using my UART service.")
-        return uart_service
-    else:
         print("Peripheral - connecting to their UART service.")
         for connection in ble.connections:
             if UARTService not in connection:
                 continue
             return connection[UARTService]
+
+  # central
+    else:
+        print("Waiting.")
+        friend = None
+        while not ble.connected:
+            if friend is None:
+                print("Scanning.")
+                in_label.text = out_label.text = "Scanning..."
+                for adv in ble.start_scan():
+                    if ble.connected:
+                        # Friend connected with us, we're done
+                        ble.stop_scan()
+                        break
+                    if adv.complete_name == FRIENDS_NAME:
+                        # Found friend, can stop scanning
+                        ble.stop_scan()
+                        friend = adv
+                        print("Found", friend.complete_name)
+                        in_label.text = "Found {}".format(friend.complete_name)
+                        out_label.text = "A+B to connect"
+                        break
+            else:
+                if clue.button_a and clue.button_b:
+                    # Connect to friend
+                    print("Connecting to", friend.complete_name)
+                    ble.connect(friend)
+                    central = True
+    
+
+    # Return a UART object to use
+    print("Central - using my UART service.")
+    return uart_service
 
 #--------------------------
 # The main application loop
