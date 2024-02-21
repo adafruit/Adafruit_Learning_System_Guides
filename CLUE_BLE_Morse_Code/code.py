@@ -78,7 +78,6 @@ def scan_and_connect():
 # peripheral
     if MY_NAME == "PERIPHERAL":
         print("Advertising.")
-        central = False
         ble.start_advertising(advertisement)
 
         while not ble.connected:
@@ -95,7 +94,6 @@ def scan_and_connect():
                 continue
             return connection[UARTService]
 
-  # central
     else:
         print("Waiting.")
         friend = None
@@ -121,8 +119,7 @@ def scan_and_connect():
                     # Connect to friend
                     print("Connecting to", friend.complete_name)
                     ble.connect(friend)
-                    central = True
-    
+
 
     # Return a UART object to use
     print("Central - using my UART service.")
