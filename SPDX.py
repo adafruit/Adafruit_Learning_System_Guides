@@ -98,7 +98,7 @@ for file in files:
                             fail = True
                             failed = True
                 if not failed:
-                    license_name = line.split("SPDX-License-Identifier: ")[1][:-1]
+                    license_name = line.split("SPDX-License-Identifier: ")[1].strip()
                     status["license"] = True
                     if os.path.isfile(BUILD_DIR + f"/LICENSES/{license_name}.txt"):
                         status["licensefile"] = True
