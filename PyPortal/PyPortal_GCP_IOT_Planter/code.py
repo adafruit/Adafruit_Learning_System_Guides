@@ -16,8 +16,9 @@ import board
 import busio
 import gcp_gfx_helper
 import neopixel
+import adafruit_connection_manager
 from adafruit_esp32spi import adafruit_esp32spi, adafruit_esp32spi_wifimanager
-import adafruit_esp32spi.adafruit_esp32spi_socket as socket
+import adafruit_esp32spi.adafruit_esp32spi_socket as pool
 from adafruit_gc_iot_core import MQTT_API, Cloud_Core
 import adafruit_minimqtt.adafruit_minimqtt as MQTT
 from adafruit_seesaw.seesaw import Seesaw
@@ -48,8 +49,7 @@ print("Connecting to WiFi...")
 wifi.connect()
 print("Connected!")
 
-# Initialize MQTT interface with the esp interface
-MQTT.set_socket(socket, esp)
+ssl_context = adafruit_connection_manager.create_fake_ssl_context(pool, esp)
 
 # Soil Sensor Setup
 i2c_bus = busio.I2C(board.SCL, board.SDA)
@@ -148,7 +148,9 @@ print("Your JWT is: ", jwt)
 client = MQTT.MQTT(broker=google_iot.broker,
                    username=google_iot.username,
                    password=jwt,
-                   client_id=google_iot.cid)
+                   client_id=google_iot.cid,
+                   socket_pool=pool,
+                   ssl_context=ssl_context)
 
 # Initialize Google MQTT API Client
 google_mqtt = MQTT_API(client)
