@@ -16,7 +16,7 @@ from adafruit_display_text import bitmap_label
 import wifi
 import socketpool
 import alarm
-import adafruit_requests as requests
+import adafruit_requests
 
 try:
     from secrets import secrets
@@ -68,7 +68,7 @@ if not TEST_RUN:
 
         # Create Socket, initialize requests
         socket = socketpool.SocketPool(wifi.radio)
-        requests = requests.Session(socket, ssl.create_default_context())
+        requests = adafruit_requests.Session(socket, ssl.create_default_context())
     except OSError:
         print("Failed to connect to AP. Rebooting in 3 seconds...")
         time.sleep(3)

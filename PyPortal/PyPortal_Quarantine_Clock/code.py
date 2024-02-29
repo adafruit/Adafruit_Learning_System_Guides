@@ -6,9 +6,10 @@ import time
 import board
 import busio
 import digitalio
-from adafruit_esp32spi import adafruit_esp32spi_socket as socket
+import adafruit_connection_manager
+from adafruit_esp32spi import adafruit_esp32spi_socket as pool
 from adafruit_esp32spi import adafruit_esp32spi
-import adafruit_requests as requests
+import adafruit_requests
 from adafruit_pyportal import PyPortal
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text import label
@@ -48,7 +49,8 @@ esp32_reset = digitalio.DigitalInOut(board.ESP_RESET)
 
 spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
 esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset, debug=False)
-requests.set_socket(socket, esp)
+ssl_context = adafruit_connection_manager.create_fake_ssl_context(pool, esp)
+requests = adafruit_requests.Session(pool, ssl_context)
 
 # initialize pyportal
 pyportal = PyPortal(esp=esp,

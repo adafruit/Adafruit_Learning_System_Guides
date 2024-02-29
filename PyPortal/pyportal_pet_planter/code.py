@@ -7,7 +7,8 @@ import time
 import board
 import busio
 from digitalio import DigitalInOut
-import adafruit_esp32spi.adafruit_esp32spi_socket as socket
+import adafruit_connection_manager
+import adafruit_esp32spi.adafruit_esp32spi_socket as pool
 from adafruit_esp32spi import adafruit_esp32spi, adafruit_esp32spi_wifimanager
 import adafruit_imageload
 import displayio
@@ -186,13 +187,14 @@ while not esp.is_connected:
         continue
 print("Connected to WiFi!")
 
-# Initialize MQTT interface with the esp interface
-MQTT.set_socket(socket, esp)
+ssl_context = adafruit_connection_manager.create_fake_ssl_context(pool, esp)
 
 # Initialize a new MQTT Client object
 mqtt_client = MQTT.MQTT(broker="io.adafruit.com",
                         username=secrets["aio_user"],
-                        password=secrets["aio_key"])
+                        password=secrets["aio_key"],
+                        socket_pool=pool,
+                        ssl_context=ssl_context)
 
 # Adafruit IO Callback Methods
 # pylint: disable=unused-argument
