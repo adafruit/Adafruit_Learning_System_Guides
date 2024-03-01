@@ -7,7 +7,6 @@ import board
 import busio
 import digitalio
 import adafruit_connection_manager
-from adafruit_esp32spi import adafruit_esp32spi_socket as pool
 from adafruit_esp32spi import adafruit_esp32spi
 import adafruit_requests
 from adafruit_pyportal import PyPortal
@@ -49,7 +48,8 @@ esp32_reset = digitalio.DigitalInOut(board.ESP_RESET)
 
 spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
 esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset, debug=False)
-ssl_context = adafruit_connection_manager.create_fake_ssl_context(pool, esp)
+pool = adafruit_connection_manager.get_radio_socketpool(esp)
+ssl_context = adafruit_connection_manager.get_radio_ssl_context(esp)
 requests = adafruit_requests.Session(pool, ssl_context)
 
 # initialize pyportal

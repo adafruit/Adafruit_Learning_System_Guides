@@ -19,7 +19,6 @@ import neopixel
 import adafruit_connection_manager
 from adafruit_esp32spi import adafruit_esp32spi
 from adafruit_esp32spi import adafruit_esp32spi_wifimanager
-import adafruit_esp32spi.adafruit_esp32spi_socket as pool
 import adafruit_minimqtt.adafruit_minimqtt as MQTT
 from adafruit_aws_iot import MQTT_CLIENT
 from adafruit_seesaw.seesaw import Seesaw
@@ -87,7 +86,8 @@ print("Connecting to WiFi...")
 wifi.connect()
 print("Connected!")
 
-ssl_context = adafruit_connection_manager.create_fake_ssl_context(pool, esp)
+pool = adafruit_connection_manager.get_radio_socketpool(esp)
+ssl_context = adafruit_connection_manager.get_radio_ssl_context(esp)
 
 # Soil Sensor Setup
 i2c_bus = busio.I2C(board.SCL, board.SDA)

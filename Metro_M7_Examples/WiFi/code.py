@@ -7,7 +7,6 @@ import busio
 from digitalio import DigitalInOut
 import adafruit_connection_manager
 import adafruit_requests
-import adafruit_esp32spi.adafruit_esp32spi_socket as pool
 from adafruit_esp32spi import adafruit_esp32spi
 
 print("ESP32 SPI webclient test")
@@ -23,7 +22,8 @@ esp32_reset = DigitalInOut(board.ESP_RESET)
 spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
 esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset)
 
-ssl_context = adafruit_connection_manager.create_fake_ssl_context(pool, esp)
+pool = adafruit_connection_manager.get_radio_socketpool(esp)
+ssl_context = adafruit_connection_manager.get_radio_ssl_context(esp)
 
 requests = adafruit_requests.Session(pool, ssl_context)
 

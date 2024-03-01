@@ -12,7 +12,6 @@ import adafruit_adt7410
 import adafruit_connection_manager
 from adafruit_esp32spi import adafruit_esp32spi
 from adafruit_esp32spi import adafruit_esp32spi_wifimanager
-import adafruit_esp32spi.adafruit_esp32spi_socket as pool
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text.label import Label
 from adafruit_button import Button
@@ -230,7 +229,8 @@ print("Connecting to WiFi...")
 wifi.connect()
 print("Connected to WiFi!")
 
-ssl_context = adafruit_connection_manager.create_fake_ssl_context(pool, esp)
+pool = adafruit_connection_manager.get_radio_socketpool(esp)
+ssl_context = adafruit_connection_manager.get_radio_ssl_context(esp)
 
 # Set up a MiniMQTT Client
 client = MQTT.MQTT(

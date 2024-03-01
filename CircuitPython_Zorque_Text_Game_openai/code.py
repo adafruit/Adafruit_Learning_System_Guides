@@ -4,7 +4,6 @@ import os
 import traceback
 
 import adafruit_connection_manager
-import adafruit_esp32spi.adafruit_esp32spi_socket as pool
 import adafruit_requests
 import adafruit_touchscreen
 from adafruit_ticks import ticks_ms, ticks_add, ticks_less
@@ -88,7 +87,8 @@ def set_up_wifi():
 
     spi = board.SPI()
     esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp_cs, esp_ready, esp_reset)
-    ssl_context = adafruit_connection_manager.create_fake_ssl_context(pool, esp)
+    pool = adafruit_connection_manager.get_radio_socketpool(esp)
+    ssl_context = adafruit_connection_manager.get_radio_ssl_context(esp)
     requests = adafruit_requests.Session(pool, ssl_context)
 
     while not esp.is_connected:
