@@ -7,6 +7,7 @@ import gc
 import math
 from random import randint
 import time
+import supervisor
 import displayio
 import picodvi
 import board
@@ -26,20 +27,30 @@ displayio.release_displays()
 
 # check for DVI Feather
 if 'CKP' in dir(board):
-    fb = picodvi.Framebuffer(320, 240,
-        clk_dp=board.CKP, clk_dn=board.CKN,
-        red_dp=board.D0P, red_dn=board.D0N,
-        green_dp=board.D1P, green_dn=board.D1N,
-        blue_dp=board.D2P, blue_dn=board.D2N,
-        color_depth=8)
+    try:
+        fb = picodvi.Framebuffer(320, 240,
+            clk_dp=board.CKP, clk_dn=board.CKN,
+            red_dp=board.D0P, red_dn=board.D0N,
+            green_dp=board.D1P, green_dn=board.D1N,
+            blue_dp=board.D2P, blue_dn=board.D2N,
+            color_depth=8)
+    except MemoryError as e:
+        print("Error:\n", str(e))
+        time.sleep(5)
+        supervisor.reload()
 # otherwise assume Pico
 else:
-    fb = picodvi.Framebuffer(320, 240,
-        clk_dp=board.GP12, clk_dn=board.GP13,
-        red_dp=board.GP10, red_dn=board.GP11,
-        green_dp=board.GP8, green_dn=board.GP9,
-        blue_dp=board.GP6, blue_dn=board.GP7,
-        color_depth=8)
+    try:
+        fb = picodvi.Framebuffer(320, 240,
+            clk_dp=board.GP12, clk_dn=board.GP13,
+            red_dp=board.GP10, red_dn=board.GP11,
+            green_dp=board.GP8, green_dn=board.GP9,
+            blue_dp=board.GP6, blue_dn=board.GP7,
+            color_depth=8)
+    except MemoryError as e:
+        print("Error:\n", str(e))
+        time.sleep(5)
+        supervisor.reload()
 display = framebufferio.FramebufferDisplay(fb)
 
 bitmap = displayio.Bitmap(display.width, display.height, 3)
