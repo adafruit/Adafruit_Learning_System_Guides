@@ -3,8 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 int analogIn = A1;
-// in arduino, feather rp2040 pin 5 is pin 7
-int digitalOut = 7;
+int digitalOut = 5;
 int analogValue = 0;
 unsigned long timer = 2000;
 unsigned long startTime = millis();
