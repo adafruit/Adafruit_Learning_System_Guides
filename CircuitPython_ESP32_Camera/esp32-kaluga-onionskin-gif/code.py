@@ -193,7 +193,7 @@ def take_stop_motion_gif(n_frames=10, replay_frame_time=.3):
         writer.add_frame(frame, replay_frame_time)
         for i in range(1, n_frames):
             print(f"{i}/{n_frames}")
-            old_frame.blit(0, 0, frame, x1=0, y1=0, x2=cam.width, y2=cam.height)
+            bitmaptools.blit(old_frame, frame, 0, 0, x1=0, y1=0, x2=cam.width, y2=cam.height)
             frame = wait_record_pressed_update_display(False, cam)
             writer.add_frame(frame, replay_frame_time)
         print("done")
