@@ -7,6 +7,7 @@ import traceback
 
 import board
 import displayio
+import i2cdisplaybus
 import digitalio
 import keypad
 import socketpool
@@ -75,7 +76,7 @@ oled_reset = board.GP9
 
 # STEMMA I2C on picowbell
 i2c = board.STEMMA_I2C()
-display_bus = displayio.I2CDisplay(i2c, device_address=0x3D, reset=oled_reset)
+display_bus = i2cdisplaybus.I2CDisplayBus(i2c, device_address=0x3D, reset=oled_reset)
 
 WIDTH = 128
 HEIGHT = 64

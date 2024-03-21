@@ -4,6 +4,7 @@
 
 import board
 import displayio
+import i2cdisplaybus
 import adafruit_displayio_ssd1306
 import terminalio
 import adafruit_ds3231
@@ -17,7 +18,7 @@ displayio.release_displays()
 
 i2c = board.I2C()  # uses board.SCL and board.SDA
 # i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
-display_bus = displayio.I2CDisplay(i2c, device_address=0x3c)
+display_bus = i2cdisplaybus.I2CDisplayBus(i2c, device_address=0x3c)
 oled = adafruit_displayio_ssd1306.SSD1306(display_bus, width=128, height=32)
 
 rtc = adafruit_ds3231.DS3231(i2c)

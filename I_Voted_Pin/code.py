@@ -6,6 +6,7 @@ import board
 from adafruit_debouncer import Debouncer
 import digitalio
 import displayio
+import i2cdisplaybus
 from adafruit_display_text import label
 import adafruit_displayio_ssd1306
 from adafruit_bitmap_font import bitmap_font
@@ -35,7 +36,7 @@ font = bitmap_font.load_font('/mround-31.bdf')
 # Set up display & add group
 i2c = board.I2C()  # uses board.SCL and board.SDA
 # i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
-display_bus = displayio.I2CDisplay(i2c, device_address=0x3C)
+display_bus = i2cdisplaybus.I2CDisplayBus(i2c, device_address=0x3C)
 display = adafruit_displayio_ssd1306.SSD1306(display_bus, width=128, height=32)
 group = displayio.Group()
 display.root_group = group
