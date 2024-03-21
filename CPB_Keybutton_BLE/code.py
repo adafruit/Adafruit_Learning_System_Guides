@@ -47,6 +47,8 @@ hid = HIDService()
 device_info = DeviceInfoService(software_revision=adafruit_ble.__version__,
                                 manufacturer="Adafruit Industries")
 advertisement = ProvideServicesAdvertisement(hid)
+# Advertise as "Keyboard" (0x03C1) icon when pairing
+# https://www.bluetooth.com/specifications/assigned-numbers/
 advertisement.appearance = 961
 scan_response = Advertisement()
 scan_response.complete_name = "CircuitPython HID"
