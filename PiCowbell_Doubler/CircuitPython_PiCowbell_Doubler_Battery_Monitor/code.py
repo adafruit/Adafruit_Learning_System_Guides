@@ -13,7 +13,7 @@ led.direction = Direction.OUTPUT
 analog_in = AnalogIn(board.A3)
 
 def get_vsys(pin):
-    return ((pin.value * 3) * 3.3) / 65536
+    return ((pin.value * 3) * 3.3) / 65535
 
 while True:
     led.value = True
