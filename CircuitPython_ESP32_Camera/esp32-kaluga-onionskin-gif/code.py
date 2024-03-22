@@ -54,6 +54,7 @@ import busio
 import bitmaptools
 import fourwire
 import displayio
+import busdisplay
 import sdcardio
 import storage
 import gifio
@@ -102,7 +103,7 @@ _INIT_SEQUENCE = (
     b"\x29\x80\x78"  # Display on then delay 0x78 (120ms)
 )
 
-display = displayio.Display(display_bus, _INIT_SEQUENCE, width=320, height=240)
+display = busdisplay.BusDisplay(display_bus, _INIT_SEQUENCE, width=320, height=240)
 
 sd_spi = busio.SPI(clock=board.IO18, MOSI=board.IO14, MISO=board.IO17)
 sd_cs = board.IO12

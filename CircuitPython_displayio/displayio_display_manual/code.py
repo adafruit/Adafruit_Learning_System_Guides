@@ -4,6 +4,7 @@
 
 import board
 import displayio
+import busdisplay
 import fourwire
 
 # Release any previously configured displays
@@ -48,7 +49,7 @@ INIT_SEQUENCE = (
 )
 
 # Setup the Display
-display = displayio.Display(display_bus, INIT_SEQUENCE, width=320, height=240)
+display = busdisplay.BusDisplay(display_bus, INIT_SEQUENCE, width=320, height=240)
 
 #
 # DONE - now you can use the display however you want
