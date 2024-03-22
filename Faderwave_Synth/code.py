@@ -13,6 +13,7 @@ import ulab.numpy as np
 import rotaryio
 from digitalio import DigitalInOut, Pull
 import displayio
+import fourwire
 from adafruit_display_text import label
 from adafruit_display_shapes.rect import Rect
 import terminalio
@@ -88,7 +89,7 @@ OLED_DC = board.D12
 OLED_CS = board.D11
 
 spi = board.SPI()
-display_bus = displayio.FourWire(spi, command=OLED_DC, chip_select=OLED_CS,
+display_bus = fourwire.FourWire(spi, command=OLED_DC, chip_select=OLED_CS,
                                  reset=OLED_RST, baudrate=30_000_000)
 display = adafruit_displayio_ssd1306.SSD1306(display_bus, width=128, height=64)
 

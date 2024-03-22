@@ -52,6 +52,7 @@ import analogio
 import board
 import busio
 import bitmaptools
+import fourwire
 import displayio
 import sdcardio
 import storage
@@ -68,7 +69,7 @@ def record_pressed():
 
 displayio.release_displays()
 spi = busio.SPI(MOSI=board.LCD_MOSI, clock=board.LCD_CLK)
-display_bus = displayio.FourWire(
+display_bus = fourwire.FourWire(
     spi,
     command=board.LCD_D_C,
     chip_select=board.LCD_CS,

@@ -19,13 +19,14 @@ import board
 import busio
 import keypad
 import displayio
+import fourwire
 import espcamera
 import espidf
 
 print("Initializing display")
 displayio.release_displays()
 spi = busio.SPI(MOSI=board.LCD_MOSI, clock=board.LCD_CLK)
-display_bus = displayio.FourWire(
+display_bus = fourwire.FourWire(
     spi,
     command=board.LCD_D_C,
     chip_select=board.LCD_CS,
