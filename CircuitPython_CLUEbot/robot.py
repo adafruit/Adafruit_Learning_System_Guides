@@ -66,7 +66,7 @@ class Robot:
     def _init_display(self):
         self.display = board.DISPLAY
         self.display_group = displayio.Group()
-        self.display.show(self.display_group)
+        self.display.root_group = self.display_group
         self.shape_color = 0
         self.bg_color = 0xFFFF00
         rect = vectorio.Rectangle(

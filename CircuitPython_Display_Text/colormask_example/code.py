@@ -21,7 +21,7 @@ bg_palette[0] = 0xDDDD00
 
 # Make the display context
 main_group = displayio.Group()
-display.show(main_group)
+display.root_group = main_group
 
 font = bitmap_font.load_font("fonts/LeagueSpartan-Bold-16.bdf")
 reg_label = label.Label(

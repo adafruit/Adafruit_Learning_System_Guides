@@ -171,28 +171,15 @@ class Pyloton:
 
         blinka_bitmap = "blinka-pyloton.bmp"
 
-        # Compatible with CircuitPython 6 & 7
-        with open(blinka_bitmap, 'rb') as bitmap_file:
-            bitmap1 = displayio.OnDiskBitmap(bitmap_file)
-            tile_grid = displayio.TileGrid(bitmap1, pixel_shader=getattr(bitmap1, 'pixel_shader', displayio.ColorConverter()))
-            self.loading_group.append(tile_grid)
-            self.display.show(self.loading_group)
-            status_heading = label.Label(font=self.arial16, x=80, y=175,
-                                         text="Status", color=self.YELLOW)
-            rect = Rect(0, 165, 240, 75, fill=self.PURPLE)
-            self.loading_group.append(rect)
-            self.loading_group.append(status_heading)
-
-        # # Compatible with CircuitPython 7+
-        # bitmap1 = displayio.OnDiskBitmap(blinka_bitmap)
-        # tile_grid = displayio.TileGrid(bitmap1, pixel_shader=bitmap1.pixel_shader)
-        # self.loading_group.append(tile_grid)
-        # self.display.show(self.loading_group)
-        # status_heading = label.Label(font=self.arial16, x=80, y=175,
-        #                              text="Status", color=self.YELLOW)
-        # rect = Rect(0, 165, 240, 75, fill=self.PURPLE)
-        # self.loading_group.append(rect)
-        # self.loading_group.append(status_heading)
+        bitmap1 = displayio.OnDiskBitmap(blinka_bitmap)
+        tile_grid = displayio.TileGrid(bitmap1, pixel_shader=bitmap1.pixel_shader)
+        self.loading_group.append(tile_grid)
+        self.display.root_group = self.loading_group
+        status_heading = label.Label(font=self.arial16, x=80, y=175,
+                                     text="Status", color=self.YELLOW)
+        rect = Rect(0, 165, 240, 75, fill=self.PURPLE)
+        self.loading_group.append(rect)
+        self.loading_group.append(status_heading)
 
     def _load_fonts(self):
         """
@@ -495,7 +482,7 @@ class Pyloton:
 
         self.splash.append(sprites)
 
-        self.display.show(self.splash)
+        self.display.root_group = self.splash
         while self.loading_group:
             self.loading_group.pop()
 

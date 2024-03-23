@@ -78,7 +78,7 @@ label_user_code.text = "2. Enter code: %s" % google_auth.user_code
 
 # Create a QR code
 graphics.qrcode(google_auth.verification_url.encode(), qr_size=2, x=170, y=165)
-graphics.display.show(graphics.splash)
+graphics.display.root_group = graphics.splash
 
 # Poll Google's authorization server
 print("Waiting for browser authorization...")
