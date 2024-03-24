@@ -230,7 +230,7 @@ class ClueLightPainter:
             board.DISPLAY.root_group = group
             sleep(4)
 
-        board.DISPLAY.show(displayio.Group()) # Clear display
+        board.DISPLAY.root_group = displayio.Group() # Clear display
         self.clear_strip() # LEDs off
 
 

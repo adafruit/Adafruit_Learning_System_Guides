@@ -269,7 +269,7 @@ def update_display_with_flight_data(flight_data, icon_group, display_group):
     display_group.append(icon_group)
 
     # Show the updated group on the display
-    display.show(display_group)
+    display.root_group = display_group
     display.refresh()
     return text_labels
 
@@ -287,7 +287,7 @@ def display_no_flights():
     main_group.append(looking_label)
 
     # Update the display with the new group
-    display.show(main_group)
+    display.root_group = main_group
     display.refresh()
 
 

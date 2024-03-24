@@ -206,7 +206,7 @@ while True:
                 print("trash time")
                 alarm = True
                 if alarm and not dismissed and not snoozed:
-                    display.show(alarm_gfx[w])
+                    display.root_group = alarm_gfx[w]
                     pyportal.play_file(alarm_sounds[w])
                 mode = w
                 print("mode is:", mode)
@@ -216,7 +216,7 @@ while True:
             if time_str == alarm_checks[a]:
                 alarm = True
                 if alarm and not dismissed and not snoozed:
-                    display.show(alarm_gfx[a])
+                    display.root_group = alarm_gfx[a]
                     pyportal.play_file(alarm_sounds[a])
                 mode = a
                 print(mode)
@@ -244,13 +244,13 @@ while True:
         print("pressed dismiss button")
         dismissed = True
         alarm = False
-        display.show(pyportal.splash)
+        display.root_group = pyportal.splash
         touched = time.monotonic()
         mode = mode
     if not switch_snooze.value and not phys_snooze:
         phys_snooze = True
         print("pressed snooze button")
-        display.show(pyportal.splash)
+        display.root_group = pyportal.splash
         snoozed = True
         alarm = False
         touched = time.monotonic()
@@ -265,7 +265,7 @@ while True:
     if touch:
         if snooze_buttons[button_mode].contains(touch) and not touch_button_snooze:
             print("Touched snooze")
-            display.show(pyportal.splash)
+            display.root_group = pyportal.splash
             touch_button_snooze = True
             snoozed = True
             alarm = False
@@ -275,7 +275,7 @@ while True:
             print("Touched dismiss")
             dismissed = True
             alarm = False
-            display.show(pyportal.splash)
+            display.root_group = pyportal.splash
             touch_button_dismiss = True
             touched = time.monotonic()
             mode = mode
@@ -294,6 +294,6 @@ while True:
         snoozed = False
         alarm = True
         mode = mode
-        display.show(alarm_gfx[mode])
+        display.root_group = alarm_gfx[mode]
         pyportal.play_file(alarm_sounds[mode])
         print(mode)

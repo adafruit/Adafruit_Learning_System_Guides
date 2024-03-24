@@ -74,7 +74,7 @@ fan_text = funhouse.add_text(
     text_font="fonts/Arial-Bold-24.pcf",
 )
 #  showing graphics
-funhouse.display.show(funhouse.splash)
+funhouse.display.root_group = funhouse.splash
 
 #  state machines
 run = False #  state if main code is running
