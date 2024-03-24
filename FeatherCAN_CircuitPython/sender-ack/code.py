@@ -38,24 +38,31 @@ while True:
     print(f"Sending message: count={count} now_ms={now_ms}")
 
     message = canio.Message(id=0x408, data=struct.pack("<II", count, now_ms))
+
+    # Keep trying to send the same message until confirmed.
     while True:
+        received_ack_confirmed = False
         can.send(message)
 
-        message_in = listener.receive()
-        if message_in is None:
-            print("No ACK received within timeout")
-            continue
+        # Read in all messages.
+        for message_in in listener:
+            data = message_in.data
+            if len(data) != 4:
+                print(f"Unusual message length {len(data)}")
+                continue
 
-        data = message_in.data
-        if len(data) != 4:
-            print(f"Unusual message length {len(data)}")
-            continue
+            ack_count = struct.unpack("<I", data)[0]
+            if ack_count == count:
+                print(f"Received ACK: {ack_count}")
+                received_ack_confirmed = True
+                break
 
-        ack_count = struct.unpack("<I", data)[0]
-        if ack_count == count:
-            print("Received ACK")
+            print(f"Received incorrect ACK: {ack_count} should be {count}")
+
+        if received_ack_confirmed:
             break
-        print(f"Received incorrect ACK: {ack_count} should be {count}")
+
+        print(f"No ACK received within receive timeout, sending {count} again")
 
     time.sleep(.5)
     count += 1

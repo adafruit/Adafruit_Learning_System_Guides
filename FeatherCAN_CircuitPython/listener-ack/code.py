@@ -50,5 +50,5 @@ while True:
     if gap != 1:
         print(f"gap: {gap}")
 
-    print("Sending ACK")
+    print(f"Sending ACK: {count}")
     can.send(canio.Message(id=0x409, data=struct.pack("<I", count)))
