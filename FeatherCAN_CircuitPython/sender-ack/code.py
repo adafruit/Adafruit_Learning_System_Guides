@@ -56,8 +56,8 @@ while True:
                 print(f"Received ACK: {ack_count}")
                 received_ack_confirmed = True
                 break
-            else:
-                print(f"Received incorrect ACK: {ack_count} should be {count}")
+
+            print(f"Received incorrect ACK: {ack_count} should be {count}")
 
         if received_ack_confirmed:
             break
