@@ -36,7 +36,7 @@ print("Connecting to WiFi")
 #  connect to your SSID
 try:
     wifi.radio.connect(os.getenv('CIRCUITPY_WIFI_SSID'), os.getenv('CIRCUITPY_WIFI_PASSWORD'))
-# pylint: disable = broad-exception-caught
+# pylint: disable = broad-except
 except Exception:
     wifi.radio.connect(os.getenv('WIFI_SSID'), os.getenv('WIFI_PASSWORD'))
 print("Connected to WiFi")
