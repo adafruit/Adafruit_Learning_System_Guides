@@ -1,23 +1,20 @@
-# SPDX-FileCopyrightText: 2022 Liz Clark for Adafruit Industries
+# SPDX-FileCopyrightText: 2024 Liz Clark for Adafruit Industries
 #
 # SPDX-License-Identifier: MIT
 
 import time
 import os
-import ipaddress
-import wifi
 import ssl
+import wifi
 import socketpool
 import board
 import digitalio
 import displayio
-import vectorio
 import adafruit_requests
 from adafruit_bitmap_font import bitmap_font
-from adafruit_display_text import bitmap_label
-import adafruit_imageload
-from adafruit_seesaw import seesaw, rotaryio, digitalio as seesaw_digitalio, neopixel
 from adafruit_display_shapes.circle import Circle
+from adafruit_display_text import bitmap_label
+from adafruit_seesaw import seesaw, rotaryio, digitalio as seesaw_digitalio, neopixel
 from adafruit_ticks import ticks_ms, ticks_add, ticks_diff
 
 num_lights = 1
@@ -39,6 +36,7 @@ print("Connecting to WiFi")
 #  connect to your SSID
 try:
     wifi.radio.connect(os.getenv('CIRCUITPY_WIFI_SSID'), os.getenv('CIRCUITPY_WIFI_PASSWORD'))
+# pylint: disable = broad-exception-caught
 except Exception:
     wifi.radio.connect(os.getenv('WIFI_SSID'), os.getenv('WIFI_PASSWORD'))
 print("Connected to WiFi")
@@ -106,7 +104,8 @@ def ctrl_light(b, t, onOff):
     for i in range(5):
         try:
             pixel.fill((0, 255, 0))
-            r = requests.request(method="PUT", url=url, data=None, json=json, headers = {'Content-Type': 'application/json'}, timeout=10)
+            r = requests.request(method="PUT", url=url, data=None, json=json,
+                                 headers = {'Content-Type': 'application/json'}, timeout=10)
             print("-" * 40)
             print(r.status_code)
             # if PUT fails, try again
@@ -114,7 +113,8 @@ def ctrl_light(b, t, onOff):
                 status_text.text = "..sending.."
                 pixel.fill((255, 255, 0))
                 time.sleep(2)
-                r = requests.request(method="PUT", url=url, data=None, json=json, headers = {'Content-Type': 'application/json'}, timeout=10)
+                r = requests.request(method="PUT", url=url, data=None, json=json,
+                                     headers = {'Content-Type': 'application/json'}, timeout=10)
             if r.status_code != 200:
                 pixel.fill((255, 0, 0))
         except Exception:
@@ -143,7 +143,6 @@ def read_light():
                 j = r.json()
             if r.status_code != 200:
                 pixel.fill((255, 0, 0))
-                raise
         except Exception:
             pixel.fill((255, 0, 0))
             time.sleep(2)
