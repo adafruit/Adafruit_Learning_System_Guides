@@ -8,6 +8,9 @@ import time
 import board
 import digitalio
 
+# pylint: disable=unused-import
+import mount_sd # You must create a module mount_sd.py that mounts your sd card!
+
 # Updating the display can interfere with MP3 playback if it is not
 # done carefully
 try:
