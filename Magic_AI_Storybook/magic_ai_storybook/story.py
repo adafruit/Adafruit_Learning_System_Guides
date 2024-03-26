@@ -5,6 +5,8 @@
 import threading
 import sys
 import os
+import importlib.resources
+
 import re
 import time
 import argparse
@@ -21,12 +23,10 @@ import pygame
 from rpi_backlight import Backlight
 from adafruit_led_animation.animation.pulse import Pulse
 
-from listener import Listener
+from .listener import Listener
 
 # Base Path is the folder the script resides in
-BASE_PATH = os.path.dirname(sys.argv[0])
-if BASE_PATH != "":
-    BASE_PATH += "/"
+BASE_PATH = importlib.resources.files(__package__)
 
 # General Settings
 STORY_WORD_LENGTH = 800
@@ -59,13 +59,13 @@ BUTTON_NEXT_IMAGE = "button_next.png"
 BUTTON_NEW_IMAGE = "button_new.png"
 
 # Asset Paths
-IMAGES_PATH = BASE_PATH + "images/"
-FONTS_PATH = BASE_PATH + "fonts/"
+IMAGES_PATH = BASE_PATH.joinpath("images/")
+FONTS_PATH = BASE_PATH.joinpath("fonts/")
 
 # Font Path & Size
-TITLE_FONT = (FONTS_PATH + "Desdemona Black Regular.otf", 48)
+TITLE_FONT = (FONTS_PATH.joinpath("Desdemona Black Regular.otf"), 48)
 TITLE_COLOR = (0, 0, 0)
-TEXT_FONT = (FONTS_PATH + "times new roman.ttf", 24)
+TEXT_FONT = (FONTS_PATH.joinpath("times new roman.ttf"), 24)
 TEXT_COLOR = (0, 0, 0)
 
 # Delays Settings
@@ -262,9 +262,9 @@ class Book:
         self._load_font("text", TEXT_FONT)
 
         # Add buttons
-        back_button_image = pygame.image.load(IMAGES_PATH + BUTTON_BACK_IMAGE)
-        next_button_image = pygame.image.load(IMAGES_PATH + BUTTON_NEXT_IMAGE)
-        new_button_image = pygame.image.load(IMAGES_PATH + BUTTON_NEW_IMAGE)
+        back_button_image = pygame.image.load(IMAGES_PATH.joinpath(BUTTON_BACK_IMAGE))
+        next_button_image = pygame.image.load(IMAGES_PATH.joinpath(BUTTON_NEXT_IMAGE))
+        new_button_image = pygame.image.load(IMAGES_PATH.joinpath(BUTTON_NEW_IMAGE))
         button_spacing = (
             self.width
             - (
@@ -407,7 +407,7 @@ class Book:
 
     def _load_image(self, name, filename):
         try:
-            image = pygame.image.load(IMAGES_PATH + filename)
+            image = pygame.image.load(IMAGES_PATH.joinpath(filename))
             self.images[name] = image
         except pygame.error:
             pass
@@ -771,7 +771,8 @@ def parse_args():
     return parser.parse_args()
 
 
-def main(args):
+def main():
+    args = parse_args()
     book = Book(args.rotation)
     try:
         book.start()
@@ -790,4 +791,4 @@ def main(args):
 
 
 if __name__ == "__main__":
-    main(parse_args())
+    main()
