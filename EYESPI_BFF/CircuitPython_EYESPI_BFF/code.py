@@ -10,6 +10,7 @@ import math
 from random import randint
 import time
 import displayio
+import fourwire
 import board
 import vectorio
 import terminalio
@@ -29,7 +30,7 @@ spi = board.SPI()
 tft_cs = board.TX
 tft_dc = board.RX
 
-display_bus = displayio.FourWire(
+display_bus = fourwire.FourWire(
     spi, command=tft_dc, chip_select=tft_cs, reset=None
 )
 

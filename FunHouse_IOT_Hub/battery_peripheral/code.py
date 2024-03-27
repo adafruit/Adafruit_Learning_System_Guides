@@ -25,6 +25,7 @@ import adafruit_minimqtt.adafruit_minimqtt as MQTT
 from adafruit_io.adafruit_io import IO_MQTT
 
 import displayio
+import i2cdisplaybus
 import terminalio
 from adafruit_display_text import label
 import adafruit_displayio_ssd1306
@@ -101,7 +102,7 @@ io.connect()
 
 i2c = board.I2C()  # uses board.SCL and board.SDA
 # i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
-display_bus = displayio.I2CDisplay(i2c, device_address=0x3C)
+display_bus = i2cdisplaybus.I2CDisplayBus(i2c, device_address=0x3C)
 
 WIDTH = 128
 HEIGHT = 32

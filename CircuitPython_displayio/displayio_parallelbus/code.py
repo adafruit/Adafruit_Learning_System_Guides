@@ -4,13 +4,15 @@
 
 import board
 import displayio
+import busdisplay
+import paralleldisplaybus
 
 # Release any previously configured displays
 displayio.release_displays()
 
 # Setup the display bus
 # Tested with a Metro M4 Express
-display_bus = displayio.ParallelBus(data0=board.D13,
+display_bus = paralleldisplaybus.ParallelBus(data0=board.D13,
                                     command=board.D6,
                                     chip_select=board.D7,
                                     write=board.D5,
@@ -45,7 +47,7 @@ INIT_SEQUENCE = (
 )
 
 # Setup the Display
-display = displayio.Display(display_bus, INIT_SEQUENCE, width=320, height=240)
+display = busdisplay.BusDisplay(display_bus, INIT_SEQUENCE, width=320, height=240)
 
 #
 # DONE - now you can use the display however you want

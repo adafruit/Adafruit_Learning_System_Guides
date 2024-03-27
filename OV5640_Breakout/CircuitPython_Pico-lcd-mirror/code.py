@@ -13,11 +13,12 @@ import digitalio
 import adafruit_ov5640
 import adafruit_st7789
 import displayio
+import fourwire
 
 # Set up the display (You must customize this block for your display!)
 displayio.release_displays()
 spi = busio.SPI(clock=board.GP2, MOSI=board.GP3)
-display_bus = displayio.FourWire(spi, command=board.GP0, chip_select=board.GP1, reset=None)
+display_bus = fourwire.FourWire(spi, command=board.GP0, chip_select=board.GP1, reset=None)
 display = adafruit_st7789.ST7789(display_bus, width=240, height=240, rowstart=80, rotation=0)
 
 print("construct bus")
