@@ -38,13 +38,13 @@ print("Connected!")
 
 try:
     sht4x_temp = aio.feeds('temp-feed')
-except: # pylint: disable = broad-except
+except: # pylint: disable = bare-except
     feed = Feed(name='temp-feed')
     sht4x_temp = aio.create_feed(feed)
 
 try:
     sht4x_humid = aio.feeds('humid-feed')
-except: # pylint: disable = broad-except
+except: # pylint: disable = bare-except
     feed = Feed(name='humid_feed')
     sht4x_humid = aio.create_feed(feed)
 
