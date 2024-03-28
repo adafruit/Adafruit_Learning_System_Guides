@@ -136,4 +136,4 @@ b = array.array("L", [0])
 while True:
     pio.run(jmp_0.assembled)
     pio.clear_rxfifo()
-    pio.write_readinto(instruction, buf)
+    pio.write_readinto(control, buf)
