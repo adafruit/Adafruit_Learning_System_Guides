@@ -706,18 +706,11 @@ class Book:
         self._sleeping = True
         self._set_status_color(NEOPIXEL_SLEEP_COLOR)
         self.sleep_check_delay = 0
-        self.saved_screen = self.screen.copy()
-        self.screen.fill((0, 0, 0))
-        pygame.display.update()
         self.backlight.power = False
 
     def _wake(self):
         # Turn on the screen
         self.backlight.power = True
-        if self.saved_screen:
-            self.screen.blit(self.saved_screen, (0, 0))
-            pygame.display.update()
-            self.saved_screen = None
         self.sleep_check_delay = 0.1
         self._set_status_color(NEOPIXEL_READING_COLOR)
         self._sleeping = False
