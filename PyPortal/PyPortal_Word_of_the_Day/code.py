@@ -8,19 +8,13 @@ Each day a new word, its part of speech, and definition
 will appear automatically on the display. Tap the screen to start
 as well as to switch between the word's definition and an example sentence.
 """
+import os
 
 import board
 from adafruit_pyportal import PyPortal
 
-# Get wifi details and more from a secrets.py file
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi settings are kept in settings.py, please add them there!")
-    raise
-
 # Set up where we'll be fetching data from
-DATA_SOURCE = "https://api.wordnik.com/v4/words.json/wordOfTheDay?api_key="+secrets['wordnik_token']
+DATA_SOURCE = "https://api.wordnik.com/v4/words.json/wordOfTheDay?api_key=" + os.getenv("WORDNIK_TOKEN")
 PART_OF_SPEECH = ['definitions', 0, 'partOfSpeech']
 DEF_LOCATION = ['definitions', 0, 'text']
 EXAMPLE_LOCATION = ['examples', 0, 'text']
