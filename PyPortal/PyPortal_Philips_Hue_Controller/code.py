@@ -50,7 +50,7 @@ except:
     username = my_bridge.register_username()
     print(f'ADD THESE VALUES TO settings.toml: \
                             \nBRIDGE_IP = "{ip}" \
-                            \nHUE_USERNAME = "{username}"`)
+                            \nHUE_USERNAME = "{username}"')
     raise
 
 # These pins are used as both analog and digital! XL, XR and YU must be analog
