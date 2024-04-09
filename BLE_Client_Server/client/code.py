@@ -2,6 +2,10 @@
 #
 # SPDX-License-Identifier: MIT
 
+from binascii import unhexlify
+from time import sleep
+
+from micropython import const
 from adafruit_ble import BLERadio
 from adafruit_ble.advertising.standard import ProvideServicesAdvertisement
 from adafruit_ble.services.nordic import UARTService
@@ -9,11 +13,9 @@ from adafruit_bluefruit_connect.packet import Packet
 from adafruit_bluefruit_connect.button_packet import ButtonPacket
 from adafruit_bluefruit_connect.color_packet import ColorPacket
 from neopixel import NeoPixel
-from binascii import unhexlify
 from board import NEOPIXEL, SWITCH
 from adafruit_debouncer import Debouncer
 from digitalio import DigitalInOut, Direction, Pull
-from time import sleep
 import adafruit_fancyled.adafruit_fancyled as fancy
 
 pin = DigitalInOut(SWITCH)  # Set up built-in pushbutton switch
@@ -90,7 +92,7 @@ while True:
             c = color.pack()
             pixels[0] = c
             pixels.show()
-            if color_index == 0 or color_index == 28:
+            if color_index in (0, 28):
                 fade_direction *= -1  # Change direction
             color_index += fade_direction
 
