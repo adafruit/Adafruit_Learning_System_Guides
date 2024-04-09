@@ -9,6 +9,8 @@ https://learn.adafruit.com/pyportal-smart-lighting-controller
 
 Brent Rubell for Adafruit Industries, 2019
 """
+import os
+
 import board
 import displayio
 from adafruit_bitmap_font import bitmap_font
@@ -24,12 +26,10 @@ from adafruit_esp32spi import adafruit_esp32spi_wifimanager
 # import lifx library
 import adafruit_lifx
 
-# Get wifi details and more from a secrets.py file
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
+secrets = {
+  "ssid" : os.getenv("CIRCUITPY_WIFI_SSID"),
+  "password" : os.getenv("CIRCUITPY_WIFI_PASSWORD"),
+}
 
 # ESP32 SPI
 esp32_cs = DigitalInOut(board.ESP_CS)
@@ -47,9 +47,9 @@ ts = adafruit_touchscreen.Touchscreen(board.TOUCH_XL, board.TOUCH_XR,
                                       calibration=((5200, 59000), (5800, 57000)),
                                       size=(320, 240))
 
-# Set this to your LIFX personal access token in secrets.py
+# Set this to your LIFX personal access token in settings.toml
 # (to obtain a token, visit: https://cloud.lifx.com/settings)
-lifx_token = secrets['lifx_token']
+lifx_token = os.getenv("LIFX_TOKEN")
 
 # Initialize the LIFX API Helper
 lifx = adafruit_lifx.LIFX(wifi, lifx_token)
