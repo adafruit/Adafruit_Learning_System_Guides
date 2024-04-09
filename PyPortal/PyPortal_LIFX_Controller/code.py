@@ -26,6 +26,11 @@ from adafruit_esp32spi import adafruit_esp32spi_wifimanager
 # import lifx library
 import adafruit_lifx
 
+secrets = {
+  "ssid" : os.getenv("CIRCUITPY_WIFI_SSID"),
+  "password" : os.getenv("CIRCUITPY_WIFI_PASSWORD"),
+}
+
 # ESP32 SPI
 esp32_cs = DigitalInOut(board.ESP_CS)
 esp32_ready = DigitalInOut(board.ESP_BUSY)
