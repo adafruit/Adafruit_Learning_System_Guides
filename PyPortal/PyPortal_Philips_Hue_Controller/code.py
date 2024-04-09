@@ -7,6 +7,8 @@ PyPortal Philips Hue Lighting Controller
 
 Brent Rubell for Adafruit Industries, 2019
 """
+import os
+
 import board
 import displayio
 from adafruit_bitmap_font import bitmap_font
@@ -21,12 +23,9 @@ from adafruit_esp32spi import adafruit_esp32spi_wifimanager
 # Import Philips Hue Bridge
 from adafruit_hue import Bridge
 
-# Get wifi details and more from a secrets.py file
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
+secrets = dict()
+secrets["ssid"] = os.getenv("CIRCUITPY_WIFI_SSID")
+secrets["password"] = os.getenv("CIRCUITPY_WIFI_PASSWORD")
 
 # ESP32 SPI
 esp32_cs = DigitalInOut(board.ESP_CS)
@@ -39,8 +38,8 @@ wifi = adafruit_esp32spi_wifimanager.ESPSPI_WiFiManager(esp, secrets, status_lig
 
 # Attempt to load bridge username and IP address from secrets.py
 try:
-    username = secrets['hue_username']
-    bridge_ip = secrets['bridge_ip']
+    username = os.getenv("HUE_USERNAME")
+    bridge_ip = os.getenv("BRIDGE_IP")
     my_bridge = Bridge(wifi, bridge_ip, username)
 except:
     # Perform first-time bridge setup
@@ -49,9 +48,9 @@ except:
     ip = my_bridge.discover_bridge()
     print('Attempting to register username, press the link button on your Hue Bridge now!')
     username = my_bridge.register_username()
-    print('ADD THESE VALUES TO SECRETS.PY: \
-                            \n\t"bridge_ip":"{0}", \
-                            \n\t"hue_username":"{1}"'.format(ip, username))
+    print(f'ADD THESE VALUES TO settings.toml: \
+                            \nBRIDGE_IP = "{ip}" \
+                            \nHUE_USERNAME = "{username}"`)
     raise
 
 # These pins are used as both analog and digital! XL, XR and YU must be analog
