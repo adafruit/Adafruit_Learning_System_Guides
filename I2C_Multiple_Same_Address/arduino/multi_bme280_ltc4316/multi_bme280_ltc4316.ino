@@ -20,7 +20,7 @@ void setup() {
   // If left out, the default address is used.
   // But also OK to just be explicit and specify.
   bme1.begin(0x77);  // address = 0x77 (default)
-  bme2.begin(0x37);  // address = 0x37 (behind TCA4316) 
+  bme2.begin(0x37);  // address = 0x37 (behind LTC4316)
 }
 
 
