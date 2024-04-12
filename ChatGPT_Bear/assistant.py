@@ -5,20 +5,21 @@
 import threading
 import os
 import sys
-
-from datetime import datetime, timedelta
-from queue import Queue
 import time
 import random
+import configparser
 from tempfile import NamedTemporaryFile
 
 import azure.cognitiveservices.speech as speechsdk
-import speech_recognition as sr
-import openai
+from openai import OpenAI
 
 import board
 import digitalio
 from adafruit_motorkit import MotorKit
+
+from listener import Listener
+
+API_KEYS_FILE = "~/keys.txt"
 
 # ChatGPT Parameters
 SYSTEM_ROLE = (
@@ -34,7 +35,6 @@ DEVICE_ID = None
 
 # Speech Recognition Parameters
 ENERGY_THRESHOLD = 1000  # Energy level for mic to detect
-PHRASE_TIMEOUT = 3.0  # Space between recordings for sepating phrases
 RECORD_TIMEOUT = 30
 
 # Motor Parameters
@@ -44,32 +44,59 @@ SPEECH_VARIANCE = 0.1  # Higher allows more mouth movement variance.
                        # It pauses for BASE_MOUTH_DURATION ± SPEECH_VARIANCE
 MOTOR_DUTY_CYCLE = 1.0  # Lower provides less power to the motors
 
-# Import keys from environment variables
-openai.api_key = os.environ.get("OPENAI_API_KEY")
-speech_key = os.environ.get("SPEECH_KEY")
-service_region = os.environ.get("SPEECH_REGION")
+# Do some checks and Import API keys from API_KEYS_FILE
+config = configparser.ConfigParser()
 
-if openai.api_key is None or speech_key is None or service_region is None:
-    print(
-        "Please set the OPENAI_API_KEY, SPEECH_KEY, and SPEECH_REGION environment variables first."
-    )
-    sys.exit(1)
+username = os.environ["USER"]
+user_homedir = os.path.expanduser(f"~{username}")
+API_KEYS_FILE = API_KEYS_FILE.replace("~", user_homedir)
+
+def get_config_value(section, key, min_length=None):
+    if not config.has_section(section):
+        print(f"Please make sure API_KEYS_FILE points to a valid file and has an [{section}] section.")
+        sys.exit(1)
+    if key not in config[section]:
+        print(
+            f"Please make sure your API keys file contains an {key} under the {section} section."
+        )
+        sys.exit(1)
+    value = config[section][key]
+    if min_length and len(value) < min_length:
+        print(f"Please set {key} in your API keys file with a valid key.")
+        sys.exit(1)
+    return config[section][key]
+
+print(os.path.expanduser(API_KEYS_FILE))
+config.read(os.path.expanduser(API_KEYS_FILE))
+openai = OpenAI(
+    # This is the default and can be omitted
+    api_key=get_config_value("openai", "OPENAI_API_KEY", 10)
+)
+
+speech_key = get_config_value("azure", "SPEECH_KEY", 15)
+service_region = get_config_value("azure", "SPEECH_REGION")
 
 speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=service_region)
 speech_config.speech_synthesis_voice_name = AZURE_SPEECH_VOICE
 
 
 def sendchat(prompt):
-    completion = openai.ChatCompletion.create(
+    response = ""
+    stream = openai.chat.completions.create(
         model=CHATGPT_MODEL,
         messages=[
             {"role": "system", "content": SYSTEM_ROLE},
             {"role": "user", "content": prompt},
         ],
+        stream=True,
     )
     # Send the heard text to ChatGPT and return the result
-    return completion.choices[0].message.content
+    for chunk in stream:
+        if chunk.choices[0].delta.content is not None:
+            response += chunk.choices[0].delta.content
 
+    # Send the heard text to ChatGPT and return the result
+    return response
 
 def transcribe(wav_data):
     # Read the transcription.
@@ -86,69 +113,6 @@ def transcribe(wav_data):
             time.sleep(3)
         attempts += 1
     return "I wasn't able to understand you. Please repeat that."
-
-
-class Listener:
-    def __init__(self):
-        self.listener_handle = None
-        self.recognizer = sr.Recognizer()
-        self.recognizer.energy_threshold = ENERGY_THRESHOLD
-        self.recognizer.dynamic_energy_threshold = False
-        self.recognizer.pause_threshold = 1
-        self.last_sample = bytes()
-        self.phrase_time = datetime.utcnow()
-        self.phrase_timeout = PHRASE_TIMEOUT
-        self.phrase_complete = False
-        # Thread safe Queue for passing data from the threaded recording callback.
-        self.data_queue = Queue()
-        self.mic_dev_index = None
-
-    def listen(self):
-        if not self.listener_handle:
-            with sr.Microphone() as source:
-                print(source.stream)
-                self.recognizer.adjust_for_ambient_noise(source)
-                audio = self.recognizer.listen(source, timeout=RECORD_TIMEOUT)
-            data = audio.get_raw_data()
-            self.data_queue.put(data)
-
-    def record_callback(self, _, audio: sr.AudioData) -> None:
-        # Grab the raw bytes and push it into the thread safe queue.
-        data = audio.get_raw_data()
-        self.data_queue.put(data)
-
-    def speech_waiting(self):
-        return not self.data_queue.empty()
-
-    def get_speech(self):
-        if self.speech_waiting():
-            return self.data_queue.get()
-        return None
-
-    def get_audio_data(self):
-        now = datetime.utcnow()
-        if self.speech_waiting():
-            self.phrase_complete = False
-            if self.phrase_time and now - self.phrase_time > timedelta(
-                seconds=self.phrase_timeout
-            ):
-                self.last_sample = bytes()
-                self.phrase_complete = True
-            self.phrase_time = now
-
-            # Concatenate our current audio data with the latest audio data.
-            while self.speech_waiting():
-                data = self.get_speech()
-                self.last_sample += data
-
-            # Use AudioData to convert the raw data to wav data.
-            with sr.Microphone() as source:
-                audio_data = sr.AudioData(
-                    self.last_sample, source.SAMPLE_RATE, source.SAMPLE_WIDTH
-                )
-            return audio_data
-
-        return None
 
 
 class Bear:
@@ -234,15 +198,15 @@ class Bear:
             if cancellation_details.reason == speechsdk.CancellationReason.Error:
                 print("Error details: {}".format(cancellation_details.error_details))
 
-
 def main():
-    listener = Listener()
+    listener = Listener(openai.api_key, ENERGY_THRESHOLD, RECORD_TIMEOUT)
     bear = Bear(speech_config)
 
     transcription = [""]
     bear.speak(
         "Hello there! Just give my left foot a squeeze if you would like to get my attention."
     )
+
     while True:
         try:
             # If button is pressed, start listening
@@ -250,25 +214,19 @@ def main():
                 bear.speak("How may I help you?")
                 listener.listen()
 
-            # Pull raw recorded audio from the queue.
             if listener.speech_waiting():
-                audio_data = listener.get_audio_data()
                 bear.speak("Let me think about that")
                 bear.move_arms(hide=True)
-                text = transcribe(audio_data.get_wav_data())
+                text = listener.recognize()
 
                 if text:
-                    if listener.phrase_complete:
-                        transcription.append(text)
-                        print(f"Phrase Complete. Sent '{text}' to ChatGPT.")
-                        chat_response = sendchat(text)
-                        transcription.append(f"> {chat_response}")
-                        print("Got response from ChatGPT. Beginning speech synthesis.")
-                        bear.move_arms(hide=False)
-                        bear.speak(chat_response)
-                    else:
-                        print("Partial Phrase...")
-                        transcription[-1] = text
+                    transcription.append(text)
+                    print(f"Phrase Complete. Sent '{text}' to ChatGPT.")
+                    chat_response = sendchat(text)
+                    transcription.append(f"> {chat_response}")
+                    print("Got response from ChatGPT. Beginning speech synthesis.")
+                    bear.move_arms(hide=False)
+                    bear.speak(chat_response)
 
                 os.system("clear")
                 for line in transcription:
