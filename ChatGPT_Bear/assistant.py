@@ -53,7 +53,8 @@ API_KEYS_FILE = API_KEYS_FILE.replace("~", user_homedir)
 
 def get_config_value(section, key, min_length=None):
     if not config.has_section(section):
-        print(f"Please make sure API_KEYS_FILE points to a valid file and has an [{section}] section.")
+        print("Please make sure API_KEYS_FILE points to "
+              f"a valid file and has an [{section}] section.")
         sys.exit(1)
     if key not in config[section]:
         print(
