@@ -1,0 +1,6 @@
+[openai]
+OPENAI_API_KEY = sk-...
+
+[azure]
+SPEECH_KEY = 4f1d...02a9
+SPEECH_REGION = eastus
