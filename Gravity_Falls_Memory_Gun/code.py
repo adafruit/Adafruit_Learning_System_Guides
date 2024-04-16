@@ -52,7 +52,6 @@ wav_index = 0
 # function to open and play the audio files
 def open_audio(num):
     n = wavs[num]
-    # pylint: disable = consider-using-with
     f = open(n, "rb")
     w = audiocore.WaveFile(f)
     return w
