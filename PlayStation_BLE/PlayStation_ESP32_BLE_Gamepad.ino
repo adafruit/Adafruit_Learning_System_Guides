@@ -1,6 +1,8 @@
+// SPDX-FileCopyrightText: 2024 John Park for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
 /*
  * Feather ESP32 Bluetooth LE gamepad https://github.com/lemmingDev/ESP32-BLE-Gamepad
- * John Park for Adafruit Industries, April 2024
  * Deep sleep with wake on START button press
  * https://randomnerdtutorials.com/esp32-deep-sleep-arduino-ide-wake-up-sources/
 
