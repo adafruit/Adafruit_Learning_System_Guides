@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2022 Dan Halbert for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import board
 import keypad
 import neopixel
