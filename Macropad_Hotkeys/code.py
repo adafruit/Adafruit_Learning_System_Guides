@@ -74,10 +74,10 @@ for key_index in range(12):
                                                 macropad.display.height - 1 -
                                                 (3 - y) * 12),
                              anchor_point=(x / 2, 1.0)))
-rect = Rect(0, 0, macropad.display.width, 12, fill=0xFFFFFF)
+rect = Rect(0, 0, macropad.display.width, 13, fill=0xFFFFFF)
 group.append(rect)
 group.append(label.Label(terminalio.FONT, text='', color=0x000000,
-                         anchored_position=(macropad.display.width//2, -2),
+                         anchored_position=(macropad.display.width//2, 0),
                          anchor_point=(0.5, 0.0)))
 macropad.display.root_group = group
 
