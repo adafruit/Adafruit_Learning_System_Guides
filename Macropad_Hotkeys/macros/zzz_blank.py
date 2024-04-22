@@ -1,5 +1,8 @@
-# MACROPAD Hotkeys: blank screen for idle
-# Contributed by GitHub @vitoni
+# SPDX-FileCopyrightText: 2021 Victor Toni - GitHub @vitoni
+#
+# SPDX-License-Identifier: MIT
+
+# MACROPAD Hotkeys example: blank screen for idle
 
 
 app = {                      # REQUIRED dict, must be named 'app'
