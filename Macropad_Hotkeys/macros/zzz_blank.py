@@ -1,8 +1,8 @@
-# SPDX-FileCopyrightText: 2021 Victor Toni
+# SPDX-FileCopyrightText: 2021 Victor Toni - GitHub @vitoni
 #
 # SPDX-License-Identifier: MIT
 
-# MACROPAD Hotkeys: blank screen for idle
+# MACROPAD Hotkeys example: blank screen for idle
 
 
 app = {                      # REQUIRED dict, must be named 'app'
