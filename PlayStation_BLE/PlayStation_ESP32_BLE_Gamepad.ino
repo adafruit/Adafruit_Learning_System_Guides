@@ -16,15 +16,20 @@
 #include <BleGamepad.h> 
 #include <Adafruit_NeoPixel.h>
 
+#include <esp_wifi.h>
 #include <WiFi.h>
 #include <WiFiClient.h>
 #include <WebServer.h>
 #include <ESPmDNS.h>
 #include <Update.h>
 
+bool web_ota = false;
+
+int sleepSeconds = 30; // how long is it inactive before going to sleep
+
 const char* host = "esp32";
 const char* ssid = "xxxxxxx";  // your WiFi SSID here
-const char* password = "xxxxxxxxx";  // your WiFi password here
+const char* password = "xxxxxxxx";  // your WiFi password here
 WebServer server(80);
 
 /*
@@ -118,7 +123,7 @@ const char* serverIndex =
 #define numOfButtons 12
 // sleep wake button definition (also update line in setup(): 'esp_sleep_enable_ext0_wakeup(GPIO_NUM_4,0);')
 #define BUTTON_PIN_BITMASK 0x10 // start button on RTC GPIO pin 4 which is 0x10 (2^4 in hex)
-RTC_DATA_ATTR int bootCount = 0;
+// RTC_DATA_ATTR int bootCount = 0;
 
 BleGamepad bleGamepad("ItsyController", "Adafruit", 100);  // name, manufacturer, batt level to start
 byte previousButtonStates[numOfButtons];
@@ -133,21 +138,7 @@ byte physicalButtons[numOfButtons] = {  1,  2,  4,  5,  7,  8,  15,  16,  13,  1
 // gampad: O/b0, X/b1, ^/b3, []]/b4, l_trig/b6, r_trig/b7, up/b14 , down/b15 , left/b12 , right/b13, select/b11, start/b10
 
 int last_button_press = millis();
-int sleepTime = 30000;  // how long is it inactive before going to sleep
-
-// void print_wakeup_reason(){
-//   esp_sleep_wakeup_cause_t wakeup_reason;
-//   wakeup_reason = esp_sleep_get_wakeup_cause();
-//   switch(wakeup_reason)
-//   {
-//     case ESP_SLEEP_WAKEUP_EXT0 : Serial.println("Wakeup caused by external signal using RTC_IO"); break;
-//     case ESP_SLEEP_WAKEUP_EXT1 : Serial.println("Wakeup caused by external signal using RTC_CNTL"); break;
-//     case ESP_SLEEP_WAKEUP_TIMER : Serial.println("Wakeup caused by timer"); break;
-//     case ESP_SLEEP_WAKEUP_TOUCHPAD : Serial.println("Wakeup caused by touchpad"); break;
-//     case ESP_SLEEP_WAKEUP_ULP : Serial.println("Wakeup caused by ULP program"); break;
-//     default : Serial.printf("Wakeup was not caused by deep sleep: %d\n",wakeup_reason); break;
-//   }
-// }
+int sleepTime = (sleepSeconds * 1000);  
 
 Adafruit_NeoPixel pixel(1, 0, NEO_GRB + NEO_KHZ800);  // Itsy on-board NeoPixel
 
@@ -172,79 +163,84 @@ void setup()
   pixel.begin();
   pixel.clear();
 
-  // Connect to WiFi network
-  WiFi.begin(ssid, password);
-  Serial.println("");
+  if (web_ota) {
 
-  // Wait for connection for 20 seconds, then move on
-  unsigned long startTime = millis(); // Get the current time
-  while (!(WiFi.status() == WL_CONNECTED) && ((millis() - startTime) < 2000)) {
-    delay(500);
-    Serial.print(".");
-  }
-
-  if (WiFi.status() == WL_CONNECTED) {
-
+    // Connect to WiFi network
+    WiFi.begin(ssid, password);
     Serial.println("");
-    Serial.print("Connected to ");
-    Serial.println(ssid);
-    Serial.print("IP address: ");
-    Serial.println(WiFi.localIP());
 
-    /*use mdns for host name resolution*/
-    if (!MDNS.begin(host)) { //http://esp32.local
-      Serial.println("Error setting up MDNS responder!");
-      while (1) {
-        delay(1000);
-      }
+    // Wait for connection for 20 seconds, then move on
+    unsigned long startTime = millis(); // Get the current time
+    while (!(WiFi.status() == WL_CONNECTED) && ((millis() - startTime) < 2000)) {
+      delay(500);
+      Serial.print(".");
     }
-    Serial.println("mDNS responder started");
-    /*return index page which is stored in serverIndex */
-    server.on("/", HTTP_GET, []() {
-      server.sendHeader("Connection", "close");
-      server.send(200, "text/html", loginIndex);
-    });
-    server.on("/serverIndex", HTTP_GET, []() {
-      server.sendHeader("Connection", "close");
-      server.send(200, "text/html", serverIndex);
-    });
-    /*handling uploading firmware file */
-    server.on("/update", HTTP_POST, []() {
-      server.sendHeader("Connection", "close");
-      server.send(200, "text/plain", (Update.hasError()) ? "FAIL" : "OK");
-      ESP.restart();
-    }, []() {
-      HTTPUpload& upload = server.upload();
-      if (upload.status == UPLOAD_FILE_START) {
-        Serial.printf("Update: %s\n", upload.filename.c_str());
-        if (!Update.begin(UPDATE_SIZE_UNKNOWN)) { //start with max available size
-          Update.printError(Serial);
-        }
-      } else if (upload.status == UPLOAD_FILE_WRITE) {
-        /* flashing firmware to ESP*/
-        if (Update.write(upload.buf, upload.currentSize) != upload.currentSize) {
-          Update.printError(Serial);
-        }
-      } else if (upload.status == UPLOAD_FILE_END) {
-        if (Update.end(true)) { //true to set the size to the current progress
-          Serial.printf("Update Success: %u\nRebooting...\n", upload.totalSize);
-        } else {
-          Update.printError(Serial);
+
+    if (WiFi.status() == WL_CONNECTED) {
+
+      Serial.println("");
+      Serial.print("Connected to ");
+      Serial.println(ssid);
+      Serial.print("IP address: ");
+      Serial.println(WiFi.localIP());
+
+      /*use mdns for host name resolution*/
+      if (!MDNS.begin(host)) { //http://esp32.local
+        Serial.println("Error setting up MDNS responder!");
+        while (1) {
+          delay(1000);
         }
       }
-    });
-    server.begin();
-  }
-  else {
-    Serial.println("");
-    Serial.println("WiFi connection timed out, you may need to update SSID/password. Moving on now.");
+      Serial.println("mDNS responder started");
+      /*return index page which is stored in serverIndex */
+      server.on("/", HTTP_GET, []() {
+        server.sendHeader("Connection", "close");
+        server.send(200, "text/html", loginIndex);
+      });
+      server.on("/serverIndex", HTTP_GET, []() {
+        server.sendHeader("Connection", "close");
+        server.send(200, "text/html", serverIndex);
+      });
+      /*handling uploading firmware file */
+      server.on("/update", HTTP_POST, []() {
+        server.sendHeader("Connection", "close");
+        server.send(200, "text/plain", (Update.hasError()) ? "FAIL" : "OK");
+        ESP.restart();
+      }, []() {
+        HTTPUpload& upload = server.upload();
+        if (upload.status == UPLOAD_FILE_START) {
+          Serial.printf("Update: %s\n", upload.filename.c_str());
+          if (!Update.begin(UPDATE_SIZE_UNKNOWN)) { //start with max available size
+            Update.printError(Serial);
+          }
+        } else if (upload.status == UPLOAD_FILE_WRITE) {
+          /* flashing firmware to ESP*/
+          if (Update.write(upload.buf, upload.currentSize) != upload.currentSize) {
+            Update.printError(Serial);
+          }
+        } else if (upload.status == UPLOAD_FILE_END) {
+          if (Update.end(true)) { //true to set the size to the current progress
+            Serial.printf("Update Success: %u\nRebooting...\n", upload.totalSize);
+          } else {
+            Update.printError(Serial);
+          }
+        }
+      });
+      server.begin();
+    }
+    else {
+      Serial.println("");
+      Serial.println("WiFi connection timed out, you may need to update SSID/password. Moving on now.");
+    }
   }
 }
 
 void loop() 
 {
-  server.handleClient();
-  delay(1);
+  if (web_ota) {
+    server.handleClient();
+    delay(1);
+  }
 
   if (bleGamepad.isConnected()) 
   {
@@ -280,6 +276,10 @@ void loop()
             bleGamepad.sendReport();
         }
       if (millis() - last_button_press > sleepTime) {
+          server.stop();
+          delay(300);
+          esp_wifi_stop();
+          delay(300);
           esp_deep_sleep_start();
         }
     }
