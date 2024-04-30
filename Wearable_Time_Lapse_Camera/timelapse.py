@@ -27,7 +27,7 @@ DEST = "/home/pi/timelapse"  # Destination directory (MUST NOT CONTAIN NUMBERS)
 PREFIX = "img"  # Image prefix (MUST NOT CONTAIN NUMBERS)
 HALT_PIN = board.D21  # Halt button GPIO pin (other end to GND)
 LED_PIN = board.D5  # Status LED pin (v2 Pi cam lacks built-in LED)
-COMMAND = "libcamera-still -n --width {width} --height {height} -q {quality} --thumb none -t 250 -o {outfile}"
+COMMAND = "libcamera-still -n --width {width} --height {height} -q {quality} --thumb none -t 250 -o {outfile}" # pylint: disable=line-too-long
 # COMMAND = "raspistill -n -w {width -h {height} -q {quality} -th none -t 250 -o {outfile}"
 
 def main():
