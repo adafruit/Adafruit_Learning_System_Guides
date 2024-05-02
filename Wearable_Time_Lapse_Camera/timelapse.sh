@@ -1,5 +1,14 @@
 #!/bin/sh
 
+#--------------------------------------------------------------------
+# NOTE !!!!!
+# Do NOT use this script.
+#
+# This is the original script used for the guide. It is out of date
+# and no longer used. It is only here for reference. Use the .py
+# version of the script found in this same repository.
+#--------------------------------------------------------------------
+
 # Timelapse script, because timelapse options in raspistill don't power
 # down the camera between captures. Script also provides a camera busy LED
 # (v2 cameras don't include one) and a system halt button.
