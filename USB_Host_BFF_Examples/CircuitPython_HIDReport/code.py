@@ -30,7 +30,7 @@ while device is None:
 
 device.set_configuration()
 
-print(device.idVendor, device.idProduct, device.manufacturer, device.product, device.serial_number)
+print(f"{device.idVendor:04x}:{device.idProduct:04x}: {device.manufacturer} {device.product}")
 
 # Test to see if the kernel is using the device and detach it.
 if device.is_kernel_driver_active(0):
