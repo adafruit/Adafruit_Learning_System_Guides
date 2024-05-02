@@ -13,7 +13,6 @@ import digitalio
 # Timelapse script, because timelapse options in raspistill don't power
 # down the camera between captures. Script also provides a camera busy LED
 # (v2 cameras don't include one) and a system halt button.
-# 'gpio' command requires WiringPi: sudo apt-get install wiringpi
 # Limitations: if DEST is FAT32 filesystem, max of 65535 files in directory;
 # if DEST is ext4 filesystem, may have performance issues above 10K files.
 # For intervals <2 sec, better just to use raspistill's timelapse feature.
