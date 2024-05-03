@@ -28,7 +28,7 @@ KEY_PINS = (
 
 km = keypad.Keys( KEY_PINS, value_when_pressed=False, pull=True)
 
-audio = audiobusio.I2SOut(board.D1, board.D0, board.D9)
+audio = audiobusio.I2SOut(board.RX, board.TX, board.D9)
 
 mixer = audiomixer.Mixer(voice_count=len(wav_files), sample_rate=22050, channel_count=1,
                          bits_per_sample=16, samples_signed=True)
