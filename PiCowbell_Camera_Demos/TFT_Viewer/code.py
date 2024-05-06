@@ -58,7 +58,12 @@ width = display.width
 height = display.height
 
 #cam.test_pattern = OV7670_TEST_PATTERN_COLOR_BAR_FADE
-bitmap = displayio.Bitmap(cam.width, cam.height, 65535)
+try:
+    bitmap = displayio.Bitmap(cam.width, cam.height, 65535)
+except MemoryError:
+    print("Oops, 240x240 is a little too big, trying 240x176..")
+    cam.size = adafruit_ov5640.OV5640_SIZE_QCIF
+    bitmap = displayio.Bitmap(cam.width, cam.height, 65535)
 print(width, height, cam.width, cam.height)
 if bitmap is None:
     raise SystemExit("Could not allocate a bitmap")
