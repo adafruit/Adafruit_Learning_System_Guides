@@ -35,7 +35,7 @@ def read_data():
         # Read device status
         status = device.read_device_status()
         print("Device Status: {}\n".format(status))
-    except Exception as e: # pylint: disable = bare-except
+    except Exception as e: # pylint: disable = broad-except
         print(f"Error: {e}")
 
 while True:
