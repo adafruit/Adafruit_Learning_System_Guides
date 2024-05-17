@@ -39,13 +39,6 @@ void setup() {
   TB.neopixelPin = PIN_NEOPIXEL;
   TB.neopixelNum = NUM_NEOPIXEL;
   TB.begin();
-  
-  for (int d=0; d < 100; d++) {
-    if (Serial.available() && (Serial.read() == 0xAF)) {
-      selftest = true;
-    }
-    delay(1);
-  }
 }
 
 void loop() {
