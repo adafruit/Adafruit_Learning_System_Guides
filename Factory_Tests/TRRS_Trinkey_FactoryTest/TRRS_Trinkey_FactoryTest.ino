@@ -21,8 +21,6 @@ Adafruit_USBD_HID usb_hid;
 extern Adafruit_TestBed TB;
 uint8_t allpins[] = {PIN_TIP, PIN_RING1, PIN_RING2, PIN_SLEEVE};
 
-
-bool selftest = false;
 bool cableinserted = false;
 bool last_cablestate = false;
 uint32_t last_i2cscan = 0;
@@ -52,40 +50,6 @@ void setup() {
 
 void loop() {
   delay(10); // sample every 10 ms
-
-  if (Serial.available() && (Serial.read() == 0xAF)) {
-    selftest = true;
-  }
-  
-  if (selftest) {
-    Serial.println("TRRS Trinkey self-tester!");
-
-    // check tied pins
-    if (! TB.testpins(PIN_RING1, PIN_RING2, allpins, sizeof(allpins))) return;
-    if (! TB.testpins(PIN_SLEEVE, PIN_TIP, allpins, sizeof(allpins))) return;
-
-    pinMode(PIN_RING1, OUTPUT);
-    digitalWrite(PIN_RING1, LOW);
-    pinMode(PIN_RING1_SWITCH, INPUT_PULLUP);
-    delay(10);
-    if (!digitalRead(PIN_RING1_SWITCH)) {
-      Serial.println("Ring1 switch not floating");
-      return;
-    }
-    pinMode(PIN_TIP, OUTPUT);
-    digitalWrite(PIN_TIP, LOW);
-    pinMode(PIN_TIP_SWITCH, INPUT_PULLUP);
-    delay(10);
-    if (!digitalRead(PIN_TIP_SWITCH)) {
-      Serial.println("Tip switch not floating");
-      return;
-    }
-
-    Serial.println("**TEST OK!**");
-
-    delay(100);
-    return;
-  }
 
   uint8_t keycode[6] = { 0 };
   uint8_t count = 0;
