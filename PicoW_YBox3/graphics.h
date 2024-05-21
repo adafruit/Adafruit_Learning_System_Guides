@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2024 Liz Clark for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
 // Graphics arrays were generated from PNG images using Python and PIL.
 // Each is bit-packed into bytes: background is 1bpp, ball is 4bpp.
 

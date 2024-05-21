@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2024 Liz Clark for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
 // 'ybox3_bmp', 320x162px
 const uint16_t myBitmapybox3_bmp [] PROGMEM = {
   4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 

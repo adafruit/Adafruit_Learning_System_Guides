@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2024 Liz Clark for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
 // 'sunnyDay', 45x32px
 const uint16_t sunnyDay [] PROGMEM = {
   4, 4, 4, 4, 4, 11, 11, 11, 11, 4, 4, 4, 4, 4, 11, 11, 
