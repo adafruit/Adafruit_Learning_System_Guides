@@ -1,9 +1,11 @@
-
-#include "FastLED.h"
-
-// ColorWavesWithPalettes
+// SPDX-FileCopyrightText: 2024 Erin St Blaine for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+//
+// Based on ColorWavesWithPalettes
 // Animated shifting color waves, with several cross-fading color palettes.
 // by Mark Kriegsman, August 2015
+//
 //
 // Color palettes courtesy of cpt-city and its contributors:
 //   http://soliton.vm.bytemark.co.uk/pub/cpt-city/
@@ -11,7 +13,7 @@
 // Color palettes converted for FastLED using "PaletteKnife" v1:
 //   http://fastled.io/tools/paletteknife/
 //
-
+#include "FastLED.h"
 
 #define DATA_PIN  SCL
 #define LED_TYPE    WS2812
