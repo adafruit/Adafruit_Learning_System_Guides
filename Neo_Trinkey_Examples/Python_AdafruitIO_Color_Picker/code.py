@@ -20,8 +20,6 @@ ADAFRUIT_IO_KEY = 'your-aio-key'
 ADAFRUIT_IO_USERNAME = 'your-aio-username'
 
 print("Connecting to Adafruit IO...")
-# Create an instance of the REST client.
-aio = Client(ADAFRUIT_IO_USERNAME, ADAFRUIT_IO_KEY)
 
 # Initialize the serial connection
 ser = serial.Serial(com_port, baud_rate)
