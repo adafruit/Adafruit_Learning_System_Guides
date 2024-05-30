@@ -4,7 +4,7 @@
 
 import time
 import serial
-from Adafruit_IO import Client, MQTTClient
+from Adafruit_IO import MQTTClient
 
 # Configuration
 com_port = 'COM123'  # Adjust this to your COM port
