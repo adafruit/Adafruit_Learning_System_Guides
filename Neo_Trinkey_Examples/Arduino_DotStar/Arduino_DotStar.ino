@@ -4,7 +4,7 @@
 
 #include <Adafruit_DotStar.h>
 
-#define NUMPIXELS 30
+#define NUMPIXELS 64
 Adafruit_DotStar  dotstrip(NUMPIXELS, PIN_DATA, PIN_CLOCK, DOTSTAR_BRG);
 
 void setup() {
