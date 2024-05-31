@@ -4,7 +4,7 @@
 
 #include <Adafruit_NeoPixel.h>
 
-#define NUMPIXELS 30
+#define NUMPIXELS 64
 Adafruit_NeoPixel neostrip(NUMPIXELS, PIN_DATA, NEO_GRB + NEO_KHZ800);
 
 char colorBuffer[9]; // Buffer to hold the incoming color data (0x000000)
