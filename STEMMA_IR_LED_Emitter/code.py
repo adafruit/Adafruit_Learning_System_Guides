@@ -20,7 +20,7 @@ count = 0
 
 while True:
 	#  send IR pulse
-    emitter.transmit(pulseout, [255, 2, 255, 0])
+    encoder.transmit(pulseout, [255, 2, 255, 0])
 	#  increase count
     count += 1
 	#  print to REPL
