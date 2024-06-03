@@ -8,7 +8,7 @@ import audiocore
 import audiobusio
 import audiomixer
 import pwmio
-from digitalio import DigitalInOut, Direction, Pull
+from digitalio import DigitalInOut, Direction
 from adafruit_ticks import ticks_ms, ticks_add, ticks_diff
 from adafruit_motor import servo
 import adafruit_lis3dh
