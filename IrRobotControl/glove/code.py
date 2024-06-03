@@ -33,9 +33,9 @@ sensor = adafruit_lis3dh.LIS3DH_I2C(i2c, address=0x19)
 pulseout = pulseio.PulseOut(board.IR_TX, frequency=38000, duty_cycle=2 ** 15)
 
 # Create an encoder that will take numbers and turn them into IR pulses
-encoder = adafruit_irremote.GenericTransmit(header=[9500, 4500],
-                                            one=[550, 550],
-                                            zero=[550, 1700],
+encoder = adafruit_irremote.GenericTransmit(header=[9000, 4500],
+                                            one=[560, 1700],
+                                            zero=[560, 560],
                                             trail=0)
 
 def log(s):
