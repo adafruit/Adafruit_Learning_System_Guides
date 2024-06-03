@@ -10,9 +10,10 @@ import adafruit_irremote
 # Create a 'PulseOut' to send infrared signals on the IR transmitter @ 38KHz
 pulseout = pulseio.PulseOut(board.D5, frequency=38000, duty_cycle=2**15)
 # Create an encoder that will take numbers and turn them into NEC IR pulses
-emitter = adafruit_irremote.GenericTransmit(
-    header=[9500, 4500], one=[550, 1700], zero=[550, 550], trail=0
-)
+encoder = adafruit_irremote.GenericTransmit(header=[9000, 4500],
+                                            one=[560, 1700],
+                                            zero=[560, 560],
+                                            trail=0)
 
 #  count variable
 count = 0
