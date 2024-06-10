@@ -14,7 +14,7 @@ import keypad
 import adafruit_lis3dh
 
 from rainbowio import colorwheel
-hue = 0
+
 # enable external power pin
 # provides power to the external components
 external_power = DigitalInOut(board.EXTERNAL_POWER)
@@ -24,6 +24,10 @@ external_power.value = True
 # external neopixels
 num_pixels = 24
 pixels = neopixel.NeoPixel(board.EXTERNAL_NEOPIXELS, num_pixels, brightness=0.4, auto_write=True)
+
+delta_hue = 256//num_pixels
+speed = 10  # higher numbers = faster rainbow spinning
+i=0
 
 # external button
 switch = keypad.Keys((board.EXTERNAL_BUTTON,), value_when_pressed=False, pull=True)
@@ -58,7 +62,6 @@ num_colors = len(color_wavs)
 num_shakes = len(shake_wavs)
 wav_index = 0
 
-
 def open_audio(num, wavs):
     n = wavs[num]
     f = open(n, "rb")
@@ -83,7 +86,7 @@ while True:
                     pixels.fill(color['color'])
                 else:
                     pass
-            time.sleep(.7)
+            time.sleep(1)
             pixels.fill((0, 0, 0))
             print('pressed')
         if event.released:
@@ -91,10 +94,9 @@ while True:
     if lis3dh.shake(shake_threshold=12):
         wave, wave_name = open_audio(random.randint(0, num_shakes - 1), shake_wavs)
         audio.play(wave)
-        for i in range(num_pixels):
-            pixels[i] = colorwheel(hue)
-            hue = (hue + 30) % 256
-            print(hue)
-        time.sleep(.7)
+        for l in range(len(pixels)):
+            pixels[l] = colorwheel( int(i*speed + l * delta_hue) % 255  )
+        pixels.show()
+        time.sleep(1)
         pixels.fill((0, 0, 0))
         print('shake')
