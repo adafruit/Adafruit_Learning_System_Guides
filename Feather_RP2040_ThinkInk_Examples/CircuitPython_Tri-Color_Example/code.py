@@ -9,6 +9,7 @@ with the Feather RP2040 ThinkInk'''
 import time
 import board
 import displayio
+import fourwire
 import busio
 import adafruit_ssd1680
 
@@ -20,7 +21,7 @@ epd_cs = board.EPD_CS
 epd_dc = board.EPD_DC
 epd_reset = board.EPD_RESET
 epd_busy = board.EPD_BUSY
-display_bus = displayio.FourWire(
+display_bus = fourwire.FourWire(
     spi, command=epd_dc, chip_select=epd_cs, reset=epd_reset, baudrate=1000000
 )
 time.sleep(1)

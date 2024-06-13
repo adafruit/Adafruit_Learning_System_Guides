@@ -4,6 +4,7 @@
 
 import board
 import displayio
+import fourwire
 import keypad
 from adafruit_st7789 import ST7789
 import adafruit_imageload
@@ -50,7 +51,7 @@ spi = board.SPI()
 tft_cs = board.D7
 tft_dc = board.D5
 
-display_bus = displayio.FourWire(
+display_bus = fourwire.FourWire(
     spi, command=tft_dc, chip_select=tft_cs, reset=board.D6
 )
 

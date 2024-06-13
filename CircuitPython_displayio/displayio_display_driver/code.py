@@ -4,6 +4,7 @@
 
 import board
 import displayio
+import fourwire
 import adafruit_ili9341
 
 # Release any previously configured displays
@@ -17,7 +18,7 @@ tft_cs = board.D10
 tft_dc = board.D9
 
 # Setup the display bus
-display_bus = displayio.FourWire(spi_bus, command=tft_dc, chip_select=tft_cs)
+display_bus = fourwire.FourWire(spi_bus, command=tft_dc, chip_select=tft_cs)
 
 # Setup the Display
 display = adafruit_ili9341.ILI9341(display_bus, width=320, height=240)

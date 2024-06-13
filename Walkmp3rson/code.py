@@ -14,6 +14,7 @@ import audiomp3
 from adafruit_neokey.neokey1x4 import NeoKey1x4
 from adafruit_seesaw import seesaw, rotaryio
 import displayio
+import fourwire
 import terminalio
 from adafruit_display_text import label
 from adafruit_st7789 import ST7789
@@ -29,7 +30,7 @@ spi = board.SPI()
 tft_cs = board.D6
 tft_dc = board.D9
 tft_reset = board.D12
-display_bus = displayio.FourWire(spi, command=tft_dc, chip_select=tft_cs, reset=tft_reset)
+display_bus = fourwire.FourWire(spi, command=tft_dc, chip_select=tft_cs, reset=tft_reset)
 display = ST7789(display_bus, width=320, height=240, rotation=90)
 
 # SD Card setup
