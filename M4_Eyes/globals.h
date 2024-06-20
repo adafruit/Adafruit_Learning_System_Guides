@@ -214,6 +214,9 @@ extern bool            filesystem_change_flag GLOBAL_INIT(true);
 extern void            loadConfig(char *filename);
 extern ImageReturnCode loadEyelid(char *filename, uint8_t *minArray, uint8_t *maxArray, uint8_t init, uint32_t maxRam);
 extern ImageReturnCode loadTexture(char *filename, uint16_t **data, uint16_t *width, uint16_t *height, uint32_t maxRam);
+extern int32_t         getDocInt(StaticJsonDocument<2048> &doc, const char *nm, int32_t def);
+extern int32_t         getDocInt(StaticJsonDocument<2048> &doc, const char *nm, const char *nm2, int32_t def);
+extern int32_t         getDocInt(StaticJsonDocument<2048> &doc, const char *nm, const char *nm2, const char *nm3, int32_t def);
 
 // Functions in memory.cpp
 extern uint32_t        availableRAM(void);
@@ -236,5 +239,13 @@ extern float           screen2map(int in);
 extern float           map2screen(int in);
 
 // Functions in user.cpp
+#include <ArduinoJson.h>          // JSON config file functions
 extern void            user_setup(void);
+extern void            user_setup(StaticJsonDocument<2048> &doc);
 extern void            user_loop(void);
+
+// user callable functions
+extern void eyesWide(bool);
+extern void eyesBlink();
+extern void eyesToCorner(float x, float y, bool immediate);
+extern void eyesNormal();

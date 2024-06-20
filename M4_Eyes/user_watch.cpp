@@ -6,7 +6,7 @@
 // CORRESPONDING LINE IN HeatSensor.cpp MUST ALSO BE ENABLED!
 
 #include "globals.h"
-#include "heatSensor.h"
+#include "HeatSensor.h"
 
 // For heat sensing
 HeatSensor heatSensor;
@@ -29,6 +29,11 @@ void user_setup(void) {
   heatSensor.setup();
 }
 
+// Called once after the processing of the configuration file. This allows
+// user configuration to also be done via the config file.
+void user_setup(StaticJsonDocument<2048> &doc) {
+}
+
 // Called periodically during eye animation. This is invoked in the
 // interval before starting drawing on the last eye (left eye on MONSTER
 // M4SK, sole eye on HalloWing M0) so it won't exacerbate visible tearing
@@ -39,8 +44,7 @@ void user_loop(void) {
   heatSensor.find_focus();
 
   // Set values for the new X and Y.
-  eyeTargetX = heatSensor.x;
-  eyeTargetY = -heatSensor.y;
+  eyesToCorner(heatSensor.x, -heatSensor.y, false);
 }
 
 #endif // 0
