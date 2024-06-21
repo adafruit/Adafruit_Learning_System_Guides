@@ -39,7 +39,8 @@ jobs:
                [[ $changedfile == *.cpp ]] ||
                [[ $changedfile == *.h ]] ||
                [[ $changedfile == *.hpp ]] ||
-               [[ $changedfile == *.ino ]]; then
+               [[ $changedfile == *.ino ]] ||
+               [[ $changedfile == *.yml ]]; then
                 ischanged=true
                 break
             fi
