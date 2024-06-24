@@ -95,7 +95,6 @@ jobs:
         git clone --quiet https://github.com/adafruit/Talkie /home/runner/Arduino/libraries/Talkie
         git clone --quiet https://github.com/Infineon/arduino-optiga-trust-m /home/runner/Arduino/libraries/arduinoOptigaTrustM
         git clone --quiet https://github.com/adafruit/HID /home/runner/Arduino/libraries/HID_Project
-        git clone --quiet https://github.com/microsoft/ArduinoHidForWindows /home/runner/Arduino/libraries/ArduinoHidForWindows
         rm -rf /home/runner/Arduino/libraries/ArduinoHttpClient
         git clone --quiet https://github.com/arduino-libraries/ArduinoHttpClient.git /home/runner/Arduino/libraries/ArduinoHttpClient
 
