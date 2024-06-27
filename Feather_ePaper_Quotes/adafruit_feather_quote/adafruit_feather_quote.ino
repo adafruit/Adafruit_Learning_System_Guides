@@ -21,6 +21,7 @@
  
 #include <Adafruit_GFX.h>    // Core graphics library
 #include <HTTPClient.h>
+#include <WiFi.h>
 #include <ArduinoJson.h>     //https://github.com/bblanchon/ArduinoJson
 #include <Adafruit_EPD.h>
 #include "secrets.h"
@@ -212,7 +213,7 @@ String getURLResponse(String url)
 
 void getQuote(String &quote, String &author)
 {
-  StaticJsonDocument<1024> doc;
+  DynamicJsonDocument doc(1024);
   String url = "https://www.adafruit.com/api/quotes.php";
   String jsonquote = getURLResponse(url);
   if(jsonquote.length() > 0)

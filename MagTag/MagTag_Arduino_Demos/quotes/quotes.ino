@@ -9,6 +9,7 @@
 */
 
 #include <WiFiClientSecure.h>
+#include <WiFi.h>
 #include <ArduinoJson.h>
 #include "Adafruit_ThinkInk.h"
 #include "Adafruit_NeoPixel.h"
