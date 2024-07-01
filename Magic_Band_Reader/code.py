@@ -23,7 +23,7 @@ button.switch_to_input(pull=digitalio.Pull.DOWN)
 audio = audiobusio.I2SOut(bit_clock=board.D24, word_select=board.D25, data=board.A3)
 
 # Make the neopixel object
-pixels = neopixel.NeoPixel(board.D6, 24, brightness=.4)
+pixels = neopixel.NeoPixel(board.D6, 31, brightness=.4)
 
 # Setup the LED animations
 chase = Chase(pixels, speed=0.02, color=GREEN, size=4, spacing=24)
