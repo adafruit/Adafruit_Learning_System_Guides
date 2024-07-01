@@ -339,6 +339,8 @@ class BMP2LED:
                         # Accumulated error vals will all now be 0.0 to <2.0.
                         # Quantizing err into a new uint8 ndarray, all values
                         # will be 0 or 1.
+                        # Convert float values in err to integers
+                        err = [int(min(max(0, e), 255)) for e in err]
                         err_bits = ulab.numpy.array(err, dtype=ulab.numpy.uint8)
                         # Add the 1's back into 'got', increasing the
                         # brightness of certain pixels by 1. Because the max
