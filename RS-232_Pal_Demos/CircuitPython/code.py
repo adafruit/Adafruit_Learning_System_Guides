@@ -3,11 +3,21 @@
 
 import time
 import board
-import busio
 
 # baud rate for your device
 baud = 38400
-uart = busio.UART(board.TX, board.RX, baudrate=baud)
+# Initialize UART for the CH9328
+# check for Raspberry Pi
+# pylint: disable=simplifiable-condition
+if "CE0" and "CE1" in dir(board):
+    import serial
+
+    uart = serial.Serial("/dev/ttyS0", baudrate=baud, timeout=3000)
+# otherwise use busio
+else:
+    import busio
+
+    uart = busio.UART(board.TX, board.RX, baudrate=baud)
 
 print("Enter commands to send to the RS-232 device. Press Ctrl+C to exit.")
 while True:
