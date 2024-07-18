@@ -68,7 +68,7 @@ def key_to_pixel_map(key_number):
 pixels.fill(OFF)  # Begin with pixels off.
 
 # make an encoder
-encoder = rotaryio.IncrementalEncoder(board.A3, board.A4)
+encoder = rotaryio.IncrementalEncoder(board.D24, board.D25)
 last_position = 0
 
 while True:
