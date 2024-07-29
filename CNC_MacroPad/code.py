@@ -9,7 +9,9 @@ import neopixel
 import usb_hid
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keycode import Keycode
+from adafruit_hid.mouse import Mouse
 
+mouse = Mouse(usb_hid.devices)
 # neopixel colors
 RED = (255, 0, 0)
 ORANGE = (255, 127, 0)
@@ -19,23 +21,23 @@ AQUA = (0, 255, 255)
 BLUE = (0, 0, 255)
 PURPLE = (127, 0, 255)
 PINK = (255, 0, 255)
-OFF = (0, 0, 0)
+OFF = (50, 50, 50)
 # axis states selected with keys 9-11
 axis_states = [0, "x", "y", "z"]
 state = axis_states[0]
 # keymap for key matrix
 keymap = {
-    (0): (axis_states[0], [Keycode.HOME], RED), # HOME X/Y
-    (1): (axis_states[0], [Keycode.END], ORANGE), # HOME Z
-    (2): (axis_states[0], (Keycode.HOME, Keycode.END), YELLOW), # HOME ALL
+    (0): (axis_states[0], (Keycode.COMMAND, Keycode.COMMA), BLUE), # SETTINGS
+    (1): (axis_states[0], (Keycode.COMMAND, Keycode.P), ORANGE), # SLICE MODEL
+    (2): (axis_states[0], (Keycode.COMMAND, Keycode.D), RED), # CLEAR BED
 
-    (3): (axis_states[0], (Keycode.SHIFT, Keycode.A), GREEN), # SHORTCUT A
-    (4): (axis_states[0], (Keycode.SHIFT, Keycode.B), AQUA), # SHORTCUT B
-    (5): (axis_states[0], (Keycode.SHIFT, Keycode.C), BLUE), # SHORTCUT C
+    (3): (axis_states[0], [Keycode.T], GREEN), # MOVE
+    (4): (axis_states[0], [Keycode.S], AQUA), # SCALE
+    (5): (axis_states[0], [Keycode.R], BLUE), # ROTATE
 
-    (6): (axis_states[0], [Keycode.TWO], AQUA), # SET STEPS 1MM
-    (7): (axis_states[0], [Keycode.THREE], PURPLE), # SET STEPS 10MM
-    (8): (axis_states[0], [Keycode.FOUR], PINK), # SET STEPS 100MM
+    (6): (axis_states[0], [Keycode.M], AQUA), # MIRROR
+    (7): (axis_states[0], [Keycode.E], PURPLE), # SUPPORT BLOCKERS
+    (8): (axis_states[0], [Keycode.I], PINK), # TABS
 
     (9): (axis_states[1], None, RED), # SET X-AXIS STATE
     (10): (axis_states[2], None, GREEN), # SET Y-AXIS STATE
@@ -45,7 +47,7 @@ keymap = {
 encoder_map = {
     ("x"): ([Keycode.RIGHT_ARROW], [Keycode.LEFT_ARROW]),
     ("y"): ([Keycode.UP_ARROW], [Keycode.DOWN_ARROW]),
-    ("z"): ([Keycode.W], [Keycode.S]),
+    # ("z"): ([Keycode.W], [Keycode.S]),
 }
 # make a keyboard
 kbd = Keyboard(usb_hid.devices)
@@ -88,7 +90,7 @@ while True:
                 kbd.press(*encoder_map[state][0])
             # ..and state is z:
             if state is axis_states[3]:
-                kbd.press(*encoder_map[state][0])
+                mouse.move(wheel=-1)
         # ..and it decreases..
         if position < last_position:
             # ..and state is x:
@@ -99,7 +101,7 @@ while True:
                 kbd.press(*encoder_map[state][1])
             # ..and state is z:
             if state is axis_states[3]:
-                kbd.press(*encoder_map[state][1])
+                mouse.move(wheel=1)
         # print(position)
         # release all keys
         kbd.release_all()
