@@ -35,7 +35,7 @@ group = displayio.Group()
 font = bitmap_font.load_font("/Helvetica-Bold-16.pcf")
 blinka_bitmap = displayio.OnDiskBitmap("/cpday_tft.bmp")
 blinka_grid = displayio.TileGrid(blinka_bitmap, pixel_shader=blinka_bitmap.pixel_shader)
-scrolling_label = bitmap_label.Label(font, text=" ", y=display.height - 15)
+scrolling_label = bitmap_label.Label(font, text=" ", y=display.height - 13)
 
 group.append(blinka_grid)
 group.append(scrolling_label)
