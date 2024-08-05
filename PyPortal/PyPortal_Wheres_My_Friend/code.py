@@ -75,7 +75,8 @@ def set_image(image_group, filename):
     image_file = open(filename, "rb")
     image = displayio.OnDiskBitmap(image_file)
     image_sprite = displayio.TileGrid(image,
-                                      pixel_shader=getattr(image, 'pixel_shader', displayio.ColorConverter()))
+                                      pixel_shader=getattr(image, 'pixel_shader',
+                                      displayio.ColorConverter()))
     image_sprite.x = IMAGE_SPRITE_X
     image_sprite.y = IMAGE_SPRITE_Y
     image_group.append(image_sprite)
