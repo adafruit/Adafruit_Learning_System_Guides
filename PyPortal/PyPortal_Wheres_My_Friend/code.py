@@ -5,7 +5,6 @@ import time
 import board
 import displayio
 import terminalio
-import adafruit_imageload
 from adafruit_display_shapes.rect import Rect
 from adafruit_display_text import label
 from adafruit_pyportal import PyPortal
@@ -17,7 +16,8 @@ SLEEP_DELAY_SECONDS = 5
 # Set the backlight brightness, 0.0 (off) to 1.0 (max brightness)
 BACKLIGHT_BRIGHTNESS = 0.5
 # Location text and images
-LOCATION_IMAGES = { 'home': 'images/home.bmp', 'work': 'images/office.bmp', 'gym': 'images/workout.bmp', 'commute': 'images/subway.bmp' }
+LOCATION_IMAGES = { 'home': 'images/home.bmp', 'work': 'images/office.bmp',
+                    'gym': 'images/workout.bmp', 'commute': 'images/subway.bmp' }
 
 # Create the PyPortal object
 pyportal = PyPortal(status_neopixel=board.NEOPIXEL)
@@ -72,16 +72,10 @@ def set_image(group, filename):
     if group:
         group.pop()
 
-    if not filename:
-        return  # we're done, no icon desired
-    try:
-        if image_file:
-            image_file.close
-    except NameError:
-        pass
     image_file = open(filename, "rb")
     image = displayio.OnDiskBitmap(image_file)
-    image_sprite = displayio.TileGrid(image, pixel_shader=getattr(image, 'pixel_shader', displayio.ColorConverter()))
+    image_sprite = displayio.TileGrid(image,
+                                      pixel_shader=getattr(image, 'pixel_shader', displayio.ColorConverter()))
     image_sprite.x = IMAGE_SPRITE_X
     image_sprite.y = IMAGE_SPRITE_Y
     group.append(image_sprite)
@@ -114,8 +108,8 @@ while True:
             text_area_location.text=f"Error: Unknown Value!"
             # Show the refreshed group
             display.root_group = group
-    except Exception as e:
-        print(f"Failed to fetch location data: {e}")
+    except RuntimeError as e:
+        print("Failed to fetch location data: ", e)
 
     # Wait 5 minutes (300 seconds) before fetching the location feed again
     print("Sleeping, fetching the location again in 5 minutes!")
