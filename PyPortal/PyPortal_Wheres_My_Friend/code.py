@@ -35,7 +35,7 @@ TEXT_AREA_LOCATION_Y = display.height - 20
 IMAGE_SPRITE_X = (display.width // 3) - 10
 IMAGE_SPRITE_Y = display.height // 5
 
-# Create a displayIO Group 
+# Create a displayIO Group
 group = displayio.Group()
 
 # Draw the background
@@ -66,11 +66,11 @@ group.append(icon_group)
 # Show the group
 display.root_group = group
 
-def set_image(group, filename):
+def set_image(image_group, filename):
     """Sets the image file for a given group for display."""
     print(f"Set image to {filename}")
-    if group:
-        group.pop()
+    if image_group:
+        image_group.pop()
 
     image_file = open(filename, "rb")
     image = displayio.OnDiskBitmap(image_file)
@@ -78,7 +78,7 @@ def set_image(group, filename):
                                       pixel_shader=getattr(image, 'pixel_shader', displayio.ColorConverter()))
     image_sprite.x = IMAGE_SPRITE_X
     image_sprite.y = IMAGE_SPRITE_Y
-    group.append(image_sprite)
+    image_group.append(image_sprite)
 
 prv_location = None
 while True:
@@ -105,7 +105,7 @@ while True:
         else:
             print("Location not found in images!")
             # Update the location text
-            text_area_location.text=f"Error: Unknown Value!"
+            text_area_location.text="Error: Unknown Value!"
             # Show the refreshed group
             display.root_group = group
     except RuntimeError as e:
