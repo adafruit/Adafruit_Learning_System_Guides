@@ -11,8 +11,8 @@ from adafruit_pyportal import PyPortal
 
 # Adafruit IO shared feed key
 IO_FEED_KEY = 'location'
-# Fetch the location every 5 seconds
-SLEEP_DELAY_SECONDS = 5
+# Fetch the location every 5 minutes
+SLEEP_DELAY_MINUTES = 5
 # Set the backlight brightness, 0.0 (off) to 1.0 (max brightness)
 BACKLIGHT_BRIGHTNESS = 0.5
 # Location text and images
@@ -54,7 +54,7 @@ text_area.y = TEXT_AREA_Y
 group.append(text_area)
 
 # Draw a label for the location text
-text_area_location = label.Label(font, text="@ home", color=0x000000, scale=3)
+text_area_location = label.Label(font, text="", color=0x000000, scale=3)
 text_area_location.x = TEXT_AREA_LOCATION_X
 text_area_location.y = TEXT_AREA_LOCATION_Y
 group.append(text_area_location)
@@ -106,7 +106,7 @@ while True:
         else:
             print("Location not found in images!")
             # Update the location text
-            text_area_location.text="Error: Unknown Value!"
+            text_area_location.text="@ unknown"
             # Show the refreshed group
             display.root_group = group
     except RuntimeError as e:
@@ -114,4 +114,4 @@ while True:
 
     # Wait 5 minutes (300 seconds) before fetching the location feed again
     print("Sleeping, fetching the location again in 5 minutes!")
-    time.sleep(SLEEP_DELAY_SECONDS * 60)
+    time.sleep(SLEEP_DELAY_MINUTES * 60)
