@@ -48,8 +48,8 @@ pool = socketpool.SocketPool(wifi.radio)
 # Initialize a new MQTT Client object
 mqtt_client = MQTT.MQTT(
     broker="io.adafruit.com",
-    username=os.getenv("ADAFRUIT_IO_USERNAME"),
-    password=os.getenv("ADAFRUIT_IO_KEY"),
+    username=os.getenv("ADAFRUIT_AIO_USERNAME"),
+    password=os.getenv("ADAFRUIT_AIO_KEY"),
     socket_pool=pool,
     ssl_context=ssl.create_default_context(),
 )
