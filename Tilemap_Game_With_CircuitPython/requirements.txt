@@ -1,2 +1,2 @@
-adafruit_display_text
-adafruit_imageload
+adafruit-circuitpython-display-text
+adafruit-circuitpython-imageload
