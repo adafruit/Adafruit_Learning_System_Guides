@@ -28,7 +28,7 @@ display.rotation = 0
 display.brightness = BACKLIGHT_BRIGHTNESS
 
 # Display label and image coordinates
-TEXT_AREA_X = display.width // 14
+TEXT_AREA_X = display.width // 6
 TEXT_AREA_Y = 20
 TEXT_AREA_LOCATION_X = display.width // 3
 TEXT_AREA_LOCATION_Y = display.height - 20
@@ -48,7 +48,7 @@ group.append(bg_group)
 font = terminalio.FONT
 
 # Draw a label for the header text
-text_area = label.Label(font, text="Where is Trevor?", color=0x000000, scale=3)
+text_area = label.Label(font, text="Where's My Friend?", color=0x000000, scale=2)
 text_area.x = TEXT_AREA_X
 text_area.y = TEXT_AREA_Y
 group.append(text_area)
