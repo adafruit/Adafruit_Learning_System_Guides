@@ -25,9 +25,9 @@ timezone = "GB"
 # The time of the thing!
 EVENT_YEAR = 2024
 EVENT_MONTH = 8
-EVENT_DAY = 6 # 16
-EVENT_HOUR = 13 # 0
-EVENT_MINUTE = 11 # 0
+EVENT_DAY = 16
+EVENT_HOUR = 0
+EVENT_MINUTE = 0
 # we'll make a python-friendly structure
 event_time = time.struct_time((EVENT_YEAR, EVENT_MONTH, EVENT_DAY,
                                EVENT_HOUR, EVENT_MINUTE, 0,  # we don't track seconds
@@ -95,9 +95,11 @@ while True:
             finished = True
             if not first_run and days_remaining == 0:
                 scrolling_label.text = "It's CircuitPython Day 2024! The snakiest day of the year!"
-                # Check for the moment of the event to trigger a NASA snake launch
-                if not triggered and (hours_remaining==0 and mins_remaining == 0 and secs_remaining <= 0):
-                    # send a signal to an adafruit IO feed, maybe firing off an email or text message
+                # Check for the moment of the event to trigger something (a NASA snake launch)
+                if not triggered and (
+                    hours_remaining==0 and mins_remaining == 0 and secs_remaining <= 0
+                ):
+                    # send a signal to an adafruit IO feed, where an Action is listening
                     print("Launch the snakes!")
                     triggered = True
                     io.send_data("cpday-countdown", "Launch the snakes!")
