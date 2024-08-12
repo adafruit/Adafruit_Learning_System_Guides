@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2024 Liz Clark for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import os
 import time
 import wifi
@@ -6,11 +10,6 @@ import displayio
 import microcontroller
 import adafruit_connection_manager
 import adafruit_requests
-
-## Import either NeoPixel or DotStar, depending on your hardware
-# import neopixel
-from adafruit_dotstar import DotStar
-
 from adafruit_io.adafruit_io import IO_HTTP
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text import bitmap_label
@@ -18,7 +17,7 @@ from adafruit_ticks import ticks_ms, ticks_add, ticks_diff
 
 ## See TZ Identifier column at https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 ## If you want to set the timezone, you can do so with the following line:
-timezone = "GB"
+timezone = "GB"  # Set timezone for UK developers ;)
 # timezone = None  # Or instead rely on automatic timezone detection based on IP Address
 
 
