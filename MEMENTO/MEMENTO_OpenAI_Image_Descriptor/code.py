@@ -65,7 +65,7 @@ def send_img(img, prompt):
       "Authorization": f"Bearer {openai_api_key}"
     }
     payload = {
-      "model": "gpt-4-vision-preview",
+      "model": "gpt-4-turbo",
       "messages": [
         {
           "role": "user",
