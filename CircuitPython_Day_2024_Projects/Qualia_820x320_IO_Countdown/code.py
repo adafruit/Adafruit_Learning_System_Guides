@@ -16,17 +16,17 @@ from adafruit_display_text import bitmap_label
 from adafruit_ticks import ticks_ms, ticks_add, ticks_diff
 
 ## See TZ Identifier column at https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
-## If you want to set the timezone, you can do so with the following line:
-timezone = "GB"  # Set timezone for UK developers ;)
+## If you want to set the timezone, you can do so with the following:
+timezone = os.getenv("ADAFRUIT_AIO_TIMEZONE", "America/New_York")  # Fetch timezone from settings.toml or default to EST
 # timezone = None  # Or instead rely on automatic timezone detection based on IP Address
 
 
 ## The time of the thing!
 EVENT_YEAR = 2024
 EVENT_MONTH = 8
-EVENT_DAY = 11  # 16
-EVENT_HOUR = 10  # 0
-EVENT_MINUTE = 28  # 0
+EVENT_DAY = 16
+EVENT_HOUR = 0
+EVENT_MINUTE = 0
 ## we'll make a python-friendly structure
 event_time = time.struct_time(
     (
@@ -82,9 +82,7 @@ else:
     PIXEL_SHADER = blinka_bitmap.pixel_shader
 group = displayio.Group()
 font = bitmap_font.load_font(FONT_FILE)
-# blinka_bitmap = displayio.OnDiskBitmap(BITMAP_FILE)
 blinka_grid = displayio.TileGrid(blinka_bitmap, pixel_shader=blinka_bitmap.pixel_shader)
-# blinka_grid.y = -100
 scrolling_label = bitmap_label.Label(font, text=" ", y=display.height - FONT_Y_OFFSET)
 
 group.append(blinka_grid)
@@ -156,11 +154,8 @@ while True:
             remaining //= 24
             days_remaining = remaining
         if not finished or (finished and days_remaining < 0):
-            # Remove 1 from days_remaining to count from end of day instead of start
+            # Add 1 to negative days_remaining to count from end of day instead of start
             if days_remaining < 0:
-                print(
-                    f"Event time in past: Adding 1 to days_remaining ({days_remaining}) to count from end of day"
-                )
                 days_remaining += 1
             # Update the display with current countdown value
             scrolling_label.text = (

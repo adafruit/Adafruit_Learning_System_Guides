@@ -2,15 +2,13 @@
 #
 # SPDX-License-Identifier: MIT
 
+# pylint: disable=import-outside-toplevel, line-too-long
 def setup_display():
     # Code taken from Adafruit Qualia ESP32-S3 for RGB-666 Displays Learn Guide - Rectangle Bar 3.2" display
     # https://learn.adafruit.com/adafruit-qualia-esp32-s3-for-rgb666-displays/qualia-rgb666-with-tl032fwv01-3-2-320x820-bar-display
     from displayio import release_displays
     release_displays()
 
-    import random
-    import displayio
-    import time
     import busio
     import board
     import dotclockframebuffer
