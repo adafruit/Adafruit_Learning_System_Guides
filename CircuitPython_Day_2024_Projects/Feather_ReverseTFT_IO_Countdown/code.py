@@ -11,6 +11,11 @@ import displayio
 import microcontroller
 import adafruit_connection_manager
 import adafruit_requests
+
+## Import either NeoPixel or DotStar, depending on your hardware
+# import neopixel
+from adafruit_dotstar import DotStar
+
 from adafruit_io.adafruit_io import IO_HTTP
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text import bitmap_label
@@ -22,28 +27,42 @@ timezone = "GB"
 #timezone = None  # Or instead rely on automatic timezone detection based on IP Address
 
 
-# The time of the thing!
+## The time of the thing!
 EVENT_YEAR = 2024
 EVENT_MONTH = 8
 EVENT_DAY = 16
 EVENT_HOUR = 0
 EVENT_MINUTE = 0
-# we'll make a python-friendly structure
+## we'll make a python-friendly structure
 event_time = time.struct_time((EVENT_YEAR, EVENT_MONTH, EVENT_DAY,
                                EVENT_HOUR, EVENT_MINUTE, 0,  # we don't track seconds
                                -1, -1, False))  # we dont know day of week/year or DST
 
 wifi.radio.connect(os.getenv("CIRCUITPY_WIFI_SSID"), os.getenv("CIRCUITPY_WIFI_PASSWORD"))
 
-# Initialize a requests session using the newer connection manager
-# See https://adafruit-playground.com/u/justmobilize/pages/adafruit-connection-manager
+## Initialize a requests session using the newer connection manager
+## See https://adafruit-playground.com/u/justmobilize/pages/adafruit-connection-manager
 pool = adafruit_connection_manager.get_radio_socketpool(wifi.radio)
 ssl_context = adafruit_connection_manager.get_radio_ssl_context(wifi.radio)
 requests = adafruit_requests.Session(pool, ssl_context)
 
-# Create an instance of the Adafruit IO HTTP client
+## Create an instance of the Adafruit IO HTTP client
 io = IO_HTTP(os.getenv("ADAFRUIT_AIO_USERNAME"), os.getenv("ADAFRUIT_AIO_KEY"), requests)
 
+## Setup RGB LEDs - comment out the DotStar import and setup if using NeoPixel
+pixels_length = 1  # Set to the number of pixels in your strip (funhouse has 5)
+pixels_brightness = 0.4  # Set to a value between 0.0 and 1.0
+# Uncomment the following lines if you are using DotStar and update pins if necessary
+dotstar_clock_pin = board.DOTSTAR_CLOCK
+dotstar_data_pin = board.DOTSTAR_DATA
+pixels = DotStar(dotstar_clock_pin, dotstar_data_pin, pixels_length, brightness=pixels_brightness)
+## Uncomment the following lines if you are using NeoPixel and update pin if necessary
+# neopixel_pin = board.NEOPIXEL
+# pixels = neopixel.NeoPixel(neopixel_pin, pixels_length, brightness=pixels_brightness)
+
+pixels.fill((0, 0, 0))  # Turn off all pixels
+
+# Setup built-in display
 display = board.DISPLAY
 group = displayio.Group()
 font = bitmap_font.load_font("/Helvetica-Bold-16.pcf")
@@ -95,6 +114,12 @@ while True:
             finished = True
             if not first_run and days_remaining == 0:
                 scrolling_label.text = "It's CircuitPython Day 2024! The snakiest day of the year!"
+                # Flash on/off blinka colours (nice purple) each second
+                if pixels[0] == (0, 0, 0):
+                    pixels.fill((0x40, 0x00, 0x80))
+                else:
+                    pixels.fill((0, 0, 0))
+
                 # Check for the moment of the event to trigger something (a NASA snake launch)
                 if not triggered and (
                     hours_remaining==0 and mins_remaining == 0 and secs_remaining <= 0
@@ -103,6 +128,8 @@ while True:
                     print("Launch the snakes!")
                     triggered = True
                     io.send_data("cpday-countdown", "Launch the snakes!")
+            else:
+                pixels.fill((0, 0, 0))  # Turn off all pixels
         else:
             secs_remaining = remaining % 60
             remaining //= 60
@@ -111,6 +138,7 @@ while True:
             hours_remaining = remaining % 24
             remaining //= 24
             days_remaining = remaining
+            pixels.fill((0, 0, 0))  # Turn off all pixels
         if not finished or (finished and days_remaining < 0):
             scrolling_label.text = (f"{days_remaining} DAYS, {hours_remaining} HOURS," +
                                 f"{mins_remaining} MINUTES & {secs_remaining} SECONDS")
