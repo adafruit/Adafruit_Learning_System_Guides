@@ -16,9 +16,11 @@ from adafruit_display_text import bitmap_label
 from adafruit_ticks import ticks_ms, ticks_add, ticks_diff
 
 ## See TZ Identifier column at https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
-## If you want to set the timezone, you can do so with the following:
-timezone = os.getenv("ADAFRUIT_AIO_TIMEZONE", "America/New_York")  # Fetch timezone from settings.toml or default to EST
-# timezone = None  # Or instead rely on automatic timezone detection based on IP Address
+## If you want to set the timezone, you can do so with the following code, which
+## attempts to get timezone from settings.toml or defaults to New York
+timezone = os.getenv("ADAFRUIT_AIO_TIMEZONE", "America/New_York")
+## Or instead rely on automatic timezone detection based on IP Address
+# timezone = None
 
 
 ## The time of the thing!
