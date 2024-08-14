@@ -8,7 +8,7 @@ import time
 import wifi
 import board
 import displayio
-import microcontroller
+import supervisor
 import adafruit_connection_manager
 import adafruit_requests
 from adafruit_io.adafruit_io import IO_HTTP
@@ -113,9 +113,13 @@ while True:
             total_seconds = time.mktime(now)
             refresh_clock = ticks_add(refresh_clock, refresh_timer)
         except Exception as e:  # pylint: disable=broad-except
-            print("Some error occured, retrying via reset in 15seconds! -", e)
-            time.sleep(15)
-            microcontroller.reset()
+            print("Some error occured, retrying via supervisor.reload in 5seconds! -", e)
+            time.sleep(5)
+            # Normally calling microcontroller.reset() would be the way to go, but due to
+            # a bug causing a reset into tinyUF2 bootloader mode we're instead going to
+            # disconnect wifi to ensure fresh connection + use supervisor.reload()
+            wifi.radio.enabled = False
+            supervisor.reload()
 
     if ticks_diff(ticks_ms(), clock_clock) >= clock_timer:
         remaining = time.mktime(event_time) - total_seconds
