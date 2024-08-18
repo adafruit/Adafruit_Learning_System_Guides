@@ -13,11 +13,13 @@ import socketpool
 import wifi
 import displayio
 import adafruit_ntp
+import adafruit_connection_manager
 from adafruit_display_text import bitmap_label,  wrap_text_to_lines
 from adafruit_bitmap_font import bitmap_font
 from adafruit_azureiot import IoTCentralDevice
 import adafruit_bme680
-from adafruit_lc709203f import LC709203F, PackSize
+import adafruit_max1704x
+#from adafruit_lc709203f import LC709203F, PackSize
 
 
 # Get wifi details and more from a secrets.py file
@@ -33,7 +35,8 @@ wifi.radio.connect(secrets["ssid"], secrets["password"])
 print("Connected to WiFi!")
 
 #  ntp clock - update tz_offset to your timezone
-pool = socketpool.SocketPool(wifi.radio)
+pool = adafruit_connection_manager.get_radio_socketpool(wifi.radio)
+ssl_context = adafruit_connection_manager.get_radio_ssl_context(wifi.radio)
 ntp = adafruit_ntp.NTP(pool, tz_offset=-4)
 rtc.RTC().datetime = ntp.datetime
 
@@ -97,7 +100,7 @@ bme680.sea_level_pressure = 1013.25
 esp = None
 pool = socketpool.SocketPool(wifi.radio)
 device = IoTCentralDevice(
-    pool, esp, secrets["id_scope"], secrets["device_id"], secrets["device_primary_key"]
+    pool, ssl_context, secrets["id_scope"], secrets["device_id"], secrets["device_primary_key"]
 )
 
 print("Connecting to Azure IoT Central...")
@@ -108,12 +111,13 @@ print("Connected to Azure IoT Central!")
 temperature_offset = -5
 
 # Create sensor object, using the board's default I2C bus.
-battery_monitor = LC709203F(i2c)
+#battery_monitor = LC709203F(i2c)
+battery_monitor = adafruit_max1704x.MAX17048(board.I2C())
 
 # Update to match the mAh of your battery for more accurate readings.
 # Can be MAH100, MAH200, MAH400, MAH500, MAH1000, MAH2000, MAH3000.
 # Choose the closest match. Include "PackSize." before it, as shown.
-battery_monitor.pack_size = PackSize.MAH2000
+#battery_monitor.pack_size = PackSize.MAH2000
 
 temp = int((bme680.temperature * 9/5) + (32 + temperature_offset))
 humidity = int(bme680.relative_humidity)
@@ -161,20 +165,20 @@ feather_clock = 30
 
 while True:
     try:
-		#  read BME sensor
+        #  read BME sensor
         temp = int((bme680.temperature * 9/5) + (32 + temperature_offset))
         humidity = int(bme680.relative_humidity)
         pressure = int(bme680.pressure)
-		#  log battery %
+        #  log battery %
         battery = battery_monitor.cell_percent
-		#  map range of battery charge to rectangle size on screen
+        #  map range of battery charge to rectangle size on screen
         battery_display = round(simpleio.map_range(battery, 0, 100, 0, 22))
-		#  update rectangle to reflect battery charge
+        #  update rectangle to reflect battery charge
         rect.width = int(battery_display)
-		#  if below 20%, change rectangle color to red
+        #  if below 20%, change rectangle color to red
         if battery_monitor.cell_percent < 20:
             rect.color_index = 1
-		#  when the azure clock runs out
+        #  when the azure clock runs out
         if azure_clock > 500:
             print("getting ntp date/time")
             cal = ntp.datetime
@@ -185,7 +189,7 @@ while True:
             minute = cal[4]
             time.sleep(2)
             print("getting msg")
-			#  pack message
+            #  pack message
             message = {"Temperature": temp,
                        "Humidity": humidity,
                        "Pressure": pressure,
@@ -199,29 +203,30 @@ while True:
             print("updating time text")
             time_text.text="\n".join(wrap_text_to_lines
             ("Data sent on %s/%s/%s at %s" % (mon,day,year,clock_view), 20))
-			#  reset azure clock
+            #  reset azure clock
             azure_clock = 0
-		#  when the feather clock runs out
+        #  when the feather clock runs out
         if feather_clock > 30:
             print("updating screen")
             temp_text.text = "%0.1f° F" % temp
             humid_text.text = "%0.1f %%" % humidity
             press_text.text = "%0.2f" % pressure
-			#  reset feather clock
+            #  reset feather clock
             feather_clock = 0
-		#  if no clocks are running out
-		#  increase counts by 1
+        #  if no clocks are running out
+        #  increase counts by 1
         else:
             feather_clock += 1
             azure_clock += 1
-		#  ping azure
+        #  ping azure
         device.loop()
-	#  if something disrupts the loop, reconnect
+    #  if something disrupts the loop, reconnect
     # pylint: disable=broad-except
     except (ValueError, RuntimeError, OSError, ConnectionError) as e:
         print("Network error, reconnecting\n", str(e))
         supervisor.reload()
         continue
-	#  delay
+    #  delay
     time.sleep(1)
     print(azure_clock)
+
