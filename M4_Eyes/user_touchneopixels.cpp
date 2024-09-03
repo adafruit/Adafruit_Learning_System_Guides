@@ -247,7 +247,9 @@ void user_setup(void) {
 
 // Called once after the processing of the configuration file. This allows
 // user configuration to also be done based on the config file.
-#include <ArduinoJson.h>          // JSON config file functions
+#define ARDUINOJSON_ENABLE_COMMENTS 1   // ARDUINOJSON_ENABLE_COMMENTS must be set to 1 before including the library.
+                                        // The same value of ARDUINOJSON_ENABLE_COMMENTS must be set in each compilation unit.
+#include <ArduinoJson.h>                // JSON config file functions
 void user_setup(StaticJsonDocument<2048> &doc) {
 }
 
@@ -258,7 +260,7 @@ void user_loop(void) {
     uint8_t pressed_buttons = arcada.readButtons();
     uint8_t justpressed_buttons = arcada.justPressedButtons();
     
-    if (justpressed_buttons & ARCADA_BUTTONMASK_UP){
+    if(justpressed_buttons & ARCADA_BUTTONMASK_UP){
       changeBehavior(0, elapsedSince);
     }
     else if(justpressed_buttons & ARCADA_BUTTONMASK_DOWN) {
@@ -272,7 +274,7 @@ void user_loop(void) {
     }
   }
     
-  if (elapsedSince - lastWave > SAMPLE_TIME) {
+  if(elapsedSince - lastWave > SAMPLE_TIME) {
     lastWave = elapsedSince;
     switch (currentBehavior) {
       case 0:
@@ -293,7 +295,7 @@ void user_loop(void) {
         break;
     }
 
-    if ((elapsedSince - lastBehaviorChange) > (SAMPLE_TIME * 1000)) {
+    if((elapsedSince - lastBehaviorChange) > (SAMPLE_TIME * 1000)) {
       lastBehaviorChange = elapsedSince;
       currentBehavior++;
       currentBehavior %= 4;

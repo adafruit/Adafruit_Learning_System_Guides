@@ -40,12 +40,14 @@ void user_setup(void) {
 
 // Called once after the processing of the configuration file. This allows
 // user configuration to also be done based on the config file.
-#include <ArduinoJson.h>          // JSON config file functions
+#define ARDUINOJSON_ENABLE_COMMENTS 1   // ARDUINOJSON_ENABLE_COMMENTS must be set to 1 before including the library.
+                                        // The same value of ARDUINOJSON_ENABLE_COMMENTS must be set in each compilation unit.
+#include <ArduinoJson.h>                // JSON config file functions
 void user_setup(StaticJsonDocument<2048> &doc) {
 }
 
 void user_loop(void) {
-  if ( !usb_hid.ready() ) {
+  if( !usb_hid.ready() ) {
     Serial.println("not ready");
     return;
   }
@@ -53,23 +55,23 @@ void user_loop(void) {
   uint8_t keycode[6] = { 0 };
 
   uint32_t buttonState = arcada.readButtons();
-  if (buttonState & ARCADA_BUTTONMASK_UP) {
+  if(buttonState & ARCADA_BUTTONMASK_UP) {
     Serial.println("Up");
     keycode[0] = UP_BUTTON_KEYCODE_TO_SEND;
   }
-  if (buttonState & ARCADA_BUTTONMASK_A) {
+  if(buttonState & ARCADA_BUTTONMASK_A) {
     Serial.println("A");
     keycode[1] = A_BUTTON_KEYCODE_TO_SEND;
   }
-  if (buttonState & ARCADA_BUTTONMASK_DOWN) {
+  if(buttonState & ARCADA_BUTTONMASK_DOWN) {
     Serial.println("Down");
     keycode[2] = DOWN_BUTTON_KEYCODE_TO_SEND;
   }
 
   uint8_t shake = arcada.accel.getClick();
-  if (shake & 0x30) {
+  if(shake & 0x30) {
     Serial.print("shake detected (0x"); Serial.print(shake, HEX); Serial.print("): ");
-    if (shake & 0x10) Serial.println(" single shake");
+    if(shake & 0x10) Serial.println(" single shake");
     keycode[3] = SHAKE_KEYCODE_TO_SEND;
   }
 
@@ -84,12 +86,12 @@ void user_loop(void) {
 
   bool anypressed = false;
   for (int k=0; k<sizeof(keycode); k++) {
-    if (keycode[k] != 0) {
+    if(keycode[k] != 0) {
       anypressed = true;
       break;
     }
   }
-  if (anypressed) {
+  if(anypressed) {
     digitalWrite(LED_BUILTIN, HIGH);
     usb_hid.keyboardReport(0, 0, keycode);
   } else {

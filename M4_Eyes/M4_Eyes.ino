@@ -59,6 +59,8 @@ int      iPupilFactor            = 42;
 uint32_t boopSum                 = 0,
          boopSumFiltered         = 0;
 bool     booped                  = false;
+bool     eyelidsClosed           = false;
+bool     eyelidsWide             = false;
 int      fixate                  = 7;
 uint8_t  lightSensorFailCount    = 0;
 
@@ -135,34 +137,52 @@ uint32_t availableRAM(void) {
 
 // USER CALLABLE FUNCTIONS
 
-// set the booped flag
-void eyesWide(bool t) {
-  booped = t;
-}
-
-// start a blink
+// Start a blink.
 void eyesBlink() {
-     timeToNextBlink = 0;
+  Serial.println("eyesBlink()");
+  timeToNextBlink = 0;
 }
 
-// force the eyes to a position on the screen
+// Force the booped flag to be set true.
+void eyesBoop() {
+  Serial.println("eyesBoop()");
+  boopSum = 99999;
+}
+
+// Close eyelids.
+void eyesClose() {
+  Serial.println("eyesClose()");
+  eyelidsClosed = true;
+}
+
+// Return the eyes to normal random movement.
+void eyesNormal() {
+//  Serial.println("eyesNormal()");
+  moveEyesRandomly = true;
+}
+
+// Open eyelids wide.
+void eyesWide() {
+  Serial.println("eyesWide()");
+  eyelidsWide = true;
+}
+
+// Force the eyes to a position on the screen.
 void eyesToCorner(float x, float y, bool immediate) {
+//  Serial.println("eyesToCorner(" + String(x) + ", " + String(-y) + ", " + (immediate ? "TRUE" : "FALSE") + ")");
   moveEyesRandomly = false;
   eyeTargetX = x;
   eyeTargetY = y;
-  if (immediate) 
+  if(immediate) 
     eyeMoveDuration = 0;
-}
-
-// return the eyes to normal random movement
-void eyesNormal() {
-  moveEyesRandomly = true;
 }
 
 
 // SETUP FUNCTION - CALLED ONCE AT PROGRAM START ---------------------------
 
 void setup() {
+  Serial.println("SETUP BEGINS");
+
   if(!arcada.arcadaBegin())     fatal("Arcada init fail!", 100);
 #if defined(USE_TINYUSB)
   if(!arcada.filesysBeginMSD()) fatal("No filesystem found!", 250);
@@ -214,10 +234,10 @@ void setup() {
   #endif
 
   yield();
-  if (showSplashScreen) {
-    if (arcada.drawBMP((char *)"/splash.bmp", 0, 0, (eye[0].display)) == IMAGE_SUCCESS) {
+  if(showSplashScreen) {
+    if(arcada.drawBMP((char *)"/splash.bmp", 0, 0, (eye[0].display)) == IMAGE_SUCCESS) {
       Serial.println("Splashing");
-      if (NUM_EYES > 1) {    // other eye
+      if(NUM_EYES > 1) {    // other eye
         yield();
         arcada.drawBMP((char *)"/splash.bmp", 0, 0, (eye[1].display));
       }
@@ -448,8 +468,9 @@ void setup() {
   }
 
   lastLightReadTime = micros() + 2000000; // Delay initial light reading
+  
+  Serial.println("END OF SETUP");
 }
-
 
 
 // LOOP FUNCTION - CALLED REPEATEDLY UNTIL POWER-OFF -----------------------
@@ -502,29 +523,29 @@ void loop() {
       // Eye movement
       int32_t dt = t - eyeMoveStartTime;      // uS elapsed since last eye event
       if(eyeInMotion) {                       // Currently moving?
-        if(dt >= eyeMoveDuration) {           // Time up?  Destination reached.
-          eyeInMotion      = false;           // Stop moving
-          if (moveEyesRandomly) {
-            eyeMoveDuration  = random(10000, 3000000); // 0.01-3 sec stop
-            eyeMoveStartTime = t;               // Save initial time of stop
+        if(dt >= eyeMoveDuration) {           // Time up? Destination reached.
+          eyeInMotion = false;                // Stop moving
+          if(moveEyesRandomly) {
+            eyeMoveDuration = random(10000, 3000000); // 0.01-3 sec stop
+            eyeMoveStartTime = t;             // Save initial time of stop
           }
           eyeX = eyeOldX = eyeNewX;           // Save position
           eyeY = eyeOldY = eyeNewY;
         } else { // Move time's not yet fully elapsed -- interpolate position
           float e  = (float)dt / float(eyeMoveDuration); // 0.0 to 1.0 during move
           e = 3 * e * e - 2 * e * e * e; // Easing function: 3*e^2-2*e^3 0.0 to 1.0
-          eyeX = eyeOldX + (eyeNewX - eyeOldX) * e; // Interp X
-          eyeY = eyeOldY + (eyeNewY - eyeOldY) * e; // and Y
+          eyeX = eyeOldX + (eyeNewX - eyeOldX) * e;      // Interp X
+          eyeY = eyeOldY + (eyeNewY - eyeOldY) * e;      // and Y
         }
-      } else {                                // Eye stopped
+      } else {                                           // Eye stopped
         eyeX = eyeOldX;
         eyeY = eyeOldY;
-        if(dt > eyeMoveDuration) {            // Time up?  Begin new move.
+        if(dt > eyeMoveDuration) {                       // Time up?  Begin new move.
           // r is the radius in X and Y that the eye can go, from (0,0) in the center.
           float r = (float)mapDiameter - (float)DISPLAY_SIZE * M_PI_2; // radius of motion
           r *= 0.6;  // calibration constant
 
-          if (moveEyesRandomly) {
+          if(moveEyesRandomly) {
             eyeNewX = random(-r, r);
             float h = sqrt(r * r - x * x);
             eyeNewY = random(-h, h);
@@ -537,9 +558,9 @@ void loop() {
           eyeNewY += mapRadius;
 
           // Set the duration for this move, and start it going.
-          eyeMoveDuration  = random(83000, 166000); // ~1/12 - ~1/6 sec
-          eyeMoveStartTime = t;               // Save initial time of move
-          eyeInMotion      = true;            // Start move on next frame
+          eyeMoveDuration  = random(83000, 166000);      // ~1/12 - ~1/6 sec
+          eyeMoveStartTime = t;                          // Save initial time of move
+          eyeInMotion      = true;                       // Start move on next frame
         }
       }
 
@@ -581,17 +602,20 @@ void loop() {
             iy = (int)map2screen(mapRadius - eye[eyeNum].eyeY) + (DISPLAY_SIZE/2); // on screen
         iy += irisRadius * trackFactor;
         if(eyeNum & 1) ix = DISPLAY_SIZE - 1 - ix; // Flip for right eye
-        if(iy > upperOpen[ix]) {
+        if(eyelidsWide) {
           uq = 1.0;
-        } else if(iy < upperClosed[ix]) {
-          uq = 0.0;
-        } else {
-          uq = (float)(iy - upperClosed[ix]) / (float)(upperOpen[ix] - upperClosed[ix]);
-        }
-        if(booped) {
+          lq = 1.0;
+        } else if(booped) {
           uq = 0.9;
           lq = 0.7;
         } else {
+          if(iy > upperOpen[ix]) {
+            uq = 1.0;
+          } else if(iy < upperClosed[ix]) {
+            uq = 0.0;
+          } else {
+            uq = (float)(iy - upperClosed[ix]) / (float)(upperOpen[ix] - upperClosed[ix]);
+          }
           lq = 1.0 - uq;
         }
       } else {
@@ -599,6 +623,10 @@ void loop() {
         uq = 1.0;
         lq = 1.0;
       }
+      if(eyelidsClosed) {
+        uq = 0.0;
+        lq = 0.0;
+      }      
       // Dampen eyelid movements slightly
       // SAVE upper & lower lid factors per eye,
       // they need to stay consistent across frame
@@ -629,13 +657,14 @@ void loop() {
       // of both screens is about 1/2 this.
       frames++;
       if(((t - lastFrameRateReportTime) >= 1000000) && t) { // Once per sec.
-        Serial.println((frames * 1000) / (t / 1000));
+        Serial.printf("Frame rate: %d\n", (frames * 1000) / (t / 1000));
         lastFrameRateReportTime = t;
       }
 
       // Once per frame (of eye #0), reset boopSum...
       if((eyeNum == 0) && (boopPin >= 0)) {
         boopSumFiltered = ((boopSumFiltered * 3) + boopSum) / 4;
+//        Serial.printf("boopSum: %d, boopSumFiltered: %d, boopThreshold: %d, booped: %s\n", boopSum, boopSumFiltered, boopThreshold, (booped ? "true" : "false"));
         if(boopSumFiltered > boopThreshold) {
           if(!booped) {
             Serial.println("BOOP!");
@@ -645,6 +674,12 @@ void loop() {
           booped = false;
         }
         boopSum = 0;
+      }
+
+      // Once per frame (of eye #1), reset eyelid states...
+      if(eyeNum == 1) {
+        eyelidsClosed = false;
+        eyelidsWide = false;
       }
 
       float mins = (float)millis() / 60000.0;

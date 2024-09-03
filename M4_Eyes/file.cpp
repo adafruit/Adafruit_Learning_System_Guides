@@ -1,7 +1,8 @@
 //34567890123456789012345678901234567890123456789012345678901234567890123456
 
-#define ARDUINOJSON_ENABLE_COMMENTS 1
-#include <ArduinoJson.h>          // JSON config file functions
+#define ARDUINOJSON_ENABLE_COMMENTS 1   // ARDUINOJSON_ENABLE_COMMENTS must be set to 1 before including the library.
+                                        // The same value of ARDUINOJSON_ENABLE_COMMENTS must be set in each compilation unit.
+#include <ArduinoJson.h>                // JSON config file functions
 #include "globals.h"
 
 extern Adafruit_Arcada arcada;
@@ -89,7 +90,7 @@ void loadConfig(char *filename) {
     DeserializationError error = deserializeJson(doc, file);
     yield();
     if(error) {
-      Serial.println("Config file error, using default settings");
+      Serial.println("Config file error, using default settings.");
       Serial.println(error.c_str());
     } else {
       uint8_t e;
@@ -286,7 +287,7 @@ void loadConfig(char *filename) {
     file.close();
     user_setup(doc);
   } else {
-    Serial.println("Can't open config file, using default settings");
+    Serial.println("Can't open config file, using default settings.");
   }
 
   // INITIALIZE DEFAULT VALUES if config file missing or in error ----------
@@ -330,7 +331,7 @@ ImageReturnCode loadEyelid(char *filename,
   Adafruit_ImageReader *reader;
 
   reader = arcada.getImageReader();
-  if (!reader) {
+  if(!reader) {
      return IMAGE_ERR_FILE_NOT_FOUND;
   }
 
@@ -340,7 +341,7 @@ ImageReturnCode loadEyelid(char *filename,
   // This is the "booster seat" described in m4eyes.ino
   if(reader->bmpDimensions(filename, &w, &h) == IMAGE_SUCCESS) {
     tempBytes = ((w + 7) / 8) * h; // Bitmap size in bytes
-    if (maxRam > tempBytes) {
+    if(maxRam > tempBytes) {
       if((tempPtr = (uint8_t *)malloc(maxRam - tempBytes)) != NULL) {
         // Make SOME tempPtr reference, or optimizer removes the alloc!
         tempPtr[0] = 0;
@@ -416,14 +417,14 @@ ImageReturnCode loadTexture(char *filename, uint16_t **data,
   Adafruit_ImageReader *reader;
 
   reader = arcada.getImageReader();
-  if (!reader) {
+  if(!reader) {
      return IMAGE_ERR_FILE_NOT_FOUND;
   }
   
   // This is the "booster seat" described in m4eyes.ino
   if(reader->bmpDimensions(filename, &w, &h) == IMAGE_SUCCESS) {
     tempBytes = w * h * 2; // Image size in bytes (converted to 16bpp)
-    if (maxRam > tempBytes) {
+    if(maxRam > tempBytes) {
       if((tempPtr = (uint8_t *)malloc(maxRam - tempBytes)) != NULL) {
         // Make SOME tempPtr reference, or optimizer removes the alloc!
         tempPtr[0] = 0;

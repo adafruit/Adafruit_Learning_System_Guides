@@ -28,7 +28,9 @@
 // Button Z: eyes blink
 // BOTH buttons: eyes are both wide AND blinking, and the colors change to red
 
-#include <ArduinoJson.h>          // JSON config file functions
+#define ARDUINOJSON_ENABLE_COMMENTS 1   // ARDUINOJSON_ENABLE_COMMENTS must be set to 1 before including the library.
+                                        // The same value of ARDUINOJSON_ENABLE_COMMENTS must be set in each compilation unit.
+#include <ArduinoJson.h>                // JSON config file functions
 #include <WiiChuck.h>
 #include <Adafruit_NeoPixel.h>
 #include "globals.h"
@@ -61,15 +63,15 @@ const int red = Adafruit_NeoPixel::Color(127,0,0);
 void user_setup(void) {
   // follow the WiiAccessory.ino example:
   nunchuck1.begin();
-  if (nunchuck1.type == Unknown) {
-    /** If the device isn't auto-detected, set the type explicatly
-     * 	NUNCHUCK,
-     WIICLASSIC,
-     GuitarHeroController,
-     GuitarHeroWorldTourDrums,
-     DrumController,
-     DrawsomeTablet,
-     Turntable
+  if(nunchuck1.type == Unknown) {
+    /** If the device isn't auto-detected, set the type explicitly:
+      NUNCHUCK,
+      WIICLASSIC,
+      GuitarHeroController,
+      GuitarHeroWorldTourDrums,
+      DrumController,
+      DrawsomeTablet,
+      Turntable
     */
     nunchuck1.type = NUNCHUCK;
   }
@@ -85,13 +87,13 @@ void user_setup(StaticJsonDocument<2048> &doc) {
 
   const char *neopin = doc["wiichuck"]["neopixel"]["pin"];
   Serial.println("neopin=" + String(neopin ? neopin : "(null)"));
-  int32_t neomax = getDocInt(doc, "wiichuck","neopixel","max",-1);
+  int32_t neomax = getDocInt(doc, "wiichuck", "neopixel", "max", -1);
   Serial.println("neopin=" + String(neomax));
 
-  if (neopin && neomax > -1) {
-    if ((strcmp(neopin, "d2") == 0) || (strcmp(neopin, "D2") == 0))
+  if(neopin && neomax > -1) {
+    if((strcmp(neopin, "d2") == 0) || (strcmp(neopin, "D2") == 0))
       neoPixelPin = 2;
-    else if ((strcmp(neopin, "d3") == 0) || (strcmp(neopin, "D3") == 0))
+    else if((strcmp(neopin, "d3") == 0) || (strcmp(neopin, "D3") == 0))
       neoPixelPin = 3;
     neoPixelMax = neomax;
 
@@ -104,8 +106,7 @@ void user_setup(StaticJsonDocument<2048> &doc) {
   }    
 }
 
-static void neoChase(int addend, int div, int color)
-{
+static void neoChase(int addend, int div, int color) {
   curChasePixel += addend;
   curChasePixel %= div;
 
@@ -116,8 +117,7 @@ static void neoChase(int addend, int div, int color)
   strip.show();
 }
 
-static void neoUpDown(int color, int dir)
-{
+static void neoUpDown(int color, int dir) {
   int np = strip.numPixels();
   curChasePixel += np + dir;
   curChasePixel %= np;
@@ -128,8 +128,7 @@ static void neoUpDown(int color, int dir)
   strip.show();
 }
 
-static void neoShine()
-{
+static void neoShine() {
   // code from user_neopixel.cpp
   for(int i=0; i<strip.numPixels(); i++) { // For each pixel in strip...
     // Offset pixel hue by an amount to make one full revolution of the
@@ -147,15 +146,13 @@ static void neoShine()
   firstPixelHue += 256;
 }
 
-static void neoSparkle()
-{
+static void neoSparkle() {
   strip.clear();
   int i = random(0, strip.numPixels());
   int pixelHue = firstPixelHue + (i * 65536L / strip.numPixels());
   strip.setPixelColor(i, strip.gamma32(strip.ColorHSV(pixelHue)));
   strip.show(); // Update strip with new contents  
 }
-
 
 // the normal map() function doesn't seem to work properly for floats
 static float map2(long x, long in_min, long in_max, float out_min, float out_max) {
@@ -181,49 +178,53 @@ void user_loop(void) {
   
   int joyX = nunchuck1.getJoyX();
   int joyY = nunchuck1.getJoyY();
+//  Serial.println("joyXY(" + String(joyX) + ", " + String(joyY) + ")");
   float x = map2(joyX, low, high, -1.0, 1.0);
   float y = map2(joyY, low, high, -1.0, 1.0);
   int cornerX = (joyX - low) / divFactor;
   int cornerY = (joyY - low) / divFactor;
   int chaseColor = 0;
-  // Serial.println("cornerXY=" + String(cornerX) + "," + String(cornerY));
-  if (cornerX == 1 && cornerY == 1) { // return to normal when the joystick is in the middle
-    // Serial.println("eyesNormal()");
+  if(cornerX == 1 && cornerY == 1) { // return to normal when the joystick is in the middle
     eyesNormal();
     neoPixelState = LUMINESCENT;
   } else {
-    // Serial.println("eyesToCorner(" + String(x) + "," + String(-y) + ")");
     eyesToCorner(x, -y, true);
-    if (cornerX < 1) {
+    if(cornerX < 1) {
       chaseColor = green;
       neoPixelState = CHASE_LEFT;
-    } else if (cornerX > 1) {
+    } else if(cornerX > 1) {
       chaseColor = blue;
       neoPixelState = CHASE_RIGHT;
-    } else if (cornerY > 1) {
+    } else if(cornerY > 1) {
       neoPixelState = CHASE_UP;
       chaseColor = green;
-    } else if (cornerY < 1) {
+    } else if(cornerY < 1) {
       neoPixelState = CHASE_DOWN;
       chaseColor = blue;
     }
   }
   
   bool buttonC = nunchuck1.getButtonC();
-  eyesWide(buttonC);
   bool buttonZ = nunchuck1.getButtonZ();
-  if (buttonZ)
-    eyesBlink();
 
-  if (buttonC && buttonZ) {
+  if(buttonC && buttonZ) {
+    Serial.println("buttonC & buttonZ");
     chaseColor = red;
-    if (neoPixelState == LUMINESCENT) neoPixelState = CHASE_UP;
-  } else if (buttonC) {
-    neoPixelState = SPARKLE;
+    if(neoPixelState == LUMINESCENT)
+      neoPixelState = CHASE_UP;
+  } else {
+    if(buttonC) {
+      Serial.println("buttonC");
+      eyesWide();
+      neoPixelState = SPARKLE;
+    } else if(buttonZ) {
+      Serial.println("buttonZ");
+      eyesClose();
+    }
   }
-  // Serial.println("neo state=" + String(neoPixelState));
 
-  if (strip.numPixels() > 0) {
+  if(strip.numPixels() > 0) {
+    // Serial.println("neo state=" + String(neoPixelState));
     switch (neoPixelState) {
       case LUMINESCENT: neoShine(); break;
       case CHASE_RIGHT: neoChase(4, 3, chaseColor); break;

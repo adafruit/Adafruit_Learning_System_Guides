@@ -17,7 +17,9 @@ void user_setup(void) {
 
 // Called once after the processing of the configuration file. This allows
 // user configuration to also be done based on the config file.
-#include <ArduinoJson.h>          // JSON config file functions
+#define ARDUINOJSON_ENABLE_COMMENTS 1   // ARDUINOJSON_ENABLE_COMMENTS must be set to 1 before including the library.
+                                        // The same value of ARDUINOJSON_ENABLE_COMMENTS must be set in each compilation unit.
+#include <ArduinoJson.h>                // JSON config file functions
 void user_setup(StaticJsonDocument<2048> &doc) {
 }
 
