@@ -726,7 +726,7 @@ void draw_gradient(int x, int y, int w, int h) {
     }
 }
 
-void millisDelay( long int delayTime){
-  long int start_time = millis();
+void millisDelay(int delayTime){
+  int start_time = millis();
   while ( millis() - start_time < delayTime) ;
 }
