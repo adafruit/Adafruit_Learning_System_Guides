@@ -151,7 +151,6 @@ void loop() {
              bgy = miny,              // Y relative to background bitmap (>= 0)
              x, y, bx1, bgx1;         // Loop counters and working vars
     uint8_t  p;                       // 'packed' value of 2 ball pixels
-    int8_t bufIdx = 0;
   
     uint8_t *buf = display.getBuffer(); // -> back buffer
   
@@ -195,7 +194,7 @@ void loop() {
         if (httpResponseCode > 0) {
           String payload = http.getString();
           Serial.println(payload);
-          DynamicJsonDocument doc(1024);
+          JsonDocument doc(1024);
           DeserializationError error = deserializeJson(doc, payload);
           if (!error) {
             if (channelNow == "weather") {
