@@ -51,20 +51,6 @@ leds = {
 for color in COLORS:
     leds[color].direction = Direction.OUTPUT
 
-# a global variable to hold the eventual high-score
-highscore = None
-
-try:
-    # read data from NVM storage
-    read_data = nvm_helper.read_data()
-    # if we found data check if it's a high-score value
-    if isinstance(read_data, list) and read_data[0] == "bls_hs":
-        # it is a high-score so populate the label with its value
-        highscore = read_data[1]
-except EOFError:
-    # no high-score data
-    pass
-
 # display setup
 display = board.DISPLAY
 main_group = Group()
@@ -91,7 +77,7 @@ curscore_val.anchored_position = (4,
 main_group.append(curscore_val)
 
 # Label to show the high score numerical value
-highscore_val = Label(terminalio.FONT, text="" if highscore is None else str(highscore), scale=4)
+highscore_val = Label(terminalio.FONT, text="0", scale=4)
 highscore_val.anchor_point = (1.0, 0.0)
 highscore_val.anchored_position = (display.width - 4,
                                    highscore_lbl.bounding_box[1] +
@@ -142,6 +128,20 @@ class GameState:
         # to avoid accidental double presses.
         self.btn_cooldown_time = -1
 
+        # a variable to hold the eventual high-score
+        self.highscore = None
+
+        try:
+            # read data from NVM storage
+            read_data = nvm_helper.read_data()
+            # if we found data check if it's a high-score value
+            if isinstance(read_data, list) and read_data[0] == "bls_hs":
+                # it is a high-score so populate the label with its value
+                self.highscore = read_data[1]
+        except EOFError:
+            # no high-score data
+            pass
+
 
 async def player_action(game_state: GameState):
     """
@@ -152,9 +152,6 @@ async def player_action(game_state: GameState):
     :return: None
     """
     # pylint: disable=too-many-branches, too-many-statements
-
-    # access the global highscore variable
-    global highscore  # pylint: disable=global-statement
 
     # loop forever inside of this task
     while True:
@@ -255,13 +252,13 @@ async def player_action(game_state: GameState):
                     game_over_lbl.hidden = False
 
                     # if the player's current score is higher than the highscore
-                    if highscore is None or game_state.score > highscore:
+                    if game_state.highscore is None or game_state.score > game_state.highscore:
 
                         # save new high score value to NVM storage
                         nvm_helper.save_data(("bls_hs", game_state.score), test_run=False)
 
-                        # update global highscore variable to the players score
-                        highscore = game_state.score
+                        # update highscore variable to the players score
+                        game_state.highscore = game_state.score
 
                         # update the high score label
                         highscore_val.text = str(game_state.score)
@@ -352,6 +349,11 @@ async def main():
 
     # initialize the Game State
     game_state = GameState(1, 500, 500)
+
+    # if there is a saved highscore
+    if game_state.highscore is not None:
+        # set the highscore into it's label to show on the display
+        highscore_val.text = str(game_state.highscore)
 
     # initialze player task
     player_task = asyncio.create_task(player_action(game_state))
