@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2024 Trevor Beaton for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 import time
 import terminalio
 from adafruit_matrixportal.matrixportal import MatrixPortal
@@ -23,18 +27,13 @@ matrixportal.add_text(
 WEATHER_IMAGES = {
     "Sunny": "images/sunny.bmp",
     "Clear": "images/moon.bmp",
-    "Cloudy": "images/cloudy.bmp",
+    "Cldy": "images/cloudy.bmp",  # Updated to use shortened version
     "Drizzle": "images/rain.bmp",
     "Rainy": "images/cloudy.bmp",
     "Heavy rain": "images/rain.bmp",
-    "Thunderstorms": "images/thunder.bmp",
-    "Isolated thunderstorms": "images/thunder.bmp",
-    "Scattered thunderstorms": "images/thunder.bmp",
-    "Strong storms": "images/thunder.bmp",
+    "TStorms": "images/thunder.bmp",
     "Sun showers": "images/rain.bmp",
     "Snow": "images/snow.bmp",
-    "Light snow": "images/snow.bmp",
-    "Heavy snow": "images/snow.bmp",
 }
 
 # Update this to your weather feed
@@ -56,12 +55,13 @@ def is_daytime(hour):
 def clean_condition(condition, is_day):
     condition = condition.replace("Mostly ", "").replace("Partly ", "")
     condition_mapping = {
+        "Cloudy": "Cldy",  # Added shortened version of Cloudy
         "Drizzle or light rain": "Rainy",
         "Heavy rain": "Rainy",
-        "Isolated thunderstorms": "Thunderstorms",
+        "Isolated thunderstorms": "TStorms",
         "Sun showers": "Rainy",
-        "Scattered thunderstorms": "Thunderstorms",
-        "Strong storms": "Thunderstorms",
+        "Scattered thunderstorms": "TStorms",
+        "Strong storms": "TStorms",
         "Light snow": "Snow",
         "Heavy snow": "Snow",
     }
@@ -109,7 +109,7 @@ def update_display():
                 print(f"Error loading image for {current_condition}: {e}")
         else:
             print(f"Failed to parse weather data: {weather_data}")
-            matrixportal.set_text("Parse Error", 0)
+            matrixportal.set_text("Error", 0)
             matrixportal.set_text("", 1)
     else:
         print("Failed to retrieve data from feed")
