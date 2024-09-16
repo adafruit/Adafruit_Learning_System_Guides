@@ -1,0 +1,20 @@
+# To auto-connect to Wi-Fi
+CIRCUITPY_WIFI_SSID= "YOUR-WIFI-SSID"
+CIRCUITPY_WIFI_PASSWORD= "YOUR-WIFI-PASSWORD"
+​
+WIFI_SSID = "YOUR-WIFI-SSID"
+WIFI_PASSWORD = "YOUR-WIFI-PASSWORD"
+
+
+
+# For Adafruit IO Login
+AIO_USERNAME="YOUR-ADAFRUIT-IO-USERNAME"
+AIO_KEY="YOUR-ADAFRUIT-IO-KEY"
+
+
+
+# To enable modifying files from the web. Change this too!
+# Leave the User field blank in the browser.
+CIRCUITPY_WEB_API_PASSWORD="passw0rd"
+​
+CIRCUITPY_WEB_API_PORT=80
