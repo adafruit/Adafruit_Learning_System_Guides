@@ -99,7 +99,7 @@ while True:
                 vl53_clock = ticks_add(vl53_clock, vl53_time)
         else:
             external_power.value = False
-    except Exception as error: # pylint: disable=broad-exception-caught
+    except Exception as error: # pylint: disable=broad-except
         print(error)
         time.sleep(5)
         microncontroller.reset()
