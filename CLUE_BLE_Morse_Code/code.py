@@ -12,29 +12,59 @@ from adafruit_ble import BLERadio
 from adafruit_ble.advertising.standard import ProvideServicesAdvertisement
 from adafruit_ble.services.nordic import UARTService
 
-#--| User Config |---------------------------------------------------
-MY_NAME = "ME"
-FRIENDS_NAME = "FRIEND"
-#--| User Config |---------------------------------------------------
+# --| User Config |---------------------------------------------------
+# Set to either A or B. The other CLUE should be set to opposite mode.
+BLE_MODE = "A"
+# --| User Config |---------------------------------------------------
+
+BLE_MODE = BLE_MODE.upper().strip()
+if BLE_MODE not in ("A", "B"):
+    raise ValueError("BLE_MODE must be set to either A or B.")
 
 WAIT_FOR_DOUBLE = 0.05
 DEBOUNCE = 0.25
 
 # Define Morse Code dictionary
 morse_code = {
-    ".-"   : "A", "-..." : "B", "-.-." : "C", "-.."  : "D", "."    : "E",
-    "..-." : "F", "--."  : "G", "...." : "H", ".."   : "I", ".---" : "J",
-    "-.-"  : "K", ".-.." : "L", "--"   : "M", "-."   : "N", "---"  : "O",
-    ".--." : "P", "--.-" : "Q", ".-."  : "R", "..."  : "S", "-"    : "T",
-    "..-"  : "U", "...-" : "V", ".--"  : "W", "-..-" : "X", "-.--" : "Y",
-    "--.." : "Z",
+    ".-": "A",
+    "-...": "B",
+    "-.-.": "C",
+    "-..": "D",
+    ".": "E",
+    "..-.": "F",
+    "--.": "G",
+    "....": "H",
+    "..": "I",
+    ".---": "J",
+    "-.-": "K",
+    ".-..": "L",
+    "--": "M",
+    "-.": "N",
+    "---": "O",
+    ".--.": "P",
+    "--.-": "Q",
+    ".-.": "R",
+    "...": "S",
+    "-": "T",
+    "..-": "U",
+    "...-": "V",
+    ".--": "W",
+    "-..-": "X",
+    "-.--": "Y",
+    "--..": "Z",
 }
 
 # BLE Radio Stuff
+if BLE_MODE == "A":
+    MY_NAME = "CENTRAL"
+    FRIENDS_NAME = "PERIPHERAL"
+else:
+    MY_NAME = "PERIPHERAL"
+    FRIENDS_NAME = "CENTRAL"
 ble = BLERadio()
 uart_service = UARTService()
 advertisement = ProvideServicesAdvertisement(uart_service)
-ble._adapter.name = MY_NAME #pylint: disable=protected-access
+ble._adapter.name = MY_NAME  # pylint: disable=protected-access
 
 # Display Stuff
 display = clue.display
@@ -42,105 +72,93 @@ disp_group = displayio.Group()
 display.root_group = disp_group
 
 # Background BMP with the Morse Code cheat sheet
-bmp, pal = adafruit_imageload.load("morse_bg.bmp",
-                                   bitmap=displayio.Bitmap,
-                                   palette=displayio.Palette)
+bmp, pal = adafruit_imageload.load(
+    "morse_bg.bmp", bitmap=displayio.Bitmap, palette=displayio.Palette
+)
 disp_group.append(displayio.TileGrid(bmp, pixel_shader=pal))
 
 # Incoming messages show up here
-in_label = label.Label(terminalio.FONT, text='A'*18, scale=2,
-                       color=0x000000)
-in_label.anchor_point = (0.5, 0)
-in_label.anchored_position = (65, 12)
+in_label = label.Label(terminalio.FONT, text="A" * 18, scale=2, color=0x000000)
+in_label.anchor_point = (1.0, 0)
+in_label.anchored_position = (235, 4)
 disp_group.append(in_label)
 
 # Outging messages show up here
-out_label = label.Label(terminalio.FONT, text='B'*18, scale=2,
-                        color=0x000000)
-out_label.anchor_point = (0.5, 0)
-out_label.anchored_position = (65, 190)
+out_label = label.Label(terminalio.FONT, text="B" * 18, scale=2, color=0x000000)
+out_label.anchor_point = (1.0, 0)
+out_label.anchored_position = (235, 180)
 disp_group.append(out_label)
 
 # Morse Code entry happens here
-edit_label = label.Label(terminalio.FONT, text='....', scale=2,
-                         color=0x000000)
+edit_label = label.Label(terminalio.FONT, text="----", scale=2, color=0x000000)
 edit_label.anchor_point = (0.5, 0)
-edit_label.anchored_position = (105, 222)
+edit_label.anchored_position = (115, 212)
 disp_group.append(edit_label)
 
+
 def scan_and_connect():
-    '''
-    Advertise self while scanning for friend. If friend is found, can
-    connect by pressing A+B buttons. If friend connects first, then
-    just stop.
+    """
+    Handles initial connection between the two CLUES.
+
+    The CLUE set to BLE_MODE="A" will act as Central.
+    The CLUE set to BLE_MODE="B" will act as Peripheral.
 
     Return is a UART object that can be used for read/write.
-    '''
+    """
 
-    print("Advertising.")
-    central = False
-    ble.start_advertising(advertisement)
+    print("Connecting...")
+    in_label.text = out_label.text = "Connecting..."
 
-    print("Waiting.")
-    friend = None
-    while not ble.connected:
+    if MY_NAME == "CENTRAL":
+        keep_scanning = True
+        print("Scanning...")
 
-        if friend is None:
-            print("Scanning.")
-            in_label.text = out_label.text = "Scanning..."
+        while keep_scanning:
             for adv in ble.start_scan():
-                if ble.connected:
-                    # Friend connected with us, we're done
-                    ble.stop_scan()
-                    break
                 if adv.complete_name == FRIENDS_NAME:
-                    # Found friend, can stop scanning
                     ble.stop_scan()
-                    friend = adv
-                    print("Found", friend.complete_name)
-                    in_label.text = "Found {}".format(friend.complete_name)
-                    out_label.text = "A+B to connect"
-                    break
-        else:
-            if clue.button_a and clue.button_b:
-                # Connect to friend
-                print("Connecting to", friend.complete_name)
-                ble.connect(friend)
-                central = True
+                    ble.connect(adv)
+                    keep_scanning = False
 
-    # We're now connected, one way or the other
-    print("Stopping advertising.")
-    ble.stop_advertising()
-
-    # Return a UART object to use
-    if central:
-        print("Central - using my UART service.")
+        print("Connected. Done scanning.")
         return uart_service
+
     else:
-        print("Peripheral - connecting to their UART service.")
+        print("Advertising...")
+        ble.start_advertising(advertisement)
+
+        while not ble.connected:
+            if ble.connected:
+                break
+
+        print("Connected. Stop advertising.")
+        ble.stop_advertising()
+
+        print("Connecting to Central UART service.")
         for connection in ble.connections:
             if UARTService not in connection:
                 continue
             return connection[UARTService]
 
-#--------------------------
-# The main application loop
-#--------------------------
-while True:
+    return None
 
+
+# --------------------------
+# The main application loop
+# --------------------------
+while True:
     # Establish initial connection
     uart = scan_and_connect()
 
     print("Connected.")
 
-    code = ''
-    in_label.text = out_label.text = ' '*18
-    edit_label.text = ' '*4
+    code = ""
+    in_label.text = out_label.text = " " * 18
+    edit_label.text = " " * 4
     done = False
 
     # Run the chat while connected
     while ble.connected:
-
         # Check for incoming message
         incoming_bytes = uart.in_waiting
         if incoming_bytes:
@@ -155,8 +173,8 @@ while True:
                 if clue.button_b:
                     done = True
             if not done and len(code) < 4:
-                print('.', end='')
-                code += '.'
+                print(".", end="")
+                code += "."
                 edit_label.text = "{:4s}".format(code)
                 time.sleep(DEBOUNCE)
 
@@ -167,19 +185,19 @@ while True:
                 if clue.button_a:
                     done = True
             if not done and len(code) < 4:
-                print('-', end='')
-                code += '-'
+                print("-", end="")
+                code += "-"
                 edit_label.text = "{:4s}".format(code)
                 time.sleep(DEBOUNCE)
 
         # Turn Morse Code into letter and send
         if done:
-            letter = morse_code.get(code, ' ')
-            print(' >', letter)
+            letter = morse_code.get(code, " ")
+            print(" >", letter)
             out_label.text = out_label.text[1:] + letter
             uart.write(str.encode(letter))
-            code = ''
-            edit_label.text = ' '*4
+            code = ""
+            edit_label.text = " " * 4
             done = False
             time.sleep(DEBOUNCE)
 

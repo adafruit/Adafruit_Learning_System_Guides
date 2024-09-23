@@ -16,6 +16,7 @@ last revision November 2015
 */
 
 #include <WiFiClientSecure.h>
+#include <WiFi.h>
 
 // Enter your WiFi SSID and password
 char ssid[] = "YOUR_SSID";             // your network SSID (name)

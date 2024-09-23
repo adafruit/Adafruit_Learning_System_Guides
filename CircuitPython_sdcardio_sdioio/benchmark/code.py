@@ -5,6 +5,8 @@
 import time
 import os
 
+# pylint: disable=unused-import
+import mount_sd # You must create a module mount_sd.py that mounts your sd card!
 
 # First, just write the file 'hello.txt' to the card
 with open("/sd/hello.txt", "w") as f:

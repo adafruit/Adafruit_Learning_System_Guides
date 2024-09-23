@@ -7,16 +7,10 @@ This example will access the twitter follow button API, grab a number like
 the number of followers... and display it on a screen!
 if you can find something that spits out JSON data, we can display it
 """
+import os
 import time
 import board
 from adafruit_pyportal import PyPortal
-
-# Get wifi details and more from a secrets.py file
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
 
 # Change this to your zip code, not all locations have AQI data. Check
 # https://airnow.gov/ to see if there's data available!
@@ -25,7 +19,7 @@ LOCATION = "90210"
 # Set up where we'll be fetching data from
 DATA_SOURCE = "http://www.airnowapi.org/aq/forecast/zipCode/?format=application/json"
 # You'll need to get a token from airnow.gov, looks like '4d36e978-e325-11cec1-08002be10318'
-DATA_SOURCE += "&zipCode="+LOCATION+"&API_KEY="+secrets['airnow_token']
+DATA_SOURCE += "&zipCode="+LOCATION+"&API_KEY="+os.getenv("AIRNOW_TOKEN")
 DATA_LOCATION = [1, "AQI"]
 
 # the current working directory (where this file is)

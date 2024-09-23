@@ -1,20 +1,13 @@
 # SPDX-FileCopyrightText: 2021 Brent Rubell, written for Adafruit Industries
 #
 # SPDX-License-Identifier: Unlicense
+
+import os
+
 from adafruit_display_text.label import Label
 from adafruit_bitmap_font import bitmap_font
 from adafruit_oauth2 import OAuth2
 from adafruit_pyportal import Network, Graphics
-
-# Add a secrets.py to your filesystem that has a dictionary called secrets with "ssid" and
-# "password" keys with your WiFi credentials. DO NOT share that file or commit it into Git or other
-# source control.
-# pylint: disable=no-name-in-module,wrong-import-order
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
 
 network = Network()
 network.connect()
@@ -50,8 +43,8 @@ scopes = ["https://www.googleapis.com/auth/calendar.readonly"]
 # Initialize an oauth2 object
 google_auth = OAuth2(
     network.requests,
-    secrets["google_client_id"],
-    secrets["google_client_secret"],
+    os.getenv("GOOGLE_CLIENT_ID"),
+    os.getenv("GOOGLE_CLIENT_SECRET"),
     scopes,
 )
 
@@ -78,7 +71,7 @@ label_user_code.text = "2. Enter code: %s" % google_auth.user_code
 
 # Create a QR code
 graphics.qrcode(google_auth.verification_url.encode(), qr_size=2, x=170, y=165)
-graphics.display.show(graphics.splash)
+graphics.display.root_group = graphics.splash
 
 # Poll Google's authorization server
 print("Waiting for browser authorization...")
@@ -87,10 +80,10 @@ if not google_auth.wait_for_authorization():
 
 print("Successfully Authenticated with Google!")
 
-# print formatted keys for adding to secrets.py
-print("Add the following lines to your secrets.py file:")
-print("\t'google_access_token' " + ":" + " '%s'," % google_auth.access_token)
-print("\t'google_refresh_token' " + ":" + " '%s'" % google_auth.refresh_token)
+# print formatted keys for adding to settings.toml
+print("Add the following lines to your settings.toml file:")
+print(f'GOOGLE_ACCESS_TOKEN = "{google_auth.access_token}"')
+print(f'GOOGLE_REFRESH_TOKEN = "{google_auth.refresh_token}"')
 # Remove QR code and code/verification labels
 graphics.splash.pop()
 graphics.splash.pop()
@@ -98,7 +91,7 @@ graphics.splash.pop()
 
 label_overview_text.text = "Successfully Authenticated!"
 label_verification_url.text = (
-    "Check the REPL for tokens to add\n\tto your secrets.py file"
+    "Check the REPL for tokens to add\n\tto your settings.toml file"
 )
 
 # prevent exit

@@ -4,6 +4,9 @@
 
 import os
 
+# pylint: disable=unused-import
+import mount_sd # You must create a module mount_sd.py that mounts your sd card!
+
 def print_directory(path, tabs=0):
     for file in os.listdir(path):
         stats = os.stat(path + "/" + file)

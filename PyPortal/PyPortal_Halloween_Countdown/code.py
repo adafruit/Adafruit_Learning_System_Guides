@@ -17,19 +17,13 @@ All text above must be included in any redistribution.
 """
 
 #pylint:disable=invalid-name
+import os
 import time
 import random
 import board
 from adafruit_pyportal import PyPortal
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text.label import Label
-
-try:
-    from secrets import secrets
-except ImportError:
-    print("""WiFi settings are kept in secrets.py, please add them there!
-the secrets dictionary must contain 'ssid' and 'password' at a minimum""")
-    raise
 
 # The time of the thing!
 EVENT_YEAR = 2019
@@ -89,7 +83,7 @@ while True:
     if (not refresh_time) or (time.monotonic() - refresh_time) > 3600:
         try:
             print("Getting time from internet!")
-            pyportal.get_local_time(location=secrets['timezone'])
+            pyportal.get_local_time(location=os.getenv("TIMEZONE"))
             refresh_time = time.monotonic()
         except RuntimeError as e:
             print("Some error occured, retrying! -", e)

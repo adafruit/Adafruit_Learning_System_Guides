@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2021 Brent Rubell, written for Adafruit Industries
 #
 # SPDX-License-Identifier: Unlicense
+import os
 import time
 from adafruit_oauth2 import OAuth2
 from adafruit_display_shapes.line import Line
@@ -42,16 +43,6 @@ WEEKDAYS = {
     6: "Sunday",
 }
 
-# Add a secrets.py to your filesystem that has a dictionary called secrets with "ssid" and
-# "password" keys with your WiFi credentials. DO NOT share that file or commit it into Git or other
-# source control.
-# pylint: disable=no-name-in-module,wrong-import-order
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
-
 # Create the PyPortal object
 pyportal = PyPortal()
 r = rtc.RTC()
@@ -63,18 +54,18 @@ pyportal.network.connect()
 scopes = ["https://www.googleapis.com/auth/calendar.readonly"]
 google_auth = OAuth2(
     pyportal.network.requests,
-    secrets["google_client_id"],
-    secrets["google_client_secret"],
+    os.getenv("GOOGLE_CLIENT_ID"),
+    os.getenv("GOOGLE_CLIENT_SECRET"),
     scopes,
-    secrets["google_access_token"],
-    secrets["google_refresh_token"],
+    os.getenv("GOOGLE_ACCESS_TOKEN"),
+    os.getenv("GOOGLE_REFRESH_TOKEN"),
 )
 
 
 def get_current_time(time_max=False):
     """Gets local time from Adafruit IO and converts to RFC3339 timestamp."""
     # Get local time from Adafruit IO
-    pyportal.get_local_time(secrets["timezone"])
+    pyportal.get_local_time(os.getenv("TIMEZONE"))
     # Format as RFC339 timestamp
     cur_time = r.datetime
     if time_max:  # maximum time to fetch events is midnight (4:59:59UTC)

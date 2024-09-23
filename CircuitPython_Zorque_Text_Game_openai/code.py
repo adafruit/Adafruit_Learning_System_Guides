@@ -3,8 +3,8 @@
 import os
 import traceback
 
-import adafruit_esp32spi.adafruit_esp32spi_socket as socket
-import adafruit_requests as requests
+import adafruit_connection_manager
+import adafruit_requests
 import adafruit_touchscreen
 from adafruit_ticks import ticks_ms, ticks_add, ticks_less
 from adafruit_bitmap_font.bitmap_font import load_font
@@ -59,7 +59,13 @@ In case the player wins (or loses) start a fresh game.
 
 clear='\033[2J'
 
+# variable for setup requests.Session
+requests = None
+
+# pylint: disable=global-statement
 def set_up_wifi():
+    global requests
+
     print(end=clear)
     if openai_api_key is None:
         print(
@@ -81,7 +87,9 @@ def set_up_wifi():
 
     spi = board.SPI()
     esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp_cs, esp_ready, esp_reset)
-    requests.set_socket(socket, esp)
+    pool = adafruit_connection_manager.get_radio_socketpool(esp)
+    ssl_context = adafruit_connection_manager.get_radio_ssl_context(esp)
+    requests = adafruit_requests.Session(pool, ssl_context)
 
     while not esp.is_connected:
         print("Connecting to AP...")

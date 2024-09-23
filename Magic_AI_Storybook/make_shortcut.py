@@ -28,6 +28,7 @@ def main():
     APP_PATH = "~/Magic_AI_Storybook/story.py"
     APP_ICON = "~/Magic_AI_Storybook/images/magic_book_icon.png"
     FILENAME = "storybook.desktop"
+    ENV_PATH = "~/story"
     AUTO_START = True
 
     if os.geteuid() == 0:
@@ -41,12 +42,16 @@ def main():
 
     APP_PATH = APP_PATH.replace("~", user_homedir)
     APP_ICON = APP_ICON.replace("~", user_homedir)
+    PYTHON_PATH = "python"
+    if ENV_PATH is not None:
+        ENV_PATH = ENV_PATH.replace("~", user_homedir)
+        PYTHON_PATH = ENV_PATH + "/bin/" + PYTHON_PATH
 
     shortcut_template = f"""[Desktop Entry]
 Comment=Run {APP_TITLE}
 Terminal={"true" if RUN_IN_TERMINAL else "false"}
 Name={APP_TITLE}
-Exec=sudo python {APP_PATH}
+Exec=sudo -E env PATH=$PATH {PYTHON_PATH} {APP_PATH}
 Type=Application
 Icon={APP_ICON}
 """

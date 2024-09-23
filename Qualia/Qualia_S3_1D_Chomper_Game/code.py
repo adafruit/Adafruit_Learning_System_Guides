@@ -9,8 +9,7 @@ Circuitpython based 1 dimensional pacman style game inspired by Paku Paku.
 import board
 from adafruit_qualia import Qualia
 from adafruit_qualia.graphics import Displays
-from entity import Entity
-from chomper_1d_lib import ChomperGame
+from chomper_1d_lib import ChomperGame, Entity
 from digitalio import DigitalInOut, Direction, Pull
 
 

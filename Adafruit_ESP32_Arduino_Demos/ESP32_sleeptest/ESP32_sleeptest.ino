@@ -9,7 +9,7 @@
 //#define ADAFRUIT_FEATHER_ESP32_V2
 
 // then these pins will be defined for us 
-#if defined(ADAFRUIT_FEATHER_ESP32_V2)
+#if defined(ADAFRUIT_FEATHER_ESP32_V2) or defined(ARDUINO_ADAFRUIT_ITSYBITSY_ESP32)
 #define PIN_NEOPIXEL 0
 #define NEOPIXEL_I2C_POWER 2
 #endif

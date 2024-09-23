@@ -22,25 +22,30 @@ from adafruit_display_shapes.roundrect import RoundRect
 from adafruit_display_shapes.triangle import Triangle
 from adafruit_display_shapes.line import Line
 
-displayio.release_displays()
+# check for DVI Feather with built-in display
+if 'DISPLAY' in dir(board):
+    display = board.DISPLAY
 
-# check for DVI Feather
-if 'CKP' in dir(board):
+# check for DVI feather without built-in display
+elif 'CKP' in dir(board):
+    displayio.release_displays()
     fb = picodvi.Framebuffer(320, 240,
         clk_dp=board.CKP, clk_dn=board.CKN,
         red_dp=board.D0P, red_dn=board.D0N,
         green_dp=board.D1P, green_dn=board.D1N,
         blue_dp=board.D2P, blue_dn=board.D2N,
         color_depth=8)
+    display = framebufferio.FramebufferDisplay(fb)
 # otherwise assume Pico
 else:
+    displayio.release_displays()
     fb = picodvi.Framebuffer(320, 240,
         clk_dp=board.GP12, clk_dn=board.GP13,
         red_dp=board.GP10, red_dn=board.GP11,
         green_dp=board.GP8, green_dn=board.GP9,
         blue_dp=board.GP6, blue_dn=board.GP7,
         color_depth=8)
-display = framebufferio.FramebufferDisplay(fb)
+    display = framebufferio.FramebufferDisplay(fb)
 
 bitmap = displayio.Bitmap(display.width, display.height, 3)
 

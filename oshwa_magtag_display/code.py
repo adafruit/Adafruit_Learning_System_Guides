@@ -7,7 +7,7 @@ import ssl
 import gc
 import wifi
 import socketpool
-import adafruit_requests as requests
+import adafruit_requests
 from adafruit_magtag.magtag import MagTag
 
 # Get wifi details and more from a secrets.py file
@@ -28,7 +28,7 @@ print(f"Connected to {secrets['ssid']}!")
 print("My IP address is", wifi.radio.ipv4_address)
 
 socket = socketpool.SocketPool(wifi.radio)
-https = requests.Session(socket, ssl.create_default_context())
+https = adafruit_requests.Session(socket, ssl.create_default_context())
 
 # Paste your API token below
 TOKEN = "YOUR_API_TOKEN"

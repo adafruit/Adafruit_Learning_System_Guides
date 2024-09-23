@@ -8,6 +8,9 @@ import board
 import digitalio
 import microcontroller
 
+# pylint: disable=unused-import
+import mount_sd # You must create a module mount_sd.py that mounts your sd card!
+
 led = digitalio.DigitalInOut(board.D13)
 led.direction = digitalio.Direction.OUTPUT
 

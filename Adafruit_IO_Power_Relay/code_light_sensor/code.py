@@ -8,9 +8,9 @@ import busio
 from digitalio import DigitalInOut
 import neopixel
 import adafruit_bh1750
+import adafruit_connection_manager
 from adafruit_esp32spi import adafruit_esp32spi
 from adafruit_esp32spi import adafruit_esp32spi_wifimanager
-import adafruit_esp32spi.adafruit_esp32spi_socket as socket
 
 import adafruit_minimqtt.adafruit_minimqtt as MQTT
 
@@ -116,13 +116,16 @@ print("Connecting to WiFi...")
 wifi.connect()
 print("Connected!")
 
-MQTT.set_socket(socket, esp)
+pool = adafruit_connection_manager.get_radio_socketpool(esp)
+ssl_context = adafruit_connection_manager.get_radio_ssl_context(esp)
 
 # Set up a MiniMQTT Client
 client = MQTT.MQTT(
     broker="io.adafruit.com",
     username=secrets["aio_username"],
     password=secrets["aio_key"],
+    socket_pool=pool,
+    ssl_context=ssl_context,
 )
 
 # Setup the callback methods above

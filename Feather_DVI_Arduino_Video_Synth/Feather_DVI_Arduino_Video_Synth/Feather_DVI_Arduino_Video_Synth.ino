@@ -681,7 +681,7 @@ void make_triangle(uint16_t x1, uint16_t y1, uint16_t side_1, uint16_t side_2,ui
 }
 
 int analog_map(int x, int minMap, int maxMap) {
-    int z = analogRead(x);
+    long unsigned int z = analogRead(x);
     z = map(z, 0, 1023, minMap, maxMap);
     return z;
   }
@@ -726,7 +726,7 @@ void draw_gradient(int x, int y, int w, int h) {
     }
 }
 
-void millisDelay( long int delayTime){
-  long int start_time = millis();
+void millisDelay(long unsigned int delayTime){
+  long unsigned int start_time = millis();
   while ( millis() - start_time < delayTime) ;
 }

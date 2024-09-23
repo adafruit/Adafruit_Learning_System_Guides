@@ -28,6 +28,8 @@ storage.mount(vfs, "/sd")
 
 def print_directory(path, tabs=0):
     for file in os.listdir(path):
+        if file == "?":
+            continue  # Issue noted in Learn
         stats = os.stat(path + "/" + file)
         filesize = stats[6]
         isdir = stats[0] & 0x4000

@@ -10,15 +10,16 @@ notifications when it needs watering with your PyPortal.
 
 Author: Brent Rubell for Adafruit Industries, 2019
 """
+import os
 import time
 import json
 import board
 import busio
 from digitalio import DigitalInOut
 import neopixel
+import adafruit_connection_manager
 from adafruit_esp32spi import adafruit_esp32spi
 from adafruit_esp32spi import adafruit_esp32spi_wifimanager
-import adafruit_esp32spi.adafruit_esp32spi_socket as socket
 import adafruit_minimqtt.adafruit_minimqtt as MQTT
 from adafruit_aws_iot import MQTT_CLIENT
 from adafruit_seesaw.seesaw import Seesaw
@@ -27,12 +28,10 @@ import aws_gfx_helper
 # Time between polling the STEMMA, in minutes
 SENSOR_DELAY = 15
 
-# Get wifi details and more from a secrets.py file
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
+secrets = {
+    "ssid" : os.getenv("CIRCUITPY_WIFI_SSID"),
+    "password" : os.getenv("CIRCUITPY_WIFI_PASSWORD"),
+}
 
 # Get device certificate
 try:
@@ -86,8 +85,8 @@ print("Connecting to WiFi...")
 wifi.connect()
 print("Connected!")
 
-# Initialize MQTT interface with the esp interface
-MQTT.set_socket(socket, esp)
+pool = adafruit_connection_manager.get_radio_socketpool(esp)
+ssl_context = adafruit_connection_manager.get_radio_ssl_context(esp)
 
 # Soil Sensor Setup
 i2c_bus = busio.I2C(board.SCL, board.SDA)
@@ -127,8 +126,10 @@ def message(client, topic, msg):
     print("Message from {}: {}".format(topic, msg))
 
 # Set up a new MiniMQTT Client
-client =  MQTT.MQTT(broker = secrets['broker'],
-                    client_id = secrets['client_id'])
+client =  MQTT.MQTT(broker = os.getenv("BROKER"),
+                    client_id = os.getenv("CLIENT_ID"),
+                    socket_pool=pool,
+                    ssl_context=ssl_context)
 
 # Initialize AWS IoT MQTT API Client
 aws_iot = MQTT_CLIENT(client)

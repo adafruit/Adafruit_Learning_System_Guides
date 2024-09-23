@@ -90,6 +90,8 @@ while True:
     cmd = "df -h | awk '$NF==\"/\"{printf \"Disk: %d/%d GB  %s\", $3,$2,$5}'"
     Disk = subprocess.check_output(cmd, shell=True).decode("utf-8")
     cmd = "cat /sys/class/thermal/thermal_zone0/temp |  awk \'{printf \"CPU Temp: %.1f C\", $(NF-0) / 1000}\'" # pylint: disable=line-too-long
+    Temp = subprocess.check_output(cmd, shell=True).decode("utf-8")
+
 
     # Pi Hole data!
     try:
@@ -112,7 +114,8 @@ while True:
         y += font.getsize(MemUsage)[1]
         draw.text((x, y), Disk, font=font, fill="#0000FF")
         y += font.getsize(Disk)[1]
-        draw.text((x, y), "DNS Queries: {}".format(DNSQUERIES), font=font, fill="#FF00FF")
+        draw.text((x, y), Temp, font=font, fill="#FF00FF")
+        y += font.getsize(Temp)[1]
     else:
         draw.text((x, y), IP, font=font, fill="#FFFF00")
         y += font.getsize(IP)[1]

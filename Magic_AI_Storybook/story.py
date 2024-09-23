@@ -16,7 +16,7 @@ from collections import deque
 import board
 import digitalio
 import neopixel
-import openai
+from openai import OpenAI
 import pygame
 from rpi_backlight import Backlight
 from adafruit_led_animation.animation.pulse import Pulse
@@ -87,12 +87,11 @@ PARAGRAPH_SPACING = 30
 
 # ChatGPT Parameters
 SYSTEM_ROLE = "You are a master AI Storyteller that can tell a story of any length."
-CHATGPT_MODEL = "gpt-3.5-turbo"
+CHATGPT_MODEL = "gpt-3.5-turbo"  # You can also use "gpt-4", which is slower, but more accurate
 WHISPER_MODEL = "whisper-1"
 
 # Speech Recognition Parameters
 ENERGY_THRESHOLD = 300  # Energy level for mic to detect
-PHRASE_TIMEOUT = 1.0  # Space between recordings for separating phrases
 RECORD_TIMEOUT = 30  # Maximum time in seconds to wait for speech
 
 # Do some checks and Import API keys from API_KEYS_FILE
@@ -118,7 +117,10 @@ if "OPENAI_API_KEY" not in config["openai"]:
 if len(config["openai"]["OPENAI_API_KEY"]) < 10:
     print("Please set OPENAI_API_KEY in your API keys file with a valid key.")
     sys.exit(1)
-openai.api_key = config["openai"]["OPENAI_API_KEY"]
+openai = OpenAI(
+    # This is the default and can be omitted
+    api_key=config["openai"]["OPENAI_API_KEY"],
+)
 
 # Check that the prompt file exists and load it
 if not os.path.isfile(PROMPT_FILE):
@@ -250,7 +252,7 @@ class Book:
 
         # Initialize the Listener
         self.listener = Listener(
-            openai.api_key, ENERGY_THRESHOLD, PHRASE_TIMEOUT, RECORD_TIMEOUT
+            openai.api_key, ENERGY_THRESHOLD, RECORD_TIMEOUT
         )
 
         # Preload remaining images
@@ -704,18 +706,11 @@ class Book:
         self._sleeping = True
         self._set_status_color(NEOPIXEL_SLEEP_COLOR)
         self.sleep_check_delay = 0
-        self.saved_screen = self.screen.copy()
-        self.screen.fill((0, 0, 0))
-        pygame.display.update()
         self.backlight.power = False
 
     def _wake(self):
         # Turn on the screen
         self.backlight.power = True
-        if self.saved_screen:
-            self.screen.blit(self.saved_screen, (0, 0))
-            pygame.display.update()
-            self.saved_screen = None
         self.sleep_check_delay = 0.1
         self._set_status_color(NEOPIXEL_READING_COLOR)
         self._sleeping = False
@@ -728,8 +723,9 @@ class Book:
     def _sendchat(self, prompt):
         response = ""
         print("Sending to chatGPT")
+        print("Prompt: ", prompt)
         # Package up the text to send to ChatGPT
-        completion = openai.ChatCompletion.create(
+        stream = openai.chat.completions.create(
             model=CHATGPT_MODEL,
             messages=[
                 {"role": "system", "content": SYSTEM_ROLE},
@@ -738,9 +734,9 @@ class Book:
             stream=True,
         )
 
-        for chunk in completion:
-            if "delta" in chunk.choices[0] and "content" in chunk.choices[0]["delta"]:
-                response += chunk.choices[0]["delta"]["content"]
+        for chunk in stream:
+            if chunk.choices[0].delta.content is not None:
+                response += chunk.choices[0].delta.content
             if self._sleep_request:
                 return None
 

@@ -211,7 +211,7 @@ class Paint(object):
         self._palette = self._make_palette()
         self._splash.append(self._palette)
 
-        self._display.show(self._splash)
+        self._display.root_group = self._splash
         try:
             gc.collect()
             self._display.refresh(target_frames_per_second=60)
