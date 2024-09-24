@@ -2,12 +2,11 @@
 #
 # SPDX-License-Identifier: MIT
 
-import time
 import board
 import audiocore
 import audiobusio
 import audiomixer
-from digitalio import DigitalInOut, Direction, Pull
+from digitalio import DigitalInOut, Direction
 import pwmio
 import neopixel
 from adafruit_led_animation.animation.rainbow import Rainbow
