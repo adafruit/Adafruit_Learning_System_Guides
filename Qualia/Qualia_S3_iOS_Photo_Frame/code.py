@@ -53,8 +53,9 @@ def decode_image(base64_msg):
     graphics.display.root_group = group
     graphics.display.refresh()
 
+
 # Define callback methods which are called when events occur
-def connected(client, userdata, flags, rc):
+def connected(client, userdata, flags, rc): # pylint: disable=unused-argument
     # This function will be called when the client is connected
     # successfully to the broker.
     print(f"Connected to Adafruit IO! Listening for topic changes on {camera_feed}")
@@ -62,16 +63,16 @@ def connected(client, userdata, flags, rc):
     client.subscribe(camera_feed)
 
 
-def disconnected(client, userdata, rc):
+def disconnected(client, userdata, rc): # pylint: disable=unused-argument
     # This method is called when the client is disconnected
     print("Disconnected from Adafruit IO!")
 
 
-def message(client, topic, message):
+def message(client, topic, msg): # pylint: disable=unused-argument
     # This method is called when a topic the client is subscribed to
     # has a new message.
     print(f"New message on topic {topic}")
-    decode_image(message)
+    decode_image(msg)
 
 pool = socketpool.SocketPool(wifi.radio)
 ssl_context = ssl.create_default_context()
