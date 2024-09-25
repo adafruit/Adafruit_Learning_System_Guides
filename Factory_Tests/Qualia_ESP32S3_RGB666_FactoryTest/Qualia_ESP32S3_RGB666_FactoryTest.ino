@@ -37,6 +37,10 @@ Arduino_RGB_Display *gfx = new Arduino_RGB_Display(
 //    320 /* width */, 820 /* height */, rgbpanel, 0 /* rotation */, true /* auto_flush */,
 //    expander, GFX_NOT_DEFINED /* RST */, tl032fwv01_init_operations, sizeof(tl032fwv01_init_operations));
 
+// 3.7" 240x960 rectangle bar display
+//    240 /* width */, 960 /* height */, rgbpanel, 0 /* rotation */, true /* auto_flush */,
+//    expander, GFX_NOT_DEFINED /* RST */, HD371001C40_init_operations, sizeof(HD371001C40_init_operations), 120 /* col_offset1 */);
+
 // 4.0" 720x720 square display
 //    720 /* width */, 720 /* height */, rgbpanel, 0 /* rotation */, true /* auto_flush */,
 //    expander, GFX_NOT_DEFINED /* RST */, NULL, 0);
