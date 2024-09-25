@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2024 John Park for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /*********************************************************************
  Adafruit invests time and resources providing this open source code,
  please support Adafruit and open-source hardware by purchasing
@@ -18,8 +22,8 @@
 
 // USBHost is defined in usbh_helper.h
 #include "usbh_helper.h"
-#include <Adafruit_GFX.h> 
-#include <Adafruit_ST7789.h> 
+#include <Adafruit_GFX.h>
+#include <Adafruit_ST7789.h>
 #include <Fonts/FreeMono18pt7b.h>
 #include <Fonts/FreeMono12pt7b.h>
 
