@@ -9,6 +9,7 @@
 import time
 import board
 import displayio
+import fourwire
 import digitalio
 import analogio
 import adafruit_ili9341
@@ -55,7 +56,7 @@ spi = board.SPI()
 tft_cs = board.D9
 tft_dc = board.D10
 tft_rst = board.D6
-display_bus = displayio.FourWire(
+display_bus = fourwire.FourWire(
     spi, command=tft_dc, chip_select=tft_cs, reset=tft_rst
 )
 display = adafruit_ili9341.ILI9341(display_bus, width=DISPLAY_WIDTH, height=DISPLAY_HEIGHT)

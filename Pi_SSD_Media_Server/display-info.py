@@ -4,6 +4,7 @@
 import subprocess
 import board
 import displayio
+import fourwire
 from adafruit_display_text import label
 from adafruit_bitmap_font import bitmap_font
 from adafruit_st7789 import ST7789
@@ -23,7 +24,7 @@ tft_cs = board.CE0
 tft_dc = board.D25
 tft_rst = board.D24
 
-display_bus = displayio.FourWire(spi, command=tft_dc, chip_select=tft_cs, reset=tft_rst)
+display_bus = fourwire.FourWire(spi, command=tft_dc, chip_select=tft_cs, reset=tft_rst)
 
 display = ST7789(display_bus, width=320, height=170, colstart=35, rotation=270)
 

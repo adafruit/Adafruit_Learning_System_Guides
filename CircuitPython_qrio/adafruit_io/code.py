@@ -15,6 +15,7 @@ from terminalio import FONT
 import board
 import busio
 import displayio
+import fourwire
 import qrio
 import socketpool
 import wifi
@@ -30,7 +31,7 @@ feed_name = "qrstring"
 print("Initializing display")
 displayio.release_displays()
 spi = busio.SPI(MOSI=board.LCD_MOSI, clock=board.LCD_CLK)
-display_bus = displayio.FourWire(
+display_bus = fourwire.FourWire(
     spi, command=board.LCD_D_C, chip_select=board.LCD_CS, reset=board.LCD_RST
 )
 display = ILI9341(display_bus, width=320, height=240, rotation=90)

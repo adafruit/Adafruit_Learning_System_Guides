@@ -8,6 +8,7 @@ import digitalio
 from rainbowio import colorwheel
 import keypad
 import displayio
+import i2cdisplaybus
 import busio
 import adafruit_seesaw.seesaw
 import adafruit_seesaw.neopixel
@@ -50,7 +51,7 @@ oled_reset = board.D13
 
 i2c = board.STEMMA_I2C()
 # STEMMA OLED setup
-display_bus = displayio.I2CDisplay(i2c, device_address=0x3D, reset=oled_reset)
+display_bus = i2cdisplaybus.I2CDisplayBus(i2c, device_address=0x3D, reset=oled_reset)
 display = adafruit_displayio_ssd1306.SSD1306(display_bus, width=128, height=64)
 
 splash = displayio.Group()

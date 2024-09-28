@@ -11,6 +11,7 @@ import busio
 import board
 import microcontroller
 import displayio
+import i2cdisplaybus
 import terminalio
 from adafruit_display_text import label
 import adafruit_displayio_ssd1306
@@ -47,7 +48,7 @@ oled_reset = board.GP9
 
 # STEMMA I2C on picowbell
 i2c = busio.I2C(board.GP5, board.GP4)
-display_bus = displayio.I2CDisplay(i2c, device_address=0x3D, reset=oled_reset)
+display_bus = i2cdisplaybus.I2CDisplayBus(i2c, device_address=0x3D, reset=oled_reset)
 
 WIDTH = 128
 HEIGHT = 64

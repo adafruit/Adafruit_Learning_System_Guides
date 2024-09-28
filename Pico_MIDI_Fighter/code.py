@@ -4,6 +4,7 @@
 
 import time
 import board
+import i2cdisplaybus
 import displayio
 import terminalio
 import adafruit_aw9523
@@ -23,7 +24,7 @@ displayio.release_displays()
 # i2c setup, higher frequency for display refresh
 i2c = busio.I2C(board.GP1, board.GP0, frequency=1000000)
 #  i2c display setup
-display_bus = displayio.I2CDisplay(i2c, device_address=0x3D)
+display_bus = i2cdisplaybus.I2CDisplayBus(i2c, device_address=0x3D)
 #  i2c AW9523 GPIO expander setup
 aw = adafruit_aw9523.AW9523(i2c)
 #  MIDI setup as MIDI out device
