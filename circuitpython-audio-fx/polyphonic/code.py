@@ -9,6 +9,7 @@ import random
 import board
 import keypad
 import audiobusio
+import audiocore
 import audiomp3
 import audiomixer
 
@@ -38,11 +39,6 @@ audiodev = audiobusio.I2SOut(
 # without "opening" a "file"!
 EMPTY_MP3_BYTES = b"\xff\xe3"
 
-# THis is actually a valid but very short mp3 file, use it in case the core
-# changes and becomes more picky
-# EMPTY_MP3_BYTES = b'\xff\xe3\x18\xc4\x00\x00\x00\x03H\x00\x00\x00\x00CIRCUITPYUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU\xff\xe3\x18\xc4;\x00\x00\x03H\x00\x00\x00\x00UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU\xff\xe3\x18\xc4v\x00\x00\x03H\x00\x00\x00\x00UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU'
-
-
 def exists(p):
     try:
         os.stat(p)
@@ -60,10 +56,10 @@ def random_choice(seq):
 # stop any audio (it's already stopped) but it DOES mark the voice & decoder as
 # available. Otherwise, we might needlessly stop some other sample.
 def free_stopped_channels():
-    for trigger in triggers:
-        if trigger._voice and not trigger.playing:
+    for i in triggers:
+        if i.voice and not i.playing:
             print("fst")
-            trigger.force_off()
+            i.force_off()
 
 
 # iterating on reversed triggers gives priority to **lower** numbered triggers
@@ -71,8 +67,8 @@ def ensure_available_decoder():
     if available_decoders:
         return available_decoders.popleft()
 
-    for trigger in reversed_triggers:
-        trigger.force_off()
+    for i in reversed_triggers:
+        i.force_off()
         if available_decoders:
             break
 
@@ -83,8 +79,8 @@ def ensure_available_voice():
     if available_voices:
         return available_voices.popleft()
 
-    for trigger in reversed_triggers:
-        trigger.force_off()
+    for i in reversed_triggers:
+        i.force_off()
         if available_voices:
             break
 
@@ -94,8 +90,8 @@ def ensure_available_voice():
 class TriggerBase:
     def __init__(self, prefix):
         self._decoder = None
-        self._voice = None
-        self._filenames = list(self._gather_filenames(prefix))
+        self.voice = None
+        self.filenames = list(self._gather_filenames(prefix))
 
     def _gather_filenames(self, prefix):
         for stem in self.stems:
@@ -108,7 +104,7 @@ class TriggerBase:
                 yield name_wav
                 continue
 
-    def _get_sample(self, path):
+    def get_sample(self, path):
         if path.endswith(".mp3"):
             self._decoder = ensure_available_decoder()
             self._decoder.open(path)
@@ -119,16 +115,16 @@ class TriggerBase:
     def play(self, path, loop=False):
         self.force_off()
         free_stopped_channels()
-        sample = self._get_sample(path)
-        self._voice = ensure_available_voice()
-        self._voice.play(sample, loop=loop)
+        sample = self.get_sample(path)
+        self.voice = ensure_available_voice()
+        self.voice.play(sample, loop=loop)
 
     def force_off(self):
         print("force off", self)
-        voice = self._voice
+        voice = self.voice
         if voice is not None:
             print(f"return voice {id(voice)}")
-            self._voice = None
+            self.voice = None
             voice.stop()
             available_voices.append(voice)
         decoder = self._decoder
@@ -141,7 +137,7 @@ class TriggerBase:
 
     @property
     def playing(self):
-        return False if self._voice is None else self._voice.playing
+        return False if self.voice is None else self.voice.playing
 
     @classmethod
     def matches(cls, prefix):
@@ -151,7 +147,7 @@ class TriggerBase:
         return exists(name_wav) or exists(name_mp3)
 
     def __repr__(self):
-        return f"<{self.__class__.__name__} {self._filenames}{' playing' if self.playing else ''}>"
+        return f"<{self.__class__.__name__} {self.filenames}{' playing' if self.playing else ''}>"
 
 
 class NopTrigger(TriggerBase):
@@ -172,7 +168,7 @@ class BasicTrigger(TriggerBase):
     stems = [""]
 
     def on_press(self):
-        self.play(self._filenames[0])
+        self.play(self.filenames[0])
 
     def on_release(self):
         pass
@@ -184,7 +180,7 @@ class HoldLoopingTrigger(TriggerBase):
     stems = ["HOLDL"]
 
     def on_press(self):
-        self.play(self._filenames[0], loop=True)
+        self.play(self.filenames[0], loop=True)
 
     def on_release(self):
         self.force_off()
@@ -199,7 +195,7 @@ class LatchingLoopTrigger(TriggerBase):
         if self.playing:
             self.force_off()
         else:
-            self.play(self._filenames[0], loop=True)
+            self.play(self.filenames[0], loop=True)
 
     def on_release(self):
         pass
@@ -213,8 +209,8 @@ class PlayNextTrigger(TriggerBase):
         self._phase = 0
 
     def on_press(self):
-        self.play(self._filenames[self._phase])
-        self._phase = (self._phase + 1) % len(self._filenames)
+        self.play(self.filenames[self._phase])
+        self._phase = (self._phase + 1) % len(self.filenames)
 
     def on_release(self):
         pass
@@ -223,11 +219,8 @@ class PlayNextTrigger(TriggerBase):
 class PlayRandomTrigger(TriggerBase):
     stems = [f"RAND{i}" for i in range(10)]
 
-    def __init__(self, prefix):
-        super().__init__(prefix)
-
     def on_press(self):
-        self.play(random_choice(self._filenames))
+        self.play(random_choice(self.filenames))
 
     def on_release(self):
         pass
@@ -275,16 +268,16 @@ def playback_specs(sample):
     )
 
 
-def check_match_make_mixer(audiodev):
+def check_match_make_mixer(dev):
     all_filenames = []
-    for trigger in triggers:
-        all_filenames.extend(trigger._filenames)
+    for i in triggers:
+        all_filenames.extend(i.filenames)
 
     if not all_filenames:
         raise RuntimeError("*** NO AUDIO FILES FOUND ***")
 
     if max_simultaneous_voices == 1:
-        return [audiodev]
+        return [dev]
 
     first_trigger = triggers[0]
 
@@ -292,7 +285,7 @@ def check_match_make_mixer(audiodev):
 
     specs = None
     for filename in all_filenames:
-        sample = first_trigger._get_sample(filename)
+        sample = first_trigger.get_sample(filename)
         new_specs = playback_specs(sample)
         if specs is None:
             specs = new_specs
@@ -312,7 +305,7 @@ def check_match_make_mixer(audiodev):
         samples_signed=samples_signed,
         **specs,
     )
-    audiodev.play(mixer)
+    dev.play(mixer)
 
     return list(mixer.voice)
 
