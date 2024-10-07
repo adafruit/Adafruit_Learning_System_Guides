@@ -90,7 +90,8 @@ icons_small_bmp, icons_small_pal = adafruit_imageload.load(ICONS_SMALL_FILE)
 
 def get_forecast():
     URL  = f"https://api.open-meteo.com/v1/forecast?latitude={LAT}&longitude={LON}&"
-    URL += "daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,wind_speed_10m_max,wind_direction_10m_dominant"
+    URL += "daily=weather_code,temperature_2m_max,temperature_2m_min"
+    URL += ",sunrise,sunset,wind_speed_10m_max,wind_direction_10m_dominant"
     URL += "&timeformat=unixtime"
     URL += f"&timezone={TMZ}"
     resp = magtag.network.fetch(URL)
@@ -158,7 +159,6 @@ def wind_text(speedkmh, direction):
         wtext += "{:2.0f}kmh".format(speedkmh)
     else:
         wtext += "{:2.0f}mph".format(0.621371 * speedkmh)
-    
     return wtext
 
 
@@ -316,4 +316,3 @@ print("Sleeping...")
 go_to_sleep(get_ntp_time(forecast_data["utc_offset_seconds"]/3600))
 #  entire code will run again after deep sleep cycle
 #  similar to hitting the reset button
-
