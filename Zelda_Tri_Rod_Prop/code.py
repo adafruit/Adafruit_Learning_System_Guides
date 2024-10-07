@@ -19,6 +19,7 @@ SWING_2_THRESHOLD = 170
 
 pixel_time = 10
 Y_THRESHOLD = -9.0
+VERTICAL_TIME = 1.0  # Time in seconds the sensor needs to be vertical to trigger
 
 fx_1 = audiocore.WaveFile(open("/sounds/swing1.wav", "rb"))
 fx_2 = audiocore.WaveFile(open("/sounds/swing1b.wav", "rb"))
@@ -32,7 +33,7 @@ mixer = audiomixer.Mixer(voice_count=3, sample_rate=22050, channel_count=1,
 audio.play(mixer)
 
 # external neopixels
-num_pixels = 50
+num_pixels = 60
 pixels = neopixel.NeoPixel(board.EXTERNAL_NEOPIXELS, num_pixels, auto_write=False)
 pixels.brightness = 0.2
 
@@ -60,7 +61,6 @@ mode = 0
 brightness = 0
 increasing = True
 pixel_clock = ticks_ms()
-VERTICAL_TIME = 2.0  # Time in seconds the sensor needs to be vertical to trigger
 # Variables to track time
 vertical_start_time = None
 
