@@ -131,159 +131,146 @@ void turbo_button() {
   }
 }
 
+bool is_combo_detected(const uint8_t* combo, size_t combo_size, const uint8_t* report) {
+  for (size_t i = 0; i < combo_size; i++) {
+    uint8_t button = combo[i];
+    
+    // Determine which byte the button is in and then check if it is pressed
+    if (button & BUTTON_A || button & BUTTON_B || button & BUTTON_X || button & BUTTON_Y) {
+      if ((report[BYTE_DPAD_BUTTONS] & button) != button) {
+        return false;  // Button is not pressed
+      }
+    } else if (button & BUTTON_LEFT_PADDLE || button & BUTTON_RIGHT_PADDLE || 
+               button & BUTTON_LEFT_TRIGGER || button & BUTTON_RIGHT_TRIGGER || 
+               button & BUTTON_BACK || button & BUTTON_START) {
+      if ((report[BYTE_MISC_BUTTONS] & button) != button) {
+        return false;  // Button is not pressed
+      }
+    }
+  }
+  return true;  // All buttons in the combo are pressed
+}
+
 void tuh_hid_report_received_cb(uint8_t dev_addr, uint8_t instance, uint8_t const* report, uint16_t len) {
-  // Known report when the combo is pressed
-  //uint8_t combo_report[] = { 0x80, 0x7F, 0x80, 0x7F, 0x28, 0x03, 0x00, 0xFF };
-  // Check if the incoming report matches the combo report
-  bool combo_detected = ((report[4] == combo_report[4]) && (report[5] == combo_report[5]));// len == sizeof(combo_report)) && (memcmp(report, combo_report, sizeof(combo_report)) == 0);
 
   // Manage the combo state and print messages
-  if (combo_detected && !combo_active) {
+  if ((is_combo_detected(combo_report, combo_size, report)) && !combo_active) {
     combo_active = true;
     Serial.println("combo!");
-  } else if (combo_detected && combo_active) {
+  } else if ((is_combo_detected(combo_report, combo_size, report)) && combo_active) {
     combo_active = false;
     Serial.println("combo released!");
   }
-  if (!(combo_active)) {
-    if (!(report[BYTE_LEFT_STICK_X] == LEFT_STICK_X_NEUTRAL)) {
-      int16_t leftStickX = report[BYTE_LEFT_STICK_X];
-      Serial.print("left stick X: ");
-      Serial.println(leftStickX);
-      int16_t new_leftStickX = map(leftStickX, 0, 255, -127, 127);
-      gp.x = new_leftStickX;
-    } else {
-      gp.x = 0;
+    // Handle analog stick inputs
+    gp.x = (report[BYTE_LEFT_STICK_X] != LEFT_STICK_X_NEUTRAL) ? map(report[BYTE_LEFT_STICK_X], 0, 255, -127, 127) : 0;
+    gp.y = (report[BYTE_LEFT_STICK_Y] != LEFT_STICK_Y_NEUTRAL) ? map(report[BYTE_LEFT_STICK_Y], 0, 255, -127, 127) : 0;
+    gp.z = (report[BYTE_RIGHT_STICK_X] != RIGHT_STICK_X_NEUTRAL) ? map(report[BYTE_RIGHT_STICK_X], 0, 255, -127, 127) : 0;
+    gp.rz = (report[BYTE_RIGHT_STICK_Y] != RIGHT_STICK_Y_NEUTRAL) ? map(report[BYTE_RIGHT_STICK_Y], 0, 255, -127, 127) : 0;
+
+    // Debug print for report data
+    /*Serial.print("Report data: ");
+    for (int i = 0; i < len; i++) {
+      Serial.print(report[i], HEX);
+      Serial.print(" ");
     }
-    if (!(report[BYTE_LEFT_STICK_Y] == LEFT_STICK_Y_NEUTRAL)) {
-      int16_t leftStickY = report[BYTE_LEFT_STICK_Y];
-      Serial.print("left stick Y: ");
-      Serial.println(leftStickY);
-      int16_t new_leftStickY = map(leftStickY, 0, 255, -127, 127);
-      gp.y = new_leftStickY;
-    } else {
-      gp.y = 0;
-    }
-    if (!(report[BYTE_RIGHT_STICK_X] == RIGHT_STICK_X_NEUTRAL)) {
-      int8_t rightStickX = report[BYTE_RIGHT_STICK_X];
-      Serial.print("right stick X: ");
-      Serial.println(rightStickX);
-      int16_t new_rightStickX = map(rightStickX, 0, 255, 127, -127);
-      gp.z = new_rightStickX;
-    } else {
-      gp.z = 0;
-    }
-    if (!(report[BYTE_RIGHT_STICK_Y] == RIGHT_STICK_Y_NEUTRAL)) {
-      int8_t rightStickY = report[BYTE_RIGHT_STICK_Y];
-      Serial.print("right stick Y: ");
-      Serial.println(rightStickY);
-      int16_t new_rightStickY = map(rightStickY, 0, 255, -127, 127);
-      gp.rz = new_rightStickY;
-    } else {
-      gp.rz = 0;
-    }
-    if (!(report[BYTE_DPAD_BUTTONS] == DPAD_NEUTRAL)) {
-      // D-Pad is active
-      uint8_t buttonsSelect = report[BYTE_DPAD_BUTTONS];
-      switch (buttonsSelect) {
-        case BUTTON_X:
-          Serial.println("x");
-          gp.buttons = GAMEPAD_BUTTON_X;
-          break;
-        case BUTTON_A:
-          Serial.println("a");
-          gp.buttons = GAMEPAD_BUTTON_A;
-          break;
-        case BUTTON_B:
-          Serial.println("b");
-          gp.buttons = GAMEPAD_BUTTON_B;
-          break;
-        case BUTTON_Y:
-          Serial.println("y");
-          gp.buttons = GAMEPAD_BUTTON_Y;
-          break;
-      }
-    } else {
-      gp.hat = 0;
-      gp.buttons = 0;
-    }
-    if (!(report[BYTE_DPAD_BUTTONS] == DPAD_NEUTRAL)) {
-      // D-Pad is active
-      uint8_t dpadDirection = report[BYTE_DPAD_BUTTONS];
-      switch (dpadDirection) {
-        case DPAD_UP:
-          Serial.println("up");
-          gp.hat = 1; // GAMEPAD_HAT_UP;
-          break;
-        case DPAD_UP_RIGHT:
-          Serial.println("up/right");
-          gp.hat = 2;
-          break;
-        case DPAD_RIGHT:
-          Serial.println("right");
-          gp.hat = 3;
-          break;
-        case DPAD_DOWN_RIGHT:
-          Serial.println("down/right");
-          gp.hat = 4;
-          break;
-        case DPAD_DOWN:
-          Serial.println("down");
-          gp.hat = 5;
-          break;
-        case DPAD_DOWN_LEFT:
-          Serial.println("down/left");
-          gp.hat = 6;
-          break;
-        case DPAD_LEFT:
-          Serial.println("left");
-          gp.hat = 7;
-          break;
-        case DPAD_UP_LEFT:
-          Serial.println("up/left");
-          gp.hat = 8;
-          break;
-      }
-    } else {
-      gp.hat = 0;
-    }
-    if (!(report[BYTE_MISC_BUTTONS] == MISC_NEUTRAL)) {
-      // misc are active
-      uint8_t miscDirection = report[BYTE_MISC_BUTTONS];
-      switch (miscDirection) {
-        case BUTTON_LEFT_PADDLE:
-          Serial.println("left paddle");
-          gp.buttons = GAMEPAD_BUTTON_TL;
-          break;
-        case BUTTON_RIGHT_PADDLE:
-          Serial.println("right paddle");
-          gp.buttons = GAMEPAD_BUTTON_TR;
-          break;
-        case BUTTON_LEFT_TRIGGER:
-          Serial.println("left trigger");
-          gp.buttons = GAMEPAD_BUTTON_TL2;
-          break;
-        case BUTTON_RIGHT_TRIGGER:
-          Serial.println("right trigger");
-          gp.buttons = GAMEPAD_BUTTON_TR2;
-          break;
-        case BUTTON_BACK:
-          Serial.println("back");
-          gp.buttons = GAMEPAD_BUTTON_SELECT;
-          break;
-        case BUTTON_START:
-          Serial.println("start");
-          gp.buttons = GAMEPAD_BUTTON_START;
-          break;  
+    Serial.println();*/
+
+    uint8_t dpad_value = report[BYTE_DPAD_BUTTONS] & DPAD_MASK;
+
+    // Handle D-pad direction
+    if ((report[BYTE_DPAD_BUTTONS] & DPAD_NEUTRAL) == 0) {
+      switch (dpad_value) {
+        case DPAD_UP: gp.hat = 1; Serial.println("up"); break;
+        case DPAD_UP_RIGHT: gp.hat = 2; Serial.println("up/right"); break;
+        case DPAD_RIGHT: gp.hat = 3; Serial.println("right"); break;
+        case DPAD_DOWN_RIGHT: gp.hat = 4; Serial.println("down/right"); break;
+        case DPAD_DOWN: gp.hat = 5; Serial.println("down"); break;
+        case DPAD_DOWN_LEFT: gp.hat = 6; Serial.println("down/left"); break;
+        case DPAD_LEFT: gp.hat = 7; Serial.println("left"); break;
+        case DPAD_UP_LEFT: gp.hat = 8; Serial.println("up/left"); break;
         }
-      }
-  } else {
-    gp.buttons = GAMEPAD_BUTTON_A;
-  }
-  while (!usb_hid.ready()) {
-      yield();
+    } else {
+      gp.hat = 0;
     }
-    usb_hid.sendReport(0, &gp, sizeof(gp));
+    uint16_t buttons = gp.buttons;
+    if ((report[BYTE_DPAD_BUTTONS] & BUTTON_X) == BUTTON_X) {
+      buttons |= GAMEPAD_BUTTON_X;
+      Serial.println("x");
+    } else {
+      buttons &= ~GAMEPAD_BUTTON_X;
+    }
+    if ((report[BYTE_DPAD_BUTTONS] & BUTTON_A) == BUTTON_A) {
+      buttons |= GAMEPAD_BUTTON_A;
+      Serial.println("a");
+    } else {
+      buttons &= ~GAMEPAD_BUTTON_A;
+    }
+    if ((report[BYTE_DPAD_BUTTONS] & BUTTON_B) == BUTTON_B) {
+      buttons |= GAMEPAD_BUTTON_B;
+      Serial.println("b");
+    } else {
+      buttons &= ~GAMEPAD_BUTTON_B;
+    }
+    if ((report[BYTE_DPAD_BUTTONS] & BUTTON_Y) == BUTTON_Y) {
+      buttons |= GAMEPAD_BUTTON_Y;
+      Serial.println("y");
+    } else {
+      buttons &= ~GAMEPAD_BUTTON_Y;
+    }
+    gp.buttons = buttons;
+
+    if ((report[BYTE_MISC_BUTTONS] & BUTTON_LEFT_PADDLE) == BUTTON_LEFT_PADDLE) {
+      buttons |= GAMEPAD_BUTTON_TL;
+      Serial.println("left paddle");
+    } else {
+      buttons &= ~GAMEPAD_BUTTON_TL;
+    }
+    if ((report[BYTE_MISC_BUTTONS] & BUTTON_RIGHT_PADDLE) == BUTTON_RIGHT_PADDLE) {
+      buttons |= GAMEPAD_BUTTON_TR;
+      Serial.println("right paddle");
+    } else {
+      buttons &= ~GAMEPAD_BUTTON_TR;
+    }
+    if ((report[BYTE_MISC_BUTTONS] & BUTTON_LEFT_TRIGGER) == BUTTON_LEFT_TRIGGER) {
+      buttons |= GAMEPAD_BUTTON_TL2;
+      Serial.println("left trigger");
+    } else {
+      buttons &= ~GAMEPAD_BUTTON_TL2;
+    }
+    if ((report[BYTE_MISC_BUTTONS] & BUTTON_RIGHT_TRIGGER) == BUTTON_RIGHT_TRIGGER) {
+      buttons |= GAMEPAD_BUTTON_TR2;
+      Serial.println("right trigger");
+    } else {
+      buttons &= ~GAMEPAD_BUTTON_TR2;
+    }
+    if ((report[BYTE_MISC_BUTTONS] & BUTTON_BACK) == BUTTON_BACK) {
+      buttons |= GAMEPAD_BUTTON_SELECT;
+      Serial.println("back");
+    } else {
+      buttons &= ~GAMEPAD_BUTTON_SELECT;
+    }
+    if ((report[BYTE_MISC_BUTTONS] & BUTTON_START) == BUTTON_START) {
+      buttons |= GAMEPAD_BUTTON_START;
+      Serial.println("start");
+    } else {
+      buttons &= ~GAMEPAD_BUTTON_START;
+    }
+    // Set the final buttons state
+    gp.buttons = buttons;
+
+  // Debug print for gp contents
+  /*Serial.print("gp.x: "); Serial.println(gp.x);
+  Serial.print("gp.y: "); Serial.println(gp.y);
+  Serial.print("gp.z: "); Serial.println(gp.z);
+  Serial.print("gp.rz: "); Serial.println(gp.rz);
+  Serial.print("gp.hat: "); Serial.println(gp.hat);
+  Serial.print("gp.buttons: "); Serial.println(gp.buttons, HEX);*/
+
+  while (!usb_hid.ready()) {
+    yield();
+  }
+  usb_hid.sendReport(0, &gp, sizeof(gp));
+
   // Continue to receive the next report
   if (!tuh_hid_receive_report(dev_addr, instance)) {
     Serial.println("Error: cannot request to receive report");

@@ -5,8 +5,6 @@
 // HID reports for Logitech Gamepad F310
 // Update defines and combo_report for your gamepad and/or combo!
 
-uint8_t combo_report[] = { 0x80, 0x7F, 0x80, 0x7F, 0x28, 0x03, 0x00, 0xFF };
-
 // Byte indices for the gamepad report
 #define BYTE_LEFT_STICK_X    0   // Left analog stick X-axis
 #define BYTE_LEFT_STICK_Y    1   // Left analog stick Y-axis
@@ -32,10 +30,10 @@ uint8_t combo_report[] = { 0x80, 0x7F, 0x80, 0x7F, 0x28, 0x03, 0x00, 0xFF };
 #define DPAD_UP_LEFT         0x07  // 0111
 
 // Face buttons (Byte[4] bits 4-7)
-#define BUTTON_X             0x18
-#define BUTTON_A             0x28
-#define BUTTON_B             0x48
-#define BUTTON_Y             0x88
+#define BUTTON_X             0x10
+#define BUTTON_A             0x20
+#define BUTTON_B             0x40
+#define BUTTON_Y             0x80
 
 // Button masks for Byte[5] (MISC buttons)
 #define MISC_NEUTRAL         0x00
@@ -52,3 +50,6 @@ uint8_t combo_report[] = { 0x80, 0x7F, 0x80, 0x7F, 0x28, 0x03, 0x00, 0xFF };
 #define LEFT_STICK_Y_NEUTRAL   0x7F
 #define RIGHT_STICK_X_NEUTRAL   0x80
 #define RIGHT_STICK_Y_NEUTRAL   0x7F
+
+uint8_t combo_report[] = { BUTTON_A, BUTTON_LEFT_PADDLE, BUTTON_RIGHT_PADDLE };
+size_t combo_size = sizeof(combo_report) / sizeof(combo_report[0]);
