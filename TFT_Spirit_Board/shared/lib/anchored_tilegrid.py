@@ -1,3 +1,6 @@
+"""
+AnchoredTilegrid helper class
+"""
 try:
     from typing import Tuple
 except ImportError:
@@ -7,6 +10,10 @@ from displayio import TileGrid
 
 
 class AnchoredTileGrid(TileGrid):
+    """
+    AnchoredTileGrid extends TileGrid and allows placing the TileGrid
+    relative to an arbitrary anchor point.
+    """
     def __init__(self, bitmap, **kwargs):
         super().__init__(bitmap, **kwargs)
         self._anchor_point = (0, 0)
@@ -18,6 +25,10 @@ class AnchoredTileGrid(TileGrid):
 
     @property
     def anchor_point(self):
+        """
+        The anchor point. tuple containing x and y values ranging
+        from 0 to 1.
+        """
         return self._anchor_point
 
     @anchor_point.setter
@@ -35,11 +46,9 @@ class AnchoredTileGrid(TileGrid):
     @anchored_position.setter
     def anchored_position(self, new_position: Tuple[int, int]) -> None:
         self._anchored_position = new_position
-        # Calculate (x,y) position
-        if (self._anchor_point is not None) and (self._anchored_position is not None):
-            new_x = int(new_position[0]
-                        - round(self._anchor_point[0] * (self.tile_width * self.width)))
 
+        if (self._anchor_point is not None) and (self._anchored_position is not None):
+            # Calculate (x,y) position
             self.x = int(
                 new_position[0]
                 - round(self._anchor_point[0] * (self.tile_width * self.width))

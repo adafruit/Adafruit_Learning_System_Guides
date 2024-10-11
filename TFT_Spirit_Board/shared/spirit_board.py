@@ -1,10 +1,15 @@
+"""
+SpiritBoard helper class
+"""
 import math
 import os
 import random
 import time
-
 import displayio
+
+# pylint: disable=import-error
 from anchored_tilegrid import AnchoredTileGrid
+
 
 class SpiritBoard(displayio.Group):
     """
@@ -13,7 +18,6 @@ class SpiritBoard(displayio.Group):
     Holds and manages everything needed to draw the spirit board and planchette, as well
     as move the planchette around to output messages from the spirits.
     """
-
     # Mapping of letters and words on the board to their pixel coordinates.
     # Points are centered on the target letter.
     # Words can contain a list of points, the planchette will move between them.
@@ -44,13 +48,16 @@ class SpiritBoard(displayio.Group):
 
         # board image file
         self.spirit_board_odb = displayio.OnDiskBitmap("spirit_board_480x320.bmp")
-        self.spirit_board_tilegrid = displayio.TileGrid(bitmap=self.spirit_board_odb, pixel_shader=self.spirit_board_odb.pixel_shader)
+        self.spirit_board_tilegrid = displayio.TileGrid(
+            bitmap=self.spirit_board_odb, pixel_shader=self.spirit_board_odb.pixel_shader)
+
         self.append(self.spirit_board_tilegrid)
 
         # planchette image file
         self.planchette_odb = displayio.OnDiskBitmap("planchette_v1.bmp")
         self.planchette_odb.pixel_shader.make_transparent(0)
-        self.planchette_tilegrid = AnchoredTileGrid(bitmap=self.planchette_odb, pixel_shader=self.planchette_odb.pixel_shader)
+        self.planchette_tilegrid = AnchoredTileGrid(
+            bitmap=self.planchette_odb, pixel_shader=self.planchette_odb.pixel_shader)
 
         # AnchoredTileGrid is used so that we can move the planchette
         # relative to the cetner of the window.
@@ -66,15 +73,15 @@ class SpiritBoard(displayio.Group):
         display.root_group = self
 
     @staticmethod
-    def dist(pointA, pointB):
+    def dist(point_a, point_b):
         """
         Calculate the distance between two points.
 
-        :param tuple pointA: x,y pair of the first point
-        :param pointB: x,y pair of the second point
+        :param tuple point_a: x,y pair of the first point
+        :param point_b: x,y pair of the second point
         :return: the distance between the two points
         """
-        return math.sqrt((pointB[0] - pointA[0]) ** 2 + (pointB[1] - pointA[1]) ** 2)
+        return math.sqrt((point_b[0] - point_a[0]) ** 2 + (point_b[1] - point_a[1]) ** 2)
 
     def slide_planchette(self, target_location, delay=0.1, step_size=4):
         """
@@ -114,12 +121,14 @@ class SpiritBoard(displayio.Group):
         # variables used to calculate where the next point
         # between where we are at and where we are going is.
         distance_ratio = step_size / distance
-        one_minus_distance_ratio = (1 - distance_ratio)
+        one_minus_distance_ratio = 1 - distance_ratio
 
         # calculate the next point
         next_point = (
-            round(one_minus_distance_ratio * current_location[0] + distance_ratio * target_location[0]),
-            round(one_minus_distance_ratio * current_location[1] + distance_ratio * target_location[1])
+            round(one_minus_distance_ratio * current_location[0]
+                  + distance_ratio * target_location[0]),
+            round(one_minus_distance_ratio * current_location[1]
+                  + distance_ratio * target_location[1])
         )
         # print(current_location)
         # print(next_point)
@@ -149,12 +158,14 @@ class SpiritBoard(displayio.Group):
 
             # distance ratio variables used to calculate next point
             distance_ratio = step_size / distance
-            one_minus_distance_ratio = (1 - distance_ratio)
+            one_minus_distance_ratio = 1 - distance_ratio
 
             # calculate the next point
             next_point = (
-                round(one_minus_distance_ratio * current_location[0] + distance_ratio * target_location[0]),
-                round(one_minus_distance_ratio * current_location[1] + distance_ratio * target_location[1])
+                round(one_minus_distance_ratio * current_location[0]
+                      + distance_ratio * target_location[0]),
+                round(one_minus_distance_ratio * current_location[1]
+                      + distance_ratio * target_location[1])
             )
 
             # if we have not arrived at the target location yet
@@ -219,7 +230,8 @@ class SpiritBoard(displayio.Group):
                 # if the word has only a single point
                 elif isinstance(SpiritBoard.LOCATIONS[word], tuple):
                     # slide the planchette to the point
-                    self.slide_planchette(SpiritBoard.LOCATIONS[word], delay=0.02, step_size=step_size)
+                    self.slide_planchette(SpiritBoard.LOCATIONS[word],
+                                          delay=0.02, step_size=step_size)
 
                     # pause at the point
                     time.sleep(0.5)
@@ -230,7 +242,8 @@ class SpiritBoard(displayio.Group):
                 # loop over each character in the word
                 for character in word:
                     # slide the planchette to the current characters location
-                    self.slide_planchette(SpiritBoard.LOCATIONS[character], delay=0.02, step_size=step_size)
+                    self.slide_planchette(SpiritBoard.LOCATIONS[character],
+                                          delay=0.02, step_size=step_size)
 
                     # pause after we arrive
                     time.sleep(0.5)
@@ -239,7 +252,8 @@ class SpiritBoard(displayio.Group):
             if not skip_spaces and index < len(message_words) - 1:
                 # handle the space
                 # slide the planchette to the empty space location.
-                self.slide_planchette(SpiritBoard.LOCATIONS[" "], delay=0.02, step_size=step_size)
+                self.slide_planchette(SpiritBoard.LOCATIONS[" "],
+                                      delay=0.02, step_size=step_size)
 
                 # pause after we arrive
                 time.sleep(0.5)
@@ -298,7 +312,7 @@ class SpiritBoard(displayio.Group):
         # if the spirit_messages.txt file exists
         if "spirit_messages.txt" in os.listdir("/"):
             # open the file
-            with open("/spirit_messages.txt", "r") as f:
+            with open("/spirit_messages.txt", "r", encoding="utf-8") as f:
                 # split on newline and set the messages found into the context
                 messages = f.read().split("\n")
 
@@ -311,7 +325,7 @@ class SpiritBoard(displayio.Group):
                                "messages to spirit_messages.txt.")
 
         # if there are messages and we need to shuffle them
-        elif shuffle:
+        if shuffle:
             # temporary list to hold them
             shuffled_list = []
 

@@ -7,6 +7,7 @@ Feather ESP32-S3 or S2 + TFT Featherwing 3.5" 480x320 pixels
 
 Receive and display messages from the spirits.
 """
+# pylint: disable=import-error, invalid-name
 import os
 import displayio
 import board
@@ -14,10 +15,12 @@ from digitalio import DigitalInOut
 import adafruit_connection_manager
 import wifi
 import adafruit_requests
-from adafruit_io.adafruit_io import IO_HTTP, AdafruitIO_RequestError
+from adafruit_io.adafruit_io import IO_HTTP
 from adafruit_hx8357 import HX8357  # TFT Featherwing 3.5" 480x320 display driver
-from spirit_board import SpiritBoard
 import adafruit_tsc2007
+
+from spirit_board import SpiritBoard
+
 
 
 # 3.5" TFT Featherwing is 480x320
@@ -37,8 +40,7 @@ _touch_flip = (False, True)
 # Initialize 3.5" TFT Featherwing Touchscreen
 ts_cs_pin = DigitalInOut(board.D6)
 i2c = board.I2C()
-irq_dio = None
-tsc = adafruit_tsc2007.TSC2007(i2c, irq=irq_dio)
+tsc = adafruit_tsc2007.TSC2007(i2c, irq=None)
 
 # Initialize a requests session
 pool = adafruit_connection_manager.get_radio_socketpool(wifi.radio)
