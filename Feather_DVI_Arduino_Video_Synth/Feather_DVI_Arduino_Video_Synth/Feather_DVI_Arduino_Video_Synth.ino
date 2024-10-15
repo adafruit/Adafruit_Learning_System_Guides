@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: 2023 Liz Clark for Adafruit Industries
 // SPDX-License-Identifier: MIT
 
+// Feather DVI Video Synth
+
 #include <PicoDVI.h>
 
 DVIGFX16 display(DVI_RES_320x240p60, adafruit_feather_dvi_cfg);
