@@ -16,7 +16,7 @@ import adafruit_connection_manager
 from adafruit_esp32spi import adafruit_esp32spi
 import adafruit_touchscreen
 import adafruit_requests
-from adafruit_io.adafruit_io import IO_HTTP, AdafruitIO_RequestError
+from adafruit_io.adafruit_io import IO_HTTP
 
 from spirit_board import SpiritBoard
 

@@ -88,14 +88,14 @@ class SpiritBoard(displayio.Group):
         _y_ratio = 240/320
         # 46x
         print(_x_ratio, _y_ratio)
-        for loc_key in self.LOCATIONS.keys():
-            if isinstance(self.LOCATIONS[loc_key], tuple):
-                _x, _y = self.LOCATIONS[loc_key]
-                self.LOCATIONS[loc_key] = (int(_x * _x_ratio), int(_y * _y_ratio))
-            elif isinstance(self.LOCATIONS[loc_key], list):
-                for i in range(len(self.LOCATIONS[loc_key])):
-                    _x, _y = self.LOCATIONS[loc_key][i]
-                    self.LOCATIONS[loc_key][i] = (int(_x * _x_ratio), int(_y * _y_ratio))
+        for key, value in self.LOCATIONS.items():
+            if isinstance(value, tuple):
+                _x, _y = value
+                self.LOCATIONS[key] = (int(_x * _x_ratio), int(_y * _y_ratio))
+            elif isinstance(value, list):
+                for i in range(len(value)):
+                    _x, _y = value[i]
+                    self.LOCATIONS[key][i] = (int(_x * _x_ratio), int(_y * _y_ratio))
 
 
     @staticmethod
