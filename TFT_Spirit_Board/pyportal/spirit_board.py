@@ -11,7 +11,7 @@ import time
 import displayio
 
 # pylint: disable=import-error
-from anchored_tilegrid import AnchoredTileGrid
+from adafruit_anchored_tilegrid import AnchoredTileGrid
 
 
 class SpiritBoard(displayio.Group):
@@ -50,14 +50,22 @@ class SpiritBoard(displayio.Group):
         super().__init__()
 
         # board image file
-        self.spirit_board_odb = displayio.OnDiskBitmap("spirit_board_480x320.bmp")
+        if display.width == 480 and display.height == 320:
+            self.spirit_board_odb = displayio.OnDiskBitmap("spirit_board_480x320.bmp")
+        elif display.width == 320 and display.height == 240:
+            self.spirit_board_odb = displayio.OnDiskBitmap("spirit_board_320x240.bmp")
+            self._convert_locations_for_small_screen()
         self.spirit_board_tilegrid = displayio.TileGrid(
             bitmap=self.spirit_board_odb, pixel_shader=self.spirit_board_odb.pixel_shader)
 
         self.append(self.spirit_board_tilegrid)
 
         # planchette image file
-        self.planchette_odb = displayio.OnDiskBitmap("planchette_v1.bmp")
+        if display.width == 480 and display.height == 320:
+            self.planchette_odb = displayio.OnDiskBitmap("planchette_v1.bmp")
+        elif display.width == 320 and display.height == 240:
+            self.planchette_odb = displayio.OnDiskBitmap("planchette_v1_sm.bmp")
+
         self.planchette_odb.pixel_shader.make_transparent(0)
         self.planchette_tilegrid = AnchoredTileGrid(
             bitmap=self.planchette_odb, pixel_shader=self.planchette_odb.pixel_shader)
@@ -74,6 +82,21 @@ class SpiritBoard(displayio.Group):
 
         # set the self Group instance to root_group, so it's shown on the display.
         display.root_group = self
+
+    def _convert_locations_for_small_screen(self):
+        _x_ratio = 320/480
+        _y_ratio = 240/320
+        # 46x
+        print(_x_ratio, _y_ratio)
+        for key, value in self.LOCATIONS.items():
+            if isinstance(value, tuple):
+                _x, _y = value
+                self.LOCATIONS[key] = (int(_x * _x_ratio), int(_y * _y_ratio))
+            elif isinstance(value, list):
+                for i in range(len(value)):
+                    _x, _y = value[i]
+                    self.LOCATIONS[key][i] = (int(_x * _x_ratio), int(_y * _y_ratio))
+
 
     @staticmethod
     def dist(point_a, point_b):
@@ -279,6 +302,8 @@ class SpiritBoard(displayio.Group):
 
         :return: List of messages
         """
+        if io is None:
+            raise RuntimeError("No connection to AdafruitIO")
 
         # fetch the latest data in the feed
         incoming_message = io.receive_data("spiritboard")
@@ -357,7 +382,7 @@ class SpiritBoard(displayio.Group):
         """
         try:
             return SpiritBoard.sync_with_io(io)
-        except OSError:
+        except (OSError, RuntimeError):
             print("Caught OSError. Will try again next time.\n"
                   "Falling back to spirit_messages.txt file.")
             return SpiritBoard.read_local_messages_file()
