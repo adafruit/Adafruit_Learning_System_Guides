@@ -12,6 +12,7 @@ import displayio
 
 # pylint: disable=import-error
 from adafruit_anchored_tilegrid import AnchoredTileGrid
+from adafruit_io.adafruit_io_errors import AdafruitIO_RequestError
 
 
 class SpiritBoard(displayio.Group):
@@ -220,12 +221,13 @@ class SpiritBoard(displayio.Group):
         # want to update the display
         self._display.auto_refresh = True
 
-    def write_message(self, message, skip_spaces=True, step_size=6):
+    def write_message(self, message, skip_spaces=True, step_size=6, delay=0.02):
         """
 
         :param string message: The message to output with the planchette
         :param skip_spaces: Whether to skip space characters
         :param step_size: How big of a step to take with each movement
+        :param delay: How many seconds to sleep between each movement step
         :return: None
         """
         # ignore empty messages
@@ -248,7 +250,7 @@ class SpiritBoard(displayio.Group):
                     for location in SpiritBoard.LOCATIONS[word]:
                         print(f"sliding to: {location}")
                         # slide the planchette to each point
-                        self.slide_planchette(location, delay=0.02, step_size=step_size)
+                        self.slide_planchette(location, delay=delay, step_size=step_size)
 
                         # pause at each point
                         time.sleep(0.25)
@@ -257,7 +259,7 @@ class SpiritBoard(displayio.Group):
                 elif isinstance(SpiritBoard.LOCATIONS[word], tuple):
                     # slide the planchette to the point
                     self.slide_planchette(SpiritBoard.LOCATIONS[word],
-                                          delay=0.02, step_size=step_size)
+                                          delay=delay, step_size=step_size)
 
                     # pause at the point
                     time.sleep(0.5)
@@ -269,7 +271,7 @@ class SpiritBoard(displayio.Group):
                 for character in word:
                     # slide the planchette to the current characters location
                     self.slide_planchette(SpiritBoard.LOCATIONS[character],
-                                          delay=0.02, step_size=step_size)
+                                          delay=delay, step_size=step_size)
 
                     # pause after we arrive
                     time.sleep(0.5)
@@ -279,14 +281,14 @@ class SpiritBoard(displayio.Group):
                 # handle the space
                 # slide the planchette to the empty space location.
                 self.slide_planchette(SpiritBoard.LOCATIONS[" "],
-                                      delay=0.02, step_size=step_size)
+                                      delay=delay, step_size=step_size)
 
                 # pause after we arrive
                 time.sleep(0.5)
 
         # after we've shown the whole message
         # slide the planchette back to it's home location
-        self.slide_planchette(SpiritBoard.LOCATIONS["home"], delay=0.02, step_size=6)
+        self.slide_planchette(SpiritBoard.LOCATIONS["home"], delay=delay, step_size=step_size)
 
     @staticmethod
     def sync_with_io(io) -> list:
@@ -382,7 +384,7 @@ class SpiritBoard(displayio.Group):
         """
         try:
             return SpiritBoard.sync_with_io(io)
-        except (OSError, RuntimeError):
-            print("Caught OSError. Will try again next time.\n"
+        except (OSError, RuntimeError, AdafruitIO_RequestError) as e:
+            print(f"Caught Exception: {type(e)} - {e}.\nWill try again next time.\n"
                   "Falling back to spirit_messages.txt file.")
             return SpiritBoard.read_local_messages_file()
