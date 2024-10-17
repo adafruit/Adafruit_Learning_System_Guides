@@ -272,7 +272,7 @@ class SpiritBoard(displayio.Group):
                 # loop over each character in the word
                 for character in word:
                     # if the character is in our locations mapping
-                    if character in SpiritBoard.LOCATIONS.keys():
+                    if character in SpiritBoard.LOCATIONS:
                         # slide the planchette to the current characters location
                         self.slide_planchette(SpiritBoard.LOCATIONS[character],
                                               delay=delay, step_size=step_size)
