@@ -1,0 +1,4 @@
+hello world
+spirits are near
+i <3 circuitpython
+goodbye
