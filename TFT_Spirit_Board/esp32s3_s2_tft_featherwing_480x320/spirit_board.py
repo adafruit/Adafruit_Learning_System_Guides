@@ -240,6 +240,8 @@ class SpiritBoard(displayio.Group):
         # loop over the words in the message
         for index, word in enumerate(message_words):
             print(f"index: {index}, word: {word}")
+            # send it to lowercase to get rid of capital letters
+            word = word.lower()
 
             # if the current word is one of the full words on the board
             if word in SpiritBoard.FULL_WORDS:
@@ -269,12 +271,17 @@ class SpiritBoard(displayio.Group):
 
                 # loop over each character in the word
                 for character in word:
-                    # slide the planchette to the current characters location
-                    self.slide_planchette(SpiritBoard.LOCATIONS[character],
-                                          delay=delay, step_size=step_size)
+                    # if the character is in our locations mapping
+                    if character in SpiritBoard.LOCATIONS.keys():
+                        # slide the planchette to the current characters location
+                        self.slide_planchette(SpiritBoard.LOCATIONS[character],
+                                              delay=delay, step_size=step_size)
 
-                    # pause after we arrive
-                    time.sleep(0.5)
+                        # pause after we arrive
+                        time.sleep(0.5)
+                    else:
+                        # character is not in our mapping
+                        print(f"Skipping '{character}', it's not on the board.")
 
             # if we are not skipping spaces, and we are not done with the message
             if not skip_spaces and index < len(message_words) - 1:
