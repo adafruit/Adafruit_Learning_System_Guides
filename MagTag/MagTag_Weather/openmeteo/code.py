@@ -11,11 +11,11 @@ from adafruit_display_text import label
 from adafruit_magtag.magtag import MagTag
 
 # --| USER CONFIG |--------------------------
-LAT = 47.6                  # latitude
-LON = -122.3                # longitude
-TMZ = "America/Los_Angeles" # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
-METRIC = False              # set to True for metric units
-CITY = None                 # optional
+LAT = 47.6  # latitude
+LON = -122.3  # longitude
+TMZ = "America/Los_Angeles"  # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+METRIC = False  # set to True for metric units
+CITY = None  # optional
 # -------------------------------------------
 
 # ----------------------------
@@ -58,15 +58,15 @@ MONTHS = (
 
 # Map the above WMO codes to index of icon in 3x3 spritesheet
 WMO_CODE_TO_ICON = (
-    (0,),                                       # 0 = sunny
-    (1,),                                       # 1 = partly sunny/cloudy
-    (2,),                                       # 2 = cloudy
-    (3,),                                       # 3 = very cloudy
-    (61, 63, 65),                               # 4 = rain
-    (51, 53, 55, 80, 81, 82),                   # 5 = showers
-    (95, 96, 99),                               # 6 = storms
-    (56, 57, 66, 67, 71, 73, 75, 77, 85, 86),   # 7 = snow
-    (45, 48),                                   # 8 = fog and stuff
+    (0,),  # 0 = sunny
+    (1,),  # 1 = partly sunny/cloudy
+    (2,),  # 2 = cloudy
+    (3,),  # 3 = very cloudy
+    (61, 63, 65),  # 4 = rain
+    (51, 53, 55, 80, 81, 82),  # 5 = showers
+    (95, 96, 99),  # 6 = storms
+    (56, 57, 66, 67, 71, 73, 75, 77, 85, 86),  # 7 = snow
+    (45, 48),  # 8 = fog and stuff
 )
 
 magtag = MagTag()
@@ -85,8 +85,9 @@ icons_small_bmp, icons_small_pal = adafruit_imageload.load(ICONS_SMALL_FILE)
 # /////////////////////////////////////////////////////////////////////////
 #  helper functions
 
+
 def get_forecast():
-    URL  = f"https://api.open-meteo.com/v1/forecast?latitude={LAT}&longitude={LON}&"
+    URL = f"https://api.open-meteo.com/v1/forecast?latitude={LAT}&longitude={LON}&"
     URL += "daily=weather_code,temperature_2m_max,temperature_2m_min"
     URL += ",sunrise,sunset,wind_speed_10m_max,wind_direction_10m_dominant"
     URL += "&timeformat=unixtime"
@@ -165,10 +166,7 @@ def update_today(data):
     s = data["daily"]["time"][0] + data["utc_offset_seconds"]
     t = time.localtime(s)
     today_date.text = "{} {} {}, {}".format(
-        DAYS[t.tm_wday].upper(),
-        MONTHS[t.tm_mon - 1].upper(),
-        t.tm_mday,
-        t.tm_year
+        DAYS[t.tm_wday].upper(), MONTHS[t.tm_mon - 1].upper(), t.tm_mday, t.tm_year
     )
     # weather icon
     w = data["daily"]["weather_code"][0]
@@ -191,14 +189,14 @@ def update_future(data):
     """Update the future forecast info."""
     for i, banner in enumerate(future_banners):
         # day of week
-        s = data["daily"]["time"][i+1] + data["utc_offset_seconds"]
+        s = data["daily"]["time"][i + 1] + data["utc_offset_seconds"]
         t = time.localtime(s)
         banner[0].text = DAYS[t.tm_wday][:3].upper()
         # weather icon
-        w = data["daily"]["weather_code"][i+1]
+        w = data["daily"]["weather_code"][i + 1]
         banner[1][0] = next(x for x, t in enumerate(WMO_CODE_TO_ICON) if w in t)
         # temperature
-        t = data["daily"]["temperature_2m_max"][i+1]
+        t = data["daily"]["temperature_2m_max"][i + 1]
         banner[2].text = temperature_text(t)
 
 
@@ -303,8 +301,8 @@ magtag.display.refresh()
 time.sleep(magtag.display.time_to_refresh + 1)
 
 print("Sleeping...")
-h, m, s = (int(t) for t in resp_data.headers['date'].split(" ")[4].split(':'))
-current_time_secs = (h * 3600) + (m * 60) + (s) + forecast_data['utc_offset_seconds']
+h, m, s = (int(t) for t in resp_data.headers["date"].split(" ")[4].split(":"))
+current_time_secs = (h * 3600) + (m * 60) + (s) + forecast_data["utc_offset_seconds"]
 go_to_sleep(current_time_secs)
 #  entire code will run again after deep sleep cycle
 #  similar to hitting the reset button
