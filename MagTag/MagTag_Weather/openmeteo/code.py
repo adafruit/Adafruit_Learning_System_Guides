@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2024 Carter Nelson for Adafruit Industries
 #
 # SPDX-License-Identifier: MIT
-# pylint: disable=redefined-outer-name, eval-used, wrong-import-order
+# pylint: disable=redefined-outer-name, eval-used, wrong-import-order, unsubscriptable-object
 
 import time
 import terminalio
@@ -308,3 +308,4 @@ current_time_secs = (h * 3600) + (m * 60) + (s) + forecast_data['utc_offset_seco
 go_to_sleep(current_time_secs)
 #  entire code will run again after deep sleep cycle
 #  similar to hitting the reset button
+
