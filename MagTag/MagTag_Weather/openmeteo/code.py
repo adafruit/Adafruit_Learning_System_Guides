@@ -9,16 +9,13 @@ import displayio
 import adafruit_imageload
 from adafruit_display_text import label
 from adafruit_magtag.magtag import MagTag
-# needed for NTP
-import wifi
-import socketpool
-import adafruit_ntp
 
 # --| USER CONFIG |--------------------------
 LAT = 47.6                  # latitude
 LON = -122.3                # longitude
 TMZ = "America/Los_Angeles" # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 METRIC = False              # set to True for metric units
+CITY = None                 # optional
 # -------------------------------------------
 
 # ----------------------------
@@ -95,7 +92,7 @@ def get_forecast():
     URL += "&timeformat=unixtime"
     URL += f"&timezone={TMZ}"
     resp = magtag.network.fetch(URL)
-    return resp.json()
+    return resp
 
 
 def make_banner(x=0, y=0):
@@ -205,26 +202,13 @@ def update_future(data):
         banner[2].text = temperature_text(t)
 
 
-def get_ntp_time(offset):
-    """Use NTP to get current local time."""
-    pool = socketpool.SocketPool(wifi.radio)
-    ntp = adafruit_ntp.NTP(pool, tz_offset=offset)
-    if ntp:
-        return ntp.datetime
-    else:
-        return None
-
-
-def go_to_sleep(current_time):
+def go_to_sleep(current_time_secs):
     """Enter deep sleep for time needed."""
-    # compute current time offset in seconds
-    hour = current_time.tm_hour
-    minutes = current_time.tm_min
-    seconds = current_time.tm_sec
-    seconds_since_midnight = 60 * (hour * 60 + minutes) + seconds
+    # work in units of seconds
+    seconds_in_a_day = 24 * 60 * 60
     three_fifteen = (3 * 60 + 15) * 60
     # wake up 15 minutes after 3am
-    seconds_to_sleep = (24 * 60 * 60 - seconds_since_midnight) + three_fifteen
+    seconds_to_sleep = (seconds_in_a_day - current_time_secs) + three_fifteen
     print(
         "Sleeping for {} hours, {} minutes".format(
             seconds_to_sleep // 3600, (seconds_to_sleep // 60) % 60
@@ -240,7 +224,12 @@ today_date = label.Label(terminalio.FONT, text="?" * 30, color=0x000000)
 today_date.anchor_point = (0, 0)
 today_date.anchored_position = (15, 14)
 
-location_name = label.Label(terminalio.FONT, text=f"({LAT},{LON})", color=0x000000)
+location_name = label.Label(terminalio.FONT, color=0x000000)
+if CITY:
+    location_name.text = f"{CITY[:16]} ({LAT:.1f},{LON:.1f})"
+else:
+    location_name.text = f"({LAT},{LON})"
+
 location_name.anchor_point = (0, 0)
 location_name.anchored_position = (15, 25)
 
@@ -301,7 +290,8 @@ for future_banner in future_banners:
 #  M A I N
 # ===========
 print("Fetching forecast...")
-forecast_data = get_forecast()
+resp_data = get_forecast()
+forecast_data = resp_data.json()
 
 print("Updating...")
 update_today(forecast_data)
@@ -313,6 +303,8 @@ magtag.display.refresh()
 time.sleep(magtag.display.time_to_refresh + 1)
 
 print("Sleeping...")
-go_to_sleep(get_ntp_time(forecast_data["utc_offset_seconds"]/3600))
+h, m, s = (int(t) for t in resp_data.headers['date'].split(" ")[4].split(':'))
+current_time_secs = (h * 3600) + (m * 60) + (s) + forecast_data['utc_offset_seconds']
+go_to_sleep(current_time_secs)
 #  entire code will run again after deep sleep cycle
 #  similar to hitting the reset button
