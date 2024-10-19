@@ -1,60 +1,63 @@
-# SPDX-FileCopyrightText: 2018 John Edgar Park for Adafruit Industries
-#
-# SPDX-License-Identifier: MIT
-
-"""LASER SWORD (pew pew) example for Adafruit Hallowing & NeoPixel strip"""
-# pylint: disable=bare-except
-
 import time
 import math
 import gc
 from digitalio import DigitalInOut, Direction, Pull
 import audioio
 import audiocore
+import audiomixer
 import busio
 import board
 import neopixel
 import adafruit_lis3dh
+from rainbowio import colorwheel
+from adafruit_led_animation.animation.chase import Chase
+from adafruit_led_animation.animation.blink import Blink
+from adafruit_led_animation.animation.pulse import Pulse
+from adafruit_led_animation.sequence import AnimationSequence
+from adafruit_led_animation.color import RED
+import adafruit_fancyled.adafruit_fancyled as fancy
+from adafruit_debouncer import Debouncer
+from random import randint
+import random
 
-# CUSTOMIZE YOUR COLOR HERE:
-# (red, green, blue) -- each 0 (off) to 255 (brightest)
-# COLOR = (255, 0, 0)  # red
-COLOR = (100, 0, 255)  # purple
-# COLOR = (0, 100, 255) #cyan
 
-# CUSTOMIZE SENSITIVITY HERE: smaller numbers = more sensitive to motion
-HIT_THRESHOLD = 350 # 250
-SWING_THRESHOLD = 125
+# SENSITIVITY
+HIT = 400
+SWING = 250
+THRUST = 600
+IDLE = 110
 
-NUM_PIXELS = 114
-# NUM_PIXELS = 85
+NUM_PIXELS = 144
 NEOPIXEL_PIN = board.D5
 POWER_PIN = board.D10
 SWITCH_PIN = board.D9
+SWITCH2_PIN = board.D13
 
 enable = DigitalInOut(POWER_PIN)
 enable.direction = Direction.OUTPUT
-enable.value =False
+enable.value = False
 
 red_led = DigitalInOut(board.D11)
 red_led.direction = Direction.OUTPUT
-green_led = DigitalInOut(board.D12)
-green_led.direction = Direction.OUTPUT
-blue_led = DigitalInOut(board.D13)
-blue_led.direction = Direction.OUTPUT
 
-audio = audioio.AudioOut(board.A0)     # Speaker
-mode = 0                               # Initial mode = OFF
+speaker = audioio.AudioOut(board.A0, right_channel=board.A1)
+mode = 0
 
-strip = neopixel.NeoPixel(NEOPIXEL_PIN, NUM_PIXELS, brightness=1, auto_write=False)
-strip.fill(0)                          # NeoPixels off ASAP on startup
+strip = neopixel.NeoPixel(NEOPIXEL_PIN, NUM_PIXELS, brightness=0.75, auto_write=False)
+
+strip.fill(0)
 strip.show()
 
 switch = DigitalInOut(SWITCH_PIN)
 switch.direction = Direction.INPUT
 switch.pull = Pull.UP
 
-time.sleep(0.1)
+switch2 = DigitalInOut(SWITCH2_PIN)
+switch2.direction = Direction.INPUT
+switch2.pull = Pull.UP
+
+switch2deb = Debouncer(switch2)
+
 
 # Set up accelerometer on I2C bus, 4G range:
 i2c = busio.I2C(board.SCL, board.SDA)
@@ -62,9 +65,61 @@ accel = adafruit_lis3dh.LIS3DH_I2C(i2c)
 accel.range = adafruit_lis3dh.RANGE_4_G
 
 # "Idle" color is 1/4 brightness, "swinging" color is full brightness...
-COLOR_IDLE = (int(COLOR[0] / 1), int(COLOR[1] / 1), int(COLOR[2] / 1))
-COLOR_SWING = COLOR
+COLOR_IDLE = colorwheel(85)
 COLOR_HIT = (255, 255, 255)  # "hit" color is white
+
+chase = Chase(strip, speed=0.01, color=COLOR_IDLE, size=100, spacing=1)
+blink = Blink(strip, speed=0.001, color=COLOR_IDLE)
+pulse = Pulse(strip, speed=0.01, period=10, color=COLOR_IDLE)
+
+index = 0
+awake = False
+setup = False
+setup2 = False
+awake2 = False
+#    [0],  # red
+#    [10],  # orange
+#    [30],  # yellow
+#    [85],  # green
+#    [137],  # cyan
+#    [170],  # blue
+#    [213],  # purple
+
+counter = 85
+
+idleWav = audiocore.WaveFile(open("sounds/idle.wav", "rb"))
+hitWav = audiocore.WaveFile(open("sounds/hit.wav", "rb"))
+hitWav2 = audiocore.WaveFile(open("sounds/hit2.wav", "rb"))
+swingWav1 = audiocore.WaveFile(open("sounds/swing.wav", "rb"))
+swingWav2 = audiocore.WaveFile(open("sounds/swing2.wav", "rb"))
+swingWav3 = audiocore.WaveFile(open("sounds/swing3.wav", "rb"))
+swingWav4 = audiocore.WaveFile(open("sounds/swing4.wav", "rb"))
+swingWav5 = audiocore.WaveFile(open("sounds/swing5.wav", "rb"))
+swingWav6 = audiocore.WaveFile(open("sounds/swing6.wav", "rb"))
+laserHitWav = audiocore.WaveFile(open("sounds/laserHit.wav", "rb"))
+setupMode = audiocore.WaveFile(open("sounds/setupMode.wav", "rb"))
+marchWav = audiocore.WaveFile(open("sounds/march.wav", "rb"))
+helloThere = audiocore.WaveFile(open("sounds/helloThere.wav", "rb"))
+
+min_brightness = 150
+max_brightness = 255
+breathing_speed = 10
+brightness = max_brightness
+brightness_up = False
+playCounter = 2
+
+
+BLACK = fancy.CRGB(0, 0, 0)
+WHITE = fancy.CRGB(255, 255, 255)
+
+
+mixer = audiomixer.Mixer(
+    voice_count=7,
+    sample_rate=11025,
+    channel_count=1,
+    bits_per_sample=16,
+    samples_signed=True,
+)
 
 def play_wav(name, loop=False):
     """
@@ -76,11 +131,12 @@ def play_wav(name, loop=False):
     """
     print("playing", name)
     try:
-        wave_file = open('sounds/' + name + '.wav', 'rb')
+        wave_file = open("sounds/" + name + ".wav", "rb")
         wave = audiocore.WaveFile(wave_file)
-        audio.play(wave, loop=loop)
+        speaker.play(wave, loop=loop)
     except:
         return
+
 
 def power(sound, duration, reverse):
     """
@@ -89,23 +145,25 @@ def power(sound, duration, reverse):
     @param duration: estimated duration of sound, in seconds (>0.0)
     @param reverse:  if True, do power-off effect (reverses animation)
     """
+
+    color = colorwheel(counter)
     if reverse:
         prev = NUM_PIXELS
     else:
         prev = 0
-    gc.collect()                   # Tidy up RAM now so animation's smoother
+    gc.collect()  # Tidy up RAM now so animation's smoother
     start_time = time.monotonic()  # Save audio start time
     play_wav(sound)
     while True:
         elapsed = time.monotonic() - start_time  # Time spent playing sound
-        if elapsed > duration:                   # Past sound duration?
-            break                                # Stop animating
-        fraction = elapsed / duration            # Animation time, 0.0 to 1.0
+        if elapsed > duration:  # Past sound duration?
+            break  # Stop animating
+        fraction = elapsed / duration  # Animation time, 0.0 to 1.0
         if reverse:
-            fraction = 1.0 - fraction            # 1.0 to 0.0 if reverse
-        fraction = math.pow(fraction, 0.5)       # Apply nonlinear curve
+            fraction = 1.0 - fraction  # 1.0 to 0.0 if reverse
+        fraction = math.pow(fraction, 0.5)  # Apply nonlinear curve
         threshold = int(NUM_PIXELS * fraction + 0.5)
-        num = threshold - prev # Number of pixels to light on this pass
+        num = threshold - prev  # Number of pixels to light on this pass
         if num != 0:
             if reverse:
                 strip[threshold:prev] = [0] * -num
@@ -120,73 +178,201 @@ def power(sound, duration, reverse):
             prev = threshold
 
     if reverse:
-        strip.fill(0)                            # At end, ensure strip is off
+        strip.fill(0)  # At end, ensure strip is off
     else:
-        strip.fill(COLOR_IDLE)                   # or all pixels set on
+        strip.fill(COLOR_IDLE)  # or all pixels set on
     strip.show()
-    while audio.playing:                         # Wait until audio done
+    while speaker.playing:  # Wait until audio done
         pass
 
-def mix(color_1, color_2, weight_2):
-    """
-    Blend between two colors with a given ratio.
-    @param color_1:  first color, as an (r,g,b) tuple
-    @param color_2:  second color, as an (r,g,b) tuple
-    @param weight_2: Blend weight (ratio) of second color, 0.0 to 1.0
-    @return: (r,g,b) tuple, blended color
-    """
-    if weight_2 < 0.0:
-        weight_2 = 0.0
-    elif weight_2 > 1.0:
-        weight_2 = 1.0
-    weight_1 = 1.0 - weight_2
-    return (int(color_1[0] * weight_1 + color_2[0] * weight_2),
-            int(color_1[1] * weight_1 + color_2[1] * weight_2),
-            int(color_1[2] * weight_1 + color_2[2] * weight_2))
+def colorwheel2tuple(RGBint):
+    Blue = RGBint & 255
+    Green = (RGBint >> 8) & 255
+    Red = (RGBint >> 16) & 255
+    return [Red, Green, Blue]
+
+def rainbow_cycle(wait):
+    for j in range(255):
+        for i in range(NUM_PIXELS):
+            rc_index = (i * 256 // NUM_PIXELS) - j
+            strip[i] = colorwheel(rc_index & 255)
+        strip.show()
+        time.sleep(wait)
+
+
+def phaser_glow(color, wait):
+    for j in range(255):
+        for i in range(NUM_PIXELS):
+            rc_index = (i * 256 // NUM_PIXELS) - j
+            strip[i] = colorwheel(rc_index & 255)
+        strip.show()
+        time.sleep(wait)
+
+
+def color_chase(color, wait):
+    for i in range(NUM_PIXELS):
+        strip[i] = color
+        time.sleep(wait)
+        strip.show()
+    time.sleep(0.5)
+
+
+def playSwing(num):
+    if num == 1:
+        swing = swingWav1
+    elif num == 2:
+        swing = swingWav2
+    elif num == 3:
+        swing = swingWav3
+    elif num == 4:
+        swing = swingWav4
+    elif num == 5:
+        swing = swingWav5
+    else:
+        swing = swingWav6
+
+    return swing
+
+def playHit(num):
+    if num == 1:
+        hit = hitWav
+    elif num == 2:
+        hit = hitWav2
+    else:
+        hit = hitWav
+
+    return hit
 
 # Main program loop, repeats indefinitely
+
 while True:
 
-    red_led.value = True
+    red_led.value = False
+    color = colorwheel(counter)
 
-    if not switch.value:                    # button pressed?
-        if mode == 0:                       # If currently off...
-            enable.value = True
-            power('on', 1.7, False)         # Power up!
-            play_wav('idle', loop=True)     # Play background hum sound
-            mode = 1                        # ON (idle) mode now
-        else:                               # else is currently on...
-            power('off', 1.15, True)        # Power down
-            mode = 0                        # OFF mode now
+    COLOR_IDLE = color
+
+    if not switch2.value and setup:
+        counter = counter + 5
+        if counter >= 255:
+            counter = 1
+        color = colorwheel(counter)
+        strip.fill(color)  # set to idle color
+        strip.show()
+        #mixer.voice[1].play(marchWav, loop=False)
+        print("changing color " + str(color))
+
+
+    if not switch2.value:
+        for j in range(NUM_PIXELS):
+            if(j>=65 and j<=85):
+                strip[j] = [255,255,255]
+            else:
+                strip[j] = colorwheel2tuple(color)
+
+        if not setup:
+            mixer.voice[1].play(laserHitWav, loop=False)
+        strip.show()
+        time.sleep(0.25)
+        strip.fill(color)
+        strip.show()
+
+    if not switch.value:  # button pressed?
+        last_motion_at = time.monotonic()
+        switched_pressed_duration = 0
+        switch_pressed_at = time.monotonic()
+        time.sleep(0.1)
+
+        # Detect long press for setup mode
+        while not switch.value:
+            print(switched_pressed_duration)
+            switched_pressed_duration = time.monotonic() - switch_pressed_at
+            if switched_pressed_duration >= 2.0:
+                break
+            time.sleep(0.2)
+
+        if switched_pressed_duration >= 2.0 and not awake:
+            if not setup:
+                print("show")
+                enable.value = True
+                setup = True
+            else:
+                #blink_switch_led(4)
+                awake = False
+                setup = False
+                print("setup exited")
+                mixer.voice[2].play(helloThere, loop=False)
+                enable.value = False
+
+        elif setup:
+            print("setup")
+            speaker.play(mixer)
+            mixer.voice[2].play(setupMode, loop=False)
+        elif awake:
+            power("off", 1.15, True)  # Power down
+            awake = False
+            setup = False
+            mode = 0  # OFF mode now
             enable.value = False
-        while not switch.value:             # Wait for button release
-            time.sleep(0.2)                 # to avoid repeated triggering
+        else:
+            enable.value = True
+            power("on", 0.5, False)  # Power up!
+            awake = True
+            setup = False
+            speaker.play(mixer)
+            mixer.voice[0].level = 0.2
+            mixer.voice[0].play(idleWav, loop=True)
+            # play_wav('idle', loop=True)     # Play background hum sound
+            mode = 1  # ON (idle) mode now
 
-    elif mode >= 1:                         # If not OFF mode...
-        x, y, z = accel.acceleration # Read accelerometer
-        accel_total = x * x + z * z
-        # (Y axis isn't needed for this, assuming Hallowing is mounted
-        # sideways to stick.  Also, square root isn't needed, since we're
-        # just comparing thresholds...use squared values instead, save math.)
-        if accel_total > HIT_THRESHOLD:   # Large acceleration = HIT
-            TRIGGER_TIME = time.monotonic() # Save initial time of hit
-            play_wav('hit')                 # Start playing 'hit' sound
-            COLOR_ACTIVE = COLOR_HIT        # Set color to fade from
-            mode = 3                        # HIT mode
-        elif mode == 1 and accel_total > SWING_THRESHOLD: # Mild = SWING
-            TRIGGER_TIME = time.monotonic() # Save initial time of swing
-            play_wav('swing')               # Start playing 'swing' sound
-            COLOR_ACTIVE = COLOR_SWING      # Set color to fade from
-            mode = 2                        # SWING mode
-        elif mode > 1:                      # If in SWING or HIT mode...
-            if audio.playing:               # And sound currently playing...
-                blend = time.monotonic() - TRIGGER_TIME # Time since triggered
-                if mode == 2:               # If SWING,
-                    blend = abs(0.5 - blend) * 2.0 # ramp up, down
-                strip.fill(mix(COLOR_ACTIVE, COLOR_IDLE, blend))
+
+    # Motion detection
+    if awake or setup:
+        x, y, z = accel.acceleration
+        accel_squared = z * z + x * x
+
+        if accel_squared > IDLE:
+            last_motion_at = time.monotonic()
+            #pulse = Pulse(strip, speed=0.01, period=10, color=color)
+            #pulse.animate()
+
+        if (time.monotonic() - last_motion_at) > 90.0:
+            if awake:
+                power("off", 1.15, True)  # Power down
+                awake = False
+                setup = False
+                mode = 0  # OFF mode now
+                enable.value = False
+            awake = False
+            setup = False
+
+
+        # Action loop
+        if awake and not setup:
+            if accel_squared > HIT:
+                print("hit")
+                for j in range(NUM_PIXELS):
+                    if(j>=75 and j<=100):
+                        strip[j] = [255,255,255]
+                    else:
+                        strip[j] = colorwheel2tuple(color)
+
+                hit = playHit(random.randint(1, 2))
+                mixer.voice[2].play(hit, loop=False)
                 strip.show()
-            else:                           # No sound now, but still MODE > 1
-                play_wav('idle', loop=True) # Resume background hum
-                strip.fill(COLOR_IDLE)      # Set to idle color
+                time.sleep(0.25)
+                strip.fill(color)
                 strip.show()
-                mode = 1                    # IDLE mode now
+
+            elif accel_squared > SWING:
+                print("swing")
+                swing = playSwing(random.randint(1, 3))
+                mixer.voice[playCounter].play(swing, loop=False)
+                if(playCounter < 6):
+                    playCounter = playCounter + 1
+                else:
+                    playCounter = 2
+                strip.brightness = 1   # make blinding
+                strip.fill(color)
+                strip.show()
+
