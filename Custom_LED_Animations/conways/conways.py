@@ -8,7 +8,6 @@ from micropython import const
 
 from adafruit_led_animation.animation import Animation
 from adafruit_led_animation.grid import PixelGrid, HORIZONTAL
-import random
 
 
 class ConwaysLifeAnimation(Animation):
@@ -21,12 +20,21 @@ class ConwaysLifeAnimation(Animation):
         (1, 1),
         (-1, 1),
         (1, -1),
-        (-1, -1)
+        (-1, -1),
     ]
     LIVE = const(0x01)
     DEAD = const(0x00)
 
-    def __init__(self, pixel_object, speed, color, width, height, initial_cells, equilibrium_restart=True):
+    def __init__(
+        self,
+        pixel_object,
+        speed,
+        color,
+        width,
+        height,
+        initial_cells,
+        equilibrium_restart=True,
+    ):
         """
         Conway's Game of Life implementation. Watch the cells live and die based on the classic rules.
 
@@ -47,7 +55,9 @@ class ConwaysLifeAnimation(Animation):
         self.initial_cells = initial_cells
 
         # PixelGrid helper to access the strand as a 2D grid
-        self.pixel_grid = PixelGrid(pixel_object, width, height, orientation=HORIZONTAL, alternating=False)
+        self.pixel_grid = PixelGrid(
+            pixel_object, width, height, orientation=HORIZONTAL, alternating=False
+        )
 
         # size of the grid
         self.width = width
@@ -59,7 +69,7 @@ class ConwaysLifeAnimation(Animation):
         # counter to store how many turns since the last change
         self.equilibrium_turns = 0
 
-        #self._init_cells()
+        # self._init_cells()
 
     def _is_pixel_off(self, pixel):
         return pixel[0] == 0 and pixel[1] == 0 and pixel[2] == 0
@@ -72,7 +82,7 @@ class ConwaysLifeAnimation(Animation):
         """
         for y in range(self.height):
             for x in range(self.width):
-                if not self._is_pixel_off(self.pixel_grid[x,y]):
+                if not self._is_pixel_off(self.pixel_grid[x, y]):
                     return False
 
         return True
@@ -96,7 +106,9 @@ class ConwaysLifeAnimation(Animation):
         neighbors = 0
         for direction in ConwaysLifeAnimation.DIRECTION_OFFSETS:
             try:
-                if not self._is_pixel_off(self.pixel_grid[cell[0] + direction[0], cell[1] + direction[1]]):
+                if not self._is_pixel_off(
+                    self.pixel_grid[cell[0] + direction[0], cell[1] + direction[1]]
+                ):
                     neighbors += 1
             except IndexError:
                 pass
@@ -125,7 +137,7 @@ class ConwaysLifeAnimation(Animation):
             for x in range(self.width):
 
                 # check and set the current cell type, live or dead
-                if self._is_pixel_off(self.pixel_grid[x,y]):
+                if self._is_pixel_off(self.pixel_grid[x, y]):
                     cur_cell_type = ConwaysLifeAnimation.DEAD
                 else:
                     cur_cell_type = ConwaysLifeAnimation.LIVE
