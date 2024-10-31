@@ -10,6 +10,10 @@ from adafruit_led_animation.animation import Animation
 from adafruit_led_animation.grid import PixelGrid, HORIZONTAL
 
 
+def _is_pixel_off(pixel):
+    return pixel[0] == 0 and pixel[1] == 0 and pixel[2] == 0
+
+
 class ConwaysLifeAnimation(Animation):
     # Constants
     DIRECTION_OFFSETS = [
@@ -36,7 +40,8 @@ class ConwaysLifeAnimation(Animation):
         equilibrium_restart=True,
     ):
         """
-        Conway's Game of Life implementation. Watch the cells live and die based on the classic rules.
+        Conway's Game of Life implementation. Watch the cells
+        live and die based on the classic rules.
 
         :param pixel_object: The initialised LED object.
         :param float speed: Animation refresh rate in seconds, e.g. ``0.1``.
@@ -71,9 +76,6 @@ class ConwaysLifeAnimation(Animation):
 
         # self._init_cells()
 
-    def _is_pixel_off(self, pixel):
-        return pixel[0] == 0 and pixel[1] == 0 and pixel[2] == 0
-
     def _is_grid_empty(self):
         """
         Checks if the grid is empty.
@@ -82,7 +84,7 @@ class ConwaysLifeAnimation(Animation):
         """
         for y in range(self.height):
             for x in range(self.width):
-                if not self._is_pixel_off(self.pixel_grid[x, y]):
+                if not _is_pixel_off(self.pixel_grid[x, y]):
                     return False
 
         return True
@@ -106,7 +108,7 @@ class ConwaysLifeAnimation(Animation):
         neighbors = 0
         for direction in ConwaysLifeAnimation.DIRECTION_OFFSETS:
             try:
-                if not self._is_pixel_off(
+                if not _is_pixel_off(
                     self.pixel_grid[cell[0] + direction[0], cell[1] + direction[1]]
                 ):
                     neighbors += 1
@@ -115,6 +117,7 @@ class ConwaysLifeAnimation(Animation):
         return neighbors
 
     def draw(self):
+        # pylint: disable=too-many-branches
         """
         draw the current frame of the animation
 
@@ -137,7 +140,7 @@ class ConwaysLifeAnimation(Animation):
             for x in range(self.width):
 
                 # check and set the current cell type, live or dead
-                if self._is_pixel_off(self.pixel_grid[x, y]):
+                if _is_pixel_off(self.pixel_grid[x, y]):
                     cur_cell_type = ConwaysLifeAnimation.DEAD
                 else:
                     cur_cell_type = ConwaysLifeAnimation.LIVE
