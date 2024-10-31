@@ -7,7 +7,7 @@ Adapted From `adafruit_led_animation.animation.rainbow`
 """
 
 from adafruit_led_animation.animation import Animation
-from adafruit_led_animation.color import BLACK, colorwheel
+from adafruit_led_animation.color import colorwheel
 from adafruit_led_animation import MS_PER_SECOND, monotonic_ms
 
 
@@ -30,7 +30,8 @@ class RainbowSweepAnimation(Animation):
     DIRECTION_END_TO_START = 1
     # pylint: disable=too-many-arguments
     def __init__(
-        self, pixel_object, speed, color, sweep_speed=0.3, period=1, name=None, sweep_direction=DIRECTION_START_TO_END
+        self, pixel_object, speed, color, sweep_speed=0.3, period=1,
+            name=None, sweep_direction=DIRECTION_START_TO_END
     ):
         super().__init__(pixel_object, speed, color, name=name)
         self._period = period
@@ -112,7 +113,8 @@ class RainbowSweepAnimation(Animation):
             # if end to start direction
             if self.direction == self.DIRECTION_END_TO_START:
                 # set the current pixels at the end of the strand to the specified color
-                self.pixel_object[self.sweep_index:] = [self.color] * (len(self.pixel_object) - self.sweep_index)
+                self.pixel_object[self.sweep_index:] = (
+                        [self.color] * (len(self.pixel_object) - self.sweep_index))
 
             # if start to end direction
             elif self.direction == self.DIRECTION_START_TO_END:

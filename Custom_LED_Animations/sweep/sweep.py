@@ -32,6 +32,8 @@ class SweepAnimation(Animation):
         # boolean indicating whether we're currently sweeping LEDs on or off
         self.sweeping_on = True
 
+        self.cycle_complete = False
+
     # This animation supports the cycle complete callback
     on_cycle_complete_supported = True
 

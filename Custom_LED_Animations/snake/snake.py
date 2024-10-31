@@ -4,11 +4,12 @@
 """
 SnakeAnimation helper class
 """
+import random
 from micropython import const
 
 from adafruit_led_animation.animation import Animation
 from adafruit_led_animation.grid import PixelGrid, HORIZONTAL
-import random
+
 
 
 class SnakeAnimation(Animation):
@@ -34,7 +35,8 @@ class SnakeAnimation(Animation):
         self.snake_length = snake_length
 
         # create a PixelGrid helper to access our strand as a 2D grid
-        self.pixel_grid = PixelGrid(pixel_object, width, height, orientation=HORIZONTAL, alternating=False)
+        self.pixel_grid = PixelGrid(pixel_object, width, height,
+                                    orientation=HORIZONTAL, alternating=False)
 
         # size variables
         self.width = width
@@ -42,6 +44,8 @@ class SnakeAnimation(Animation):
 
         # list that will hold locations of snake segments
         self.snake_pixels = []
+
+        self.direction = None
 
         # initialize the snake
         self._new_snake()
@@ -75,7 +79,8 @@ class SnakeAnimation(Animation):
         returns true if the snake can move in the given direction
         """
         # location of the next tile if we would move that direction
-        next_tile = tuple(map(sum, zip(SnakeAnimation.DIRECTION_OFFSETS[direction], self.snake_pixels[0])))
+        next_tile = tuple(map(sum, zip(
+            SnakeAnimation.DIRECTION_OFFSETS[direction], self.snake_pixels[0])))
 
         # if the tile is one of the snake segments
         if next_tile in self.snake_pixels:
@@ -111,7 +116,8 @@ class SnakeAnimation(Animation):
         # loop over the copied list of directions to check
         while len(directions_to_check) > 0:
             # choose a random one from the list and pop it out of the list
-            possible_direction = directions_to_check.pop(random.randint(0, len(directions_to_check)-1))
+            possible_direction = directions_to_check.pop(
+                random.randint(0, len(directions_to_check)-1))
             # if we can move the chosen direction
             if self._can_move(possible_direction):
                 # return the chosen direction
@@ -140,7 +146,8 @@ class SnakeAnimation(Animation):
                 self.direction = self._choose_direction()
 
                 # the location of the next tile where the head of the snake will move to
-                next_tile = tuple(map(sum, zip(SnakeAnimation.DIRECTION_OFFSETS[self.direction], self.snake_pixels[0])))
+                next_tile = tuple(map(sum, zip(
+                    SnakeAnimation.DIRECTION_OFFSETS[self.direction], self.snake_pixels[0])))
 
                 # insert the next tile at list index 0
                 self.snake_pixels.insert(0, next_tile)
