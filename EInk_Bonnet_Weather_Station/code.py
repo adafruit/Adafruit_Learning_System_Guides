@@ -15,6 +15,7 @@ import busio
 import board
 from adafruit_epd.ssd1675 import Adafruit_SSD1675
 from adafruit_epd.ssd1680 import Adafruit_SSD1680
+from adafruit_epd.ssd1680 import Adafruit_SSD1680Z
 from weather_graphics import Weather_Graphics
 
 spi = busio.SPI(board.SCK, MOSI=board.MOSI, MISO=board.MISO)
@@ -42,9 +43,11 @@ params = {"q": LOCATION, "appid": OPEN_WEATHER_TOKEN}
 data_source = DATA_SOURCE_URL + "?" + urllib.parse.urlencode(params)
 
 # Initialize the Display
-display = Adafruit_SSD1680(     # Newer eInk Bonnet
-# display = Adafruit_SSD1675(   # Older eInk Bonnet
-    122, 250, spi, cs_pin=ecs, dc_pin=dc, sramcs_pin=None, rst_pin=rst, busy_pin=busy,
+display = Adafruit_SSD1680Z(     # New Bonnet ssd1680z [GDEY0213B74]
+#display = Adafruit_SSD1680(     # Old eInk Bonnet ssd1680
+#display = Adafruit_SSD1675(   # Older eInk Bonnet ssd1675
+#    122, 250, spi, cs_pin=ecs, dc_pin=dc, sramcs_pin=None, rst_pin=rst, busy_pin=busy,
+    120, 250, spi, cs_pin=ecs, dc_pin=dc, sramcs_pin=None, rst_pin=rst, busy_pin=busy,
 )
 
 display.rotation = 1
