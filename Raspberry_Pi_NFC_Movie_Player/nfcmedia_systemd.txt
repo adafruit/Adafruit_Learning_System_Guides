@@ -1,0 +1,13 @@
+[Unit]
+Description=NFC Media Player
+After=x-session-manager.service
+
+[Service]
+User=USERNAME
+Environment=DISPLAY=:0
+Environment=XAUTHORITY=/home/USERNAME/.Xauthority
+ExecStartPre=/bin/sleep 10
+ExecStart=sudo /home/USERNAME/blinka/bin/python /home/USERNAME/nfc_movie_player.py
+
+[Install]
+WantedBy=default.target
