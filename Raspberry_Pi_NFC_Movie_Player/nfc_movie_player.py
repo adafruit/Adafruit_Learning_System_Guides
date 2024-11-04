@@ -14,9 +14,9 @@ from digitalio import DigitalInOut
 from adafruit_pn532.spi import PN532_SPI
 
 # ---- Update these file paths for your raspberry pi! ----
-home_path = "/home/YOUR-USERNAME"
-image_path = f"{home_path}/Pictures/blinka.png"
-movie_path = f"{home_path}/Videos"
+username = "YOUR-USERNAME"
+image_path = f"/home/{username}/Pictures/blinka.png"
+movie_path = f"/media/{username}/YOUR-M.2-DRIVE-NAME"
 csv_file = "movies.csv"
 # ----
 
