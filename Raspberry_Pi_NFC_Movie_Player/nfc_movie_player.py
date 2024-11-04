@@ -96,7 +96,7 @@ def read_card():
         movie_name = get_movie(title)
         if movie_path:
             video = f"{movie_path}/{movie_name}.mp4"
-            subprocess.run(["sudo", "-u", "adafruit", "vlc", "--fullscreen", video], check=False)
+            subprocess.run(["sudo", "-u", username, "vlc", "--fullscreen", video], check=False)
             now_playing = True
     else:
         current_time = datetime.now().strftime("%I:%M %p")
