@@ -14,9 +14,9 @@ from digitalio import DigitalInOut
 from adafruit_pn532.spi import PN532_SPI
 
 # ---- Update these file paths for your raspberry pi! ----
-home_path = "/home/YOUR-USERNAME"
-image_path = f"{home_path}/Pictures/blinka.png"
-movie_path = f"{home_path}/Videos"
+username = "YOUR-USERNAME"
+image_path = f"/home/{username}/Pictures/blinka.png"
+movie_path = f"/media/{username}/YOUR-M.2-DRIVE-NAME"
 csv_file = "movies.csv"
 # ----
 
@@ -79,7 +79,7 @@ def move():
     root.after(30, move)
 
 def get_movie(uid):
-    with open(f"{home_path}/{csv_file}", "r") as file:
+    with open(f"/home/{username}/{csv_file}", "r") as file:
         reader = csv.DictReader(file)
         for row in reader:
             if row["uid"] == uid:
@@ -96,7 +96,7 @@ def read_card():
         movie_name = get_movie(title)
         if movie_path:
             video = f"{movie_path}/{movie_name}.mp4"
-            subprocess.run(["sudo", "-u", "adafruit", "vlc", "--fullscreen", video], check=False)
+            subprocess.run(["sudo", "-u", username, "vlc", "--fullscreen", video], check=False)
             now_playing = True
     else:
         current_time = datetime.now().strftime("%I:%M %p")
