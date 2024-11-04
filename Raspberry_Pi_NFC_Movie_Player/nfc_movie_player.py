@@ -16,7 +16,7 @@ from adafruit_pn532.spi import PN532_SPI
 # ---- Update these file paths for your raspberry pi! ----
 username = "YOUR-USERNAME"
 image_path = f"/home/{username}/Pictures/blinka.png"
-movie_path = f"/media/{username}/YOUR-M.2-DRIVE-NAME"
+movie_path = "/mnt/movie_disk"
 csv_file = "movies.csv"
 # ----
 
