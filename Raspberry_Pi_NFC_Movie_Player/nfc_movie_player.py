@@ -79,7 +79,7 @@ def move():
     root.after(30, move)
 
 def get_movie(uid):
-    with open(f"{home_path}/{csv_file}", "r") as file:
+    with open(f"/home/{username}/{csv_file}", "r") as file:
         reader = csv.DictReader(file)
         for row in reader:
             if row["uid"] == uid:
