@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 import time
-import microncontroller
+import microcontroller
 import board
 import audiocore
 import audiobusio
@@ -102,4 +102,4 @@ while True:
     except Exception as error: # pylint: disable=broad-except
         print(error)
         time.sleep(5)
-        microncontroller.reset()
+        microcontroller.reset()
