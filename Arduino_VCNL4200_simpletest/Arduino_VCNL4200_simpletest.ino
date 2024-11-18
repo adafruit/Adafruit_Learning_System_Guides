@@ -25,9 +25,6 @@ void setup() {
   vcnl4200.setALSshutdown(false);
   vcnl4200.setALSIntegrationTime(VCNL4200_ALS_IT_100MS);
   vcnl4200.setALSPersistence(VCNL4200_ALS_PERS_2);
-  vcnl4200.setALSthresholdLow(100);
-  vcnl4200.setALSthresholdHigh(20000);
-  vcnl4200.setInterrupt(true, false); // activate int on ALS chan
 
   vcnl4200.setProxShutdown(false);
   vcnl4200.setProxHD(false);
@@ -46,19 +43,6 @@ void loop() {
   uint16_t whiteData = vcnl4200.readWhiteData();
   Serial.print(", White Data: ");
   Serial.println(whiteData);
-
-  uint8_t flags = vcnl4200.getInterruptFlags();
-  if (flags != 0 && flags != 0xFF) {
-    Serial.print("Interrupt flags: 0x");
-    Serial.println(flags, HEX);
-
-    if (flags & VCNL4200_INTFLAG_ALS_HIGH) {
-      Serial.println("ALS high threshold interrupt triggered.");
-    }
-    if (flags & VCNL4200_INTFLAG_ALS_LOW) {
-      Serial.println("ALS low threshold interrupt triggered.");
-    }
-  }
 
   delay(100);
 }
