@@ -38,8 +38,10 @@ CRGB leds[ NUM_LEDS ];
 // This code, plus the supporting 80-byte table is much smaller 
 // and much faster than trying to calculate the pixel ID with code.
 #define LAST_VISIBLE_LED 119
-uint8_t XY( uint8_t x, uint8_t y)
+uint16_t XY(uint16_t x, uint16_t y, uint16_t width, uint16_t height)
 {
+  (void)width;
+  (void)height;
   // any out of bounds address maps to the first hidden pixel
   if( (x >= kMatrixWidth) || (y >= kMatrixHeight) ) {
     return (LAST_VISIBLE_LED + 1);
@@ -82,4 +84,4 @@ uint8_t XY( uint8_t x, uint8_t y)
 }
 
 // Instantiate an XYMap object
-XYMap myXYMap(kMatrixWidth, kMatrixHeight);
+XYMap myXYMap = XYMap::constructWithUserFunction(kMatrixWidth, kMatrixHeight, XY);
