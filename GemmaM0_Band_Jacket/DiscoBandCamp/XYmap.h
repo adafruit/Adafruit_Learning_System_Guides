@@ -23,6 +23,7 @@
 //  XY(x,y) takes x and y coordinates and returns an LED index number,
 //  for use like this:  leds[ XY(x,y) ] == CRGB::Red;
 
+#include <FastLED.h>
 
 // Parameters for width and height
 const uint8_t kMatrixWidth = 24;
@@ -79,3 +80,6 @@ uint8_t XY( uint8_t x, uint8_t y)
   uint8_t j = JacketTable[i];
   return j;
 }
+
+// Instantiate an XYMap object
+XYMap myXYMap(kMatrixWidth, kMatrixHeight);

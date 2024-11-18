@@ -286,7 +286,7 @@ void swirly()
   // blur it repeatedly.  Since the blurring is 'lossy', there's
   // an automatic trend toward black -- by design.
   uint8_t blurAmount = beatsin8(2,10,255);
-  blur2d( leds, kMatrixWidth, kMatrixHeight, blurAmount);
+  blur2d(leds, kMatrixWidth, kMatrixHeight, blurAmount, myXYMap);
 
   // Use two out-of-sync sine waves
   uint8_t  i = beatsin8( 27, kBorderWidth, kMatrixHeight-kBorderWidth);
