@@ -26,7 +26,7 @@ void threeSine() {
       byte sinDistanceG = qmul8(abs(y * (255 / kMatrixHeight) - sin8(sineOffset * 10 + x * 16)), 2);
       byte sinDistanceB = qmul8(abs(y * (255 / kMatrixHeight) - sin8(sineOffset * 11 + x * 16)), 2);
 
-      leds[XY(x, y)] = CRGB(255 - sinDistanceR, 255 - sinDistanceG, 255 - sinDistanceB);
+      leds[XY(x, y, 0, 0)] = CRGB(255 - sinDistanceR, 255 - sinDistanceG, 255 - sinDistanceB);
     }
   }
 
@@ -70,7 +70,7 @@ void plasma() {
   for (int x = 0; x < kMatrixWidth; x++) {
     for (int y = 0; y < kMatrixHeight; y++) {
       byte color = sin8(sqrt(sq(((float)x - 7.5) * 10 + xOffset - 127) + sq(((float)y - 2) * 10 + yOffset - 127)) + offset);
-      leds[XY(x, y)] = CHSV(color, 255, 255);
+      leds[XY(x, y, 0, 0)] = CHSV(color, 255, 255);
     }
   }
 
@@ -100,7 +100,7 @@ void rider() {
     brightness = 255 - brightness;
     CRGB riderColor = CHSV(cycleHue, 255, brightness);
     for (byte y = 0; y < kMatrixHeight; y++) {
-      leds[XY(x, y)] = riderColor;
+      leds[XY(x, y, 0, 0)] = riderColor;
     }
   }
 
@@ -133,7 +133,7 @@ void colorFill() {
     for (byte x = 0; x < kMatrixWidth; x++) {
       byte y = currentRow;
       if (currentDirection == 2) y = kMatrixHeight - 1 - currentRow;
-      leds[XY(x, y)] = currentPalette[currentColor];
+      leds[XY(x, y, 0, 0)] = currentPalette[currentColor];
     }
   }
 
@@ -143,7 +143,7 @@ void colorFill() {
     for (byte y = 0; y < kMatrixHeight; y++) {
       byte x = currentRow;
       if (currentDirection == 3) x = kMatrixWidth - 1 - currentRow;
-      leds[XY(x, y)] = currentPalette[currentColor];
+      leds[XY(x, y, 0, 0)] = currentPalette[currentColor];
     }
   }
 
@@ -174,8 +174,8 @@ void sideRain() {
 
   scrollArray(rainDir);
   byte randPixel = random8(kMatrixHeight);
-  for (byte y = 0; y < kMatrixHeight; y++) leds[XY((kMatrixWidth - 1) * rainDir, y)] = CRGB::Black;
-  leds[XY((kMatrixWidth - 1)*rainDir, randPixel)] = CHSV(cycleHue, 255, 255);
+  for (byte y = 0; y < kMatrixHeight; y++) leds[XY((kMatrixWidth - 1) * rainDir, y, 0, 0)] = CRGB::Black;
+  leds[XY((kMatrixWidth - 1)*rainDir, randPixel, 0, 0)] = CHSV(cycleHue, 255, 255);
 
 }
 
@@ -194,7 +194,7 @@ void confetti() {
 
   // scatter random colored pixels at several random coordinates
   for (byte i = 0; i < 4; i++) {
-    leds[XY(random16(kMatrixWidth), random16(kMatrixHeight))] = ColorFromPalette(currentPalette, random16(255), 255); //CHSV(random16(255), 255, 255);
+    leds[XY(random16(kMatrixWidth), random16(kMatrixHeight), 0, 0)] = ColorFromPalette(currentPalette, random16(255), 255); //CHSV(random16(255), 255, 255);
     random16_add_entropy(1);
   }
 }
@@ -233,7 +233,7 @@ void myConfetti() {
 
 //  scatter random colored pixels at several random coordinates
   for (byte i = 0; i < 4; i++) {
-    leds[XY(random16(kMatrixWidth), random16(kMatrixHeight))] = ColorFromPalette(MyColors_p, random16(255), 255); //CHSV(random16(255), 255, 255);
+    leds[XY(random16(kMatrixWidth), random16(kMatrixHeight), 0, 0)] = ColorFromPalette(MyColors_p, random16(255), 255); //CHSV(random16(255), 255, 255);
     random16_add_entropy(1);
   }
 
@@ -263,7 +263,7 @@ void slantBars() {
 
   for (byte x = 0; x < kMatrixWidth; x++) {
     for (byte y = 0; y < kMatrixHeight; y++) {
-      leds[XY(x, y)] = CHSV(cycleHue, 255, quadwave8(x * 32 + y * 32 + slantPos));
+      leds[XY(x, y, 0, 0)] = CHSV(cycleHue, 255, quadwave8(x * 32 + y * 32 + slantPos));
     }
   }
 
@@ -286,7 +286,7 @@ void swirly()
   // blur it repeatedly.  Since the blurring is 'lossy', there's
   // an automatic trend toward black -- by design.
   uint8_t blurAmount = beatsin8(2,10,255);
-  blur2d( leds, kMatrixWidth, kMatrixHeight, blurAmount);
+  blur2d(leds, kMatrixWidth, kMatrixHeight, blurAmount, myXYMap);
 
   // Use two out-of-sync sine waves
   uint8_t  i = beatsin8( 27, kBorderWidth, kMatrixHeight-kBorderWidth);
@@ -297,12 +297,12 @@ void swirly()
   
   // The color of each point shifts over time, each at a different speed.
   uint16_t ms = millis();  
-  leds[XY( i, j)] += CHSV( ms / 11, 200, 255);
-  leds[XY( j, i)] += CHSV( ms / 13, 200, 255);
-  leds[XY(ni,nj)] += CHSV( ms / 17, 200, 255);
-  leds[XY(nj,ni)] += CHSV( ms / 29, 200, 255);
-  leds[XY( i,nj)] += CHSV( ms / 37, 200, 255);
-  leds[XY(ni, j)] += CHSV( ms / 41, 200, 255);
+  leds[XY(i, j, 0, 0)] += CHSV( ms / 11, 200, 255);
+  leds[XY(j, i, 0, 0)] += CHSV( ms / 13, 200, 255);
+  leds[XY(ni,nj, 0, 0)] += CHSV( ms / 17, 200, 255);
+  leds[XY(nj,ni, 0, 0)] += CHSV( ms / 29, 200, 255);
+  leds[XY(i,nj, 0, 0)] += CHSV( ms / 37, 200, 255);
+  leds[XY(ni, j, 0, 0)] += CHSV( ms / 41, 200, 255);
   
   FastLED.show();
 }

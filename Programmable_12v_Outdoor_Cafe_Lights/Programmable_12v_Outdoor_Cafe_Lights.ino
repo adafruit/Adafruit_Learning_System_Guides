@@ -43,7 +43,7 @@ void setup() {
 // Forward declarations of an array of cpt-city gradient palettes, and 
 // a count of how many there are.  The actual color palette definitions
 // are at the bottom of this file.
-extern const TProgmemRGBGradientPalettePtr gGradientPalettes[];
+extern const TProgmemRGBGradientPaletteRef gGradientPalettes[];
 extern const uint8_t gGradientPaletteCount;
 
 // Current palette number from the 'playlist' of color palettes
@@ -265,7 +265,7 @@ DEFINE_GRADIENT_PALETTE( bhw3_32_gp ) {
 //
 // This list of color palettes acts as a "playlist"; you can
 // add or delete, or re-arrange as you wish.
-const TProgmemRGBGradientPalettePtr gGradientPalettes[] = {
+const TProgmemRGBGradientPaletteRef gGradientPalettes[] = {
   bhw3_32_gp,
   bhw1_01_gp,
   bhw1_07_gp,
@@ -281,7 +281,7 @@ const TProgmemRGBGradientPalettePtr gGradientPalettes[] = {
 
 // Count of how many cpt-city gradients are defined:
 const uint8_t gGradientPaletteCount = 
-  sizeof( gGradientPalettes) / sizeof( TProgmemRGBGradientPalettePtr );
+  sizeof( gGradientPalettes) / sizeof( TProgmemRGBGradientPaletteRef );
   void loop()
 {
   EVERY_N_SECONDS( SECONDS_PER_PALETTE ) {

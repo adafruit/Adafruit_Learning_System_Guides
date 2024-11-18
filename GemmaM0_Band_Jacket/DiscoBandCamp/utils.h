@@ -68,7 +68,7 @@ void scrollArray(byte scrollDir) {
       }
       
       for (byte y = 0; y < kMatrixHeight; y++) {
-        leds[XY(scrollX,y)] = leds[XY(scrollX + scrollDir*2 - 1,y)];
+        leds[XY(scrollX,y,0,0)] = leds[XY(scrollX + scrollDir*2 - 1,y,0,0)];
       }
     }
   
@@ -177,7 +177,7 @@ void mapNoiseToLEDsUsingPalette()
       }
 
       CRGB color = ColorFromPalette( currentPalette, index, bri);
-      leds[XY(i,j)] = color;
+      leds[XY(i,j,0,0)] = color;
     }
   }
   
