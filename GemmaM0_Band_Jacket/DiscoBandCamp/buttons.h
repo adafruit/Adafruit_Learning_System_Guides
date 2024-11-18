@@ -6,7 +6,8 @@
 //  Retained button code from RGB Shades though just using one button
 
 #define NUMBUTTONS 1
-#define MODEBUTTON PIN_EXTERNAL_BUTTON  //define the pin the button is connected to
+#define MODEBUTTON 2  //define the pin the button is connected to
+
 #define BTNIDLE 0
 #define BTNDEBOUNCING 1
 #define BTNPRESSED 2

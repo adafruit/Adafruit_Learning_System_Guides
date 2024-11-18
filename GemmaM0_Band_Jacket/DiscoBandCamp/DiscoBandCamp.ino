@@ -20,9 +20,9 @@
 
 
 //  Pins on Adafruit Gemma M0
-#define LEFT_PIN    PIN_EXTERNAL_NEOPIXELS     // Visual Left (LEDs on the wearers right) connected to D1
+#define LEFT_PIN    1     // Visual Left (LEDs on the wearers right) connected to D1
 #define NUM_LEFT    60    // number of LEDs connected on the Left
-#define RIGHT_PIN   4     // Visual Right (LEDs on the wearers left) connected to D0
+#define RIGHT_PIN   0     // Visual Right (LEDs on the wearers left) connected to D0
 #define NUM_RIGHT   60    // number of LEDs connected on the Right
 
 //  Color order (Green/Red/Blue)
@@ -62,8 +62,7 @@ const byte numEffects = (sizeof(effectList)/sizeof(effectList[0]));
 
 // Runs one time at the start of the program (power up or reset)
 void setup() {
-  pinMode(PIN_EXTERNAL_POWER, OUTPUT);
-  digitalWrite(PIN_EXTERNAL_POWER, HIGH);
+
 //Add the onboard Strip on the Right and Left to create a single array
   FastLED.addLeds<CHIPSET, LEFT_PIN, COLOR_ORDER>(leds, 0, NUM_LEFT);
   FastLED.addLeds<CHIPSET, RIGHT_PIN, COLOR_ORDER>(leds, NUM_LEFT, NUM_RIGHT);
