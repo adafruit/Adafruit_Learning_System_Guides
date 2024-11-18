@@ -33,6 +33,7 @@ void setup() {
 }
 
 void loop() {
+  // Read the proximity sensor data
   uint16_t proxData = vcnl4200.readProxData();
   Serial.print("Prox Data: ");
   Serial.println(proxData);
@@ -40,6 +41,7 @@ void loop() {
   uint16_t alsData = vcnl4200.readALSdata();
   Serial.print("ALS Data: ");
   Serial.print(alsData);
+  // Read the raw white sensor data
   uint16_t whiteData = vcnl4200.readWhiteData();
   Serial.print(", White Data: ");
   Serial.println(whiteData);
