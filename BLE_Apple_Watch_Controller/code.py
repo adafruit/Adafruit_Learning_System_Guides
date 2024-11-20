@@ -85,14 +85,14 @@ while True:
 	#  while BLE connected
     while ble.connected:
         position = encoder.position
-        #  if the encoder is turned to the right
-        if position > last_position:
-            kbd.send(Keycode.RIGHT_ARROW)
-		#  if the encoder is turned to the left
-        if position < last_position:
-            kbd.send(Keycode.LEFT_ARROW)
-		#  reset encoder position
         if position != last_position:
+            #  if the encoder is turned to the right
+            if position > last_position:
+                kbd.send(Keycode.RIGHT_ARROW)
+            #  if the encoder is turned to the left
+            if position < last_position:
+                kbd.send(Keycode.LEFT_ARROW)
+		    #  reset encoder position
             last_position = position
             print(f"Position: {position}")
         for b in range(5):
