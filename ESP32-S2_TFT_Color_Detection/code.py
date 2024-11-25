@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2021 Anne Barela for Adafruit Industries
+# SPDX-FileCopyrightText: 2024 Trevor Beaton for Adafruit Industries
 #
 # SPDX-License-Identifier: MIT
 '''This is a program for a color detection project using the APD-9960 and Feather ESP32-S2 & S3'''
