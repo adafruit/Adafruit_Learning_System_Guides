@@ -11,13 +11,15 @@ import os
 import requests
 import webview
 
-FEEDLINK_RETROCOMPUTING = "https://bsky.app/profile/did:plc:tbo4hkau3p2itkar2vsnb3gp/feed/aaabo5oe7bzok"
+FEEDLINK_RETROCOMPUTING = (
+    "https://bsky.app/profile/did:plc:tbo4hkau3p2itkar2vsnb3gp/feed/aaabo5oe7bzok"
+)
 
 # Un-comment a single key inside of FEED_ARGS and set it's value to the feed, list or search
 # that you want to scroll.
 FETCH_ARGS = {
     # "feed_share_link": FEEDLINK_RETROCOMPUTING,
-    # "feed_share_link": "https://bsky.app/profile/did:plc:463touruejpokvutnn5ikxb5/lists/3lbfdtahfzt2a",
+    # "feed_share_link": "https://bsky.app/profile/did:plc:463touruejpokvutnn5ikxb5/lists/3lbfdtahfzt2a", # pylint: disable=line-too-long
     # "search_args": {"q": "Adafruit", "sort": "latest"}
     "search_args": {"q": "#circuitpython", "sort": "latest"}
 }
@@ -51,6 +53,7 @@ def fetch_data(feed_share_link=None, search_args=None):
         the hashtag or term to search for. See bsky API docs for other supported keys.
     :return: None
     """
+    # pylint: disable=too-many-statements,too-many-branches
     if feed_share_link is None and search_args is None:
         # If both inputs are None, just use retrocomputing feed.
         feed_share_link = FEEDLINK_RETROCOMPUTING
@@ -62,19 +65,23 @@ def fetch_data(feed_share_link=None, search_args=None):
 
         # if it's a feed
         if "/app.bsky.feed.generator/" in FEED_AT:
-            URL = f"https://public.api.bsky.app/xrpc/app.bsky.feed.getFeed?feed={FEED_AT}&limit=30"
+            URL = (f"https://public.api.bsky.app/xrpc/app.bsky.feed.getFeed?"
+                   f"feed={FEED_AT}&limit=30")
             headers = {"Accept-Language": "en"}
             resp = requests.get(URL, headers=headers)
 
         # if it's a list
         elif "/app.bsky.graph.list/" in FEED_AT:
-            URL = f"https://public.api.bsky.app/xrpc/app.bsky.feed.getListFeed?list={FEED_AT}&limit=30"
+            URL = (f"https://public.api.bsky.app/xrpc/app.bsky.feed.getListFeed?"
+                   f"list={FEED_AT}&limit=30")
             headers = {"Accept-Language": "en"}
             resp = requests.get(URL, headers=headers)
 
         # raise error if it's an unknown type
         else:
-            raise ValueError("Only 'app.bsky.feed.generator' and 'app.bsky.graph.list' URIs are supported.")
+            raise ValueError(
+                "Only 'app.bsky.feed.generator' and 'app.bsky.graph.list' URIs are supported."
+            )
 
     # if a search input was provided
     if search_args is not None:
@@ -111,7 +118,10 @@ def fetch_data(feed_share_link=None, search_args=None):
                 cur_post["image_url"] = post["embed"]["images"][0]["thumb"]
             elif "thumbnail" in post["embed"].keys():
                 cur_post["image_url"] = post["embed"]["thumbnail"]
-            elif "external" in post["embed"].keys() and "thumb" in post["embed"]["external"].keys():
+            elif (
+                "external" in post["embed"].keys()
+                and "thumb" in post["embed"]["external"].keys()
+            ):
                 cur_post["image_url"] = post["embed"]["external"]["thumb"]
 
             # if we actually have an image to show
@@ -150,6 +160,7 @@ class Api:
     and JS code running inside the page.
     """
 
+    # pylint: disable=no-self-use
     def get_posts(self):
         """
         Fetch new posts data from Bluesky API, cache and return it.
@@ -166,11 +177,13 @@ class Api:
 
         :return: None
         """
+        # pylint: disable=unnecessary-pass
         pass
 
 
 # create a webview and load the index.html page
-webview.create_window("bsky posts", "static/index.html",
-                      js_api=Api(), width=320, height=240)
+webview.create_window(
+    "bsky posts", "static/index.html", js_api=Api(), width=320, height=240
+)
 webview.start()
 # webview.start(debug=True)  # use this one to enable chromium dev tools to see console.log() output from the page.
