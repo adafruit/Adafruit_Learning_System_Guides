@@ -117,3 +117,10 @@ function autoScroll() {
     pywebview.api.check_quit();
     window.scrollBy(0, 2);
 }
+
+document.addEventListener('keydown', function(event){
+    /* Quit if the user presses esc key */
+     if (event.key === "Escape"){
+         pywebview.api.quit();
+     }
+} );

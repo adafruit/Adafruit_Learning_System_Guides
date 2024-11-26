@@ -7,6 +7,7 @@ Infinitely scroll Bluesky posts on a 320x240 pixel TFT
 """
 import json
 import os
+import sys
 
 import requests
 import webview
@@ -180,10 +181,16 @@ class Api:
         # pylint: disable=unnecessary-pass
         pass
 
+    def quit(self):
+        window.destroy()
+        sys.exit(0)
+
 
 # create a webview and load the index.html page
-webview.create_window(
-    "bsky posts", "static/index.html", js_api=Api(), width=320, height=240
+window = webview.create_window(
+    "bsky posts", "static/index.html", js_api=Api(), width=320, height=240,
+    x=0, y=0, frameless=True, fullscreen=True
+
 )
 webview.start()
 # webview.start(debug=True)  # use this one to enable chromium dev tools to see console.log() output from the page.
