@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bluesky Posts</title>
+    <style>
+        .hidden {
+            display: none;
+        }
+
+        /* Scale image down to fit the full thing on the TFT */
+        img {
+            max-width: 304px;
+            max-height: 240px;
+            object-fit: contain;
+        }
+
+        /* make really long handles wrap to next line instead of run off edge */
+        .postAuthor{
+            overflow-wrap: break-word;
+        }
+
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        body::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<!-- container to hold all posts -->
+<div id="postWall">
+
+</div>
+
+<!-- template element for a single post -->
+<div id="postTemplate" class="hidden">
+    <h3 class="postAuthor"></h3>
+    <p class="postText"></p>
+    <img class="postImg">
+</div>
+
+<!-- load the JS for the rest of the fun -->
+<script src="script.js"></script>
+</body>
+</html>
