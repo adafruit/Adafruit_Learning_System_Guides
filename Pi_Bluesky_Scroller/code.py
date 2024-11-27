@@ -188,8 +188,10 @@ class Api:
 
 # create a webview and load the index.html page
 window = webview.create_window(
-    "bsky posts", "static/index.html", js_api=Api(), width=320, height=240,
-    x=0, y=0, frameless=True, fullscreen=True
+    "bsky posts", "static/index.html", js_api=Api(),
+    #width=320, height=240,
+    width=640, height=480,
+    x=0, y=0, #frameless=True, fullscreen=True
 
 )
 webview.start()
