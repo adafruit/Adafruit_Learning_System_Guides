@@ -8,15 +8,30 @@
             display: none;
         }
 
-        /* Scale image down to fit the full thing on the TFT */
-        img {
-            max-width: 304px;
-            max-height: 240px;
-            object-fit: contain;
+        @media only screen and (max-width: 320px) {
+            img {
+                /* For TFT Size Display */
+                max-width: 304px;
+                max-height: 240px;
+                object-fit: contain;
+            }
+
+        }
+
+        @media only screen and (max-width: 640px) {
+            img {
+                /* For Window on HDMI Display */
+                max-width: 600px;
+                max-height: 440px;
+                object-fit: contain;
+            }
+            body {
+                font-size: 1.2em;
+            }
         }
 
         /* make really long handles wrap to next line instead of run off edge */
-        .postAuthor{
+        .postAuthor {
             overflow-wrap: break-word;
         }
 
