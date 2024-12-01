@@ -10,6 +10,7 @@ Pinouts are for the 3.5" TFT FeatherWing V2
 import os
 import board
 import displayio
+import fourwire
 import adafruit_hx8357
 import adafruit_tsc2007
 
@@ -25,7 +26,7 @@ tft_dc = board.D10
 display_width = 480
 display_height = 320
 
-display_bus = displayio.FourWire(spi, command=tft_dc, chip_select=tft_cs)
+display_bus = fourwire.FourWire(spi, command=tft_dc, chip_select=tft_cs)
 display = adafruit_hx8357.HX8357(display_bus, width=display_width, height=display_height)
 
 i2c = board.STEMMA_I2C()

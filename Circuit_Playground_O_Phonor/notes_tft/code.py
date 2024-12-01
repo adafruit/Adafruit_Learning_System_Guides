@@ -8,6 +8,7 @@ import board
 import busio
 import audiobusio
 import displayio
+import fourwire
 from adafruit_st7789 import ST7789
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text import label
@@ -46,7 +47,7 @@ tft_cs = board.RX
 tft_dc = board.TX
 tft_backlight = board.A3
 
-display_bus = displayio.FourWire(spi, command=tft_dc, chip_select=tft_cs)
+display_bus = fourwire.FourWire(spi, command=tft_dc, chip_select=tft_cs)
 
 display = ST7789(display_bus, width=240, height=240, rowstart=80,
                  backlight_pin=tft_backlight, rotation=180)

@@ -10,6 +10,7 @@ import re
 from datetime import datetime
 import board
 import displayio
+import fourwire
 import adafruit_dotstar
 from adafruit_st7789 import ST7789
 
@@ -98,7 +99,7 @@ tft_cs = board.CE0
 tft_dc = board.D25
 tft_lite = board.D26
 
-display_bus = displayio.FourWire(spi, command=tft_dc, chip_select=tft_cs)
+display_bus = fourwire.FourWire(spi, command=tft_dc, chip_select=tft_cs)
 
 display = ST7789(
     display_bus,

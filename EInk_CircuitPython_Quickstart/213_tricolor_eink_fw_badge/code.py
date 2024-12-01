@@ -17,6 +17,7 @@ Supported products:
 import time
 import board
 import displayio
+import fourwire
 import adafruit_il0373
 import terminalio
 from adafruit_display_text import label
@@ -43,7 +44,7 @@ epd_reset = board.D5
 epd_busy = board.D6
 
 # Create the displayio connection to the display pins
-display_bus = displayio.FourWire(spi, command=epd_dc, chip_select=epd_cs,
+display_bus = fourwire.FourWire(spi, command=epd_dc, chip_select=epd_cs,
                                  reset=epd_reset, baudrate=1000000)
 time.sleep(1)  # Wait a bit
 

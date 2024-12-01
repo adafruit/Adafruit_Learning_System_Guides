@@ -4,6 +4,7 @@ import time
 import board
 from adafruit_simplemath import map_range
 import displayio
+import fourwire
 from adafruit_seesaw.seesaw import Seesaw
 import adafruit_imageload
 from adafruit_st7789 import ST7789
@@ -17,7 +18,7 @@ ss = Seesaw(i2c)
 spi = board.SPI()  # setup for display over SPI
 tft_cs = board.D5
 tft_dc = board.D6
-display_bus = displayio.FourWire(
+display_bus = fourwire.FourWire(
     spi, command=tft_dc, chip_select=tft_cs, reset=board.D9
 )
 
