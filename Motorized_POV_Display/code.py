@@ -96,6 +96,9 @@ try:
                         pow((color * BRIGHTNESS) / 255, 2.7) * 255 + 0.5)
                     idx += 1
 
+except BMPError as e:
+    print("Failed to parse BMP: " + e.args[0])
+
 gc.collect()
 print(gc.mem_free())
 print("Ready to go!")
