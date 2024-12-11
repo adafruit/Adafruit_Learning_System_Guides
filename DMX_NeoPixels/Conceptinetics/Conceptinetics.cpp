@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2013 W.A. van der Meeren <danny@illogic.nl>
+//
+// SPDX-License-Identifier: LGPL-3.0-or-later
 /*
   Conceptinetics.cpp - DMX library for Arduino
   Copyright (c) 2013 W.A. van der Meeren <danny@illogic.nl>.  All right reserved.

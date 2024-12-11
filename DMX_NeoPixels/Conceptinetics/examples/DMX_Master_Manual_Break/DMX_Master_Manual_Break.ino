@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2013 W.A. van der Meeren <danny@illogic.nl>
+//
+// SPDX-License-Identifier: LGPL-3.0-or-later
 /*
   DMX_Master.ino - Example code for using the Conceptinetics DMX library
   Copyright (c) 2013 W.A. van der Meeren <danny@illogic.nl>.  All right reserved.

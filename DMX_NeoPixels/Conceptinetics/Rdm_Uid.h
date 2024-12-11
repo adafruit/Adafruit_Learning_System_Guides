@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2013 W.A. van der Meeren <danny@illogic.nl>
+//
+// SPDX-License-Identifier: LGPL-3.0-or-later
 /*
   Rdm_Uid.h - DMX library for Arduino with RDM (Remote Device Management) support
   Copyright (c) 2013 W.A. van der Meeren <danny@illogic.nl>.  All right reserved.
