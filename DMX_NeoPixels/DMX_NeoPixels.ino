@@ -7,7 +7,7 @@
 // Recieves incoming DMX messages from controller, translates to NeoPixel
 
 
-#include "Conceptinetics/Conceptinetics.h"
+#include <"Conceptinetics/>Conceptinetics.h"
 #include <Adafruit_NeoPixel.h>
 
 // User adjust these for the number of strips, pins, pixels per strip, and color formats:
