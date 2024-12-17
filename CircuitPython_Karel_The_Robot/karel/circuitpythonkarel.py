@@ -271,7 +271,7 @@ def turn_left():
 
 def corner_is_blocked(corner_x, corner_y):
     corner_loc = [corner_x, corner_y]
-    if 0 > corner_loc[0] or 0 > corner_loc[1]:
+    if corner_loc[0] < 0 or corner_loc[1] < 0:
         return True
 
     if corner_loc[0] >= world.world_width or corner_loc[1] >= world.world_height:
