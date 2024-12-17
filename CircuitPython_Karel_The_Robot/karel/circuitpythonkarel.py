@@ -1,3 +1,10 @@
+# SPDX-FileCopyrightText: 2024 Tim Cocks for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+"""
+Karel the Robot helper class
+"""
+
 import json
 import time
 
@@ -34,7 +41,7 @@ COLOR_NAMES = [
     "dark_green",
     "turquoise",
     "dark_blue",
-    "dark_red"
+    "dark_red",
 ]
 COLOR_VALUES = [
     0xFFFFFF,
@@ -52,7 +59,7 @@ COLOR_VALUES = [
     0x008700,
     0x00C0C0,
     0x0000AA,
-    0x800000
+    0x800000,
 ]
 
 
@@ -69,10 +76,15 @@ class NoBeepersInBag(Exception):
 
 
 class Karel:
-    def __init__(self, spritesheet_bmp, spritesheet_palette, world_width=20, world_height=15):
+    def __init__(self, spritesheet_bmp, spritesheet_palette):
 
-        self.tilegrid = TileGrid(spritesheet_bmp, pixel_shader=spritesheet_palette,
-                                 default_tile=0, tile_width=TILE_SIZE, tile_height=TILE_SIZE)
+        self.tilegrid = TileGrid(
+            spritesheet_bmp,
+            pixel_shader=spritesheet_palette,
+            default_tile=0,
+            tile_width=TILE_SIZE,
+            tile_height=TILE_SIZE,
+        )
         self._direction = EAST
         self.beeper_count = 0
 
@@ -111,7 +123,6 @@ class Karel:
 
 class World:
     def __init__(self, display, world_width=10, world_height=10, beeper_limit=False):
-        print("world init()")
         self.world_width = world_width
         self.world_height = world_height
         color_count = len(COLOR_NAMES)
@@ -119,7 +130,9 @@ class World:
         self.background_palette = Palette(color_count)
         for i, color_val in enumerate(COLOR_VALUES):
             self.background_palette[i] = color_val
-        self.background_tilegrid = TileGrid(bitmap=self.background_bmp, pixel_shader=self.background_palette)
+        self.background_tilegrid = TileGrid(
+            bitmap=self.background_bmp, pixel_shader=self.background_palette
+        )
         self.background_group = Group(scale=TILE_SIZE)
         self.background_group.append(self.background_tilegrid)
         self.display = display
@@ -128,12 +141,20 @@ class World:
         self.world_group.append(self.background_group)
 
         lib_dir = "/".join(__file__.split("/")[0:3])
-        # print(lib_dir)
-        self.spritesheet_bmp, self.spritesheet_palette = adafruit_imageload.load(f"{lib_dir}/spritesheet_24px.png")
+        self.spritesheet_bmp, self.spritesheet_palette = adafruit_imageload.load(
+            f"{lib_dir}/spritesheet.png"
+        )
         self.spritesheet_palette.make_transparent(0)
 
-        self.world_tilegrid = TileGrid(self.spritesheet_bmp, pixel_shader=self.spritesheet_palette,
-                                       tile_width=TILE_SIZE, tile_height=TILE_SIZE, width=20, height=15, default_tile=7)
+        self.world_tilegrid = TileGrid(
+            self.spritesheet_bmp,
+            pixel_shader=self.spritesheet_palette,
+            tile_width=TILE_SIZE,
+            tile_height=TILE_SIZE,
+            width=20,
+            height=15,
+            default_tile=7,
+        )
 
         self.beeper_limit = beeper_limit
 
@@ -154,24 +175,24 @@ class World:
 
         self.beeper_count_labels = {}
         self.beeper_counts = []
-        for y in range(self.background_bmp.width):
-            self.beeper_counts.append([0 for x in range(self.background_bmp.width)])
+        for _ in range(self.world_height):
+            self.beeper_counts.append([0 for x in range(self.world_width)])
 
     def load_state(self, state_obj):
         self._init_beeper_counts()
         if "beeper_counts" in state_obj["input"]:
             for beeper_count_loc_str in state_obj["input"]["beeper_counts"].keys():
                 beeper_count_loc = [int(_) for _ in beeper_count_loc_str.split(",")]
-                print(beeper_count_loc)
-                self.beeper_counts[world.world_height - 1 - beeper_count_loc[1]][beeper_count_loc[0]] \
-                    = state_obj["input"]["beeper_counts"][beeper_count_loc_str]
-            for row in self.beeper_counts:
-                print(row)
+                self.beeper_counts[world.world_height - 1 - beeper_count_loc[1]][
+                    beeper_count_loc[0]
+                ] = state_obj["input"]["beeper_counts"][beeper_count_loc_str]
             update_beeper_count_labels()
 
         self.karel.x = state_obj["input"]["karel"]["x"]
         self.karel.y = self.world_height - 1 - state_obj["input"]["karel"]["y"]
-        self.karel.direction = DIRECTION_WORDS.index(state_obj["input"]["karel"]["direction"])
+        self.karel.direction = DIRECTION_WORDS.index(
+            state_obj["input"]["karel"]["direction"]
+        )
 
         for y, row in enumerate(state_obj["input"]["world"]):
             for x, cell in enumerate(row):
@@ -185,15 +206,21 @@ class World:
         if self.karel.x != state_obj["goal"]["karel"]["x"]:
             print("karel x incorrect")
             return False
-        if self.karel.direction != DIRECTION_WORDS.index(state_obj["goal"]["karel"]["direction"]):
+        if self.karel.direction != DIRECTION_WORDS.index(
+            state_obj["goal"]["karel"]["direction"]
+        ):
             print("karel dir incorrect")
             return False
 
         if "beeper_counts" in state_obj["goal"]:
             for beeper_count_loc_str in state_obj["goal"]["beeper_counts"].keys():
                 beeper_count_loc = [int(_) for _ in beeper_count_loc_str.split(",")]
-                if self.beeper_counts[world.world_height - 1 - beeper_count_loc[1]][beeper_count_loc[0]] != \
-                        state_obj["goal"]["beeper_counts"][beeper_count_loc_str]:
+                if (
+                    self.beeper_counts[world.world_height - 1 - beeper_count_loc[1]][
+                        beeper_count_loc[0]
+                    ]
+                    != state_obj["goal"]["beeper_counts"][beeper_count_loc_str]
+                ):
                     print(f"beeper count incorrect {beeper_count_loc}")
                     return False
 
@@ -202,25 +229,11 @@ class World:
 
                 goal_cell_index = state_obj["goal"]["world"][y][x]
                 if self.world_tilegrid[x, y] != goal_cell_index:
-                    print(f"world mismatch: {(x, y)}: {self.world_tilegrid[x, y]} != {goal_cell_index}")
+                    print(
+                        f"world mismatch: {(x, world.world_height - 1 - y)}: "
+                        + f"{self.world_tilegrid[x, y]} != {goal_cell_index}"
+                    )
                     return False
-
-                # print(f"({x}, {y}) goal: {goal_cell_index} actual: {self.world_tilegrid[x, y]}")
-                # if goal_cell_index == 0:
-                #     if self.karel.x != x or self.karel.y != y or self.karel.direction != EAST:
-                #         return False
-                # elif goal_cell_index == 1:
-                #     if self.karel.x != x or self.karel.y != y or self.karel.direction != NORTH:
-                #         return False
-                # elif goal_cell_index == 2:
-                #     if self.karel.x != x or self.karel.y != y or self.karel.direction != WEST:
-                #         return False
-                # elif goal_cell_index == 3:
-                #     if self.karel.x != x or self.karel.y != y or self.karel.direction != SOUTH:
-                #         return False
-                # else:
-                #     if self.world_tilegrid[x, y] != goal_cell_index:
-                #         return False
         return True
 
 
@@ -228,8 +241,6 @@ world = World(board.DISPLAY)
 
 
 def move():
-    print(f"Moving: {world.karel.direction}")
-
     if front_is_blocked():
         raise FrontIsBlocked("Karel can't move there")
 
@@ -313,8 +324,9 @@ def left_is_blocked():
 
 def paint_corner(color):
     if color not in COLOR_NAMES:
-        raise ValueError(f"Color {color} is not valid. Supported colors are {COLOR_NAMES}")
-    print(f"name: {color} index: {COLOR_NAMES.index(color)}")
+        raise ValueError(
+            f"Color {color} is not valid. Supported colors are {COLOR_NAMES}"
+        )
     world.background_bmp[world.karel.x, world.karel.y] = COLOR_NAMES.index(color)
 
 
@@ -330,12 +342,16 @@ def update_beeper_count_labels():
                 if (x, y) in world.beeper_count_labels:
                     world.beeper_count_labels[(x, y)].text = str(count)
                 else:
-                    world.beeper_count_labels[(x, y)] = Label(terminalio.FONT,
-                                                              text=str(count),
-                                                              color=0x000000,
-                                                              anchor_point=(0.5, 0.5),
-                                                              anchored_position=(x * TILE_SIZE + TILE_SIZE // 2,
-                                                                                 y * TILE_SIZE + TILE_SIZE // 2))
+                    world.beeper_count_labels[(x, y)] = Label(
+                        terminalio.FONT,
+                        text=str(count),
+                        color=0x000000,
+                        anchor_point=(0.5, 0.5),
+                        anchored_position=(
+                            x * TILE_SIZE + TILE_SIZE // 2,
+                            y * TILE_SIZE + TILE_SIZE // 2,
+                        ),
+                    )
                     world.world_group.append(world.beeper_count_labels[(x, y)])
 
 
@@ -345,8 +361,9 @@ def pick_beeper():
 
     world.karel.beeper_count += 1
 
-    world.beeper_counts[world.karel.y][world.karel.x] = max(0,
-                                                            world.beeper_counts[world.karel.y][world.karel.x] - 1)
+    world.beeper_counts[world.karel.y][world.karel.x] = max(
+        0, world.beeper_counts[world.karel.y][world.karel.x] - 1
+    )
     update_beeper_count_labels()
     if world.beeper_counts[world.karel.y][world.karel.x] == 0:
         world.world_tilegrid[world.karel.x, world.karel.y] = 5
@@ -425,6 +442,7 @@ def right_is_clear():
 
 def front_is_clear():
     return not front_is_blocked()
+
 
 def load_state_file(state_filepath):
     with open(state_filepath, "r") as f:
