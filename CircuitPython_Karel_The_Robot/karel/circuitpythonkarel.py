@@ -140,7 +140,7 @@ class World:
         self.world_group = Group()
         self.world_group.append(self.background_group)
 
-        lib_dir = "/".join(__file__.split("/")[0:3])
+        lib_dir = "karel"
         self.spritesheet_bmp, self.spritesheet_palette = adafruit_imageload.load(
             f"{lib_dir}/spritesheet.png"
         )
