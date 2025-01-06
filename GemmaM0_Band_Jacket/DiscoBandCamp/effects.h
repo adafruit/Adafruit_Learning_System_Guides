@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 //   Selection of effects from the FastLED library & Macetech RGB Shades
-
+#include "XYmap.h"
 
 //  Triple Sine Waves
 void threeSine() {
