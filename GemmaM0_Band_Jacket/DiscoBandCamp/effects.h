@@ -4,7 +4,7 @@
 
 //   Selection of effects from the FastLED library & Macetech RGB Shades
 #include "XYmap.h"
-
+extern XYMap myXYMap;
 //  Triple Sine Waves
 void threeSine() {
 
