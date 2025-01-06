@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 #include "XYmap.h"
-extern XYMap myXYMap;
+
 // Assorted useful functions and variables
 // Global variables
 boolean effectInit = false;   // indicates if a pattern has been recently switched
