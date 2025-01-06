@@ -96,7 +96,7 @@ void loop()
   }
 
   // run a fade effect too if the confetti or myConfetti is running:
-  if (effectList[currentEffect] == confetti || effectList[currentEffect] == myConfetti) fadeAll(1);
+  if (effectList[currentEffect] == confetti or myConfetti) fadeAll(1);
 
   FastLED.show(); // send the contents of the led memory to the LEDs
 }
