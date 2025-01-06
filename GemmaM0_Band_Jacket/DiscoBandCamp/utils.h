@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MIT
 
 // Assorted useful functions and variables
-#include "XYmap.h"
 // Global variables
 boolean effectInit = false;   // indicates if a pattern has been recently switched
 uint16_t effectDelay = 0;   // time between automatic effect changes
