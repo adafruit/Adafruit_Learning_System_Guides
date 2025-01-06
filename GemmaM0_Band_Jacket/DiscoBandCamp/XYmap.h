@@ -23,9 +23,6 @@
 //  XY(x,y) takes x and y coordinates and returns an LED index number,
 //  for use like this:  leds[ XY(x,y) ] == CRGB::Red;
 
-#ifndef XYMAP_H
-#define XYMAP_H
-
 #include <FastLED.h>
 
 // Parameters for width and height
@@ -34,7 +31,7 @@ const uint8_t kMatrixHeight = 8;
 const uint8_t kBorderWidth = 2; //for swirly
 
 #define NUM_LEDS (kMatrixWidth * kMatrixHeight)
-extern CRGB leds[ NUM_LEDS ];
+CRGB leds[ NUM_LEDS ];
 
 // This function will return the right 'led index number' for 
 // a given set of X and Y coordinates on DiscoBandCamp
@@ -85,7 +82,6 @@ uint16_t XY(uint16_t x, uint16_t y, uint16_t width, uint16_t height)
   uint8_t j = JacketTable[i];
   return j;
 }
-#endif
 
 // Instantiate an XYMap object
 XYMap myXYMap = XYMap::constructWithUserFunction(kMatrixWidth, kMatrixHeight, XY);

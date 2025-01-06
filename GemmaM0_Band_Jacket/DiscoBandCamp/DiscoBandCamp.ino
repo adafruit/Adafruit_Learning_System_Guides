@@ -42,7 +42,6 @@
 #include "utils.h"
 #include "effects.h"
 #include "buttons.h"
-extern XYMap myXYMap;
 
 // list of Functions:
 functionList effectList[] = {SolidRed,    //all pixels solid red
