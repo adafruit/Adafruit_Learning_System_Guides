@@ -4,7 +4,6 @@
 
 //   Selection of effects from the FastLED library & Macetech RGB Shades
 
-
 //  Triple Sine Waves
 void threeSine() {
 
