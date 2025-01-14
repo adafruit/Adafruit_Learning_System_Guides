@@ -3,9 +3,9 @@
 """
 CircuitPython Multiple Button Digital Input Example - Handling multiple buttons with simple logic.
 """
+import time
 import board
 import digitalio
-import time
 
 # LED setup
 led = digitalio.DigitalInOut(board.LED)
