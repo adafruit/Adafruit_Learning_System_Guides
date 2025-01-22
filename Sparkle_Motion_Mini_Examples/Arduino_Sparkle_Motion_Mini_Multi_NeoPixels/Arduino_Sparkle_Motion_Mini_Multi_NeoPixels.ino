@@ -12,8 +12,6 @@ Adafruit_NeoPixel STRIP_1(NUM_PIXELS, BLOCK_1, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel STRIP_2(NUM_PIXELS, BLOCK_2, NEO_GRB + NEO_KHZ800);
 
 void setup() {
-  Serial.begin(115200);
-  
   STRIP_1.begin();
   STRIP_2.begin();
 }
