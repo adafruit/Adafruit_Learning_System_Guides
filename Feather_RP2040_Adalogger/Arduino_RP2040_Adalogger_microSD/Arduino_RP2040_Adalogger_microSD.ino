@@ -30,7 +30,7 @@
 #define SD_CS_PIN 23
 
 SdFat SD;
-File32 myFile;
+FsFile myFile;
 SdSpiConfig config(SD_CS_PIN, DEDICATED_SPI, SD_SCK_MHZ(16), &SPI1);
 
 void setup() {
