@@ -84,7 +84,7 @@ class ConwaysLifeAnimation(Animation):
         """
         for y in range(self.height):
             for x in range(self.width):
-                if not _is_pixel_off(self.pixel_grid[x, y]):
+                if not _is_pixel_off(self.pixel_grid[x][y]):
                     return False
 
         return True
@@ -109,7 +109,7 @@ class ConwaysLifeAnimation(Animation):
         for direction in ConwaysLifeAnimation.DIRECTION_OFFSETS:
             try:
                 if not _is_pixel_off(
-                    self.pixel_grid[cell[0] + direction[0], cell[1] + direction[1]]
+                    self.pixel_grid[cell[0] + direction[0]][cell[1] + direction[1]]
                 ):
                     neighbors += 1
             except IndexError:
@@ -140,7 +140,7 @@ class ConwaysLifeAnimation(Animation):
             for x in range(self.width):
 
                 # check and set the current cell type, live or dead
-                if _is_pixel_off(self.pixel_grid[x, y]):
+                if _is_pixel_off(self.pixel_grid[x][y]):
                     cur_cell_type = ConwaysLifeAnimation.DEAD
                 else:
                     cur_cell_type = ConwaysLifeAnimation.LIVE
