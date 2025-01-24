@@ -59,7 +59,7 @@ pir.direction = digitalio.Direction.INPUT
 
 def send_jpeg_to_io():
     # before we send the image to IO, it needs to be encoded into base64
-    encoded_data = binascii.b2a_base64(jpeg).strip()
+    encoded_data = binascii.b2a_base64(jpeg).strip().decode("utf-8")
     # then, send the encoded_data to Adafruit IO camera feed
     print("Sending image to IO...")
     io.send_data(feed_camera["key"], encoded_data)
