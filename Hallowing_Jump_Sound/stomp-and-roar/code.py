@@ -57,8 +57,21 @@ except AttributeError:
 i2c = board.I2C()  # uses board.SCL and board.SDA
 # i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
 if IS_HALLOWING_M4:
-    import adafruit_msa301
-    ACCEL = adafruit_msa301.MSA301(i2c)
+    # i2c scan to determine which accelo
+    while not i2c.try_lock():
+        pass
+    ADDR = i2c.scan()
+    i2c.unlock()
+    if 0x26 in ADDR:
+        # MSA301
+        from adafruit_msa3xx import MSA301
+        ACCEL = MSA301(i2c)
+    elif 0x62 in ADDR:
+        # MSA311
+        from adafruit_msa3xx import MSA311
+        ACCEL = MSA311(i2c)
+    else:
+        raise RuntimeError("Accelerometer not found.")
 else:
     import adafruit_lis3dh
     try:
