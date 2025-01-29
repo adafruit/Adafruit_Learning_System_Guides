@@ -22,7 +22,7 @@ IR_CODE_LEFT = (0, 253, 16, 239)
 
 t0 = next_heartbeat = time.monotonic()
 
-pixel = neopixel.NeoPixel(board.NEOPIXEL, 1)
+pixel = neopixel.NeoPixel(board.D21, 8)
 
 brightness = 1
 pixel.brightness = brightness / 10
