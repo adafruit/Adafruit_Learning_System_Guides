@@ -10,7 +10,7 @@ import keypad
 import rotaryio
 import neopixel
 # crypto stuff
-import adafruit_pcf8523
+from adafruit_pcf8523.pcf8523 import PCF8523
 import adafruit_hashlib as hashlib
 # UI stuff
 import displayio
@@ -45,7 +45,7 @@ except KeyError:
 # set board to use PCF8523 as its RTC
 i2c = board.I2C()  # uses board.SCL and board.SDA
 # i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
-pcf = adafruit_pcf8523.PCF8523(i2c)
+pcf = PCF8523(i2c)
 rtc.set_time_source(pcf)
 
 #-------------------------------------------------------------------------
