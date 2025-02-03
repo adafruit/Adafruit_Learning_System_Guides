@@ -97,8 +97,7 @@ while True:
                 mapped_time = simpleio.map_range(
                     time_remaining, 0, (timer * 60000), 0, NUM_PIXELS + 1
                 )
-                if mapped_time < 1:
-                    mapped_time = 1
+                mapped_time = max(mapped_time, 1)
                 if int(mapped_time) != last_map:
                     pixels.fill(OFF)
                     last_map = int(mapped_time)
