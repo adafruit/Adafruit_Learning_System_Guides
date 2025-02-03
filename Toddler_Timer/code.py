@@ -2,19 +2,17 @@
 #
 # SPDX-License-Identifier: MIT
 
-import asyncio
+import time
 import board
 import displayio
-import adafruit_imageload
 import neopixel
-from digitalio import DigitalInOut, Direction
+import digitalio
 from adafruit_seesaw import seesaw, rotaryio, digitalio
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text import label
 import adafruit_displayio_ssd1306
 import simpleio
 from adafruit_ticks import ticks_ms, ticks_add, ticks_diff
-import time
 from rainbowio import colorwheel
 
 COLOR = (255, 150, 0) # yellow
