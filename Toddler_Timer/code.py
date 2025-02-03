@@ -47,8 +47,7 @@ HEIGHT = 64
 display = adafruit_displayio_ssd1306.SSD1306(display_bus, width=WIDTH, height=HEIGHT)
 
 font = bitmap_font.load_font('/Arial-14.bdf')
-main_area = label.Label(
-    font, text="6 Minutes", color=0xFFFFFF)
+main_area = label.Label(font, text="6 Minutes", color=0xFFFFFF)
 main_area.anchor_point = (0.5, 0.0)
 main_area.anchored_position = (display.width / 2, display.height/2)
 splash = displayio.Group()
