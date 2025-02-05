@@ -127,7 +127,7 @@ if avg_distance is not None:
         # Show cyan on successful connection
         pixel.fill(CYAN)
         time.sleep(1)  # Brief pause to show the connection success
-
+    # pylint: disable=broad-except
     except Exception as e:
         print("Failed to connect to WiFi. Error:", e, "\nBoard will hard reset in 30 seconds.")
         pixel.fill(OFF)
@@ -233,7 +233,7 @@ if avg_distance is not None:
 
         response.close()
 
-
+    # pylint: disable=broad-except
     except Exception as e:
         print("Failed to get or send data, or connect. Error:", e,
               "\nBoard will hard reset in 30 seconds.")
