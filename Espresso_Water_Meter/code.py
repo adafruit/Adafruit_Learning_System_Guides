@@ -103,7 +103,7 @@ time.sleep(0.1)
 avg_distance = get_average_distance()
 
 if avg_distance is not None:
-    # pylint: disable=consider-using-min-builtin
+
     if avg_distance >= 22:
         # pylint: disable=invalid-name
         avg_distance = 22
@@ -118,7 +118,7 @@ if avg_distance is not None:
 
     # Try connecting to WiFi
     try:
-        # pylint: disable=consider-using-f-string
+
         print("Connecting to %s" % os.getenv("CIRCUITPY_WIFI_SSID"))
         # Show pink while attempting to connect
         pixel.fill(PINK)
@@ -127,7 +127,7 @@ if avg_distance is not None:
         # Show cyan on successful connection
         pixel.fill(CYAN)
         time.sleep(1)  # Brief pause to show the connection success
-        # pylint: disable=broad-exception-caught
+
     except Exception as e:
         print("Failed to connect to WiFi. Error:", e, "\nBoard will hard reset in 30 seconds.")
         pixel.fill(OFF)
@@ -233,7 +233,7 @@ if avg_distance is not None:
 
         response.close()
 
-    # pylint: disable=broad-exception-caught
+
     except Exception as e:
         print("Failed to get or send data, or connect. Error:", e,
               "\nBoard will hard reset in 30 seconds.")
