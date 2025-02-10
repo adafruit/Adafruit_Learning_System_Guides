@@ -4,7 +4,7 @@
 
 #include <Adafruit_NeoPixel.h>
 #include <Adafruit_BME280.h>
-#include <SensirionI2CScd4x.h>
+#include <SensirionI2cScd4x.h>
 #include <Wire.h>
 
 //--| User Config |-----------------------------------------------
@@ -15,7 +15,7 @@
 //----------------------------------------------------------------
 
 Adafruit_BME280 bme;
-SensirionI2CScd4x scd4x;
+SensirionI2cScd4x scd4x;
 Adafruit_NeoPixel neopixel(1, PIN_NEOPIXEL, NEO_GRB + NEO_KHZ800);
 
 uint16_t CO2, data_ready;
@@ -36,9 +36,9 @@ void setup() {
     Serial.println("Failed to initialize BME280.");
     neoPanic();
   }
-
+  Wire.begin();
   // init SCD40
-  scd4x.begin(Wire);
+  scd4x.begin(Wire, SCD41_I2C_ADDR_62);
   scd4x.stopPeriodicMeasurement();
   if (scd4x.startPeriodicMeasurement()) {
     Serial.println("Failed to start SCD40.");
