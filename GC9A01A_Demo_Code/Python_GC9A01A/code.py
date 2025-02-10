@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-'''Raspberry Pi Graphics example for the Vertical Newxie TFT'''
+'''Raspberry Pi Graphics example for the 240x240 Round Display'''
 
 import time
 import digitalio
@@ -18,7 +18,7 @@ cs_pin = digitalio.DigitalInOut(board.CE0)
 dc_pin = digitalio.DigitalInOut(board.D25)
 reset_pin = digitalio.DigitalInOut(board.D27)
 
-BAUDRATE=24000000
+BAUDRATE = 24000000
 
 
 spi = board.SPI()
