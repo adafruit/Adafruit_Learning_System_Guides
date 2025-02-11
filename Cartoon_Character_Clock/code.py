@@ -9,6 +9,7 @@ The art and songs are inspired by an early 20th-century public domain
 cartoon.
 
 """
+import os
 import time
 import board
 from adafruit_display_analogclock import AnalogClock
@@ -19,7 +20,6 @@ import displayio
 from fourwire import FourWire
 import adafruit_ntp
 import wifi
-import os
 import audiobusio
 from audiomp3 import MP3Decoder
 
@@ -50,6 +50,8 @@ try:
 except ConnectionError:
     print("Failed to connect to WiFi with provided credentials")
     raise
+
+# pylint: disable=consider-using-with, possibly-used-before-assignment, unsubscriptable-object
 
 if HOURLY_CHIME or ALARM_TIME is not None:
     # Audio Setup
