@@ -51,7 +51,7 @@ except ConnectionError:
     print("Failed to connect to WiFi with provided credentials")
     raise
 
-# pylint: disable=consider-using-with, possibly-used-before-assignment, unsubscriptable-object
+# pylint: disable=unsubscriptable-object
 
 if HOURLY_CHIME or ALARM_TIME is not None:
     # Audio Setup
