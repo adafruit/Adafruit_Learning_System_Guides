@@ -14,6 +14,7 @@ import supervisor
 import socketpool
 import wifi
 import board
+import digitalio
 import alarm
 import neopixel
 import adafruit_hcsr04
@@ -21,6 +22,20 @@ import adafruit_minimqtt.adafruit_minimqtt as MQTT
 from adafruit_io.adafruit_io import IO_MQTT
 import adafruit_requests
 import adafruit_max1704x
+
+# Initialize the power pin for the sensor
+sensor_power = digitalio.DigitalInOut(board.A2)
+sensor_power.direction = digitalio.Direction.OUTPUT
+sensor_power.value = False  # Start with sensor powered off
+
+def power_sensor_on():
+    """Turn on power to the ultrasonic sensor and wait for it to stabilize."""
+    sensor_power.value = True
+    time.sleep(0.55)  # Give sensor time to power up and stabilize
+
+def power_sensor_off():
+    """Turn off power to the ultrasonic sensor."""
+    sensor_power.value = False
 
 # Initialize the sonar sensor
 sonar = adafruit_hcsr04.HCSR04(trigger_pin=board.A0, echo_pin=board.A1)
@@ -46,9 +61,9 @@ pixel.fill(YELLOW)
 
 # Operating hours (24-hour format with minutes, e.g., "6:35" and "16:00")
 OPENING_TIME = "6:00"
-CLOSING_TIME = "22:30"
+CLOSING_TIME = "15:30"
 # Normal operation check interval
-NORMAL_CHECK_MINUTES = 5
+NORMAL_CHECK_MINUTES = 10
 # Sleep duration in seconds during operating hours
 SLEEP_DURATION = 60 * NORMAL_CHECK_MINUTES
 # Display duration in seconds
@@ -64,6 +79,7 @@ def parse_time(time_str):
 
 def get_average_distance():
     """Take multiple distance readings and return the average."""
+    power_sensor_on()  # Power on the sensor before taking measurements
     distances = []
     for _ in range(NUM_SAMPLES):
         try:
@@ -73,6 +89,7 @@ def get_average_distance():
         except RuntimeError:
             print("Error reading distance")
             continue
+    power_sensor_off()  # Power off the sensor after measurements
 
     # Only average valid readings
     if distances:
@@ -248,6 +265,7 @@ else:
     sleep_seconds = SLEEP_DURATION  # Use normal interval if we couldn't get readings
 
 # Prepare for deep sleep
+power_sensor_off()  # Make sure sensor is powered off before sleep
 pixel.brightness = 0  # Turn off NeoPixel
 
 # Flush the serial output before sleep
