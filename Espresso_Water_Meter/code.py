@@ -8,9 +8,9 @@ Feather ESP32-S2 with RCWL-1601 Ultrasonic distance sensor
 
 import time
 import os
+import ssl
 import microcontroller
 import supervisor
-import ssl
 import socketpool
 import wifi
 import board
@@ -22,8 +22,6 @@ import adafruit_minimqtt.adafruit_minimqtt as MQTT
 from adafruit_io.adafruit_io import IO_MQTT
 import adafruit_requests
 import adafruit_max1704x
-
-
 
 # Initialize the power pin for the sensor
 sensor_power = digitalio.DigitalInOut(board.A2)
@@ -75,6 +73,7 @@ NUM_SAMPLES = 5
 
 def parse_time(time_str):
     """Convert time string (HH:MM format) to hours and minutes."""
+    # pylint: disable=redefined-outer-name
     parts = time_str.split(':')
     return int(parts[0]), int(parts[1])
 
@@ -121,7 +120,9 @@ time.sleep(0.1)
 avg_distance = get_average_distance()
 
 if avg_distance is not None:
+
     if avg_distance >= 22:
+        # pylint: disable=invalid-name
         avg_distance = 22
     print(f"Average distance: {avg_distance:.1f} cm")
     # Set color based on average distance
@@ -134,6 +135,7 @@ if avg_distance is not None:
 
     # Try connecting to WiFi
     try:
+
         print("Connecting to %s" % os.getenv("CIRCUITPY_WIFI_SSID"))
         # Show pink while attempting to connect
         pixel.fill(PINK)
@@ -142,6 +144,7 @@ if avg_distance is not None:
         # Show cyan on successful connection
         pixel.fill(CYAN)
         time.sleep(1)  # Brief pause to show the connection success
+    # pylint: disable=broad-except
     except Exception as e:
         print("Failed to connect to WiFi. Error:", e, "\nBoard will hard reset in 30 seconds.")
         pixel.fill(OFF)
@@ -174,6 +177,7 @@ if avg_distance is not None:
         aio_username = os.getenv("ADAFRUIT_AIO_USERNAME")
         aio_key = os.getenv("ADAFRUIT_AIO_KEY")
         timezone = os.getenv("TIMEZONE")
+        # pylint: disable=line-too-long
         TIME_URL = f"https://io.adafruit.com/api/v2/{aio_username}/integrations/time/strftime?x-aio-key={aio_key}&tz={timezone}"
         TIME_URL += "&fmt=%25Y-%25m-%25d+%25H%3A%25M%3A%25S.%25L+%25j+%25u+%25z+%25Z"
 
@@ -222,6 +226,7 @@ if avg_distance is not None:
             time.sleep(DISPLAY_DURATION)
 
             # Use normal check interval during operating hours
+            # # pylint: disable=invalid-name
             sleep_seconds = SLEEP_DURATION
             print(f"Next check in {NORMAL_CHECK_MINUTES} minutes")
         else:
@@ -245,6 +250,7 @@ if avg_distance is not None:
 
         response.close()
 
+    # pylint: disable=broad-except
     except Exception as e:
         print("Failed to get or send data, or connect. Error:", e,
               "\nBoard will hard reset in 30 seconds.")
@@ -255,13 +261,15 @@ if avg_distance is not None:
 else:
     print("Failed to get valid distance readings")
     pixel.fill(OFF)
+    # pylint: disable=invalid-name
     sleep_seconds = SLEEP_DURATION  # Use normal interval if we couldn't get readings
 
 # Prepare for deep sleep
-pixel.brightness = 0  # Turn off NeoPixel
 power_sensor_off()  # Make sure sensor is powered off before sleep
+pixel.brightness = 0  # Turn off NeoPixel
 
 # Flush the serial output before sleep
+# pylint: disable=pointless-statement
 supervisor.runtime.serial_bytes_available
 time.sleep(0.05)
 
