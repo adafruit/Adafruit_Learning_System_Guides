@@ -90,6 +90,8 @@ while True:
     cmd = "df -h | awk '$NF==\"/\"{printf \"Disk: %d/%d GB  %s\", $3,$2,$5}'"
     Disk = subprocess.check_output(cmd, shell=True).decode("utf-8")
     cmd = "cat /sys/class/thermal/thermal_zone0/temp |  awk \'{printf \"CPU Temp: %.1f C\", $(NF-0) / 1000}\'" # pylint: disable=line-too-long
+    Temp = subprocess.check_output(cmd, shell=True).decode("utf-8")
+
 
     # Pi Hole data!
     try:
@@ -105,25 +107,26 @@ while True:
     y = top
     if not buttonA.value:  # just button A pressed
         draw.text((x, y), IP, font=font, fill="#FFFF00")
-        y += font.getsize(IP)[1]
+        y += font.getbbox(IP)[3]
         draw.text((x, y), CPU, font=font, fill="#FFFF00")
-        y += font.getsize(CPU)[1]
+        y += font.getbbox(CPU)[3]
         draw.text((x, y), MemUsage, font=font, fill="#00FF00")
-        y += font.getsize(MemUsage)[1]
+        y += font.getbbox(MemUsage)[3]
         draw.text((x, y), Disk, font=font, fill="#0000FF")
-        y += font.getsize(Disk)[1]
-        draw.text((x, y), "DNS Queries: {}".format(DNSQUERIES), font=font, fill="#FF00FF")
+        y += font.getbbox(Disk)[3]
+        draw.text((x, y), Temp, font=font, fill="#FF00FF")
+        y += font.getbbox(Temp)[3]
     else:
         draw.text((x, y), IP, font=font, fill="#FFFF00")
-        y += font.getsize(IP)[1]
+        y += font.getbbox(IP)[3]
         draw.text((x, y), HOST, font=font, fill="#FFFF00")
-        y += font.getsize(HOST)[1]
+        y += font.getbbox(HOST)[3]
         draw.text((x, y), "Ads Blocked: {}".format(str(ADSBLOCKED)), font=font, fill="#00FF00")
-        y += font.getsize(str(ADSBLOCKED))[1]
+        y += font.getbbox(str(ADSBLOCKED))[3]
         draw.text((x, y), "Clients: {}".format(str(CLIENTS)), font=font, fill="#0000FF")
-        y += font.getsize(str(CLIENTS))[1]
+        y += font.getbbox(str(CLIENTS))[3]
         draw.text((x, y), "DNS Queries: {}".format(str(DNSQUERIES)), font=font, fill="#FF00FF")
-        y += font.getsize(str(DNSQUERIES))[1]
+        y += font.getbbox(str(DNSQUERIES))[3]
 
     # Display image.
     disp.image(image, rotation)

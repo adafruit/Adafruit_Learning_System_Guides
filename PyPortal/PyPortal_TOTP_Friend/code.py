@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+import os
 import time
 
 import board
@@ -35,11 +36,11 @@ ALWAYS_ON = True
 # How long to stay on if not in always_on mode
 ON_SECONDS = 60
 
-# Get wifi details and more from a secrets.py file
+# Get totp keys from a secrets.py file
 try:
     from secrets import secrets
 except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
+    print("TOTP keys are kept in secrets.py, please add them there!")
     raise
 
 # Initialize PyPortal Display
@@ -200,12 +201,12 @@ display.root_group = splash
 print("Connecting to AP...")
 while not esp.is_connected:
     try:
-        esp.connect_AP(secrets['ssid'], secrets['password'])
+        esp.connect_AP(os.getenv("CIRCUITPY_WIFI_SSID"), os.getenv("CIRCUITPY_WIFI_PASSWORD"))
     except RuntimeError as e:
         print("Could not connect to AP, retrying: ", e)
         continue
 
-print("Connected to ", secrets['ssid'])
+print("Connected")
 
 # get_time will raise ValueError if the time isn't available yet so loop until
 # it works.

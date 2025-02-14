@@ -41,7 +41,7 @@ mixer.voice[0].level = 0
 
 # propmaker neopixel pin
 pixel_pin = board.D5
-num_pixels = 35
+num_pixels = 40
 
 pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=0.3, auto_write=False)
 

@@ -8,19 +8,13 @@ Use Dashblock to create a custom API for learn.adafruit.com,
 then display the number of learn guides on the site
 """
 
+import os
 import time
 import board
 from adafruit_pyportal import PyPortal
 
-# Get wifi details and more from a secrets.py file
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi settings are kept in settings.py, please add them there!")
-    raise
-
 # Set up where we'll be fetching data from
-DATA_SOURCE = "https://api.dashblock.io/model/v1?api_key=" + secrets['dashblock_key']
+DATA_SOURCE = "https://api.dashblock.io/model/v1?api_key=" + os.getenv("DASHBLOCK_KEY")
 GUIDE_COUNT = ['entities', 0, 'guide count']
 CAPTION = 'total tutorials:'
 

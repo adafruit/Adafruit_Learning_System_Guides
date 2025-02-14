@@ -93,7 +93,7 @@ void disableInternalPower() {
 #endif
 
 #if defined(ARDUINO_ADAFRUIT_FEATHER_ESP32S2)
-  // turn on the I2C power by setting pin to rest state (off)
+  // turn off the I2C power by setting pin to rest state (off)
   pinMode(PIN_I2C_POWER, INPUT);
   pinMode(NEOPIXEL_POWER, OUTPUT);
   digitalWrite(NEOPIXEL_POWER, LOW);

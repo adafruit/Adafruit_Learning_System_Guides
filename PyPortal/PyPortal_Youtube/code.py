@@ -9,16 +9,10 @@ If you can find something that spits out JSON data, we can display it!
 
 Requires a youtube API key!
 """
+import os
 import time
 import board
 from adafruit_pyportal import PyPortal
-
-# Get wifi details and more from a secrets.py file
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
 
 # Set up where we'll be fetching data from
 CHANNEL_ID = "UCpOlOeQjj7EsVnDh3zuCgsA" # this isn't a secret but you have to look it up
@@ -27,7 +21,7 @@ CAPTION = "www.youtube.com/adafruit"
 #CAPTION = "www.youtube.com/c/JohnParkMakes"
 
 # pylint: disable=line-too-long
-DATA_SOURCE = "https://www.googleapis.com/youtube/v3/channels/?part=statistics&id="+CHANNEL_ID+"&key="+secrets['youtube_token']
+DATA_SOURCE = "https://www.googleapis.com/youtube/v3/channels/?part=statistics&id="+CHANNEL_ID+"&key="+os.getenv("YOUTUBE_TOKEN")
 DATA_LOCATION1 = ["items", 0, "statistics", "viewCount"]
 DATA_LOCATION2 = ["items", 0, "statistics", "subscriberCount"]
 # pylint: enable=line-too-long

@@ -444,7 +444,7 @@ class Plotter:
         if self._displayio_graph is None:
             self._displayio_graph = self._make_empty_graph(tg_and_plot=tg_and_plot)
 
-        self._output.show(self._displayio_graph)
+        self._output.root_group = self._displayio_graph
 
     def display_off(self):
         pass

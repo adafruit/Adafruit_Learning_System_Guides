@@ -40,7 +40,7 @@ import busio as io
 # import bitbangio as io
 
 # import adafruit_ds3231
-import adafruit_pcf8523
+from adafruit_pcf8523.pcf8523 import PCF8523
 
 # SD card
 import sdcardio
@@ -115,7 +115,7 @@ i2c = io.I2C(board.SCL, board.SDA)  # Change to the appropriate I2C clock & data
 
 # Create the RTC instance:
 # rtc = adafruit_ds3231.DS3231(i2c)
-rtc = adafruit_pcf8523.PCF8523(i2c)
+rtc = PCF8523(i2c)
 
 # Lookup table for names of days (nicer printing).
 days = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")

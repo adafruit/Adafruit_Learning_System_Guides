@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+import os
 import time
 
 import board
@@ -51,12 +52,10 @@ wav_water_low = "/sounds/water-low.wav"
 # the current working directory (where this file is)
 cwd = ("/"+__file__).rsplit('/', 1)[0]
 
-# Get wifi details and more from a secrets.py file
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
+secrets = {
+    "ssid" : os.getenv("CIRCUITPY_WIFI_SSID"),
+    "password" : os.getenv("CIRCUITPY_WIFI_PASSWORD"),
+}
 
 # Set up i2c bus
 i2c_bus = busio.I2C(board.SCL, board.SDA)
@@ -191,8 +190,8 @@ ssl_context = adafruit_connection_manager.get_radio_ssl_context(esp)
 
 # Initialize a new MQTT Client object
 mqtt_client = MQTT.MQTT(broker="io.adafruit.com",
-                        username=secrets["aio_user"],
-                        password=secrets["aio_key"],
+                        username=os.getenv("AIO_USERNAME"),
+                        password=os.getenv("AIO_KEY"),
                         socket_pool=pool,
                         ssl_context=ssl_context)
 

@@ -81,7 +81,7 @@ label_verification_url.text = (
 label_user_code.text = "2. Enter code: %s" % google_auth.user_code
 
 graphics.qrcode(google_auth.verification_url.encode(), qr_size=2, x=240, y=70)
-graphics.display.show(graphics.splash)
+graphics.display.root_group = graphics.splash
 display.refresh()
 
 # Poll Google's authorization server

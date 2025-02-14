@@ -51,7 +51,7 @@ for i in range(len(images)):
 index = 0
 touch_state = False
 
-display.show(groups[index])
+display.root_group = groups[index]
 
 while True:
     if tsc.touched and not touch_state:
@@ -60,11 +60,11 @@ while True:
         # left side of the screen
         if point["y"] < 2000:
             index = (index - 1) % len(images)
-            display.show(groups[index])
+            display.root_group = groups[index]
         # right side of the screen
         else:
             index = (index + 1) % len(images)
-            display.show(groups[index])
+            display.root_group = groups[index]
         touch_state = True
     if not tsc.touched and touch_state:
         touch_state = False

@@ -2,22 +2,16 @@
 #
 # SPDX-License-Identifier: MIT
 
+import os
 import time
 import random
 import board
 import adafruit_pyportal
 
-# Get wifi details and more from a settings.py file
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
-
 # Set up where we'll be fetching data from
 NUM_THINGS=25  # how many things to select from (we randomize between em)
 DATA_SOURCE = "https://api.thingiverse.com/users/adafruit/things?per_page="+str(NUM_THINGS)
-DATA_SOURCE += "&access_token=" + secrets['thingiverse_token']
+DATA_SOURCE += "&access_token=" + os.getenv("THINGIVERSE_TOKEN")
 IMAGE_LOCATION = [0, "thumbnail"]
 TITLE_LOCATION = [0, "name"]
 URL_LOCATION = [0, "public_url"]

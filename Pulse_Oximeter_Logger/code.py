@@ -21,7 +21,7 @@ import sdcardio
 import board
 import busio
 import storage
-import adafruit_pcf8523
+from adafruit_pcf8523.pcf8523 import PCF8523
 import _bleio
 import adafruit_ble
 from adafruit_ble.advertising.standard import Advertisement
@@ -39,7 +39,7 @@ log_interval = 2  # you can adjust this to log at a different rate
 
 # RTC setup
 I2C = busio.I2C(board.SCL, board.SDA)
-rtc = adafruit_pcf8523.PCF8523(I2C)
+rtc = PCF8523(I2C)
 
 days = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
 

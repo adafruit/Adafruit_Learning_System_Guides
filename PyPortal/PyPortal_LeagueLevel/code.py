@@ -8,22 +8,17 @@ and display it on a screen.
 You'll need a Riot API key in your secrets.py file
 If you can find something that spits out JSON data, we can display it!
 """
+import os
 import time
 import board
 from adafruit_pyportal import PyPortal
-
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
 
 #Choose a valid Summoner name
 SUMMONER_NAME = "RiotSchmick"
 
 # Set up where we'll be fetching data from
 DATA_SOURCE = "https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-name/"+SUMMONER_NAME
-DATA_SOURCE += "?api_key="+secrets['league_token']
+DATA_SOURCE += "?api_key=" + os.getenv("LEAGUE_TOKEN")
 DATA_LOCATION = ["summonerLevel"]
 CAPTION = "SUMMONER  "+SUMMONER_NAME
 

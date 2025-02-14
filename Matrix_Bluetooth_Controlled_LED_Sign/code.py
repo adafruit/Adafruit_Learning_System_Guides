@@ -50,7 +50,7 @@ def update_display(text, color=0xFFFFFF):
     text_area.x = display.width
     text_area.y = 13
     main_group.append(text_area)
-    display.show(main_group)
+    display.root_group = main_group
 
 while True:
     print("WAITING...")

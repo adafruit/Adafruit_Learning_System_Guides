@@ -10,6 +10,7 @@ notifications when it needs watering with your PyPortal.
 
 Author: Brent Rubell for Adafruit Industries, 2019
 """
+import os
 import time
 import json
 import board
@@ -27,12 +28,10 @@ import aws_gfx_helper
 # Time between polling the STEMMA, in minutes
 SENSOR_DELAY = 15
 
-# Get wifi details and more from a secrets.py file
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
+secrets = {
+    "ssid" : os.getenv("CIRCUITPY_WIFI_SSID"),
+    "password" : os.getenv("CIRCUITPY_WIFI_PASSWORD"),
+}
 
 # Get device certificate
 try:
@@ -127,8 +126,8 @@ def message(client, topic, msg):
     print("Message from {}: {}".format(topic, msg))
 
 # Set up a new MiniMQTT Client
-client =  MQTT.MQTT(broker = secrets['broker'],
-                    client_id = secrets['client_id'],
+client =  MQTT.MQTT(broker = os.getenv("BROKER"),
+                    client_id = os.getenv("CLIENT_ID"),
                     socket_pool=pool,
                     ssl_context=ssl_context)
 

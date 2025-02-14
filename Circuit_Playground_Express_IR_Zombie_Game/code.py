@@ -28,8 +28,10 @@ decoder = adafruit_irremote.GenericDecode()
 # Create a 'pulseio' output, to send infrared signals on the IR transmitter @ 38KHz
 pulseout = pulseio.PulseOut(board.IR_TX, frequency=38000, duty_cycle=2 ** 15)
 # Create an encoder that will take numbers and turn them into NEC IR pulses
-encoder = adafruit_irremote.GenericTransmit(header=[9500, 4500], one=[550, 550],
-                                            zero=[550, 1700], trail=0)
+encoder = adafruit_irremote.GenericTransmit(header=[9000, 4500],
+                                            one=[560, 1700],
+                                            zero=[560, 560],
+                                            trail=0)
 
 # Set between 0 and 1 to set LED pulse speed. Smaller numbers are slower.
 healer_led_pulse = 0.008

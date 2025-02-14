@@ -73,7 +73,7 @@ text_group.append(text_area)  # Add this text to the text group
 g.append(text_group)
 
 # Place the display group on the screen
-display.show(g)
+display.root_group = g
 
 # Refresh the display to have everything show on the display
 # NOTE: Do not refresh eInk displays more often than 180 seconds!

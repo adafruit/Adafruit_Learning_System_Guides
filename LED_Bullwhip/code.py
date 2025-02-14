@@ -20,7 +20,16 @@ import digitalio
 import audiobusio
 import board
 import neopixel
-import adafruit_lsm6ds
+
+i2c = board.I2C()  # uses board.SCL and board.SDA
+
+# check for LSM6DS33 or LSM6DS3TR-C
+try:
+    from adafruit_lsm6ds.lsm6ds33 import LSM6DS33 as LSM6DS
+    sensor = LSM6DS(i2c)
+except RuntimeError:
+    from adafruit_lsm6ds.lsm6ds3 import LSM6DS3 as LSM6DS
+    sensor = LSM6DS(i2c)
 
 # CUSTOMISE COLORS HERE:
 COLOR = (40, 3, 0)      # Default idle is blood orange
@@ -70,12 +79,7 @@ strip.show()
 
 WAVE_FILE = None
 
-i2c = board.I2C()  # uses board.SCL and board.SDA
-# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
-
-#Set up accelerometer & mic
-
-sensor = adafruit_lsm6ds.LSM6DS33(i2c)
+#Set up mic
 mic = audiobusio.PDMIn(board.MICROPHONE_CLOCK,
                        board.MICROPHONE_DATA,
                        sample_rate=16000,
