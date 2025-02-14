@@ -7,6 +7,7 @@ import board
 from analogio import AnalogIn
 import adafruit_st7789
 import displayio
+import fourwire
 import neopixel
 from rainbowio import colorwheel
 from adafruit_display_text import label
@@ -15,7 +16,7 @@ from font_orbitron_bold_webfont_36 import FONT as orbitron_font
 
 displayio.release_displays()
 spi = busio.SPI(clock=board.GP18, MOSI=board.GP19)
-display_bus = displayio.FourWire(spi, command=board.GP20, chip_select=board.GP21, reset=None)
+display_bus = fourwire.FourWire(spi, command=board.GP20, chip_select=board.GP21, reset=None)
 display = adafruit_st7789.ST7789(display_bus, width=240, height=240, rowstart=80, rotation=0)
 
 group = displayio.Group()

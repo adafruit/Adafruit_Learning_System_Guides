@@ -5,6 +5,7 @@ import time
 import gc
 import board
 import displayio
+import fourwire
 import terminalio
 import adafruit_ble
 from adafruit_ble.advertising.standard import SolicitServicesAdvertisement
@@ -23,7 +24,7 @@ small_font = bitmap_font.load_font("/Arial-16.bdf")
 spi = board.SPI()
 tft_cs = board.D9
 tft_dc = board.D10
-display_bus = displayio.FourWire(spi, command=tft_dc, chip_select=tft_cs)
+display_bus = fourwire.FourWire(spi, command=tft_dc, chip_select=tft_cs)
 display = adafruit_hx8357.HX8357(display_bus, width=480, height=320)
 # touch
 i2c = board.I2C()
