@@ -6,6 +6,7 @@ import busio
 import usb_midi
 import adafruit_midi
 import displayio
+import i2cdisplaybus
 import terminalio
 from adafruit_display_text import label
 import adafruit_displayio_ssd1306
@@ -26,7 +27,7 @@ i2c = busio.I2C(board.SCL1, board.SDA1)
 #  STEMMA I2C setup for CP 7.2+
 #  i2c = board.STEMMA_I2C()
 
-display_bus = displayio.I2CDisplay(i2c, device_address=0x3D, reset=oled_reset)
+display_bus = i2cdisplaybus.I2CDisplayBus(i2c, device_address=0x3D, reset=oled_reset)
 
 #  midi setup
 print(usb_midi.ports)

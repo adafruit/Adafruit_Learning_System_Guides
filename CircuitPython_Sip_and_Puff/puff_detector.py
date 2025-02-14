@@ -10,6 +10,7 @@ import terminalio
 from adafruit_display_text import label
 from displayio import Group
 import displayio
+import i2cdisplaybus
 import adafruit_displayio_ssd1306
 import adafruit_lps35hw
 
@@ -94,7 +95,7 @@ class PuffDetector:
         displayio.release_displays()
         i2c = board.I2C()
 
-        display_bus = displayio.I2CDisplay(i2c, device_address=0x3D)
+        display_bus = i2cdisplaybus.I2CDisplayBus(i2c, device_address=0x3D)
         self.display = adafruit_displayio_ssd1306.SSD1306(
             display_bus, width=DISPLAY_WIDTH, height=DISPLAY_HEIGHT
         )

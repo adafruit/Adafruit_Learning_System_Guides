@@ -21,6 +21,7 @@ import time
 from random import seed, randint
 import board
 import displayio
+import fourwire
 from adafruit_st7789 import ST7789
 import adafruit_imageload
 
@@ -54,7 +55,7 @@ def make_display():
     spi.unlock()
 
     displayio.release_displays()
-    display_bus = displayio.FourWire(spi, command=board.D7, chip_select=board.D10, reset=board.D9)
+    display_bus = fourwire.FourWire(spi, command=board.D7, chip_select=board.D10, reset=board.D9)
 
     return ST7789(display_bus, width=240, height=240, rowstart=80, auto_refresh=True)
 

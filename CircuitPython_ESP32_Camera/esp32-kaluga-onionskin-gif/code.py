@@ -52,7 +52,9 @@ import analogio
 import board
 import busio
 import bitmaptools
+import fourwire
 import displayio
+import busdisplay
 import sdcardio
 import storage
 import gifio
@@ -68,7 +70,7 @@ def record_pressed():
 
 displayio.release_displays()
 spi = busio.SPI(MOSI=board.LCD_MOSI, clock=board.LCD_CLK)
-display_bus = displayio.FourWire(
+display_bus = fourwire.FourWire(
     spi,
     command=board.LCD_D_C,
     chip_select=board.LCD_CS,
@@ -101,7 +103,7 @@ _INIT_SEQUENCE = (
     b"\x29\x80\x78"  # Display on then delay 0x78 (120ms)
 )
 
-display = displayio.Display(display_bus, _INIT_SEQUENCE, width=320, height=240)
+display = busdisplay.BusDisplay(display_bus, _INIT_SEQUENCE, width=320, height=240)
 
 sd_spi = busio.SPI(clock=board.IO18, MOSI=board.IO14, MISO=board.IO17)
 sd_cs = board.IO12
@@ -193,7 +195,7 @@ def take_stop_motion_gif(n_frames=10, replay_frame_time=.3):
         writer.add_frame(frame, replay_frame_time)
         for i in range(1, n_frames):
             print(f"{i}/{n_frames}")
-            old_frame.blit(0, 0, frame, x1=0, y1=0, x2=cam.width, y2=cam.height)
+            bitmaptools.blit(old_frame, frame, 0, 0, x1=0, y1=0, x2=cam.width, y2=cam.height)
             frame = wait_record_pressed_update_display(False, cam)
             writer.add_frame(frame, replay_frame_time)
         print("done")

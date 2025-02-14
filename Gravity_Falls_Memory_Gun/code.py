@@ -8,6 +8,7 @@ import audiocore
 import audiobusio
 from digitalio import DigitalInOut, Direction
 import displayio
+import i2cdisplaybus
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text import label
 import adafruit_displayio_ssd1306
@@ -31,7 +32,7 @@ last_position = 0
 
 # oled
 oled_reset = board.D9
-display_bus = displayio.I2CDisplay(i2c, device_address=0x3D, reset=oled_reset)
+display_bus = i2cdisplaybus.I2CDisplayBus(i2c, device_address=0x3D, reset=oled_reset)
 WIDTH = 128
 HEIGHT = 64
 display = adafruit_displayio_ssd1306.SSD1306(display_bus, width=WIDTH, height=HEIGHT)

@@ -5,6 +5,7 @@
 import time
 import board
 import displayio
+import i2cdisplaybus
 import neopixel
 import digitalio
 from adafruit_seesaw import seesaw, rotaryio, digitalio
@@ -41,7 +42,7 @@ displayio.release_displays()
 
 # oled
 oled_reset = board.D9
-display_bus = displayio.I2CDisplay(i2c, device_address=0x3D, reset=oled_reset)
+display_bus = i2cdisplaybus.I2CDisplayBus(i2c, device_address=0x3D, reset=oled_reset)
 WIDTH = 128
 HEIGHT = 64
 display = adafruit_displayio_ssd1306.SSD1306(display_bus, width=WIDTH, height=HEIGHT)

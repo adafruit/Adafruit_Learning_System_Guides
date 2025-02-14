@@ -25,6 +25,8 @@ import struct
 import board
 import busio
 import displayio
+import busdisplay
+import fourwire
 import espcamera
 import espidf
 import keypad
@@ -34,7 +36,7 @@ import storage
 print("Initializing display")
 displayio.release_displays()
 spi = busio.SPI(MOSI=board.LCD_MOSI, clock=board.LCD_CLK)
-display_bus = displayio.FourWire(
+display_bus = fourwire.FourWire(
     spi,
     command=board.LCD_D_C,
     chip_select=board.LCD_CS,
@@ -67,7 +69,7 @@ _INIT_SEQUENCE = (
     b"\x29\x80\x78"  # Display on then delay 0x78 (120ms)
 )
 
-display = displayio.Display(display_bus, _INIT_SEQUENCE, width=320, height=240)
+display = busdisplay.BusDisplay(display_bus, _INIT_SEQUENCE, width=320, height=240)
 
 if espidf.get_reserved_psram() < 1047586:
     print("""Place the following line in CIRCUITPY/settings.toml, then hard-reset the board:

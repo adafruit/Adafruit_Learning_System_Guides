@@ -5,6 +5,7 @@ import time
 import board
 import terminalio
 import displayio
+import i2cdisplaybus
 from digitalio import DigitalInOut
 from adafruit_mcp2515.canio import Message, RemoteTransmissionRequest
 from adafruit_mcp2515 import MCP2515 as CAN
@@ -15,7 +16,7 @@ displayio.release_displays()
 
 i2c = board.STEMMA_I2C()
 # STEMMA OLED setup
-display_bus = displayio.I2CDisplay(i2c, device_address=0x3D, reset=None)
+display_bus = i2cdisplaybus.I2CDisplayBus(i2c, device_address=0x3D, reset=None)
 display = adafruit_displayio_ssd1306.SSD1306(display_bus, width=128, height=64)
 
 cs = DigitalInOut(board.A3)

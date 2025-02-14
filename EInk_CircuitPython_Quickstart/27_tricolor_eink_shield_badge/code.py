@@ -16,6 +16,7 @@ Simple Badge script for a 2.7" 264x176 Tri-Color eInk display shield
 import time
 import board
 import displayio
+import fourwire
 import adafruit_il91874
 import terminalio
 from adafruit_display_text import label
@@ -39,7 +40,7 @@ epd_cs = board.D10
 epd_dc = board.D9
 
 # Create the displayio connection to the display pins
-display_bus = displayio.FourWire(spi, command=epd_dc, chip_select=epd_cs,
+display_bus = fourwire.FourWire(spi, command=epd_dc, chip_select=epd_cs,
                                  baudrate=1000000)
 time.sleep(1)  # Wait a bit
 

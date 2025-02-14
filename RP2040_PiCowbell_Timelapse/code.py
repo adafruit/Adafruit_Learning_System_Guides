@@ -13,6 +13,7 @@ import board
 import busio
 from adafruit_ticks import ticks_ms, ticks_add, ticks_diff
 import displayio
+import fourwire
 from adafruit_neokey.neokey1x4 import NeoKey1x4
 import adafruit_st7789
 from adafruit_display_text import label
@@ -33,7 +34,7 @@ gc.collect()
 i2c = busio.I2C(board.GP5, board.GP4)
 tft_cs = board.GP21
 tft_dc = board.GP20
-display_bus = displayio.FourWire(spi, command=tft_dc, chip_select=tft_cs, reset=None)
+display_bus = fourwire.FourWire(spi, command=tft_dc, chip_select=tft_cs, reset=None)
 display = adafruit_st7789.ST7789(display_bus, width=240, height=240, rowstart=80, rotation=0)
 
 gc.collect()
