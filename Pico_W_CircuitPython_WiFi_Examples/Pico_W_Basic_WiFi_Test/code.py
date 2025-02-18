@@ -11,7 +11,11 @@ print()
 print("Connecting to WiFi")
 
 #  connect to your SSID
-wifi.radio.connect(os.getenv('CIRCUITPY_WIFI_SSID'), os.getenv('CIRCUITPY_WIFI_PASSWORD'))
+try:
+    wifi.radio.connect(os.getenv('CIRCUITPY_WIFI_SSID'), os.getenv('CIRCUITPY_WIFI_PASSWORD'))
+except TypeError:
+    print("Could not find WiFi info. Check your settings.toml file!")
+    raise
 
 print("Connected to WiFi")
 

@@ -14,7 +14,11 @@ import adafruit_requests
 quotes_url = "https://www.adafruit.com/api/quotes.php"
 
 #  connect to SSID
-wifi.radio.connect(os.getenv('CIRCUITPY_WIFI_SSID'), os.getenv('CIRCUITPY_WIFI_PASSWORD'))
+try:
+    wifi.radio.connect(os.getenv('CIRCUITPY_WIFI_SSID'), os.getenv('CIRCUITPY_WIFI_PASSWORD'))
+except TypeError:
+    print("Could not find WiFi info. Check your settings.toml file!")
+    raise
 
 pool = socketpool.SocketPool(wifi.radio)
 requests = adafruit_requests.Session(pool, ssl.create_default_context())

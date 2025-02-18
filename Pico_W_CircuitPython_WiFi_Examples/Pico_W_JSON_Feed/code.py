@@ -10,15 +10,23 @@ import socketpool
 import microcontroller
 import adafruit_requests
 
-wifi.radio.connect(os.getenv('CIRCUITPY_WIFI_SSID'), os.getenv('CIRCUITPY_WIFI_PASSWORD'))
+try:
+    wifi.radio.connect(os.getenv('CIRCUITPY_WIFI_SSID'), os.getenv('CIRCUITPY_WIFI_PASSWORD'))
+except TypeError:
+    print("Could not find WiFi info. Check your settings.toml file!")
+    raise
 
 # Use cityname, country code where countrycode is ISO3166 format.
 # E.g. "New York, US" or "London, GB"
 location = "Manhattan, US"
 
 # openweathermap URL, brings in your location & your token
-url = "http://api.openweathermap.org/data/2.5/weather?q="+location
-url += "&appid="+os.getenv('openweather_token')
+try:
+    url = "http://api.openweathermap.org/data/2.5/weather?q="+location
+    url += "&appid="+os.getenv('openweather_token')
+except TypeError:
+    print("Could not find OpenWeatherMap token. Check your settings.toml file!")
+    raise
 
 pool = socketpool.SocketPool(wifi.radio)
 requests = adafruit_requests.Session(pool, ssl.create_default_context())
