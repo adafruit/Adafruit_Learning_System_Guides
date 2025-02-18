@@ -19,7 +19,11 @@ i2c = busio.I2C(board.GP1, board.GP0)
 aht20 = adafruit_ahtx0.AHTx0(i2c)
 
 print("Connecting to WiFi...")
-wifi.radio.connect(os.getenv('CIRCUITPY_WIFI_SSID'), os.getenv('CIRCUITPY_WIFI_PASSWORD'))
+try:
+    wifi.radio.connect(os.getenv('CIRCUITPY_WIFI_SSID'), os.getenv('CIRCUITPY_WIFI_PASSWORD'))
+except TypeError:
+    print("Could not find WiFi info. Check your settings.toml file!")
+    raise
 
 print("Connected to WiFi!")
 
@@ -38,9 +42,13 @@ else:
 # Create an IoT Hub device client and connect
 esp = None
 pool = socketpool.SocketPool(wifi.radio)
-device = IoTCentralDevice(
-    pool, esp, os.getenv('id_scope'), os.getenv('device_id'), os.getenv('device_primary_key')
-)
+try:
+    device = IoTCentralDevice(
+        pool, esp, os.getenv('id_scope'), os.getenv('device_id'), os.getenv('device_primary_key')
+    )
+except TypeError:
+    print("Could not find Azure IoT info. Check your settings.toml file!")
+    raise
 
 print("Connecting to Azure IoT Central...")
 

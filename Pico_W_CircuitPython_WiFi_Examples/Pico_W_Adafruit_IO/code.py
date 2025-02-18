@@ -13,10 +13,18 @@ import adafruit_requests
 import adafruit_ahtx0
 from adafruit_io.adafruit_io import IO_HTTP, AdafruitIO_RequestError
 
-wifi.radio.connect(os.getenv('CIRCUITPY_WIFI_SSID'), os.getenv('CIRCUITPY_WIFI_PASSWORD'))
+try:
+    wifi.radio.connect(os.getenv('CIRCUITPY_WIFI_SSID'), os.getenv('CIRCUITPY_WIFI_PASSWORD'))
+except TypeError:
+    print("Could not find WiFi info. Check your settings.toml file!")
+    raise
 
-aio_username = os.getenv('aio_username')
-aio_key = os.getenv('aio_key')
+try:
+    aio_username = os.getenv('ADAFRUIT_AIO_USERNAME')
+    aio_key = os.getenv('ADAFRUIT_AIO_KEY')
+except TypeError:
+    print("Could not find Adafruit IO info. Check your settings.toml file!")
+    raise
 
 pool = socketpool.SocketPool(wifi.radio)
 requests = adafruit_requests.Session(pool, ssl.create_default_context())
