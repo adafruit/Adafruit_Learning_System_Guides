@@ -55,7 +55,7 @@ if servo_one:
         out_feed = io.get_feed("touch-1")
         in_feed = io.get_feed("touch-2")
     except AdafruitIO_RequestError:
-        # if no feed exists, create one
+        # if no feed exists, create one and push the first value
         out_feed = io.create_new_feed("touch-1")
         in_feed = io.create_new_feed("touch-2")
         io.send_data(in_feed["key"], float(abs((ANGLE_MAX-ANGLE_MIN)/2)))
@@ -68,7 +68,7 @@ if servo_two:
         out_feed = io.get_feed("touch-2")
         in_feed = io.get_feed("touch-1")
     except AdafruitIO_RequestError:
-        # if no feed exists, create one
+        # if no feed exists, create one and push the first value
         out_feed = io.create_new_feed("touch-2")
         in_feed = io.create_new_feed("touch-1")
         io.send_data(in_feed["key"], float(abs((ANGLE_MAX-ANGLE_MIN)/2)))
