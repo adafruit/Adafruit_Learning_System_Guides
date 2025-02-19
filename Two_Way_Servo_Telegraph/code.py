@@ -18,6 +18,10 @@ from adafruit_motor import servo
 servo_one = True
 #  servo_two = True
 
+#  angles for servo
+ANGLE_MIN = 0
+ANGLE_MAX = 180
+
 try:
     from secrets import secrets
 except ImportError:
@@ -54,6 +58,7 @@ if servo_one:
         # if no feed exists, create one
         out_feed = io.create_new_feed("touch-1")
         in_feed = io.create_new_feed("touch-2")
+        io.send_data(in_feed["key"], float(abs((ANGLE_MAX-ANGLE_MIN)/2)))
 #  setup for display 2
 if servo_two:
     CALIB_MIN = 15668
@@ -66,6 +71,7 @@ if servo_two:
         # if no feed exists, create one
         out_feed = io.create_new_feed("touch-2")
         in_feed = io.create_new_feed("touch-1")
+        io.send_data(in_feed["key"], float(abs((ANGLE_MAX-ANGLE_MIN)/2)))
 
 received_data = io.receive_data(in_feed["key"])
 
@@ -73,10 +79,6 @@ received_data = io.receive_data(in_feed["key"])
 SERVO_PIN = board.A1
 FEEDBACK_PIN = board.A2
 touch = touchio.TouchIn(board.TX)
-
-#  angles for servo
-ANGLE_MIN = 0
-ANGLE_MAX = 180
 
 # servo setup
 pwm = pwmio.PWMOut(SERVO_PIN, duty_cycle=2 ** 15, frequency=50)
