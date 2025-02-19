@@ -90,11 +90,11 @@ def print_array(arr, max_index=None, fmt="hex"):
     else:
         length = max_index
 
-    for i in range(length):
+    for _ in range(length):
         if fmt == "hex":
-            out_str += f"{int(arr[i]):02x} "
+            out_str += f"{int(arr[_]):02x} "
         elif fmt == "bin":
-            out_str += f"{int(arr[i]):08b} "
+            out_str += f"{int(arr[_]):08b} "
     print(out_str)
 
 
@@ -109,9 +109,9 @@ def reports_equal(report_a, report_b):
     if report_a is None and report_b is not None or \
             report_b is None and report_a is not None:
         return False
-    for i in range(len(report_a)):
-        if IGNORE_INDEXES is not None and i not in IGNORE_INDEXES:
-            if report_a[i] != report_b[i]:
+    for _ in range(len(report_a)):
+        if IGNORE_INDEXES is not None and _ not in IGNORE_INDEXES:
+            if report_a[_] != report_b[_]:
                 return False
     return True
 
