@@ -1,7 +1,0 @@
-CLUE_Light_Painter/bmp2led.py 14: Unnecessary pass statement (unnecessary-pass)
-CLUE_Light_Painter/bmp2led.py 392: Unnecessary "else" after "raise" (no-else-raise)
-CLUE_Light_Painter/bmp2led.py 393: Consider explicitly re-raising using the 'from' keyword (raise-missing-from)
-CLUE_Light_Painter/bmp2led.py 395: Consider explicitly re-raising using the 'from' keyword (raise-missing-from)
-CLUE_Light_Painter/bmp2led.py 167: Either all return statements in a function should return an expression, or none of them should. (inconsistent-return-statements)
-CLUE_Light_Painter/code.py 317: Comparison to literal (literal-comparison)
-CLUE_Light_Painter/code.py 361: Unnecessary "else" after "break" (no-else-break)

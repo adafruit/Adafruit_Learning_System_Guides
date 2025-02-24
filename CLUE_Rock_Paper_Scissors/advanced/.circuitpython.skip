@@ -1,4 +1,0 @@
-CLUE_Rock_Paper_Scissors/advanced/rps_comms.py 160: Unnecessary "else" after "break" (no-else-break)
-CLUE_Rock_Paper_Scissors/advanced/rps_comms.py 229: Dangerous default value {} as argument (dangerous-default-value)
-CLUE_Rock_Paper_Scissors/advanced/rps_comms.py 229: Dangerous default value {} as argument (dangerous-default-value)
-CLUE_Rock_Paper_Scissors/advanced/rps_display.py 133: Import outside toplevel (adafruit_imageload) (import-outside-toplevel)

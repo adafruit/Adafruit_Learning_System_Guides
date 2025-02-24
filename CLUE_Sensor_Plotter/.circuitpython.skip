@@ -1,3 +1,0 @@
-CLUE_Sensor_Plotter/plot_source.py 225: Unnecessary use of a comprehension (unnecessary-comprehension)
-CLUE_Sensor_Plotter/plot_source.py 245: Consider using a generator instead 'tuple(ana.value * self._conversion_factor for ana in self._analogin)' (consider-using-generator)
-CLUE_Sensor_Plotter/clue-plotter.py 223: Unnecessary "elif" after "break" (no-else-break)

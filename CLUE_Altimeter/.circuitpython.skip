@@ -1,8 +1,0 @@
-CLUE_Altimeter/clue_altimeter.py 26: Access to a protected member _pressure of a client class (protected-access)
-CLUE_Altimeter/clue_altimeter.py 27: Access to a protected member _pressure of a client class (protected-access)
-CLUE_Altimeter/clue_altimeter.py 28: Access to a protected member _pressure of a client class (protected-access)
-CLUE_Altimeter/clue_altimeter.py 29: Access to a protected member _pressure of a client class (protected-access)
-CLUE_Altimeter/clue_altimeter.py 30: Access to a protected member _pressure of a client class (protected-access)
-CLUE_Altimeter/clue_altimeter.py 121: Redefining name 'now' from outer scope (line 172) (redefined-outer-name)
-CLUE_Altimeter/clue_altimeter.py 110: Unused argument 'current_sea_level_pressure' (unused-argument)
-CLUE_Altimeter/clue_altimeter.py 7: Unused bitmap_font imported from adafruit_bitmap_font (unused-import)
