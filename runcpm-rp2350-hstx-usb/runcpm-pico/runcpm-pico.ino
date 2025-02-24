@@ -72,12 +72,13 @@ FILE_TYPE lst_dev;
 int lst_open = FALSE;
 #endif
 
+// (n.b. these are order sensitive. don't let clang-format reorder them!)
+#include "ram.h"
 #include "console.h"
-#include "cpm.h"
 #include "cpu.h"
 #include "disk.h"
 #include "host.h"
-#include "ram.h"
+#include "cpm.h"
 #ifdef CCP_INTERNAL
 #include "ccp.h"
 #endif
