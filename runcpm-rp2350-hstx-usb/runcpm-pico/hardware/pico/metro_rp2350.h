@@ -5,8 +5,8 @@
 
 #include "../../arduino_hooks.h"
 #include "../../console.h"
-#include "Adafruit_TinyUSB.h"
-#include "pio_usb.h"
+#include <Adafruit_TinyUSB.h>
+#include <pio_usb.h>
 #include <Adafruit_dvhstx.h>
 #include <SdCard/SdSpiCard.h>
 #include <SdFat.h>
@@ -19,7 +19,11 @@ Adafruit_USBH_Host USBHost;
 #define SD_CS_PIN 39
 
 SdFat SD;
+#if defined(ADAFRUIT_METRO_RP2340)
 SdSpiConfig config(SD_CS_PIN, DEDICATED_SPI, SD_SCK_MHZ(16), &SPI1);
+#else
+SdSpiConfig config(SD_CS_PIN, DEDICATED_SPI, SD_SCK_MHZ(16));
+#endif
 
 static bool start1;
 
