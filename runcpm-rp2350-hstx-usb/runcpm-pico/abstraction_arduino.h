@@ -13,6 +13,10 @@
 #define HostOS 0x01
 // #endif
 
+#if !defined(FILE_TYPE)
+#define FILE_TYPE FsFile
+#endif
+
 #if defined CORE_TEENSY
 #define HostOS 0x04
 #endif
@@ -26,7 +30,7 @@
 /* Memory abstraction functions */
 /*===============================================================================*/
 bool _RamLoad(char* filename, uint16 address) {
-	File32 f;
+	FILE_TYPE f;
 	bool result = false;
 
 	if (f = SD.open(filename, FILE_READ)) {
@@ -40,7 +44,7 @@ bool _RamLoad(char* filename, uint16 address) {
 
 /* Filesystem (disk) abstraction fuctions */
 /*===============================================================================*/
-File32 rootdir, userdir;
+FILE_TYPE rootdir, userdir;
 #define FOLDERCHAR '/'
 
 typedef struct {
@@ -60,31 +64,29 @@ typedef struct {
 	uint8 al[16];
 } CPM_DIRENTRY;
 
-static DirFat_t fileDirEntry;
-
 bool _sys_exists(uint8* filename) {
 	return(SD.exists((const char *)filename));
 }
 
-File32 _sys_fopen_w(uint8* filename) {
+FILE_TYPE _sys_fopen_w(uint8* filename) {
 	return(SD.open((char*)filename, O_CREAT | O_WRITE));
 }
 
-int _sys_fputc(uint8 ch, File32& f) {
+int _sys_fputc(uint8 ch, FILE_TYPE& f) {
 	return(f.write(ch));
 }
 
-void _sys_fflush(File32& f) {
+void _sys_fflush(FILE_TYPE& f) {
 	f.flush();
 }
 
-void _sys_fclose(File32& f) {
+void _sys_fclose(FILE_TYPE& f) {
 	f.close();
 }
 
 int _sys_select(uint8* disk) {
 	uint8 result = FALSE;
-	File32 f;
+	FILE_TYPE f;
 
 	digitalWrite(LED, HIGH ^ LEDinv);
 	if (f = SD.open((char*)disk, O_READ)) {
@@ -98,7 +100,7 @@ int _sys_select(uint8* disk) {
 
 long _sys_filesize(uint8* filename) {
 	long l = -1;
-	File32 f;
+	FILE_TYPE f;
 
 	digitalWrite(LED, HIGH ^ LEDinv);
 	if (f = SD.open((char*)filename, O_RDONLY)) {
@@ -110,13 +112,12 @@ long _sys_filesize(uint8* filename) {
 }
 
 int _sys_openfile(uint8* filename) {
-	File32 f;
+	FILE_TYPE f;
 	int result = 0;
 
 	digitalWrite(LED, HIGH ^ LEDinv);
 	f = SD.open((char*)filename, O_READ);
 	if (f) {
-		f.dirEntry(&fileDirEntry);
 		f.close();
 		result = 1;
 	}
@@ -125,7 +126,7 @@ int _sys_openfile(uint8* filename) {
 }
 
 int _sys_makefile(uint8* filename) {
-	File32 f;
+	FILE_TYPE f;
 	int result = 0;
 
 	digitalWrite(LED, HIGH ^ LEDinv);
@@ -145,7 +146,7 @@ int _sys_deletefile(uint8* filename) {
 }
 
 int _sys_renamefile(uint8* filename, uint8* newname) {
-	File32 f;
+	FILE_TYPE f;
 	int result = 0;
 
 	digitalWrite(LED, HIGH ^ LEDinv);
@@ -165,7 +166,7 @@ void _sys_logbuffer(uint8* buffer) {
 #ifdef CONSOLELOG
 	puts((char*)buffer);
 #else
-	File32 f;
+	FILE_TYPE f;
 	uint8 s = 0;
 	while (*(buffer + s))	// Computes buffer size
 		++s;
@@ -181,7 +182,7 @@ void _sys_logbuffer(uint8* buffer) {
 bool _sys_extendfile(char* fn, unsigned long fpos)
 {
 	uint8 result = true;
-	File32 f;
+	FILE_TYPE f;
 	unsigned long i;
 
 	digitalWrite(LED, HIGH ^ LEDinv);
@@ -204,7 +205,7 @@ bool _sys_extendfile(char* fn, unsigned long fpos)
 
 uint8 _sys_readseq(uint8* filename, long fpos) {
 	uint8 result = 0xff;
-	File32 f;
+	FILE_TYPE f;
 	uint8 bytesread;
 	uint8 dmabuf[BlkSZ];
 	uint8 i;
@@ -234,7 +235,7 @@ uint8 _sys_readseq(uint8* filename, long fpos) {
 
 uint8 _sys_writeseq(uint8* filename, long fpos) {
 	uint8 result = 0xff;
-	File32 f;
+	FILE_TYPE f;
 
 	digitalWrite(LED, HIGH ^ LEDinv);
 	if (_sys_extendfile((char*)filename, fpos))
@@ -256,7 +257,7 @@ uint8 _sys_writeseq(uint8* filename, long fpos) {
 
 uint8 _sys_readrand(uint8* filename, long fpos) {
 	uint8 result = 0xff;
-	File32 f;
+	FILE_TYPE f;
 	uint8 bytesread;
 	uint8 dmabuf[BlkSZ];
 	uint8 i;
@@ -297,7 +298,7 @@ uint8 _sys_readrand(uint8* filename, long fpos) {
 
 uint8 _sys_writerand(uint8* filename, long fpos) {
 	uint8 result = 0xff;
-	File32 f;
+	FILE_TYPE f;
 
 	digitalWrite(LED, HIGH ^ LEDinv);
 	if (_sys_extendfile((char*)filename, fpos)) {
@@ -325,7 +326,7 @@ static uint16 fileExtentsUsed = 0;
 static uint16 firstFreeAllocBlock;
 
 uint8 _findnext(uint8 isdir) {
-	File32 f;
+	FILE_TYPE f;
 	uint8 result = 0xff;
 	bool isfile;
 	uint32 bytes;
@@ -339,7 +340,6 @@ uint8 _findnext(uint8 isdir) {
 			f.getName((char*)&findNextDirName[0], 13);
 			isfile = !f.isDirectory();
 			bytes = f.size();
-			f.dirEntry(&fileDirEntry);
 			f.close();
 			if (!isfile)
 				continue;
@@ -440,7 +440,7 @@ uint8 _findfirstallusers(uint8 isdir) {
 }
 
 uint8 _Truncate(char* filename, uint8 rc) {
-	File32 f;
+	FILE_TYPE f;
 	int result = 0;
 
 	digitalWrite(LED, HIGH ^ LEDinv);

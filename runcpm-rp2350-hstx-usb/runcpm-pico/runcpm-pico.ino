@@ -12,8 +12,7 @@
 
 #include <SPI.h>
 
-#include <SdFat.h>        // One SD library to rule them all - Greinman SdFat from Library Manager
-#include <Adafruit_SPIFlash.h>
+#include <SdFat.h> // One SD library to rule them all - Greinman SdFat from Library Manager
 
 #ifndef USE_VT100
 #define USE_VT100 (0)
@@ -29,14 +28,14 @@
 
 #include "globals.h"
 
-
 // =========================================================================================
-// Board definitions go into the "hardware" folder, if you use a board different than the
-// Arduino DUE, choose/change a file from there and reference that file here
+// Board definitions go into the "hardware" folder, if you use a board different
+// than the Arduino DUE, choose/change a file from there and reference that file
+// here
 // =========================================================================================
 
-// Raspberry Pi Pico - normal (LED = GPIO25)
-#include "hardware/pico/feather_dvi.h"
+// Metro RP2350
+#include "hardware/pico/metro_rp2350.h"
 
 #ifndef BOARD_TEXT
 #define BOARD_TEXT USB_MANUFACTURER " " USB_PRODUCT
@@ -52,7 +51,6 @@
 #define sDELAY 100
 #define DELAY 1200
 
-
 // =========================================================================================
 // Serial port speed
 // =========================================================================================
@@ -62,7 +60,7 @@
 // PUN: device configuration
 // =========================================================================================
 #ifdef USE_PUN
-File32 pun_dev;
+FILE_TYPE pun_dev;
 int pun_open = FALSE;
 #endif
 
@@ -70,16 +68,16 @@ int pun_open = FALSE;
 // LST: device configuration
 // =========================================================================================
 #ifdef USE_LST
-File32 lst_dev;
+FILE_TYPE lst_dev;
 int lst_open = FALSE;
 #endif
 
-#include "ram.h"
 #include "console.h"
+#include "cpm.h"
 #include "cpu.h"
 #include "disk.h"
 #include "host.h"
-#include "cpm.h"
+#include "ram.h"
 #ifdef CCP_INTERNAL
 #include "ccp.h"
 #endif
@@ -87,7 +85,6 @@ int lst_open = FALSE;
 void setup(void) {
   pinMode(LED, OUTPUT);
   digitalWrite(LED, LOW ^ LEDinv);
-
 
   // =========================================================================================
   // Serial Port Definition
@@ -119,7 +116,7 @@ void setup(void) {
   // _clrscr();
   // _puts("Opening serial-port...\r\n");
   Serial.begin(SERIALSPD);
-  while (!Serial) {	// Wait until serial is connected
+  while (!Serial) { // Wait until serial is connected
     digitalWrite(LED, HIGH ^ LEDinv);
     delay(sDELAY);
     digitalWrite(LED, LOW ^ LEDinv);
@@ -131,7 +128,6 @@ void setup(void) {
   _sys_deletefile((uint8 *)LogName);
 #endif
 
-
   // =========================================================================================
   // Printing the Startup-Messages
   // =========================================================================================
@@ -139,10 +135,12 @@ void setup(void) {
   _clrscr();
 
   // if (bootup_press == 1)
-  //   { _puts("Recognized " TEXT_BOLD "#" TEXT_NORMAL " key as pressed! :)\r\n\r\n");
+  //   { _puts("Recognized " TEXT_BOLD "#" TEXT_NORMAL " key as pressed!
+  //   :)\r\n\r\n");
   //   }
 
-  _puts("CP/M Emulator " TEXT_BOLD "v" VERSION "" TEXT_NORMAL "   by   " TEXT_BOLD "Marcelo  Dantas" TEXT_NORMAL "\r\n");
+  _puts("CP/M Emulator " TEXT_BOLD "v" VERSION "" TEXT_NORMAL
+        "   by   " TEXT_BOLD "Marcelo  Dantas" TEXT_NORMAL "\r\n");
   _puts("----------------------------------------------\r\n");
   _puts("    running on [" TEXT_BOLD BOARD_TEXT TEXT_NORMAL "]\r\n");
   _puts("----------------------------------------------\r\n");
@@ -166,61 +164,63 @@ void setup(void) {
   _puts("" TEXT_NORMAL "]banks\r\n");
 #endif
 
-  // Serial.printf("Free Memory          [" TEXT_BOLD "%d bytes" TEXT_NORMAL "]\r\n", freeMemory());
+  // Serial.printf("Free Memory          [" TEXT_BOLD "%d bytes" TEXT_NORMAL
+  // "]\r\n", freeMemory());
 
   _puts("CPU-Clock            [" TEXT_BOLD);
-  _putdec((clock_get_hz( clk_sys ) + 500'000) / 1'000'000);
-           _puts(TEXT_NORMAL "] MHz\r\n");
+  _putdec((clock_get_hz(clk_sys) + 500'000) / 1'000'000);
+  _puts(TEXT_NORMAL "] MHz\r\n");
 
-           _puts("Init Storage         [ " TEXT_BOLD "");
-           if (port_flash_begin()) {
-           _puts("OK " TEXT_NORMAL "]\r\n");
-           _puts("----------------------------------------------");
+  _puts("Init Storage         [ " TEXT_BOLD "");
+  if (port_flash_begin()) {
+    _puts("OK " TEXT_NORMAL "]\r\n");
+    _puts("----------------------------------------------");
 
-           if (VersionCCP >= 0x10 || SD.exists(CCPname)) {
-           while (true) {
-           _puts(CCPHEAD);
-           _PatchCPM();
-           Status = 0;
+    if (VersionCCP >= 0x10 || SD.exists(CCPname)) {
+      while (true) {
+        _puts(CCPHEAD);
+        _PatchCPM();
+        Status = 0;
 #ifndef CCP_INTERNAL
-           if (!_RamLoad((char *)CCPname, CCPaddr)) {
-           _puts("Unable to load the CCP.\r\nCPU halted.\r\n");
-           break;
-         }
-           Z80reset();
-           SET_LOW_REGISTER(BC, _RamRead(DSKByte));
-           PC = CCPaddr;
-           Z80run();
+        if (!_RamLoad((char *)CCPname, CCPaddr)) {
+          _puts("Unable to load the CCP.\r\nCPU halted.\r\n");
+          break;
+        }
+        Z80reset();
+        SET_LOW_REGISTER(BC, _RamRead(DSKByte));
+        PC = CCPaddr;
+        Z80run();
 #else
-           _ccp();
+        _ccp();
 #endif
-           if (Status == 1)
-           break;
+        if (Status == 1)
+          break;
 #ifdef USE_PUN
-           if (pun_dev)
-           _sys_fflush(pun_dev);
+        if (pun_dev)
+          _sys_fflush(pun_dev);
 #endif
 #ifdef USE_LST
-           if (lst_dev)
-           _sys_fflush(lst_dev);
+        if (lst_dev)
+          _sys_fflush(lst_dev);
 #endif
-         }
-         } else {
-           _puts("Unable to load CP/M CCP.\r\nCPU halted.\r\n");
-         }
-         } else {
-           _puts("ERR " TEXT_NORMAL "]\r\nUnable to initialize SD card.\r\nCPU halted.\r\n");
-         }
-         }
+      }
+    } else {
+      _puts("Unable to load CP/M CCP.\r\nCPU halted.\r\n");
+    }
+  } else {
+    _puts("ERR " TEXT_NORMAL
+          "]\r\nUnable to initialize SD card.\r\nCPU halted.\r\n");
+  }
+}
 
-           // if loop is reached, blink LED forever to signal error
-           void loop(void) {
-           digitalWrite(LED, HIGH^LEDinv);
-           delay(DELAY);
-           digitalWrite(LED, LOW^LEDinv);
-           delay(DELAY);
-           digitalWrite(LED, HIGH^LEDinv);
-           delay(DELAY);
-           digitalWrite(LED, LOW^LEDinv);
-           delay(DELAY * 4);
-         }
+// if loop is reached, blink LED forever to signal error
+void loop(void) {
+  digitalWrite(LED, HIGH ^ LEDinv);
+  delay(DELAY);
+  digitalWrite(LED, LOW ^ LEDinv);
+  delay(DELAY);
+  digitalWrite(LED, HIGH ^ LEDinv);
+  delay(DELAY);
+  digitalWrite(LED, LOW ^ LEDinv);
+  delay(DELAY * 4);
+}
