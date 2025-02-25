@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Gemma M0 version of TVBgone
 # This will NOT work with CircuitPython 7 and later
 # as PulseOut is no longer available on Gemma M0
