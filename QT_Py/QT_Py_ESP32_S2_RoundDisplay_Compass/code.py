@@ -1,4 +1,3 @@
-import math
 # SPDX-FileCopyrightText: 2025 Tim Cocks for Adafruit Industries
 # SPDX-License-Identifier: MIT
 #
@@ -6,7 +5,7 @@ import math
 # https://learn.adafruit.com/qualia-s3-compass/
 
 import time
-from math import atan2, degrees
+from math import atan2, degrees, radians
 import adafruit_lis3mdl
 import board
 from adafruit_lsm6ds.lsm6dsox import LSM6DSOX
@@ -155,13 +154,13 @@ while True:
             bitmaptools.rotozoom(rotated_pointer, pointer_eraser,
                                  ox=120, oy=120,
                                  px=pointer.width // 2, py=pointer.height,
-                                 angle=math.radians(last_heading + offset_angle))
+                                 angle=radians(last_heading + offset_angle))
 
             # draw the new pointer needle
             bitmaptools.rotozoom(rotated_pointer, pointer,
                                  ox=120, oy=120,
                                  px=pointer.width // 2, py=pointer.height,
-                                 angle=math.radians(heading + offset_angle))
+                                 angle=radians(heading + offset_angle))
 
             # set the previous heading to compare next iteration
             last_heading = heading
