@@ -11,7 +11,7 @@
 #include <SdCard/SdSpiCard.h>
 #include <SdFat.h>
 
-DVHSTXText3 display(DVHSTX_PINOUT_DEFAULT);
+DVHSTXText display(DVHSTX_PINOUT_DEFAULT);
 
 // USB Host object
 Adafruit_USBH_Host USBHost;
