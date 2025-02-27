@@ -1,0 +1,25 @@
+{
+    "exportedFromDevice": {
+        "referenceVoltage": 3.3,
+        "totalGPIOPins": 18,
+        "totalAnalogPins": 4,
+        "sd_cs_pin": 23,
+        "statusLEDBrightness": 0.5
+    },
+    "components": [
+        {
+            "name": "BME280 Sensor",
+            "componentAPI": "i2c",
+            "i2cDeviceName": "bme280",
+            "period": 15,
+            "i2cDeviceAddress": "0x77",
+            "i2cDeviceSensorTypes": [
+                {"type": "relative-humidity"},
+                {"type": "ambient-temp"},
+                {"type": "ambient-temp-fahrenheit"},
+                {"type": "pressure"},
+                {"type": "altitude"}
+            ]
+        }
+    ]
+}
