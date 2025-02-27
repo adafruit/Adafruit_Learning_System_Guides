@@ -21,7 +21,7 @@
 */
 
 
-#include <Conceptinetics.h>
+#include "Conceptinetics.h"
 
 
 //

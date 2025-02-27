@@ -21,7 +21,7 @@
 */
 
 
-#include <Conceptinetics.h>
+#include "Conceptinetics.h"
 
 //
 // When configuring a DMX_Master it will normally automaticly
