@@ -66,7 +66,7 @@ def play_brick_hit():
     """Sound for ball hitting brick"""
     if piezo is None:
         return
-    
+
     play_tone(660, 0.05)  # E5, short
 
 def play_game_over():
@@ -161,26 +161,26 @@ def check_keys():
     Check for keyboard input via supervisor.runtime.serial_bytes_available
     Returns tuple of (left_pressed, right_pressed, space_pressed, any_input)
     """
-    left_pressed = False
-    right_pressed = False
-    space_pressed = False
-    any_input = False
+    l_pressed = False
+    r_pressed = False
+    s_pressed = False
+    any_key = False
 
     # Check if serial data is available
     if supervisor.runtime.serial_bytes_available:
-        any_input = True
+        any_key = True
         try:
             key = sys.stdin.read(1)
             if key in ('a', 'A'):  # Left movement
-                left_pressed = True
+                l_pressed = True
             elif key in ('d', 'D'):  # Right movement
-                right_pressed = True
+                r_pressed = True
             elif key == ' ':  # Space for start/launch
-                space_pressed = True
+                s_pressed = True
         except Exception as e:
             print("Input error:", e)
 
-    return (left_pressed, right_pressed, space_pressed, any_input)
+    return (l_pressed, r_pressed, s_pressed, any_key)
 
 def create_game_elements():
     """Create and return all game display elements"""
@@ -230,7 +230,7 @@ def create_game_elements():
         terminalio.FONT,
         text="Score: 0",
         color=0xFFFFFF,
-        x=5, 
+        x=5,
         y=display.height - 10
     )
     lives_label = label.Label(
@@ -262,7 +262,7 @@ def create_game_elements():
         y=display.height // 2
     )
     game_group.append(message_label)
-    
+
     return (game_group, paddle, ball, bricks, score_label,
             lives_label, message_label, controls_label)
 
@@ -327,14 +327,14 @@ while True:
 
     # Check keyboard input
     left_pressed, right_pressed, space_pressed, any_input = check_keys()
-    
+
     # Apply paddle movement ONLY if keys are currently pressed
     if left_pressed and paddle_pos_x > 0:
         paddle_pos_x -= PADDLE_SPEED
         # Ensure paddle doesn't go offscreen
         if paddle_pos_x < 0:
             paddle_pos_x = 0
-    
+
     if right_pressed and paddle_pos_x < display.width - PADDLE_WIDTH:
         paddle_pos_x += PADDLE_SPEED
         # Ensure paddle doesn't go offscreen
@@ -484,7 +484,7 @@ while True:
                 min_dist = min(dx1, dx2, dy1, dy2)
 
                 # Bounce based on which side was hit
-                if min_dist == dy1 or min_dist == dy2:  # Top or bottom hit
+                if min_dist in (dy1, dy2):  # Top or bottom hit
                     ball_dy = -ball_dy
                 else:  # Left or right hit
                     ball_dx = -ball_dx
