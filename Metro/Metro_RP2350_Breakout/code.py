@@ -33,7 +33,7 @@ leds.fill((0, 40, 0))  # Initial status: green
 try:
     piezo = pwmio.PWMOut(board.D23, frequency=440, duty_cycle=0,
                          variable_frequency=True)
-except Exception as e:
+except Exception as e:  # pylint: disable=broad-except
     print("Piezo initialization error:", e)
     piezo = None
 
@@ -171,17 +171,18 @@ def check_keys():
         any_key = True
         try:
             key = sys.stdin.read(1)
-            if key in ('a', 'A'):  # Left movement
+            if key in ('a', 'A'):    # Left movement
                 l_pressed = True
             elif key in ('d', 'D'):  # Right movement
                 r_pressed = True
-            elif key == ' ':  # Space for start/launch
+            elif key == ' ':         # Space for start/launch
                 s_pressed = True
-        except Exception as e:
+        except Exception as e:       # pylint: disable=broad-except
             print("Input error:", e)
 
     return (l_pressed, r_pressed, s_pressed, any_key)
 
+# pylint: disable=redefined-outer-name
 def create_game_elements():
     """Create and return all game display elements"""
     game_group = displayio.Group()
@@ -288,7 +289,7 @@ paddle_pos_x = float((display.width - PADDLE_WIDTH) // 2)
 
 def reset_ball():
     """Reset the ball position and set it initially stationary"""
-    global ball_dx, ball_dy, ball_pos_x, ball_pos_y
+    global ball_dx, ball_dy, ball_pos_x, ball_pos_y  # pylint: disable=global-statement
     ball_pos_x = float(display.width // 2)
     ball_pos_y = float(display.height - PADDLE_HEIGHT - DISPLAY_LINE - BALL_RADIUS * 3)
     ball.x = int(ball_pos_x)
@@ -298,7 +299,7 @@ def reset_ball():
 
 def launch_ball():
     """Launch the ball in a random upward direction"""
-    global ball_dx, ball_dy, ball_speed
+    global ball_dx, ball_dy, ball_speed  # pylint: disable=global-statement
     ball_speed = BALL_SPEED_INITIAL
     angle = random.uniform(0.5, 0.8)  # Launch at angle between 45-65 degrees
     ball_dx = ball_speed * random.choice([-angle, angle])
