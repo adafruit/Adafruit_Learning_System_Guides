@@ -40,6 +40,30 @@ def get_username():
     except Exception:
         pass
     return "Mark S."
+
+def generate_serial_number(username):
+    """
+    Generate a Severance-style serial number based on the username.
+    Format: 0xAAAAAA : 0xBBBBBB where A and B are hex values derived from username.
+    """
+    username_bytes = username.encode('utf-8')
+    first_hex = 0
+    for i in range(min(3, len(username_bytes))):
+        first_hex = (first_hex << 8) | username_bytes[i]
+    second_hex = 0
+    if len(username_bytes) > 3:
+        remaining_bytes = username_bytes[3:]
+        for i, byte in enumerate(remaining_bytes):
+            second_hex ^= (byte << (8 * (i % 3)))
+    else:
+        hash_obj = hashlib.md5(username_bytes)
+        digest = hash_obj.digest()
+        second_hex = int.from_bytes(digest[:3], byteorder='big')
+    serial = f"0x{first_hex:06X} : 0x{second_hex:06X}"
+    return serial
+def calculate_distance(x1, y1, x2, y2):
+    """Calculate Euclidean distance between two points"""
+    return math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
 # pylint: disable=too-many-branches,too-many-lines,broad-except,unused-argument
 # pylint: disable=too-many-statements,too-many-locals,too-many-public-methods,too-many-nested-blocks
 class MacrodataRefinementTerminal:
@@ -53,8 +77,8 @@ class MacrodataRefinementTerminal:
         self.completion = 0
         self.total_goal = TOTAL_REFINEMENT_GOAL
         self.total_refined = 0
-        self.image_path = f"/home/{self.username}/lumon-logo.png"
-        self.logo_img = Image.open(f"/home/{self.username}/lumon-logo-small.png")
+        self.image_path = "lumon-logo.png"
+        self.logo_img = Image.open("lumon-logo-small.png")
 
         # graphics
         self.root = tk.Tk()
@@ -212,27 +236,6 @@ class MacrodataRefinementTerminal:
                 number.mouse_offset_y *= 0.95
                 if abs(number.mouse_offset_y) < 0.05:
                     number.mouse_offset_y = 0
-
-    def generate_serial_number(self, username):
-        """
-        Generate a Severance-style serial number based on the username.
-        Format: 0xAAAAAA : 0xBBBBBB where A and B are hex values derived from username.
-        """
-        username_bytes = username.encode('utf-8')
-        first_hex = 0
-        for i in range(min(3, len(username_bytes))):
-            first_hex = (first_hex << 8) | username_bytes[i]
-        second_hex = 0
-        if len(username_bytes) > 3:
-            remaining_bytes = username_bytes[3:]
-            for i, byte in enumerate(remaining_bytes):
-                second_hex ^= (byte << (8 * (i % 3)))
-        else:
-            hash_obj = hashlib.md5(username_bytes)
-            digest = hash_obj.digest()
-            second_hex = int.from_bytes(digest[:3], byteorder='big')
-        serial = f"0x{first_hex:06X} : 0x{second_hex:06X}"
-        return serial
 
     def save_progress(self, filepath=None):
         """
@@ -396,7 +399,7 @@ class MacrodataRefinementTerminal:
             self.margin + usable_width + 5, bottom_frame_y + footer_height,
             outline=self.palette.FG, fill=self.palette.FG, width=2
         )
-        serial = self.generate_serial_number(self.username)
+        serial = generate_serial_number(self.username)
         self.ui_elements['serial'] = self.canvas.create_text(
             self.margin + usable_width/2, bottom_frame_y + footer_height/2,
             text=serial,
@@ -883,7 +886,7 @@ class MacrodataRefinementTerminal:
             return
         seed_number = random.choice(available_numbers)
         for number in available_numbers:
-            number.distance_to_seed = self.calculate_distance(
+            number.distance_to_seed = calculate_distance(
                 seed_number.x, seed_number.y, number.x, number.y
             )
         available_numbers.sort(key=lambda n: n.distance_to_seed)
@@ -892,10 +895,6 @@ class MacrodataRefinementTerminal:
         self.wiggle_numbers = clustered_numbers
         for number in self.wiggle_numbers:
             number.needs_refinement = True
-
-    def calculate_distance(self, x1, y1, x2, y2):
-        """Calculate Euclidean distance between two points"""
-        return math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
 
     def wiggle_selected_numbers(self):
         """Apply smooth, floating wiggle effect to numbers
