@@ -40,7 +40,7 @@ def get_username():
     except Exception:
         pass
     return "Mark S."
-# pylint: disable=too-many-branches,too-many-lines,broad-exception-caught,unused-argument
+# pylint: disable=too-many-branches,too-many-lines,broad-except,unused-argument
 # pylint: disable=too-many-statements,too-many-locals,too-many-public-methods,too-many-nested-blocks
 class MacrodataRefinementTerminal:
     def __init__(self, username=None, location=LOCATION):

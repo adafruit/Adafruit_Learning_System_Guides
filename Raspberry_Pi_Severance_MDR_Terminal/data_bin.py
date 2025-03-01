@@ -7,7 +7,7 @@ import random
 import tkinter as tk
 from PIL import Image, ImageTk, ImageFont, ImageDraw
 
-# pylint: disable=broad-exception-caught,too-many-locals
+# pylint: disable=broad-except,too-many-locals
 
 class Bin:
     KEYS = ['WO', 'FC', 'DR', 'MA']
