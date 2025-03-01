@@ -27,18 +27,15 @@ TOTAL_REFINEMENT_GOAL = 250 # how many numbers to refine?
 LOCATION = "Cold Harbor"
 
 def get_username():
-    try:
-        username = os.environ.get('USER')
-        if username:
-            return username
-        username = os.environ.get('LOGNAME')
-        if username:
-            return username
-        username = os.environ.get('USERNAME')
-        if username:
-            return username
-    except Exception:
-        pass
+    username = os.environ.get('USER')
+    if username:
+        return username
+    username = os.environ.get('LOGNAME')
+    if username:
+        return username
+    username = os.environ.get('USERNAME')
+    if username:
+        return username
     return "Mark S."
 
 def generate_serial_number(username):
