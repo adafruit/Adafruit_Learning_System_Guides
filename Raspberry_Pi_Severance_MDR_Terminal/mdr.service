@@ -1,0 +1,18 @@
+[Unit]
+Description=Macrodata Refinement
+After=multi-user.service
+
+[Service]
+Type=simple
+PAMName=login
+User=pi-lumon
+Group=pi-lumon
+WorkingDirectory=/home/pi-lumon
+Environment=DISPLAY=:0
+Environment=XAUTHORITY=/home/pi-lumon/.Xauthority
+ExecStart=/home/pi-lumon/lumon/bin/python /home/pi-lumon/lumon.py
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target
