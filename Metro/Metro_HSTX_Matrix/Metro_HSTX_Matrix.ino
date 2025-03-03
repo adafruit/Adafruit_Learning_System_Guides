@@ -1,11 +1,10 @@
 // SPDX-FileCopyrightText: 2021 Anne Barela for Adafruit Industries
 //
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: MIT 
 //
 // Based on Adafruit-DVI-HSTX library code written by Jeff Epler 
-// and use of Claude 3.7 Sonnet
+// and use of Claude 3.7 Sonnet on 3/2/2025
 // https://claude.site/artifacts/cf022b66-50c3-43eb-b334-17fbf0ed791c
-// on 3/2/2025
 
 #include <Adafruit_dvhstx.h>
 
