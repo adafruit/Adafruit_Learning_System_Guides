@@ -259,7 +259,7 @@ def create_game_elements():
         terminalio.FONT,
         text="Press SPACE to begin",
         color=0xFFFFFF,
-        x=(display.width - 150) // 2,
+        x=(display.width - 130) // 2,
         y=display.height // 2
     )
     game_group.append(message_label)
