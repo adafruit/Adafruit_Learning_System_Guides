@@ -35,7 +35,7 @@ struct CharStream {
 CharStream streams[250]; // Allow for decent density
 
 // Stream creation rate (higher = more frequent new streams)
-const int STREAM_CREATION_CHANCE = 40; // % chance per frame to create new stream
+const int STREAM_CREATION_CHANCE = 65; // % chance per frame to create new stream
 
 // Initial streams to create at startup
 const int INITIAL_STREAMS = 30;
