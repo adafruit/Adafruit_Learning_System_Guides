@@ -1,6 +1,6 @@
 // SPDX-FileCopyrightText: 2021 Anne Barela for Adafruit Industries
 //
-// SPDX-License-Identifier: MIT 
+// SPDX-License-Identifier: MIT
 //
 // Based on Adafruit-DVI-HSTX library code written by Jeff Epler 
 // and use of Claude 3.7 Sonnet on 3/2/2025
@@ -35,7 +35,7 @@ struct CharStream {
 CharStream streams[250]; // Allow for decent density
 
 // Stream creation rate (higher = more frequent new streams)
-const int STREAM_CREATION_CHANCE = 40; // % chance per frame to create new stream
+const int STREAM_CREATION_CHANCE = 65; // % chance per frame to create new stream
 
 // Initial streams to create at startup
 const int INITIAL_STREAMS = 30;
