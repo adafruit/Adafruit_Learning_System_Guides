@@ -14,12 +14,19 @@ from adafruit_esp32spi import adafruit_esp32spi_wifimanager
 
 import adafruit_minimqtt.adafruit_minimqtt as MQTT
 
-### WiFi ###
+# Get WiFi details, ensure these are setup in settings.toml
+ssid = os.getenv("CIRCUITPY_WIFI_SSID")
+password = os.getenv("CIRCUITPY_WIFI_PASSWORD")
 
-secrets = {
-    "ssid" : os.getenv("CIRCUITPY_WIFI_SSID"),
-    "password" : os.getenv("CIRCUITPY_WIFI_PASSWORD"),
-}
+if None in [ssid, password]:
+    raise RuntimeError(
+        "WiFi settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "at a minimum."
+    )
+
+### WiFi ###
 
 # If you are using a board with pre-defined ESP32 Pins:
 esp32_cs = DigitalInOut(board.ESP_CS)
@@ -34,19 +41,19 @@ esp32_reset = DigitalInOut(board.ESP_RESET)
 spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
 esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset)
 """Use below for Most Boards"""
-status_light = neopixel.NeoPixel(
+status_pixel = neopixel.NeoPixel(
     board.NEOPIXEL, 1, brightness=0.2
 )  # Uncomment for Most Boards
 """Uncomment below for ItsyBitsy M4"""
-# status_light = dotstar.DotStar(board.APA102_SCK, board.APA102_MOSI, 1, brightness=0.2)
+# status_pixel = dotstar.DotStar(board.APA102_SCK, board.APA102_MOSI, 1, brightness=0.2)
 # Uncomment below for an externally defined RGB LED
 # import adafruit_rgbled
 # from adafruit_esp32spi import PWMOut
 # RED_LED = PWMOut.PWMOut(esp, 26)
 # GREEN_LED = PWMOut.PWMOut(esp, 27)
 # BLUE_LED = PWMOut.PWMOut(esp, 25)
-# status_light = adafruit_rgbled.RGBLED(RED_LED, BLUE_LED, GREEN_LED)
-wifi = adafruit_esp32spi_wifimanager.ESPSPI_WiFiManager(esp, secrets, status_light)
+# status_pixel = adafruit_rgbled.RGBLED(RED_LED, BLUE_LED, GREEN_LED)
+wifi = adafruit_esp32spi_wifimanager.WiFiManager(esp, ssid, password, status_pixel=status_pixel)
 
 # Set up a pin for controlling the relay
 power_pin = DigitalInOut(board.D3)

@@ -3,6 +3,8 @@
 """
 CircuitPython Adafruit IO Example for BME280 and LC709203 Sensors
 """
+
+from os import getenv
 import time
 import ssl
 import alarm
@@ -14,11 +16,21 @@ import adafruit_requests
 from adafruit_io.adafruit_io import IO_HTTP, AdafruitIO_RequestError
 from adafruit_lc709203f import LC709203F, PackSize
 from adafruit_bme280 import basic as adafruit_bme280
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi and Adafruit IO credentials are kept in secrets.py, please add them there!")
-    raise
+
+# Get WiFi details and Adafruit IO keys, ensure these are setup in settings.toml
+# (visit io.adafruit.com if you need to create an account, or if you need your Adafruit IO key.)
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+aio_username = getenv("ADAFRUIT_AIO_USERNAME")
+aio_key = getenv("ADAFRUIT_AIO_KEY")
+
+if None in [ssid, password, aio_username, aio_key]:
+    raise RuntimeError(
+        "WiFi and Adafruit IO settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "'ADAFRUIT_AIO_USERNAME' and 'ADAFRUIT_AIO_KEY' at a minimum."
+    )
 
 # Duration of sleep in seconds. Default is 600 seconds (10 minutes).
 # Feather will sleep for this duration between sensor readings / sending data to AdafruitIO
@@ -78,9 +90,9 @@ def send_io_data(feed, value):
 # Wi-Fi connections can have issues! This ensures the code will continue to run.
 try:
     # Connect to Wi-Fi
-    wifi.radio.connect(secrets["ssid"], secrets["password"])
-    print("Connected to {}!".format(secrets["ssid"]))
-    print("IP:", wifi.radio.ipv4_address)
+    wifi.radio.connect(ssid, password)
+    print(f"Connected to {ssid}!")
+    print(f"IP: {wifi.radio.ipv4_address}")
 
     pool = socketpool.SocketPool(wifi.radio)
     requests = adafruit_requests.Session(pool, ssl.create_default_context())
@@ -89,12 +101,6 @@ try:
 except Exception as e:  # pylint: disable=broad-except
     print(e)
     go_to_sleep(60)
-
-# Set your Adafruit IO Username and Key in secrets.py
-# (visit io.adafruit.com if you need to create an account,
-# or if you need your Adafruit IO key.)
-aio_username = secrets["aio_username"]
-aio_key = secrets["aio_key"]
 
 # Initialize an Adafruit IO HTTP API object
 io = IO_HTTP(aio_username, aio_key, requests)

@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+from os import getenv
 import time
 import board
 import busio
@@ -22,14 +23,22 @@ USE_CELSIUS = False
 # Interval the sensor publishes to Adafruit IO, in minutes
 PUBLISH_INTERVAL = 10
 
-### WiFi ###
+# Get WiFi details and Adafruit IO keys, ensure these are setup in settings.toml
+# (visit io.adafruit.com if you need to create an account, or if you need your Adafruit IO key.)
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+aio_username = getenv("ADAFRUIT_AIO_USERNAME")
+aio_key = getenv("ADAFRUIT_AIO_KEY")
 
-# Get wifi details and more from a secrets.py file
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
+if None in [ssid, password, aio_username, aio_key]:
+    raise RuntimeError(
+        "WiFi and Adafruit IO settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "'ADAFRUIT_AIO_USERNAME' and 'ADAFRUIT_AIO_KEY' at a minimum."
+    )
+
+### WiFi ###
 
 # AirLift FeatherWing
 esp32_cs = DigitalInOut(board.D13)
@@ -38,8 +47,8 @@ esp32_ready = DigitalInOut(board.D11)
 
 spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
 esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset)
-status_light = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.2)
-wifi = adafruit_esp32spi_wifimanager.ESPSPI_WiFiManager(esp, secrets, status_light)
+status_pixel = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.2)
+wifi = adafruit_esp32spi_wifimanager.WiFiManager(esp, ssid, password, status_pixel=status_pixel)
 
 # Connect to a PM2.5 sensor over UART
 reset_pin = None
@@ -142,7 +151,7 @@ def read_bme(is_celsius=False):
 
 
 # Create an instance of the Adafruit IO HTTP client
-io = IO_HTTP(secrets["aio_user"], secrets["aio_key"], wifi)
+io = IO_HTTP(aio_username, aio_key, wifi)
 
 # Describes feeds used to hold Adafruit IO data
 feed_aqi = io.get_feed("air-quality-sensor.aqi")
@@ -150,11 +159,11 @@ feed_aqi_category = io.get_feed("air-quality-sensor.category")
 feed_humidity = io.get_feed("air-quality-sensor.humidity")
 feed_temperature = io.get_feed("air-quality-sensor.temperature")
 
-# Set up location metadata from secrets.py file
+# Set up location metadata from settings.toml file
 location_metadata = {
-    "lat": secrets["latitude"],
-    "lon": secrets["longitude"],
-    "ele": secrets["elevation"],
+    "lat": getenv("latitude"),
+    "lon": getenv("longitude"),
+    "ele": getenv("elevation"),
 }
 
 elapsed_minutes = 0

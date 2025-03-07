@@ -7,6 +7,7 @@ library example esp32spi_simpletest.py:
 https://github.com/adafruit/Adafruit_CircuitPython_ESP32SPI/
 blob/master/examples/esp32spi_simpletest.py '''
 
+from os import getenv
 import board
 import busio
 from digitalio import DigitalInOut
@@ -14,12 +15,17 @@ import adafruit_connection_manager
 import adafruit_requests
 from adafruit_esp32spi import adafruit_esp32spi
 
-# Get wifi details and more from a secrets.py file
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
+# Get WiFi details, ensure these are setup in settings.toml
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+
+if None in [ssid, password]:
+    raise RuntimeError(
+        "WiFi settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "at a minimum."
+    )
 
 print("Arduino Nano RP2040 Connect webclient test")
 
@@ -51,7 +57,7 @@ for ap in esp.scan_networks():
 print("Connecting to AP...")
 while not esp.is_connected:
     try:
-        esp.connect_AP(secrets["ssid"], secrets["password"])
+        esp.connect_AP(ssid, password)
     except RuntimeError as e:
         print("could not connect to AP, retrying: ", e)
         continue
