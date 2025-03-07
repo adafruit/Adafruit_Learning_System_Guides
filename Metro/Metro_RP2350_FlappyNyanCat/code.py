@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2025 Tim Cocks for Adafruit Industries
+# SPDX-License-Identifier: MIT
 import random
 import sys
 import terminalio
@@ -222,6 +224,16 @@ class PostPool:
         self.pool.append(post)
 
 
+class GameOverException(Exception):
+    """
+    Exception that will be raised when the player loses the game.
+    """
+
+    def __init__(self, msg):
+        self.msg = msg
+        super().__init__(self.msg)
+
+
 # palette of colors for the trail
 trail_palette = Palette(10)
 # rainbow colors
@@ -326,13 +338,29 @@ nyan_tg.x = 80
 nyan_tg.y = 50
 
 # text label for the current score
-score_lbl = Label(terminalio.FONT, text="0", color=0xFFFFFF, scale=2)
+score_lbl = Label(terminalio.FONT, text="Spacebar", color=0xFFFFFF, scale=2)
 # move it to the bottom left corner
 score_lbl.anchor_point = (0, 1)
 score_lbl.anchored_position = (2, display.height - 2)
 
 # add it to the main_group
 main_group.append(score_lbl)
+
+game_over_label = Label(
+    terminalio.FONT,
+    text="",
+    color=0xFFFFFF,
+    background_color=0x000000,
+    padding_top=10,
+    padding_bottom=10,
+    padding_left=10,
+    padding_right=10,
+)
+game_over_label.anchor_point = (0.5, 0.5)
+game_over_label.anchored_position = (display.width // 2, display.height // 2)
+game_over_label.hidden = True
+
+main_group.append(game_over_label)
 
 # set the main_group to show on the display
 display.root_group = main_group
@@ -450,96 +478,129 @@ print("Press space to jump")
 playing = False
 
 while True:
+    try:
+        # if the player hasn't started yet
+        if not playing:
+            while True:
+                # check if any keys were pressed
+                available = supervisor.runtime.serial_bytes_available
 
-    # if the player hasn't started yet
-    if not playing:
-        while True:
-            # check if any keys were pressed
-            available = supervisor.runtime.serial_bytes_available
+                # if one or more keys was pressed
+                if available:
+                    # read the value
+                    cur_btn_val = sys.stdin.read(available)
+                else:
+                    cur_btn_val = None
 
-            # if one or more keys was pressed
-            if available:
-                # read the value
-                cur_btn_val = sys.stdin.read(available)
-            else:
-                cur_btn_val = None
+                # if spacebar was pressed
+                if cur_btn_val == " ":
+                    # do the first jump
+                    cat_speed = -JUMP_SPEED
 
-            # if spacebar was pressed
-            if cur_btn_val == " ":
-                # do the first jump
-                cat_speed = -JUMP_SPEED
+                    # set playing to true and breakout of the pause loop
+                    playing = True
+                    break
 
-                # set playing to true and breakout of the pause loop
-                playing = True
-                break
+        # check if the cat is touching the first post
+        if first_post.check_collision(nyan_tg):
+            raise GameOverException(
+                f"Kitty got distracted by the scratchers post.\nScore: {score}"
+            )
 
-    # check if the cat is touching the first post
-    if first_post.check_collision(nyan_tg):
-        raise KeyboardInterrupt(
-            f"Kitty got distracted by the scratchers post. Score: {score}"
-        )
+        # check if the cat is touching the second post
+        if second_post.check_collision(nyan_tg):
+            raise GameOverException(
+                f"Kitty got distracted by the scratchers post.\nScore: {score}"
+            )
 
-    # check if the cat is touching the second post
-    if second_post.check_collision(nyan_tg):
-        raise KeyboardInterrupt(
-            f"Kitty got distracted by the scratchers post. Score: {score}"
-        )
+        # check if any keyboard data is available
+        available = supervisor.runtime.serial_bytes_available
+        if available:
+            # read the data if there is some available
+            cur_btn_val = sys.stdin.read(available)
+        else:
+            cur_btn_val = None
 
-    # check if any keyboard data is available
+        # apply gravity to the cat, maxing out at terminal velocity
+        cat_speed = min(cat_speed + FALL_SPEED, TERMINAL_VELOCITY)
+
+        # if there is keyboard data and spacebar was pressed
+        if cur_btn_val is not None and " " in cur_btn_val:
+            cat_speed = -JUMP_SPEED
+
+            # award a point for each jump
+            score += 1
+        elif cur_btn_val is not None and "s" in cur_btn_val:
+            swap_trail()
+            # award a point for swapping the trail
+            score += 1
+
+        # move the cat down by cat_speed amount of pixels
+        nyan_tg.y += cat_speed
+
+        # if the cat has touched the top or bottom edge
+        if nyan_tg.y > display.height // 2 or nyan_tg.y < 0:
+            raise GameOverException(f"Kitty wandered away.\nScore: {score}")
+
+        # current coordinates of the cat
+        draw_coords = [nyan_tg.x // 2, nyan_tg.y // 2]
+
+        try:
+            # erase the trail
+            erase_trail()
+        except ValueError as exc:
+            raise GameOverException(f"Kitty wandered away.\nScore: {score}") from exc
+
+        # shift the trail coordinates over
+        shift_trail()
+
+        # add new coordinates to the trail at the cats current location
+        trail_coords.append(draw_coords)
+
+        # if the trail is at its maximum length
+        if len(trail_coords) > TRAIL_LENGTH:
+            # remove the oldest coordinate from the trail coordinates list.
+            trail_coords.pop(0)
+
+        # draw the trail
+        draw_trail()
+
+        # shift the posts over
+        first_post = shift_post(first_post)
+        second_post = shift_post(second_post)
+
+        # update the score label
+        score_lbl.text = str(score)
+
+        # refresh the display
+        display.refresh(target_frames_per_second=30)
+
+    except GameOverException as e:
+        # update the game over message
+        game_over_label.text = str(f"{e.msg}\nPress P to play again\nPress Q to quit")
+        # make the game over message visible
+        game_over_label.hidden = False
+
+        # refresh display so the message shows
+        display.refresh()
+        break
+
+# wait for the player to press a key
+while True:
+    # check if any keys were pressed
     available = supervisor.runtime.serial_bytes_available
+
+    # if one or more keys was pressed
     if available:
-        # read the data if there is some available
+        # read the value
         cur_btn_val = sys.stdin.read(available)
-    else:
-        cur_btn_val = None
 
-    # apply gravity to the cat, maxing out at terminal velocity
-    cat_speed = min(cat_speed + FALL_SPEED, TERMINAL_VELOCITY)
+        # if player pressed p
+        if "p" in cur_btn_val:
+            supervisor.set_next_code_file(__file__)
+            supervisor.reload()
 
-    # if there is keyboard data and spacebar was pressed
-    if cur_btn_val is not None and " " in cur_btn_val:
-        cat_speed = -JUMP_SPEED
-
-        # award a point for each jump
-        score += 1
-    elif cur_btn_val is not None and "s" in cur_btn_val:
-        swap_trail()
-        # award a point for swapping the trail
-        score += 1
-
-    # move the cat down by cat_speed amount of pixels
-    nyan_tg.y += cat_speed
-
-    # if the cat has touched the top or bottom edge
-    if nyan_tg.y > display.height // 2 or nyan_tg.y < 0:
-        raise KeyboardInterrupt(f"Kitty wandered away. Score: {score}")
-
-    # current coordinates of the cat
-    draw_coords = [nyan_tg.x // 2, nyan_tg.y // 2]
-
-    # erase the trail
-    erase_trail()
-
-    # shift the trail coordinates over
-    shift_trail()
-
-    # add new coordinates to the trail at the cats current location
-    trail_coords.append(draw_coords)
-
-    # if the trail is at its maximum length
-    if len(trail_coords) > TRAIL_LENGTH:
-        # remove the oldest coordinate from the trail coordinates list.
-        trail_coords.pop(0)
-
-    # draw the trail
-    draw_trail()
-
-    # shift the posts over
-    first_post = shift_post(first_post)
-    second_post = shift_post(second_post)
-
-    # update the score label
-    score_lbl.text = str(score)
-
-    # refresh the display
-    display.refresh(target_frames_per_second=30)
+        # if player pressed q
+        elif "q" in cur_btn_val:
+            print("exiting")
+            break
