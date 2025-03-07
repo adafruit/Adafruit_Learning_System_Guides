@@ -1,5 +1,15 @@
 # SPDX-FileCopyrightText: 2025 Tim Cocks for Adafruit Industries
 # SPDX-License-Identifier: MIT
+"""
+A game featuring Nyan cat inspired by flappy bird.
+Learn Guide: https://learn.adafruit.com/flappy-nyan-cat-game-on-metro-rp2350
+
+Controls:
+    Spacebar: Jump
+           S: Switch Trails
+           P: Play again after game over
+           Q: Quit after game over
+"""
 import random
 import sys
 import terminalio
