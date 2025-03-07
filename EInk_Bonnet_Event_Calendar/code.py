@@ -18,6 +18,7 @@ from PIL import Image, ImageDraw, ImageFont
 from adafruit_epd.epd import Adafruit_EPD
 from adafruit_epd.ssd1675 import Adafruit_SSD1675
 from adafruit_epd.ssd1680 import Adafruit_SSD1680
+from adafruit_epd.ssd1680b import Adafruit_SSD1680B
 
 spi = busio.SPI(board.SCK, MOSI=board.MOSI, MISO=board.MISO)
 ecs = digitalio.DigitalInOut(board.CE0)
@@ -39,7 +40,8 @@ MAX_LINES = 2
 DEBOUNCE_DELAY = 0.3
 
 # Initialize the Display
-display = Adafruit_SSD1680(     # Newer eInk Bonnet
+display = Adafruit_SSD1680B(    # Newer eInk Bonnet (GDEY0213B74 display)
+# display = Adafruit_SSD1680(   # Old eInk Bonnet
 # display = Adafruit_SSD1675(   # Older eInk Bonnet
     122, 250, spi, cs_pin=ecs, dc_pin=dc, sramcs_pin=None, rst_pin=rst, busy_pin=busy,
 )
