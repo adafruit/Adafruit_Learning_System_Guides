@@ -1,6 +1,6 @@
 // SPDX-FileCopyrightText: 2020 Phil Schatzmann
 //
-// SPDX-License-Identifier: GNU General Public License
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 /*
   Streaming Music from Bluetooth
