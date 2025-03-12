@@ -5,8 +5,8 @@ CircuitPython Simple Example for BME280 and LC709203 Sensors
 """
 import time
 import board
-from adafruit_bme280 import basic as adafruit_bme280
 from adafruit_lc709203f import LC709203F, PackSize
+from adafruit_bme280 import basic as adafruit_bme280
 
 # Create sensor objects, using the board's default I2C bus.
 i2c = board.I2C()  # uses board.SCL and board.SDA

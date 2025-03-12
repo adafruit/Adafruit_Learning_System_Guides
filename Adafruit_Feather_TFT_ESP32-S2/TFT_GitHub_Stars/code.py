@@ -3,6 +3,8 @@
 """
 CircuitPython GitHub Stars viewer
 """
+
+from os import getenv
 import time
 import ssl
 import wifi
@@ -13,12 +15,17 @@ from adafruit_display_text import bitmap_label
 from adafruit_bitmap_font import bitmap_font
 import adafruit_requests
 
-# Get WiFi details secrets.py file
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
+# Get WiFi details, ensure these are setup in settings.toml
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+
+if None in [ssid, password]:
+    raise RuntimeError(
+        "WiFi settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "at a minimum."
+    )
 
 display = board.DISPLAY
 
@@ -38,10 +45,10 @@ group.append(text_area)
 display.root_group = group
 
 # Connect to WiFi
-print("Connecting to %s"%secrets["ssid"])
-wifi.radio.connect(secrets["ssid"], secrets["password"])
-print("Connected to %s!"%secrets["ssid"])
-print("My IP address is", wifi.radio.ipv4_address)
+print(f"Connecting to {ssid}")
+wifi.radio.connect(ssid, password)
+print(f"Connected to {ssid}!")
+print(f"My IP address is {wifi.radio.ipv4_address}")
 
 pool = socketpool.SocketPool(wifi.radio)
 requests = adafruit_requests.Session(pool, ssl.create_default_context())
