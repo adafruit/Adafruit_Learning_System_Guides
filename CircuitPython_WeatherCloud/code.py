@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+from os import getenv
 import time
 import random
 import audioio
@@ -20,25 +21,29 @@ print("ESP32 Open Weather API demo")
 button = digitalio.DigitalInOut(board.A1)
 button.switch_to_input(pull=digitalio.Pull.UP)
 
-wave_file = open("sound/Rain.wav", "rb")
-wave = audiocore.WaveFile(wave_file)
+with open("sound/Rain.wav", "rb") as wave_file:
+    wave = audiocore.WaveFile(wave_file)
 audio = audioio.AudioOut(board.A0)
 
+# Get WiFi details, ensure these are setup in settings.toml
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
 
-# Get wifi details and more from a secrets.py file
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
+if None in [ssid, password]:
+    raise RuntimeError(
+        "WiFi settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "at a minimum."
+    )
 
 # Use cityname, country code where countrycode is ISO3166 format.
 # E.g. "New York, US" or "London, GB"
-LOCATION = secrets['timezone']
+LOCATION = getenv('timezone')
 
 # Set up where we'll be fetching data from
-DATA_SOURCE = "http://api.openweathermap.org/data/2.5/weather?q="+secrets['timezone']
-DATA_SOURCE += "&appid="+secrets['openweather_token']
+DATA_SOURCE = "http://api.openweathermap.org/data/2.5/weather?q="+LOCATION
+DATA_SOURCE += "&appid="+getenv('openweather_token')
 
 # If you are using a board with pre-defined ESP32 Pins:
 esp32_cs = DigitalInOut(board.ESP_CS)
@@ -47,8 +52,8 @@ esp32_reset = DigitalInOut(board.ESP_RESET)
 
 spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
 esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset)
-status_light = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.2)  # Uncomment  for Most Boards
-wifi = adafruit_esp32spi_wifimanager.ESPSPI_WiFiManager(esp, secrets, status_light)
+status_pixel = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.2)  # Uncomment  for Most Boards
+wifi = adafruit_esp32spi_wifimanager.WiFiManager(esp, ssid, password, status_pixel=status_pixel)
 pixels = neopixel.NeoPixel(board.D2, 150, brightness=1.0, auto_write=False)
 pixels.fill(0x050505)
 pixels.show()
@@ -134,18 +139,18 @@ while True:
             raining = snowing = thundering = has_sound = False
             if weather_type == 'Sunny':
                 palette = sunny_palette
-                wave_file = open("sound/Clear.wav", "rb")
-                wave = audiocore.WaveFile(wave_file)
+                with open("sound/Clear.wav", "rb") as wave_file:
+                    wave = audiocore.WaveFile(wave_file)
                 has_sound = True
             if weather_type == 'Clouds':
                 palette = cloudy_palette
-                wave_file = open("sound/Clouds.wav", "rb")
-                wave = audiocore.WaveFile(wave_file)
+                with open("sound/Clouds.wav", "rb") as wave_file:
+                    wave = audiocore.WaveFile(wave_file)
                 has_sound = True
             if weather_type == 'Rain':
                 palette = cloudy_palette
-                wave_file = open("sound/Rain.wav", "rb")
-                wave = audiocore.WaveFile(wave_file)
+                with open("sound/Rain.wav", "rb") as wave_file:
+                    wave = audiocore.WaveFile(wave_file)
                 raining = True
                 has_sound = True
             if weather_type == 'Thunderstorm':
@@ -156,8 +161,8 @@ while True:
                 next_bolt_time = time.monotonic() + random.randint(1, 5)
             if weather_type == 'Snow':
                 palette = cloudy_palette
-                wave_file = open("sound/Snow.wav", "rb")
-                wave = audiocore.WaveFile(wave_file)
+                with open("sound/Snow.wav", "rb") as wave_file:
+                    wave = audiocore.WaveFile(wave_file)
                 snowing = True
                 has_sound = True
             weather_refresh = time.monotonic()
@@ -204,11 +209,13 @@ while True:
         # pick next thunderbolt time now
         Thunder = random.randint(0, 2)
         if Thunder == 0:
-            wave_file = open("sound/Thunderstorm0.wav", "rb")
+            wave_filename = "sound/Thunderstorm0.wav"
         elif Thunder == 1:
-            wave_file = open("sound/Thunderstorm1.wav", "rb")
+            wave_filename = "sound/Thunderstorm1.wav"
         elif Thunder == 2:
-            wave_file = open("sound/Thunderstorm2.wav", "rb")
-        wave = audiocore.WaveFile(wave_file)
-        audio.play(wave)
+            wave_filename = "sound/Thunderstorm2.wav"
+        if wave_filename:
+            with open(wave_filename, "rb") as wave_file:
+                wave = audiocore.WaveFile(wave_file)
+            audio.play(wave)
         next_bolt_time = time.monotonic() + random.randint(5, 15)  # between 5 and 15 s
