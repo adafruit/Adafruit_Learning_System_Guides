@@ -3,6 +3,9 @@
 import sys
 import time
 from micropython import const
+import board
+import picodvi
+import framebufferio
 import supervisor
 import displayio
 import terminalio
@@ -31,8 +34,26 @@ INITIAL_SNAKE_LEN = 3
 # variable for the players score
 score = 0
 
-# default HSTX display gets initialized by default by circuitpython
-display = supervisor.runtime.display
+# initialize display
+displayio.release_displays()
+fb = picodvi.Framebuffer(
+    320,
+    240,
+    clk_dp=board.CKP,
+    clk_dn=board.CKN,
+    red_dp=board.D0P,
+    red_dn=board.D0N,
+    green_dp=board.D1P,
+    green_dn=board.D1N,
+    blue_dp=board.D2P,
+    blue_dn=board.D2N,
+    color_depth=16,
+)
+display = framebufferio.FramebufferDisplay(fb)
+
+# In future release the default HSTX display
+# will get initialized by default by circuitpython
+# display = supervisor.runtime.display
 
 # load title splash screen bitmap
 title_bmp = displayio.OnDiskBitmap("snake_splash.bmp")
