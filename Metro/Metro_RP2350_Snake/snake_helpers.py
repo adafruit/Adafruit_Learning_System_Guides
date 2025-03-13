@@ -279,7 +279,7 @@ class SpeedAdjuster:
         :param speed: speed as a value 0-20, lower is faster.
         """
         # limit speed to the range 0-20
-        if 0 > speed or speed > 20:
+        if speed < 0 or speed > 20:
             raise ValueError("Speed must be between 0 and 20")
 
         # store speed value on self
@@ -348,6 +348,3 @@ class GameOverException(Exception):
     Exception that indicates the game is over.
     Message will contain the reason.
     """
-
-    def __init__(self, message):
-        super().__init__(message)
