@@ -177,31 +177,31 @@ while True:
     # if game is being played
     elif CURRENT_STATE == STATE_PLAYING:
         # if up button was pressed
-        if cur_btn_val == KEY_UP:
+        if cur_btn_val == KEY_UP.lower():
             # if the snake is not already moving up or down
             if snake.direction not in (snake.DIRECTION_DOWN, snake.DIRECTION_UP):
                 # change the direction to up
                 snake.direction = snake.DIRECTION_UP
         # if down button was pressed
-        if cur_btn_val == KEY_DOWN:
+        if cur_btn_val == KEY_DOWN.lower():
             # if the snake is not already moving up or down
             if snake.direction not in (snake.DIRECTION_DOWN, snake.DIRECTION_UP):
                 # change the direction to down
                 snake.direction = snake.DIRECTION_DOWN
         # if right button was pressed
-        if cur_btn_val == KEY_RIGHT:
+        if cur_btn_val == KEY_RIGHT.lower():
             # if the snake is not already moving left or right
             if snake.direction not in (snake.DIRECTION_LEFT, snake.DIRECTION_RIGHT):
                 # change the direction to right
                 snake.direction = snake.DIRECTION_RIGHT
         # if left button was pressed
-        if cur_btn_val == KEY_LEFT:
+        if cur_btn_val == KEY_LEFT.lower():
             # if the snake is not already moving left or right
             if snake.direction not in (snake.DIRECTION_LEFT, snake.DIRECTION_RIGHT):
                 # change direction to left
                 snake.direction = snake.DIRECTION_LEFT
         # if the pause button was pressed
-        if cur_btn_val == KEY_PAUSE:
+        if cur_btn_val == KEY_PAUSE.lower():
             # change the state to paused
             CURRENT_STATE = STATE_PAUSED
 
@@ -249,19 +249,19 @@ while True:
     # if the game is paused
     elif CURRENT_STATE == STATE_PAUSED:
         # if the pause button was pressed
-        if cur_btn_val == KEY_PAUSE:
+        if cur_btn_val == KEY_PAUSE.lower():
             # change the state to playing so the game resumes
             CURRENT_STATE = STATE_PLAYING
 
     # if the current state is game over
     elif CURRENT_STATE == STATE_GAME_OVER:
         # if the p button is pressed for play again
-        if cur_btn_val == "p":
+        if cur_btn_val in {"p", "P"}:
             # set next code file to this one
             supervisor.set_next_code_file(__file__)
             # reload
             supervisor.reload()
         # if the q button is pressed for exit
-        if cur_btn_val == "q":
+        if cur_btn_val in {"q", "Q"}:
             # break out of main while True loop.
             break
