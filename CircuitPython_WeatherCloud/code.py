@@ -21,7 +21,7 @@ print("ESP32 Open Weather API demo")
 button = digitalio.DigitalInOut(board.A1)
 button.switch_to_input(pull=digitalio.Pull.UP)
 
-wave_file = open("sound/Rain.wav", "rb")  # pylint: disable=consider-using-with
+wave_file = open("sound/Rain.wav", "rb")
 wave = audiocore.WaveFile(wave_file)
 audio = audioio.AudioOut(board.A0)
 
@@ -159,7 +159,7 @@ while True:
                 wave_filename = "sound/Snow.wav"
                 snowing = True
             if wave_filename:
-                wave_file = open(wave_filename, "rb")  # pylint: disable=consider-using-with
+                wave_file = open(wave_filename, "rb")
                 wave = audiocore.WaveFile(wave_file)
                 has_sound = True
             weather_refresh = time.monotonic()
@@ -212,7 +212,7 @@ while True:
         elif Thunder == 2:
             wave_filename = "sound/Thunderstorm2.wav"
         if wave_filename:
-            wave_file = open(wave_filename, "rb")  # pylint: disable=consider-using-with
+            wave_file = open(wave_filename, "rb")
             wave = audiocore.WaveFile(wave_file)
             audio.play(wave)
         next_bolt_time = time.monotonic() + random.randint(5, 15)  # between 5 and 15 s
