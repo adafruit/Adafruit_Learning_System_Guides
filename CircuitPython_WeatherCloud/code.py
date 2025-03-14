@@ -21,8 +21,8 @@ print("ESP32 Open Weather API demo")
 button = digitalio.DigitalInOut(board.A1)
 button.switch_to_input(pull=digitalio.Pull.UP)
 
-with open("sound/Rain.wav", "rb") as wave_file:
-    wave = audiocore.WaveFile(wave_file)
+wave_file = open("sound/Rain.wav", "rb")  # pylint: disable=consider-using-with
+wave = audiocore.WaveFile(wave_file)
 audio = audioio.AudioOut(board.A0)
 
 # Get WiFi details, ensure these are setup in settings.toml
@@ -137,22 +137,17 @@ while True:
                 print(weather_type)  # See https://openweathermap.org/weather-conditions
             # default to no rain or thunder
             raining = snowing = thundering = has_sound = False
+            wave_filename = None
             if weather_type == 'Sunny':
                 palette = sunny_palette
-                with open("sound/Clear.wav", "rb") as wave_file:
-                    wave = audiocore.WaveFile(wave_file)
-                has_sound = True
+                wave_filename = "sound/Clear.wav"
             if weather_type == 'Clouds':
                 palette = cloudy_palette
-                with open("sound/Clouds.wav", "rb") as wave_file:
-                    wave = audiocore.WaveFile(wave_file)
-                has_sound = True
+                wave_filename = "sound/Clouds.wav"
             if weather_type == 'Rain':
                 palette = cloudy_palette
-                with open("sound/Rain.wav", "rb") as wave_file:
-                    wave = audiocore.WaveFile(wave_file)
+                wave_filename = "sound/Rain.wav"
                 raining = True
-                has_sound = True
             if weather_type == 'Thunderstorm':
                 palette = thunder_palette
                 raining = thundering = True
@@ -161,9 +156,11 @@ while True:
                 next_bolt_time = time.monotonic() + random.randint(1, 5)
             if weather_type == 'Snow':
                 palette = cloudy_palette
-                with open("sound/Snow.wav", "rb") as wave_file:
-                    wave = audiocore.WaveFile(wave_file)
+                wave_filename = "sound/Snow.wav"
                 snowing = True
+            if wave_filename:
+                wave_file = open(wave_filename, "rb")  # pylint: disable=consider-using-with
+                wave = audiocore.WaveFile(wave_file)
                 has_sound = True
             weather_refresh = time.monotonic()
         except RuntimeError as e:
@@ -215,7 +212,7 @@ while True:
         elif Thunder == 2:
             wave_filename = "sound/Thunderstorm2.wav"
         if wave_filename:
-            with open(wave_filename, "rb") as wave_file:
-                wave = audiocore.WaveFile(wave_file)
+            wave_file = open(wave_filename, "rb")  # pylint: disable=consider-using-with
+            wave = audiocore.WaveFile(wave_file)
             audio.play(wave)
         next_bolt_time = time.monotonic() + random.randint(5, 15)  # between 5 and 15 s
