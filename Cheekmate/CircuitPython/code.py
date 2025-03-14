@@ -6,10 +6,9 @@
 CHEEKMATE: secret message receiver using WiFi, Adafruit IO and a haptic
 buzzer. Periodically polls an Adafruit IO dashboard, converting new messages
 to Morse code.
-
-secrets.py file must be present and contain WiFi & Adafruit IO credentials.
 """
 
+from os import getenv
 import gc
 import time
 import ssl
@@ -23,11 +22,20 @@ import supervisor
 import wifi
 from adafruit_io.adafruit_io import IO_HTTP
 
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
+# Get WiFi details and Adafruit IO keys, ensure these are setup in settings.toml
+# (visit io.adafruit.com if you need to create an account, or if you need your Adafruit IO key.)
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+aio_username = getenv("ADAFRUIT_AIO_USERNAME")
+aio_key = getenv("ADAFRUIT_AIO_KEY")
+
+if None in [ssid, password, aio_username, aio_key]:
+    raise RuntimeError(
+        "WiFi and Adafruit IO settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "'ADAFRUIT_AIO_USERNAME' and 'ADAFRUIT_AIO_KEY' at a minimum."
+    )
 
 # CONFIGURABLE GLOBALS -----------------------------------------------------
 
@@ -154,10 +162,10 @@ i2c.unlock()
 # WIFI CONNECT -------------------------------------------------------------
 
 try:
-    print("Connecting to {}...".format(secrets["ssid"]), end="")
-    wifi.radio.connect(secrets["ssid"], secrets["password"])
+    print(f"Connecting to {ssid}...")
+    wifi.radio.connect(ssid, password)
     print("OK")
-    print("IP:", wifi.radio.ipv4_address)
+    print(f"IP: {wifi.radio.ipv4_address}")
 
     pool = socketpool.SocketPool(wifi.radio)
     requests = adafruit_requests.Session(pool, ssl.create_default_context())
@@ -169,8 +177,6 @@ except Exception as error:  # pylint: disable=broad-except
 
 # ADAFRUIT IO INITIALIZATION -----------------------------------------------
 
-aio_username = secrets["aio_username"]
-aio_key = secrets["aio_key"]
 io = IO_HTTP(aio_username, aio_key, requests)
 
 # SUCCESSFUL STARTUP, PROCEED INTO MAIN LOOP -------------------------------

@@ -62,18 +62,10 @@ from rps_crypto import bytesPad, strUnpad, generateOTPadKey, \
 from rps_display import RPSDisplay, blankScreen
 
 
-# Look for our name in secrets.py file if present
-ble_name = None
-try:
-    from secrets import secrets
-    ble_name = secrets.get("rps_name")
-    if ble_name is None:
-        ble_name = secrets.get("ble_name")
-        if ble_name is None:
-            print("INFO: No rps_name or ble_name entry found in secrets dict")
-except ImportError:
-    pass   # File is optional, reaching here is not a program error
-
+# Look for our name in settings.toml file if present
+ble_name = os.getenv("rps_name", os.getenv("ble_name"))
+if ble_name is None:
+    print("INFO: No rps_name or ble_name entry found in settings.toml")
 
 debug = 1
 
@@ -228,7 +220,7 @@ LAST_ACK_TIME_S = 1.5
 # Intro screen with audio
 rps_display.introductionScreen()
 
-# Enable the Bluetooth LE radio and set player's name (from secrets.py)
+# Enable the Bluetooth LE radio and set player's name (from settings.toml)
 ble = BLERadio()
 if ble_name is not None:
     ble.name = ble_name

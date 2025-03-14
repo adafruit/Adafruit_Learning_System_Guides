@@ -4,8 +4,7 @@
 
 """
 This demo is designed for the Kaluga development kit version 1.3 with the
-ILI9341 display.  Your secrets.py must be populated with your wifi credentials
-and your Adafruit IO credentials.
+ILI9341 display.
 """
 
 from ulab import numpy as np

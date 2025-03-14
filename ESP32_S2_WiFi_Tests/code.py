@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+from os import getenv
 import ipaddress
 import ssl
 import wifi
@@ -13,12 +14,17 @@ TEXT_URL = "http://wifitest.adafruit.com/testwifi/index.html"
 JSON_QUOTES_URL = "https://www.adafruit.com/api/quotes.php"
 JSON_STARS_URL = "https://api.github.com/repos/adafruit/circuitpython"
 
-# Get wifi details and more from a secrets.py file
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
+# Get WiFi details, ensure these are setup in settings.toml
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+
+if None in [ssid, password]:
+    raise RuntimeError(
+        "WiFi settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "at a minimum."
+    )
 
 print("ESP32-S2 WebClient Test")
 
@@ -30,10 +36,10 @@ for network in wifi.radio.start_scanning_networks():
             network.rssi, network.channel))
 wifi.radio.stop_scanning_networks()
 
-print("Connecting to %s"%secrets["ssid"])
-wifi.radio.connect(secrets["ssid"], secrets["password"])
-print("Connected to %s!"%secrets["ssid"])
-print("My IP address is", wifi.radio.ipv4_address)
+print(f"Connecting to {ssid}")
+wifi.radio.connect(ssid, password)
+print(f"Connected to {ssid}!")
+print(f"My IP address is {wifi.radio.ipv4_address}")
 
 ipv4 = ipaddress.ip_address("8.8.4.4")
 print("Ping google.com: %f ms" % (wifi.radio.ping(ipv4)*1000))

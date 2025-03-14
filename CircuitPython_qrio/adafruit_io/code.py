@@ -4,12 +4,12 @@
 
 """
 This demo is designed for the Kaluga development kit version 1.3 with the
-ILI9341 display.  Your secrets.py must be populated with your wifi credentials
+ILI9341 display.  Your settings.toml must be populated with your wifi credentials
 and your Adafruit IO credentials.
 """
 
+from os import getenv
 import ssl
-from secrets import secrets
 from ulab import numpy as np
 from terminalio import FONT
 import board
@@ -24,6 +24,21 @@ from adafruit_display_text.bitmap_label import Label
 from adafruit_ili9341 import ILI9341
 from adafruit_io.adafruit_io import IO_MQTT
 import adafruit_minimqtt.adafruit_minimqtt as MQTT
+
+# Get WiFi details and Adafruit IO keys, ensure these are setup in settings.toml
+# (visit io.adafruit.com if you need to create an account, or if you need your Adafruit IO key.)
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+aio_username = getenv("ADAFRUIT_AIO_USERNAME")
+aio_key = getenv("ADAFRUIT_AIO_KEY")
+
+if None in [ssid, password, aio_username, aio_key]:
+    raise RuntimeError(
+        "WiFi and Adafruit IO settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "'ADAFRUIT_AIO_USERNAME' and 'ADAFRUIT_AIO_KEY' at a minimum."
+    )
 
 # To change the name of the feed on adafruit_io, just modify this string:
 feed_name = "qrstring"
@@ -53,14 +68,14 @@ cam.flip_y = False
 cam.colorspace = adafruit_ov2640.OV2640_COLOR_YUV
 
 print("Connecting to WIFI")
-wifi.radio.connect(secrets["ssid"], secrets["password"])
+wifi.radio.connect(ssid, password)
 pool = socketpool.SocketPool(wifi.radio)
 
 print("Connecting to Adafruit IO")
 mqtt_client = MQTT.MQTT(
     broker="io.adafruit.com",
-    username=secrets["aio_username"],
-    password=secrets["aio_key"],
+    username=aio_username,
+    password=aio_key,
     socket_pool=pool,
     ssl_context=ssl.create_default_context(),
 )

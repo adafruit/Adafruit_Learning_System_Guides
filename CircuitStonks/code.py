@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+from os import getenv
 import time
 import board
 from digitalio import DigitalInOut
@@ -14,12 +15,17 @@ import displayio
 
 minitft = minitft_featherwing.MiniTFTFeatherWing()
 
-# Get wifi details and more from a secrets.py file
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
+# Get WiFi details, ensure these are setup in settings.toml
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+
+if None in [ssid, password]:
+    raise RuntimeError(
+        "WiFi settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "at a minimum."
+    )
 
 # If you are using a board with pre-defined ESP32 Pins:
 esp32_cs = DigitalInOut(board.D13)
@@ -27,11 +33,11 @@ esp32_ready = DigitalInOut(board.D11)
 esp32_reset = DigitalInOut(board.D12)
 spi = board.SPI()
 esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset)
-wifi = adafruit_esp32spi_wifimanager.ESPSPI_WiFiManager(esp, secrets)
+wifi = adafruit_esp32spi_wifimanager.WiFiManager(esp, ssid, password)
 
 # Symbol "INX" for S&P500, "DJIA" for Dow
 DATA_SOURCE = "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&apikey="
-DATA_SOURCE += secrets['alphavantage_key']
+DATA_SOURCE += getenv('alphavantage_key')
 symbols = ["DJIA", "INX", "AAPL", "TSLA", "MSFT"]
 
 # Set text, font, and color
