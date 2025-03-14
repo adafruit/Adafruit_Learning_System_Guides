@@ -157,6 +157,10 @@ while True:
         # read it into cur_btn_val
         cur_btn_val = sys.stdin.read(available)
 
+        # change to lower-case before comparison
+        # so that it's case-insensitive.
+        cur_btn_val = cur_btn_val.lower()
+
     else:  # no keyboard input
         # set to None to clear out previous value
         cur_btn_val = None
