@@ -1,21 +1,28 @@
 # SPDX-FileCopyrightText: 2021 John Park for Adafruit Industries
 # SPDX-License-Identifier: MIT
 # FunHouse PIR Motion Sensor for LIFX light bulbs
+
+from os import getenv
 import time
 import ssl
 import socketpool
 import wifi
 import adafruit_requests
-from adafruit_funhouse import FunHouse
 from displayio import CIRCUITPYTHON_TERMINAL
 import adafruit_lifx
+from adafruit_funhouse import FunHouse
 
-# Get wifi details and more from a secrets.py file
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi and API secrets are kept in secrets.py, please add them there!")
-    raise
+# Get WiFi details, ensure these are setup in settings.toml
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+
+if None in [ssid, password]:
+    raise RuntimeError(
+        "WiFi settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "at a minimum."
+    )
 
 # choose colors here. Note formatting differences.
 default_bulb_color = "#002010"
@@ -24,13 +31,13 @@ tripped_bulb_color = "#440044"
 tripped_led_color = 0x440044
 
 # Set up ESP32-S2 and adafruit_requests session
-wifi.radio.connect(ssid=secrets["ssid"], password=secrets["password"])
+wifi.radio.connect(ssid, password)
 pool = socketpool.SocketPool(wifi.radio)
 http_session = adafruit_requests.Session(pool, ssl.create_default_context())
 
-# Add your LIFX Personal Access token to secrets.py
+# Add your LIFX Personal Access token to settings.toml
 # (to obtain a token, visit: https://cloud.lifx.com/settings)
-lifx_token = secrets["lifx_token"]
+lifx_token = getenv("lifx_token")
 
 # Set this to your LIFX light separator label
 # https://api.developer.lifx.com/docs/selectors
@@ -115,7 +122,7 @@ while True:
             time.sleep(0.5)
 
     # when sensor is tripped, set the color x amount of time
-    if running_state is True and funhouse.peripherals.pir_sensor and pir_state is 0:
+    if running_state is True and funhouse.peripherals.pir_sensor and pir_state == 0:
         funhouse.peripherals.dotstars.fill(tripped_led_color)
         funhouse.set_text("tripped", running_label)
         lifx.set_color(
@@ -134,7 +141,7 @@ while True:
 
     # return to default color
     elif (
-            running_state is True and not funhouse.peripherals.pir_sensor and pir_state is 1
+            running_state is True and not funhouse.peripherals.pir_sensor and pir_state == 1
     ):
         funhouse.peripherals.dotstars.fill(default_led_color)
         funhouse.set_text("sensing...", running_label)

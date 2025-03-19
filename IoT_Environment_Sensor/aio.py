@@ -16,6 +16,7 @@ Licensed under the MIT license.
 All text above must be included in any redistribution.
 """
 
+from os import getenv
 import time
 import gc
 import board
@@ -37,14 +38,22 @@ TIME_SERVICE_STRFTIME = '&fmt=%25Y-%25m-%25d+%25H%3A%25M%3A%25S.%25L+%25j+%25u+%
 
 
 
-# Get wifi details and more from a settings.py file
-try:
-    from secrets import secrets
-except ImportError:
-    logger.critical('WiFi settings are kept in settings.py, please add them there!')
-    raise
+# Get WiFi details and Adafruit IO keys, ensure these are setup in settings.toml
+# (visit io.adafruit.com if you need to create an account, or if you need your Adafruit IO key.)
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+aio_username = getenv("ADAFRUIT_AIO_USERNAME")
+aio_key = getenv("ADAFRUIT_AIO_KEY")
 
-class AIO(object):
+if None in [ssid, password, aio_username, aio_key]:
+    raise RuntimeError(
+        "WiFi and Adafruit IO settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "'ADAFRUIT_AIO_USERNAME' and 'ADAFRUIT_AIO_KEY' at a minimum."
+    )
+
+class AIO:
 
     def __init__(self):
         try:
@@ -76,16 +85,16 @@ class AIO(object):
         logger.debug("Connecting...")
         while not self._esp.is_connected:
             try:
-                self._esp.connect_AP(secrets['ssid'], secrets['password'])
+                self._esp.connect_AP(ssid, password)
             except RuntimeError as e:
                 logger.error("could not connect to AP, retrying: %s", e)
                 continue
 
     def post(self, feed, payload):
-        api_url = 'https://io.adafruit.com/api/v2/{0}/feeds/{1}/data'.format(secrets['aio_username'], feed)# pylint: disable=line-too-long
+        api_url = f'https://io.adafruit.com/api/v2/{aio_username}/feeds/{feed}/data'
         logger.info('POSTing to %s', api_url)
         logger.info('payload: %s', str(payload))
-        auth_header = {'X-AIO-KEY':secrets['aio_key']}
+        auth_header = {'X-AIO-KEY': aio_key}
         self.connect()
         r = None
         tries = 0
@@ -119,13 +128,8 @@ class AIO(object):
         """
         # pylint: enable=line-too-long
         api_url = None
-        try:
-            aio_username = secrets['aio_username']
-            aio_key = secrets['aio_key']
-        except KeyError:
-            raise KeyError("\n\nOur time service requires a login/password to rate-limit. Please register for a free adafruit.io account and place the user/key in your secrets file under 'aio_username' and 'aio_key'")# pylint: disable=line-too-long
 
-        location = secrets['timezone']
+        location = getenv('timezone')
         if location:
             logger.debug('Getting time for timezone %s', location)
             api_url = (TIME_SERVICE + "&tz=%s") % (aio_username, aio_key, location)
@@ -144,8 +148,8 @@ class AIO(object):
             year_day = int(times[2])
             week_day = int(times[3])
             is_dst = None  # no way to know yet
-        except KeyError:
-            raise KeyError("Was unable to lookup the time, try setting secrets['timezone'] according to http://worldtimeapi.org/timezones")  # pylint: disable=line-too-long
+        except KeyError as exc:
+            raise KeyError("Was unable to lookup the time, try setting timezone in your settings.toml according to http://worldtimeapi.org/timezones") from exc  # pylint: disable=line-too-long
         year, month, mday = [int(x) for x in the_date.split('-')]
         the_time = the_time.split('.')[0]
         hours, minutes, seconds = [int(x) for x in the_time.split(':')]

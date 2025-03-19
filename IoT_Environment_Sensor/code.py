@@ -21,9 +21,9 @@ import board
 import busio
 import air_quality
 import gps
-import adafruit_bme280
 import aio
 import adafruit_logging as logging
+import adafruit_bme280
 
 logger = logging.getLogger('main')
 if not logger.hasHandlers():

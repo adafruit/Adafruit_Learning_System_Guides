@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2021 Eva Herrada for Adafruit Industries
 # SPDX-License-Identifier: MIT
 
+from os import getenv
 import time
 import ssl
 import displayio
@@ -14,6 +15,21 @@ import wifi
 import adafruit_minimqtt.adafruit_minimqtt as MQTT
 from adafruit_io.adafruit_io import IO_MQTT
 from adafruit_dash_display import Hub
+
+# Get WiFi details and Adafruit IO keys, ensure these are setup in settings.toml
+# (visit io.adafruit.com if you need to create an account, or if you need your Adafruit IO key.)
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+aio_username = getenv("ADAFRUIT_AIO_USERNAME")
+aio_key = getenv("ADAFRUIT_AIO_KEY")
+
+if None in [ssid, password, aio_username, aio_key]:
+    raise RuntimeError(
+        "WiFi and Adafruit IO settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "'ADAFRUIT_AIO_USERNAME' and 'ADAFRUIT_AIO_KEY' at a minimum."
+    )
 
 # Set up navigation buttons
 up = DigitalInOut(board.BUTTON_UP)
@@ -30,14 +46,6 @@ down.pull = Pull.DOWN
 
 back = touchio.TouchIn(board.CAP7)
 submit = touchio.TouchIn(board.CAP8)
-
-# Check for secrets.py. Note: for this project, your secrets.py needs an adafruit io api key as
-# well as the wifi information
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
 
 # Make the rgb group for setting rgb hex values for NeoPixels
 rgb_group = displayio.Group()
@@ -174,15 +182,9 @@ def pub_lamp(lamp):
 
 display = board.DISPLAY
 
-# Set your Adafruit IO Username and Key in secrets.py
-# (visit io.adafruit.com if you need to create an account,
-# or if you need your Adafruit IO key.)
-aio_username = secrets["aio_username"]
-aio_key = secrets["aio_key"]
-
-print("Connecting to %s" % secrets["ssid"])
-wifi.radio.connect(secrets["ssid"], secrets["password"])
-print("Connected to %s!" % secrets["ssid"])
+print(f"Connecting to {ssid}")
+wifi.radio.connect(ssid, password)
+print(f"Connected to {ssid}!")
 
 # Create a socket pool
 pool = socketpool.SocketPool(wifi.radio)
@@ -190,8 +192,8 @@ pool = socketpool.SocketPool(wifi.radio)
 # Initialize a new MQTT Client object
 mqtt_client = MQTT.MQTT(
     broker="io.adafruit.com",
-    username=secrets["aio_username"],
-    password=secrets["aio_key"],
+    username=aio_username,
+    password=aio_key,
     socket_pool=pool,
     ssl_context=ssl.create_default_context(),
 )

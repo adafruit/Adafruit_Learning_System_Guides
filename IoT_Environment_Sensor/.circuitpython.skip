@@ -1,5 +1,0 @@
-IoT_Environment_Sensor/gps.py 22: Class 'Gps' inherits from object, can be safely removed from bases in python3 (useless-object-inheritance)
-IoT_Environment_Sensor/air_quality.py 24: Class 'AirQualitySensor' inherits from object, can be safely removed from bases in python3 (useless-object-inheritance)
-IoT_Environment_Sensor/aio.py 41: Class 'AIO' inherits from object, can be safely removed from bases in python3 (useless-object-inheritance)
-IoT_Environment_Sensor/aio.py 120: Consider explicitly re-raising using the 'from' keyword (raise-missing-from)
-IoT_Environment_Sensor/aio.py 142: Consider explicitly re-raising using the 'from' keyword (raise-missing-from)

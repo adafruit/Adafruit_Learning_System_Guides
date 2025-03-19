@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+from os import getenv
 import time
 import ssl
 import microcontroller
@@ -38,23 +39,26 @@ pir = digitalio.DigitalInOut(board.D6)
 pir.direction = digitalio.Direction.INPUT
 motion = Debouncer(pir)
 
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi and Adafruit IO credentials are kept in secrets.py - please add them there!")
-    raise
+# Get WiFi details and Adafruit IO keys, ensure these are setup in settings.toml
+# (visit io.adafruit.com if you need to create an account, or if you need your Adafruit IO key.)
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+aio_username = getenv("ADAFRUIT_AIO_USERNAME")
+aio_key = getenv("ADAFRUIT_AIO_KEY")
 
-# Add your Adafruit IO Username and Key to secrets.py
-# (visit io.adafruit.com if you need to create an account,
-# or if you need to obtain your Adafruit IO key.)
-aio_username = secrets["aio_username"]
-aio_key = secrets["aio_key"]
+if None in [ssid, password, aio_username, aio_key]:
+    raise RuntimeError(
+        "WiFi and Adafruit IO settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "'ADAFRUIT_AIO_USERNAME' and 'ADAFRUIT_AIO_KEY' at a minimum."
+    )
 
 # WiFi
 try:
-    print("Connecting to %s" % secrets["ssid"])
-    wifi.radio.connect(secrets["ssid"], secrets["password"])
-    print("Connected to %s!" % secrets["ssid"])
+    print(f"Connecting to {ssid}")
+    wifi.radio.connect(ssid, password)
+    print(f"Connected to {ssid}!")
 # Wi-Fi connectivity fails with error messages, not specific errors, so this except is broad.
 except Exception as e:  # pylint: disable=broad-except
     print("Failed to connect to WiFi. Error:", e, "\nBoard will restart in 5 seconds.")
@@ -67,8 +71,8 @@ pool = socketpool.SocketPool(wifi.radio)
 # Initialize a new MQTT Client object
 mqtt_client = MQTT.MQTT(
     broker="io.adafruit.com",
-    username=secrets["aio_username"],
-    password=secrets["aio_key"],
+    username=aio_username,
+    password=aio_key,
     socket_pool=pool,
     ssl_context=ssl.create_default_context(),
 )
