@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-#include <SdFat.h>
 #include <SPI.h>
 #include "Adafruit_TestBed.h"
 
