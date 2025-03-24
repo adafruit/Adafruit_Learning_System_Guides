@@ -6,9 +6,6 @@
 #include "pio_usb.h"
 #include "Adafruit_TinyUSB.h"
 #include "pico/stdlib.h"
-#include "Adafruit_dvhstx.h"
-
-DVHSTXText3 display(DVHSTX_PINOUT_DEFAULT);
 
 // Pin D+ for host, D- = D+ + 1
 #ifndef PIN_USB_HOST_DP
@@ -31,22 +28,16 @@ Adafruit_USBH_Host USBHost;
 SerialPIO pio_serial(1 /* RX of the sibling board */, SerialPIO::NOPIN);
 
 void setup() {
-// ensure text generation interrupt takes place on core0
-display.begin();
-display.println("Hello hstx\n");
 }
 
 void loop() {
 }
 
 void setup1() {
-while(!display) ; 
-delay(10);
-display.println("Hello hstx in setup1\n");
-  // override tools menu CPU frequency setting
-  //set_sys_clock_khz(264'000, true);
 
-Serial.begin(115200);
+  // override tools menu CPU frequency setting
+  set_sys_clock_khz(120'000, true);
+
 #if 0
   while ( !Serial ) delay(10);   // wait for native usb
   Serial.println("Core1 setup to run TinyUSB host with pio-usb");
@@ -59,9 +50,6 @@ Serial.begin(115200);
 
   pio_usb_configuration_t pio_cfg = PIO_USB_DEFAULT_CONFIG;
   pio_cfg.pin_dp = PIN_USB_HOST_DP;
-  pio_cfg.tx_ch      = dma_claim_unused_channel(true);
-  dma_channel_unclaim(pio_cfg.tx_ch);
-
   USBHost.configure_pio_usb(1, &pio_cfg);
 
   // run host stack on controller (rhport) 1
@@ -71,8 +59,6 @@ Serial.begin(115200);
 
   // this `begin` is a void function, no way to check for failure!
   pio_serial.begin(115200);
-display.println("end of setup1\n");
-display.show_cursor();
 }
 
 int old_ascii = -1;
@@ -84,21 +70,16 @@ const uint32_t initial_repeat_time = 500;
 void send_ascii(uint8_t code, uint32_t repeat_time=default_repeat_time) {
   old_ascii = code;
   repeat_timeout = millis() + repeat_time;
-  if (code >= 32 && code < 127) {
-    display.printf("%c", code);
+  if (code > 32 && code < 127) {
+    Serial.printf("'%c'\r\n", code);
   } else {
-    display.printf("\\x%02x", code);
+    Serial.printf("'\\x%02x'\r\n", code);
   }
   pio_serial.write(code);
 }
 
 void loop1()
 {
-static bool last_serial;
-  if (!last_serial && Serial) {
-last_serial = true;
-Serial.println("Hello host serial");
-  }
   uint32_t now = millis();
   uint32_t deadline = repeat_timeout - now;
   if (old_ascii >= 0 && deadline > INT32_MAX) {
@@ -185,12 +166,12 @@ bool report_contains(const hid_keyboard_report_t &report, uint8_t key) {
 
 hid_keyboard_report_t old_report;
 
-static bool caps, num;
-static uint8_t old_leds;
 void process_event(uint8_t dev_addr, uint8_t instance, const hid_keyboard_report_t &report) {
   bool alt = report.modifier & 0x44;
   bool shift = report.modifier & 0x22;
   bool ctrl = report.modifier & 0x11;
+  bool caps = old_report.reserved & 1;
+  bool num = old_report.reserved & 2;
   uint8_t code = 0;
 
   if (report.keycode[0] == 1 && report.keycode[1] == 1) {
@@ -207,10 +188,8 @@ void process_event(uint8_t dev_addr, uint8_t instance, const hid_keyboard_report
 
     /* key is newly pressed */
     if (keycode == HID_KEY_NUM_LOCK) {
-        Serial.println("toggle numlock");
       num = !num;
     } else if (keycode == HID_KEY_CAPS_LOCK) {
-        Serial.println("toggle capslock");
       caps = !caps;
     } else {
       for (const auto &mapper : keycode_to_ascii) {
@@ -240,15 +219,15 @@ void process_event(uint8_t dev_addr, uint8_t instance, const hid_keyboard_report
     }
   }
 
-  uint8_t leds = (caps << 1) | num;
-  if (leds != old_leds) {
-    old_leds = leds;
+  uint8_t leds = (caps | (num << 1));
+  if (leds != old_report.reserved) {
     Serial.printf("Send LEDs report %d (dev:instance = %d:%d)\r\n", leds, dev_addr, instance);
     // no worky
-    auto r = tuh_hid_set_report(dev_addr, instance/*idx*/, 0/*report_id*/, HID_REPORT_TYPE_OUTPUT/*report_type*/, &old_leds, sizeof(old_leds));
+    auto r = tuh_hid_set_report(dev_addr, instance/*idx*/, 0/*report_id*/, HID_REPORT_TYPE_OUTPUT/*report_type*/, &leds, sizeof(leds));
     Serial.printf("set_report() -> %d\n", (int)r);
   }
   old_report = report;
+  old_report.reserved = leds;
 }
 
 // Invoked when received report from device via interrupt endpoint
