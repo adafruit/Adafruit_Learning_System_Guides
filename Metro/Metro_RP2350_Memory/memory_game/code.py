@@ -58,8 +58,32 @@ STATE_GAMEOVER = 2
 # initial state is title screen
 CUR_STATE = STATE_TITLE
 
-# use the built-in display
-display = supervisor.runtime.display
+if hasattr(supervisor.runtime, "display") and supervisor.runtime.display is not None:
+    # use the built-in HSTX display for Metro RP2350
+    display = supervisor.runtime.display
+else:
+    from displayio import release_displays
+    import picodvi
+    import board
+    import framebufferio
+
+    # initialize display
+    release_displays()
+
+    fb = picodvi.Framebuffer(
+        320,
+        240,
+        clk_dp=board.CKP,
+        clk_dn=board.CKN,
+        red_dp=board.D0P,
+        red_dn=board.D0N,
+        green_dp=board.D1P,
+        green_dn=board.D1N,
+        blue_dp=board.D2P,
+        blue_dn=board.D2N,
+        color_depth=16,
+    )
+    display = framebufferio.FramebufferDisplay(fb)
 
 # main group will hold all of our visual elements
 main_group = Group()

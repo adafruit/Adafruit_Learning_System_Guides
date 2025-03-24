@@ -18,8 +18,33 @@ from adafruit_displayio_layout.layouts.grid_layout import GridLayout
 import supervisor
 import terminalio
 import usb.core
-# use the built-in HSTX display for Metro RP2350
-display = supervisor.runtime.display
+
+if hasattr(supervisor.runtime, "display") and supervisor.runtime.display is not None:
+    # use the built-in HSTX display for Metro RP2350
+    display = supervisor.runtime.display
+else:
+    from displayio import release_displays
+    import picodvi
+    import board
+    import framebufferio
+
+    # initialize display
+    release_displays()
+
+    fb = picodvi.Framebuffer(
+        320,
+        240,
+        clk_dp=board.CKP,
+        clk_dn=board.CKN,
+        red_dp=board.D0P,
+        red_dn=board.D0N,
+        green_dp=board.D1P,
+        green_dn=board.D1N,
+        blue_dp=board.D2P,
+        blue_dn=board.D2N,
+        color_depth=16,
+    )
+    display = framebufferio.FramebufferDisplay(fb)
 
 # group to hold visual elements
 main_group = Group()
@@ -71,13 +96,7 @@ mouse.set_configuration()
 buf = array.array("b", [0] * 4)
 
 # set up a 3x3 grid for the tic-tac-toe board
-board_grid = GridLayout(
-    x=40,
-    y=40,
-    width=128,
-    height=128,
-    grid_size=(3, 3)
-)
+board_grid = GridLayout(x=40, y=40, width=128, height=128, grid_size=(3, 3))
 
 # load the tic-tac-toe spritesheet
 tictactoe_spritesheet = OnDiskBitmap("tictactoe_spritesheet.bmp")
@@ -95,10 +114,15 @@ for y in range(3):
     # loop over columns
     for x in range(3):
         # create a TileGrid for this cell
-        new_tg = TileGrid(bitmap=tictactoe_spritesheet, default_tile=0,
-                          tile_height=32, tile_width=32,
-                          height=1, width=1,
-                          pixel_shader=tictactoe_spritesheet.pixel_shader)
+        new_tg = TileGrid(
+            bitmap=tictactoe_spritesheet,
+            default_tile=0,
+            tile_height=32,
+            tile_width=32,
+            height=1,
+            width=1,
+            pixel_shader=tictactoe_spritesheet.pixel_shader,
+        )
 
         # add the new TileGrid to the board grid at the current position
         board_grid.add_content(new_tg, grid_position=(x, y), cell_size=(1, 1))
@@ -122,40 +146,52 @@ def check_for_winner():
     # check rows
     for row_idx in range(3):
         # if the 3 cells in this row match
-        if (board_grid[0 + (row_idx * 3)][0] != 0 and
-                board_grid[0 + (row_idx * 3)][0] ==
-                board_grid[1 + (row_idx * 3)][0] ==
-                board_grid[2 + (row_idx * 3)][0]):
+        if (
+            board_grid[0 + (row_idx * 3)][0] != 0
+            and board_grid[0 + (row_idx * 3)][0]
+            == board_grid[1 + (row_idx * 3)][0]
+            == board_grid[2 + (row_idx * 3)][0]
+        ):
             return board_grid[0 + (row_idx * 3)][0]
 
         # if any of the cells in this row are empty
-        if 0 in (board_grid[0 + (row_idx * 3)][0],
-                 board_grid[1 + (row_idx * 3)][0],
-                 board_grid[2 + (row_idx * 3)][0]):
+        if 0 in (
+            board_grid[0 + (row_idx * 3)][0],
+            board_grid[1 + (row_idx * 3)][0],
+            board_grid[2 + (row_idx * 3)][0],
+        ):
             found_empty = True
 
     # check columns
     for col_idx in range(3):
         # if the 3 cells in this column match
-        if (board_grid[0 + col_idx][0] != 0 and
-                board_grid[0 + col_idx][0] ==
-                board_grid[3 + col_idx][0] ==
-                board_grid[6 + col_idx][0]):
+        if (
+            board_grid[0 + col_idx][0] != 0
+            and board_grid[0 + col_idx][0]
+            == board_grid[3 + col_idx][0]
+            == board_grid[6 + col_idx][0]
+        ):
             return board_grid[0 + col_idx][0]
 
         # if any of the cells in this column are empty
-        if 0 in (board_grid[0 + col_idx][0],
-                 board_grid[3 + col_idx][0],
-                 board_grid[6 + col_idx][0]):
+        if 0 in (
+            board_grid[0 + col_idx][0],
+            board_grid[3 + col_idx][0],
+            board_grid[6 + col_idx][0],
+        ):
             found_empty = True
 
     # check diagonals
-    if board_grid[0][0] != 0 and \
-            board_grid[0][0] == board_grid[4][0] == board_grid[8][0]:
+    if (
+        board_grid[0][0] != 0
+        and board_grid[0][0] == board_grid[4][0] == board_grid[8][0]
+    ):
         return board_grid[0][0]
 
-    if board_grid[2][0] != 0 and \
-            board_grid[2][0] == board_grid[4][0] == board_grid[6][0]:
+    if (
+        board_grid[2][0] != 0
+        and board_grid[2][0] == board_grid[4][0] == board_grid[6][0]
+    ):
         return board_grid[2][0]
 
     if found_empty:
