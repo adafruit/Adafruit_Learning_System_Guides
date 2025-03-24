@@ -16,13 +16,11 @@ DVHSTXText display(DVHSTX_PINOUT_DEFAULT);
 // USB Host object
 Adafruit_USBH_Host USBHost;
 
-#define SD_CS_PIN 39
-
 SdFat SD;
-#if defined(ADAFRUIT_METRO_RP2340)
-SdSpiConfig config(SD_CS_PIN, DEDICATED_SPI, SD_SCK_MHZ(16), &SPI1);
+#if PIN_SPI1_SCK == PIN_SD_CLK
+SdSpiConfig config(PIN_SD_DAT3_CS, DEDICATED_SPI, SD_SCK_MHZ(16), &SPI1);
 #else
-SdSpiConfig config(SD_CS_PIN, DEDICATED_SPI, SD_SCK_MHZ(16));
+SdSpiConfig config(PIN_SD_DAT3_CS, DEDICATED_SPI, SD_SCK_MHZ(16));
 #endif
 
 static bool start1;
