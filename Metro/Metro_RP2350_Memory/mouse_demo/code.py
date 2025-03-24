@@ -14,11 +14,12 @@ import supervisor
 import terminalio
 import usb.core
 
-
+# pylint: disable=ungrouped-imports
 if hasattr(supervisor.runtime, "display") and supervisor.runtime.display is not None:
     # use the built-in HSTX display for Metro RP2350
     display = supervisor.runtime.display
 else:
+    # pylint: disable=ungrouped-imports
     from displayio import release_displays
     import picodvi
     import board
