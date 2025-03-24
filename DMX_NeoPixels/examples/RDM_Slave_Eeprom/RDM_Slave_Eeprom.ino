@@ -23,7 +23,7 @@
 
 #include <avr/eeprom.h>
 
-#include <Conceptinetics.h>
+#include "Conceptinetics.h"
 
 //
 // CTC-DRA-13-1 ISOLATED DMX-RDM SHIELD JUMPER INSTRUCTIONS
