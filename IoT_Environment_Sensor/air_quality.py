@@ -27,7 +27,7 @@ logger = logging.getLogger('main')
 if not logger.hasHandlers():
     logger.addHandler(logging.StreamHandler())
 
-class AirQualitySensor (object):
+class AirQualitySensor:
 
     def __init__(self, uart):
         self._uart = uart

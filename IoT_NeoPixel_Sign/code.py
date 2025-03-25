@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+from os import getenv
 import ssl
 import board
 import neopixel
@@ -12,19 +13,25 @@ from adafruit_io.adafruit_io import IO_HTTP
 from adafruit_pixel_framebuf import PixelFramebuffer
 # adafruit_circuitpython_adafruitio usage with native wifi networking
 
+# Get WiFi details and Adafruit IO keys, ensure these are setup in settings.toml
+# (visit io.adafruit.com if you need to create an account, or if you need your Adafruit IO key.)
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+aio_username = getenv("ADAFRUIT_AIO_USERNAME")
+aio_key = getenv("ADAFRUIT_AIO_KEY")
+
+if None in [ssid, password, aio_username, aio_key]:
+    raise RuntimeError(
+        "WiFi and Adafruit IO settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "'ADAFRUIT_AIO_USERNAME' and 'ADAFRUIT_AIO_KEY' at a minimum."
+    )
+
 # Neopixel matrix configuration
 PIXEL_PIN = board.IO6
 PIXEL_WIDTH = 12
 PIXEL_HEIGHT = 12
-
-# secrets.py has SSID/password and adafruit.io
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
-AIO_USERNAME = secrets["aio_username"]
-AIO_KEY = secrets["aio_key"]
 
 # LED matrix creation
 PIXELS = neopixel.NeoPixel(
@@ -48,7 +55,7 @@ CURRENT_COLOR = 0xFFFFFF
 
 # Helper function to get updated data from Adafruit.io
 def update_data():
-    global CURRENT_TEXT, CURRENT_COLOR
+    global CURRENT_TEXT, CURRENT_COLOR # pylint: disable=global-statement
     print("Updating data from Adafruit IO")
     try:
         quote_feed = IO.get_feed(QUOTE_FEED)
@@ -63,15 +70,15 @@ def update_data():
 
 
 # Connect to WiFi
-print("Connecting to %s" % secrets["ssid"])
-wifi.radio.connect(secrets["ssid"], secrets["password"])
-print("Connected to %s!" % secrets["ssid"])
+print(f"Connecting to {ssid}")
+wifi.radio.connect(ssid, password)
+print(f"Connected to {ssid}!")
 
 # Setup Adafruit IO connection
-POOL = socketpool.SocketPool(wifi.radio)
-REQUESTS = adafruit_requests.Session(POOL, ssl.create_default_context())
+pool = socketpool.SocketPool(wifi.radio)
+requests = adafruit_requests.Session(pool, ssl.create_default_context())
 # Initialize an Adafruit IO HTTP API object
-IO = IO_HTTP(AIO_USERNAME, AIO_KEY, REQUESTS)
+IO = IO_HTTP(aio_username, aio_key, requests)
 
 
 while True:

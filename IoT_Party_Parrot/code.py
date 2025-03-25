@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+from os import getenv
 import time
 import board
 import displayio
@@ -9,17 +10,22 @@ from adafruit_matrixportal.matrixportal import MatrixPortal
 from adafruit_matrixportal.matrix import Matrix
 import adafruit_imageload
 
-# Get wifi details and more from a secrets.py file
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
-
 print("Party Parrot Twitter Matrix")
 
+# Get WiFi details, ensure these are setup in settings.toml
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+
+if None in [ssid, password]:
+    raise RuntimeError(
+        "WiFi settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "at a minimum."
+    )
+
 #  import your bearer token
-bear = secrets['bearer_token']
+bear = getenv('bearer_token')
 
 #  query URL for tweets. looking for hashtag partyparrot sent to a specific username
 DATA_SOURCE = 'https://api.twitter.com/2/tweets/search/recent?query=#partyparrot to:blitzcitydiy'

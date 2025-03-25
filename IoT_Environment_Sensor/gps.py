@@ -25,7 +25,7 @@ logger = logging.getLogger('main')
 if not logger.hasHandlers():
     logger.addHandler(logging.StreamHandler())
 
-class Gps(object):
+class Gps:
 
     def __init__(self, uart):
         self._gps = adafruit_gps.GPS(uart, debug=False)

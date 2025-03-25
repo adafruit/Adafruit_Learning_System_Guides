@@ -14,6 +14,7 @@ Uses:
     * https://www.adafruit.com/product/4399
 """
 
+from os import getenv
 import ssl
 import socketpool
 import wifi
@@ -25,33 +26,30 @@ import busio
 import board
 import adafruit_sht4x
 
-### WiFi ###
+# Get WiFi details and Adafruit IO keys, ensure these are setup in settings.toml
+# (visit io.adafruit.com if you need to create an account, or if you need your Adafruit IO key.)
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+aio_username = getenv("ADAFRUIT_AIO_USERNAME")
+aio_key = getenv("ADAFRUIT_AIO_KEY")
 
-# Add a secrets.py to your filesystem that has a dictionary called secrets with "ssid" and
-# "password" keys with your WiFi credentials. DO NOT share that file or commit it into Git or other
-# source control.
-# pylint: disable=no-name-in-module,wrong-import-order
+if None in [ssid, password, aio_username, aio_key]:
+    raise RuntimeError(
+        "WiFi and Adafruit IO settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "'ADAFRUIT_AIO_USERNAME' and 'ADAFRUIT_AIO_KEY' at a minimum."
+    )
+
+### WiFi ###
 
 magtag = MagTag()
 
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
-
-# Set your Adafruit IO Username and Key in secrets.py
-# (visit io.adafruit.com if you need to create an account,
-# or if you need your Adafruit IO key.)
-aio_username = secrets["aio_username"]
-aio_key = secrets["aio_key"]
-
-
 connected = False
 try:
-    print("Connecting to %s" % secrets["ssid"])
-    wifi.radio.connect(secrets["ssid"], secrets["password"])
-    print("Connected to %s!" % secrets["ssid"])
+    print(f"Connecting to {ssid}")
+    wifi.radio.connect(ssid, password)
+    print(f"Connected to {ssid}!")
 
     # Create a socket pool
     pool = socketpool.SocketPool(wifi.radio)
@@ -59,8 +57,8 @@ try:
     # Initialize a new MQTT Client object
     mqtt_client = MQTT.MQTT(
         broker="io.adafruit.com",
-        username=secrets["aio_username"],
-        password=secrets["aio_key"],
+        username=aio_username,
+        password=aio_key,
         socket_pool=pool,
         ssl_context=ssl.create_default_context(),
     )
