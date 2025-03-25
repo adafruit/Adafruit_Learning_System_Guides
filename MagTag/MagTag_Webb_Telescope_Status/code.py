@@ -4,6 +4,8 @@
 """
 MagTag status display for James Webb Telescope
 """
+
+from os import getenv
 import time
 import json
 import ssl
@@ -18,11 +20,17 @@ import socketpool
 import alarm
 import adafruit_requests
 
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
+# Get WiFi details, ensure these are setup in settings.toml
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+
+if None in [ssid, password]:
+    raise RuntimeError(
+        "WiFi settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "at a minimum."
+    )
 
 # Update once per hour
 SLEEP_TIME = 60 * 60  # seconds
@@ -66,7 +74,7 @@ if not TEST_RUN:
     print("Connecting to AP...")
     try:
         # wifi connect
-        wifi.radio.connect(secrets["ssid"], secrets["password"])
+        wifi.radio.connect(ssid, password)
 
         # Create Socket, initialize requests
         socket = socketpool.SocketPool(wifi.radio)

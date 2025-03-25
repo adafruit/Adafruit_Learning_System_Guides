@@ -3,12 +3,24 @@
 # SPDX-License-Identifier: MIT
 
 # MagTag Shower Thoughts
-# Be sure to put WiFi access point info in secrets.py file to connect
+# Be sure to put WiFi access point info in settings.toml file to connect
 
+from os import getenv
 import time
 import random
 from adafruit_magtag.magtag import MagTag
 
+# Get WiFi details, ensure these are setup in settings.toml
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+
+if None in [ssid, password]:
+    raise RuntimeError(
+        "WiFi settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "at a minimum."
+    )
 
 # Set up where we'll be fetching data from
 DATA_SOURCE = "https://www.reddit.com/r/showerthoughts/hot.json?limit=10"

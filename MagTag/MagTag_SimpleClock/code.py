@@ -31,7 +31,6 @@ while True:
     if HOUR_MODE_24:
         timestr = "%d:%02d" % (hour, minute)
     else:
-        is_pm = (hour >= 12)
         hour %= 12
         if hour == 0:
             hour = 12

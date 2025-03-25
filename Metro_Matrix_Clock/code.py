@@ -5,6 +5,7 @@
 # Metro Matrix Clock
 # Runs on Airlift Metro M4 with 64x32 RGB Matrix display & shield
 
+from os import getenv
 import time
 import board
 import displayio
@@ -17,14 +18,20 @@ from adafruit_matrixportal.matrix import Matrix
 BLINK = True
 DEBUG = False
 
-# Get wifi details and more from a secrets.py file
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
+# Get WiFi details, ensure these are setup in settings.toml
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+
+if None in [ssid, password]:
+    raise RuntimeError(
+        "WiFi settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "at a minimum."
+    )
+
 print("    Metro Minimal Clock")
-print("Time will be set for {}".format(secrets["timezone"]))
+print("Time will be set for {}".format(getenv("timezone")))
 
 # --- Display setup ---
 matrix = Matrix()

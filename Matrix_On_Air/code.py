@@ -5,6 +5,7 @@
 # ON AIR sign for YouTube livestreaming
 # Runs on Airlift Metro M4 with 64x32 RGB Matrix display & shield
 
+from os import getenv
 import time
 import board
 import displayio
@@ -15,12 +16,17 @@ from adafruit_bitmap_font import bitmap_font
 from adafruit_matrixportal.network import Network
 from adafruit_matrixportal.matrix import Matrix
 
-# Get wifi details and more from a secrets.py file
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
+# Get WiFi details, ensure these are setup in settings.toml
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+
+if None in [ssid, password]:
+    raise RuntimeError(
+        "WiFi settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "at a minimum."
+    )
 
 # Set up where we'll be fetching data from
 # Adafruit YouTube channel:
@@ -32,7 +38,7 @@ DATA_SOURCE = (
     "https://www.googleapis.com/youtube/v3/search?part=snippet&channelId="
     + CHANNEL_ID
     + "&type=video&eventType=live&key="
-    + secrets["youtube_token"]
+    + getenv("youtube_token")
 )
 DATA_LOCATION1 = ["items"]
 
