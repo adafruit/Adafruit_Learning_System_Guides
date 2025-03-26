@@ -45,6 +45,7 @@
 #include "Adafruit_TinyUSB.h"
 #include "SPI.h"
 
+// USB Host with MAX3421E
 Adafruit_USBH_Host USBHost(&SPI, A1, A2);
 
 // Language ID: English
