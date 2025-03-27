@@ -2,17 +2,22 @@
 # SPDX-FileCopyrightText: 2020 Brent Rubell for Adafruit Industries.
 #
 # SPDX-License-Identifier: Unlicense
+
+from os import getenv
 import time
 from adafruit_magtag.magtag import MagTag
 
-try:
-    from secrets import secrets
-except ImportError:
-    print(
-        """WiFi settings are kept in secrets.py, please add them there!
-the secrets dictionary must contain 'ssid' and 'password' at a minimum"""
+# Get WiFi details, ensure these are setup in settings.toml
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+
+if None in [ssid, password]:
+    raise RuntimeError(
+        "WiFi settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "at a minimum."
     )
-    raise
 
 # Set to the twitter username you'd like to fetch tweets from
 TWITTER_USERNAME = "adafruit"
@@ -31,7 +36,7 @@ TWEET_HANDLE = [0, "user", "screen_name"]
 
 magtag = MagTag(url=DATA_SOURCE, json_path=(TWEET_FULL_NAME, TWEET_HANDLE, TWEET_TEXT))
 # Set Twitter OAuth2.0 Bearer Token
-bearer_token = secrets["twitter_bearer_token"]
+bearer_token = getenv("twitter_bearer_token")
 magtag.set_headers({"Authorization": "Bearer " + bearer_token})
 
 # Display setup

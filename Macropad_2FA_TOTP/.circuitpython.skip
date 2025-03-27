@@ -1,6 +1,0 @@
-Macropad_2FA_TOTP/secrets.py 19: Final newline missing (missing-final-newline)
-Macropad_2FA_TOTP/secrets.py 19: Unexpected line ending format. There is 'CRLF' while it should be 'LF'. (unexpected-line-ending-format)
-Macropad_2FA_TOTP/rtc_setter.py 35: Final newline missing (missing-final-newline)
-Macropad_2FA_TOTP/rtc_setter.py 35: Unexpected line ending format. There is 'CRLF' while it should be 'LF'. (unexpected-line-ending-format)
-Macropad_2FA_TOTP/macropad_totp.py 77: Line too long (103/100) (line-too-long)
-Macropad_2FA_TOTP/macropad_totp.py 169: Redefining name 'code' from outer scope (line 65) (redefined-outer-name)

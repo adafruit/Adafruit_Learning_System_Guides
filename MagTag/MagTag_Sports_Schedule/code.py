@@ -2,18 +2,30 @@
 # SPDX-License-Identifier: MIT
 
 # MagTag Sports Schedule Viewer
-# Be sure to add your wifi credentials to the secrets.py file
+# Be sure to add your wifi credentials to the settings.toml file
 
 # Press D to advance to next game
 # Press C to go back one game
 # Press B to refresh the schedule (this takes a minute)
 # Press A to advance to next sport (this takes a minute)
 
-
+from os import getenv
 import time
 import json
 from adafruit_datetime import datetime, timedelta
 from adafruit_magtag.magtag import MagTag
+
+# Get WiFi details, ensure these are setup in settings.toml
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+
+if None in [ssid, password]:
+    raise RuntimeError(
+        "WiFi settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "at a minimum."
+    )
 
 USE_24HR_TIME = False
 TIME_ZONE_OFFSET = -8  # hours ahead or behind Zulu time, e.g. Pacific is -8
@@ -186,7 +198,7 @@ def update_labels():
 def fetch_sports_data(reset_game_number=True):
     # Fetches and parses data for all games for the current sport
     # pylint: disable=global-statement
-    global sports_data, current_game, current_sport
+    global current_game
     magtag.url = SPORTS[current_sport]["url"]
     sports_data.clear()
     raw_data = json.loads(magtag.fetch(auto_refresh=False))

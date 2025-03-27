@@ -9,13 +9,26 @@ Lists in-season fruits and vegetables for a user's location and season.
 """
 
 # pylint: disable=import-error, line-too-long
+
+from os import getenv
 import time
-from secrets import secrets
 import rtc
 from adafruit_display_shapes.rect import Rect
 from adafruit_magtag.magtag import MagTag
 from produce import Produce
 
+
+# Get WiFi details, ensure these are setup in settings.toml
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+
+if None in [ssid, password]:
+    raise RuntimeError(
+        "WiFi settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "at a minimum."
+    )
 
 # CONFIGURABLE SETTINGS and ONE-TIME INITIALIZATION ------------------------
 
@@ -24,9 +37,9 @@ DD_MM = False      # If set, show DD/MM instead of MM/DD dates
 # Location of produce data (file:// or http:// or https://):
 JSON_URL = 'https://raw.githubusercontent.com/adafruit/Adafruit_Learning_System_Guides/master/MagTag_Seasonal_Produce/produce.json'
 
-# Location is configured in secrets.py. If location is not contained there,
+# Location is configured in settings.toml. If location is not contained there,
 # default value below will be used.
-LOCATION = secrets.get('location', 'NY') # default to 'NY'
+LOCATION = getenv('location', 'NY') # default to 'NY'
 
 PRODUCE = Produce(JSON_URL, LOCATION)
 MAGTAG = MagTag(rotation=0) # Portrait (vertical) display

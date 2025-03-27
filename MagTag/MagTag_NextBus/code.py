@@ -11,9 +11,10 @@ MIT license, all text above must be included in any redistribution.
 """
 
 # pylint: disable=import-error
+
+from os import getenv
 import gc
 import time
-from secrets import secrets
 import displayio
 from rtc import RTC
 from adafruit_magtag.magtag import Graphics
@@ -23,6 +24,17 @@ from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text.label import Label
 from nextbus import NextBus
 
+# Get WiFi details, ensure these are setup in settings.toml
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+
+if None in [ssid, password]:
+    raise RuntimeError(
+        "WiFi settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "at a minimum."
+    )
 
 # CONFIGURABLE SETTINGS ----------------------------------------------------
 
@@ -54,15 +66,12 @@ MINIMUM_TIME = 5 * 60
 # not a big problem if this drifts a bit due to infrequent synchronizations.
 # 6 hour default.
 CLOCK_SYNC_INTERVAL = 6 * 60 * 60
-# Load time zone string from secrets.py, else IP geolocation is used
+# Load time zone string from settings.toml, else IP geolocation is used
 # (http://worldtimeapi.org/api/timezone for list). Again, this is only
 # used for the 'Last checked' display, not predictions, so it's not
 # especially disruptive if missing.
 # pylint: disable=bare-except
-try:
-    TIME_ZONE = secrets['timezone'] # e.g. 'America/New_York'
-except:
-    TIME_ZONE = None # Use IP geolocation
+TIME_ZONE = getenv('timezone') # e.g. 'America/New_York'
 
 
 # SOME UTILITY FUNCTIONS ---------------------------------------------------

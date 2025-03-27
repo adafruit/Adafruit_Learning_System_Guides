@@ -31,15 +31,11 @@ DISPLAY_TIMEOUT = 60   # screen saver timeout in seconds
 DISPLAY_RATE = 1       # screen refresh rate
 #-------------------------------------------------------------------------
 
-# Get secrets from a secrets.py file
+# Get totp_keys from a totp_keys.py file
 try:
-    from secrets import secrets
-    totp_keys = secrets["totp_keys"]
+    from totp_keys import totp_keys
 except ImportError:
-    print("Secrets are kept in secrets.py, please add them there!")
-    raise
-except KeyError:
-    print("TOTP info not found in secrets.py.")
+    print("TOTP info not found in totp_keys.py, please add them there!")
     raise
 
 # set board to use PCF8523 as its RTC
@@ -80,7 +76,9 @@ rtc_time = label.Label(terminalio.FONT, text="12:34:56 AM")
 rtc_time.anchor_point = (0.0, 0.5)
 rtc_time.anchored_position = (0, 59)
 
-progress_bar = HorizontalProgressBar((68, 46), (55, 17), bar_color=0xFFFFFF, min_value=0, max_value=30)
+progress_bar = HorizontalProgressBar(
+    (68, 46), (55, 17), bar_color=0xFFFFFF, min_value=0, max_value=30
+)
 
 splash = displayio.Group()
 splash.append(name)
@@ -172,15 +170,15 @@ def generate_otp(int_input, secret_key, digits=6):
              int_to_bytestring(int_input)).digest()
     )
     offset = hmac_hash[-1] & 0xf
-    code = ((hmac_hash[offset] & 0x7f) << 24 |
-            (hmac_hash[offset + 1] & 0xff) << 16 |
-            (hmac_hash[offset + 2] & 0xff) << 8 |
-            (hmac_hash[offset + 3] & 0xff))
-    str_code = str(code % 10 ** digits)
-    while len(str_code) < digits:
-        str_code = '0' + str_code
+    otp_code = ((hmac_hash[offset] & 0x7f) << 24 |
+               (hmac_hash[offset + 1] & 0xff) << 16 |
+               (hmac_hash[offset + 2] & 0xff) << 8 |
+               (hmac_hash[offset + 3] & 0xff))
+    str_otp_code = str(otp_code % 10 ** digits)
+    while len(str_otp_code) < digits:
+        str_otp_code = '0' + str_otp_code
 
-    return str_code
+    return str_otp_code
 
 #-------------------------------------------------------------------------
 #                    M A C R O P A D    S E T U P

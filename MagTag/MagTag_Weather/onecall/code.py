@@ -3,13 +3,25 @@
 # SPDX-License-Identifier: MIT
 # pylint: disable=redefined-outer-name, eval-used, wrong-import-order
 
+from os import getenv
 import time
 import terminalio
 import displayio
 import adafruit_imageload
 from adafruit_display_text import label
 from adafruit_magtag.magtag import MagTag
-from secrets import secrets
+
+# Get WiFi details, ensure these are setup in settings.toml
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+
+if None in [ssid, password]:
+    raise RuntimeError(
+        "WiFi settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "at a minimum."
+    )
 
 # --| USER CONFIG |--------------------------
 METRIC = False  # set to True for metric units
@@ -68,7 +80,7 @@ def get_data_source_url(api="onecall", location=None):
         URL += "&lon={}".format(location[1])
     else:
         raise ValueError("Unknown API type: " + api)
-    return URL + "&appid=" + secrets["openweather_token"]
+    return URL + "&appid=" + getenv("openweather_token")
 
 
 def get_latlon(city_name):
@@ -183,18 +195,20 @@ def go_to_sleep(current_time):
 # ===========
 # Location
 # ===========
-if isinstance(secrets["openweather_location"], str):
+openweather_location = getenv("openweather_location")
+is_lat_long = "," in openweather_location
+if openweather_location and not is_lat_long:
     # Get lat/lon using city name
-    city = secrets["openweather_location"]
+    city = openweather_location
     print("Getting lat/lon for city:", city)
     latlon = get_latlon(city)
-elif isinstance(secrets["openweather_location"], tuple):
+elif openweather_location:
     # Get city name using lat/lon
-    latlon = secrets["openweather_location"]
+    latlon = openweather_location.split(",")
     print("Getting city name for lat/lon:", latlon)
     city = get_city(latlon)
 else:
-    raise ValueError("Unknown location:", secrets["openweather_location"])
+    raise ValueError(f"Unknown location:{openweather_location}")
 
 print("City =", city)
 print("Lat/Lon = ", latlon)

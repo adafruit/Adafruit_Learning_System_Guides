@@ -1,21 +1,25 @@
 # SPDX-FileCopyrightText: 2021 Brent Rubell, written for Adafruit Industries
 #
 # SPDX-License-Identifier: Unlicense
+
+from os import getenv
 from adafruit_oauth2 import OAuth2
 from adafruit_display_text.label import Label
 from adafruit_bitmap_font import bitmap_font
 from adafruit_magtag.magtag import Graphics, Network
 from adafruit_display_shapes.rect import Rect
 
-# Add a secrets.py to your filesystem that has a dictionary called secrets with "ssid" and
-# "password" keys with your WiFi credentials. DO NOT share that file or commit it into Git or other
-# source control.
-# pylint: disable=no-name-in-module,wrong-import-order
-try:
-    from secrets import secrets
-except ImportError:
-    print("Credentials and tokens are kept in secrets.py, please add them there!")
-    raise
+# Get WiFi details, ensure these are setup in settings.toml
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+
+if None in [ssid, password]:
+    raise RuntimeError(
+        "WiFi settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "at a minimum."
+    )
 
 network = Network()
 network.connect()
@@ -57,8 +61,8 @@ scopes = ["https://www.googleapis.com/auth/calendar.readonly"]
 # Initialize an OAuth2 object
 google_auth = OAuth2(
     network.requests,
-    secrets["google_client_id"],
-    secrets["google_client_secret"],
+    getenv("google_client_id"),
+    getenv("google_client_secret"),
     scopes,
 )
 
@@ -90,9 +94,9 @@ if not google_auth.wait_for_authorization():
     raise RuntimeError("Timed out waiting for browser response!")
 
 print("Successfully Authenticated with Google!")
-print("Add the following lines to your secrets.py file:")
-print("\t'google_access_token' " + ":" + " '%s'," % google_auth.access_token)
-print("\t'google_refresh_token' " + ":" + " '%s'" % google_auth.refresh_token)
+print("Add the following lines to your settings.toml file:")
+print(f'google_access_token="{google_auth.access_token}"')
+print(f'google_refresh_token="{google_auth.refresh_token}"')
 
 graphics.splash.pop()
 graphics.splash.pop()
@@ -100,6 +104,6 @@ graphics.splash.pop()
 
 label_overview_text.text = "Successfully Authenticated!"
 label_verification_url.text = (
-    "Check the REPL for tokens to add\n\tto your secrets.py file"
+    "Check the REPL for tokens to add\n\tto your settings.toml file"
 )
 display.refresh()

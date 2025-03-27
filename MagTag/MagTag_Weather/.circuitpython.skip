@@ -1,2 +1,0 @@
-MagTag_Weather/magtag_weather.py 269: Trailing newlines (trailing-newlines)
-MagTag_Weather/magtag_weather.py 7: standard import "from secrets import secrets" should be placed before "import terminalio" (wrong-import-order)

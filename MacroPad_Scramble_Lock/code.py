@@ -22,7 +22,7 @@ from adafruit_macropad import MacroPad
 # CONFIGURABLES ------------------------
 
 # Password information
-#  For higher security, place password in a separate file like secrets.py
+#  For higher security, place password in a separate file like settings.toml
 PASSWORD = "2468"
 PASSWORD_LENGTH = len(PASSWORD)
 
