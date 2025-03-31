@@ -1,3 +1,9 @@
+// SPDX-FileCopyrightText: 2016 Sandeep Mistry
+// SPDX-FileCopyrightText: 2022 Earle F. Philhower, III
+// SPDX-FileCopyrightText: 2023 Ladyada for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 #include <Adafruit_TLV320DAC3100.h>
 #include <I2S.h>
 #include <math.h>
