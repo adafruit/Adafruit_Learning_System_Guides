@@ -1,11 +1,25 @@
 # SPDX-FileCopyrightText: 2021 Brent Rubell, written for Adafruit Industries
 #
 # SPDX-License-Identifier: Unlicense
+
+from os import getenv
 import time
 import rtc
 from adafruit_oauth2 import OAuth2
 from adafruit_display_shapes.line import Line
 from adafruit_magtag.magtag import MagTag
+
+# Get WiFi details, ensure these are setup in settings.toml
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+
+if None in [ssid, password]:
+    raise RuntimeError(
+        "WiFi settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "at a minimum."
+    )
 
 # Calendar ID
 CALENDAR_ID = "YOUR_CALENDAR_ID"
@@ -42,15 +56,6 @@ WEEKDAYS = {
     6: "Sunday",
 }
 
-# Add a secrets.py to your filesystem that has a dictionary called secrets with "ssid" and
-# "password" keys with your WiFi credentials. DO NOT share that file or commit it into Git or other
-# source control.
-# pylint: disable=no-name-in-module,wrong-import-order
-try:
-    from secrets import secrets
-except ImportError:
-    print("Credentials and tokens are kept in secrets.py, please add them there!")
-    raise
 
 # Create a new MagTag object
 magtag = MagTag()
@@ -62,18 +67,18 @@ magtag.network.connect()
 scopes = ["https://www.googleapis.com/auth/calendar.readonly"]
 google_auth = OAuth2(
     magtag.network.requests,
-    secrets["google_client_id"],
-    secrets["google_client_secret"],
+    getenv("google_client_id"),
+    getenv("google_client_secret"),
     scopes,
-    secrets["google_access_token"],
-    secrets["google_refresh_token"],
+    getenv("google_access_token"),
+    getenv("google_refresh_token"),
 )
 
 
 def get_current_time(time_max=False):
     """Gets local time from Adafruit IO and converts to RFC3339 timestamp."""
     # Get local time from Adafruit IO
-    magtag.get_local_time(secrets["timezone"])
+    magtag.get_local_time(getenv("timezone"))
     # Format as RFC339 timestamp
     cur_time = r.datetime
     if time_max:  # maximum time to fetch events is midnight (4:59:59UTC)

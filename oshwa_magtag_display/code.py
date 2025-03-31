@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+from os import getenv
 import random
 import ssl
 import gc
@@ -10,12 +11,17 @@ import socketpool
 import adafruit_requests
 from adafruit_magtag.magtag import MagTag
 
-# Get wifi details and more from a secrets.py file
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
+# Get WiFi details, ensure these are setup in settings.toml
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+
+if None in [ssid, password]:
+    raise RuntimeError(
+        "WiFi settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "at a minimum."
+    )
 
 # Initialize magtag object
 magtag = MagTag()
@@ -23,9 +29,9 @@ magtag = MagTag()
 magtag.set_background("bmps/oshwa_full.bmp")
 
 # Set up WiFi
-wifi.radio.connect(secrets["ssid"], secrets["password"])
-print(f"Connected to {secrets['ssid']}!")
-print("My IP address is", wifi.radio.ipv4_address)
+wifi.radio.connect(ssid, password)
+print(f"Connected to {ssid}!")
+print(f"My IP address is {wifi.radio.ipv4_address}")
 
 socket = socketpool.SocketPool(wifi.radio)
 https = adafruit_requests.Session(socket, ssl.create_default_context())

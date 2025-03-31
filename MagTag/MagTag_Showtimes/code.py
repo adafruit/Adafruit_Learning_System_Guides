@@ -4,12 +4,25 @@
 
 # MagTag Showtimes Event Viewer
 # Uses the events.json file to display next or current event
-# Be sure to put WiFi access point info in secrets.py file to connect
+# Be sure to put WiFi access point info in settings.toml file to connect
 
+from os import getenv
 import time
 import json
 import re
 from adafruit_magtag.magtag import MagTag
+
+# Get WiFi details, ensure these are setup in settings.toml
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+
+if None in [ssid, password]:
+    raise RuntimeError(
+        "WiFi settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "at a minimum."
+    )
 
 # You can test by setting a time.struct here, to pretend its a different day
 # (tm_year, tm_mon, tm_mday, tm_hour, tm_min, tm_sec, tm_wday, tm_yday, tm_isdst)

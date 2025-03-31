@@ -17,6 +17,8 @@ included in derivative projects, thanks. Tall splash images licensed from
 """
 
 # pylint: disable=import-error
+
+from os import getenv
 import gc
 import time
 import math
@@ -30,11 +32,17 @@ from adafruit_bitmap_font import bitmap_font
 import adafruit_display_text.label
 import adafruit_lis3dh
 
-try:
-    from secrets import secrets
-except ImportError:
-    print('WiFi secrets are kept in secrets.py, please add them there!')
-    raise
+# Get WiFi details, ensure these are setup in settings.toml
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+
+if None in [ssid, password]:
+    raise RuntimeError(
+        "WiFi settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "at a minimum."
+    )
 
 # CONFIGURABLE SETTINGS ----------------------------------------------------
 
@@ -61,7 +69,7 @@ HEADERS = { "User-Agent" : "AdafruitMoonClock/1.1 support@adafruit.com" }
 
 def update_system_time():
     """ Update system clock date/time from Adafruit IO. Credentials and time
-        zone are in secrets.py. See http://worldtimeapi.org/api/timezone for
+        zone are in settings.toml. See http://worldtimeapi.org/api/timezone for
         list of time zones. If missing, will attempt using IP geolocation.
         Returns present local (not UTC) time as a struct_time and UTC offset
         as string "sHH:MM". This may throw an exception on get_local_time(),
@@ -271,11 +279,11 @@ NETWORK.connect()
 
 # LATITUDE, LONGITUDE, TIMEZONE are set up once, constant over app lifetime
 
-# Fetch latitude/longitude from secrets.py. If not present, use
+# Fetch latitude/longitude from settings.toml. If not present, use
 # IP geolocation. This only needs to be done once, at startup!
 try:
-    LATITUDE = secrets['latitude']
-    LONGITUDE = secrets['longitude']
+    LATITUDE = getenv('latitude')
+    LONGITUDE = getenv('longitude')
     print('Using stored geolocation: ', LATITUDE, LONGITUDE)
 except KeyError:
     LATITUDE, LONGITUDE = (
@@ -285,7 +293,7 @@ except KeyError:
     print('Using IP geolocation: ', LATITUDE, LONGITUDE)
 
 # Set initial clock time, also fetch initial UTC offset while
-# here (NOT stored in secrets.py as it may change with DST).
+# here (NOT stored in settings.toml as it may change with DST).
 # pylint: disable=bare-except
 try:
     DATETIME_LOCAL_STRUCT, UTC_OFFSET_STRING = update_system_time()
@@ -328,7 +336,7 @@ while True:
     # moon properties are UTC. Convert 'now' to UTC seconds...
     # UTC_OFFSET_STRING is a string, like +HH:MM. Convert to integer seconds:
     hhmm = UTC_OFFSET_STRING.split(':')
-    utc_offset_seconds = ((int(hhmm[0]) * 60 + int(hhmm[1])) * 60)
+    utc_offset_seconds = (int(hhmm[0]) * 60 + int(hhmm[1])) * 60
     NOW_UTC_SECONDS = NOW_LOCAL_SECONDS - utc_offset_seconds
 
     # If PERIOD has expired, move data down and fetch new +24-hour data
