@@ -99,7 +99,7 @@ while True:
         time.sleep(30)
 
     # Stepper 1
-    if not st1.isAlive() and int(stepper_start.value):
+    if not st1.is_alive() and int(stepper_start.value):
         stepper_1_steps = aio.receive(feed_step_1_steps.key)
         stepper_1_steps = int(stepper_1_steps.value)
         if stepper_1_steps > 0: # stepper slider is set
@@ -125,7 +125,7 @@ while True:
             st1.start()
 
     # Stepper 2
-    if not st2.isAlive() and int(stepper_start.value):
+    if not st2.is_alive() and int(stepper_start.value):
         stepper_2_steps = aio.receive(feed_step_2_steps.key)
         stepper_2_steps = int(stepper_2_steps.value)
         if stepper_2_steps > 0: # stepper slider is set
