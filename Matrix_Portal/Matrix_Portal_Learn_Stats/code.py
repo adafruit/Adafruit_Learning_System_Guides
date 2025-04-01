@@ -13,7 +13,7 @@ from adafruit_matrixportal.matrixportal import MatrixPortal
 DISPLAY_NUM_GUIDES = 5
 # Data source URL
 DATA_SOURCE = (
-    "https://learn.adafruit.com/api/guides/new.json?count=%d" % DISPLAY_NUM_GUIDES
+    "https://learn.adafruit.com/api/guides.json?count=%d" % DISPLAY_NUM_GUIDES
 )
 TITLE_DATA_LOCATION = ["guides"]
 
@@ -65,7 +65,7 @@ def get_guide_info(index):
     print("Obtaining guide info for guide %d..." % index)
 
     # Traverse JSON data for title
-    guide_count = matrixportal.network.json_traverse(als_data.json(), ["guide_count"])
+    guide_count = matrixportal.network.json_traverse(als_data.json(), ["guides_total_count"])
 
     # Set guide count
     matrixportal.set_text(guide_count, 0)
