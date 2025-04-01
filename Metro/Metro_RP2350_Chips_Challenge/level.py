@@ -22,9 +22,9 @@ FIELD_HINT = 7
 FIELD_MOVING_CREATURES = 10
 
 class Tile:
-    def __init__(self):
-        self.id = 0
-        self.state = 0
+    def __init__(self, tile_id=0, state=0):
+        self.id = tile_id
+        self.state = state
 
 class Cell:
     def __init__(self):
@@ -33,6 +33,13 @@ class Cell:
 
     def __repr__(self):
         return f"Top: {hex(self.top.id)} Bottom: {hex(self.bottom.id)}"
+
+def read_int(file, byte_count):
+    return int.from_bytes(file.read(byte_count), "little")
+
+
+def position_to_coords(position):
+    return Point(position % 32, position // 32)
 
 class Level:
     def __init__(self, data_file):
@@ -60,17 +67,8 @@ class Level:
 
     def get_cell(self, coords):
         if isinstance(coords, int):
-            coords = self.position_to_coords(coords)
-        return self.level_map[self.coords_to_position(coords)]
-
-    def coords_to_position(self, coords):
-        return coords.y * 32 + coords.x
-
-    def position_to_coords(self, position):
-        return Point(position % 32, position // 32)
-
-    def _read_int(self, file, byte_count):
-        return int.from_bytes(file.read(byte_count), "little")
+            coords = position_to_coords(coords)
+        return self.level_map[coords.y * 32 + coords.x]
 
     def _update_cell_id(self, coords, tile_id, layer):
         getattr(self.get_cell(coords), layer).id = tile_id
@@ -96,7 +94,7 @@ class Level:
                 if 0x0E <= tile_id <= 0x11:
                     tile_id += 0xC2
                 for _ in range(map_data[current_byte + 1]):
-                    coords = self.position_to_coords(current_position)
+                    coords = position_to_coords(current_position)
                     self._update_cell_id(coords, tile_id, layer)
                     current_position += 1
                 current_byte += 3
@@ -104,7 +102,7 @@ class Level:
                 tile_id = map_data[current_byte]
                 if 0x0E <= tile_id <= 0x11:
                     tile_id += 0xC2
-                coords = self.position_to_coords(current_position)
+                coords = position_to_coords(current_position)
                 self._update_cell_id(coords, tile_id, layer)
                 current_position += 1
                 current_byte += 1
@@ -116,41 +114,41 @@ class Level:
         # Read the file and fill in the variables
         with open(self._data_file, "rb") as file:
             # Read the first 4 bytes in little endian format
-            if self._read_int(file, 4) not in (0x0002AAAC, 0x0102AAAC):
+            if read_int(file, 4) not in (0x0002AAAC, 0x0102AAAC):
                 raise ValueError("Not a CHIP file")
-            self.last_level = self._read_int(file, 2)
+            self.last_level = read_int(file, 2)
             if not 0 < level_number <= self.last_level:
                 raise ValueError("Invalid level number")
             self.level_number = level_number
             # Seek to the start of the level data for the specified level
             while True:
-                level_bytes = self._read_int(file, 2)
-                if self._read_int(file, 2) == level_number:
+                level_bytes = read_int(file, 2)
+                if read_int(file, 2) == level_number:
                     break
                 # Go to next level
                 file.seek(level_bytes - 2, 1)
 
             # Read the level data
-            self.time_limit = self._read_int(file, 2)
-            self.chips_required = self._read_int(file, 2)
-            compression = self._read_int(file, 2)
+            self.time_limit = read_int(file, 2)
+            self.chips_required = read_int(file, 2)
+            compression = read_int(file, 2)
             if compression == COMPRESSED:
                 raise ValueError("Compressed levels not supported")
 
             # Process the top map data
-            layer_bytes = self._read_int(file, 2)
+            layer_bytes = read_int(file, 2)
             map_data = file.read(layer_bytes)
             self._process_map_data(map_data, "top")
 
             # Process the bottom map data
-            layer_bytes = self._read_int(file, 2)
+            layer_bytes = read_int(file, 2)
             map_data = file.read(layer_bytes)
             self._process_map_data(map_data, "bottom")
 
-            remaining_bytes = self._read_int(file, 2)
+            remaining_bytes = read_int(file, 2)
             while remaining_bytes > 0:
-                field_type = self._read_int(file, 1)
-                field_size = self._read_int(file, 1)
+                field_type = read_int(file, 1)
+                field_size = read_int(file, 1)
                 remaining_bytes -= (2 + field_size)
                 if field_type == FIELD_TITLE:
                     self.title = file.read(field_size).decode("utf-8").replace("\x00", "")
@@ -163,22 +161,22 @@ class Level:
                 elif field_type == FIELD_BEAR_TRAPS:
                     trap_count = field_size // 10
                     for _ in range(trap_count):
-                        button = Point(self._read_int(file, 2), self._read_int(file, 2))
-                        device = Point(self._read_int(file, 2), self._read_int(file, 2))
+                        button = Point(read_int(file, 2), read_int(file, 2))
+                        device = Point(read_int(file, 2), read_int(file, 2))
                         self.traps.append(Device(button, device))
                         file.seek(2, 1)
                 elif field_type == FIELD_CLONING_MACHINES:
                     cloner_count = field_size // 8
                     for _ in range(cloner_count):
-                        button = Point(self._read_int(file, 2), self._read_int(file, 2))
-                        device = Point(self._read_int(file, 2), self._read_int(file, 2))
+                        button = Point(read_int(file, 2), read_int(file, 2))
+                        device = Point(read_int(file, 2), read_int(file, 2))
                         self.cloners.append(Device(button, device))
                 elif field_type == FIELD_MOVING_CREATURES:
                     creature_count = field_size // 2
                     for _ in range(creature_count):
                         self.creatures.append(Point(
-                            self._read_int(file, 1),
-                            self._read_int(file, 1)
+                            read_int(file, 1),
+                            read_int(file, 1)
                         ))
 
             # Load passwords if not already loaded
@@ -189,16 +187,16 @@ class Level:
         file.seek(6)    # Skip the file header
         while True:
             file.seek(2, 1)
-            level_number = self._read_int(file, 2)
+            level_number = read_int(file, 2)
             file.seek(6, 1)
-            layer_bytes = self._read_int(file, 2)   # Number of bytes in the top layer
+            layer_bytes = read_int(file, 2)   # Number of bytes in the top layer
             file.seek(layer_bytes, 1)   # Skip top layer
-            layer_bytes = self._read_int(file, 2)   # Number of bytes in the top layer
+            layer_bytes = read_int(file, 2)   # Number of bytes in the top layer
             file.seek(layer_bytes, 1)   # Skip bottom layer
-            remaining_bytes = self._read_int(file, 2)
+            remaining_bytes = read_int(file, 2)
             while remaining_bytes > 0:
-                field_type = self._read_int(file, 1)
-                field_size = self._read_int(file, 1)
+                field_type = read_int(file, 1)
+                field_size = read_int(file, 1)
                 remaining_bytes -= (2 + field_size)
                 if field_type == FIELD_PASSWORD:
                     password = file.read(field_size)

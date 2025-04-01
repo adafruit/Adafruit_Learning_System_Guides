@@ -13,6 +13,52 @@ BORDER_STYLE_FLAT = 2
 BORDER_STYLE_LIGHT_OUTLINE = 3
 BORDER_STYLE_DARK_OUTLINE = 4
 
+def add_border(bitmap, border_color_ul, border_color_br):
+    if border_color_ul is not None:
+        for x in range(bitmap.width):
+            bitmap[x, 0] = border_color_ul
+        for y in range(bitmap.height):
+            bitmap[0, y] = border_color_ul
+    if border_color_br is not None:
+        for x in range(bitmap.width):
+            bitmap[x, bitmap.height - 1] = border_color_br
+        for y in range(bitmap.height):
+            bitmap[bitmap.width - 1, y] = border_color_br
+    return bitmap
+
+def convert_padding(padding):
+    if isinstance(padding, int):    # Top, Right, Bottom Left (same as CSS)
+        padding = {
+            "top": padding // 2,
+            "right": padding // 2,
+            "bottom": padding // 2,
+            "left": padding // 2
+        }
+    elif isinstance(padding, (tuple, list)) and len(padding) == 2:  # Top/Bottom, Left/Right
+        padding = {
+            "top": padding[0],
+            "right": padding[1],
+            "bottom": padding[0],
+            "left": padding[1]
+        }
+    elif isinstance(padding, (tuple, list)) and len(padding) == 4:  # Top, Right, Bottom, Left
+        padding = {
+            "top": padding[0],
+            "right": padding[1],
+            "bottom": padding[2],
+            "left": padding[3]
+        }
+    return padding
+
+def text_bounding_box(text, font, line_spacing=0.75):
+    temp_label = bitmap_label.Label(
+        font,
+        text=text,
+        line_spacing=line_spacing,
+        background_tight=True
+    )
+    return temp_label.bounding_box
+
 class InputFields:
 
     ALPHANUMERIC = const(0)
@@ -123,52 +169,6 @@ class Dialog:
                         new_bitmap[(x, y)] = foreground_color_index
         return new_bitmap
 
-    def _add_border(self, bitmap, border_color_ul, border_color_br):
-        if border_color_ul is not None:
-            for x in range(bitmap.width):
-                bitmap[x, 0] = border_color_ul
-            for y in range(bitmap.height):
-                bitmap[0, y] = border_color_ul
-        if border_color_br is not None:
-            for x in range(bitmap.width):
-                bitmap[x, bitmap.height - 1] = border_color_br
-            for y in range(bitmap.height):
-                bitmap[bitmap.width - 1, y] = border_color_br
-        return bitmap
-
-    def _convert_padding(self, padding):
-        if isinstance(padding, int):    # Top, Right, Bottom Left (same as CSS)
-            padding = {
-                "top": padding // 2,
-                "right": padding // 2,
-                "bottom": padding // 2,
-                "left": padding // 2
-            }
-        elif isinstance(padding, (tuple, list)) and len(padding) == 2:  # Top/Bottom, Left/Right
-            padding = {
-                "top": padding[0],
-                "right": padding[1],
-                "bottom": padding[0],
-                "left": padding[1]
-            }
-        elif isinstance(padding, (tuple, list)) and len(padding) == 4:  # Top, Right, Bottom, Left
-            padding = {
-                "top": padding[0],
-                "right": padding[1],
-                "bottom": padding[2],
-                "left": padding[3]
-            }
-        return padding
-
-    def _text_bounding_box(self, text, font, line_spacing=0.75):
-        temp_label = bitmap_label.Label(
-            font,
-            text=text,
-            line_spacing=line_spacing,
-            background_tight=True
-        )
-        return temp_label.bounding_box
-
     def _draw_button(self, buffer, text, font, x_position, y_position,
                      width=None, height=None, center_button=True, **kwargs):
         del kwargs["center_dialog_vertically"]
@@ -227,17 +227,17 @@ class Dialog:
 
         background_bitmap = displayio.Bitmap(width, height, len(self.shader))
         background_bitmap.fill(background_color_index)
-        background_bitmap = self._add_border(background_bitmap, border_color_ul, border_color_br)
+        background_bitmap = add_border(background_bitmap, border_color_ul, border_color_br)
         bitmaptools.blit(buffer, background_bitmap, x_position, y_position)
 
     def _calculate_dialog_size(self, text, font, width, height, padding):
         # Calculate the size of the dialog based on the text and font
         if text is not None:
-            text_width = self._text_bounding_box(text, font)[2]
+            text_width = text_bounding_box(text, font)[2]
             if width is None:
                 width = text_width + padding["right"] + padding["left"]
             if height is None:
-                height = self._text_bounding_box(text, font)[3] + padding["top"] + padding["bottom"]
+                height = text_bounding_box(text, font)[3] + padding["top"] + padding["bottom"]
         else:
             if width is None:
                 width = 0
@@ -277,13 +277,13 @@ class Dialog:
         if background_color_index is None:
             background_color_index = self._color_index["dialog_background"]
 
-        padding = self._convert_padding(padding)
+        padding = convert_padding(padding)
 
         if text is not None:
             text_area_padding = (0, 0)
             if width is None:
                 # Create a regular bitmap label with the text to get the width
-                text_width = self._text_bounding_box(text, font, line_spacing=line_spacing)[2]
+                text_width = text_bounding_box(text, font, line_spacing=line_spacing)[2]
                 text_area_padding = (-padding["left"], -padding["right"])
             else:
                 text_width = width - padding["right"] - padding["left"] - border_width * 2
@@ -357,7 +357,7 @@ class Dialog:
             button_font = kwargs.pop("button_font")
         if "button_text" in kwargs:
             button_text = kwargs.pop("button_text")
-        padding = self._convert_padding(kwargs.get("padding", 5))
+        padding = convert_padding(kwargs.get("padding", 5))
         control_spacing = 5
         button_height = button_font.get_bounding_box()[1] + control_spacing + padding["bottom"]
 
@@ -403,7 +403,7 @@ class Dialog:
             # draw the label
             label = TextBox(
                 field["font"],
-                self._text_bounding_box(field["label"], field["font"])[2],
+                text_bounding_box(field["label"], field["font"])[2],
                 TextBox.DYNAMIC_HEIGHT,
                 align=TextBox.ALIGN_RIGHT,
                 text=field["label"],
@@ -445,7 +445,7 @@ class Dialog:
                 border_color_ul, border_color_br = col_index["black"], col_index["black"]
             else:
                 border_color_ul, border_color_br = col_index["light_gray"], col_index["light_gray"]
-            textbox_bmp = self._add_border(textbox_bmp, border_color_ul, border_color_br)
+            textbox_bmp = add_border(textbox_bmp, border_color_ul, border_color_br)
             bitmaptools.blit(field["buffer"], textbox_bmp, field["x"], field["y"] - 2)
             field["redraw"] = False
 
@@ -456,12 +456,12 @@ class Dialog:
         padding = 10
         if "button_font" in kwargs:
             button_font = kwargs.pop("button_font")
-        padding = self._convert_padding(kwargs.get("padding", 10))
+        padding = convert_padding(kwargs.get("padding", 10))
         control_spacing = 8
         button_height = button_font.get_bounding_box()[1] + control_spacing + padding["bottom"]
 
         # Calculate total field height
-        field_height = self._text_bounding_box(fields[0]["label"], font, line_spacing=0.75)[3]
+        field_height = text_bounding_box(fields[0]["label"], font, line_spacing=0.75)[3]
         field_area_height = (field_height + control_spacing )* len(fields)
 
         # Draw dialog (and text if present)
@@ -487,7 +487,7 @@ class Dialog:
         for field in fields:
             max_field_label_width = max(
                 max_field_label_width,
-                self._text_bounding_box(
+                text_bounding_box(
                     field["label"], font)[2] + padding["right"] + padding["left"]
             )
 
@@ -528,7 +528,7 @@ class Dialog:
         # Figure out the maximum width of the buttons by checking the bounding box of their text
         total_button_width = 0
         for button_text in buttons:
-            total_button_width += self._text_bounding_box(
+            total_button_width += text_bounding_box(
                 button_text, button_font)[2] + padding["right"] + padding["left"] + 2
 
         button_spacing = (dialog_width - total_button_width) // (len(buttons) + 1)

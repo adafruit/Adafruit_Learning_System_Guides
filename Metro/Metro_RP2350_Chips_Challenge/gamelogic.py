@@ -32,6 +32,42 @@ SOUND_EFFECTS = {
     "TIME_UP": "/sounds/bell.wav"
 }
 
+def is_ice(tile):
+    return tile == TYPE_ICE or TYPE_ICEWALL_SOUTHEAST <= tile <= TYPE_ICEWALL_NORTHEAST
+
+def is_slide(tile):
+    return (tile in (TYPE_SLIDE_SOUTH, TYPE_SLIDE_RANDOM) or
+            TYPE_SLIDE_NORTH <= tile <= TYPE_SLIDE_WEST)
+
+def get_slide_dir(floor):
+    if floor == TYPE_SLIDE_NORTH:
+        return NORTH
+    elif floor == TYPE_SLIDE_WEST:
+        return WEST
+    elif floor == TYPE_SLIDE_SOUTH:
+        return SOUTH
+    elif floor == TYPE_SLIDE_EAST:
+        return EAST
+    elif floor == TYPE_SLIDE_RANDOM:
+        return 1 << random.randint(0, 3)
+    return NONE
+
+def ice_wall_turn(floor, direction):
+    if floor == TYPE_ICEWALL_NORTHEAST:
+        return EAST if direction == SOUTH else NORTH if direction == WEST else direction
+    elif floor == TYPE_ICEWALL_SOUTHWEST:
+        return WEST if direction == NORTH else SOUTH if direction == EAST else direction
+    elif floor == TYPE_ICEWALL_NORTHWEST:
+        return WEST if direction == SOUTH else NORTH if direction == EAST else direction
+    elif floor == TYPE_ICEWALL_SOUTHEAST:
+        return EAST if direction == NORTH else SOUTH if direction == WEST else direction
+    return direction
+
+def random_p(array, level):
+    for index in range(5 - level, level + 1):
+        number = random.randint(0, index - 1)
+        array[number], array[index - 1] = array[index - 1], array[number]
+
 class GameLogic:
     """
     A class to represent the state of the game as well as
@@ -185,30 +221,6 @@ class GameLogic:
         if key in functions:
             functions[key]()
 
-    def _get_slide_dir(self, floor):
-        if floor == TYPE_SLIDE_NORTH:
-            return NORTH
-        elif floor == TYPE_SLIDE_WEST:
-            return WEST
-        elif floor == TYPE_SLIDE_SOUTH:
-            return SOUTH
-        elif floor == TYPE_SLIDE_EAST:
-            return EAST
-        elif floor == TYPE_SLIDE_RANDOM:
-            return 1 << random.randint(0, 3)
-        return NONE
-
-    def _ice_wall_turn(self, floor, direction):
-        if floor == TYPE_ICEWALL_NORTHEAST:
-            return EAST if direction == SOUTH else NORTH if direction == WEST else direction
-        elif floor == TYPE_ICEWALL_SOUTHWEST:
-            return WEST if direction == NORTH else SOUTH if direction == EAST else direction
-        elif floor == TYPE_ICEWALL_NORTHWEST:
-            return WEST if direction == SOUTH else NORTH if direction == EAST else direction
-        elif floor == TYPE_ICEWALL_SOUTHEAST:
-            return EAST if direction == NORTH else SOUTH if direction == WEST else direction
-        return direction
-
     def get_view_port(self):
         """
         This function lines up the edge of the map to the edge of the screen
@@ -339,12 +351,6 @@ class GameLogic:
             creature.state &= ~(CS_SLIP | CS_SLIDE)
         return result
 
-    def _make_tile(self, tile_id, state):
-        tile = Tile()
-        tile.id = tile_id
-        tile.state = state
-        return tile
-
     def _update_creature(self, creature):
         if creature.hidden:
             return
@@ -404,20 +410,13 @@ class GameLogic:
                     self._spring_trap(Point(x, y))
                     self._audio.play("BUTTON_PUSHED")
 
-    def _is_ice(self, tile):
-        return (tile == TYPE_ICE or TYPE_ICEWALL_SOUTHEAST <= tile <= TYPE_ICEWALL_NORTHEAST)
-
-    def _is_slide(self, tile):
-        return (tile in (TYPE_SLIDE_SOUTH, TYPE_SLIDE_RANDOM) or
-                TYPE_SLIDE_NORTH <= tile <= TYPE_SLIDE_WEST)
-
     def _start_floor_movement(self, creature, floor):
         creature.state &= ~(CS_SLIP | CS_SLIDE)
 
-        if self._is_ice(floor):
-            direction = self._ice_wall_turn(floor, creature.direction)
-        elif self._is_slide(floor):
-            direction = self._get_slide_dir(floor)
+        if is_ice(floor):
+            direction = ice_wall_turn(floor, creature.direction)
+        elif is_slide(floor):
+            direction = get_slide_dir(floor)
         elif floor == TYPE_TELEPORT:
             direction = creature.direction
         elif floor == TYPE_BEARTRAP and creature.type == TYPE_BLOCK:
@@ -426,7 +425,7 @@ class GameLogic:
             return
 
         if creature.type == TYPE_CHIP:
-            creature.state |= (CS_SLIDE if self._is_slide(floor) else CS_SLIP)
+            creature.state |= (CS_SLIDE if is_slide(floor) else CS_SLIP)
             self._prepend_to_slip_list(creature, direction)
             creature.direction = direction
             self._update_creature(creature)
@@ -462,12 +461,12 @@ class GameLogic:
                     creature.state &= ~CS_HASMOVED
             else:
                 floor = self.current_level.get_cell(creature.cur_pos).bottom.id
-                if self._is_slide(floor):
+                if is_slide(floor):
                     if creature.type == TYPE_CHIP:
                         creature.state &= ~CS_HASMOVED
-                elif self._is_ice(floor):
+                elif is_ice(floor):
                     # Go back
-                    slip_direction = self._ice_wall_turn(floor, back(slip_direction))
+                    slip_direction = ice_wall_turn(floor, back(slip_direction))
                     if creature.type == TYPE_CHIP:
                         self._last_slip_dir = slip_direction
                     if self._advance_creature(creature, slip_direction):
@@ -699,10 +698,10 @@ class GameLogic:
 
         if floor == TYPE_TELEPORT:
             self._start_floor_movement(creature, floor)
-        elif (self._is_ice(floor) and
+        elif (is_ice(floor) and
               (creature.type != TYPE_CHIP or not self._possesion(TYPE_BOOTS_ICE))):
             self._start_floor_movement(creature, floor)
-        elif (self._is_slide(floor) and
+        elif (is_slide(floor) and
               (creature.type != TYPE_CHIP or not self._possesion(TYPE_BOOTS_SLIDE))):
             self._start_floor_movement(creature, floor)
         elif floor == TYPE_BEARTRAP and creature.type == TYPE_BLOCK and was_slipping:
@@ -717,7 +716,7 @@ class GameLogic:
     def _add_creature_to_map(self, creature):
         if creature.hidden:
             return
-        self.current_level.push_tile(creature.cur_pos, self._make_tile(TYPE_EMPTY, 0))
+        self.current_level.push_tile(creature.cur_pos, Tile(TYPE_EMPTY, 0))
         self._update_creature(creature)
 
     def _cloner_from_button(self, pos):
@@ -756,7 +755,7 @@ class GameLogic:
             dummy_creature = Creature(
                 position=cloner_position,
                 direction=creature_dir_id(tile_to_clone),
-                type=creature_id(tile_to_clone)
+                creature_type=creature_id(tile_to_clone)
             )
             if not self._can_make_move(
                 dummy_creature, dummy_creature.direction, CMM_CLONECANTBLOCK):
@@ -978,11 +977,6 @@ class GameLogic:
                     break
         return new_block
 
-    def _random_p(self, array, level):
-        for index in range(5 - level, level + 1):
-            number = random.randint(0, index - 1)
-            array[number], array[index - 1] = array[index - 1], array[number]
-
     def _toggle_tanks(self, mid_move):
         for creature in self._creature_pool:
             if creature.hidden or creature.type != TYPE_TANK:
@@ -1077,7 +1071,7 @@ class GameLogic:
                 choices[1] = left(current_direction)
                 choices[2] = back(current_direction)
                 choices[3] = right(current_direction)
-                self._random_p(choices, 4)
+                random_p(choices, 4)
             elif creature_type in (TYPE_BUG, TYPE_PARAMECIUM, TYPE_TEETH):
                 choices[0] = self._controller_dir
                 creature.to_direction = self._controller_dir
@@ -1105,13 +1099,13 @@ class GameLogic:
                 choices[1] = left(current_direction)
                 choices[2] = back(current_direction)
                 choices[3] = right(current_direction)
-                self._random_p(choices[1:], 3)
+                random_p(choices[1:], 3)
             elif creature_type == TYPE_BLOB:
                 choices[0] = current_direction
                 choices[1] = left(current_direction)
                 choices[2] = back(current_direction)
                 choices[3] = right(current_direction)
-                self._random_p(choices, 4)
+                random_p(choices, 4)
             elif creature_type == TYPE_BUG:
                 choices[0] = left(current_direction)
                 choices[1] = current_direction
