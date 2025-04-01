@@ -59,7 +59,7 @@ class Google_GFX(displayio.Group):
         temp_group.append(temp_label)
 
         self.temp_data_label = Label(font, text="75 F")
-        self.temp_data_label.x = (self.display.width//3)
+        self.temp_data_label.x = self.display.width//3
         self.temp_data_label.y = 55
         temp_group.append(self.temp_data_label)
         self._text_group.append(temp_group)
@@ -72,7 +72,7 @@ class Google_GFX(displayio.Group):
         water_group.append(self.water_level)
 
         self.water_lvl_label = Label(font, text="350")
-        self.water_lvl_label.x = (self.display.width//3)
+        self.water_lvl_label.x = self.display.width//3
         self.water_lvl_label.y = 75
         temp_group.append(self.water_lvl_label)
         self._text_group.append(water_group)
