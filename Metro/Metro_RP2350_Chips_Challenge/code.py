@@ -11,7 +11,6 @@ from game import Game
 from definitions import SECOND_LENGTH, TICKS_PER_SECOND
 
 # Disable auto-reload to prevent the game from restarting
-# TODO: Enable after testing
 #import supervisor
 #supervisor.runtime.autoreload = False
 
