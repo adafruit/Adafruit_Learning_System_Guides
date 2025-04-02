@@ -230,21 +230,6 @@ class Dialog:
         background_bitmap = add_border(background_bitmap, border_color_ul, border_color_br)
         bitmaptools.blit(buffer, background_bitmap, x_position, y_position)
 
-    def _calculate_dialog_size(self, text, font, width, height, padding):
-        # Calculate the size of the dialog based on the text and font
-        if text is not None:
-            text_width = text_bounding_box(text, font)[2]
-            if width is None:
-                width = text_width + padding["right"] + padding["left"]
-            if height is None:
-                height = text_bounding_box(text, font)[3] + padding["top"] + padding["bottom"]
-        else:
-            if width is None:
-                width = 0
-            if height is None:
-                height = 0
-        return width, height
-
     def display_simple(
             self,
             text,       # the text to display in the dialog

@@ -108,7 +108,7 @@ class Level:
                 current_byte += 1
 
     def load(self, level_number):
-        #pylint: disable=too-many-branches
+        #pylint: disable=too-many-branches, too-many-locals
         # Reset the data prior to loading
         self._reset_data()
         # Read the file and fill in the variables
