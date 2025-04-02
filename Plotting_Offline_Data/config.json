@@ -1,0 +1,61 @@
+{
+    "exportedFromDevice": {
+        "referenceVoltage": 3.3,
+        "totalGPIOPins": 32,
+        "totalAnalogPins": 6,
+        "sd_cs_pin": 17,
+        "rtc": "PCF8523",
+        "statusLEDBrightness": 0.1
+    },
+    "components": [
+        {
+            "name": "mcp9808",
+            "componentAPI": "i2c",
+            "i2cDeviceName": "mcp9808",
+            "period": 30,
+            "i2cDeviceAddress": "0x18",
+            "i2cDeviceSensorTypes": [
+                {"type": "ambient-temp-fahrenheit"},
+                {"type": "ambient-temp"}
+            ]
+        },
+        {
+            "componentAPI": "ds18x20",
+            "name": "DS18B20: Temperature Sensor",
+            "sensorTypeCount": 2,
+            "sensorType1": "object-temp-fahrenheit",
+            "sensorType2": "object-temp",
+            "pinName": "D13",
+            "sensorResolution": 12,
+            "period": 30
+        },
+        {
+            "componentAPI": "ds18x20",
+            "name": "DS18B20: Temperature Sensor",
+            "sensorTypeCount": 2,
+            "sensorType1": "object-temp-fahrenheit",
+            "sensorType2": "object-temp",
+            "pinName": "D14",
+            "sensorResolution": 12,
+            "period": 30
+        },
+        {
+            "name": "Weatherproof SHT30",
+            "componentAPI": "i2c",
+            "i2cDeviceName": "sht30_mesh",
+            "period": 30,
+            "i2cDeviceAddress": "0x44",
+            "i2cDeviceSensorTypes": [
+                {
+                    "type": "ambient-temp"
+                },
+                {
+                    "type": "ambient-temp-fahrenheit"
+                },
+                {
+                    "type": "relative-humidity"
+                }
+            ]
+        }
+    ]
+}
