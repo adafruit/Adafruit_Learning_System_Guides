@@ -1549,36 +1549,6 @@
 </library>
 <library name="adafruit_electromech">
 <packages>
-<package name="JST-XH-2-SM4">
-<wire x1="-5" y1="5.13" x2="5" y2="5.13" width="0.2032" layer="51"/>
-<wire x1="5" y1="5.13" x2="5" y2="-2.67" width="0.2032" layer="51"/>
-<wire x1="-5" y1="-2.67" x2="-5" y2="5.13" width="0.2032" layer="51"/>
-<wire x1="5" y1="-2.67" x2="-5" y2="-2.67" width="0.2032" layer="51"/>
-<wire x1="-3.25" y1="5.13" x2="3.35" y2="5.13" width="0.2032" layer="21"/>
-<wire x1="5" y1="1.03" x2="5" y2="-2.67" width="0.2032" layer="21"/>
-<wire x1="5" y1="-2.67" x2="2.15" y2="-2.67" width="0.2032" layer="21"/>
-<wire x1="-2.15" y1="-2.67" x2="-5" y2="-2.67" width="0.2032" layer="21"/>
-<wire x1="-5" y1="-2.67" x2="-5" y2="1.03" width="0.2032" layer="21"/>
-<smd name="1" x="-1.25" y="-3.57" dx="1.3" dy="4.5" layer="1"/>
-<smd name="2" x="1.25" y="-3.57" dx="1.3" dy="4.5" layer="1"/>
-<smd name="NC1" x="-4.45" y="3.23" dx="3.9" dy="1.8" layer="1" rot="R90"/>
-<smd name="NC2" x="4.45" y="3.23" dx="3.9" dy="1.8" layer="1" rot="R90"/>
-<text x="-2.2225" y="3.6985" size="0.8128" layer="25" ratio="18">&gt;Name</text>
-<text x="-2.2225" y="3" size="0.4064" layer="27" ratio="10">&gt;Value</text>
-</package>
-<package name="JST-XH-2-SV">
-<wire x1="-4.266" y1="5.286" x2="4.366" y2="5.286" width="0.2032" layer="21"/>
-<wire x1="5" y1="0.87" x2="5" y2="-1.714" width="0.2032" layer="21"/>
-<wire x1="5" y1="-1.714" x2="2.15" y2="-1.714" width="0.2032" layer="21"/>
-<wire x1="-2.15" y1="-1.714" x2="-5" y2="-1.714" width="0.2032" layer="21"/>
-<wire x1="-5" y1="-1.714" x2="-5" y2="0.87" width="0.2032" layer="21"/>
-<smd name="1" x="-1.25" y="-2.014" dx="1.3" dy="4.5" layer="1"/>
-<smd name="2" x="1.25" y="-2.014" dx="1.3" dy="4.5" layer="1"/>
-<smd name="MT1" x="-4.45" y="2.77" dx="3" dy="1.6" layer="1" rot="R90"/>
-<smd name="MT2" x="4.45" y="2.77" dx="3" dy="1.6" layer="1" rot="R90"/>
-<text x="-2.2225" y="3.1545" size="0.8128" layer="25" ratio="18">&gt;Name</text>
-<text x="-1.3225" y="1.356" size="0.4064" layer="27" ratio="10">&gt;Value</text>
-</package>
 <package name="PEC11+SWITCH">
 <wire x1="-2.5" y1="-1.5" x2="2.5" y2="-1.5" width="0.127" layer="21"/>
 <wire x1="-5.55" y1="6.6" x2="5.55" y2="6.6" width="0.127" layer="21"/>
@@ -1781,19 +1751,6 @@
 </package>
 </packages>
 <symbols>
-<symbol name="1X2">
-<wire x1="-2.54" y1="5.08" x2="-2.54" y2="-2.54" width="0.254" layer="94"/>
-<wire x1="-2.54" y1="-2.54" x2="5.08" y2="-2.54" width="0.254" layer="94"/>
-<wire x1="5.08" y1="-2.54" x2="5.08" y2="5.08" width="0.254" layer="94"/>
-<wire x1="5.08" y1="5.08" x2="-2.54" y2="5.08" width="0.254" layer="94"/>
-<pin name="1" x="-5.08" y="2.54" visible="pin" length="middle" direction="pas"/>
-<pin name="2" x="-5.08" y="0" visible="pin" length="middle" direction="pas"/>
-<text x="-2.54" y="-5.08" size="1.27" layer="96">&gt;VALUE</text>
-<text x="-2.54" y="7.62" size="1.27" layer="95">&gt;NAME</text>
-</symbol>
-<symbol name="MOUNTING">
-<pin name="MT" x="0" y="0" length="middle"/>
-</symbol>
 <symbol name="ENCODER_PLUS_SWITCH">
 <wire x1="1.905" y1="8.89" x2="1.905" y2="7.62" width="0.254" layer="94"/>
 <wire x1="1.905" y1="8.89" x2="0" y2="8.89" width="0.254" layer="94"/>
@@ -1873,37 +1830,6 @@
 </symbol>
 </symbols>
 <devicesets>
-<deviceset name="CON_JST_XH_2PIN" prefix="X">
-<gates>
-<gate name="G$1" symbol="1X2" x="0" y="0"/>
-<gate name="G$2" symbol="MOUNTING" x="-2.54" y="-7.62"/>
-<gate name="G$3" symbol="MOUNTING" x="-2.54" y="-10.16"/>
-</gates>
-<devices>
-<device name="-SM4" package="JST-XH-2-SM4">
-<connects>
-<connect gate="G$1" pin="1" pad="1"/>
-<connect gate="G$1" pin="2" pad="2"/>
-<connect gate="G$2" pin="MT" pad="NC1"/>
-<connect gate="G$3" pin="MT" pad="NC2"/>
-</connects>
-<technologies>
-<technology name=""/>
-</technologies>
-</device>
-<device name="-VERT" package="JST-XH-2-SV">
-<connects>
-<connect gate="G$1" pin="1" pad="1"/>
-<connect gate="G$1" pin="2" pad="2"/>
-<connect gate="G$2" pin="MT" pad="MT1"/>
-<connect gate="G$3" pin="MT" pad="MT2"/>
-</connects>
-<technologies>
-<technology name=""/>
-</technologies>
-</device>
-</devices>
-</deviceset>
 <deviceset name="ENCODER_PLUS_SWITCH" prefix="SW" uservalue="yes">
 <description>&lt;p&gt;&lt;b&gt;Rotary Encoder with Built-In Switch&lt;/b&gt;&lt;/p&gt;
 &lt;p&gt;&lt;ul&gt;
@@ -4222,6 +4148,108 @@ type 0309, grid 2.5 mm</description>
 </deviceset>
 </devicesets>
 </library>
+<library name="thermalBonnet">
+<description>Generated from &lt;b&gt;thermalBonnet.sch&lt;/b&gt;&lt;p&gt;
+by exp-lbrs.ulp</description>
+<packages>
+<package name="REMBRANDT-ELECTRONICS---JST-XH-CONNECTORS-V1-0_JST-XH-02-PACKAGE-LONG-PAD">
+<description>&lt;b&gt;JST XH Connector Long Pads (Package)&lt;/b&gt;&lt;p&gt;
+
+Wire to board connector.
+
+Pitch: 2,54 mm, (0.100")&lt;p&gt;
+Number of pins: &lt;b&gt;2&lt;/b&gt;&lt;b&gt;&lt;P&gt;
+
+&lt;b&gt;Created by Rembrandt Electronics&lt;/b&gt;&lt;p&gt;
+&lt;b&gt;www.rembrandtelectronics.com&lt;/b&gt;&lt;p&gt;</description>
+<wire x1="3.7" y1="-2.3575" x2="3.7" y2="3.3925" width="0.254" layer="21"/>
+<wire x1="3.7" y1="3.3925" x2="-3.7" y2="3.3925" width="0.254" layer="21"/>
+<wire x1="-3.7" y1="3.3925" x2="-3.7" y2="-2.3575" width="0.254" layer="21"/>
+<wire x1="-3.7" y1="-2.3575" x2="3.7" y2="-2.3575" width="0.254" layer="21"/>
+<wire x1="-1.3" y1="-2.3" x2="-1.3" y2="-1.8" width="0.2" layer="21"/>
+<wire x1="1.3" y1="-2.3" x2="1.3" y2="-1.8" width="0.2" layer="21"/>
+<wire x1="-1.3" y1="-1.8" x2="1.3" y2="-1.8" width="0.2" layer="21"/>
+<pad name="1" x="-1.27" y="0" drill="1.016" shape="long" rot="R90"/>
+<pad name="2" x="1.27" y="0" drill="1.016" shape="long" rot="R90"/>
+<text x="-4.255" y="-2.04" size="1.016" layer="25" ratio="10" rot="R90">&gt;NAME</text>
+<text x="-3.3025" y="3.8925" size="1.016" layer="27" ratio="10">&gt;VALUE</text>
+<text x="-2.8675" y="-1.4875" size="1.016" layer="51" ratio="10">1</text>
+</package>
+<package name="REMBRANDT-ELECTRONICS---JST-XH-CONNECTORS-V1-0_JST-XH-02-PACKAGE-ROUND-PAD">
+<description>&lt;b&gt;JST XH Connector Round Pads (Package)&lt;/b&gt;&lt;p&gt;
+
+Wire to board connector.
+
+Pitch: 2,54 mm, (0.100")&lt;p&gt;
+Number of pins: &lt;b&gt;2&lt;/b&gt;&lt;b&gt;&lt;P&gt;
+
+&lt;b&gt;Created by Rembrandt Electronics&lt;/b&gt;&lt;p&gt;
+&lt;b&gt;www.rembrandtelectronics.com&lt;/b&gt;&lt;p&gt;</description>
+<wire x1="3.7" y1="-2.3575" x2="3.7" y2="3.3925" width="0.254" layer="21"/>
+<wire x1="3.7" y1="3.3925" x2="-3.7" y2="3.3925" width="0.254" layer="21"/>
+<wire x1="-3.7" y1="3.3925" x2="-3.7" y2="-2.3575" width="0.254" layer="21"/>
+<wire x1="-3.7" y1="-2.3575" x2="3.7" y2="-2.3575" width="0.254" layer="21"/>
+<wire x1="-1.3" y1="-2.3" x2="-1.3" y2="-1.8" width="0.2" layer="21"/>
+<wire x1="1.3" y1="-2.3" x2="1.3" y2="-1.8" width="0.2" layer="21"/>
+<wire x1="-1.3" y1="-1.8" x2="1.3" y2="-1.8" width="0.2" layer="21"/>
+<pad name="1" x="-1.27" y="0" drill="1.016" rot="R90"/>
+<pad name="2" x="1.27" y="0" drill="1.016" rot="R90"/>
+<text x="-4.255" y="-2.04" size="1.016" layer="25" ratio="10" rot="R90">&gt;NAME</text>
+<text x="-3.3025" y="3.8925" size="1.016" layer="27" ratio="10">&gt;VALUE</text>
+<text x="-2.8675" y="-1.4875" size="1.016" layer="51" ratio="10">1</text>
+</package>
+</packages>
+<symbols>
+<symbol name="REMBRANDT-ELECTRONICS---JST-XH-CONNECTORS-V1-0_MV">
+<wire x1="1.27" y1="0" x2="0" y2="0" width="0.6096" layer="94"/>
+<pin name="S" x="-2.54" y="0" visible="off" length="short" direction="pas"/>
+<text x="2.54" y="-0.762" size="1.524" layer="95">&gt;NAME</text>
+<text x="-0.762" y="1.397" size="1.778" layer="96">&gt;VALUE</text>
+</symbol>
+<symbol name="REMBRANDT-ELECTRONICS---JST-XH-CONNECTORS-V1-0_M">
+<wire x1="1.27" y1="0" x2="0" y2="0" width="0.6096" layer="94"/>
+<pin name="S" x="-2.54" y="0" visible="off" length="short" direction="pas"/>
+<text x="2.54" y="-0.762" size="1.524" layer="95">&gt;NAME</text>
+</symbol>
+</symbols>
+<devicesets>
+<deviceset name="REMBRANDT-ELECTRONICS---JST-XH-CONNECTORS-V1-0_JST-XH-02-PIN" prefix="X">
+<description>&lt;b&gt;JST XH Connector 2 Pin&lt;/b&gt;&lt;p&gt;
+
+Wire to board connector.
+
+Pitch: 2,54 mm, (0.100")&lt;p&gt;
+Number of pins: &lt;b&gt;2&lt;/b&gt;&lt;b&gt;&lt;P&gt;
+
+&lt;b&gt;Created by Rembrandt Electronics&lt;/b&gt;&lt;p&gt;
+&lt;b&gt;www.rembrandtelectronics.com&lt;/b&gt;&lt;p&gt;</description>
+<gates>
+<gate name="-1" symbol="REMBRANDT-ELECTRONICS---JST-XH-CONNECTORS-V1-0_MV" x="2.54" y="17.78" addlevel="always" swaplevel="1"/>
+<gate name="-2" symbol="REMBRANDT-ELECTRONICS---JST-XH-CONNECTORS-V1-0_M" x="2.54" y="15.24" addlevel="always" swaplevel="1"/>
+</gates>
+<devices>
+<device name="-LONG-PAD" package="REMBRANDT-ELECTRONICS---JST-XH-CONNECTORS-V1-0_JST-XH-02-PACKAGE-LONG-PAD">
+<connects>
+<connect gate="-1" pin="S" pad="1"/>
+<connect gate="-2" pin="S" pad="2"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="-ROUND-PAD" package="REMBRANDT-ELECTRONICS---JST-XH-CONNECTORS-V1-0_JST-XH-02-PACKAGE-ROUND-PAD">
+<connects>
+<connect gate="-1" pin="S" pad="1"/>
+<connect gate="-2" pin="S" pad="2"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+</devicesets>
+</library>
 </libraries>
 <attributes>
 </attributes>
@@ -4238,8 +4266,6 @@ type 0309, grid 2.5 mm</description>
 <part name="MOTOR2" library="microbuilder" deviceset="HEADER-1X10" device=""/>
 <part name="MPM3601" library="microbuilder" deviceset="HEADER-1X4" device=""/>
 <part name="TFT" library="microbuilder" deviceset="HEADER-1X11" device=""/>
-<part name="JSTXH-2" library="adafruit_electromech" deviceset="CON_JST_XH_2PIN" device="-VERT"/>
-<part name="JSTXH-1" library="adafruit_electromech" deviceset="CON_JST_XH_2PIN" device="-VERT"/>
 <part name="ROTARY" library="adafruit_electromech" deviceset="ENCODER_PLUS_SWITCH" device="_PEC11" technology="_BOURNS"/>
 <part name="DCJACK" library="adafruit_electromech" deviceset="DCBARREL" device="PTH"/>
 <part name="GND1" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
@@ -4274,6 +4300,8 @@ type 0309, grid 2.5 mm</description>
 <part name="J1" library="adafruit" library_urn="urn:adsk.eagle:library:420" deviceset="1X2" device="-3.5MM" package3d_urn="urn:adsk.eagle:package:6240635/1"/>
 <part name="P+5" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="VCC" device=""/>
 <part name="GND13" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
+<part name="X1" library="thermalBonnet" deviceset="REMBRANDT-ELECTRONICS---JST-XH-CONNECTORS-V1-0_JST-XH-02-PIN" device="-LONG-PAD"/>
+<part name="X2" library="thermalBonnet" deviceset="REMBRANDT-ELECTRONICS---JST-XH-CONNECTORS-V1-0_JST-XH-02-PIN" device="-LONG-PAD"/>
 </parts>
 <sheets>
 <sheet>
@@ -4303,14 +4331,6 @@ type 0309, grid 2.5 mm</description>
 <instance part="TFT" gate="G$1" x="101.6" y="30.48" smashed="yes">
 <attribute name="NAME" x="95.25" y="46.355" size="1.778" layer="95"/>
 <attribute name="VALUE" x="95.25" y="12.7" size="1.778" layer="96"/>
-</instance>
-<instance part="JSTXH-2" gate="G$1" x="66.04" y="-22.86" smashed="yes">
-<attribute name="VALUE" x="63.5" y="-27.94" size="1.27" layer="96"/>
-<attribute name="NAME" x="63.5" y="-15.24" size="1.27" layer="95"/>
-</instance>
-<instance part="JSTXH-1" gate="G$1" x="66.04" y="-2.54" smashed="yes">
-<attribute name="VALUE" x="63.5" y="-7.62" size="1.27" layer="96"/>
-<attribute name="NAME" x="63.5" y="5.08" size="1.27" layer="95"/>
 </instance>
 <instance part="ROTARY" gate="G$1" x="152.4" y="25.4" smashed="yes">
 <attribute name="VALUE" x="150.495" y="36.83" size="1.778" layer="96"/>
@@ -4419,6 +4439,20 @@ type 0309, grid 2.5 mm</description>
 <instance part="GND13" gate="1" x="127" y="78.74" smashed="yes" rot="MR180">
 <attribute name="VALUE" x="124.46" y="81.28" size="1.778" layer="96" rot="MR180"/>
 </instance>
+<instance part="X1" gate="-1" x="86.36" y="0" smashed="yes">
+<attribute name="NAME" x="88.9" y="-0.762" size="1.524" layer="95"/>
+<attribute name="VALUE" x="85.598" y="1.397" size="1.778" layer="96"/>
+</instance>
+<instance part="X1" gate="-2" x="86.36" y="-2.54" smashed="yes">
+<attribute name="NAME" x="88.9" y="-3.302" size="1.524" layer="95"/>
+</instance>
+<instance part="X2" gate="-1" x="86.36" y="-20.32" smashed="yes">
+<attribute name="NAME" x="88.9" y="-21.082" size="1.524" layer="95"/>
+<attribute name="VALUE" x="85.598" y="-18.923" size="1.778" layer="96"/>
+</instance>
+<instance part="X2" gate="-2" x="86.36" y="-22.86" smashed="yes">
+<attribute name="NAME" x="88.9" y="-23.622" size="1.524" layer="95"/>
+</instance>
 </instances>
 <busses>
 </busses>
@@ -4509,14 +4543,14 @@ type 0309, grid 2.5 mm</description>
 <junction x="139.7" y="48.26"/>
 </segment>
 <segment>
-<pinref part="JSTXH-2" gate="G$1" pin="2"/>
 <pinref part="GND10" gate="1" pin="GND"/>
-<wire x1="60.96" y1="-22.86" x2="55.88" y2="-22.86" width="0.1524" layer="91"/>
+<pinref part="X2" gate="-2" pin="S"/>
+<wire x1="55.88" y1="-22.86" x2="83.82" y2="-22.86" width="0.1524" layer="91"/>
 </segment>
 <segment>
-<pinref part="JSTXH-1" gate="G$1" pin="2"/>
 <pinref part="GND9" gate="1" pin="GND"/>
-<wire x1="60.96" y1="-2.54" x2="55.88" y2="-2.54" width="0.1524" layer="91"/>
+<pinref part="X1" gate="-2" pin="S"/>
+<wire x1="55.88" y1="-2.54" x2="83.82" y2="-2.54" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="ROTARY" gate="G$1" pin="P$C"/>
@@ -4613,9 +4647,9 @@ type 0309, grid 2.5 mm</description>
 <label x="17.78" y="58.42" size="1.778" layer="95" rot="R90"/>
 </segment>
 <segment>
-<pinref part="JSTXH-1" gate="G$1" pin="1"/>
-<wire x1="60.96" y1="0" x2="55.88" y2="0" width="0.1524" layer="91"/>
 <label x="55.88" y="0" size="1.778" layer="95"/>
+<pinref part="X1" gate="-1" pin="S"/>
+<wire x1="55.88" y1="0" x2="83.82" y2="0" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="A2" class="0">
@@ -4625,9 +4659,9 @@ type 0309, grid 2.5 mm</description>
 <label x="20.32" y="58.42" size="1.778" layer="95" rot="R90"/>
 </segment>
 <segment>
-<pinref part="JSTXH-2" gate="G$1" pin="1"/>
-<wire x1="60.96" y1="-20.32" x2="55.88" y2="-20.32" width="0.1524" layer="91"/>
 <label x="55.88" y="-20.32" size="1.778" layer="95"/>
+<pinref part="X2" gate="-1" pin="S"/>
+<wire x1="55.88" y1="-20.32" x2="83.82" y2="-20.32" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="SCK" class="0">
