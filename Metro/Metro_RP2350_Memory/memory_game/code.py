@@ -87,7 +87,7 @@ else:
     )
     display = framebufferio.FramebufferDisplay(fb)
 
-# main group will hold all of our visual elements
+# main group will hold all the visual elements
 main_group = Group()
 
 # make main group visible on the display
@@ -202,7 +202,7 @@ game_over_label.anchored_position = (
     40,
 )
 
-# make it hidden, we'll show it when the game is over.
+# make it hidden, it will show it when the game is over.
 game_over_group.hidden = True
 
 # add the game over lable to the game over group
@@ -339,9 +339,9 @@ buf = array.array("b", [0] * 4)
 # back over and changing turns
 WAIT_UNTIL = 0
 
-# bool indicating whether we are waiting to reset flipped
+# bool indicating whether the code is waiting to reset flipped
 # cards and change turns or award points and remove
-# cards. Will be True if we are waiting to take action,
+# cards. Will be True if the code is waiting to take action,
 # False otherwise.
 waiting_to_reset = False
 
@@ -352,16 +352,16 @@ while True:
 
     # attempt mouse read
     try:
-        # read data from the mouse, small timeout so we move on
+        # try to read data from the mouse, small timeout so the code will move on
         # quickly if there is no data
         data_len = mouse.read(0x81, buf, timeout=10)
 
-        # if we got data, then update the mouse cursor on the display
+        # if there was data, then update the mouse cursor on the display
         # using min and max to keep it within the bounds of the display
         mouse_tg.x = max(0, min(display.width - 1, mouse_tg.x + buf[1] // 2))
         mouse_tg.y = max(0, min(display.height - 1, mouse_tg.y + buf[2] // 2))
 
-    # timeout error is raised if no data was read within the alotted timeout
+    # timeout error is raised if no data was read within the allotted timeout
     except usb.core.USBTimeoutError:
         # no problem, just go on
         pass
@@ -380,13 +380,13 @@ while True:
     # if the current state is playing
     elif CUR_STATE == STATE_PLAYING:
 
-        # if we are waiting to reset, and it's time to take action
+        # if the code is  waiting to reset, and it's time to take action
         if waiting_to_reset and now >= WAIT_UNTIL:
             # this means that there are already 2 cards flipped face up.
-            # we need to either award points, or flip them back over and
-            # change to the next players turn.
+            # The code needs to either award points, or flip the cards
+            # back over and change to the next players turn.
 
-            # change variable to indicate we're no longer waiting to take action
+            # change variable to indicate the code is no longer waiting to take action
             waiting_to_reset = False
 
             # if both cards were the same i.e. they found a match
@@ -406,7 +406,7 @@ while True:
                 update_score_text()
 
                 # if the total of both players scores is equal to half the amount
-                # of cards then we know the game is over because each pair is worth 1
+                # of cards then the code knows the game is over because each pair is worth 1
                 # point
                 if (
                     player_scores[0] + player_scores[1]
@@ -454,7 +454,7 @@ while True:
             # empty out the cards flipped this turn list
             cards_flipped_this_turn = []
 
-        # ignore any clicks while we're waiting to take reset cards
+        # ignore any clicks while the code is waiting to take reset cards
         if now >= WAIT_UNTIL:
             # left btn pressed
             if buf[0] & (1 << 0) != 0:
@@ -497,7 +497,7 @@ while True:
                 # reload
                 supervisor.reload()
 
-            # if the mouse pint is within the exit
+            # if the mouse point is within the exit
             # button bounding box
             if exit_btn.contains(coords):
                 # break to exit out of this script
