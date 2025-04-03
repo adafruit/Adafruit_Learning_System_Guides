@@ -29,11 +29,11 @@
 <layer number="19" name="Unrouted" color="6" fill="1" visible="yes" active="yes"/>
 <layer number="20" name="Dimension" color="24" fill="1" visible="yes" active="yes"/>
 <layer number="21" name="tPlace" color="7" fill="1" visible="yes" active="yes"/>
-<layer number="22" name="bPlace" color="7" fill="1" visible="no" active="yes"/>
+<layer number="22" name="bPlace" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="23" name="tOrigins" color="15" fill="1" visible="yes" active="yes"/>
 <layer number="24" name="bOrigins" color="15" fill="1" visible="yes" active="yes"/>
-<layer number="25" name="tNames" color="7" fill="1" visible="yes" active="yes"/>
-<layer number="26" name="bNames" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="25" name="tNames" color="7" fill="1" visible="no" active="yes"/>
+<layer number="26" name="bNames" color="7" fill="1" visible="no" active="yes"/>
 <layer number="27" name="tValues" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="28" name="bValues" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="29" name="tStop" color="7" fill="3" visible="yes" active="yes"/>
@@ -269,9 +269,9 @@ DISPLAY</text>
 <text x="44.75" y="30.5" size="0.6096" layer="22" font="vector" rot="MR0" align="center">D8</text>
 <text x="47.25" y="30.5" size="0.6096" layer="22" font="vector" rot="MR0" align="center">D9</text>
 <text x="49.75" y="30.5" size="0.6096" layer="22" font="vector" rot="MR0" align="center">D10</text>
-<text x="85.5" y="32" size="1.016" layer="21" font="vector" align="center">3.3V</text>
-<text x="88" y="30.5" size="1.016" layer="21" font="vector" align="center">GND</text>
-<text x="83" y="30.5" size="1.016" layer="21" font="vector" align="center">V+</text>
+<text x="85.5" y="31.5" size="1.016" layer="21" font="vector" rot="R90" align="center">3.3V</text>
+<text x="88" y="31.5" size="1.016" layer="21" font="vector" rot="R90" align="center">GND</text>
+<text x="83" y="31.5" size="1.016" layer="21" font="vector" rot="R90" align="center">V+</text>
 <text x="35.5" y="10.5" size="1.016" layer="22" font="vector" rot="MR270" align="center">MS1</text>
 <text x="33" y="10.5" size="1.016" layer="22" font="vector" rot="MR270" align="center">MS2</text>
 <text x="60.5" y="10.5" size="1.016" layer="22" font="vector" rot="MR270" align="center">MS2</text>
@@ -283,61 +283,65 @@ DISPLAY</text>
 <text x="84.5" y="24.5" size="1.6764" layer="21" font="vector" align="center">MPM3601</text>
 <text x="39.5" y="62.5" size="5.08" layer="22" font="vector" rot="MR0" align="center">Camera Slider
 Helper</text>
-<text x="8" y="53.5" size="1.9304" layer="22" rot="MR15" align="center">📷</text>
-<text x="34.5" y="43.5" size="1.9304" layer="22" rot="MR15" align="center">📷</text>
-<text x="16" y="61" size="1.9304" layer="22" rot="MR15" align="center">📷</text>
-<text x="55.5" y="61" size="1.9304" layer="22" rot="MR15" align="center">📷</text>
+<text x="12" y="56.5" size="1.9304" layer="22" rot="MR15" align="center">📷</text>
+<text x="34.5" y="42.5" size="1.9304" layer="22" rot="MR15" align="center">📷</text>
+<text x="18" y="60.5" size="1.9304" layer="22" rot="MR15" align="center">📷</text>
+<text x="54" y="61" size="1.9304" layer="22" rot="MR15" align="center">📷</text>
 <text x="48.5" y="19.5" size="1.9304" layer="22" rot="MR15" align="center">📷</text>
 <text x="97.5" y="26.5" size="1.9304" layer="22" rot="MR15" align="center">📷</text>
 <text x="86" y="48.5" size="1.9304" layer="22" rot="MR15" align="center">📷</text>
-<text x="51" y="9" size="1.9304" layer="22" rot="MR15" align="center">📷</text>
+<text x="53" y="13.5" size="1.9304" layer="22" rot="MR15" align="center">📷</text>
 <text x="22.5" y="7" size="1.9304" layer="22" rot="MR15" align="center">📷</text>
 <text x="17.5" y="31" size="1.9304" layer="22" rot="MR15" align="center">📷</text>
-<text x="5.5" y="33.5" size="1.9304" layer="22" rot="MR15" align="center">📷</text>
-<text x="72.5" y="3" size="1.9304" layer="22" rot="MR15" align="center">📷</text>
+<text x="4" y="26.5" size="1.9304" layer="22" rot="MR15" align="center">📷</text>
+<text x="71" y="3" size="1.9304" layer="22" rot="MR15" align="center">📷</text>
 <text x="75.5" y="29" size="1.9304" layer="22" rot="MR15" align="center">📷</text>
-<text x="90" y="38" size="1.9304" layer="22" rot="MR15" align="center">📷</text>
+<text x="87.5" y="37.5" size="1.9304" layer="22" rot="MR15" align="center">📷</text>
 <text x="72" y="53.5" size="1.9304" layer="22" rot="MR15" align="center">📷</text>
-<text x="32.5" y="53" size="1.9304" layer="22" rot="MR15" align="center">📷</text>
+<text x="55" y="52.5" size="1.9304" layer="22" rot="MR15" align="center">📷</text>
 <text x="3.5" y="45" size="1.9304" layer="22" rot="MR15" align="center">📷</text>
-<text x="76.5" y="67" size="1.9304" layer="22" rot="MR15" align="center">📷</text>
-<text x="89.5" y="69" size="1.9304" layer="22" rot="MR15" align="center">📷</text>
-<text x="63.5" y="67.5" size="1.9304" layer="22" rot="MR345" align="center">📷</text>
-<text x="48" y="47.5" size="1.9304" layer="22" rot="MR345" align="center">📷</text>
+<text x="86" y="68" size="1.9304" layer="22" rot="MR15" align="center">📷</text>
+<text x="70" y="68" size="1.9304" layer="22" rot="MR15" align="center">📷</text>
+<text x="33.5" y="52.5" size="1.9304" layer="22" rot="MR345" align="center">📷</text>
+<text x="44.5" y="53.5" size="1.9304" layer="22" rot="MR345" align="center">📷</text>
 <text x="4" y="58.5" size="1.9304" layer="22" rot="MR345" align="center">📷</text>
-<text x="11" y="49.5" size="1.9304" layer="22" rot="MR345" align="center">📷</text>
-<text x="12" y="35" size="1.9304" layer="22" rot="MR345" align="center">📷</text>
+<text x="11" y="47" size="1.9304" layer="22" rot="MR345" align="center">📷</text>
+<text x="5" y="35.5" size="1.9304" layer="22" rot="MR345" align="center">📷</text>
 <text x="27.5" y="13.5" size="1.9304" layer="22" rot="MR345" align="center">📷</text>
 <text x="34" y="5" size="1.9304" layer="22" rot="MR345" align="center">📷</text>
 <text x="43" y="11" size="1.9304" layer="22" rot="MR345" align="center">📷</text>
 <text x="60" y="6.5" size="1.9304" layer="22" rot="MR345" align="center">📷</text>
-<text x="69.5" y="11" size="1.9304" layer="22" rot="MR345" align="center">📷</text>
+<text x="81.5" y="56" size="1.9304" layer="22" rot="MR345" align="center">📷</text>
 <text x="85.5" y="17.5" size="1.9304" layer="22" rot="MR345" align="center">📷</text>
 <text x="53.5" y="29" size="1.9304" layer="22" rot="MR345" align="center">📷</text>
 <text x="35" y="29" size="1.9304" layer="22" rot="MR345" align="center">📷</text>
 <text x="28.5" y="36" size="1.9304" layer="22" rot="MR345" align="center">📷</text>
 <text x="16.5" y="68" size="1.9304" layer="22" rot="MR345" align="center">📷</text>
-<text x="40.5" y="50.5" size="1.778" layer="22" rot="R345">🎥</text>
-<text x="27.5" y="60.5" size="1.778" layer="22" rot="R15">🎥</text>
-<text x="10.5" y="56" size="1.778" layer="22" rot="R15">🎥</text>
-<text x="3.5" y="48" size="1.778" layer="22" rot="R15">🎥</text>
+<text x="61.5" y="68" size="1.778" layer="22" rot="R345">🎥</text>
+<text x="25.5" y="60" size="1.778" layer="22" rot="R15">🎥</text>
+<text x="5" y="51" size="1.778" layer="22" rot="R15">🎥</text>
+<text x="91" y="12.5" size="1.778" layer="22" rot="R15">🎥</text>
 <text x="19.5" y="14.5" size="1.778" layer="22" rot="R15">🎥</text>
 <text x="10.5" y="4" size="1.778" layer="22" rot="R15">🎥</text>
-<text x="44" y="3.5" size="1.778" layer="22" rot="R15">🎥</text>
+<text x="48" y="5" size="1.778" layer="22" rot="R15">🎥</text>
 <text x="76" y="19.5" size="1.778" layer="22" rot="R15">🎥</text>
 <text x="94" y="53.5" size="1.778" layer="22" rot="R15">🎥</text>
-<text x="81" y="66.5" size="1.778" layer="22" rot="R15">🎥</text>
-<text x="32.5" y="46" size="1.778" layer="22" rot="R15">🎥</text>
-<text x="11" y="64.5" size="1.778" layer="22" rot="R345">🎥</text>
-<text x="2.5" y="39" size="1.778" layer="22" rot="R345">🎥</text>
+<text x="76.5" y="65.5" size="1.778" layer="22" rot="R15">🎥</text>
+<text x="37.5" y="47" size="1.778" layer="22" rot="R15">🎥</text>
+<text x="11" y="63.5" size="1.778" layer="22" rot="R345">🎥</text>
+<text x="9.5" y="39.5" size="1.778" layer="22" rot="R345">🎥</text>
 <text x="2.5" y="12" size="1.778" layer="22" rot="R345">🎥</text>
-<text x="42.5" y="40.5" size="1.778" layer="22" rot="R345">🎥</text>
-<text x="65" y="6" size="1.778" layer="22" rot="R345">🎥</text>
+<text x="41" y="39" size="1.778" layer="22" rot="R345">🎥</text>
+<text x="66.5" y="8.5" size="1.778" layer="22" rot="R345">🎥</text>
 <text x="95" y="34" size="1.778" layer="22" rot="R345">🎥</text>
-<text x="49.5" y="52.5" size="1.778" layer="22" rot="R345">🎥</text>
+<text x="47" y="48.5" size="1.778" layer="22" rot="R345">🎥</text>
 <text x="78.5" y="13.5" size="2.54" layer="21" align="center">⚡</text>
 <text x="90" y="19" size="2.54" layer="21" align="center">⚡</text>
 <text x="74.5" y="51.5" size="1.778" layer="21">🐗</text>
+<text x="34" y="8.5" size="5.08" layer="21" align="center">⚙️</text>
+<text x="61.5" y="8.5" size="5.08" layer="21" align="center">⚙️</text>
+<text x="12.5" y="65" size="1.778" layer="21" font="vector">v0, April 2025</text>
+<text x="12.5" y="60.5" size="3.81" layer="21">📸</text>
 </plain>
 <libraries>
 <library name="microbuilder">
