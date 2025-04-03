@@ -246,6 +246,41 @@
 <text x="86" y="30" size="0.8" layer="25" font="vector" ratio="12" rot="R90">3V</text>
 <text x="83.5" y="30" size="0.8" layer="25" font="vector" ratio="12" rot="R90">VIN</text>
 <text x="80.5" y="30" size="0.8" layer="25" font="vector" ratio="12" rot="R90">EN</text>
+<text x="93.5" y="23.5" size="1.778" layer="21">V+</text>
+<text x="97.5" y="14.5" size="1.778" layer="21" rot="R180">GND</text>
+<text x="61.5" y="25" size="1.778" layer="21" align="center">MOTOR 1</text>
+<text x="34" y="25" size="1.778" layer="21" align="center">MOTOR 2</text>
+<text x="4.5" y="15.5" size="1.778" layer="21" align="center">A3</text>
+<text x="4.5" y="24" size="1.778" layer="21" align="center">A2</text>
+<text x="17.5" y="39" size="1.016" layer="22" rot="MR0" align="center">D3</text>
+<text x="26.5" y="39" size="1.016" layer="22" rot="MR0" align="center">D4</text>
+<text x="23" y="57" size="1.016" layer="22" rot="MR0" align="center">D2</text>
+<text x="56.5" y="52.5" size="1.016" layer="22" rot="R270" align="center">2.2K</text>
+<text x="53" y="37.5" size="1.6764" layer="22" rot="MR0" align="center">TFT
+DISPLAY</text>
+<text x="65" y="31.5" size="0.8128" layer="22" rot="MR0" align="center">3.3V</text>
+<text x="60" y="31.5" size="0.8128" layer="22" rot="MR0" align="center">GND</text>
+<text x="57.25" y="31.5" size="0.8128" layer="22" rot="MR0" align="center">SCK</text>
+<text x="54.75" y="31.5" size="0.8128" layer="22" rot="MR0" align="center">MI</text>
+<text x="52.25" y="31.5" size="0.8128" layer="22" rot="MR0" align="center">MO</text>
+<text x="49.75" y="31.5" size="0.8128" layer="22" rot="MR0" align="center">CS</text>
+<text x="47.25" y="31.5" size="0.8128" layer="22" rot="MR0" align="center">RST</text>
+<text x="44.75" y="31.5" size="0.8128" layer="22" rot="MR0" align="center">DC</text>
+<text x="44.75" y="30.5" size="0.6096" layer="22" rot="MR0" align="center">D8</text>
+<text x="47.25" y="30.5" size="0.6096" layer="22" rot="MR0" align="center">D9</text>
+<text x="49.75" y="30.5" size="0.6096" layer="22" rot="MR0" align="center">D10</text>
+<text x="85.5" y="25" size="1.016" layer="21" align="center">3.3V</text>
+<text x="88" y="30.5" size="1.016" layer="21" align="center">GND</text>
+<text x="83" y="30.5" size="1.016" layer="21" align="center">V+</text>
+<text x="35.5" y="10.5" size="1.016" layer="22" rot="MR270" align="center">MS1</text>
+<text x="33" y="10.5" size="1.016" layer="22" rot="MR270" align="center">MS2</text>
+<text x="60.5" y="10.5" size="1.016" layer="22" rot="MR270" align="center">MS2</text>
+<text x="63" y="10.5" size="1.016" layer="22" rot="MR270" align="center">MS1</text>
+<text x="45.5" y="18" size="1.016" layer="21" rot="R90" align="center">3.3V</text>
+<text x="72.5" y="18" size="1.016" layer="21" rot="R90" align="center">3.3V</text>
+<text x="83.5" y="52" size="1.9304" layer="21" align="center">KB2040</text>
+<text x="98.5" y="52" size="1.27" layer="21" rot="R270" align="center">USB</text>
+<text x="84.5" y="24.5" size="1.6764" layer="21" align="center">MPM3601</text>
 </plain>
 <libraries>
 <library name="microbuilder">
@@ -846,8 +881,8 @@ design rules under a new name.</description>
 <attribute name="NAME" x="34.27" y="12.349" size="0.8128" layer="26" ratio="18" rot="MR90"/>
 <attribute name="VALUE" x="33" y="14.4001" size="0.02" layer="28" rot="MR90"/>
 </element>
-<element name="J1" library="adafruit" library_urn="urn:adsk.eagle:library:420" package="1X2-3.5MM" package3d_urn="urn:adsk.eagle:package:6240635/1" value="1X2-3.5MM" x="91.5" y="17" smashed="yes" rot="R270">
-<attribute name="NAME" x="96.5" y="14" size="1.27" layer="25" rot="R90"/>
+<element name="J1" library="adafruit" library_urn="urn:adsk.eagle:library:420" package="1X2-3.5MM" package3d_urn="urn:adsk.eagle:package:6240635/1" value="1X2-3.5MM" x="95" y="19" smashed="yes" rot="R270">
+<attribute name="NAME" x="100" y="16" size="1.27" layer="25" rot="R90"/>
 </element>
 </elements>
 <signals>
@@ -905,8 +940,8 @@ design rules under a new name.</description>
 <wire x1="84.86934375" y1="3.9412" x2="86.45065625" y2="3.9412" width="0.8128" layer="16"/>
 <wire x1="80.96" y1="4.3" x2="84.51054375" y2="4.3" width="0.8128" layer="16"/>
 <wire x1="84.51054375" y1="4.3" x2="84.86934375" y2="3.9412" width="0.8128" layer="16"/>
-<wire x1="86.45065625" y1="3.9412" x2="91.5" y2="8.99054375" width="0.8128" layer="16"/>
-<wire x1="91.5" y1="8.99054375" x2="91.5" y2="15.2" width="0.8128" layer="16"/>
+<wire x1="86.45065625" y1="3.9412" x2="95" y2="12.49054375" width="0.8128" layer="16"/>
+<wire x1="95" y1="12.49054375" x2="95" y2="17.2" width="0.8128" layer="16"/>
 <contactref element="DCJACK" pad="GNDBREAK"/>
 <wire x1="80.96" y1="4.3" x2="83.86" y2="7.2" width="0.8128" layer="16"/>
 <wire x1="83.86" y1="7.2" x2="85.66" y2="7.2" width="0.8128" layer="16"/>
@@ -973,8 +1008,8 @@ design rules under a new name.</description>
 <wire x1="81.6928" y1="26.70221875" x2="81.6928" y2="26.7728" width="0.8128" layer="1"/>
 <wire x1="81.6928" y1="26.7728" x2="82.92" y2="28" width="0.8128" layer="1"/>
 <contactref element="J1" pad="2"/>
-<wire x1="91.5" y1="18.7" x2="83" y2="10.2" width="0.8128" layer="1"/>
-<wire x1="83" y1="10.2" x2="80.96" y2="10.2" width="0.8128" layer="1"/>
+<wire x1="95" y1="20.7" x2="84.5" y2="10.2" width="0.8128" layer="1"/>
+<wire x1="84.5" y1="10.2" x2="80.96" y2="10.2" width="0.8128" layer="1"/>
 </signal>
 <signal name="A3">
 <contactref element="KB2040-2" pad="8"/>
@@ -1175,6 +1210,10 @@ design rules under a new name.</description>
 </board>
 </drawing>
 <compatibility>
+<note version="6.3" minversion="6.2.2" severity="warning">
+Since Version 6.2.2 text objects can contain more than one line,
+which will not be processed correctly with this version.
+</note>
 <note version="8.2" severity="warning">
 Since Version 8.2, EAGLE supports online libraries. The ids
 of those online libraries will not be understood (or retained)
