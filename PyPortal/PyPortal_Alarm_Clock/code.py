@@ -20,9 +20,9 @@ All text above must be included in any redistribution.
 #pylint:disable=no-self-use,too-many-branches,too-many-statements
 #pylint:disable=useless-super-delegation, too-many-locals
 
+from os import getenv
 import time
 import json
-from secrets import secrets
 import board
 from adafruit_pyportal import PyPortal
 from adafruit_bitmap_font import bitmap_font
@@ -32,9 +32,21 @@ import analogio
 import displayio
 import adafruit_logging as logging
 
+# Get WiFi details, ensure these are setup in settings.toml
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+
+if None in [ssid, password]:
+    raise RuntimeError(
+        "WiFi settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "at a minimum."
+    )
+
 # Set up where we'll be fetching data from
-DATA_SOURCE = 'http://api.openweathermap.org/data/2.5/weather?id='+secrets['city_id']
-DATA_SOURCE += '&appid='+secrets['openweather_token']
+DATA_SOURCE = 'http://api.openweathermap.org/data/2.5/weather?id='+getenv('city_id')
+DATA_SOURCE += '&appid='+getenv('openweather_token')
 # You'll need to get a token from openweather.org, looks like 'b6907d289e10d714a6e88b30761fae22'
 DATA_LOCATION = []
 
@@ -73,7 +85,7 @@ mugsy_background = 'mugsy_background.bmp'
 
 icon_file = None
 icon_sprite = None
-celcius = secrets['celcius']
+celcius = getenv('celcius')
 
 # display/data refresh timers
 
@@ -243,7 +255,7 @@ class Time_State(State):
         if (not self.refresh_time) or ((now - self.refresh_time) > 3600):
             logger.debug('Fetching time')
             try:
-                pyportal.get_local_time(location=secrets['timezone'])
+                pyportal.get_local_time(location=getenv('timezone'))
                 self.refresh_time = now
             except RuntimeError as e:
                 self.refresh_time = now - 3000   # delay 10 minutes before retrying

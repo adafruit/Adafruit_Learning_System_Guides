@@ -7,25 +7,30 @@ PyPortal Adafruit IO Feed Display
 
 Displays an Adafruit IO Feed on a PyPortal.
 """
+
+from os import getenv
 import time
 import board
 from adafruit_pyportal import PyPortal
 
-# Get Adafruit IO details and more from a secrets.py file
-try:
-    from secrets import secrets
-except ImportError:
-    print("Adafruit IO secrets are kept in secrets.py, please add them there!")
-    raise
+# (visit io.adafruit.com if you need to create an account, or if you need your Adafruit IO key.)
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+aio_username = getenv("ADAFRUIT_AIO_USERNAME")
+aio_key = getenv("ADAFRUIT_AIO_KEY")
 
-# Adafruit IO Account
-IO_USER = secrets['aio_username']
-IO_KEY = secrets['aio_key']
+if None in [ssid, password, aio_username, aio_key]:
+    raise RuntimeError(
+        "WiFi and Adafruit IO settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "'ADAFRUIT_AIO_USERNAME' and 'ADAFRUIT_AIO_KEY' at a minimum."
+    )
+
 # Adafruit IO Feed
-IO_FEED = 'zapemail'
+io_feed = 'zapemail'
 
-DATA_SOURCE = "https://io.adafruit.com/api/v2/{0}/feeds/{1}?X-AIO-Key={2}".format(IO_USER,
-                                                                                  IO_FEED, IO_KEY)
+DATA_SOURCE = f"https://io.adafruit.com/api/v2/{aio_username}/feeds/{io_feed}?X-AIO-Key={aio_key}"
 FEED_VALUE_LOCATION = ['last_value']
 
 cwd = ("/"+__file__).rsplit('/', 1)[0]

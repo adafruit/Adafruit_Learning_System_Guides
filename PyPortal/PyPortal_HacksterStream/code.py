@@ -2,22 +2,28 @@
 #
 # SPDX-License-Identifier: MIT
 
+from os import getenv
 import time
 import random
 import board
 import adafruit_pyportal
 
-# Get wifi details and more from a settings.py file
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
+# Get WiFi details, ensure these are setup in settings.toml
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+
+if None in [ssid, password]:
+    raise RuntimeError(
+        "WiFi settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "at a minimum."
+    )
 
 # Set up where we'll be fetching data from
 DATA_SOURCE = "https://api.hackster.io/v2/projects?"
-DATA_SOURCE += "client_id="+secrets['hackster_clientid']
-DATA_SOURCE += "&client_secret="+secrets['hackster_secret']
+DATA_SOURCE += "client_id="+getenv('hackster_clientid')
+DATA_SOURCE += "&client_secret="+getenv('hackster_secret')
 IMAGE_LOCATION = ['records', 0, "cover_image_url"]
 TITLE_LOCATION = ['records',0, "name"]
 HID_LOCATION = ['records', 0, "hid"]

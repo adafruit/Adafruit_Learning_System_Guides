@@ -10,7 +10,8 @@ notifications when it needs watering with your PyPortal.
 
 Author: Brent Rubell for Adafruit Industries, 2019
 """
-import os
+
+from os import getenv
 import time
 import json
 import board
@@ -28,10 +29,17 @@ import aws_gfx_helper
 # Time between polling the STEMMA, in minutes
 SENSOR_DELAY = 15
 
-secrets = {
-    "ssid" : os.getenv("CIRCUITPY_WIFI_SSID"),
-    "password" : os.getenv("CIRCUITPY_WIFI_PASSWORD"),
-}
+# Get WiFi details, ensure these are setup in settings.toml
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+
+if None in [ssid, password]:
+    raise RuntimeError(
+        "WiFi settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "at a minimum."
+    )
 
 # Get device certificate
 try:
@@ -65,9 +73,10 @@ esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset)
 # Verify nina-fw version >= 1.4.0
 assert int(bytes(esp.firmware_version).decode("utf-8")[2]) >= 4, "Please update nina-fw to >=1.4.0."
 
-status_light = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.2)
-wifi = adafruit_esp32spi_wifimanager.ESPSPI_WiFiManager(
-    esp, secrets, status_light)
+status_pixel = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.2)
+wifi = adafruit_esp32spi_wifimanager.WiFiManager(
+    esp, ssid, password, status_pixel=status_pixel
+)
 
 # Initialize the graphics helper
 print("Loading AWS IoT Graphics...")
@@ -126,8 +135,8 @@ def message(client, topic, msg):
     print("Message from {}: {}".format(topic, msg))
 
 # Set up a new MiniMQTT Client
-client =  MQTT.MQTT(broker = os.getenv("BROKER"),
-                    client_id = os.getenv("CLIENT_ID"),
+client =  MQTT.MQTT(broker = getenv("BROKER"),
+                    client_id = getenv("CLIENT_ID"),
                     socket_pool=pool,
                     ssl_context=ssl_context)
 

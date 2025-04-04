@@ -112,7 +112,8 @@ class Electioncal_Graphics(displayio.Group):
         date_str = date_format_str % (year, month, day)
         self.date_text.text = "Today is: " + date_str
 
-    def paragrapher(self, text, cut): # pylint: disable=no-self-use
+    @staticmethod
+    def paragrapher(text, cut):
         """ Cuts a long line into two, having spaces in mind.
         Note we return line2 first as it looks better to clear the line2
         before printing a line1 with empty line2

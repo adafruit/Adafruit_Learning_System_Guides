@@ -12,6 +12,8 @@ your PyPortal
 Authors: Brent Rubell for Adafruit Industries, 2019
        : Jim Bennett for Microsoft, 2020
 """
+
+from os import getenv
 import time
 import json
 import board
@@ -30,12 +32,17 @@ import azure_gfx_helper
 # init. graphics helper
 gfx = azure_gfx_helper.Azure_GFX(is_celsius=True)
 
-# Get wifi details and more from a secrets.py file
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
+# Get WiFi details, ensure these are setup in settings.toml
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+
+if None in [ssid, password]:
+    raise RuntimeError(
+        "WiFi settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "at a minimum."
+    )
 
 # PyPortal ESP32 Setup
 esp32_cs = DigitalInOut(board.ESP_CS)
@@ -45,8 +52,8 @@ spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
 esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset)
 
 # Set up the WiFi manager with a status light to show the WiFi connection status
-status_light = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.2)
-wifi = adafruit_esp32spi_wifimanager.ESPSPI_WiFiManager(esp, secrets, status_light)
+status_pixel = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.2)
+wifi = adafruit_esp32spi_wifimanager.WiFiManager(esp, ssid, password, status_pixel=status_pixel)
 print("WiFi connecting...")
 wifi.connect()
 print("WiFi connected!")
@@ -68,7 +75,7 @@ ss = Seesaw(i2c_bus, addr=0x36)
 
 # Create an instance of the Azure IoT Central device
 device = IoTCentralDevice(
-    socket, esp, secrets["id_scope"], secrets["device_id"], secrets["key"]
+    socket, esp, getenv("id_scope"), getenv("device_id"), getenv("key")
 )
 
 # Connect to Azure IoT Central

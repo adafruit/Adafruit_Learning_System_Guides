@@ -2,23 +2,29 @@
 #
 # SPDX-License-Identifier: MIT
 
+from os import getenv
 import time
 import board
 from adafruit_pyportal import PyPortal
 
-# Get wifi details and more from a secrets.py file
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
+# Get WiFi details, ensure these are setup in settings.toml
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+
+if None in [ssid, password]:
+    raise RuntimeError(
+        "WiFi settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "at a minimum."
+    )
 
 PROJECT_NAME = "3c92f0"
 
 # Set up where we'll be fetching data from
 DATA_SOURCE = "https://api.hackster.io/v2/projects/"+PROJECT_NAME+"?"
-DATA_SOURCE += "client_id="+secrets['hackster_clientid']
-DATA_SOURCE += "&client_secret="+secrets['hackster_secret']
+DATA_SOURCE += "client_id="+getenv('hackster_clientid')
+DATA_SOURCE += "&client_secret="+getenv('hackster_secret')
 VIEWS_LOCATION = ['stats', 'views']
 LIKES_LOCATION = ['stats', 'respects']
 CAPTION = "http://www.hackster.com/project/"+PROJECT_NAME
