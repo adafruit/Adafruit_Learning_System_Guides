@@ -70,7 +70,7 @@ def get_victory_message(deaths):
     return None
 
 class Game:
-    def __init__(self, display, data_file, **kwargs):
+    def __init__(self, display, data_file, audio):
         self._display = display
         self._images = {}
         self._buffers = {}
@@ -78,7 +78,7 @@ class Game:
         self._loading_group = displayio.Group()
         self._tile_size = 24  # Default tile size (length and width)
         self._digit_dims = (0, 0)
-        self._gamelogic = GameLogic(data_file, **kwargs)
+        self._gamelogic = GameLogic(data_file, audio)
         self._databuffer = DataBuffer()
         self._color_index = {}
         self._init_display()
@@ -850,5 +850,5 @@ Total Score: {score[3]}"""
                             y_pos * self._tile_size + VIEWPORT_OFFSET[1], top_tile, bottom_tile
                         )
 
-        self._draw_hint()
         self._draw_title_dialog()
+        self._draw_hint()
