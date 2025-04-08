@@ -12,16 +12,19 @@ from adafruit_display_shapes.circle import Circle
 WIDTH = board.DISPLAY.width
 HEIGHT = board.DISPLAY.height
 
-# Get WiFi details, ensure these are setup in settings.toml
+# Get WiFi details and Adafruit IO keys, ensure these are setup in settings.toml
+# (visit io.adafruit.com if you need to create an account, or if you need your Adafruit IO key.)
 ssid = getenv("CIRCUITPY_WIFI_SSID")
 password = getenv("CIRCUITPY_WIFI_PASSWORD")
+aio_username = getenv("ADAFRUIT_AIO_USERNAME")
+aio_key = getenv("ADAFRUIT_AIO_KEY")
 
-if None in [ssid, password]:
+if None in [ssid, password, aio_username, aio_key]:
     raise RuntimeError(
-        "WiFi settings are kept in settings.toml, "
+        "WiFi and Adafruit IO settings are kept in settings.toml, "
         "please add them there. The settings file must contain "
         "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
-        "at a minimum."
+        "'ADAFRUIT_AIO_USERNAME' and 'ADAFRUIT_AIO_KEY' at a minimum."
     )
 
 #pylint: disable=line-too-long
