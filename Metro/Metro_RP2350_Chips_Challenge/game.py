@@ -70,7 +70,7 @@ def get_victory_message(deaths):
     return None
 
 class Game:
-    def __init__(self, display, data_file, **kwargs):
+    def __init__(self, display, data_file, audio):
         self._display = display
         self._images = {}
         self._buffers = {}
@@ -78,7 +78,7 @@ class Game:
         self._loading_group = displayio.Group()
         self._tile_size = 24  # Default tile size (length and width)
         self._digit_dims = (0, 0)
-        self._gamelogic = GameLogic(data_file, **kwargs)
+        self._gamelogic = GameLogic(data_file, audio)
         self._databuffer = DataBuffer()
         self._color_index = {}
         self._init_display()
@@ -268,7 +268,8 @@ class Game:
                     self.request_password()
         elif command == PREVIOUS_LEVEL:
             if self._gamelogic.current_level_number > 1:
-                if self._savestate.is_level_unlocked(self._gamelogic.current_level_number - 1):
+                if (self._gamelogic.current_level_number - 1 == 1 or
+                    self._savestate.is_level_unlocked(self._gamelogic.current_level_number - 1)):
                     self.reset_level()
                     self._gamelogic.dec_level()
                     self.save_level()
@@ -412,10 +413,10 @@ Total Score: {score[3]}"""
                     level = self._savestate.find_unlocked_level(password)
                 if not 0 < level <= self._gamelogic.last_level:
                     self.show_message("That is not a valid level number.")
-                elif (level and password and
+                elif (level > 1 and password and
                       self._gamelogic.current_level.passwords[level] != password):
                     self.show_message("You must enter a valid password.")
-                elif (self._savestate.is_level_unlocked(level) and
+                elif (level != 1 and self._savestate.is_level_unlocked(level) and
                     self._savestate.find_unlocked_level(level) is None
                     and self._savestate.find_unlocked_level(password) is None):
                     self.show_message("You must enter a valid password.")
@@ -850,5 +851,5 @@ Total Score: {score[3]}"""
                             y_pos * self._tile_size + VIEWPORT_OFFSET[1], top_tile, bottom_tile
                         )
 
-        self._draw_hint()
         self._draw_title_dialog()
+        self._draw_hint()

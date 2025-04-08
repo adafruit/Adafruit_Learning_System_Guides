@@ -13,24 +13,6 @@ from element import Element
 from level import Level, Tile
 from point import Point
 from slip import Slip
-from audio import Audio
-
-SOUND_EFFECTS = {
-    "BUTTON_PUSHED": "/sounds/pop2.wav",
-    "DOOR_OPENED": "/sounds/door.wav",
-    "ITEM_COLLECTED": "/sounds/blip2.wav",
-    "BOOTS_STOLEN": "/sounds/strike.wav",
-    "WATER_SPLASH": "/sounds/water2.wav",
-    "TELEPORT": "/sounds/teleport.wav",
-    "CANT_MOVE": "/sounds/oof3.wav",
-    "CHIP_LOSES": "/sounds/bummer.wav",
-    "LEVEL_COMPLETE": "/sounds/ditty1.wav",
-    "IC_COLLECTED": "/sounds/click3.wav",
-    "BOMB_EXPLOSION": "/sounds/hit3.wav",
-    "SOCKET_SOUND": "/sounds/chimes.wav",
-    "TIME_LOW_TICK": "/sounds/click1.wav",
-    "TIME_UP": "/sounds/bell.wav"
-}
 
 def is_ice(tile):
     return tile == TYPE_ICE or TYPE_ICEWALL_SOUTHEAST <= tile <= TYPE_ICEWALL_NORTHEAST
@@ -73,7 +55,8 @@ class GameLogic:
     A class to represent the state of the game as well as
     control all the game movements and actions.
     """
-    def __init__(self, data_file, **kwargs):
+    def __init__(self, data_file, audio):
+        self._audio = audio
         self._tileset = [Element() for _ in range(0x70)]
         self._chip = Creature()
         self._create_tileset()
@@ -96,10 +79,7 @@ class GameLogic:
         self._current_time = 0
         self._last_slip_dir = NONE
         self._controller_dir = NONE
-        self._audio = Audio(**kwargs)
         self._time_limit = 0
-        for sound_name, file in SOUND_EFFECTS.items():
-            self._audio.add_sound(sound_name, file)
 
     def dec_level(self):
         if self.current_level_number > 1:

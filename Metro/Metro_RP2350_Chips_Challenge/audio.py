@@ -2,16 +2,16 @@
 #
 # SPDX-License-Identifier: MIT
 import audiocore
-import audiobusio
 from definitions import PLAY_SOUNDS
 
 class Audio:
-    def __init__(self, *, bit_clock, word_select, data):
-        self._audio = audiobusio.I2SOut(bit_clock, word_select, data)
+    def __init__(self, audio_bus, sounds):
+        self._audio = audio_bus
         self._wav_files = {}
-
-    def add_sound(self, sound_name, file):
-        self._wav_files[sound_name] = file
+        for sound_name, file in sounds.items():
+            self._add_sound(sound_name, file)
+        # Play the first sound in the list to initialize the audio system
+        self.play(tuple(self._wav_files.keys())[0], wait=True)
 
     def play(self, sound_name, wait=False):
         if not PLAY_SOUNDS:
@@ -23,3 +23,6 @@ class Audio:
                 if wait:
                     while self._audio.playing:
                         pass
+
+    def _add_sound(self, sound_name, file):
+        self._wav_files[sound_name] = file

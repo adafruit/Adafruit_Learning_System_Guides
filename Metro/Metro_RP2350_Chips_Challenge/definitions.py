@@ -4,7 +4,7 @@
 from micropython import const
 
 # Settings
-PLAY_SOUNDS = False
+PLAY_SOUNDS = True
 
 # Timing Constants
 TICKS_PER_SECOND = const(20)
