@@ -60,7 +60,7 @@ class SaveState:
             with open("/sd/" + SAVESTATE_FILE, "r") as f:
                 data = json.load(f)
                 self._levels = data["levels"]
-        except OSError:
+        except (OSError, ValueError):
             pass
 
     def set_level_score(self, level, score, time_left):

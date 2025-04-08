@@ -268,7 +268,8 @@ class Game:
                     self.request_password()
         elif command == PREVIOUS_LEVEL:
             if self._gamelogic.current_level_number > 1:
-                if self._savestate.is_level_unlocked(self._gamelogic.current_level_number - 1):
+                if (self._gamelogic.current_level_number - 1 == 1 or
+                    self._savestate.is_level_unlocked(self._gamelogic.current_level_number - 1)):
                     self.reset_level()
                     self._gamelogic.dec_level()
                     self.save_level()
@@ -412,10 +413,10 @@ Total Score: {score[3]}"""
                     level = self._savestate.find_unlocked_level(password)
                 if not 0 < level <= self._gamelogic.last_level:
                     self.show_message("That is not a valid level number.")
-                elif (level and password and
+                elif (level > 1 and password and
                       self._gamelogic.current_level.passwords[level] != password):
                     self.show_message("You must enter a valid password.")
-                elif (self._savestate.is_level_unlocked(level) and
+                elif (level != 1 and self._savestate.is_level_unlocked(level) and
                     self._savestate.find_unlocked_level(level) is None
                     and self._savestate.find_unlocked_level(password) is None):
                     self.show_message("You must enter a valid password.")
