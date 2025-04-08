@@ -384,6 +384,9 @@ class Dialog:
         # The box should be on the right of the coordinates
         # The width and height should be the size of the box
         # The font should be the font to use for the label and the text box
+        if isinstance(field["padding"], int):
+            field["padding"] = convert_padding(field["padding"])
+
         if first_draw:
             # draw the label
             label = TextBox(
