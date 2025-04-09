@@ -98,17 +98,17 @@ def set_waning_crescent():
     for i in range(5, 18):
         pixels[i] = ON
     pixels.show()
-	
+
 def set_dark_moon():
-	pixels.fill(OFF)
-	for i in range(9,14):
-		pixels[i] = ON
-	pixels.show()
+    pixels.fill(OFF)
+    for i in range(9,14):
+        pixels[i] = ON
+    pixels.show()
 
 def set_red_moon():
-	pixels.fill(RED)
-	pixels.show()
-	
+    pixels.fill(RED)
+    pixels.show()
+
 # match functions with phases
 phase_functions = {
     NEW_MOON: set_new_moon,
@@ -141,8 +141,8 @@ def set_moon_phase(phase):
             phase_functions[i]()
             print(f"Moon phase set to: {name}")
     if error_check == 0:
-	print("ERROR")
-	set_red_moon() #error indicator if API responce is unexpected
+        print("ERROR")
+        set_red_moon() #error indicator if API responce is unexpected
 
 # time keeping, fetches API every 6 hours
 timer_clock = ticks_ms()
