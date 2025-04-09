@@ -24,6 +24,7 @@ from adafruit_gc_iot_core import MQTT_API, Cloud_Core
 import adafruit_minimqtt.adafruit_minimqtt as MQTT
 from adafruit_seesaw.seesaw import Seesaw
 import digitalio
+from rsa_private_key import private_key
 
 # Get WiFi details, ensure these are setup in settings.toml
 ssid = getenv("CIRCUITPY_WIFI_SSID")
@@ -148,7 +149,7 @@ def handle_pump(command):
 settings = {
     "cloud_region": getenv("cloud_region"),
     "device_id": getenv("device_id"),
-    "private_key": getenv("private_key"),
+    "private_key": private_key,
     "project_id": getenv("project_id"),
     "registry_id": getenv("registry_id"),
 }
