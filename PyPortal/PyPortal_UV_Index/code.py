@@ -16,6 +16,7 @@ Licensed under the MIT license.
 All text above must be included in any redistribution.
 """
 
+from os import getenv
 import time
 import json
 import board
@@ -25,12 +26,17 @@ from adafruit_display_shapes.rect import Rect
 from adafruit_display_text.Label import Label
 from adafruit_bitmap_font import bitmap_font
 
-try:
-    from secrets import secrets
-except ImportError:
-    print("""WiFi settings are kept in secrets.py, please add them there!
-the secrets dictionary must contain 'ssid' and 'password' at a minimum""")
-    raise
+# Get WiFi details, ensure these are setup in settings.toml
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+
+if None in [ssid, password]:
+    raise RuntimeError(
+        "WiFi settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "at a minimum."
+    )
 
 MAX_BAR_HEIGHT = 160
 MARGIN = 10
@@ -48,7 +54,7 @@ CAPTION_FONT_FILE = cwd+'/fonts/Helvetica-Bold-16.bdf'
 BAR_FONT_FILE = cwd+'/fonts/Arial-Bold-12.bdf'
 
 #pylint:disable=line-too-long
-url = 'https://enviro.epa.gov/enviro/efservice/getEnvirofactsUVHOURLY/ZIP/{0}/JSON'.format(secrets['zip'])
+url = f"https://enviro.epa.gov/enviro/efservice/getEnvirofactsUVHOURLY/ZIP/{getenv('zip')}/JSON"
 #pylint:enable=line-too-long
 
 def extract_hour(date_time):

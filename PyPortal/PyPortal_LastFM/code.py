@@ -7,26 +7,35 @@ This example will access the lastFM API, grab a number like subreddit followers
 and display it on a screen
 If you can find something that spits out JSON data, we can display it!
 """
+
+from os import getenv
 import time
 import board
 from adafruit_pyportal import PyPortal
 
-# Get wifi details and more from a secrets.py file
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
+# Get WiFi details, ensure these are setup in settings.toml
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+
+if None in [ssid, password]:
+    raise RuntimeError(
+        "WiFi settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "at a minimum."
+    )
 
 # Set up where we'll be fetching data from
 DATA_SOURCE = "http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&limit=1&format=json"
 CAPTION = "www.last.fm/user"
 # If we have an access token, we can query more often
-if 'lfm_username' in secrets:
-    DATA_SOURCE += "&user="+secrets['lfm_username']
-    CAPTION += "/"+secrets['lfm_username']
-if 'lfm_key' in secrets:
-    DATA_SOURCE += "&api_key="+secrets['lfm_key']
+lfm_username = getenv("lfm_username")
+lfm_key = getenv("lfm_key")
+if lfm_username:
+    DATA_SOURCE += "&user=" + lfm_username
+    CAPTION += "/" + lfm_username
+if lfm_key:
+    DATA_SOURCE += "&api_key=" + lfm_key
 print(DATA_SOURCE)
 
 # Total number of plays
