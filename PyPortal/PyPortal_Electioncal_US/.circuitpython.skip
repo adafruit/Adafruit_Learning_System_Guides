@@ -1,7 +1,0 @@
-PyPortal_Electioncal_US/electioncal_graphics.py 73: Line too long (120/100) (line-too-long)
-PyPortal_Electioncal_US/electioncal_graphics.py 75: Line too long (108/100) (line-too-long)
-PyPortal_Electioncal_US/electioncal_graphics.py 86: Line too long (141/100) (line-too-long)
-PyPortal_Electioncal_US/electioncal_graphics.py 107: Unused variable 'time_str' (unused-variable)
-PyPortal_Electioncal_US/electioncal_graphics.py 111: Method could be a function (no-self-use)
-PyPortal_Electioncal_US/electioncal_graphics.py 72: Attribute 'electioncal' defined outside __init__ (attribute-defined-outside-init)
-PyPortal_Electioncal_US/electioncal.py 11: Unused secrets imported from secrets (unused-import)

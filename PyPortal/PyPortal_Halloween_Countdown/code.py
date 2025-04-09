@@ -16,14 +16,26 @@ Licensed under the MIT license.
 All text above must be included in any redistribution.
 """
 
-#pylint:disable=invalid-name
-import os
+from os import getenv
 import time
 import random
 import board
 from adafruit_pyportal import PyPortal
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text.label import Label
+
+# Get WiFi details, ensure these are setup in settings.toml
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+
+if None in [ssid, password]:
+    raise RuntimeError(
+        "WiFi settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "at a minimum."
+    )
+
 
 # The time of the thing!
 EVENT_YEAR = 2019
@@ -83,7 +95,7 @@ while True:
     if (not refresh_time) or (time.monotonic() - refresh_time) > 3600:
         try:
             print("Getting time from internet!")
-            pyportal.get_local_time(location=os.getenv("TIMEZONE"))
+            pyportal.get_local_time(location=getenv("timezone"))
             refresh_time = time.monotonic()
         except RuntimeError as e:
             print("Some error occured, retrying! -", e)

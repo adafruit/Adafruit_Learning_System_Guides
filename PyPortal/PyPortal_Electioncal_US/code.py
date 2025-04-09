@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+from os import getenv
 import sys
 import time
 import board
@@ -10,12 +11,17 @@ cwd = ("/"+__file__).rsplit('/', 1)[0] # the current working directory (where th
 sys.path.append(cwd)
 import electioncal_graphics  # pylint: disable=wrong-import-position
 
-# Get wifi details and more from a secrets.py file
-try:
-    from secrets import secrets # pylint: disable=unused-import
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
+# Get WiFi details, ensure these are setup in settings.toml
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+
+if None in [ssid, password]:
+    raise RuntimeError(
+        "WiFi settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "at a minimum."
+    )
 
 # Change this to your state and county, replacing spaces for underscores and in lowercase
 STATE="new_york"

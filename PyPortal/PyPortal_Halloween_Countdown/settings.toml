@@ -1,0 +1,12 @@
+# SPDX-FileCopyrightText: 2019 Kattni Rembor for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
+# This file is where you keep private settings, passwords, and tokens!
+# If you put them in the code you risk committing that info or sharing it
+
+CIRCUITPY_WIFI_SSID="your-wifi-ssid"
+CIRCUITPY_WIFI_PASSWORD="your-wifi-password"
+ADAFRUIT_AIO_USERNAME="my_username"
+ADAFRUIT_AIO_KEY="my_key"
+timezone="America/New_York"  # http://worldtimeapi.org/timezones
