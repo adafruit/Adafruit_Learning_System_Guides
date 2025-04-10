@@ -10,6 +10,8 @@ This example queries the Open Weather Maps site API to find out the current
 weather for your location... and display it on a screen!
 if you can find something that spits out JSON data, we can display it
 """
+
+from os import getenv
 import time
 import board
 import microcontroller
@@ -18,12 +20,17 @@ from adafruit_matrixportal.network import Network
 from adafruit_matrixportal.matrix import Matrix
 import openweather_graphics  # pylint: disable=wrong-import-position
 
-# Get wifi details and more from a secrets.py file
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
+# Get WiFi details, ensure these are setup in settings.toml
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+
+if None in [ssid, password]:
+    raise RuntimeError(
+        "WiFi settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "at a minimum."
+    )
 
 if hasattr(board, "D12"):
     jumper = DigitalInOut(board.D12)
@@ -62,10 +69,10 @@ print("Getting weather for {}".format(LOCATION))
 DATA_SOURCE = (
     "http://api.openweathermap.org/data/2.5/weather?q=" + LOCATION + "&units=" + UNITS
 )
-DATA_SOURCE += "&appid=" + secrets["openweather_token"]
+DATA_SOURCE += "&appid=" + getenv("openweather_token")
 # You'll need to get a token from openweather.org, looks like 'b6907d289e10d714a6e88b30761fae22'
-# it goes in your secrets.py file on a line such as:
-# 'openweather_token' : 'your_big_humongous_gigantor_token',
+# it goes in your settings.toml file on a line such as:
+# 'openweather_token="your_big_humongous_gigantor_token"',
 DATA_LOCATION = []
 SCROLL_HOLD_TIME = 0  # set this to hold each line before finishing scroll
 

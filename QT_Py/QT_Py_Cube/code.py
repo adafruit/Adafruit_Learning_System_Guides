@@ -1,7 +1,8 @@
 # SPDX-FileCopyrightText: 2022 Charlyn Gonda for Adafruit Industries
 #
 # SPDX-License-Identifier: MIT
-from secrets import secrets
+
+from os import getenv
 import ssl
 import busio
 import board
@@ -15,6 +16,21 @@ from adafruit_led_animation.color import (
 from adafruit_io.adafruit_io import IO_HTTP
 
 from cube import Cube
+
+# Get WiFi details and Adafruit IO keys, ensure these are setup in settings.toml
+# (visit io.adafruit.com if you need to create an account, or if you need your Adafruit IO key.)
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+aio_username = getenv("ADAFRUIT_AIO_USERNAME")
+aio_key = getenv("ADAFRUIT_AIO_KEY")
+
+if None in [ssid, password, aio_username, aio_key]:
+    raise RuntimeError(
+        "WiFi and Adafruit IO settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "'ADAFRUIT_AIO_USERNAME' and 'ADAFRUIT_AIO_KEY' at a minimum."
+    )
 
 # Specify pins
 top_cin = board.A0
@@ -42,9 +58,9 @@ lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c)
 connected = False
 while not connected:
     try:
-        wifi.radio.connect(secrets["ssid"], secrets["password"])
-        print("Connected to %s!" % secrets["ssid"])
-        print("My IP address is", wifi.radio.ipv4_address)
+        wifi.radio.connect(ssid, password)
+        print(f"Connected to {ssid}!")
+        print(f"My IP address is {wifi.radio.ipv4_address}")
         connected = True
     # pylint: disable=broad-except
     except Exception as error:
@@ -54,8 +70,8 @@ while not connected:
 
 # Setup for http requests
 pool = socketpool.SocketPool(wifi.radio)
-REQUESTS = adafruit_requests.Session(pool, ssl.create_default_context())
-IO = IO_HTTP(secrets["aio_username"], secrets["aio_key"], REQUESTS)
+requests = adafruit_requests.Session(pool, ssl.create_default_context())
+IO = IO_HTTP(aio_username, aio_key, requests)
 
 # Data for top pixels, will be updated by update_data()
 TOP_PIXELS_ON = []

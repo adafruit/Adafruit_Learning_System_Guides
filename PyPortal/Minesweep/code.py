@@ -201,7 +201,7 @@ def play_a_game():
                         set_data(touch_x, touch_y, BOMBDEATH) #reveal a red bomb
                         tilegrid[touch_x, touch_y] = BOMBDEATH
                         return False          #lost
-                    elif under_the_tile > OPEN0 and under_the_tile <= OPEN8:
+                    elif OPEN0 < under_the_tile <= OPEN8:
                         tilegrid[touch_x, touch_y] = under_the_tile
                     elif under_the_tile == OPEN0:
                         tilegrid[touch_x, touch_y] = BLANK
