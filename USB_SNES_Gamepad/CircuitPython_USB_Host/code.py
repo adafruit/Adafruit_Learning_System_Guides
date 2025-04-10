@@ -120,21 +120,6 @@ def reports_equal(report_a, report_b, check_length=None):
     return True
 
 
-def differing_indexes(report_a, report_b):
-    if (
-        report_a is None
-        and report_b is not None
-        or report_b is None
-        and report_a is not None
-    ):
-        return None
-    indexes = []
-    for _ in range(len(report_a)):
-        if report_a[_] != report_b[_]:
-            indexes.append(_)
-    return indexes
-
-
 idle_state = None
 prev_state = None
 
@@ -152,14 +137,6 @@ while True:
         print()
 
     if not reports_equal(buf, prev_state, 8) and not reports_equal(buf, idle_state, 8):
-        # print_array(buf, max_index=count)
-        # diff_indexes = differing_indexes(idle_state, buf)
-        # print(f"diff indexes: {diff_indexes}")
-
-        # for idx in diff_indexes:
-        #     print(f"{idx}: {idle_state[idx]} -> {buf[idx]}")
-        # print_array(buf)
-
         if buf[BTN_DPAD_UPDOWN_INDEX] == 0x0:
             print("D-Pad UP pressed")
         elif buf[BTN_DPAD_UPDOWN_INDEX] == 0xFF:
@@ -188,6 +165,6 @@ while True:
         elif buf[BTN_OTHER_INDEX] == 0x20:
             print("START pressed")
 
-        print_array(buf[:8])
+        # print_array(buf[:8])
 
     prev_state = buf[:]
