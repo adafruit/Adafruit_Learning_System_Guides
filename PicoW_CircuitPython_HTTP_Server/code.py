@@ -37,7 +37,7 @@ ow_bus = OneWireBus(board.GP6)
 # scan for temp sensor
 ds18 = DS18X20(ow_bus, ow_bus.scan()[0])
 
-#  function to convert celcius to fahrenheit
+#  function to convert celsius to fahrenheit
 def c_to_f(temp):
     temp_f = (temp * 9/5) + 32
     return temp_f

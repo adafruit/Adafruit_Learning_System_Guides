@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+from os import getenv
 import board
 import displayio
 import busio
@@ -18,14 +19,19 @@ from adafruit_button import Button
 import adafruit_touchscreen
 import adafruit_minimqtt.adafruit_minimqtt as MQTT
 
-# ------------- WiFi ------------- #
+# Get WiFi details, ensure these are setup in settings.toml
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
 
-# Get wifi details and more from a secrets.py file
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
+if None in [ssid, password]:
+    raise RuntimeError(
+        "WiFi settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "at a minimum."
+    )
+
+# ------------- WiFi ------------- #
 
 # If you are using a board with pre-defined ESP32 Pins:
 esp32_cs = DigitalInOut(board.ESP_CS)
@@ -34,8 +40,8 @@ esp32_reset = DigitalInOut(board.ESP_RESET)
 
 spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
 esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset)
-status_light = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.2)
-wifi = adafruit_esp32spi_wifimanager.ESPSPI_WiFiManager(esp, secrets, status_light)
+status_pixel = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.2)
+wifi = adafruit_esp32spi_wifimanager.WiFiManager(esp, ssid, password, status_pixel=status_pixel)
 
 # ------- Sensor Setup ------- #
 # init. the temperature sensor
@@ -234,10 +240,10 @@ ssl_context = adafruit_connection_manager.get_radio_ssl_context(esp)
 
 # Set up a MiniMQTT Client
 client = MQTT.MQTT(
-    broker=secrets["broker"],
+    broker=getenv("mqtt_broker"),
     port=1883,
-    username=secrets["user"],
-    password=secrets["pass"],
+    username=getenv("mqtt_username"),
+    password=getenv("mqtt_password"),
     socket_pool=pool,
     ssl_context=ssl_context,
 )

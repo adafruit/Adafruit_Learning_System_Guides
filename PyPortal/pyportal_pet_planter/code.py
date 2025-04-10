@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-import os
+from os import getenv
 import time
 
 import board
@@ -20,6 +20,21 @@ import adafruit_minimqtt.adafruit_minimqtt as MQTT
 from adafruit_pyportal import PyPortal
 from adafruit_seesaw.seesaw import Seesaw
 from simpleio import map_range
+
+# Get WiFi details and Adafruit IO keys, ensure these are setup in settings.toml
+# (visit io.adafruit.com if you need to create an account, or if you need your Adafruit IO key.)
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+aio_username = getenv("ADAFRUIT_AIO_USERNAME")
+aio_key = getenv("ADAFRUIT_AIO_KEY")
+
+if None in [ssid, password, aio_username, aio_key]:
+    raise RuntimeError(
+        "WiFi and Adafruit IO settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "'ADAFRUIT_AIO_USERNAME' and 'ADAFRUIT_AIO_KEY' at a minimum."
+    )
 
 #---| User Config |---------------
 
@@ -52,11 +67,6 @@ wav_water_low = "/sounds/water-low.wav"
 # the current working directory (where this file is)
 cwd = ("/"+__file__).rsplit('/', 1)[0]
 
-secrets = {
-    "ssid" : os.getenv("CIRCUITPY_WIFI_SSID"),
-    "password" : os.getenv("CIRCUITPY_WIFI_PASSWORD"),
-}
-
 # Set up i2c bus
 i2c_bus = busio.I2C(board.SCL, board.SDA)
 
@@ -70,8 +80,8 @@ esp32_reset = DigitalInOut(board.ESP_RESET)
 
 spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
 esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset)
-status_light = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.2)
-wifi = adafruit_esp32spi_wifimanager.ESPSPI_WiFiManager(esp, secrets, status_light)
+status_pixel = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.2)
+wifi = adafruit_esp32spi_wifimanager.WiFiManager(esp, ssid, password, status_pixel=status_pixel)
 
 # Initialize PyPortal Display
 display = board.DISPLAY
@@ -190,8 +200,8 @@ ssl_context = adafruit_connection_manager.get_radio_ssl_context(esp)
 
 # Initialize a new MQTT Client object
 mqtt_client = MQTT.MQTT(broker="io.adafruit.com",
-                        username=os.getenv("AIO_USERNAME"),
-                        password=os.getenv("AIO_KEY"),
+                        username=aio_username,
+                        password=aio_key,
                         socket_pool=pool,
                         ssl_context=ssl_context)
 

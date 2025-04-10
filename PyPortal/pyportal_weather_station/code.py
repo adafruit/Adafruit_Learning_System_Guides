@@ -10,6 +10,8 @@ Adafruit IO
 
 Author: Brent Rubell for Adafruit Industries, 2019
 """
+
+from os import getenv
 import time
 import board
 import neopixel
@@ -38,12 +40,20 @@ anemometer_max_volts = 2.0
 min_wind_speed = 0.0
 max_wind_speed = 32.4
 
-# Get wifi details and more from a secrets.py file
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
+# Get WiFi details and Adafruit IO keys, ensure these are setup in settings.toml
+# (visit io.adafruit.com if you need to create an account, or if you need your Adafruit IO key.)
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+aio_username = getenv("ADAFRUIT_AIO_USERNAME")
+aio_key = getenv("ADAFRUIT_AIO_KEY")
+
+if None in [ssid, password, aio_username, aio_key]:
+    raise RuntimeError(
+        "WiFi and Adafruit IO settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "'ADAFRUIT_AIO_USERNAME' and 'ADAFRUIT_AIO_KEY' at a minimum."
+    )
 
 # PyPortal ESP32 Setup
 esp32_cs = DigitalInOut(board.ESP_CS)
@@ -51,14 +61,8 @@ esp32_ready = DigitalInOut(board.ESP_BUSY)
 esp32_reset = DigitalInOut(board.ESP_RESET)
 spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
 esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset)
-status_light = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.2)
-wifi = adafruit_esp32spi_wifimanager.ESPSPI_WiFiManager(esp, secrets, status_light)
-
-# Set your Adafruit IO Username and Key in secrets.py
-# (visit io.adafruit.com if you need to create an account,
-# or if you need your Adafruit IO key.)
-ADAFRUIT_IO_USER = secrets['aio_username']
-ADAFRUIT_IO_KEY = secrets['aio_key']
+status_pixel = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.2)
+wifi = adafruit_esp32spi_wifimanager.WiFiManager(esp, ssid, password, status_pixel=status_pixel)
 
 # Create an instance of the Adafruit IO HTTP client
 io = IO_HTTP(ADAFRUIT_IO_USER, ADAFRUIT_IO_KEY, wifi)

@@ -23,7 +23,7 @@ pixels = neopixel.NeoPixel(board.D1,  # NeoPixels on pin D1
 # For the Gemma M0 onboard DotStar LED
 dotstar = adafruit_dotstar.DotStar(board.APA102_SCK, board.APA102_MOSI, 1)
 
-def deg_f(deg_c):  # Convert Celcius to Fahrenheit
+def deg_f(deg_c):  # Convert celsius to Fahrenheit
     return(deg_c * 9 / 5) + 32.0
 
 while True:

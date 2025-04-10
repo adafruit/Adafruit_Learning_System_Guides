@@ -36,12 +36,11 @@ ALWAYS_ON = True
 # How long to stay on if not in always_on mode
 ON_SECONDS = 60
 
-# Get totp keys from a secrets.py file
+# Get totp_keys from a totp_keys.py file
 try:
-    from secrets import secrets
+    from totp_keys import totp_keys
 except ImportError:
-    print("TOTP keys are kept in secrets.py, please add them there!")
-    raise
+    print("TOTP info not found in totp_keys.py, please add them there!")
 
 # Initialize PyPortal Display
 display = board.DISPLAY
@@ -228,13 +227,13 @@ mono_time = int(time.monotonic())
 print("Monotonic time", mono_time)
 
 # Add buttons to the interface
-assert len(secrets['totp_keys']) < 6, "This code can only display 5 keys at a time"
+assert len(totp_keys) < 6, "This code can only display 5 keys at a time"
 
 # generate buttons
 buttons = []
 
 btn_x = 5
-for i in secrets['totp_keys']:
+for i in totp_keys:
     button = Button(name=i[0], x=btn_x,
                     y=175, width=60,
                     height=60, label=i[0].strip(" "),
@@ -264,7 +263,7 @@ splash.append(progress_bar)
 countdown = ON_SECONDS
 
 # current button state, defaults to first item in totp_keys
-current_button = secrets['totp_keys'][0][0]
+current_button = totp_keys[0][0]
 buttons[0].selected = True
 
 while ALWAYS_ON or (countdown > 0):
@@ -295,7 +294,7 @@ while ALWAYS_ON or (countdown > 0):
         for i, b in enumerate(buttons):
             if b.contains(p):
                 b.selected = True
-                for name, secret in secrets['totp_keys']:
+                for name, secret in totp_keys:
                     # check if button name is the same as a key name
                     if b.name == name:
                         current_button = name
@@ -305,7 +304,7 @@ while ALWAYS_ON or (countdown > 0):
             else:
                 b.selected = False
     else:
-        for name, secret in secrets['totp_keys']:
+        for name, secret in totp_keys:
             if current_button == name:
                 # Generate OTP
                 otp = generate_otp(unix_time // 30, secret)

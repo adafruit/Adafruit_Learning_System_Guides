@@ -5,20 +5,33 @@
 """
 This project will access the League of Legends API, grab a Summoner's Level
 and display it on a screen.
-You'll need a Riot API key in your secrets.py file
+You'll need a Riot API key in your settings.toml file
 If you can find something that spits out JSON data, we can display it!
 """
-import os
+
+from os import getenv
 import time
 import board
 from adafruit_pyportal import PyPortal
+
+# Get WiFi details, ensure these are setup in settings.toml
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+
+if None in [ssid, password]:
+    raise RuntimeError(
+        "WiFi settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "at a minimum."
+    )
 
 #Choose a valid Summoner name
 SUMMONER_NAME = "RiotSchmick"
 
 # Set up where we'll be fetching data from
 DATA_SOURCE = "https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-name/"+SUMMONER_NAME
-DATA_SOURCE += "?api_key=" + os.getenv("LEAGUE_TOKEN")
+DATA_SOURCE += "?api_key=" + getenv("LEAGUE_TOKEN")
 DATA_LOCATION = ["summonerLevel"]
 CAPTION = "SUMMONER  "+SUMMONER_NAME
 
