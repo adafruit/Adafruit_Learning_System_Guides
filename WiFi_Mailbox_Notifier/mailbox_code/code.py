@@ -4,6 +4,7 @@
 
 """CircuitPython WiFi Mailbox Notifier"""
 
+from os import getenv
 import time
 import ssl
 import alarm
@@ -17,12 +18,20 @@ import microcontroller
 import adafruit_requests
 from adafruit_io.adafruit_io import IO_HTTP
 
-# Get WiFi/Adafruit IO details from secrets.py
-try:
-    from secrets import secrets
-except ImportError:
-    print("Please create secrets.py and add your WiFi and AIO credentials there!")
-    raise
+# Get WiFi details and Adafruit IO keys, ensure these are setup in settings.toml
+# (visit io.adafruit.com if you need to create an account, or if you need your Adafruit IO key.)
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+aio_username = getenv("ADAFRUIT_AIO_USERNAME")
+aio_key = getenv("ADAFRUIT_AIO_KEY")
+
+if None in [ssid, password, aio_username, aio_key]:
+    raise RuntimeError(
+        "WiFi and Adafruit IO settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "'ADAFRUIT_AIO_USERNAME' and 'ADAFRUIT_AIO_KEY' at a minimum."
+    )
 
 # Update to True if you want metadata sent to Adafruit IO. Defaults to False.
 METADATA = False
@@ -81,9 +90,9 @@ def send_io_data(feed_name, value):
 
 # Connect to WiFi
 try:
-    wifi.radio.connect(secrets["ssid"], secrets["password"])
-    print("Connected to {}!".format(secrets["ssid"]))
-    print("IP:", wifi.radio.ipv4_address)
+    wifi.radio.connect(ssid, password)
+    print(f"Connected to {ssid}!")
+    print(f"IP: {wifi.radio.ipv4_address}")
 
     pool = socketpool.SocketPool(wifi.radio)
     requests = adafruit_requests.Session(pool, ssl.create_default_context())
@@ -94,9 +103,6 @@ except Exception as error:  # pylint: disable=broad-except
     time.sleep(15)
     supervisor.reload()
 
-# Pull your Adafruit IO username and key from secrets.py
-aio_username = secrets["aio_username"]
-aio_key = secrets["aio_key"]
 # Initialize an Adafruit IO HTTP API object
 io = IO_HTTP(aio_username, aio_key, requests)
 

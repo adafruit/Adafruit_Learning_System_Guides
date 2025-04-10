@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+from os import getenv
 import time
 import board
 import rtc
@@ -25,16 +26,13 @@ NEO_CNT = 12  # neopixel count
 # Set up NeoPixels
 pixels = neopixel.NeoPixel(NEO_PIN, NEO_CNT)
 
-# Get wifi details and more from a secrets.py file
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
+# Get WiFi details, ensure these are setup in settings.toml
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
 
 # Connect to local network
 try:
-    wifi.radio.connect(secrets["ssid"], secrets["password"])
+    wifi.radio.connect(ssid, password)
 except ConnectionError:
     print("Wifi failed to connect.")
     while True:

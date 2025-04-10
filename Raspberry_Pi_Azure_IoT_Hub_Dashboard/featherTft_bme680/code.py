@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2022 Liz Clark for Adafruit Industries
 # SPDX-License-Identifier: MIT
 
+from os import getenv
 import json
 import time
 import digitalio
@@ -17,18 +18,23 @@ import adafruit_ntp
 from adafruit_display_text import bitmap_label,  wrap_text_to_lines
 from adafruit_bitmap_font import bitmap_font
 from adafruit_azureiot import IoTHubDevice
-import adafruit_bme680
 from adafruit_lc709203f import LC709203F, PackSize
+import adafruit_bme680
 
-# Get wifi details and more from a secrets.py file
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
+# Get WiFi details, ensure these are setup in settings.toml
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+
+if None in [ssid, password]:
+    raise RuntimeError(
+        "WiFi settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "at a minimum."
+    )
 
 print("Connecting to WiFi...")
-wifi.radio.connect(secrets["ssid"], secrets["password"])
+wifi.radio.connect(ssid, password)
 
 print("Connected to WiFi!")
 
@@ -47,7 +53,7 @@ else:
 esp = None
 pool = socketpool.SocketPool(wifi.radio)
 # Create an IoT Hub device client and connect
-device = IoTHubDevice(pool, esp, secrets["device_connection_string"])
+device = IoTHubDevice(pool, esp, getenv("device_connection_string"))
 
 print("Connecting to Azure IoT Hub...")
 

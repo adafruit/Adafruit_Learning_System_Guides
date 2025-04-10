@@ -1,1 +1,0 @@
-Weather_Display_Matrix/weather_display_matrix.py 71: Consider merging these comparisons with "in" to "UNITS in ('imperial', 'metric')" (consider-using-in)

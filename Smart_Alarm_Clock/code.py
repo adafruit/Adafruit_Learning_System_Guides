@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: MIT
 
 # General imports
+
+from os import getenv
 import gc
 import time
 import math
@@ -35,6 +37,22 @@ import adafruit_minimqtt.adafruit_minimqtt as MQTT
 import audiocore
 import audiobusio
 
+# Get WiFi details and Adafruit IO keys, ensure these are setup in settings.toml
+# (visit io.adafruit.com if you need to create an account, or if you need your Adafruit IO key.)
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+aio_username = getenv("ADAFRUIT_AIO_USERNAME")
+aio_key = getenv("ADAFRUIT_AIO_KEY")
+
+if None in [ssid, password, aio_username, aio_key]:
+    raise RuntimeError(
+        "WiFi and Adafruit IO settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "'ADAFRUIT_AIO_USERNAME' and 'ADAFRUIT_AIO_KEY' at a minimum."
+    )
+
+
 TIMES = {}
 ENABLED = {}
 
@@ -59,21 +77,9 @@ days = {
     6: "sunday",
 }
 
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
-
-# Set your Adafruit IO Username and Key in secrets.py
-# (visit io.adafruit.com if you need to create an account,
-# or if you need your Adafruit IO key.)
-aio_username = secrets["aio_username"]
-aio_key = secrets["aio_key"]
-
-print("Connecting to %s" % secrets["ssid"])
-wifi.radio.connect(secrets["ssid"], secrets["password"])
-print("Connected to %s!" % secrets["ssid"])
+print(f"Connecting to {ssid}")
+wifi.radio.connect(ssid, password)
+print(f"Connected to {ssid}!")
 
 # Define callback functions which will be called when certain events happen.
 # pylint: disable=unused-argument
@@ -97,7 +103,7 @@ def connected(client, userdata, flags, rc):
         "alarm",
     ]
     for feed in feeds:
-        feed_slug = secrets["aio_username"] + "/feeds/alarm-clock." + feed
+        feed_slug = f"{aio_username}/feeds/alarm-clock." + feed
         print("Subscribed to: alarm-clock." + feed)
         client.subscribe(feed_slug, 1)
 
@@ -126,7 +132,7 @@ def fade(warm_val, cool_val):
 
 
 def get(feed_key):
-    mqtt_client.publish(f'{secrets["aio_username"]}/feeds/{feed_key}/get', "\0")
+    mqtt_client.publish(f'{aio_username}/feeds/{feed_key}/get', "\0")
     time.sleep(0.1)
 
 
@@ -169,7 +175,7 @@ def on_iso(client, feed_id, payload):
             and WAIT < time.monotonic()
         ):
             mqtt_client.publish(
-                f"{secrets['aio_username']}/feeds/alarm-clock.alarm", "True"
+                f"{aio_username}/feeds/alarm-clock.alarm", "True"
             )
             get("alarm-clock.alarm")
     gc.collect()
@@ -314,8 +320,8 @@ pool = socketpool.SocketPool(wifi.radio)
 # Initialize a new MQTT Client object
 mqtt_client = MQTT.MQTT(
     broker="io.adafruit.com",
-    username=secrets["aio_username"],
-    password=secrets["aio_key"],
+    username=aio_username,
+    password=aio_key,
     socket_pool=pool,
     ssl_context=ssl.create_default_context(),
 )
@@ -331,51 +337,51 @@ mqtt_client.connect()
 mqtt_client.add_topic_callback("time/ISO-8601", on_iso)
 
 mqtt_client.add_topic_callback(
-    secrets["aio_username"] + "/feeds/alarm-clock.alarm", on_alarm
+    f"{aio_username}/feeds/alarm-clock.alarm", on_alarm
 )
 
 mqtt_client.add_topic_callback(
-    secrets["aio_username"] + "/feeds/alarm-clock.sunday", on_time
+    f"{aio_username}/feeds/alarm-clock.sunday", on_time
 )
 mqtt_client.add_topic_callback(
-    secrets["aio_username"] + "/feeds/alarm-clock.monday", on_time
+    f"{aio_username}/feeds/alarm-clock.monday", on_time
 )
 mqtt_client.add_topic_callback(
-    secrets["aio_username"] + "/feeds/alarm-clock.tuesday", on_time
+    f"{aio_username}/feeds/alarm-clock.tuesday", on_time
 )
 mqtt_client.add_topic_callback(
-    secrets["aio_username"] + "/feeds/alarm-clock.wednesday", on_time
+    f"{aio_username}/feeds/alarm-clock.wednesday", on_time
 )
 mqtt_client.add_topic_callback(
-    secrets["aio_username"] + "/feeds/alarm-clock.thursday", on_time
+    f"{aio_username}/feeds/alarm-clock.thursday", on_time
 )
 mqtt_client.add_topic_callback(
-    secrets["aio_username"] + "/feeds/alarm-clock.friday", on_time
+    f"{aio_username}/feeds/alarm-clock.friday", on_time
 )
 mqtt_client.add_topic_callback(
-    secrets["aio_username"] + "/feeds/alarm-clock.saturday", on_time
+    f"{aio_username}/feeds/alarm-clock.saturday", on_time
 )
 
 mqtt_client.add_topic_callback(
-    secrets["aio_username"] + "/feeds/alarm-clock.sunday-enable", on_enable
+    f"{aio_username}/feeds/alarm-clock.sunday-enable", on_enable
 )
 mqtt_client.add_topic_callback(
-    secrets["aio_username"] + "/feeds/alarm-clock.monday-enable", on_enable
+    f"{aio_username}/feeds/alarm-clock.monday-enable", on_enable
 )
 mqtt_client.add_topic_callback(
-    secrets["aio_username"] + "/feeds/alarm-clock.tuesday-enable", on_enable
+    f"{aio_username}/feeds/alarm-clock.tuesday-enable", on_enable
 )
 mqtt_client.add_topic_callback(
-    secrets["aio_username"] + "/feeds/alarm-clock.wednesday-enable", on_enable
+    f"{aio_username}/feeds/alarm-clock.wednesday-enable", on_enable
 )
 mqtt_client.add_topic_callback(
-    secrets["aio_username"] + "/feeds/alarm-clock.thursday-enable", on_enable
+    f"{aio_username}/feeds/alarm-clock.thursday-enable", on_enable
 )
 mqtt_client.add_topic_callback(
-    secrets["aio_username"] + "/feeds/alarm-clock.friday-enable", on_enable
+    f"{aio_username}/feeds/alarm-clock.friday-enable", on_enable
 )
 mqtt_client.add_topic_callback(
-    secrets["aio_username"] + "/feeds/alarm-clock.saturday-enable", on_enable
+    f"{aio_username}/feeds/alarm-clock.saturday-enable", on_enable
 )
 
 
@@ -398,7 +404,7 @@ get("alarm-clock.saturday-enable")
 while len(TIMES) < 7 or len(ENABLED) < 7:
     mqtt_client.loop()
 
-mqtt_client.publish(secrets["aio_username"] + "/feeds/alarm-clock.alarm", "False")
+mqtt_client.publish(f"{aio_username}/feeds/alarm-clock.alarm", "False")
 mqtt_client.subscribe("time/ISO-8601", 1)
 
 print("Starting")

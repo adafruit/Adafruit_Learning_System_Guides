@@ -5,12 +5,14 @@
 """
 Clock & sky colorbox for Adafruit MagTag: displays current time while
 NeoPixels provide theme lighting for the time of day. Requires WiFi
-internet access -- configure credentials in secrets.py. An Adafruit IO
+internet access -- configure credentials in settings.toml. An Adafruit IO
 user name and API key are also needed there, plus timezone and
 geographic coords.
 """
 
 # pylint: disable=import-error
+
+from os import getenv
 import time
 import json
 import board
@@ -18,12 +20,20 @@ import neopixel
 from adafruit_magtag.magtag import MagTag
 import adafruit_fancyled.adafruit_fancyled as fancy
 
-# UTC offset queries require some info from the secrets table...
-try:
-    from secrets import secrets
-except ImportError:
-    print('Please set up secrets.py with network credentials.')
+# Get WiFi details and Adafruit IO keys, ensure these are setup in settings.toml
+# (visit io.adafruit.com if you need to create an account, or if you need your Adafruit IO key.)
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+aio_username = getenv("ADAFRUIT_AIO_USERNAME")
+aio_key = getenv("ADAFRUIT_AIO_KEY")
 
+if None in [ssid, password, aio_username, aio_key]:
+    raise RuntimeError(
+        "WiFi and Adafruit IO settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "'ADAFRUIT_AIO_USERNAME' and 'ADAFRUIT_AIO_KEY' at a minimum."
+    )
 
 # CONFIGURABLE SETTINGS ----------------------------------------------------
 
@@ -179,16 +189,13 @@ while True:
         # Since time is synced only once per hour, the extra request
         # isn't particularly burdensome.
         try:
-            RESPONSE = MAGTAG.network.requests.get(
-                'https://io.adafruit.com/api/v2/%s/integrations/time/'
-                'strftime?x-aio-key=%s&tz=%s' % (secrets.get('aio_username'),
-                                                 secrets.get('aio_key'),
-                                                 secrets.get('timezone')) +
-                '&fmt=%25z')
-            if RESPONSE.status_code == 200:
+            url = f"https://io.adafruit.com/api/v2/{aio_username}/integrations/time/strftime"
+            url += f'x-aio-key={aio_key}tz={getenv("timezone")}&fmt=%25z'
+            response = MAGTAG.network.requests.get(url)
+            if response.status_code == 200:
                 # Arrives as sHHMM, convert to sHH:MM
-                print(RESPONSE.text)
-                UTC_OFFSET = RESPONSE.text[:3] + ':' + RESPONSE.text[-2:]
+                print(response.text)
+                UTC_OFFSET = response.text[:3] + ':' + response.text[-2:]
         except: # pylint: disable=bare-except
             # If query fails, prior value is kept until next query.
             # Only changes 2X a year anyway -- worst case, if these
@@ -217,7 +224,7 @@ while True:
         try:
             URL = ('https://api.met.no/weatherapi/sunrise/2.0/.json?'
                    'lat=%s&lon=%s&date=%s-%s-%s&offset=%s' %
-                   (secrets.get('latitude'), secrets.get('longitude'),
+                   (getenv('latitude'), getenv('longitude'),
                     str(NOW.tm_year), '{0:0>2}'.format(NOW.tm_mon),
                     '{0:0>2}'.format(NOW.tm_mday), UTC_OFFSET))
             print('Fetching sun data via', URL)

@@ -9,7 +9,7 @@ Receive and display messages from the spirits.
 """
 # pylint: disable=import-error, invalid-name
 
-import os
+from os import getenv
 import board
 from digitalio import DigitalInOut
 import adafruit_connection_manager
@@ -21,6 +21,21 @@ from adafruit_io.adafruit_io import IO_HTTP
 from spirit_board import SpiritBoard
 
 display = board.DISPLAY
+
+# Get WiFi details and Adafruit IO keys, ensure these are setup in settings.toml
+# (visit io.adafruit.com if you need to create an account, or if you need your Adafruit IO key.)
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+aio_username = getenv("ADAFRUIT_AIO_USERNAME")
+aio_key = getenv("ADAFRUIT_AIO_KEY")
+
+if None in [ssid, password, aio_username, aio_key]:
+    raise RuntimeError(
+        "WiFi and Adafruit IO settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "'ADAFRUIT_AIO_USERNAME' and 'ADAFRUIT_AIO_KEY' at a minimum."
+    )
 
 # Initialize the touch overlay
 touchscreen = adafruit_touchscreen.Touchscreen(
@@ -43,18 +58,12 @@ esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset)
 print("Connecting to AP...")
 
 try:
-    esp.connect_AP(os.getenv("CIRCUITPY_WIFI_SSID"), os.getenv("CIRCUITPY_WIFI_PASSWORD"))
+    esp.connect_AP(ssid, password)
 
     # Initialize a requests session
     pool = adafruit_connection_manager.get_radio_socketpool(esp)
     ssl_context = adafruit_connection_manager.get_radio_ssl_context(esp)
     requests = adafruit_requests.Session(pool, ssl_context)
-
-    # Set your Adafruit IO Username and Key in secrets.py
-    # (visit io.adafruit.com if you need to create an account,
-    # or if you need your Adafruit IO key.)
-    aio_username = os.getenv("AIO_USERNAME")
-    aio_key = os.getenv("AIO_KEY")
 
     # Initialize an Adafruit IO HTTP API object
     io = IO_HTTP(aio_username, aio_key, requests)

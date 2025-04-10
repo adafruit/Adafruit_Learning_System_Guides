@@ -17,16 +17,23 @@ All text above must be included in any redistribution.
 """
 
 #pylint:disable=invalid-name
+
+from os import getenv
 import time
 import board
 from adafruit_pyportal import PyPortal
 
-try:
-    from secrets import secrets
-except ImportError:
-    print("""WiFi settings are kept in secrets.py, please add them there!
-the secrets dictionary must contain 'ssid' and 'password' at a minimum""")
-    raise
+# Get WiFi details, ensure these are setup in settings.toml
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+
+if None in [ssid, password]:
+    raise RuntimeError(
+        "WiFi settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "at a minimum."
+    )
 
 # Set this to the username you'd like to display tweets from
 username = 'codewisdom'
@@ -53,7 +60,7 @@ pyportal = PyPortal(url=url,
                     caption_color=0x808080)
 
 # Set OAuth2.0 Bearer Token
-bearer_token = secrets['twitter_bearer_token']
+bearer_token = getenv('twitter_bearer_token')
 pyportal.set_headers({'Authorization': 'Bearer ' + bearer_token})
 
 while True:
