@@ -99,10 +99,12 @@ def print_array(arr, max_index=None, fmt="hex"):
 
 def reports_equal(report_a, report_b, check_length=None):
     """
-    Test if two reports are equal. Accounting for any IGNORE_INDEXES
+    Test if two reports are equal. If check_length is provided then
+    check for equality in only the first check_length number of bytes.
 
     :param report_a: First report data
     :param report_b: Second report data
+    :param check_length: How many bytes to check
     :return: True if the reports are equal, otherwise False.
     """
     if (
