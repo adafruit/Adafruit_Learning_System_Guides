@@ -6,7 +6,7 @@ import supervisor
 import terminalio
 import usb.core
 from adafruit_display_text.bitmap_label import Label
-from displayio import Group, OnDiskBitmap, TileGrid, Palette, ColorConverter
+from displayio import Group, OnDiskBitmap, TileGrid, Palette
 
 import adafruit_usb_host_descriptors
 

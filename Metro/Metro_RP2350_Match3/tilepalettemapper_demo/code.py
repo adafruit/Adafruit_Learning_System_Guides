@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 import supervisor
-from displayio import Group, OnDiskBitmap, TileGrid, Palette
+from displayio import Group, OnDiskBitmap, TileGrid
 from tilepalettemapper import TilePaletteMapper
 
 # use the default built-in display,

@@ -580,7 +580,9 @@ class Match3Game(Group):
                         # if 3 cards have been clicked
                         if len(self.clicked_cards) == 3:
                             # check if the 3 cards make a valid set
-                            valid_set = validate_set(*self.clicked_cards)
+                            valid_set = validate_set(self.clicked_cards[0],
+                                                     self.clicked_cards[1],
+                                                     self.clicked_cards[2])
 
                             # if they are a valid set
                             if valid_set:
@@ -658,7 +660,7 @@ class Match3Game(Group):
                 # load the game from the given game state
                 self.load_from_game_state(self.game_state)
                 # hide the title screen
-                self.title_screen.hidden = True
+                self.title_screen.hidden = True  # pylint: disable=attribute-defined-outside-init
                 # set the current state to open play
                 self.cur_state = STATE_PLAYING_OPEN
 
@@ -674,7 +676,7 @@ class Match3Game(Group):
                 # initialize a new game
                 self.init_new_game()
                 # hide the title screen
-                self.title_screen.hidden = True
+                self.title_screen.hidden = True  # pylint: disable=attribute-defined-outside-init
                 # set the current state to open play
                 self.cur_state = STATE_PLAYING_OPEN
 
