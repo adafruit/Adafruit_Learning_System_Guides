@@ -76,7 +76,7 @@ def open_next_image():
         return open(filename, "wb")
 
 cam.colorspace = adafruit_ov5640.OV5640_COLOR_JPEG
-cam.quality = 3
+cam.quality = 5
 b = bytearray(cam.capture_buffer_size)
 jpeg = cam.capture(b)
 
