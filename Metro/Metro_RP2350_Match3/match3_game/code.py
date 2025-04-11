@@ -49,6 +49,7 @@ if display.width > 360:
 save_to = None
 game_state = None
 try:
+    # check for autosave file on CPSAVES drive
     if AUTOSAVE_FILENAME in os.listdir("/saves/"):
         savegame_buffer = io.BytesIO()
         with open(f"/saves/{AUTOSAVE_FILENAME}", "rb") as f:
@@ -113,7 +114,7 @@ bg_group = Group(scale=10)
 bg_group.append(bg_tg)
 main_group.append(bg_group)
 
-
+# create Game helper object
 match3_game = Match3Game(
     game_state=game_state,
     display_size=(display.width // scale_factor, display.height // scale_factor),
