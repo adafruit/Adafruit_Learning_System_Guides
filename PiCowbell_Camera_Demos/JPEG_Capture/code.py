@@ -94,7 +94,7 @@ for quality in range(2,55): #valid range is 2 to 54 inclusive
     except Exception:
         print(f"Quality {quality} was too big.  Trying next lowest.")
 
-if b==None:
+if b is None:
     print("There wasn't enough system memory to allocate the lowest quality buffer.")
     
 jpeg = cam.capture(b)
