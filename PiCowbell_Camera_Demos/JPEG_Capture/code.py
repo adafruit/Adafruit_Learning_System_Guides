@@ -78,10 +78,10 @@ def open_next_image():
 cam.colorspace = adafruit_ov5640.OV5640_COLOR_JPEG
 
 # Different platforms have different amounts of memory available.
-# Typically a Pico 2 can handle quality = 2 and a Pico can handle quality = 5.  
-# Rather than detect and select sizes, let's try to detect the best dynamically 
-# for broader platform support. 
-# Start with the highest quality setting and attempt to allocate a buffer 
+# Typically a Pico 2 can handle quality = 2 and a Pico can handle quality = 5.
+# Rather than detect and select sizes, let's try to detect the best dynamically
+# for broader platform support.
+# Start with the highest quality setting and attempt to allocate a buffer
 # of the necessary size.  If it fails, try the next lowest.
 b = None
 for quality in range(2,55): #valid range is 2 to 54 inclusive
@@ -91,12 +91,12 @@ for quality in range(2,55): #valid range is 2 to 54 inclusive
         b = bytearray(cam.capture_buffer_size)
         print(f"Quality {quality} successfully selected.")
         break
-    except Exception:
+    except MemoryError:
         print(f"Quality {quality} was too big.  Trying next lowest.")
 
 if b is None:
     print("There wasn't enough system memory to allocate the lowest quality buffer.")
-    
+
 jpeg = cam.capture(b)
 
 while True:
