@@ -29,6 +29,7 @@ requests = adafruit_requests.Session(pool, ssl.create_default_context())
 # neopixels, 49 total
 OFF = (0, 0, 0)
 ON = (255, 255, 255)
+RED = (255,0,0)
 pixel_pin = board.A3
 num_pixels = 49
 pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=0.1, auto_write=False)
@@ -43,9 +44,11 @@ FULL_MOON = 4
 WANING_GIBBOUS = 5
 THIRD_QUARTER = 6
 WANING_CRESCENT = 7
+DARK_MOON = 8
+RED_MOON = 9
 # strings that match return from API
 phase_names = ["New Moon", "Waxing Crescent", "First Quarter", "Waxing Gibbous",
-          "Full Moon", "Waning Gibbous", "Third Quarter", "Waning Crescent"]
+          "Full Moon", "Waning Gibbous", "Third Quarter", "Waning Crescent","Dark Moon","Red Moon"]
 
 # functions for each moon phase to light up based on neopixel orientation
 def set_new_moon():
@@ -96,6 +99,16 @@ def set_waning_crescent():
         pixels[i] = ON
     pixels.show()
 
+def set_dark_moon():
+    pixels.fill(OFF)
+    for i in range(9,14):
+        pixels[i] = ON
+    pixels.show()
+
+def set_red_moon():
+    pixels.fill(RED)
+    pixels.show()
+
 # match functions with phases
 phase_functions = {
     NEW_MOON: set_new_moon,
@@ -105,12 +118,14 @@ phase_functions = {
     FULL_MOON: set_full_moon,
     WANING_GIBBOUS: set_waning_gibbous,
     THIRD_QUARTER: set_third_quarter,
-    WANING_CRESCENT: set_waning_crescent
+    WANING_CRESCENT: set_waning_crescent,
+    DARK_MOON: set_dark_moon,
+    RED_MOON: set_red_moon
 }
 
 # test function, runs through all 8 in order
 def demo_all_phases(delay=1):
-    for phase in range(8):
+    for phase in range(9):
         print(f"Setting phase: {phase_names[phase]}")
         phase_functions[phase]()
         time.sleep(delay)
@@ -119,10 +134,15 @@ demo_all_phases()
 # takes response from API, matches to function, runs function
 def set_moon_phase(phase):
     phase_lower = phase.lower()
+    error_check = 0
     for i, name in enumerate(phase_names):
         if phase_lower == name.lower():
+            error_check = 1
             phase_functions[i]()
             print(f"Moon phase set to: {name}")
+    if error_check == 0:
+        print("ERROR")
+        set_red_moon() #error indicator if API responce is unexpected
 
 # time keeping, fetches API every 6 hours
 timer_clock = ticks_ms()
