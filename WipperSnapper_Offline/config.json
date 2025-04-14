@@ -1,25 +1,36 @@
 {
     "exportedFromDevice": {
-        "referenceVoltage": 3.3,
-        "totalGPIOPins": 18,
-        "totalAnalogPins": 4,
-        "sd_cs_pin": 23,
-        "statusLEDBrightness": 0.5
+      "sd_cs_pin": 23,
+      "referenceVoltage": 0,
+      "totalGPIOPins": 0,
+      "totalAnalogPins": 0,
+      "statusLEDBrightness": 0.3
     },
     "components": [
-        {
-            "name": "BME280 Sensor",
-            "componentAPI": "i2c",
-            "i2cDeviceName": "bme280",
-            "period": 15,
-            "i2cDeviceAddress": "0x77",
-            "i2cDeviceSensorTypes": [
-                {"type": "relative-humidity"},
-                {"type": "ambient-temp"},
-                {"type": "ambient-temp-fahrenheit"},
-                {"type": "pressure"},
-                {"type": "altitude"}
-            ]
-        }
+      {
+        "name": "bme280",
+        "componentAPI": "i2c",
+        "i2cDeviceName": "bme280",
+        "period": 30,
+        "autoConfig": "true",
+        "i2cDeviceAddress": "0x77",
+        "i2cDeviceSensorTypes": [
+          {
+            "type": "ambient-temp"
+          },
+          {
+            "type": "ambient-temp-fahrenheit"
+          },
+          {
+            "type": "relative-humidity"
+          },
+          {
+            "type": "pressure"
+          },
+          {
+            "type": "altitude"
+          }
+        ]
+      }
     ]
-}
+  }
