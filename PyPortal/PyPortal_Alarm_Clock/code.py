@@ -85,7 +85,7 @@ mugsy_background = 'mugsy_background.bmp'
 
 icon_file = None
 icon_sprite = None
-celcius = getenv('celcius')
+celsius = getenv('celsius')
 
 # display/data refresh timers
 
@@ -294,7 +294,7 @@ class Time_State(State):
                     self.weather_icon.append(icon_sprite)
 
                 temperature = weather['main']['temp'] - 273.15 # its...in kelvin
-                if celcius:
+                if celsius:
                     temperature_text = '%3d C' % round(temperature)
                 else:
                     temperature_text = '%3d F' % round(((temperature * 9 / 5) + 32))

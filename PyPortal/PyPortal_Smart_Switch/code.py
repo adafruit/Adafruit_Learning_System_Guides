@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+from os import getenv
 import time
 import gc
 import board
@@ -19,6 +20,21 @@ from adafruit_display_text import label
 import adafruit_touchscreen
 
 from adafruit_minimqtt import MQTT
+
+# Get WiFi details and Adafruit IO keys, ensure these are setup in settings.toml
+# (visit io.adafruit.com if you need to create an account, or if you need your Adafruit IO key.)
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+aio_username = getenv("ADAFRUIT_AIO_USERNAME")
+aio_key = getenv("ADAFRUIT_AIO_KEY")
+
+if None in [ssid, password, aio_username, aio_key]:
+    raise RuntimeError(
+        "WiFi and Adafruit IO settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "'ADAFRUIT_AIO_USERNAME' and 'ADAFRUIT_AIO_KEY' at a minimum."
+    )
 
 DISPLAY_COLOR = 0x006600
 SWITCH_COLOR = 0x008800
@@ -39,15 +55,8 @@ def get_local_timestamp(location=None):
     """Fetch and "set" the local time of this microcontroller to the local time at the location, using an internet time API.
     :param str location: Your city and country, e.g. ``"New York, US"``.
     """
-    # pylint: enable=line-too-long
     api_url = None
-    try:
-        aio_username = secrets['aio_username']
-        aio_key = secrets['aio_key']
-    except KeyError:
-        raise KeyError("\n\nOur time service requires a login/password to rate-limit. Please register for a free adafruit.io account and place the user/key in your secrets file under 'aio_username' and 'aio_key'")# pylint: disable=line-too-long
-
-    location = secrets.get('timezone', location)
+    location = getenv('timezone', location)
     if location:
         print("Getting time for timezone", location)
         api_url = (TIME_SERVICE + "&tz=%s") % (aio_username, aio_key, location)
@@ -70,7 +79,7 @@ def get_local_timestamp(location=None):
             tzseconds += tzminutes * 60
         print(seconds + tzseconds, tzoffset, tzhours, tzminutes)
     except KeyError:
-        raise KeyError("Was unable to lookup the time, try setting secrets['timezone'] according to http://worldtimeapi.org/timezones")  # pylint: disable=line-too-long
+        raise KeyError("Was unable to lookup the time, try setting timezone in your settings.toml according to http://worldtimeapi.org/timezones")  # pylint: disable=line-too-long
 
     # now clean up
     response.close()
@@ -157,7 +166,7 @@ class Clock(object):
             # Update the time
             print("update the time")
             self.update_time = int(now)
-            self.snapshot_time = get_local_timestamp(secrets['timezone'])
+            self.snapshot_time = get_local_timestamp(getenv("timezone"))
             self.current_time = time.localtime(self.snapshot_time)
         else:
             self.current_time = time.localtime(int(now) - self.update_time + self.snapshot_time)
@@ -185,8 +194,8 @@ class Clock(object):
 def connected(client, userdata, flags, rc):
     # This function will be called when the client is connected
     # successfully to the broker.
-    onoff_feed = secrets['aio_username'] + '/feeds/' + FEED_NAME
-    print('Connected to Adafruit IO! Listening for topic changes on %s' % onoff_feed)
+    onoff_feed = f"{aio_username}/feeds/{FEED_NAME}"
+    print(f"Connected to Adafruit IO! Listening for topic changes on {onoff_feed}")
     # Subscribe to all changes on the onoff_feed.
     client.subscribe(onoff_feed)
 
@@ -204,13 +213,6 @@ def message(client, topic, message):
         switch.enable(False)
 
 ############################################
-
-try:
-    from secrets import secrets
-except ImportError:
-    print("""WiFi settings are kept in secrets.py, please add them there!
-the secrets dictionary must contain 'ssid' and 'password' at a minimum""")
-    raise
 
 esp32_cs = digitalio.DigitalInOut(board.ESP_CS)
 esp32_ready = digitalio.DigitalInOut(board.ESP_BUSY)
@@ -257,7 +259,7 @@ for ap in esp.scan_networks():
     print("Connecting to AP...")
     while not esp.is_connected:
         try:
-            esp.connect_AP(secrets['ssid'], secrets['password'])
+            esp.connect_AP(ssid, password)
         except RuntimeError as e:
             print("could not connect to AP, retrying: ",e)
             continue
@@ -265,14 +267,15 @@ print("Connected to", str(esp.ssid, 'utf-8'), "\tRSSI:", esp.rssi)
 print("My IP address is", esp.pretty_ip(esp.ip_address))
 
 
-wifi = adafruit_esp32spi_wifimanager.ESPSPI_WiFiManager(
-    esp, secrets, debug = True)
+wifi = adafruit_esp32spi_wifimanager.WiFiManager(
+    esp, ssid, password, debug=True
+)
 
 
 # Set up a MiniMQTT Client
 mqtt_client = MQTT(broker='io.adafruit.com',
-                   username=secrets['aio_username'],
-                   password=secrets['aio_key'],
+                   username=aio_username,
+                   password=aio_key,
                    network_manager=wifi,
                    socket_pool=pool,
                    ssl_context=ssl_context)

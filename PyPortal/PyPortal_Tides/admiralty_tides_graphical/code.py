@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+from os import getenv
 import time
 import json
 import board
@@ -10,12 +11,17 @@ from adafruit_pyportal import PyPortal
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text.label import Label
 
-# Get wifi details and more from a secrets.py file
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
+# Get WiFi details, ensure these are setup in settings.toml
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+
+if None in [ssid, password]:
+    raise RuntimeError(
+        "WiFi settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "at a minimum."
+    )
 
 #--| USER CONFIG |--------------------------
 STATION_ID = "0245"      # tide location, find yours from admiralty website
@@ -44,7 +50,7 @@ else:
     bg_image_path = "/images/tides_bg_graph.bmp"
 
 pyportal = PyPortal(url=DATA_SOURCE,
-                    headers={"Ocp-Apim-Subscription-Key":secrets['Ocp-Apim-Subscription-Key']},
+                    headers={"Ocp-Apim-Subscription-Key": getenv('Ocp-Apim-Subscription-Key')},
                     json_path=DATA_LOCATION,
                     status_neopixel=board.NEOPIXEL,
                     default_bg=cwd+bg_image_path)

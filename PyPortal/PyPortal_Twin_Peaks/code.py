@@ -14,11 +14,11 @@ analogin = AnalogIn(board.LIGHT)
 
 cwd = ("/"+__file__).rsplit('/', 1)[0]
 
-laura = (cwd+"/laura.bmp")
+laura = cwd+"/laura.bmp"
 
-woodsman = (cwd+"/woodsman.bmp")
+woodsman = cwd+"/woodsman.bmp"
 
-gottaLight = (cwd+"/gottaLight.wav")
+gottaLight = cwd+"/gottaLight.wav"
 
 pyportal = PyPortal(default_bg=laura)
 

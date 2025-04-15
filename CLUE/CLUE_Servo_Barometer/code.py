@@ -58,7 +58,7 @@ group.append(press_data)
 
 display.root_group = group
 
-#  function to convert celcius to fahrenheit
+#  function to convert celsius to fahrenheit
 def c_to_f(temp):
     temp_f = (temp * 9/5) + 32
     return temp_f
@@ -87,12 +87,12 @@ while True:
         print(servo_value)
         #  if metric units...
         if metric_units:
-            #  update temp & pressure text in celcius and hPa
+            #  update temp & pressure text in celsius and hPa
             temp_data.text = "%0.1f ºC" % bmp280.temperature
             press_data.text = "%0.1f hPa" % bmp280.pressure
         #  if imperial units...
         else:
-            #  convert celcius to fahrenheit
+            #  convert celsius to fahrenheit
             temp_fahrenheit = c_to_f(bmp280.temperature)
             #  convert hPa to inHg
             pressure_inHg = hpa_to_inHg(bmp280.pressure)
