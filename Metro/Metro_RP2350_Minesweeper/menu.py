@@ -45,7 +45,8 @@ class SubMenu(Group):
         )
         self._render()
 
-    def _create_button(self, callback, label, width, x, y=0, border=True):
+    @staticmethod
+    def _create_button(callback, label, width, x, y=0, border=True):
         if border:
             outline_color = 0x000000
             selected_outline = 0x333333

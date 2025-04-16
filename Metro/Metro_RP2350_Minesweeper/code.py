@@ -17,8 +17,8 @@ from eventbutton import EventButton
 import supervisor
 import terminalio
 import usb.core
-from gamelogic import GameLogic, BLANK, INFO_BAR_HEIGHT, DIFFICULTIES
-from menu import Menu, SubMenu
+from .gamelogic import GameLogic, BLANK, INFO_BAR_HEIGHT, DIFFICULTIES
+from .menu import Menu, SubMenu
 
 # pylint: disable=ungrouped-imports
 if hasattr(supervisor.runtime, "display") and supervisor.runtime.display is not None:
@@ -199,7 +199,6 @@ def set_difficulty(diff):
     reset()
 
 def hide_group(group):
-    print("Hiding")
     group.hidden = True
 
 for i, difficulty in enumerate(DIFFICULTIES):
