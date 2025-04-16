@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+from os import getenv
 import time
 import board
 import busio
@@ -13,12 +14,17 @@ from adafruit_pyportal import PyPortal
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text import label
 
-try:
-    from secrets import secrets
-except ImportError:
-    print("""WiFi settings are kept in secrets.py, please add them there!
-the secrets dictionary must contain 'ssid' and 'password' at a minimum""")
-    raise
+# Get WiFi details, ensure these are setup in settings.toml
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+
+if None in [ssid, password]:
+    raise RuntimeError(
+        "WiFi settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "at a minimum."
+    )
 
 # Label colors
 LABEL_DAY_COLOR = 0xFFFFFF
@@ -88,7 +94,7 @@ if esp.status == adafruit_esp32spi.WL_IDLE_STATUS:
 print("Connecting to AP...")
 while not esp.is_connected:
     try:
-        esp.connect_AP(secrets['ssid'], secrets['password'])
+        esp.connect_AP(ssid, password)
     except RuntimeError as e:
         print("could not connect to AP, retrying: ", e)
         continue
@@ -117,7 +123,7 @@ while True:
     if (not refresh_time) or (time.monotonic() - refresh_time) > 3600:
         try:
             print("Getting new time from internet...")
-            pyportal.get_local_time(secrets['timezone'])
+            pyportal.get_local_time(getenv('timezone'))
             refresh_time = time.monotonic()
             # set the_time
             the_time = time.localtime()

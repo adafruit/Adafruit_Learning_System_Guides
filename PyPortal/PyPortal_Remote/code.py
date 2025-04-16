@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2019 ladyada for Adafruit Industries
 # SPDX-License-Identifier: MIT
 
+from os import getenv
 import time
 import math
 import board
@@ -13,6 +14,18 @@ import displayio
 import adafruit_touchscreen
 import adafruit_imageload
 
+# Get WiFi details, ensure these are setup in settings.toml
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+
+if None in [ssid, password]:
+    raise RuntimeError(
+        "WiFi settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "at a minimum."
+    )
+
 # Set up the touchscreen
 ts = adafruit_touchscreen.Touchscreen(
     board.TOUCH_XL,
@@ -23,13 +36,6 @@ ts = adafruit_touchscreen.Touchscreen(
     size=(320, 240),
 )
 
-# Get wifi details and more from a secrets.py file
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
-
 # If you are using a board with pre-defined ESP32 Pins:
 esp32_cs = DigitalInOut(board.ESP_CS)
 esp32_ready = DigitalInOut(board.ESP_BUSY)
@@ -38,9 +44,9 @@ esp32_reset = DigitalInOut(board.ESP_RESET)
 spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
 esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset)
 
-status_light = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.2)
+status_pixel = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.2)
 
-wifi = adafruit_esp32spi_wifimanager.ESPSPI_WiFiManager(esp, secrets, status_light)
+wifi = adafruit_esp32spi_wifimanager.WiFiManager(esp, ssid, password, status_pixel=status_pixel)
 
 # Set the ip of your Roku here
 ip = "192.168.1.3"

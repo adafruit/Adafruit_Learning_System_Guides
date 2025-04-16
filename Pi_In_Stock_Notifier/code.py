@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+from os import getenv
 import time
 import ssl
 import wifi
@@ -14,6 +15,21 @@ import adafruit_requests
 from digitalio import DigitalInOut, Direction, Pull
 from adafruit_debouncer import Debouncer
 
+# Get WiFi details and Adafruit IO keys, ensure these are setup in settings.toml
+# (visit io.adafruit.com if you need to create an account, or if you need your Adafruit IO key.)
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+aio_username = getenv("ADAFRUIT_AIO_USERNAME")
+aio_key = getenv("ADAFRUIT_AIO_KEY")
+
+if None in [ssid, password, aio_username, aio_key]:
+    raise RuntimeError(
+        "WiFi and Adafruit IO settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "'ADAFRUIT_AIO_USERNAME' and 'ADAFRUIT_AIO_KEY' at a minimum."
+    )
+
 alarm_out = DigitalInOut(board.A1)
 alarm_out.direction = Direction.OUTPUT
 alarm_out.value = False
@@ -23,37 +39,28 @@ button_in.pull = Pull.UP
 button = Debouncer(button_in)
 
 
-# Get wifi details and more from a secrets.py file
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
-
 print("Adafruit Raspberry Pi In Stock Tweet Listener")
 
 #  import your bearer token
-bear = secrets['bearer_token']
+bearer_token = getenv('bearer_token')
 
 #  query URL for tweets. looking for hashtag partyparrot sent to a specific username
 #  disabling line-too-long because queries for tweet_query & TIME_URL cannot have line breaks
 #  pylint: disable=line-too-long
 tweet_query = 'https://api.twitter.com/2/tweets/search/recent?query=In Stock at Adafruit from:rpilocator&tweet.fields=created_at'
 
-headers = {'Authorization': 'Bearer ' + bear}
+headers = {'Authorization': 'Bearer ' + bearer_token}
 
-print("Connecting to %s"%secrets["ssid"])
-wifi.radio.connect(secrets["ssid"], secrets["password"])
-print("Connected to %s!"%secrets["ssid"])
-print("My IP address is", wifi.radio.ipv4_address)
+print(f"Connecting to {ssid}")
+wifi.radio.connect(ssid, password)
+print(f"Connected to {ssid}!")
+print(f"My IP address is {wifi.radio.ipv4_address}")
 
 pool = socketpool.SocketPool(wifi.radio)
 requests = adafruit_requests.Session(pool, ssl.create_default_context())
 
 #  gets and formats time from adafruit.io
-aio_username = secrets["aio_username"]
-aio_key = secrets["aio_key"]
-location = secrets.get("timezone", None)
+location = getenv("timezone", None)
 TIME_URL = "https://io.adafruit.com/api/v2/%s/integrations/time/strftime?x-aio-key=%s" % (aio_username, aio_key)
 TIME_URL += "&fmt=%25Y-%25m-%25dT%25H%3A%25M%3A%25S.%25L%25j%25u%25z%25Z"
 
@@ -132,7 +139,7 @@ while True:
 
                 else:
                     #  if it's not new, then the wait continues
-                    no_tweet_text = ("No stock in last hour :( Last stock: %s" % (timestamp))
+                    no_tweet_text = "No stock in last hour :( Last stock: %s" % (timestamp)
                     text_area.text = "\n".join(wrap_text_to_lines(no_tweet_text, 21))
                     print("no new in stock notifications :(")
             #  updates tweet ID
@@ -140,6 +147,6 @@ while True:
         #  if the tweet wasn't today
         else:
             #  if it's not new, then the wait continues
-            no_tweet_text = ("No stock in last hour :( Last stock: %s" % (timestamp))
+            no_tweet_text = "No stock in last hour :( Last stock: %s" % (timestamp)
             text_area.text = "\n".join(wrap_text_to_lines(no_tweet_text, 21))
             print("no new in stock notifications :(")

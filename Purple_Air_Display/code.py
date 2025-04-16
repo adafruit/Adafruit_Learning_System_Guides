@@ -7,17 +7,23 @@
 # or Matrix Portal
 # and 64 x 32 RGB LED Matrix
 
+from os import getenv
 import time
 import board
 import terminalio
 from adafruit_matrixportal.matrixportal import MatrixPortal
 
-# Get wifi details and more from a secrets.py file
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
+# Get WiFi details, ensure these are setup in settings.toml
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+
+if None in [ssid, password]:
+    raise RuntimeError(
+        "WiFi settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "at a minimum."
+    )
 
 def aqi_transform(val):
     aqi = pm_to_aqi(val)  # derive Air Quality Index from Particulate Matter 2.5 value
@@ -49,7 +55,7 @@ matrixportal = MatrixPortal(
     status_neopixel=board.NEOPIXEL,
     debug=True,
     url=DATA_SOURCE,
-    headers={"X-API-Key": secrets["purple_air_api_key"],  # purpleair.com
+    headers={"X-API-Key": getenv("purple_air_api_key"),  # purpleair.com
              "Accept": "application/json"
     },
     json_path=(DATA_LOCATION, DATA_LOCATION),
