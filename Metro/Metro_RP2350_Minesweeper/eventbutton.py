@@ -26,15 +26,16 @@ class EventButton(Button):
         self.callback(*self.args)
 
     def handle_mouse(self, point, clicked, waiting_for_release):
+        # pylint: disable=attribute-defined-outside-init
         if waiting_for_release:
             return False
 
         # Handle mouse events for the button
         if self.contains(point):
-            super().selected = True
+            self.selected = True
             if clicked:
                 self.click()
                 return True
         else:
-            super().selected = False
+            self.selected = False
         return False
