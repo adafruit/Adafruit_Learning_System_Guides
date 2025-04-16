@@ -49,7 +49,7 @@ else:
     )
     display = framebufferio.FramebufferDisplay(fb)
 
-game_logic = GameLogic(display)
+game_logic = GameLogic(display) # pylint: disable=no-value-for-parameter
 
 # Load the spritesheet
 sprite_sheet = OnDiskBitmap("/bitmaps/game_sprites.bmp")
