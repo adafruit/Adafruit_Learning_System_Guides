@@ -8,7 +8,8 @@ Feather ESP32-S3 or S2 + TFT Featherwing 3.5" 480x320 pixels
 Receive and display messages from the spirits.
 """
 # pylint: disable=import-error, invalid-name
-import os
+
+from os import getenv
 import displayio
 import fourwire
 import board
@@ -22,6 +23,20 @@ import adafruit_tsc2007
 
 from spirit_board import SpiritBoard
 
+# Get WiFi details and Adafruit IO keys, ensure these are setup in settings.toml
+# (visit io.adafruit.com if you need to create an account, or if you need your Adafruit IO key.)
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+aio_username = getenv("ADAFRUIT_AIO_USERNAME")
+aio_key = getenv("ADAFRUIT_AIO_KEY")
+
+if None in [ssid, password, aio_username, aio_key]:
+    raise RuntimeError(
+        "WiFi and Adafruit IO settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "'ADAFRUIT_AIO_USERNAME' and 'ADAFRUIT_AIO_KEY' at a minimum."
+    )
 
 
 # 3.5" TFT Featherwing is 480x320
@@ -48,12 +63,6 @@ try:
     pool = adafruit_connection_manager.get_radio_socketpool(wifi.radio)
     ssl_context = adafruit_connection_manager.get_radio_ssl_context(wifi.radio)
     requests = adafruit_requests.Session(pool, ssl_context)
-
-    # Set your Adafruit IO Username and Key in secrets.py
-    # (visit io.adafruit.com if you need to create an account,
-    # or if you need your Adafruit IO key.)
-    aio_username = os.getenv("AIO_USERNAME")
-    aio_key = os.getenv("AIO_KEY")
 
     # Initialize an Adafruit IO HTTP API object
     io = IO_HTTP(aio_username, aio_key, requests)

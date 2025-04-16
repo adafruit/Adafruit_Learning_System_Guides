@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2022 Liz Clark for Adafruit Industries
 # SPDX-License-Identifier: MIT
 
+from os import getenv
 import time
 import ssl
 import board
@@ -14,6 +15,21 @@ from adafruit_io.adafruit_io import IO_HTTP, AdafruitIO_RequestError
 from simpleio import map_range
 from adafruit_motor import servo
 
+# Get WiFi details and Adafruit IO keys, ensure these are setup in settings.toml
+# (visit io.adafruit.com if you need to create an account, or if you need your Adafruit IO key.)
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+aio_username = getenv("ADAFRUIT_AIO_USERNAME")
+aio_key = getenv("ADAFRUIT_AIO_KEY")
+
+if None in [ssid, password, aio_username, aio_key]:
+    raise RuntimeError(
+        "WiFi and Adafruit IO settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "'ADAFRUIT_AIO_USERNAME' and 'ADAFRUIT_AIO_KEY' at a minimum."
+    )
+
 #  select which display is running the code
 servo_one = True
 #  servo_two = True
@@ -22,18 +38,9 @@ servo_one = True
 ANGLE_MIN = 0
 ANGLE_MAX = 180
 
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
-#  connect to adafruitio
-aio_username = secrets["aio_username"]
-aio_key = secrets["aio_key"]
-
-print("Connecting to %s" % secrets["ssid"])
-wifi.radio.connect(secrets["ssid"], secrets["password"])
-print("Connected to %s!" % secrets["ssid"])
+print(f"Connecting to {ssid}")
+wifi.radio.connect(ssid, password)
+print(f"Connected to {ssid}!")
 
 pool = socketpool.SocketPool(wifi.radio)
 requests = adafruit_requests.Session(pool, ssl.create_default_context())

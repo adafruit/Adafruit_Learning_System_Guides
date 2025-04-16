@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2021 Eva Herrada for Adafruit Industries
 # SPDX-License-Identifier: MIT
 
+from os import getenv
 import time
 
 import board
@@ -13,6 +14,21 @@ import adafruit_minimqtt.adafruit_minimqtt as MQTT
 from adafruit_io.adafruit_io import IO_MQTT
 from adafruit_seesaw.seesaw import Seesaw
 import busio
+
+# Get WiFi details and Adafruit IO keys, ensure these are setup in settings.toml
+# (visit io.adafruit.com if you need to create an account, or if you need your Adafruit IO key.)
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+aio_username = getenv("ADAFRUIT_AIO_USERNAME")
+aio_key = getenv("ADAFRUIT_AIO_KEY")
+
+if None in [ssid, password, aio_username, aio_key]:
+    raise RuntimeError(
+        "WiFi and Adafruit IO settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "'ADAFRUIT_AIO_USERNAME' and 'ADAFRUIT_AIO_KEY' at a minimum."
+    )
 
 # Used to make sure that the Adafruit IO Trigger is only run once when the moisture value is below
 # the desired threshold, set in MIN
@@ -28,13 +44,6 @@ i2c = board.I2C()  # uses board.SCL and board.SDA
 # i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
 seesaw = Seesaw(i2c, addr=0x36)
 
-# Get wifi details and more from a secrets.py file
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
-
 # Set up WiFi
 esp32_cs = DigitalInOut(board.D13)
 esp32_ready = DigitalInOut(board.D11)
@@ -42,8 +51,8 @@ esp32_reset = DigitalInOut(board.D12)
 
 spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
 esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset)
-status_light = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.2)
-wifi = adafruit_esp32spi_wifimanager.ESPSPI_WiFiManager(esp, secrets, status_light)
+status_pixel = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.2)
+wifi = adafruit_esp32spi_wifimanager.WiFiManager(esp, ssid, password, status_pixel=status_pixel)
 
 # Define callback functions which will be called when certain events happen.
 # pylint: disable=unused-argument
@@ -73,8 +82,8 @@ ssl_context = adafruit_connection_manager.get_radio_ssl_context(esp)
 # Initialize a new MQTT Client object
 mqtt_client = MQTT.MQTT(
     broker="io.adafruit.com",
-    username=secrets["aio_username"],
-    password=secrets["aio_key"],
+    username=aio_username,
+    password=aio_key,
     socket_pool=pool,
     ssl_context=ssl_context,
 )

@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+from os import getenv
 import ipaddress
 import wifi
 import socketpool
@@ -10,12 +11,17 @@ import simpleio
 import adafruit_tsc2007
 import adafruit_adxl34x
 
-# Get wifi details and host IP from a secrets.py file
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
+# Get WiFi details, ensure these are setup in settings.toml
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+
+if None in [ssid, password]:
+    raise RuntimeError(
+        "WiFi settings are kept in settings.toml, "
+        "please add them there. The settings file must contain "
+        "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+        "at a minimum."
+    )
 
 #  I2C setup for STEMMA port
 i2c = board.STEMMA_I2C()
@@ -56,16 +62,16 @@ last_tap = False
 new_val = False
 
 # URLs to fetch from
-HOST = secrets["host"]
+HOST = getenv("host")
 PORT = 12345
 TIMEOUT = 5
 INTERVAL = 5
 MAXBUF = 256
 
 #  connect to WIFI
-print("Connecting to %s"%secrets["ssid"])
-wifi.radio.connect(secrets["ssid"], secrets["password"])
-print("Connected to %s!"%secrets["ssid"])
+print(f"Connecting to {ssid}")
+wifi.radio.connect(ssid, password)
+print(f"Connected to {ssid}!")
 
 pool = socketpool.SocketPool(wifi.radio)
 

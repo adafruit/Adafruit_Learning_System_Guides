@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+from os import getenv
 import time
 import ssl
 import board
@@ -22,26 +23,26 @@ NEO_PIN = board.SCK  # neopixel pin
 NEO_CNT = 12  # neopixel count
 # -------------------------------------------------
 
+# Get WiFi details and Adafruit IO keys, ensure these are setup in settings.toml
+# (visit io.adafruit.com if you need to create an account, or if you need your Adafruit IO key.)
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+aio_username = getenv("ADAFRUIT_AIO_USERNAME")
+aio_key = getenv("ADAFRUIT_AIO_KEY")
+
 # Set up NeoPixels
 pixels = neopixel.NeoPixel(NEO_PIN, NEO_CNT)
 
-# Get wifi details and more from a secrets.py file
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
-
 # Setup AIO time query URL
 TIME_URL = "https://io.adafruit.com/api/v2/"
-TIME_URL += secrets["aio_username"]
+TIME_URL += aio_username
 TIME_URL += "/integrations/time/strftime?x-aio-key="
-TIME_URL += secrets["aio_key"]
+TIME_URL += aio_key
 TIME_URL += "&fmt=%25Y%3A%25m%3A%25d%3A%25H%3A%25M%3A%25S"
 
 # Connect to local network
 try:
-    wifi.radio.connect(secrets["ssid"], secrets["password"])
+    wifi.radio.connect(ssid, password)
 except ConnectionError:
     print("Wifi failed to connect.")
     while True:
