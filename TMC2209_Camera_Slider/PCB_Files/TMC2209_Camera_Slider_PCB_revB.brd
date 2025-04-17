@@ -42828,7 +42828,7 @@ design rules under a new name.</description>
 <element name="PLABEL200" library="pinguin" package="PLABEL200" value="" x="50" y="60" smashed="yes"/>
 <element name="PLABEL201" library="pinguin" package="PLABEL201" value="" x="49.5" y="45" smashed="yes" rot="R90"/>
 <element name="PLABEL202" library="pinguin" package="PLABEL202" value="" x="13" y="65" smashed="yes"/>
-<element name="PLABEL203" library="pinguin" package="PLABEL203" value="" x="18" y="38.5" smashed="yes" rot="MR0"/>
+<element name="PLABEL203" library="pinguin" package="PLABEL203" value="" x="17.5" y="38.5" smashed="yes" rot="MR0"/>
 <element name="PLABEL204" library="pinguin" package="PLABEL204" value="" x="29" y="38.5" smashed="yes" rot="MR0"/>
 </elements>
 <signals>
@@ -43089,10 +43089,10 @@ design rules under a new name.</description>
 <wire x1="64.5" y1="47.5" x2="59.5" y2="42.5" width="0.6096" layer="16"/>
 <wire x1="59.5" y1="42.5" x2="29.5" y2="42.5" width="0.6096" layer="16"/>
 <via x="29.5" y="42.5" extent="1-16" drill="0.35"/>
-<wire x1="20.080625" y1="40.38" x2="19.46" y2="40.38" width="0.6096" layer="1"/>
-<wire x1="21.437825" y1="41.7372" x2="20.080625" y2="40.38" width="0.6096" layer="1"/>
-<wire x1="29.5" y1="42.5" x2="28.7372" y2="41.7372" width="0.6096" layer="1"/>
-<wire x1="28.7372" y1="41.7372" x2="21.437825" y2="41.7372" width="0.6096" layer="1"/>
+<wire x1="20.937825" y1="42.7372" x2="19.46" y2="41.259375" width="0.6096" layer="1"/>
+<wire x1="19.46" y1="40.38" x2="19.46" y2="41.259375" width="0.6096" layer="1"/>
+<wire x1="29.5" y1="42.5" x2="29.2628" y2="42.7372" width="0.6096" layer="1"/>
+<wire x1="29.2628" y1="42.7372" x2="20.937825" y2="42.7372" width="0.6096" layer="1"/>
 <contactref element="KB2040-1" pad="4"/>
 <wire x1="73.13" y1="56.5" x2="75.87" y2="59.24" width="0.6096" layer="16"/>
 <wire x1="64.5" y1="53.5" x2="67.5" y2="56.5" width="0.6096" layer="16"/>
