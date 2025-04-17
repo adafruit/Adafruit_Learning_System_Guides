@@ -57,7 +57,7 @@ void setup() {
   usb_hid.setReportDescriptor(desc_hid_report, sizeof(desc_hid_report));
   usb_hid.begin();
 
-  // If already enumerated, additional class driverr begin() e.g msc, hid, midi won't take effect until re-enumeration
+  // If already enumerated, additional class driver begin() e.g msc, hid, midi won't take effect until re-enumeration
   if (TinyUSBDevice.mounted()) {
     TinyUSBDevice.detach();
     delay(10);
