@@ -42720,7 +42720,7 @@ design rules under a new name.</description>
 <attribute name="NAME" x="100" y="15" size="1.27" layer="25" rot="R90"/>
 </element>
 <element name="U$1" library="microbuilder" package="ADAFRUIT_9MM" value="" x="15" y="37" smashed="yes" rot="R90"/>
-<element name="PLABEL0" library="pinguin" package="PLABEL0" value="" x="88.5" y="19" smashed="yes"/>
+<element name="PLABEL0" library="pinguin" package="PLABEL0" value="" x="88" y="19" smashed="yes"/>
 <element name="PLABEL2" library="pinguin" package="PLABEL2" value="" x="61.5" y="25" smashed="yes"/>
 <element name="PLABEL3" library="pinguin" package="PLABEL3" value="" x="34" y="25" smashed="yes"/>
 <element name="PLABEL4" library="pinguin" package="PLABEL4" value="" x="4.5" y="15.5" smashed="yes"/>
