@@ -81,7 +81,7 @@
 #ifdef ARDUINO_ARCH_RP2040
 static void rp2040_configure_pio_usb(void) {
   //while ( !Serial ) delay(10);   // wait for native usb
-  Serial.println("Core1 setup to run TinyUSB host with pio-usb");
+  Serial.println("Setup to run TinyUSB host with pio-usb");
 
 #ifdef PIN_5V_EN
   pinMode(PIN_5V_EN, OUTPUT);

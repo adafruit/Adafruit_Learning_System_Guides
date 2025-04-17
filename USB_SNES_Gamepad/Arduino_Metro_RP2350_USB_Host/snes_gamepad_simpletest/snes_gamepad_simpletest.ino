@@ -54,8 +54,6 @@ void setup() {
   rp2040_configure_pio_usb();
 
   // run host stack on controller (rhport) 1
-  // Note: For rp2040 pico-pio-usb, calling USBHost.begin() on core1 will have most of the
-  // host bit-banging processing works done in core1 to free up core0 for other works
   USBHost.begin(1);
   delay(3000);
   Serial.print("USB D+ Pin:");
