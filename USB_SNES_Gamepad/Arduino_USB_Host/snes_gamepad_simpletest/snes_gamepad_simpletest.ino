@@ -48,34 +48,8 @@ hid_gamepad_report_t gp;
 bool printed_blank = false;
 
 void setup() {
-  if (!TinyUSBDevice.isInitialized()) {
-    TinyUSBDevice.begin(0);
-  }
   Serial.begin(115200);
-  // Setup HID
-  usb_hid.setPollInterval(2);
-  usb_hid.setReportDescriptor(desc_hid_report, sizeof(desc_hid_report));
-  usb_hid.begin();
 
-  // If already enumerated, additional class driver begin() e.g msc, hid, midi won't take effect until re-enumeration
-  if (TinyUSBDevice.mounted()) {
-    TinyUSBDevice.detach();
-    delay(10);
-    TinyUSBDevice.attach();
-  }
-}
-
-#if defined(ARDUINO_ARCH_RP2040)
-//--------------------------------------------------------------------+
-// For RP2040 use both core0 for device stack, core1 for host stack
-//--------------------------------------------------------------------//
-
-//------------- Core0 -------------//
-void loop() {
-}
-
-//------------- Core1 -------------//
-void setup1() {
   // configure pio-usb: defined in usbh_helper.h
   rp2040_configure_pio_usb();
 
@@ -83,14 +57,18 @@ void setup1() {
   // Note: For rp2040 pico-pio-usb, calling USBHost.begin() on core1 will have most of the
   // host bit-banging processing works done in core1 to free up core0 for other works
   USBHost.begin(1);
+  delay(3000);
+  Serial.print("USB D+ Pin:");
+  Serial.println(PIN_USB_HOST_DP);
+  Serial.print("USB 5V Pin:");
+  Serial.println(PIN_5V_EN);
 }
 
-void loop1() {
+void loop() {
   USBHost.task();
   Serial.flush();
 
 }
-#endif
 
 //--------------------------------------------------------------------+
 // HID Host Callback Functions
@@ -112,16 +90,15 @@ void tuh_hid_umount_cb(uint8_t dev_addr, uint8_t instance)
   Serial.printf("HID device unmounted (address %d, instance %d)\n", dev_addr, instance);
 }
 
-
 void tuh_hid_report_received_cb(uint8_t dev_addr, uint8_t instance, uint8_t const* report, uint16_t len) {
 
     if (report[BYTE_DPAD_LEFT_RIGHT] != DPAD_NEUTRAL ||
         report[BYTE_DPAD_UP_DOWN] != DPAD_NEUTRAL ||
         report[BYTE_ABXY_BUTTONS] != BUTTON_NEUTRAL ||
         report[BYTE_OTHER_BUTTONS] != BUTTON_MISC_NEUTRAL){
-      
+
       printed_blank = false;
-      
+
       //debug print report data
       // Serial.print("Report data: ");
       // for (int i = 0; i < len; i++) {

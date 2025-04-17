@@ -35,6 +35,26 @@
   #endif
 #endif // ARDUINO_ARCH_RP2040
 
+#ifdef ARDUINO_ARCH_RP2350
+
+  // pio-usb is required for rp2040 host
+  #include "pio_usb.h"
+
+  // Pin D+ for host, D- = D+ + 1
+  #ifndef PIN_USB_HOST_DP
+  #define PIN_USB_HOST_DP  32
+  #endif
+
+  // Pin for enabling Host VBUS. comment out if not used
+  #ifndef PIN_5V_EN
+  #define PIN_5V_EN        29
+  #endif
+
+  #ifndef PIN_5V_EN_STATE
+  #define PIN_5V_EN_STATE  1
+  #endif
+#endif // ARDUINO_ARCH_RP2350
+
 #include "Adafruit_TinyUSB.h"
 
 #if defined(CFG_TUH_MAX3421) && CFG_TUH_MAX3421
