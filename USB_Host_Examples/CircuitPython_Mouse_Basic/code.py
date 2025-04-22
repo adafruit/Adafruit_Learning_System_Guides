@@ -48,9 +48,9 @@ buf = array.array("b", [0] * 8)
 while True:
     try:
         # attempt to read data from the mouse
-        # 10ms timeout, so we don't block long if there
+        # 20ms timeout, so we don't block long if there
         # is no data
-        count = mouse.read(0x81, buf, timeout=10)
+        count = mouse.read(0x81, buf, timeout=20)
     except usb.core.USBTimeoutError:
         # skip the rest of the loop if there is no data
         continue
