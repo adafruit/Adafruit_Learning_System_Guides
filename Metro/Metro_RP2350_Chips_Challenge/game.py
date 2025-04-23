@@ -78,7 +78,7 @@ class Game:
         self._loading_group = displayio.Group()
         self._tile_size = 24  # Default tile size (length and width)
         self._digit_dims = (0, 0)
-        self._gamelogic = GameLogic(data_file, audio)
+        self._gamelogic = GameLogic(data_file, audio)  # pylint: disable=too-many-function-args
         self._databuffer = DataBuffer()
         self._color_index = {}
         self._init_display()
