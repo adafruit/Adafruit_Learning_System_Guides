@@ -4447,18 +4447,6 @@ Number of pins: &lt;b&gt;2&lt;/b&gt;&lt;b&gt;&lt;P&gt;
 <label x="83.82" y="25.4" size="1.778" layer="95"/>
 </segment>
 </net>
-<net name="MI" class="0">
-<segment>
-<pinref part="KB2040-2" gate="G$1" pin="3"/>
-<wire x1="30.48" y1="50.8" x2="30.48" y2="60.96" width="0.1524" layer="91"/>
-<label x="30.48" y="58.42" size="1.778" layer="95" rot="R90"/>
-</segment>
-<segment>
-<pinref part="TFT" gate="G$1" pin="6"/>
-<wire x1="99.06" y1="30.48" x2="83.82" y2="30.48" width="0.1524" layer="91"/>
-<label x="83.82" y="30.48" size="1.778" layer="95"/>
-</segment>
-</net>
 <net name="MO" class="0">
 <segment>
 <pinref part="KB2040-2" gate="G$1" pin="2"/>
@@ -4466,9 +4454,9 @@ Number of pins: &lt;b&gt;2&lt;/b&gt;&lt;b&gt;&lt;P&gt;
 <label x="33.02" y="55.88" size="1.778" layer="95" rot="R90"/>
 </segment>
 <segment>
-<pinref part="TFT" gate="G$1" pin="7"/>
-<wire x1="99.06" y1="27.94" x2="83.82" y2="27.94" width="0.1524" layer="91"/>
-<label x="83.82" y="27.94" size="1.778" layer="95"/>
+<pinref part="TFT" gate="G$1" pin="6"/>
+<wire x1="99.06" y1="30.48" x2="83.82" y2="30.48" width="0.1524" layer="91"/>
+<label x="83.82" y="30.48" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="CS" class="0">
