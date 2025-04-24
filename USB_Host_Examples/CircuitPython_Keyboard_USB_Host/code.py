@@ -6,15 +6,14 @@ import array
 import usb
 import adafruit_usb_host_descriptors
 
-# lists for mouse interface indexes, endpoint addresses, and USB Device instances
-# each of these will end up with length 2 once we find both mice
+#interface index, and endpoint addresses for USB Device instance
 kbd_interface_index = None
 kbd_endpoint_address = None
 keyboard = None
 
 # scan for connected USB devices
 for device in usb.core.find(find_all=True):
-    # check for boot mouse endpoints on this device
+    # check for boot keyboard endpoints on this device
     kbd_interface_index, kbd_endpoint_address = (
         adafruit_usb_host_descriptors.find_boot_keyboard_endpoint(device)
     )
@@ -161,7 +160,7 @@ while True:
 
     # if there is no data it will raise USBTimeoutError
     except usb.core.USBTimeoutError:
-        # Nothing to do if there is no data for this mouse
+        # Nothing to do if there is no data for this keyboard
         continue
 
     print_keyboard_report(buf)
