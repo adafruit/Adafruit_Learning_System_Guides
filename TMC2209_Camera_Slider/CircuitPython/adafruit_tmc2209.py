@@ -7,7 +7,7 @@ import busio
 from micropython import const
 from generic_uart_device import GenericUARTDevice
 
-# pylint: disable=protected-access, too-many-public-methods, bare-except
+# pylint: disable=protected-access, too-many-public-methods, bare-except, too-many-function-args
 
 class TMC2209:
 
@@ -147,6 +147,7 @@ class TMC2209:
         self._start_position = None
         self._end_position = None
 
+    @staticmethod
     def calc_crc(data: bytes) -> int:
         """Calculate CRC8-ATM
         Polynomial: x^8 + x^2 + x + 1 (0x07)
