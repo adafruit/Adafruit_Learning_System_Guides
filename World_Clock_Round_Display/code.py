@@ -1,14 +1,14 @@
 # SPDX-FileCopyrightText: 2025 Ben Everard for Adafruit Industries
-# 
+#
 # SPDX-License-Identifier: MIT
 '''Display a world clock on a round LCD'''
 
-import board
 import os
+import time
+import board
 import displayio
 import fourwire
 from adafruit_gc9a01a import GC9A01A
-import time
 import wifi
 import adafruit_ntp
 import adafruit_connection_manager
