@@ -49,7 +49,6 @@ class SubMenu(Group):
         self._render()
 
     def select_item(self, key):
-        print(f"selecting {key}")
         for item in self._menu_items:
             if item["key"] == key:
                 item["selected"] = True
