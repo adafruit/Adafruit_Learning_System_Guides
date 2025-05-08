@@ -66,9 +66,9 @@ class SubMenu(Group):
             selected_outline = 0xBBBBBB
 
         if selected:
-            label_color = 0x008800
+            selected_label = label_color = 0x008800
         else:
-            label_color = 0x333333
+            selected_label = label_color = 0x333333
 
         button = EventButton(
             callback,
@@ -82,7 +82,7 @@ class SubMenu(Group):
             outline_color=outline_color,
             label_color=label_color,
             selected_fill=0xBBBBBB,
-            selected_label=0x333333,
+            selected_label=selected_label,
             selected_outline=selected_outline,
         )
         return button
