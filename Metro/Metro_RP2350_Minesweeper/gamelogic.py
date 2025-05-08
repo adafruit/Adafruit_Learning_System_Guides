@@ -245,7 +245,6 @@ class GameLogic:
         if self._start_time is None:
             return 0
         if self._end_time is None:
-            print(ticks_ms() / 1000, self._start_time / 1000)
             return min(999, (ticks_ms() - self._start_time) // 1000)
         return min(999, (self._end_time - self._start_time) // 1000)
 
