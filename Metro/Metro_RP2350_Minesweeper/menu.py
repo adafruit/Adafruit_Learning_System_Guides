@@ -36,23 +36,40 @@ class SubMenu(Group):
         self._menu_items = []
         self._root_button = None
 
-    def add_item(self, function, label):
+    def add_item(self, function, label, selected=False):
+        key = label.lower().replace(" ", "_")
         self._menu_items.append(
             {
+                "key": key,
                 "function": function,
                 "label": label,
+                "selected": selected,
             }
         )
         self._render()
 
+    def select_item(self, key):
+        print(f"selecting {key}")
+        for item in self._menu_items:
+            if item["key"] == key:
+                item["selected"] = True
+            else:
+                item["selected"] = False
+        self._render()
+
     @staticmethod
-    def _create_button(callback, label, width, x, y=0, border=True):
+    def _create_button(callback, label, width, x, y=0, border=True, selected=False):
         if border:
             outline_color = 0x000000
             selected_outline = 0x333333
         else:
             outline_color = 0xEEEEEE
             selected_outline = 0xBBBBBB
+
+        if selected:
+            label_color = 0x008800
+        else:
+            label_color = 0x333333
 
         button = EventButton(
             callback,
@@ -64,12 +81,13 @@ class SubMenu(Group):
             style=EventButton.RECT,
             fill_color=0xEEEEEE,
             outline_color=outline_color,
-            label_color=0x333333,
+            label_color=label_color,
             selected_fill=0xBBBBBB,
             selected_label=0x333333,
             selected_outline=selected_outline,
         )
         return button
+
 
     def _toggle_submenu(self):
         self._menu_items_group.hidden = not self._menu_items_group.hidden
@@ -87,7 +105,7 @@ class SubMenu(Group):
             self._button_width,
             self._xpos,
             self._ypos,
-            border=True,
+            True,
         )
         self.append(self._root_button)
 
@@ -113,7 +131,8 @@ class SubMenu(Group):
                 self._menu_width - 2,
                 self._xpos + 1,
                 self._ypos + index * MENU_ITEM_HEIGHT + self._root_button.height,
-                border=False,
+                False,
+                item["selected"],
             )
             self._menu_items_group.append(button)
 
@@ -151,3 +170,7 @@ class SubMenu(Group):
     @property
     def items_group(self):
         return self._menu_items_group
+
+    @property
+    def items(self):
+        return self._menu_items

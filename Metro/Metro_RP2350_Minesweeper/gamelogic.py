@@ -23,6 +23,11 @@ DIFFICULTIES = (
         'grid_size': (20, 14),
         'mines': 58,
     },
+    {
+        'label': "Custom",
+        'grid_size': (8, 8),
+        'mines': 49,
+    },
 )
 
 INFO_BAR_HEIGHT = 16
@@ -68,8 +73,12 @@ class GameLogic:
         if (self.grid_width * 16 > self._display.width or
             self.grid_height * 16 > self._display.height - INFO_BAR_HEIGHT):
             raise ValueError("Grid size exceeds display size")
-        self._board_data = bytearray(self.grid_width * self.grid_height)
         self._mine_count = DIFFICULTIES[self._difficulty]['mines']
+        if self._mine_count > (self.grid_width - 1) * (self.grid_height - 1):
+            raise ValueError("Too many mines for grid size")
+        if self._mine_count < 10:
+            raise ValueError("There must be at least 10 mines")
+        self._board_data = bytearray(self.grid_width * self.grid_height)
         self._status = STATUS_NEWGAME
         self._start_time = None
         self._end_time = None
