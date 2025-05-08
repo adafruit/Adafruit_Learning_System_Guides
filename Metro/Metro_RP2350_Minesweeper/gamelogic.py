@@ -23,11 +23,6 @@ DIFFICULTIES = (
         'grid_size': (20, 14),
         'mines': 58,
     },
-    {
-        'label': "Custom",
-        'grid_size': (8, 8),
-        'mines': 49,
-    },
 )
 
 INFO_BAR_HEIGHT = 16

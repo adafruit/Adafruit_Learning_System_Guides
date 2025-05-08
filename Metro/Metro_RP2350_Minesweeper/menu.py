@@ -170,7 +170,3 @@ class SubMenu(Group):
     @property
     def items_group(self):
         return self._menu_items_group
-
-    @property
-    def items(self):
-        return self._menu_items
