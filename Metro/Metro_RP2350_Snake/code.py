@@ -10,6 +10,7 @@ import supervisor
 import displayio
 import terminalio
 from adafruit_display_text.text_box import TextBox
+from adafruit_fruitjam.peripherals import request_display_config
 from snake_helpers import World, Snake, GameOverException, SpeedAdjuster
 
 # state machine constant
@@ -34,26 +35,8 @@ INITIAL_SNAKE_LEN = 3
 # variable for the players score
 score = 0
 
-# initialize display
-displayio.release_displays()
-fb = picodvi.Framebuffer(
-    320,
-    240,
-    clk_dp=board.CKP,
-    clk_dn=board.CKN,
-    red_dp=board.D0P,
-    red_dn=board.D0N,
-    green_dp=board.D1P,
-    green_dn=board.D1N,
-    blue_dp=board.D2P,
-    blue_dn=board.D2N,
-    color_depth=16,
-)
-display = framebufferio.FramebufferDisplay(fb)
-
-# In future release the default HSTX display
-# will get initialized by default by circuitpython
-# display = supervisor.runtime.display
+request_display_config(320,240)
+display = supervisor.runtime.display
 
 # load title splash screen bitmap
 title_bmp = displayio.OnDiskBitmap("snake_splash.bmp")
@@ -263,5 +246,5 @@ while True:
             supervisor.reload()
         # if the q button is pressed for exit
         if cur_btn_val in {"q", "Q"}:
-            # break out of main while True loop.
-            break
+            # reload to go back to code.py
+            supervisor.reload()

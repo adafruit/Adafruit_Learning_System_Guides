@@ -14,9 +14,10 @@ import displayio
 import supervisor
 from displayio import Group, TileGrid
 from tilepalettemapper import TilePaletteMapper
+from adafruit_fruitjam.peripherals import request_display_config
 import adafruit_imageload
 
-# use the built-in HSTX display
+request_display_config(320,240)
 display = supervisor.runtime.display
 
 # screen size in tiles, tiles are 16x16

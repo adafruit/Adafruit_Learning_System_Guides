@@ -10,6 +10,7 @@ Players trade off using the USB mouse to play their turns.
 import array
 import random
 import time
+import atexit
 from displayio import Group, OnDiskBitmap, TileGrid
 from adafruit_display_text.bitmap_label import Label
 from adafruit_display_text.text_box import TextBox
@@ -18,6 +19,9 @@ from adafruit_ticks import ticks_ms
 import supervisor
 import terminalio
 import usb.core
+from adafruit_fruitjam.peripherals import request_display_config
+import adafruit_usb_host_descriptors
+from adafruit_pathlib import Path
 
 
 def random_selection(lst, count):
@@ -58,34 +62,8 @@ STATE_GAMEOVER = 2
 # initial state is title screen
 CUR_STATE = STATE_TITLE
 
-# pylint: disable=ungrouped-imports
-if hasattr(supervisor.runtime, "display") and supervisor.runtime.display is not None:
-    # use the built-in HSTX display for Metro RP2350
-    display = supervisor.runtime.display
-else:
-    # pylint: disable=ungrouped-imports
-    from displayio import release_displays
-    import picodvi
-    import board
-    import framebufferio
-
-    # initialize display
-    release_displays()
-
-    fb = picodvi.Framebuffer(
-        320,
-        240,
-        clk_dp=board.CKP,
-        clk_dn=board.CKN,
-        red_dp=board.D0P,
-        red_dn=board.D0N,
-        green_dp=board.D1P,
-        green_dn=board.D1N,
-        blue_dp=board.D2P,
-        blue_dn=board.D2N,
-        color_depth=16,
-    )
-    display = framebufferio.FramebufferDisplay(fb)
+request_display_config(320,240)
+display = supervisor.runtime.display
 
 # main group will hold all the visual elements
 main_group = Group()
@@ -312,6 +290,9 @@ mouse = None
 # wait a second for USB devices to be ready
 time.sleep(1)
 
+mouse_interface_index, mouse_endpoint_address = None, None
+mouse = None
+
 # scan for connected USB devices
 for device in usb.core.find(find_all=True):
     # print information about the found devices
@@ -319,16 +300,40 @@ for device in usb.core.find(find_all=True):
     print(device.manufacturer, device.product)
     print(device.serial_number)
 
-    # assume this device is the mouse
-    mouse = device
+    config_descriptor = adafruit_usb_host_descriptors.get_configuration_descriptor(
+        device, 0
+    )
 
-    # detach from kernel driver if active
+    _possible_interface_index, _possible_endpoint_address = adafruit_usb_host_descriptors.find_boot_mouse_endpoint(
+        device)
+    if _possible_interface_index is not None and _possible_endpoint_address is not None:
+        mouse = device
+        mouse_interface_index = _possible_interface_index
+        mouse_endpoint_address = _possible_endpoint_address
+        print(f"mouse interface: {mouse_interface_index} endpoint_address: {hex(mouse_endpoint_address)}")
+
+mouse_was_attached = None
+if mouse is not None:
+    # detach the kernel driver if needed
     if mouse.is_kernel_driver_active(0):
+        mouse_was_attached = True
         mouse.detach_kernel_driver(0)
+    else:
+        mouse_was_attached = False
 
-    # set the mouse configuration so it can be used
+    # set configuration on the mouse so we can use it
     mouse.set_configuration()
 
+def atexit_callback():
+    """
+    re-attach USB devices to kernel if needed.
+    :return:
+    """
+    print("inside atexit callback")
+    if mouse_was_attached and not mouse.is_kernel_driver_active(0):
+        mouse.attach_kernel_driver(0)
+
+atexit.register(atexit_callback)
 
 # Buffer to hold data read from the mouse
 # Boot mice have 4 byte reports
@@ -354,7 +359,7 @@ while True:
     try:
         # try to read data from the mouse, small timeout so the code will move on
         # quickly if there is no data
-        data_len = mouse.read(0x81, buf, timeout=10)
+        data_len = mouse.read(mouse_endpoint_address, buf, timeout=20)
 
         # if there was data, then update the mouse cursor on the display
         # using min and max to keep it within the bounds of the display
@@ -493,12 +498,12 @@ while True:
             # button bounding box
             if play_again_btn.contains(coords):
                 # set next code file to this one
-                supervisor.set_next_code_file(__file__)
+                supervisor.set_next_code_file(__file__, working_directory=Path(__file__).parent.absolute())
                 # reload
                 supervisor.reload()
 
             # if the mouse point is within the exit
             # button bounding box
             if exit_btn.contains(coords):
-                # break to exit out of this script
-                break
+                # restart back to code.py
+                supervisor.reload()

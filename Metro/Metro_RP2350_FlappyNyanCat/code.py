@@ -17,11 +17,10 @@ from displayio import Group, TileGrid, Bitmap, release_displays, Palette
 import supervisor
 import bitmaptools
 from adafruit_display_text.bitmap_label import Label
-import picodvi
-import framebufferio
-import board
 from micropython import const
 import adafruit_imageload
+from adafruit_fruitjam.peripherals import request_display_config
+from adafruit_pathlib import Path
 
 # how strong the gravity is
 FALL_SPEED = 1
@@ -42,23 +41,8 @@ TRAIL_LENGTH = 20
 # current score
 score = 0
 
-# initialize display
-release_displays()
-
-fb = picodvi.Framebuffer(
-    320,
-    240,
-    clk_dp=board.CKP,
-    clk_dn=board.CKN,
-    red_dp=board.D0P,
-    red_dn=board.D0N,
-    green_dp=board.D1P,
-    green_dn=board.D1N,
-    blue_dp=board.D2P,
-    blue_dn=board.D2N,
-    color_depth=16,
-)
-display = framebufferio.FramebufferDisplay(fb)
+request_display_config(320,240)
+display = supervisor.runtime.display
 
 # initialize groups to hold visual elements
 main_group = Group()
@@ -607,10 +591,10 @@ while True:
 
         # if player pressed p
         if "p" in cur_btn_val:
-            supervisor.set_next_code_file(__file__)
+            supervisor.set_next_code_file(__file__, working_directory=Path(__file__).parent.absolute())
             supervisor.reload()
 
         # if player pressed q
         elif "q" in cur_btn_val:
             print("exiting")
-            break
+            supervisor.reload()
