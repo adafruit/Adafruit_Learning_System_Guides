@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2025 John Park and Claude AI for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
 """
 # ui_manager.py: CircuitPython Music Staff Application component
 """
@@ -21,7 +24,7 @@ from playback_controller import PlaybackController
 
 # pylint: disable=invalid-name,no-member,too-many-instance-attributes,too-many-arguments
 # pylint: disable=too-many-branches,too-many-statements,too-many-public-methods
-# pylint: disable=too-many-locals,attribute-defined-outside-init,possibly-used-before-assignment
+# pylint: disable=too-many-locals,attribute-defined-outside-init
 # pylint: disable=consider-using-in,too-many-return-statements,no-else-return
 class UIManager:
     """Manages the UI elements, input, and user interaction"""

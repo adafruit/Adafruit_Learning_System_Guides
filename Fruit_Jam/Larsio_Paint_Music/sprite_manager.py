@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2025 John Park and Claude AI for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
 """
 Sprite manager for CircuitPython Music Staff Application.
 Handles loading and managing sprite images and palettes.
@@ -8,7 +11,7 @@ import adafruit_imageload
 from displayio import Palette, TileGrid
 
 
-# pylint: disable=too-many-instance-attributes,invalid-name,broad-exception-caught
+# pylint: disable=too-many-instance-attributes,invalid-name,broad-except
 class SpriteManager:
     """Manages sprites and palettes for note display"""
 

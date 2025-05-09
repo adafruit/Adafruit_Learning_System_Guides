@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2025 John Park and Claude AI for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
 """
 # input_handler.py: CircuitPython Music Staff Application component
 """
@@ -11,8 +14,8 @@ import usb.core
 
 
 # pylint: disable=invalid-name,no-member,too-many-instance-attributes,too-many-arguments
-# pylint: disable=too-many-branches,too-many-statements,broad-exception-caught
-# pylint: disable=too-many-nested-blocks,too-many-locals,too-many-positional-arguments
+# pylint: disable=too-many-branches,too-many-statements,broad-except
+# pylint: disable=too-many-nested-blocks,too-many-locals,no-self-use
 class InputHandler:
     """Handles user input through mouse and interactions with UI elements"""
 
@@ -62,7 +65,7 @@ class InputHandler:
                         try:
                             manufacturer = device.manufacturer
                             product = device.product
-                        except Exception:  # Specify exception type
+                        except Exception:  # pylint: disable=broad-except
                             manufacturer = "Unknown"
                             product = "Unknown"
 
@@ -74,13 +77,13 @@ class InputHandler:
                             has_kernel_driver = hasattr(device, 'is_kernel_driver_active')
                             if has_kernel_driver and device.is_kernel_driver_active(0):
                                 device.detach_kernel_driver(0)
-                        except Exception as e:
+                        except Exception as e:  # pylint: disable=broad-except
                             print(f"Error detaching kernel driver: {e}")
 
                         # Set configuration
                         try:
                             device.set_configuration()
-                        except Exception as e:
+                        except Exception as e:  # pylint: disable=broad-except
                             print(f"Error setting configuration: {e}")
                             continue  # Try next device
 
@@ -98,7 +101,7 @@ class InputHandler:
                             buf = bytearray(1)
                             device.ctrl_transfer(bmRequestType, bRequest, wValue, wIndex, buf)
                             print("Set to report protocol mode")
-                        except Exception as e:
+                        except Exception as e:  # pylint: disable=broad-except
                             print(f"Could not set protocol: {e}")
 
                         # Buffer for reading data
@@ -115,14 +118,14 @@ class InputHandler:
                             # Timeout is normal if mouse isn't moving
                             print("Mouse connected but not sending data (normal)")
                             return True
-                        except Exception as e:
+                        except Exception as e:  # pylint: disable=broad-except
                             print(f"Mouse test read failed: {e}")
                             # Continue to try next device or retry
                             self.mouse = None
                             self.in_endpoint = None
                             continue
 
-                    except Exception as e:
+                    except Exception as e:  # pylint: disable=broad-except
                         print(f"Error initializing device: {e}")
                         continue
 
@@ -134,7 +137,7 @@ class InputHandler:
                 gc.collect()
                 time.sleep(RETRY_DELAY)
 
-            except Exception as e:
+            except Exception as e:  # pylint: disable=broad-except
                 print(f"Error during mouse detection: {e}")
                 gc.collect()
                 time.sleep(RETRY_DELAY)
@@ -204,7 +207,7 @@ class InputHandler:
                 gc.collect()
 
             return False
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-except
             print(f"Error reading mouse: {type(e).__name__}")
             return False
 

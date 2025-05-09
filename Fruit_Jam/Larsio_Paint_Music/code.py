@@ -7,7 +7,7 @@ Fruit Jam w mouse, HDMI, audio out
 or Metro RP2350 with EYESPI DVI breakout and TLV320DAC3100 breakout on STEMMA_I2C,
 pin D7 reset, 9/10/11 = BCLC/WSEL/DIN
 """
-# pylint: disable=invalid-name,too-few-public-methods,broad-exception-caught,redefined-outer-name
+# pylint: disable=invalid-name,too-few-public-methods,broad-except,redefined-outer-name
 
 # Main application file for Larsio Paint Music
 
@@ -101,7 +101,7 @@ if __name__ == "__main__":
     try:
         app = MusicStaffApp(audio_output=AUDIO_OUTPUT)
         app.run()
-    except Exception as e:
+    except Exception as e:  # pylint: disable=broad-except
         print(f"Error with I2S audio: {e}")
 
         # Force garbage collection
@@ -112,5 +112,5 @@ if __name__ == "__main__":
         try:
             app = MusicStaffApp(audio_output="pwm")
             app.run()
-        except Exception as e2:
+        except Exception as e2:  # pylint: disable=broad-except
             print(f"Fatal error: {e2}")

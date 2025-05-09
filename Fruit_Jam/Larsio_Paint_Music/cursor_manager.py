@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2025 John Park and Claude AI for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
 """
 # cursor_manager.py: CircuitPython Music Staff Application component
 """

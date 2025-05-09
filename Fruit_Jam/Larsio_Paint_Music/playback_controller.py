@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2025 John Park and Claude AI for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
 """
 Playback controller for CircuitPython Music Staff Application.
 Manages the playback state, button displays, and sound triggering.

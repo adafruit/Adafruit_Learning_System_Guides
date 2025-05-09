@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2025 John Park and Claude AI for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
 """
 # note_manager.py: CircuitPython Music Staff Application component
 """
@@ -8,7 +11,7 @@ from displayio import Group, Bitmap, Palette, TileGrid
 
 # pylint: disable=invalid-name,no-member,too-many-instance-attributes,too-many-arguments
 # pylint: disable=too-many-branches,too-many-statements,protected-access,too-many-locals
-# pylint: disable=too-many-positional-arguments, trailing-whitespace
+# pylint: disable=trailing-whitespace
 class NoteManager:
     """Manages notes, their positions, and related data"""
 
