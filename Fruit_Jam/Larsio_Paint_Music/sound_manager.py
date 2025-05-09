@@ -29,8 +29,8 @@ import usb_midi
 
 
 # pylint: disable=invalid-name,no-member,too-many-instance-attributes,too-many-arguments
-# pylint: disable=too-many-branches,too-many-statements,too-many-locals,broad-exception-caught
-# pylint: disable=possibly-used-before-assignment,cell-var-from-loop
+# pylint: disable=too-many-branches,too-many-statements,too-many-locals,broad-except
+# pylint: disable=cell-var-from-loop,undefined-loop-variable
 class SoundManager:
     """Handles playback of both MIDI notes and WAV samples, and synthio for channels 3-5"""
 
