@@ -197,13 +197,15 @@ def reset():
 def set_difficulty(diff):
     game_logic.difficulty = diff
     reset()
+    difficulty_menu.select_item(DIFFICULTIES[diff]['label'].lower().replace(" ", "_"))
 
 def hide_group(group):
     group.hidden = True
 
 for i, difficulty in enumerate(DIFFICULTIES):
     # Create a button for each difficulty
-    difficulty_menu.add_item((set_difficulty, i), difficulty['label'])
+    selected = i == game_logic.difficulty
+    difficulty_menu.add_item((set_difficulty, i), difficulty['label'], selected)
 
 reset_menu.add_item(reset, "OK")
 
