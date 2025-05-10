@@ -218,8 +218,6 @@ for i in range(2):
 # create tile palette mappers
 for i in range(2):
     palette_mapper = TilePaletteMapper(remap_palette, 3)
-    # remap index 2 to each of the colors in mouse colors list
-    palette_mapper[0] = [0, 1, i + 3]
     palette_mappers.append(palette_mapper)
 
     # create tilegrid for each mouse
@@ -227,6 +225,9 @@ for i in range(2):
     mouse_tg.x = display.width // scale_factor // 2 - (i * 12)
     mouse_tg.y = display.height // scale_factor // 2
     mouse_tgs.append(mouse_tg)
+
+    # remap index 2 to each of the colors in mouse colors list
+    palette_mapper[0] = [0, 1, i + 3]
 
 # USB info lists
 mouse_interface_indexes = []
