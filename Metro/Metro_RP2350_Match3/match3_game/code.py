@@ -217,7 +217,7 @@ for i in range(2):
 
 # create tile palette mappers
 for i in range(2):
-    palette_mapper = TilePaletteMapper(remap_palette, 3, 1, 1)
+    palette_mapper = TilePaletteMapper(remap_palette, 3)
     # remap index 2 to each of the colors in mouse colors list
     palette_mapper[0] = [0, 1, i + 3]
     palette_mappers.append(palette_mapper)
