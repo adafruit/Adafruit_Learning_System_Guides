@@ -133,7 +133,7 @@ class Match3Card(Group):
 
     def __init__(self, card_tuple, **kwargs):
         # tile palette mapper to color the card
-        self._mapper = TilePaletteMapper(kwargs["pixel_shader"], 5, 1, 1)
+        self._mapper = TilePaletteMapper(kwargs["pixel_shader"], 5)
         kwargs["pixel_shader"] = self._mapper
         # tile grid to for the visible sprite
         self._tilegrid = TileGrid(**kwargs)

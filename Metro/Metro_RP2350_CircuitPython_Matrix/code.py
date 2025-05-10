@@ -14,9 +14,12 @@ import displayio
 import supervisor
 from displayio import Group, TileGrid
 from tilepalettemapper import TilePaletteMapper
+from adafruit_fruitjam.peripherals import request_display_config
 import adafruit_imageload
 
+
 # use the built-in HSTX display
+request_display_config(320,240)
 display = supervisor.runtime.display
 
 # screen size in tiles, tiles are 16x16
@@ -64,7 +67,7 @@ for i in range(0, len(COLORS)):
     shader_palette[i + 1] = COLORS[i]
 
 # mapper to change colors of tiles within the grid
-grid_color_shader = TilePaletteMapper(shader_palette, 2, SCREEN_WIDTH, SCREEN_HEIGHT)
+grid_color_shader = TilePaletteMapper(shader_palette, 2)
 
 # load the spritesheet
 katakana_bmp, katakana_pixelshader = adafruit_imageload.load("matrix_characters.bmp")
