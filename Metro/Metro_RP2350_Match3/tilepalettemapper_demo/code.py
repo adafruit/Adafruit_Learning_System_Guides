@@ -23,8 +23,6 @@ spritesheet_bmp = OnDiskBitmap("match3_cards_spritesheet.bmp")
 tile_palette_mapper = TilePaletteMapper(
     spritesheet_bmp.pixel_shader,  # input pixel_shader
     5,  # input color count
-    3,  # grid width
-    1  # grid height
 )
 
 # create a TileGrid to show some cards
