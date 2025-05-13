@@ -28,7 +28,7 @@ for i in range(8):
     noid = mcp.get_pin(i)
     noid.switch_to_output(value=False)
     noids.append(noid)
-# pylint: disable=used-before-assignment, unused-argument, global-statement
+# pylint: disable=used-before-assignment, unused-argument, global-statement, no-self-use
 if not music_box:
     midi = adafruit_midi.MIDI(
         midi_in=usb_midi.ports[0], in_channel=0, midi_out=usb_midi.ports[1], out_channel=0
