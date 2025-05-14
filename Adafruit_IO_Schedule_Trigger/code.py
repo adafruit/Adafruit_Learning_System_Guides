@@ -98,11 +98,11 @@ def on_message(client, feed_id, payload):
 
 def on_relay_msg(client, topic, message):
     # Method called whenever user/feeds/relay has a new value
-    if message == "morning":
-        print("Morning - turning outlet ON")
+    if message == "1":
+        print("Received 1 - turning outlet ON")
         power_pin.value = True
-    elif message == "night":
-        print("Night - turning outlet OFF")
+    elif message == "0":
+        print("Received 0 - turning outlet OFF")
         power_pin.value = False
     else:
         print("Unexpected value received on relay feed.")
