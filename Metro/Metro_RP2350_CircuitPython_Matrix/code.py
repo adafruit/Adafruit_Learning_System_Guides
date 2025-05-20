@@ -19,7 +19,7 @@ import adafruit_imageload
 
 
 # use the built-in HSTX display
-request_display_config(320,240)
+request_display_config(320, 240)
 display = supervisor.runtime.display
 
 # screen size in tiles, tiles are 16x16
@@ -67,7 +67,12 @@ for i in range(0, len(COLORS)):
     shader_palette[i + 1] = COLORS[i]
 
 # mapper to change colors of tiles within the grid
-grid_color_shader = TilePaletteMapper(shader_palette, 2)
+if sys.implementation.version[0] == 9:
+    grid_color_shader = TilePaletteMapper(
+        shader_palette, 2, SCREEN_WIDTH, SCREEN_HEIGHT
+    )
+elif sys.implementation.version[0] >= 10:
+    grid_color_shader = TilePaletteMapper(shader_palette, 2)
 
 # load the spritesheet
 katakana_bmp, katakana_pixelshader = adafruit_imageload.load("matrix_characters.bmp")

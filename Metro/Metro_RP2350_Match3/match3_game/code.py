@@ -9,6 +9,7 @@ import array
 import atexit
 import io
 import os
+import sys
 import time
 
 import board
@@ -217,7 +218,11 @@ for i in range(2):
 
 # create tile palette mappers
 for i in range(2):
-    palette_mapper = TilePaletteMapper(remap_palette, 3)
+    if sys.implementation.version[0] == 9:
+        palette_mapper = TilePaletteMapper(remap_palette, 3, 1, 1)
+    elif sys.implementation.version[0] >= 10:
+        palette_mapper = TilePaletteMapper(remap_palette, 3)
+
     palette_mappers.append(palette_mapper)
 
     # create tilegrid for each mouse

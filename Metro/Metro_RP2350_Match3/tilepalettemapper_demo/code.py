@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: Copyright (c) 2025 Tim Cocks for Adafruit Industries
 #
 # SPDX-License-Identifier: MIT
+import sys
 
 import supervisor
 from displayio import Group, OnDiskBitmap, TileGrid
@@ -20,14 +21,28 @@ display.root_group = main_group
 spritesheet_bmp = OnDiskBitmap("match3_cards_spritesheet.bmp")
 
 # create a TilePaletteMapper
-tile_palette_mapper = TilePaletteMapper(
-    spritesheet_bmp.pixel_shader,  # input pixel_shader
-    5,  # input color count
-)
+if sys.implementation.version[0] == 9:
+    tile_palette_mapper = TilePaletteMapper(
+        spritesheet_bmp.pixel_shader,  # input pixel_shader
+        5,  # input color count
+        3,  # grid width
+        1,  # grid height
+    )
+elif sys.implementation.version[0] >= 10:
+    tile_palette_mapper = TilePaletteMapper(
+        spritesheet_bmp.pixel_shader,  # input pixel_shader
+        5,  # input color count
+    )
 
 # create a TileGrid to show some cards
-cards_tilegrid = TileGrid(spritesheet_bmp, pixel_shader=tile_palette_mapper,
-                          width=3, height=1, tile_width=24, tile_height=32)
+cards_tilegrid = TileGrid(
+    spritesheet_bmp,
+    pixel_shader=tile_palette_mapper,
+    width=3,
+    height=1,
+    tile_width=24,
+    tile_height=32,
+)
 
 # set each tile in the grid to a different sprite index
 cards_tilegrid[0, 0] = 10
