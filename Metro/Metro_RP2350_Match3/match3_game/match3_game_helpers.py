@@ -666,9 +666,7 @@ class Match3Game(Group):
                 # load the game from the given game state
                 self.load_from_game_state(self.game_state)
                 # hide the title screen
-                self.title_screen.hidden = (
-                    True  # pylint: disable=attribute-defined-outside-init
-                )
+                self.title_screen.hidden = True
                 # set the current state to open play
                 self.cur_state = STATE_PLAYING_OPEN
 
@@ -684,9 +682,7 @@ class Match3Game(Group):
                 # initialize a new game
                 self.init_new_game()
                 # hide the title screen
-                self.title_screen.hidden = (
-                    True  # pylint: disable=attribute-defined-outside-init
-                )
+                self.title_screen.hidden = True
                 # set the current state to open play
                 self.cur_state = STATE_PLAYING_OPEN
 
@@ -737,6 +733,7 @@ class Match3TitleScreen(Group):
 
     def __init__(self, display_size):
         super().__init__()
+        self.hidden = False
         self.display_size = display_size
         # background bitmap color
         bg_bmp = Bitmap(display_size[0] // 10, display_size[1] // 10, 1)
