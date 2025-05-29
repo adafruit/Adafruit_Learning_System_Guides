@@ -386,7 +386,8 @@ class GameLogic:
 
         return True, len(all_matches) > 0
 
-    def check_horizontal_match(self, grid, row, column, piece):
+    @staticmethod
+    def check_horizontal_match(grid, row, column, piece):
         """Check for horizontal 3-in-a-row matches centered
         around or including the given position."""
         matches = []
@@ -404,7 +405,8 @@ class GameLogic:
 
         return matches
 
-    def check_vertical_match(self, grid, row, column, piece):
+    @staticmethod
+    def check_vertical_match(grid, row, column, piece):
         """Check for vertical 3-in-a-row matches centered around or including the given position."""
         matches = []
         rows = len(grid)

@@ -142,7 +142,14 @@ ui_group = Group()
 main_group.append(ui_group)
 
 # Create the game logic object
-game_logic = GameLogic(display, game_grid, swap_piece, selected_piece_group, GAME_PIECES) # pylint: disable=no-value-for-parameter
+# pylint: disable=no-value-for-parameter, too-many-function-args
+game_logic = GameLogic(
+    display,
+    game_grid,
+    swap_piece,
+    selected_piece_group,
+    GAME_PIECES
+)
 
 # Create the mouse graphics and add to the main group
 mouse = find_and_init_boot_mouse("/bitmaps/mouse_cursor.bmp")
