@@ -23,7 +23,7 @@ uint16_t pixelHue_2 = 256;
 
 void loop() {  
   pixelHue_1 += 256;
-  for(int i=0; i<STRIP_1.numPixels(); i++) {
+  for(uint i=0; i<STRIP_1.numPixels(); i++) {
       int hue_1 = pixelHue_1 + (i * 65536L / STRIP_1.numPixels());
       STRIP_1.setPixelColor(i, STRIP_1.gamma32(STRIP_1.ColorHSV(hue_1)));
     }
