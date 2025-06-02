@@ -109,16 +109,32 @@ void setup() {
   digitalWrite(ESP32_RESETN, HIGH);
   pixel.setPixelColor(0, 20, 20, 0); pixel.show();
   delay(100);
+
+#if defined(LED_BUILTIN)
+  pinMode(LED_BUILTIN, OUTPUT);
+#endif
 }
 
 void loop() {
   while (Serial.available()) {
+#if defined(ARDUINO_ARCH_RP2040) // Neopixel is blocking and this annoys esptool
+  #if defined(LED_BUILTIN)
+  digitalWrite(LED_BUILTIN, HIGH);
+  #endif
+#else
     pixel.setPixelColor(0, 10, 0, 0); pixel.show();
+#endif
     SerialESP32.write(Serial.read());
   }
 
   while (SerialESP32.available()) {
+#if defined(ARDUINO_ARCH_RP2040) // Neopixel is blocking and this annoys esptool
+  #if defined(LED_BUILTIN)
+  digitalWrite(LED_BUILTIN, LOW);
+  #endif
+#else
     pixel.setPixelColor(0, 0, 0, 10); pixel.show();
+#endif    
     Serial.write(SerialESP32.read());
   }
 }
