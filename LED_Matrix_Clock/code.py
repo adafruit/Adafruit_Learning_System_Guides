@@ -383,4 +383,4 @@ while True:
                     BRIGHTNESS = 128
                 matrix1.set_led_scaling(BRIGHTNESS)
                 matrix2.set_led_scaling(BRIGHTNESS)
-            clock_clock = ticks_add(clock_clock, clock_timer)     
+            clock_clock = ticks_add(clock_clock, clock_timer)
