@@ -22,10 +22,11 @@ from adafruit_seesaw import digitalio, rotaryio, seesaw
 from adafruit_debouncer import Button
 
 timezone = -4 # your timezone offset
-alarm_hour = 14 # hour is 24 hour for alarm to denote am/pm
-alarm_min = 11 # minutes
+alarm_hour = 12 # hour is 24 hour for alarm to denote am/pm
+alarm_min = 00 # minutes
 alarm_volume = 1 # float 0.0 to 1.0
 hour_12 = True # 12 hour or 24 hour time
+no_alarm_plz = False
 BRIGHTNESS = 128 # led brightness (0-255)
 
 # I2S pins for Audio BFF
@@ -279,13 +280,16 @@ while True:
             BRIGHTNESS = 128
             matrix1.set_led_scaling(BRIGHTNESS)
             matrix2.set_led_scaling(BRIGHTNESS)
-    if button.short_count:
+    if button.short_count == 1:
         # short press to set hour and minute
         set_alarm = (set_alarm + 1) % 3
         if set_alarm == 0:
             draw_text(time_str, COLOR)
         elif set_alarm == 2:
             draw_text(f"  :{alarm_min:02}", COLOR)
+    if button.short_count == 3:
+        no_alarm_plz = not no_alarm_plz
+        print(f"alarms off? {no_alarm_plz}")
 
     position = -encoder.position
     if position != last_position:
@@ -365,10 +369,11 @@ while True:
                 new_time = False
                 print(time_str)
                 draw_text(time_str, COLOR)
-                if f"{am_pm_hour:02}:{mins:02}" == alarm:
+                if f"{am_pm_hour:02}:{mins:02}" == alarm and not no_alarm_plz:
                     print("alarm!")
                     # grab a new wav file from the wavs list
                     wave = open_audio()
+                    mixer.voice[0].play(wave, loop=True)
                     active_alarm = True
             if active_alarm:
                 # blink the clock characters
@@ -379,7 +384,3 @@ while True:
                 matrix1.set_led_scaling(BRIGHTNESS)
                 matrix2.set_led_scaling(BRIGHTNESS)
             clock_clock = ticks_add(clock_clock, clock_timer)
-
-    # loop alarm wav
-    if active_alarm:
-        mixer.voice[0].play(wave, loop=True)
