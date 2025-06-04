@@ -31,7 +31,6 @@
 # not support PIL/pillow (python imaging library)!
 
 
-import json
 import subprocess
 import time
 
@@ -102,7 +101,7 @@ while True:
         DNSQUERIES = data["queries"]["total"]
         ADSBLOCKED = data["queries"]["blocked"]
         CLIENTS    = data["clients"]["total"]
-    except Exception:
+    except (KeyError, requests.RequestException, json.JSONDecodeError):
         DNSQUERIES = 0
         ADSBLOCKED = 0
         CLIENTS    = 0
