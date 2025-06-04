@@ -9,7 +9,7 @@ GAMEBOARD_POSITION = (55, 8)
 
 SELECTOR_SPRITE = 9
 EMPTY_SPRITE = 10
-DEBOUNCE_TIME = 0.1  # seconds for debouncing mouse clicks
+DEBOUNCE_TIME = 0.2  # seconds for debouncing mouse clicks
 
 class GameBoard:
     "Contains the game board"
@@ -42,6 +42,10 @@ class GameBoard:
             for row in range(self.rows):
                 if self._game_grid[(column, row)] != EMPTY_SPRITE:
                     self.remove_game_piece(column, row)
+        # Hide the animation TileGrids
+        self._selector.hidden = True
+        self._swap_piece.hidden = True
+        self.selected_piece_group.hidden = True
 
     def move_game_piece(self, old_x, old_y, new_x, new_y):
         if 0 <= old_x < self.columns and 0 <= old_y < self.rows:
@@ -153,18 +157,41 @@ class GameBoard:
 
 class GameLogic:
     "Contains the Logic to examine the game board and determine if a move is valid."
-    def __init__(self, display, game_grid, swap_piece, selected_piece_group, game_pieces):
+    def __init__(self, display, mouse, game_grid, swap_piece,
+                 selected_piece_group, game_pieces, hint_timeout):
         self._display = display
+        self._mouse = mouse
         self.game_board = GameBoard(game_grid, swap_piece, selected_piece_group)
         self._score = 0
         self._available_moves = []
         if not 3 <= game_pieces <= 8:
             raise ValueError("game_pieces must be between 3 and 8")
         self._game_pieces = game_pieces  # Number of different game pieces
+        self._hint_timeout = hint_timeout
         self._last_update_time = ticks_ms() # For hint timing
         self._last_click_time = ticks_ms()  # For debouncing mouse clicks
+        self.pressed_btns = None
+        self.waiting_for_release = False
 
-    def piece_clicked(self, coords):
+    def update_mouse(self):
+        self.pressed_btns = self._mouse.update()
+        if self.waiting_for_release and not self.pressed_btns:
+            # If both buttons are released, we can process the next click
+            self.waiting_for_release = False
+
+    def update(self):
+        gb = self.game_board
+        if (gb.x <= self._mouse.x <= gb.x + gb.columns * 32 and
+            gb.y <= self._mouse.y <= gb.y + gb.rows * 32 and
+            not self.waiting_for_release):
+            piece_coords = ((self._mouse.x - gb.x) // 32, (self._mouse.y - gb.y) // 32)
+            if self.pressed_btns and "left" in self.pressed_btns:
+                self._piece_clicked(piece_coords)
+                self.waiting_for_release = True
+        if self.time_since_last_update > self._hint_timeout:
+            self.show_hint()
+
+    def _piece_clicked(self, coords):
         """ Handle a piece click event. """
         if ticks_ms() <= self._last_click_time:
             self._last_click_time -= 2**29 # ticks_ms() wraps around after 2**29 ms
@@ -206,7 +233,7 @@ class GameLogic:
             if ((abs(previous_x - column) == 1 and previous_y == row) or
                 (previous_x == column and abs(previous_y - row) == 1)):
                 # Swap the pieces
-                self.swap_selected_piece(column, row)
+                self._swap_selected_piece(column, row)
 
     def show_hint(self):
         """ Show a hint by selecting a random available
@@ -216,21 +243,21 @@ class GameLogic:
             from_coords = move['from']
             to_coords = move['to']
             self.game_board.select_piece(from_coords[0], from_coords[1])
-            self.animate_swap(to_coords[0], to_coords[1])
+            self._animate_swap(to_coords[0], to_coords[1])
             self.game_board.select_piece(from_coords[0], from_coords[1])
-            self.animate_swap(to_coords[0], to_coords[1])
+            self._animate_swap(to_coords[0], to_coords[1])
             self._last_update_time = ticks_ms()     # Reset hint timer
 
-    def swap_selected_piece(self, column, row):
+    def _swap_selected_piece(self, column, row):
         """ Swap the selected piece with the piece at the specified column and row.
         If the swap is not valid, revert to the previous selection. """
         old_coords = self.game_board.selected_coords
-        self.animate_swap(column, row)
-        if not self.update():
+        self._animate_swap(column, row)
+        if not self._update_board():
             self.game_board.select_piece(column, row, show_selector=False)
-            self.animate_swap(old_coords[0], old_coords[1])
+            self._animate_swap(old_coords[0], old_coords[1])
 
-    def animate_swap(self, column, row):
+    def _animate_swap(self, column, row):
         """ Copy the pieces to separate tilegrids, animate the swap, and update the game board. """
         if 0 <= column < self.game_board.columns and 0 <= row < self.game_board.rows:
             selected_coords = self.game_board.selected_coords
@@ -271,11 +298,12 @@ class GameLogic:
             # Deselect the selected piece (which sets the value)
             self.game_board.select_piece(column, row)
 
-    def apply_gravity(self):
+    def _apply_gravity(self):
         """ Go through each column from the bottom up and move pieces down
         continue until there are no more pieces to move """
         # pylint:disable=too-many-nested-blocks
         while True:
+            self.pressed_btns = self._mouse.update()
             moved = False
             for x in range(self.game_board.columns):
                 for y in range(self.game_board.rows - 1, -1, -1):
@@ -295,7 +323,7 @@ class GameLogic:
             if not moved:
                 break
 
-    def check_for_matches(self):
+    def _check_for_matches(self):
         """ Scan the game board for matches of 3 or more in a row or column """
         matches = []
         for x in range(self.game_board.columns):
@@ -325,11 +353,11 @@ class GameLogic:
                         matches.append(vertical_match)
         return matches
 
-    def update(self):
+    def _update_board(self):
         """ Update the game logic, check for matches, and apply gravity. """
         matches_found = False
         multiplier = 1
-        matches = self.check_for_matches()
+        matches = self._check_for_matches()
         while matches:
             if matches:
                 for match in matches:
@@ -337,23 +365,25 @@ class GameLogic:
                         self.game_board.remove_game_piece(x, y)
                         self._score += 10 * multiplier * len(matches) * (len(match) - 2)
                 time.sleep(0.5)  # Pause to show the match removal
-                self.apply_gravity()
+                self._apply_gravity()
                 matches_found = True
-                matches = self.check_for_matches()
+                matches = self._check_for_matches()
                 multiplier += 1
-        self._available_moves = self.find_all_possible_matches()
+        self._available_moves = self._find_all_possible_matches()
         print(f"{len(self._available_moves)} available moves found.")
         return matches_found
 
     def reset(self):
         """ Reset the game board and score. """
+        print("Reset started")
         self.game_board.reset()
         self._score = 0
         self._last_update_time = ticks_ms()
-        self.apply_gravity()
-        self.update()
+        self._apply_gravity()
+        self._update_board()
+        print("Reset completed")
 
-    def check_match_after_move(self, row, column, direction, move_type='horizontal'):
+    def _check_match_after_move(self, row, column, direction, move_type='horizontal'):
         """ Move the piece in a copy of the board to see if it creates a match."""
         if move_type == 'horizontal':
             new_row, new_column = row, column + direction
@@ -371,15 +401,15 @@ class GameLogic:
         new_grid[row][column], new_grid[new_row][new_column] = new_grid[new_row][new_column], piece
 
         # Check for horizontal matches at the new position
-        horizontal_match = self.check_horizontal_match(new_grid, new_row, new_column, piece)
+        horizontal_match = self._check_horizontal_match(new_grid, new_row, new_column, piece)
 
         # Check for vertical matches at the new position
-        vertical_match = self.check_vertical_match(new_grid, new_row, new_column, piece)
+        vertical_match = self._check_vertical_match(new_grid, new_row, new_column, piece)
 
         # Also check the original position for matches after the swap
         original_piece = new_grid[row][column]
-        horizontal_match_orig = self.check_horizontal_match(new_grid, row, column, original_piece)
-        vertical_match_orig = self.check_vertical_match(new_grid, row, column, original_piece)
+        horizontal_match_orig = self._check_horizontal_match(new_grid, row, column, original_piece)
+        vertical_match_orig = self._check_vertical_match(new_grid, row, column, original_piece)
 
         all_matches = (horizontal_match + vertical_match +
                        horizontal_match_orig + vertical_match_orig)
@@ -387,7 +417,7 @@ class GameLogic:
         return True, len(all_matches) > 0
 
     @staticmethod
-    def check_horizontal_match(grid, row, column, piece):
+    def _check_horizontal_match(grid, row, column, piece):
         """Check for horizontal 3-in-a-row matches centered
         around or including the given position."""
         matches = []
@@ -406,7 +436,7 @@ class GameLogic:
         return matches
 
     @staticmethod
-    def check_vertical_match(grid, row, column, piece):
+    def _check_vertical_match(grid, row, column, piece):
         """Check for vertical 3-in-a-row matches centered around or including the given position."""
         matches = []
         rows = len(grid)
@@ -429,7 +459,7 @@ class GameLogic:
             return True
         return False
 
-    def find_all_possible_matches(self):
+    def _find_all_possible_matches(self):
         """
         Scan the entire game board to find all possible moves that would create a 3-in-a-row match.
         """
@@ -438,7 +468,8 @@ class GameLogic:
         for row in range(self.game_board.rows):
             for column in range(self.game_board.columns):
                 # Check move right
-                can_move, creates_match = self.check_match_after_move(row, column, 1, 'horizontal')
+                can_move, creates_match = self._check_match_after_move(
+                    row, column, 1, 'horizontal')
                 if can_move and creates_match:
                     possible_moves.append({
                         'from': (column, row),
@@ -446,7 +477,8 @@ class GameLogic:
                     })
 
                 # Check move left
-                can_move, creates_match = self.check_match_after_move(row, column, -1, 'horizontal')
+                can_move, creates_match = self._check_match_after_move(
+                    row, column, -1, 'horizontal')
                 if can_move and creates_match:
                     possible_moves.append({
                         'from': (column, row),
@@ -454,7 +486,8 @@ class GameLogic:
                     })
 
                 # Check move down
-                can_move, creates_match = self.check_match_after_move(row, column, 1, 'vertical')
+                can_move, creates_match = self._check_match_after_move(
+                    row, column, 1, 'vertical')
                 if can_move and creates_match:
                     possible_moves.append({
                         'from': (column, row),
@@ -462,7 +495,8 @@ class GameLogic:
                     })
 
                 # Check move up
-                can_move, creates_match = self.check_match_after_move(row, column, -1, 'vertical')
+                can_move, creates_match = self._check_match_after_move(
+                    row, column, -1, 'vertical')
                 if can_move and creates_match:
                     possible_moves.append({
                         'from': (column, row),

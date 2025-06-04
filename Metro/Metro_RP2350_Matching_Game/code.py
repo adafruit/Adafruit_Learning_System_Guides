@@ -4,6 +4,7 @@
 An implementation of a match3 jewel swap game. The idea is to move one character at a time
 to line up at least 3 characters.
 """
+import time
 from displayio import Group, OnDiskBitmap, TileGrid, Bitmap, Palette
 from adafruit_display_text.bitmap_label import Label
 from adafruit_display_text.text_box import TextBox
@@ -141,21 +142,24 @@ main_group.append(foreground_tg)
 ui_group = Group()
 main_group.append(ui_group)
 
-# Create the game logic object
-# pylint: disable=no-value-for-parameter, too-many-function-args
-game_logic = GameLogic(
-    display,
-    game_grid,
-    swap_piece,
-    selected_piece_group,
-    GAME_PIECES
-)
-
 # Create the mouse graphics and add to the main group
+time.sleep(1)  # Allow time for USB host to initialize
 mouse = find_and_init_boot_mouse("/bitmaps/mouse_cursor.bmp")
 if mouse is None:
     raise RuntimeError("No mouse found connected to USB Host")
 main_group.append(mouse.tilegrid)
+
+# Create the game logic object
+# pylint: disable=no-value-for-parameter, too-many-function-args
+game_logic = GameLogic(
+    display,
+    mouse,
+    game_grid,
+    swap_piece,
+    selected_piece_group,
+    GAME_PIECES,
+    HINT_TIMEOUT
+)
 
 def update_ui():
     # Update the UI elements with the current game state
@@ -232,38 +236,29 @@ ui_group.append(message_dialog)
 while True:
     update_ui()
     # update mouse
-    pressed_btns = mouse.update()
-
-    if waiting_for_release and not pressed_btns:
-        # If both buttons are released, we can process the next click
-        waiting_for_release = False
+    game_logic.update_mouse()
 
     if not message_dialog.hidden:
-        if message_button.handle_mouse((mouse.x, mouse.y),
-                                       pressed_btns and "left" in pressed_btns,
-                                       waiting_for_release):
-            waiting_for_release = True
+        if message_button.handle_mouse(
+            (mouse.x, mouse.y),
+            game_logic.pressed_btns and "left" in game_logic.pressed_btns,
+            waiting_for_release
+        ):
+            game_logic.waiting_for_release = True
         continue
 
-    if reset_button.handle_mouse((mouse.x, mouse.y),
-                                 pressed_btns and "left" in pressed_btns,
-                                 waiting_for_release):
-        waiting_for_release = True
+    if reset_button.handle_mouse(
+        (mouse.x, mouse.y),
+        game_logic.pressed_btns is not None and "left" in game_logic.pressed_btns,
+        game_logic.waiting_for_release
+    ):
+        game_logic.waiting_for_release = True
 
     # process gameboard click if no menu
-    game_board = game_logic.game_board
-    if (game_board.x <= mouse.x <= game_board.x + game_board.columns * 32 and
-        game_board.y <= mouse.y <= game_board.y + game_board.rows * 32 and
-        not waiting_for_release):
-        piece_coords = ((mouse.x - game_board.x) // 32, (mouse.y - game_board.y) // 32)
-        if pressed_btns and "left" in pressed_btns:
-            game_logic.piece_clicked(piece_coords)
-            waiting_for_release = True
+    game_logic.update()
     game_over = game_logic.check_for_game_over()
     if game_over and not game_over_shown:
         message_label.text = ("No more moves available. your final score is:\n"
                               + str(game_logic.score))
         message_dialog.hidden = False
         game_over_shown = True
-    if game_logic.time_since_last_update > HINT_TIMEOUT:
-        game_logic.show_hint()
