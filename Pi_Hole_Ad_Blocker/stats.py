@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2017 Limor Fried for Adafruit Industries
 # SPDX-FileCopyrightText: 2017 Tony DiCola for Adafruit Industries
 # SPDX-FileCopyrightText: 2017 James DeVito for Adafruit Industries
+# SPDX-FileCopyrightText: 2025 Mikey Sklar for Adafruit Industries
 #
 # SPDX-License-Identifier: MIT
 
@@ -29,44 +30,34 @@
 # Adafruit Blinka to support CircuitPython libraries. CircuitPython does
 # not support PIL/pillow (python imaging library)!
 
-# Import Python System Libraries
+
 import json
 import subprocess
 import time
 
-# Import Requests Library
 import requests
-
-# Import Blinka
 from board import SCL, SDA
 import busio
 import adafruit_ssd1306
-
-# Import Python Imaging Library
 from PIL import Image, ImageDraw, ImageFont
 
-API_TOKEN = "YOUR_API_TOKEN_HERE"
-api_url = "http://localhost/admin/api.php?summaryRaw&auth="+API_TOKEN
+api_url = "http://localhost/api/stats/summary"
 
 # Create the I2C interface.
 i2c = busio.I2C(SCL, SDA)
 
 # Create the SSD1306 OLED class.
-# The first two parameters are the pixel width and pixel height.  Change these
-# to the right size for your display!
 disp = adafruit_ssd1306.SSD1306_I2C(128, 32, i2c)
 
 # Leaving the OLED on for a long period of time can damage it
-# Set these to prevent OLED burn in
-DISPLAY_ON  = 10 # on time in seconds
-DISPLAY_OFF = 50 # off time in seconds
+DISPLAY_ON  = 10  # on time in seconds
+DISPLAY_OFF = 50  # off time in seconds
 
 # Clear display.
 disp.fill(0)
 disp.show()
 
 # Create blank image for drawing.
-# Make sure to create image with mode '1' for 1-bit color.
 width = disp.width
 height = disp.height
 image = Image.new('1', (width, height))
@@ -77,27 +68,21 @@ draw = ImageDraw.Draw(image)
 # Draw a black filled box to clear the image.
 draw.rectangle((0, 0, width, height), outline=0, fill=0)
 
-# Draw some shapes.
-# First define some constants to allow easy resizing of shapes.
 padding = -2
 top = padding
-bottom = height - padding
-# Move left to right keeping track of the current x position
-# for drawing shapes.
 x = 0
 
 # Load nice silkscreen font
 font = ImageFont.truetype('/home/pi/slkscr.ttf', 8)
 
 while True:
-    # Draw a black filled box to clear the image.
+    # Clear the image buffer
     draw.rectangle((0, 0, width, height), outline=0, fill=0)
 
-    # Shell scripts for system monitoring from here :
-    # https://unix.stackexchange.com/questions/119126/command-to-display-memory-usage-disk-usage-and-cpu-load
-    cmd = "hostname -I | cut -d\' \' -f1 | tr -d \'\\n\'"
+    # Shell scripts for system monitoring
+    cmd = "hostname -I | cut -d' ' -f1 | tr -d '\\n'"
     IP = subprocess.check_output(cmd, shell=True).decode("utf-8")
-    cmd = "hostname | tr -d \'\\n\'"
+    cmd = "hostname | tr -d '\\n'"
     HOST = subprocess.check_output(cmd, shell=True).decode("utf-8")
     cmd = "top -bn1 | grep load | awk " \
           "'{printf \"CPU Load: %.2f\", $(NF-2)}'"
@@ -109,35 +94,30 @@ while True:
           "\"Disk: %d/%dGB %s\", $3,$2,$5}'"
     Disk = subprocess.check_output(cmd, shell=True).decode("utf-8")
 
-    # Pi Hole data!
+    # Pi-Hole data!
     try:
-        r = requests.get(api_url)
-        data = json.loads(r.text)
-        DNSQUERIES = data['dns_queries_today']
-        ADSBLOCKED = data['ads_blocked_today']
-        CLIENTS = data['unique_clients']
-    except KeyError:
-        time.sleep(1)
-        continue
+        r = requests.get(api_url, timeout=2)
+        r.raise_for_status()
+        data = r.json()
+        DNSQUERIES = data["queries"]["total"]
+        ADSBLOCKED = data["queries"]["blocked"]
+        CLIENTS    = data["clients"]["total"]
+    except Exception:
+        DNSQUERIES = 0
+        ADSBLOCKED = 0
+        CLIENTS    = 0
 
-    draw.text((x, top), "IP: " + str(IP) +
-              " (" + HOST + ")", font=font, fill=255)
-    draw.text((x, top + 8), "Ads Blocked: " +
-              str(ADSBLOCKED), font=font, fill=255)
-    draw.text((x, top + 16), "Clients:     " +
-              str(CLIENTS), font=font, fill=255)
-    draw.text((x, top + 24), "DNS Queries: " +
-              str(DNSQUERIES), font=font, fill=255)
-
-    # skip over original stats
-    # draw.text((x, top+8),     str(CPU), font=font, fill=255)
-    # draw.text((x, top+16),    str(MemUsage),  font=font, fill=255)
-    # draw.text((x, top+25),    str(Disk),  font=font, fill=255)
+    draw.text((x, top),       "IP: " + IP + " (" + HOST + ")", font=font, fill=255)
+    draw.text((x, top + 8),   "Ads Blocked: " + str(ADSBLOCKED),            font=font, fill=255)
+    draw.text((x, top + 16),  "Clients:     " + str(CLIENTS),                 font=font, fill=255)
+    draw.text((x, top + 24),  "DNS Queries: " + str(DNSQUERIES),               font=font, fill=255)
 
     # Display image.
     disp.image(image)
     disp.show()
     time.sleep(DISPLAY_ON)
+
+    # Blank screen to prevent burn-in
     disp.fill(0)
     disp.show()
     time.sleep(DISPLAY_OFF)
