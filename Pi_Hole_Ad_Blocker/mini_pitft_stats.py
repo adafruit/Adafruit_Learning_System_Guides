@@ -82,7 +82,7 @@ draw = ImageDraw.Draw(image)
 
 # Load default font (or replace with a TTF if desired)
 FONT_PATH = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
-font = ImageFont.truetype(FONT_PATH, 20)
+font = ImageFont.truetype(FONT_PATH, 24)
 
 buttonA = digitalio.DigitalInOut(board.D23)
 buttonA.switch_to_input()
