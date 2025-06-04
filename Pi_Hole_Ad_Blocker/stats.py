@@ -101,7 +101,7 @@ while True:
         DNSQUERIES = data["queries"]["total"]
         ADSBLOCKED = data["queries"]["blocked"]
         CLIENTS    = data["clients"]["total"]
-    except (KeyError, requests.RequestException, json.JSONDecodeError):
+    except (KeyError, requests.RequestException):
         DNSQUERIES = 0
         ADSBLOCKED = 0
         CLIENTS    = 0
