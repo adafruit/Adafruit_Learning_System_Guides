@@ -1,6 +1,33 @@
 # SPDX-FileCopyrightText: 2019 Brent Rubell for Adafruit Industries
+# SPDX-FileCopyrightText: 2025 Mikey Sklar for Adafruit Industries
 #
 # SPDX-License-Identifier: MIT
+
+# Copyright (c) 2017 Adafruit Industries
+# Author: Brent Rubell, Mikey Sklar
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+
+# This example is for use on (Linux) computers that are using CPython with
+# Adafruit Blinka to support CircuitPython libraries. CircuitPython does
+# not support PIL/pillow (python imaging library)!
+
 
 # -*- coding: utf-8 -*-
 # Import Python System Libraries
@@ -19,7 +46,7 @@ import board
 from PIL import Image, ImageDraw, ImageFont
 import adafruit_rgb_display.st7789 as st7789
 
-API_URL = "http://pi.hole/api/stats/summary"
+API_URL = "http://localhost/api/stats/summary"
 
 # Configuration for CS and DC pins (these are FeatherWing defaults on M0/M4):
 cs_pin = digitalio.DigitalInOut(board.D17)
