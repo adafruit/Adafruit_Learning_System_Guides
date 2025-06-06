@@ -33,8 +33,8 @@ BRIGHTNESS_NIGHT = 50
 
 # I2S pins for Audio BFF
 DATA = board.A0
-LRCLK = board.A2
-BCLK = board.A3
+LRCLK = board.A1
+BCLK = board.A2
 
 # Connect to WIFI
 wifi.radio.connect(os.getenv("CIRCUITPY_WIFI_SSID"), os.getenv("CIRCUITPY_WIFI_PASSWORD"))
