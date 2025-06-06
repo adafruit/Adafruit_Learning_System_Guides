@@ -128,7 +128,7 @@ class Display:
         self.matrix1.show()
         self.matrix2.show()
 
-    def pixel(self, matrix, x, y, color):
+    def pixel(self, matrix, x, y, color): # pylint: disable=no-self-use
         """Draw a pixel with 180-degree rotation"""
         fx, fy = 12 - x, 8 - y
         if 0 <= fx < 13 and 0 <= fy < 9:
