@@ -172,7 +172,7 @@ bool Adafruit_PyCamera::initSD(void) {
   }
 
   Serial.println("Card successfully initialized");
-  uint32_t size = sd.card()->cardSize();
+  uint32_t size = sd.card()->sectorCount();
   if (size == 0) {
     Serial.println("Can't determine the card size");
   } else {
@@ -497,7 +497,7 @@ bool Adafruit_PyCamera::takePhoto(const char *filename_base,
     return false;
   }
 
-  if (!sd.card() || (sd.card()->cardSize() == 0)) {
+  if (!sd.card() || (sd.card()->sectorCount() == 0)) {
     Serial.println("No SD card found");
     // try to initialize?
     if (!initSD())
