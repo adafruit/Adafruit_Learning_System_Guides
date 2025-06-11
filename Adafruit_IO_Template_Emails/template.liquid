@@ -62,7 +62,7 @@ Success rate: {{ success_rate }}% [{%- for i in (1..bar_filled) -%}█{%- endfor
 Keep being awesome!
 With love and high-fives! 🙌
 ---
-{%- capture event_mod -%}{{ total_events | modulo: 3 }}{%- endcapture %}
+{% assign event_mod = total_events | modulo: 3 %}
 {% if event_mod == 0 %}
 <i>P.S. Remember: Every expert was once a beginner - they're doing brilliantly! 🌟</i>
 {% elsif event_mod == 1 %}
