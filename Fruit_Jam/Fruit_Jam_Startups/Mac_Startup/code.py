@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2025 Tim Cocks for Adafruit Industries
+# SPDX-License-Identifier: MIT
 import time
 from audiocore import WaveFile
 import audiobusio
@@ -24,9 +26,7 @@ dac.headphone_volume = -15  # dB
 # dac.speaker_volume = -15  # dB
 
 # Chime audio setup
-wave_file = open(  # pylint: disable=consider-using-with
-    "mac_startup/mac_chime.wav", "rb"
-)
+wave_file = open("mac_startup/mac_chime.wav", "rb")
 wave = WaveFile(wave_file)
 audio = audiobusio.I2SOut(board.I2S_BCLK, board.I2S_WS, board.I2S_DIN)
 
