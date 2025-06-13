@@ -53,7 +53,7 @@ bme280.overscan_pressure = adafruit_bme280.OVERSCAN_X16
 bme280.iir_filter = adafruit_bme280.IIR_FILTER_DISABLE
 bme280.standby_period = adafruit_bme280.STANDBY_TC_1000
 
-
+# set status pixel to yellow
 status_pixel[0] = 0xFFFF00
 
 print("Connecting to AdafruitIO")
@@ -69,12 +69,15 @@ print("Connecting to %s" % ssid)
 wifi.radio.connect(ssid, password)
 print("Connected to %s!" % ssid)
 
+# setup socket pool and requests session
 pool = adafruit_connection_manager.get_radio_socketpool(wifi.radio)
 ssl_context = adafruit_connection_manager.get_radio_ssl_context(wifi.radio)
 requests = adafruit_requests.Session(pool, ssl_context)
+
 # Initialize an Adafruit IO HTTP API object
 io = IO_HTTP(aio_username, aio_key, requests)
 
+# set status pixel to green
 status_pixel[0] = 0x00FF00
 
 try:
@@ -94,6 +97,7 @@ except AdafruitIO_RequestError as e:
         "You must create feeds on AdafruitIO for: temperature, humidity, and pressure"
     )
 
+# turn off the neopixel and builtin LED
 np_power.value = False
 builtin_led.value = False
 
