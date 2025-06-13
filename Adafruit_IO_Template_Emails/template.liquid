@@ -34,12 +34,12 @@ COMMUNICATION SUPERSTAR! 🌟 They're amazing at telling adults - that's such a 
 <b>👻 Nothing Happened: {{ vars.nothing_progress }}</b>
 {% for i in (1..vars.nothing_progress) %}⭕{% endfor %}
 {% if vars.nothing_progress <= 3 -%}
-That's okay! Trying is what matters, and they're body will let them know when it's ready! 🌈
+That's okay! Trying is what matters, and their body will let them know when it's ready! 🌈
 {% else -%}
 So patient and persistent! Even when nothing happens, they keep trying - that's real determination! 💫
 {% endif %}---
 
-<b>📊 Week Summary:</b>
+<b>📊 Daily Summary:</b>
 {% capture total_tries -%}{{ vars.wee_progress | plus: vars.poo_progress | plus: vars.nothing_progress }}{% endcapture -%}
 {% capture successes -%}{{ vars.wee_progress | plus: vars.poo_progress }}{% endcapture -%}
 {% capture success_rate -%}{% if total_tries != "0" -%}{{ successes | times: 100 | divided_by: total_tries }}{% else -%}100{% endif -%}{% endcapture -%}
@@ -48,15 +48,15 @@ So patient and persistent! Even when nothing happens, they keep trying - that's 
 Total potty visits: {{ total_tries }}
 Success rate: {{ success_rate }}% [{%- for i in (1..bar_filled) -%}█{%- endfor -%}{%- for i in (1..bar_empty) -%}░{%- endfor -%}]
 {%- assign total_events = vars.wee_progress | plus: vars.poo_progress | plus: vars.nothing_progress | plus: vars.informed_progress -%}
- ({{ total_events }} events this week )
+ ({{ total_events }} events today )
 {% if total_events <= 3 %}
-💝 <b>This Week:</b> They're doing such a great job learning! Every day gets a little easier...
+💝 <b>Today:</b> They're doing such a great job learning! Every day gets a little easier...
 {% elsif total_events <= 5 %}
-🌟 <b>This Week:</b> Ayee! They're really getting the hang of this potty training thing! Keep it up!
+🌟 <b>Today:</b> Ayee! They're really getting the hang of this potty training thing! Keep it up!
 {% elsif total_events <= 8 %}
-🌟 <b>This Week:</b> WOW! Look at all that practice! They're becoming such a potty expert.
+🌟 <b>Today:</b> WOW! Look at all that practice! They're becoming such a potty expert.
 {% else %}
-🏆 <b>This Week:</b> INCREDIBLE WEEK! They're absolutely rocking this potty training journey! 🎊🎉
+🏆 <b>Today:</b> INCREDIBLE DAY! They're absolutely rocking this potty training journey! 🎊🎉
 {%- endif %}
 
 Keep being awesome!
