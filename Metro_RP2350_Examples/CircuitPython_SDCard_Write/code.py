@@ -8,6 +8,8 @@ REMOVE THIS LINE AND ALL BELOW IT BEFORE SUBMITTING TO LEARN
 Update CHIP_SELECT_PIN to match the CS pin on your board.
 
 For example, for the Metro ESP32-S3, you would use: board.SD_CS.
+
+This code stops working with CircuitPython 10.x which automounts /sd
 """
 
 import time
