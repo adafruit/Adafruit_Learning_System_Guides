@@ -71,7 +71,8 @@ class TypewriterSender:
             keyboard.Key.cmd_r: 0x80,
         }
 
-    def find_feather_port(self):
+    @staticmethod
+    def find_feather_port():
         """Find the Feather's serial port"""
         ports = serial.tools.list_ports.comports()
 
