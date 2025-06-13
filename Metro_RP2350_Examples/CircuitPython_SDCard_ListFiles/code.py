@@ -16,13 +16,20 @@ import adafruit_sdcard
 # The SD_CS pin is the chip select line.
 SD_CS = board.SD_CS
 
-# Connect to the card and mount the filesystem.
-cs = digitalio.DigitalInOut(SD_CS)
-sdcard = adafruit_sdcard.SDCard(busio.SPI(board.SD_SCK, board.SD_MOSI, board.SD_MISO), cs)
-vfs = storage.VfsFat(sdcard)
-storage.mount(vfs, "/sd")
+try:
+    # Connect to the card and mount the filesystem.
+    cs = digitalio.DigitalInOut(SD_CS)
+    sdcard = adafruit_sdcard.SDCard(
+        busio.SPI(board.SD_SCK, board.SD_MOSI, board.SD_MISO), cs
+    )
+    vfs = storage.VfsFat(sdcard)
+    storage.mount(vfs, "/sd")
+except ValueError:
+    # SD_CS in use error happens if CircuitPython core initialized the SD automatically
+    pass
 
 # Use the filesystem as normal! Our files are under /sd
+
 
 # This helper function will print the contents of the SD
 def print_directory(path, tabs=0):
