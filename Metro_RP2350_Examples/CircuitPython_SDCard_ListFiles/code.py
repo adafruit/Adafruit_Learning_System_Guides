@@ -3,7 +3,7 @@
 
 """
 CircuitPython Essentials SD Card Read Demo
-
+* Not compatible with CircuitPython 10.x
 """
 
 import os
