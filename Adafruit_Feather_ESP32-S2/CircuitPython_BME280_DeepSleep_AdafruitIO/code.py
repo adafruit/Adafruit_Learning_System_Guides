@@ -19,14 +19,15 @@ import adafruit_requests
 from adafruit_io.adafruit_io import IO_HTTP, AdafruitIO_RequestError
 
 
-# On MagTag, enable power to NeoPixels.
-# Remove these two lines on boards without board.NEOPIXEL_POWER.
+# enable power to NeoPixels.
 np_power = digitalio.DigitalInOut(board.NEOPIXEL_POWER)
 np_power.switch_to_output(value=True)
 
+# standard LED
 builtin_led = digitalio.DigitalInOut(board.LED)
 builtin_led.switch_to_output(value=True)
 
+# neopixel to use for status
 status_pixel = neopixel.NeoPixel(
     board.NEOPIXEL, 1, brightness=0.1, pixel_order=neopixel.GRB, auto_write=True
 )
@@ -39,6 +40,7 @@ print("Found BME280")
 # change this to match the location's pressure (hPa) at sea level
 bme280.sea_level_pressure = 1013.25
 
+# temperature converted to F
 temperature = bme280.temperature * 9 / 5 + 32
 humidity = bme280.relative_humidity
 pressure = bme280.pressure
