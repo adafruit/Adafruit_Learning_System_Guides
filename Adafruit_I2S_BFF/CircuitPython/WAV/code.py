@@ -11,7 +11,7 @@ LOOP = False  # Update to True loop WAV playback. False plays once.
 
 audio = audiobusio.I2SOut(board.A2, board.A1, board.A0)
 
-with open("chikken.wav", "rb") as wave_file:
+with open("booploop.wav", "rb") as wave_file:
     wav = audiocore.WaveFile(wave_file)
 
     print("Playing wav file!")

@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 import os
 import random
+import sys
 import time
 from io import BytesIO
 
@@ -133,7 +134,10 @@ class Match3Card(Group):
 
     def __init__(self, card_tuple, **kwargs):
         # tile palette mapper to color the card
-        self._mapper = TilePaletteMapper(kwargs["pixel_shader"], 5, 1, 1)
+        if sys.implementation.version[0] == 9:
+            self._mapper = TilePaletteMapper(kwargs["pixel_shader"], 5, 1, 1)
+        elif sys.implementation.version[0] >= 10:
+            self._mapper = TilePaletteMapper(kwargs["pixel_shader"], 5)
         kwargs["pixel_shader"] = self._mapper
         # tile grid to for the visible sprite
         self._tilegrid = TileGrid(**kwargs)
@@ -580,9 +584,11 @@ class Match3Game(Group):
                         # if 3 cards have been clicked
                         if len(self.clicked_cards) == 3:
                             # check if the 3 cards make a valid set
-                            valid_set = validate_set(self.clicked_cards[0],
-                                                     self.clicked_cards[1],
-                                                     self.clicked_cards[2])
+                            valid_set = validate_set(
+                                self.clicked_cards[0],
+                                self.clicked_cards[1],
+                                self.clicked_cards[2],
+                            )
 
                             # if they are a valid set
                             if valid_set:
@@ -660,7 +666,7 @@ class Match3Game(Group):
                 # load the game from the given game state
                 self.load_from_game_state(self.game_state)
                 # hide the title screen
-                self.title_screen.hidden = True  # pylint: disable=attribute-defined-outside-init
+                self.title_screen.hidden = True
                 # set the current state to open play
                 self.cur_state = STATE_PLAYING_OPEN
 
@@ -676,7 +682,7 @@ class Match3Game(Group):
                 # initialize a new game
                 self.init_new_game()
                 # hide the title screen
-                self.title_screen.hidden = True  # pylint: disable=attribute-defined-outside-init
+                self.title_screen.hidden = True
                 # set the current state to open play
                 self.cur_state = STATE_PLAYING_OPEN
 
@@ -727,6 +733,7 @@ class Match3TitleScreen(Group):
 
     def __init__(self, display_size):
         super().__init__()
+        self.hidden = False
         self.display_size = display_size
         # background bitmap color
         bg_bmp = Bitmap(display_size[0] // 10, display_size[1] // 10, 1)

@@ -68,8 +68,12 @@ class GameLogic:
         if (self.grid_width * 16 > self._display.width or
             self.grid_height * 16 > self._display.height - INFO_BAR_HEIGHT):
             raise ValueError("Grid size exceeds display size")
-        self._board_data = bytearray(self.grid_width * self.grid_height)
         self._mine_count = DIFFICULTIES[self._difficulty]['mines']
+        if self._mine_count > (self.grid_width - 1) * (self.grid_height - 1):
+            raise ValueError("Too many mines for grid size")
+        if self._mine_count < 10:
+            raise ValueError("There must be at least 10 mines")
+        self._board_data = bytearray(self.grid_width * self.grid_height)
         self._status = STATUS_NEWGAME
         self._start_time = None
         self._end_time = None
@@ -241,7 +245,6 @@ class GameLogic:
         if self._start_time is None:
             return 0
         if self._end_time is None:
-            print(ticks_ms() / 1000, self._start_time / 1000)
             return min(999, (ticks_ms() - self._start_time) // 1000)
         return min(999, (self._end_time - self._start_time) // 1000)
 

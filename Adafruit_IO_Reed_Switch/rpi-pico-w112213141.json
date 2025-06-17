@@ -1,0 +1,27 @@
+{
+  "exportVersion": "1.0.0",
+  "exportedBy": "tyeth_demo",
+  "exportedAt": "2025-05-02T17:08:03.857Z",
+  "exportedFromDevice": {
+    "board": "rpi-pico-w",
+    "firmwareVersion": "1.0.0-beta.100"
+  },
+  "components": [
+    {
+      "name": "Reed Switch",
+      "pinName": "D13",
+      "type": "reed_switch",
+      "mode": "DIGITAL",
+      "direction": "INPUT",
+      "period": 0,
+      "pull": "UP",
+      "isPin": true,
+      "visualization": {
+        "offLabel": "Open",
+        "offIcon": "fa6:solid:door-open",
+        "onLabel": "Closed",
+        "onIcon": "fa6:regular:door-closed"
+      }
+    }
+  ]
+}
