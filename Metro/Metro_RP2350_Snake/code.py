@@ -3,9 +3,6 @@
 import sys
 import time
 from micropython import const
-import board
-import picodvi
-import framebufferio
 import supervisor
 import displayio
 import terminalio

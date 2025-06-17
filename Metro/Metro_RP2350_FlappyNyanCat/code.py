@@ -13,7 +13,7 @@ Controls:
 import random
 import sys
 import terminalio
-from displayio import Group, TileGrid, Bitmap, release_displays, Palette
+from displayio import Group, TileGrid, Bitmap, Palette
 import supervisor
 import bitmaptools
 from adafruit_display_text.bitmap_label import Label
@@ -591,7 +591,8 @@ while True:
 
         # if player pressed p
         if "p" in cur_btn_val:
-            supervisor.set_next_code_file(__file__, working_directory=Path(__file__).parent.absolute())
+            supervisor.set_next_code_file(__file__,
+                                          working_directory=Path(__file__).parent.absolute())
             supervisor.reload()
 
         # if player pressed q

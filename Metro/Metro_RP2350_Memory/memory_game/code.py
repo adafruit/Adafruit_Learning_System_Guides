@@ -44,7 +44,7 @@ def update_score_text():
     Update the score text on the display for each player
     """
     for _ in range(2):
-        out_str = f"p{_+1} score: {player_scores[_]}"
+        out_str = f"p{_ + 1} score: {player_scores[_]}"
         score_lbls[_].text = out_str
 
 
@@ -62,7 +62,7 @@ STATE_GAMEOVER = 2
 # initial state is title screen
 CUR_STATE = STATE_TITLE
 
-request_display_config(320,240)
+request_display_config(320, 240)
 display = supervisor.runtime.display
 
 # main group will hold all the visual elements
@@ -304,13 +304,15 @@ for device in usb.core.find(find_all=True):
         device, 0
     )
 
-    _possible_interface_index, _possible_endpoint_address = adafruit_usb_host_descriptors.find_boot_mouse_endpoint(
-        device)
+    _possible_interface_index, _possible_endpoint_address = (
+        adafruit_usb_host_descriptors.find_boot_mouse_endpoint(device))
+
     if _possible_interface_index is not None and _possible_endpoint_address is not None:
         mouse = device
         mouse_interface_index = _possible_interface_index
         mouse_endpoint_address = _possible_endpoint_address
-        print(f"mouse interface: {mouse_interface_index} endpoint_address: {hex(mouse_endpoint_address)}")
+        print(f"mouse interface: {mouse_interface_index}", end="")
+        print(f"endpoint_address: {hex(mouse_endpoint_address)}")
 
 mouse_was_attached = None
 if mouse is not None:
@@ -324,6 +326,7 @@ if mouse is not None:
     # set configuration on the mouse so we can use it
     mouse.set_configuration()
 
+
 def atexit_callback():
     """
     re-attach USB devices to kernel if needed.
@@ -332,6 +335,7 @@ def atexit_callback():
     print("inside atexit callback")
     if mouse_was_attached and not mouse.is_kernel_driver_active(0):
         mouse.attach_kernel_driver(0)
+
 
 atexit.register(atexit_callback)
 
@@ -396,8 +400,8 @@ while True:
 
             # if both cards were the same i.e. they found a match
             if (
-                card_tgs[cards_flipped_this_turn[0]][0]
-                == card_tgs[cards_flipped_this_turn[1]][0]
+                    card_tgs[cards_flipped_this_turn[0]][0]
+                    == card_tgs[cards_flipped_this_turn[1]][0]
             ):
 
                 # set the cards tile index to show a blank spot instead of a card
@@ -414,8 +418,8 @@ while True:
                 # of cards then the code knows the game is over because each pair is worth 1
                 # point
                 if (
-                    player_scores[0] + player_scores[1]
-                    >= (grid_size[0] * grid_size[1]) // 2
+                        player_scores[0] + player_scores[1]
+                        >= (grid_size[0] * grid_size[1]) // 2
                 ):
 
                     # if the player's scores are equal
@@ -498,7 +502,8 @@ while True:
             # button bounding box
             if play_again_btn.contains(coords):
                 # set next code file to this one
-                supervisor.set_next_code_file(__file__, working_directory=Path(__file__).parent.absolute())
+                supervisor.set_next_code_file(__file__,
+                                              working_directory=Path(__file__).parent.absolute())
                 # reload
                 supervisor.reload()
 
