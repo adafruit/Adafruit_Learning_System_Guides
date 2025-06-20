@@ -18,7 +18,10 @@ All text above must be included in any redistribution.
 
 
 from adafruit_logging import Handler, NOTSET
-from adafruit_ble.uart import UARTServer
+
+from adafruit_ble import BLERadio
+from adafruit_ble.advertising.standard import ProvideServicesAdvertisement
+from adafruit_ble.services.nordic import UARTService
 
 
 class BLEHandler(Handler):
@@ -31,8 +34,10 @@ class BLEHandler(Handler):
         """
         super().__init__(level)
         self._advertising_now = False
-        self._uart = UARTServer()
-        self._uart.start_advertising()
+        ble = BLERadio()
+        self._uart = UARTService()
+        self._advertisement = ProvideServicesAdvertisement(self._uart)
+        ble.start_advertising(self._advertisement)
 
     def format(self, record):
         """Generate a string to log.
@@ -46,7 +51,5 @@ class BLEHandler(Handler):
 
         :param record: The record (message object) to be logged
         """
-        while not self._uart.connected:
-            pass
         data = bytes(self.format(record), "utf-8")
         self._uart.write(data)

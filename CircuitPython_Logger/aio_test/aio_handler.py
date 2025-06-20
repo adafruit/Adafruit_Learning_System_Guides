@@ -24,7 +24,7 @@ class AIOHandler(Handler):
 
     def __init__(self, name, portal_device, level: int = NOTSET):
         """Create an instance."""
-        super().__init__(name)
+        super().__init__(level)
         self._log_feed_name = f"{name}-logging"
         if not issubclass(type(portal_device), PortalBase):
             raise TypeError(
