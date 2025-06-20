@@ -17,34 +17,39 @@ All text above must be included in any redistribution.
 """
 
 
-from adafruit_logging import Handler
-from adafruit_ble.uart import UARTServer
+from adafruit_logging import Handler, NOTSET
+
+from adafruit_ble import BLERadio
+from adafruit_ble.advertising.standard import ProvideServicesAdvertisement
+from adafruit_ble.services.nordic import UARTService
+
 
 class BLEHandler(Handler):
     """Send logging output to the BLE uart port."""
 
-    def __init__(self):
+    def __init__(self, level: int = NOTSET):
         """Create an instance.
 
         :param uart: the busio.UART instance to which to write messages
         """
+        super().__init__(level)
         self._advertising_now = False
-        self._uart = UARTServer()
-        self._uart.start_advertising()
+        ble = BLERadio()
+        self._uart = UARTService()
+        self._advertisement = ProvideServicesAdvertisement(self._uart)
+        ble.start_advertising(self._advertisement)
 
     def format(self, record):
         """Generate a string to log.
 
         :param record: The record (message object) to be logged
         """
-        return super().format(record) + '\r\n'
+        return super().format(record) + "\r\n"
 
     def emit(self, record):
         """Generate the message and write it to the UART.
 
         :param record: The record (message object) to be logged
         """
-        while not self._uart.connected:
-            pass
-        data = bytes(self.format(record), 'utf-8')
+        data = bytes(self.format(record), "utf-8")
         self._uart.write(data)

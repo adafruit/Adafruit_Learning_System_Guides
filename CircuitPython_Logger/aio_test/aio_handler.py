@@ -17,29 +17,20 @@ All text above must be included in any redistribution.
 """
 
 from adafruit_portalbase import PortalBase
+from adafruit_logging import Handler, NOTSET
 
-# Example:
-#
-# from aio_handler import AIOHandler
-# import adafruit_logging as logging
-# l = logging.getLogger('aio')
-# # Pass in the device object based on portal_base
-# # (Funhouse, PyPortal, MagTag, etc) as the 2nd parameter
-# l.addHandler(AIOHandler('test', portal_device))
-# l.level = logging.ERROR
-# l.error("test")
-
-from adafruit_logging import Handler
 
 class AIOHandler(Handler):
 
-    def __init__(self, name, portal_device):
+    def __init__(self, name, portal_device, level: int = NOTSET):
         """Create an instance."""
-        self._log_feed_name=f"{name}-logging"
+        super().__init__(level)
+        self._log_feed_name = f"{name}-logging"
         if not issubclass(type(portal_device), PortalBase):
-            raise TypeError("portal_device must be a PortalBase or subclass of PortalBase")
+            raise TypeError(
+                "portal_device must be a PortalBase or subclass of PortalBase"
+            )
         self._portal_device = portal_device
-
 
     def emit(self, record):
         """Generate the message and write it to the AIO Feed.
