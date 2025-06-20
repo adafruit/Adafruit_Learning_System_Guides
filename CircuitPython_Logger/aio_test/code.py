@@ -8,27 +8,28 @@ from adafruit_pyportal import PyPortal
 from aio_handler import AIOHandler
 import adafruit_logging as logging
 
-device=PyPortal()
+device = PyPortal()
 
-l = logging.getLogger('aio')
-l.addHandler(AIOHandler('test', device))
+l = logging.getLogger("aio")
+l.addHandler(AIOHandler("test", device))
+
 
 def go():
     while True:
         t = random.randint(1, 5)
         if t == 1:
-            print('debug')
+            print("debug")
             l.debug("debug message: %d", random.randint(0, 1000))
         elif t == 2:
-            print('info')
+            print("info")
             l.info("info message: %d", random.randint(0, 1000))
         elif t == 3:
-            print('warning')
+            print("warning")
             l.warning("warning message: %d", random.randint(0, 1000))
         elif t == 4:
-            print('error')
+            print("error")
             l.error("error message: %d", random.randint(0, 1000))
         elif t == 5:
-            print('critical')
+            print("critical")
             l.critical("critical message: %d", random.randint(0, 1000))
         time.sleep(5.0 + (random.random() * 5.0))
