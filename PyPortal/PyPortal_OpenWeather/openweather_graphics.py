@@ -131,6 +131,6 @@ class OpenWeather_Graphics(displayio.Group):
             return  # we're done, no icon desired
 
         icon = displayio.OnDiskBitmap(filename)
-        self._icon_sprite = displayio.TileGrid(icon, pixel_shader=background.pixel_shader)
+        self._icon_sprite = displayio.TileGrid(icon, pixel_shader=icon.pixel_shader)
 
         self._icon_group.append(self._icon_sprite)
