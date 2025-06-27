@@ -22,31 +22,17 @@ clue.pixel.fill(0)  # turn off NeoPixel
 clue_display = displayio.Group()
 
 # draw the dry plant
-dry_plant_file = open("dry.bmp", "rb")
-dry_plant_bmp = displayio.OnDiskBitmap(dry_plant_file)
-# CircuitPython 6 & 7 compatible
+dry_plant_bmp = displayio.OnDiskBitmap("dry.bmp")
 dry_plant_sprite = displayio.TileGrid(
-    dry_plant_bmp,
-    pixel_shader=getattr(dry_plant_bmp, "pixel_shader", displayio.ColorConverter()),
+    dry_plant_bmp, pixel_shader=dry_plant_bmp.pixel_shader
 )
-# CircuitPython 7 compatible
-# dry_plant_sprite = displayio.TileGrid(
-#     dry_plant_bmp, pixel_shader=dry_plant_bmp.pixel_shader
-# )
 clue_display.append(dry_plant_sprite)
 
 # draw the happy plant on top (so it can be moved out of the way when needed)
-happy_plant_file = open("happy.bmp", "rb")
-happy_plant_bmp = displayio.OnDiskBitmap(happy_plant_file)
-# CircuitPython 6 & 7 compatible
+happy_plant_bmp = displayio.OnDiskBitmap("happy.bmp")
 happy_plant_sprite = displayio.TileGrid(
-    happy_plant_bmp,
-    pixel_shader=getattr(happy_plant_bmp, "pixel_shader", displayio.ColorConverter()),
+    happy_plant_bmp, pixel_shader=happy_plant_bmp.pixel_shader
 )
-# CircuitPython 7 compatible
-# happy_plant_sprite = displayio.TileGrid(
-#     happy_plant_bmp, pixel_shader=happy_plant_bmp.pixel_shader
-# )
 clue_display.append(happy_plant_sprite)
 
 # Create text

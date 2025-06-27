@@ -30,16 +30,13 @@ display = adafruit_spd1656.SPD1656(
 
 g = displayio.Group()
 
-fn = "/display-ruler-720p.bmp"
+pic = displayio.OnDiskBitmap("/display-ruler-720p.bmp")
+t = displayio.TileGrid(pic, pixel_shader=pic.pixel_shader)
+g.append(t)
 
-with open(fn, "rb") as f:
-    pic = displayio.OnDiskBitmap(f)
-    t = displayio.TileGrid(pic, pixel_shader=pic.pixel_shader)
-    g.append(t)
+display.root_group = g
 
-    display.root_group = g
-
-    display.refresh()
+display.refresh()
 
 while True:
     pass

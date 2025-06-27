@@ -64,23 +64,12 @@ def play_wave(filename):
         pass
 
 def show_image(filename):
-    # CircuitPython 6 & 7 compatible
-    try:
-        image_file = open(filename, "rb")
-    except OSError:
-        image_file = open("missing.bmp", "rb")
-    odb = displayio.OnDiskBitmap(image_file)
-    face = displayio.TileGrid(
-        odb,
-        pixel_shader=getattr(odb, 'pixel_shader', displayio.ColorConverter())
-    )
 
-    # # CircuitPython 7+ compatible
-    # try:
-    #     odb = displayio.OnDiskBitmap(filename)
-    # except (OSError, ValueError):
-    #     odb = displayio.OnDiskBitmap("missing.bmp")
-    # face = displayio.TileGrid(odb, pixel_shader=odb.pixel_shader)
+    try:
+        odb = displayio.OnDiskBitmap(filename)
+    except (OSError, ValueError):
+        odb = displayio.OnDiskBitmap("missing.bmp")
+    face = displayio.TileGrid(odb, pixel_shader=odb.pixel_shader)
 
     backlight.value = False
     splash.append(face)

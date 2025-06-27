@@ -22,32 +22,14 @@ splash = displayio.Group()
 # bad egg
 BAD_EGG_FILENAME = "broken_egg.bmp"
 
-# CircuitPython 6 & 7 compatible
-begg_file = open(BAD_EGG_FILENAME, "rb")
-begg_bmp = displayio.OnDiskBitmap(begg_file)
-begg_sprite = displayio.TileGrid(
-    begg_bmp,
-    pixel_shader=getattr(begg_bmp, 'pixel_shader', displayio.ColorConverter())
-)
-
-# # CircuitPython 7+ compatible
-# begg_bmp = displayio.OnDiskBitmap(BAD_EGG_FILENAME)
-# begg_sprite = displayio.TileGrid(begg_bmp, pixel_shader=begg_bmp.pixel_shader)
+begg_bmp = displayio.OnDiskBitmap(BAD_EGG_FILENAME)
+begg_sprite = displayio.TileGrid(begg_bmp, pixel_shader=begg_bmp.pixel_shader)
 
 # good egg
 GOOD_EGG_FILENAME = "good_egg.bmp"
 
-# CircuitPython 6 & 7 compatible
-gegg_file = open(GOOD_EGG_FILENAME, "rb")
-gegg_bmp = displayio.OnDiskBitmap(gegg_file)
-gegg_sprite = displayio.TileGrid(
-    gegg_bmp,
-    pixel_shader=getattr(gegg_bmp, 'pixel_shader', displayio.ColorConverter())
-)
-
-# # CircuitPython 7+ compatible
-# gegg_bmp = displayio.OnDiskBitmap(GOOD_EGG_FILENAME)
-# gegg_sprite = displayio.TileGrid(gegg_bmp, pixel_shader=gegg_bmp.pixel_shader)
+gegg_bmp = displayio.OnDiskBitmap(GOOD_EGG_FILENAME)
+gegg_sprite = displayio.TileGrid(gegg_bmp, pixel_shader=gegg_bmp.pixel_shader)
 
 # draw the bad egg!
 splash.append(begg_sprite)

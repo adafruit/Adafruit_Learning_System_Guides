@@ -21,38 +21,18 @@ clue_display = displayio.Group()
 
 # draw the background image
 WASH_ON_FILENAME = "wash_on.bmp"
-
-# CircuitPython 6 & 7 compatible
-wash_on_file = open(WASH_ON_FILENAME, "rb")
-wash_on_bmp = displayio.OnDiskBitmap(wash_on_file)
-wash_on_sprite = displayio.TileGrid(
-    wash_on_bmp,
-    pixel_shader=getattr(wash_on_bmp, 'pixel_shader', displayio.ColorConverter())
-)
-
-# # CircuitPython 7+ compatible
-# wash_on_bmp = displayio.OnDiskBitmap(WASH_ON_FILENAME)
-# wash_on_sprite = displayio.TileGrid(wash_on_bmp, pixel_shader=wash_on_bmp.pixel_shader)
+wash_on_bmp = displayio.OnDiskBitmap(WASH_ON_FILENAME)
+wash_on_sprite = displayio.TileGrid(wash_on_bmp, pixel_shader=wash_on_bmp.pixel_shader)
 
 clue_display.append(wash_on_sprite)
 
 # draw the foreground image
 WASH_OFF_FILENAME = "wash_off.bmp"
 
-# CircuitPython 6 & 7 compatible
-wash_off_file = open(WASH_OFF_FILENAME, "rb")
-wash_off_bmp = displayio.OnDiskBitmap(wash_off_file)
-wash_off_sprite = displayio.TileGrid(
-    wash_off_bmp,
-    pixel_shader=getattr(wash_off_bmp, 'pixel_shader', displayio.ColorConverter())
-)
-
-# # CircuitPython 7+ compatible
-# wash_off_bmp = displayio.OnDiskBitmap(WASH_OFF_FILENAME)
-# wash_off_sprite = displayio.TileGrid(wash_off_bmp, pixel_shader=wash_off_bmp.pixel_shader)
+wash_off_bmp = displayio.OnDiskBitmap(WASH_OFF_FILENAME)
+wash_off_sprite = displayio.TileGrid(wash_off_bmp, pixel_shader=wash_off_bmp.pixel_shader)
 
 clue_display.append(wash_off_sprite)
-
 
 # Create text
 # first create the group

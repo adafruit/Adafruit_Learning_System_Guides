@@ -25,14 +25,8 @@ display = framebufferio.FramebufferDisplay(matrix, auto_refresh=False)
 
 filename = "emoji.bmp"
 
-# CircuitPython 6 & 7 compatible
-bitmap_file = open(filename, 'rb')
-bitmap = displayio.OnDiskBitmap(bitmap_file)
-pixel_shader = getattr(bitmap, 'pixel_shader', displayio.ColorConverter())
-
-# # CircuitPython 7+ compatible
-# bitmap = displayio.OnDiskBitmap(filename)
-# pixel_shader = bitmap.pixel_shader
+bitmap = displayio.OnDiskBitmap(filename)
+pixel_shader = bitmap.pixel_shader
 
 # Each wheel can be in one of three states:
 STOPPED, RUNNING, BRAKING = range(3)

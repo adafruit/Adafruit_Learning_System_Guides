@@ -58,13 +58,9 @@ def load_image(path):
     "Load an image from the path"
     if len(splash):
         splash.pop()
-    # CircuitPython 6 & 7 compatible
-    bitmap = displayio.OnDiskBitmap(open(path, "rb"))
-    sprite = displayio.TileGrid(bitmap, pixel_shader=getattr(bitmap, 'pixel_shader', displayio.ColorConverter()))
 
-    # # CircuitPython 7+ compatible
-    # bitmap = displayio.OnDiskBitmap(path)
-    # sprite = displayio.TileGrid(bitmap, pixel_shader=bitmap.pixel_shader)
+    bitmap = displayio.OnDiskBitmap(path)
+    sprite = displayio.TileGrid(bitmap, pixel_shader=bitmap.pixel_shader)
 
     splash.append(sprite)
 

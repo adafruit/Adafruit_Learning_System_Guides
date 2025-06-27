@@ -102,7 +102,7 @@ main_display_group = displayio.Group()  # everything goes in main group
 display.root_group = main_display_group  # show main group (clears screen, too)
 
 # background bitmap w OnDiskBitmap
-tape_bitmap = displayio.OnDiskBitmap(open("mp3_tape.bmp", "rb"))
+tape_bitmap = displayio.OnDiskBitmap("mp3_tape.bmp")
 tape_tilegrid = displayio.TileGrid(tape_bitmap, pixel_shader=tape_bitmap.pixel_shader)
 main_display_group.append(tape_tilegrid)
 

@@ -127,31 +127,15 @@ class PlaybackDisplay:
             if i == self._bitmap_filename:
                 return # Already loaded
 
-            # CircuitPython 6 & 7 compatible
             try:
-                bitmap_file = open(i, 'rb')
+                bitmap = displayio.OnDiskBitmap(i)
             except OSError:
                 continue
-            bitmap = displayio.OnDiskBitmap(bitmap_file)
             self._bitmap_filename = i
             # Create a TileGrid to hold the bitmap
             self.tile_grid = displayio.TileGrid(
-                bitmap,
-                pixel_shader=getattr(
-                    bitmap, "pixel_shader", displayio.ColorConverter()
-                ),
+                bitmap, pixel_shader=bitmap.pixel_shader
             )
-
-            # # CircuitPython 7+ compatible
-            # try:
-            #     bitmap = displayio.OnDiskBitmap(i)
-            # except OSError:
-            #     continue
-            # self._bitmap_filename = i
-            # # Create a TileGrid to hold the bitmap
-            # self.tile_grid = displayio.TileGrid(
-            #     bitmap, pixel_shader=bitmap.pixel_shader
-            # )
 
             # Add the TileGrid to the Group
             if len(self.group) == 0:

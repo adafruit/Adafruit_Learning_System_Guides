@@ -232,16 +232,8 @@ GROUP = displayio.Group()
 try:
     FILENAME = 'moon/splash-' + str(DISPLAY.rotation) + '.bmp'
 
-    # CircuitPython 6 & 7 compatible
-    BITMAP = displayio.OnDiskBitmap(open(FILENAME, 'rb'))
-    TILE_GRID = displayio.TileGrid(
-        BITMAP,
-        pixel_shader=getattr(BITMAP, 'pixel_shader', displayio.ColorConverter())
-    )
-
-    # # CircuitPython 7+ compatible
-    # BITMAP = displayio.OnDiskBitmap(FILENAME)
-    # TILE_GRID = displayio.TileGrid(BITMAP, pixel_shader=BITMAP.pixel_shader)
+    BITMAP = displayio.OnDiskBitmap(FILENAME)
+    TILE_GRID = displayio.TileGrid(BITMAP, pixel_shader=BITMAP.pixel_shader)
 
     GROUP.append(TILE_GRID)
 except:
@@ -413,15 +405,6 @@ while True:
     # Update moon image (GROUP[0])
     FILENAME = 'moon/moon' + '{0:0>2}'.format(FRAME) + '.bmp'
 
-    # CircuitPython 6 & 7 compatible
-    # BITMAP = displayio.OnDiskBitmap(open(FILENAME, 'rb'))
-    # TILE_GRID = displayio.TileGrid(
-    #     BITMAP,
-    #     pixel_shader=getattr(BITMAP, 'pixel_shader',
-    #                          displayio.ColorConverter())
-    # )
-
-    # CircuitPython 7+ compatible
     BITMAP = displayio.OnDiskBitmap(FILENAME)
     TILE_GRID = displayio.TileGrid(BITMAP, pixel_shader=BITMAP.pixel_shader)
 
