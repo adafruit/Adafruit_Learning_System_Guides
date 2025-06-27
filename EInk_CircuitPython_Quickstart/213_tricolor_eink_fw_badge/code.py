@@ -77,18 +77,9 @@ g.append(bg_sprite)
 filename = "/picture.bmp"
 
 # Create a Tilegrid with the bitmap and put in the displayio group
-
-# CircuitPython 6 & 7 compatible
-pic = displayio.OnDiskBitmap(open(filename, "rb"))
-t = displayio.TileGrid(
-    pic, pixel_shader=getattr(pic, 'pixel_shader', displayio.ColorConverter())
-)
+pic = displayio.OnDiskBitmap(filename)
+t = displayio.TileGrid(pic, pixel_shader=pic.pixel_shader)
 g.append(t)
-
-# # CircuitPython 7+ compatible
-# pic = displayio.OnDiskBitmap(filename)
-# t = displayio.TileGrid(pic, pixel_shader=pic.pixel_shader)
-# g.append(t)
 
 # Draw simple text using the built-in font into a displayio group
 # For smaller text, change scale=2 to scale=1

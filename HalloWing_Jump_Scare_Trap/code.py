@@ -98,17 +98,9 @@ images = ["trap_sprung.bmp", "reset_trap.bmp", "please_standby.bmp",
           "trap_set.bmp"]
 # Function for displaying images on HalloWing TFT screen
 def show_image(filename):
-    # CircuitPython 6 & 7 compatible
-    image_file = open(filename, "rb")
-    odb = displayio.OnDiskBitmap(image_file)
-    face = displayio.TileGrid(
-        odb,
-        pixel_shader=getattr(odb, 'pixel_shader', displayio.ColorConverter())
-    )
 
-    # # CircuitPython 7+ compatible
-    # odb = displayio.OnDiskBitmap(filename)
-    # face = displayio.TileGrid(odb, pixel_shader=odb.pixel_shader)
+    odb = displayio.OnDiskBitmap(filename)
+    face = displayio.TileGrid(odb, pixel_shader=odb.pixel_shader)
 
     backlight.duty_cycle = 0
     splash.append(face)

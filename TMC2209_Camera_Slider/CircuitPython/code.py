@@ -43,7 +43,7 @@ display = ST7789(display_bus, width=240, height=240, rowstart=80, auto_refresh=F
 splash = displayio.Group()
 display.root_group = splash
 
-bitmap = displayio.OnDiskBitmap(open("/icons.bmp", "rb"))
+bitmap = displayio.OnDiskBitmap("/icons.bmp")
 
 grid_bg = displayio.TileGrid(bitmap, pixel_shader=bitmap.pixel_shader,
                              tile_height=100, tile_width=100,

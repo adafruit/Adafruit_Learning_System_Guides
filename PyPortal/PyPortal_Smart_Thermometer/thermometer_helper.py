@@ -135,13 +135,6 @@ class Thermometer_GFX(displayio.Group):
         if self._icon_file:
             self._icon_file.close()
 
-        # CircuitPython 6 & 7 compatible
-        # self._icon_file = open(filename, "rb")
-        # icon = displayio.OnDiskBitmap(self._icon_file)
-        # self._icon_sprite = displayio.TileGrid(icon,
-        #                                        pixel_shader=getattr(icon, 'pixel_shader', displayio.ColorConverter()))
-
-        # # CircuitPython 7+ compatible
         icon = displayio.OnDiskBitmap(filename)
         self._icon_sprite = displayio.TileGrid(icon, pixel_shader=icon.pixel_shader)
 

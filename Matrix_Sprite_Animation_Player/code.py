@@ -62,24 +62,13 @@ def load_image():
         sprite_group.pop()
 
     filename = SPRITESHEET_FOLDER + "/" + file_list[current_image]
-
-    # CircuitPython 6 & 7 compatible
-    bitmap = displayio.OnDiskBitmap(open(filename, "rb"))
+    bitmap = displayio.OnDiskBitmap(filename)
     sprite = displayio.TileGrid(
         bitmap,
-        pixel_shader=getattr(bitmap, 'pixel_shader', displayio.ColorConverter()),
+        pixel_shader=bitmap.pixel_shader,
         tile_width=bitmap.width,
         tile_height=matrix.display.height,
     )
-
-    # # CircuitPython 7+ compatible
-    # bitmap = displayio.OnDiskBitmap(filename)
-    # sprite = displayio.TileGrid(
-    #     bitmap,
-    #     pixel_shader=bitmap.pixel_shader,
-    #     tile_width=bitmap.width,
-    #     tile_height=matrix.display.height,
-    # )
 
     sprite_group.append(sprite)
 

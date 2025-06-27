@@ -106,10 +106,10 @@ arial12.load_glyphs(
 display = board.DISPLAY
 clue_group = displayio.Group()
 
-bitmap_file = open("bmps/background.bmp", "rb")
-bitmap1 = displayio.OnDiskBitmap(bitmap_file)
+
+bitmap1 = displayio.OnDiskBitmap("bmps/background.bmp")
 tile_grid = displayio.TileGrid(
-    bitmap1, pixel_shader=getattr(bitmap1, "pixel_shader", displayio.ColorConverter())
+    bitmap1, pixel_shader=bitmap1.pixel_shader
 )
 clue_group.append(tile_grid)
 

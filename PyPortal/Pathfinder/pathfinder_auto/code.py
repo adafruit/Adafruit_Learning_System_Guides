@@ -73,25 +73,21 @@ vo_sound = [
 
 pyportal = PyPortal(status_neopixel=board.NEOPIXEL)
 
-# Open the file
-with open(emote_img[0], "rb") as bitmap_file:
-    # Setup the file as the bitmap data source
-    bitmap = displayio.OnDiskBitmap(bitmap_file)
-    # Create a TileGrid to hold the bitmap
-    tile_grid = displayio.TileGrid(bitmap, pixel_shader=getattr(bitmap,
-                                                                'pixel_shader',
-                                                                displayio.ColorConverter()))
-    # Create a Group to hold the TileGrid
-    group = displayio.Group()
-    # Add the TileGrid to the Group
-    group.append(tile_grid)
-    # Add the Group to the Display
-    display.root_group = group
-    if sound_mode != 0:
-        # play a sound file
-        pyportal.play_file(vo_sound[10])
-    else:
-        pyportal.play_file("/vo/pathfnd_silent.wav")  # hack to deal w no mute method
+# Setup the file as the bitmap data source
+bitmap = displayio.OnDiskBitmap(emote_img[0])
+# Create a TileGrid to hold the bitmap
+tile_grid = displayio.TileGrid(bitmap, pixel_shader=getattr(bitmap.pixel_shader))
+# Create a Group to hold the TileGrid
+group = displayio.Group()
+# Add the TileGrid to the Group
+group.append(tile_grid)
+# Add the Group to the Display
+display.root_group = group
+if sound_mode != 0:
+    # play a sound file
+    pyportal.play_file(vo_sound[10])
+else:
+    pyportal.play_file("/vo/pathfnd_silent.wav")  # hack to deal w no mute method
 
 
 # Loop forever so you can enjoy your image
@@ -107,7 +103,6 @@ while True:
     pixel.show()
     time.sleep(1)
 
-    # CircuitPython 7+ compatible
     bitmap = displayio.OnDiskBitmap(emote_img[i])
     tile_grid = displayio.TileGrid(bitmap, pixel_shader=bitmap.pixel_shader)
     group = displayio.Group()

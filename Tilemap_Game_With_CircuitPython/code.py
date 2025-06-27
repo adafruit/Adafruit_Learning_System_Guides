@@ -443,17 +443,9 @@ def show_splash(new_text, color, vertical_offset=18):
 # Make the splash context
 splash = displayio.Group()
 
-# CircuitPython 6 & 7 compatible
-
 # game message background bmp file
-game_message_background = open("tilegame_assets/game_message_background.bmp", "rb")
-odb = displayio.OnDiskBitmap(game_message_background)
-bg_grid = displayio.TileGrid(odb, pixel_shader=getattr(odb, 'pixel_shader', displayio.ColorConverter()))
-
-# # CircuitPython 7+ compatible
-# game message background bmp file
-# odb = displayio.OnDiskBitmap("tilegame_assets/game_message_background.bmp")
-# bg_grid = displayio.TileGrid(odb, pixel_shader=odb.pixel_shader)
+odb = displayio.OnDiskBitmap("tilegame_assets/game_message_background.bmp")
+bg_grid = displayio.TileGrid(odb, pixel_shader=odb.pixel_shader)
 
 splash.append(bg_grid)
 

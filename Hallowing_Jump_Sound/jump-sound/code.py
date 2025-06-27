@@ -102,7 +102,6 @@ try:
     SCREEN = displayio.Group()
     board.DISPLAY.root_group = SCREEN
 
-    # CircuitPython 7+ compatible
     BITMAP = displayio.OnDiskBitmap(IMAGEFILE)
     TILEGRID = displayio.TileGrid(BITMAP, pixel_shader=BITMAP.pixel_shader)
 

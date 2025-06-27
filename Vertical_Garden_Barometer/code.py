@@ -61,26 +61,14 @@ clue.display.brightness = 0.8
 clue_display = displayio.Group()
 
 # draw the rising image
-# CircuitPython 6 & 7 compatible
-rising_file = open("rising.bmp", "rb")
-rising_bmp = displayio.OnDiskBitmap(rising_file)
-rising_sprite = displayio.TileGrid(rising_bmp, pixel_shader=getattr(rising_bmp, 'pixel_shader', displayio.ColorConverter()))
-
-# # CircuitPython 7+ compatible
-# rising_bmp = displayio.OnDiskBitmap("rising.bmp")
-# rising_sprite = displayio.TileGrid(rising_bmp, pixel_shader=rising_bmp.pixel_shader)
+rising_bmp = displayio.OnDiskBitmap("rising.bmp")
+rising_sprite = displayio.TileGrid(rising_bmp, pixel_shader=rising_bmp.pixel_shader)
 
 clue_display.append(rising_sprite)
 
 # draw the sinking image
-# CircuitPython 6 & 7 compatible
-sinking_file = open("sinking.bmp", "rb")
-sinking_bmp = displayio.OnDiskBitmap(sinking_file)
-sinking_sprite = displayio.TileGrid(sinking_bmp, pixel_shader=getattr(sinking_bmp, 'pixel_shader', displayio.ColorConverter()))
-
-# # CircuitPython 7+ compatible
-# sinking_bmp = displayio.OnDiskBitmap("sinking.bmp")
-# sinking_sprite = displayio.TileGrid(sinking_bmp, pixel_shader=sinking_bmp.pixel_shader)
+sinking_bmp = displayio.OnDiskBitmap("sinking.bmp")
+sinking_sprite = displayio.TileGrid(sinking_bmp, pixel_shader=sinking_bmp.pixel_shader)
 
 clue_display.append(sinking_sprite)
 

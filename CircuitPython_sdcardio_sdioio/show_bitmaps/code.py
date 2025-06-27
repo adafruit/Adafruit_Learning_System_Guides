@@ -21,17 +21,8 @@ while True:
     for filename in bmpfiles:
         print("showing", filename)
 
-        # CircuitPython 6 & 7 compatible
-        bitmap_file = open(filename, "rb")
-        bitmap = displayio.OnDiskBitmap(bitmap_file)
-        tile_grid = displayio.TileGrid(
-            bitmap,
-            pixel_shader=getattr(bitmap, 'pixel_shader', displayio.ColorConverter())
-        )
-
-        # # CircuitPython 7+ compatible
-        # bitmap = displayio.OnDiskBitmap(filename)
-        # tile_grid = displayio.TileGrid(bitmap, pixel_shader=bitmap.pixel_shader)
+        bitmap = displayio.OnDiskBitmap(filename)
+        tile_grid = displayio.TileGrid(bitmap, pixel_shader=bitmap.pixel_shader)
 
         group = displayio.Group()
         group.append(tile_grid)
