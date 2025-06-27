@@ -218,12 +218,10 @@ def create_icon_tilegrid(ident):
     icon_path = f"/airline_logos/{airline_code}.bmp"
 
     try:
-        file = open(icon_path, "rb")
-        icon_bitmap = OnDiskBitmap(file)
+        icon_bitmap = OnDiskBitmap(icon_path)
     except OSError:
         print(f"Icon for {airline_code} not found. Using placeholder.")
-        file = open(PLACEHOLDER_ICON_PATH, "rb")
-        icon_bitmap = OnDiskBitmap(file)
+        icon_bitmap = OnDiskBitmap(PLACEHOLDER_ICON_PATH)
 
     icon_tilegrid = TileGrid(icon_bitmap, pixel_shader=icon_bitmap.pixel_shader, x=0, y=0)
     return icon_tilegrid
