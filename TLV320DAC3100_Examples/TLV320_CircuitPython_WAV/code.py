@@ -15,7 +15,7 @@ dac.configure_clocks(sample_rate=44100, bit_depth=16)
 
 # use headphones
 dac.headphone_output = True
-dac.headphone_volume = -15  # dB
+dac.dac_volume = -15  # dB
 # or use speaker
 # dac.speaker_output = True
 # dac.speaker_volume = -10 # dB
