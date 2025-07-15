@@ -3,9 +3,12 @@
 #
 # SPDX-License-Identifier: MIT
 #
+# Make an adafruit_color_terminal terminal with ASCI escape character support
+# This uses a Code Page 437 LVGL font to draw a box also
+#
 import gc
 import supervisor
-import displayio 
+import displayio
 from lvfontio import OnDiskFont
 from adafruit_fruitjam.peripherals import request_display_config
 from adafruit_color_terminal import ColorTerminal
@@ -47,13 +50,13 @@ def out_char(value, row, column, color):
 
 def set_color(palette_index):
     """Set FOREGROUND color only"""
-    if not (0 <= palette_index <= 7):
+    if not (0 <= palette_index <= 7):  # pylint: disable=superfluous-parens
         raise ValueError("Palette index must be between 0 and 7")
     terminal.write(f"\033[3{palette_index}m")
 
 def set_bgcolor(palette_index):
     """Set BACKGROUND color only"""
-    if not (0 <= palette_index <= 7):
+    if not (0 <= palette_index <= 7):  # pylint: disable=superfluous-parens
         raise ValueError("Palette index must be between 0 and 7")
     terminal.write(f"\033[4{palette_index}m")
 
