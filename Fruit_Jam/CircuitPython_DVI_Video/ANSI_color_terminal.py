@@ -3,6 +3,9 @@
 #
 # SPDX-License-Identifier: MIT
 #
+# Make an adafruit_color_terminal terminal with ASCI escape character support
+# This uses a Code Page 437 LVGL font to draw a box also
+#
 import gc
 import supervisor
 import displayio 
