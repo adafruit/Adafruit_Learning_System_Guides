@@ -193,7 +193,7 @@ supported_modes = []
 established_modes = parse_established_timings(edid)
 supported_modes.extend(established_modes)
 
-# Get standard timings  
+# Get standard timings
 standard_modes = parse_standard_timings(edid)
 supported_modes.extend(standard_modes)
 
