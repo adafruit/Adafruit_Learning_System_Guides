@@ -152,7 +152,7 @@ for char_code in range(256):
         msg = f"Processed up to character {char_code}, memory: {gc.mem_free()}"  # pylint: disable=f-string-without-interpolation
         print(msg)
 
-print(f"\nCompleted character display:")
+print("\nCompleted character display:")
 print(f"Found {displayed_count - skipped_count} characters with glyphs")
 print(f"{skipped_count} missing characters displayed as periods")
 print(f"Total labels created: {len(main_group)}")
