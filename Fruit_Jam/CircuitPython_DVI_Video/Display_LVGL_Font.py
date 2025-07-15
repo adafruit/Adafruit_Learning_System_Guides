@@ -149,8 +149,8 @@ for char_code in range(256):
 
     # Progress indicator for debugging
     if char_code % 32 == 0:
-        print(f"Processed up to character {char_code}, memory: {gc.mem_free()}")  /
-        # pylint: disable=f-string-without-interpolation
+# pylint: disable=f-string-without-interpolation
+        print(f"Processed up to character {char_code}, memory: {gc.mem_free()}")
 
 print(f"\nCompleted character display:")
 print(f"Found {displayed_count - skipped_count} characters with glyphs")
