@@ -75,12 +75,12 @@ current_x = line_number_width  # Start after line number space
 current_y = char_height
 current_line_start = 0
 
-def create_char_label(font, chr, x, y):
+def create_char_label(thefont, ch, x, y):
     """Helper function to create character labels with error handling"""
     try:
-        return label.Label(font, text=chr, color=0xFFFFFF, x=x, y=y)
+        return label.Label(thefont, text=ch, color=0xFFFFFF, x=x, y=y)
     except Exception as e:
-        print(f"Error creating label for '{chr}': {e}")
+        print(f"Error creating label for '{ch}': {e}")
         return None
 
 # Add first line number
@@ -149,8 +149,8 @@ for char_code in range(256):
 
     # Progress indicator for debugging
     if char_code % 32 == 0:
-# pylint: disable=f-string-without-interpolation
-        print(f"Processed up to character {char_code}, memory: {gc.mem_free()}")
+        msg = f"Processed up to character {char_code}, memory: {gc.mem_free()}"  # pylint: disable=f-string-without-interpolation
+        print(msg)
 
 print(f"\nCompleted character display:")
 print(f"Found {displayed_count - skipped_count} characters with glyphs")
