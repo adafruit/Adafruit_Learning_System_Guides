@@ -8,7 +8,7 @@
 #
 import gc
 from terminalio import Terminal
-import displayio 
+import displayio
 from lvfontio import OnDiskFont
 from adafruit_fruitjam.peripherals import request_display_config
 import supervisor
