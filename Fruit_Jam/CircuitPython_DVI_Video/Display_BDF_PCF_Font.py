@@ -6,7 +6,6 @@
 # HDMI/DVI display in 320x200 resolution. "." is used for unknown characters
 
 import gc
-import terminalio
 import displayio
 import supervisor
 from adafruit_bitmap_font import bitmap_font
