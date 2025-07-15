@@ -34,11 +34,13 @@ display_group = displayio.Group()
 display.root_group = display_group
 
 # Create labels
+# pylint: disable=line-too-long
 text = "         1         2         3         4         5         6         7         8         9         0         1         2"
 text_area = label.Label(terminalio.FONT, text=text, color=0xFFFFFF)
 text_area.x = 0
 text_area.y = 5
 display_group.append(text_area)
+# pylint: disable=line-too-long
 text = "123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
 text_area = label.Label(terminalio.FONT, text=text, color=0xFFFFFF)
 text_area.x = 0
