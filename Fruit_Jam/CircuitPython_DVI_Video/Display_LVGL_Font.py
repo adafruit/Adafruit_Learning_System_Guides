@@ -5,11 +5,13 @@
 # Display an LVGL (.bin) font on a CircuitPython board and
 # 640x480 DVI display. Unknown characters will be "."
 #
+# pylint: disable=broad-except, bare-except
+
+import gc
 import displayio
 import supervisor
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text import label
-import gc
 from adafruit_fruitjam.peripherals import request_display_config
 
 # Use the easy library call to set the resolution
@@ -25,7 +27,7 @@ print(f"Initial memory: {gc.mem_free()}")
 # Font loading with error handling and diagnostics
 font_file = "fonts/CP437_16h.bin"
 try:
-    font = bitmap_font.load_font(font_file)
+    font = bitmap_font.load_font(font_file) # pylint: disable=redefined-outer-name
     print(f"Font loaded: {font_file}")
     print(f"Memory after font load: {gc.mem_free()}")
 
@@ -73,12 +75,12 @@ current_x = line_number_width  # Start after line number space
 current_y = char_height
 current_line_start = 0
 
-def create_char_label(font, char, x, y):
+def create_char_label(font, chr, x, y):
     """Helper function to create character labels with error handling"""
     try:
-        return label.Label(font, text=char, color=0xFFFFFF, x=x, y=y)
+        return label.Label(font, text=chr, color=0xFFFFFF, x=x, y=y)
     except Exception as e:
-        print(f"Error creating label for '{char}': {e}")
+        print(f"Error creating label for '{chr}': {e}")
         return None
 
 # Add first line number
@@ -147,7 +149,8 @@ for char_code in range(256):
 
     # Progress indicator for debugging
     if char_code % 32 == 0:
-        print(f"Processed up to character {char_code}, memory: {gc.mem_free()}")
+        print(f"Processed up to character {char_code}, memory: {gc.mem_free()}")  /
+        # pylint: disable=f-string-without-interpolation
 
 print(f"\nCompleted character display:")
 print(f"Found {displayed_count - skipped_count} characters with glyphs")
