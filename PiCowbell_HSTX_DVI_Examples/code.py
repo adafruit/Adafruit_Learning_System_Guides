@@ -1,3 +1,4 @@
+# SPDX-FileCopyrightText: 2025 Tim Cocks for Adafruit Industries
 # SPDX-FileCopyrightText: 2023 Liz Clark for Adafruit Industries
 # SPDX-FileCopyrightText: Adapted from Phil B.'s 16bit_hello Arduino Code
 #
@@ -12,6 +13,7 @@ import vectorio
 import terminalio
 import supervisor
 import simpleio
+from setup_display import setup_display
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text import label, wrap_text_to_lines
 from adafruit_display_shapes.rect import Rect
@@ -20,7 +22,7 @@ from adafruit_display_shapes.roundrect import RoundRect
 from adafruit_display_shapes.triangle import Triangle
 from adafruit_display_shapes.line import Line
 
-# see boot.py for display initialization
+setup_display()
 display = supervisor.runtime.display
 
 bitmap = displayio.Bitmap(display.width, display.height, 3)
