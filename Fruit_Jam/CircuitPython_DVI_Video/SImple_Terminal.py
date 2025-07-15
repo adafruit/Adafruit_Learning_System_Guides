@@ -53,5 +53,5 @@ term.write("Terminal %dx%d:\r\n" % (COLS, ROWS))
 term.write("  %dx%d pixels.\r\n" % (COLS * w, ROWS * h))
 term.write("Both carriage return and line feed \r\n   are required.\r\n")
 
-while(True):
+while True:
     pass
