@@ -6,7 +6,7 @@
 # 640x480 DVI display. Unknown characters will be "."
 #
 # pylint: disable=broad-except, bare-except
-
+# pylint: disable=f-string-without-interpolation
 import gc
 import displayio
 import supervisor
@@ -149,7 +149,7 @@ for char_code in range(256):
 
     # Progress indicator for debugging
     if char_code % 32 == 0:
-        msg = f"Processed up to character {char_code}, memory: {gc.mem_free()}"  # pylint: disable=f-string-without-interpolation
+        msg = f"Processed up to character {char_code}, memory: {gc.mem_free()}" 
         print(msg)
 
 print(f"\nCompleted character display:")
