@@ -8,6 +8,7 @@ import sys
 import board
 import busio 
 
+# Functions used for EDID parsing
 def parse_established_timings(edid):
     """Parse established timings from EDID bytes 35-37"""
     modes = []
