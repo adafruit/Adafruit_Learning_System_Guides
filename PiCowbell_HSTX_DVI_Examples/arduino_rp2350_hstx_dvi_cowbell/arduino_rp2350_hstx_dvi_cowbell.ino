@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2024 Michael Bell and Pimoroni Ltd
+//
+// SPDX-License-Identifier: MIT
 // 16-bit Adafruit_GFX-compatible framebuffer for RP2350 HSTX
 
 #include <Adafruit_dvhstx.h>

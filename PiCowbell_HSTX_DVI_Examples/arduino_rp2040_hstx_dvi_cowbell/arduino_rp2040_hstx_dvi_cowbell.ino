@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 Phil B. for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // Basic full-color PicoDVI test. Provides a 16-bit color video framebuffer to
 // which Adafruit_GFX calls can be made. It's based on the EYESPI_Test.ino sketch.
 
