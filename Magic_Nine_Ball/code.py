@@ -33,24 +33,13 @@ while True:
     shaken = False
 
     print("Image load {}".format(images[i]))
-    # CircuitPython 6 & 7 compatible
     try:
-        f = open(images[i], "rb")
-        odb = displayio.OnDiskBitmap(f)
+        odb = displayio.OnDiskBitmap(images[i])
     except ValueError:
         print("Image unsupported {}".format(images[i]))
         del images[i]
         continue
-    face = displayio.TileGrid(odb, pixel_shader=getattr(odb, 'pixel_shader', displayio.ColorConverter()))
-
-    # # CircuitPython 7+ compatible
-    # try:
-    #     odb = displayio.OnDiskBitmap(images[i])
-    # except ValueError:
-    #     print("Image unsupported {}".format(images[i]))
-    #     del images[i]
-    #     continue
-    # face = displayio.TileGrid(odb, pixel_shader=odb.pixel_shader)
+    face = displayio.TileGrid(odb, pixel_shader=odb.pixel_shader)
 
     splash.append(face)
     # Wait for the image to load.

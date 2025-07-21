@@ -75,17 +75,8 @@ def play_wave(filename):
 # Display an image on the HalloWing TFT screen
 
 def show_image(filename):
-    # CircuitPython 6 & 7 compatible
-    image_file = open(filename, "rb")
-    odb = displayio.OnDiskBitmap(image_file)
-    face = displayio.TileGrid(
-        odb,
-        pixel_shader=getattr(odb, 'pixel_shader', displayio.ColorConverter())
-    )
-
-    # # CircuitPython 7+ compatible
-    # odb = displayio.OnDiskBitmap(filename)
-    # face = displayio.TileGrid(odb, pixel_shader=odb.pixel_shader)
+    odb = displayio.OnDiskBitmap(filename)
+    face = displayio.TileGrid(odb, pixel_shader=odb.pixel_shader)
 
     backlight.value = False
     splash.append(face)

@@ -1,4 +1,0 @@
-CircuitPython_Logger/ble_handler.py 16: Bad option value 'missing-super-argument' (bad-option-value)
-CircuitPython_Logger/uart_handler.py 16: Bad option value 'missing-super-argument' (bad-option-value)
-CircuitPython_Logger/file_handler.py 15: Bad option value 'missing-super-argument' (bad-option-value)
-CircuitPython_Logger/aio_handler.py 15: Bad option value 'missing-super-argument' (bad-option-value)

@@ -47,15 +47,8 @@ class OpenWeather_Graphics(displayio.Group):
         self.display = display
 
         splash = displayio.Group()
-        # CircuitPython 6 & 7 compatible
-        background = displayio.OnDiskBitmap(open("loading.bmp", "rb"))
-        bg_sprite = displayio.TileGrid(
-            background,
-            pixel_shader=getattr(background, 'pixel_shader', displayio.ColorConverter()),
-        )
-        # # CircuitPython 7+ compatible
-        # background = displayio.OnDiskBitmap("loading.bmp")
-        # bg_sprite = displayio.TileGrid(background, pixel_shader=background.pixel_shader)
+        background = displayio.OnDiskBitmap("loading.bmp")
+        bg_sprite = displayio.TileGrid(background, pixel_shader=background.pixel_shader)
 
         splash.append(bg_sprite)
         display.root_group = splash
@@ -73,22 +66,13 @@ class OpenWeather_Graphics(displayio.Group):
         self._current_label = None
 
         # Load the icon sprite sheet
-        # CircuitPython 6 & 7 compatible
-        icons = displayio.OnDiskBitmap(open(icon_spritesheet, "rb"))
+        icons = displayio.OnDiskBitmap(icon_spritesheet)
         self._icon_sprite = displayio.TileGrid(
             icons,
-            pixel_shader=getattr(icons, 'pixel_shader', displayio.ColorConverter()),
+            pixel_shader=icons.pixel_shader,
             tile_width=icon_width,
             tile_height=icon_height
         )
-        # # CircuitPython 7+ compatible
-        # icons = displayio.OnDiskBitmap(icon_spritesheet)
-        # self._icon_sprite = displayio.TileGrid(
-        #     icons,
-        #     pixel_shader=icons.pixel_shader,
-        #     tile_width=icon_width,
-        #     tile_height=icon_height
-        # )
 
         self.set_icon(None)
         self._scrolling_texts = []

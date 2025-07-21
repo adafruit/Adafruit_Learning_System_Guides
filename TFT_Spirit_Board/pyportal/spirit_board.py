@@ -45,7 +45,7 @@ class SpiritBoard(displayio.Group):
         """
         Create a SpiritBoard instance and put it in the displays root_group to make it visible.
 
-        :param displayio.Display display:  Display object to show the spirit board on.
+        :param displayio.AnyDisplay display:  Display object to show the spirit board on.
         """
         self._display = display
         super().__init__()

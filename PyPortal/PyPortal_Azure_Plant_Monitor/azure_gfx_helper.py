@@ -134,18 +134,7 @@ class Azure_GFX(displayio.Group):
         if not filename:
             return  # we're done, no icon desired
 
-        # CircuitPython 6 & 7 compatible
-        if self._icon_file:
-            self._icon_file.close()
-        self._icon_file = open(filename, "rb")
-        icon = displayio.OnDiskBitmap(self._icon_file)
-        self._icon_sprite = displayio.TileGrid(
-            icon, pixel_shader=getattr(icon, "pixel_shader", displayio.ColorConverter())
-        )
-
-        # CircuitPython 7 compatible
-        # # Remove self._icon_file - it is no longer used
-        # icon = displayio.OnDiskBitmap(filename)
-        # self._icon_sprite = displayio.TileGrid(icon, pixel_shader=icon.pixel_shader)
+        icon = displayio.OnDiskBitmap(filename)
+        self._icon_sprite = displayio.TileGrid(icon, pixel_shader=icon.pixel_shader)
 
         self._icon_group.append(self._icon_sprite)

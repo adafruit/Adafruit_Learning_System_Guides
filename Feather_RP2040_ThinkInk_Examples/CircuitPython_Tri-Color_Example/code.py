@@ -37,20 +37,17 @@ display = adafruit_ssd1680.SSD1680(
 
 g = displayio.Group()
 
-with open("/display-ruler.bmp", "rb") as f:
-    pic = displayio.OnDiskBitmap(f)
 
-    t = displayio.TileGrid(
-        pic, pixel_shader=getattr(pic, "pixel_shader", displayio.ColorConverter())
-    )
+pic = displayio.OnDiskBitmap("/display-ruler.bmp")
+t = displayio.TileGrid(pic, pixel_shader=pic.pixel_shader)
 
-    g.append(t)
+g.append(t)
 
-    display.root_group = g
+display.root_group = g
 
-    display.refresh()
+display.refresh()
 
-    print("refreshed")
+print("refreshed")
 
 while True:
     pass

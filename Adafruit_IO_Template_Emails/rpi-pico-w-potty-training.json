@@ -1,0 +1,83 @@
+{
+  "exportVersion": "1.0.0",
+  "exportedBy": "tyeth",
+  "exportedAt": "2025-06-10T18:13:03.071Z",
+  "exportedFromDevice": {
+    "board": "rpi-pico-w",
+    "firmwareVersion": "1.0.0-beta.100"
+  },
+  "components": [
+    {
+      "name": "💦 Wee Button",
+      "pinName": "D18",
+      "type": "push_button",
+      "mode": "DIGITAL",
+      "direction": "INPUT",
+      "period": 0,
+      "pull": "UP",
+      "isPin": true
+    },
+    {
+      "name": "💦 Wee LED",
+      "pinName": "D2",
+      "type": "led",
+      "mode": "DIGITAL",
+      "direction": "OUTPUT",
+      "isPin": true
+    },
+    {
+      "name": "💩 Poo Button",
+      "pinName": "D19",
+      "type": "push_button",
+      "mode": "DIGITAL",
+      "direction": "INPUT",
+      "period": 0,
+      "pull": "UP",
+      "isPin": true
+    },
+    {
+      "name": "💩 Poo LED",
+      "pinName": "D3",
+      "type": "led",
+      "mode": "DIGITAL",
+      "direction": "OUTPUT",
+      "isPin": true
+    },
+    {
+      "name": "❌ Didn't Go Button",
+      "pinName": "D20",
+      "type": "push_button",
+      "mode": "DIGITAL",
+      "direction": "INPUT",
+      "period": 0,
+      "pull": "UP",
+      "isPin": true
+    },
+    {
+      "name": "❌ Didn't Go LED",
+      "pinName": "D4",
+      "type": "led",
+      "mode": "DIGITAL",
+      "direction": "OUTPUT",
+      "isPin": true
+    },
+    {
+      "name": "🔔 Tell Adult Button",
+      "pinName": "D21",
+      "type": "push_button",
+      "mode": "DIGITAL",
+      "direction": "INPUT",
+      "period": 0,
+      "pull": "UP",
+      "isPin": true
+    },
+    {
+      "name": "🔔 Tell Adult LED",
+      "pinName": "D5",
+      "type": "led",
+      "mode": "DIGITAL",
+      "direction": "OUTPUT",
+      "isPin": true
+    }
+  ]
+}

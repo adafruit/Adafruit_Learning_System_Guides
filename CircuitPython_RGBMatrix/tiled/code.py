@@ -46,23 +46,13 @@ DISPLAY = framebufferio.FramebufferDisplay(MATRIX, auto_refresh=False,
 # Load BMP image, create Group and TileGrid to hold it
 FILENAME = "wales.bmp"
 
-# CircuitPython 6 & 7 compatible
-BITMAP = displayio.OnDiskBitmap(open(FILENAME, "rb"))
+BITMAP = displayio.OnDiskBitmap(FILENAME)
 TILEGRID = displayio.TileGrid(
     BITMAP,
-    pixel_shader=getattr(BITMAP, 'pixel_shader', displayio.ColorConverter()),
+    pixel_shader=BITMAP.pixel_shader,
     tile_width=BITMAP.width,
     tile_height=BITMAP.height
 )
-
-# # CircuitPython 7+ compatible
-# BITMAP = displayio.OnDiskBitmap(FILENAME)
-# TILEGRID = displayio.TileGrid(
-#     BITMAP,
-#     pixel_shader=BITMAP.pixel_shader,
-#     tile_width=BITMAP.width,
-#     tile_height=BITMAP.height
-# )
 
 GROUP = displayio.Group()
 GROUP.append(TILEGRID)

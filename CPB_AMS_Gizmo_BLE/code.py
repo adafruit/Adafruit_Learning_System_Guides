@@ -33,15 +33,8 @@ a.solicited_services.append(AppleMediaService)
 radio.start_advertising(a)
 
 def wrap_in_tilegrid(filename:str):
-    # CircuitPython 6 & 7 compatible
-    odb = displayio.OnDiskBitmap(open(filename, "rb"))
-    return displayio.TileGrid(
-        odb, pixel_shader=getattr(odb, 'pixel_shader', displayio.ColorConverter())
-    )
-
-    # # CircuitPython 7+ compatible
-    # odb = displayio.OnDiskBitmap(filename)
-    # return displayio.TileGrid(odb, pixel_shader=odb.pixel_shader)
+    odb = displayio.OnDiskBitmap(filename)
+    return displayio.TileGrid(odb, pixel_shader=odb.pixel_shader)
 
 def make_background(width, height, color):
     color_bitmap = displayio.Bitmap(width, height, 1)

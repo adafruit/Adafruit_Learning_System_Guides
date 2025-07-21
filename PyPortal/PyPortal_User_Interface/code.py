@@ -93,16 +93,8 @@ def set_image(group, filename):
     if not filename:
         return  # we're done, no icon desired
 
-    # CircuitPython 6 & 7 compatible
-    image_file = open(filename, "rb")
-    image = displayio.OnDiskBitmap(image_file)
-    image_sprite = displayio.TileGrid(
-        image, pixel_shader=getattr(image, "pixel_shader", displayio.ColorConverter())
-    )
-
-    # # CircuitPython 7+ compatible
-    # image = displayio.OnDiskBitmap(filename)
-    # image_sprite = displayio.TileGrid(image, pixel_shader=image.pixel_shader)
+    image = displayio.OnDiskBitmap(filename)
+    image_sprite = displayio.TileGrid(image, pixel_shader=image.pixel_shader)
 
     group.append(image_sprite)
 

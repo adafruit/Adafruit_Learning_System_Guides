@@ -93,15 +93,8 @@ advertisement.complete_name = "CIRCUITPY"
 advertisement.solicited_services.append(AppleNotificationCenterService)
 
 def wrap_in_tilegrid(filename:str):
-    # CircuitPython 6 & 7 compatible
-    odb = displayio.OnDiskBitmap(open(filename, "rb"))
-    return displayio.TileGrid(
-        odb, pixel_shader=getattr(odb, 'pixel_shader', displayio.ColorConverter())
-    )
-
-    # # CircuitPython 7+ compatible
-    # odb = displayio.OnDiskBitmap(filename)
-    # return displayio.TileGrid(odb, pixel_shader=odb.pixel_shader)
+    odb = displayio.OnDiskBitmap(filename)
+    return displayio.TileGrid(odb, pixel_shader=odb.pixel_shader)
 
 display = tft_gizmo.TFT_Gizmo()
 group = displayio.Group()
