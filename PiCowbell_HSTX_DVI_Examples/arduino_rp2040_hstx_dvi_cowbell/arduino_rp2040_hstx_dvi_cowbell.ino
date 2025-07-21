@@ -11,9 +11,9 @@
 // Here's how a 320x240 16-bit color framebuffer is declared. Double-buffering
 // is not an option in 16-bit color mode, just not enough RAM; all drawing
 // operations are shown as they occur. Second argument is a hardware
-// configuration -- examples are written for Adafruit Feather RP2040 DVI, but
-// that's easily switched out for boards like the Pimoroni Pico DV (use
-// 'pimoroni_demo_hdmi_cfg') or Pico DVI Sock ('pico_sock_cfg').
+// configuration -- this example is written for Adafruit PiCowBell HSTX DVI,
+// and Raspberry Pi RP2040, but that's easily switched out for boards
+// like the Pimoroni Pico DV (use 'pimoroni_demo_hdmi_cfg') or Pico DVI Sock ('pico_sock_cfg').
 DVIGFX16 display(DVI_RES_320x240p60, adafruit_hstxdvibell_cfg);
 
 // A 400x240 mode is possible but pushes overclocking even higher than
