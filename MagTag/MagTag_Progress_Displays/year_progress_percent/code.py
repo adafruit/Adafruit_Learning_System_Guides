@@ -53,7 +53,7 @@ progress_bar = ProgressBar(
     BAR_X, BAR_Y, BAR_WIDTH, BAR_HEIGHT, 1.0, bar_color=0x999999, outline_color=0x000000
 )
 
-magtag.graphics.splash.append(progress_bar)
+magtag.graphics.root_group.append(progress_bar)
 
 
 try:

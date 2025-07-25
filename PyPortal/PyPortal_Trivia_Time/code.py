@@ -121,12 +121,12 @@ pyportal = PyPortal(url=DATA_SOURCE,
 
 pyportal.preload_font() # speed things up by preloading font
 
-pyportal.splash.append(loading_text_area) #loading...
-pyportal.splash.append(q_text_area)
-pyportal.splash.append(reveal_text_area)
-pyportal.splash.append(timer_text_area)
+pyportal.root_group.append(loading_text_area) #loading...
+pyportal.root_group.append(q_text_area)
+pyportal.root_group.append(reveal_text_area)
+pyportal.root_group.append(timer_text_area)
 for textarea in ans_text_areas:
-    pyportal.splash.append(textarea)
+    pyportal.root_group.append(textarea)
 
 while True:
     # Load new question when screen is touched

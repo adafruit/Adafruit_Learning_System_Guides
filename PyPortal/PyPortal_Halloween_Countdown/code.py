@@ -86,7 +86,7 @@ countdown_text = Label(big_font)
 countdown_text.x = 25
 countdown_text.y = 120
 countdown_text.color = 0x7942a0
-pyportal.splash.append(countdown_text)
+pyportal.root_group.append(countdown_text)
 
 refresh_time = None
 

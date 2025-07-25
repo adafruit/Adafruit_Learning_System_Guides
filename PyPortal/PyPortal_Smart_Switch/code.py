@@ -104,11 +104,11 @@ class Switch(object):
         self.switch.direction = digitalio.Direction.OUTPUT
         rect = RoundRect(SWITCHX, SWITCHY, 31, 60, 16, outline=SWITCH_COLOR,
                          fill=SWITCH_FILL_COLOR, stroke=3)
-        my_pyportal.splash.append(rect)
+        my_pyportal.root_group.append(rect)
         self.circle_on = Circle(SWITCHX + 15, SWITCHY + 16, 10, fill=SWITCH_FILL_COLOR)
-        my_pyportal.splash.append(self.circle_on)
+        my_pyportal.root_group.append(self.circle_on)
         self.circle_off = Circle(SWITCHX + 15, SWITCHY + 42, 10, fill=DISPLAY_COLOR)
-        my_pyportal.splash.append(self.circle_off)
+        my_pyportal.root_group.append(self.circle_off)
 
     # turn switch on or off
     def enable(self, enable):
@@ -149,7 +149,7 @@ class Clock(object):
         self.text_areas = create_text_areas(text_area_configs)
         self.text_areas[2].text = "starting..."
         for ta in self.text_areas:
-            self.pyportal.splash.append(ta)
+            self.pyportal.root_group.append(ta)
 
     def adjust_backlight(self, force=False):
         """Check light level. Adjust the backlight and background image if it's dark."""

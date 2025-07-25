@@ -65,8 +65,8 @@ progress_bar_1 = ProgressBar(
     BAR_X, 95, BAR_WIDTH, BAR_HEIGHT, 1.0, bar_color=0x999999, outline_color=0x000000
 )
 
-magtag.graphics.splash.append(progress_bar)
-magtag.graphics.splash.append(progress_bar_1)
+magtag.graphics.root_group.append(progress_bar)
+magtag.graphics.root_group.append(progress_bar_1)
 magtag.graphics.set_background("/bmps/background.bmp")
 
 

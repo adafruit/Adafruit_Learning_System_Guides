@@ -56,7 +56,7 @@ icon2 = displayio.TileGrid(bitmap5, pixel_shader=palette5, x = 2, y = 2)
 group = displayio.Group()
 #  adding start-up bitmap to group
 group.append(tile_grid)
-funhouse.splash.append(group)
+funhouse.graphics.root_group.append(group)
 #  text for fume data
 fume_text = funhouse.add_text(
     text="    ",
@@ -74,7 +74,7 @@ fan_text = funhouse.add_text(
     text_font="fonts/Arial-Bold-24.pcf",
 )
 #  showing graphics
-funhouse.display.root_group = funhouse.splash
+funhouse.display.root_group = funhouse.graphics.root_group
 
 #  state machines
 run = False #  state if main code is running

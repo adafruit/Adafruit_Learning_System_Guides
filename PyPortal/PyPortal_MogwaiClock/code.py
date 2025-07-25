@@ -45,7 +45,7 @@ time_textarea = Label(big_font)
 time_textarea.x = 0
 time_textarea.y = 130
 time_textarea.color = 0xFF0000
-pyportal.splash.append(time_textarea)
+pyportal.root_group.append(time_textarea)
 
 # To help us know if we've changed the times, print them out!
 gremlin_hour, gremlin_min = gremlin_time[3:5]

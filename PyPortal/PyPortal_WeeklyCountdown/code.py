@@ -48,7 +48,7 @@ for pos in (days_position, hours_position, minutes_position):
     textarea.x = pos[0]
     textarea.y = pos[1]
     textarea.color = text_color
-    pyportal.splash.append(textarea)
+    pyportal.root_group.append(textarea)
     text_areas.append(textarea)
 refresh_time = None
 

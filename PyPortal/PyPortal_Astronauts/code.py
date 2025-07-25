@@ -54,6 +54,6 @@ while True:
             names_textarea.x = names_position[0]
             names_textarea.y = names_position[1]
             names_textarea.color = names_color
-            pyportal.splash.append(names_textarea)
+            pyportal.root_group.append(names_textarea)
             time.sleep(30)  # wait 30 seconds to read it
-            pyportal.splash.pop()
+            pyportal.root_group.pop()

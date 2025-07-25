@@ -77,7 +77,7 @@ time_label = funhouse.add_text(
     text=trip_time, text_scale=2, text_position=(30, 25), text_color=0x606060
 )
 
-funhouse.display.root_group = funhouse.splash
+funhouse.display.root_group = funhouse.graphics.root_group
 
 # Turn on the light
 print("Turning on light...")

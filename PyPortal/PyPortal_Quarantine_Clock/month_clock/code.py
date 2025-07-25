@@ -109,13 +109,13 @@ font_small.load_glyphs(b'abcdefghjiklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123
 label_month = label.Label(font_large, color=LABEL_DAY_COLOR)
 label_month.x = board.DISPLAY.width // 10
 label_month.y = 80
-pyportal.splash.append(label_month)
+pyportal.root_group.append(label_month)
 
 # Set up label for the time
 label_time = label.Label(font_small, color=LABEL_TIME_COLOR)
 label_time.x = board.DISPLAY.width // 3
 label_time.y = 150
-pyportal.splash.append(label_time)
+pyportal.root_group.append(label_time)
 
 refresh_time = None
 while True:

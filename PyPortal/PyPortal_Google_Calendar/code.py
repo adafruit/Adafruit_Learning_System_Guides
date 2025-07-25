@@ -202,7 +202,7 @@ font_events = "fonts/Arial-14.pcf"
 
 # Add the header
 line_header = Line(0, 50, 320, 50, color=0x000000)
-pyportal.splash.append(line_header)
+pyportal.root_group.append(line_header)
 
 label_header = pyportal.add_text(
     text_font="fonts/Arial-18.pcf",

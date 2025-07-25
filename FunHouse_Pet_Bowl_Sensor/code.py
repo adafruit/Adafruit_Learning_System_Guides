@@ -77,10 +77,10 @@ level_label = funhouse.add_text(
     text_color=0xFFFF00,
     text_font="fonts/Arial-Bold-24.pcf",
 )
-funhouse.display.root_group = funhouse.splash
+funhouse.display.root_group = funhouse.graphics.root_group
 
 status = Circle(229, 10, 10, fill=0xFF0000, outline=0x880000)
-funhouse.splash.append(status)
+funhouse.graphics.root_group.append(status)
 
 # Initialize a new MQTT Client object
 funhouse.network.init_mqtt(

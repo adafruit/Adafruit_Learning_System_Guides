@@ -205,7 +205,7 @@ magtag.set_background(0xFFFFFF)
 
 # Add the header
 line_header = Line(0, 30, 320, 30, color=0x000000)
-magtag.splash.append(line_header)
+magtag.graphics.root_group.append(line_header)
 
 label_header = magtag.add_text(
     text_font="fonts/Arial-18.pcf",
