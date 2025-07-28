@@ -41,7 +41,7 @@ for i, c in enumerate(icons_pal):
     if c == 0xFFFF00:
         icons_pal.make_transparent(i)
 storm_icons = displayio.Group()
-pyportal.splash.append(storm_icons)
+pyportal.root_group.append(storm_icons)
 STORM_CLASS = ("TD", "TS", "HU")
 
 # setup info label
@@ -53,7 +53,7 @@ info_update = Label(
 )
 info_update.anchor_point = (0.0, 1.0)
 info_update.anchored_position = (10, board.DISPLAY.height - 10)
-pyportal.splash.append(info_update)
+pyportal.root_group.append(info_update)
 
 # these are need for lat/lon to screen x/y mapping
 VIRTUAL_WIDTH = board.DISPLAY.width * 360 / (LON_RANGE[1] - LON_RANGE[0])

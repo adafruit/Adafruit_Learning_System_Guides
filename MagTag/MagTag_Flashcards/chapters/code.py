@@ -40,7 +40,7 @@ for i in range(list_len):
 
 # Add button labels at the bottom of the screen
 BUTTON_TEXT_IDX = list_len
-magtag.graphics.splash.append(Rect(0, magtag.graphics.display.height - 14,
+magtag.graphics.root_group.append(Rect(0, magtag.graphics.display.height - 14,
                                    magtag.graphics.display.width,
                                    magtag.graphics.display.height, fill=0x0))
 magtag.add_text(

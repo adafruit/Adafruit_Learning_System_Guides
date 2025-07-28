@@ -33,7 +33,7 @@ for peg in pegs:
                     style=Button.RECT,
                     fill_color=None, outline_color=0x5C3C15,
                     name=peg['label'])
-    pyportal.splash.append(button.group)
+    pyportal.root_group.append(button.group)
     buttons.append(button)
 
 note_select = None

@@ -69,7 +69,7 @@ MAGTAG.add_text(
 
 # Add 14-pixel-tall black bar at bottom of display. It's a distinct layer
 # (not just background) to appear on top of task list if it runs long.
-MAGTAG.graphics.splash.append(Rect(0, MAGTAG.graphics.display.height - 14,
+MAGTAG.graphics.root_group.append(Rect(0, MAGTAG.graphics.display.height - 14,
                                    MAGTAG.graphics.display.width,
                                    MAGTAG.graphics.display.height, fill=0x0))
 

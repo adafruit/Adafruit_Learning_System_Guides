@@ -38,7 +38,7 @@ pyportal = PyPortal(url=DATA_SOURCE,
                     default_bg=0x000000)
 
 
-gfx = electioncal_graphics.Electioncal_Graphics(pyportal.splash, am_pm=True)
+gfx = electioncal_graphics.Electioncal_Graphics(pyportal.root_group, am_pm=True)
 display_refresh = None
 while True:
     # only query the online time once per hour (and on first run)

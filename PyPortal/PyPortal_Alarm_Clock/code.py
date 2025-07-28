@@ -136,8 +136,8 @@ def create_text_areas(configs):
 
 
 def clear_splash():
-    for _ in range(len(pyportal.splash) - 1):
-        pyportal.splash.pop()
+    for _ in range(len(pyportal.root_group) - 1):
+        pyportal.root_group.pop()
 
 
 def touch_in_button(t, b):
@@ -337,8 +337,8 @@ class Time_State(State):
     def enter(self):
         self.adjust_backlight_based_on_light(force=True)
         for ta in self.text_areas:
-            pyportal.splash.append(ta)
-        pyportal.splash.append(self.weather_icon)
+            pyportal.root_group.append(ta)
+        pyportal.root_group.append(self.weather_icon)
         if snooze_time:
             # CircuitPython 6 & 7 compatible
             if self.snooze_file:
@@ -348,7 +348,7 @@ class Time_State(State):
             icon_sprite = displayio.TileGrid(icon, pixel_shader=icon.pixel_shader)
 
             self.snooze_icon.append(icon_sprite)
-            pyportal.splash.append(self.snooze_icon)
+            pyportal.root_group.append(self.snooze_icon)
         if alarm_enabled:
             self.text_areas[1].text = '%2d:%02d' % (alarm_hour, alarm_minute)
         else:
@@ -532,7 +532,7 @@ class Setting_State(State):
 
         pyportal.set_background(self.background)
         for ta in self.text_areas:
-            pyportal.splash.append(ta)
+            pyportal.root_group.append(ta)
         if alarm_enabled:
             self.text_areas[0].text = '%02d:%02d' % (alarm_hour, alarm_minute) # set time textarea
         else:

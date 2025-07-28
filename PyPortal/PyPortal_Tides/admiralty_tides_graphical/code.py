@@ -67,7 +67,7 @@ palette.make_transparent(0)
 
 # Setup tide plot bitmap
 tide_plot = displayio.Bitmap(WIDTH, HEIGHT, 3)
-pyportal.splash.append(displayio.TileGrid(tide_plot, pixel_shader=palette))
+pyportal.root_group.append(displayio.TileGrid(tide_plot, pixel_shader=palette))
 
 # Setup font used for date and time
 date_font = bitmap_font.load_font(cwd+"/fonts/mono-bold-8.bdf")
@@ -75,7 +75,7 @@ date_font.load_glyphs(b'1234567890-')
 
 # Setup date label
 date_label = Label(date_font, text="0000-00-00", color=DATE_COLOR, x=7, y=14)
-pyportal.splash.append(date_label)
+pyportal.root_group.append(date_label)
 
 if board.board_id == "pyportal_titano":
     x_pos = 394
@@ -84,14 +84,14 @@ else:
 
 # Setup time label
 time_label = Label(date_font, text="00:00:00", color=TIME_COLOR, x=x_pos, y=14)
-pyportal.splash.append(time_label)
+pyportal.root_group.append(time_label)
 
 # Setup current time marker
 time_marker_bitmap = displayio.Bitmap(MARK_SIZE, MARK_SIZE, 3)
 for pixel in range(MARK_SIZE * MARK_SIZE):
     time_marker_bitmap[pixel] = 2
 time_marker = displayio.TileGrid(time_marker_bitmap, pixel_shader=palette, x=-MARK_SIZE, y=-MARK_SIZE)
-pyportal.splash.append(time_marker)
+pyportal.root_group.append(time_marker)
 
 def get_tide_data():
     """Fetch JSON tide data and return parsed results in a list."""

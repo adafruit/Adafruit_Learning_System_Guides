@@ -283,9 +283,9 @@ future_banners = [
     make_banner(x=210, y=102),
 ]
 
-magtag.splash.append(today_banner)
+magtag.graphics.root_group.append(today_banner)
 for future_banner in future_banners:
-    magtag.splash.append(future_banner)
+    magtag.graphics.root_group.append(future_banner)
 
 # ===========
 #  M A I N

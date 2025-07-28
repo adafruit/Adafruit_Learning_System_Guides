@@ -43,21 +43,21 @@ pyportal.get_local_time()
 # Date and time label
 date_label = Label(FONT, text="0000-00-00", color=DATE_COLOR, x=165, y=223)
 time_label = Label(FONT, text="00:00:00", color=TIME_COLOR, x=240, y=223)
-pyportal.splash.append(date_label)
-pyportal.splash.append(time_label)
+pyportal.root_group.append(date_label)
+pyportal.root_group.append(time_label)
 
 # ISS trail
 trail_bitmap = displayio.Bitmap(3, 3, 1)
 trail_palette = displayio.Palette(1)
 trail_palette[0] = TRAIL_COLOR
 trail = displayio.Group()
-pyportal.splash.append(trail)
+pyportal.root_group.append(trail)
 
 # ISS location marker
 marker = displayio.Group()
 for r in range(MARK_SIZE - MARK_THICKNESS, MARK_SIZE):
     marker.append(Circle(0, 0, r, outline=MARK_COLOR))
-pyportal.splash.append(marker)
+pyportal.root_group.append(marker)
 
 def get_location(width=WIDTH, height=HEIGHT):
     """Fetch current lat/lon, convert to (x, y) tuple scaled to width/height."""

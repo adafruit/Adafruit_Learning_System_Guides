@@ -31,7 +31,7 @@ mail_label = funhouse.add_text(
 )
 reset_label = funhouse.add_text(text="reset", text_position=(3, 70), text_color=GRAY)
 
-funhouse.display.root_group = funhouse.splash
+funhouse.display.root_group = funhouse.graphics.root_group
 
 
 def send_io_data(mail_value):

@@ -133,7 +133,7 @@ alarm_checks = [None, alarms['bed'],alarms['breakfast'],alarms['lunch'],alarms['
 alarm_gfx = [group_trash, group_bed, group_eat, group_eat, group_eat]
 
 #  allows for the openweather_graphics to show
-gfx = openweather_graphics.OpenWeather_Graphics(pyportal.splash, am_pm=True, celsius=False)
+gfx = openweather_graphics.OpenWeather_Graphics(pyportal.root_group, am_pm=True, celsius=False)
 
 #  state machines
 localtile_refresh = None
@@ -250,13 +250,13 @@ while True:
         print("pressed dismiss button")
         dismissed = True
         alarm = False
-        display.root_group = pyportal.splash
+        display.root_group = pyportal.root_group
         touched = time.monotonic()
         mode = mode
     if not switch_snooze.value and not phys_snooze:
         phys_snooze = True
         print("pressed snooze button")
-        display.root_group = pyportal.splash
+        display.root_group = pyportal.root_group
         snoozed = True
         alarm = False
         touched = time.monotonic()
@@ -271,7 +271,7 @@ while True:
     if touch:
         if snooze_buttons[button_mode].contains(touch) and not touch_button_snooze:
             print("Touched snooze")
-            display.root_group = pyportal.splash
+            display.root_group = pyportal.root_group
             touch_button_snooze = True
             snoozed = True
             alarm = False
@@ -281,7 +281,7 @@ while True:
             print("Touched dismiss")
             dismissed = True
             alarm = False
-            display.root_group = pyportal.splash
+            display.root_group = pyportal.root_group
             touch_button_dismiss = True
             touched = time.monotonic()
             mode = mode

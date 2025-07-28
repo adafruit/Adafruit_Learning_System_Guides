@@ -84,9 +84,9 @@ light_on_time_position = (15,220)
 light_on_time_textarea = Label(info_font, color=light_on_time_color,
                                x=light_on_time_position[0], y=light_on_time_position[1])
 
-pyportal.splash.append(time_textarea)
-pyportal.splash.append(wakeup_time_textarea)
-pyportal.splash.append(light_on_time_textarea)
+pyportal.root_group.append(time_textarea)
+pyportal.root_group.append(wakeup_time_textarea)
+pyportal.root_group.append(light_on_time_textarea)
 
 while True:
     try:

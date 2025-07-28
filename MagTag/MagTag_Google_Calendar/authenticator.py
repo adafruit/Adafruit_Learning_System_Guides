@@ -32,7 +32,7 @@ graphics = Graphics(auto_refresh=False)
 display = graphics.display
 
 background = Rect(0, 0, 296, 128, fill=0xFFFFFF)
-graphics.splash.append(background)
+graphics.root_group.append(background)
 
 label_overview_text = Label(
     font_large,
@@ -42,18 +42,18 @@ label_overview_text = Label(
     color=0x000000,
     text="Authorize this device with Google:",
 )
-graphics.splash.append(label_overview_text)
+graphics.root_group.append(label_overview_text)
 
 label_verification_url = Label(font_small, x=0, y=40, line_spacing=0.75, color=0x000000)
-graphics.splash.append(label_verification_url)
+graphics.root_group.append(label_verification_url)
 
 label_user_code = Label(font_small, x=0, y=80, color=0x000000, line_spacing=0.75)
-graphics.splash.append(label_user_code)
+graphics.root_group.append(label_user_code)
 
 label_qr_code = Label(
     font_small, x=0, y=100, color=0x000000, text="Or scan the QR code:"
 )
-graphics.splash.append(label_qr_code)
+graphics.root_group.append(label_qr_code)
 
 # Set scope(s) of access required by the API you're using
 scopes = ["https://www.googleapis.com/auth/calendar.readonly"]
@@ -85,7 +85,7 @@ label_verification_url.text = (
 label_user_code.text = "2. Enter code: %s" % google_auth.user_code
 
 graphics.qrcode(google_auth.verification_url.encode(), qr_size=2, x=240, y=70)
-graphics.display.root_group = graphics.splash
+graphics.display.root_group = graphics.root_group
 display.refresh()
 
 # Poll Google's authorization server
@@ -98,9 +98,9 @@ print("Add the following lines to your settings.toml file:")
 print(f'google_access_token="{google_auth.access_token}"')
 print(f'google_refresh_token="{google_auth.refresh_token}"')
 
-graphics.splash.pop()
-graphics.splash.pop()
-graphics.splash.pop()
+graphics.root_group.pop()
+graphics.root_group.pop()
+graphics.root_group.pop()
 
 label_overview_text.text = "Successfully Authenticated!"
 label_verification_url.text = (

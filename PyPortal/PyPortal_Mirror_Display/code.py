@@ -47,7 +47,7 @@ display = board.DISPLAY
 display.rotation = 270
 
 #  instantiate the openweather_graphics class
-gfx = openweather_graphics.OpenWeather_Graphics(pyportal.splash, am_pm=True, celsius=False)
+gfx = openweather_graphics.OpenWeather_Graphics(pyportal.root_group, am_pm=True, celsius=False)
 
 #  time keeping for refreshing screen icons and weather information
 localtile_refresh = None

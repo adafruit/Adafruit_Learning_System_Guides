@@ -80,7 +80,7 @@ pyportal = PyPortal(url=url,
                     caption_font=CAPTION_FONT_FILE)
 
 canvas = displayio.Group()
-pyportal.splash.append(canvas)
+pyportal.root_group.append(canvas)
 bar_font = bitmap_font.load_font(BAR_FONT_FILE)
 
 while True:

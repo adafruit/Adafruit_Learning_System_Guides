@@ -65,10 +65,10 @@ pres_label = funhouse.add_text(
 )
 
 # Now display the splash to draw all labels at once
-funhouse.display.root_group = funhouse.splash
+funhouse.display.root_group = funhouse.graphics.root_group
 
 status = Circle(229, 10, 10, fill=0xFF0000, outline=0x880000)
-funhouse.splash.append(status)
+funhouse.graphics.root_group.append(status)
 
 def connected(client, _userdata, _result, _payload):
     status.fill = 0x00FF00

@@ -61,7 +61,7 @@ DATE_LABEL = Label(date_font, text="0000-00-00 00:00:00", color=DATE_COLOR, x=75
 
 # Add all the labels to the display
 for label in HI_LABELS + LO_LABELS + [DATE_LABEL]:
-    pyportal.splash.append(label)
+    pyportal.root_group.append(label)
 
 def get_tide_info():
     """Fetch JSON tide time info and return it."""

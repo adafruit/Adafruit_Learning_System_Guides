@@ -130,12 +130,12 @@ station_info.anchored_position = (158, 126)
 # ----------------------------
 # Add all the graphic layers
 # ----------------------------
-magtag.splash.append(tide_tg)
-magtag.splash.append(grid_overlay)
-magtag.splash.append(plot_y_labels)
-magtag.splash.append(tide_info)
-magtag.splash.append(date_label)
-magtag.splash.append(station_info)
+magtag.graphics.root_group.append(tide_tg)
+magtag.graphics.root_group.append(grid_overlay)
+magtag.graphics.root_group.append(plot_y_labels)
+magtag.graphics.root_group.append(tide_info)
+magtag.graphics.root_group.append(date_label)
+magtag.graphics.root_group.append(station_info)
 
 # /////////////////////////////////////////////////////////////////////////
 

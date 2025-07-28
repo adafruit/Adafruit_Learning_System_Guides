@@ -26,16 +26,16 @@ font_large.load_glyphs(glyphs)
 label_overview_text = Label(
     font_large, x=0, y=45, text="To authorize this device with Google:"
 )
-graphics.splash.append(label_overview_text)
+graphics.root_group.append(label_overview_text)
 
 label_verification_url = Label(font_small, x=0, y=100, line_spacing=1)
-graphics.splash.append(label_verification_url)
+graphics.root_group.append(label_verification_url)
 
 label_user_code = Label(font_small, x=0, y=150)
-graphics.splash.append(label_user_code)
+graphics.root_group.append(label_user_code)
 
 label_qr_code = Label(font_small, x=0, y=190, text="Or scan the QR code:")
-graphics.splash.append(label_qr_code)
+graphics.root_group.append(label_qr_code)
 
 # Set scope(s) of access required by the API you're using
 scopes = ["https://www.googleapis.com/auth/calendar.readonly"]
@@ -71,7 +71,7 @@ label_user_code.text = "2. Enter code: %s" % google_auth.user_code
 
 # Create a QR code
 graphics.qrcode(google_auth.verification_url.encode(), qr_size=2, x=170, y=165)
-graphics.display.root_group = graphics.splash
+graphics.display.root_group = graphics.root_group
 
 # Poll Google's authorization server
 print("Waiting for browser authorization...")
@@ -85,9 +85,9 @@ print("Add the following lines to your settings.toml file:")
 print(f'GOOGLE_ACCESS_TOKEN = "{google_auth.access_token}"')
 print(f'GOOGLE_REFRESH_TOKEN = "{google_auth.refresh_token}"')
 # Remove QR code and code/verification labels
-graphics.splash.pop()
-graphics.splash.pop()
-graphics.splash.pop()
+graphics.root_group.pop()
+graphics.root_group.pop()
+graphics.root_group.pop()
 
 label_overview_text.text = "Successfully Authenticated!"
 label_verification_url.text = (
