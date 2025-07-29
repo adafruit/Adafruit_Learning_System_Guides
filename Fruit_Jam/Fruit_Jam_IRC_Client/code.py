@@ -1,9 +1,9 @@
 # SPDX-FileCopyrightText: 2025 Tim Cocks for Adafruit Industries
 # SPDX-License-Identifier: MIT
+from os import getenv
 from displayio import Group
 from terminalio import FONT
 import supervisor
-from os import getenv
 import audiocore
 import board
 import busio
@@ -57,7 +57,7 @@ while not esp.is_connected:
         print("could not connect to AP, retrying: ", e)
         continue
 
-print(f"IRC Configuration:")
+print("IRC Configuration:")
 print(f"Server: {IRC_CONFIG['server']}:{IRC_CONFIG['port']}")
 print(f"Nickname: {IRC_CONFIG['username']}")
 print(f"Channel: {IRC_CONFIG['channel']}")

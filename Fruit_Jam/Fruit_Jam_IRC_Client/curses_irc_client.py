@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2025 Tim Cocks for Adafruit Industries
 # SPDX-License-Identifier: MIT
-import adafruit_dang as curses
 import time
+import adafruit_dang as curses
 
 from irc_client import IRCClient
 
@@ -48,6 +48,7 @@ def irc_client_main(
     audio_interface=None,
     beep_wave=None,
 ):
+    # pylint: disable=too-many-locals, too-many-branches, too-many-statements
     """
     Main curses IRC client application loop.
     """
@@ -98,9 +99,9 @@ def irc_client_main(
         page_end = page_start + page_len
 
         page = irc_client.message_buffer[page_start:page_end]
-        # print(f"get_page({row_index}) len: {len(page)} start: {page_start} end: {page_end} rows: {window.n_rows - 2}")
         return page
 
+    # pylint: disable=too-many-nested-blocks
     try:
         # main application loop
         while True:
@@ -128,7 +129,7 @@ def irc_client_main(
 
             user_message_row = terminal_tilegrid.height - 1
             if status_bar["user_message"] is None:
-                message = f" {irc_config['username']} | {irc_config['server']} | {irc_config['channel']}"
+                message = f" {irc_config['username']} | {irc_config['server']} | {irc_config['channel']}"  # pylint: disable=line-too-long
                 message += " " * (terminal_tilegrid.width - len(message) - 1)
                 line = f"{ANSI_BLACK_ON_GREY}{message}{ANSI_RESET}"
             else:
@@ -226,9 +227,9 @@ def irc_client_main(
                 else:
                     print(f"unknown key: {k}")
 
-    except KeyboardInterrupt:
+    except KeyboardInterrupt as exc:
         irc_client.disconnect()
-        raise KeyboardInterrupt
+        raise KeyboardInterrupt from exc
 
 
 def run_irc_client(

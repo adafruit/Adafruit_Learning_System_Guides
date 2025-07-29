@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: MIT
 import time
 
-
 import adafruit_connection_manager
 
 ANSI_ESCAPE_CODES = [
@@ -22,7 +21,8 @@ class IRCClient:
     Handles interaction with IRC Server and makes incoming messages available.
 
     :param radio: The network radio to connect with.
-    :param dict irc_config: Dictionary containing IRC configration for server, port, username and channel.
+    :param dict irc_config: Dictionary containing IRC configration for
+      server, port, username and channel.
     :param audio_interface: Optional interface to play audio from for beep messages
     :param beep_wave: Optional wave file to use for beep messages
     :param int max_line_length: Maximum characters per line to format messages into.
@@ -142,7 +142,7 @@ class IRCClient:
             # no data before timeout
             # print(e)
             if "ETIMEDOUT" not in str(e):
-                raise RuntimeError(e)
+                raise RuntimeError(e) from e
                 # raise RuntimeError("Connection timed out")
         return updated_display_lines
 
@@ -163,7 +163,6 @@ class IRCClient:
         """
         irc_command = f"PRIVMSG {to_user} :{message}\r\n"
         self.socket.send(irc_command.encode("utf-8"))
-        # self.process_message(f":{self.config['username']}!~{self.config['username']}@localhost " + irc_command[:-2])
         color = self.get_color_for_user(to_user)
         self.message_buffer.append(f"DM out: <{color}{to_user}{ANSI_RESET}> {message}")
 
@@ -205,7 +204,7 @@ class IRCClient:
                 if "ETIMEDOUT" in str(e):
                     whois_resp_lines = None
                 else:
-                    raise RuntimeError(e)
+                    raise RuntimeError(e) from e
 
         if whois_resp_lines is None:
             return None
@@ -221,9 +220,10 @@ class IRCClient:
 
                 whois_response = parts[2].split(" ", 1)[1]
                 response_parts = whois_response.split(" ")
-                showname = response_parts[0]
                 technical_name = f"*!{response_parts[1]}@{response_parts[2]}"
                 return technical_name
+
+        return None
 
     def ban(self, user):
         """
@@ -301,13 +301,14 @@ class IRCClient:
         return chunks
 
     def process_message(self, message):
+        # pylint: disable=too-many-branches, too-many-statements
         """
         Process an incoming IRC message
         :param message: The message that came from the IRC server.
 
         :return lines_added: The number of lines added to the display
         """
-
+        # pylint: disable=too-many-locals
         lines_added = 0
 
         message = message.lstrip("\x00")
@@ -317,12 +318,12 @@ class IRCClient:
         if message.startswith("PING"):
             pong_response = message.replace("PING", "PONG")
             self.socket.send(f"{pong_response}\r\n".encode("utf-8"))
-            print(f"Responded to PING")
+            print("Responded to PING")
             return 0
 
         # Parse IRC message format: :prefix COMMAND params
         parts = message.split(" ", 2)
-
+        # pylint: disable=too-many-nested-blocks
         if len(parts) >= 2:
             command = parts[1]
             try:
@@ -331,7 +332,7 @@ class IRCClient:
                 command_num = None
 
             # End of MOTD - now we can join the channel
-            if command == "376" or command == "422":  # 422 is "no MOTD"
+            if command in {"376", "422"}:  # 422 is "no MOTD"
                 # join channel
                 self.join()
 
@@ -357,7 +358,7 @@ class IRCClient:
                         welcome_text = welcome_text[1:]
 
                     print(
-                        f"'{welcome_text[0:11]}' startswith '{self.config['username']}' ? {welcome_text.startswith(self.config['username'])}"
+                        f"'{welcome_text[0:11]}' startswith '{self.config['username']}' ? {welcome_text.startswith(self.config['username'])}"  # pylint: disable=line-too-long
                     )
                     if welcome_text.startswith(self.config["username"]):
                         welcome_text = welcome_text.replace(
@@ -451,11 +452,13 @@ class IRCClient:
                 action_user = parts[0].split("!", 1)[0][1:]
                 mode_msg_parts = parts[2].split(" ", 2)
                 if len(mode_msg_parts) >= 3:
-                    channel, mode, target_user = mode_msg_parts
+                    channel, mode, target_user = (
+                        mode_msg_parts  # pylint: disable=unused-variable
+                    )
                     action_user_color = self.get_color_for_user(action_user)
                     target_user_color = self.get_color_for_user(target_user)
                     self.message_buffer.append(
-                        f"{action_user_color}{action_user}{ANSI_RESET} sets mode {mode} on {target_user_color}{target_user}{ANSI_RESET}"
+                        f"{action_user_color}{action_user}{ANSI_RESET} sets mode {mode} on {target_user_color}{target_user}{ANSI_RESET}"  # pylint: disable=line-too-long
                     )
                     lines_added += 1
 
