@@ -133,7 +133,7 @@ def irc_client_main(
                 message += " " * (terminal_tilegrid.width - len(message) - 1)
                 line = f"{ANSI_BLACK_ON_GREY}{message}{ANSI_RESET}"
             else:
-                line = f"{ANSI_BLACK_ON_GREY}{status_bar["user_message"]}{ANSI_RESET}"
+                line = f"{ANSI_BLACK_ON_GREY}{status_bar['user_message']}{ANSI_RESET}"
                 if status_bar["user_message_shown_time"] + 3.0 < time.monotonic():
                     status_bar["user_message"] = None
             setline(user_message_row, line)

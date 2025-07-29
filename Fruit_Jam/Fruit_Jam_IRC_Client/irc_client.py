@@ -452,8 +452,8 @@ class IRCClient:
                 action_user = parts[0].split("!", 1)[0][1:]
                 mode_msg_parts = parts[2].split(" ", 2)
                 if len(mode_msg_parts) >= 3:
-                    channel, mode, target_user = (
-                        mode_msg_parts  # pylint: disable=unused-variable
+                    channel, mode, target_user = (  # pylint: disable=unused-variable
+                        mode_msg_parts
                     )
                     action_user_color = self.get_color_for_user(action_user)
                     target_user_color = self.get_color_for_user(target_user)
