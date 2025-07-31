@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2018 Arduino SA 
+// SPDX-FileCopyrightText: 2018 Arduino SA
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 /*
@@ -23,6 +23,10 @@
 */
 
 #include <Adafruit_NeoPixel.h>
+// For Adafruit core, Arduino USB impl on SAMD sometimes does not work properly.
+// Choose the TinyUSB implementation instead.
+// Must compile with Tools->USB Stack->TinyUSB
+#include "Adafruit_TinyUSB.h"
 
 unsigned long baud = 115200;
 
@@ -100,7 +104,7 @@ void setup() {
   pinMode(SPIWIFI_SS, OUTPUT);
   pinMode(ESP32_GPIO0, OUTPUT);
   pinMode(ESP32_RESETN, OUTPUT);
-  
+
   // manually put the ESP32 in upload mode
   digitalWrite(ESP32_GPIO0, LOW);
 
