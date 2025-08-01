@@ -24,6 +24,14 @@ class SaveState:
         self._sdcard = None
 
     def _mount_sd_card(self):
+
+        # Check if the SD card is already mounted
+        try:
+            storage.remount('/sd',readonly=False)
+            return True
+        except:
+            pass
+
         self._card_detect = DigitalInOut(board.SD_CARD_DETECT)
         self._card_detect.switch_to_input(pull=Pull.UP)
         if self._card_detect.value:
