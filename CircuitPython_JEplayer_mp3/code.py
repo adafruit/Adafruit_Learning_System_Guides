@@ -38,7 +38,7 @@ import time
 
 import adafruit_bitmap_font.bitmap_font
 import adafruit_display_text.label
-from adafruit_progressbar import ProgressBar
+from adafruit_progressbar.horizontalprogressbar import HorizontalProgressBar
 import sdcardio
 import analogjoy
 import audioio
@@ -75,9 +75,12 @@ class PlaybackDisplay:
     def __init__(self):
         self.group = displayio.Group()
         self.glyph_width, self.glyph_height = font.get_bounding_box()[:2]
-        self.pbar = ProgressBar(0, 0, board.DISPLAY.width,
-                                self.glyph_height*2, bar_color=0x0000ff,
-                                outline_color=0x333333, stroke=1)
+        self.pbar = HorizontalProgressBar((0, 0),
+                                          (board.DISPLAY.width, self.glyph_height*2),
+                                          min_value = 0.0, max_value = 1.0,
+                                          bar_color=0x0000ff,
+                                          outline_color=0x333333,
+                                          fill_color=0x000000)
         self.iconbar = icons.IconBar()
         self.iconbar.group.y = 1000
         for i in range(5, 8):
@@ -115,11 +118,11 @@ class PlaybackDisplay:
     @property
     def progress(self):
         """The fraction of progress through the current track"""
-        return self.pbar.progress
+        return self.pbar.value
 
     @progress.setter
     def progress(self, frac):
-        self.pbar.progress = frac
+        self.pbar.value = frac
 
     def set_bitmap(self, candidates):
         """Find and use a background from among candidates, or else the fallback bitmap"""
