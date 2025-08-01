@@ -123,8 +123,8 @@ while True:
             sent_label.text = "TX'd: "  # Keep this tomato colored
             sent_counter_label.text = str(message_count)  # Color with sender color
             sent_counter_label.color = SENDER_COLORS.get(DEVICE_ID, WHITE)
-        #pylint: disable=broad-exception-caught
-        except Exception as ex:
+
+        except Exception as ex: # pylint: disable=broad-except
             print(f"Send failed: {ex}")
             status_label.text = "xxx"
             status_label.color = RED
