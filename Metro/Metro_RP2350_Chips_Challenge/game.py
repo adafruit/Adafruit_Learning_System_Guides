@@ -26,8 +26,8 @@ from savestate import SaveState
 from microcontroller import nvm
 
 # Colors must be colors in palette
-LARGE_FONT = bitmap_font.load_font("/fonts/Arial-Bold-10.pcf")
-SMALL_FONT = bitmap_font.load_font("/fonts/Arial-8.pcf")
+LARGE_FONT = bitmap_font.load_font("fonts/Arial-Bold-10.pcf")
+SMALL_FONT = bitmap_font.load_font("fonts/Arial-8.pcf")
 
 colors = {
     "key_color": 0xAAFF00, # Light Green

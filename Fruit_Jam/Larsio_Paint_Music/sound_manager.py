@@ -141,37 +141,37 @@ class SoundManager:
         try:
             # Channel 1 samples
             self.samples = {
-                59: audiocore.WaveFile("/samples/larso_B3.wav"),  # B3
-                60: audiocore.WaveFile("/samples/larso_C4.wav"),  # C4
-                62: audiocore.WaveFile("/samples/larso_D4.wav"),  # D4
-                64: audiocore.WaveFile("/samples/larso_E4.wav"),  # E4
-                65: audiocore.WaveFile("/samples/larso_F4.wav"),  # F4
-                67: audiocore.WaveFile("/samples/larso_G4.wav"),  # G4
-                69: audiocore.WaveFile("/samples/larso_A4.wav"),  # A4
-                71: audiocore.WaveFile("/samples/larso_B4.wav"),  # B4
-                72: audiocore.WaveFile("/samples/larso_C5.wav"),  # C5
-                74: audiocore.WaveFile("/samples/larso_D5.wav"),  # D5
-                76: audiocore.WaveFile("/samples/larso_E5.wav"),  # E5
-                77: audiocore.WaveFile("/samples/larso_F5.wav"),  # F5
-                79: audiocore.WaveFile("/samples/larso_G5.wav"),  # G5
+                59: audiocore.WaveFile("samples/larso_B3.wav"),  # B3
+                60: audiocore.WaveFile("samples/larso_C4.wav"),  # C4
+                62: audiocore.WaveFile("samples/larso_D4.wav"),  # D4
+                64: audiocore.WaveFile("samples/larso_E4.wav"),  # E4
+                65: audiocore.WaveFile("samples/larso_F4.wav"),  # F4
+                67: audiocore.WaveFile("samples/larso_G4.wav"),  # G4
+                69: audiocore.WaveFile("samples/larso_A4.wav"),  # A4
+                71: audiocore.WaveFile("samples/larso_B4.wav"),  # B4
+                72: audiocore.WaveFile("samples/larso_C5.wav"),  # C5
+                74: audiocore.WaveFile("samples/larso_D5.wav"),  # D5
+                76: audiocore.WaveFile("samples/larso_E5.wav"),  # E5
+                77: audiocore.WaveFile("samples/larso_F5.wav"),  # F5
+                79: audiocore.WaveFile("samples/larso_G5.wav"),  # G5
             }
             print("Loaded channel 1 WAV samples")
 
             # Load samples for channel 2
             self.heart_samples = {
-                59: audiocore.WaveFile("/samples/musicnote16_B3.wav"),  # B3
-                60: audiocore.WaveFile("/samples/musicnote16_C4.wav"),  # C4
-                62: audiocore.WaveFile("/samples/musicnote16_D4.wav"),  # D4
-                64: audiocore.WaveFile("/samples/musicnote16_E4.wav"),  # E4
-                65: audiocore.WaveFile("/samples/musicnote16_F4.wav"),  # F4
-                67: audiocore.WaveFile("/samples/musicnote16_G4.wav"),  # G4
-                69: audiocore.WaveFile("/samples/musicnote16_A4.wav"),  # A4
-                71: audiocore.WaveFile("/samples/musicnote16_B4.wav"),  # B4
-                72: audiocore.WaveFile("/samples/musicnote16_C5.wav"),  # C5
-                74: audiocore.WaveFile("/samples/musicnote16_D5.wav"),  # D5
-                76: audiocore.WaveFile("/samples/musicnote16_E5.wav"),  # E5
-                77: audiocore.WaveFile("/samples/musicnote16_F5.wav"),  # F5
-                79: audiocore.WaveFile("/samples/musicnote16_G5.wav"),  # G5
+                59: audiocore.WaveFile("samples/musicnote16_B3.wav"),  # B3
+                60: audiocore.WaveFile("samples/musicnote16_C4.wav"),  # C4
+                62: audiocore.WaveFile("samples/musicnote16_D4.wav"),  # D4
+                64: audiocore.WaveFile("samples/musicnote16_E4.wav"),  # E4
+                65: audiocore.WaveFile("samples/musicnote16_F4.wav"),  # F4
+                67: audiocore.WaveFile("samples/musicnote16_G4.wav"),  # G4
+                69: audiocore.WaveFile("samples/musicnote16_A4.wav"),  # A4
+                71: audiocore.WaveFile("samples/musicnote16_B4.wav"),  # B4
+                72: audiocore.WaveFile("samples/musicnote16_C5.wav"),  # C5
+                74: audiocore.WaveFile("samples/musicnote16_D5.wav"),  # D5
+                76: audiocore.WaveFile("samples/musicnote16_E5.wav"),  # E5
+                77: audiocore.WaveFile("samples/musicnote16_F5.wav"),  # F5
+                79: audiocore.WaveFile("samples/musicnote16_G5.wav"),  # G5
             }
             print("Loaded channel 2 WAV samples")
 
@@ -179,19 +179,19 @@ class SoundManager:
             self.drum_samples = {}
             try:
                 self.drum_samples = {
-                    59: audiocore.WaveFile("/samples/kick_01.wav"),
-                    60: audiocore.WaveFile("/samples/kick_01.wav"),
-                    62: audiocore.WaveFile("/samples/kick_01.wav"),
-                    64: audiocore.WaveFile("/samples/snare_01.wav"),
-                    65: audiocore.WaveFile("/samples/snare_01.wav"),
-                    67: audiocore.WaveFile("/samples/snare_01.wav"),
-                    69: audiocore.WaveFile("/samples/chat_01.wav"),
-                    71: audiocore.WaveFile("/samples/chat_01.wav"),
-                    72: audiocore.WaveFile("/samples/chat_01.wav"),
-                    74: audiocore.WaveFile("/samples/ohat_01.wav"),
-                    76: audiocore.WaveFile("/samples/ohat_01.wav"),
-                    77: audiocore.WaveFile("/samples/crash_01.wav"),
-                    79: audiocore.WaveFile("/samples/crash_01.wav"),
+                    59: audiocore.WaveFile("samples/kick_01.wav"),
+                    60: audiocore.WaveFile("samples/kick_01.wav"),
+                    62: audiocore.WaveFile("samples/kick_01.wav"),
+                    64: audiocore.WaveFile("samples/snare_01.wav"),
+                    65: audiocore.WaveFile("samples/snare_01.wav"),
+                    67: audiocore.WaveFile("samples/snare_01.wav"),
+                    69: audiocore.WaveFile("samples/chat_01.wav"),
+                    71: audiocore.WaveFile("samples/chat_01.wav"),
+                    72: audiocore.WaveFile("samples/chat_01.wav"),
+                    74: audiocore.WaveFile("samples/ohat_01.wav"),
+                    76: audiocore.WaveFile("samples/ohat_01.wav"),
+                    77: audiocore.WaveFile("samples/crash_01.wav"),
+                    79: audiocore.WaveFile("samples/crash_01.wav"),
                 }
                 print("Loaded channel 3 WAV samples (drums)")
             except Exception as e:
@@ -204,7 +204,7 @@ class SoundManager:
             print(f"Error loading WAV samples: {e}")
             # Fallback to basic samples if there's an error
             self.samples = {
-                65: audiocore.WaveFile("/samples/musicnote01.wav"),  # Default sample
+                65: audiocore.WaveFile("samples/musicnote01.wav"),  # Default sample
             }
             self.heart_samples = self.samples  # Use same samples as fallback
             self.drum_samples = self.samples   # Use same samples as fallback
