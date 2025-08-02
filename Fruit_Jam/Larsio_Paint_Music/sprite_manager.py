@@ -80,21 +80,21 @@ class SpriteManager:
         try:
             # Load the Lars note bitmap for channel 1 notes
             self.mario_head, self.mario_palette = adafruit_imageload.load(
-                "/sprites/lars_note.bmp"
+                "sprites/lars_note.bmp"
             )
             # Make the background color transparent (not just the same color)
             self.mario_palette.make_transparent(0)
 
             # Load the Heart note bitmap for channel 2 notes
             self.heart_note, self.heart_palette = adafruit_imageload.load(
-                "/sprites/heart_note.bmp"
+                "sprites/heart_note.bmp"
             )
             # Make the background color transparent
             self.heart_palette.make_transparent(0)
 
             # Load the Drum note bitmap for channel 3 notes
             self.drum_note, self.drum_palette = adafruit_imageload.load(
-                "/sprites/drum_note.bmp"
+                "sprites/drum_note.bmp"
             )
             # Make the background color transparent
             self.drum_palette.make_transparent(0)
@@ -102,18 +102,18 @@ class SpriteManager:
             # Load the new sprites for channels 4, 5, and 6
             # Meatball for channel 4
             self.meatball_note, self.meatball_palette = adafruit_imageload.load(
-                "/sprites/meatball.bmp"
+                "sprites/meatball.bmp"
             )
             self.meatball_palette.make_transparent(0)
 
             # Star for channel 5
             self.star_note, self.star_palette = adafruit_imageload.load(
-                "/sprites/star.bmp"
+                "sprites/star.bmp"
             )
             self.star_palette.make_transparent(0)
 
             # Bot for channel 6
-            self.bot_note, self.bot_palette = adafruit_imageload.load("/sprites/bot.bmp")
+            self.bot_note, self.bot_palette = adafruit_imageload.load("sprites/bot.bmp")
             self.bot_palette.make_transparent(0)
 
         except Exception as e:
@@ -171,45 +171,45 @@ class SpriteManager:
         try:
             # Load play button images
             self.play_up, self.play_up_palette = adafruit_imageload.load(
-                "/sprites/play_up.bmp"
+                "sprites/play_up.bmp"
             )
             self.play_up_palette.make_transparent(0)
 
             self.play_down, self.play_down_palette = adafruit_imageload.load(
-                "/sprites/play_down.bmp"
+                "sprites/play_down.bmp"
             )
             self.play_down_palette.make_transparent(0)
 
             # Load stop button images
             self.stop_up, self.stop_up_palette = adafruit_imageload.load(
-                "/sprites/stop_up.bmp"
+                "sprites/stop_up.bmp"
             )
             self.stop_up_palette.make_transparent(0)
 
             self.stop_down, self.stop_down_palette = adafruit_imageload.load(
-                "/sprites/stop_down.bmp"
+                "sprites/stop_down.bmp"
             )
             self.stop_down_palette.make_transparent(0)
 
             # Load loop button images
             self.loop_up, self.loop_up_palette = adafruit_imageload.load(
-                "/sprites/loop_up.bmp"
+                "sprites/loop_up.bmp"
             )
             self.loop_up_palette.make_transparent(0)
 
             self.loop_down, self.loop_down_palette = adafruit_imageload.load(
-                "/sprites/loop_down.bmp"
+                "sprites/loop_down.bmp"
             )
             self.loop_down_palette.make_transparent(0)
 
             # Load clear button images
             self.clear_up, self.clear_up_palette = adafruit_imageload.load(
-                "/sprites/clear_up.bmp"
+                "sprites/clear_up.bmp"
             )
             self.clear_up_palette.make_transparent(0)
 
             self.clear_down, self.clear_down_palette = adafruit_imageload.load(
-                "/sprites/clear_down.bmp"
+                "sprites/clear_down.bmp"
             )
             self.clear_down_palette.make_transparent(0)
 
