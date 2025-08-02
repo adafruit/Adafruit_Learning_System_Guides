@@ -45,9 +45,9 @@ dac.configure_clocks(sample_rate=44100, bit_depth=16)
 dac.headphone_output = True
 dac.headphone_volume = -15  # dB
 
-try:
+if hasattr(board, "I2S_BCLK"):
     audio_bus = audiobusio.I2SOut(board.I2S_BCLK, board.I2S_WS, board.I2S_DIN)
-except:
+else:
     audio_bus = audiobusio.I2SOut(board.D9, board.D10, board.D11)
 audio = Audio(audio_bus, SOUND_EFFECTS)
 

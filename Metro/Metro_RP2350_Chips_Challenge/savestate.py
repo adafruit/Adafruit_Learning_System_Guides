@@ -27,9 +27,9 @@ class SaveState:
 
         # Check if the SD card is already mounted
         try:
-            storage.remount('/sd',readonly=False)
+            storage.getmount("/sd")
             return True
-        except:
+        except OSError:
             pass
 
         self._card_detect = DigitalInOut(board.SD_CARD_DETECT)
