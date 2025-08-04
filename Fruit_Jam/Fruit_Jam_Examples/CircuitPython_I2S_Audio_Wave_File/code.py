@@ -26,4 +26,3 @@ with open("StreetChicken.wav", "rb") as wave_file:
         pass
 
 print("Done!")
-

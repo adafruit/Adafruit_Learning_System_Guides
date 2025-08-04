@@ -6,7 +6,6 @@ from os import getenv
 import adafruit_connection_manager
 import adafruit_requests
 import board
-import busio
 from digitalio import DigitalInOut
 
 from adafruit_esp32spi import adafruit_esp32spi
