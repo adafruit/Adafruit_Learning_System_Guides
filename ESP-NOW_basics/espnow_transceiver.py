@@ -19,7 +19,7 @@ display = board.DISPLAY
 group = displayio.Group()
 
 # Create background rectangles like your example
-background_rect = Rect(0, 0, display.width, display.height, fill=000000)
+background_rect = Rect(0, 0, display.width, display.height, fill=0x000000)
 group.append(background_rect)
 
 # Set up a button on pin D0/BOOT
@@ -100,10 +100,12 @@ group.append(received_message_label)
 # Show the display
 display.root_group = group
 
-# Button debouncing
+# Button debouncing and status tracking
 last_button_time = 0
 button_debounce = 0.2  # 200ms debounce
 message_count = 0
+status_reset_time = 0
+status_needs_reset = False
 
 while True:
     current_time = time.monotonic()
@@ -123,18 +125,23 @@ while True:
             sent_label.text = "TX'd: "  # Keep this tomato colored
             sent_counter_label.text = str(message_count)  # Color with sender color
             sent_counter_label.color = SENDER_COLORS.get(DEVICE_ID, WHITE)
+            status_reset_time = current_time + 0.5  # Reset after 0.5 seconds
+            status_needs_reset = True
 
         except Exception as ex: # pylint: disable=broad-except
             print(f"Send failed: {ex}")
             status_label.text = "xxx"
             status_label.color = RED
+            status_reset_time = current_time + 2.0  # Show error for 2 seconds
+            status_needs_reset = True
 
         last_button_time = current_time
 
-    # Reset status after a moment
-    if current_time - last_button_time > 0.2:
+    # Reset status only when needed and after appropriate delay
+    if status_needs_reset and current_time >= status_reset_time:
         status_label.text = "press D0 to send"
         status_label.color = TOMATO
+        status_needs_reset = False
 
     # Check for incoming packets
     if e:
@@ -153,5 +160,7 @@ while True:
                 received_label.text = "RX'd: "  # Keep this tomato colored
                 received_message_label.text = message[-12:]  # Color just the message
                 received_message_label.color = sender_color
+                status_reset_time = current_time + 0.5  # Reset after 0.5 seconds
+                status_needs_reset = True
 
     time.sleep(0.05)  # Light polling
