@@ -21,20 +21,20 @@ from definitions import SECOND_LENGTH, TICKS_PER_SECOND
 DATA_FILE = "CHIPS.DAT"
 
 SOUND_EFFECTS = {
-    "BUTTON_PUSHED": "/sounds/pop2.wav",
-    "DOOR_OPENED": "/sounds/door.wav",
-    "ITEM_COLLECTED": "/sounds/blip2.wav",
-    "BOOTS_STOLEN": "/sounds/strike.wav",
-    "WATER_SPLASH": "/sounds/water2.wav",
-    "TELEPORT": "/sounds/teleport.wav",
-    "CANT_MOVE": "/sounds/oof3.wav",
-    "CHIP_LOSES": "/sounds/bummer.wav",
-    "LEVEL_COMPLETE": "/sounds/ditty1.wav",
-    "IC_COLLECTED": "/sounds/click3.wav",
-    "BOMB_EXPLOSION": "/sounds/hit3.wav",
-    "SOCKET_SOUND": "/sounds/chimes.wav",
-    "TIME_LOW_TICK": "/sounds/click1.wav",
-    "TIME_UP": "/sounds/bell.wav"
+    "BUTTON_PUSHED": "sounds/pop2.wav",
+    "DOOR_OPENED": "sounds/door.wav",
+    "ITEM_COLLECTED": "sounds/blip2.wav",
+    "BOOTS_STOLEN": "sounds/strike.wav",
+    "WATER_SPLASH": "sounds/water2.wav",
+    "TELEPORT": "sounds/teleport.wav",
+    "CANT_MOVE": "sounds/oof3.wav",
+    "CHIP_LOSES": "sounds/bummer.wav",
+    "LEVEL_COMPLETE": "sounds/ditty1.wav",
+    "IC_COLLECTED": "sounds/click3.wav",
+    "BOMB_EXPLOSION": "sounds/hit3.wav",
+    "SOCKET_SOUND": "sounds/chimes.wav",
+    "TIME_LOW_TICK": "sounds/click1.wav",
+    "TIME_UP": "sounds/bell.wav"
 }
 
 displayio.release_displays()
@@ -45,7 +45,10 @@ dac.configure_clocks(sample_rate=44100, bit_depth=16)
 dac.headphone_output = True
 dac.headphone_volume = -15  # dB
 
-audio_bus = audiobusio.I2SOut(board.D9, board.D10, board.D11)
+if hasattr(board, "I2S_BCLK"):
+    audio_bus = audiobusio.I2SOut(board.I2S_BCLK, board.I2S_WS, board.I2S_DIN)
+else:
+    audio_bus = audiobusio.I2SOut(board.D9, board.D10, board.D11)
 audio = Audio(audio_bus, SOUND_EFFECTS)
 
 fb = picodvi.Framebuffer(320, 240, clk_dp=board.CKP, clk_dn=board.CKN,
