@@ -7,7 +7,6 @@ import board
 import picodvi
 import framebufferio
 import displayio
-import adafruit_tlv320
 import audiobusio
 from audio import Audio
 from game import Game
@@ -39,16 +38,12 @@ SOUND_EFFECTS = {
 
 displayio.release_displays()
 
-i2c = board.I2C()
-dac = adafruit_tlv320.TLV320DAC3100(i2c)
-dac.configure_clocks(sample_rate=44100, bit_depth=16)
-dac.headphone_output = True
-dac.headphone_volume = -15  # dB
-
 if hasattr(board, "I2S_BCLK"):
     audio_bus = audiobusio.I2SOut(board.I2S_BCLK, board.I2S_WS, board.I2S_DIN)
-else:
+elif hasattr(board, "D9") and hasattr(board, "D10") and hasattr(board, "D11"):
     audio_bus = audiobusio.I2SOut(board.D9, board.D10, board.D11)
+else:
+    audio_bus = None
 audio = Audio(audio_bus, SOUND_EFFECTS)
 
 fb = picodvi.Framebuffer(320, 240, clk_dp=board.CKP, clk_dn=board.CKN,
