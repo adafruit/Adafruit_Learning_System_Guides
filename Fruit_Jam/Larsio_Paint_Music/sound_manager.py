@@ -109,7 +109,9 @@ class SoundManager:
                     din_pin = board.I2S_DIN
 
                 # Check if DAC is connected
-                while not i2c.try_lock():
+                for i in range(500): # try for 5 seconds
+                    if i2c.try_lock():
+                        break
                     time.sleep(0.01)
                 if 0x18 in i2c.scan():
                     ltv320_present = True
