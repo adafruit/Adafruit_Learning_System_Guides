@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 import json
+import time
 import board
 from micropython import const
 import adafruit_pathlib as pathlib

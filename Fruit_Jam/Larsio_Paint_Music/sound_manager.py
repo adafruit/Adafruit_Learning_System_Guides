@@ -65,7 +65,8 @@ class SoundManager:
             # Setup PWM audio output on D10
             self.audio = audiopwmio.PWMAudioOut(board.D10)
         else:  # i2s
-            # optional configuration file for speaker/headphone setting, check current and root directory
+            # optional configuration file for speaker/headphone setting
+            # check current directory first and then root directory
             launcher_config = {}
             if pathlib.Path("launcher.conf.json").exists():
                 with open("launcher.conf.json", "r") as f:
