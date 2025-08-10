@@ -681,7 +681,7 @@ class Paint(object):
                 newmin_col = self._w - 1 
                 newmax_col = (self._w // 10) + 1
                 done = True
-                self._logger.debug("Rows: %d to %d  Cols: %d to %d" , min_row, max_row, min_col, max_col)
+                #self._logger.debug("Rows: %d to %d  Cols: %d to %d" , min_row, max_row, min_col, max_col)
                 for i in range(min_row,max_row):
                     for j in range(min_col,max_col):
                         newmarker = False
