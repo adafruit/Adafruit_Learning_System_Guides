@@ -684,26 +684,23 @@ class Paint(object):
                 #self._logger.debug("Rows: %d to %d  Cols: %d to %d" , min_row, max_row, min_col, max_col)
                 for i in range(min_row,max_row):
                     for j in range(min_col,max_col):
-                        newmarker = False
                         if self._fg_bitmap[j, i] == MARKER:
+                            newmarker = False
                             if j > self._w // 10 and self._fg_bitmap[j - 1, i] == blank_color:
                                 self._fg_bitmap[j - 1, i] = MARKER
-                                done = False
                                 newmarker = True
                             if j < self._w - 1 and self._fg_bitmap[j + 1, i] == blank_color:
                                 self._fg_bitmap[j + 1, i] = MARKER
-                                done = False
                                 newmarker = True
                             if i > 0 and self._fg_bitmap[j, i - 1] == blank_color:
                                 self._fg_bitmap[j, i - 1] = MARKER
-                                done = False
                                 newmarker = True
                             if i < self._h - 1 and self._fg_bitmap[j, i + 1] == blank_color:
                                 self._fg_bitmap[j, i + 1] = MARKER
-                                done = False
                                 newmarker = True
 
                             if newmarker:
+                                done = False
                                 if i < newmin_row:
                                     newmin_row = i
                                 if i > newmax_row:
