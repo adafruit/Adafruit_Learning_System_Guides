@@ -179,10 +179,10 @@ class MousePoller(object):
     """Get 'pressed' and location updates from a USB mouse."""
 
     def __init__(self, splash, cursor_bmp, screen_width, screen_height):
-        logger = logging.getLogger("Paint")
-        if not logger.hasHandlers():
-            logger.addHandler(logging.StreamHandler())
-        logger.debug("Creating a MousePoller")
+        self._logger = logging.getLogger("Paint")
+        if not self._logger.hasHandlers():
+            self._logger.addHandler(logging.StreamHandler())
+        self._logger.debug("Creating a MousePoller")
         self._display_grp = splash
         self._cursor_grp = displayio.Group()
         self._cur_palette = displayio.Palette(3)
@@ -217,8 +217,8 @@ class MousePoller(object):
         if self.find_mouse():
             mouse_found = True
         else:
-            print("WARNING: Mouse not found after multiple attempts.")
-            print("The application will run, but mouse control may not work.")
+            self._logger.debug("WARNING: Mouse not found after multiple attempts.")
+            self._logger.debug("The application will run, but mouse control may not work.")
 
 
     def find_mouse(self):
@@ -227,12 +227,12 @@ class MousePoller(object):
         RETRY_DELAY = 1  # seconds
 
         if not usb_available:
-            print("USB library not available; cannot find mouse.")
+            self._logger.debug("USB library not available; cannot find mouse.")
             return False
 
         for attempt in range(MAX_ATTEMPTS):
             try:
-                print(f"Mouse detection attempt {attempt+1}/{MAX_ATTEMPTS}")
+                self._logger.debug(f"Mouse detection attempt {attempt+1}/{MAX_ATTEMPTS}")
 
                 # Constants for USB control transfers
                 DIR_OUT = 0
@@ -246,7 +246,7 @@ class MousePoller(object):
 
                 for device in usb.core.find(find_all=True):
                     devices_found = True
-                    print(f"Found device: {device.idVendor:04x}:{device.idProduct:04x}")
+                    self._logger.debug(f"Found device: {device.idVendor:04x}:{device.idProduct:04x}")
 
                     try:
                         # Try to get device info
@@ -266,18 +266,18 @@ class MousePoller(object):
                             if has_kernel_driver and device.is_kernel_driver_active(0):
                                 device.detach_kernel_driver(0)
                         except Exception as e:  # pylint: disable=broad-except
-                            print(f"Error detaching kernel driver: {e}")
+                            self._logger.debug(f"Error detaching kernel driver: {e}")
 
                         # Set configuration
                         try:
                             device.set_configuration()
                         except Exception as e:  # pylint: disable=broad-except
-                            print(f"Error setting configuration: {e}")
+                            self._logger.debug(f"Error setting configuration: {e}")
                             continue  # Try next device
 
                         # Just assume endpoint 0x81 (common for mice)
                         self.in_endpoint = 0x81
-                        print(f"Using mouse: {manufacturer}, {product}")
+                        self._logger.debug(f"Using mouse: {manufacturer}, {product}")
 
                         # Set to report protocol mode
                         try:
@@ -288,49 +288,49 @@ class MousePoller(object):
 
                             buf = bytearray(1)
                             device.ctrl_transfer(bmRequestType, bRequest, wValue, wIndex, buf)
-                            print("Set to report protocol mode")
+                            self._logger.debug("Set to report protocol mode")
                         except Exception as e:  # pylint: disable=broad-except
-                            print(f"Could not set protocol: {e}")
+                            self._logger.debug(f"Could not set protocol: {e}")
 
                         # Buffer for reading data
                         self.buf = array.array("B", [0] * 4)
-                        print("Created 4-byte buffer for mouse data")
+                        self._logger.debug("Created 4-byte buffer for mouse data")
 
                         # Verify mouse works by reading from it
                         try:
                             # Try to read some data with a short timeout
                             data = device.read(self.in_endpoint, self.buf, timeout=100)
-                            print(f"Mouse test read successful: {data} bytes")
+                            self._logger.debug(f"Mouse test read successful: {data} bytes")
                             return True
                         except usb.core.USBTimeoutError:
                             # Timeout is normal if mouse isn't moving
-                            print("Mouse connected but not sending data (normal)")
+                            self._logger.debug("Mouse connected but not sending data (normal)")
                             return True
                         except Exception as e:  # pylint: disable=broad-except
-                            print(f"Mouse test read failed: {e}")
+                            self._logger.debug(f"Mouse test read failed: {e}")
                             # Continue to try next device or retry
                             self.mouse = None
                             self.in_endpoint = None
                             continue
 
                     except Exception as e:  # pylint: disable=broad-except
-                        print(f"Error initializing device: {e}")
+                        self._logger.debug(f"Error initializing device: {e}")
                         continue
 
                 if not devices_found:
-                    print("No USB devices found")
+                    self._logger.debug("No USB devices found")
 
                 # If we get here without returning, no suitable mouse was found
-                print(f"No working mouse found on attempt {attempt+1}, retrying...")
+                self._logger.debug(f"No working mouse found on attempt {attempt+1}, retrying...")
                 gc.collect()
                 time.sleep(RETRY_DELAY)
 
             except Exception as e:  # pylint: disable=broad-except
-                print(f"Error during mouse detection: {e}")
+                self._logger.debug(f"Error during mouse detection: {e}")
                 gc.collect()
                 time.sleep(RETRY_DELAY)
 
-        print("Failed to find a working mouse after multiple attempts")
+        self._logger.debug("Failed to find a working mouse after multiple attempts")
         return False
 
 
@@ -381,14 +381,14 @@ class MousePoller(object):
 
             # Handle disconnections
             if e.errno == 19:  # No such device
-                print("Mouse disconnected")
+                self._logger.debug("Mouse disconnected")
                 self.mouse = None
                 self.in_endpoint = None
                 gc.collect()
 
             return False
         except Exception as e:  # pylint: disable=broad-except
-            print(f"Error reading mouse: {type(e).__name__}")
+            self._logger.debug(f"Error reading mouse: {type(e).__name__}")
             return False
 
         if count >= 3:  # We need at least buttons, X and Y
