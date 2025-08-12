@@ -1,0 +1,16 @@
+# SPDX-FileCopyrightText: 2025 Tim Cocks for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+voice = "expr-voice-3-f"
+location_points = "36,33"
+forecast_length = 3
+#sound_device = "plughw:3,0"
+available_voices = [
+    'expr-voice-2-m',
+    'expr-voice-2-f',
+    'expr-voice-3-m',
+    'expr-voice-3-f',
+    'expr-voice-4-m',
+    'expr-voice-4-f',
+    'expr-voice-5-m',
+    'expr-voice-5-f' ]
