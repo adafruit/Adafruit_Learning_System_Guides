@@ -640,8 +640,7 @@ class Paint(): # pylint: disable=too-many-statements
         MARKER = 8  # Marker for filled areas
         print(f"Filling at ({x}, {y}) with color {c}")
 
-        # pylint: disable-next=too-many-nested-blocks
-        if self._fg_bitmap[x, y] != c: 
+        if self._fg_bitmap[x, y] != c: # pylint: disable=too-many-statements
             blank_color = self._fg_bitmap[x, y]
             self._fg_bitmap[x, y] = MARKER
             done = False
