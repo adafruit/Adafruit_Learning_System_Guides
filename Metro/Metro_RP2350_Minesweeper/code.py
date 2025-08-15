@@ -52,7 +52,7 @@ else:
 game_logic = GameLogic(display) # pylint: disable=no-value-for-parameter
 
 # Load the spritesheet
-sprite_sheet = OnDiskBitmap("/bitmaps/game_sprites.bmp")
+sprite_sheet = OnDiskBitmap("bitmaps/game_sprites.bmp")
 
 # Main group will hold all the visual layers
 main_group = Group()
@@ -76,7 +76,7 @@ ui_group = Group()
 main_group.append(ui_group)
 
 # Create the mouse graphics and add to the main group
-mouse_bmp = OnDiskBitmap("/bitmaps/mouse_cursor.bmp")
+mouse_bmp = OnDiskBitmap("bitmaps/mouse_cursor.bmp")
 mouse_bmp.pixel_shader.make_transparent(0)
 mouse_tg = TileGrid(mouse_bmp, pixel_shader=mouse_bmp.pixel_shader)
 mouse_tg.x = display.width // 2
