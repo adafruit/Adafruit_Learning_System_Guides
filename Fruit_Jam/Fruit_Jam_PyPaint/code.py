@@ -697,7 +697,6 @@ class Paint(): # pylint: disable=too-many-statements
 
             self._poller.poke()
         # pylint: enable=too-many-nested-blocks
-        
 
     def _handle_palette_selection(self, location):
         selected = location[1] // self._swatch_height
