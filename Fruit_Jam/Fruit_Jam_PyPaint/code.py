@@ -205,7 +205,7 @@ class MousePoller():
             print("The application will run, but mouse control may not work.")
 
 
-    def find_mouse(self):
+    def find_mouse(self): # pylint: disable=too-many-statements, too-many-locals
         """Find the mouse device with multiple retry attempts"""
         MAX_ATTEMPTS = 5
         RETRY_DELAY = 1  # seconds
@@ -414,7 +414,7 @@ class MousePoller():
 
 ################################################################################
 
-class Paint():
+class Paint(): # pylint: disable=too-many-statements
     def __init__(self, display=None):
 
         def _cursor_bitmap_1():
@@ -630,7 +630,7 @@ class Paint():
             else:
                 x0 += 1
 
-    def _fill(self, x, y, c):
+    def _fill(self, x, y, c): # pylint: disable=too-many-branches,too-many-locals
         """Fill an area with the current color.
 
         :param x: x coordinate to start filling from
@@ -640,7 +640,8 @@ class Paint():
         MARKER = 8  # Marker for filled areas
         print(f"Filling at ({x}, {y}) with color {c}")
 
-        if self._fg_bitmap[x, y] != c:
+        # pylint: disable-next=too-many-nested-blocks
+        if self._fg_bitmap[x, y] != c: 
             blank_color = self._fg_bitmap[x, y]
             self._fg_bitmap[x, y] = MARKER
             done = False
@@ -719,7 +720,8 @@ class Paint():
             self._plot(location[0], location[1], self._pencolor)
             self._poller.poke()
 
-    def _handle_a_release(self):
+    @staticmethod
+    def _handle_a_release():
         print("A Released!")
 
     def _handle_b_release(self, location):
