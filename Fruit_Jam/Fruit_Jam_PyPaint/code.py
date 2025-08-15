@@ -19,11 +19,9 @@ All text above must be included in any redistribution.
 import array
 import gc
 import time
-import os
 import supervisor
 import board
 import displayio
-import adafruit_logging as logging
 
 try:
     import usb.core
@@ -33,7 +31,6 @@ except ImportError:
 
 try:
     from adafruit_fruitjam.peripherals import request_display_config
-    from adafruit_fruitjam.peripherals import VALID_DISPLAY_SIZES
 except ImportError:
     request_display_config = None
 try:
@@ -46,8 +43,7 @@ try:
 except ImportError:
     pass
 
-
-class Color(object):
+class Color():
     """Standard colors"""
 
     WHITE = 0xFFFFFF
@@ -69,14 +65,11 @@ class Color(object):
 ################################################################################
 
 
-class TouchscreenPoller(object):
+class TouchscreenPoller():
     """Get 'pressed' and location updates from a touch screen device."""
 
     def __init__(self, splash, cursor_bmp):
-        logger = logging.getLogger("Paint")
-        if not logger.hasHandlers():
-            logger.addHandler(logging.StreamHandler())
-        logger.debug("Creating a TouchscreenPoller")
+        print("Creating a TouchscreenPoller")
         self._display_grp = splash
         self._touchscreen = adafruit_touchscreen.Touchscreen(
             board.TOUCH_XL, board.TOUCH_XR,
@@ -131,14 +124,11 @@ class TouchscreenPoller(object):
 ################################################################################
 
 
-class CursorPoller(object):
+class CursorPoller():
     """Get 'pressed' and location updates from a D-Pad/joystick device."""
 
     def __init__(self, splash, cursor_bmp):
-        self._logger = logging.getLogger("Paint")
-        if not self._logger.hasHandlers():
-            self._logger.addHandler(logging.StreamHandler())
-        self._logger.debug("Creating a CursorPoller")
+        print("Creating a CursorPoller")
         self._mouse_cursor = Cursor(
             board.DISPLAY, display_group=splash, bmp=cursor_bmp, cursor_speed=2
         )
@@ -159,7 +149,7 @@ class CursorPoller(object):
             )
         return a_button, False, location
 
-    def poke(self, x=None, y=None):
+    def poke(self):
         """Force a bitmap refresh."""
         self._mouse_cursor.hide()
         self._mouse_cursor.show()
@@ -175,14 +165,11 @@ class CursorPoller(object):
 
 ################################################################################
 
-class MousePoller(object):
+class MousePoller():
     """Get 'pressed' and location updates from a USB mouse."""
 
     def __init__(self, splash, cursor_bmp, screen_width, screen_height):
-        self._logger = logging.getLogger("Paint")
-        if not self._logger.hasHandlers():
-            self._logger.addHandler(logging.StreamHandler())
-        self._logger.debug("Creating a MousePoller")
+        print("Creating a MousePoller")
         self._display_grp = splash
         self._cursor_grp = displayio.Group()
         self._cur_palette = displayio.Palette(3)
@@ -213,12 +200,9 @@ class MousePoller(object):
         self.mouse_x = screen_width // 2
         self.mouse_y = screen_height // 2
 
-        mouse_found = False
-        if self.find_mouse():
-            mouse_found = True
-        else:
-            self._logger.debug("WARNING: Mouse not found after multiple attempts.")
-            self._logger.debug("The application will run, but mouse control may not work.")
+        if not self.find_mouse():
+            print("WARNING: Mouse not found after multiple attempts.")
+            print("The application will run, but mouse control may not work.")
 
 
     def find_mouse(self):
@@ -227,110 +211,104 @@ class MousePoller(object):
         RETRY_DELAY = 1  # seconds
 
         if not usb_available:
-            self._logger.debug("USB library not available; cannot find mouse.")
+            print("USB library not available; cannot find mouse.")
             return False
 
         for attempt in range(MAX_ATTEMPTS):
-            try:
-                self._logger.debug(f"Mouse detection attempt {attempt+1}/{MAX_ATTEMPTS}")
+            print(f"Mouse detection attempt {attempt+1}/{MAX_ATTEMPTS}")
 
-                # Constants for USB control transfers
-                DIR_OUT = 0
-                # DIR_IN = 0x80  # Unused variable
-                REQTYPE_CLASS = 1 << 5
-                REQREC_INTERFACE = 1 << 0
-                HID_REQ_SET_PROTOCOL = 0x0B
+            # Constants for USB control transfers
+            DIR_OUT = 0
+            # DIR_IN = 0x80  # Unused variable
+            REQTYPE_CLASS = 1 << 5
+            REQREC_INTERFACE = 1 << 0
+            HID_REQ_SET_PROTOCOL = 0x0B
 
-                # Find all USB devices
-                devices_found = False
+            # Find all USB devices
+            devices_found = False
 
-                for device in usb.core.find(find_all=True):
-                    devices_found = True
-                    self._logger.debug(f"Found device: {device.idVendor:04x}:{device.idProduct:04x}")
+            for device in usb.core.find(find_all=True):
+                devices_found = True
+                print(f"Found device: {device.idVendor:04x}:{device.idProduct:04x}")
 
+                try:
+                    # Try to get device info
                     try:
-                        # Try to get device info
-                        try:
-                            manufacturer = device.manufacturer
-                            product = device.product
-                        except Exception:  # pylint: disable=broad-except
-                            manufacturer = "Unknown"
-                            product = "Unknown"
+                        manufacturer = device.manufacturer
+                        product = device.product
+                    except Exception:  # pylint: disable=broad-except
+                        manufacturer = "Unknown"
+                        product = "Unknown"
 
-                        # Just use whatever device we find
-                        self.mouse = device
+                    # Just use whatever device we find
+                    self.mouse = device
 
-                        # Try to detach kernel driver
-                        try:
-                            has_kernel_driver = hasattr(device, 'is_kernel_driver_active')
-                            if has_kernel_driver and device.is_kernel_driver_active(0):
-                                device.detach_kernel_driver(0)
-                        except Exception as e:  # pylint: disable=broad-except
-                            self._logger.debug(f"Error detaching kernel driver: {e}")
-
-                        # Set configuration
-                        try:
-                            device.set_configuration()
-                        except Exception as e:  # pylint: disable=broad-except
-                            self._logger.debug(f"Error setting configuration: {e}")
-                            continue  # Try next device
-
-                        # Just assume endpoint 0x81 (common for mice)
-                        self.in_endpoint = 0x81
-                        self._logger.debug(f"Using mouse: {manufacturer}, {product}")
-
-                        # Set to report protocol mode
-                        try:
-                            bmRequestType = DIR_OUT | REQTYPE_CLASS | REQREC_INTERFACE
-                            bRequest = HID_REQ_SET_PROTOCOL
-                            wValue = 1  # 1 = report protocol
-                            wIndex = 0  # First interface
-
-                            buf = bytearray(1)
-                            device.ctrl_transfer(bmRequestType, bRequest, wValue, wIndex, buf)
-                            self._logger.debug("Set to report protocol mode")
-                        except Exception as e:  # pylint: disable=broad-except
-                            self._logger.debug(f"Could not set protocol: {e}")
-
-                        # Buffer for reading data
-                        self.buf = array.array("B", [0] * 4)
-                        self._logger.debug("Created 4-byte buffer for mouse data")
-
-                        # Verify mouse works by reading from it
-                        try:
-                            # Try to read some data with a short timeout
-                            data = device.read(self.in_endpoint, self.buf, timeout=100)
-                            self._logger.debug(f"Mouse test read successful: {data} bytes")
-                            return True
-                        except usb.core.USBTimeoutError:
-                            # Timeout is normal if mouse isn't moving
-                            self._logger.debug("Mouse connected but not sending data (normal)")
-                            return True
-                        except Exception as e:  # pylint: disable=broad-except
-                            self._logger.debug(f"Mouse test read failed: {e}")
-                            # Continue to try next device or retry
-                            self.mouse = None
-                            self.in_endpoint = None
-                            continue
-
+                    # Try to detach kernel driver
+                    try:
+                        has_kernel_driver = hasattr(device, 'is_kernel_driver_active')
+                        if has_kernel_driver and device.is_kernel_driver_active(0):
+                            device.detach_kernel_driver(0)
                     except Exception as e:  # pylint: disable=broad-except
-                        self._logger.debug(f"Error initializing device: {e}")
+                        print(f"Error detaching kernel driver: {e}")
+
+                    # Set configuration
+                    try:
+                        device.set_configuration()
+                    except Exception as e:  # pylint: disable=broad-except
+                        print(f"Error setting configuration: {e}")
+                        continue  # Try next device
+
+                    # Just assume endpoint 0x81 (common for mice)
+                    self.in_endpoint = 0x81
+                    print(f"Using mouse: {manufacturer}, {product}")
+
+                    # Set to report protocol mode
+                    try:
+                        bmRequestType = DIR_OUT | REQTYPE_CLASS | REQREC_INTERFACE
+                        bRequest = HID_REQ_SET_PROTOCOL
+                        wValue = 1  # 1 = report protocol
+                        wIndex = 0  # First interface
+
+                        buf = bytearray(1)
+                        device.ctrl_transfer(bmRequestType, bRequest, wValue, wIndex, buf)
+                        print("Set to report protocol mode")
+                    except Exception as e:  # pylint: disable=broad-except
+                        print(f"Could not set protocol: {e}")
+
+                    # Buffer for reading data
+                    self.buf = array.array("B", [0] * 4)
+                    print("Created 4-byte buffer for mouse data")
+
+                    # Verify mouse works by reading from it
+                    try:
+                        # Try to read some data with a short timeout
+                        data = device.read(self.in_endpoint, self.buf, timeout=100)
+                        print(f"Mouse test read successful: {data} bytes")
+                        return True
+                    except usb.core.USBTimeoutError:
+                        # Timeout is normal if mouse isn't moving
+                        print("Mouse connected but not sending data (normal)")
+                        return True
+                    except Exception as e:  # pylint: disable=broad-except
+                        print(f"Mouse test read failed: {e}")
+                        # Continue to try next device or retry
+                        self.mouse = None
+                        self.in_endpoint = None
                         continue
 
-                if not devices_found:
-                    self._logger.debug("No USB devices found")
+                except Exception as e:  # pylint: disable=broad-except
+                    print(f"Error initializing device: {e}")
+                    continue
 
-                # If we get here without returning, no suitable mouse was found
-                self._logger.debug(f"No working mouse found on attempt {attempt+1}, retrying...")
-                gc.collect()
-                time.sleep(RETRY_DELAY)
+            if not devices_found:
+                print("No USB devices found")
 
-            except Exception as e:  # pylint: disable=broad-except
-                self._logger.debug(f"Error during mouse detection: {e}")
-                gc.collect()
-                time.sleep(RETRY_DELAY)
+            # If we get here without returning, no suitable mouse was found
+            print(f"No working mouse found on attempt {attempt+1}, retrying...")
+            gc.collect()
+            time.sleep(RETRY_DELAY)
 
-        self._logger.debug("Failed to find a working mouse after multiple attempts")
+        print("Failed to find a working mouse after multiple attempts")
         return False
 
 
@@ -381,14 +359,14 @@ class MousePoller(object):
 
             # Handle disconnections
             if e.errno == 19:  # No such device
-                self._logger.debug("Mouse disconnected")
+                print("Mouse disconnected")
                 self.mouse = None
                 self.in_endpoint = None
                 gc.collect()
 
             return False
         except Exception as e:  # pylint: disable=broad-except
-            self._logger.debug(f"Error reading mouse: {type(e).__name__}")
+            print(f"Error reading mouse: {type(e).__name__}")
             return False
 
         if count >= 3:  # We need at least buttons, X and Y
@@ -436,9 +414,30 @@ class MousePoller(object):
 
 ################################################################################
 
-
-class Paint(object):
+class Paint():
     def __init__(self, display=None):
+
+        def _cursor_bitmap_1():
+            bmp = displayio.Bitmap(9, 9, 3)
+            for i in range(9):
+                bmp[4, i] = 1
+                bmp[i, 4] = 1
+            bmp[4, 4] = 0
+            return bmp
+
+        def _cursor_bitmap_3():
+            bmp = displayio.Bitmap(9, 9, 3)
+            for i in range(9):
+                bmp[3, i] = 1
+                bmp[4, i] = 1
+                bmp[5, i] = 1
+                bmp[i, 3] = 1
+                bmp[i, 4] = 1
+                bmp[i, 5] = 1
+            for i in range(3, 6):
+                for j in range(3, 6):
+                    bmp[i, j] = 0
+            return bmp
 
         if display is None:
             if hasattr(board, "DISPLAY"):
@@ -450,10 +449,6 @@ class Paint(object):
                 else:
                     raise RuntimeError("No display found.")
 
-        self._logger = logging.getLogger("Paint")
-        if not self._logger.hasHandlers():
-            self._logger.addHandler(logging.StreamHandler())
-        self._logger.setLevel(logging.DEBUG)
         self._display = display
         self._w = self._display.width
         self._h = self._display.height
@@ -492,8 +487,8 @@ class Paint(object):
         self._number_of_palette_options = len(Color.colors) + 2
         self._swatch_height = self._h // self._number_of_palette_options
         self._swatch_width = self._w // 10
-        self._logger.debug("Height: %d", self._h)
-        self._logger.debug("Swatch height: %d", self._swatch_height)
+        print(f"Height: {self._h}")
+        print(f"Swatch height: {self._swatch_height}")
 
         self._palette = self._make_palette()
         self._splash.append(self._palette)
@@ -508,7 +503,7 @@ class Paint(object):
             self._display.wait_for_frame()
 
         self._brush = 0
-        self._cursor_bitmaps = [self._cursor_bitmap_1(), self._cursor_bitmap_3()]
+        self._cursor_bitmaps = [_cursor_bitmap_1(), _cursor_bitmap_3()]
         if hasattr(board, "TOUCH_XL"):
             self._poller = TouchscreenPoller(self._splash, self._cursor_bitmaps[0])
         elif hasattr(board, "BUTTON_CLOCK"):
@@ -565,28 +560,6 @@ class Paint(object):
             self._palette_bitmap, pixel_shader=self._palette_palette, x=0, y=0
         )
 
-    def _cursor_bitmap_1(self):
-        bmp = displayio.Bitmap(9, 9, 3)
-        for i in range(9):
-            bmp[4, i] = 1
-            bmp[i, 4] = 1
-        bmp[4, 4] = 0
-        return bmp
-
-    def _cursor_bitmap_3(self):
-        bmp = displayio.Bitmap(9, 9, 3)
-        for i in range(9):
-            bmp[3, i] = 1
-            bmp[4, i] = 1
-            bmp[5, i] = 1
-            bmp[i, 3] = 1
-            bmp[i, 4] = 1
-            bmp[i, 5] = 1
-        for i in range(3, 6):
-            for j in range(3, 6):
-                bmp[i, j] = 0
-        return bmp
-
     def _plot(self, x, y, c):
         if self._brush == 0:
             r = [0]
@@ -609,7 +582,7 @@ class Paint(object):
         y0 = start[1]
         x1 = end[0]
         y1 = end[1]
-        self._logger.debug("* GoTo from (%d, %d) to (%d, %d)", x0, y0, x1, y1)
+        print(f"* GoTo from ({x0}, {y0}) to ({x1}, {y1})")
         steep = abs(y1 - y0) > abs(x1 - x0)
         rev = False
         dx = x1 - x0
@@ -637,7 +610,7 @@ class Paint(object):
                     pass
                 self._x = y0
                 self._y = x0
-                self._poller.poke((int(y0), int(x0)))
+                self._poller.poke()
                 time.sleep(0.003)
             else:
                 try:
@@ -646,7 +619,7 @@ class Paint(object):
                     pass
                 self._x = x0
                 self._y = y0
-                self._poller.poke((int(x0), int(y0)))
+                self._poller.poke()
                 time.sleep(0.003)
             err -= dy
             if err < 0:
@@ -665,7 +638,7 @@ class Paint(object):
         :param c: color to fill with
         """
         MARKER = 8  # Marker for filled areas
-        self._logger.debug("Filling at (%d, %d) with color %d", x, y, c)
+        print(f"Filling at ({x}, {y}) with color {c}")
 
         if self._fg_bitmap[x, y] != c:
             blank_color = self._fg_bitmap[x, y]
@@ -678,10 +651,9 @@ class Paint(object):
             while not done:
                 newmin_row = self._h - 1
                 newmax_row = 0
-                newmin_col = self._w - 1 
+                newmin_col = self._w - 1
                 newmax_col = (self._w // 10) + 1
                 done = True
-                #self._logger.debug("Rows: %d to %d  Cols: %d to %d" , min_row, max_row, min_col, max_col)
                 for i in range(min_row,max_row):
                     for j in range(min_col,max_col):
                         if self._fg_bitmap[j, i] == MARKER:
@@ -721,14 +693,14 @@ class Paint(object):
                 for j in range(self._w):
                     if self._fg_bitmap[j, i] == MARKER:
                         self._fg_bitmap[j, i] = c
-            
+
             self._poller.poke()
 
     def _handle_palette_selection(self, location):
         selected = location[1] // self._swatch_height
         if selected >= self._number_of_palette_options:
             return
-        self._logger.debug("Palette selection: %d", selected)
+        print(f"Palette selection: {selected}")
         if selected < len(Color.colors):
             self._pencolor = selected
         else:
@@ -736,24 +708,22 @@ class Paint(object):
             self._poller.set_cursor_bitmap(self._cursor_bitmaps[self._brush])
 
     def _handle_motion(self, start, end):
-        self._logger.debug(
-            "Moved: (%d, %d) -> (%d, %d)", start[0], start[1], end[0], end[1]
-        )
+        print(f"Moved: ({start[0]}, {start[1]}) -> ({end[0]}, {end[1]})")
         self._draw_line(start, end)
 
     def _handle_a_press(self, location):
-        self._logger.debug("A Pressed!")
+        print("A Pressed!")
         if location[0] < self._w // 10:  # in color picker
             self._handle_palette_selection(location)
         else:
             self._plot(location[0], location[1], self._pencolor)
             self._poller.poke()
 
-    def _handle_a_release(self, location):
-        self._logger.debug("A Released!")
+    def _handle_a_release(self):
+        print("A Released!")
 
     def _handle_b_release(self, location):
-        self._logger.debug("B Released!")
+        print("B Released!")
         if location[0] >= self._w // 10:  # not in color picker
             self._fill(location[0], location[1], self._pencolor)
             self._poller.poke()
@@ -793,7 +763,7 @@ class Paint(object):
             if self._was_a_just_pressed:
                 self._handle_a_press(self._location)
             elif self._was_a_just_released:
-                self._handle_a_release(self._location)
+                self._handle_a_release()
             if self._was_b_just_released:
                 self._handle_b_release(self._last_location)
             if self._did_move and self._a_pressed:
