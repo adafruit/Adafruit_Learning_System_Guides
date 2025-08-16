@@ -49,15 +49,17 @@ if ltv320_present:
         dac.headphone_output = True
         dac.headphone_volume = -15  # dB
 
-# Settings
 if ltv320_present:
-    PLAY_SOUNDS = True
+    _default_play_sounds = True
 else:
-    PLAY_SOUNDS = False
+    _default_play_sounds = False
 
 if "sound" in launcher_config:
     if launcher_config["sound"] == "mute":
-        PLAY_SOUNDS = False
+        _default_play_sounds = False
+
+# Settings
+PLAY_SOUNDS = _default_play_sounds
 
 # Timing Constants
 TICKS_PER_SECOND = const(20)
