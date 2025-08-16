@@ -9,6 +9,7 @@
 import math
 import time
 import array
+import json
 import gc
 import os
 import digitalio
@@ -22,6 +23,7 @@ import audiobusio
 import audiomixer
 import synthio
 import board
+import adafruit_pathlib as pathlib
 import adafruit_tlv320
 from adafruit_midi.note_on import NoteOn
 from adafruit_midi.note_off import NoteOff
@@ -63,6 +65,16 @@ class SoundManager:
             # Setup PWM audio output on D10
             self.audio = audiopwmio.PWMAudioOut(board.D10)
         else:  # i2s
+            # optional configuration file for speaker/headphone setting
+            # check current directory first and then root directory
+            launcher_config = {}
+            if pathlib.Path("launcher.conf.json").exists():
+                with open("launcher.conf.json", "r") as f:
+                    launcher_config = json.load(f)
+            elif pathlib.Path("/launcher.conf.json").exists():
+                with open("/launcher.conf.json", "r") as f:
+                    launcher_config = json.load(f)
+
             try:
                 # Import libraries needed for I2S
                 #check for Metro RP2350 vs. Fruit Jam
@@ -98,9 +110,23 @@ class SoundManager:
 
                 # Initialize TLV320
                 self.tlv = adafruit_tlv320.TLV320DAC3100(i2c)
+
+                # set sample rate & bit depth
                 self.tlv.configure_clocks(sample_rate=11025, bit_depth=16)
-                self.tlv.headphone_output = True
-                self.tlv.headphone_volume = -15  # dB
+
+                if "sound" in launcher_config:
+                    if launcher_config["sound"] == "speaker":
+                        # use speaker
+                        self.tlv.speaker_output = True
+                        self.tlv.speaker_volume = -60
+                    else:
+                        # use headphones
+                        self.tlv.headphone_output = True
+                        self.tlv.headphone_volume = -15  # dB
+                else:
+                    # default to headphones
+                    self.tlv.headphone_output = True
+                    self.tlv.headphone_volume = -15  # dB
 
                 # Setup I2S audio output - important to do this AFTER configuring the DAC
                 self.audio = audiobusio.I2SOut(
