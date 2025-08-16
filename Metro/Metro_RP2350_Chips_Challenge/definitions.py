@@ -18,16 +18,19 @@ elif pathlib.Path("/launcher.conf.json").exists():
         launcher_config = json.load(f)
 
 # Check if DAC is connected
-i2c = board.I2C()
-for i in range(500): # try for 5 seconds
-    if i2c.try_lock():
-        break
-    time.sleep(0.01)
-if 0x18 in i2c.scan():
-    ltv320_present = True
+if "I2C" in dir(board):
+    i2c = board.I2C()
+    for i in range(500): # try for 5 seconds
+        if i2c.try_lock():
+            break
+        time.sleep(0.01)
+    if 0x18 in i2c.scan():
+        ltv320_present = True
+    else:
+        ltv320_present = False
+    i2c.unlock()
 else:
     ltv320_present = False
-i2c.unlock()
 
 if ltv320_present:
     dac = adafruit_tlv320.TLV320DAC3100(i2c)
