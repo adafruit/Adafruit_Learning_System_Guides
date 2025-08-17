@@ -8,12 +8,9 @@ from micropython import const
 import adafruit_pathlib as pathlib
 import adafruit_tlv320
 
-# optional configuration file for speaker/headphone setting, check current and root directory
+# optional configuration file for speaker/headphone setting
 launcher_config = {}
-if pathlib.Path("launcher.conf.json").exists():
-    with open("launcher.conf.json", "r") as f:
-        launcher_config = json.load(f)
-elif pathlib.Path("/launcher.conf.json").exists():
+if pathlib.Path("/launcher.conf.json").exists():
     with open("/launcher.conf.json", "r") as f:
         launcher_config = json.load(f)
 
@@ -25,40 +22,41 @@ if "I2C" in dir(board):
             break
         time.sleep(0.01)
     if 0x18 in i2c.scan():
-        ltv320_present = True
+        tlv320_present = True
     else:
-        ltv320_present = False
+        tlv320_present = False
     i2c.unlock()
 else:
-    ltv320_present = False
+    tlv320_present = False
 
-if ltv320_present:
+if tlv320_present:
     dac = adafruit_tlv320.TLV320DAC3100(i2c)
+    dac.reset()
 
     # set sample rate & bit depth
     dac.configure_clocks(sample_rate=44100, bit_depth=16)
 
-    if "sound" in launcher_config:
-        if launcher_config["sound"] == "speaker":
+    if "tlv320" in launcher_config:
+        if launcher_config["tlv320"].get("output") == "speaker":
             # use speaker
             dac.speaker_output = True
-            dac.speaker_volume = -40
-        elif launcher_config["sound"] != "mute":
+            dac.dac_volume = launcher_config["tlv320"].get("volume",5)  # dB
+        else:
             # use headphones
             dac.headphone_output = True
-            dac.headphone_volume = -15  # dB
+            dac.dac_volume = launcher_config["tlv320"].get("volume",0)  # dB
     else:
         # default to headphones
         dac.headphone_output = True
-        dac.headphone_volume = -15  # dB
+        dac.dac_volume = 0  # dB
 
-if ltv320_present:
+if tlv320_present:
     _default_play_sounds = True
 else:
     _default_play_sounds = False
 
 if "sound" in launcher_config:
-    if launcher_config["sound"] == "mute":
+    if launcher_config["tlv320"].get("output") == "mute":
         _default_play_sounds = False
 
 # Settings

@@ -66,12 +66,8 @@ class SoundManager:
             self.audio = audiopwmio.PWMAudioOut(board.D10)
         else:  # i2s
             # optional configuration file for speaker/headphone setting
-            # check current directory first and then root directory
             launcher_config = {}
-            if pathlib.Path("launcher.conf.json").exists():
-                with open("launcher.conf.json", "r") as f:
-                    launcher_config = json.load(f)
-            elif pathlib.Path("/launcher.conf.json").exists():
+            if pathlib.Path("/launcher.conf.json").exists():
                 with open("/launcher.conf.json", "r") as f:
                     launcher_config = json.load(f)
 
@@ -110,23 +106,24 @@ class SoundManager:
 
                 # Initialize TLV320
                 self.tlv = adafruit_tlv320.TLV320DAC3100(i2c)
+                self.tlv.reset()
 
                 # set sample rate & bit depth
                 self.tlv.configure_clocks(sample_rate=11025, bit_depth=16)
 
-                if "sound" in launcher_config:
-                    if launcher_config["sound"] == "speaker":
+                if "tlv320" in launcher_config:
+                    if launcher_config["tlv320"].get("output") == "speaker":
                         # use speaker
                         self.tlv.speaker_output = True
-                        self.tlv.speaker_volume = -60
+                        self.tlv.dac_volume = launcher_config["tlv320"].get("volume",5)  # dB
                     else:
                         # use headphones
                         self.tlv.headphone_output = True
-                        self.tlv.headphone_volume = -15  # dB
+                        self.tlv.dac_volume = launcher_config["tlv320"].get("volume",0)  # dB
                 else:
                     # default to headphones
                     self.tlv.headphone_output = True
-                    self.tlv.headphone_volume = -15  # dB
+                    self.tlv.dac_volume = 0  # dB
 
                 # Setup I2S audio output - important to do this AFTER configuring the DAC
                 self.audio = audiobusio.I2SOut(
