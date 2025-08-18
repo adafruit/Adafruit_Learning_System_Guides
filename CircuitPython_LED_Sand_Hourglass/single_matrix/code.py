@@ -4,7 +4,6 @@
 
 import time
 import board
-import adafruit_lsm6ds.lsm6ds33
 from adafruit_ht16k33 import matrix
 import matrixsand
 
@@ -16,11 +15,11 @@ i2c = board.I2C()  # uses board.SCL and board.SDA
 
 # check for LSM6DS33 or LSM6DS3TR-C (Adafruit Feather Sense)
 try:
-    from adafruit_lsm6ds.lsm6ds33 import LSM6DS33 as LSM6DS
-    lsm6ds = LSM6DS(i2c)
+    from adafruit_lsm6ds.lsm6ds33 import LSM6DS33 as LSM6DS  # pylint: disable=unused-import
+    accelo = LSM6DS(i2c)
 except RuntimeError:
-    from adafruit_lsm6ds.lsm6ds3 import LSM6DS3 as LSM6DS
-    lsm6ds = LSM6DS(i2c)
+    from adafruit_lsm6ds.lsm6ds3 import LSM6DS3 as LSM6DS  # pylint: disable=unused-import
+    accelo = LSM6DS(i2c)
 
 # the matrix
 matrix = matrix.Matrix8x8(i2c, 0x70)
