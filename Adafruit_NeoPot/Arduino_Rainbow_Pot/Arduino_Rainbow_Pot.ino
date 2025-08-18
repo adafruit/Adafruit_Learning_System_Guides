@@ -4,15 +4,12 @@
 
 #include <Adafruit_NeoPixel.h>
 int sensorPin = A0;   // select the input pin for the potentiometer
-int neoPixelPin = D4;      // select the pin for the LED
+int neoPixelPin = 4;      // select the pin for the LED
 int sensorValue = 0;  // variable to store the value coming from the sensor
 
 int readings[10];
 size_t count = 0;
 
-//   NEO_GRB     Pixels are wired for GRB bitstream (most NeoPixel products)
-//   NEO_RGB     Pixels are wired for RGB bitstream (v1 FLORA pixels, not v2)
-//   NEO_RGBW    Pixels are wired for RGBW bitstream (NeoPixel RGBW products)
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(1, neoPixelPin, NEO_GRB + NEO_KHZ800);
 
 // Insert an int value at index 0 of an int array, shifting all other elements up.
