@@ -14,8 +14,13 @@ DELAY = 0.00 # add some delay if you want
 i2c = board.I2C()  # uses board.SCL and board.SDA
 # i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
 
-# the accelo
-accelo = adafruit_lsm6ds.lsm6ds33.LSM6DS33(i2c)
+# check for LSM6DS33 or LSM6DS3TR-C (Adafruit Feather Sense)
+try:
+    from adafruit_lsm6ds.lsm6ds33 import LSM6DS33 as LSM6DS
+    lsm6ds = LSM6DS(i2c)
+except RuntimeError:
+    from adafruit_lsm6ds.lsm6ds3 import LSM6DS3 as LSM6DS
+    lsm6ds = LSM6DS(i2c)
 
 # the matrix
 matrix = matrix.Matrix8x8(i2c, 0x70)
