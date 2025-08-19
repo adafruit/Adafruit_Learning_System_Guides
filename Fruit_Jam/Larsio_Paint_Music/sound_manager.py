@@ -106,7 +106,6 @@ class SoundManager:
 
                 # Initialize TLV320
                 self.tlv = adafruit_tlv320.TLV320DAC3100(i2c)
-                self.tlv.reset()
 
                 # set sample rate & bit depth
                 self.tlv.configure_clocks(sample_rate=11025, bit_depth=16)

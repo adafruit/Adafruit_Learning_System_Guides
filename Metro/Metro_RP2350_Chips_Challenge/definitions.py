@@ -31,7 +31,6 @@ else:
 
 if tlv320_present:
     dac = adafruit_tlv320.TLV320DAC3100(i2c)
-    dac.reset()
 
     # set sample rate & bit depth
     dac.configure_clocks(sample_rate=44100, bit_depth=16)
