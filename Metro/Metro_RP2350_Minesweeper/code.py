@@ -123,7 +123,8 @@ mouse = None
 time.sleep(1)
 
 good_devices = False
-while not good_devices:
+wait_time = time.monotonic() + 10 # wait up to 20 seconds for a good device to be found
+while not good_devices and time.monotonic() < wait_time:
     for device in usb.core.find(find_all=True):
         if device.manufacturer is not None:
             good_devices = True
