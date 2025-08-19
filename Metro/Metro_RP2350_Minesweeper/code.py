@@ -291,7 +291,7 @@ while True:
                 # read data from the mouse endpoint
                 data_len = mouse.read(mouse_endpt, buf, timeout=10)
                 if data_len > 0:
-                    break                    
+                    break
             except usb.core.USBTimeoutError:
                 # if we get a timeout error, it means there is no data available
                 pass
