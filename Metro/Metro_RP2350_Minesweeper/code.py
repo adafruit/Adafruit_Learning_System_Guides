@@ -122,12 +122,12 @@ mouse = None
 # wait a second for USB devices to be ready
 time.sleep(1)
 
-#good_devices = False
-#while not good_devices:
-#    for device in usb.core.find(find_all=True):
-#        if device.manufacturer is not None:
-#            good_devices = True
-#            break
+good_devices = False
+while not good_devices:
+    for device in usb.core.find(find_all=True):
+        if device.manufacturer is not None:
+            good_devices = True
+            break
 # scan for connected USB devices
 for device in usb.core.find(find_all=True):
     # print information about the found devices
@@ -155,11 +155,6 @@ for device in usb.core.find(find_all=True):
         # Try to read some data with a short timeout
         data = mouse.read(mouse_endpt, buf, timeout=100)
         print(f"Mouse test read successful: {data} bytes - {buf}")
-
-        # without this subsequent reads sometimes can't find the endpoint?
-        # I've never seen the Flush mouse queue print so it must just need the extra read
-        if mouse.read(mouse_endpt, buf, timeout=10) > 0:
-            print(f"Flush mouse queue: {buf}")
         break
     except usb.core.USBTimeoutError:
         # Timeout is normal if mouse isn't moving
@@ -291,7 +286,19 @@ while True:
     try:
         # try to read data from the mouse, small timeout so the code will move on
         # quickly if there is no data
-        data_len = mouse.read(mouse_endpt, buf, timeout=10)
+        while True:
+            try:
+                # read data from the mouse endpoint
+                data_len = mouse.read(mouse_endpt, buf, timeout=10)
+                if data_len > 0:
+                    break                    
+            except usb.core.USBTimeoutError:
+                # if we get a timeout error, it means there is no data available
+                pass
+            except usb.core.USBError as exc:
+                # if we get a USBError, it may mean the mouse is not ready yet
+                pass
+
         left_button = buf[0] & 0x01
         right_button = buf[0] & 0x02
 
