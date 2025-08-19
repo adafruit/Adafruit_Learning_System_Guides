@@ -297,7 +297,7 @@ while True:
                 # if we get a timeout error, it means there is no data available
                 pass
             except usb.core.USBError as exc:
-                # if we get a USBError, it may mean the mouse is not ready yet
+                # if we get a USBError, We may be getting no endpoint msgs which can be waited out
                 pass
 
         left_button = buf[0] & 0x01
