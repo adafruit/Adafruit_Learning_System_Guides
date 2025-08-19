@@ -24,7 +24,7 @@ import board
 import displayio
 
 try:
-    import usb.core
+    from adafruit_usb_host_mouse import find_and_init_boot_mouse
     usb_available = True
 except ImportError:
     usb_available = False
@@ -206,111 +206,12 @@ class MousePoller():
 
 
     def find_mouse(self): # pylint: disable=too-many-statements, too-many-locals
-        """Find the mouse device with multiple retry attempts"""
-        MAX_ATTEMPTS = 5
-        RETRY_DELAY = 1  # seconds
-
-        if not usb_available:
-            print("USB library not available; cannot find mouse.")
+        """Find and initialize the USB mouse."""
+        self.mouse = find_and_init_boot_mouse()
+        if self.mouse is None:
+            print("No mouse found.")
             return False
-
-        for attempt in range(MAX_ATTEMPTS):
-            print(f"Mouse detection attempt {attempt+1}/{MAX_ATTEMPTS}")
-
-            # Constants for USB control transfers
-            DIR_OUT = 0
-            # DIR_IN = 0x80  # Unused variable
-            REQTYPE_CLASS = 1 << 5
-            REQREC_INTERFACE = 1 << 0
-            HID_REQ_SET_PROTOCOL = 0x0B
-
-            # Find all USB devices
-            devices_found = False
-
-            for device in usb.core.find(find_all=True):
-                devices_found = True
-                print(f"Found device: {device.idVendor:04x}:{device.idProduct:04x}")
-
-                try:
-                    # Try to get device info
-                    try:
-                        manufacturer = device.manufacturer
-                        product = device.product
-                    except Exception:  # pylint: disable=broad-except
-                        manufacturer = "Unknown"
-                        product = "Unknown"
-
-                    # Just use whatever device we find
-                    self.mouse = device
-
-                    # Try to detach kernel driver
-                    try:
-                        has_kernel_driver = hasattr(device, 'is_kernel_driver_active')
-                        if has_kernel_driver and device.is_kernel_driver_active(0):
-                            device.detach_kernel_driver(0)
-                    except Exception as e:  # pylint: disable=broad-except
-                        print(f"Error detaching kernel driver: {e}")
-
-                    # Set configuration
-                    try:
-                        device.set_configuration()
-                    except Exception as e:  # pylint: disable=broad-except
-                        print(f"Error setting configuration: {e}")
-                        continue  # Try next device
-
-                    # Just assume endpoint 0x81 (common for mice)
-                    self.in_endpoint = 0x81
-                    print(f"Using mouse: {manufacturer}, {product}")
-
-                    # Set to report protocol mode
-                    try:
-                        bmRequestType = DIR_OUT | REQTYPE_CLASS | REQREC_INTERFACE
-                        bRequest = HID_REQ_SET_PROTOCOL
-                        wValue = 1  # 1 = report protocol
-                        wIndex = 0  # First interface
-
-                        buf = bytearray(1)
-                        device.ctrl_transfer(bmRequestType, bRequest, wValue, wIndex, buf)
-                        print("Set to report protocol mode")
-                    except Exception as e:  # pylint: disable=broad-except
-                        print(f"Could not set protocol: {e}")
-
-                    # Buffer for reading data
-                    self.buf = array.array("B", [0] * 4)
-                    print("Created 4-byte buffer for mouse data")
-
-                    # Verify mouse works by reading from it
-                    try:
-                        # Try to read some data with a short timeout
-                        data = device.read(self.in_endpoint, self.buf, timeout=100)
-                        print(f"Mouse test read successful: {data} bytes")
-                        return True
-                    except usb.core.USBTimeoutError:
-                        # Timeout is normal if mouse isn't moving
-                        print("Mouse connected but not sending data (normal)")
-                        return True
-                    except Exception as e:  # pylint: disable=broad-except
-                        print(f"Mouse test read failed: {e}")
-                        # Continue to try next device or retry
-                        self.mouse = None
-                        self.in_endpoint = None
-                        continue
-
-                except Exception as e:  # pylint: disable=broad-except
-                    print(f"Error initializing device: {e}")
-                    continue
-
-            if not devices_found:
-                print("No USB devices found")
-
-            # If we get here without returning, no suitable mouse was found
-            print(f"No working mouse found on attempt {attempt+1}, retrying...")
-            gc.collect()
-            time.sleep(RETRY_DELAY)
-
-        print("Failed to find a working mouse after multiple attempts")
-        return False
-
+        return True
 
     def poll(self):
         """Check for input. Returns contact (a bool), False (no button B),
@@ -345,72 +246,40 @@ class MousePoller():
     def _process_mouse_input(self):
         """Process mouse input - simplified version without wheel support"""
 
-        try:
-            # Attempt to read data from the mouse (10ms timeout)
-            count = self.mouse.read(self.in_endpoint, self.buf, timeout=10)
+        buttons = self.mouse.update()
 
-        except usb.core.USBTimeoutError:
-            # Timeout is normal if mouse isn't moving
-            return False
-        except usb.core.USBError as e:
-            # Handle timeouts silently
-            if e.errno == 110:  # Operation timed out
-                return False
+        # Extract button states
+        if buttons is None:
+            current_left_button_state = 0
+            current_right_button_state = 0
+        else:
+            current_left_button_state = 1 if 'left' in buttons else 0
+            current_right_button_state = 1 if 'right' in buttons else 0
 
-            # Handle disconnections
-            if e.errno == 19:  # No such device
-                print("Mouse disconnected")
-                self.mouse = None
-                self.in_endpoint = None
-                gc.collect()
+        # Detect button presses
+        if current_left_button_state == 1 and self.last_left_button_state == 0:
+            self.left_button_pressed = True
+        elif current_left_button_state == 0 and self.last_left_button_state == 1:
+            self.left_button_pressed = False
 
-            return False
-        except Exception as e:  # pylint: disable=broad-except
-            print(f"Error reading mouse: {type(e).__name__}")
-            return False
+        if current_right_button_state == 1 and self.last_right_button_state == 0:
+            self.right_button_pressed = True
+        elif current_right_button_state == 0 and self.last_right_button_state == 1:
+            self.right_button_pressed = False
 
-        if count >= 3:  # We need at least buttons, X and Y
-            # Extract mouse button states
-            buttons = self.buf[0]
-            x = self.buf[1]
-            y = self.buf[2]
+        # Update button states
+        self.last_left_button_state = current_left_button_state
+        self.last_right_button_state = current_right_button_state
 
-            # Convert to signed values if needed
-            if x > 127:
-                x = x - 256
-            if y > 127:
-                y = y - 256
+        # Update position
+        self.mouse_x = self.mouse.x
+        self.mouse_y = self.mouse.y
 
-            # Extract button states
-            current_left_button_state = buttons & 0x01
-            current_right_button_state = (buttons & 0x02) >> 1
+        # Ensure position stays within bounds
+        self.mouse_x = max(0, min(self.SCREEN_WIDTH - 1, self.mouse_x))
+        self.mouse_y = max(0, min(self.SCREEN_HEIGHT - 1, self.mouse_y))
 
-            # Detect button presses
-            if current_left_button_state == 1 and self.last_left_button_state == 0:
-                self.left_button_pressed = True
-            elif current_left_button_state == 0 and self.last_left_button_state == 1:
-                self.left_button_pressed = False
-
-            if current_right_button_state == 1 and self.last_right_button_state == 0:
-                self.right_button_pressed = True
-            elif current_right_button_state == 0 and self.last_right_button_state == 1:
-                self.right_button_pressed = False
-
-            # Update button states
-            self.last_left_button_state = current_left_button_state
-            self.last_right_button_state = current_right_button_state
-
-            # Update position
-            self.mouse_x += x
-            self.mouse_y += y
-
-            # Ensure position stays within bounds
-            self.mouse_x = max(0, min(self.SCREEN_WIDTH - 1, self.mouse_x))
-            self.mouse_y = max(0, min(self.SCREEN_HEIGHT - 1, self.mouse_y))
-
-            return True
-
-        return False
+        return True
 
 ################################################################################
 
