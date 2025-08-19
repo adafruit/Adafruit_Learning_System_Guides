@@ -192,8 +192,6 @@ class MousePoller():
         self.left_button_pressed = False
         self.right_button_pressed = False
         self.mouse = None
-        self.buf = None
-        self.in_endpoint = None
 
         # Mouse position
         self.mouse_x = screen_width // 2
