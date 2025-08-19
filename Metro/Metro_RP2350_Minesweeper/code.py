@@ -138,6 +138,22 @@ for device in usb.core.find(find_all=True):
     # set the mouse configuration so it can be used
     mouse.set_configuration()
 
+    # Verify mouse works by reading from it
+    buf = array.array("b", [0] * 4)
+    try:
+        # Try to read some data with a short timeout
+        data = mouse.read(0x81, buf, timeout=100)
+        print(f"Mouse test read successful: {data} bytes")
+        break
+    except usb.core.USBTimeoutError:
+        # Timeout is normal if mouse isn't moving
+        print("Mouse connected but not sending data (normal)")
+        break
+    except Exception as e:  # pylint: disable=broad-except
+        print(f"Mouse test read failed: {e}")
+        # Continue to try next device or retry
+        mouse = None
+
 buf = array.array("b", [0] * 4)
 waiting_for_release = False
 left_button = right_button = False
