@@ -13,6 +13,7 @@ import time
 from displayio import Group, OnDiskBitmap, TileGrid, Bitmap, Palette
 from adafruit_display_text.bitmap_label import Label
 from adafruit_display_text.text_box import TextBox
+import adafruit_usb_host_descriptors
 from eventbutton import EventButton
 import supervisor
 import terminalio
@@ -121,6 +122,12 @@ mouse = None
 # wait a second for USB devices to be ready
 time.sleep(1)
 
+#good_devices = False
+#while not good_devices:
+#    for device in usb.core.find(find_all=True):
+#        if device.manufacturer is not None:
+#            good_devices = True
+#            break
 # scan for connected USB devices
 for device in usb.core.find(find_all=True):
     # print information about the found devices
@@ -128,12 +135,16 @@ for device in usb.core.find(find_all=True):
     print(device.manufacturer, device.product)
     print(device.serial_number)
 
+    mouse_intfc,mouse_endpt = adafruit_usb_host_descriptors.find_boot_mouse_endpoint(device)
+    if (mouse_intfc is None or mouse_endpt is None):
+        continue  # Not a mouse device
+
     # assume this device is the mouse
     mouse = device
 
     # detach from kernel driver if active
-    if mouse.is_kernel_driver_active(0):
-        mouse.detach_kernel_driver(0)
+    if mouse.is_kernel_driver_active(mouse_intfc):
+        mouse.detach_kernel_driver(mouse_intfc)
 
     # set the mouse configuration so it can be used
     mouse.set_configuration()
@@ -142,8 +153,13 @@ for device in usb.core.find(find_all=True):
     buf = array.array("b", [0] * 4)
     try:
         # Try to read some data with a short timeout
-        data = mouse.read(0x81, buf, timeout=100)
-        print(f"Mouse test read successful: {data} bytes")
+        data = mouse.read(mouse_endpt, buf, timeout=100)
+        print(f"Mouse test read successful: {data} bytes - {buf}")
+
+        # without this subsequent reads sometimes can't find the endpoint?
+        # I've never seen the Flush mouse queue print so it must just need the extra read
+        if mouse.read(mouse_endpt, buf, timeout=10) > 0:
+            print(f"Flush mouse queue: {buf}")
         break
     except usb.core.USBTimeoutError:
         # Timeout is normal if mouse isn't moving
@@ -153,6 +169,10 @@ for device in usb.core.find(find_all=True):
         print(f"Mouse test read failed: {e}")
         # Continue to try next device or retry
         mouse = None
+
+if mouse is None:
+    display.root_group = displayio.CIRCUITPYTHON_TERMINAL
+    raise RuntimeError("No mouse found. Please connect a USB mouse.")
 
 buf = array.array("b", [0] * 4)
 waiting_for_release = False
@@ -271,7 +291,7 @@ while True:
     try:
         # try to read data from the mouse, small timeout so the code will move on
         # quickly if there is no data
-        data_len = mouse.read(0x81, buf, timeout=10)
+        data_len = mouse.read(mouse_endpt, buf, timeout=10)
         left_button = buf[0] & 0x01
         right_button = buf[0] & 0x02
 
