@@ -167,7 +167,7 @@ class CursorPoller():
 class MousePoller():
     """Get 'pressed' and location updates from a USB mouse."""
 
-    def __init__(self, splash, cursor_bmp, screen_width, screen_height):
+    def __init__(self, splash, cursor_bmp, screen_width, screen_height, sensitivity=3):
         print("Creating a MousePoller")
         self._display_grp = splash
         self._cursor_grp = displayio.Group()
@@ -197,6 +197,9 @@ class MousePoller():
         self.mouse_x = screen_width // 2
         self.mouse_y = screen_height // 2
 
+        # Mouse resolution/sensitivity
+        self.sensitivity = sensitivity
+
         if not self.find_mouse():
             print("WARNING: Mouse not found after multiple attempts.")
             print("The application will run, but mouse control may not work.")
@@ -208,6 +211,10 @@ class MousePoller():
         if self.mouse is None:
             print("No mouse found.")
             return False
+
+        # Change the mouse resolution so it's not too sensitive
+        self.mouse.display_size = (supervisor.runtime.display.width*self.sensitivity,
+                                  supervisor.runtime.display.height*self.sensitivity)
         return True
 
     def poll(self):
@@ -269,8 +276,8 @@ class MousePoller():
         self.last_right_button_state = current_right_button_state
 
         # Update position
-        self.mouse_x = self.mouse.x
-        self.mouse_y = self.mouse.y
+        self.mouse_x = self.mouse.x // self.sensitivity
+        self.mouse_y = self.mouse.y // self.sensitivity
 
         # Ensure position stays within bounds
         self.mouse_x = max(0, min(self.SCREEN_WIDTH - 1, self.mouse_x))
