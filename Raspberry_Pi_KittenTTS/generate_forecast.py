@@ -13,7 +13,7 @@ import soundfile as sf
 with open("weather_narrator.toml", "rb") as f:
     config = tomllib.load(f)
 
-m = KittenTTS("KittenML/kitten-tts-nano-0.1")
+m = KittenTTS("KittenML/kitten-tts-nano-0.2")
 
 replacements = {"mph": "miles per hour"}
 
