@@ -66,7 +66,7 @@ debounced_btn = Debouncer(button)
 with open("forecast.json", "r") as f:
     forecast = json.load(f)
 
-m = KittenTTS("KittenML/kitten-tts-nano-0.1")
+m = KittenTTS("KittenML/kitten-tts-nano-0.2")
 
 
 def generate_date_time_audio(date_obj):
