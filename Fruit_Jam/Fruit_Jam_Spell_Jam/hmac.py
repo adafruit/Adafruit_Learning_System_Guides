@@ -7,7 +7,7 @@
 
 
 class HMAC:
-    # pylint: disable=protected-access, import-outside-toplevel,unnecessary-lambda-assignment
+    # pylint: disable=protected-access, import-outside-toplevel
     def __init__(self, key, msg=None, digestmod=None):
         if not isinstance(key, (bytes, bytearray)):
             raise TypeError("key: expected bytes/bytearray")
