@@ -100,14 +100,12 @@ jobs:
         git clone --quiet https://github.com/pschatzmann/ESP32-A2DP /home/runner/Arduino/libraries/ESP32-A2DP
         git clone --quiet https://github.com/pschatzmann/arduino-audio-tools /home/runner/Arduino/libraries/arduino-audio-tools
 
-    - name: Configure build flags for FastLED
+    - name: test platforms
       run: |
-        echo "Checking for FastLED usage in repository..."
-        
         # Check if any sketch uses FastLED
         USES_FASTLED=false
         
-        # Find all .ino files and check for FastLED usage
+        echo "Checking for FastLED usage in repository..."
         for sketch in $(find . -name "*.ino" -type f); do
           if grep -q "#include.*FastLED" "$sketch" 2>/dev/null || grep -q "include.*FastLED" "$sketch" 2>/dev/null; then
             echo "Found FastLED usage in: $sketch"
@@ -116,47 +114,43 @@ jobs:
           fi
         done
         
-        # If FastLED is used, create platform.local.txt files for ALL platforms
+        # If FastLED is used, create platform.local.txt files
         if [ "$USES_FASTLED" = true ]; then
-          echo "FastLED detected in repository, applying compile flag fix for all platforms"
+          echo "FastLED detected, applying compile flag fix"
           
-          # Wait for Arduino CLI to be fully set up
-          sleep 2
+          # Debug: Show current Arduino package structure
+          echo "Arduino package structure:"
+          find ~/.arduino15/packages -name platform.txt -type f 2>/dev/null || echo "No platform.txt files found yet"
           
-          # Find all platform.txt files and create corresponding platform.local.txt
+          # Create platform.local.txt in all possible Arduino package locations
+          # This needs to happen right before the build
           if [ -d ~/.arduino15/packages ]; then
-            for platform_file in $(find ~/.arduino15/packages -name platform.txt -type f); do
+            for platform_file in $(find ~/.arduino15/packages -name platform.txt -type f 2>/dev/null); do
               dir=$(dirname "$platform_file")
               echo "compiler.cpp.extra_flags=-DFASTLED_USE_COMPILE_TESTS=0" > "$dir/platform.local.txt"
               echo "Created platform.local.txt in $dir"
+              # Verify it was created
+              ls -la "$dir/platform.local.txt"
             done
           fi
           
-          # Also check for Arduino cores in other possible locations
-          ARDUINO_DIRS=(
-            "$HOME/.arduino15"
-            "$HOME/Arduino"
-            "/usr/local/share/arduino"
-            "/usr/share/arduino"
-          )
+          # Also try the home Arduino directory
+          if [ -d "$HOME/Arduino/hardware" ]; then
+            for platform_file in $(find "$HOME/Arduino/hardware" -name platform.txt -type f 2>/dev/null); do
+              dir=$(dirname "$platform_file")
+              echo "compiler.cpp.extra_flags=-DFASTLED_USE_COMPILE_TESTS=0" > "$dir/platform.local.txt"
+              echo "Created platform.local.txt in $dir"
+              ls -la "$dir/platform.local.txt"
+            done
+          fi
           
-          for arduino_dir in "${ARDUINO_DIRS[@]}"; do
-            if [ -d "$arduino_dir/packages" ]; then
-              for platform_file in $(find "$arduino_dir/packages" -name platform.txt -type f 2>/dev/null); do
-                dir=$(dirname "$platform_file")
-                if [ ! -f "$dir/platform.local.txt" ]; then
-                  echo "compiler.cpp.extra_flags=-DFASTLED_USE_COMPILE_TESTS=0" > "$dir/platform.local.txt"
-                  echo "Created platform.local.txt in $dir"
-                fi
-              done
-            fi
-          done
-        else
-          echo "No FastLED usage detected in repository"
+          # Alternative approach: Set environment variable
+          export ARDUINO_BUILD_FLAGS="-DFASTLED_USE_COMPILE_TESTS=0"
+          echo "Also set ARDUINO_BUILD_FLAGS=$ARDUINO_BUILD_FLAGS"
         fi
-
-    - name: test platforms
-      run: python3 ci/build_platform.py ${{ matrix.arduino-platform }}
+        
+        # Now run the actual build
+        python3 ci/build_platform.py ${{ matrix.arduino-platform }}
 
 
     - name: Upload build artifacts
