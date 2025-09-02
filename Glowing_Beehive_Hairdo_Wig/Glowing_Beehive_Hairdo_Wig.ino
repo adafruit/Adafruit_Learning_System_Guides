@@ -8,6 +8,10 @@
 #include <Adafruit_CircuitPlayground.h>  // add this before the FastLED library to avoid issues
 #include <FastLED.h>
 
+#if defined(FASTLED_VERSION) && FASTLED_VERSION > 3010001
+  #error "FastLED 3.10.2 has known compile issues with SAMD boards. Please downgrade to FastLED 3.10.1"
+#endif
+
 #define LED_PIN     6    //led strand is soldered to pin 6
 #define CP_PIN      17   //circuit playground's neopixels live on pin 17
 #define NUM_LEDS    12   // number of LEDs in my strand

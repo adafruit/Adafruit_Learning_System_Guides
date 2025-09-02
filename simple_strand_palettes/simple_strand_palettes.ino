@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-
 #include "FastLED.h"
 
 // ColorWavesWithPalettes
@@ -16,9 +15,9 @@
 //   http://fastled.io/tools/paletteknife/
 //
 
-//#if FASTLED_VERSION < 3001000
-//#error "Requires FastLED 3.1 or later; check github for latest code."
-//#endif
+#if defined(FASTLED_VERSION) && FASTLED_VERSION > 3010001
+  #error "FastLED 3.10.2 has known compile issues with SAMD boards. Please downgrade to FastLED 3.10.1"
+#endif
 
 #define DATA_PIN   6
 #define LED_TYPE    WS2812B

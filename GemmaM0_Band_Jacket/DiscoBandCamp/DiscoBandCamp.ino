@@ -43,6 +43,10 @@
 #include "effects.h"
 #include "buttons.h"
 
+#if defined(FASTLED_VERSION) && FASTLED_VERSION > 3010001
+  #error "FastLED 3.10.2 has known compile issues with SAMD boards. Please downgrade to FastLED 3.10.1"
+#endif
+
 // list of Functions:
 functionList effectList[] = {SolidRed,    //all pixels solid red
                              swirly,      //glittery swirly patterns

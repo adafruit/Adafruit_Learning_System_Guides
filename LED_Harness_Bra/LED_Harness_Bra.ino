@@ -16,6 +16,10 @@ Summary:
 #include <FastLED.h>
 #include <Adafruit_CircuitPlayground.h>
 
+#if defined(FASTLED_VERSION) && FASTLED_VERSION > 3010001
+  #error "FastLED 3.10.2 has known compile issues with SAMD boards. Please downgrade to FastLED 3.10.1"
+#endif
+
 // Circuit Playground Setup----------------------------------------------------
 #define CP_PIN      8         //CPX neopixels live on pin 8, CP live on pin 17
 #define NUM_CP      10        //number of neopixels on the CP

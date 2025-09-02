@@ -9,6 +9,10 @@
 #include "Adafruit_FreeTouch.h"
 #include "FastLED.h"
 
+#if defined(FASTLED_VERSION) && FASTLED_VERSION > 3010001
+  #error "FastLED 3.10.2 has known compile issues with SAMD boards. Please downgrade to FastLED 3.10.1"
+#endif
+
 #define CAPTOUCH_PIN A2  //A2 capacitive touch pin
 #define CAPTOUCH_PIN2 A3  //A3 capacitive touch pin
 #define NEOPIXEL_PIN A1  //A1 neopixel pin
