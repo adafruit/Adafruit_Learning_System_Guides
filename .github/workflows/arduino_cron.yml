@@ -100,6 +100,61 @@ jobs:
         git clone --quiet https://github.com/pschatzmann/ESP32-A2DP /home/runner/Arduino/libraries/ESP32-A2DP
         git clone --quiet https://github.com/pschatzmann/arduino-audio-tools /home/runner/Arduino/libraries/arduino-audio-tools
 
+    - name: Configure build flags for FastLED
+      run: |
+        echo "Checking for FastLED usage in repository..."
+        
+        # Check if any sketch uses FastLED
+        USES_FASTLED=false
+        
+        # Find all .ino files and check for FastLED usage
+        while IFS= read -r sketch; do
+          if grep -q "#include.*FastLED" "$sketch" 2>/dev/null || grep -q "include.*FastLED" "$sketch" 2>/dev/null; then
+            echo "Found FastLED usage in: $sketch"
+            USES_FASTLED=true
+            break
+          fi
+        done < <(find . -name "*.ino" -type f)
+        
+        # If FastLED is used, create platform.local.txt files for ALL platforms
+        if [ "$USES_FASTLED" = true ]; then
+          echo "FastLED detected in repository, applying compile flag fix for all platforms"
+          
+          # Wait for Arduino CLI to be fully set up
+          sleep 2
+          
+          # Find all platform.txt files and create corresponding platform.local.txt
+          if [ -d ~/.arduino15/packages ]; then
+            find ~/.arduino15/packages -name platform.txt -type f | while read platform_file; do
+              dir=$(dirname "$platform_file")
+              echo "compiler.cpp.extra_flags=-DFASTLED_USE_COMPILE_TESTS=0" > "$dir/platform.local.txt"
+              echo "Created platform.local.txt in $dir"
+            done
+          fi
+          
+          # Also check for Arduino cores in other possible locations
+          ARDUINO_DIRS=(
+            "$HOME/.arduino15"
+            "$HOME/Arduino"
+            "/usr/local/share/arduino"
+            "/usr/share/arduino"
+          )
+          
+          for arduino_dir in "${ARDUINO_DIRS[@]}"; do
+            if [ -d "$arduino_dir/packages" ]; then
+              find "$arduino_dir/packages" -name platform.txt -type f 2>/dev/null | while read platform_file; do
+                dir=$(dirname "$platform_file")
+                if [ ! -f "$dir/platform.local.txt" ]; then
+                  echo "compiler.cpp.extra_flags=-DFASTLED_USE_COMPILE_TESTS=0" > "$dir/platform.local.txt"
+                  echo "Created platform.local.txt in $dir"
+                fi
+              done
+            fi
+          done
+        else
+          echo "No FastLED usage detected in repository"
+        fi
+
     - name: test platforms
       run: python3 ci/build_platform.py ${{ matrix.arduino-platform }}
 

@@ -2,8 +2,16 @@
 //
 // SPDX-License-Identifier: MIT
 
-#include "FastLED.h"
+// Disable FastLED compile tests to avoid type conflicts
+// Force type definitions before FastLED include
+#include <FastLED.h>
 
+// If for some reason you are hitting this then use a BUILD define
+// (not an include define) in your build flags section
+// '-DFASTLED_USE_COMPILE_TESTS=0'
+#ifdef FASTLED_USE_COMPILE_TESTS
+#define FASTLED_USE_COMPILE_TESTS 0
+#endif
 // ColorWavesWithPalettes
 // Animated shifting color waves, with several cross-fading color palettes.
 // by Mark Kriegsman, August 2015
