@@ -15,6 +15,10 @@
 
 #include <FastLED.h>
 
+#if defined(FASTLED_VERSION) && FASTLED_VERSION > 3010001
+  #error "FastLED 3.10.2 has known compile issues with SAMD boards. Please downgrade to FastLED 3.10.1"
+#endif
+
 #define LED_PIN  12
 #define NUM_LEDS    20    
 #define LED_TYPE    WS2812B
@@ -372,5 +376,3 @@ void FillLEDsFromPaletteColors( uint8_t colorIndex)
     colorIndex += STEPS;
   }
 }
-
-

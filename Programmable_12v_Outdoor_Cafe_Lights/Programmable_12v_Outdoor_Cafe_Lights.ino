@@ -15,6 +15,10 @@
 //
 #include "FastLED.h"
 
+#if defined(FASTLED_VERSION) && FASTLED_VERSION > 3010001
+  #error "FastLED 3.10.2 has known compile issues with SAMD boards. Please downgrade to FastLED 3.10.1"
+#endif
+
 #define DATA_PIN  SCL
 #define LED_TYPE    WS2812
 #define COLOR_ORDER RBG     // If colors are coming out wrong, re-order (RGB, BRG, etc)

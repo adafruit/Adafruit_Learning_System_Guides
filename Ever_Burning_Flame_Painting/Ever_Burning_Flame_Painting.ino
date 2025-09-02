@@ -5,6 +5,10 @@
 #include <Adafruit_CircuitPlayground.h>  
 #include <FastLED.h> // add FastLED library AFTER Circuit Playground library to avoid issues
 
+#if defined(FASTLED_VERSION) && FASTLED_VERSION > 3010001
+  #error "FastLED 3.10.2 has known compile issues with SAMD boards. Please downgrade to FastLED 3.10.1"
+#endif
+
 #define STRIP1_DATA_PIN 9  // define data pins for all 3 LED strips
 #define STRIP2_DATA_PIN 12
 #define STRIP3_DATA_PIN 6

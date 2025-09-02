@@ -2,16 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-// Disable FastLED compile tests to avoid type conflicts
-// Force type definitions before FastLED include
-#include <FastLED.h>
+#include "FastLED.h"
 
-// If for some reason you are hitting this then use a BUILD define
-// (not an include define) in your build flags section
-// '-DFASTLED_USE_COMPILE_TESTS=0'
-#ifdef FASTLED_USE_COMPILE_TESTS
-#define FASTLED_USE_COMPILE_TESTS 0
-#endif
 // ColorWavesWithPalettes
 // Animated shifting color waves, with several cross-fading color palettes.
 // by Mark Kriegsman, August 2015
@@ -23,9 +15,9 @@
 //   http://fastled.io/tools/paletteknife/
 //
 
-//#if FASTLED_VERSION < 3001000
-//#error "Requires FastLED 3.1 or later; check github for latest code."
-//#endif
+#if defined(FASTLED_VERSION) && FASTLED_VERSION > 3010001
+  #error "FastLED 3.10.2 has known compile issues with SAMD boards. Please downgrade to FastLED 3.10.1"
+#endif
 
 #define DATA_PIN   6
 #define LED_TYPE    WS2812B
