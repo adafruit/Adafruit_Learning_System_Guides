@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-
 #include "FastLED.h"
 
 // ColorWavesWithPalettes
