@@ -9,11 +9,9 @@ The player can also flag squares they suspect contain mines. The game ends when
 the player successfully reveals all squares without mines or clicks on a mine.
 """
 import array
-import time
 from displayio import Group, OnDiskBitmap, TileGrid, Bitmap, Palette
 from adafruit_display_text.bitmap_label import Label
 from adafruit_display_text.text_box import TextBox
-import adafruit_usb_host_descriptors
 from eventbutton import EventButton
 import supervisor
 import terminalio
