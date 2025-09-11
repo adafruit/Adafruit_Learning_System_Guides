@@ -13,10 +13,9 @@ import json
 import gc
 import os
 import digitalio
-import busio
-
 
 import adafruit_midi
+import audiobusio
 import audiocore
 import audiopwmio
 import audiomixer
@@ -53,12 +52,6 @@ class SoundManager:
         # Initialize audio output based on selected type
         self.audio_output_type = audio_output
         self.tlv = None
-
-        # Initialize these variables to avoid use-before-assignment issues
-        i2c = None
-        bclck_pin = None
-        wsel_pin = None
-        din_pin = None
 
         if self.audio_output_type == "pwm":
             # Setup PWM audio output on D10
