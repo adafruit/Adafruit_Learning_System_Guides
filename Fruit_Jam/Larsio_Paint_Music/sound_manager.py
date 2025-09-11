@@ -19,12 +19,11 @@ import busio
 import adafruit_midi
 import audiocore
 import audiopwmio
-import audiobusio
 import audiomixer
 import synthio
 import board
 import adafruit_pathlib as pathlib
-import adafruit_tlv320
+import adafruit_fruitjam
 from adafruit_midi.note_on import NoteOn
 from adafruit_midi.note_off import NoteOff
 import usb_midi
@@ -67,9 +66,13 @@ class SoundManager:
         else:  # i2s
             # optional configuration file for speaker/headphone setting
             launcher_config = {}
-            if pathlib.Path("/launcher.conf.json").exists():
-                with open("/launcher.conf.json", "r") as f:
-                    launcher_config = json.load(f)
+            for directory in ("/", "/sd/", "/saves/"):
+                launcher_config_path = directory + "launcher.conf.json"
+                if pathlib.Path(launcher_config_path).exists():
+                    with open(launcher_config_path, "r") as f:
+                        launcher_config = launcher_config | json.load(f)
+            if "audio" not in launcher_config:
+                launcher_config["audio"] = {}
 
             try:
                 # Import libraries needed for I2S
@@ -84,11 +87,17 @@ class SoundManager:
                     time.sleep(0.1)  # Pause 100ms
                     reset_pin.value = True  # Set high to release from reset
 
-                    i2c = board.STEMMA_I2C()  # initialize I2C
+                    # Initialize TLV320
+                    fjPeriphs = adafruit_fruitjam.Peripherals(
+                        audio_output=launcher_config["audio"].get("output", "headphone"), 
+                        safe_volume_limit=launcher_config["audio"].get("volume_override_danger",12),
+                        sample_rate=11025,
+                        bit_depth=16,
+                        i2c=board.STEMMA_I2C()
+                    )
 
-                    bclck_pin = board.D9
-                    wsel_pin = board.D10
-                    din_pin = board.D11
+                    self.tlv = fjPeriphs.dac
+                    fjPeriphs.audio = audiobusio.I2SOut(board.D9, board.D10, board.D11)
 
                 elif 'Fruit Jam' in board_type:
                     print("Fruit Jam setup")
@@ -98,38 +107,27 @@ class SoundManager:
                     time.sleep(0.1)
                     reset_pin.value = True
 
-                    i2c = busio.I2C(board.SCL, board.SDA)
+                    # Initialize TLV320
+                    fjPeriphs = adafruit_fruitjam.Peripherals(
+                        audio_output=launcher_config["audio"].get("output", "headphone"), 
+                        safe_volume_limit=launcher_config["audio"].get("volume_override_danger",12),
+                        sample_rate=11025,
+                        bit_depth=16,
+                        i2c=board.I2C()
+                    )
 
-                    bclck_pin = board.I2S_BCLK
-                    wsel_pin = board.I2S_WS
-                    din_pin = board.I2S_DIN
+                    self.tlv = fjPeriphs.dac
 
-                # Initialize TLV320
-                self.tlv = adafruit_tlv320.TLV320DAC3100(i2c)
-
-                # set sample rate & bit depth
-                self.tlv.configure_clocks(sample_rate=11025, bit_depth=16)
-
-                if "tlv320" in launcher_config:
-                    if launcher_config["tlv320"].get("output") == "speaker":
-                        # use speaker
-                        self.tlv.speaker_output = True
-                        self.tlv.dac_volume = launcher_config["tlv320"].get("volume",5)  # dB
-                    else:
-                        # use headphones
-                        self.tlv.headphone_output = True
-                        self.tlv.dac_volume = launcher_config["tlv320"].get("volume",0)  # dB
-                else:
-                    # default to headphones
-                    self.tlv.headphone_output = True
-                    self.tlv.dac_volume = 0  # dB
+                # If volume was specified use it, otherwise use the fruitjam library default
+                if "volume_override_danger" in launcher_config["audio"]:
+                    fjPeriphs.volume = launcher_config["audio"]["volume_override_danger"]
+                elif "volume" in launcher_config["audio"]:
+                    fjPeriphs.volume = launcher_config["audio"]["volume"] # FruitJam vol (1-20)
 
                 # Setup I2S audio output - important to do this AFTER configuring the DAC
-                self.audio = audiobusio.I2SOut(
-                    bit_clock=bclck_pin,
-                    word_select=wsel_pin,
-                    data=din_pin
-                )
+                # Fruitjam library actually does this before we modify the configuration
+                # but after the initial default configuration is performed
+                self.audio = fjPeriphs.audio
 
                 print("TLV320 I2S DAC initialized successfully")
             except Exception as e:
@@ -617,6 +615,7 @@ class SoundManager:
             try:
                 # For TLV320DAC3100, headphone_output = False will power down the output
                 self.tlv.headphone_output = False
+                self.tlv.speaker_output = False
             except Exception:
                 pass
 

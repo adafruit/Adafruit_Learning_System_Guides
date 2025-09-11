@@ -1,65 +1,10 @@
 # SPDX-FileCopyrightText: 2025 Melissa LeBlanc-Williams
 #
 # SPDX-License-Identifier: MIT
-import json
-import time
-import board
 from micropython import const
-import adafruit_pathlib as pathlib
-import adafruit_tlv320
-
-# optional configuration file for speaker/headphone setting
-launcher_config = {}
-if pathlib.Path("/launcher.conf.json").exists():
-    with open("/launcher.conf.json", "r") as f:
-        launcher_config = json.load(f)
-
-# Check if DAC is connected
-if "I2C" in dir(board):
-    i2c = board.I2C()
-    for i in range(500): # try for 5 seconds
-        if i2c.try_lock():
-            break
-        time.sleep(0.01)
-    if 0x18 in i2c.scan():
-        tlv320_present = True
-    else:
-        tlv320_present = False
-    i2c.unlock()
-else:
-    tlv320_present = False
-
-if tlv320_present:
-    dac = adafruit_tlv320.TLV320DAC3100(i2c)
-
-    # set sample rate & bit depth
-    dac.configure_clocks(sample_rate=44100, bit_depth=16)
-
-    if "tlv320" in launcher_config:
-        if launcher_config["tlv320"].get("output") == "speaker":
-            # use speaker
-            dac.speaker_output = True
-            dac.dac_volume = launcher_config["tlv320"].get("volume",5)  # dB
-        else:
-            # use headphones
-            dac.headphone_output = True
-            dac.dac_volume = launcher_config["tlv320"].get("volume",0)  # dB
-    else:
-        # default to headphones
-        dac.headphone_output = True
-        dac.dac_volume = 0  # dB
-
-if tlv320_present:
-    _default_play_sounds = True
-else:
-    _default_play_sounds = False
-
-if "sound" in launcher_config:
-    if launcher_config["tlv320"].get("output") == "mute":
-        _default_play_sounds = False
 
 # Settings
-PLAY_SOUNDS = _default_play_sounds
+PLAY_SOUNDS = True
 
 # Timing Constants
 TICKS_PER_SECOND = const(20)
