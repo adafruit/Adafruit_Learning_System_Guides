@@ -17,7 +17,7 @@ import adafruit_usb_host_descriptors
 from eventbutton import EventButton
 import supervisor
 import terminalio
-import usb.core
+from adafruit_usb_host_mouse import find_and_init_boot_mouse
 from gamelogic import GameLogic, BLANK, INFO_BAR_HEIGHT, DIFFICULTIES
 from menu import Menu, SubMenu
 
@@ -117,62 +117,14 @@ def update_ui():
     elapsed_time_label.text = f"Time: {game_logic.elapsed_time}"
 
 # variable for the mouse USB device instance
-mouse = None
-
-# wait a second for USB devices to be ready
-time.sleep(1)
-
-good_devices = False
-wait_time = time.monotonic() + 10 # wait up to 20 seconds for a good device to be found
-while not good_devices and time.monotonic() < wait_time:
-    for device in usb.core.find(find_all=True):
-        if device.manufacturer is not None:
-            good_devices = True
-            break
-# scan for connected USB devices
-for device in usb.core.find(find_all=True):
-    # print information about the found devices
-    print(f"{device.idVendor:04x}:{device.idProduct:04x}")
-    print(device.manufacturer, device.product)
-    print(device.serial_number)
-
-    mouse_intfc,mouse_endpt = adafruit_usb_host_descriptors.find_boot_mouse_endpoint(device)
-    if (mouse_intfc is None or mouse_endpt is None):
-        continue  # Not a mouse device
-
-    # assume this device is the mouse
-    mouse = device
-
-    # detach from kernel driver if active
-    if mouse.is_kernel_driver_active(mouse_intfc):
-        mouse.detach_kernel_driver(mouse_intfc)
-
-    # set the mouse configuration so it can be used
-    mouse.set_configuration()
-
-    # Verify mouse works by reading from it
-    buf = array.array("b", [0] * 4)
-    try:
-        # Try to read some data with a short timeout
-        data = mouse.read(mouse_endpt, buf, timeout=100)
-        print(f"Mouse test read successful: {data} bytes - {buf}")
-        break
-    except usb.core.USBTimeoutError:
-        # Timeout is normal if mouse isn't moving
-        print("Mouse connected but not sending data (normal)")
-        break
-    except Exception as e:  # pylint: disable=broad-except
-        print(f"Mouse test read failed: {e}")
-        # Continue to try next device or retry
-        mouse = None
-
+mouse = find_and_init_boot_mouse()
 if mouse is None:
     raise RuntimeError("No mouse found. Please connect a USB mouse.")
 
 buf = array.array("b", [0] * 4)
 waiting_for_release = False
 left_button = right_button = False
-mouse_coords = (0, 0)
+mouse_coords = (display.width // 2, display.height // 2)
 
 # Create the UI Elements (Ideally fit into 320x16 area)
 # Label for the Mines Left (Left of Center)
@@ -279,45 +231,61 @@ ui_group.append(message_dialog)
 
 menus = (reset_menu, difficulty_menu)
 
+# Mouse state
+last_left_button_state = 0
+last_right_button_state = 0
+left_button_pressed = False
+right_button_pressed = False
+
+# Mouse resolution/sensitivity
+sensitivity = 4
+mouse.x = mouse_coords[0] * sensitivity
+mouse.y = mouse_coords[1] * sensitivity
+
+# Change the mouse resolution so it's not too sensitive
+mouse.display_size = (display.width*sensitivity, display.height*sensitivity)
+
 # main loop
 while True:
     update_ui()
     # attempt mouse read
-    try:
-        # try to read data from the mouse, small timeout so the code will move on
-        # quickly if there is no data
-        while True:
-            try:
-                # read data from the mouse endpoint
-                data_len = mouse.read(mouse_endpt, buf, timeout=10)
-                if data_len > 0:
-                    break
-            except usb.core.USBTimeoutError:
-                # if we get a timeout error, it means there is no data available
-                pass
-            except usb.core.USBError as exc:
-                # if we get a USBError, We may be getting no endpoint msgs which can be waited out
-                pass
+    buttons = mouse.update()
 
-        left_button = buf[0] & 0x01
-        right_button = buf[0] & 0x02
+    # Extract button states
+    if buttons is None:
+        left_button = 0
+        right_button = 0
+    else:
+        print(buttons)
+        left_button = 1 if 'left' in buttons else 0
+        right_button = 1 if 'right' in buttons else 0
 
-        # if there was data, then update the mouse cursor on the display
-        # using min and max to keep it within the bounds of the display
-        mouse_tg.x = max(0, min(display.width - 1, mouse_tg.x + buf[1] // 2))
-        mouse_tg.y = max(0, min(display.height - 1, mouse_tg.y + buf[2] // 2))
-        mouse_coords = (mouse_tg.x, mouse_tg.y)
+    # Detect button presses
+    if left_button == 1 and last_left_button_state == 0:
+        left_button_pressed = True
+    elif left_button == 0 and last_left_button_state == 1:
+        left_button_pressed = False
 
-        if waiting_for_release and not left_button and not right_button:
-            # If both buttons are released, we can process the next click
-            waiting_for_release = False
+    if right_button == 1 and last_right_button_state == 0:
+        right_button_pressed = True
+    elif right_button == 0 and last_right_button_state == 1:
+        right_button_pressed = False
 
-    # timeout error is raised if no data was read within the allotted timeout
-    except usb.core.USBTimeoutError:
-        # no problem, just go on
-        pass
-    except AttributeError as exc:
-        raise RuntimeError("Mouse not found") from exc
+    # Update button states
+    last_left_button_state = left_button
+    last_right_button_state = right_button
+
+    # Update position
+    # Ensure position stays within bounds
+    mouse_tg.x = max(0, min(display.width - 1, mouse.x // sensitivity))
+    mouse_tg.y = max(0, min(display.height - 1, mouse.y // sensitivity))
+
+    mouse_coords = (mouse_tg.x, mouse_tg.y)
+
+    if waiting_for_release and not left_button and not right_button:
+        # If both buttons are released, we can process the next click
+        waiting_for_release = False
+
     if not message_dialog.hidden:
         if message_button.handle_mouse(mouse_coords, left_button, waiting_for_release):
             waiting_for_release = True
