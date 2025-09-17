@@ -32,7 +32,10 @@ class SaveState:
         except OSError:
             pass
 
-        self._card_detect = DigitalInOut(board.SD_CARD_DETECT)
+        try:
+            self._card_detect = DigitalInOut(board.SD_CARD_DETECT)
+        except ValueError:
+            return False
         self._card_detect.switch_to_input(pull=Pull.UP)
         if self._card_detect.value:
             return False

@@ -14,7 +14,7 @@ class Audio:
         self.play(tuple(self._wav_files.keys())[0], wait=True)
 
     def play(self, sound_name, wait=False):
-        if not PLAY_SOUNDS:
+        if not PLAY_SOUNDS or self._audio is None:
             return
         if sound_name in self._wav_files:
             with open(self._wav_files[sound_name], "rb") as wave_file:
