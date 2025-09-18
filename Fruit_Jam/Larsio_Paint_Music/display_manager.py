@@ -8,9 +8,6 @@
 
 import supervisor
 import displayio
-import picodvi
-import framebufferio
-import board
 from adafruit_fruitjam.peripherals import request_display_config
 
 
