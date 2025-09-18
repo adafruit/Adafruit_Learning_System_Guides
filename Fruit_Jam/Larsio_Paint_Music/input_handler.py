@@ -28,11 +28,9 @@ class InputHandler:
         self.buf = None
         self.in_endpoint = None
 
-        self.sensitivity = 4  # Sensitivity factor for mouse movement
-
         # Mouse position
-        self.mouse_x = (screen_width // 2) * self.sensitivity
-        self.mouse_y = (screen_height // 2) * self.sensitivity
+        self.mouse_x = screen_width // 2
+        self.mouse_y = screen_height // 2
 
     def find_mouse(self):
         self.mouse = find_and_init_boot_mouse(cursor_image="sprites/lars_note.bmp")
@@ -41,8 +39,7 @@ class InputHandler:
             return False
 
         # Change the mouse resolution so it's not too sensitive
-        self.mouse.display_size = \
-            (self.SCREEN_WIDTH*self.sensitivity, self.SCREEN_HEIGHT*self.sensitivity)
+        self.mouse.sensitivity = 4
 
         return True
 
@@ -74,8 +71,8 @@ class InputHandler:
         self.last_right_button_state = current_right_button_state
 
         # Update position
-        self.mouse_x = self.mouse.x // self.sensitivity
-        self.mouse_y = self.mouse.y // self.sensitivity
+        self.mouse_x = self.mouse.x
+        self.mouse_y = self.mouse.y
 
         # Ensure position stays within bounds
         self.mouse_x = max(0, min(self.SCREEN_WIDTH - 1, self.mouse_x))
