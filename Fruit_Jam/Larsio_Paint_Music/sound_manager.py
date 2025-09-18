@@ -83,7 +83,8 @@ class SoundManager:
                     # Initialize TLV320
                     fjPeriphs = adafruit_fruitjam.Peripherals(
                         audio_output=launcher_config["audio"].get("output", "headphone"), 
-                        safe_volume_limit=launcher_config["audio"].get("volume_override_danger",.75),
+                        safe_volume_limit=
+                            launcher_config["audio"].get("volume_override_danger",.75),
                         sample_rate=11025,
                         bit_depth=16,
                         i2c=board.STEMMA_I2C()
@@ -103,7 +104,8 @@ class SoundManager:
                     # Initialize TLV320
                     fjPeriphs = adafruit_fruitjam.Peripherals(
                         audio_output=launcher_config["audio"].get("output", "headphone"), 
-                        safe_volume_limit=launcher_config["audio"].get("volume_override_danger",.75),
+                        safe_volume_limit=
+                            launcher_config["audio"].get("volume_override_danger",.75),
                         sample_rate=11025,
                         bit_depth=16,
                         i2c=board.I2C()
