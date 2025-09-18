@@ -47,6 +47,7 @@ else:
         color_depth=16,
     )
     display = framebufferio.FramebufferDisplay(fb)
+    supervisor.runtime.display = display
 
 game_logic = GameLogic(display) # pylint: disable=no-value-for-parameter
 
@@ -73,14 +74,6 @@ main_group.append(game_group)
 # Add a group for the UI Elements
 ui_group = Group()
 main_group.append(ui_group)
-
-# Create the mouse graphics and add to the main group
-mouse_bmp = OnDiskBitmap("bitmaps/mouse_cursor.bmp")
-mouse_bmp.pixel_shader.make_transparent(0)
-mouse_tg = TileGrid(mouse_bmp, pixel_shader=mouse_bmp.pixel_shader)
-mouse_tg.x = display.width // 2
-mouse_tg.y = display.height // 2
-main_group.append(mouse_tg)
 
 MENU_ITEM_HEIGHT = INFO_BAR_HEIGHT
 
@@ -114,10 +107,22 @@ def update_ui():
     mines_left_label.text = f"Mines: {game_logic.mines_left}"
     elapsed_time_label.text = f"Time: {game_logic.elapsed_time}"
 
+
+# Mouse resolution/sensitivity
+sensitivity = 4
+
 # variable for the mouse USB device instance
-mouse = find_and_init_boot_mouse()
+mouse = find_and_init_boot_mouse(cursor_image="bitmaps/mouse_cursor.bmp")
 if mouse is None:
     raise RuntimeError("No mouse found. Please connect a USB mouse.")
+
+mouse.sensitivity = sensitivity
+mouse_tg = mouse.tilegrid
+mouse_tg.x = display.width // 2
+mouse_tg.y = display.height // 2
+
+# add mouse graphic to main_group
+main_group.append(mouse_tg)
 
 buf = array.array("b", [0] * 4)
 waiting_for_release = False
@@ -235,18 +240,10 @@ last_right_button_state = 0
 left_button_pressed = False
 right_button_pressed = False
 
-# Mouse resolution/sensitivity
-sensitivity = 4
-mouse.x = mouse_coords[0] * sensitivity
-mouse.y = mouse_coords[1] * sensitivity
-
-# Change the mouse resolution so it's not too sensitive
-mouse.display_size = (display.width*sensitivity, display.height*sensitivity)
-
 # main loop
 while True:
     update_ui()
-    # attempt mouse read
+    # update cursor position, and check for clicks
     buttons = mouse.update()
 
     # Extract button states
@@ -254,7 +251,6 @@ while True:
         left_button = 0
         right_button = 0
     else:
-        print(buttons)
         left_button = 1 if 'left' in buttons else 0
         right_button = 1 if 'right' in buttons else 0
 
@@ -272,11 +268,6 @@ while True:
     # Update button states
     last_left_button_state = left_button
     last_right_button_state = right_button
-
-    # Update position
-    # Ensure position stays within bounds
-    mouse_tg.x = max(0, min(display.width - 1, mouse.x // sensitivity))
-    mouse_tg.y = max(0, min(display.height - 1, mouse.y // sensitivity))
 
     mouse_coords = (mouse_tg.x, mouse_tg.y)
 
