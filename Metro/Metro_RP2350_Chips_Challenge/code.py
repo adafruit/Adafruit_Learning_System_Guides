@@ -50,7 +50,7 @@ if "audio" not in launcher_config:
 
 fjPeriphs = adafruit_fruitjam.Peripherals.Peripherals(
     audio_output=launcher_config["audio"].get("output", "headphone"),
-    safe_volume_limit=launcher_config["audio"].get("volume_override_danger",12),
+    safe_volume_limit=launcher_config["audio"].get("volume_override_danger",.75),
     sample_rate=44100,
     bit_depth=16,
     i2c=board.I2C()
@@ -61,10 +61,8 @@ if not hasattr(board, "I2S_BCLK") and \
     fjPeriphs.audio = audiobusio.I2SOut(board.D9, board.D10, board.D11)
 
 # If volume was specified use it, otherwise use the fruitjam library default
-if "volume_override_danger" in launcher_config["audio"]:
-    fjPeriphs.volume = launcher_config["audio"]["volume_override_danger"]
-elif "volume" in launcher_config["audio"]:
-    fjPeriphs.volume = launcher_config["audio"]["volume"] # FruitJam vol (1-20)
+if "volume" in launcher_config["audio"]:
+    fjPeriphs.volume = launcher_config["audio"]["volume"] # FruitJam vol 0.0-1.0
 
 if fjPeriphs.audio is not None:
     audio = Audio(fjPeriphs.audio, SOUND_EFFECTS)

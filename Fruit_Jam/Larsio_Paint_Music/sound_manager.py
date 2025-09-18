@@ -83,7 +83,7 @@ class SoundManager:
                     # Initialize TLV320
                     fjPeriphs = adafruit_fruitjam.Peripherals(
                         audio_output=launcher_config["audio"].get("output", "headphone"), 
-                        safe_volume_limit=launcher_config["audio"].get("volume_override_danger",12),
+                        safe_volume_limit=launcher_config["audio"].get("volume_override_danger",.75),
                         sample_rate=11025,
                         bit_depth=16,
                         i2c=board.STEMMA_I2C()
@@ -103,7 +103,7 @@ class SoundManager:
                     # Initialize TLV320
                     fjPeriphs = adafruit_fruitjam.Peripherals(
                         audio_output=launcher_config["audio"].get("output", "headphone"), 
-                        safe_volume_limit=launcher_config["audio"].get("volume_override_danger",12),
+                        safe_volume_limit=launcher_config["audio"].get("volume_override_danger",.75),
                         sample_rate=11025,
                         bit_depth=16,
                         i2c=board.I2C()
@@ -112,10 +112,8 @@ class SoundManager:
                     self.tlv = fjPeriphs.dac
 
                 # If volume was specified use it, otherwise use the fruitjam library default
-                if "volume_override_danger" in launcher_config["audio"]:
-                    fjPeriphs.volume = launcher_config["audio"]["volume_override_danger"]
-                elif "volume" in launcher_config["audio"]:
-                    fjPeriphs.volume = launcher_config["audio"]["volume"] # FruitJam vol (1-20)
+                if "volume" in launcher_config["audio"]:
+                    fjPeriphs.volume = launcher_config["audio"]["volume"] # FruitJam vol 0.0-1.0
 
                 # Setup I2S audio output - important to do this AFTER configuring the DAC
                 # Fruitjam library actually does this before we modify the configuration
