@@ -73,18 +73,9 @@ class MusicStaffApp:
         MAX_ATTEMPTS = 5
         RETRY_DELAY = 1  # seconds
 
-        mouse_found = False
-        for attempt in range(MAX_ATTEMPTS):
-            print(f"Mouse detection attempt {attempt+1}/{MAX_ATTEMPTS}")
-            if self.ui_manager.find_mouse():
-                mouse_found = True
-                print("Mouse found successfully!")
-                break
-
-            print(f"Mouse detection attempt {attempt+1} failed, retrying...")
-            time.sleep(RETRY_DELAY)
-
-        if not mouse_found:
+        if self.ui_manager.find_mouse():
+            print("Mouse found successfully!")
+        else:
             print("WARNING: Mouse not found after multiple attempts.")
             print("The application will run, but mouse control may be limited.")
 

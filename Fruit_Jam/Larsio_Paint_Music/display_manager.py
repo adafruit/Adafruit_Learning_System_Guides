@@ -6,6 +6,7 @@
 """
 # pylint: disable=import-error,invalid-name,no-member,too-many-instance-attributes,too-many-arguments,too-many-branches,too-many-statements
 
+import supervisor
 import displayio
 import picodvi
 import framebufferio
@@ -38,6 +39,7 @@ class DisplayManager:
 
         # Create the display
         self.display = framebufferio.FramebufferDisplay(fb)
+        supervisor.runtime.display = self.display  # Keep display on in runtime info
 
         # Create main group
         self.main_group = displayio.Group()
