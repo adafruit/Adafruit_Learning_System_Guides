@@ -35,7 +35,7 @@ class InputHandler:
         self.mouse_y = (screen_height // 2) * self.sensitivity
 
     def find_mouse(self):
-        self.mouse = find_and_init_boot_mouse()
+        self.mouse = find_and_init_boot_mouse(cursor_image="sprites/lars_note.bmp")
         if self.mouse is None:
             print("Failed to find a working mouse after multiple attempts")
             return False
