@@ -69,14 +69,11 @@ class MusicStaffApp:
         time.sleep(0.5)
         gc.collect()
 
-        # Try to find the mouse with multiple attempts
-        MAX_ATTEMPTS = 5
-        RETRY_DELAY = 1  # seconds
-
+        # Try to find the mouse
         if self.ui_manager.find_mouse():
             print("Mouse found successfully!")
         else:
-            print("WARNING: Mouse not found after multiple attempts.")
+            print("WARNING: Mouse not found.")
             print("The application will run, but mouse control may be limited.")
 
         # Enter the main loop

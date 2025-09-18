@@ -7,6 +7,8 @@
 
 import array
 import gc
+
+# pylint: disable=import-error
 from adafruit_usb_host_mouse import find_and_init_boot_mouse
 
 # pylint: disable=invalid-name,no-member,too-many-instance-attributes,too-many-arguments
