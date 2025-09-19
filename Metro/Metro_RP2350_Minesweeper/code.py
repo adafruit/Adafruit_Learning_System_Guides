@@ -108,15 +108,12 @@ def update_ui():
     elapsed_time_label.text = f"Time: {game_logic.elapsed_time}"
 
 
-# Mouse resolution/sensitivity
-sensitivity = 4
-
 # variable for the mouse USB device instance
 mouse = find_and_init_boot_mouse(cursor_image="bitmaps/mouse_cursor.bmp")
 if mouse is None:
     raise RuntimeError("No mouse found. Please connect a USB mouse.")
 
-mouse.sensitivity = sensitivity
+mouse.sensitivity = 4  # Slow the mouse down a bit
 mouse_tg = mouse.tilegrid
 mouse_tg.x = display.width // 2
 mouse_tg.y = display.height // 2
