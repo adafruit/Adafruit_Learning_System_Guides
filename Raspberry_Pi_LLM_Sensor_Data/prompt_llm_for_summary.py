@@ -8,7 +8,7 @@ from sqlalchemy.orm import sessionmaker
 from ollama import chat
 from db_models import SensorReading
 
-# pylint: disable=too-many-locals
+# pylint: disable=too-many-locals, too-many-nested-blocks
 
 # Database connection configuration
 DATABASE_URL = "sqlite:///sensor_data.db"
@@ -159,7 +159,7 @@ def fetch_data(
                 + (f" (sampled every {sample_rate} minutes)" if sample_rate > 1 else "")
             )
         return results
-
+    # pylint:disable=broad-except
     except Exception as e:
         print(f"Error fetching data: {e}")
         return []
