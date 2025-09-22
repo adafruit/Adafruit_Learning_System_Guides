@@ -151,7 +151,9 @@ fruitjam.add_text(
 fruitjam.add_text(
     text_font=OVERLAY_FONT, text_wrap=0, text_maxlen=30, text_color=0xFFFFFF, outline_size=1
 )  # stock
-fruitjam.add_text(text_font=OVERLAY_FONT, text_wrap=0, text_maxlen=30, text_color=0xFFFFFF, outline_size=1)  #
+fruitjam.add_text(
+    text_font=OVERLAY_FONT, text_wrap=0, text_maxlen=30, text_color=0xFFFFFF, outline_size=1
+)  # price
 apply_hotkey_visuals(config_index)
 
 fruitjam.neopixels.brightness = 0.1
