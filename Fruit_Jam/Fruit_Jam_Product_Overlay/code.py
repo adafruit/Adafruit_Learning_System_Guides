@@ -5,11 +5,18 @@
 import time
 import board
 import supervisor
+import terminalio
 
 from adafruit_fruitjam import FruitJam
 from adafruit_fruitjam.peripherals import request_display_config
 
 BG_COLOR = 0x0000FF
+
+# use built-in system font
+OVERLAY_FONT = terminalio.FONT
+
+# or un-comment to use a custom font. Fill in the path to your font file.
+# OVERLAY_FONT = "Free_Mono_10.pcf"
 
 request_display_config(320, 240)
 display = supervisor.runtime.display
@@ -139,12 +146,12 @@ fruitjam = FruitJam(
 )
 fruitjam.remove_all_text()
 fruitjam.add_text(
-    text_wrap=35, text_maxlen=180, text_color=0xFFFFFF, outline_size=1
+    text_font=OVERLAY_FONT, text_wrap=35, text_maxlen=180, text_color=0xFFFFFF, outline_size=1
 )  # title
 fruitjam.add_text(
-    text_wrap=0, text_maxlen=30, text_color=0xFFFFFF, outline_size=1
+    text_font=OVERLAY_FONT, text_wrap=0, text_maxlen=30, text_color=0xFFFFFF, outline_size=1
 )  # stock
-fruitjam.add_text(text_wrap=0, text_maxlen=30, text_color=0xFFFFFF, outline_size=1)  #
+fruitjam.add_text(text_font=OVERLAY_FONT, text_wrap=0, text_maxlen=30, text_color=0xFFFFFF, outline_size=1)  #
 apply_hotkey_visuals(config_index)
 
 fruitjam.neopixels.brightness = 0.1
