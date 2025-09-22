@@ -1,0 +1,35 @@
+# SPDX-FileCopyrightText: 2025 Tim Cocks for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+[Unit]
+Description=Python Script with Virtual Environment
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=pi
+Group=pi
+WorkingDirectory=/home/pi/RaspberryPi_LLM_Sensor_Data
+Environment=PATH=/home/pi/venvs/sensor_llm_venv/bin
+ExecStart=/home/pi/RaspberryPi_LLM_Sensor_Data/start_service.sh
+Restart=always
+RestartSec=10
+
+# Optional: Set environment variables
+Environment=PYTHONPATH=/home/pi/RaspberryPi_LLM_Sensor_Data
+Environment=PYTHONUNBUFFERED=1
+
+# Optional: Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=Environmental-Sensor-Reader
+
+# Optional: Security settings
+NoNewPrivileges=yes
+ProtectSystem=strict
+#ProtectHome=yes
+ReadWritePaths=/home/pi/RaspberryPi_LLM_Sensor_Data
+
+[Install]
+WantedBy=multi-user.target
