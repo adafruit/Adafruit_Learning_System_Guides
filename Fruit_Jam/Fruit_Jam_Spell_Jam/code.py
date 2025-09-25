@@ -42,7 +42,8 @@ main_group.append(screen_lbl)
 # initialize Fruit Jam built-in hardware
 fj = FruitJam()
 fj.neopixels.brightness = 0.1
-fj.peripherals.volume = 9
+fj.peripherals.volume = 0.5
+vol_int = 50
 
 # AWS auth requires us to have accurate date/time
 now = fj.sync_time()
@@ -119,13 +120,13 @@ while True:
                 say_and_spell_lastword()
         elif c.encode("utf-8") == b"\x1b[B":
             # down arrow
-            fj.peripherals.volume = max(1, fj.peripherals.volume - 1)
+            vol_int = max(0, vol_int - 5)
+            fj.peripherals.volume = vol_int / 100
             print(f"Volume: {fj.peripherals.volume}")
         elif c.encode("utf-8") == b"\x1b[A":
             # up arrow
-            fj.peripherals.volume = min(
-                fj.peripherals.safe_volume_limit, fj.peripherals.volume + 1
-            )
+            vol_int = min(fj.peripherals.safe_volume_limit * 100, vol_int + 5)
+            fj.peripherals.volume = vol_int / 100
             print(f"Volume: {fj.peripherals.volume}")
         else:
             print(f"unused key: {c.encode('utf-8')}")
