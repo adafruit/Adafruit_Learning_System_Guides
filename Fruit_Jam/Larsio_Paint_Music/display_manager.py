@@ -6,10 +6,9 @@
 """
 # pylint: disable=import-error,invalid-name,no-member,too-many-instance-attributes,too-many-arguments,too-many-branches,too-many-statements
 
+import supervisor
 import displayio
-import picodvi
-import framebufferio
-import board
+from adafruit_fruitjam.peripherals import request_display_config
 
 
 
@@ -25,19 +24,13 @@ class DisplayManager:
 
     def initialize_display(self):
         """Initialize the DVI display"""
-        # Release any existing displays
-        displayio.release_displays()
+        # Use the Fruit Jam library to set up display, that way on DAC fallback
+        # the display doesn't attempt to be re-initialized
 
-        # Initialize the DVI framebuffer
-        fb = picodvi.Framebuffer(self.SCREEN_WIDTH, self.SCREEN_HEIGHT,
-                              clk_dp=board.CKP, clk_dn=board.CKN,
-                              red_dp=board.D0P, red_dn=board.D0N,
-                              green_dp=board.D1P, green_dn=board.D1N,
-                              blue_dp=board.D2P, blue_dn=board.D2N,
-                              color_depth=16)
+        request_display_config(self.SCREEN_WIDTH, self.SCREEN_HEIGHT,color_depth=16)
 
         # Create the display
-        self.display = framebufferio.FramebufferDisplay(fb)
+        self.display = supervisor.runtime.display
 
         # Create main group
         self.main_group = displayio.Group()
