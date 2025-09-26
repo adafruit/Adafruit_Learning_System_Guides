@@ -9,7 +9,7 @@
 Arduino_XCA9554SWSPI *expander = new Arduino_XCA9554SWSPI(
     PCA_TFT_RESET, PCA_TFT_CS, PCA_TFT_SCK, PCA_TFT_MOSI,
     &Wire, 0x3F);
-    
+
 Arduino_ESP32RGBPanel *rgbpanel = new Arduino_ESP32RGBPanel(
     TFT_DE, TFT_VSYNC, TFT_HSYNC, TFT_PCLK,
     TFT_R1, TFT_R2, TFT_R3, TFT_R4, TFT_R5,
@@ -32,6 +32,10 @@ Arduino_RGB_Display *gfx = new Arduino_RGB_Display(
 // 3.4" 480x480 square display
 //    480 /* width */, 480 /* height */, rgbpanel, 0 /* rotation */, true /* auto_flush */,
 //    expander, GFX_NOT_DEFINED /* RST */, tl034wvs05_b1477a_init_operations, sizeof(tl034wvs05_b1477a_init_operations));
+
+/* 4.0" 480x480 square */
+//    480 /* width */, 480 /* height */, rgbpanel, 0 /* rotation */, true /* auto_flush */,
+//    expander, GFX_NOT_DEFINED /* RST */, tl040wvs03_init_operations, sizeof(tl040wvs03_init_operations));
 
 // 3.2" 320x820 rectangle bar display
 //    320 /* width */, 820 /* height */, rgbpanel, 0 /* rotation */, true /* auto_flush */,
@@ -68,10 +72,10 @@ bool touchOK = false;        // we will check if the touchscreen exists
 bool isFocalTouch = false;
 
 void setup(void)
-{  
+{
   Serial.begin(115200);
   //while (!Serial) delay(100);
-  
+
 #ifdef GFX_EXTRA_PRE_INIT
   GFX_EXTRA_PRE_INIT();
 #endif
@@ -79,7 +83,7 @@ void setup(void)
   Serial.println("Beginning");
   // Init Display
 
-  Wire.setClock(1000000); // speed up I2C 
+  Wire.setClock(1000000); // speed up I2C
   if (!gfx->begin()) {
     Serial.println("gfx->begin() failed!");
   }
@@ -128,7 +132,7 @@ void loop()
       gfx->fillRect(p.x, p.y, 5, 5, WHITE);
     }
   }
-   
+
   // use the buttons to turn off
   if (! expander->digitalRead(PCA_BUTTON_DOWN)) {
     expander->digitalWrite(PCA_TFT_BACKLIGHT, LOW);
