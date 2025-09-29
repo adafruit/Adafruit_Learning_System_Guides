@@ -99,10 +99,17 @@ class GameLogic:
             raise ValueError("Game board not initialized")
         self.game_board[x, y] = value # pylint: disable=unsupported-assignment-operation
 
-    def _get_board(self, x, y):
+    def _get_board(self, x, y, dx=0, dy=0):
         if not isinstance(self.game_board, TileGrid):
             raise ValueError("Game board not initialized")
-        return self.game_board[x, y] # pylint: disable=unsubscriptable-object
+
+        if x + dx < 0 or x + dx >= self.grid_width:
+            return None     # Off screen
+
+        if y + dy < 0 or y + dy >= self.grid_height:
+            return None     # Off screen
+
+        return self.game_board[x + dx, y + dy] # pylint: disable=unsubscriptable-object
 
     def _compute_counts(self):
         """For each mine, increment the count in each non-mine square around it"""
@@ -166,6 +173,7 @@ class GameLogic:
         return True
 
     def square_chorded(self, coords):
+        # pylint: disable=too-many-nested-blocks
         if self._status in (STATUS_WON, STATUS_LOST):
             return False
 
@@ -174,26 +182,19 @@ class GameLogic:
             # Count the flags around this square
             flags = 0
             for dx in (-1, 0, 1):
-                if x + dx < 0 or x + dx >= self.grid_width:
-                    continue              # off screen
                 for dy in (-1, 0, 1):
-                    if y + dy < 0 or y + dy >= self.grid_height:
-                        continue          # off screen
                     if dx == 0 and dy == 0:
                         continue          # don't process where the mine
-                    if self._get_board(x + dx, y + dy) == FLAG:
+                    if self._get_board(x, y, dx, dy) == FLAG:
                         flags += 1
             if flags == self._get_board(x, y):
                 # Uncover all non-flagged squares around here
                 for dx in (-1, 0, 1):
-                    if x + dx < 0 or x + dx >= self.grid_width:
-                        continue              # off screen
                     for dy in (-1, 0, 1):
-                        if y + dy < 0 or y + dy >= self.grid_height:
-                            continue          # off screen
                         if dx == 0 and dy == 0:
                             continue          # don't process where the mine
-                        if self._get_board(x + dx, y + dy) != FLAG:
+                        _tile_content = self._get_board(x, y, dx, dy)
+                        if _tile_content != FLAG and _tile_content != None:
                             if not self.square_clicked((x + dx, y + dy)):
                                 return False      # lost
         return True
