@@ -92,6 +92,8 @@ class GameLogic:
         self._board_data[y * self.grid_width + x] = value
 
     def _get_data(self, x, y):
+        if x < 0 or x >= self.grid_width or y < 0 or y >= self.grid_height:
+            return None  # out of bounds, do nothing
         return self._board_data[y * self.grid_width + x]
 
     def _set_board(self, x, y, value):
@@ -99,17 +101,12 @@ class GameLogic:
             raise ValueError("Game board not initialized")
         self.game_board[x, y] = value # pylint: disable=unsupported-assignment-operation
 
-    def _get_board(self, x, y, dx=0, dy=0):
+    def _get_board(self, x, y):
         if not isinstance(self.game_board, TileGrid):
             raise ValueError("Game board not initialized")
-
-        if x + dx < 0 or x + dx >= self.grid_width:
-            return None     # Off screen
-
-        if y + dy < 0 or y + dy >= self.grid_height:
-            return None     # Off screen
-
-        return self.game_board[x + dx, y + dy] # pylint: disable=unsubscriptable-object
+        if x < 0 or x >= self.grid_width or y < 0 or y >= self.grid_height:
+            return None  # out of bounds, do nothing
+        return self.game_board[x, y] # pylint: disable=unsubscriptable-object
 
     def _compute_counts(self):
         """For each mine, increment the count in each non-mine square around it"""
@@ -173,30 +170,40 @@ class GameLogic:
         return True
 
     def square_chorded(self, coords):
-        # pylint: disable=too-many-nested-blocks
         if self._status in (STATUS_WON, STATUS_LOST):
             return False
 
         x, y = coords
-        if self._get_board(x, y) in (OPEN1, OPEN2, OPEN3, OPEN4, OPEN5, OPEN6, OPEN7, OPEN8):
-            # Count the flags around this square
-            flags = 0
-            for dx in (-1, 0, 1):
-                for dy in (-1, 0, 1):
-                    if dx == 0 and dy == 0:
-                        continue          # don't process where the mine
-                    if self._get_board(x, y, dx, dy) == FLAG:
-                        flags += 1
-            if flags == self._get_board(x, y):
-                # Uncover all non-flagged squares around here
-                for dx in (-1, 0, 1):
-                    for dy in (-1, 0, 1):
-                        if dx == 0 and dy == 0:
-                            continue          # don't process where the mine
-                        _tile_content = self._get_board(x, y, dx, dy)
-                        if _tile_content not in (FLAG, None):
-                            if not self.square_clicked((x + dx, y + dy)):
-                                return False      # lost
+        if x < 0 or x >= self.grid_width or y < 0 or y >= self.grid_height:
+            return True  # out of bounds, do nothing
+
+        value = self._get_board(x, y)
+
+        if value not in (OPEN1, OPEN2, OPEN3, OPEN4, OPEN5, OPEN6, OPEN7, OPEN8):
+            return True  # Nothing to do if not an open numbered square
+
+        # Pre-compute valid neighbors
+        neighbors = [
+            (nx, ny)
+            for nx in range(x - 1, x + 2)
+            for ny in range(y - 1, y + 2)
+            if (0 <= nx < self.grid_width
+                and 0 <= ny < self.grid_height
+                and not (nx == x and ny == y))
+        ]
+
+        # Count flagged neighbors
+        flags = sum(1 for nx, ny in neighbors if self._get_board(nx, ny) == FLAG)
+
+        if flags != value:
+            return True  # not enough flags, do nothing
+
+        # Uncover all non-flagged neighbors
+        for nx, ny in neighbors:
+            if self._get_board(nx, ny) != FLAG:
+                if not self.square_clicked((nx, ny)):
+                    return False  # lost
+
         return True
 
     def square_chord_highlight(self, coords, highlight=True):
@@ -204,22 +211,33 @@ class GameLogic:
             return False
 
         x, y = coords
-        if self._get_board(x, y) in (OPEN1, OPEN2, OPEN3, OPEN4, OPEN5, OPEN6, OPEN7, OPEN8):
-            # Highlight all non-flagged squares around here
-            for dx in (-1, 0, 1):
-                if x + dx < 0 or x + dx >= self.grid_width:
-                    continue              # off screen
-                for dy in (-1, 0, 1):
-                    if y + dy < 0 or y + dy >= self.grid_height:
-                        continue          # off screen
-                    if dx == 0 and dy == 0:
-                        continue          # don't process where the mine
-                    if highlight:
-                        if self._get_board(x + dx, y + dy) == BLANK:
-                            self._set_board(x + dx, y + dy,MINE_QUESTION_OPEN)
-                    else:
-                        if self._get_board(x + dx, y + dy) == MINE_QUESTION_OPEN:
-                            self._set_board(x + dx, y + dy, BLANK)
+        if x < 0 or x >= self.grid_width or y < 0 or y >= self.grid_height:
+            return False  # out of bounds, do nothing
+
+        value = self._get_board(x, y)
+
+        if value not in (OPEN1, OPEN2, OPEN3, OPEN4, OPEN5, OPEN6, OPEN7, OPEN8):
+            return False  # Nothing to do if not an open numbered square
+
+        # Pre-compute valid neighbors
+        neighbors = [
+            (nx, ny)
+            for nx in range(x - 1, x + 2)
+            for ny in range(y - 1, y + 2)
+            if (0 <= nx < self.grid_width
+                and 0 <= ny < self.grid_height
+                and not (nx == x and ny == y))
+        ]
+
+        # Highlight all non-flagged squares around here
+        for nx, ny in neighbors:
+            if highlight:
+                if self._get_board(nx, ny) == BLANK:
+                    self._set_board(nx, ny,MINE_QUESTION_OPEN)
+            else:
+                if self._get_board(nx, ny) == MINE_QUESTION_OPEN:
+                    self._set_board(nx, ny, BLANK)
+
         return True
 
     def square_clicked(self, coords):
@@ -235,7 +253,7 @@ class GameLogic:
             if self._start_time is None:
                 self._start_time = ticks_ms()
 
-        if self._get_board(x, y) != FLAG:
+        if self._get_board(x, y) not in (FLAG, None):
             under_the_tile = self._get_data(x, y)
             if under_the_tile == MINE:
                 self._set_data(x, y, MINE_CLICKED)

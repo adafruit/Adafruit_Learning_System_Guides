@@ -266,9 +266,9 @@ while True:
 
         if left_button and right_button and not chord_selected:
             chord_coords = ((mouse_tg.x - ms_board.x) // 16, (mouse_tg.y - ms_board.y) // 16)
-            chord_selected = True
-            game_logic.square_chord_highlight(chord_coords)
-            waiting_for_release = True
+            chord_selected = game_logic.square_chord_highlight(chord_coords)
+            if chord_selected:
+                waiting_for_release = True
 
         if (ms_board.x <= mouse_tg.x <= ms_board.x + game_logic.grid_width * 16 and
             ms_board.y <= mouse_tg.y <= ms_board.y + game_logic.grid_height * 16 and
