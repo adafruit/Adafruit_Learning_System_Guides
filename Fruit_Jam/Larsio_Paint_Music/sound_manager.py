@@ -126,6 +126,7 @@ class SoundManager:
             except Exception as e:
                 print(f"Error initializing TLV320 DAC: {e}")
                 print("Falling back to PWM audio output")
+                fjPeriphs.deinit()
                 # Fallback to PWM if I2S initialization fails
                 self.audio = audiopwmio.PWMAudioOut(board.D10)
 
