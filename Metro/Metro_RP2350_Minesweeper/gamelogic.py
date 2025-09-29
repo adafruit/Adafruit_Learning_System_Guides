@@ -165,6 +165,62 @@ class GameLogic:
                 break
         return True
 
+    def square_chorded(self, coords):
+        if self._status in (STATUS_WON, STATUS_LOST):
+            return False
+
+        x, y = coords
+        if self._get_board(x, y) in (OPEN1, OPEN2, OPEN3, OPEN4, OPEN5, OPEN6, OPEN7, OPEN8):
+            # Count the flags around this square
+            flags = 0
+            for dx in (-1, 0, 1):
+                if x + dx < 0 or x + dx >= self.grid_width:
+                    continue              # off screen
+                for dy in (-1, 0, 1):
+                    if y + dy < 0 or y + dy >= self.grid_height:
+                        continue          # off screen
+                    if dx == 0 and dy == 0:
+                        continue          # don't process where the mine
+                    if self._get_board(x + dx, y + dy) == FLAG:
+                        flags += 1
+            if flags == self._get_board(x, y):
+                # Uncover all non-flagged squares around here
+                for dx in (-1, 0, 1):
+                    if x + dx < 0 or x + dx >= self.grid_width:
+                        continue              # off screen
+                    for dy in (-1, 0, 1):
+                        if y + dy < 0 or y + dy >= self.grid_height:
+                            continue          # off screen
+                        if dx == 0 and dy == 0:
+                            continue          # don't process where the mine
+                        if self._get_board(x + dx, y + dy) != FLAG:
+                            if not self.square_clicked((x + dx, y + dy)):
+                                return False      # lost
+        return True
+
+    def square_chord_highlight(self, coords, highlight=True):
+        if self._status in (STATUS_WON, STATUS_LOST):
+            return False
+
+        x, y = coords
+        if self._get_board(x, y) in (OPEN1, OPEN2, OPEN3, OPEN4, OPEN5, OPEN6, OPEN7, OPEN8):
+            # Highlight all non-flagged squares around here
+            for dx in (-1, 0, 1):
+                if x + dx < 0 or x + dx >= self.grid_width:
+                    continue              # off screen
+                for dy in (-1, 0, 1):
+                    if y + dy < 0 or y + dy >= self.grid_height:
+                        continue          # off screen
+                    if dx == 0 and dy == 0:
+                        continue          # don't process where the mine
+                    if highlight:
+                        if self._get_board(x + dx, y + dy) == BLANK:
+                            self._set_board(x + dx, y + dy,MINE_QUESTION_OPEN)
+                    else:
+                        if self._get_board(x + dx, y + dy) == MINE_QUESTION_OPEN:
+                            self._set_board(x + dx, y + dy, BLANK)
+        return True
+
     def square_clicked(self, coords):
         x, y = coords
 
@@ -215,7 +271,9 @@ class GameLogic:
         # first make sure everything has been explored and decided
         for x in range(self.grid_width):
             for y in range(self.grid_height):
-                if self._get_board(x, y) == BLANK or self._get_board(x, y) == MINE_QUESTION:
+                if self._get_board(x, y) == BLANK or \
+                    self._get_board(x, y) == MINE_QUESTION or \
+                    self._get_board(x, y) == MINE_QUESTION_OPEN:
                     return None               # still ignored or question squares
         # then check for mistagged bombs
         for x in range(self.grid_width):

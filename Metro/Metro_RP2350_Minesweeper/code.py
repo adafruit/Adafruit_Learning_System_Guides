@@ -123,6 +123,7 @@ main_group.append(mouse_tg)
 
 buf = array.array("b", [0] * 4)
 waiting_for_release = False
+chord_selected = False
 left_button = right_button = False
 mouse_coords = (display.width // 2, display.height // 2)
 
@@ -231,40 +232,20 @@ ui_group.append(message_dialog)
 
 menus = (reset_menu, difficulty_menu)
 
-# Mouse state
-last_left_button_state = 0
-last_right_button_state = 0
-left_button_pressed = False
-right_button_pressed = False
-
 # main loop
 while True:
     update_ui()
     # update cursor position, and check for clicks
-    buttons = mouse.update()
+    mouse.update()
+    buttons = mouse.pressed_btns
 
     # Extract button states
-    if buttons is None:
+    if buttons is None or buttons == ():
         left_button = 0
         right_button = 0
     else:
         left_button = 1 if 'left' in buttons else 0
         right_button = 1 if 'right' in buttons else 0
-
-    # Detect button presses
-    if left_button == 1 and last_left_button_state == 0:
-        left_button_pressed = True
-    elif left_button == 0 and last_left_button_state == 1:
-        left_button_pressed = False
-
-    if right_button == 1 and last_right_button_state == 0:
-        right_button_pressed = True
-    elif right_button == 0 and last_right_button_state == 1:
-        right_button_pressed = False
-
-    # Update button states
-    last_left_button_state = left_button
-    last_right_button_state = right_button
 
     mouse_coords = (mouse_tg.x, mouse_tg.y)
 
@@ -282,11 +263,23 @@ while True:
     else:
         # process gameboard click if no menu
         ms_board = game_logic.game_board
+
+        if left_button and right_button and not chord_selected:
+            chord_coords = ((mouse_tg.x - ms_board.x) // 16, (mouse_tg.y - ms_board.y) // 16)
+            chord_selected = True
+            game_logic.square_chord_highlight(chord_coords)
+            waiting_for_release = True
+
         if (ms_board.x <= mouse_tg.x <= ms_board.x + game_logic.grid_width * 16 and
             ms_board.y <= mouse_tg.y <= ms_board.y + game_logic.grid_height * 16 and
             not waiting_for_release):
+
             coords = ((mouse_tg.x - ms_board.x) // 16, (mouse_tg.y - ms_board.y) // 16)
-            if right_button:
+            if chord_selected:
+                chord_selected = False
+                game_logic.square_chord_highlight(chord_coords, False)
+                game_logic.square_chorded(chord_coords)
+            elif right_button:
                 game_logic.square_flagged(coords)
             elif left_button:
                 if not game_logic.square_clicked(coords):
