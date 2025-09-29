@@ -194,7 +194,7 @@ class GameLogic:
                         if dx == 0 and dy == 0:
                             continue          # don't process where the mine
                         _tile_content = self._get_board(x, y, dx, dy)
-                        if _tile_content != FLAG and _tile_content != None:
+                        if _tile_content not in (FLAG, None):
                             if not self.square_clicked((x + dx, y + dy)):
                                 return False      # lost
         return True
