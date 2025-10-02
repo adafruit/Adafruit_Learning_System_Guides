@@ -12,11 +12,16 @@ import neopixel
 import adafruit_requests
 from adafruit_ticks import ticks_ms, ticks_add, ticks_diff
 
-# FarmSense API for moon phase
-# https://www.farmsense.net/api/astro-widgets/
-url = "https://api.farmsense.net/v1/moonphases/?d="
-# Adafruit IO time server for UNIX time, no API key needed
-time_url = "https://io.adafruit.com/api/v2/time/seconds"
+# US Navy Astronomical Applications API for moon phase
+# https://aa.usno.navy.mil/api
+# Your location coordinates (adjust these to your location)
+LATITUDE = 40.71
+LONGITUDE = -74.0060
+TIMEZONE = -5  # EST/EDT, adjust for your timezone
+DST = True  # Set to False if not in daylight saving time
+
+# Adafruit IO time server for current date, no API key needed
+date_url = "https://io.adafruit.com/api/v2/time/ISO-8601"
 # connect to wifi
 try:
     wifi.radio.connect(os.getenv('CIRCUITPY_WIFI_SSID'), os.getenv('CIRCUITPY_WIFI_PASSWORD'))
@@ -42,13 +47,13 @@ FIRST_QUARTER = 2
 WAXING_GIBBOUS = 3
 FULL_MOON = 4
 WANING_GIBBOUS = 5
-THIRD_QUARTER = 6
+LAST_QUARTER = 6
 WANING_CRESCENT = 7
 DARK_MOON = 8
 RED_MOON = 9
 # strings that match return from API
 phase_names = ["New Moon", "Waxing Crescent", "First Quarter", "Waxing Gibbous",
-          "Full Moon", "Waning Gibbous", "Third Quarter", "Waning Crescent","Dark Moon","Red Moon"]
+          "Full Moon", "Waning Gibbous", "Last Quarter", "Waning Crescent","Dark Moon","Red Moon"]
 
 # functions for each moon phase to light up based on neopixel orientation
 def set_new_moon():
@@ -87,7 +92,7 @@ def set_waning_gibbous():
         pixels[i] = ON
     pixels.show()
 
-def set_third_quarter():
+def set_last_quarter():
     pixels.fill(OFF)
     for i in range(0, 24):
         pixels[i] = ON
@@ -117,7 +122,7 @@ phase_functions = {
     WAXING_GIBBOUS: set_waxing_gibbous,
     FULL_MOON: set_full_moon,
     WANING_GIBBOUS: set_waning_gibbous,
-    THIRD_QUARTER: set_third_quarter,
+    LAST_QUARTER: set_last_quarter,
     WANING_CRESCENT: set_waning_crescent,
     DARK_MOON: set_dark_moon,
     RED_MOON: set_red_moon
@@ -152,19 +157,26 @@ first_run = True
 while True:
     try:
         if first_run or ticks_diff(ticks_ms(), timer_clock) >= timer:
-			# get unix time
-            unix_time = requests.get(time_url)
-			# update farmsense request with UNIX time
-            url = f"https://api.farmsense.net/v1/moonphases/?d={unix_time.text}"
+			# get current date
+            date_response = requests.get(date_url)
+            iso_date = date_response.text.strip('"')
+            current_date = iso_date.split('T')[0]
+            date_response.close()
+			# build Navy API URL with parameters
+            # pylint: disable=line-too-long
+            url = f"https://aa.usno.navy.mil/api/rstt/oneday?date={current_date}&coords={LATITUDE},{LONGITUDE}&tz={TIMEZONE}"
+            if DST:
+                url += "&dst=true"
 			# get the JSON response
             response = requests.get(url)
             json_response = response.json()
 			# isolate phase info
+            current_phase = json_response["properties"]["data"]["curphase"]
             print("-" * 40)
-            print(json_response[0]['Phase'])
+            print(current_phase)
             print("-" * 40)
 			# run function to update neopixels with current phase
-            set_moon_phase(json_response[0]['Phase'])
+            set_moon_phase(current_phase)
             response.close()
             time.sleep(1)
             first_run = False
