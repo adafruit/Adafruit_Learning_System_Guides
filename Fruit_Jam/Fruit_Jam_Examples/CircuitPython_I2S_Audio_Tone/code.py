@@ -16,8 +16,8 @@ fruit_jam = Peripherals()
 fruit_jam.dac.headphone_output = True
 fruit_jam.dac.dac_volume = -10  # dB
 # or use speaker
-# dac.speaker_output = True
-# dac.speaker_volume = -20 # dB
+# fruit_jam.dac.speaker_output = True
+# fruit_jam.dac.speaker_volume = -20 # dB
 
 # generate a sine wave
 tone_volume = 0.5

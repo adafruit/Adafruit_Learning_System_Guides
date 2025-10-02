@@ -11,8 +11,8 @@ fruit_jam = Peripherals()
 fruit_jam.dac.headphone_output = True
 fruit_jam.dac.dac_volume = -10  # dB
 # or use speaker
-# dac.speaker_output = True
-# dac.speaker_volume = -20 # dB
+# fruit_jam.dac.speaker_output = True
+# fruit_jam.dac.speaker_volume = -20 # dB
 
 # set sample rate & bit depth, use bclk
 fruit_jam.dac.configure_clocks(sample_rate=44100, bit_depth=16)
