@@ -9,15 +9,20 @@ from adafruit_clue import clue
 from simpleio import map_range
 from adafruit_bitmap_font import bitmap_font
 from adafruit_lsm6ds.lsm6ds33 import LSM6DS33
+from adafruit_lsm6ds.lsm6ds3trc import LSM6DS3TRC
 from adafruit_lsm6ds import Rate, AccelRange
 from adafruit_progressbar.progressbar import ProgressBar
 from adafruit_display_text.label import Label
 
 #  turns off onboard NeoPixel to conserve battery
-clue.pixel.brightness = (0.0)
+clue.pixel.brightness = 0.0
 
 #  accessing the Clue's accelerometer
 sensor = LSM6DS33(board.I2C())
+try:
+    sensor = LSM6DS33(board.I2C())
+except RuntimeError:
+    sensor = LSM6DS3TRC(board.I2C())
 
 #  step goal
 step_goal = 10000
