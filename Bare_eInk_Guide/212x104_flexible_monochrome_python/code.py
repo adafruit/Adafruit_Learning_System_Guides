@@ -65,7 +65,7 @@ draw.rectangle((1, 1, width - 2, height - 2), outline=BLACK, fill=WHITE)
 # Draw some shapes.
 # First define some constants to allow easy resizing of shapes.
 padding = 5
-shape_width = 30 
+shape_width = 30
 top = padding
 bottom = height - padding
 # Move left to right keeping track of the current x position for drawing shapes.
