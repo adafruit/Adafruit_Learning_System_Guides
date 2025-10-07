@@ -3,8 +3,8 @@
 
 """
 ePaper Display Shapes and Text demo using the Pillow Library.
-5.83" mono 648x480 display
-https://www.adafruit.com/product/6397
+7.5" Tri-Color 800x480 display
+https://www.adafruit.com/product/6415
 """
 
 import board
@@ -16,7 +16,8 @@ from adafruit_epd.uc8179 import Adafruit_UC8179
 
 # First define some color constants
 WHITE = (0xFF, 0xFF, 0xFF)
-BLACK = (0xFF, 0x00, 0x00)
+BLACK = (0x00, 0x00, 0x00)
+RED = (0xFF, 0x00, 0x00)
 
 # Next define some constants to allow easy resizing of shapes and colors
 BORDER = 20
@@ -33,18 +34,16 @@ srcs = None
 rst = digitalio.DigitalInOut(board.D27)
 busy = digitalio.DigitalInOut(board.D17)
 
-# give them all to our driver
-display = Adafruit_UC8179(648, 480,
+display = Adafruit_UC8179(800, 480,         # 7.5" tricolor 800x480 display
     spi,
     cs_pin=ecs,
     dc_pin=dc,
     sramcs_pin=srcs,
     rst_pin=rst,
     busy_pin=busy,
+    tri_color = True
 )
 
-display.set_black_buffer(1, False)
-display.set_color_buffer(1, False)
 display.rotation = 0
 
 width = display.width
@@ -65,34 +64,34 @@ draw.rectangle((1, 1, width - 2, height - 2), outline=BLACK, fill=WHITE)
 # Draw some shapes.
 # First define some constants to allow easy resizing of shapes.
 padding = 25
-shape_width = 80
+shape_width = 100
 top = padding
 bottom = height - padding
 # Move left to right keeping track of the current x position for drawing shapes.
 x = padding
 # Draw an ellipse.
-draw.ellipse((x, top, x + shape_width, bottom), outline=BLACK, fill=WHITE)
+draw.ellipse((x, top, x + shape_width, bottom), outline=RED, fill=WHITE)
 x += shape_width + padding
 # Draw a rectangle.
-draw.rectangle((x, top, x + shape_width, bottom), outline=BLACK, fill=BLACK)
+draw.rectangle((x, top, x + shape_width, bottom), outline=RED, fill=BLACK)
 x += shape_width + padding
 # Draw a triangle.
 draw.polygon(
     [(x, bottom), (x + shape_width / 2, top), (x + shape_width, bottom)],
     outline=BLACK,
-    fill=BLACK,
+    fill=RED,
 )
 x += shape_width + padding
 # Draw an X.
 draw.line((x, bottom, x + shape_width, top), fill=BLACK)
-draw.line((x, top, x + shape_width, bottom), fill=BLACK)
+draw.line((x, top, x + shape_width, bottom), fill=RED)
 x += shape_width + padding
 
 # Load default font.
-font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 40)
+font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 50)
 
 draw.text((x, top), "Hello", font=font, fill=BLACK)
-draw.text((x, top + 40), "World!", font=font, fill=BLACK)
+draw.text((x, top + 50), "World!", font=font, fill=BLACK)
 
 # Display image.
 display.image(image)

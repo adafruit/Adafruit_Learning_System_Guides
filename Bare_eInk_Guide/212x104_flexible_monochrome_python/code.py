@@ -12,7 +12,7 @@ import busio
 import digitalio
 from PIL import Image, ImageDraw, ImageFont
 
-from adafruit_epd.il0373 import Adafruit_IL0373
+from adafruit_epd.il0373 import Adafruit_IL0373, Adafruit_IL0373_213_Flex_Mono
 
 # First define some color constants
 WHITE = (0xFF, 0xFF, 0xFF)
@@ -34,18 +34,15 @@ rst = digitalio.DigitalInOut(board.D27)
 busy = digitalio.DigitalInOut(board.D17)
 
 # give them all to our driver
-display = Adafruit_IL0373(104, 212,
+display = Adafruit_IL0373_213_Flex_Mono(104, 212,
     spi,
     cs_pin=ecs,
     dc_pin=dc,
     sramcs_pin=srcs,
     rst_pin=rst,
     busy_pin=busy,
-    pid=4243 # special arg to use different power up
 )
 
-display.set_black_buffer(1, True)
-display.set_color_buffer(0, True)
 display.rotation = 3
 width = display.width
 height = display.height

@@ -3,8 +3,8 @@
 
 """
 ePaper Display Shapes and Text demo using the Pillow Library.
-5.83" mono 648x480 display
-https://www.adafruit.com/product/6397
+7.5" mono 800x480 display
+https://www.adafruit.com/product/6396
 """
 
 import board
@@ -34,7 +34,7 @@ rst = digitalio.DigitalInOut(board.D27)
 busy = digitalio.DigitalInOut(board.D17)
 
 # give them all to our driver
-display = Adafruit_UC8179(648, 480,
+display = Adafruit_UC8179(800, 480,
     spi,
     cs_pin=ecs,
     dc_pin=dc,
@@ -65,7 +65,7 @@ draw.rectangle((1, 1, width - 2, height - 2), outline=BLACK, fill=WHITE)
 # Draw some shapes.
 # First define some constants to allow easy resizing of shapes.
 padding = 25
-shape_width = 80
+shape_width = 100
 top = padding
 bottom = height - padding
 # Move left to right keeping track of the current x position for drawing shapes.
@@ -89,10 +89,10 @@ draw.line((x, top, x + shape_width, bottom), fill=BLACK)
 x += shape_width + padding
 
 # Load default font.
-font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 40)
+font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 50)
 
 draw.text((x, top), "Hello", font=font, fill=BLACK)
-draw.text((x, top + 40), "World!", font=font, fill=BLACK)
+draw.text((x, top + 50), "World!", font=font, fill=BLACK)
 
 # Display image.
 display.image(image)
