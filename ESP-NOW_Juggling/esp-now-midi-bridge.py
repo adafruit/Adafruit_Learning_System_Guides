@@ -119,7 +119,7 @@ def parse_trigger_message(message_str):
             trigger_type = parts[2]  # pylint:disable=redefined-outer-name
             timestamp = parts[3]  # pylint:disable=redefined-outer-name
             return device_id, trigger_type, timestamp
-    except Exception:
+    except Exception:  # pylint:disable=broad-except
         pass
 
     return None, None, None
@@ -137,7 +137,7 @@ def parse_battery_message(message_str):
             voltage = parts[2]  # pylint:disable=redefined-outer-name
             color_hex = int(parts[3], 16)  # pylint:disable=redefined-outer-name
             return device_id, voltage, color_hex
-    except Exception:
+    except Exception:  # pylint:disable=broad-except
         pass
 
     return None, None, None
@@ -163,8 +163,8 @@ def send_midi_note(device_id, velocity=100, duration=0.05):  # pylint:disable=re
         midi.send(NoteOn(note, velocity))
         time.sleep(duration)
         midi.send(NoteOff(note, 0))
-    except Exception as e:  # pylint:disable=redefined-outer-name
-        print(f"MIDI error: {e}")
+    except Exception as err:  # pylint:disable=broad-except
+        print(f"MIDI error: {err}")
 
 
 def send_color_command(device_id):  # pylint:disable=redefined-outer-name
@@ -181,7 +181,7 @@ def send_color_command(device_id):  # pylint:disable=redefined-outer-name
         print(f"{device_id} color now: {ball_colors[device_id]:06X}")
 
         return True
-    except Exception as ex:
+    except Exception as ex:  # pylint:disable=broad-except
         print(f"Color send error: {ex}")
         return False
 

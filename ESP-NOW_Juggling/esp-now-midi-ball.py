@@ -60,7 +60,7 @@ try:
     lis3dh.set_tap(1, 90)
     has_accelerometer = True
     print("LIS3DH accelerometer initialized with tap detection")
-except Exception as e:
+except Exception as e:  # pylint:disable=broad-except
     print(f"Accelerometer init failed: {e}")
     has_accelerometer = False
 
@@ -123,8 +123,8 @@ def check_tap():
         return False
     try:
         return lis3dh.tapped
-    except Exception as e:
-        print(f"Accelerometer read error: {e}")
+    except Exception as er:  # pylint:disable=broad-except
+        print(f"Accelerometer read error: {er}")
         return False
 
 
@@ -138,8 +138,8 @@ def send_trigger_message(trigger_type="tap"):
         # print(f"TX: {message}")
         flash()
         return True
-    except Exception as ex:
-        print(f"Send error: {ex}")
+    except Exception as exc:  # pylint:disable=broad-except
+        print(f"Send error: {exc}")
         return False
 
 
@@ -155,8 +155,8 @@ def send_battery_report():
         e.send(message, broadcast_peer)
         print(f"TX Battery: {message} ({voltage:.2f}V, color: {CURRENT_COLOR:06X})")
         return True
-    except Exception as ex:
-        print(f"Battery report send error: {ex}")
+    except Exception as exb:  # pylint:disable=broad-except
+        print(f"Battery report send error: {exb}")
         return False
 
 
@@ -179,7 +179,7 @@ if has_accelerometer:
             if tap_state:
                 print(f"Cleared startup tap {i + 1}")
             time.sleep(0.1)
-        except Exception:
+        except Exception:  # pylint:disable=broad-except
             pass
     print("Accelerometer ready for tap detection")
 
