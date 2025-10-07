@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 Ladyada for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /***************************************************
   Adafruit invests time and resources providing this open source code,
   please support Adafruit and open-source hardware by purchasing
