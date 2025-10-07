@@ -3,8 +3,8 @@
 
 """
 ePaper Display Shapes and Text demo using the Pillow Library.
-4.2" 300x400 Monochrome
-https://www.adafruit.com/product/6381
+5.83" mono 648x480 display
+https://www.adafruit.com/product/6397
 """
 
 import board
@@ -12,10 +12,11 @@ import busio
 import digitalio
 from PIL import Image, ImageDraw, ImageFont
 
-from adafruit_epd.ssd1683 import Adafruit_SSD1683
+from adafruit_epd.uc8179 import Adafruit_UC8179
 
 # First define some color constants
 WHITE = (0xFF, 0xFF, 0xFF)
+BLACK = (0x00, 0x00, 0x00)
 BLACK = (0xFF, 0x00, 0x00)
 
 # Next define some constants to allow easy resizing of shapes and colors
@@ -33,8 +34,8 @@ srcs = None
 rst = digitalio.DigitalInOut(board.D27)
 busy = digitalio.DigitalInOut(board.D17)
 
-
-display = Adafruit_SSD1683(400, 300,        # 4.2" 300x400 monochrome display
+# give them all to our driver
+display = Adafruit_UC8179(648, 480,
     spi,
     cs_pin=ecs,
     dc_pin=dc,
@@ -43,7 +44,10 @@ display = Adafruit_SSD1683(400, 300,        # 4.2" 300x400 monochrome display
     busy_pin=busy,
 )
 
+display.set_black_buffer(1, False)
+display.set_color_buffer(1, False)
 display.rotation = 0
+
 width = display.width
 height = display.height
 image = Image.new("RGB", (width, height))
@@ -61,8 +65,8 @@ draw.rectangle((1, 1, width - 2, height - 2), outline=BLACK, fill=WHITE)
 
 # Draw some shapes.
 # First define some constants to allow easy resizing of shapes.
-padding = 15
-shape_width = 50
+padding = 25
+shape_width = 80
 top = padding
 bottom = height - padding
 # Move left to right keeping track of the current x position for drawing shapes.
@@ -86,10 +90,10 @@ draw.line((x, top, x + shape_width, bottom), fill=BLACK)
 x += shape_width + padding
 
 # Load default font.
-font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 30)
+font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 40)
 
 draw.text((x, top), "Hello", font=font, fill=BLACK)
-draw.text((x, top + 30), "World!", font=font, fill=BLACK)
+draw.text((x, top + 40), "World!", font=font, fill=BLACK)
 
 # Display image.
 display.image(image)
