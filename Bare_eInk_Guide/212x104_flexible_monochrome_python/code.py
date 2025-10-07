@@ -12,7 +12,7 @@ import busio
 import digitalio
 from PIL import Image, ImageDraw, ImageFont
 
-from adafruit_epd.il0373 import Adafruit_IL0373, Adafruit_IL0373_213_Flex_Mono
+from adafruit_epd.il0373 import Adafruit_IL0373_213_Flex_Mono
 
 # First define some color constants
 WHITE = (0xFF, 0xFF, 0xFF)
