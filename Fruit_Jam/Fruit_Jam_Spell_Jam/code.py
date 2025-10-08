@@ -82,7 +82,7 @@ def fetch_word(word, voice="Joanna"):
     :return: Boolean, whether the request was successful.
     """
 
-    if AWS_ACCESS_KEY == None or AWS_SECRET_KEY == None:
+    if AWS_ACCESS_KEY is None or AWS_SECRET_KEY is None:
         return False
 
     fj.neopixels.fill(0xFFFF00)
