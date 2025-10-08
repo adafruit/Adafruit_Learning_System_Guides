@@ -15,12 +15,17 @@ from adafruit_display_text.bitmap_label import Label
 
 from aws_polly import text_to_speech_polly_http
 
+from launcher_config import LauncherConfig
+
+launcher_config = LauncherConfig()
+
 # constants
 LETTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 # local variables
 curword = ""
 lastword = ""
+sayword = False
 
 # setup display
 request_display_config(320, 240)
@@ -41,9 +46,19 @@ main_group.append(screen_lbl)
 
 # initialize Fruit Jam built-in hardware
 fj = FruitJam()
+
+if "audio" in launcher_config.data and "volume" in launcher_config.data["audio"]:
+    volume_level = launcher_config.audio_volume
+else:
+    volume_level = 0.5
+
+fj.peripherals.audio_output = launcher_config.audio_output
+fj.peripherals.safe_volume_limit = launcher_config.audio_volume_override_danger
+
+fj.peripherals.volume = volume_level
+vol_int = round(volume_level * 100)
+
 fj.neopixels.brightness = 0.1
-fj.peripherals.volume = 0.5
-vol_int = 50
 
 # AWS auth requires us to have accurate date/time
 now = fj.sync_time()
@@ -66,6 +81,10 @@ def fetch_word(word, voice="Joanna"):
     :param voice: The AWS Polly voide ID to use
     :return: Boolean, whether the request was successful.
     """
+
+    if AWS_ACCESS_KEY is None or AWS_SECRET_KEY is None:
+        return False
+
     fj.neopixels.fill(0xFFFF00)
     success = text_to_speech_polly_http(
         requests,
@@ -82,12 +101,14 @@ def say_and_spell_lastword():
     """
     Say the last word, then spell it out one letter at a time, finally say it once more.
     """
-    fj.play_mp3_file("/saves/awspollyoutput.mp3")
-    time.sleep(0.2)
+    if sayword:
+        fj.play_mp3_file("/saves/awspollyoutput.mp3")
+        time.sleep(0.2)
     for letter in lastword:
         fj.play_mp3_file(f"spell_jam_assets/letter_mp3s/{letter.upper()}.mp3")
     time.sleep(0.2)
-    fj.play_mp3_file("/saves/awspollyoutput.mp3")
+    if sayword:
+        fj.play_mp3_file("/saves/awspollyoutput.mp3")
     fj.neopixels.fill(0x000000)
 
 
@@ -112,7 +133,7 @@ while True:
         elif c == "\n":
             if curword:
                 lastword = curword
-                fetch_word(lastword)
+                sayword = fetch_word(lastword)
                 say_and_spell_lastword()
                 curword = ""
             else:
