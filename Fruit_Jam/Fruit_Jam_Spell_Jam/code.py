@@ -1,5 +1,7 @@
 # SPDX-FileCopyrightText: 2025 Tim Cocks for Adafruit Industries
 # SPDX-License-Identifier: MIT
+
+import os
 import sys
 import time
 import supervisor
@@ -12,12 +14,12 @@ from adafruit_display_text.bitmap_label import Label
 
 from launcher_config import LauncherConfig
 
-# If tts_local.py exists, use that instead of tts_aws.py
-try:
+# choose AWS TTS engine if AWS credentials are set in environment variables
+if os.getenv("AWS_ACCESS_KEY") is not None and os.getenv("AWS_SECRET_KEY") is not None:
+    from tts_aws import WordFetcherTTS
+else:
     # tts_local defines WordFetcherTTS for TTS engine running on local network server
     from tts_local import WordFetcherTTS
-except ImportError:
-    from tts_aws import WordFetcherTTS
 
 # read the user settings
 launcher_config = LauncherConfig()

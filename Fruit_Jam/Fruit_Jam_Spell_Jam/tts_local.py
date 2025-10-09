@@ -1,6 +1,33 @@
 # SPDX-FileCopyrightText: 2025 RetiredWizard
 # SPDX-License-Identifier: MIT
 
+"""
+    Kani TTS engine for Fruit Jam Spell Jam. Install and run the kani-tts AI server on your
+    local network following the instructions at: https://github.com/nineninesix-ai/kani-tts
+
+    The server.py script from the kani-tts repo needs to be modified to create 16bit WAV files
+    instead of the default 32bit WAV files. Change the following lines in server.py
+
+        # Convert to WAV bytes
+        wav_buffer = io.BytesIO()
+        wav_write(wav_buffer, 22050, full_audio)
+        wav_buffer.seek(0)
+    to:
+        # Convert float32 audio (-1.0 to 1.0) to 16-bit PCM
+        audio_int16 = np.clip(full_audio, -1.0, 1.0)
+        audio_int16 = (audio_int16 * 32767).astype(np.int16)
+
+        # Write as 16-bit WAV
+        wav_buffer = io.BytesIO()
+        wav_write(wav_buffer, 22050, audio_int16)
+        wav_buffer.seek(0)
+
+    Then configure the server endpoint in launcher.conf.json, e.g.:
+    "spell_jam": {
+        "tts_server_endpoint": "http://myserver.local:8000"
+    }
+"""
+
 # tts_kani.py
 import json
 import adafruit_connection_manager
