@@ -92,7 +92,6 @@ class WordFetcherTTS():
         """
 
         # Prepare request
-        print(self.launcher_config.data)
         endpoint = ""
         if self.launcher_config and "spell_jam" in self.launcher_config.data:
             endpoint = self.launcher_config.data["spell_jam"].get("tts_server_endpoint","")
