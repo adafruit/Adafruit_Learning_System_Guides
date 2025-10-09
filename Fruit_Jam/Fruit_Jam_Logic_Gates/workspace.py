@@ -727,9 +727,9 @@ class ToolBox:
                 y=item_lbl.bounding_box[3] + 4,
                 x=x_pos,
             )
-            for i in range(len(item["tiles"])):
-                item_icon[i] = item["tiles"][i]
-                item_icon[i] = item["tiles"][i]
+            for tile_index in range(len(item["tiles"])):
+                item_icon[tile_index] = item["tiles"][tile_index]
+                item_icon[tile_index] = item["tiles"][tile_index]
 
             # put the entity label and icon in an AnchoredGroup
             item_group = AnchoredGroup()
@@ -794,9 +794,9 @@ class ToolBox:
 
         # set the created entity as the entity moving with mouse
         self._workspace.moving_entity = new_entity
-        self._workspace._set_mouse_moving_tiles(
+        self._workspace._set_mouse_moving_tiles(  # pylint: disable=protected-access
             new_entity
-        )  # pylint: disable=protected-access
+        )
         self._workspace.mouse_moving_tg.hidden = False
 
         # close the ToolBox
