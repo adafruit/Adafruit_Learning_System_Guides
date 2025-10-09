@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2025 RetiredWizard
+# SPDX-License-Identifier: MIT
+
 # tts_kani.py
 import json
 import adafruit_connection_manager
@@ -10,8 +13,7 @@ class WordFetcherTTS():
         self.launcher_config = launcher_config
         self.fj = fj
 
-        # AWS auth requires us to have accurate date/time
-        now = fj.sync_time()
+        fj.network.connect()
 
         # setup adafruit_requests session
         pool = adafruit_connection_manager.get_radio_socketpool(fj.network._wifi.esp)
@@ -71,7 +73,6 @@ class WordFetcherTTS():
             print("tts_server_endpoint not configured in launcher.conf.json.")
             return None
 
-        method = "POST"
         uri = "/tts"
 
         # Create request body
@@ -101,4 +102,3 @@ class WordFetcherTTS():
         except Exception as e:  # pylint: disable=broad-except
             print(f"Request failed: {e}")
             return None
-

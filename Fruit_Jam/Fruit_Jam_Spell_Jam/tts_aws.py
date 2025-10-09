@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2025 Tim Cocks for Adafruit Industries
+# SPDX-License-Identifier: MIT
+
 # tts_aws.py
 import os
 import adafruit_connection_manager
@@ -12,7 +15,7 @@ class WordFetcherTTS():
         self.launcher_config = launcher_config
 
         # AWS auth requires us to have accurate date/time
-        now = fj.sync_time()
+        fj.sync_time()
 
         # setup adafruit_requests session
         pool = adafruit_connection_manager.get_radio_socketpool(fj.network._wifi.esp)

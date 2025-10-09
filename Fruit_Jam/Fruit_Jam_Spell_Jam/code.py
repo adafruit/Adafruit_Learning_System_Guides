@@ -1,14 +1,11 @@
 # SPDX-FileCopyrightText: 2025 Tim Cocks for Adafruit Industries
 # SPDX-License-Identifier: MIT
-import os
 import sys
 import time
 import supervisor
 
 from adafruit_fruitjam import FruitJam
 from adafruit_fruitjam.peripherals import request_display_config
-import adafruit_connection_manager
-import adafruit_requests
 from displayio import OnDiskBitmap, TileGrid, Group
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text.bitmap_label import Label
