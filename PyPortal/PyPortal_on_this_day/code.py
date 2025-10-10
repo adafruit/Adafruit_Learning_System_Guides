@@ -11,6 +11,7 @@ Data sources: https://github.com/adafruit/OTD/tree/master/electronics
 import time
 import board
 from adafruit_pyportal import PyPortal
+from adafruit_pyportal.network import CONTENT_JSON
 
 cwd = ("/"+__file__).rsplit('/', 1)[0] # the current working directory (where this file is)
 
@@ -34,7 +35,7 @@ pyportal = PyPortal(url = BASE_DATA, debug=True,
                     default_bg = cwd + "/on_this_day_bg.bmp",
                     text_font = cwd+"fonts/Arial-ItalicMT-17.bdf",
                     text_transform = [identity]*6,  # we do this so the date doesnt get commas
-                    text_position=((10, 70), (10, 100), (10, 130),(60, 160), (105, 190), (10, 220)),
+                    text_position=((10, 60), (10, 90), (10, 120),(60, 150), (105, 180), (10, 210)),
                     text_color=(0xFFFFFF, 0xFFFFFF, 0xFFFFFF, 0xFFFFFF, 0xFFFFFF, 0xFFFFFF),
                     text_maxlen=(50, 50, 50, 50, 50, 50), # cut off characters
                    )
@@ -54,13 +55,13 @@ while True:
     print(url)
     response = None
     try:
-        response = pyportal.fetch(url)
+        response = pyportal.fetch(url, force_content_type = CONTENT_JSON)
         print("Response is", response)
     except RuntimeError as e:
         print("Some error occured, retrying! -", e)
 
     # Make a QR code from web reference
-    pyportal.show_QR(bytearray(response[5]), qr_size=3,
+    pyportal.show_QR(bytearray(response[5], "utf-8"), qr_size=3,
                      x=220, y=10)
 
     # wait 10 minutes before running again
