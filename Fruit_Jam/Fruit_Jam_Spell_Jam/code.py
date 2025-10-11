@@ -1,7 +1,6 @@
 # SPDX-FileCopyrightText: 2025 Tim Cocks for Adafruit Industries
 # SPDX-License-Identifier: MIT
 
-import os
 import sys
 import time
 import supervisor
