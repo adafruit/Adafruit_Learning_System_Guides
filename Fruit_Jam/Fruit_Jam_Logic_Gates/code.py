@@ -65,6 +65,8 @@ main_group.append(mouse.tilegrid)
 old_button_values = [True, True, True]
 button_values_changed = False
 
+waiting_for_release = False
+
 while True:
     # update mouse, and get any mouse buttons that are pressed
     pressed_btns = mouse.update()
@@ -73,10 +75,16 @@ while True:
     now = time.monotonic()
     if last_click_time is None or now > last_click_time + CLICK_COOLDOWN:
         # if any buttons are pressed
-        if pressed_btns is not None and len(pressed_btns) > 0:
+        if not waiting_for_release and pressed_btns is not None and len(pressed_btns) > 0:
+            waiting_for_release = True
+            click_x = mouse.x
+            click_y = mouse.y
+            click_btns = pressed_btns
+        elif waiting_for_release and not mouse.pressed_btns:
+            waiting_for_release = False
             last_click_time = now
             # let workspace handle the click event
-            workspace.handle_mouse_click(mouse.x, mouse.y, pressed_btns)
+            workspace.handle_mouse_click(click_x, click_y, click_btns)
 
     # if there is an entity on the mouse being moved
     if not workspace.mouse_moving_tg.hidden:

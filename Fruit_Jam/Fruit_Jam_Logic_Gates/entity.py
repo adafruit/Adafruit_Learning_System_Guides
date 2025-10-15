@@ -121,6 +121,11 @@ class OutputPanel(Entity):
         self._input_one = value
         self.apply_state_palette_mapping()
 
+    @property
+    def value(self):
+        # Output panel does not have a logic output value
+        return False
+
     def update(self):
         """
         Run logic simulation for this entity
@@ -243,6 +248,7 @@ class Wire(Entity):
     TILE_INDEXES = [19, 9, 1, 0, 17]
 
     def __init__(self, location, workspace, state=None, add_to_workspace=True):
+        self._recursion_guard = False
         self.type = "wire"
         self.size = (1, 1)
         self._workspace = workspace
@@ -423,6 +429,12 @@ class Wire(Entity):
 
     @property
     def value(self):
+        if self._recursion_guard:
+            self._recursion_guard = False
+            return self.input_one or self.input_two or self.input_three or self.input_three
+
+        self._recursion_guard = True
+
         if "left" in self.STATES[self.state]:
             if (
                 self.input_one_entity is None
@@ -435,6 +447,7 @@ class Wire(Entity):
                 else:
                     self.input_one = self.input_one_entity.value
                 if self.input_one:
+                    self._recursion_guard = False
                     return True
         if "right" in self.STATES[self.state]:
             if (
@@ -449,6 +462,7 @@ class Wire(Entity):
                     # right side only allows input from Wires
                     self.input_two = False
                 if self.input_two:
+                    self._recursion_guard = False
                     return True
         if "up" in self.STATES[self.state]:
             if (
@@ -463,6 +477,7 @@ class Wire(Entity):
                     # top side only accepts input from wires
                     self.input_three = False
                 if self.input_three:
+                    self._recursion_guard = False
                     return True
         if "down" in self.STATES[self.state]:
             if (
@@ -477,7 +492,10 @@ class Wire(Entity):
                     # bottom side only accepts input from wires?
                     self.input_four = False
                 if self.input_four:
+                    self._recursion_guard = False
                     return True
+
+        self._recursion_guard = False
         return self.input_one or self.input_two or self.input_three or self.input_three
 
     @property
@@ -512,7 +530,6 @@ class Wire(Entity):
         else:
             return None
 
-
 class TwoInputOneOutputGate(Entity):
     """
     Super class for all Gate objects that have two inputs and one output.
@@ -535,6 +552,13 @@ class TwoInputOneOutputGate(Entity):
 
     _inputs_left = True
     """Whether the inputs are to the left (True), or top/bottom (False)"""
+    def __init__(self):
+        self._recursion_guard = False
+        self.type = "gate"
+
+        self._input_one = False
+        self._input_two = False
+        self._output = False
 
     @property
     def output(self) -> bool:
@@ -573,6 +597,11 @@ class TwoInputOneOutputGate(Entity):
     def value(self):
         """Calculate the output logic value of this gate. Will call
         value property on input entities."""
+        if self._recursion_guard:
+            self._recursion_guard = False
+            return self.output
+
+        self._recursion_guard = True
         input_one_entity = self.input_one_entity
         input_two_entity = self.input_two_entity
 
@@ -594,6 +623,7 @@ class TwoInputOneOutputGate(Entity):
             else:
                 self.input_two = input_two_entity.value
 
+        self._recursion_guard = False
         return self.output
 
     def handle_click(self):
@@ -664,7 +694,7 @@ class AndGate(TwoInputOneOutputGate):
     """AndGate - When both inputs are True the output will be True, otherwise False."""
 
     def __init__(self, location, workspace, add_to_workspace=True):
-        self.type = "gate"
+        super().__init__()
 
         self._workspace = workspace
         self.location = location
@@ -672,10 +702,6 @@ class AndGate(TwoInputOneOutputGate):
         self._init_tile_locations()
 
         self.tiles = [0, 10, 11, 20]
-
-        self._input_one = False
-        self._input_two = False
-        self._output = False
 
         if add_to_workspace:
             self._workspace.add_entity(self)
@@ -697,7 +723,7 @@ class NandGate(TwoInputOneOutputGate):
     """NandGate - When at least one input is False the output will be True, otherwise False."""
 
     def __init__(self, location, workspace, add_to_workspace=True):
-        self.type = "gate"
+        super().__init__()
 
         self._workspace = workspace
         self.location = location
@@ -705,10 +731,6 @@ class NandGate(TwoInputOneOutputGate):
         self._init_tile_locations()
 
         self.tiles = [0, 14, 15, 20]
-
-        self._input_one = False
-        self._input_two = False
-        self._output = False
 
         if add_to_workspace:
             self._workspace.add_entity(self)
@@ -730,7 +752,7 @@ class OrGate(TwoInputOneOutputGate):
     """OrGate - When either input is True the output will be True, otherwise False."""
 
     def __init__(self, location, workspace, add_to_workspace=True):
-        self.type = "gate"
+        super().__init__()
 
         self._workspace = workspace
         self.location = location
@@ -738,10 +760,6 @@ class OrGate(TwoInputOneOutputGate):
         self._init_tile_locations()
 
         self.tiles = [0, 12, 13, 20]
-
-        self._input_one = False
-        self._input_two = False
-        self._output = False
 
         if add_to_workspace:
             self._workspace.add_entity(self)
@@ -763,7 +781,7 @@ class NorGate(TwoInputOneOutputGate):
     """NorGate - When both inputs are False the output will be True, otherwise False."""
 
     def __init__(self, location, workspace, add_to_workspace=True):
-        self.type = "gate"
+        super().__init__()
 
         self._workspace = workspace
         self.location = location
@@ -771,10 +789,6 @@ class NorGate(TwoInputOneOutputGate):
         self._init_tile_locations()
 
         self.tiles = [0, 6, 7, 20]
-
-        self._input_one = False
-        self._input_two = False
-        self._output = False
 
         if add_to_workspace:
             self._workspace.add_entity(self)
@@ -796,7 +810,7 @@ class XorGate(TwoInputOneOutputGate):
     """XorGate - When one input is True and the other input is False the output will be True, otherwise False."""
 
     def __init__(self, location, workspace, add_to_workspace=True):
-        self.type = "gate"
+        super().__init__()
 
         self._workspace = workspace
         self.location = location
@@ -804,10 +818,6 @@ class XorGate(TwoInputOneOutputGate):
         self._init_tile_locations()
 
         self.tiles = [0, 4, 5, 20]
-
-        self._input_one = False
-        self._input_two = False
-        self._output = False
 
         if add_to_workspace:
             self._workspace.add_entity(self)
@@ -837,7 +847,7 @@ class XnorGate(TwoInputOneOutputGate):
     """XNOR Gate - When both inputs are True, or both inputs are False the output will be True, otherwise False"""
 
     def __init__(self, location, workspace, add_to_workspace=True):
-        self.type = "gate"
+        super().__init__()
 
         self._workspace = workspace
         self.location = location
@@ -845,10 +855,6 @@ class XnorGate(TwoInputOneOutputGate):
         self._init_tile_locations()
 
         self.tiles = [0, 24, 25, 20]
-
-        self._input_one = False
-        self._input_two = False
-        self._output = False
 
         if add_to_workspace:
             self._workspace.add_entity(self)
@@ -878,6 +884,8 @@ class NotGate(Entity):
     """NOT Gate - When the input is False the output will be True, otherwise False."""
 
     def __init__(self, location, workspace, add_to_workspace=True):
+        self._recursion_guard = False
+
         self.type = "gate"
 
         self._workspace = workspace
@@ -919,6 +927,11 @@ class NotGate(Entity):
 
     @property
     def value(self):
+        if self._recursion_guard:
+            self._recursion_guard = False
+            return self.output
+
+        self._recursion_guard = True
         input_one_entity = self.input_one_entity
 
         if input_one_entity is not None:
@@ -926,6 +939,7 @@ class NotGate(Entity):
         else:
             self.input_one = False
 
+        self._recursion_guard = False
         return self.output
 
     def _init_tile_locations(self):
@@ -1056,6 +1070,10 @@ class NeoPixelOutput(Entity):
         pal[4] = 7 if self.input_two else 1
         pal[5] = 7 if self.input_three else 1
         return pal
+
+    @property
+    def value(self):
+        return False
 
     def apply_state_palette_mapping(self):
         """
