@@ -407,20 +407,6 @@ class Workspace:
             if self.moving_entity is not None:
                 self.moving_entity = None
                 self.mouse_moving_tg.hidden = True
-            else:
-                # apply offset value based on scroll position
-                mouse_x -= self._scroll_x * self.tilegrid.tile_width * 1
-                mouse_y -= self._scroll_y * self.tilegrid.tile_height * 1
-
-                # calculate tile coordinates
-                tile_x = mouse_x // self.tilegrid.tile_width
-                tile_y = mouse_y // self.tilegrid.tile_height
-
-                # get the entity at the coordinates if there is one
-                hovered_entity = self.entity_at((tile_x, tile_y))
-
-                if hovered_entity is not None:
-                    self.remove_entity(hovered_entity)
 
         # eyedropper or pipette action
         elif action == "eyedropper":
