@@ -59,7 +59,7 @@ def clock_conversion(h, m, set_brightness):
     if hour_12 == 0:
         hour_12 = 12
     display.print(f"{(hour_12):02}:{m:02}")  # Use for leading zero re. 09:35
-    # display.print(f"{hour_12:2}:{m:02}")   # uncomment to suppress leading zero 
+    # display.print(f"{hour_12:2}:{m:02}")   # uncomment to suppress leading zero
     #                                        #  (shows 1:00 instead of 01:00)
     display.ampm = am_pm
     if set_brightness:
