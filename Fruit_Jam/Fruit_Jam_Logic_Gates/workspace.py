@@ -586,9 +586,14 @@ class Workspace:
             )
         # special case Connectors need the connector number
         elif entity_json["class"] == "ConnectorIn" or entity_json["class"] == "ConnectorOut":
-            new_entity = ENTITY_CLASS_CONSTRUCTOR_MAP[entity_json["class"]](
-                location, self, entity_json["connector_number"], add_to_workspace=add_to_workspace
-            )
+            if entity_json.get("connector_number") is not None:
+                new_entity = ENTITY_CLASS_CONSTRUCTOR_MAP[entity_json["class"]](
+                    location, self, entity_json["connector_number"], add_to_workspace=add_to_workspace
+                )
+            else:
+                new_entity = ENTITY_CLASS_CONSTRUCTOR_MAP[entity_json["class"]](
+                    location, self, add_to_workspace=add_to_workspace
+                )
         # default case all other entity types
         else:
             new_entity = ENTITY_CLASS_CONSTRUCTOR_MAP[entity_json["class"]](
@@ -623,13 +628,13 @@ class Workspace:
 
         # Connect any connectors
         for entity in self.entities:
-            if isinstance(entity,ConnectorIn):
-                for entity_out in self.entities:
-                    if isinstance(entity_out,ConnectorOut) and \
-                        entity.connector_number == entity_out.connector_number:
+            if isinstance(entity,ConnectorOut):
+                self.available_connectors.remove(entity.connector_number)
+                for entity_in in self.entities:
+                    if isinstance(entity_in,ConnectorIn) and \
+                        entity.connector_number == entity_in.connector_number:
 
-                        entity.input_one = entity_out
-                        break
+                        entity_in.input_one = entity
 
         # update the logic simulation with all new entities
         self.update()
