@@ -747,9 +747,9 @@ class ToolBox:
             "size": (1, 1),
         },
         {
-            "label": "Wire",
-            "tiles": (19,),
-            "constructor": Wire,
+            "label": "Output Connector",
+            "tiles": (31,),
+            "constructor": ConnectorOut,
             "size": (1, 1),
         },
         {
@@ -759,9 +759,9 @@ class ToolBox:
             "size": (1, 1),
         },
         {
-            "label": "Output Connector",
-            "tiles": (31,),
-            "constructor": ConnectorOut,
+            "label": "Wire",
+            "tiles": (19,),
+            "constructor": Wire,
             "size": (1, 1),
         },
     ]
