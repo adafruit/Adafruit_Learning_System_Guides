@@ -630,9 +630,11 @@ class Workspace:
         # Connect any connectors
         for entity in self.entities:
             if isinstance(entity,ConnectorOut):
-                self.available_connectors.remove(entity.connector_number)
+                if entity.connector_number in self.available_connectors:
+                    self.available_connectors.remove(entity.connector_number)
                 for entity_in in self.entities:
                     if isinstance(entity_in,ConnectorIn) and \
+                        entity_in.connector_number is not None and \
                         entity.connector_number == entity_in.connector_number:
 
                         entity_in.input_one = entity

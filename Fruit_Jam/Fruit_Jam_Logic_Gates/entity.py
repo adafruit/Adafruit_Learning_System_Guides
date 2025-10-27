@@ -635,9 +635,17 @@ class Wire(Entity):
     def output(self):
         return self._output
 
+    @output.setter
+    def output(self, value):
+        self._output = value
+
     @property
     def recursion_guard(self):
         return self._recursion_guard
+
+    @recursion_guard.setter
+    def recursion_guard(self, value):
+        self._recursion_guard = value
 
     @property
     def value(self):
