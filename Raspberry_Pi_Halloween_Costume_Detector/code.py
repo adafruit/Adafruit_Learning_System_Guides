@@ -142,7 +142,7 @@ def get_costume_joke(image_path):
     joke = message.content[0].text
     print(f"Claude's joke: {joke}")
     return joke
-# pylint: disable=subprocess-run-check
+# pylint: disable=subprocess-run-check, broad-except
 def play_audio_file(filename):
     """Play a pre-existing audio file"""
     print(f"Playing {filename}...")
