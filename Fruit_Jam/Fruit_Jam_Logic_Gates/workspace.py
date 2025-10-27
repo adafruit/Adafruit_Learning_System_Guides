@@ -588,7 +588,8 @@ class Workspace:
         elif entity_json["class"] == "ConnectorIn" or entity_json["class"] == "ConnectorOut":
             if entity_json.get("connector_number") is not None:
                 new_entity = ENTITY_CLASS_CONSTRUCTOR_MAP[entity_json["class"]](
-                    location, self, entity_json["connector_number"], add_to_workspace=add_to_workspace
+                    location, self, entity_json["connector_number"],
+                    add_to_workspace=add_to_workspace
                 )
             else:
                 new_entity = ENTITY_CLASS_CONSTRUCTOR_MAP[entity_json["class"]](
