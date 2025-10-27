@@ -326,6 +326,7 @@ class ConnectorIn(Entity):
         if len(inuse_connector_numbers) == 0:
             return
 
+        inuse_connector_numbers.sort()
         if self.connector_number is None:
             self.connector_number = inuse_connector_numbers[0]
         else:
