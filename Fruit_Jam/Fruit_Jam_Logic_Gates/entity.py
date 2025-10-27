@@ -224,6 +224,231 @@ class PhysicalButton(Entity):
         for loc in self.tile_locations:
             self._workspace.tilegrid.pixel_shader[loc] = pal
 
+class ConnectorIn(Entity):
+    """
+    Input Connector used to bring signals into an entity from an output connector
+    """
+
+    def __init__(self, location, workspace, add_to_workspace=True):
+        self.type = "input"
+        self.size = (1, 1)
+        self._workspace = workspace
+        self.location = location
+        self._init_tile_locations()
+        self.tiles = [30]
+
+        if add_to_workspace:
+            self._workspace.add_entity(self)
+
+        self.connector_number = None
+        self._overlay_tile = None
+        self._input_one = None
+
+        # Find the last ConnectorOut entity added to the workspace to link to
+        for entity in self._workspace.entities:
+            if isinstance(entity, ConnectorOut):
+                self.connector_number = entity.connector_number
+                self._input_one = entity
+        self.apply_state_palette_mapping()
+        
+
+    def _init_tile_locations(self):
+        self.tile_locations = (self.location,)
+
+    def update(self):
+        """
+        Run logic simulation for this entity
+        """
+        self.apply_state_palette_mapping()
+
+    @property
+    def input_one(self):
+        """The input entity for this Wire."""
+        return self._input_one
+
+    @input_one.setter
+    def input_one(self, input_entity):
+        if isinstance(input_entity, ConnectorOut):
+            self._input_one = input_entity
+            self.apply_state_palette_mapping()
+
+    @property
+    def value(self):
+        if self.connector_number is None:
+            return False
+        #elif self.input_one not in self._workspace.entities:
+        #    self.connector_number = None
+        #    self.input_one = None
+        #    return False
+        elif self.input_one is None:
+            return False
+        elif self.input_one.input_one is None:
+            return False
+        elif self._input_one.input_one == self:
+            return False
+
+        return self.input_one.input_one.value
+
+    def apply_state_palette_mapping(self):
+        pal = list(range(COLOR_COUNT))
+        pal[5] = 7 if self.value else 1
+        pal[2] = 7 if self.value else 6
+
+        for loc in self.tile_locations:
+            self._workspace.tilegrid.pixel_shader[loc] = pal
+
+        if self._overlay_tile is not None and self._overlay_tile != self.tile_locations[0]:
+            self._workspace.overlay_tilegrid[self._overlay_tile] = EMPTY
+        pal = list(range(COLOR_COUNT))
+        pal[3] = 1
+        pal[4] = 0
+        if self.connector_number is not None:
+            self._workspace.overlay_palette_mapper[self.tile_locations[0]] = pal
+            self._workspace.overlay_tilegrid[self.tile_locations[0]] = 34 + self.connector_number
+            self._overlay_tile = self.tile_locations[0]
+        else:
+            self._workspace.overlay_tilegrid[self.tile_locations[0]] = EMPTY
+            self._overlay_tile = None
+
+    def handle_click(self):
+        """
+        Cycle through available ConnectorOut entities on the workspace
+        """
+        connector_outs = []
+        inuse_connector_numbers = []
+        for entity in self._workspace.entities:
+            if isinstance(entity, ConnectorOut):
+                connector_outs.append(entity)
+                inuse_connector_numbers.append(entity.connector_number)
+
+        if len(inuse_connector_numbers) == 0:
+            return
+
+        if self.connector_number is None:
+            self.connector_number = inuse_connector_numbers[0]
+        else:
+            if self.connector_number in inuse_connector_numbers:
+                connector_index = inuse_connector_numbers.index(self.connector_number)
+            else:
+                connector_index = -1
+
+            self.connector_number = \
+                inuse_connector_numbers[(connector_index + 1) % max(len(connector_outs),1)]
+
+        self.input_one = None
+        for entity in connector_outs:
+            if entity.connector_number == self.connector_number:
+                self.input_one = entity
+
+class ConnectorOut(Entity):
+    """
+    Output Connector used to send signals from an entity to an input connector
+    """
+
+    def __init__(self, location, workspace, add_to_workspace=True):
+        self.type = "output"
+        self.size = (1, 1)
+        self._workspace = workspace
+        self.location = location
+        self._init_tile_locations()
+        self.tiles = [31]
+        self._input_one = None
+        self._overlay_tile = None
+
+        # Set the connection_number to the next value available
+        if len(self._workspace.available_connectors) > 0:
+            self.connector_number = self._workspace.available_connectors.pop(0)
+        else:
+            # Too many connectors, workspace shouldn't allow this to happen
+            raise RuntimeError("Too many Output Connectors")            
+
+        self._tap = None
+
+        if add_to_workspace:
+            self._workspace.add_entity(self)
+
+    def _init_tile_locations(self):
+        self.tile_locations = (self.location,)
+        # Location of the entity connected to the input of the output connector in x,y tile coords
+        self.input_entity_location = (self.location[X] - 1, self.location[Y])
+
+    def update(self):
+        """
+        Run logic simulation for this entity
+        """
+        # if no input entity
+        if self.input_entity is None:
+            self.input_one = None
+            self.apply_state_palette_mapping()
+            return
+
+        # update logic value based on entity value
+        self.input_one = self.input_entity
+        self.apply_state_palette_mapping()
+
+    @property
+    def input_entity(self):
+        """Entity at the input location"""
+        return self._workspace.entity_at(self.input_entity_location)
+
+    @property
+    def palette_mapping(self):
+        """The palette mapping for the current state. Used for
+        setting the appropriate color on the input and output lines."""
+        pal = list(range(COLOR_COUNT))
+        if self.input_one is not None:
+            pal[2] = 7 if self.input_one.value else 6
+            pal[5] = 7 if self.input_one.value else 1
+        else:
+            pal[2] = 6
+            pal[5] = 1
+
+        return pal
+
+    def apply_state_palette_mapping(self):
+        cur_state_palette = self.palette_mapping
+        for loc in self.tile_locations:
+            self._workspace.tilegrid.pixel_shader[loc] = cur_state_palette
+
+        if self._tap is not None and self._tap != self.input_entity_location:
+            self._workspace.overlay_tilegrid[self._tap] = EMPTY
+        if self._overlay_tile is not None and self._overlay_tile != self.tile_locations[0]:
+            self._workspace.overlay_tilegrid[self._overlay_tile] = EMPTY
+        pal = list(range(COLOR_COUNT))
+
+        if isinstance(self.input_entity,Wire):
+            pal[3] = 7 if self.input_one.value else 1
+            self._workspace.overlay_palette_mapper[self.input_entity_location] = pal
+            self._workspace.overlay_tilegrid[self.input_entity_location] = 33
+            self._tap = self.input_entity_location
+        else:
+            self._tap = None
+
+        if self.connector_number is not None:
+            pal[3] = 0
+            pal[4] = 1
+            self._workspace.overlay_palette_mapper[self.tile_locations[0]] = pal
+            self._workspace.overlay_tilegrid[self.tile_locations[0]] = 34 + self.connector_number
+            self._overlay_tile = self.tile_locations[0]
+        else:
+            self._overlay_tile = None
+
+        
+    @property
+    def input_one(self):
+        """Entity at input one"""
+        self._input_one = self.input_entity
+        return self._input_one
+
+    @input_one.setter
+    def input_one(self, value):
+        self._input_one = value
+        self.apply_state_palette_mapping()
+
+    @property
+    def value(self):
+        # Output panel does not have a logic output value
+        return False
 
 class Wire(Entity):
     """
@@ -236,8 +461,8 @@ class Wire(Entity):
         "up_right",
         "down_left",
         "up_left",
+        "down_right",
         # unused states
-        # "down_right",
         # "left_up_right",
         # "left_down_right",
         # "left_up_down",
@@ -245,7 +470,7 @@ class Wire(Entity):
     ]
 
     # sprite sheet tile indexes matching states from STATES list
-    TILE_INDEXES = [19, 9, 1, 0, 17]
+    TILE_INDEXES = [19, 9, 1, 0, 17, 32]
 
     def __init__(self, location, workspace, state=None, add_to_workspace=True):
         self._recursion_guard = False
@@ -261,24 +486,19 @@ class Wire(Entity):
             self.state = state
         self.location = location
 
-        self._input_one = False
-        self._input_two = False
-        self._input_three = False
-        self._input_four = False
-
         self._output = False
 
         if add_to_workspace:
             self._workspace.add_entity(self)
 
-        # entity to ignore for purposes of
-        # calculating logic value
-        self._ignore_entity = None
-
         # whether to keep the existing state after
         # being placed on the workspace.
         self.keep_state_after_drop = False
 
+    def update(self):
+        _ = self.value
+        self._recursion_guard = False
+    
     @property
     def state(self):
         """The index of the current state of the Wire. Different states
@@ -328,6 +548,8 @@ class Wire(Entity):
             return 3
         if entity_above and entity_left:
             return 4
+        if entity_below and entity_right:
+            return 5
 
         return 0
 
@@ -335,25 +557,13 @@ class Wire(Entity):
         """
         Change the state of the Wire cycling between all possible states.
         """
-        if self.state < 4:
+        if self.state < 5:
             self.state += 1
         else:
             self.state = 0
 
     def _init_tile_locations(self):
         self.tile_locations = (self.location,)
-        self.input_one_entity_location = None
-        self.input_two_entity_location = None
-        self.input_three_entity_location = None
-        self.input_four_entity_location = None
-        if "left" in self.STATES[self.state]:
-            self.input_one_entity_location = (self.location[X] - 1, self.location[Y])
-        if "right" in self.STATES[self.state]:
-            self.input_two_entity_location = (self.location[X] + 1, self.location[Y])
-        if "up" in self.STATES[self.state]:
-            self.input_three_entity_location = (self.location[X], self.location[Y] - 1)
-        if "down" in self.STATES[self.state]:
-            self.input_four_entity_location = (self.location[X], self.location[Y] + 1)
 
     @property
     def palette_mapping(self):
@@ -361,14 +571,7 @@ class Wire(Entity):
         Dynamic palette mapping list of colors based on the current state
         """
         pal = list(range(COLOR_COUNT))
-        pal[3] = (
-            7
-            if self._input_one
-            or self._input_two
-            or self._input_three
-            or self._input_four
-            else 1
-        )
+        pal[3] = 7 if self._output else 1
         return pal
 
     def apply_state_palette_mapping(self):
@@ -376,159 +579,84 @@ class Wire(Entity):
         for loc in self.tile_locations:
             self._workspace.tilegrid.pixel_shader[loc] = cur_state_palette
 
-    @property
-    def input_one(self):
-        """Logic value of input one (left)"""
-        return self._input_one
+    def _find_neighboring_wire_end(self, direction, wire_segments=[]):
+        """
+        Find the end of the wire segment in the given direction.
 
-    @input_one.setter
-    def input_one(self, value):
-        self._input_one = value
-        self._output = value
-        self.apply_state_palette_mapping()
+        :param direction: Direction to search in ("left", "right", "up", "down")
+        :return: tuple of (end entity, list of wire segments in this direction)
+        """
 
-    @property
-    def input_two(self):
-        """Logic value of input two (right)"""
-        return self._input_two
+        # exit recursion if we have already visited this wire segment
+        if self in wire_segments:
+            return (None, wire_segments)
 
-    @input_two.setter
-    def input_two(self, value):
-        self._input_two = value
-        self._output = value
-        self.apply_state_palette_mapping()
+        wire_segments.append(self)
+        current_location = self.location
 
-    @property
-    def input_three(self):
-        """Logic value of input three (above)"""
-        return self._input_three
+        if direction == "left":
+            opposite = "right"
+            next_location = (current_location[X] - 1, current_location[Y])
+        elif direction == "right":
+            opposite = "left"
+            next_location = (current_location[X] + 1, current_location[Y])
+        elif direction == "up":
+            opposite = "down"
+            next_location = (current_location[X], current_location[Y] - 1)
+        elif direction == "down":
+            opposite = "up"
+            next_location = (current_location[X], current_location[Y] + 1)
 
-    @input_three.setter
-    def input_three(self, value):
-        self._input_three = value
-        self._output = value
-        self.apply_state_palette_mapping()
+        neighbor_entity = self._workspace.entity_at(next_location)
 
-    @property
-    def input_four(self):
-        """Logic value of input four (below)"""
-        return self._input_four
+        if neighbor_entity is not None:
+            if neighbor_entity.type == "wire":
+                if opposite in self.STATES[neighbor_entity.state]:
+                    # wire is properly connected to another wire segment, follow it
+                    neighbor_state = self.STATES[neighbor_entity.state].split('_')
+                    neighbor_direction = neighbor_state[1-neighbor_state.index(opposite)]
+                    return neighbor_entity._find_neighboring_wire_end(neighbor_direction, wire_segments)
+            elif direction == "left" and neighbor_entity.type in ("input", "gate"):
+                # wire is properly connected to an entity that supplies a value
+                return(neighbor_entity, wire_segments)
 
-    @input_four.setter
-    def input_four(self, value):
-        self._input_four = value
-        self._output = value
-        self.apply_state_palette_mapping()
-
-    def get_value(self, ignore_input_entity):
-        """Return the value of this entity ignoring the given entity when determining it"""
-        self._ignore_entity = ignore_input_entity
-        val = self.value
-        self._ignore_entity = None
-        return val
+        # no wire or input entity found, or not properly connected
+        return (None, wire_segments)
 
     @property
     def value(self):
+
         if self._recursion_guard:
-            self._recursion_guard = False
-            return self.input_one or self.input_two or self.input_three or self.input_three
+            if self._output is None:
+                self._output = False
+            self.apply_state_palette_mapping()
+            return self._output
 
         self._recursion_guard = True
 
-        if "left" in self.STATES[self.state]:
-            if (
-                self.input_one_entity is None
-                or self.input_one_entity is self._ignore_entity
-            ):
-                self.input_one = False
-            else:
-                if isinstance(self.input_one_entity, Wire):
-                    self.input_one = self.input_one_entity.get_value(self)
-                else:
-                    self.input_one = self.input_one_entity.value
-                if self.input_one:
-                    self._recursion_guard = False
-                    return True
-        if "right" in self.STATES[self.state]:
-            if (
-                self.input_two_entity is None
-                or self.input_two_entity is self._ignore_entity
-            ):
-                self.input_two = False
-            else:
-                if isinstance(self.input_two_entity, Wire):
-                    self.input_two = self.input_two_entity.get_value(self)
-                else:
-                    # right side only allows input from Wires
-                    self.input_two = False
-                if self.input_two:
-                    self._recursion_guard = False
-                    return True
-        if "up" in self.STATES[self.state]:
-            if (
-                self.input_three_entity is None
-                or self.input_three_entity is self._ignore_entity
-            ):
-                self.input_three = False
-            else:
-                if isinstance(self.input_three_entity, Wire):
-                    self.input_three = self.input_three_entity.get_value(self)
-                else:
-                    # top side only accepts input from wires
-                    self.input_three = False
-                if self.input_three:
-                    self._recursion_guard = False
-                    return True
-        if "down" in self.STATES[self.state]:
-            if (
-                self.input_four_entity is None
-                or self.input_four_entity is self._ignore_entity
-            ):
-                self.input_four = False
-            else:
-                if isinstance(self.input_four_entity, Wire):
-                    self.input_four = self.input_four_entity.get_value(self)
-                else:
-                    # bottom side only accepts input from wires?
-                    self.input_four = False
-                if self.input_four:
-                    self._recursion_guard = False
-                    return True
+        # traverse connected wire segments to find input entities and map entire wire
+        wires = []
+        wire_value = False
+        # only check for entities connected to the two sides defined by the state
+        for direction in self.STATES[self.state].split('_'):
+            end_entity, wire_seg = self._find_neighboring_wire_end(direction,[])
+            wires.append(wire_seg)
 
-        self._recursion_guard = False
-        return self.input_one or self.input_two or self.input_three or self.input_three
+            # Set wire value to the value of the input entity found at the end of the wire segment
+            if end_entity is not None and end_entity.type in ("input", "gate"):
+                wire_value = end_entity.value
+        
+        # Set the output of all the line segments to the value of the input entity
+        for seg in wires[0]+wires[1]:
+            if seg is not self:
+                seg._output = wire_value
+                # _recursion_guard is now being used as a sort of "dirty" flag to improve performance
+                seg._recursion_guard = True
+                seg.apply_state_palette_mapping()
 
-    @property
-    def input_one_entity(self):
-        """Entity at input one (left)"""
-        if self.input_one_entity_location is not None:
-            return self._workspace.entity_at(self.input_one_entity_location)
-        else:
-            return None
-
-    @property
-    def input_two_entity(self):
-        """Entity at input two (right)"""
-        if self.input_two_entity_location is not None:
-            return self._workspace.entity_at(self.input_two_entity_location)
-        else:
-            return None
-
-    @property
-    def input_three_entity(self):
-        """Entity at input three (above)"""
-        if self.input_three_entity_location is not None:
-            return self._workspace.entity_at(self.input_three_entity_location)
-        else:
-            return None
-
-    @property
-    def input_four_entity(self):
-        """Entity at input four (below)"""
-        if self.input_four_entity_location is not None:
-            return self._workspace.entity_at(self.input_four_entity_location)
-        else:
-            return None
+        self._output = wire_value
+        self.apply_state_palette_mapping()
+        return self._output
 
 class TwoInputOneOutputGate(Entity):
     """
@@ -610,18 +738,12 @@ class TwoInputOneOutputGate(Entity):
         if input_one_entity is None:
             self.input_one = False
         else:
-            if isinstance(input_one_entity, Wire):
-                self.input_one = input_one_entity.get_value(self)
-            else:
-                self.input_one = input_one_entity.value
+            self.input_one = input_one_entity.value
 
         if input_two_entity is None:
             self.input_two = False
         else:
-            if isinstance(input_two_entity, Wire):
-                self.input_two = input_two_entity.get_value(self)
-            else:
-                self.input_two = input_two_entity.value
+            self.input_two = input_two_entity.value
 
         self._recursion_guard = False
         return self.output

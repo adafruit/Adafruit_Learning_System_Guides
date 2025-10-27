@@ -29,6 +29,8 @@ from entity import (
     NeoPixelOutput,
     PhysicalButton,
     Wire,
+    ConnectorIn,
+    ConnectorOut,
 )
 
 # pylint: disable=too-many-branches, too-many-statements
@@ -61,12 +63,16 @@ ENTITY_CLASS_CONSTRUCTOR_MAP = {
     "XnorGate": XnorGate,
     "NotGate": NotGate,
     "Wire": Wire,
+    "ConnectorIn": ConnectorIn,
+    "ConnectorOut": ConnectorOut,
     "OutputPanel": OutputPanel,
     "VirtualPushButton": VirtualPushButton,
     "PhysicalButton": PhysicalButton,
     "NeoPixelOutput": NeoPixelOutput,
 }
 
+# maximum number of connectors allowed on workspace
+MAX_CONNECTORS = 5
 
 class Workspace:
     """
@@ -115,6 +121,30 @@ class Workspace:
         self.group = Group()
         self.group.append(self.tilegrid)
 
+        # setup overlay elements that float on top of the workspace
+        self.overlay_palette = Palette(18)
+        for i, color in enumerate(self.spritesheet_pixel_shader):
+            self.overlay_palette[i] = color
+        self.overlay_palette.make_transparent(0)
+
+        # setup Overlay TilePaletteMapper
+        self.overlay_palette_mapper = TilePaletteMapper(
+            self.overlay_palette,  # input pixel_shader
+            len(self.overlay_palette),  # input color count
+        )
+
+        # setup overlay TileGrid
+        self.overlay_tilegrid = TileGrid(
+            bitmap=self.spritesheet,
+            pixel_shader=self.overlay_palette_mapper,
+            default_tile=EMPTY,
+            width=26,
+            height=18,
+            tile_width=24,
+            tile_height=24)
+
+        self.group.append(self.overlay_tilegrid)
+
         # setup add entity button bitmap and TileGrid
         self.add_btn_bmp = OnDiskBitmap("logic_gates_assets/add_btn.bmp")
         self.add_btn_tg = TileGrid(
@@ -154,6 +184,9 @@ class Workspace:
         # list to hold all Entities on the workspace
         self.entities = []
 
+        # list to hold available connectors
+        self.available_connectors = list(range(MAX_CONNECTORS))
+
         # variable to hold an Entity that is moving with the mouse
         self.moving_entity = None
 
@@ -187,6 +220,12 @@ class Workspace:
         self.entities.remove(entity)
         for i in range(len(entity.tiles)):
             self.tilegrid[entity.tile_locations[i]] = EMPTY
+            self.overlay_tilegrid[entity.tile_locations[i]] = EMPTY
+
+        # Special case for ConnectorOut to clear its input wire tap overlay
+        if isinstance(entity, ConnectorOut):
+            if isinstance(entity.input_entity,Wire):
+                self.overlay_tilegrid[entity.input_entity_location] = EMPTY
 
     def _set_mouse_moving_tiles(self, entity):
         """
@@ -405,16 +444,31 @@ class Workspace:
         # remove action, clear out the entity moving with the mouse
         elif action == "remove":
             if self.moving_entity is not None:
+                # Speical ConnectorOut case, add connection_number back into available list
+                if isinstance(self.moving_entity, ConnectorOut):
+                    self.available_connectors.append(self.moving_entity.connector_number)
+                    self.available_connectors.sort()
+                    # Remove connections from all ConnectorIn entities pointing to this ConnectorOut
+                    for entity in self.entities:
+                        if isinstance(entity, ConnectorIn) and \
+                            entity.connector_number == self.moving_entity.connector_number:
+
+                            entity.connector_number = None
+                            entity.input_one = None
+
                 self.moving_entity = None
                 self.mouse_moving_tg.hidden = True
+                self.update()
 
         # eyedropper or pipette action
         elif action == "eyedropper":
             # if there is already an entity moving with the mouse
             if self.moving_entity is not None:
                 # clear out the entity moving with the mouse
-                self.moving_entity = None
-                self.mouse_moving_tg.hidden = True
+                # This was a "back door" delete of the object, better to just ignore
+                # otherwise we need to add the ConnectorOut special case here as well
+                #self.moving_entity = None
+                #self.mouse_moving_tg.hidden = True
                 return
 
             # adjust mouse coordinates for the scroll position
@@ -427,6 +481,16 @@ class Workspace:
 
             # try to get the entity at the tile coordinates
             target_entity = self.entity_at((tile_x, tile_y))
+
+            # special case only limited number of ConnectorOuts
+            if target_entity is not None and isinstance(target_entity, ConnectorOut):
+                num_ConnectorOuts = 0
+                for entity in self.entities:
+                    if isinstance(entity, ConnectorOut):
+                        num_ConnectorOuts += 1
+                if num_ConnectorOuts >= MAX_CONNECTORS:
+                    # Can't create additional ConnectorOut
+                    target_entity = None
 
             # if there was an entity at the coordinates
             if target_entity is not None:
@@ -534,10 +598,13 @@ class Workspace:
         """
         Load the workspace state from a JSON object.
         """
+        # reset list of available ConnectorOuts
+        self.available_connectors = list(range(MAX_CONNECTORS))
         self.neopixels.fill(0)
         # clear out all sprites in the tilegrid
         for i in range(self.tilegrid.width * self.tilegrid.height):
             self.tilegrid[i] = EMPTY
+            self.overlay_tilegrid[i] = EMPTY
 
         # clear out entities list
         self.entities.clear()
@@ -662,6 +729,18 @@ class ToolBox:
             "constructor": Wire,
             "size": (1, 1),
         },
+        {
+            "label": "Input Connector",
+            "tiles": (30,),
+            "constructor": ConnectorIn,
+            "size": (1, 1),
+        },
+        {
+            "label": "Output Connector",
+            "tiles": (31,),
+            "constructor": ConnectorOut,
+            "size": (1, 1),
+        },
     ]
 
     def __init__(self, spritesheet_bmp, workspace):
@@ -784,6 +863,21 @@ class ToolBox:
         elif clicked_item["label"] == "Physical Button":
             new_entity = clicked_item["constructor"](
                 (0, 0), self._workspace, clicked_item["index"], add_to_workspace=False
+            )
+
+        # special case only limited number of ConnectorOuts
+        elif clicked_item["label"] == "Output Connector":
+            num_ConnectorOuts = 0
+            for entity in self._workspace.entities:
+                if isinstance(entity, ConnectorOut):
+                    num_ConnectorOuts += 1
+            if num_ConnectorOuts >= MAX_CONNECTORS:
+                # close the ToolBox
+                self.hidden = True
+                return
+
+            new_entity = clicked_item["constructor"](
+                (0, 0), self._workspace, add_to_workspace=False
             )
 
         # default behavior all other entity types
