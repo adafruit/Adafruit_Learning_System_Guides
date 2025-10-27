@@ -648,6 +648,8 @@ class Workspace:
         """
         self.tilegrid.x = self._scroll_x * self.tilegrid.tile_width * 1
         self.tilegrid.y = self._scroll_y * self.tilegrid.tile_height * 1
+        self.overlay_tilegrid.x = self._scroll_x * self.overlay_tilegrid.tile_width * 1
+        self.overlay_tilegrid.y = self._scroll_y * self.overlay_tilegrid.tile_height * 1
 
     def entity_at(self, location):
         """
