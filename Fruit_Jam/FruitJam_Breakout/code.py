@@ -8,10 +8,10 @@ import sys
 import time
 import array
 import math
+import random
 import audiocore
 from adafruit_fruitjam.peripherals import Peripherals
 from adafruit_fruitjam.peripherals import request_display_config
-import random
 import displayio
 import supervisor
 from adafruit_display_shapes.rect import Rect
