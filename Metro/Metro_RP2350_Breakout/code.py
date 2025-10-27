@@ -177,6 +177,8 @@ def check_keys():
                 r_pressed = True
             elif key == ' ':         # Space for start/launch
                 s_pressed = True
+            elif key in ('q', 'Q') or ord(key) == 27:  # q, Q, or ESC is quit
+                sys.exit(0)  # We're out of here
         except Exception as e:       # pylint: disable=broad-except
             print("Input error:", e)
 
@@ -420,7 +422,7 @@ while True:
             if lives <= 0:
                 game_active = False
                 game_over = True
-                update_message("GAME OVER - Press SPACE to play again")
+                update_message("GAME OVER - Press SPACE to play again, Q to quit")
 
                 # Play game over sound
                 play_game_over()
