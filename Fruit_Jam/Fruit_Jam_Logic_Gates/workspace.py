@@ -559,6 +559,8 @@ class Workspace:
                 entity_obj["index"] = entity.index
             if hasattr(entity, "inputs_left"):
                 entity_obj["inputs_left"] = entity.inputs_left
+            if hasattr(entity, "connector_number"):
+                entity_obj["connector_number"] = entity.connector_number
             save_obj["entities"].append(entity_obj)
         return json.dumps(save_obj)
 
@@ -581,6 +583,11 @@ class Workspace:
         elif entity_json["class"] == "Wire":
             new_entity = ENTITY_CLASS_CONSTRUCTOR_MAP[entity_json["class"]](
                 location, self, entity_json["state"], add_to_workspace=add_to_workspace
+            )
+        # special case Connectors need the connector number
+        elif entity_json["class"] == "ConnectorIn" or entity_json["class"] == "ConnectorOut":
+            new_entity = ENTITY_CLASS_CONSTRUCTOR_MAP[entity_json["class"]](
+                location, self, entity_json["connector_number"], add_to_workspace=add_to_workspace
             )
         # default case all other entity types
         else:
@@ -613,6 +620,16 @@ class Workspace:
         for entity_json in json_data["entities"]:
             # create current entity
             self.create_entity_from_json(entity_json)
+
+        # Connect any connectors
+        for entity in self.entities:
+            if isinstance(entity,ConnectorIn):
+                for entity_out in self.entities:
+                    if isinstance(entity_out,ConnectorOut) and \
+                        entity.connector_number == entity_out.connector_number:
+
+                        entity.input_one = entity_out
+                        break
 
         # update the logic simulation with all new entities
         self.update()
