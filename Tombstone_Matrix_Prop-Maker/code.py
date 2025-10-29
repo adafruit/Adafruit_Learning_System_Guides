@@ -77,7 +77,7 @@ for filename in os.listdir('/tomb_sounds'):
 
 audio = audiobusio.I2SOut(board.I2S_BIT_CLOCK, board.I2S_WORD_SELECT, board.I2S_DATA)
 mixer = audiomixer.Mixer(voice_count=1, sample_rate=22050, channel_count=1,
-                         bits_per_sample=16, samples_signed=True, buffer_size=32768)
+                         bits_per_sample=16, samples_signed=True)
 
 mixer.voice[0].level = 1
 audio.play(mixer)
