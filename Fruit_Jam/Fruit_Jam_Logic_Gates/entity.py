@@ -341,7 +341,7 @@ class SignalReceiver(Entity):
 
 class SignalTransmitter(Entity):
     """
-    Virtual Connector used to send signals from an entity to an input connector
+    Virtual Connector used to send signals from an entity to a Signal Receiver
     """
 
     def __init__(self, location, workspace, connector_number=None, add_to_workspace=True):
@@ -360,7 +360,7 @@ class SignalTransmitter(Entity):
                 self.connector_number = self._workspace.available_connectors.pop(0)
             else:
                 # Too many connectors, workspace shouldn't allow this to happen
-                raise RuntimeError("Too many Output Connectors")
+                raise RuntimeError("Too many Signal Transmitters")
         else:
             self.connector_number = connector_number
 
@@ -371,7 +371,7 @@ class SignalTransmitter(Entity):
 
     def _init_tile_locations(self):
         self.tile_locations = (self.location,)
-        # Location of the entity connected to the input of the output connector in x,y tile coords
+        # Location of the entity connected to the left of the Signal Transmitter in x,y tile coords
         self.input_entity_location = (self.location[X] - 1, self.location[Y])
 
     def update(self):
@@ -391,6 +391,15 @@ class SignalTransmitter(Entity):
     @property
     def input_entity(self):
         """Entity at the input location"""
+        # Only recieve input from output wire on larger gates
+        if self._workspace.entity_at(self.input_entity_location) == \
+            self._workspace.entity_at((self.location[X], self.location[Y] - 1)) or \
+            self._workspace.entity_at(self.input_entity_location) == \
+            self._workspace.entity_at((self.location[X], self.location[Y] + 1)):
+
+            # If entity to left is also above or below us then we're not connected to it's output
+            return None
+
         return self._workspace.entity_at(self.input_entity_location)
 
     @property
@@ -621,8 +630,14 @@ class Wire(Entity):
                     neighbor_direction = neighbor_state[1-neighbor_state.index(opposite)]
                     return neighbor_entity.find_neighboring_wire_end(neighbor_direction, wire_segments)
             elif direction == "left" and neighbor_entity.type in ("input", "gate"):
-                # wire is properly connected to an entity that supplies a value
-                return(neighbor_entity, wire_segments)
+                # Only recieve input from output wire on larger gates
+                if self._workspace.entity_at(next_location) != \
+                    self._workspace.entity_at((current_location[X], current_location[Y] - 1)) and \
+                    self._workspace.entity_at(next_location) != \
+                    self._workspace.entity_at((current_location[X], current_location[Y] + 1)):
+
+                    # wire is properly connected to an entity that supplies a value
+                    return(neighbor_entity, wire_segments)
 
         # no wire or input entity found, or not properly connected
         return (None, wire_segments)
