@@ -278,10 +278,6 @@ class SignalReceiver(Entity):
     def value(self):
         if self.connector_number is None:
             return False
-        #elif self.input_one not in self._workspace.entities:
-        #    self.connector_number = None
-        #    self.input_one = None
-        #    return False
         elif self.input_one is None:
             return False
         elif self.input_one.input_one is None:
@@ -345,7 +341,7 @@ class SignalReceiver(Entity):
 
 class SignalTransmitter(Entity):
     """
-    Output Connector used to send signals from an entity to an input connector
+    Virtual Connector used to send signals from an entity to an input connector
     """
 
     def __init__(self, location, workspace, connector_number=None, add_to_workspace=True):
