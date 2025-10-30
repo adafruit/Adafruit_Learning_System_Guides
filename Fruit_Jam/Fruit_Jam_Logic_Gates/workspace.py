@@ -29,8 +29,8 @@ from entity import (
     NeoPixelOutput,
     PhysicalButton,
     Wire,
-    ConnectorIn,
-    ConnectorOut,
+    SignalReceiver,
+    SignalTransmitter,
 )
 
 # pylint: disable=too-many-branches, too-many-statements
@@ -63,8 +63,8 @@ ENTITY_CLASS_CONSTRUCTOR_MAP = {
     "XnorGate": XnorGate,
     "NotGate": NotGate,
     "Wire": Wire,
-    "ConnectorIn": ConnectorIn,
-    "ConnectorOut": ConnectorOut,
+    "SignalReceiver": SignalReceiver,
+    "SignalTransmitter": SignalTransmitter,
     "OutputPanel": OutputPanel,
     "VirtualPushButton": VirtualPushButton,
     "PhysicalButton": PhysicalButton,
@@ -222,8 +222,8 @@ class Workspace:
             self.tilegrid[entity.tile_locations[i]] = EMPTY
             self.overlay_tilegrid[entity.tile_locations[i]] = EMPTY
 
-        # Special case for ConnectorOut to clear its input wire tap overlay
-        if isinstance(entity, ConnectorOut):
+        # Special case for SignalTransmitter to clear its input wire tap overlay
+        if isinstance(entity, SignalTransmitter):
             if isinstance(entity.input_entity,Wire):
                 self.overlay_tilegrid[entity.input_entity_location] = EMPTY
 
@@ -241,6 +241,23 @@ class Workspace:
                 loc[0] - entity.location[0],
                 loc[1] - entity.location[1] + midpoint_offset,
             ] = entity.tiles[i]
+
+    def _clear_cursor(self):
+        # Special SignalTransmitter case, add connection_number back into available list
+        if isinstance(self.moving_entity, SignalTransmitter):
+            self.available_connectors.append(self.moving_entity.connector_number)
+            self.available_connectors.sort()
+            # Remove connections from SignalReceivers pointing to this SignalTransmitter
+            for entity in self.entities:
+                if isinstance(entity, SignalReceiver) and \
+                    entity.connector_number == self.moving_entity.connector_number:
+
+                    entity.connector_number = None
+                    entity.input_one = None
+
+        self.moving_entity = None
+        self.mouse_moving_tg.hidden = True
+        self.update()
 
     def handle_mouse_click(self, screen_x, screen_y, pressed_btns):
         """
@@ -263,8 +280,7 @@ class Workspace:
 
                 # if there is an entity on the mouse, remove it
                 else:
-                    self.moving_entity = None
-                    self.mouse_moving_tg.hidden = True
+                    self._clear_cursor()
                 return
 
         # apply offset value based on scroll position
@@ -444,31 +460,13 @@ class Workspace:
         # remove action, clear out the entity moving with the mouse
         elif action == "remove":
             if self.moving_entity is not None:
-                # Speical ConnectorOut case, add connection_number back into available list
-                if isinstance(self.moving_entity, ConnectorOut):
-                    self.available_connectors.append(self.moving_entity.connector_number)
-                    self.available_connectors.sort()
-                    # Remove connections from all ConnectorIn entities pointing to this ConnectorOut
-                    for entity in self.entities:
-                        if isinstance(entity, ConnectorIn) and \
-                            entity.connector_number == self.moving_entity.connector_number:
-
-                            entity.connector_number = None
-                            entity.input_one = None
-
-                self.moving_entity = None
-                self.mouse_moving_tg.hidden = True
-                self.update()
+                self._clear_cursor()
 
         # eyedropper or pipette action
         elif action == "eyedropper":
             # if there is already an entity moving with the mouse
             if self.moving_entity is not None:
-                # clear out the entity moving with the mouse
-                # This was a "back door" delete of the object, better to just ignore
-                # otherwise we need to add the ConnectorOut special case here as well
-                #self.moving_entity = None
-                #self.mouse_moving_tg.hidden = True
+                self._clear_cursor()
                 return
 
             # adjust mouse coordinates for the scroll position
@@ -482,14 +480,14 @@ class Workspace:
             # try to get the entity at the tile coordinates
             target_entity = self.entity_at((tile_x, tile_y))
 
-            # special case only limited number of ConnectorOuts
-            if target_entity is not None and isinstance(target_entity, ConnectorOut):
-                num_ConnectorOuts = 0
+            # special case only limited number of SignalTransmitters
+            if target_entity is not None and isinstance(target_entity, SignalTransmitter):
+                num_SignalTransmitters = 0
                 for entity in self.entities:
-                    if isinstance(entity, ConnectorOut):
-                        num_ConnectorOuts += 1
-                if num_ConnectorOuts >= MAX_CONNECTORS:
-                    # Can't create additional ConnectorOut
+                    if isinstance(entity, SignalTransmitter):
+                        num_SignalTransmitters += 1
+                if num_SignalTransmitters >= MAX_CONNECTORS:
+                    # Can't create additional SignalTransmitters
                     target_entity = None
 
             # if there was an entity at the coordinates
@@ -585,7 +583,7 @@ class Workspace:
                 location, self, entity_json["state"], add_to_workspace=add_to_workspace
             )
         # special case Connectors need the connector number
-        elif entity_json["class"] == "ConnectorIn" or entity_json["class"] == "ConnectorOut":
+        elif entity_json["class"] == "SignalReceiver" or entity_json["class"] == "SignalTransmitter":
             if entity_json.get("connector_number") is not None:
                 new_entity = ENTITY_CLASS_CONSTRUCTOR_MAP[entity_json["class"]](
                     location, self, entity_json["connector_number"],
@@ -611,7 +609,7 @@ class Workspace:
         """
         Load the workspace state from a JSON object.
         """
-        # reset list of available ConnectorOuts
+        # reset list of available SignalTransmitters
         self.available_connectors = list(range(MAX_CONNECTORS))
         self.neopixels.fill(0)
         # clear out all sprites in the tilegrid
@@ -629,11 +627,11 @@ class Workspace:
 
         # Connect any connectors
         for entity in self.entities:
-            if isinstance(entity,ConnectorOut):
+            if isinstance(entity,SignalTransmitter):
                 if entity.connector_number in self.available_connectors:
                     self.available_connectors.remove(entity.connector_number)
                 for entity_in in self.entities:
-                    if isinstance(entity_in,ConnectorIn) and \
+                    if isinstance(entity_in,SignalReceiver) and \
                         entity_in.connector_number is not None and \
                         entity.connector_number == entity_in.connector_number:
 
@@ -751,15 +749,15 @@ class ToolBox:
             "size": (1, 1),
         },
         {
-            "label": "Output Connector",
+            "label": "Signal Transmit'r",
             "tiles": (31,),
-            "constructor": ConnectorOut,
+            "constructor": SignalTransmitter,
             "size": (1, 1),
         },
         {
-            "label": "Input Connector",
+            "label": "Signal Receiver",
             "tiles": (30,),
-            "constructor": ConnectorIn,
+            "constructor": SignalReceiver,
             "size": (1, 1),
         },
         {
@@ -892,13 +890,13 @@ class ToolBox:
                 (0, 0), self._workspace, clicked_item["index"], add_to_workspace=False
             )
 
-        # special case only limited number of ConnectorOuts
+        # special case only limited number of SignalTransmitters
         elif clicked_item["label"] == "Output Connector":
-            num_ConnectorOuts = 0
+            num_SignalTransmitters = 0
             for entity in self._workspace.entities:
-                if isinstance(entity, ConnectorOut):
-                    num_ConnectorOuts += 1
-            if num_ConnectorOuts >= MAX_CONNECTORS:
+                if isinstance(entity, SignalTransmitter):
+                    num_SignalTransmitters += 1
+            if num_SignalTransmitters >= MAX_CONNECTORS:
                 # close the ToolBox
                 self.hidden = True
                 return

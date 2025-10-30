@@ -224,9 +224,9 @@ class PhysicalButton(Entity):
         for loc in self.tile_locations:
             self._workspace.tilegrid.pixel_shader[loc] = pal
 
-class ConnectorIn(Entity):
+class SignalReceiver(Entity):
     """
-    Input Connector used to bring signals into an entity from an output connector
+    Virtual Connector used to bring signals into an entity from a Signal Transmitter
     """
 
     def __init__(self, location, workspace, connector_number=None, add_to_workspace=True):
@@ -241,9 +241,9 @@ class ConnectorIn(Entity):
         self._input_one = None
 
         if connector_number is None:
-            # Find the last ConnectorOut entity added to the workspace to link to
+            # Find the last SignalTransmitter entity added to the workspace to link to
             for entity in self._workspace.entities:
-                if isinstance(entity, ConnectorOut):
+                if isinstance(entity, SignalTransmitter):
                     self.connector_number = entity.connector_number
                     self._input_one = entity
         else:
@@ -270,7 +270,7 @@ class ConnectorIn(Entity):
 
     @input_one.setter
     def input_one(self, input_entity):
-        if isinstance(input_entity, ConnectorOut):
+        if isinstance(input_entity, SignalTransmitter):
             self._input_one = input_entity
             self.apply_state_palette_mapping()
 
@@ -314,12 +314,12 @@ class ConnectorIn(Entity):
 
     def handle_click(self):
         """
-        Cycle through available ConnectorOut entities on the workspace
+        Cycle through available SignalTransmitter entities on the workspace
         """
         connector_outs = []
         inuse_connector_numbers = []
         for entity in self._workspace.entities:
-            if isinstance(entity, ConnectorOut):
+            if isinstance(entity, SignalTransmitter):
                 connector_outs.append(entity)
                 inuse_connector_numbers.append(entity.connector_number)
 
@@ -343,7 +343,7 @@ class ConnectorIn(Entity):
             if entity.connector_number == self.connector_number:
                 self.input_one = entity
 
-class ConnectorOut(Entity):
+class SignalTransmitter(Entity):
     """
     Output Connector used to send signals from an entity to an input connector
     """
