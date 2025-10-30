@@ -893,7 +893,7 @@ class ToolBox:
             )
 
         # special case only limited number of SignalTransmitters
-        elif clicked_item["label"] == "Output Connector":
+        elif clicked_item["label"] == "Signal Transmit'r":
             num_SignalTransmitters = 0
             for entity in self._workspace.entities:
                 if isinstance(entity, SignalTransmitter):
