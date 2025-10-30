@@ -585,7 +585,7 @@ class Workspace:
         # special case Connectors need the connector number
         elif entity_json["class"] == "SignalReceiver" or \
             entity_json["class"] == "SignalTransmitter":
-            
+
             if entity_json.get("connector_number") is not None:
                 new_entity = ENTITY_CLASS_CONSTRUCTOR_MAP[entity_json["class"]](
                     location, self, entity_json["connector_number"],
