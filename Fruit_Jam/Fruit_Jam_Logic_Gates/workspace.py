@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+import os
 import json
 import time
 
@@ -46,6 +47,7 @@ DEFAULT_HOTKEYS = {
     b"s": "save",
     b"o": "open",
     b"a": "add",
+    b"i": "import",
     b"\x08": "remove",  # backspace
     b"\x1b[3~": "remove",  # delete
 }
@@ -73,6 +75,7 @@ ENTITY_CLASS_CONSTRUCTOR_MAP = {
 
 # maximum number of connectors allowed on workspace
 MAX_CONNECTORS = 5
+
 
 class Workspace:
     """
@@ -141,7 +144,8 @@ class Workspace:
             width=26,
             height=18,
             tile_width=24,
-            tile_height=24)
+            tile_height=24,
+        )
 
         self.group.append(self.overlay_tilegrid)
 
@@ -201,6 +205,7 @@ class Workspace:
         # variables for message control
         self.waiting_for_save_slot_input = False
         self.waiting_for_open_slot_input = False
+        self.waiting_for_import_slot_input = False
         self.hide_message_at = None
 
     def add_entity(self, entity):
@@ -224,7 +229,7 @@ class Workspace:
 
         # Special case for SignalTransmitter to clear its input wire tap overlay
         if isinstance(entity, SignalTransmitter):
-            if isinstance(entity.input_entity,Wire):
+            if isinstance(entity.input_entity, Wire):
                 self.overlay_tilegrid[entity.input_entity_location] = EMPTY
 
     def _set_mouse_moving_tiles(self, entity):
@@ -249,8 +254,10 @@ class Workspace:
             self.available_connectors.sort()
             # Remove connections from SignalReceivers pointing to this SignalTransmitter
             for entity in self.entities:
-                if isinstance(entity, SignalReceiver) and \
-                    entity.connector_number == self.moving_entity.connector_number:
+                if (
+                    isinstance(entity, SignalReceiver)
+                    and entity.connector_number == self.moving_entity.connector_number
+                ):
 
                     entity.connector_number = None
                     entity.input_one = None
@@ -364,6 +371,7 @@ class Workspace:
         Handle keyboard key press events sent from code.py.
         Also receives the current mouse location.
         """
+        # pylint: disable=too-many-locals
 
         # if we're waiting for user to input the save slot number
         if self.waiting_for_save_slot_input:
@@ -410,6 +418,35 @@ class Workspace:
                 self.waiting_for_open_slot_input = False
             return
 
+        # if we're waiting for user to input the import slot number
+        if self.waiting_for_import_slot_input:
+            # convert keypress to string
+            key_str = key_bytes.decode("utf-8")
+            # if the entered value is a valid save slot 0-9
+            if key_str in VALID_SAVE_SLOTS:
+                # update the message to the user with the value they typed
+                self.message_lbl.text += key_str
+                if "logic_gates_import.json" in os.listdir("/"):
+                    with open("/logic_gates_import.json", "r") as f:
+                        import_data = f.read()
+                        # write JSON data to the save file with slot number in filename
+                        with open(f"/saves/logic_gates_{key_str}.json", "w") as f:
+                            f.write(import_data)
+                            # update the message to user with save success
+                            self.message_lbl.text = f"Imported to slot: {key_str}"
+                            # set the time to hide the message to user
+                            self.hide_message_at = time.monotonic() + 2.0
+                        # set flag back to not waiting for import slot input
+                        self.waiting_for_import_slot_input = False
+                else:
+                    self.message_lbl.text = "logic_gates_import.json not found"
+                    # set the time to hide the message to user
+                    self.hide_message_at = time.monotonic() + 2.0
+                    # set flag back to not waiting for import slot input
+                    self.waiting_for_import_slot_input = False
+
+            return
+
         # lookup the pressed key int he hotkey map
         action = self.hotkeys.get(key_bytes, None)
         # if the pressed key doesn't map to any actions
@@ -452,6 +489,13 @@ class Workspace:
             # keep message showing until user responds
             self.hide_message_at = None
 
+        # import action, ask user for slot to import to
+        elif action == "import":
+            self.waiting_for_import_slot_input = True
+            self.message_lbl.text = "Import To Slot: "
+            # keep message showing until user responds
+            self.hide_message_at = None
+
         # add action, show the ToolBox to select a new entity to add
         elif action == "add":
             if self.moving_entity is None:
@@ -481,7 +525,9 @@ class Workspace:
             target_entity = self.entity_at((tile_x, tile_y))
 
             # special case only limited number of SignalTransmitters
-            if target_entity is not None and isinstance(target_entity, SignalTransmitter):
+            if target_entity is not None and isinstance(
+                target_entity, SignalTransmitter
+            ):
                 num_SignalTransmitters = 0
                 for entity in self.entities:
                     if isinstance(entity, SignalTransmitter):
@@ -583,13 +629,17 @@ class Workspace:
                 location, self, entity_json["state"], add_to_workspace=add_to_workspace
             )
         # special case Connectors need the connector number
-        elif entity_json["class"] == "SignalReceiver" or \
-            entity_json["class"] == "SignalTransmitter":
+        elif (
+            entity_json["class"] == "SignalReceiver"
+            or entity_json["class"] == "SignalTransmitter"
+        ):
 
             if entity_json.get("connector_number") is not None:
                 new_entity = ENTITY_CLASS_CONSTRUCTOR_MAP[entity_json["class"]](
-                    location, self, entity_json["connector_number"],
-                    add_to_workspace=add_to_workspace
+                    location,
+                    self,
+                    entity_json["connector_number"],
+                    add_to_workspace=add_to_workspace,
                 )
             else:
                 new_entity = ENTITY_CLASS_CONSTRUCTOR_MAP[entity_json["class"]](
@@ -629,13 +679,15 @@ class Workspace:
 
         # Connect any connectors
         for entity in self.entities:
-            if isinstance(entity,SignalTransmitter):
+            if isinstance(entity, SignalTransmitter):
                 if entity.connector_number in self.available_connectors:
                     self.available_connectors.remove(entity.connector_number)
                 for entity_in in self.entities:
-                    if isinstance(entity_in,SignalReceiver) and \
-                        entity_in.connector_number is not None and \
-                        entity.connector_number == entity_in.connector_number:
+                    if (
+                        isinstance(entity_in, SignalReceiver)
+                        and entity_in.connector_number is not None
+                        and entity.connector_number == entity_in.connector_number
+                    ):
 
                         entity_in.input_one = entity
 
