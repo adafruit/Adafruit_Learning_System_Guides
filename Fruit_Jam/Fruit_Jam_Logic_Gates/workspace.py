@@ -29,6 +29,8 @@ from entity import (
     NeoPixelOutput,
     PhysicalButton,
     Wire,
+    SignalReceiver,
+    SignalTransmitter,
 )
 
 # pylint: disable=too-many-branches, too-many-statements
@@ -61,12 +63,16 @@ ENTITY_CLASS_CONSTRUCTOR_MAP = {
     "XnorGate": XnorGate,
     "NotGate": NotGate,
     "Wire": Wire,
+    "SignalReceiver": SignalReceiver,
+    "SignalTransmitter": SignalTransmitter,
     "OutputPanel": OutputPanel,
     "VirtualPushButton": VirtualPushButton,
     "PhysicalButton": PhysicalButton,
     "NeoPixelOutput": NeoPixelOutput,
 }
 
+# maximum number of connectors allowed on workspace
+MAX_CONNECTORS = 5
 
 class Workspace:
     """
@@ -115,6 +121,30 @@ class Workspace:
         self.group = Group()
         self.group.append(self.tilegrid)
 
+        # setup overlay elements that float on top of the workspace
+        self.overlay_palette = Palette(18)
+        for i, color in enumerate(self.spritesheet_pixel_shader):
+            self.overlay_palette[i] = color
+        self.overlay_palette.make_transparent(0)
+
+        # setup Overlay TilePaletteMapper
+        self.overlay_palette_mapper = TilePaletteMapper(
+            self.overlay_palette,  # input pixel_shader
+            len(self.overlay_palette),  # input color count
+        )
+
+        # setup overlay TileGrid
+        self.overlay_tilegrid = TileGrid(
+            bitmap=self.spritesheet,
+            pixel_shader=self.overlay_palette_mapper,
+            default_tile=EMPTY,
+            width=26,
+            height=18,
+            tile_width=24,
+            tile_height=24)
+
+        self.group.append(self.overlay_tilegrid)
+
         # setup add entity button bitmap and TileGrid
         self.add_btn_bmp = OnDiskBitmap("logic_gates_assets/add_btn.bmp")
         self.add_btn_tg = TileGrid(
@@ -154,6 +184,9 @@ class Workspace:
         # list to hold all Entities on the workspace
         self.entities = []
 
+        # list to hold available connectors
+        self.available_connectors = list(range(MAX_CONNECTORS))
+
         # variable to hold an Entity that is moving with the mouse
         self.moving_entity = None
 
@@ -187,6 +220,12 @@ class Workspace:
         self.entities.remove(entity)
         for i in range(len(entity.tiles)):
             self.tilegrid[entity.tile_locations[i]] = EMPTY
+            self.overlay_tilegrid[entity.tile_locations[i]] = EMPTY
+
+        # Special case for SignalTransmitter to clear its input wire tap overlay
+        if isinstance(entity, SignalTransmitter):
+            if isinstance(entity.input_entity,Wire):
+                self.overlay_tilegrid[entity.input_entity_location] = EMPTY
 
     def _set_mouse_moving_tiles(self, entity):
         """
@@ -202,6 +241,23 @@ class Workspace:
                 loc[0] - entity.location[0],
                 loc[1] - entity.location[1] + midpoint_offset,
             ] = entity.tiles[i]
+
+    def _clear_cursor(self):
+        # Special SignalTransmitter case, add connection_number back into available list
+        if isinstance(self.moving_entity, SignalTransmitter):
+            self.available_connectors.append(self.moving_entity.connector_number)
+            self.available_connectors.sort()
+            # Remove connections from SignalReceivers pointing to this SignalTransmitter
+            for entity in self.entities:
+                if isinstance(entity, SignalReceiver) and \
+                    entity.connector_number == self.moving_entity.connector_number:
+
+                    entity.connector_number = None
+                    entity.input_one = None
+
+        self.moving_entity = None
+        self.mouse_moving_tg.hidden = True
+        self.update()
 
     def handle_mouse_click(self, screen_x, screen_y, pressed_btns):
         """
@@ -224,8 +280,7 @@ class Workspace:
 
                 # if there is an entity on the mouse, remove it
                 else:
-                    self.moving_entity = None
-                    self.mouse_moving_tg.hidden = True
+                    self._clear_cursor()
                 return
 
         # apply offset value based on scroll position
@@ -405,16 +460,13 @@ class Workspace:
         # remove action, clear out the entity moving with the mouse
         elif action == "remove":
             if self.moving_entity is not None:
-                self.moving_entity = None
-                self.mouse_moving_tg.hidden = True
+                self._clear_cursor()
 
         # eyedropper or pipette action
         elif action == "eyedropper":
             # if there is already an entity moving with the mouse
             if self.moving_entity is not None:
-                # clear out the entity moving with the mouse
-                self.moving_entity = None
-                self.mouse_moving_tg.hidden = True
+                self._clear_cursor()
                 return
 
             # adjust mouse coordinates for the scroll position
@@ -427,6 +479,16 @@ class Workspace:
 
             # try to get the entity at the tile coordinates
             target_entity = self.entity_at((tile_x, tile_y))
+
+            # special case only limited number of SignalTransmitters
+            if target_entity is not None and isinstance(target_entity, SignalTransmitter):
+                num_SignalTransmitters = 0
+                for entity in self.entities:
+                    if isinstance(entity, SignalTransmitter):
+                        num_SignalTransmitters += 1
+                if num_SignalTransmitters >= MAX_CONNECTORS:
+                    # Can't create additional SignalTransmitters
+                    target_entity = None
 
             # if there was an entity at the coordinates
             if target_entity is not None:
@@ -495,6 +557,8 @@ class Workspace:
                 entity_obj["index"] = entity.index
             if hasattr(entity, "inputs_left"):
                 entity_obj["inputs_left"] = entity.inputs_left
+            if hasattr(entity, "connector_number"):
+                entity_obj["connector_number"] = entity.connector_number
             save_obj["entities"].append(entity_obj)
         return json.dumps(save_obj)
 
@@ -518,6 +582,19 @@ class Workspace:
             new_entity = ENTITY_CLASS_CONSTRUCTOR_MAP[entity_json["class"]](
                 location, self, entity_json["state"], add_to_workspace=add_to_workspace
             )
+        # special case Connectors need the connector number
+        elif entity_json["class"] == "SignalReceiver" or \
+            entity_json["class"] == "SignalTransmitter":
+
+            if entity_json.get("connector_number") is not None:
+                new_entity = ENTITY_CLASS_CONSTRUCTOR_MAP[entity_json["class"]](
+                    location, self, entity_json["connector_number"],
+                    add_to_workspace=add_to_workspace
+                )
+            else:
+                new_entity = ENTITY_CLASS_CONSTRUCTOR_MAP[entity_json["class"]](
+                    location, self, add_to_workspace=add_to_workspace
+                )
         # default case all other entity types
         else:
             new_entity = ENTITY_CLASS_CONSTRUCTOR_MAP[entity_json["class"]](
@@ -534,10 +611,13 @@ class Workspace:
         """
         Load the workspace state from a JSON object.
         """
+        # reset list of available SignalTransmitters
+        self.available_connectors = list(range(MAX_CONNECTORS))
         self.neopixels.fill(0)
         # clear out all sprites in the tilegrid
         for i in range(self.tilegrid.width * self.tilegrid.height):
             self.tilegrid[i] = EMPTY
+            self.overlay_tilegrid[i] = EMPTY
 
         # clear out entities list
         self.entities.clear()
@@ -546,6 +626,18 @@ class Workspace:
         for entity_json in json_data["entities"]:
             # create current entity
             self.create_entity_from_json(entity_json)
+
+        # Connect any connectors
+        for entity in self.entities:
+            if isinstance(entity,SignalTransmitter):
+                if entity.connector_number in self.available_connectors:
+                    self.available_connectors.remove(entity.connector_number)
+                for entity_in in self.entities:
+                    if isinstance(entity_in,SignalReceiver) and \
+                        entity_in.connector_number is not None and \
+                        entity.connector_number == entity_in.connector_number:
+
+                        entity_in.input_one = entity
 
         # update the logic simulation with all new entities
         self.update()
@@ -556,6 +648,8 @@ class Workspace:
         """
         self.tilegrid.x = self._scroll_x * self.tilegrid.tile_width * 1
         self.tilegrid.y = self._scroll_y * self.tilegrid.tile_height * 1
+        self.overlay_tilegrid.x = self._scroll_x * self.overlay_tilegrid.tile_width * 1
+        self.overlay_tilegrid.y = self._scroll_y * self.overlay_tilegrid.tile_height * 1
 
     def entity_at(self, location):
         """
@@ -654,6 +748,18 @@ class ToolBox:
             "tiles": (27,),
             "constructor": PhysicalButton,
             "index": 2,
+            "size": (1, 1),
+        },
+        {
+            "label": "Signal Transmit'r",
+            "tiles": (31,),
+            "constructor": SignalTransmitter,
+            "size": (1, 1),
+        },
+        {
+            "label": "Signal Receiver",
+            "tiles": (30,),
+            "constructor": SignalReceiver,
             "size": (1, 1),
         },
         {
@@ -784,6 +890,21 @@ class ToolBox:
         elif clicked_item["label"] == "Physical Button":
             new_entity = clicked_item["constructor"](
                 (0, 0), self._workspace, clicked_item["index"], add_to_workspace=False
+            )
+
+        # special case only limited number of SignalTransmitters
+        elif clicked_item["label"] == "Signal Transmit'r":
+            num_SignalTransmitters = 0
+            for entity in self._workspace.entities:
+                if isinstance(entity, SignalTransmitter):
+                    num_SignalTransmitters += 1
+            if num_SignalTransmitters >= MAX_CONNECTORS:
+                # close the ToolBox
+                self.hidden = True
+                return
+
+            new_entity = clicked_item["constructor"](
+                (0, 0), self._workspace, add_to_workspace=False
             )
 
         # default behavior all other entity types
