@@ -427,7 +427,7 @@ class Workspace:
                 # update the message to the user with the value they typed
                 self.message_lbl.text += key_str
                 if "logic_gates_import.json" in os.listdir("/"):
-                    with open("logic_gates_import.json", "r") as f:
+                    with open("/logic_gates_import.json", "r") as f:
                         import_data = f.read()
                         # write JSON data to the save file with slot number in filename
                         with open(f"/saves/logic_gates_{key_str}.json", "w") as f:
