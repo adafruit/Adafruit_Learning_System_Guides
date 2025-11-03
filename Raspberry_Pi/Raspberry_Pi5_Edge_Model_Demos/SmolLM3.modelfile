@@ -1,0 +1,42 @@
+FROM hf.co/unsloth/SmolLM3-3B-128K-GGUF
+TEMPLATE "
+{{- $lastUserIdx := -1 }}
+{{- range $i, $_ := .Messages }}
+{{- if eq .Role "user" }}{{- $lastUserIdx = $i }}{{ end }}
+{{- end -}}
+<|im_start|>system
+## Metadata
+
+Knowledge Cutoff Date: June 2025
+Today Date: {{ currentDate }}
+Reasoning Mode: {{ if $.IsThinkSet }}{{ if $.Think }}/think{{ else }}/no_think{{ end }}{{ else }}/think{{ end }}
+
+{{ if .System }}
+## Custom Instructions
+
+{{ .System }}
+
+
+{{ end }}
+{{- range $i, $_ := .Messages }}
+{{- $last := eq (len (slice $.Messages $i)) 1 }}
+{{- if eq .Role "user" }}<|im_start|>user
+{{ .Content }}<|im_end|>
+{{- else if eq .Role "assistant" }}<|im_start|>assistant
+{{- if (and $.IsThinkSet (and .Thinking (or $last (gt $i $lastUserIdx)))) -}}
+<think>{{ .Thinking }}</think>
+{{- end }}
+{{ .Content }}
+{{- end }}
+{{ if and (ne .Role "assistant") $last }}<|im_start|>assistant
+{{- if and $.IsThinkSet (not $.Think) -}}
+<think>
+
+</think>
+
+{{ end }}
+{{ end }}
+{{- end -}}
+"
+PARAMETER temperature 0.3
+PARAMETER top_p 0.9
