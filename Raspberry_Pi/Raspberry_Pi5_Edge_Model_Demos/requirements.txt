@@ -1,0 +1,3 @@
+ollama
+piper-tts
+requests
