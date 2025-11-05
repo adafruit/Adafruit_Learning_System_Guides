@@ -15,7 +15,8 @@ Starting in 2023, guides using a specific Adafruit board will be placed in a sub
 * PyPortal/
 * QTPy/
 * Metro/ (all types)
-* Matrix_Portal
+* Matrix_Portal/
+* Crickits/
 
 If a new product or project group is contemplated, contact Learn moderators for guidance.
 
