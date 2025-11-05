@@ -57,4 +57,4 @@ Adafruit_Learning_System_Guides, not a sub-directory):
 Adafruit Learning System code files should have author and license information conforming to the open [SPDX specification](https://www.iso.org/standard/81870.html).
 See [this page](https://learn.adafruit.com/contribute-to-the-adafruit-learning-system-with-git-and-github/add-author-and-license-information) for more.
 
-Updated November 29, 2023
+Updated November 5, 2025
