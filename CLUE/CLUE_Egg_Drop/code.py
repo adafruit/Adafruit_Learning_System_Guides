@@ -8,6 +8,7 @@ import board
 from digitalio import DigitalInOut, Direction, Pull
 import pwmio
 from adafruit_lsm6ds.lsm6ds33 import LSM6DS33
+from adafruit_lsm6ds.lsm6ds3trc import LSM6DS3TRC
 from adafruit_lsm6ds import AccelRange, AccelHPF, Rate
 from adafruit_display_text import label
 import displayio
@@ -49,7 +50,13 @@ board.DISPLAY.root_group = splash
 # connect to the accelerometer
 i2c = board.I2C()  # uses board.SCL and board.SDA
 # i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
-sensor = LSM6DS33(i2c)
+# connect to the accelerometer
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
+try:
+    sensor = LSM6DS33(i2c)      # older CLUEs
+except RuntimeError:
+    sensor = LSM6DS3TRC(i2c)    # newer CLUEs (Jan 2025)
 # highest range for impacts!
 sensor.accelerometer_range = AccelRange.RANGE_16G
 # we'll read at about 1KHz
