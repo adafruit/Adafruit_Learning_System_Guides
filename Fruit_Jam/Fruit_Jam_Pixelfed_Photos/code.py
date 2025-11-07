@@ -51,7 +51,7 @@ try:
     img_bmp = OnDiskBitmap("/saves/downloaded_img.bmp")
     img_tg = TileGrid(img_bmp, pixel_shader=img_bmp.pixel_shader)
     main_group.append(img_tg)
-except (ValueError, RuntimeError):
+except (ValueError, RuntimeError, OSError):
     img_tg = None
 
 # Setup WIFI
@@ -172,7 +172,7 @@ while True:
                 gc.collect()
                 img_tg = TileGrid(img_bmp, pixel_shader=img_bmp.pixel_shader)
                 main_group.append(img_tg)
-            except (ValueError, RuntimeError):
+            except (ValueError, RuntimeError, OSError):
                 pass
 
             # wait for 4 minutes
