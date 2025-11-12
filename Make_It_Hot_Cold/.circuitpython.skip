@@ -1,3 +1,0 @@
-Make_It_Hot_Cold/hot.py 11: Useless return at end of function or method (useless-return)
-Make_It_Hot_Cold/cold.py 11: Useless return at end of function or method (useless-return)
-Make_It_Hot_Cold/cold.py 37: Simplify chained comparison between the operands (chained-comparison)
