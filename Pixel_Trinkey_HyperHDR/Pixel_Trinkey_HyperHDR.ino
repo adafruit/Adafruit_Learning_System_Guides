@@ -68,6 +68,7 @@ uint8_t applyCorrection(uint8_t value, uint16_t correction) {
   #else
     // Just apply color correction
     return (value * correction) / 255;
+  #endif
 }
 
 // AWA Protocol states (matching ESP32 implementation)
