@@ -8,6 +8,8 @@ This project illustrates how to fetch CPI data from the
 US Bureau of Labor Statistics API. CPI data from 1994,
 when 50 Cent adopted his moniker, is compared with the latest
 data to determine how much 50 Cent from 1994 is worth today.
+
+This project was inspired by: https://50centadjustedforinflation.com/
 """
 import json
 import os
