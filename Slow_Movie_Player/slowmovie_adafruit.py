@@ -230,7 +230,7 @@ def find_subtitles(file):  # pylint: disable=redefined-outer-name
 
 
 class ArgparseLogger(configargparse.ArgumentParser):
-    def error(self, message):
+    def error(self, message):  # pylint: disable=no-self-use
         logger.error(message)
         sys.exit(1)
 
@@ -264,7 +264,7 @@ parser.add_argument(
 )
 parser.add_argument(
     "-l",
-    "--loop",
+    "--loop",  # pylint: disable=broad-except
     action="store_true",
     help="loop a single video; otherwise play through the files in the videos directory",
 )
