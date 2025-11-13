@@ -364,7 +364,7 @@ try:
     epd.rotation = 0
 
     logger.info("Display initialized successfully")
-except Exception as e:
+except Exception as e:  # pylint: disable=broad-except
     logger.error(f"Failed to initialize display: {e}")  # pylint: disable=logging-fstring-interpolation
     sys.exit(1)
 
