@@ -1,9 +1,17 @@
+# SPDX-FileCopyrightText: 2025 John Park for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+"""
+this code is a very slight adjustment of Tom Whitwell's slowmovie.py to use eInk Bonnet and
+7.5" monochrome display
+https://github.com/TomWhitwell/SlowMovie/blob/main/slowmovie.py
+"""
+
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
 # example use:
 # sudo -E env PATH=$PATH python3 slowmovie_adafruit.py -f Steamboat_Willie_480p.mp4 -s 1 -c 4.0
-
 
 import os
 import time
