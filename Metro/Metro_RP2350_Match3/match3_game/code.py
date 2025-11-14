@@ -100,7 +100,7 @@ if game_state is None:
             # if we made it to here then /sd/ exists and has a card
             # so use it for save data
             save_to = "/sd/set_game_autosave.dat"
-    except OSError as e:
+    except OSError:
         # no SDcard
         pass
 
