@@ -266,9 +266,6 @@ for device in usb.core.find(find_all=True):
                 + f"endpoint_address: {hex(mouse_endpoint_address)}"
             )
             mouse_sync.append(0)
-    except usb.core.USBError as e:
-        # The mouse might have glitched and may not be detected but at least we don't crash
-        print(e)
 
         # detach kernel driver if needed
         kernel_driver_active_flags.append(device.is_kernel_driver_active(0))
@@ -278,6 +275,9 @@ for device in usb.core.find(find_all=True):
         # set the mouse configuration so it can be used
         device.set_configuration()
 
+    except usb.core.USBError as e:
+        # The mouse might have glitched and may not be detected but at least we don't crash
+        print(e)
 
 def is_mouse1_left_clicked():
     """
