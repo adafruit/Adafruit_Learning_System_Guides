@@ -33,8 +33,6 @@ from match3_game_helpers import (
     GameOverException,
 )
 
-_MOUSE_SYNC = []
-
 original_autoreload_val = supervisor.runtime.autoreload
 supervisor.runtime.autoreload = False
 
@@ -103,7 +101,6 @@ if game_state is None:
             # so use it for save data
             save_to = "/sd/set_game_autosave.dat"
     except OSError as e:
-        print(f'no SDcard {e}')
         # no SDcard
         pass
 
@@ -247,26 +244,31 @@ mice = []
 mouse_bufs = []
 # debouncers list for debouncing mouse left clicks
 mouse_debouncers = []
+mouse_sync = []
 
 # scan for connected USB devices
 for device in usb.core.find(find_all=True):
     # check if current device is has a boot mouse endpoint
-    mouse_interface_index, mouse_endpoint_address = (
-        adafruit_usb_host_descriptors.find_boot_mouse_endpoint(device)
-    )
-    if mouse_interface_index is not None and mouse_endpoint_address is not None:
-        # if it does have a boot mouse endpoint then add information to the
-        # usb info lists
-        mouse_interface_indexes.append(mouse_interface_index)
-        mouse_endpoint_addresses.append(mouse_endpoint_address)
-
-        # add the mouse device instance to list
-        mice.append(device)
-        print(
-            f"mouse interface: {mouse_interface_index} "
-            + f"endpoint_address: {hex(mouse_endpoint_address)}"
+    try:
+        mouse_interface_index, mouse_endpoint_address = (
+            adafruit_usb_host_descriptors.find_boot_mouse_endpoint(device)
         )
-        _MOUSE_SYNC.append(0)
+        if mouse_interface_index is not None and mouse_endpoint_address is not None:
+            # if it does have a boot mouse endpoint then add information to the
+            # usb info lists
+            mouse_interface_indexes.append(mouse_interface_index)
+            mouse_endpoint_addresses.append(mouse_endpoint_address)
+
+            # add the mouse device instance to list
+            mice.append(device)
+            print(
+                f"mouse interface: {mouse_interface_index} "
+                + f"endpoint_address: {hex(mouse_endpoint_address)}"
+            )
+            mouse_sync.append(0)
+    except usb.core.USBError as e:
+        # The mouse might have glitched and may not be detected but at least we don't crash
+        print(e)
 
         # detach kernel driver if needed
         kernel_driver_active_flags.append(device.is_kernel_driver_active(0))
@@ -336,7 +338,7 @@ display.root_group = main_group
 winner = None
 
 
-def get_mouse_deltas(buffer, read_count, mouse_indx):
+def get_mouse_deltas(buffer, read_count, sync):
     """
     Given a mouse packet buffer and a read count of number of bytes read,
     return the delta x and y values of the mouse.
@@ -344,20 +346,19 @@ def get_mouse_deltas(buffer, read_count, mouse_indx):
     :param read_count: the number of bytes read from the mouse
     :return: tuple containing x and y delta values
     """
-    global _MOUSE_SYNC
-    if read_count == 4 or (read_count == 8 and _MOUSE_SYNC[mouse_indx] > 50):
+    if read_count == 4 or (read_count == 8 and sync > 50):
         delta_x = buffer[1]
         delta_y = buffer[2]
     elif read_count == 8:
         delta_x = buffer[2]
         delta_y = buffer[4]
         if delta_y != 0:
-            _MOUSE_SYNC[mouse_indx] = -999
-        elif delta_y == 0 and _MOUSE_SYNC[mouse_indx] > -1:
-            _MOUSE_SYNC[mouse_indx] += 1
+            sync = -999
+        elif delta_y == 0 and sync > -1:
+            sync += 1
     else:
         raise ValueError(f"Unsupported mouse packet size: {read_count}, must be 4 or 8")
-    return delta_x, delta_y
+    return delta_x, delta_y, sync
 
 
 def atexit_callback():
@@ -394,7 +395,8 @@ while True:
             data_len = mouse.read(
                 mouse_endpoint_addresses[i], mouse_bufs[i], timeout=20
             )
-            mouse_deltas = get_mouse_deltas(mouse_bufs[i], data_len, i)
+            mouse_deltas = get_mouse_deltas(mouse_bufs[i], data_len, mouse_sync[i])
+            mouse_sync[i] = mouse_deltas[2]
             # if we got data, then update the mouse cursor on the display
             # using min and max to keep it within the bounds of the display
             mouse_tg.x = max(
