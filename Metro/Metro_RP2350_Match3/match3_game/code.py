@@ -394,23 +394,22 @@ while True:
             data_len = mouse.read(
                 mouse_endpoint_addresses[i], mouse_bufs[i], timeout=20
             )
-            if data_len > 0:
-                mouse_deltas = get_mouse_deltas(mouse_bufs[i], data_len, i)
-                # if we got data, then update the mouse cursor on the display
-                # using min and max to keep it within the bounds of the display
-                mouse_tg.x = max(
-                    0,
-                    min(
-                        display.width // scale_factor - 1, mouse_tg.x + mouse_deltas[0] // 2
-                    ),
-                )
-                mouse_tg.y = max(
-                    0,
-                    min(
-                        display.height // scale_factor - 1,
-                        mouse_tg.y + mouse_deltas[1] // 2,
-                    ),
-                )
+            mouse_deltas = get_mouse_deltas(mouse_bufs[i], data_len, i)
+            # if we got data, then update the mouse cursor on the display
+            # using min and max to keep it within the bounds of the display
+            mouse_tg.x = max(
+                0,
+                min(
+                    display.width // scale_factor - 1, mouse_tg.x + mouse_deltas[0] // 2
+                ),
+            )
+            mouse_tg.y = max(
+                0,
+                min(
+                    display.height // scale_factor - 1,
+                    mouse_tg.y + mouse_deltas[1] // 2,
+                ),
+            )
 
         # timeout error is raised if no data was read within the allotted timeout
         except usb.core.USBTimeoutError:
