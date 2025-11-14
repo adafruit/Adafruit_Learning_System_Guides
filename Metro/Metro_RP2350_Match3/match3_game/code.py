@@ -33,6 +33,8 @@ from match3_game_helpers import (
     GameOverException,
 )
 
+_MOUSE_SYNC = []
+
 original_autoreload_val = supervisor.runtime.autoreload
 supervisor.runtime.autoreload = False
 
@@ -100,7 +102,8 @@ if game_state is None:
             # if we made it to here then /sd/ exists and has a card
             # so use it for save data
             save_to = "/sd/set_game_autosave.dat"
-    except OSError:
+    except OSError as e:
+        print(f'no SDcard {e}')
         # no SDcard
         pass
 
@@ -263,6 +266,7 @@ for device in usb.core.find(find_all=True):
             f"mouse interface: {mouse_interface_index} "
             + f"endpoint_address: {hex(mouse_endpoint_address)}"
         )
+        _MOUSE_SYNC.append(0)
 
         # detach kernel driver if needed
         kernel_driver_active_flags.append(device.is_kernel_driver_active(0))
@@ -332,7 +336,7 @@ display.root_group = main_group
 winner = None
 
 
-def get_mouse_deltas(buffer, read_count):
+def get_mouse_deltas(buffer, read_count, mouse_indx):
     """
     Given a mouse packet buffer and a read count of number of bytes read,
     return the delta x and y values of the mouse.
@@ -340,12 +344,17 @@ def get_mouse_deltas(buffer, read_count):
     :param read_count: the number of bytes read from the mouse
     :return: tuple containing x and y delta values
     """
-    if read_count == 4:
+    global _MOUSE_SYNC
+    if read_count == 4 or (read_count == 8 and _MOUSE_SYNC[mouse_indx] > 50):
         delta_x = buffer[1]
         delta_y = buffer[2]
     elif read_count == 8:
         delta_x = buffer[2]
         delta_y = buffer[4]
+        if delta_y != 0:
+            _MOUSE_SYNC[mouse_indx] = -999
+        elif delta_y == 0 and _MOUSE_SYNC[mouse_indx] > -1:
+            _MOUSE_SYNC[mouse_indx] += 1
     else:
         raise ValueError(f"Unsupported mouse packet size: {read_count}, must be 4 or 8")
     return delta_x, delta_y
@@ -381,28 +390,34 @@ while True:
         try:
             # read data from the mouse, small timeout so we move on
             # quickly if there is no data
+            data_len = 0
             data_len = mouse.read(
-                mouse_endpoint_addresses[i], mouse_bufs[i], timeout=10
+                mouse_endpoint_addresses[i], mouse_bufs[i], timeout=20
             )
-            mouse_deltas = get_mouse_deltas(mouse_bufs[i], data_len)
-            # if we got data, then update the mouse cursor on the display
-            # using min and max to keep it within the bounds of the display
-            mouse_tg.x = max(
-                0,
-                min(
-                    display.width // scale_factor - 1, mouse_tg.x + mouse_deltas[0] // 2
-                ),
-            )
-            mouse_tg.y = max(
-                0,
-                min(
-                    display.height // scale_factor - 1,
-                    mouse_tg.y + mouse_deltas[1] // 2,
-                ),
-            )
+            if data_len > 0:
+                mouse_deltas = get_mouse_deltas(mouse_bufs[i], data_len, i)
+                # if we got data, then update the mouse cursor on the display
+                # using min and max to keep it within the bounds of the display
+                mouse_tg.x = max(
+                    0,
+                    min(
+                        display.width // scale_factor - 1, mouse_tg.x + mouse_deltas[0] // 2
+                    ),
+                )
+                mouse_tg.y = max(
+                    0,
+                    min(
+                        display.height // scale_factor - 1,
+                        mouse_tg.y + mouse_deltas[1] // 2,
+                    ),
+                )
 
         # timeout error is raised if no data was read within the allotted timeout
         except usb.core.USBTimeoutError:
+            pass
+
+        # common non-fatal error
+        except usb.core.USBError:
             pass
 
         # update the mouse debouncers
