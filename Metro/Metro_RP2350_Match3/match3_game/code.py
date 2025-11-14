@@ -267,13 +267,13 @@ for device in usb.core.find(find_all=True):
             )
             mouse_sync.append(0)
 
-        # detach kernel driver if needed
-        kernel_driver_active_flags.append(device.is_kernel_driver_active(0))
-        if device.is_kernel_driver_active(0):
-            device.detach_kernel_driver(0)
+            # detach kernel driver if needed
+            kernel_driver_active_flags.append(device.is_kernel_driver_active(0))
+            if device.is_kernel_driver_active(0):
+                device.detach_kernel_driver(0)
 
-        # set the mouse configuration so it can be used
-        device.set_configuration()
+            # set the mouse configuration so it can be used
+            device.set_configuration()
 
     except usb.core.USBError as e:
         # The mouse might have glitched and may not be detected but at least we don't crash
