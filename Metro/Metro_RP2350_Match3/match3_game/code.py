@@ -26,12 +26,22 @@ from adafruit_debouncer import Debouncer
 import adafruit_sdcard
 import msgpack
 import storage
-from match3_game_helpers import (
-    Match3Game,
-    STATE_GAMEOVER,
-    STATE_PLAYING_SETCALLED,
-    GameOverException,
-)
+try:
+    from match3_game_helpers import (
+        Match3Game,
+        STATE_GAMEOVER,
+        STATE_PLAYING_SETCALLED,
+        GameOverException,
+    )
+except ImportError:
+    # Needed for Fruit Jam OS if "Play again" is selected at end of game
+    os.chdir('/apps/Metro_RP2350_Match3')
+    from match3_game_helpers import (
+        Match3Game,
+        STATE_GAMEOVER,
+        STATE_PLAYING_SETCALLED,
+        GameOverException,
+    )
 
 original_autoreload_val = supervisor.runtime.autoreload
 supervisor.runtime.autoreload = False
