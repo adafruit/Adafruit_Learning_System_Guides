@@ -64,24 +64,7 @@ fj.neopixels.brightness = 0.1
 
 word_fetcher = WordFetcherTTS(fj, launcher_config)
 
-def say_and_spell_lastword():
-    """
-    Say the last word, then spell it out one letter at a time, finally say it once more.
-    """
-    if sayword:
-        if word_fetcher.output_path[-4:] == ".mp3":
-            fj.play_mp3_file(word_fetcher.output_path)
-        elif word_fetcher.output_path[-4:] == ".wav":
-            fj.play_file(word_fetcher.output_path)
-        time.sleep(0.2)
-    for letter in lastword:
-        fj.play_mp3_file(f"spell_jam_assets/letter_mp3s/{letter.upper()}.mp3")
-    time.sleep(0.2)
-    if sayword:
-        if word_fetcher.output_path[-4:] == ".mp3":
-            fj.play_mp3_file(word_fetcher.output_path)
-        elif word_fetcher.output_path[-4:] == ".wav":
-            fj.play_file(word_fetcher.output_path)
+def play_sound():
     soundPath = None
     if 'words' in os.listdir('spell_jam_assets'):
         soundPath = 'spell_jam_assets/words/'
@@ -102,6 +85,26 @@ def say_and_spell_lastword():
                 elif sound[-4:] == ".wav":
                     fj.play_file(f'{soundPath}{sound}')
                 break
+
+def say_and_spell_lastword():
+    """
+    Say the last word, then spell it out one letter at a time, finally say it once more.
+    """
+    if sayword:
+        if word_fetcher.output_path[-4:] == ".mp3":
+            fj.play_mp3_file(word_fetcher.output_path)
+        elif word_fetcher.output_path[-4:] == ".wav":
+            fj.play_file(word_fetcher.output_path)
+        time.sleep(0.2)
+    for letter in lastword:
+        fj.play_mp3_file(f"spell_jam_assets/letter_mp3s/{letter.upper()}.mp3")
+    time.sleep(0.2)
+    if sayword:
+        if word_fetcher.output_path[-4:] == ".mp3":
+            fj.play_mp3_file(word_fetcher.output_path)
+        elif word_fetcher.output_path[-4:] == ".wav":
+            fj.play_file(word_fetcher.output_path)
+    play_sound()
 
     fj.neopixels.fill(0x000000)
 
