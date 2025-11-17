@@ -16,7 +16,7 @@ from adafruit_epd.ssd1683 import Adafruit_SSD1683
 
 # First define some color constants
 WHITE = (0xFF, 0xFF, 0xFF)
-BLACK = (0xFF, 0x00, 0x00)
+BLACK = (0x00, 0x00, 0x00)
 
 # Next define some constants to allow easy resizing of shapes and colors
 BORDER = 20
