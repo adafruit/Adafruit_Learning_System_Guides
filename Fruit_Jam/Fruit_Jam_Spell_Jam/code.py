@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 import sys
+import os
 import time
 import supervisor
 
@@ -63,6 +64,28 @@ fj.neopixels.brightness = 0.1
 
 word_fetcher = WordFetcherTTS(fj, launcher_config)
 
+def play_sound():
+    soundPath = None
+    if 'words' in os.listdir('spell_jam_assets'):
+        soundPath = 'spell_jam_assets/words/'
+    else:
+        try:
+            sdAssets = os.listdir('/sd/spell_jam_assets/')
+            soundPath = f"/sd/spell_jam_assets/{sdAssets[sdAssets.index('words')]}/"
+        except ValueError:
+            soundPath = None
+        except OSError:
+            soundPath = None
+
+    if soundPath is not None:
+        for sound in os.listdir(soundPath):
+            if sound.upper()[:-4] == lastword.upper():
+                if sound[-4:] == ".mp3":
+                    fj.play_mp3_file(f'{soundPath}{sound}')
+                elif sound[-4:] == ".wav":
+                    fj.play_file(f'{soundPath}{sound}')
+                break
+
 def say_and_spell_lastword():
     """
     Say the last word, then spell it out one letter at a time, finally say it once more.
@@ -81,6 +104,8 @@ def say_and_spell_lastword():
             fj.play_mp3_file(word_fetcher.output_path)
         elif word_fetcher.output_path[-4:] == ".wav":
             fj.play_file(word_fetcher.output_path)
+    play_sound()
+
     fj.neopixels.fill(0x000000)
 
 
