@@ -10,6 +10,7 @@ Players trade off using the USB mouse to play their turns.
 import array
 import random
 import time
+import atexit
 from displayio import Group, OnDiskBitmap, TileGrid
 from adafruit_display_text.bitmap_label import Label
 from adafruit_display_text.text_box import TextBox
@@ -18,7 +19,6 @@ from adafruit_ticks import ticks_ms
 import supervisor
 import terminalio
 import usb.core
-import atexit
 from adafruit_fruitjam.peripherals import request_display_config
 import adafruit_usb_host_descriptors
 from adafruit_pathlib import Path
