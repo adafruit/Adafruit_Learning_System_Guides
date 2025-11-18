@@ -10,7 +10,6 @@ Players trade off using the USB mouse to play their turns.
 import array
 import random
 import time
-import atexit
 from displayio import Group, OnDiskBitmap, TileGrid
 from adafruit_display_text.bitmap_label import Label
 from adafruit_display_text.text_box import TextBox
@@ -299,20 +298,18 @@ for device in usb.core.find(find_all=True):
     print(f"{device.idVendor:04x}:{device.idProduct:04x}")
     print(device.manufacturer, device.product)
     print(device.serial_number)
-
-    config_descriptor = adafruit_usb_host_descriptors.get_configuration_descriptor(
-        device, 0
-    )
-
-    _possible_interface_index, _possible_endpoint_address = (
+    mouse_interface_index, mouse_endpoint_address = (
         adafruit_usb_host_descriptors.find_boot_mouse_endpoint(device))
 
-    if _possible_interface_index is not None and _possible_endpoint_address is not None:
+    if mouse_interface_index is not None and mouse_endpoint_address is not None:
         mouse = device
-        mouse_interface_index = _possible_interface_index
-        mouse_endpoint_address = _possible_endpoint_address
-        print(f"mouse interface: {mouse_interface_index}", end="")
-        print(f"endpoint_address: {hex(mouse_endpoint_address)}")
+        print(
+            f"mouse interface: {mouse_interface_index} "
+            + f"endpoint_address: {hex(mouse_endpoint_address)}"
+        )
+
+        break
+
 
 mouse_was_attached = None
 if mouse is not None:
@@ -325,19 +322,6 @@ if mouse is not None:
 
     # set configuration on the mouse so we can use it
     mouse.set_configuration()
-
-
-def atexit_callback():
-    """
-    re-attach USB devices to kernel if needed.
-    :return:
-    """
-    print("inside atexit callback")
-    if mouse_was_attached and not mouse.is_kernel_driver_active(0):
-        mouse.attach_kernel_driver(0)
-
-
-atexit.register(atexit_callback)
 
 # Buffer to hold data read from the mouse
 # Boot mice have 4 byte reports
