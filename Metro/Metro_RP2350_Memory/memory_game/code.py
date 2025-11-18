@@ -18,6 +18,7 @@ from adafruit_ticks import ticks_ms
 import supervisor
 import terminalio
 import usb.core
+import atexit
 from adafruit_fruitjam.peripherals import request_display_config
 import adafruit_usb_host_descriptors
 from adafruit_pathlib import Path
@@ -322,6 +323,18 @@ if mouse is not None:
 
     # set configuration on the mouse so we can use it
     mouse.set_configuration()
+
+def atexit_callback():
+    """
+    re-attach USB devices to kernel if needed.
+    :return:
+    """
+    print("inside atexit callback")
+    if mouse_was_attached and not mouse.is_kernel_driver_active(0):
+        mouse.attach_kernel_driver(0)
+
+
+atexit.register(atexit_callback)
 
 # Buffer to hold data read from the mouse
 # Boot mice have 4 byte reports
