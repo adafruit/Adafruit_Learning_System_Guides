@@ -12,8 +12,8 @@ various examples from RGB Shades Demo Code & the FastLED demo library.
 Can easily incorporate other examples or create your own!
 
 To use:
-⦁	Press the button to cycle through available effects shown on the functions list
-⦁	Press and hold the button (>one second) to cycle through five brightness levels
+*	Press the button to cycle through available effects shown on the functions list
+*	Press and hold the button (>one second) to cycle through five brightness levels
 
 Special credit to RGB Shades Demo Code Copyright (c) 2015 macetech LLC
 
