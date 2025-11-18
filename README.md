@@ -17,6 +17,7 @@ Starting in 2023, guides using a specific Adafruit board will be placed in a sub
 * Metro/ (all types)
 * Matrix_Portal/
 * Crickits/
+* Gemma/ (both types)
 
 If a new product or project group is contemplated, contact Learn moderators for guidance.
 
@@ -57,4 +58,4 @@ Adafruit_Learning_System_Guides, not a sub-directory):
 Adafruit Learning System code files should have author and license information conforming to the open [SPDX specification](https://www.iso.org/standard/81870.html).
 See [this page](https://learn.adafruit.com/contribute-to-the-adafruit-learning-system-with-git-and-github/add-author-and-license-information) for more.
 
-Updated November 5, 2025
+Updated November 18, 2025
