@@ -12,7 +12,16 @@ from displayio import OnDiskBitmap, TileGrid, Group
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text.bitmap_label import Label
 
-from launcher_config import LauncherConfig
+try:
+    from launcher_config import LauncherConfig
+except ImportError:
+
+    class LauncherConfig:
+        def __init__(self):
+            self.data = {}
+            self.audio_output = "headphone"
+            self.audio_volume_override_danger = 0.75
+
 
 # comment out one of these imports depending on which TTS engine you want to use
 from tts_aws import WordFetcherTTS
@@ -64,13 +73,14 @@ fj.neopixels.brightness = 0.1
 
 word_fetcher = WordFetcherTTS(fj, launcher_config)
 
+
 def play_sound():
     soundPath = None
-    if 'words' in os.listdir('spell_jam_assets'):
-        soundPath = 'spell_jam_assets/words/'
+    if "words" in os.listdir("spell_jam_assets"):
+        soundPath = "spell_jam_assets/words/"
     else:
         try:
-            sdAssets = os.listdir('/sd/spell_jam_assets/')
+            sdAssets = os.listdir("/sd/spell_jam_assets/")
             soundPath = f"/sd/spell_jam_assets/{sdAssets[sdAssets.index('words')]}/"
         except ValueError:
             soundPath = None
@@ -81,10 +91,11 @@ def play_sound():
         for sound in os.listdir(soundPath):
             if sound.upper()[:-4] == lastword.upper():
                 if sound[-4:] == ".mp3":
-                    fj.play_mp3_file(f'{soundPath}{sound}')
+                    fj.play_mp3_file(f"{soundPath}{sound}")
                 elif sound[-4:] == ".wav":
-                    fj.play_file(f'{soundPath}{sound}')
+                    fj.play_file(f"{soundPath}{sound}")
                 break
+
 
 def say_and_spell_lastword():
     """
