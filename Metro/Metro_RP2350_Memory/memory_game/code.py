@@ -7,7 +7,7 @@ flipped face down so the players must try to remember where they are.
 
 Players trade off using the USB mouse to play their turns.
 """
-import array
+import sys
 import random
 import time
 import atexit
@@ -18,10 +18,8 @@ from adafruit_displayio_layout.layouts.grid_layout import GridLayout
 from adafruit_ticks import ticks_ms
 import supervisor
 import terminalio
-import usb.core
 from adafruit_fruitjam.peripherals import request_display_config
 from adafruit_usb_host_mouse import find_and_init_boot_mouse, find_and_init_report_mouse
-import adafruit_usb_host_descriptors
 from adafruit_pathlib import Path
 
 
