@@ -19,8 +19,8 @@ All text above must be included in any redistribution.
 import gc
 import sys
 import time
-import supervisor
 import atexit
+import supervisor
 import board
 import displayio
 import terminalio
@@ -220,8 +220,9 @@ class MousePoller():
             return False
 
         # Change the mouse resolution so it's not too sensitive
+        fontHeight = terminalio.FONT.get_bounding_box()[1]
         self.mouse.display_size = (supervisor.runtime.display.width*self.sensitivity,
-            (supervisor.runtime.display.height - terminalio.FONT.get_bounding_box()[1])*self.sensitivity)
+            (supervisor.runtime.display.height - fontHeight)*self.sensitivity)
         return True
 
     def poll(self):
@@ -396,6 +397,7 @@ class Paint(): # pylint: disable=too-many-statements
 
         self._brush = 0
         self._cursor_bitmaps = [_cursor_bitmap_1(), _cursor_bitmap_3()]
+        self.mouse = None
         if hasattr(board, "TOUCH_XL"):
             self._poller = TouchscreenPoller(self._splash, self._cursor_bitmaps[0])
         elif hasattr(board, "BUTTON_CLOCK"):
@@ -404,6 +406,7 @@ class Paint(): # pylint: disable=too-many-statements
             self._poller = MousePoller(self._splash, self._cursor_bitmaps[0], self._w, self._h)
             if not self._poller.mouse:
                 raise RuntimeError("No mouse found. Please connect a USB mouse.")
+            self.mouse = self._poller.mouse
         else:
             raise AttributeError("PyPaint requires a mouse, touchscreen or cursor.")
 
@@ -675,8 +678,8 @@ def atexit_callback():
     :return:
     """
     print("inside atexit callback")
-    if type(painter._poller) == MousePoller:
-        mouse = painter._poller.mouse
+    if painter.mouse is not None:
+        mouse = painter.mouse
         if mouse.was_attached and not mouse.device.is_kernel_driver_active(0):
             mouse.device.attach_kernel_driver(0)
             # The keyboard buffer seems to have data left over from when it was detached
