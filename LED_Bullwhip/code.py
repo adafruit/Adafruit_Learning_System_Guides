@@ -28,7 +28,7 @@ try:
     from adafruit_lsm6ds.lsm6ds33 import LSM6DS33 as LSM6DS
     sensor = LSM6DS(i2c)
 except RuntimeError:
-    from adafruit_lsm6ds.lsm6ds3 import LSM6DS3 as LSM6DS
+    from adafruit_lsm6ds.lsm6ds3trc import LSM6DS3TRC as LSM6DS
     sensor = LSM6DS(i2c)
 
 # CUSTOMISE COLORS HERE:
