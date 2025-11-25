@@ -291,7 +291,6 @@ time.sleep(1)
 mouse_ptr = find_and_init_boot_mouse("mouse_cursor.bmp")
 if mouse_ptr is None:
     mouse_ptr = find_and_init_report_mouse("mouse_cursor.bmp")
-    sensitivity = 1
 if mouse_ptr is None:
     print("No mouse found.")
 mouse = mouse_ptr.device
