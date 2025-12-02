@@ -311,8 +311,12 @@ def atexit_callback():
     """
     print("inside atexit callback")
     if mouse is not None:
-        if mouse_ptr.was_attached and not mouse_ptr.device.is_kernel_driver_active(0):
-            mouse.attach_kernel_driver(0)
+        if (
+            mouse_ptr.was_attached and
+            not mouse_ptr.device.is_kernel_driver_active(mouse_ptr.interface)
+        ):
+
+            mouse.attach_kernel_driver(mouse_ptr.interface)
             # The keyboard buffer seems to have data left over from when it was detached
             # This clears it before the next process starts
             while supervisor.runtime.serial_bytes_available:
