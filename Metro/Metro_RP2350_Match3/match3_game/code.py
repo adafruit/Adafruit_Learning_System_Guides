@@ -245,7 +245,7 @@ for i in range(2):
 # USB info lists
 mouse_interface_indexes = []
 mouse_endpoint_addresses = []
-kernel_driver_active_flags = []
+detached_interfaces = []
 # USB device object instance list
 mice = []
 # buffers list for mouse packet data
@@ -255,58 +255,23 @@ mouse_debouncers = []
 mouse_sync = []
 
 # scan for connected USB devices
-for device in usb.core.find(find_all=True):
-    # check if current device is has a boot mouse endpoint
-    try:
-        mouse_interface_index, mouse_endpoint_address = (
-            adafruit_usb_host_descriptors.find_boot_mouse_endpoint(device)
-        )
-        if mouse_interface_index is not None and mouse_endpoint_address is not None:
-            # if it does have a boot mouse endpoint then add information to the
-            # usb info lists
-            mouse_interface_indexes.append(mouse_interface_index)
-            mouse_endpoint_addresses.append(mouse_endpoint_address)
+for find_endpoint, default_sync in [
+    (adafruit_usb_host_descriptors.find_boot_mouse_endpoint, 0),
+    (adafruit_usb_host_descriptors.find_report_mouse_endpoint, -1)
+]:
 
-            # add the mouse device instance to list
-            mice.append(device)
-            print(
-                f"mouse interface: {mouse_interface_index} "
-                + f"endpoint_address: {hex(mouse_endpoint_address)}"
-            )
-            mouse_sync.append(0)
-
-            # detach kernel driver if needed
-            kernel_driver_active_flags.append(
-                device.is_kernel_driver_active(mouse_interface_index)
-            )
-            if device.is_kernel_driver_active(mouse_interface_index):
-                device.detach_kernel_driver(mouse_interface_index)
-
-            # set the mouse configuration so it can be used
-            device.set_configuration()
-
-    except usb.core.USBError as e:
-        # The mouse might have glitched and may not be detected but at least we don't crash
-        print(e)
-
-    if len(mice) >= 2:
-        break
-
-if len(mice) < 2:
     for device in usb.core.find(find_all=True):
         if device in mice:
             print('found device twice')
             continue
         # check if current device is has a boot mouse endpoint
         try:
-            mouse_interface_index, mouse_endpoint_address = (
-                adafruit_usb_host_descriptors.find_report_mouse_endpoint(device)
-            )
+            mouse_interface_index, mouse_endpoint_address = (find_endpoint(device))
             if mouse_interface_index is not None and mouse_endpoint_address is not None:
                 if mouse_interface_index in mouse_interface_indexes and mouse_endpoint_address in mouse_endpoint_addresses:
                     print('found index/address twice')
                     continue
-                # if it does have a boot mouse endpoint then add information to the
+                # if it does have a mouse endpoint then add information to the
                 # usb info lists
                 mouse_interface_indexes.append(mouse_interface_index)
                 mouse_endpoint_addresses.append(mouse_endpoint_address)
@@ -314,17 +279,26 @@ if len(mice) < 2:
                 # add the mouse device instance to list
                 mice.append(device)
                 print(
-                    f"mouse interface: {mouse_interface_index} "
+                    f"{default_sync} mouse interface: {mouse_interface_index} "
                     + f"endpoint_address: {hex(mouse_endpoint_address)}"
                 )
-                mouse_sync.append(-1)
+                mouse_sync.append(default_sync)
 
                 # detach kernel driver if needed
-                kernel_driver_active_flags.append(
-                    device.is_kernel_driver_active(mouse_interface_index)
-                )
-                if device.is_kernel_driver_active(mouse_interface_index):
-                    device.detach_kernel_driver(mouse_interface_index)
+                detached = []
+
+                # Typically HID devices have interfaces 0,1,2
+                # Trying 0..mouse_iface is safe and sufficient
+                for intf in range(mouse_interface_index + 1):
+                    try:
+                        if device.is_kernel_driver_active(intf):
+                            device.detach_kernel_driver(intf)
+                            detached.append(intf)
+                            print(f"Detached kernel driver from interface {intf}")
+                    except usb.core.USBError as e:
+                        print(e)
+
+                detached_interfaces.append(detached)
 
                 # set the mouse configuration so it can be used
                 device.set_configuration()
@@ -335,6 +309,9 @@ if len(mice) < 2:
 
         if len(mice) >= 2:
             break
+
+    if len(mice) >= 2:
+        break
 
 def is_mouse1_left_clicked():
     """
@@ -429,14 +406,16 @@ def atexit_callback():
     :return:
     """
     for _i, _mouse in enumerate(mice):
-        if kernel_driver_active_flags[_i]:
-            if not _mouse.is_kernel_driver_active(mouse_interface_indexes[_i]):
-                _mouse.attach_kernel_driver(mouse_interface_indexes[_i])
-                print(f'#{_i} Index: {mouse_interface_indexes[_i]} (reattaching)')
-            else:
-                print(f'#{_i} Index: {mouse_interface_indexes[_i]} (Not Attaching)')
-        else:
-            print(f'#{_i} Index: {mouse_interface_indexes[_i]} kernel not active (was not attached)')
+        detached_from_device = detached_interfaces[_i]
+
+        if detached_from_device:
+            for intf in detached_from_device:
+                if not _mouse.is_kernel_driver_active(intf):
+                    _mouse.attach_kernel_driver(intf)
+                    print(f'#{_i} Index: {intf} (reattaching)')
+                else:
+                    print(f'#{_i} Index: {intf} (Not Attaching)')
+
     supervisor.runtime.autoreload = original_autoreload_val
 
 
