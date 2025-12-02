@@ -68,8 +68,8 @@ const byte numEffects = (sizeof(effectList)/sizeof(effectList[0]));
 void setup() {
 
 //Add the onboard Strip on the Right and Left to create a single array
-  FastLED.addLeds<CHIPSET, LEFT_PIN, COLOR_ORDER>(leds, NUM_LEFT);  // See https://github.com/fastled/fastled/wiki/basic-usage
-  FastLED.addLeds<CHIPSET, RIGHT_PIN, COLOR_ORDER>(leds, NUM_RIGHT);
+  FastLED.addLeds<CHIPSET, LEFT_PIN, COLOR_ORDER>(leds, LEFT_PIN, NUM_LEFT);  // See https://github.com/fastled/fastled/wiki/basic-usage
+  FastLED.addLeds<CHIPSET, RIGHT_PIN, COLOR_ORDER>(leds, RIGHT_PIN, NUM_RIGHT);
 
   // set global brightness value
   FastLED.setBrightness( scale8(currentBrightness, MAXBRIGHTNESS) );
