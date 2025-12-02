@@ -310,13 +310,14 @@ def atexit_callback():
     :return:
     """
     print("inside atexit callback")
-    if mouse is not None:
-        if (
-            mouse_ptr.was_attached and
-            not mouse_ptr.device.is_kernel_driver_active(mouse_ptr.interface)
-        ):
-
-            mouse.attach_kernel_driver(mouse_ptr.interface)
+    if mouse_ptr.device is not None:
+        if mouse_ptr.was_attached:
+            # Typically HID devices have interfaces 0,1,2
+            # Trying 0..mouse_iface is safe and sufficient
+            for intf in range(mouse_ptr.interface+1):
+                if not mouse_ptr.device.is_kernel_driver_active(intf):
+                    mouse_ptr.device.attach_kernel_driver(intf)
+    
             # The keyboard buffer seems to have data left over from when it was detached
             # This clears it before the next process starts
             while supervisor.runtime.serial_bytes_available:
