@@ -291,20 +291,22 @@ for find_endpoint, default_sync in [
                 detached = []
 
                 # Typically HID devices have interfaces 0,1,2
-                # Trying 0..mouse_iface is safe and sufficient
-                for intf in range(mouse_interface_index + 1):
+                for intf in range(3):
+                    print(f'interface: {intf} ',end="")
                     try:
                         if device.is_kernel_driver_active(intf):
                             device.detach_kernel_driver(intf)
                             detached.append(intf)
                             print(f"Detached kernel driver from interface {intf}")
+                        else:
+                            print("not active")
                     except usb.core.USBError as e:
                         print(e)
 
                 detached_interfaces.append(detached)
 
                 # set the mouse configuration so it can be used
-                device.set_configuration()
+                #device.set_configuration()
 
         except usb.core.USBError as e:
             # The mouse might have glitched and may not be detected but at least we don't crash
@@ -315,6 +317,9 @@ for find_endpoint, default_sync in [
 
     if len(mice) >= 2:
         break
+
+for device in mice:
+    device.set_configuration()
 
 def is_mouse1_left_clicked():
     """
