@@ -682,8 +682,7 @@ def atexit_callback():
         mouse = painter.mouse
         if mouse.was_attached:
             # Typically HID devices have interfaces 0,1,2
-            # Trying 0..mouse_iface is safe and sufficient
-            for intf in range(mouse.interface+1):
+            for intf in range(3):
                 if not mouse.device.is_kernel_driver_active(intf):
                     mouse.device.attach_kernel_driver(intf)
             # The keyboard buffer seems to have data left over from when it was detached

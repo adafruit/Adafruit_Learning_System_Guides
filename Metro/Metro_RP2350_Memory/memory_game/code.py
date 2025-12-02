@@ -313,8 +313,7 @@ def atexit_callback():
     if mouse_ptr.device is not None:
         if mouse_ptr.was_attached:
             # Typically HID devices have interfaces 0,1,2
-            # Trying 0..mouse_iface is safe and sufficient
-            for intf in range(mouse_ptr.interface+1):
+            for intf in range(3):
                 if not mouse_ptr.device.is_kernel_driver_active(intf):
                     mouse_ptr.device.attach_kernel_driver(intf)
 
