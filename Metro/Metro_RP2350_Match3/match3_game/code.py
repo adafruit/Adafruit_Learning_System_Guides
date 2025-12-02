@@ -276,9 +276,11 @@ for device in usb.core.find(find_all=True):
             mouse_sync.append(0)
 
             # detach kernel driver if needed
-            kernel_driver_active_flags.append(device.is_kernel_driver_active(0))
-            if device.is_kernel_driver_active(0):
-                device.detach_kernel_driver(0)
+            kernel_driver_active_flags.append(
+                device.is_kernel_driver_active(mouse_interface_index)
+            )
+            if device.is_kernel_driver_active(mouse_interface_index):
+                device.detach_kernel_driver(mouse_interface_index)
 
             # set the mouse configuration so it can be used
             device.set_configuration()
@@ -318,9 +320,11 @@ if len(mice) < 2:
                 mouse_sync.append(-1)
 
                 # detach kernel driver if needed
-                kernel_driver_active_flags.append(device.is_kernel_driver_active(0))
-                if device.is_kernel_driver_active(0):
-                    device.detach_kernel_driver(0)
+                kernel_driver_active_flags.append(
+                    device.is_kernel_driver_active(mouse_interface_index)
+                )
+                if device.is_kernel_driver_active(mouse_interface_index):
+                    device.detach_kernel_driver(mouse_interface_index)
 
                 # set the mouse configuration so it can be used
                 device.set_configuration()
@@ -426,8 +430,8 @@ def atexit_callback():
     """
     for _i, _mouse in enumerate(mice):
         if kernel_driver_active_flags[_i]:
-            if not _mouse.is_kernel_driver_active(0):
-                _mouse.attach_kernel_driver(0)
+            if not _mouse.is_kernel_driver_active(mouse_interface_indexes[_i]):
+                _mouse.attach_kernel_driver(mouse_interface_indexes[_i])
     supervisor.runtime.autoreload = original_autoreload_val
 
 
