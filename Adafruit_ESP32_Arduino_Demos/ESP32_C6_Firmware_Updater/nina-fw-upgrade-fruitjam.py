@@ -43,7 +43,7 @@ esptool = adafruit_miniesptool.miniesptool(uart, gpio0, reset, flashsize=4 * 102
 # Attempt to sync with the ESP32-C6
 esptool.sync()
 chip_name = esptool.chip_name
-if (chip_name is None):
+if chip_name is None:
     pixels.fill((255, 0, 0))
     time.sleep(3)
     raise RuntimeError("Unable to detect chip type!")
@@ -60,7 +60,7 @@ try:
 except (OSError, RuntimeError) as e:
     pixels.fill((255, 0, 0))
     time.sleep(2)
-    raise RuntimeError("Flashing failed: " + str(e))
+    raise RuntimeError("Flashing failed: " + str(e)) from e
 
 print("Done flashing, resetting..")
 esptool.reset()
