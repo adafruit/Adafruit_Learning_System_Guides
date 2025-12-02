@@ -67,6 +67,14 @@ unsigned long baud = 115200;
   #define SPIWIFI_ACK    7  // a.k.a BUSY or READY pin
   #define ESP32_GPIO0   -1
   #define NEOPIXEL_PIN   8
+#elif defined(ADAFRUIT_METRO_M4_EXPRESS) || defined(ARDUINO_SAMD_METRO_M4)
+  #define SerialESP32   Serial1
+  #define SPIWIFI       SPI
+  #define SPIWIFI_SS    10    // AirLift CS
+  #define ESP32_RESETN   5    // AirLift RESET
+  #define SPIWIFI_ACK    7    // AirLift BUSY / READY
+  #define ESP32_GPIO0    6    // AirLift GPIO0 (boot)
+  #define NEOPIXEL_PIN  40    // Metro M4 onboard NeoPixel
 #elif !defined(SPIWIFI_SS)  // if the wifi definition isnt in the board variant
   // Don't change the names of these #define's! they match the variant ones
   #define SerialESP32   Serial1
