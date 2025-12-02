@@ -432,6 +432,11 @@ def atexit_callback():
         if kernel_driver_active_flags[_i]:
             if not _mouse.is_kernel_driver_active(mouse_interface_indexes[_i]):
                 _mouse.attach_kernel_driver(mouse_interface_indexes[_i])
+                print(f'#{_i} Index: {mouse_interface_indexes[_i]} (reattaching)')
+            else:
+                print(f'#{_i} Index: {mouse_interface_indexes[_i]} (Not Attaching)')
+        else:
+            print(f'#{_i} Index: {mouse_interface_indexes[_i]} kernel not active (was not attached)')
     supervisor.runtime.autoreload = original_autoreload_val
 
 
