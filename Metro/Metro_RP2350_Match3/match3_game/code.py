@@ -268,7 +268,10 @@ for find_endpoint, default_sync in [
         try:
             mouse_interface_index, mouse_endpoint_address = (find_endpoint(device))
             if mouse_interface_index is not None and mouse_endpoint_address is not None:
-                if mouse_interface_index in mouse_interface_indexes and mouse_endpoint_address in mouse_endpoint_addresses:
+                if (
+                    mouse_interface_index in mouse_interface_indexes and
+                    mouse_endpoint_address in mouse_endpoint_addresses
+                ):
                     print('found index/address twice')
                     continue
                 # if it does have a mouse endpoint then add information to the
@@ -409,12 +412,12 @@ def atexit_callback():
         detached_from_device = detached_interfaces[_i]
 
         if detached_from_device:
-            for intf in detached_from_device:
-                if not _mouse.is_kernel_driver_active(intf):
-                    _mouse.attach_kernel_driver(intf)
-                    print(f'#{_i} Index: {intf} (reattaching)')
+            for _intf in detached_from_device:
+                if not _mouse.is_kernel_driver_active(_intf):
+                    _mouse.attach_kernel_driver(_intf)
+                    print(f'#{_i} Index: {_intf} (reattaching)')
                 else:
-                    print(f'#{_i} Index: {intf} (Not Attaching)')
+                    print(f'#{_i} Index: {_intf} (Not Attaching)')
 
     supervisor.runtime.autoreload = original_autoreload_val
 
