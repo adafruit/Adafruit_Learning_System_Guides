@@ -317,7 +317,7 @@ def atexit_callback():
             for intf in range(mouse_ptr.interface+1):
                 if not mouse_ptr.device.is_kernel_driver_active(intf):
                     mouse_ptr.device.attach_kernel_driver(intf)
-    
+
             # The keyboard buffer seems to have data left over from when it was detached
             # This clears it before the next process starts
             while supervisor.runtime.serial_bytes_available:
