@@ -680,11 +680,8 @@ def atexit_callback():
     print("inside atexit callback")
     if painter.mouse is not None:
         mouse = painter.mouse
+        mouse.release()
         if mouse.was_attached:
-            # Typically HID devices have interfaces 0,1,2
-            for intf in range(3):
-                if not mouse.device.is_kernel_driver_active(intf):
-                    mouse.device.attach_kernel_driver(intf)
             # The keyboard buffer seems to have data left over from when it was detached
             # This clears it before the next process starts
             while supervisor.runtime.serial_bytes_available:

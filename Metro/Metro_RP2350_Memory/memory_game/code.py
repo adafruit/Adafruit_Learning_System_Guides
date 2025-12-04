@@ -311,12 +311,8 @@ def atexit_callback():
     """
     print("inside atexit callback")
     if mouse_ptr.device is not None:
+        mouse_ptr.release()
         if mouse_ptr.was_attached:
-            # Typically HID devices have interfaces 0,1,2
-            for intf in range(3):
-                if not mouse_ptr.device.is_kernel_driver_active(intf):
-                    mouse_ptr.device.attach_kernel_driver(intf)
-
             # The keyboard buffer seems to have data left over from when it was detached
             # This clears it before the next process starts
             while supervisor.runtime.serial_bytes_available:
@@ -454,7 +450,7 @@ while True:
             if left_button_pressed:
                 # if the mouse point is within the exit button
                 if (mouse_tg.x >= display.width - 30 and
-                    mouse_tg.y >= display.height - 15):
+                    mouse_tg.y >= display.height - 20):
                     # restart back to code.py
                     supervisor.reload()
 
