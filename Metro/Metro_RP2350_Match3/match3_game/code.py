@@ -305,9 +305,6 @@ for find_endpoint, default_sync in [
 
                 detached_interfaces.append(detached)
 
-                # set the mouse configuration so it can be used
-                #device.set_configuration()
-
         except usb.core.USBError as e:
             # The mouse might have glitched and may not be detected but at least we don't crash
             print(e)
@@ -318,6 +315,7 @@ for find_endpoint, default_sync in [
     if len(mice) >= 2:
         break
 
+# set the mouse configuration on any detected mice so they can be used
 for device in mice:
     device.set_configuration()
 
