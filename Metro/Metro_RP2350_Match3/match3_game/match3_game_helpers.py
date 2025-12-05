@@ -663,12 +663,13 @@ class Match3Game(Group):
                 and self.title_screen.resume_btn.contains(coords)
             ):
 
-                # load the game from the given game state
-                self.load_from_game_state(self.game_state)
-                # hide the title screen
-                self.title_screen.hidden = True
-                # set the current state to open play
-                self.cur_state = STATE_PLAYING_OPEN
+                if self.game_state is not None:
+                    # load the game from the given game state
+                    self.load_from_game_state(self.game_state)
+                    # hide the title screen
+                    self.title_screen.hidden = True
+                    # set the current state to open play
+                    self.cur_state = STATE_PLAYING_OPEN
 
             # if the new game button was clicked
             elif self.title_screen.new_game_btn.contains(coords):

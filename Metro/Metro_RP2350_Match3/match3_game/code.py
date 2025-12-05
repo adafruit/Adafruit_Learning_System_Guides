@@ -185,16 +185,14 @@ exit_btn = TileGrid(bitmap=exit_btn_bmp, pixel_shader=exit_btn_bmp.pixel_shader)
 # transparent pixels in the corners for the rounded corner effect
 exit_btn_bmp.pixel_shader.make_transparent(0)
 
-# centered within the display, offset to the right
-exit_btn.x = display.width // scale_factor // 2 - (exit_btn_bmp.width) // 2 + 30
-
-# inside the bounds of the game over label, so it looks like a dialog visually
-exit_btn.y = 100
-
 # add the play again and exit buttons to the game over group
 game_over_group.append(play_again_btn)
-game_over_group.append(exit_btn)
 main_group.append(game_over_group)
+
+# Along right border
+exit_btn.x = display.width // scale_factor - (exit_btn_bmp.width)
+exit_btn.y = 100
+main_group.append(exit_btn)
 
 # wait a second for USB devices to be ready
 time.sleep(1)
@@ -247,7 +245,7 @@ for i in range(2):
 # USB info lists
 mouse_interface_indexes = []
 mouse_endpoint_addresses = []
-kernel_driver_active_flags = []
+detached_interfaces = []
 # USB device object instance list
 mice = []
 # buffers list for mouse packet data
@@ -257,37 +255,69 @@ mouse_debouncers = []
 mouse_sync = []
 
 # scan for connected USB devices
-for device in usb.core.find(find_all=True):
-    # check if current device is has a boot mouse endpoint
-    try:
-        mouse_interface_index, mouse_endpoint_address = (
-            adafruit_usb_host_descriptors.find_boot_mouse_endpoint(device)
-        )
-        if mouse_interface_index is not None and mouse_endpoint_address is not None:
-            # if it does have a boot mouse endpoint then add information to the
-            # usb info lists
-            mouse_interface_indexes.append(mouse_interface_index)
-            mouse_endpoint_addresses.append(mouse_endpoint_address)
+for find_endpoint, default_sync in [
+    (adafruit_usb_host_descriptors.find_boot_mouse_endpoint, 0),
+    (adafruit_usb_host_descriptors.find_report_mouse_endpoint, -1)
+]:
 
-            # add the mouse device instance to list
-            mice.append(device)
-            print(
-                f"mouse interface: {mouse_interface_index} "
-                + f"endpoint_address: {hex(mouse_endpoint_address)}"
-            )
-            mouse_sync.append(0)
+    for device in usb.core.find(find_all=True):
+        if device in mice:
+            print('found device twice')
+            continue
+        # check if current device is has a boot mouse endpoint
+        try:
+            mouse_interface_index, mouse_endpoint_address = (find_endpoint(device))
+            if mouse_interface_index is not None and mouse_endpoint_address is not None:
+                if (
+                    mouse_interface_index in mouse_interface_indexes and
+                    mouse_endpoint_address in mouse_endpoint_addresses
+                ):
+                    print('found index/address twice')
+                    continue
+                # if it does have a mouse endpoint then add information to the
+                # usb info lists
+                mouse_interface_indexes.append(mouse_interface_index)
+                mouse_endpoint_addresses.append(mouse_endpoint_address)
 
-            # detach kernel driver if needed
-            kernel_driver_active_flags.append(device.is_kernel_driver_active(0))
-            if device.is_kernel_driver_active(0):
-                device.detach_kernel_driver(0)
+                # add the mouse device instance to list
+                mice.append(device)
+                print(
+                    f"{default_sync} mouse interface: {mouse_interface_index} "
+                    + f"endpoint_address: {hex(mouse_endpoint_address)}"
+                )
+                mouse_sync.append(default_sync)
 
-            # set the mouse configuration so it can be used
-            device.set_configuration()
+                # detach kernel driver if needed
+                detached = []
 
-    except usb.core.USBError as e:
-        # The mouse might have glitched and may not be detected but at least we don't crash
-        print(e)
+                # Typically HID devices have interfaces 0,1,2
+                for intf in range(3):
+                    print(f'interface: {intf} ',end="")
+                    try:
+                        if device.is_kernel_driver_active(intf):
+                            device.detach_kernel_driver(intf)
+                            detached.append(intf)
+                            print(f"Detached kernel driver from interface {intf}")
+                        else:
+                            print("not active")
+                    except usb.core.USBError as e:
+                        print(e)
+
+                detached_interfaces.append(detached)
+
+        except usb.core.USBError as e:
+            # The mouse might have glitched and may not be detected but at least we don't crash
+            print(e)
+
+        if len(mice) >= 2:
+            break
+
+    if len(mice) >= 2:
+        break
+
+# set the mouse configuration on any detected mice so they can be used
+for device in mice:
+    device.set_configuration()
 
 def is_mouse1_left_clicked():
     """
@@ -356,7 +386,11 @@ def get_mouse_deltas(buffer, read_count, sync):
     :param read_count: the number of bytes read from the mouse
     :return: tuple containing x and y delta values
     """
-    if read_count == 4 or (read_count == 8 and sync > 50):
+
+    if read_count == 6 and sync == -1:
+        delta_x = buffer[2]
+        delta_y = buffer[3]
+    elif read_count == 4 or (read_count == 8 and sync > 50):
         delta_x = buffer[1]
         delta_y = buffer[2]
     elif read_count == 8:
@@ -378,9 +412,16 @@ def atexit_callback():
     :return:
     """
     for _i, _mouse in enumerate(mice):
-        if kernel_driver_active_flags[_i]:
-            if not _mouse.is_kernel_driver_active(0):
-                _mouse.attach_kernel_driver(0)
+        detached_from_device = detached_interfaces[_i]
+
+        if detached_from_device:
+            for _intf in detached_from_device:
+                if not _mouse.is_kernel_driver_active(_intf):
+                    _mouse.attach_kernel_driver(_intf)
+                    print(f'#{_i} Index: {_intf} (reattaching)')
+                else:
+                    print(f'#{_i} Index: {_intf} (Not Attaching)')
+
     supervisor.runtime.autoreload = original_autoreload_val
 
 
@@ -407,6 +448,8 @@ while True:
             )
             mouse_deltas = get_mouse_deltas(mouse_bufs[i], data_len, mouse_sync[i])
             mouse_sync[i] = mouse_deltas[2]
+            if mouse_sync[i] == -1:
+                mouse_bufs[i][0] = mouse_bufs[i][1]
             # if we got data, then update the mouse cursor on the display
             # using min and max to keep it within the bounds of the display
             mouse_tg.x = max(
@@ -445,6 +488,11 @@ while True:
                 # get the current mouse coordinates
                 coords = (mouse_tg.x, mouse_tg.y, 0)
 
+                # if the mouse point is within the exit
+                # button bounding box
+                if exit_btn.contains(coords):
+                    supervisor.reload()
+
                 # if the current state is GAMEOVER
                 if match3_game.cur_state != STATE_GAMEOVER:
                     # let the game object handle the click event
@@ -456,11 +504,6 @@ while True:
                         # set next code file to this one
                         supervisor.set_next_code_file(__file__)
                         # reload
-                        supervisor.reload()
-
-                    # if the mouse point is within the exit
-                    # button bounding box
-                    if exit_btn.contains(coords):
                         supervisor.reload()
 
         # if the game is over
@@ -483,6 +526,10 @@ while True:
                 # show a tie game message
                 message = "\nGame Over\nTie Game Everyone Wins!"
 
+            # centered within the display, offset to the right
+            # inside the bounds of the game over label, so it looks like a dialog visually
+            exit_btn.x = display.width // scale_factor // 2 - (exit_btn_bmp.width) // 2 + 30
+            exit_btn.y = 100
             # make the gameover group visible
             game_over_group.hidden = False
 
