@@ -11,7 +11,7 @@ import sys
 import random
 import time
 import atexit
-from displayio import Group, OnDiskBitmap, TileGrid
+from displayio import Group, OnDiskBitmap, TileGrid, CIRCUITPYTHON_TERMINAL
 from adafruit_display_text.bitmap_label import Label
 from adafruit_display_text.text_box import TextBox
 from adafruit_displayio_layout.layouts.grid_layout import GridLayout
@@ -292,7 +292,14 @@ mouse_ptr = find_and_init_boot_mouse("mouse_cursor.bmp")
 if mouse_ptr is None:
     mouse_ptr = find_and_init_report_mouse("mouse_cursor.bmp")
 if mouse_ptr is None:
-    print("No mouse found.")
+    display.root_group = CIRCUITPYTHON_TERMINAL
+    print("\nNo mouse found")
+    print("Memory requires a mouse to run")
+    print("please attach a mouse and try again.")
+    time.sleep(7)
+    # restart back to code.py
+    supervisor.reload()
+
 mouse = mouse_ptr.device
 
 mouse_tg = mouse_ptr.tilegrid
