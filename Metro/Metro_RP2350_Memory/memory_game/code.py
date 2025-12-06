@@ -7,20 +7,19 @@ flipped face down so the players must try to remember where they are.
 
 Players trade off using the USB mouse to play their turns.
 """
-import array
+import sys
 import random
 import time
 import atexit
-from displayio import Group, OnDiskBitmap, TileGrid
+from displayio import Group, OnDiskBitmap, TileGrid, CIRCUITPYTHON_TERMINAL
 from adafruit_display_text.bitmap_label import Label
 from adafruit_display_text.text_box import TextBox
 from adafruit_displayio_layout.layouts.grid_layout import GridLayout
 from adafruit_ticks import ticks_ms
 import supervisor
 import terminalio
-import usb.core
 from adafruit_fruitjam.peripherals import request_display_config
-import adafruit_usb_host_descriptors
+from adafruit_usb_host_mouse import find_and_init_boot_mouse, find_and_init_report_mouse
 from adafruit_pathlib import Path
 
 
@@ -223,6 +222,20 @@ game_over_group.append(exit_btn)
 # add the game over group to the main group
 main_group.append(game_over_group)
 
+# add the Exit Game button to game screen
+exit_game = TextBox(
+    terminalio.FONT,
+    text="Exit",
+    color=0xFFFFFF,
+    background_color=0xFF0000,
+    width=30,
+    height=15,
+    align=TextBox.ALIGN_CENTER,
+)
+exit_game.x = display.width - 30
+exit_game.y = display.height - 15
+main_group.append(exit_game)
+
 # create score label for each player
 for i in range(2):
     # create a new label to hold score
@@ -268,14 +281,28 @@ title_screen_tg = TileGrid(
 # add it to the main group
 main_group.append(title_screen_tg)
 
-# load the mouse bitmap
-mouse_bmp = OnDiskBitmap("mouse_cursor.bmp")
+# variable for the mouse USB device instance
+mouse = None
 
-# make the background pink pixels transparent
-mouse_bmp.pixel_shader.make_transparent(0)
+# wait a second for USB devices to be ready
+time.sleep(1)
 
-# create a TileGrid for the mouse
-mouse_tg = TileGrid(mouse_bmp, pixel_shader=mouse_bmp.pixel_shader)
+# scan for connected USB devices
+mouse_ptr = find_and_init_boot_mouse("mouse_cursor.bmp")
+if mouse_ptr is None:
+    mouse_ptr = find_and_init_report_mouse("mouse_cursor.bmp")
+if mouse_ptr is None:
+    display.root_group = CIRCUITPYTHON_TERMINAL
+    print("\nNo mouse found")
+    print("Memory requires a mouse to run")
+    print("please attach a mouse and try again.")
+    time.sleep(7)
+    # restart back to code.py
+    supervisor.reload()
+
+mouse = mouse_ptr.device
+
+mouse_tg = mouse_ptr.tilegrid
 
 # place it in the center of the display
 mouse_tg.x = display.width // 2
@@ -284,61 +311,21 @@ mouse_tg.y = display.height // 2
 # add the mouse to the main group
 main_group.append(mouse_tg)
 
-# variable for the mouse USB device instance
-mouse = None
-
-# wait a second for USB devices to be ready
-time.sleep(1)
-
-mouse_interface_index, mouse_endpoint_address = None, None
-mouse = None
-
-# scan for connected USB devices
-for device in usb.core.find(find_all=True):
-    # print information about the found devices
-    print(f"{device.idVendor:04x}:{device.idProduct:04x}")
-    print(device.manufacturer, device.product)
-    print(device.serial_number)
-    mouse_interface_index, mouse_endpoint_address = (
-        adafruit_usb_host_descriptors.find_boot_mouse_endpoint(device))
-
-    if mouse_interface_index is not None and mouse_endpoint_address is not None:
-        mouse = device
-        print(
-            f"mouse interface: {mouse_interface_index} "
-            + f"endpoint_address: {hex(mouse_endpoint_address)}"
-        )
-
-        break
-
-
-mouse_was_attached = None
-if mouse is not None:
-    # detach the kernel driver if needed
-    if mouse.is_kernel_driver_active(0):
-        mouse_was_attached = True
-        mouse.detach_kernel_driver(0)
-    else:
-        mouse_was_attached = False
-
-    # set configuration on the mouse so we can use it
-    mouse.set_configuration()
-
 def atexit_callback():
     """
     re-attach USB devices to kernel if needed.
     :return:
     """
     print("inside atexit callback")
-    if mouse_was_attached and not mouse.is_kernel_driver_active(0):
-        mouse.attach_kernel_driver(0)
-
+    if mouse_ptr.device is not None:
+        mouse_ptr.release()
+        if mouse_ptr.was_attached:
+            # The keyboard buffer seems to have data left over from when it was detached
+            # This clears it before the next process starts
+            while supervisor.runtime.serial_bytes_available:
+                sys.stdin.read(1)
 
 atexit.register(atexit_callback)
-
-# Buffer to hold data read from the mouse
-# Boot mice have 4 byte reports
-buf = array.array("b", [0] * 4)
 
 # timestamp in the future to wait until before
 # awarding points for a pair, or flipping cards
@@ -352,36 +339,40 @@ WAIT_UNTIL = 0
 waiting_to_reset = False
 
 # main loop
+last_left_button_state = None
+left_button_pressed = False
 while True:
     # timestamp of the current time
     now = ticks_ms()
 
     # attempt mouse read
-    try:
-        # try to read data from the mouse, small timeout so the code will move on
-        # quickly if there is no data
-        data_len = mouse.read(mouse_endpoint_address, buf, timeout=20)
+    buttons = mouse_ptr.update()
 
-        # if there was data, then update the mouse cursor on the display
-        # using min and max to keep it within the bounds of the display
-        mouse_tg.x = max(0, min(display.width - 1, mouse_tg.x + buf[1] // 2))
-        mouse_tg.y = max(0, min(display.height - 1, mouse_tg.y + buf[2] // 2))
+    # Extract button states
+    if buttons is None or last_left_button_state is None:
+        current_left_button_state = 0
+    else:
+        current_left_button_state = 1 if 'left' in buttons else 0
 
-    # timeout error is raised if no data was read within the allotted timeout
-    except usb.core.USBTimeoutError:
-        # no problem, just go on
-        pass
+    # Detect button presses
+    if current_left_button_state == 1 and last_left_button_state == 0:
+        left_button_pressed = True
+    elif current_left_button_state == 0 and last_left_button_state == 1:
+        left_button_pressed = False
+
+    # Update button states
+    last_left_button_state = current_left_button_state
 
     # if the current state is title screen
     if CUR_STATE == STATE_TITLE:
         # if the left mouse button was clicked
-        if buf[0] & (1 << 0) != 0:
+        if left_button_pressed:
             # change the current state to playing
             CUR_STATE = STATE_PLAYING
             # hide the title screen
             title_screen_tg.hidden = True
             # change the mouse cursor color to match the current player
-            mouse_bmp.pixel_shader[2] = colors[current_turn_index]
+            mouse_tg.pixel_shader[2] = colors[current_turn_index]
 
     # if the current state is playing
     elif CUR_STATE == STATE_PLAYING:
@@ -455,7 +446,7 @@ while True:
                 current_player_lbl.color = colors[current_turn_index]
 
                 # update the color of the mouse cursor
-                mouse_bmp.pixel_shader[2] = colors[current_turn_index]
+                mouse_tg.pixel_shader[2] = colors[current_turn_index]
 
             # empty out the cards flipped this turn list
             cards_flipped_this_turn = []
@@ -463,7 +454,12 @@ while True:
         # ignore any clicks while the code is waiting to take reset cards
         if now >= WAIT_UNTIL:
             # left btn pressed
-            if buf[0] & (1 << 0) != 0:
+            if left_button_pressed:
+                # if the mouse point is within the exit button
+                if (mouse_tg.x >= display.width - 30 and
+                    mouse_tg.y >= display.height - 20):
+                    # restart back to code.py
+                    supervisor.reload()
 
                 # loop over all cards
                 for card_index, card in enumerate(card_tgs):
@@ -491,7 +487,7 @@ while True:
     # if the current state is gameover
     elif CUR_STATE == STATE_GAMEOVER:
         # left btn pressed
-        if buf[0] & (1 << 0) != 0:
+        if left_button_pressed:
             # get the coordinates of the mouse cursor point
             coords = (mouse_tg.x, mouse_tg.y, 0)
 
@@ -500,7 +496,7 @@ while True:
             if play_again_btn.contains(coords):
                 # set next code file to this one
                 supervisor.set_next_code_file(__file__,
-                                              working_directory=Path(__file__).parent.absolute())
+                    working_directory=Path(__file__).parent.absolute())
                 # reload
                 supervisor.reload()
 
