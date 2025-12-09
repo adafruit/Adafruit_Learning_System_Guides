@@ -6,8 +6,8 @@ import board
 import neopixel
 import adafruit_dotstar
 
-LED = adafruit_dotstar.DotStar(board.APA102_SCK, board.APA102_MOSI, 1) # Setup Internal Dotstar
-LED.brightness = 0.8 # DotStar brightness
+LED = adafruit_dotstar.DotStar(board.APA102_SCK, board.APA102_MOSI, 1)  # Setup Internal Dotstar
+LED.brightness = 0.8  # DotStar brightness
 
 NUMPIX = 7         # Number of NeoPixels
 PIXPIN = board.D2  # Pin where NeoPixels are connected
