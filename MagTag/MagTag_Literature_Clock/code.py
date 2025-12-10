@@ -158,7 +158,7 @@ while True:
     hour = f"{now.tm_hour:02d}"
 
     # open the data file for the current hour
-    with open(f"split_data_compressed/{hour}.csv.gz", "rb") as f:
+    with open(f"quotes_data/{hour}.csv.gz", "rb") as f:
         # read and unzip the data
         compressed_data = f.read()
         rows = zlib.decompress(compressed_data).split(b"\n")
@@ -212,9 +212,6 @@ while True:
     # extract the book title
     title = parts[3]
 
-    # set the text in the book info label to show the title and author
-    book_info_lbl.text = f"{title} - {author}"
-
     # extract the current time reference string
     time_part = parts[1]
 
@@ -243,7 +240,7 @@ while True:
     # Temporary version of final visible quote joined with spaces instead of newlines,
     # so we can search for the time_part without worrying about potential newlines.
     shown_quote_with_spaces = " ".join(
-        quote_lines[first_line_to_show : first_line_to_show + 7]
+        quote_lines[first_line_to_show: first_line_to_show + 7]
     )
 
     # find the current time reference within the quote that will be shown
@@ -251,10 +248,22 @@ while True:
     time_end_index = time_start_index + len(time_part)
 
     # wrap the quote to be shown to multiple lines and set it on the label
-    quote_lbl.text = "\n".join(quote_lines[first_line_to_show : first_line_to_show + 7])
+    quote_lbl.text = "\n".join(quote_lines[first_line_to_show: first_line_to_show + 7])
 
     # accent the part of the quote that references the current time
     quote_lbl.add_accent_range(time_start_index, time_end_index, 4, 3, "outline")
+
+    # show title and author in the book info label
+    # allow it to split to two lines if the quote is short enough
+    if len(quote_lines) <= 6:
+        book_info = f"{title} - {author}"
+        book_info_lbl.text = "\n".join(wrap_text_to_pixels(
+            book_info,
+            display.width - 4,
+            terminalio.FONT,
+        ))
+    else:
+        book_info_lbl.text = f"{title} - {author}"
 
     # update the display and wait 60 seconds
     display.refresh()
