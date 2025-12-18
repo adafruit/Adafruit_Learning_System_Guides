@@ -1,5 +1,8 @@
 # SPDX-FileCopyrightText: 2025 Tim Cocks for Adafruit Industries
 # SPDX-License-Identifier: MIT
+"""
+Helper functions and class for the Fruit Jam greeting card maker.
+"""
 import math
 import random
 

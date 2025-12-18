@@ -1,7 +1,9 @@
 # SPDX-FileCopyrightText: 2025 Tim Cocks for Adafruit Industries
 # SPDX-License-Identifier: MIT
 """
-Greeting card maker for Fruit Jam
+Greeting card maker for Fruit Jam. Input messages for the front
+and inside of the card and select a custom image for the front,
+or use a snowflake image designed right inside the app.
 """
 import json
 import os
@@ -22,8 +24,14 @@ from adafruit_display_text.text_box import TextBox
 from adafruit_checkbox import CheckBox
 from adafruit_button import Button
 
-from card_maker_helpers import (PointHighlighterCache, svg_points, fill_polygon,
-                                draw_snowflake, random_polygon, distance)
+from card_maker_helpers import (
+    PointHighlighterCache,
+    svg_points,
+    fill_polygon,
+    draw_snowflake,
+    random_polygon,
+    distance,
+)
 
 # change emoji here if you want to use different ones
 emoji = "🎄⛄❄️🌟"
