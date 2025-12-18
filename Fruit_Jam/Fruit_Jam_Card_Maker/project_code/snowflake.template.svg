@@ -1,0 +1,15 @@
+<!-- SPDX-FileCopyrightText: 2025 Tim Cocks for Adafruit Industries -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- snowflake SVG template file with mirror flipped quadrants for Fruit Jam greeting card maker -->
+<svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+    {% for polygon_points in context["polygons"] %}
+        <polygon points="{% autoescape off %}{{ polygon_points }}{% autoescape on %}" fill="#{{ context['color'] }}"/>
+        <polygon transform="translate(237,0) scale(-1, 1)"
+                 points="{% autoescape off %}{{ polygon_points }}{% autoescape on %}" fill="#{{ context['color'] }}"/>
+
+        <polygon transform="translate(0,237) scale(1, -1) " fill="#{{ context['color'] }}"
+                 points="{% autoescape off %}{{ polygon_points }}{% autoescape on %}"/>
+        <polygon transform="translate(237,237) scale(-1, -1)" fill="#{{ context['color'] }}"
+                 points="{% autoescape off %}{{ polygon_points }}{% autoescape on %}"/>
+    {% endfor %}
+</svg>

@@ -1,0 +1,89 @@
+<!-- SPDX-FileCopyrightText: 2025 Tim Cocks for Adafruit Industries -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- quarter fold greeting card template file for Fruit Jam greeting card maker -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Card</title>
+    <style>
+        :root {
+            --fold-line-size: 1px;
+            --fold-line-color: #f5f5f5;
+        }
+
+        .sheet {
+            height: 11in;
+            width: 8.5in;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+        }
+
+        p, h1, h3 {
+            text-align: center;
+            font-family: sans-serif;
+        }
+
+        #inside-left, #outside-back {
+            border-right: var(--fold-line-size) dashed var(--fold-line-color);
+        }
+        #outside-front, #inside-right {
+            border-left: var(--fold-line-size) dashed var(--fold-line-color);
+        }
+
+        #outside-back, #outside-front {
+            border-top: var(--fold-line-size) dashed var(--fold-line-color);
+            transform: scaleY(-1) scaleX(-1);
+        }
+
+        #inside-left, #inside-right {
+            border-top: var(--fold-line-size) dashed var(--fold-line-color);
+        }
+
+        #outside-back h3{
+            font-size: 1.6em;
+            text-align: center;
+            margin-bottom: 10px;
+            margin-top: 200px;
+        }
+
+        img{
+            display: block;
+            margin:auto;
+        }
+
+        #outside-front img{
+            max-width: 317px;
+            max-height: 360px;
+            margin-top: 40px;
+        }
+        #outside-front h1{
+            margin-top: 30px;
+        }
+        #inside-right{
+            padding: 160px 30px;
+            font-size: 1.7em;
+        }
+
+    </style>
+</head>
+<body>
+<div class="sheet">
+    <div class="quadrant" id="outside-front">
+        <h1>{% autoescape off %}{{ context["outside_message"] }}{% autoescape on %}</h1>
+        <img src="{{ context['front_img'] }}?timestamp={{ context['timestamp'] }}">
+    </div>
+    <div class="quadrant" id="outside-back">
+        <h3>made with</h3>
+        <img src="https://github.com/adafruit/Adafruit_Learning_System_Guides/raw/refs/heads/main/Fruit_Jam/Fruit_Jam_Card_Maker/remote_assets/fruit_jam_logo_invert.png" alt="Adafruit Fruit Jam">
+    </div>
+    <div class="quadrant" id="inside-left">
+
+    </div>
+    <div class="quadrant" id="inside-right">
+        <p>{{ context["inside_message"] }}</p>
+    </div>
+</div>
+</body>
+</html>
