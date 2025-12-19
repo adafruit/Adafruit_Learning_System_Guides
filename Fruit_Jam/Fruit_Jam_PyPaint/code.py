@@ -17,13 +17,17 @@ All text above must be included in any redistribution.
 """
 
 import gc
+import sys
 import time
+import atexit
 import supervisor
 import board
 import displayio
+import terminalio
+from adafruit_display_text import label
 
 try:
-    from adafruit_usb_host_mouse import find_and_init_boot_mouse
+    from adafruit_usb_host_mouse import find_and_init_boot_mouse, find_and_init_report_mouse
     usb_available = True
 except ImportError:
     usb_available = False
@@ -209,12 +213,16 @@ class MousePoller():
         """Find and initialize the USB mouse."""
         self.mouse = find_and_init_boot_mouse()
         if self.mouse is None:
+            self.mouse = find_and_init_report_mouse()
+            self.sensitivity = 1
+        if self.mouse is None:
             print("No mouse found.")
             return False
 
         # Change the mouse resolution so it's not too sensitive
+        fontHeight = terminalio.FONT.get_bounding_box()[1]
         self.mouse.display_size = (supervisor.runtime.display.width*self.sensitivity,
-                                  supervisor.runtime.display.height*self.sensitivity)
+            (supervisor.runtime.display.height - fontHeight)*self.sensitivity)
         return True
 
     def poll(self):
@@ -324,11 +332,23 @@ class Paint(): # pylint: disable=too-many-statements
 
         self._display = display
         self._w = self._display.width
-        self._h = self._display.height
+        self._h = self._display.height - terminalio.FONT.get_bounding_box()[1]
         self._x = self._w // 2
         self._y = self._h // 2
 
         self._splash = displayio.Group()
+
+        self._info_label = label.Label(
+            terminalio.FONT,
+            text = "Right Click->Palette:Exit  Right Click->Canvas:Fill"[:self._w],
+            color = 0xFFFFFF,
+            x = 0,
+            y = self._h
+        )
+        self._info_label.anchor_point = (0.0, 1.0)
+        self._info_label.anchored_position = (2, display.height - 2)
+
+        self._splash.append(self._info_label)
 
         self._bg_bitmap = displayio.Bitmap(self._w, self._h, 1)
         self._bg_palette = displayio.Palette(1)
@@ -377,6 +397,7 @@ class Paint(): # pylint: disable=too-many-statements
 
         self._brush = 0
         self._cursor_bitmaps = [_cursor_bitmap_1(), _cursor_bitmap_3()]
+        self.mouse = None
         if hasattr(board, "TOUCH_XL"):
             self._poller = TouchscreenPoller(self._splash, self._cursor_bitmaps[0])
         elif hasattr(board, "BUTTON_CLOCK"):
@@ -385,8 +406,9 @@ class Paint(): # pylint: disable=too-many-statements
             self._poller = MousePoller(self._splash, self._cursor_bitmaps[0], self._w, self._h)
             if not self._poller.mouse:
                 raise RuntimeError("No mouse found. Please connect a USB mouse.")
+            self.mouse = self._poller.mouse
         else:
-            raise AttributeError("PyPaint requires a touchscreen or cursor.")
+            raise AttributeError("PyPaint requires a mouse, touchscreen or cursor.")
 
         self._a_pressed = False
         self._last_a_pressed = False
@@ -603,6 +625,8 @@ class Paint(): # pylint: disable=too-many-statements
         if location[0] >= self._w // 10:  # not in color picker
             self._fill(location[0], location[1], self._pencolor)
             self._poller.poke()
+        else:
+            supervisor.reload()
 
     @property
     def _was_a_just_pressed(self):
@@ -646,6 +670,23 @@ class Paint(): # pylint: disable=too-many-statements
                 self._handle_motion(self._last_location, self._location)
             time.sleep(0.1)
 
-
 painter = Paint()
+
+def atexit_callback():
+    """
+    re-attach USB devices to kernel if needed.
+    :return:
+    """
+    print("inside atexit callback")
+    if painter.mouse is not None:
+        mouse = painter.mouse
+        mouse.release()
+        if mouse.was_attached:
+            # The keyboard buffer seems to have data left over from when it was detached
+            # This clears it before the next process starts
+            while supervisor.runtime.serial_bytes_available:
+                sys.stdin.read(1)
+
+atexit.register(atexit_callback)
+
 painter.run()
