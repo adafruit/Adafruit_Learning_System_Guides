@@ -33,8 +33,12 @@ except ImportError:
         pass
 
 
+# 3.5" display (480x320): LINES = 24, COLS = 80
 LINES = 24
 COLS = 80
+# 2.4" display (320x240): LINES = 19, COLS = 53
+# LINES = 19
+# COLS = 53
 
 special_keys = {
     "\x1b": ...,  # all prefixes of special keys must be entered as Ellipsis
