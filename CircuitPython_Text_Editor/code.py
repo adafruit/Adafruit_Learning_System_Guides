@@ -3,7 +3,10 @@
 # SPDX-License-Identifier: MIT
 import traceback
 from adafruit_editor import editor, picker
+# 3.5" FeatherWing (original)
 from adafruit_featherwing import tft_featherwing_35
+# 2.4" FeatherWing V2
+# from adafruit_featherwing import tft_featherwing_24
 import terminalio
 import displayio
 from adafruit_display_text.bitmap_label import Label
@@ -14,7 +17,10 @@ def print(message):
     usb_cdc.data.write(f"{message}\r\n".encode("utf-8"))
 
 
+# 3.5" FeatherWing (original)
 tft_featherwing = tft_featherwing_35.TFTFeatherWing35V2()
+# 2.4" FeatherWing V2
+# tft_featherwing = tft_featherwing_24.TFTFeatherWing24V2()
 display = tft_featherwing.display
 display.rotation = 180
 
