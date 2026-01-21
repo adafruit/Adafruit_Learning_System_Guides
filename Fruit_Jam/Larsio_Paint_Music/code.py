@@ -13,6 +13,9 @@ pin D7 reset, 9/10/11 = BCLC/WSEL/DIN
 
 import time
 import gc
+import sys
+import supervisor
+import atexit
 from sound_manager import SoundManager
 from note_manager import NoteManager
 from ui_manager import UIManager
@@ -86,6 +89,23 @@ if __name__ == "__main__":
     gc.collect()
     print("Starting Music Staff Application...")
 
+    def atexit_callback():
+        """
+        re-attach USB devices to kernel if needed.
+        :return:
+        """
+        print("inside atexit callback")
+        if app.ui_manager.input_handler.mouse is not None:
+            mouse = app.ui_manager.input_handler.mouse
+            mouse.release()
+            if mouse.was_attached:
+                # The keyboard buffer seems to have data left over from when it was detached
+                # This clears it before the next process starts
+                while supervisor.runtime.serial_bytes_available:
+                    sys.stdin.read(1)
+
+    atexit.register(atexit_callback)
+
     try:
         app = MusicStaffApp(audio_output=AUDIO_OUTPUT)
         app.run()
@@ -102,3 +122,5 @@ if __name__ == "__main__":
             app.run()
         except Exception as e2:  # pylint: disable=broad-except
             print(f"Fatal error: {e2}")
+
+    supervisor.reload()

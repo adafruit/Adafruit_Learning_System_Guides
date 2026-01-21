@@ -84,6 +84,7 @@ class UIManager:
         self.triangle_cursor = None
         self.tempo_minus_label = None
         self.tempo_plus_label = None
+        self.exit_button_label = None
 
         # Channel setting
         self.current_channel = 0
@@ -123,6 +124,9 @@ class UIManager:
 
         # Create tempo display
         self._create_tempo_display()
+
+        # Add Exit button
+        self._create_exit_button()
 
         # Create highlight
         self.highlight_grid = self.staff_view.create_highlight()
@@ -205,6 +209,21 @@ class UIManager:
         self.note_name_label.anchor_point = (0, 0)
         self.note_name_label.anchored_position = (10, self.SCREEN_HEIGHT - 70)
         self.main_group.append(self.note_name_label)
+
+    def _create_exit_button(self):
+        """Create a lable to be used as an "Exit" button"""
+        gc.collect()
+
+        self.exit_button_label = Label(
+            terminalio.FONT,
+            text="Exit",
+            color=0xFFFFFF,
+            background_color=0xFF0000,
+            scale=1
+        )        
+        self.exit_button_label.anchor_point = (0.5, 0.5)
+        self.exit_button_label.anchored_position = (self.SCREEN_WIDTH - 135, 10)
+        self.main_group.append(self.exit_button_label)
 
     def _create_tempo_display(self):
         """Create a label for the tempo display with + and - buttons"""
@@ -496,17 +515,26 @@ class UIManager:
             # Check for tempo button clicks
             minus_button_x, minus_button_y = self.tempo_minus_label.anchored_position
             plus_button_x, plus_button_y = self.tempo_plus_label.anchored_position
+            exit_button_x, exit_button_y = self.exit_button_label.anchored_position
             button_radius = 8  # Allow a bit of space around the button for easier clicking
+
+            # Radius 16**2 = 256, but squared to a y < 16
+            if (
+                ((mouse_x - exit_button_x)**2 + (mouse_y - exit_button_y)**2) < 256 and
+                mouse_y < 16):
+
+                # Clicked Exit button
+                return False
 
             if ((mouse_x - minus_button_x)**2 + (mouse_y - minus_button_y)**2) < button_radius**2:
                 # Clicked minus button - decrease tempo
                 self.adjust_tempo(-1)
-                return
+                return True
 
             if ((mouse_x - plus_button_x)**2 + (mouse_y - plus_button_y)**2) < button_radius**2:
                 # Clicked plus button - increase tempo
                 self.adjust_tempo(1)
-                return
+                return True
 
             # Check if a channel button was clicked
             channel_clicked = False
@@ -564,6 +592,8 @@ class UIManager:
                 self.sound_manager
             )
             self.note_name_label.text = message
+
+        return True
 
     def _add_note_based_on_channel(self, x, y):
         """Add a note based on the current channel"""
@@ -641,4 +671,5 @@ class UIManager:
                 self.handle_mouse_position()
 
                 # Handle mouse button presses
-                self.handle_mouse_buttons()
+                if not self.handle_mouse_buttons():
+                    break
