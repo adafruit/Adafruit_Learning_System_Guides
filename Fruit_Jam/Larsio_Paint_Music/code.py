@@ -14,8 +14,8 @@ pin D7 reset, 9/10/11 = BCLC/WSEL/DIN
 import time
 import gc
 import sys
-import supervisor
 import atexit
+import supervisor
 from sound_manager import SoundManager
 from note_manager import NoteManager
 from ui_manager import UIManager
