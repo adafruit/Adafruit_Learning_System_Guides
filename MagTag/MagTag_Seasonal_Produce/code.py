@@ -35,7 +35,7 @@ if None in [ssid, password]:
 TWELVE_HOUR = True # If set, show 12-hour vs 24-hour (e.g. 3:00 vs 15:00)
 DD_MM = False      # If set, show DD/MM instead of MM/DD dates
 # Location of produce data (file:// or http:// or https://):
-JSON_URL = 'https://raw.githubusercontent.com/adafruit/Adafruit_Learning_System_Guides/master/MagTag_Seasonal_Produce/produce.json'
+JSON_URL = 'https://raw.githubusercontent.com/adafruit/Adafruit_Learning_System_Guides/master/MagTag/MagTag_Seasonal_Produce/produce.json'
 
 # Location is configured in settings.toml. If location is not contained there,
 # default value below will be used.
