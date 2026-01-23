@@ -102,7 +102,7 @@ class Weather_Graphics:
         draw = ImageDraw.Draw(image)
 
         # Draw the Icon
-        (font_width, font_height) = icon_font.getsize(self._weather_icon)
+        (font_width, font_height) = icon_font.getbbox(self._weather_icon)[2:4]
         draw.text(
             (
                 self.display.width // 2 - font_width // 2,
@@ -119,7 +119,7 @@ class Weather_Graphics:
         )
 
         # Draw the time
-        (font_width, font_height) = medium_font.getsize(self._time_text)
+        (font_width, font_height) = medium_font.getbbox(self._time_text)[2:4]
         draw.text(
             (5, font_height * 2 - 5),
             self._time_text,
@@ -128,7 +128,7 @@ class Weather_Graphics:
         )
 
         # Draw the main text
-        (font_width, font_height) = large_font.getsize(self._main_text)
+        (font_width, font_height) = large_font.getbbox(self._main_text)[2:4]
         draw.text(
             (5, self.display.height - font_height * 2),
             self._main_text,
@@ -137,7 +137,7 @@ class Weather_Graphics:
         )
 
         # Draw the description
-        (font_width, font_height) = small_font.getsize(self._description)
+        (font_width, font_height) = small_font.getbbox(self._description)[2:4]
         draw.text(
             (5, self.display.height - font_height - 5),
             self._description,
@@ -146,7 +146,7 @@ class Weather_Graphics:
         )
 
         # Draw the temperature
-        (font_width, font_height) = large_font.getsize(self._temperature)
+        (font_width, font_height) = large_font.getbbox(self._temperature)[2:4]
         draw.text(
             (
                 self.display.width - font_width - 5,
