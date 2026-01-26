@@ -116,7 +116,7 @@ mixer.voice[0].play(mp3, loop=False)
 
 while True:
 
-    # negate the position to make clockwise rotation positive
+    # make clockwise rotation positive
     position = -encoder.position
 
     if position != last_position:
@@ -128,7 +128,7 @@ while True:
             #increase volume
             volume = volume + 0.05
             volume = min(volume, 1)
-         # set the audio volume
+        # set the audio volume
         mixer.voice[0].level = volume
         print(volume)
         last_position = position
