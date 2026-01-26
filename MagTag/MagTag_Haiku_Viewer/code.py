@@ -132,7 +132,7 @@ border_group.append(border_tg)
 main_group.append(border_group)
 
 # load the custom font & initialze Label to show haiku
-FONT = bitmap_font.load_font("fanwood_webfont_15.bdf", displayio.Bitmap)
+FONT = bitmap_font.load_font("fanwood_webfont_15.pcf", displayio.Bitmap)
 haiku_lbl = Label(FONT, text=haiku, scale=1, color=0x333333, line_spacing=1.0)
 haiku_lbl.anchor_point = (0, 0)
 haiku_lbl.anchored_position = (8, 0)
