@@ -27,7 +27,10 @@ vfs = storage.VfsFat(sdcard)
 storage.mount(vfs, "/sd", readonly=True)
 
 #Audio
-mp3 = audiomp3.MP3Decoder(open("/sd/blue.mp3", "rb"))
+try:
+    mp3 = audiomp3.MP3Decoder(open("/sd/blue.mp3", "rb"))
+except OSError as error:
+    print(f"{error} - did you put the mp3 files on the micro SD card?")
 
 i2s = audiobusio.I2SOut(board.I2S_BIT_CLOCK, board.I2S_WORD_SELECT, board.I2S_DATA)
 mixer = audiomixer.Mixer(voice_count=1, sample_rate=mp3.sample_rate, channel_count=1,
