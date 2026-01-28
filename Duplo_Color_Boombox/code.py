@@ -24,7 +24,7 @@ spi = board.SPI()
 cs = board.D10
 sdcard = sdcardio.SDCard(spi, cs)
 vfs = storage.VfsFat(sdcard)
-storage.mount(vfs, "/sd", readonly=True)
+storage.mount(vfs, "/sd")
 
 #Audio
 try:
