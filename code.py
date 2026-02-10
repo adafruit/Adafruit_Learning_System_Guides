@@ -6,6 +6,8 @@
 # Code written by Adafruit Industries
 # Adafruit Circuit Playground Express Bluefruit
 
+# pylint: disable=global-statement
+
 import time
 import math
 import array
@@ -117,19 +119,29 @@ vu_level = 0.0  # smoothed VU level
 
 def update_vu():
     """Update NeoPixels based on mic input level with smooth rise and fall."""
-    global last_vu_input, vu_level
+    global last_vu_input, vu_level, input_floor, input_ceiling
     if not active_vu:
         return
     mic.record(samples, len(samples))
     magnitude = normalized_rms(samples)
+    # Adaptive noise floor: continuously tracks ambient noise
+    # (including BLE radio EMI) so the meter stays zeroed.
+    if magnitude < input_floor:
+        # Below floor — floor drifts down slowly
+        input_floor = input_floor * 0.999 + magnitude * 0.001
+    elif magnitude < input_floor + 4:
+        # Near the floor — this is still noise, nudge floor up
+        input_floor = input_floor * 0.9 + magnitude * 0.1
+    input_ceiling = input_floor + 15.0
     # Compute scaled logarithmic reading in the range 0 to NUM_LEDS
-    target = log_scale(constrain(magnitude, input_floor, input_ceiling),
-                       input_floor, input_ceiling, 0, NUM_LEDS)
+    target = log_scale(
+        constrain(magnitude, input_floor, input_ceiling),
+        input_floor, input_ceiling, 0, NUM_LEDS)
     # Smooth: rise slowly, fall even slower
     if target > vu_level:
-        vu_level = vu_level + (target - vu_level) * 0.4  # rise speed
+        vu_level = vu_level + (target - vu_level) * 0.3
     else:
-        vu_level = vu_level + (target - vu_level) * 0.15  # fall speed
+        vu_level = vu_level + (target - vu_level) * 0.12
     input_val = int(vu_level)
     if last_vu_input != input_val:
         pixels.fill(VU_OFF)
@@ -180,10 +192,10 @@ def update_light():
 # Sentinel for Light meter mode in animation list
 LIGHT_METER = "LIGHT_METER"
 
-# Calibrate: record initial sample to get ambient noise floor
+# Calibrate: seed the adaptive noise floor
 mic.record(samples, len(samples))
-input_floor = normalized_rms(samples) + 2
-input_ceiling = input_floor + .5
+input_floor = normalized_rms(samples) + 10
+input_ceiling = input_floor + 15.0
 
 # setup bluetooth
 ble = BLERadio()
@@ -236,14 +248,13 @@ def apply_mode(selection):
         last_vu_input = 0
         pixels.fill(VU_OFF)
         pixels.show()
-        # Let tap vibration settle before listening
+        # Brief settle, then seed the adaptive floor
         time.sleep(0.15)
-        # Flush stale mic data, then recalibrate noise floor
         for _ in range(3):
             mic.record(samples, len(samples))
         mic.record(samples, len(samples))
-        input_floor = normalized_rms(samples) + 2
-        input_ceiling = input_floor + 0.5
+        input_floor = normalized_rms(samples) + 10
+        input_ceiling = input_floor + 15.0
         active_vu = True
     elif selection == LIGHT_METER:
         light_level = 0.0
@@ -336,8 +347,8 @@ while True:
                         apply_mode(PALETTE_RAINBOW)
                     if packet.button == ButtonPacket.BUTTON_2: # VU Meter
                         apply_mode(VU_METER)
-                    if packet.button == ButtonPacket.BUTTON_3: # Light Meter
-                        apply_mode(LIGHT_METER)
+                    if packet.button == ButtonPacket.BUTTON_3: # Purple
+                        apply_mode(PURPLE)
                     if packet.button == ButtonPacket.BUTTON_4: # Light Meter
                         apply_mode(LIGHT_METER)
                     if packet.button == ButtonPacket.UP: # Brighten
