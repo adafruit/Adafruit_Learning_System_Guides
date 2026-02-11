@@ -82,9 +82,9 @@ while True:
     newY = int(yAvg.average())
 
     #We only call move_joysticks if one of the values has changed from last time
-    if (newX != lastXAvg or newY != lastYAvg):
-        gp.move_joysticks(x=newX,y=newY)
-        # print(hor.value, vert.value)  # print debug raw values
-        # print((newX, newY,))  # print debug remapped, averaged values
+    #if (newX != lastXAvg or newY != lastYAvg):
+    gp.move_joysticks(x=newX,y=newY)
+    # print(hor.value, vert.value)  # print debug raw values
+    # print((newX, newY,))  # print debug remapped, averaged values
     #Sleep to avoid overwhelming the XAC
-    time.sleep(0.05)
+    time.sleep(0.008)  # 125Hz polling rate is standard
