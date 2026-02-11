@@ -65,7 +65,7 @@ while True:
 
     # Fade down the backlight
     for b in range(100, 0, -1):
-        board.DISPLAY.brightness = b
+        board.DISPLAY.brightness = b / 100
         time.sleep(0.005)  # default (0.005)
 
     splash.pop()
