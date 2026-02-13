@@ -1,7 +1,8 @@
 # SPDX-FileCopyrightText: 2026 Tim C, written for Adafruit Industries
 #
 # SPDX-License-Identifier: MIT
-# Adapted from files found in [tini_wiki for Micropython by Kevin McAleer](https://github.com/kevinmcaleer/tiny_wiki)
+# Adapted from files found in tini_wiki for Micropython by Kevin McAleer:
+# https://github.com/kevinmcaleer/tiny_wiki
 import re
 
 class SimpleMarkdown:
@@ -17,7 +18,7 @@ class SimpleMarkdown:
             page_name = match.group(1)
             if link_callback:
                 return link_callback(page_name)
-            return '<a href="/wiki/{}">{}</a>'.format(page_name, page_name)
+            return f'<a href="/wiki/{page_name}">{page_name}</a>'
 
         result = []
         index = 0
@@ -40,6 +41,7 @@ class SimpleMarkdown:
 
     def to_html(self, markdown_text):
         """Convert markdown to HTML (simplified)"""
+        # pylint: disable=too-many-branches, too-many-statements
         if not markdown_text:
             return ""
 

@@ -3,7 +3,8 @@
 # SPDX-License-Identifier: MIT
 """CircuitPython port of Tiny Wiki for the Fruit Jam.
 
-This project was ported from [tiny_wiki for Micropython](https://github.com/kevinmcaleer/tiny_wiki) by Kevin McAleer.
+This project was ported from tiny_wiki for Micropython by Kevin McAleer:
+https://github.com/kevinmcaleer/tiny_wiki
 
 This script runs on CircuitPython with the ESP32SPI WiFi coprocessor. It uses
 Adafruit's HTTP Server and TemplateEngine libraries to serve a small Wiki system.
@@ -24,7 +25,7 @@ from adafruit_httpserver.methods import POST
 from adafruit_templateengine import render_template
 
 from tiny_wiki.markdown import SimpleMarkdown
-from tiny_wiki.storage import WikiStorage
+from tiny_wiki.wiki_storage import WikiStorage
 
 # directory for HTML template files
 TEMPLATES_DIR = "/templates"
@@ -76,18 +77,18 @@ def _init_wifi():
     esp32_reset = DigitalInOut(board.ESP_RESET)
     esp32_cs = DigitalInOut(board.ESP_CS)
 
-    radio = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset)
+    _radio = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset)
 
     print(f"Connecting to {WIFI_SSID}...")
-    radio.connect(WIFI_SSID, WIFI_PASSWORD)
+    _radio.connect(WIFI_SSID, WIFI_PASSWORD)
     print("WiFi connected")
 
-    pool = adafruit_connection_manager.get_radio_socketpool(radio)
-    _ssl_context = adafruit_connection_manager.get_radio_ssl_context(radio)
+    pool = adafruit_connection_manager.get_radio_socketpool(_radio)
+    _ssl_context = adafruit_connection_manager.get_radio_ssl_context(_radio)
     connection_manager = adafruit_connection_manager.get_connection_manager(pool)
 
     # Keep the connection manager alive to ensure sockets stay open
-    return radio, pool, connection_manager
+    return _radio, pool, connection_manager
 
 # initialize WiFi and server object
 radio, socket_pool, _connection_manager = _init_wifi()
@@ -283,6 +284,7 @@ def login_form(request):
 def login_submit(request):
     """Validate credentials and set session token auth cookie."""
 
+    # pylint: disable=too-many-locals
     form = request.form_data
     username = (form.get("username", "") or "").strip()
     password = (form.get("password", "") or "").strip()
@@ -324,7 +326,9 @@ def login_submit(request):
                     )
 
                     # combine password_hash + server secret_key + random str
-                    token_input_data = f"{password_hash}:){WIKI_AUTH_SECRET_KEY}=D{random_str}".encode("utf-8")
+                    token_input_data = (f"{password_hash}:)"
+                                        f"{WIKI_AUTH_SECRET_KEY}=D"
+                                        f"{random_str}").encode("utf-8")
 
                     # session token will be the hash of above str
                     token = hashlib.new("sha256", token_input_data).digest().hex()
