@@ -5,6 +5,16 @@
 # https://github.com/kevinmcaleer/tiny_wiki
 import re
 
+
+def _escape_html(text):
+    """Escape HTML special characters"""
+    text = text.replace('&', '&amp;')
+    text = text.replace('<', '&lt;')
+    text = text.replace('>', '&gt;')
+    text = text.replace('"', '&quot;')
+    return text
+
+
 class SimpleMarkdown:
     """Lightweight markdown parser optimized for MicroPython"""
 
@@ -72,7 +82,7 @@ class SimpleMarkdown:
                 continue
 
             if in_code_block:
-                code_block_lines.append(self._escape_html(line))
+                code_block_lines.append(_escape_html(line))
                 i += 1
                 continue
 
@@ -142,7 +152,7 @@ class SimpleMarkdown:
             code_spans = []
 
             def replace_code_span(match):
-                code_text = self._escape_html(match.group(1))
+                code_text = _escape_html(match.group(1))
                 code_spans.append('<code>{}</code>'.format(code_text))
                 return '%%CODESPAN{}%%'.format(len(code_spans) - 1)
 
@@ -181,11 +191,3 @@ class SimpleMarkdown:
             index = end
 
         return ''.join(result)
-
-    def _escape_html(self, text):
-        """Escape HTML special characters"""
-        text = text.replace('&', '&amp;')
-        text = text.replace('<', '&lt;')
-        text = text.replace('>', '&gt;')
-        text = text.replace('"', '&quot;')
-        return text
