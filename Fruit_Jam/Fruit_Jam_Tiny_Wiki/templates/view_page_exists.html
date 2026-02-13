@@ -1,0 +1,20 @@
+<!-- SPDX-FileCopyrightText: 2026 Tim Cocks for Adafruit Industries -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- Adapted from pages found in [tiny_wiki for Micropython by Kevin McAleer](https://github.com/kevinmcaleer/tiny_wiki) -->
+
+{% extends "templates/base.html" %}
+
+{% block title %}{{ context['page_name'] }} - {{ context['wiki_title'] }}{% endblock title %}
+
+{% block content %}
+<div class="title-row">
+    <h2>{{ context['page_name'] }}</h2>
+    <div class="actions edit-btn-container">
+        <a href="/edit/{{ context['page_name'] }}" class="btn">Edit</a>
+    </div>
+    </div>
+<hr>
+{% autoescape off %}
+{{ context['html_content'] }}
+{% autoescape on %}
+{% endblock content %}

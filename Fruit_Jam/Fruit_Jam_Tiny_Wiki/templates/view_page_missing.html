@@ -1,0 +1,15 @@
+<!-- SPDX-FileCopyrightText: 2026 Tim Cocks for Adafruit Industries -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- Adapted from pages found in [tiny_wiki for Micropython by Kevin McAleer](https://github.com/kevinmcaleer/tiny_wiki) -->
+
+{% extends "templates/base.html" %}
+
+{% block title %}{{ context['page_name'] }} - {{ context['wiki_title'] }}{% endblock title %}
+
+{% block content %}
+<h1>{{ context['page_name'] }}</h1>
+<div class="info">
+    <p>This page doesn't exist yet.</p>
+    <p><a href="/edit/{{ context['page_name'] }}" class="btn">Create this page</a></p>
+</div>
+{% endblock content %}
