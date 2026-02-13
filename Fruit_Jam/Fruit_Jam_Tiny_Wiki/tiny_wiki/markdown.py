@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2026 Tim C, written for Adafruit Industries
 #
 # SPDX-License-Identifier: MIT
-# Adapted from files found in tini_wiki for Micropython by Kevin McAleer:
+# Adapted from files found in tiny_wiki for Micropython by Kevin McAleer:
 # https://github.com/kevinmcaleer/tiny_wiki
 import re
 
