@@ -1,0 +1,22 @@
+<!-- SPDX-FileCopyrightText: 2026 Tim Cocks for Adafruit Industries -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- Adapted from pages found in [tini_wiki for Micropython by Kevin McAleer](https://github.com/kevinmcaleer/tiny_wiki) -->
+
+{% extends "templates/base.html" %}
+
+{% block title %}All Pages - {{ context['wiki_title'] }}{% endblock title %}
+
+{% block content %}
+<h1>All Pages</h1>
+<p>{{ context['page_count'] }} page(s) total</p>
+<hr>
+{% if context['has_pages'] %}
+<ul class="page-list">
+    {% for page in context['pages'] %}
+    <li><a href="/wiki/{{ page }}">{{ page }}</a></li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>No pages yet. <a href="/new">Create the first page!</a></p>
+{% endif %}
+{% endblock content %}

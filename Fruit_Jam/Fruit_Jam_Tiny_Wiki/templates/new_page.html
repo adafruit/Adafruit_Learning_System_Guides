@@ -1,0 +1,28 @@
+<!-- SPDX-FileCopyrightText: 2026 Tim Cocks for Adafruit Industries -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- Adapted from pages found in [tini_wiki for Micropython by Kevin McAleer](https://github.com/kevinmcaleer/tiny_wiki) -->
+
+{% extends "templates/base.html" %}
+
+{% block title %}New Page - {{ context['wiki_title'] }}{% endblock title %}
+
+{% block content %}
+<h1>Create New Page</h1>
+{% if context['error_message'] %}
+<div class="error">{{ context['error_message'] }}</div>
+{% endif %}
+<form method="POST" action="/create">
+    <p>
+        <label for="page_name">Page Name:</label><br>
+        <input type="text" id="page_name" name="page_name"
+               style="width: 100%; padding: 0.5rem; font-size: 1rem; margin-top: 0.5rem;"
+               placeholder="MyNewPage" required autofocus>
+    </p>
+    <div class="actions">
+        <button type="submit" class="btn">Create Page</button>
+        <a href="/" class="btn" style="background: #95a5a6;">Cancel</a>
+    </div>
+</form>
+<hr>
+<p><small>Page names can contain spaces. Some special characters like parenthesis and ampersand are supported, but others may not work.</small></p>
+{% endblock content %}
