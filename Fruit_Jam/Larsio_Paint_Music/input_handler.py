@@ -5,7 +5,7 @@
 # input_handler.py: CircuitPython Music Staff Application component
 """
 
-from adafruit_usb_host_mouse import find_and_init_boot_mouse
+from adafruit_usb_host_mouse import find_and_init_boot_mouse, find_and_init_report_mouse
 
 # pylint: disable=invalid-name,no-member,too-many-instance-attributes,too-many-arguments
 # pylint: disable=too-many-branches,too-many-statements,broad-except
@@ -34,6 +34,9 @@ class InputHandler:
 
     def find_mouse(self):
         self.mouse = find_and_init_boot_mouse(cursor_image=None)
+        if self.mouse is None:
+            self.mouse = find_and_init_report_mouse(cursor_image=None)
+
         if self.mouse is None:
             print("Failed to find a working mouse after multiple attempts")
             return False
