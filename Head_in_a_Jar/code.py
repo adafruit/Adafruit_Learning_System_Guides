@@ -1,4 +1,6 @@
-# SPDX-License-Identifier: GPL-1.0-or-later
+# SPDX-FileCopyrightText: Erin St. Blaine for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
 
 """
 Circuit Playground Express shake trigger.
