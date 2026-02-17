@@ -1,0 +1,37 @@
+[project]
+name = "Magic_AI_Storybook"
+version = "0.1.0"
+description = "A storybook generating content based on spoken input."
+authors = [
+    {name = "Melissa LeBlanc-Williams "},
+    {name = "Thomas Fenzl"},
+]
+requires-python = ">=3.9"
+readme = "README.md"
+license = {text = "MIT"}
+dependencies = [
+    "openai>=0.27.8",
+    "SpeechRecognition>=3.10.0",
+    "pygame>=2.5.1",
+    "pyaudio>=0.2.13",
+    "RPi-GPIO>=0.7.1",
+    "adafruit-blinka>=8.20.1",
+    "adafruit-circuitpython-led-animation>=2.7.3",
+    "adafruit-circuitpython-neopixel>=6.3.9",
+    "rpi-backlight>=2.6.0",
+]
+
+[project.scripts]
+"magicbook-story" = "magic_ai_storybook:story.main"
+
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[options.extras_require]
+dev = [
+    "black",
+]
+
+[tool.setuptools.package-data]
+"*" = ["*.otf", "*.ttf", "*.png"]
