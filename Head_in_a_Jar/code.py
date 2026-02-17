@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+
 """
 Circuit Playground Express shake trigger.
 
@@ -34,14 +36,13 @@ def set_pixel_pattern() -> None:
     green = (0, 255, 0)
 
     pattern = (
-        red, red, red,        # 0-2
-        green, green,         # 3-4
-        red, red, red,        # 5-7
-        green, green,         # 8-9
+        red, red, red,
+        green, green,
+        red, red, red,
+        green, green,
     )
 
     cpx.pixels.auto_write = False
-    # Adjust to taste; helps battery + brightness.
     cpx.pixels.brightness = 0.2
 
     for index, color in enumerate(pattern):
@@ -54,13 +55,6 @@ def acceleration_magnitude() -> float:
     """Return the magnitude of the CPX acceleration vector."""
     accel_x, accel_y, accel_z = cpx.acceleration
     return math.sqrt((accel_x ** 2) + (accel_y ** 2) + (accel_z ** 2))
-
-
-def pulse(output: digitalio.DigitalInOut, duration_s: float) -> None:
-    """Set output HIGH for duration_s seconds, then LOW."""
-    output.value = True
-    time.sleep(duration_s)
-    output.value = False
 
 
 def main() -> None:
