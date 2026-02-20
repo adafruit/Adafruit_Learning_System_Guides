@@ -38,6 +38,8 @@ mqtt:
     topic: ${io_username}/feeds/status
     payload: Offline
   log_topic:
+  discovery: false
+  discover_ip: false
 
 # Enable Home Assistant API
 api:
