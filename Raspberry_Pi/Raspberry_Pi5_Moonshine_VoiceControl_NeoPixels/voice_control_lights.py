@@ -1,3 +1,10 @@
+# SPDX-FileCopyrightText: 2026 Tim Cocks for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+"""
+Adapted from Moonshine my-dalek example:
+https://github.com/moonshine-ai/moonshine/blob/main/examples/raspberry-pi/my-dalek/my-dalek.py
+"""
 import argparse
 import sys
 import time
@@ -11,6 +18,7 @@ from moonshine_voice import (
     get_embedding_model,
 )
 from adafruit_led_animation.animation.colorcycle import ColorCycle
+
 # pylint: disable=global-statement
 
 # NeoPixels setup
@@ -63,7 +71,7 @@ class TranscriptPrinter(TranscriptEventListener):
             print(f"{' ' * diff}", end="", flush=True)
         self.last_line_text_length = len(new_text)
 
-    def on_line_started(self, event):  #pylint: disable=unused-argument
+    def on_line_started(self, event):  # pylint: disable=unused-argument
         self.last_line_text_length = 0
 
     def on_line_text_changed(self, event):
