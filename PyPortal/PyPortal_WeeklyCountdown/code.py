@@ -21,7 +21,7 @@ EVENT_DURATION = 3600   # in seconds!
 # Instead of messing around with timezones, just put in
 # the *location* of the event, and we'll automatically set the PyPortal's
 # time to that location. Then compute the math from there
-# for a list of valid locations, see http://worldtimeapi.org/api/timezone
+# for a list of valid locations, see https://time.now/developer/api/timezone
 EVENT_LOCATION = "America/New_York"  # set to None if its for your local time
 
 # the current working directory (where this file is)

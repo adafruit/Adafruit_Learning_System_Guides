@@ -67,7 +67,7 @@ MINIMUM_TIME = 5 * 60
 # 6 hour default.
 CLOCK_SYNC_INTERVAL = 6 * 60 * 60
 # Load time zone string from settings.toml, else IP geolocation is used
-# (http://worldtimeapi.org/api/timezone for list). Again, this is only
+# (https://time.now/developer/api/timezone for list). Again, this is only
 # used for the 'Last checked' display, not predictions, so it's not
 # especially disruptive if missing.
 # pylint: disable=bare-except
@@ -117,7 +117,7 @@ def parse_time(timestring, is_dst=-1):
 def update_time(timezone=None):
     """ Update system date/time from WorldTimeAPI public server;
         no account required. Pass in time zone string
-        (http://worldtimeapi.org/api/timezone for list)
+        (https://time.now/developer/api/timezone for list)
         or None to use IP geolocation. Returns current local time as a
         time.struct_time and UTC offset as string. This may throw an
         exception on fetch_data() - it is NOT CAUGHT HERE, should be
@@ -125,9 +125,9 @@ def update_time(timezone=None):
         needed in different situations (e.g. reschedule for later).
     """
     if timezone: # Use timezone api
-        time_url = 'http://worldtimeapi.org/api/timezone/' + timezone
+        time_url = 'https://time.now/developer/api/timezone/' + timezone
     else: # Use IP geolocation
-        time_url = 'http://worldtimeapi.org/api/ip'
+        time_url = 'https://time.now/developer/api/ip'
 
     time_data = NETWORK.fetch_data(time_url,
                                    json_path=[['datetime'], ['dst'],

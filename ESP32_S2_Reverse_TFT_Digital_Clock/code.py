@@ -27,7 +27,7 @@ pool = socketpool.SocketPool(wifi.radio)
 requests = adafruit_requests.Session(pool, ssl.create_default_context())
 
 # Set up the URL for fetching time data
-DATA_SOURCE = "http://worldtimeapi.org/api/timezone/" + os.getenv("TIMEZONE")
+DATA_SOURCE = "https://time.now/developer/api/timezone/" + os.getenv("TIMEZONE")
 
 # Set up display a default image
 display = board.DISPLAY
