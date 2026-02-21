@@ -8,5 +8,5 @@
 
 CIRCUITPY_WIFI_SSID="your-wifi-ssid"
 CIRCUITPY_WIFI_PASSWORD="your-wifi-password"
-timezone="America/New_York"  # http://worldtimeapi.org/timezones
+timezone="America/New_York"  # https://time.now/developer/timezones
 openweather_token="putYourOpenWeatherTokenHere"

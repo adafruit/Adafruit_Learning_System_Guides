@@ -9,4 +9,4 @@ CIRCUITPY_WIFI_SSID="your-wifi-ssid"
 CIRCUITPY_WIFI_PASSWORD="your-wifi-password"
 ADAFRUIT_AIO_USERNAME="my_username"
 ADAFRUIT_AIO_KEY="my_key"
-timezone=""  # leave blank or use timezone from # http://worldtimeapi.org/timezones
+timezone=""  # leave blank or use timezone from # https://time.now/developer/timezones

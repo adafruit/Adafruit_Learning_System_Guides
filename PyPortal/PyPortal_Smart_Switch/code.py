@@ -79,7 +79,7 @@ def get_local_timestamp(location=None):
             tzseconds += tzminutes * 60
         print(seconds + tzseconds, tzoffset, tzhours, tzminutes)
     except KeyError:
-        raise KeyError("Was unable to lookup the time, try setting timezone in your settings.toml according to http://worldtimeapi.org/timezones")  # pylint: disable=line-too-long
+        raise KeyError("Was unable to lookup the time, try setting timezone in your settings.toml according to https://time.now/developer/timezones")  # pylint: disable=line-too-long
 
     # now clean up
     response.close()
