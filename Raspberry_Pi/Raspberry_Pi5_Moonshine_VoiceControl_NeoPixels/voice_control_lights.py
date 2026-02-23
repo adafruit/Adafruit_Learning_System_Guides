@@ -50,14 +50,6 @@ parser.add_argument(
 args = parser.parse_args()
 
 
-# Generic handler for intent triggers
-def on_intent_triggered_on(trigger: str, utterance: str, similarity: float):
-    """Handler for when an intent is triggered."""
-    print(
-        f"\n'{trigger.upper()}' triggered by '{utterance}' with {similarity:.0%} confidence"
-    )
-
-
 class TranscriptPrinter(TranscriptEventListener):
     """Listener that prints transcript updates to the terminal."""
 
