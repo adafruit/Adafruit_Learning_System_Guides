@@ -130,12 +130,14 @@ main_group.append(bg_group)
 
 # Setup accent palette for the outlined text
 accent_palette = displayio.Palette(5)
+accent_palette[1] = 0x666666
 accent_palette[3] = 0x666666
 accent_palette[4] = 0xFFFFFF
+accent_palette.make_transparent(0)
 
 # Setup BitmapLabel to show the quote
 quote_lbl = Label(
-    terminalio.FONT, text="", color=0x666666, color_palette=accent_palette
+    terminalio.FONT, text="", color_palette=accent_palette
 )
 quote_lbl.anchor_point = (0, 0)
 quote_lbl.anchored_position = (2, 2)
