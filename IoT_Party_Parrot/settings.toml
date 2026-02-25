@@ -7,7 +7,7 @@
 
 CIRCUITPY_WIFI_SSID="your-wifi-ssid"
 CIRCUITPY_WIFI_PASSWORD="your-wifi-password"
-timezone="America/New_York"  # http://worldtimeapi.org/timezones
+timezone="America/New_York"  # https://time.now/developer/timezones
 twitter_api_key="insert your twitter api key here"
 twitter_secret_key="insert your twitter secret key here"
 bearer_token="insert your bearer token here"

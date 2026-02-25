@@ -50,7 +50,7 @@ char dateBuffer[20];
 char timeBuffer[10];
 
 String weatherEndpoint = "http://api.openweathermap.org/data/2.5/weather?q=" + owm_location + "&appid=" + owm_key;
-String clockEndpoint = "http://worldtimeapi.org/api/timezone/Etc/UTC";
+String clockEndpoint = "https://time.now/developer/api/timezone/Etc/UTC";
 String apiEndpoint = clockEndpoint;
 String channelNow = "clock";
 

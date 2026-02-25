@@ -69,7 +69,7 @@ HEADERS = { "User-Agent" : "AdafruitMoonClock/1.1 support@adafruit.com" }
 
 def update_system_time():
     """ Update system clock date/time from Adafruit IO. Credentials and time
-        zone are in settings.toml. See http://worldtimeapi.org/api/timezone for
+        zone are in settings.toml. See https://time.now/developer/api/timezone for
         list of time zones. If missing, will attempt using IP geolocation.
         Returns present local (not UTC) time as a struct_time and UTC offset
         as string "sHH:MM". This may throw an exception on get_local_time(),

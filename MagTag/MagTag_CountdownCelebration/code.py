@@ -27,10 +27,10 @@ event_time = time.struct_time(
 )  # we dont know day of week/year or DST
 
 # Set up where we'll be fetching data from
-# Check http://worldtimeapi.org/timezones for valid values
+# Check https://time.now/developer/timezones for valid values
 # pylint: disable=line-too-long
-DATA_SOURCE = "http://worldtimeapi.org/api/timezone/America/New_York"
-#DATA_SOURCE = "http://worldtimeapi.org/api/timezone/Europe/Stockholm"
+DATA_SOURCE = "https://time.now/developer/api/timezone/America/New_York"
+#DATA_SOURCE = "https://time.now/developer/api/timezone/Europe/Stockholm"
 
 magtag = MagTag()
 magtag.network.connect()

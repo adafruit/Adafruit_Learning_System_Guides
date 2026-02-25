@@ -149,7 +149,7 @@ class AIO:
             week_day = int(times[3])
             is_dst = None  # no way to know yet
         except KeyError as exc:
-            raise KeyError("Was unable to lookup the time, try setting timezone in your settings.toml according to http://worldtimeapi.org/timezones") from exc  # pylint: disable=line-too-long
+            raise KeyError("Was unable to lookup the time, try setting timezone in your settings.toml according to https://time.now/developer/timezones") from exc  # pylint: disable=line-too-long
         year, month, mday = [int(x) for x in the_date.split('-')]
         the_time = the_time.split('.')[0]
         hours, minutes, seconds = [int(x) for x in the_time.split(':')]
