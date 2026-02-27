@@ -155,7 +155,7 @@ def get_tilt_angle():
 def check_tilt_skip():
     '''Check if display is tilted left or right long enough.
     Returns True if held in either zone for TILT_HOLD_TIME.'''
-    global tilt_start  # pylint: disable=global-statement
+    global tilt_start  # pylint: disable=global-statement,invalid-name
     if not USE_ACCEL:
         return False
     angle = get_tilt_angle()
@@ -190,7 +190,7 @@ def check_tilt_skip():
 def check_shake():
     '''Detect shake gesture from acceleration spikes.
     Returns True if enough spikes within time window.'''
-    global shake_times  # pylint: disable=global-statement
+    global shake_times  # pylint: disable=global-statement,invalid-name
     if not USE_ACCEL:
         return False
     accel_x, accel_y, accel_z = lis3dh.acceleration
@@ -494,7 +494,7 @@ local_images = []
 
 def load_local_images():
     '''Scan /sd/imgs/ for BMP files.'''
-    global local_images  # pylint: disable=global-statement
+    global local_images  # pylint: disable=global-statement,invalid-name
     local_images = []
     try:
         for fname in os.listdir(LOCAL_IMG_PATH):
@@ -508,7 +508,7 @@ def load_local_images():
 def next_mode(steps=1):
     '''Cycle feed mode forward by steps.
     Skips online modes if settings are missing.'''
-    global feed_index, current_feed  # pylint: disable=global-statement
+    global feed_index, current_feed  # pylint: disable=global-statement,invalid-name
     feed_index = (feed_index + steps) % len(FEED_MODES)
     # Skip online modes if WiFi/AIO keys are missing
     if not online_available:
@@ -720,7 +720,7 @@ def show_online_image():
     '''Fetch and display an image from the API.
     Returns True on success, False on failure,
     or "mode" if screen was tapped mid-load.'''
-    global display_file, prefetch_file  # pylint: disable=global-statement
+    global display_file, prefetch_file  # pylint: disable=global-statement,invalid-name
     url = build_feed_url()
     print("Fetching:", url)
     status_text.text = "Fetching..."
@@ -820,7 +820,7 @@ def prefetch_online_image():
     Current image stays on screen during download.
     Returns True on success, False on failure,
     or "mode" if screen was tapped mid-load.'''
-    global prefetch_ready, prefetch_title  # pylint: disable=global-statement
+    global prefetch_ready, prefetch_title  # pylint: disable=global-statement,invalid-name
     prefetch_ready = False
     prefetch_title = ""
     status_text.text = "Prefetching..."
@@ -899,8 +899,8 @@ def display_prefetched():
     '''Instantly display the prefetched image.
     Swaps cache file roles so next prefetch writes
     to the file that is no longer on screen.'''
-    global prefetch_ready  # pylint: disable=global-statement
-    global display_file, prefetch_file  # pylint: disable=global-statement
+    global prefetch_ready  # pylint: disable=global-statement,invalid-name
+    global display_file, prefetch_file  # pylint: disable=global-statement,invalid-name
     if not prefetch_ready:
         return False
     wipe_transition(prefetch_file)
@@ -927,8 +927,8 @@ def wait_for_input(duration):
     Returns "skip" for D3 button, tilt, or shake.
     Returns "mode" for screen tap.
     Returns "timeout" if time expires.'''
-    global tilt_start  # pylint: disable=global-statement
-    global shake_times  # pylint: disable=global-statement
+    global tilt_start  # pylint: disable=global-statement,invalid-name
+    global shake_times  # pylint: disable=global-statement,invalid-name
     stamp = time.monotonic()
     tap_cooldown = stamp + 1.0  # ignore taps for 1s
     btn_was_pressed = False
