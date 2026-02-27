@@ -5,7 +5,7 @@
 '''PyPortal Art Display - Multi-feed with mode switching'''
 
 # pylint: disable=global-statement,invalid-name,too-many-lines
-# pylint: disable=consider-using-f-string,redefined-outer-name
+# pylint: disable=redefined-outer-name
 # pylint: disable=no-member,protected-access,too-many-return-statements
 
 from os import getenv
