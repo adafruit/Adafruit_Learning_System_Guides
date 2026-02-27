@@ -1,12 +1,10 @@
-# SPDX-FileCopyrightText: 2025 Pedro for Adafruit Industries
+# SPDX-FileCopyrightText: 2025 Pedro Ruiz for Adafruit Industries
 #
 # SPDX-License-Identifier: MIT
 
 '''PyPortal Art Display - Multi-feed with mode switching'''
 
-# pylint: disable=global-statement,invalid-name,too-many-lines
-# pylint: disable=redefined-outer-name
-# pylint: disable=no-member,protected-access,too-many-return-statements
+# pylint: disable=too-many-lines
 
 from os import getenv
 import os
@@ -91,7 +89,7 @@ HEIGHT = board.DISPLAY.height
 # Skip button on D3 (pull-up, active low)
 # Set to False if no button is wired to D3
 USE_BUTTON = False
-skip_btn = None
+skip_btn = None  # pylint: disable=invalid-name
 if USE_BUTTON:
     skip_btn = digitalio.DigitalInOut(board.D3)
     skip_btn.direction = digitalio.Direction.INPUT
@@ -100,7 +98,7 @@ if USE_BUTTON:
 # --- LIS3DH Accelerometer (STEMMA I2C) ---
 # Set to False if no accelerometer is connected
 USE_ACCEL = True
-lis3dh = None
+lis3dh = None  # pylint: disable=invalid-name
 
 # Tilt detection: LIS3DH on back of diamond-oriented display.
 # Resting position reads ~-10 to -16 degrees on Z-axis.
@@ -110,7 +108,7 @@ TILT_TARGET_RIGHT = -60   # center of right zone (-50 to -70)
 TILT_THRESHOLD_LEFT = 6    # +/- tolerance (range: 0 to -3)
 TILT_THRESHOLD_RIGHT = 30  # +/- tolerance (range: -50 to -70)
 TILT_HOLD_TIME = 0.5      # seconds to hold at target before skip
-tilt_start = 0.0          # when tilt was first detected
+tilt_start = 0.0          # pylint: disable=invalid-name
 
 # Shake detection: triggers skip on quick shake gesture
 SHAKE_THRESHOLD = 20.0    # m/s^2 total accel (1g = 9.8)
@@ -126,7 +124,7 @@ if USE_ACCEL:
         print("LIS3DH accelerometer found!")
     except (ValueError, RuntimeError) as accel_err:
         print("No LIS3DH found:", accel_err)
-        lis3dh = None
+        lis3dh = None  # pylint: disable=invalid-name
         USE_ACCEL = False
 
 # --- Audio confirmation chirp ---
@@ -140,8 +138,8 @@ def play_beep():
     '''Play confirmation chirp via PyPortal's built-in audio.'''
     try:
         pyportal.play_file(BEEP_WAV)
-    except (OSError, RuntimeError) as err:
-        print("Beep error:", err)
+    except (OSError, RuntimeError) as beep_err:
+        print("Beep error:", beep_err)
 
 
 def get_tilt_angle():
@@ -248,15 +246,15 @@ TAP_WINDOW = 0.8          # seconds to wait for additional taps
 def count_taps():
     '''Count total taps within TAP_WINDOW after first tap.
     Returns tap count (1 if no extra taps detected).'''
-    taps = 1
+    tap_count = 1
     deadline = time.monotonic() + TAP_WINDOW
     while time.monotonic() < deadline:
         if check_tap():
-            taps = taps + 1
+            tap_count = tap_count + 1
             # Reset window on each tap
             deadline = time.monotonic() + TAP_WINDOW
         time.sleep(0.1)
-    return taps
+    return tap_count
 
 
 # ============================================
@@ -308,8 +306,8 @@ def wipe_transition(bg_path):
 
     # Animate with ease-in (accelerates like dripping)
     for step in range(1, WIPE_STEPS + 1):
-        t = step / WIPE_STEPS
-        progress = t * t  # ease-in: slow start, fast finish
+        frac = step / WIPE_STEPS
+        progress = frac * frac  # ease-in: slow start, fast finish
         new_x = int(-WIDTH * WIPE_X_BIAS * (1.0 - progress))
         new_y = int(-HEIGHT * (1.0 - progress))
         new_tile.x = new_x
@@ -376,7 +374,7 @@ if not AIO_USER:
 if not AIO_KEY:
     missing_keys.append("AIO_KEY")
     print("WARNING: ADAFRUIT_AIO_KEY missing")
-online_available = len(missing_keys) == 0
+online_available = len(missing_keys) == 0  # pylint: disable=invalid-name
 
 BACKGROUND_FILE = "/background.bmp"
 if WIDTH > 320:
@@ -389,10 +387,9 @@ pyportal = PyPortal(
     image_position=(0, 0),
 )
 
-# Generate chirp WAV file on SD card at startup
-try:
-    import struct
-    # 16-bit mono PCM WAV at 16000 Hz
+def generate_chirp_wav():
+    '''Generate chirp WAV file on SD card.'''
+    import struct  # pylint: disable=import-outside-toplevel
     sample_rate = 16000
     num_samples = int(sample_rate * BEEP_DURATION)
     data_size = num_samples * 2
@@ -410,14 +407,18 @@ try:
         # Phase accumulates based on instantaneous freq
         phase = 0.0
         for i in range(num_samples):
-            t = i / num_samples  # 0.0 to 1.0
+            frac = i / num_samples  # 0.0 to 1.0
             freq = (BEEP_FREQ_START
-                    + (BEEP_FREQ_END - BEEP_FREQ_START) * t)
+                    + (BEEP_FREQ_END - BEEP_FREQ_START) * frac)
             phase += 2 * math.pi * freq / sample_rate
             val = math.sin(phase)
             sample = int(val * 32000)
             wav_file.write(struct.pack("<h", sample))
     print("Chirp WAV generated!")
+
+
+try:
+    generate_chirp_wav()
 except (OSError, RuntimeError) as wav_err:
     print("WAV generation error:", wav_err)
 
@@ -454,8 +455,8 @@ pyportal.root_group.append(status_text)
 # ============================================
 # MODE MANAGEMENT
 # ============================================
-feed_index = FEED_MODES.index(START_MODE)
-current_feed = FEED_MODES[feed_index]
+feed_index = FEED_MODES.index(START_MODE)  # pylint: disable=invalid-name
+current_feed = FEED_MODES[feed_index]  # pylint: disable=invalid-name
 
 # Show startup warnings for missing hardware/settings
 startup_warnings = []
@@ -468,7 +469,7 @@ if missing_keys:
 
 # Force local mode if online features unavailable
 if not online_available:
-    current_feed = "local"
+    current_feed = "local"  # pylint: disable=invalid-name
     feed_index = FEED_MODES.index("local")
     print("Online unavailable, forcing local mode")
 
@@ -482,10 +483,10 @@ if startup_warnings:
 
 # Prefetch state - alternate cache files to avoid
 # overwriting the currently displayed OnDiskBitmap
-prefetch_ready = False
-prefetch_title = ""
-prefetch_file = "/sd/cache2.bmp"  # next prefetch target
-display_file = "/sd/cache.bmp"    # currently shown file
+prefetch_ready = False  # pylint: disable=invalid-name
+prefetch_title = ""  # pylint: disable=invalid-name
+prefetch_file = "/sd/cache2.bmp"  # pylint: disable=invalid-name
+display_file = "/sd/cache.bmp"  # pylint: disable=invalid-name
 
 # Cache list of local images
 local_images = []
@@ -493,7 +494,7 @@ local_images = []
 
 def load_local_images():
     '''Scan /sd/imgs/ for BMP files.'''
-    global local_images
+    global local_images  # pylint: disable=global-statement
     local_images = []
     try:
         for fname in os.listdir(LOCAL_IMG_PATH):
@@ -660,8 +661,8 @@ def show_local_image():
         gc.collect()
         print("Local image displayed!")
         return True
-    except (OSError, RuntimeError, MemoryError) as err:
-        print("Local image error:", err)
+    except (OSError, RuntimeError, MemoryError) as local_err:
+        print("Local image error:", local_err)
         return False
 
 
@@ -687,14 +688,14 @@ def show_fallback_local():
             attempt, remaining))
         status_text.text = "Retry #%d..." % attempt
         try:
-            result = show_online_image()
-            if result is True:
+            online_result = show_online_image()
+            if online_result is True:
                 print("Online image loaded!")
                 return True
-            if result == "mode":
-                return result
-        except (RuntimeError, Exception) as err:  # pylint: disable=broad-except
-            print("Retry error:", err)
+            if online_result == "mode":
+                return online_result
+        except Exception as retry_err:  # pylint: disable=broad-except
+            print("Retry error:", retry_err)
         gc.collect()
         # Tap-aware wait between retries
         if tap_aware_sleep(3):
@@ -743,14 +744,15 @@ def show_online_image():
         try:
             json_data = json_data["data"][0]
         except (KeyError, IndexError, TypeError):
-            print("No CMA data in response")
-            return False
+            json_data = None
 
-    new_title = get_title(json_data)
-    print("Title:", new_title)
-
-    # Validate image URL
-    image_url = validate_image(json_data)
+    # Validate data and image URL
+    image_url = None
+    new_title = ""
+    if json_data:
+        new_title = get_title(json_data)
+        print("Title:", new_title)
+        image_url = validate_image(json_data)
     json_data = None
     gc.collect()
     if not image_url:
@@ -898,7 +900,7 @@ def display_prefetched():
     Swaps cache file roles so next prefetch writes
     to the file that is no longer on screen.'''
     global prefetch_ready  # pylint: disable=global-statement
-    global display_file, prefetch_file
+    global display_file, prefetch_file  # pylint: disable=global-statement
     if not prefetch_ready:
         return False
     wipe_transition(prefetch_file)
@@ -926,7 +928,7 @@ def wait_for_input(duration):
     Returns "mode" for screen tap.
     Returns "timeout" if time expires.'''
     global tilt_start  # pylint: disable=global-statement
-    global shake_times
+    global shake_times  # pylint: disable=global-statement
     stamp = time.monotonic()
     tap_cooldown = stamp + 1.0  # ignore taps for 1s
     btn_was_pressed = False
@@ -967,13 +969,15 @@ def wait_for_input(duration):
 # MAIN LOOP
 # ============================================
 load_local_images()
-loopcount = 0
-errorcount = 0
+loopcount = 0  # pylint: disable=invalid-name
+errorcount = 0  # pylint: disable=invalid-name
 
 print("Starting art display...")
 print("Mode:", current_feed)
 text_area.text = "Mode: " + current_feed
 
+# Main loop variables use snake_case (not module constants)
+# pylint: disable=invalid-name
 while True:
     try:
         # Check for mode tap at start of each cycle
@@ -1083,7 +1087,7 @@ while True:
                 or "Expected" in error_str):
             print("ESP32 SPI/WiFi error - resetting...")
             try:
-                pyportal.network._wifi.esp.reset()
+                pyportal.network._wifi.esp.reset()  # pylint: disable=protected-access
                 print("ESP32 reset complete, waiting...")
                 if tap_aware_sleep(10):
                     next_mode(count_taps())
