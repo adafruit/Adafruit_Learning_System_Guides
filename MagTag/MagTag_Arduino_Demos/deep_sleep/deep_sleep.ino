@@ -7,7 +7,10 @@
 #include "magtaglogo.h"
 
 Adafruit_NeoPixel intneo = Adafruit_NeoPixel(4, PIN_NEOPIXEL, NEO_GRB + NEO_KHZ800);
-ThinkInk_290_Grayscale4_T5 display(EPD_DC, EPD_RESET, EPD_CS, -1, -1);
+// older pre-2025 magtag
+//ThinkInk_290_Grayscale4_T5 display(EPD_DC, EPD_RESET, EPD_CS, -1, -1);
+// magtag with SSD1680Z chipset
+ThinkInk_290_Grayscale4_EAAMFGN display(EPD_DC, EPD_RESET, EPD_CS, -1, -1);
 
 void setup() {
   //Initialize serial and wait for port to open:
