@@ -90,7 +90,7 @@ void setup(void)
 
   Serial.println("Initialized!");
 
-  gfx->fillScreen(BLACK);
+  gfx->fillScreen(RGB565_BLACK);
 
   expander->pinMode(PCA_TFT_BACKLIGHT, OUTPUT);
   expander->digitalWrite(PCA_TFT_BACKLIGHT, HIGH);
@@ -125,11 +125,11 @@ void loop()
     if (isFocalTouch && focal_ctp.touched()) {
       TS_Point p = focal_ctp.getPoint(0);
       Serial.printf("(%d, %d)\n", p.x, p.y);
-      gfx->fillRect(p.x, p.y, 5, 5, WHITE);
+      gfx->fillRect(p.x, p.y, 5, 5, RGB565_WHITE);
     } else if (!isFocalTouch && cst_ctp.touched()) {
       CST_TS_Point p = cst_ctp.getPoint(0);
       Serial.printf("(%d, %d)\n", p.x, p.y);
-      gfx->fillRect(p.x, p.y, 5, 5, WHITE);
+      gfx->fillRect(p.x, p.y, 5, 5, RGB565_WHITE);
     }
   }
 
