@@ -56,28 +56,28 @@ void setup(void)
     while (1) yield();
   }
 
-  gfx->fillScreen(BLACK);
+  gfx->fillScreen(RGB565_BLACK);
 
   expander->pinMode(PCA_TFT_BACKLIGHT, OUTPUT);
   expander->digitalWrite(PCA_TFT_BACKLIGHT, HIGH);
 
   Serial.println("Hello!");
-  gfx->fillScreen(BLACK);
+  gfx->fillScreen(RGB565_BLACK);
   gfx->setCursor(100, gfx->height() / 2 - 75);
   gfx->setTextSize(5);
-  gfx->setTextColor(WHITE);
+  gfx->setTextColor(RGB565_WHITE);
   gfx->println("Hello World!");
 
   gfx->setCursor(100, gfx->height() / 2 - 25);
-  gfx->setTextColor(RED);
+  gfx->setTextColor(RGB565_RED);
   gfx->println("RED");
 
   gfx->setCursor(100, gfx->height() / 2 + 25);
-  gfx->setTextColor(GREEN);
+  gfx->setTextColor(RGB565_GREEN);
   gfx->println("GREEN");
 
   gfx->setCursor(100, gfx->height() / 2 + 75);
-  gfx->setTextColor(BLUE);
+  gfx->setTextColor(RGB565_BLUE);
   gfx->println("BLUE");
 
   if (!ctp.begin(0, &Wire, I2C_TOUCH_ADDR)) {
@@ -86,7 +86,7 @@ void setup(void)
     Serial.println("No touchscreen found");
     touchOK = false;
   } else {
-    gfx->setTextColor(WHITE);
+    gfx->setTextColor(RGB565_WHITE);
     gfx->println("\nTouch found");
     Serial.println("Touchscreen found");
     touchOK = true;
@@ -101,7 +101,7 @@ void loop()
   if (touchOK && ctp.touched()) {
     TS_Point p = ctp.getPoint(0);
     Serial.printf("(%d, %d)\n", p.x, p.y);
-    gfx->fillRect(p.x, p.y, 5, 5, WHITE);
+    gfx->fillRect(p.x, p.y, 5, 5, RGB565_WHITE);
   }
 
   // use the buttons to turn off
