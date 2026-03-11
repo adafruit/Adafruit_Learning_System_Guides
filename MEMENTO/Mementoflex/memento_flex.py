@@ -69,7 +69,7 @@ if SSID and PASSWORD:
                                tz_offset=(UTC_OFFSET or 0) // 3600)
         rtc.RTC().datetime = ntp.datetime
         print("Time Synced:", ntp.datetime)
-    except Exception as e:  # pylint: disable=broad-exception-caught
+    except Exception as e:  # pylint: disable=broad-except
         print("Wifi/NTP failed:", e)
 
 # --- Hardware Setup ---
@@ -140,7 +140,7 @@ def send_to_ai():
         else:
             pycam.display_message(f"Err {response.status_code}", color=0xFF0000)
         time.sleep(6)
-    except Exception as e:  # pylint: disable=broad-exception-caught
+    except Exception as e:  # pylint: disable=broad-except
         print("AI Error:", e)
         pycam.display_message("AI Fail", color=0xFF0000)
         time.sleep(2)
@@ -177,7 +177,7 @@ while True:
             try:
                 pycam.display_message("Snap!", color=0x0000FF)
                 pycam.capture_jpeg()
-            except Exception:  # pylint: disable=broad-exception-caught
+            except Exception:  # pylint: disable=broad-except
                 pycam.display_message("Error", color=0xFF0000)
             pycam.live_preview_mode()
             pycam.display.refresh()
@@ -215,7 +215,7 @@ while True:
                             g.add_frame(_frame, 0.12)
                             pycam.blit(_frame)
                     pycam._mode_label.text = "GIF"
-            except Exception:  # pylint: disable=broad-exception-caught
+            except Exception:  # pylint: disable=broad-except
                 pycam.display_message("SD Error", color=0xFF0000)
 
     if pycam.ok.fell:
@@ -259,5 +259,5 @@ while True:
     if pycam.card_detect.rose:
         try:
             pycam.mount_sd_card()
-        except Exception: 
+        except Exception:  # pylint: disable=broad-except
             pass
