@@ -1,6 +1,9 @@
 # SPDX-FileCopyrightText: 2026 Gautham Chenoth Praveen 
 # SPDX-License-Identifier: MIT 
-
+"""
+Memento Flex: An AI-enhanced multi-mode camera for the Adafruit Memento.
+Supports standard JPEG, GIF, Timelapse, and OpenRouter AI Vision analysis.
+"""
 import binascii
 import gc
 import os
@@ -34,6 +37,7 @@ requests = None
 
 # Custom wrapping function to replace the 'textwrap' module
 def wrap_text(text, width):
+    """Custom wrapping function to replace the 'textwrap' module."""
     words = text.split()
     lines = []
     current_line = []
@@ -85,6 +89,7 @@ timelapse_remaining = None
 timelapse_timestamp = None
 
 def send_to_ai():
+    """Captures an image, encodes it to base64, and sends it to the AI API."""
     if not requests:
         pycam.display_message("No WiFi", color=0xFF0000)
         return
