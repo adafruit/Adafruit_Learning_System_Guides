@@ -1,5 +1,6 @@
-# SPDX-FileCopyrightText: 2026 Gautham Chenoth Praveen 
-# SPDX-License-Identifier: MIT 
+# SPDX-FileCopyrightText: 2026 Gautham Chenoth Praveen
+#
+# SPDX-License-Identifier: MIT
 """
 Memento Flex: An AI-enhanced multi-mode camera for the Adafruit Memento.
 Supports standard JPEG, GIF, Timelapse, and OpenRouter AI Vision analysis.
@@ -35,7 +36,6 @@ MODEL_ID = "openrouter/free"
 pool = None
 requests = None
 
-# Custom wrapping function to replace the 'textwrap' module
 def wrap_text(text, width):
     """Custom wrapping function to replace the 'textwrap' module."""
     words = text.split()
@@ -60,21 +60,21 @@ if SSID and PASSWORD:
         wifi.radio.connect(SSID, PASSWORD)
         pool = socketpool.SocketPool(wifi.radio)
         requests = adafruit_requests.Session(pool, ssl.create_default_context())
-        
-        if UTC_OFFSET is None and TZ:
-            resp = requests.get("http://worldtimeapi.org/api/timezone/" + TZ).json()
-            UTC_OFFSET = resp["raw_offset"] + resp["dst_offset"]
 
-        ntp = adafruit_ntp.NTP(pool, server="pool.ntp.org", tz_offset=(UTC_OFFSET or 0) // 3600)
+        if UTC_OFFSET is None and TZ:
+            r = requests.get("http://worldtimeapi.org/api/timezone/" + TZ).json()
+            UTC_OFFSET = r["raw_offset"] + r["dst_offset"]
+
+        ntp = adafruit_ntp.NTP(pool, server="pool.ntp.org",
+                               tz_offset=(UTC_OFFSET or 0) // 3600)
         rtc.RTC().datetime = ntp.datetime
         print("Time Synced:", ntp.datetime)
-    except Exception as e:
+    except Exception as e:  # pylint: disable=broad-exception-caught
         print("Wifi/NTP failed:", e)
 
 # --- Hardware Setup ---
 pycam = adafruit_pycamera.PyCamera()
 
-# External Button Setup (Pin A0)
 ext_pin = DigitalInOut(board.A0)
 ext_pin.direction = Direction.INPUT
 ext_pin.pull = Pull.UP
@@ -96,133 +96,97 @@ def send_to_ai():
 
     gc.collect()
     old_res = pycam.resolution
-    pycam.resolution = 0 # Lowest res for RAM safety
-    
+    pycam.resolution = 0  # Lowest res for RAM safety
+
     try:
         pycam.display_message("AI Snap...", color=0xFFFF00)
-        
-        prefix = "ai_v" 
+        prefix = "ai_v"
         pycam.capture_jpeg(prefix)
-        
-        # Find latest file
-        all_files = [f for f in os.listdir("/sd") if f.startswith(prefix) and f.endswith(".jpg")]
-        if not all_files:
-            raise Exception("File not found")
-        all_files.sort()
-        latest_file = "/sd/" + all_files[-1]
-        
-        with open(latest_file, "rb") as f:
-            image_binary = f.read()
-            
+
+        all_fs = [f for f in os.listdir("/sd") if f.startswith(prefix) and f.endswith(".jpg")]
+        if not all_fs:
+            raise RuntimeError("File not found")
+        all_fs.sort()
+        latest_file = "/sd/" + all_fs[-1]
+
+        with open(latest_file, "rb") as f_handle:
+            image_binary = f_handle.read()
+
         encoded = binascii.b2a_base64(image_binary).decode("utf-8").replace("\n", "")
-        image_binary = None 
+        image_binary = None
         gc.collect()
-        
+
         pycam.display_message("Thinking...", color=0x00FFFF)
-        
-        headers = {
-            "Authorization": f"Bearer {API_KEY}",
-            "Content-Type": "application/json"
-        }
-        
-        data = {
-            "model": MODEL_ID,
-            "messages": [
-                {
-                    "role": "user",
-                    "content": [
-                        {"type": "text", "text": AI_PROMPT},
-                        {
-                            "type": "image_url",
-                            "image_url": {
-                                "url": f"data:image/jpeg;base64,{encoded}"
-                            }
-                        }
-                    ]
-                }
-            ]
-        }
-        
+
+        headers = {"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/json"}
+        user_c = [
+            {"type": "text", "text": AI_PROMPT},
+            {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{encoded}"}}
+        ]
+        data = {"model": MODEL_ID, "messages": [{"role": "user", "content": user_c}]}
+
         print(f"Sending to {MODEL_ID}...")
         response = requests.post(AI_API_URL, headers=headers, json=data)
-        
+
         if response.status_code == 200:
             result = response.json()
             answer = result["choices"][0]["message"]["content"]
             print("AI Result:", answer)
-            
-            # --- Text Wrapping and Scaling ---
-            # Using our custom function to wrap text to ~22 chars wide
-            wrapped_result = wrap_text(answer, 22)
-            pycam.display_message(wrapped_result, color=0x00FF00, scale=1)
-            
-            # Clean up SD card
+            pycam.display_message(wrap_text(answer, 22), color=0x00FF00, scale=1)
             try:
                 os.remove(latest_file)
-            except:
+            except OSError:
                 pass
         else:
             pycam.display_message(f"Err {response.status_code}", color=0xFF0000)
-                
-        time.sleep(6) # Extra time to read the result
-        
-    except Exception as e:
+        time.sleep(6)
+    except Exception as e:  # pylint: disable=broad-exception-caught
         print("AI Error:", e)
         pycam.display_message("AI Fail", color=0xFF0000)
         time.sleep(2)
-    
+
     encoded = None
     gc.collect()
     pycam.resolution = old_res
     pycam.live_preview_mode()
 
 print("Starting Loop!")
-
 while True:
-    # --- Mode Handling & Preview ---
     if pycam.mode_text == "STOP" and pycam.stop_motion_frame != 0:
-        new_frame = pycam.continuous_capture()
-        bitmaptools.alphablend(onionskin, last_frame, new_frame, displayio.Colorspace.RGB565_SWAPPED)
+        new_f = pycam.continuous_capture()
+        bitmaptools.alphablend(onionskin, last_frame, new_f, displayio.Colorspace.RGB565_SWAPPED)
         pycam.blit(onionskin)
-        
     elif pycam.mode_text == "GBOY":
-        bitmaptools.dither(last_frame, pycam.continuous_capture(), displayio.Colorspace.RGB565_SWAPPED)
+        bitmaptools.dither(last_frame, pycam.continuous_capture(),
+                           displayio.Colorspace.RGB565_SWAPPED)
         pycam.blit(last_frame)
-        
     elif pycam.mode_text == "LAPS":
         if timelapse_remaining is None:
             pycam.timelapsestatus_label.text = "STOP"
         else:
             timelapse_remaining = int(timelapse_timestamp - time.time())
             pycam.timelapsestatus_label.text = f"{timelapse_remaining}s /    "
-        
-        pycam.timelapse_rate_label.text = pycam.timelapse_rate_label.text
-        pycam.timelapse_submode_label.text = pycam.timelapse_submode_label.text
-
         if (timelapse_remaining is None) or (pycam.timelapse_submode_label.text == "HiPwr"):
             pycam.blit(pycam.continuous_capture())
-        
-        pycam.display.brightness = 0.05 if (pycam.timelapse_submode_label.text == "LowPwr" and timelapse_remaining is not None) else 1.0
+        pycam.display.brightness = 0.05 if (
+            pycam.timelapse_submode_label.text == "LowPwr" and timelapse_remaining is not None
+        ) else 1.0
         pycam.display.refresh()
-
         if timelapse_remaining is not None and timelapse_remaining <= 0:
             pycam.blit(pycam.continuous_capture())
             try:
                 pycam.display_message("Snap!", color=0x0000FF)
                 pycam.capture_jpeg()
-            except Exception:
+            except Exception:  # pylint: disable=broad-exception-caught
                 pycam.display_message("Error", color=0xFF0000)
-            
             pycam.live_preview_mode()
             pycam.display.refresh()
             timelapse_timestamp = time.time() + pycam.timelapse_rates[pycam.timelapse_rate] + 1
     else:
         pycam.blit(pycam.continuous_capture())
 
-    # --- Button Inputs ---
     pycam.keys_debounce()
     ext_button.update()
-
     if pycam.shutter.long_press or ext_button.long_press:
         pycam.autofocus()
 
@@ -240,30 +204,30 @@ while True:
         elif pycam.mode_text == "GIF":
             try:
                 with pycam.open_next_image("gif") as f:
+                    # pylint: disable=protected-access
                     pycam._mode_label.text = "RECORDING"
-                    with gifio.GifWriter(f, pycam.camera.width, pycam.camera.height, 
+                    with gifio.GifWriter(f, pycam.camera.width, pycam.camera.height,
                                          displayio.Colorspace.RGB565_SWAPPED, dither=True) as g:
                         i = 0
                         while (i < 15) or not pycam.shutter_button.value:
                             i += 1
-                            _f = pycam.continuous_capture()
-                            g.add_frame(_f, 0.12)
-                            pycam.blit(_f)
+                            _frame = pycam.continuous_capture()
+                            g.add_frame(_frame, 0.12)
+                            pycam.blit(_frame)
                     pycam._mode_label.text = "GIF"
-            except:
+            except Exception:  # pylint: disable=broad-exception-caught
                 pycam.display_message("SD Error", color=0xFF0000)
 
-    # --- OK Button (Trigger AI in JPEG mode) ---
     if pycam.ok.fell:
         if pycam.mode_text == "LAPS":
-            if timelapse_remaining is None: # Start
+            if timelapse_remaining is None:
                 timelapse_remaining = pycam.timelapse_rates[pycam.timelapse_rate]
                 timelapse_timestamp = time.time() + timelapse_remaining + 1
                 s = pycam.get_camera_autosettings()
                 pycam.set_camera_exposure(s["exposure"])
                 pycam.set_camera_gain(s["gain"])
                 pycam.set_camera_wb(s["wb"])
-            else: # Stop
+            else:
                 timelapse_remaining = None
                 pycam.camera.exposure_ctrl = True
                 pycam.set_camera_gain(None)
@@ -272,13 +236,11 @@ while True:
         elif pycam.mode_text == "JPEG":
             send_to_ai()
 
-    # D-Pad Navigation
     if pycam.right.fell:
         curr_setting = (curr_setting + 1) % len(settings)
         if pycam.mode_text != "LAPS" and settings[curr_setting] == "timelapse_rate":
             curr_setting = (curr_setting + 1) % len(settings)
         pycam.select_setting(settings[curr_setting])
-        
     if pycam.left.fell:
         curr_setting = (curr_setting - 1 + len(settings)) % len(settings)
         if pycam.mode_text != "LAPS" and settings[curr_setting] == "timelapse_rate":
@@ -289,13 +251,13 @@ while True:
         setattr(pycam, settings[curr_setting], getattr(pycam, settings[curr_setting]) + 1)
     if pycam.down.fell and settings[curr_setting]:
         setattr(pycam, settings[curr_setting], getattr(pycam, settings[curr_setting]) - 1)
-
     if pycam.select.fell and pycam.mode_text == "LAPS":
         pycam.timelapse_submode += 1
 
-    # SD Card hot-swap
     if pycam.card_detect.fell:
         pycam.unmount_sd_card()
     if pycam.card_detect.rose:
-        try: pycam.mount_sd_card()
-        except: pass
+        try:
+            pycam.mount_sd_card()
+        except Exception: 
+            pass
