@@ -1,0 +1,7 @@
+CIRCUITPY_WIFI_SSID = "Your_Wifi_SSID"
+CIRCUITPY_WIFI_PASSWORD = "Your_Wifi_Password"
+OPENROUTER_API_KEY ="Your_API_Key"
+TZ = "Your_Timezone"
+UTC_OFFSET = Your Offset
+
+AI_PROMPT="What is this object? Describe in 5 words."
