@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: 2026 Gautham Chenoth Praveen 
-# SPDX-License-Identifier: MIT license
+# SPDX-License-Identifier: MIT
 
 import os
 import ssl
