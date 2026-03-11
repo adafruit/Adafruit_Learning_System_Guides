@@ -1,6 +1,8 @@
 # SPDX-FileCopyrightText: 2026 Gautham Chenoth Praveen 
 # SPDX-License-Identifier: MIT 
 
+import binascii
+import gc
 import os
 import ssl
 import time
@@ -13,8 +15,6 @@ import adafruit_requests
 import bitmaptools
 import displayio
 import gifio
-import binascii
-import gc
 import adafruit_pycamera
 from adafruit_debouncer import Button
 from digitalio import DigitalInOut, Direction, Pull
