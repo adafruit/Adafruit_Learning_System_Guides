@@ -56,6 +56,13 @@ Arduino_RGB_Display *gfx = new Arduino_RGB_Display(
 //    1 /* hync_polarity */, 46 /* hsync_front_porch */, 2 /* hsync_pulse_width */, 44 /* hsync_back_porch */,
 //    1 /* vsync_polarity */, 50 /* vsync_front_porch */, 16 /* vsync_pulse_width */, 16 /* vsync_back_porch */
 
+// 4.58" 320x960 rectangle bar display
+//    320 /* width */, 960 /* height */, rgbpanel, 0 /* rotation */, true /* auto_flush */,
+//    expander, GFX_NOT_DEFINED /* RST */, HD458002C40_init_operations, sizeof(HD458002C40_init_operations), 80 /* col_offset1 */);
+// needs also the rgbpanel to have these pulse/sync values:
+//    1 /* hsync_polarity */, 30 /* hsync_front_porch */, 10 /* hsync_pulse_width */, 50 /* hsync_back_porch */,
+//    1 /* vsync_polarity */, 15 /* vsync_front_porch */,  2 /* vsync_pulse_width */, 17 /* vsync_back_porch */
+
 uint16_t *colorWheel;
 
 // The Capacitive touchscreen overlays uses hardware I2C (SCL/SDA)
