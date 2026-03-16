@@ -1,0 +1,23 @@
+# SPDX-FileCopyrightText: 2026 Pedro Ruiz for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
+# WiFi credentials — remove or leave blank for offline manual mode
+CIRCUITPY_WIFI_SSID = "your-wifi-ssid"
+CIRCUITPY_WIFI_PASSWORD = "your-wifi-password"
+
+# Standard UTC offset (without DST)
+# Examples: -5 for Eastern, -6 for Central, -7 for Mountain,
+# -8 for Pacific, 0 for GMT, +1 for CET
+TZ_STD_OFFSET = "-5"
+
+# Auto-compute US Daylight Saving Time (true/false)
+# When true, adds +1 hour during DST (2nd Sunday March
+# through 1st Sunday November). Set to false for
+# non-US timezones or locations that don't observe DST.
+DST_AUTO = "true"
+
+# Display rotation (0, 90, 180, 270)
+# 0 = USB left, 90 = USB down, 180 = USB right, 270 = USB up
+# Long-press UP button to cycle at runtime
+DISPLAY_ROTATION = "90"
