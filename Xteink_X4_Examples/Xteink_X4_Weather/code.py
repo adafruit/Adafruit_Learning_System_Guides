@@ -148,8 +148,8 @@ def update_today(data):
     w = data["daily"]["weather_code"][0]
     today_icon[0] = next(i for i, t in enumerate(WMO_CODE_TO_ICON) if w in t)
     # temperatures
-    today_temp.text = f"H: {temperature_text(data["daily"]["temperature_2m_max"][0])} "
-    today_temp.text += f"L: {temperature_text(data["daily"]["temperature_2m_min"][0])}"
+    today_temp.text = f"H: {temperature_text(data['daily']['temperature_2m_max'][0])} "
+    today_temp.text += f"L: {temperature_text(data['daily']['temperature_2m_min'][0])}"
     # sunrise/set
     sr = time.localtime(data["daily"]["sunrise"][0] + data["utc_offset_seconds"])
     ss = time.localtime(data["daily"]["sunset"][0] + data["utc_offset_seconds"])
