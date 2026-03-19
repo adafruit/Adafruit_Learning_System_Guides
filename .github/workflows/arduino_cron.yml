@@ -12,7 +12,7 @@ jobs:
     outputs:
       answer: ${{ steps.is-needed.outputs.answer }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 2
       - name: Check if run by adabot
@@ -66,15 +66,15 @@ jobs:
     if: needs.check-if-needed.outputs.answer == 'true'
     needs: check-if-needed
     steps:
-    - uses: actions/setup-python@v5
+    - uses: actions/setup-python@v6
       with:
         python-version: "3.x"
 
     # Checkout the learn repo itself
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
 
     # Checkout the CI scripts
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
       with:
          repository: adafruit/ci-arduino
          path: ci
@@ -105,7 +105,7 @@ jobs:
 
 
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: ${{ github.event.repository.name }}.${{ github.sha }}
         path: |
@@ -127,7 +127,7 @@ jobs:
 
     - name: Create release
       if: startsWith(github.ref, 'refs/tags/')
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v3
       with:
         files: build/${{ matrix.arduino-platform }}.zip
         fail_on_unmatched_files: false
