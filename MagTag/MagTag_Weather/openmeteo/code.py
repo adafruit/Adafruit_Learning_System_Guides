@@ -170,7 +170,7 @@ def update_today(data):
         DAYS[t.tm_wday].upper(), MONTHS[t.tm_mon - 1].upper(), t.tm_mday, t.tm_year
     )
     battery_percent = 100 * (magtag.peripherals.battery - 3.5) / (4.2 - 3.5)
-    battery_state.text = f'B:{batt_percent:.0f}%'
+    battery_state.text = f'B:{battery_percent:.0f}%'
     # weather icon
     w = data["daily"]["weather_code"][0]
     today_icon[0] = next(i for i, t in enumerate(WMO_CODE_TO_ICON) if w in t)
@@ -271,7 +271,7 @@ today_sunset.anchored_position = (130, 117)
 
 today_banner = displayio.Group()
 today_banner.append(today_date)
-today_banner.append(batt_volt)
+today_banner.append(battery_state)
 today_banner.append(location_name)
 today_banner.append(today_icon)
 today_banner.append(today_low_temp)
