@@ -9,6 +9,7 @@ import displayio
 import adafruit_imageload
 from adafruit_display_text import label
 from adafruit_magtag.magtag import MagTag
+import analogio
 
 # --| USER CONFIG |--------------------------
 LAT = 47.6  # latitude
@@ -168,6 +169,8 @@ def update_today(data):
     today_date.text = "{} {} {}, {}".format(
         DAYS[t.tm_wday].upper(), MONTHS[t.tm_mon - 1].upper(), t.tm_mday, t.tm_year
     )
+    battery_percent = 100 * (magtag.peripherals.battery - 3.5) / (4.2 - 3.5)
+    battery_state.text = f'B:{batt_percent:.0f}%'
     # weather icon
     w = data["daily"]["weather_code"][0]
     today_icon[0] = next(i for i, t in enumerate(WMO_CODE_TO_ICON) if w in t)
@@ -231,6 +234,10 @@ else:
 location_name.anchor_point = (0, 0)
 location_name.anchored_position = (15, 25)
 
+battery_state = label.Label(terminalio.FONT, text="B??%", color=0x777777)
+battery_state.anchor_point = (0, 0)
+battery_state.anchored_position = (157, 25)
+
 today_icon = displayio.TileGrid(
     icons_large_bmp,
     pixel_shader=icons_small_pal,
@@ -264,6 +271,7 @@ today_sunset.anchored_position = (130, 117)
 
 today_banner = displayio.Group()
 today_banner.append(today_date)
+today_banner.append(batt_volt)
 today_banner.append(location_name)
 today_banner.append(today_icon)
 today_banner.append(today_low_temp)
@@ -287,6 +295,12 @@ for future_banner in future_banners:
 # ===========
 #  M A I N
 # ===========
+
+battery_percent = 100 * (magtag.peripherals.battery - 3.5) / (4.2 - 3.5)
+print(f"Battery: {magtag.peripherals.battery}V, ~{battery_percent:.0f}%")
+if magtag.peripherals.battery < 3.5:
+    print("Battery: LOW, please charge!")
+
 print("Fetching forecast...")
 resp_data = get_forecast()
 forecast_data = resp_data.json()
