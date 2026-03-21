@@ -9,7 +9,6 @@ import displayio
 import adafruit_imageload
 from adafruit_display_text import label
 from adafruit_magtag.magtag import MagTag
-import analogio
 
 # --| USER CONFIG |--------------------------
 LAT = 47.6  # latitude
