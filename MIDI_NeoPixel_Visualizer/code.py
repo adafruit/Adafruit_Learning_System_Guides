@@ -5,11 +5,9 @@ import time
 import board
 import usb_midi
 import adafruit_midi
-from digitalio import DigitalInOut, Direction, Pull
-from adafruit_midi.control_change import ControlChange
+from digitalio import DigitalInOut, Direction
 from adafruit_midi.note_off import NoteOff
 from adafruit_midi.note_on import NoteOn
-from adafruit_midi.pitch_bend import PitchBend
 import neopixel
 
 # enable external power pin
@@ -23,7 +21,8 @@ NUMPIXELS = 72
 BRIGHTNESS = 1
 PIN = board.EXTERNAL_NEOPIXELS
 ORDER = neopixel.BGR
-pixels = neopixel.NeoPixel(PIN, NUMPIXELS, brightness=BRIGHTNESS, auto_write=False, pixel_order=ORDER)
+pixels = neopixel.NeoPixel(PIN, NUMPIXELS, brightness=BRIGHTNESS,
+                           auto_write=False, pixel_order=ORDER)
 
 # Matrix layout
 MATRIX_ROWS = 6
@@ -92,26 +91,26 @@ def note_to_matrix(note):
     NOTE_OFFSET determines which note maps to (row=0, col=0).
     """
     offset_note = note - NOTE_OFFSET
-    row = (offset_note // MATRIX_COLS) % MATRIX_ROWS
-    col = offset_note % MATRIX_COLS
-    return row, col
+    r = (offset_note // MATRIX_COLS) % MATRIX_ROWS
+    c = offset_note % MATRIX_COLS
+    return r, c
 
-def matrix_to_pixel(row, col):
+def matrix_to_pixel(r, c):
     """
     Convert a (row, col) matrix position to a physical pixel index,
     accounting for zigzag wiring.
     Even rows (0, 2, 4) run left to right.
     Odd rows  (1, 3, 5) run right to left.
     """
-    if row % 2 == 0:
-        return row * MATRIX_COLS + col                       # Left to right
+    if r % 2 == 0:
+        return r * MATRIX_COLS + c                       # Left to right
     else:
-        return row * MATRIX_COLS + (MATRIX_COLS - 1 - col)  # Right to left
+        return r * MATRIX_COLS + (MATRIX_COLS - 1 - c)  # Right to left
 
 def note_to_pixel(note):
     """Map a MIDI note directly to a physical pixel index via the matrix."""
-    row, col = note_to_matrix(note)
-    return matrix_to_pixel(row, col)
+    r, c = note_to_matrix(note)
+    return matrix_to_pixel(r, c)
 
 def note_to_name(note):
     """Return a human-readable note name and octave, e.g. 'C2' for note 36."""
@@ -127,10 +126,10 @@ def color_for_note(note):
     offset_note = note - NOTE_OFFSET
     return BASE_COLORS[offset_note % len(BASE_COLORS)]
 
-def color_wipe(color, delay=0.01):
+def color_wipe(c, delay=0.01):
     """Wipe a color across the strip one LED at a time."""
     for i in range(NUMPIXELS):
-        pixels[i] = color
+        pixels[i] = c
         pixels.show()
         time.sleep(delay)
 
@@ -145,22 +144,22 @@ def update_fades():
     """Call this every loop iteration to advance any active fades."""
     now = time.monotonic()
     completed = []
-    for pixel_index, state in fading_pixels.items():
+    for pix_index, state in fading_pixels.items():
         step_delay = FADE_DURATION / FADE_STEPS
         if now - state["last_time"] >= step_delay:
             state["step"] += 1
             state["last_time"] = now
             if state["step"] >= FADE_STEPS:
-                pixels[pixel_index] = (0, 0, 0)
+                pixels[pix_index] = (0, 0, 0)
                 pixels.show()
-                completed.append(pixel_index)
+                completed.append(pix_index)
             else:
                 r, g, b = state["color"]
                 factor = (FADE_STEPS - state["step"]) / FADE_STEPS
-                pixels[pixel_index] = (int(r * factor), int(g * factor), int(b * factor))
+                pixels[pix_index] = (int(r * factor), int(g * factor), int(b * factor))
                 pixels.show()
-    for pixel_index in completed:
-        del fading_pixels[pixel_index]
+    for pix_index in completed:
+        del fading_pixels[pix_index]
 
 # Run boot sequence on startup
 boot_sequence()
@@ -178,7 +177,7 @@ while True:
             del fading_pixels[pixel_index]
         pixels[pixel_index] = color
         pixels.show()
-        print(f"Note ON:  {note_name} ({msg.note}) -> Row {row}, Col {col}, Pixel {pixel_index}, Color {color}, Channel {msg.channel + 1}")
+        print(f"Note ON:  {note_name} ({msg.note}) Pixel {pixel_index}, Color {color}")
 
     elif isinstance(msg, NoteOff) or (isinstance(msg, NoteOn) and msg.velocity == 0):
         pixel_index = note_to_pixel(msg.note)
@@ -190,7 +189,7 @@ while True:
             "step": 0,
             "last_time": time.monotonic()
         }
-        print(f"Note OFF: {note_name} ({msg.note}) -> Row {row}, Col {col}, Pixel {pixel_index} fading, Channel {msg.channel + 1}")
+        print(f"Note OFF: {note_name} ({msg.note}) Pixel {pixel_index} fading")
 
     # Advance all active fades each loop iteration
     update_fades()
