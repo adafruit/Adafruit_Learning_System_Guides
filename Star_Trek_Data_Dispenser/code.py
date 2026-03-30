@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-# pylint: disable=global-statement,invalid-name,redefined-outer-name
+# pylint: disable=global-statement,invalid-name,redefined-outer-name,too-many-lines
 
 """Star Trek TNG Data Dispenser Prop - Environmental Monitor.
 
@@ -1095,7 +1095,7 @@ def build_graph():
     )
 
 
-def update_graph():  # pylint: disable=too-many-locals
+def update_graph():  # pylint: disable=too-many-locals,too-many-branches
     """Redraw the graph bitmap from co2_history."""
     if graph_bmp is None:
         return
@@ -1296,7 +1296,7 @@ def _build_lcars_graph(title, unit, lo, hi,  # pylint: disable=too-many-locals
     return grp, bmp, pal, val_lbl, mm_lbl
 
 
-def _update_lcars_graph(bmp, history, lo, hi,  # pylint: disable=too-many-locals
+def _update_lcars_graph(bmp, history, lo, hi,  # pylint: disable=too-many-locals,too-many-branches
                         zones, val_lbl, mm_lbl,
                         mn, mx, fmt_fn):
     """Generic graph bitmap updater with dynamic bars."""
@@ -1632,7 +1632,7 @@ def update_stats(disp):
     stats_batt_lbl.text = disp[7]
 
 
-def build_about():  # pylint: disable=too-many-locals
+def build_about():  # pylint: disable=too-many-locals,too-many-statements
     """Build the LCARS name badge display group."""
     global about_group
 
@@ -1872,7 +1872,7 @@ def toggle_brightness():
 DEMO_HOLD = 3  # seconds per screen in demo mode
 
 
-def demo_mode():
+def demo_mode():  # pylint: disable=too-many-statements
     """Auto-cycle all screens for video recording."""
     global graph_zoomed
     print("Demo mode started")
@@ -2057,7 +2057,7 @@ def read_sensors():
     return co2_r, hum_r, tmp_r, bat_r, bat_v, bat_rate
 
 
-def compute_display(co2_r, hum_r, tmp_r,  # pylint: disable=too-many-locals
+def compute_display(co2_r, hum_r, tmp_r,  # pylint: disable=too-many-locals,too-many-branches
                     bat_r, _bat_v, bat_rate):
     """Compute percentages and label text."""
     global is_charging, bolt_visible, volt_visible
