@@ -31,11 +31,7 @@ import terminalio
 from adafruit_display_text import label
 import adafruit_stcc4
 import adafruit_max1704x
-
-try:
-    import adafruit_drv2605
-except ImportError:
-    adafruit_drv2605 = None
+import adafruit_drv2605
 
 # ============================================================
 #  TUNABLES
@@ -336,14 +332,8 @@ sensor.continuous_measurement = True
 
 batt = adafruit_max1704x.MAX17048(i2c)
 
-haptic = None
-drv_effect = None
-if adafruit_drv2605 is not None:
-    try:
-        haptic = adafruit_drv2605.DRV2605(i2c)
-        drv_effect = adafruit_drv2605.Effect
-    except (ValueError, RuntimeError, OSError):
-        print("No haptic motor found.")
+haptic = adafruit_drv2605.DRV2605(i2c)
+drv_effect = adafruit_drv2605.Effect
 
 # ============================================================
 #  BUILD BAR GRAPH UI
@@ -369,73 +359,68 @@ soft_masks = []
 pct_labels = []
 
 
-def _build_bars():
-    """Build the bar graph UI elements."""
-    for idx in range(NUM_BARS):
-        bx = X_OFFSET + idx * (BAR_W + BAR_GAP)
+for bar_idx in range(NUM_BARS):
+    bar_x = X_OFFSET + bar_idx * (BAR_W + BAR_GAP)
 
-        out_pal = displayio.Palette(1)
-        out_pal[0] = OUTLINE_COLORS[idx]
-        root.append(
-            vectorio.Polygon(
-                pixel_shader=out_pal,
-                points=outline_shape(),
-                x=bx, y=BAR_Y,
-            )
+    out_pal = displayio.Palette(1)
+    out_pal[0] = OUTLINE_COLORS[bar_idx]
+    root.append(
+        vectorio.Polygon(
+            pixel_shader=out_pal,
+            points=outline_shape(),
+            x=bar_x, y=BAR_Y,
         )
+    )
 
-        trk_pal = displayio.Palette(1)
-        trk_pal[0] = TRACK_COLORS[idx]
-        root.append(
-            vectorio.Polygon(
-                pixel_shader=trk_pal,
-                points=bar_shape(),
-                x=bx, y=BAR_Y,
-            )
-        )
-
-        fill_pal = displayio.Palette(1)
-        fill_pal[0] = BAR_COLORS[idx]
-        root.append(
-            vectorio.Polygon(
-                pixel_shader=fill_pal,
-                points=bar_shape(),
-                x=bx, y=BAR_Y,
-            )
-        )
-
-        soft_pal = displayio.Palette(1)
-        soft_pal[0] = SOFT_COLORS[idx]
-        soft = vectorio.Polygon(
-            pixel_shader=soft_pal,
-            points=bar_shape(),
-            x=bx, y=BAR_Y,
-        )
-        root.append(soft)
-        soft_masks.append(soft)
-
-        mask = vectorio.Polygon(
+    trk_pal = displayio.Palette(1)
+    trk_pal[0] = TRACK_COLORS[bar_idx]
+    root.append(
+        vectorio.Polygon(
             pixel_shader=trk_pal,
             points=bar_shape(),
-            x=bx, y=BAR_Y,
+            x=bar_x, y=BAR_Y,
         )
-        root.append(mask)
-        bar_masks.append(mask)
+    )
 
-        lbl = label.Label(
-            terminalio.FONT,
-            text="---",
-            color=BAR_COLORS[idx],
-            anchor_point=(0.5, 0.0),
-            anchored_position=(
-                bx + BAR_W // 2, LABEL_Y
-            ),
+    fill_pal = displayio.Palette(1)
+    fill_pal[0] = BAR_COLORS[bar_idx]
+    root.append(
+        vectorio.Polygon(
+            pixel_shader=fill_pal,
+            points=bar_shape(),
+            x=bar_x, y=BAR_Y,
         )
-        root.append(lbl)
-        pct_labels.append(lbl)
+    )
 
+    soft_pal = displayio.Palette(1)
+    soft_pal[0] = SOFT_COLORS[bar_idx]
+    soft = vectorio.Polygon(
+        pixel_shader=soft_pal,
+        points=bar_shape(),
+        x=bar_x, y=BAR_Y,
+    )
+    root.append(soft)
+    soft_masks.append(soft)
 
-_build_bars()
+    mask = vectorio.Polygon(
+        pixel_shader=trk_pal,
+        points=bar_shape(),
+        x=bar_x, y=BAR_Y,
+    )
+    root.append(mask)
+    bar_masks.append(mask)
+
+    lbl = label.Label(
+        terminalio.FONT,
+        text="---",
+        color=BAR_COLORS[bar_idx],
+        anchor_point=(0.5, 0.0),
+        anchored_position=(
+            bar_x + BAR_W // 2, LABEL_Y
+        ),
+    )
+    root.append(lbl)
+    pct_labels.append(lbl)
 
 # ============================================================
 #  CHARGING INDICATOR
@@ -619,8 +604,6 @@ def update_bar(idx, pct, txt):
 
 def scan_buzz():
     """Three quick haptic pulses for scan events."""
-    if haptic is None:
-        return
     for pulse in range(3):  # pylint: disable=unused-variable
         haptic.sequence[0] = drv_effect(47)
         haptic.play()
@@ -633,8 +616,6 @@ def scan_buzz():
 def buzz_alert(force=False):
     """Double-pulse haptic warning."""
     global last_haptic
-    if haptic is None:
-        return
     now = time.monotonic()
     if not force:
         if now - last_haptic < HAPTIC_COOLDOWN:
@@ -2006,8 +1987,11 @@ while True:
                 ):
                     # Zoom toggle on graph views
                     graph_zoomed = not graph_zoomed
-                    print(f"Zoom: {"15min" if graph_zoomed
-                        else "full"}")
+                    zoom_label = (
+                        "15min" if graph_zoomed
+                        else "full"
+                    )
+                    print(f"Zoom: {zoom_label}")
                 else:
                     # F/C toggle on other views
                     use_fahrenheit = not use_fahrenheit
