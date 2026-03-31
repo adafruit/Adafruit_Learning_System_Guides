@@ -989,7 +989,7 @@ def _build_lcars_graph(title, unit, lo, hi,  # pylint: disable=too-many-locals
     return grp, bmp, val_lbl, mm_lbl
 
 
-def _update_lcars_graph(bmp, history, lo, hi,  # pylint: disable=too-many-locals
+def _update_lcars_graph(bmp, history, lo, hi,  # pylint: disable=too-many-locals,too-many-branches
                         zones, val_lbl, mm_lbl,
                         mn, mx, fmt_fn):
     """Generic graph bitmap updater with dynamic bars."""
