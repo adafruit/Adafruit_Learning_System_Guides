@@ -1511,7 +1511,8 @@ def toggle_brightness():
         display.brightness = DIM_BRIGHTNESS
     else:
         display.brightness = FULL_BRIGHTNESS
-    print(f"Brightness: {"dim" if is_dimmed else "full"}")
+    bright_label = "dim" if is_dimmed else "full"
+    print(f"Brightness: {bright_label}")
 
 
 DEMO_HOLD = 3  # seconds per screen in demo mode
