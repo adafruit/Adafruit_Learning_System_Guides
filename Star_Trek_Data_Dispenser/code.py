@@ -24,12 +24,18 @@ import time
 import struct
 import alarm
 import board
-import busio
 import digitalio
 import displayio
 import vectorio
 import terminalio
 from adafruit_display_text import label
+import adafruit_stcc4
+import adafruit_max1704x
+
+try:
+    import adafruit_drv2605
+except ImportError:
+    adafruit_drv2605 = None
 
 # ============================================================
 #  TUNABLES
@@ -42,7 +48,6 @@ TEMP_MIN = 15.0
 TEMP_MAX = 40.0
 UPDATE_INTERVAL = 2
 HAPTIC_COOLDOWN = 30
-I2C_RETRIES = 10
 LONG_PRESS_MS = 2000    # hold time for long press
 IDLE_SLEEP_S = 300      # 5 min idle -> deep sleep
 DIM_BRIGHTNESS = 0.15   # dimmed display brightness
@@ -260,9 +265,7 @@ try:
     if abs(co2_offset) > 1000:
         co2_offset = 0
     if co2_offset != 0:
-        print("Restored CO2 offset: {}".format(
-            co2_offset
-        ))
+        print(f"Restored CO2 offset: {co2_offset}")
 except (IndexError, ValueError, TypeError):
     co2_offset = 0
 
@@ -324,79 +327,23 @@ btn_d2.pull = digitalio.Pull.DOWN
 
 
 # ============================================================
-#  I2C BUS
+#  I2C BUS + SENSORS
 # ============================================================
-def try_i2c():
-    """Attempt to create I2C bus."""
-    methods = []
-    if hasattr(board, "STEMMA_I2C"):
-        methods.append(("STEMMA_I2C", board.STEMMA_I2C))
-    if hasattr(board, "I2C"):
-        methods.append(("I2C", board.I2C))
-    for method_name, method in methods:
-        try:
-            bus = method()
-            print("I2C via board.{}".format(
-                method_name
-            ))
-            return bus
-        except RuntimeError:
-            pass
-    try:
-        bus = busio.I2C(board.SCL, board.SDA)
-        print("I2C via busio.I2C")
-        return bus
-    except RuntimeError:
-        pass
-    return None
+i2c = board.STEMMA_I2C()
 
+sensor = adafruit_stcc4.STCC4(i2c)
+sensor.continuous_measurement = True
 
-i2c = None
-for attempt in range(I2C_RETRIES):
-    i2c = try_i2c()
-    if i2c is not None:
-        break
-    status_lbl.text = "I2C retry {}/{}".format(
-        attempt + 1, I2C_RETRIES
-    )
-    time.sleep(2)
-
-if i2c is None:
-    status_lbl.text = "NO I2C - CHECK WIRING"
-    while True:
-        time.sleep(10)
-
-# ============================================================
-#  SENSOR + BATTERY INIT
-# ============================================================
-import adafruit_stcc4  # pylint: disable=import-outside-toplevel,wrong-import-position
-import adafruit_max1704x  # pylint: disable=import-outside-toplevel,wrong-import-position
-
-sensor = None
-batt = None
-
-try:
-    sensor = adafruit_stcc4.STCC4(i2c)
-    sensor.continuous_measurement = True
-    print("STCC4 detected.")
-except (ValueError, RuntimeError, OSError) as err:
-    print("STCC4 not found: {}".format(err))
-
-try:
-    batt = adafruit_max1704x.MAX17048(i2c)
-    print("MAX17048 detected.")
-except (ValueError, RuntimeError, OSError) as err:
-    print("MAX17048 not found: {}".format(err))
+batt = adafruit_max1704x.MAX17048(i2c)
 
 haptic = None
 drv_effect = None
-try:
-    import adafruit_drv2605  # pylint: disable=import-outside-toplevel,wrong-import-position
-    haptic = adafruit_drv2605.DRV2605(i2c)
-    drv_effect = adafruit_drv2605.Effect
-    print("DRV2605 detected.")
-except (ImportError, ValueError, RuntimeError, OSError):
-    print("No haptic motor found.")
+if adafruit_drv2605 is not None:
+    try:
+        haptic = adafruit_drv2605.DRV2605(i2c)
+        drv_effect = adafruit_drv2605.Effect
+    except (ValueError, RuntimeError, OSError):
+        print("No haptic motor found.")
 
 # ============================================================
 #  BUILD BAR GRAPH UI
@@ -421,68 +368,74 @@ bar_masks = []
 soft_masks = []
 pct_labels = []
 
-for i in range(NUM_BARS):
-    bx = X_OFFSET + i * (BAR_W + BAR_GAP)
 
-    out_pal = displayio.Palette(1)
-    out_pal[0] = OUTLINE_COLORS[i]
-    root.append(
-        vectorio.Polygon(
-            pixel_shader=out_pal,
-            points=outline_shape(),
+def _build_bars():
+    """Build the bar graph UI elements."""
+    for idx in range(NUM_BARS):
+        bx = X_OFFSET + idx * (BAR_W + BAR_GAP)
+
+        out_pal = displayio.Palette(1)
+        out_pal[0] = OUTLINE_COLORS[idx]
+        root.append(
+            vectorio.Polygon(
+                pixel_shader=out_pal,
+                points=outline_shape(),
+                x=bx, y=BAR_Y,
+            )
+        )
+
+        trk_pal = displayio.Palette(1)
+        trk_pal[0] = TRACK_COLORS[idx]
+        root.append(
+            vectorio.Polygon(
+                pixel_shader=trk_pal,
+                points=bar_shape(),
+                x=bx, y=BAR_Y,
+            )
+        )
+
+        fill_pal = displayio.Palette(1)
+        fill_pal[0] = BAR_COLORS[idx]
+        root.append(
+            vectorio.Polygon(
+                pixel_shader=fill_pal,
+                points=bar_shape(),
+                x=bx, y=BAR_Y,
+            )
+        )
+
+        soft_pal = displayio.Palette(1)
+        soft_pal[0] = SOFT_COLORS[idx]
+        soft = vectorio.Polygon(
+            pixel_shader=soft_pal,
+            points=bar_shape(),
             x=bx, y=BAR_Y,
         )
-    )
+        root.append(soft)
+        soft_masks.append(soft)
 
-    trk_pal = displayio.Palette(1)
-    trk_pal[0] = TRACK_COLORS[i]
-    root.append(
-        vectorio.Polygon(
+        mask = vectorio.Polygon(
             pixel_shader=trk_pal,
             points=bar_shape(),
             x=bx, y=BAR_Y,
         )
-    )
+        root.append(mask)
+        bar_masks.append(mask)
 
-    fill_pal = displayio.Palette(1)
-    fill_pal[0] = BAR_COLORS[i]
-    root.append(
-        vectorio.Polygon(
-            pixel_shader=fill_pal,
-            points=bar_shape(),
-            x=bx, y=BAR_Y,
+        lbl = label.Label(
+            terminalio.FONT,
+            text="---",
+            color=BAR_COLORS[idx],
+            anchor_point=(0.5, 0.0),
+            anchored_position=(
+                bx + BAR_W // 2, LABEL_Y
+            ),
         )
-    )
+        root.append(lbl)
+        pct_labels.append(lbl)
 
-    soft_pal = displayio.Palette(1)
-    soft_pal[0] = SOFT_COLORS[i]
-    soft = vectorio.Polygon(
-        pixel_shader=soft_pal,
-        points=bar_shape(),
-        x=bx, y=BAR_Y,
-    )
-    root.append(soft)
-    soft_masks.append(soft)
 
-    mask = vectorio.Polygon(
-        pixel_shader=trk_pal,
-        points=bar_shape(),
-        x=bx, y=BAR_Y,
-    )
-    root.append(mask)
-    bar_masks.append(mask)
-
-    lbl = label.Label(
-        terminalio.FONT,
-        text="---",
-        color=BAR_COLORS[i],
-        anchor_point=(0.5, 0.0),
-        anchored_position=(
-            bx + BAR_W // 2, LABEL_Y
-        ),
-    )
-    root.append(lbl)
-    pct_labels.append(lbl)
+_build_bars()
 
 # ============================================================
 #  CHARGING INDICATOR
@@ -621,26 +574,8 @@ hum_max = 0
 temp_min_val = 999.0
 temp_max_val = -999.0
 
-# CO2 graph display group
-graph_group = None
-graph_bmp = None
-graph_pal = None
-graph_co2_lbl = None
-graph_minmax_lbl = None
-
-# Humidity graph display group
-hum_graph_group = None
-hum_graph_bmp = None
-hum_graph_pal = None
-hum_graph_lbl = None
-hum_minmax_lbl = None
-
-# Temperature graph display group
-temp_graph_group = None
-temp_graph_bmp = None
-temp_graph_pal = None
-temp_graph_lbl = None
-temp_minmax_lbl = None
+# Consolidated graph storage {view_mode: (group, bmp, val_lbl, mm_lbl)}
+sensor_graphs = {}
 
 # Stats display group (built on first show)
 stats_group = None
@@ -904,251 +839,34 @@ def do_co2_calibrate():
     co2_offset = 400 - int(raw)
     save_co2_offset()
     show_message(
-        "OFFSET: {}".format(co2_offset), 2.0
+        f"OFFSET: {co2_offset}", 2.0
     )
-    print("CO2 offset set to {}".format(co2_offset))
+    print(f"CO2 offset set to {co2_offset}")
 
 
-def build_graph():
-    """Build the LCARS-style CO2 graph display group."""
-    global graph_group, graph_bmp, graph_pal
-    global graph_co2_lbl, graph_minmax_lbl
-
-    graph_group = displayio.Group()
-
-    # Black background
-    gbg_pal = displayio.Palette(1)
-    gbg_pal[0] = BG_COLOR
-    graph_group.append(
-        vectorio.Rectangle(
-            pixel_shader=gbg_pal,
-            width=DISPLAY_W, height=DISPLAY_H,
-            x=0, y=0,
-        )
-    )
-
-    # LCARS left sweep panel - top rounded block
-    lc_pal = displayio.Palette(1)
-    lc_pal[0] = LCARS_GOLD
-    # Top bar
-    graph_group.append(
-        vectorio.Rectangle(
-            pixel_shader=lc_pal,
-            width=50, height=8,
-            x=0, y=0,
-        )
-    )
-    # Left vertical bar
-    graph_group.append(
-        vectorio.Rectangle(
-            pixel_shader=lc_pal,
-            width=8, height=DISPLAY_H,
-            x=0, y=0,
-        )
-    )
-    # Bottom bar
-    graph_group.append(
-        vectorio.Rectangle(
-            pixel_shader=lc_pal,
-            width=50, height=8,
-            x=0, y=DISPLAY_H - 8,
-        )
-    )
-    # Accent blocks
-    acc_pal = displayio.Palette(1)
-    acc_pal[0] = LCARS_BLUE
-    graph_group.append(
-        vectorio.Rectangle(
-            pixel_shader=acc_pal,
-            width=42, height=6,
-            x=8, y=10,
-        )
-    )
-    occ_pal = displayio.Palette(1)
-    occ_pal[0] = LCARS_ORANGE
-    graph_group.append(
-        vectorio.Rectangle(
-            pixel_shader=occ_pal,
-            width=42, height=6,
-            x=8, y=DISPLAY_H - 16,
-        )
-    )
-
-    # CO2 current reading label
-    graph_co2_lbl = label.Label(
-        terminalio.FONT,
-        text="---",
-        color=LCARS_GOLD,
-        anchor_point=(0.5, 0.0),
-        anchored_position=(30, 22),
-    )
-    graph_group.append(graph_co2_lbl)
-
-    # "PPM" label
-    graph_group.append(
-        label.Label(
-            terminalio.FONT,
-            text="PPM",
-            color=LCARS_BLUE,
-            anchor_point=(0.5, 0.0),
-            anchored_position=(30, 34),
-        )
-    )
-
-    # Min/max labels
-    graph_minmax_lbl = label.Label(
-        terminalio.FONT,
-        text="",
-        color=LCARS_ORANGE,
-        anchor_point=(0.5, 0.0),
-        anchored_position=(30, 50),
-    )
-    graph_group.append(graph_minmax_lbl)
-
-    # Time label
-    graph_group.append(
-        label.Label(
-            terminalio.FONT,
-            text="2HR",
-            color=LCARS_GOLD,
-            anchor_point=(0.5, 0.0),
-            anchored_position=(30, 66),
-        )
-    )
-
-    # Graph bitmap: 4 palette entries
-    # 0=black, 1=green, 2=yellow, 3=red
-    graph_pal = displayio.Palette(4)
-    graph_pal[0] = BG_COLOR
-    graph_pal[1] = LCARS_GREEN
-    graph_pal[2] = LCARS_YELLOW
-    graph_pal[3] = LCARS_RED
-
-    graph_bmp = displayio.Bitmap(
-        GRAPH_W, GRAPH_H, 4
-    )
-
-    grid = displayio.TileGrid(
-        graph_bmp,
-        pixel_shader=graph_pal,
-        x=GRAPH_X, y=GRAPH_Y,
-    )
-    graph_group.append(grid)
-
-    # Zone threshold lines (dashed effect)
-    # 600 ppm line
-    y600 = GRAPH_Y + GRAPH_H - int(
-        (600 - GRAPH_CO2_LO)
-        / (GRAPH_CO2_HI - GRAPH_CO2_LO) * GRAPH_H
-    )
-    for dx in range(0, GRAPH_W, 6):
-        if dx + 2 <= GRAPH_W:
-            g_pal = displayio.Palette(1)
-            g_pal[0] = LCARS_GREEN
-            graph_group.append(
-                vectorio.Rectangle(
-                    pixel_shader=g_pal,
-                    width=2, height=1,
-                    x=GRAPH_X + dx, y=y600,
-                )
-            )
-    # 800 ppm line
-    y800 = GRAPH_Y + GRAPH_H - int(
-        (800 - GRAPH_CO2_LO)
-        / (GRAPH_CO2_HI - GRAPH_CO2_LO) * GRAPH_H
-    )
-    for dx in range(0, GRAPH_W, 6):
-        if dx + 2 <= GRAPH_W:
-            r_pal = displayio.Palette(1)
-            r_pal[0] = LCARS_RED
-            graph_group.append(
-                vectorio.Rectangle(
-                    pixel_shader=r_pal,
-                    width=2, height=1,
-                    x=GRAPH_X + dx, y=y800,
-                )
-            )
-
-    # Axis labels on graph
-    graph_group.append(
-        label.Label(
-            terminalio.FONT,
-            text="{}".format(GRAPH_CO2_LO),
-            color=0x666666,
-            anchor_point=(0.0, 1.0),
-            anchored_position=(
-                GRAPH_X, GRAPH_Y + GRAPH_H + 10
-            ),
-        )
-    )
-    graph_group.append(
-        label.Label(
-            terminalio.FONT,
-            text="{}".format(GRAPH_CO2_HI),
-            color=0x666666,
-            anchor_point=(1.0, 0.0),
-            anchored_position=(
-                GRAPH_X + GRAPH_W,
-                GRAPH_Y - 2
-            ),
-        )
-    )
-
-
-def update_graph():  # pylint: disable=too-many-locals,too-many-branches
-    """Redraw the graph bitmap from co2_history."""
-    if graph_bmp is None:
-        return
-
-    # Clear bitmap
-    for x_pos in range(GRAPH_W):
-        for y_pos in range(GRAPH_H):
-            graph_bmp[x_pos, y_pos] = 0
-
-    n = len(co2_history)
-    bar_px, slot, x_start, count = graph_layout(
-        n, graph_zoomed
-    )
-    data = co2_history[-count:] if count > 0 else []
-    rng = GRAPH_CO2_HI - GRAPH_CO2_LO
-    for i, val in enumerate(data):
-        clamped = max(GRAPH_CO2_LO, min(
-            GRAPH_CO2_HI, val
-        ))
-        bar_h = max(int(
-            (clamped - GRAPH_CO2_LO) / rng * GRAPH_H
-        ), 1)
-
-        if clamped > 800:
-            cidx = 3
-        elif clamped > 600:
-            cidx = 2
-        else:
-            cidx = 1
-
-        bx = x_start + i * slot
-        for px in range(bar_px):
-            x_pos = bx + px
-            if x_pos >= GRAPH_W:
-                break
-            for y_off in range(bar_h):
-                y_pos = GRAPH_H - 1 - y_off
-                graph_bmp[x_pos, y_pos] = cidx
-
-    # Update labels
-    if graph_co2_lbl is not None:
-        if co2_history:
-            graph_co2_lbl.text = "{}".format(
-                int(co2_history[-1])
-            )
-        else:
-            graph_co2_lbl.text = "---"
-    if graph_minmax_lbl is not None:
-        lo = co2_min if co2_min < 9999 else 0
-        hi = co2_max if co2_max > 0 else 0
-        graph_minmax_lbl.text = "{}-{}".format(
-            int(lo), int(hi)
-        )
+# ============================================================
+#  GRAPH ZONE DEFINITIONS
+# ============================================================
+CO2_ZONES = [
+    (600, 1),   # green below 600
+    (800, 2),   # yellow 600-800
+    (800, 3),   # red above 800
+]
+HUM_ZONES = [
+    (30, 1),    # green below 30
+    (60, 2),    # yellow 30-60
+    (80, 3),    # red above 80
+]
+TEMP_ZONES_F = [
+    (65, 1),    # green below 65F
+    (80, 2),    # yellow 65-80F
+    (90, 3),    # red above 90F
+]
+TEMP_ZONES_C = [
+    (18, 1),    # green below 18C
+    (27, 2),    # yellow 18-27C
+    (32, 3),    # red above 32C
+]
 
 
 def _build_lcars_graph(title, unit, lo, hi,  # pylint: disable=too-many-locals
@@ -1157,7 +875,7 @@ def _build_lcars_graph(title, unit, lo, hi,  # pylint: disable=too-many-locals
 
     zones is a list of (threshold, palette_index)
     tuples sorted ascending. Returns
-    (group, bmp, pal, val_lbl, minmax_lbl)."""
+    (group, bmp, val_lbl, mm_lbl)."""
     grp = displayio.Group()
 
     # Black background
@@ -1237,21 +955,17 @@ def _build_lcars_graph(title, unit, lo, hi,  # pylint: disable=too-many-locals
         anchored_position=(30, 74),
     ))
 
-    # Bitmap with palette entries per zone + black
+    # Bitmap with zone palette
     n_colors = len(zones) + 1
     pal = displayio.Palette(n_colors)
     pal[0] = BG_COLOR
-    zone_colors = [
-        LCARS_GREEN, LCARS_YELLOW, LCARS_RED
-    ]
-    for i in range(len(zones)):
-        pal[i + 1] = zone_colors[
-            min(i, len(zone_colors) - 1)
+    zone_colors = [LCARS_GREEN, LCARS_YELLOW, LCARS_RED]
+    for idx in range(len(zones)):
+        pal[idx + 1] = zone_colors[
+            min(idx, len(zone_colors) - 1)
         ]
 
-    bmp = displayio.Bitmap(
-        GRAPH_W, GRAPH_H, n_colors
-    )
+    bmp = displayio.Bitmap(GRAPH_W, GRAPH_H, n_colors)
     grp.append(displayio.TileGrid(
         bmp, pixel_shader=pal,
         x=GRAPH_X, y=GRAPH_Y,
@@ -1275,8 +989,7 @@ def _build_lcars_graph(title, unit, lo, hi,  # pylint: disable=too-many-locals
 
     # Axis labels
     grp.append(label.Label(
-        terminalio.FONT,
-        text="{}".format(int(lo)),
+        terminalio.FONT, text=f"{int(lo)}",
         color=0x666666,
         anchor_point=(0.0, 1.0),
         anchored_position=(
@@ -1284,8 +997,7 @@ def _build_lcars_graph(title, unit, lo, hi,  # pylint: disable=too-many-locals
         ),
     ))
     grp.append(label.Label(
-        terminalio.FONT,
-        text="{}".format(int(hi)),
+        terminalio.FONT, text=f"{int(hi)}",
         color=0x666666,
         anchor_point=(1.0, 0.0),
         anchored_position=(
@@ -1293,42 +1005,42 @@ def _build_lcars_graph(title, unit, lo, hi,  # pylint: disable=too-many-locals
         ),
     ))
 
-    return grp, bmp, pal, val_lbl, mm_lbl
+    return grp, bmp, val_lbl, mm_lbl
 
 
-def _update_lcars_graph(bmp, history, lo, hi,  # pylint: disable=too-many-locals,too-many-branches
+def _update_lcars_graph(bmp, history, lo, hi,  # pylint: disable=too-many-locals
                         zones, val_lbl, mm_lbl,
                         mn, mx, fmt_fn):
     """Generic graph bitmap updater with dynamic bars."""
     if bmp is None:
         return
-    for x in range(GRAPH_W):
-        for y in range(GRAPH_H):
-            bmp[x, y] = 0
+    for col in range(GRAPH_W):
+        for row in range(GRAPH_H):
+            bmp[col, row] = 0
 
-    n = len(history)
+    num = len(history)
     bar_px, slot, x_start, count = graph_layout(
-        n, graph_zoomed
+        num, graph_zoomed
     )
     data = history[-count:] if count > 0 else []
     rng = hi - lo
-    for i, val in enumerate(data):
+    for idx, val in enumerate(data):
         clamped = max(lo, min(hi, val))
         bar_h = max(
             int((clamped - lo) / rng * GRAPH_H), 1
         )
         cidx = 1
-        for thresh, zi in zones:
+        for thresh, zone_idx in zones:
             if clamped > thresh:
-                cidx = zi
-        bx = x_start + i * slot
+                cidx = zone_idx
+        bar_x = x_start + idx * slot
         for px in range(bar_px):
-            x = bx + px
-            if x >= GRAPH_W:
+            col = bar_x + px
+            if col >= GRAPH_W:
                 break
             for y_off in range(bar_h):
-                y = GRAPH_H - 1 - y_off
-                bmp[x, y] = cidx
+                row = GRAPH_H - 1 - y_off
+                bmp[col, row] = cidx
 
     if val_lbl is not None:
         if history:
@@ -1336,115 +1048,88 @@ def _update_lcars_graph(bmp, history, lo, hi,  # pylint: disable=too-many-locals
         else:
             val_lbl.text = "---"
     if mm_lbl is not None:
-        mm_lbl.text = "{}-{}".format(
-            fmt_fn(mn), fmt_fn(mx)
+        mm_lbl.text = f"{fmt_fn(mn)}-{fmt_fn(mx)}"
+
+
+def create_sensor_graph(view_mode):
+    """Build and store an LCARS graph for a sensor."""
+    if view_mode == VIEW_CO2:
+        grp, bmp, vlbl, mlbl = _build_lcars_graph(
+            "CO2", "PPM",
+            GRAPH_CO2_LO, GRAPH_CO2_HI,
+            LCARS_GOLD, CO2_ZONES,
         )
-
-
-# --- Humidity graph ---
-# Zones: good 30-60%, dry <30, humid >60
-HUM_ZONES = [
-    (30, 1),   # green above 0
-    (60, 2),   # yellow above 60
-    (80, 3),   # red above 80
-]
-
-
-def build_hum_graph():
-    """Build the LCARS humidity graph."""
-    global hum_graph_group, hum_graph_bmp
-    global hum_graph_pal
-    global hum_graph_lbl, hum_minmax_lbl
-    result = _build_lcars_graph(
-        "HUM", "%RH",
-        GRAPH_HUM_LO, GRAPH_HUM_HI,
-        LCARS_GREEN, HUM_ZONES,
-    )
-    hum_graph_group = result[0]
-    hum_graph_bmp = result[1]
-    hum_graph_pal = result[2]
-    hum_graph_lbl = result[3]
-    hum_minmax_lbl = result[4]
-
-
-def update_hum_graph():
-    """Update humidity graph bitmap."""
-    mn = hum_min if hum_min < 999 else 0
-    mx = hum_max if hum_max > 0 else 0
-    _update_lcars_graph(
-        hum_graph_bmp, hum_history,
-        GRAPH_HUM_LO, GRAPH_HUM_HI,
-        HUM_ZONES,
-        hum_graph_lbl, hum_minmax_lbl,
-        mn, mx,
-        lambda v: "{}".format(int(v)),
-    )
-
-
-# --- Temperature graph ---
-# Zones: cool <65F/18C, good, warm >80F/27C
-TEMP_ZONES_F = [
-    (65, 1),   # green above 50F
-    (80, 2),   # yellow above 80F
-    (90, 3),   # red above 90F
-]
-TEMP_ZONES_C = [
-    (18, 1),   # green above 10C
-    (27, 2),   # yellow above 27C
-    (32, 3),   # red above 32C
-]
-
-
-def build_temp_graph():
-    """Build the LCARS temperature graph."""
-    global temp_graph_group, temp_graph_bmp
-    global temp_graph_pal
-    global temp_graph_lbl, temp_minmax_lbl
-    if use_fahrenheit:
-        lo, hi = GRAPH_TEMP_LO, GRAPH_TEMP_HI
-        zones = TEMP_ZONES_F
-        unit = "DEG.F"
+    elif view_mode == VIEW_HUM:
+        grp, bmp, vlbl, mlbl = _build_lcars_graph(
+            "HUM", "%RH",
+            GRAPH_HUM_LO, GRAPH_HUM_HI,
+            LCARS_GREEN, HUM_ZONES,
+        )
+    elif view_mode == VIEW_TEMP:
+        if use_fahrenheit:
+            lo, hi = GRAPH_TEMP_LO, GRAPH_TEMP_HI
+            zones = TEMP_ZONES_F
+            unit = "DEG.F"
+        else:
+            lo, hi = GRAPH_TEMP_LO_C, GRAPH_TEMP_HI_C
+            zones = TEMP_ZONES_C
+            unit = "DEG.C"
+        grp, bmp, vlbl, mlbl = _build_lcars_graph(
+            "TEMP", unit, lo, hi,
+            LCARS_YELLOW, zones,
+        )
     else:
-        lo, hi = GRAPH_TEMP_LO_C, GRAPH_TEMP_HI_C
-        zones = TEMP_ZONES_C
-        unit = "DEG.C"
-    result = _build_lcars_graph(
-        "TEMP", unit, lo, hi,
-        LCARS_YELLOW, zones,
-    )
-    temp_graph_group = result[0]
-    temp_graph_bmp = result[1]
-    temp_graph_pal = result[2]
-    temp_graph_lbl = result[3]
-    temp_minmax_lbl = result[4]
+        return
+    sensor_graphs[view_mode] = (grp, bmp, vlbl, mlbl)
 
 
-def update_temp_graph():
-    """Update temperature graph bitmap."""
-    if use_fahrenheit:
-        lo, hi = GRAPH_TEMP_LO, GRAPH_TEMP_HI
-        zones = TEMP_ZONES_F
-        hist = [t * 9.0 / 5.0 + 32
-                for t in temp_history]
-        mn = temp_min_val * 9.0 / 5.0 + 32
-        mx = temp_max_val * 9.0 / 5.0 + 32
-    else:
-        lo, hi = GRAPH_TEMP_LO_C, GRAPH_TEMP_HI_C
-        zones = TEMP_ZONES_C
-        hist = list(temp_history)
-        mn = temp_min_val
-        mx = temp_max_val
-    if temp_min_val > 900:
-        mn = 0
-    if temp_max_val < -900:
-        mx = 0
-    _update_lcars_graph(
-        temp_graph_bmp, hist, lo, hi,
-        zones,
-        temp_graph_lbl, temp_minmax_lbl,
-        mn, mx,
-        lambda v: "{}".format(int(v)),
-    )
+def update_sensor_graph(view_mode):
+    """Update the graph bitmap for a sensor."""
+    if view_mode not in sensor_graphs:
+        return
+    _, bmp, vlbl, mlbl = sensor_graphs[view_mode]
+
+    if view_mode == VIEW_CO2:
+        mn = co2_min if co2_min < 9999 else 0
+        mx = co2_max if co2_max > 0 else 0
+        _update_lcars_graph(
+            bmp, co2_history,
+            GRAPH_CO2_LO, GRAPH_CO2_HI,
+            CO2_ZONES, vlbl, mlbl, mn, mx,
+            lambda v: f"{int(v)}",
+        )
+    elif view_mode == VIEW_HUM:
+        mn = hum_min if hum_min < 999 else 0
+        mx = hum_max if hum_max > 0 else 0
+        _update_lcars_graph(
+            bmp, hum_history,
+            GRAPH_HUM_LO, GRAPH_HUM_HI,
+            HUM_ZONES, vlbl, mlbl, mn, mx,
+            lambda v: f"{int(v)}",
+        )
+    elif view_mode == VIEW_TEMP:
+        if use_fahrenheit:
+            lo, hi = GRAPH_TEMP_LO, GRAPH_TEMP_HI
+            zones = TEMP_ZONES_F
+            hist = [t * 9.0 / 5.0 + 32
+                    for t in temp_history]
+            mn = temp_min_val * 9.0 / 5.0 + 32
+            mx = temp_max_val * 9.0 / 5.0 + 32
+        else:
+            lo, hi = GRAPH_TEMP_LO_C, GRAPH_TEMP_HI_C
+            zones = TEMP_ZONES_C
+            hist = list(temp_history)
+            mn = temp_min_val
+            mx = temp_max_val
+        if temp_min_val > 900:
+            mn = 0
+        if temp_max_val < -900:
+            mx = 0
+        _update_lcars_graph(
+            bmp, hist, lo, hi,
+            zones, vlbl, mlbl, mn, mx,
+            lambda v: f"{int(v)}",
+        )
 
 
 def build_stats():
@@ -1594,24 +1279,20 @@ def update_stats(disp):
     elapsed = time.monotonic() - boot_time
     hrs = int(elapsed // 3600)
     mins = int((elapsed % 3600) // 60)
-    stats_uptime_lbl.text = "{}:{:02d}".format(
-        hrs, mins
-    )
-    stats_samples_lbl.text = "{}/{}".format(
-        len(co2_history), HISTORY_SIZE
+    stats_uptime_lbl.text = f"{hrs}:{mins:02d}"
+    stats_samples_lbl.text = (
+        f"{len(co2_history)}/{HISTORY_SIZE}"
     )
 
     co2_r = disp[8]
-    stats_co2_lbl.text = "{} {}-{}".format(
-        int(co2_r),
-        int(co2_min) if co2_min < 9999 else "---",
-        int(co2_max) if co2_max > 0 else "---",
+    co2_lo = int(co2_min) if co2_min < 9999 else "---"
+    co2_hi = int(co2_max) if co2_max > 0 else "---"
+    stats_co2_lbl.text = (
+        f"{int(co2_r)} {co2_lo}-{co2_hi}"
     )
     hlo = int(hum_min) if hum_min < 999 else "---"
     hhi = int(hum_max) if hum_max > 0 else "---"
-    stats_hum_lbl.text = "{} {}-{}".format(
-        disp[5], hlo, hhi
-    )
+    stats_hum_lbl.text = f"{disp[5]} {hlo}-{hhi}"
     if use_fahrenheit:
         tlo = int(
             temp_min_val * 9.0 / 5.0 + 32
@@ -1626,9 +1307,7 @@ def update_stats(disp):
         thi = int(
             temp_max_val
         ) if temp_max_val > -900 else "---"
-    stats_temp_lbl.text = "{} {}-{}".format(
-        disp[6], tlo, thi
-    )
+    stats_temp_lbl.text = f"{disp[6]} {tlo}-{thi}"
     stats_batt_lbl.text = disp[7]
 
 
@@ -1738,10 +1417,9 @@ def build_about():  # pylint: disable=too-many-locals,too-many-statements
     )
 
     # Sensor status
-    s_status = "STCC4: {}  DRV: {}".format(
-        "OK" if sensor else "N/A",
-        "OK" if haptic else "N/A",
-    )
+    stcc_ok = "OK" if sensor else "N/A"
+    drv_ok = "OK" if haptic else "N/A"
+    s_status = f"STCC4: {stcc_ok}  DRV: {drv_ok}"
     about_group.append(
         label.Label(
             terminalio.FONT,
@@ -1809,11 +1487,9 @@ def build_about():  # pylint: disable=too-many-locals,too-many-statements
             )
             qr_group.append(qr_grid)
             about_group.append(qr_group)
-            print("QR code generated: {}".format(
-                BADGE_QR_URL
-            ))
+            print(f"QR code generated: {BADGE_QR_URL}")
         except (ImportError, MemoryError) as err:
-            print("QR skipped: {}".format(err))
+            print(f"QR skipped: {err}")
 
 
 def set_view(mode):
@@ -1829,21 +1505,11 @@ def set_view(mode):
         if stats_group is None:
             build_stats()
         display.root_group = stats_group
-    elif mode == VIEW_CO2:
-        if graph_group is None:
-            build_graph()
-        update_graph()
-        display.root_group = graph_group
-    elif mode == VIEW_HUM:
-        if hum_graph_group is None:
-            build_hum_graph()
-        update_hum_graph()
-        display.root_group = hum_graph_group
-    elif mode == VIEW_TEMP:
-        if temp_graph_group is None:
-            build_temp_graph()
-        update_temp_graph()
-        display.root_group = temp_graph_group
+    elif mode in (VIEW_CO2, VIEW_HUM, VIEW_TEMP):
+        if mode not in sensor_graphs:
+            create_sensor_graph(mode)
+        update_sensor_graph(mode)
+        display.root_group = sensor_graphs[mode][0]
     elif mode == VIEW_ABOUT:
         if about_group is None:
             build_about()
@@ -1864,9 +1530,7 @@ def toggle_brightness():
         display.brightness = DIM_BRIGHTNESS
     else:
         display.brightness = FULL_BRIGHTNESS
-    print("Brightness: {}".format(
-        "dim" if is_dimmed else "full"
-    ))
+    print(f"Brightness: {"dim" if is_dimmed else "full"}")
 
 
 DEMO_HOLD = 3  # seconds per screen in demo mode
@@ -1914,7 +1578,7 @@ def demo_mode():  # pylint: disable=too-many-statements
 
     # 4) CO2 graph full
     graph_zoomed = False
-    update_graph()
+    update_sensor_graph(VIEW_CO2)
     time.sleep(DEMO_HOLD)
 
     # 5) Humidity graph zoomed
@@ -1924,7 +1588,7 @@ def demo_mode():  # pylint: disable=too-many-statements
 
     # 6) Humidity graph full
     graph_zoomed = False
-    update_hum_graph()
+    update_sensor_graph(VIEW_HUM)
     time.sleep(DEMO_HOLD)
 
     # 7) Temp graph zoomed
@@ -1934,7 +1598,7 @@ def demo_mode():  # pylint: disable=too-many-statements
 
     # 8) Temp graph full
     graph_zoomed = False
-    update_temp_graph()
+    update_sensor_graph(VIEW_TEMP)
     time.sleep(DEMO_HOLD)
 
     # 9) Badge / about
@@ -1976,7 +1640,7 @@ def enter_sleep():
     # Wait for ALL buttons to be released
     while (not btn_d0.value) or btn_d1.value or btn_d2.value:
         time.sleep(0.05)
-    time.sleep(0.5)
+    time.sleep(0.2)
 
     # Blank display
     display.brightness = 0
@@ -2025,7 +1689,7 @@ def read_sensors():
         )
         tmp_r = sensor.temperature if sensor else 0
     except (RuntimeError, OSError) as err:
-        print("Sensor error: {}".format(err))
+        print(f"Sensor error: {err}")
         co2_r, hum_r, tmp_r = 0, 0, 0
 
     try:
@@ -2033,7 +1697,7 @@ def read_sensors():
         bat_v = batt.cell_voltage if batt else 0
         bat_rate = batt.charge_rate if batt else 0
     except (RuntimeError, OSError) as err:
-        print("Battery error: {}".format(err))
+        print(f"Battery error: {err}")
         bat_r, bat_v, bat_rate = 0, 0, 0
 
     # Track min/max for all sensors
@@ -2068,32 +1732,32 @@ def compute_display(co2_r, hum_r, tmp_r,  # pylint: disable=too-many-locals,too-
     tmpp = to_pct(tmp_r, TEMP_MIN, TEMP_MAX)
     batp = int(clamp(bat_r, 0, 100))
 
-    co2t = "{}".format(int(co2_r))
-    humt = "{}%".format(hump)
+    co2t = f"{int(co2_r)}"
+    humt = f"{hump}%"
     if use_fahrenheit:
         tv = tmp_r * 9.0 / 5.0 + 32
-        tmpt = "{}F".format(int(tv))
+        tmpt = f"{int(tv)}F"
     else:
-        tmpt = "{}C".format(int(tmp_r))
+        tmpt = f"{int(tmp_r)}C"
 
     is_charging = bat_rate > 0.5
     is_discharging = bat_rate < -0.5
-    batt_t = "{}%".format(batp)  # always show % below
+    batt_t = f"{batp}%"  # always show % below
 
     # Compute time estimate
     bar_txt = ""
     if is_charging and bat_rate > 0.5:
         hrs = (100.0 - bat_r) / bat_rate
         if hrs < 1.0:
-            bar_txt = "{}m".format(int(hrs * 60))
+            bar_txt = f"{int(hrs * 60)}m"
         else:
-            bar_txt = "{:.1f}h".format(hrs)
+            bar_txt = f"{hrs:.1f}h"
     elif is_discharging and abs(bat_rate) > 0.5:
         hrs = bat_r / abs(bat_rate)
         if hrs < 1.0:
-            bar_txt = "{}m".format(int(hrs * 60))
+            bar_txt = f"{int(hrs * 60)}m"
         else:
-            bar_txt = "{:.1f}h".format(hrs)
+            bar_txt = f"{hrs:.1f}h"
 
     # Bolt: charging only
     if is_charging:
@@ -2137,7 +1801,7 @@ def compute_display(co2_r, hum_r, tmp_r,  # pylint: disable=too-many-locals,too-
 # ============================================================
 #  MAIN LOOP
 # ============================================================
-time.sleep(2)
+time.sleep(1)  # sensor stabilization
 
 # Wait for all buttons to be released before boot scan
 # (prevents double-scan on wake from deep sleep)
@@ -2211,12 +1875,8 @@ while True:
             temp_history.pop(0)
 
     # --- Update display based on current view ---
-    if current_view == VIEW_CO2:
-        update_graph()
-    elif current_view == VIEW_HUM:
-        update_hum_graph()
-    elif current_view == VIEW_TEMP:
-        update_temp_graph()
+    if current_view in (VIEW_CO2, VIEW_HUM, VIEW_TEMP):
+        update_sensor_graph(current_view)
     elif current_view == VIEW_STATS:
         update_stats(disp)
     elif current_view == VIEW_BARS:
@@ -2238,10 +1898,8 @@ while True:
         buzz_alert()
 
     print(
-        "CO2: {}ppm | Hum: {}% | "
-        "Temp: {} | Batt: {}".format(
-            int(co2_raw_adj), hump, tmpt, batt_t
-        )
+        f"CO2: {int(co2_raw_adj)}ppm | Hum: {hump}% | "
+        f"Temp: {tmpt} | Batt: {batt_t}"
     )
 
     # --- Poll buttons at 50ms ---
@@ -2348,10 +2006,8 @@ while True:
                 ):
                     # Zoom toggle on graph views
                     graph_zoomed = not graph_zoomed
-                    print("Zoom: {}".format(
-                        "15min" if graph_zoomed
-                        else "full"
-                    ))
+                    print(f"Zoom: {"15min" if graph_zoomed
+                        else "full"}")
                 else:
                     # F/C toggle on other views
                     use_fahrenheit = not use_fahrenheit
@@ -2359,11 +2015,9 @@ while True:
                         tv = (
                             temp_raw * 9.0 / 5.0 + 32
                         )
-                        tmpt = "{}F".format(int(tv))
+                        tmpt = f"{int(tv)}F"
                     else:
-                        tmpt = "{}C".format(
-                            int(temp_raw)
-                        )
+                        tmpt = f"{int(temp_raw)}C"
                     if current_view == VIEW_BARS:
                         solo_scan(
                             2, tmpp, tmpp, tmpt
