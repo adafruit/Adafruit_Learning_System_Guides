@@ -171,9 +171,9 @@ def clear_labels(label_list):
 # Main loop
 while True:
     try:
-        people_count, astronaut_list = fetch_astronauts()
-        name_list = build_name_list(astronaut_list)
-        del astronaut_list
+        people_count, fetched_list = fetch_astronauts()
+        name_list = build_name_list(fetched_list)
+        del fetched_list
         gc.collect()
         print("People in space:", people_count)
         for n in name_list:
