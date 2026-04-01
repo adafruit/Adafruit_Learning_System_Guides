@@ -81,15 +81,15 @@ def fetch_astronauts():
         data = json.loads(raw)
     else:
         data = raw
-    result = [
+    humans = [
         a for a in data["results"]
         if a.get("type", {}).get("name") != "Non-Human"
     ]
-    num_people = len(result)
+    num_people = len(humans)
     del data
     del raw
     gc.collect()
-    return num_people, result
+    return num_people, humans
 
 
 def build_name_list(astronaut_list):
