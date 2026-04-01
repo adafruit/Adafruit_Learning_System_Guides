@@ -6,10 +6,10 @@
 This example will access the Space Devs astronaut API, display the number of
 humans currently in space and their names and agency on a PyPortal screen.
 """
-import time
-import board
 import gc
 import json
+import time
+import board
 import supervisor
 from adafruit_pyportal import PyPortal
 from adafruit_bitmap_font import bitmap_font
@@ -64,12 +64,14 @@ AGENCY_ABBREV = {
 
 gc.collect()
 
-def make_count_label(count):
-    lbl = Label(names_font, text="{} People in Space".format(count))
+
+def make_count_label(num_people):
+    lbl = Label(names_font, text="{} People in Space".format(num_people))
     lbl.color = count_color
     lbl.x = count_position[0]
     lbl.y = count_position[1]
     return lbl
+
 
 def fetch_astronauts():
     """Fetch and parse astronaut data, filtering out non-humans."""
@@ -79,24 +81,26 @@ def fetch_astronauts():
         data = json.loads(raw)
     else:
         data = raw
-    astronauts = [
+    result = [
         a for a in data["results"]
         if a.get("type", {}).get("name") != "Non-Human"
     ]
-    count = len(astronauts)
+    num_people = len(result)
     del data
     del raw
     gc.collect()
-    return count, astronauts
+    return num_people, result
 
-def build_name_list(astronauts):
+
+def build_name_list(astronaut_list):
     """Build display strings from astronaut records."""
     result = []
-    for a in astronauts:
+    for a in astronaut_list:
         agency_full = a.get("agency", "")
         abbrev = AGENCY_ABBREV.get(agency_full, agency_full[:4])
         result.append("%s (%s)" % (a["name"], abbrev))
     return result
+
 
 def calculate_columns(names):
     """Calculate column widths and positions based on name lengths.
@@ -125,20 +129,18 @@ def calculate_columns(names):
     max_chars_col1 = col1_width // char_width
     max_chars_col2 = col2_width // char_width if col2_names else 0
 
-    return col2_x, max_chars_col1, max_chars_col2, bool(col2_names)
+    return col2_x, max_chars_col1, max_chars_col2
 
-def display_astronauts(count, names):
+
+def display_astronauts(num_people, names):
     """Create and append all labels, return list for later cleanup."""
-    labels = []
+    label_list = []
 
     # Count label
-    lbl = make_count_label(count)
-    pyportal.root_group.append(lbl)
-    labels.append(lbl)
+    label_list.append(make_count_label(num_people))
+    pyportal.root_group.append(label_list[-1])
 
-    col2_x, max_chars_col1, max_chars_col2, has_col2 = (
-        calculate_columns(names)
-    )
+    col2_x, max_chars_col1, max_chars_col2 = calculate_columns(names)
     y_start = names_position[1]
 
     for i, name in enumerate(names):
@@ -146,34 +148,35 @@ def display_astronauts(count, names):
         max_chars = max_chars_col2 if in_col2 else max_chars_col1
         if len(name) > max_chars:
             name = name[:max_chars - 1] + "~"
-        lbl = Label(names_font, text=name)
-        lbl.color = names_color
-        lbl.x = col2_x if in_col2 else names_position[0]
-        lbl.y = (
+        new_lbl = Label(names_font, text=name)
+        new_lbl.color = names_color
+        new_lbl.x = col2_x if in_col2 else names_position[0]
+        new_lbl.y = (
             y_start + (i - max_rows) * font_height
             if in_col2
             else y_start + i * font_height
         )
-        pyportal.root_group.append(lbl)
-        labels.append(lbl)
+        pyportal.root_group.append(new_lbl)
+        label_list.append(new_lbl)
 
-    return labels
+    return label_list
 
-def clear_labels(labels):
+
+def clear_labels(label_list):
     """Remove all labels from the display group."""
-    for lbl in labels:
+    for _lbl in label_list:
         pyportal.root_group.pop()
 
 
 # Main loop
 while True:
     try:
-        count, astronauts = fetch_astronauts()
-        names = build_name_list(astronauts)
-        del astronauts
+        people_count, astronaut_list = fetch_astronauts()
+        name_list = build_name_list(astronaut_list)
+        del astronaut_list
         gc.collect()
-        print("People in space:", count)
-        for n in names:
+        print("People in space:", people_count)
+        for n in name_list:
             print(" ", n)
     except HttpError as e:
         print("Rate limited, backing off! -", e)
@@ -184,8 +187,8 @@ while True:
         time.sleep(30)
         supervisor.reload()
 
-    labels = display_astronauts(count, names)
+    active_labels = display_astronauts(people_count, name_list)
     time.sleep(3600)  # display for 1 hour - data changes infrequently
-    clear_labels(labels)
+    clear_labels(active_labels)
     gc.collect()
     supervisor.reload()
