@@ -16,6 +16,7 @@ import board
 from adafruit_epd.ssd1675 import Adafruit_SSD1675
 from adafruit_epd.ssd1680 import Adafruit_SSD1680
 from adafruit_epd.ssd1680b import Adafruit_SSD1680B
+from adafruit_epd.ssd1680_legacy import Adafruit_SSD1680_Legacy
 from weather_graphics import Weather_Graphics
 
 spi = busio.SPI(board.SCK, MOSI=board.MOSI, MISO=board.MISO)
@@ -44,6 +45,7 @@ data_source = DATA_SOURCE_URL + "?" + urllib.parse.urlencode(params)
 
 # Initialize the Display
 display = Adafruit_SSD1680B(   # Newer eInk Bonnet (GDEY0213B74 display)
+#display = Adafruit_SSD1680_Legacy(122, 250, # pre-2024 SSD1680 Bonnet
 #display = Adafruit_SSD1680(   # Old eInk Bonnet ssd1680
 #display = Adafruit_SSD1675(   # Older eInk Bonnet ssd1675
 #    122, 250, spi, cs_pin=ecs, dc_pin=dc, sramcs_pin=None, rst_pin=rst, busy_pin=busy,
