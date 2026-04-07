@@ -315,9 +315,16 @@ display.root_group = group
 while True:
     show_shapes()
     sine_chart()
-    widget0()
-    widget1()
-    text_align()
-    custom_font()
-    bitmap_example()
-    sensor_values()
+    # the RP2040 Pico runs into MemoryErrors trying to
+    # run all of the examples
+    if board.board_id == "raspberry_pi_pico":
+        text_align()
+        bitmap_example()
+        sensor_values()
+    else:
+        widget0()
+        widget1()
+        text_align()
+        custom_font()
+        bitmap_example()
+        sensor_values()
