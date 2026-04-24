@@ -128,7 +128,7 @@ def get_data(data, dictionary):
                            "score_away": score_away, "date": date, "clock": clock, "status": status,
                            "location": location})
     # debug printing
-    print(f"game 1: {dictionary[0]["home"]} vs {dictionary[0]["away"]}, game 2: {dictionary[1]}")
+    # print(dictionary)
     got_data = True
     return dictionary, got_data
 
