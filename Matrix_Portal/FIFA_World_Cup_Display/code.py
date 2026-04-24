@@ -175,7 +175,7 @@ def make_gfx(dictionary, grps): # pylint: disable=too-many-locals
         info_text.anchored_position = (DISPLAY_WIDTH / 2, DISPLAY_HEIGHT)
         grp.append(info_text) # index 5
         location_text = adafruit_display_text.label.Label(terminalio.FONT, color=font_color,
-                                                    text=f"{dictionary[i]["location"]}")
+                                                    text=f"{dictionary[i]['location']}")
         location_text.anchor_point = (0.5, 1.0)
         location_text.anchored_position = (DISPLAY_WIDTH / 2, DISPLAY_HEIGHT - 12)
         grp.append(location_text) # index 6
@@ -184,8 +184,8 @@ def make_gfx(dictionary, grps): # pylint: disable=too-many-locals
             info_text.text=dictionary[i]["date"]
         # if it's active or final show score
         else:
-            info_text.text=f"Clock: {dictionary[i]["clock"]}"
-            vs_text.text=f"{dictionary[i]["score_home"]} - {dictionary[i]["score_away"]}"
+            info_text.text=f"Clock: {dictionary[i]['clock']}"
+            vs_text.text=f"{dictionary[i]['score_home']} - {dictionary[i]['score_away']}"
         grps.append(grp)
     return grps
 
