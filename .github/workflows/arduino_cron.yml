@@ -29,7 +29,6 @@ jobs:
           echo "status=$isdispatch" >> "$GITHUB_OUTPUT"
       - name: Check for Arduino file updates
         id: check-updated
-        if: steps.check-cron.outputs.status == false && steps.check-dispatch.outputs.status == false
         run: |
           changedfiles=$(git diff --name-only -r HEAD^1 HEAD)
           ischanged=false
