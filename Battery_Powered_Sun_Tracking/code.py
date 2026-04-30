@@ -26,14 +26,15 @@ Required entries in settings.toml:
   ADAFRUIT_AIO_KEY = "your-aio-key"
 """
 
-import board
 import time
+from os import getenv
+
 import alarm
+import board
 import wifi
 import adafruit_connection_manager
 import adafruit_requests
 import adafruit_veml7700
-from os import getenv
 from adafruit_io.adafruit_io import IO_HTTP
 
 # -- Settings --
@@ -72,7 +73,7 @@ while True:
         io.send_data(FEED_NAME, lux)
         print("Sent to Adafruit IO!")
 
-    except Exception as e:
+    except Exception as e:  # pylint: disable=broad-except
         print(f"ERROR: {e}")
 
     # -- Deep sleep (battery) or wait (USB) --
