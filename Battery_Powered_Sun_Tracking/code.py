@@ -84,3 +84,4 @@ while True:
     alarm.exit_and_deep_sleep_until_alarms(time_alarm)
     # On battery: board resets, script runs from the top.
     # On USB: pretend sleep returns here, loop continues.
+    
