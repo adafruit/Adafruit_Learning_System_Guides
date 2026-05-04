@@ -8,7 +8,7 @@ import audiocore
 import board
 import audiobusio
 
-audio = audiobusio.I2SOut(board.D6, board.D5, board.D9)
+audio = audiobusio.I2SOut(board.D5, board.D6, board.D9)
 
 with open("StreetChicken.wav", "rb") as wave_file:
     wav = audiocore.WaveFile(wave_file)
