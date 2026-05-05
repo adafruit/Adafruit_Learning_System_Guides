@@ -35,7 +35,7 @@ from digitalio import DigitalInOut, Direction, Pull
 #            of this file.
 #
 #   reading     : which sensor data type drives this challenge. One of:
-#                 "gsp" -> gsp.latitude,gps.longitude (coordinates, string)
+#                 "gps" -> gps.latitude,gps.longitude (coordinates, string)
 #
 #   precision_level : Controls how big the "unlock" target area is.
 #                     Approximate sizes at the equator:
