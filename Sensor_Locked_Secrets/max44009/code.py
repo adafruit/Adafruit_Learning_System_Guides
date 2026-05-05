@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Tim Cocks for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
 import hashlib
 import struct
 import time
