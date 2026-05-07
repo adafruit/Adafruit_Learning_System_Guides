@@ -19,7 +19,6 @@ import time
 import _bleio
 import board
 import digitalio
-import neopixel
 from adafruit_debouncer import Button
 
 import battery as battery_mod
