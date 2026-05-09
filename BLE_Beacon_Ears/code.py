@@ -7,10 +7,12 @@ Scans for Disney BLE adverts and renders matching commands on stereo
 NeoPixel Jewels. Two logical zones (left ear, right ear) are rendered
 with stereo phase offsets to give static colors a gentle out-of-phase
 breathing animation and rotations a left-leads-right sweep.
-
-To switch from real Jewels to onboard NeoPixel for testing without the
-ear hardware, flip _USE_ONBOARD to True below.
 '''
+# pylint: disable=redefined-outer-name
+# Setup and main loop are inlined at module level (no main() wrapper).
+# Helper functions defined above take parameters named the same as the
+# inlined module-level loop variables (zone, t, etc) - this is expected
+# and harmless: helpers and the inline body never share scope at runtime.
 # Target: Adafruit QT Py ESP32-S3 - the BLE Beacon Ears
 import math
 import random
@@ -25,9 +27,6 @@ import battery as battery_mod
 import magicband_protocol
 import pixel_zones
 import renderer
-
-# Flip this to True to test on the QT Py's onboard pixel without jewels.
-_USE_ONBOARD = False
 
 # 15 fps target -> ~66ms per frame.
 _TARGET_FPS = 15
@@ -66,7 +65,7 @@ _BRIGHTNESS_PRESETS = (0.02, 0.04, 0.08)
 # How long the BOOT button must be held to count as a long press.
 # Short press cycles brightness preset (the more frequently-used action).
 # Long press shows the battery level (less frequent, requires intent).
-_LONG_PRESS_S = 0.5
+LONG_PRESS_S = 0.5
 _BRIGHTNESS_FLASH_DURATION_S = 0.6
 
 # USB-presence detection threshold (raw QT Py voltage reading).
@@ -146,8 +145,8 @@ _SOLO_EXIT_RGB = (40, 100, 220)
 # committing a multi-press count. 350ms is a common sweet spot - tight
 # enough that single-press brightness cycling still feels responsive,
 # wide enough that comfortable triple-presses register reliably.
-_BUTTON_SHORT_MS = 350
-_BUTTON_LONG_MS = int(_LONG_PRESS_S * 1000)
+BUTTON_SHORT_MS = 350
+BUTTON_LONG_MS = int(LONG_PRESS_S * 1000)
 
 
 def _build_showpieces():
@@ -374,26 +373,21 @@ def _render_battery_display(zones, voltage, t):
 #   0x03 = cycle brightness preset
 #   0x04 = find me
 #   0x05 = statue animation preview
-_REMOTE_BATTERY_PACKET = bytes.fromhex("aa4201")
-_REMOTE_BRIGHTNESS_PACKET = bytes.fromhex("aa4203")
-_REMOTE_FIND_PACKET = bytes.fromhex("aa4204")
-_REMOTE_STATUE_PACKET = bytes.fromhex("aa4205")
+# Remote-trigger packet table. Sub-protocol: AA42xx is sent only by the
+# CLUE remote. Real bands and wands ignore packets they don't recognize,
+# so this is safe alongside MagicBand+ (E1/E2/CC), wand (CF), and
+# Fab 50 statue (C4) traffic.
+REMOTE_COMMANDS = {
+    bytes.fromhex("aa4201"): "battery",
+    bytes.fromhex("aa4203"): "brightness",
+    bytes.fromhex("aa4204"): "find",
+    bytes.fromhex("aa4205"): "statue",
+}
 
 
-def _is_remote_battery_trigger(payload):
-    return bytes(payload[:3]) == _REMOTE_BATTERY_PACKET
-
-
-def _is_remote_brightness_trigger(payload):
-    return bytes(payload[:3]) == _REMOTE_BRIGHTNESS_PACKET
-
-
-def _is_remote_find_trigger(payload):
-    return bytes(payload[:3]) == _REMOTE_FIND_PACKET
-
-
-def _is_remote_statue_trigger(payload):
-    return bytes(payload[:3]) == _REMOTE_STATUE_PACKET
+def remote_command(payload):
+    '''Return the remote-trigger command name, or None if not a trigger.'''
+    return REMOTE_COMMANDS.get(bytes(payload[:3]))
 
 
 def _extract_disney_payload(ad_bytes):
@@ -418,374 +412,338 @@ def _log_command(label, rssi, raw):
     print(f"           raw={raw.hex()}")
 
 
+print("MagicBand+ BLE Beacon Ears")
+print(f"BLE scan: window={_SCAN_WINDOW_S * 1000:.0f}ms"
+      f"  interval={_SCAN_INTERVAL_S * 1000:.0f}ms")
+print("-" * 60)
 
-class _RuntimeState:
-    '''All mutable state for the receiver main loop in one object.
+pixels = pixel_zones.StereoJewels(
+    left_pin=board.A1, right_pin=board.A3,
+    brightness=_BRIGHTNESS_PRESETS[0])
+zones = pixels.make_zones()
+brightness_idx = [0]
 
-    Bundling state into a single object keeps main() under the lint limit
-    for local variables and makes the per-frame helpers cleanly testable.
-    Plain data holder, no methods, like a struct.
-    '''
-    # pylint: disable=too-many-instance-attributes
-    def __init__(self):
-        # Active rendered animation
-        self.active_state = None
-        self.active_started_at = 0.0
-        # Dedup tracking for incoming BLE packets
-        self.last_payload = None
-        self.last_payload_at = 0.0
-        # Brightness flash UI feedback
-        self.brightness_flash_until = 0.0
-        self.brightness_flash_level = 0
-        self.brightness_idx = [0]  # list-wrapped for mutation reasons
-        # Trigger cooldowns to suppress repeated remote commands
-        self.last_trigger_time = 0.0
-        self.last_statue_trigger = 0.0
-        # On-demand battery display state
-        self.battery_display_until = 0.0
-        self.battery_display_started_at = 0.0
-        self.battery_display_voltage = None
-        # Yellow "plug in" flash (battery display unavailable)
-        self.unavailable_flash_until = 0.0
-        self.unavailable_flash_started_at = 0.0
-        # Find Me beacon mode
-        self.find_mode_until = 0.0
-        self.find_mode_started_at = 0.0
-        # Periodic battery voltage logging
-        self.last_battery_log = 0.0
-        # Solo mode (curated showpiece reel)
-        self.solo_mode = False
-        self.solo_state = None
-        self.solo_label = ""
-        self.solo_idx = -1
-        self.solo_started_at = 0.0
-        self.solo_indicator_until = 0.0
-        self.solo_indicator_started_at = 0.0
-        self.solo_indicator_kind = None  # 'enter' or 'exit'
+adapter = _bleio.adapter
+if not adapter.enabled:
+    adapter.enabled = True
 
+batt = battery_mod.BatteryMonitor()
 
+button_pin = digitalio.DigitalInOut(board.BUTTON)
+button_pin.switch_to_input(pull=digitalio.Pull.UP)
+button = Button(button_pin, value_when_pressed=False,
+                short_duration_ms=BUTTON_SHORT_MS,
+                long_duration_ms=BUTTON_LONG_MS)
+
+active_state = None
+active_started_at = 0.0
+last_payload = None
+last_payload_at = 0.0
+brightness_flash_until = 0.0
+brightness_flash_level = 0
+last_trigger_time = 0.0
+battery_display_until = 0.0
+battery_display_started_at = 0.0
+battery_display_voltage = None  # voltage snapshot at trigger time
+unavailable_flash_until = 0.0   # yellow flash for "plug in to check"
+unavailable_flash_started_at = 0.0
+last_statue_trigger = 0.0       # last Fab 50 statue swirl fired
+find_mode_until = 0.0           # find-me beacon animation end time
+find_mode_started_at = 0.0
+last_battery_log = 0.0
 _BATTERY_LOG_INTERVAL_S = 60.0  # log raw voltage once per minute
 
+# Solo mode state. solo_state is a renderer animation dict (same shape
+# as active_state); solo_label / solo_idx / solo_started_at track the
+# current showpiece. solo_indicator_* drives the enter/exit pulse.
+solo_mode = False
+solo_state = None
+solo_label = ""
+solo_idx = -1
+solo_started_at = 0.0
+solo_indicator_until = 0.0
+solo_indicator_started_at = 0.0
+solo_indicator_kind = None      # 'enter' or 'exit'
 
-def _handle_button(state, button, batt, pixels):
-    '''Process one tick of BOOT-button input.
+while True:
+    frame_start = time.monotonic()
 
-    Single-press: brightness cycle. Double-press (in solo): skip
-    showpiece. Triple-press: toggle solo mode. Long-press: battery.
-    '''
+    new_command = None
+    try:
+        for entry in adapter.start_scan(
+                interval=_SCAN_INTERVAL_S, window=_SCAN_WINDOW_S,
+                minimum_rssi=_MIN_RSSI,
+                timeout=_SCAN_WINDOW_S,
+                extended=False, active=False):
+            payload = _extract_disney_payload(entry.advertisement_bytes)
+            if payload is None:
+                continue
+            if not payload:
+                continue
+            # Remote-trigger commands from the CLUE share a 4s cooldown.
+            command = remote_command(payload)
+            if command is not None:
+                now = time.monotonic()
+                if now - last_trigger_time < _TRIGGER_COOLDOWN_S:
+                    continue
+                last_trigger_time = now
+                if command == "brightness":
+                    brightness_idx[0] = (
+                        (brightness_idx[0] + 1) % len(_BRIGHTNESS_PRESETS))
+                    pixels.set_brightness(_BRIGHTNESS_PRESETS[brightness_idx[0]])
+                    brightness_flash_until = now + _BRIGHTNESS_FLASH_DURATION_S
+                    brightness_flash_level = brightness_idx[0]
+                elif command == "battery":
+                    # On battery power, WS2812 timing corruption makes
+                    # the full animation unreliable (green renders as
+                    # red). Show a brief yellow "plug in" flash on
+                    # battery; full animation only on USB.
+                    batt.update(force=True)
+                    battery_display_voltage = batt.voltage
+                    v_str = (f"{battery_display_voltage:.3f}V"
+                             if battery_display_voltage is not None else "None")
+                    if (battery_display_voltage is not None
+                            and battery_display_voltage > _USB_PRESENT_V_RAW):
+                        print(f"[battery trigger remote] {v_str} (USB)")
+                        battery_display_until = now + _BATTERY_DISPLAY_DURATION_S
+                        battery_display_started_at = now
+                    else:
+                        print(f"[battery trigger remote] {v_str} (yellow flash)")
+                        unavailable_flash_until = now + _UNAVAILABLE_FLASH_DURATION_S
+                        unavailable_flash_started_at = now
+                elif command == "find":
+                    # Forces max brightness for the 30s high-visibility
+                    # animation, then restores the user's preset.
+                    print("[find me] starting high-visibility animation")
+                    pixels.set_brightness(1.0)
+                    find_mode_until = now + renderer.FIND_MODE_DURATION_S
+                    find_mode_started_at = now
+                elif command == "statue":
+                    # Fires the same golden swirl that real Fab 50
+                    # statue beacons trigger - useful for demos.
+                    print("[statue preview] firing golden swirl")
+                    candidate = renderer.for_command({
+                        "kind": "statue_beacon",
+                        "statue_id": "PV",
+                        "raw": bytes(payload),
+                    })
+                    if candidate is not None:
+                        new_command = (candidate, entry.rssi, bytes(payload))
+                continue
+            # Accept MagicBand+ commands (E1/E2/CC), wand casts (CF),
+            # and Fab 50 statue beacons (C4). Statue beacons trigger
+            # a special golden-swirl animation rather than rendering
+            # any of their content.
+            is_mb = payload[0] in (0xE1, 0xE2, 0xCC)
+            is_wand = magicband_protocol.is_wand_packet(payload)
+            is_statue = (payload[0] == 0xC4 and len(payload) in (18, 23))
+            if not (is_mb or is_wand or is_statue):
+                continue
+            now = time.monotonic()
+            # Statues broadcast many packets per second per statue.
+            # Use a longer cooldown specifically for statue triggers
+            # to avoid restarting the swirl animation constantly.
+            if is_statue:
+                if now - last_statue_trigger < _STATUE_COOLDOWN_S:
+                    continue
+                last_statue_trigger = now
+            else:
+                if (payload == last_payload
+                        and now - last_payload_at < _DEDUP_WINDOW_S):
+                    continue
+                last_payload = payload
+                last_payload_at = now
+            parsed = magicband_protocol.parse(payload)
+            candidate = renderer.for_command(parsed)
+            if candidate is not None:
+                new_command = (candidate, entry.rssi, payload)
+    finally:
+        adapter.stop_scan()
+
+    # --- Button check (BOOT button via adafruit_debouncer.Button) ---
+    # short_count=1 -> cycle brightness
+    # short_count=2 -> skip showpiece (solo mode only)
+    # short_count>=3 -> toggle solo mode
+    # long_press   -> show battery (USB) or yellow "plug in" flash
     button.update()
     if button.long_press:
         batt.update(force=True)
-        state.battery_display_voltage = batt.voltage
-        v_str = (f"{state.battery_display_voltage:.3f}V"
-                 if state.battery_display_voltage is not None else "None")
+        battery_display_voltage = batt.voltage
+        v_str = (f"{battery_display_voltage:.3f}V"
+                 if battery_display_voltage is not None else "None")
         now = time.monotonic()
-        if (state.battery_display_voltage is not None
-                and state.battery_display_voltage > _USB_PRESENT_V_RAW):
+        if (battery_display_voltage is not None
+                and battery_display_voltage > _USB_PRESENT_V_RAW):
             print(f"[battery trigger BOOT] {v_str} (USB - showing display)")
-            state.battery_display_until = now + _BATTERY_DISPLAY_DURATION_S
-            state.battery_display_started_at = now
+            battery_display_until = now + _BATTERY_DISPLAY_DURATION_S
+            battery_display_started_at = now
         else:
             print(f"[battery trigger BOOT] {v_str} (battery - yellow flash)")
-            state.unavailable_flash_until = now + _UNAVAILABLE_FLASH_DURATION_S
-            state.unavailable_flash_started_at = now
+            unavailable_flash_until = now + _UNAVAILABLE_FLASH_DURATION_S
+            unavailable_flash_started_at = now
     elif button.short_count >= 3:
         # Triple-press toggles solo mode.
         now = time.monotonic()
-        state.solo_indicator_started_at = now
-        if state.solo_mode:
-            state.solo_mode = False
-            state.solo_state = None
-            state.solo_indicator_kind = "exit"
-            state.solo_indicator_until = now + _SOLO_INDICATOR_EXIT_S
+        solo_indicator_started_at = now
+        if solo_mode:
+            solo_mode = False
+            solo_state = None
+            solo_indicator_kind = "exit"
+            solo_indicator_until = now + _SOLO_INDICATOR_EXIT_S
             print("[solo] exiting")
         else:
-            state.solo_mode = True
-            state.solo_idx = -1
-            state.solo_state = None
-            state.solo_indicator_kind = "enter"
-            state.solo_indicator_until = now + _SOLO_INDICATOR_ENTER_S
+            solo_mode = True
+            solo_idx = -1  # forces a fresh pick on next render
+            solo_state = None
+            solo_indicator_kind = "enter"
+            solo_indicator_until = now + _SOLO_INDICATOR_ENTER_S
             print("[solo] entering")
-    elif button.short_count == 2 and state.solo_mode:
-        state.solo_state = None
+    elif button.short_count == 2 and solo_mode:
+        # Double-press in solo: skip to a new random showpiece.
+        solo_state = None  # next render block picks a new one
         print("[solo] skipping to next showpiece")
     elif button.short_count == 1:
-        state.brightness_idx[0] = (
-            (state.brightness_idx[0] + 1) % len(_BRIGHTNESS_PRESETS))
-        new_b = _BRIGHTNESS_PRESETS[state.brightness_idx[0]]
+        # Single press: cycle brightness preset.
+        brightness_idx[0] = (brightness_idx[0] + 1) % len(_BRIGHTNESS_PRESETS)
+        new_b = _BRIGHTNESS_PRESETS[brightness_idx[0]]
         pixels.set_brightness(new_b)
-        state.brightness_flash_until = (
-            time.monotonic() + _BRIGHTNESS_FLASH_DURATION_S)
-        state.brightness_flash_level = state.brightness_idx[0]
+        brightness_flash_until = time.monotonic() + _BRIGHTNESS_FLASH_DURATION_S
+        brightness_flash_level = brightness_idx[0]
 
+    # --- State update ---
+    if new_command is not None:
+        active_state, rssi, raw = new_command
+        active_started_at = time.monotonic()
+        _log_command(active_state["label"], rssi, raw)
 
-def _check_battery_log(state, batt):
-    '''Throttled battery voltage logger - one line per minute.'''
+    # --- Expiration check ---
+    if active_state is not None:
+        duration = active_state["duration_s"]
+        if duration is not None:
+            t = time.monotonic() - active_started_at
+            if t >= duration:
+                active_state = None
+
+    # --- Battery monitor ---
+    # update() internally throttles to every 5 seconds, so calling
+    # every frame is cheap. No state machine - we just keep a fresh
+    # voltage available for the on-demand display.
     batt.update()
+    # Log raw voltage occasionally to help tune thresholds
     now = time.monotonic()
     if (batt.voltage is not None
-            and now - state.last_battery_log >= _BATTERY_LOG_INTERVAL_S):
-        state.last_battery_log = now
+            and now - last_battery_log >= _BATTERY_LOG_INTERVAL_S):
+        last_battery_log = now
         level = _battery_level_match(batt.voltage)
         level_str = f"{level[0]} pixels" if level else "CRITICAL"
         print(f"[battery] raw={batt.voltage:.3f}V -> {level_str}")
 
-
-def _render_brightness_flash(zones, state, frame_t):
-    '''Brightness-cycle confirmation flash on the outer ring.'''
-    flash_t = (_BRIGHTNESS_FLASH_DURATION_S
-               - (state.brightness_flash_until - frame_t))
-    frac = flash_t / _BRIGHTNESS_FLASH_DURATION_S
-    if frac < 0.15:
-        envelope = frac / 0.15
-    elif frac < 0.65:
-        envelope = 1.0
-    else:
-        envelope = max(0.0, (1.0 - frac) / 0.35)
-    count = state.brightness_flash_level + 1
-    lit = (int(255 * envelope),) * 3
-    for zone in zones:
-        zone.set_led(0, (0, 0, 0))
-        for i in range(1, zone.count):
-            zone.set_led(i, lit if (i - 1) < count else (0, 0, 0))
-
-
-def _render_unavailable_flash(zones, state, frame_t):
-    '''Yellow center pulse - "plug in to check battery".'''
-    flash_t = frame_t - state.unavailable_flash_started_at
-    frac = flash_t / _UNAVAILABLE_FLASH_DURATION_S
-    envelope = (frac * 2) if frac < 0.5 else max(0.0, 2 * (1 - frac))
-    color = (int(_UNAVAILABLE_FLASH_COLOR[0] * envelope),
-             int(_UNAVAILABLE_FLASH_COLOR[1] * envelope),
-             int(_UNAVAILABLE_FLASH_COLOR[2] * envelope))
-    for zone in zones:
-        zone.set_led(0, color)
-        for i in range(1, zone.count):
-            zone.set_led(i, (0, 0, 0))
-
-
-def _render_active_state(zones, state, frame_t):
-    '''Render the currently active animation, with crash safety.'''
-    t = frame_t - state.active_started_at
-    try:
-        state.active_state["render"](zones, t)
-    except Exception as err:  # pylint: disable=broad-except
-        print(f"RENDER ERROR at t={t:.2f}s: "
-              f"{type(err).__name__}: {err}")
-        state.active_state = None
-        renderer.render_idle(zones)
-
-
-def _render_solo_cycle(zones, state, frame_t):
-    '''Render one frame of solo mode\'s curated showpiece reel.'''
-    if state.solo_state is None:
-        state.solo_idx = _pick_showpiece_idx(state.solo_idx)
-        state.solo_label, parsed = _SHOWPIECES[state.solo_idx]
-        state.solo_state = renderer.for_command(parsed)
-        state.solo_started_at = frame_t
-        print(f"[solo] now playing: {state.solo_label}")
-    duration = state.solo_state["duration_s"] or _SOLO_DEFAULT_DURATION_S
-    t = frame_t - state.solo_started_at
-    if t >= duration + _SOLO_BREATH_S:
-        state.solo_state = None
-        renderer.render_idle(zones)
-    elif t >= duration:
-        renderer.render_idle(zones)
-    else:
-        try:
-            state.solo_state["render"](zones, t)
-        except Exception as err:  # pylint: disable=broad-except
-            print(f"SOLO RENDER ERROR ({state.solo_label}) at "
-                  f"t={t:.2f}s: {type(err).__name__}: {err}")
-            state.solo_state = None
-            renderer.render_idle(zones)
-
-
-def _render_frame(zones, state, pixels):
-    '''Render one frame, picking the highest-priority active source.'''
+    # --- Render frame ---
     frame_t = time.monotonic()
-    if 0.0 < state.find_mode_until <= frame_t:
-        pixels.set_brightness(_BRIGHTNESS_PRESETS[state.brightness_idx[0]])
-        state.find_mode_until = 0.0
+    # Find Me beacon takes priority over EVERYTHING - including
+    # brightness flashes, animations, idle. Forces visibility for
+    # the full 30 seconds. When it ends, restore the user's
+    # brightness preset.
+    if 0.0 < find_mode_until <= frame_t:
+        # Animation just finished - restore user's brightness preset
+        pixels.set_brightness(_BRIGHTNESS_PRESETS[brightness_idx[0]])
+        find_mode_until = 0.0
         print("[find me] animation complete, brightness restored")
 
-    if frame_t < state.find_mode_until:
-        t = frame_t - state.find_mode_started_at
+    if frame_t < find_mode_until:
+        t = frame_t - find_mode_started_at
+        # Build a synthetic command dict to invoke the renderer
         find_state = renderer.for_command({"kind": "find_me"})
         if find_state is not None:
             find_state["render"](zones, t)
-    elif frame_t < state.solo_indicator_until:
-        t = frame_t - state.solo_indicator_started_at
-        if state.solo_indicator_kind == "enter":
+    elif frame_t < solo_indicator_until:
+        # Solo enter (white burst) or exit (cool blue pulse). Sized
+        # to read clearly on camera for B-roll of the toggle moment.
+        t = frame_t - solo_indicator_started_at
+        if solo_indicator_kind == "enter":
             _render_solo_enter(zones, t)
         else:
             _render_solo_exit(zones, t)
-    elif frame_t < state.brightness_flash_until:
-        _render_brightness_flash(zones, state, frame_t)
-    elif frame_t < state.unavailable_flash_until:
-        _render_unavailable_flash(zones, state, frame_t)
-    elif frame_t < state.battery_display_until:
-        t = frame_t - state.battery_display_started_at
-        _render_battery_display(zones, state.battery_display_voltage, t)
-    elif state.active_state is not None:
-        _render_active_state(zones, state, frame_t)
-    elif state.solo_mode:
-        _render_solo_cycle(zones, state, frame_t)
+    elif frame_t < brightness_flash_until:
+        flash_t = _BRIGHTNESS_FLASH_DURATION_S - (brightness_flash_until - frame_t)
+        frac = flash_t / _BRIGHTNESS_FLASH_DURATION_S
+        if frac < 0.15:
+            envelope = frac / 0.15
+        elif frac < 0.65:
+            envelope = 1.0
+        else:
+            envelope = max(0.0, (1.0 - frac) / 0.35)
+        count = brightness_flash_level + 1
+        lit = (int(255 * envelope),) * 3
+        for zone in zones:
+            zone.set_led(0, (0, 0, 0))
+            for i in range(1, zone.count):
+                ring_idx = i - 1
+                if ring_idx < count:
+                    zone.set_led(i, lit)
+                else:
+                    zone.set_led(i, (0, 0, 0))
+    elif frame_t < unavailable_flash_until:
+        # Brief yellow center pulse - "plug in to check battery"
+        # Yellow uses both R and G channels heavily, which keeps it
+        # readable even if WS2812 timing corrupts on battery.
+        flash_t = frame_t - unavailable_flash_started_at
+        frac = flash_t / _UNAVAILABLE_FLASH_DURATION_S
+        # Triangle envelope: ramp up first half, ramp down second
+        envelope = (frac * 2) if frac < 0.5 else max(0.0, 2 * (1 - frac))
+        c = _UNAVAILABLE_FLASH_COLOR
+        color = (int(c[0] * envelope),
+                 int(c[1] * envelope),
+                 int(c[2] * envelope))
+        for zone in zones:
+            zone.set_led(0, color)
+            for i in range(1, zone.count):
+                zone.set_led(i, (0, 0, 0))
+    elif frame_t < battery_display_until:
+        t = frame_t - battery_display_started_at
+        _render_battery_display(zones, battery_display_voltage, t)
+    elif active_state is not None:
+        t = frame_t - active_started_at
+        try:
+            active_state["render"](zones, t)
+        except Exception as err:  # pylint: disable=broad-except
+            print(f"RENDER ERROR at t={t:.2f}s: "
+                  f"{type(err).__name__}: {err}")
+            active_state = None
+            renderer.render_idle(zones)
+    elif solo_mode:
+        # Cycle through curated showpieces. A real BLE packet sets
+        # active_state above this branch and preempts solo cleanly;
+        # solo resumes (with a fresh pick) once the BLE animation
+        # ends, so park interaction works without manual toggling.
+        if solo_state is None:
+            solo_idx = _pick_showpiece_idx(solo_idx)
+            solo_label, parsed = _SHOWPIECES[solo_idx]
+            solo_state = renderer.for_command(parsed)
+            solo_started_at = frame_t
+            print(f"[solo] now playing: {solo_label}")
+        duration = solo_state["duration_s"] or _SOLO_DEFAULT_DURATION_S
+        t = frame_t - solo_started_at
+        if t >= duration + _SOLO_BREATH_S:
+            # Showpiece + breath gap done; clear so next frame picks.
+            solo_state = None
+            renderer.render_idle(zones)
+        elif t >= duration:
+            # In the breath gap between showpieces.
+            renderer.render_idle(zones)
+        else:
+            try:
+                solo_state["render"](zones, t)
+            except Exception as err:  # pylint: disable=broad-except
+                print(f"SOLO RENDER ERROR ({solo_label}) at "
+                      f"t={t:.2f}s: {type(err).__name__}: {err}")
+                solo_state = None
+                renderer.render_idle(zones)
     else:
         renderer.render_idle(zones)
+    pixels.show()
 
-
-def main():
-    # pylint: disable=too-many-locals,too-many-branches,too-many-statements
-    '''Receiver main loop. See README "code.py size constraint" for
-    why the lint disables above are required - exceeding ~32.5KB
-    breaks _bleio init on QT Py S3 with CP 10.1.4 (bisected).
-    '''
-    print("MagicBand+ BLE Beacon Ears")
-    print(f"Rendering on {'onboard NeoPixel' if _USE_ONBOARD else 'stereo Jewels'}")
-    print(f"BLE scan: window={_SCAN_WINDOW_S * 1000:.0f}ms"
-          f"  interval={_SCAN_INTERVAL_S * 1000:.0f}ms")
-    print("-" * 60)
-
-    if _USE_ONBOARD:
-        pixels = pixel_zones.OnboardSingle(brightness=0.2)
-    else:
-        pixels = pixel_zones.StereoJewels(
-            left_pin=board.A1, right_pin=board.A3,
-            brightness=_BRIGHTNESS_PRESETS[0])
-    zones = pixels.make_zones()
-
-    adapter = _bleio.adapter
-    if not adapter.enabled:
-        adapter.enabled = True
-
-    batt = battery_mod.BatteryMonitor()
-
-    button_pin = digitalio.DigitalInOut(board.BUTTON)
-    button_pin.switch_to_input(pull=digitalio.Pull.UP)
-    button = Button(button_pin, value_when_pressed=False,
-                    short_duration_ms=_BUTTON_SHORT_MS,
-                    long_duration_ms=_BUTTON_LONG_MS)
-
-    state = _RuntimeState()
-
-    while True:
-        frame_start = time.monotonic()
-
-        # --- BLE scan (still inline; Stages E and F will refactor) ---
-        new_command = None
-        try:
-            for entry in adapter.start_scan(
-                    interval=_SCAN_INTERVAL_S, window=_SCAN_WINDOW_S,
-                    minimum_rssi=_MIN_RSSI,
-                    timeout=_SCAN_WINDOW_S,
-                    extended=False, active=False):
-                payload = _extract_disney_payload(entry.advertisement_bytes)
-                if payload is None:
-                    continue
-                if not payload:
-                    continue
-                if _is_remote_brightness_trigger(payload):
-                    now = time.monotonic()
-                    if now - state.last_trigger_time < _TRIGGER_COOLDOWN_S:
-                        continue
-                    state.last_trigger_time = now
-                    state.brightness_idx[0] = (
-                        (state.brightness_idx[0] + 1) % len(_BRIGHTNESS_PRESETS))
-                    new_b = _BRIGHTNESS_PRESETS[state.brightness_idx[0]]
-                    pixels.set_brightness(new_b)
-                    state.brightness_flash_until = now + _BRIGHTNESS_FLASH_DURATION_S
-                    state.brightness_flash_level = state.brightness_idx[0]
-                    continue
-                if _is_remote_battery_trigger(payload):
-                    now = time.monotonic()
-                    if now - state.last_trigger_time < _TRIGGER_COOLDOWN_S:
-                        continue
-                    state.last_trigger_time = now
-                    batt.update(force=True)
-                    state.battery_display_voltage = batt.voltage
-                    v_str = (f"{state.battery_display_voltage:.3f}V"
-                             if state.battery_display_voltage is not None else "None")
-                    if (state.battery_display_voltage is not None
-                            and state.battery_display_voltage > _USB_PRESENT_V_RAW):
-                        print(f"[battery trigger remote] {v_str} (USB - showing display)")
-                        state.battery_display_until = now + _BATTERY_DISPLAY_DURATION_S
-                        state.battery_display_started_at = now
-                    else:
-                        print(f"[battery trigger remote] {v_str} (battery - yellow flash)")
-                        state.unavailable_flash_until = now + _UNAVAILABLE_FLASH_DURATION_S
-                        state.unavailable_flash_started_at = now
-                    continue
-                if _is_remote_find_trigger(payload):
-                    now = time.monotonic()
-                    if now - state.last_trigger_time < _TRIGGER_COOLDOWN_S:
-                        continue
-                    state.last_trigger_time = now
-                    print("[find me] starting high-visibility animation")
-                    pixels.set_brightness(1.0)
-                    state.find_mode_until = now + renderer.FIND_MODE_DURATION_S
-                    state.find_mode_started_at = now
-                    continue
-                if _is_remote_statue_trigger(payload):
-                    now = time.monotonic()
-                    if now - state.last_trigger_time < _TRIGGER_COOLDOWN_S:
-                        continue
-                    state.last_trigger_time = now
-                    print("[statue preview] firing golden swirl")
-                    fake_statue_cmd = {
-                        "kind": "statue_beacon",
-                        "statue_id": "PV",
-                        "raw": bytes(payload),
-                    }
-                    candidate = renderer.for_command(fake_statue_cmd)
-                    if candidate is not None:
-                        new_command = (candidate, entry.rssi, bytes(payload))
-                    continue
-                is_mb = payload[0] in (0xE1, 0xE2, 0xCC)
-                is_wand = magicband_protocol.is_wand_packet(payload)
-                is_statue = (payload[0] == 0xC4 and len(payload) in (18, 23))
-                if not (is_mb or is_wand or is_statue):
-                    continue
-                now = time.monotonic()
-                if is_statue:
-                    if now - state.last_statue_trigger < _STATUE_COOLDOWN_S:
-                        continue
-                    state.last_statue_trigger = now
-                else:
-                    if (payload == state.last_payload
-                            and now - state.last_payload_at < _DEDUP_WINDOW_S):
-                        continue
-                    state.last_payload = payload
-                    state.last_payload_at = now
-                parsed = magicband_protocol.parse(payload)
-                candidate = renderer.for_command(parsed)
-                if candidate is not None:
-                    new_command = (candidate, entry.rssi, payload)
-        finally:
-            adapter.stop_scan()
-
-        # --- Helpers extracted in Stage D ---
-        _handle_button(state, button, batt, pixels)
-
-        if new_command is not None:
-            state.active_state, rssi, raw = new_command
-            state.active_started_at = time.monotonic()
-            _log_command(state.active_state["label"], rssi, raw)
-
-        if state.active_state is not None:
-            duration = state.active_state["duration_s"]
-            if duration is not None:
-                if time.monotonic() - state.active_started_at >= duration:
-                    state.active_state = None
-
-        _check_battery_log(state, batt)
-        _render_frame(zones, state, pixels)
-        pixels.show()
-
-        elapsed = time.monotonic() - frame_start
-        remaining = _FRAME_BUDGET_S - elapsed
-        if remaining > 0:
-            time.sleep(remaining)
-
-
-main()
+    elapsed = time.monotonic() - frame_start
+    remaining = _FRAME_BUDGET_S - elapsed
+    if remaining > 0:
+        time.sleep(remaining)
