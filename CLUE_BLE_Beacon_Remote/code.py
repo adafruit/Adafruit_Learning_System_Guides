@@ -42,18 +42,18 @@ _PALETTE = command_library.CATEGORIES
 _CHIME = ((523, 0.08), (659, 0.08), (784, 0.14))
 
 # Direct hardware access - skips loading adafruit_clue's full sensor suite.
-_i2c = board.I2C()
+i2c = board.I2C()
 try:
     from adafruit_lsm6ds.lsm6ds33 import LSM6DS33
-    _accel = LSM6DS33(_i2c)
+    accel = LSM6DS33(i2c)
 except (OSError, RuntimeError, ImportError):
     from adafruit_lsm6ds.lsm6ds3trc import LSM6DS3TRC
-    _accel = LSM6DS3TRC(_i2c)
+    accel = LSM6DS3TRC(i2c)
 
-_display = board.DISPLAY
-_DISPLAY_ACTIVE_BRIGHTNESS = 0.8
-_DISPLAY_SLEEP_TIMEOUT_S = 30.0  # sleep TFT backlight after this many idle seconds
-_display.brightness = _DISPLAY_ACTIVE_BRIGHTNESS
+display = board.DISPLAY
+DISPLAY_ACTIVE_BRIGHTNESS = 0.8
+DISPLAY_SLEEP_TIMEOUT_S = 30.0  # sleep TFT backlight after this many idle seconds
+display.brightness = DISPLAY_ACTIVE_BRIGHTNESS
 
 # Battery voltage monitoring intentionally not implemented on the CLUE.
 # Unlike the Feather Sense which has a hardwired voltage divider from the
@@ -63,16 +63,16 @@ _display.brightness = _DISPLAY_ACTIVE_BRIGHTNESS
 # For power awareness, rely on the display auto-sleep feature which is the
 # larger power saver anyway (~25-35mA savings when backlight is off).
 
-_pixel = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.3)
-_pixel.fill((0, 0, 0))
+pixel = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.3)
+pixel.fill((0, 0, 0))
 
 # PWM-driven speaker avoids per-note audio buffer allocations.
-_speaker = pwmio.PWMOut(board.SPEAKER, variable_frequency=True, duty_cycle=0)
+speaker = pwmio.PWMOut(board.SPEAKER, variable_frequency=True, duty_cycle=0)
 
-_btn_a_io = digitalio.DigitalInOut(board.BUTTON_A)
-_btn_a_io.switch_to_input(pull=digitalio.Pull.UP)
-_btn_b_io = digitalio.DigitalInOut(board.BUTTON_B)
-_btn_b_io.switch_to_input(pull=digitalio.Pull.UP)
+btn_a_io = digitalio.DigitalInOut(board.BUTTON_A)
+btn_a_io.switch_to_input(pull=digitalio.Pull.UP)
+btn_b_io = digitalio.DigitalInOut(board.BUTTON_B)
+btn_b_io.switch_to_input(pull=digitalio.Pull.UP)
 
 gc.collect()
 
@@ -81,11 +81,11 @@ list_view = ui.ListView()
 confirm_view = ui.ConfirmView()
 listen_view = ui.ListenView()
 
-_display.root_group = grid_view.group
+display.root_group = grid_view.group
 
-button_a = Button(_btn_a_io, value_when_pressed=False,
+button_a = Button(btn_a_io, value_when_pressed=False,
                   short_duration_ms=250, long_duration_ms=600)
-button_b = Button(_btn_b_io, value_when_pressed=False,
+button_b = Button(btn_b_io, value_when_pressed=False,
                   short_duration_ms=250, long_duration_ms=600)
 
 
@@ -97,17 +97,17 @@ def play_chime():
     if _silent_mode[0]:
         return
     for freq, dur in _CHIME:
-        _speaker.frequency = int(freq)
-        _speaker.duty_cycle = 0x8000
+        speaker.frequency = int(freq)
+        speaker.duty_cycle = 0x8000
         time.sleep(dur)
-        _speaker.duty_cycle = 0
+        speaker.duty_cycle = 0
 
 
 def pulse_pixel_and_fire(payload, display_color=(80, 0, 160)):
     '''Light the onboard NeoPixel while broadcasting, then fade.'''
-    _pixel.fill(display_color)
+    pixel.fill(display_color)
     ble_transmitter.broadcast(payload)
-    _pixel.fill((0, 0, 0))
+    pixel.fill((0, 0, 0))
 
 
 def fire_command(command, status_setter):
@@ -131,7 +131,7 @@ def fire_command(command, status_setter):
         status_setter(f"Firing: {name}", 0x00FF00)
         play_chime()
         if needs_ping:
-            _pixel.fill((30, 30, 30))
+            pixel.fill((30, 30, 30))
             ble_transmitter.broadcast(
                 command_library.PING_PAYLOAD, duration=0.5,
             )
@@ -140,7 +140,7 @@ def fire_command(command, status_setter):
         status_setter(f"Playing: {name}", 0x00FFFF)
         play_chime()
         if needs_ping:
-            _pixel.fill((30, 30, 30))
+            pixel.fill((30, 30, 30))
             ble_transmitter.broadcast(
                 command_library.PING_PAYLOAD, duration=0.5,
             )
@@ -148,9 +148,9 @@ def fire_command(command, status_setter):
         for i, step in enumerate(payload):
             step_bytes, hold, color = step
             status_setter(f"{name}  {i + 1}/{total}", 0x00FFFF)
-            _pixel.fill(color)
+            pixel.fill(color)
             ble_transmitter.broadcast(step_bytes, duration=hold)
-        _pixel.fill((0, 0, 0))
+        pixel.fill((0, 0, 0))
     status_setter("Ready", 0x404040)
 
 
@@ -220,26 +220,17 @@ def _save_capture_with_fallback(seen, elapsed):
 
 
 def _wait_for_dismiss_press():
-    '''Wait for B-release then a fresh B-press to dismiss save confirm.
+    '''Wait for the next short B-press to dismiss the save confirmation.
 
-    Polls the raw debounced .value rather than waiting for short_count
-    so dismissal feels instant. button_b.value reflects the LAST debounced
-    state, so update() must be called each loop iteration.
+    The user was holding B to stop capture, so adafruit_debouncer.Button
+    has already emitted a long_press for that hold. We just need to wait
+    for the next short_count tick - the debouncer handles release-detect
+    and debounce timing internally.
     '''
-    # First: wait for release (B may still be held from the long-press
-    # that ended capture).
     while True:
         button_b.update()
-        if button_b.value:  # True = not pressed (active-low)
-            break
-        time.sleep(0.05)
-    time.sleep(0.1)  # debounce gap
-    # Then: wait for next fresh press.
-    while True:
-        button_b.update()
-        if not button_b.value:
-            break
-        time.sleep(0.05)
+        if button_b.short_count > 0:
+            return
 
 
 def run_listen_mode():
@@ -250,7 +241,7 @@ def run_listen_mode():
     '''
     # Aggressively free memory before allocating capture state.
     gc.collect()
-    _display.root_group = listen_view.group
+    display.root_group = listen_view.group
     note_activity()
     if supervisor.runtime.usb_connected:
         listen_view.set_status("USB - hold B to stop", 0xFF8000)
@@ -323,9 +314,9 @@ def fire_off(status_setter):
     gc.collect()
     status_setter("Off", 0xFF4040)
     play_chime()
-    _pixel.fill((40, 40, 40))
+    pixel.fill((40, 40, 40))
     ble_transmitter.broadcast(payload, duration=1.5)
-    _pixel.fill((0, 0, 0))
+    pixel.fill((0, 0, 0))
     status_setter("Ready", 0x404040)
 
 
@@ -369,36 +360,20 @@ def toggle_silent(status_setter):
 
 # --- Display sleep management ---
 # When no buttons have been pressed or commands fired within
-# _DISPLAY_SLEEP_TIMEOUT_S, the TFT backlight turns off to save power.
+# DISPLAY_SLEEP_TIMEOUT_S, the TFT backlight turns off to save power.
 # Any button press wakes it immediately.
 #
 # Primary mechanism: display.brightness = 0.0, which on the CLUE drives
 # the backlight PWM pin to 0% duty cycle.
-# Fallback: directly drive board.TFT_LITE low via digitalio if the
-# brightness property doesn't fully kill the backlight.
 _last_activity_time = [time.monotonic()]
 _display_sleeping = [False]
-
-# Try to grab a direct handle to the backlight pin as a fallback. The
-# main display object has this pin claimed, so this may fail with
-# ValueError - that's fine, we fall back to display.brightness only.
-_backlight_pin = None
-try:
-    _backlight_pin = digitalio.DigitalInOut(board.TFT_LITE)
-    _backlight_pin.switch_to_output(value=True)
-except (AttributeError, ValueError, RuntimeError):
-    # Display module has claimed TFT_LITE - fine, we'll use
-    # display.brightness alone to control the backlight.
-    pass
 
 
 def note_activity():
     '''Mark the current moment as user-active - wake display if sleeping.'''
     _last_activity_time[0] = time.monotonic()
     if _display_sleeping[0]:
-        if _backlight_pin is not None:
-            _backlight_pin.value = True
-        _display.brightness = _DISPLAY_ACTIVE_BRIGHTNESS
+        display.brightness = DISPLAY_ACTIVE_BRIGHTNESS
         _display_sleeping[0] = False
         print(f"[DISPLAY] wake at t={time.monotonic():.1f}s")
 
@@ -408,10 +383,8 @@ def check_display_sleep():
     if _display_sleeping[0]:
         return
     idle_s = time.monotonic() - _last_activity_time[0]
-    if idle_s >= _DISPLAY_SLEEP_TIMEOUT_S:
-        _display.brightness = 0.0
-        if _backlight_pin is not None:
-            _backlight_pin.value = False
+    if idle_s >= DISPLAY_SLEEP_TIMEOUT_S:
+        display.brightness = 0.0
         _display_sleeping[0] = True
         print(f"[DISPLAY] sleep at t={time.monotonic():.1f}s"
               f" (idle for {idle_s:.0f}s)")
@@ -433,20 +406,18 @@ def enter_light_sleep():
     reassignment which complicates the function signature).
     '''
     # Fade out chime speaker if it was running (shouldn't be, but safe)
-    _speaker.duty_cycle = 0
+    speaker.duty_cycle = 0
     # Turn off onboard status pixel
-    _pixel.fill((0, 0, 0))
+    pixel.fill((0, 0, 0))
     # Turn off display backlight
-    if _backlight_pin is not None:
-        _backlight_pin.value = False
-    _display.brightness = 0.0
+    display.brightness = 0.0
 
     # Release the digital pins before setting up PinAlarm on the same
     # pins. The adafruit_debouncer.Button wrapper doesn't have deinit()
     # itself - we only need to release the underlying DigitalInOut
-    # objects (_btn_a_io and _btn_b_io).
-    _btn_a_io.deinit()
-    _btn_b_io.deinit()
+    # objects (btn_a_io and btn_b_io).
+    btn_a_io.deinit()
+    btn_b_io.deinit()
 
     # Wait for both buttons to actually be released before arming the
     # PinAlarms. Without this pause, the still-held state of the triggering
@@ -504,7 +475,7 @@ def pick_random_command():
 
 def shake_magnitude():
     '''Return the current accelerometer magnitude in m/s^2.'''
-    a_x, a_y, a_z = _accel.acceleration
+    a_x, a_y, a_z = accel.acceleration
     return (a_x * a_x + a_y * a_y + a_z * a_z) ** 0.5
 
 
@@ -513,18 +484,18 @@ def enter_list(cat_idx):
     gc.collect()
     name, commands = _PALETTE[cat_idx]
     list_view.load_category(cat_idx, name, commands)
-    _display.root_group = list_view.group
+    display.root_group = list_view.group
 
 
 def enter_grid():
     '''Switch back to the grid view.'''
-    _display.root_group = grid_view.group
+    display.root_group = grid_view.group
 
 
 def enter_confirm(name):
     '''Switch to the confirm modal for a random-picked command.'''
     confirm_view.set_command(name)
-    _display.root_group = confirm_view.group
+    display.root_group = confirm_view.group
 
 
 def handle_grid(last_shake_time):
@@ -597,16 +568,16 @@ def handle_confirm(pending, return_state, last_shake_time):
     if button_a.short_count == 2:
         setter = list_view.set_status if return_state == _STATE_LIST else grid_view.set_status
         if return_state == _STATE_LIST:
-            _display.root_group = list_view.group
+            display.root_group = list_view.group
         else:
-            _display.root_group = grid_view.group
+            display.root_group = grid_view.group
         fire_command(pending, setter)
         return return_state, last_shake_time, None, None
     if button_b.short_count == 1:
         if return_state == _STATE_LIST:
-            _display.root_group = list_view.group
+            display.root_group = list_view.group
         else:
-            _display.root_group = grid_view.group
+            display.root_group = grid_view.group
         return return_state, last_shake_time, None, None
     return _STATE_CONFIRM, last_shake_time, pending, return_state
 
@@ -648,18 +619,16 @@ while True:
             enter_light_sleep()
             # After wake, the button IO pins were deinit'd for PinAlarm
             # and need to be re-established for normal polling.
-            _btn_a_io = digitalio.DigitalInOut(board.BUTTON_A)
-            _btn_a_io.switch_to_input(pull=digitalio.Pull.UP)
-            _btn_b_io = digitalio.DigitalInOut(board.BUTTON_B)
-            _btn_b_io.switch_to_input(pull=digitalio.Pull.UP)
-            button_a = Button(_btn_a_io, value_when_pressed=False,
+            btn_a_io = digitalio.DigitalInOut(board.BUTTON_A)
+            btn_a_io.switch_to_input(pull=digitalio.Pull.UP)
+            btn_b_io = digitalio.DigitalInOut(board.BUTTON_B)
+            btn_b_io.switch_to_input(pull=digitalio.Pull.UP)
+            button_a = Button(btn_a_io, value_when_pressed=False,
                               short_duration_ms=200, long_duration_ms=800)
-            button_b = Button(_btn_b_io, value_when_pressed=False,
+            button_b = Button(btn_b_io, value_when_pressed=False,
                               short_duration_ms=200, long_duration_ms=800)
             # Restore the display and reset activity timer
-            _display.brightness = _DISPLAY_ACTIVE_BRIGHTNESS
-            if _backlight_pin is not None:
-                _backlight_pin.value = True
+            display.brightness = DISPLAY_ACTIVE_BRIGHTNESS
             _last_activity_time[0] = time.monotonic()
             _display_sleeping[0] = False
             grid_view.set_status("Awake!", 0x40C0FF)
