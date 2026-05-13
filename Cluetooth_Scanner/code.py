@@ -468,7 +468,7 @@ def parse_service_uuids(data_dict):
                 svc_label = svc_name if svc_name else "(proprietary)"
                 if svc_label not in results:
                     results.append(svc_label)
-    except Exception:
+    except Exception:  # pylint: disable=broad-except
         pass
     return results
 
@@ -637,25 +637,25 @@ def do_scan():
             addr_str = clean_addr(entry.address)
             try:
                 name = entry.complete_name or entry.short_name or ""
-            except Exception:
+            except Exception:  # pylint: disable=broad-except
                 name = ""
             # Pull all fields from data_dict directly
             dd = entry.data_dict
             try:
                 msd = parse_mfr_data(dd)
-            except Exception:
+            except Exception:  # pylint: disable=broad-except
                 msd = None
             try:
                 svcs = parse_service_uuids(dd)
-            except Exception:
+            except Exception:  # pylint: disable=broad-except
                 svcs = []
             try:
                 appearance = parse_appearance(dd)
-            except Exception:
+            except Exception:  # pylint: disable=broad-except
                 appearance = None
             try:
                 svc_data = parse_svc_data(dd)
-            except Exception:
+            except Exception:  # pylint: disable=broad-except
                 svc_data = None
             if addr_str not in devices:
                 if len(devices) >= MAX_DEVICES:
@@ -684,11 +684,11 @@ def do_scan():
                 if svc_data:
                     dev["svc_data"] = svc_data
         ble.stop_scan()
-    except Exception as e:
+    except Exception as e:  # pylint: disable=broad-except
         print("scan error:", e)
         try:
             ble.stop_scan()
-        except Exception:
+        except Exception:  # pylint: disable=broad-except
             pass
 
     # Prune devices not seen in the last 3 scan cycles
