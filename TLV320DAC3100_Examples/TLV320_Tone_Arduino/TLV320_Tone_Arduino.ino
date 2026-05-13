@@ -10,9 +10,10 @@
 
 Adafruit_TLV320DAC3100 codec;  // Create codec object
 
-#define pBCLK D9   // BITCLOCK - I2S clock
-#define pWS   D10  // LRCLOCK - Word select
-#define pDOUT D11  // DATA - I2S data
+#define pBCLK  D9   // BITCLOCK - I2S clock
+#define pWS    D10  // LRCLOCK - Word select
+#define pDOUT  D11  // DATA - I2S data
+#define pRESET 7    // RST - hardware reset (required for Pico 2W / RP2350)
 
 // Create I2S port
 I2S i2s(OUTPUT);
@@ -31,6 +32,14 @@ void setup() {
   
   while (!Serial) delay(10);
   Serial.println("\n\nTLV320DAC3100 Sine Tone Test");
+
+  // Hardware reset - required for Pico 2W (RP2350), harmless on Pico (RP2040)
+  pinMode(pRESET, OUTPUT);
+  digitalWrite(pRESET, LOW);
+  delay(100);
+  digitalWrite(pRESET, HIGH);
+  delay(100);
+
   // Start I2C communication with codec
   Serial.println("Initializing codec...");
   if (!codec.begin()) {
@@ -92,7 +101,7 @@ void setup() {
       !codec.setChannelVolume(true, 18)) {         // Right DAC +0dB
     Serial.println("Failed to configure DAC volume control!");
   }
-  
+
 
   if (!codec.setChannelVolume(false, 12.0) ||
       !codec.setChannelVolume(true, 12.0)) {
@@ -105,6 +114,13 @@ void setup() {
       !codec.setSPKVolume(true, 0)) { // Enable and set volume to 0dB
     Serial.println("Failed to configure speaker output!");
   }
+
+  // Headphone output
+  codec.configureHeadphoneDriver(true, true, TLV320_HP_COMMON_1_35V, false);
+  codec.setHPLVolume(true, 0);
+  codec.setHPRVolume(true, 0);
+  codec.configureHPL_PGA(9, true);
+  codec.configureHPR_PGA(9, true);
 
   // Initialize I2S peripheral
   Serial.println("Initializing I2S...");
