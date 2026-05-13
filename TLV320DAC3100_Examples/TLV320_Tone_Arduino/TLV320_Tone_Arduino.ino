@@ -101,7 +101,7 @@ void setup() {
       !codec.setChannelVolume(true, 18)) {         // Right DAC +0dB
     Serial.println("Failed to configure DAC volume control!");
   }
-  
+
 
   if (!codec.setChannelVolume(false, 12.0) ||
       !codec.setChannelVolume(true, 12.0)) {
@@ -115,12 +115,12 @@ void setup() {
     Serial.println("Failed to configure speaker output!");
   }
 
-  // Uncomment to use headphone output instead of (or in addition to) speaker
-  // codec.configureHeadphoneDriver(true, true, TLV320_HP_COMMON_1_35V, false);
-  // codec.setHPLVolume(true, 0);
-  // codec.setHPRVolume(true, 0);
-  // codec.configureHPL_PGA(9, true);
-  // codec.configureHPR_PGA(9, true);
+  // Headphone output
+  codec.configureHeadphoneDriver(true, true, TLV320_HP_COMMON_1_35V, false);
+  codec.setHPLVolume(true, 0);
+  codec.setHPRVolume(true, 0);
+  codec.configureHPL_PGA(9, true);
+  codec.configureHPR_PGA(9, true);
 
   // Initialize I2S peripheral
   Serial.println("Initializing I2S...");
