@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2026 Tim Cocks for Adafruit Industries
+# SPDX-License-Identifier: MIT
 import array
 import os
 import time

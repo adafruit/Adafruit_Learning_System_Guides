@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-FileCopyrightText: 2026 Tim Cocks for Adafruit Industries
+# SPDX-License-Identifier: MIT
 """CLI for sending commands to an MCU over Adafruit IO MQTT or HTTP and waiting for an ack."""
 
 import argparse
