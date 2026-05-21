@@ -60,7 +60,9 @@ def parse_arguments(raw_args):
     result = {}
     for item in raw_args:
         if "=" not in item:
-            raise argparse.ArgumentTypeError(f"Argument must be key=value format, got: {item!r}")
+            raise argparse.ArgumentTypeError(
+                f"Argument must be key=value format, got: {item!r}"
+            )
         key, _, raw_value = item.partition("=")
         if raw_value.startswith("0x") or raw_value.startswith("0X"):
             try:
@@ -71,7 +73,7 @@ def parse_arguments(raw_args):
             try:
                 value = json.loads(raw_value)
             except json.JSONDecodeError:
-                value = raw_value.encode('raw_unicode_escape').decode('unicode_escape')
+                value = raw_value.encode("raw_unicode_escape").decode("unicode_escape")
         result[key] = value
     return result
 
@@ -189,10 +191,7 @@ def send_via_aio(aio_username, aio_key, payload, command_uuid, timeout, log):
         for msg in data.get("messages", []):
             metadata = msg.get("metadata", {})
             command = msg.get("command", {})
-            if (
-                metadata.get("type") == "ack"
-                and command.get("uuid") == state["uuid"]
-            ):
+            if metadata.get("type") == "ack" and command.get("uuid") == state["uuid"]:
                 state["status"] = "received"
                 state["response"] = msg
                 return
@@ -225,10 +224,7 @@ def send_via_aio(aio_username, aio_key, payload, command_uuid, timeout, log):
     while time.monotonic() - start < timeout and state["status"] == "waiting":
         io_rx.loop()
 
-    try:
-        io_rx.disconnect()
-    except Exception:
-        pass
+    io_rx.disconnect()
 
     if state["status"] == "received":
         return state["response"]
