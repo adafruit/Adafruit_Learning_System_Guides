@@ -57,6 +57,26 @@ def normalized_rms(values):
     return math.sqrt(samples_sum / len(values))
 
 
+def _message_is_command(message_obj):
+    return (
+        "metadata" in message_obj
+        and "type" in message_obj["metadata"]
+        and message_obj["metadata"]["type"] == "command"
+        and "command" in message_obj
+    )
+
+
+def _average_acceleration(sensor, n):
+    """Take N readings from the accelerometer and return the average x, y, z values."""
+    sum_x = sum_y = sum_z = 0
+    for _ in range(n):
+        x, y, z = sensor.acceleration
+        sum_x += x
+        sum_y += y
+        sum_z += z
+    return sum_x / n, sum_y / n, sum_z / n
+
+
 class EmbodimentMessageHandler:
     def __init__(self, config):
         self.display = config["display"]
@@ -104,7 +124,9 @@ class EmbodimentMessageHandler:
             elif sensor_config["type"] == "lux":
                 self.lux_sensor = sensor_config["sensor"]
 
-    def _display_face(self, face_options, background_color):
+    def _display_face(
+        self, face_options, background_color
+    ):  # pylint: disable=too-many-locals
         while len(self.face_group) > 1:
             _ = self.face_group.pop()
 
@@ -167,16 +189,8 @@ class EmbodimentMessageHandler:
 
         self.face_bg_palette[0] = background_color
 
-    def _message_is_command(self, message_obj):
-        return (
-            "metadata" in message_obj
-            and "type" in message_obj["metadata"]
-            and message_obj["metadata"]["type"] == "command"
-            and "command" in message_obj
-        )
-
     def handle_message(self, message_obj):
-        if self._message_is_command(message_obj):
+        if _message_is_command(message_obj):
             return self._do_command(message_obj["command"])
         return None
 
@@ -245,13 +259,13 @@ class EmbodimentMessageHandler:
             return self._create_ack(command_obj, _proof)
 
         elif command == "vibrate":
-            _x, _y, _z = self._average_acceleration(self.accelerometer, 100)
+            _x, _y, _z = _average_acceleration(self.accelerometer, 100)
             _proof = {
                 "idle_z_acceleration": _z,
             }
             self.vibration_driver.play()
             time.sleep(0.25)
-            _x, _y, _z = self._average_acceleration(self.accelerometer, 100)
+            _x, _y, _z = _average_acceleration(self.accelerometer, 100)
             _proof["vibrating_z_acceleration"] = _z
             time.sleep(0.5)
             self.vibration_driver.stop()
@@ -346,7 +360,7 @@ class EmbodimentMessageHandler:
                 else:
                     _data[_type] = getattr(_sensor, _sensor_config["property"])
             elif _type == "accelerometer":
-                _x, _y, _z = self._average_acceleration(self.accelerometer, 10)
+                _x, _y, _z = _average_acceleration(self.accelerometer, 10)
                 _data[_type] = f"x={_x}, y={_y}, z={_z}"
             elif _type == "pdm_mic":
                 _sensor.record(self._samples, len(self._samples))
@@ -361,13 +375,3 @@ class EmbodimentMessageHandler:
     def _get_sound_level(self):
         self.mic.record(self._samples, len(self._samples))
         return normalized_rms(self._samples)
-
-    def _average_acceleration(self, sensor, n):
-        """Take N readings from the accelerometer and return the average x, y, z values."""
-        sum_x = sum_y = sum_z = 0
-        for _ in range(n):
-            x, y, z = sensor.acceleration
-            sum_x += x
-            sum_y += y
-            sum_z += z
-        return sum_x / n, sum_y / n, sum_z / n

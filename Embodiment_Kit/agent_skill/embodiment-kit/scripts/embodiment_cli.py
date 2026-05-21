@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 """CLI for sending commands to an MCU over Adafruit IO MQTT or HTTP and waiting for an ack."""
 
+# pylint: disable=import-outside-toplevel, too-many-locals, too-many-return-statements
 import argparse
 import json
 import os
@@ -164,6 +165,8 @@ def send_via_aio(aio_username, aio_key, payload, command_uuid, timeout, log):
     socket_pool = adafruit_connection_manager.get_radio_socketpool(radio)
     ssl_context = adafruit_connection_manager.get_radio_ssl_context(radio)
 
+    # pylint: disable=unused-argument
+    # The arguments aren't used, but omitting them causes exception from MQTT library
     def on_connect(client):
         client.subscribe(RX_FEED)
 
