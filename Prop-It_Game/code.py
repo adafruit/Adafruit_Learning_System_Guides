@@ -60,11 +60,16 @@ def get_slider_zone(): # helper for slider to read it as a zone
 
 SFX_FILES = ["/push.wav", "/flip.wav", "/spin.wav", "/slide.wav", "/shake.wav"]
 inputs = [ # inputs dictionary to track states, display text, sound effect, reading pins
-    {'label': "PUSH", 'current_state': False, 'last_state': False, 'sfx_file': SFX_FILES[0], 'check': lambda: key.value},
-    {'label': "FLIP", 'current_state': False, 'last_state': False, 'sfx_file': SFX_FILES[1], 'check': lambda: toggle.value},
-    {'label': "SPIN", 'current_state': False, 'last_state': False, 'sfx_file': SFX_FILES[2], 'check': lambda: hall.value},
-    {'label': "SLDE", 'current_state': False, 'last_state': False, 'sfx_file': SFX_FILES[3], 'check': lambda: get_slider_zone()},
-    {'label': "SHKE", 'current_state': False, 'last_state': False, 'sfx_file': SFX_FILES[4], 'check': lambda: lis3dh.shake(shake_threshold=SHAKE_THRESHOLD)},
+    {'label': "PUSH", 'current_state': False, 'last_state': False,
+     'sfx_file': SFX_FILES[0], 'check': lambda: key.value},
+    {'label': "FLIP", 'current_state': False, 'last_state': False,
+     'sfx_file': SFX_FILES[1], 'check': lambda: toggle.value},
+    {'label': "SPIN", 'current_state': False, 'last_state': False,
+     'sfx_file': SFX_FILES[2], 'check': lambda: hall.value},
+    {'label': "SLDE", 'current_state': False, 'last_state': False,
+     'sfx_file': SFX_FILES[3], 'check': get_slider_zone},
+    {'label': "SHKE", 'current_state': False, 'last_state': False,
+     'sfx_file': SFX_FILES[4], 'check': lambda: lis3dh.shake(shake_threshold=SHAKE_THRESHOLD)},
 ]
 
 # audio mixer setup - import wav files
@@ -96,9 +101,9 @@ mixer.voice[0].play(wav_bg, loop=True) # background music loops
 mixer.voice[1].level = 0.5
 
 def play_sfx(sfx_key): # helper to play sfx
-    sfx_file = open(inputs[sfx_key]['sfx_file'], "rb")
-    wav_sfx = audiocore.WaveFile(sfx_file)
-    mixer.voice[1].play(wav_sfx, loop=False)
+    sfx = open(inputs[sfx_key]['sfx_file'], "rb")
+    w = audiocore.WaveFile(sfx)
+    mixer.voice[1].play(w, loop=False)
 
 def scroll_text(txt, scroll_x, count = 0, counting = False):
     padded = "    " + txt + "    "
@@ -170,7 +175,7 @@ while True:
                 num_pixels = simpleio.map_range(time_left, 0, STATE_CHANGE_TIMEOUT, 0, 7)
                 for i in range(num_pixels):
                     pixels[i] = ((255, 0, 255))
-                # check for state change 
+                # check for state change
                 if inputs[seed]['check']() != inputs[seed]['last_state']:
                     pixels.fill((0, 255, 0))
                     state_changed = True
@@ -181,7 +186,8 @@ while True:
                 for i, inp in enumerate(inputs):
                     if i == seed:
                         continue
-                    if i in IGNORE_MAP.get(seed, []): # don't check for spin during shake, vice versa
+                    if i in IGNORE_MAP.get(seed, []):
+                        # don't check for spin during shake, vice versa
                         continue
                     if inp['check']() != inp['last_state']: # wrong input, game over
                         pixels.fill((255, 0, 0))
@@ -199,7 +205,8 @@ while True:
                     TRIGGER_INTERVAL = max(TRIGGER_INTERVAL, TRIGGER_LIMIT)
                     STATE_CHANGE_TIMEOUT -= INTERVAL_CHANGE
                     STATE_CHANGE_TIMEOUT = max(STATE_CHANGE_TIMEOUT, STATE_CHANGE_LIMIT)
-                    speed = simpleio.map_range(STATE_CHANGE_TIMEOUT, STATE_CHANGE_LIMIT, 2000, 3.0, 0.5)
+                    speed = simpleio.map_range(
+                                     STATE_CHANGE_TIMEOUT, STATE_CHANGE_LIMIT, 2000, 3.0, 0.5)
                     wav_bg.rate = speed # music speeds up too
                 state_changed = False # reset state and clock
                 timer = ticks_ms()
@@ -210,8 +217,9 @@ while True:
                 pixels.fill((255, 0, 0))
                 while scroll_count < 2: # scroll game over and score text 2x
                     if ticks_diff(ticks_ms(), timer) >= 250:
-                        scroll_x_pos, scroll_count = scroll_text(f"GAME OVER - SCORE: {score}", scroll_x_pos,
-                                                                 scroll_count, counting = True)
+                        scroll_x_pos, scroll_count = scroll_text(
+                                                     f"GAME OVER - SCORE: {score}", scroll_x_pos,
+                                                     scroll_count, counting = True)
                         timer = ticks_add(timer, 250)
                 scroll_count = 0 # reset all the states to restart game
                 scroll_x_pos = 0
