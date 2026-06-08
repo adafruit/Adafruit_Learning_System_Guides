@@ -58,8 +58,10 @@ def get_slider_zone(): # helper for slider to read it as a zone
         last_slider_zone[0] = zone
     return last_slider_zone[0]
 
-TEXT_FILES = ["/sfx_files/push.wav", "/sfx_files/flip.wav", "/sfx_files/spin.wav", "/sfx_files/slide.wav", "/sfx_files/shake.wav"]
-SFX_FILES = ["/sfx_files/push_it_fx.wav", "/sfx_files/flip_it_fx.wav", "/sfx_files/spin_it_fx.wav", "/sfx_files/slide_it_fx.wav", "/sfx_files/shake_it_fx.wav"]
+TEXT_FILES = ["/sfx_files/push.wav", "/sfx_files/flip.wav", "/sfx_files/spin.wav",
+              "/sfx_files/slide.wav", "/sfx_files/shake.wav"]
+SFX_FILES = ["/sfx_files/push_it_fx.wav", "/sfx_files/flip_it_fx.wav", "/sfx_files/spin_it_fx.wav",
+             "/sfx_files/slide_it_fx.wav", "/sfx_files/shake_it_fx.wav"]
 inputs = [
     {'label': "PUSH", 'current_state': False, 'last_state': False, 'txt_file': TEXT_FILES[0],
      'sfx_file': SFX_FILES[0], 'check': lambda: key.value},
