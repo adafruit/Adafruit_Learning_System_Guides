@@ -58,34 +58,35 @@ def get_slider_zone(): # helper for slider to read it as a zone
         last_slider_zone[0] = zone
     return last_slider_zone[0]
 
-SFX_FILES = ["/push.wav", "/flip.wav", "/spin.wav", "/slide.wav", "/shake.wav"]
-inputs = [ # inputs dictionary to track states, display text, sound effect, reading pins
-    {'label': "PUSH", 'current_state': False, 'last_state': False,
+TEXT_FILES = ["/sfx_files/push.wav", "/sfx_files/flip.wav", "/sfx_files/spin.wav", "/sfx_files/slide.wav", "/sfx_files/shake.wav"]
+SFX_FILES = ["/sfx_files/push_it_fx.wav", "/sfx_files/flip_it_fx.wav", "/sfx_files/spin_it_fx.wav", "/sfx_files/slide_it_fx.wav", "/sfx_files/shake_it_fx.wav"]
+inputs = [
+    {'label': "PUSH", 'current_state': False, 'last_state': False, 'txt_file': TEXT_FILES[0],
      'sfx_file': SFX_FILES[0], 'check': lambda: key.value},
-    {'label': "FLIP", 'current_state': False, 'last_state': False,
+    {'label': "FLIP", 'current_state': False, 'last_state': False, 'txt_file': TEXT_FILES[1],
      'sfx_file': SFX_FILES[1], 'check': lambda: toggle.value},
-    {'label': "SPIN", 'current_state': False, 'last_state': False,
+    {'label': "SPIN", 'current_state': False, 'last_state': False, 'txt_file': TEXT_FILES[2],
      'sfx_file': SFX_FILES[2], 'check': lambda: hall.value},
-    {'label': "SLDE", 'current_state': False, 'last_state': False,
+    {'label': "SLDE", 'current_state': False, 'last_state': False, 'txt_file': TEXT_FILES[3],
      'sfx_file': SFX_FILES[3], 'check': get_slider_zone},
-    {'label': "SHKE", 'current_state': False, 'last_state': False,
+    {'label': "SHKE", 'current_state': False, 'last_state': False, 'txt_file': TEXT_FILES[4],
      'sfx_file': SFX_FILES[4], 'check': lambda: lis3dh.shake(shake_threshold=SHAKE_THRESHOLD)},
 ]
 
 # audio mixer setup - import wav files
 
 try:
-    bg_file = open("/Beat.wav", "rb")
+    bg_file = open("/sfx_files/Beat.wav", "rb")
     wav = audiocore.WaveFile(bg_file)
     wav_bg = audiospeed.SpeedChanger(wav, rate=1.0)
 except OSError as e:
     print(f"Missing Beat.wav: {e}")
 
 try:
-    sfx_file = open(SFX_FILES[0], "rb")
-    wav_sfx  = audiocore.WaveFile(sfx_file)
+    txt_file = open(TEXT_FILES[0], "rb")
+    wav_sfx  = audiocore.WaveFile(txt_file)
 except OSError as e:
-    print(f"Missing {SFX_FILES[0]}: {e}")
+    print(f"Missing {TEXT_FILES[0]}: {e}")
 SAMPLE_RATE = 22050
 i2s   = audiobusio.I2SOut(board.I2S_BIT_CLOCK, board.I2S_WORD_SELECT, board.I2S_DATA)
 mixer = audiomixer.Mixer(
@@ -100,8 +101,8 @@ mixer.voice[0].level = 0.4
 mixer.voice[0].play(wav_bg, loop=True) # background music loops
 mixer.voice[1].level = 0.5
 
-def play_sfx(sfx_key): # helper to play sfx
-    sfx = open(inputs[sfx_key]['sfx_file'], "rb")
+def play_sfx(file): # helper to play sfx
+    sfx = open(file, "rb")
     w = audiocore.WaveFile(sfx)
     mixer.voice[1].play(w, loop=False)
 
@@ -153,6 +154,7 @@ while True:
             inputs[0]['current_state'] = True
         if inputs[0]['check']() and inputs[0]['current_state']:
             inputs[0]['current_state'] = False
+            play_sfx("/sfx_files/game_start.wav")
             scroll_x_pos = 0
             display.print("****")
             display.show()
@@ -165,7 +167,7 @@ while True:
                 inp['last_state'] = inp['check']()
                 inp['current_state'] = False
             seed = random.randint(0, 4) # pick seed
-            play_sfx(seed) # play audio clip
+            play_sfx(inputs[seed]['txt_file']) # play audio clip
             display.print(inputs[seed]['label']) # update display
             display.show()
             secondary_timer = ticks_ms()
@@ -197,6 +199,7 @@ while True:
                     break
 
             if state_changed: # you scored!
+                play_sfx(inputs[seed]['sfx_file'])
                 score += 1
                 display.print(f"{score:>4}")
                 display.show()
@@ -206,7 +209,7 @@ while True:
                     STATE_CHANGE_TIMEOUT -= INTERVAL_CHANGE
                     STATE_CHANGE_TIMEOUT = max(STATE_CHANGE_TIMEOUT, STATE_CHANGE_LIMIT)
                     speed = simpleio.map_range(
-                                     STATE_CHANGE_TIMEOUT, STATE_CHANGE_LIMIT, 2000, 3.0, 0.5)
+                                     STATE_CHANGE_TIMEOUT, STATE_CHANGE_LIMIT, 2000, 2.0, 0.5)
                     wav_bg.rate = speed # music speeds up too
                 state_changed = False # reset state and clock
                 timer = ticks_ms()
@@ -214,6 +217,7 @@ while True:
                 timer = ticks_ms()
                 speed = 0.5 # reset music speed
                 wav_bg.rate = speed
+                play_sfx("/sfx_files/game_over.wav")
                 pixels.fill((255, 0, 0))
                 while scroll_count < 2: # scroll game over and score text 2x
                     if ticks_diff(ticks_ms(), timer) >= 250:
