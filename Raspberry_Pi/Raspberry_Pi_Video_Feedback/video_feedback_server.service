@@ -1,0 +1,16 @@
+[Unit]
+Description=GlitchCam web camera filter server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=[username]
+Group=[username]
+WorkingDirectory=/home/[username]/Raspberry_Pi_Video_Feedback
+ExecStart=/home/[username]/venv_videofeedback/bin/python /home/[username]/Raspberry_Pi_Video_Feedback/camera_filters_web.py
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
