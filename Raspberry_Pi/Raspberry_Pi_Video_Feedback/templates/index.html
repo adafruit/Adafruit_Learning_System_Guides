@@ -1,0 +1,768 @@
+<!--SPDX-FileCopyrightText: 2026 Tim Cocks, written for Adafruit Industries
+
+SPDX-License-Identifier: MIT -->
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Camera Filters</title>
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            background: #1a1a1a;
+            color: #eee;
+            margin: 0;
+        }
+
+        h1 {
+            margin: 0 0 16px 0;
+            font-size: 20px;
+        }
+
+        .layout {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: flex-start;
+        }
+
+        .preview {
+            background: #111;
+            overflow: hidden;
+            flex: 1 1 640px;
+            min-width: 320px;
+            max-height: 100%;
+        }
+
+        .preview img {
+            display: block;
+            width: 100%;
+            height: calc(100vh);
+            object-fit: fill;
+        }
+
+        .controls {
+            flex: 0 0 auto;
+            background: #2a2a2a;
+            padding: 12px;
+            border-radius: 6px;
+            max-height: calc(100vh - 32px);
+            overflow-y: auto;
+        }
+
+        .controls.hidden {
+            display: none;
+        }
+
+        .preview img {
+            cursor: pointer;
+        }
+
+        fieldset {
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 8px;
+            margin: 0 0 8px 0;
+        }
+
+        legend {
+            padding: 0 6px;
+            font-size: 13px;
+            color: #aaa;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 130px auto 16px;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0;
+            justify-content: start;
+        }
+
+        .row label {
+            user-select: none;
+            cursor: pointer;
+        }
+
+        .row input[type=number] {
+            width: 64px;
+            background: #1f1f1f;
+            color: #eee;
+            border: 1px solid #555;
+            border-radius: 4px;
+            padding: 4px 6px;
+            font-size: 13px;
+        }
+
+        .row .pct {
+            text-align: left;
+            font-variant-numeric: tabular-nums;
+            color: #bbb;
+            font-size: 13px;
+        }
+
+        .glitch-params,
+        .rowshift-params,
+        .colorgel-params,
+        .rainbow-params,
+        .colortransform-params {
+            padding: 4px 0 6px 8px;
+            border-left: 2px solid #555;
+            margin: 0 0 4px 0;
+        }
+
+        .rainbow-params select {
+            background: #1f1f1f;
+            color: #eee;
+            border: 1px solid #555;
+            border-radius: 4px;
+            padding: 4px 6px;
+            font-size: 12px;
+        }
+
+        .rainbow-params input[type=number] {
+            width: 64px;
+            background: #1f1f1f;
+            color: #eee;
+            border: 1px solid #555;
+            border-radius: 4px;
+            padding: 4px 6px;
+            font-size: 12px;
+        }
+
+        .colortransform-params textarea {
+            width: 100%;
+            box-sizing: border-box;
+            background: #1f1f1f;
+            color: #eee;
+            border: 1px solid #555;
+            border-radius: 4px;
+            padding: 4px 6px;
+            font-family: ui-monospace, monospace;
+            font-size: 12px;
+            resize: vertical;
+        }
+
+        .colortransform-params .ct-error {
+            color: #f55;
+            font-size: 12px;
+            min-height: 14px;
+        }
+
+        details.glitch-params > summary,
+        details.colorgel-params > summary,
+        details.rainbow-params > summary,
+        details.colortransform-params > summary,
+        details.rowshift-params > summary {
+            cursor: pointer;
+            user-select: none;
+            font-size: 12px;
+            color: #aaa;
+            padding: 2px 0;
+            list-style: revert;
+        }
+
+        details.glitch-params > summary:hover,
+        details.colorgel-params > summary:hover,
+        details.rainbow-params > summary:hover,
+        details.colortransform-params > summary:hover,
+        details.rowshift-params > summary:hover {
+            color: #ddd;
+        }
+
+        details.glitch-params[open] > summary,
+        details.colorgel-params[open] > summary,
+        details.rainbow-params[open] > summary,
+        details.colortransform-params[open] > summary,
+        details.rowshift-params[open] > summary {
+            margin-bottom: 4px;
+        }
+
+        .rowshift-params input[type=number] {
+            width: 64px;
+            background: #1f1f1f;
+            color: #eee;
+            border: 1px solid #555;
+            border-radius: 4px;
+            padding: 4px 6px;
+            font-size: 12px;
+        }
+
+        .rowshift-params button {
+            padding: 4px 10px;
+            font-size: 12px;
+        }
+
+        .param-row {
+            display: grid;
+            grid-template-columns: 90px auto;
+            align-items: center;
+            gap: 8px;
+            padding: 2px 0;
+            justify-content: start;
+        }
+
+        .param-row input[type=number] {
+            width: 64px;
+            background: #1f1f1f;
+            color: #eee;
+            border: 1px solid #555;
+            border-radius: 4px;
+            padding: 4px 6px;
+            font-size: 12px;
+        }
+
+        .param-label {
+            font-size: 12px;
+            color: #aaa;
+        }
+
+        button {
+            background: #444;
+            color: #eee;
+            border: 1px solid #555;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        button:hover {
+            background: #555;
+        }
+
+        .record-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0 0 4px 0;
+        }
+
+        #record-toggle.recording {
+            background: #a22;
+            border-color: #c33;
+        }
+
+        #record-toggle.recording:hover {
+            background: #c33;
+        }
+
+        .rec-status {
+            font-size: 13px;
+            color: #f55;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .rec-status:empty:after {
+            content: '\200b';
+        }
+
+        .rec-status.saved {
+            color: #6c6;
+        }
+
+        .rec-status a {
+            color: inherit;
+            text-decoration: underline;
+        }
+
+        @keyframes rec-blink {
+            50% { opacity: 0.25; }
+        }
+        
+        #reset{
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        .rec-status.live {
+            animation: rec-blink 1s steps(1, end) infinite;
+        }
+        .flex-container{
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+        }
+        
+        #legend-txt{
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+<div class="layout">
+    <div class="preview">
+        <img id="preview-img" src="{{ url_for('stream') }}" alt="camera preview"
+             title="Click to toggle controls">
+    </div>
+    
+    <div class="controls hidden" id="controls">
+        <div class="record-bar">
+            <button id="btn-screenshot">📷 Photo</button>
+            <button id="record-toggle">● Record</button>
+        </div>
+        <div class="record-bar">
+            <span id="status" class="rec-status"></span>
+        </div>
+        <fieldset>
+            <legend>Filters (applied top to bottom)</legend>
+            <div class="flex-container">
+                
+                <p id="legend-txt"><strong>F</strong>: Fullscreen<br/>
+                <strong>R</strong>: Record Video<br/>
+                <strong>S</strong>: Save Photo<br/>
+                <strong>1</strong>-<strong>9</strong>, <strong>0</strong>: Toggle filter</p>
+                <div>
+                    <button id="reset">Reset all</button>
+                    <p style="margin: 4px 0 0 0;">
+                        <a href="{{ url_for('photos') }}" style="color:#6cf;">Photos</a>
+                        &middot;
+                        <a href="{{ url_for('videos') }}" style="color:#6cf;">Videos</a>
+                    </p>
+                </div>
+            </div>
+            {% for f in filters %}
+            <div class="row" data-index="{{ loop.index0 }}">
+                <label>
+                    <input type="checkbox" class="enabled"
+                           {% if f.enabled %}checked{% endif %}>
+                    {{ f.name }}
+                </label>
+                <input type="number" class="intensity" min="0" max="100" step="1"
+                       value="{{ (f.intensity * 100)|int }}">
+                <span class="pct">%</span>
+            </div>
+            {% if f.name == "Glitch" %}
+            <details class="glitch-params" data-index="{{ loop.index0 }}">
+                <summary>Glitch options</summary>
+                <div class="param-row">
+                    <span class="param-label">Translate X</span>
+                    <input type="number" class="gcfg" data-key="translate_x" data-fmt="int"
+                           min="-50" max="50" step="1"
+                           value="{{ f.extra_config.get('translate_x', 8)|int }}">
+                </div>
+                <div class="param-row">
+                    <span class="param-label">Translate Y</span>
+                    <input type="number" class="gcfg" data-key="translate_y" data-fmt="int"
+                           min="-50" max="50" step="1"
+                           value="{{ f.extra_config.get('translate_y', 0)|int }}">
+                </div>
+                <div class="param-row">
+                    <span class="param-label">Scale X</span>
+                    <input type="number" class="gcfg" data-key="scale_x" data-fmt="float"
+                           min="0.5" max="2.0" step="0.05"
+                           value="{{ f.extra_config.get('scale_x', 1.0) }}">
+                </div>
+                <div class="param-row">
+                    <span class="param-label">Scale Y</span>
+                    <input type="number" class="gcfg" data-key="scale_y" data-fmt="float"
+                           min="0.5" max="2.0" step="0.05"
+                           value="{{ f.extra_config.get('scale_y', 1.0) }}">
+                </div>
+                <div class="param-row">
+                    <span class="param-label">Shear X</span>
+                    <input type="number" class="gcfg" data-key="shear_x" data-fmt="float"
+                           min="-1.0" max="1.0" step="0.01"
+                           value="{{ f.extra_config.get('shear_x', 0.0) }}">
+                </div>
+                <div class="param-row">
+                    <span class="param-label">Shear Y</span>
+                    <input type="number" class="gcfg" data-key="shear_y" data-fmt="float"
+                           min="-1.0" max="1.0" step="0.01"
+                           value="{{ f.extra_config.get('shear_y', 0.0) }}">
+                </div>
+            </details>
+            {% endif %}
+            {% if f.name == "Color Gel" %}
+            <details class="colorgel-params" data-index="{{ loop.index0 }}">
+                <summary>Color Gel options</summary>
+                <div class="param-row">
+                    <span class="param-label">Red</span>
+                    <input type="number" class="wcfg" data-key="red"
+                           min="-255" max="255" step="1"
+                           value="{{ f.extra_config.get('red', -20)|int }}">
+                </div>
+                <div class="param-row">
+                    <span class="param-label">Green</span>
+                    <input type="number" class="wcfg" data-key="green"
+                           min="-255" max="255" step="1"
+                           value="{{ f.extra_config.get('green', 0)|int }}">
+                </div>
+                <div class="param-row">
+                    <span class="param-label">Blue</span>
+                    <input type="number" class="wcfg" data-key="blue"
+                           min="-255" max="255" step="1"
+                           value="{{ f.extra_config.get('blue', 30)|int }}">
+                </div>
+            </details>
+            {% endif %}
+            {% if f.name == "Rainbow" %}
+            <details class="rainbow-params" data-index="{{ loop.index0 }}">
+                <summary>Rainbow options</summary>
+                <div class="param-row">
+                    <span class="param-label">Direction</span>
+                    {% set orient = f.extra_config.get('orientation', f.extra_config.get('vertical', 0))|int %}
+                    <select class="rbcfg" data-key="orientation">
+                        <option value="0" {% if orient == 0 %}selected{% endif %}>Per row</option>
+                        <option value="1" {% if orient == 1 %}selected{% endif %}>Per column</option>
+                        <option value="2" {% if orient == 2 %}selected{% endif %}>Diagonal &#8600;</option>
+                        <option value="3" {% if orient == 3 %}selected{% endif %}>Diagonal &#8599;</option>
+                    </select>
+                </div>
+                <div class="param-row">
+                    <span class="param-label">Strength</span>
+                    <input type="number" class="rbcfg" data-key="scale"
+                           min="0" max="1" step="0.01"
+                           value="{{ f.extra_config.get('scale', 0.4) }}">
+                </div>
+                <div class="param-row">
+                    <span class="param-label">Spread</span>
+                    <input type="number" class="rbcfg" data-key="spread"
+                           min="1" max="100" step="1"
+                           value="{{ f.extra_config.get('spread', 2)|int }}">
+                </div>
+                <div class="param-row">
+                    <span class="param-label">Offset</span>
+                    <input type="number" class="rbcfg" data-key="offset"
+                           min="0" max="255" step="1"
+                           value="{{ f.extra_config.get('offset', 0)|int }}">
+                </div>
+            </details>
+            {% endif %}
+            {% if f.name == "Color Matrix" %}
+            {% set m = f.extra_config.get('matrix') %}
+            <details class="colortransform-params" data-index="{{ loop.index0 }}">
+                <summary>Color Matrix options</summary>
+                <div class="param-row" style="grid-template-columns: auto;">
+                    <span class="param-label">Transform matrix (3×3)</span>
+                </div>
+                <textarea class="ctcfg" data-key="matrix" rows="4" spellcheck="false">{{ "[[%g, %g, %g],\n [%g, %g, %g],\n [%g, %g, %g]]" | format(m[0][0], m[0][1], m[0][2], m[1][0], m[1][1], m[1][2], m[2][0], m[2][1], m[2][2]) }}</textarea>
+                <div class="ct-error"></div>
+            </details>
+            {% endif %}
+            {% if f.name == "Rowshift" %}
+            <details class="rowshift-params" data-index="{{ loop.index0 }}">
+                <summary>Rowshift options</summary>
+                <div class="param-row">
+                    <span class="param-label">Rows</span>
+                    <input type="number" class="rcfg" data-key="num_rows"
+                           min="1" max="100" step="1"
+                           value="{{ f.extra_config.get('num_rows', 3)|int }}">
+                </div>
+                <div class="param-row">
+                    <button class="randomize">Randomize</button>
+                </div>
+            </details>
+            {% endif %}
+            {% endfor %}
+        </fieldset>
+    </div>
+</div>
+
+<script>
+    document.getElementById('preview-img').addEventListener('click', () => {
+        document.getElementById('controls').classList.toggle('hidden');
+    });
+
+    let pending = null;
+
+    function postFilter(index, body) {
+        clearTimeout(pending);
+        pending = setTimeout(() => {
+            fetch(`/filter/${index}`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(body),
+            });
+        }, 30);
+    }
+
+    const cfgPending = {};
+
+    function postConfig(index, key, value) {
+        const k = `${index}_${key}`;
+        clearTimeout(cfgPending[k]);
+        cfgPending[k] = setTimeout(() => {
+            fetch(`/filter/${index}`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({config: {[key]: value}}),
+            });
+        }, 30);
+    }
+
+    document.querySelectorAll('.row').forEach(row => {
+        const index = row.dataset.index;
+        const cb = row.querySelector('.enabled');
+        const num = row.querySelector('.intensity');
+
+        cb.addEventListener('change', () => {
+            postFilter(index, {enabled: cb.checked});
+            // Drop focus so the keyboard hotkeys keep working afterwards.
+            cb.blur();
+        });
+        num.addEventListener('input', () => {
+            postFilter(index, {intensity: num.value / 100});
+        });
+    });
+
+    document.querySelectorAll('.glitch-params').forEach(panel => {
+        const index = panel.dataset.index;
+        panel.querySelectorAll('.gcfg').forEach(input => {
+            input.addEventListener('input', () => {
+                postConfig(index, input.dataset.key, parseFloat(input.value));
+            });
+        });
+    });
+
+    document.querySelectorAll('.colorgel-params').forEach(panel => {
+        const index = panel.dataset.index;
+        panel.querySelectorAll('.wcfg').forEach(input => {
+            input.addEventListener('input', () => {
+                postConfig(index, input.dataset.key, parseFloat(input.value));
+            });
+        });
+    });
+
+    document.querySelectorAll('.rainbow-params').forEach(panel => {
+        const index = panel.dataset.index;
+        panel.querySelectorAll('.rbcfg').forEach(input => {
+            const handler = () => postConfig(index, input.dataset.key,
+                                             parseFloat(input.value));
+            // Number inputs fire 'input'; the direction <select> fires 'change'.
+            input.addEventListener('input', handler);
+            input.addEventListener('change', handler);
+        });
+    });
+
+    function formatMatrix(m) {
+        return '[[' + m[0].join(', ') + '],\n [' + m[1].join(', ')
+             + '],\n [' + m[2].join(', ') + ']]';
+    }
+
+    document.querySelectorAll('.colortransform-params').forEach(panel => {
+        const index = panel.dataset.index;
+        const $colorTransformInput = panel.querySelector('.ctcfg');
+        const err = panel.querySelector('.ct-error');
+        $colorTransformInput.addEventListener('input', () => {
+            let matrix;
+            try {
+                matrix = JSON.parse($colorTransformInput.value);
+            } catch (e) {
+                err.textContent = 'Invalid matrix (must be valid JSON)';
+                return;
+            }
+            const valid = Array.isArray(matrix) && matrix.length === 3 &&
+                matrix.every(r => Array.isArray(r) && r.length === 3 &&
+                    r.every(x => typeof x === 'number' && isFinite(x)));
+            if (!valid) {
+                err.textContent = 'Matrix must be 3 rows of 3 numbers';
+                return;
+            }
+            err.textContent = '';
+            postConfig(index, 'matrix', matrix);
+        });
+    });
+
+    document.querySelectorAll('.rowshift-params').forEach(panel => {
+        const index = panel.dataset.index;
+        panel.querySelectorAll('.rcfg').forEach(input => {
+            input.addEventListener('input', () => {
+                postConfig(index, input.dataset.key, parseFloat(input.value));
+            });
+        });
+        const randomize = panel.querySelector('.randomize');
+        if (randomize) {
+            randomize.addEventListener('click', () => {
+                // Bump the reroll seed so the server re-picks split points.
+                postConfig(index, 'reroll', Date.now());
+            });
+        }
+    });
+
+    const GLITCH_DEFAULTS = {
+        translate_x: 8, translate_y: 0,
+        scale_x: 1.0, scale_y: 1.0,
+        shear_x: 0.0, shear_y: 0.0,
+    };
+
+    const COLORGEL_DEFAULTS = {red: -20, green: 0, blue: 30};
+
+    const RAINBOW_DEFAULTS = {orientation: 0, scale: 1.0, spread: 1, offset: 0};
+
+    const COLORTRANSFORM_DEFAULT = [[0.272, 0.534, 0.131],
+                                    [0.349, 0.686, 0.168],
+                                    [0.393, 0.769, 0.189]];
+
+    document.getElementById('reset').addEventListener('click', async () => {
+        await fetch('/reset', {method: 'POST'});
+        document.querySelectorAll('.row').forEach(row => {
+            row.querySelector('.enabled').checked = false;
+            row.querySelector('.intensity').value = 100;
+        });
+        document.querySelectorAll('.glitch-params').forEach(panel => {
+            panel.querySelectorAll('.gcfg').forEach(input => {
+                input.value = GLITCH_DEFAULTS[input.dataset.key];
+            });
+        });
+        document.querySelectorAll('.colorgel-params').forEach(panel => {
+            panel.querySelectorAll('.wcfg').forEach(input => {
+                input.value = COLORGEL_DEFAULTS[input.dataset.key];
+            });
+        });
+        document.querySelectorAll('.rainbow-params').forEach(panel => {
+            panel.querySelectorAll('.rbcfg').forEach(input => {
+                input.value = RAINBOW_DEFAULTS[input.dataset.key];
+            });
+        });
+        document.querySelectorAll('.colortransform-params').forEach(panel => {
+            panel.querySelector('.ctcfg').value = formatMatrix(COLORTRANSFORM_DEFAULT);
+            panel.querySelector('.ct-error').textContent = '';
+        });
+        document.querySelectorAll('.rowshift-params').forEach(panel => {
+            panel.querySelectorAll('.rcfg').forEach(input => {
+                input.value = 3;
+            });
+        });
+    });
+
+    // --- Recording -------------------------------------------------------
+    const recBtn = document.getElementById('record-toggle');
+    const recStatus = document.getElementById('status');
+    let recording = false;
+    let recStart = null;     // epoch ms when the current recording began
+    let recTimer = null;     // interval handle for the elapsed-time tick
+    
+    
+    // Build a download link to a saved capture. `kind` is 'photos' or
+    // 'videos'; the filename is escaped so it's safe to drop into innerHTML.
+    function mediaLink(kind, file) {
+        const safe = file.replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                         .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        const href = `/media/${kind}/${encodeURIComponent(file)}?download`;
+        return `<a href="${href}" download>${safe}</a>`;
+    }
+
+    function fmtElapsed(sec) {
+        sec = Math.max(0, Math.floor(sec));
+        const m = String(Math.floor(sec / 60)).padStart(2, '0');
+        const s = String(sec % 60).padStart(2, '0');
+        return `${m}:${s}`;
+    }
+
+    function tickRecUI() {
+        const elapsed = recStart ? (Date.now() - recStart) / 1000 : 0;
+        recStatus.textContent = '● REC ' + fmtElapsed(elapsed);
+    }
+
+    function setRecordingUI(on) {
+        recording = on;
+        if (on) {
+            recBtn.textContent = '■ Stop';
+            recBtn.classList.add('recording');
+            recStatus.className = 'rec-status live';
+            tickRecUI();
+            recTimer = setInterval(tickRecUI, 1000);
+        } else {
+            recBtn.textContent = '● Record';
+            recBtn.classList.remove('recording');
+            clearInterval(recTimer);
+            recTimer = null;
+        }
+    }
+
+    recBtn.addEventListener('click', async () => {
+        recBtn.disabled = true;
+        try {
+            if (!recording) {
+                const r = await fetch('/record/start', {method: 'POST'});
+                const j = await r.json();
+                if (j.error) {
+                    recStatus.className = 'rec-status';
+                    recStatus.textContent = j.error;
+                    return;
+                }
+                recStart = Date.now();
+                setRecordingUI(true);
+            } else {
+                const r = await fetch('/record/stop', {method: 'POST'});
+                const j = await r.json();
+                setRecordingUI(false);
+                recStatus.className = 'rec-status saved';
+                recStatus.innerHTML = j.file
+                    ? `Saved ${mediaLink('videos', j.file)} (${j.duration}s)`
+                    : '';
+            }
+        } finally {
+            recBtn.disabled = false;
+        }
+    });
+    
+    const photoBtn = document.getElementById("btn-screenshot");
+    const photoStatus = recStatus;
+    photoBtn.addEventListener("click", function(){
+       savePhoto();
+    });
+
+    async function savePhoto() {
+        try {
+            const j = await (await fetch('/snapshot', {method: 'POST'})).json();
+            photoStatus.className = j.file ? 'rec-status saved' : 'rec-status';
+            if (j.file) {
+                photoStatus.innerHTML = `Saved ${mediaLink('photos', j.file)}`;
+            } else {
+                photoStatus.textContent = j.error || '';
+            }
+        } catch (e) {
+            photoStatus.className = 'rec-status';
+            photoStatus.textContent = 'Could not save photo';
+        }
+    }
+
+    // Hotkeys: 'R' toggles recording, 'F' shows/hides the controls panel,
+    // 'S' saves a still photo of the current frame. Number keys 1-9 toggle the
+    // corresponding filter, and '0' toggles the 10th (last) filter. Ignored
+    // while typing in an input or combined with modifier keys.
+    document.addEventListener('keydown', (e) => {
+        const k = e.key.toLowerCase();
+        const isFilterKey = k >= '0' && k <= '9';
+        if (k !== 'r' && k !== 'f' && k !== 's' && !isFilterKey) return;
+        if (e.ctrlKey || e.metaKey || e.altKey) return;
+        const t = e.target;
+        if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA'
+                  || t.isContentEditable)) return;
+        if (isFilterKey) {
+            // '1'-'9' map to filter index 0-8, '0' maps to index 9.
+            const index = k === '0' ? 9 : Number(k) - 1;
+            const cb = document.querySelector(
+                `.row[data-index="${index}"] .enabled`);
+            if (!cb) return;
+            e.preventDefault();
+            cb.checked = !cb.checked;
+            cb.dispatchEvent(new Event('change'));
+            return;
+        }
+        e.preventDefault();
+        if (k === 'r') {
+            recBtn.click();
+        } else if (k === 'f') {
+            document.getElementById('controls').classList.toggle('hidden');
+        } else {
+            photoBtn.click();
+        }
+    });
+
+    // Sync with server state on load (recording survives a page reload).
+    (async () => {
+        try {
+            const j = await (await fetch('/record/status')).json();
+            if (j.recording) {
+                recStart = Date.now() - (j.elapsed || 0) * 1000;
+                setRecordingUI(true);
+            }
+        } catch (e) { /* ignore */ }
+    })();
+</script>
+</body>
+</html>

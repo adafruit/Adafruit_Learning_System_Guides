@@ -1,0 +1,225 @@
+<!--SPDX-FileCopyrightText: 2026 Tim Cocks, written for Adafruit Industries
+
+SPDX-License-Identifier: MIT -->
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Photos</title>
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            background: #1a1a1a;
+            color: #eee;
+            margin: 0;
+            padding: 16px;
+        }
+
+        header {
+            display: flex;
+            align-items: baseline;
+            gap: 16px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .count {
+            color: #888;
+            font-size: 14px;
+        }
+
+        nav a {
+            color: #6cf;
+            text-decoration: none;
+            margin-right: 12px;
+            font-size: 14px;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        .empty {
+            color: #888;
+            margin-top: 32px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 12px;
+        }
+
+        .tile {
+            background: #2a2a2a;
+            border-radius: 6px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tile .thumb {
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            object-fit: cover;
+            cursor: pointer;
+            display: block;
+            background: #111;
+        }
+
+        .meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 6px 8px;
+        }
+
+        .name {
+            font-size: 11px;
+            color: #bbb;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .meta a.dl {
+            color: #6cf;
+            text-decoration: none;
+            font-size: 14px;
+            flex: 0 0 auto;
+        }
+
+        .meta a.dl:hover {
+            text-decoration: underline;
+        }
+
+        /* Lightbox */
+        .lightbox {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.92);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 12px;
+            padding: 16px;
+            box-sizing: border-box;
+            z-index: 10;
+        }
+
+        .lightbox.open {
+            display: flex;
+        }
+
+        .lightbox img {
+            max-width: 100%;
+            max-height: calc(100vh - 80px);
+            object-fit: contain;
+        }
+
+        .lightbox-bar {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            color: #ddd;
+            font-size: 14px;
+        }
+
+        .lightbox-bar a {
+            color: #6cf;
+            text-decoration: none;
+        }
+
+        .lightbox-bar a:hover {
+            text-decoration: underline;
+        }
+
+        .lightbox .close {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            font-size: 28px;
+            color: #ddd;
+            cursor: pointer;
+            line-height: 1;
+            user-select: none;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Photos</h1>
+    <span class="count">{{ files|length }} item{{ '' if files|length == 1 else 's' }}</span>
+    <nav>
+        <a href="{{ url_for('index') }}">← Live</a>
+        <a href="{{ url_for('videos') }}">Videos</a>
+    </nav>
+</header>
+
+{% if not files %}
+<p class="empty">No photos yet. Capture some from the live view.</p>
+{% else %}
+<div class="grid">
+    {% for f in files %}
+    {% set src = url_for('media_photo', filename=f) %}
+    <div class="tile">
+        <img class="thumb" src="{{ src }}" alt="{{ f }}" loading="lazy"
+             data-src="{{ src }}" data-name="{{ f }}"
+             data-dl="{{ url_for('media_photo', filename=f, download=1) }}">
+        <div class="meta">
+            <span class="name" title="{{ f }}">{{ f }}</span>
+            <a class="dl" href="{{ url_for('media_photo', filename=f, download=1) }}"
+               download title="Download">⬇</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="lightbox" id="lightbox">
+    <span class="close" id="lb-close">&times;</span>
+    <img id="lb-img" src="" alt="">
+    <div class="lightbox-bar">
+        <span id="lb-name"></span>
+        <a id="lb-dl" href="" download>⬇ Download</a>
+    </div>
+</div>
+
+<script>
+    const lb = document.getElementById('lightbox');
+    const lbImg = document.getElementById('lb-img');
+    const lbName = document.getElementById('lb-name');
+    const lbDl = document.getElementById('lb-dl');
+
+    document.querySelectorAll('.thumb').forEach(img => {
+        img.addEventListener('click', () => {
+            lbImg.src = img.dataset.src;
+            lbName.textContent = img.dataset.name;
+            lbDl.href = img.dataset.dl;
+            lb.classList.add('open');
+        });
+    });
+
+    function closeLightbox() {
+        lb.classList.remove('open');
+        lbImg.src = '';
+    }
+
+    document.getElementById('lb-close').addEventListener('click', closeLightbox);
+    lb.addEventListener('click', (e) => {
+        if (e.target === lb) closeLightbox();
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeLightbox();
+    });
+</script>
+</body>
+</html>
