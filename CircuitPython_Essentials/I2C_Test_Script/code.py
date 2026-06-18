@@ -15,8 +15,6 @@ def is_hardware_I2C(scl, sda):
         return True
     except ValueError:
         return False
-    except RuntimeError:
-        return True
 
 
 def get_unique_pins():
