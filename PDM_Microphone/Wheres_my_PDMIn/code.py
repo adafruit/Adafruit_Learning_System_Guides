@@ -14,8 +14,6 @@ def is_hardware_PDM(clock, data):
         return True
     except ValueError:
         return False
-    except RuntimeError:
-        return True
 
 
 def get_unique_pins():
