@@ -32,8 +32,8 @@ from mc_config import (
     PICK_PAD, PICK_ROWS, PICK_TITLE_H,
 )
 from mc_ui import (
-    triangle_points, apply_mode_header, header_fg, header_shadow,
-    point_in_rect, solid_palette, ui,
+    apply_mode_header, flash_message, point_in_rect, solid_palette,
+    triangle_points, ui,
 )
 
 
@@ -395,11 +395,7 @@ def handle_list_touch(point):
             # can't point anywhere yet, so let the user know it's waiting on
             # satellites rather than appearing broken.
             if not mc_compass.hw["gps"].has_fix:
-                header_fg.text = "No fix yet"
-                header_shadow.text = "No fix yet"
-                ui["display"].refresh(minimum_frames_per_second=0)
-                time.sleep(1.0)
-                apply_mode_header(MODE_WAYPOINT)
+                flash_message("No fix yet")
             return True
         return False
     # A tap on empty panel space disarms any pending delete or load.
@@ -534,11 +530,7 @@ def handle_picker_touch(point):
         # Preview mode (no fix when the picker opened): nothing to save.
         # Let the names be browsed, then report there's no fix yet.
         apply_mode_header(mode[0])
-        header_fg.text = "No fix yet"
-        header_shadow.text = "No fix yet"
-        ui["display"].refresh(minimum_frames_per_second=0)
-        time.sleep(1.0)
-        apply_mode_header(mode[0])
+        flash_message("No fix yet")
         return
     name = PICK_NAMES[idx]
     waypoints.append((lat, lon, name))

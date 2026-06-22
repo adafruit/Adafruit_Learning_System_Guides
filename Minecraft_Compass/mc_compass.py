@@ -17,12 +17,11 @@ modules can both read and mutate them through the shared reference.
 import json
 import math
 import os
-import time
 import microcontroller
 
 from mc_config import (
     ACCEL_SMOOTHING, CARDINALS, DECLINATION_DEFAULT_INDEX, DECLINATION_OPTIONS,
-    EARTH_RADIUS_M, EXTRA_LONG_PRESS_S, LONG_PRESS_S, MAX_WAYPOINTS, MODE_COMPASS,
+    EARTH_RADIUS_M, MAX_WAYPOINTS, MODE_COMPASS,
     NVM_DECLINATION_BYTE, NVM_MARINE_BYTE, NVM_ROTATION_BYTE, NVM_THEME_BYTE,
     NVM_UNITS_BYTE, THEMES, WAYPOINTS_FILE,
 )
@@ -322,45 +321,20 @@ def read_mag_calibrated(cal_data):
     )
 
 
-_press_state = [None]   # press-start time, or None when not pressed
-_hold_tier = [0]        # 0 none, 1 past LONG, 2 past EXTRA_LONG
-
-
 def poll_button():
-    """Classify button activity with two hold tiers.
+    """Classify button activity using adafruit_debouncer.Button.
 
     Returns one of:
-      "none"       - nothing this poll
-      "short"      - quick tap (released before LONG_PRESS_S)
-      "enter_save" - crossed into the save tier while holding (feedback)
-      "enter_theme"- crossed into the theme tier while holding (feedback)
-      "save"       - released within the save tier
-      "theme"      - released within the theme tier
-    The "enter_*" events let the caller flash on-screen feedback so the
-    user knows which tier they are in before releasing.
+      "none"  - nothing this poll
+      "short" - a quick tap (switch mode, or close an open overlay)
+      "save"  - a long press (save a waypoint)
+    The Button class does the press timing; short_duration_ms and
+    long_duration_ms are set where the button is created in code.py.
     """
-    hw["button"].update()
-
-    if hw["button"].fell:
-        _press_state[0] = time.monotonic()
-        _hold_tier[0] = 0
-        return "none"
-
-    result = "none"
-
-    if _press_state[0] is not None:
-        held = time.monotonic() - _press_state[0]
-        if held >= EXTRA_LONG_PRESS_S and _hold_tier[0] < 2:
-            _hold_tier[0] = 2
-            result = "enter_theme"
-        elif held >= LONG_PRESS_S and _hold_tier[0] < 1:
-            _hold_tier[0] = 1
-            result = "enter_save"
-
-    if hw["button"].rose and _press_state[0] is not None:
-        tier = _hold_tier[0]
-        _press_state[0] = None
-        _hold_tier[0] = 0
-        result = ("short", "save", "theme")[tier]
-
-    return result
+    button = hw["button"]
+    button.update()
+    if button.long_press:
+        return "save"
+    if button.short_count > 0:
+        return "short"
+    return "none"

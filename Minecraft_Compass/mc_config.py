@@ -37,10 +37,10 @@ PICK_NAMES = (
 # isogonic map (see the in-app guide page).
 MAGNETIC_DECLINATION = 0.0
 
-# Button hold timing (seconds): a short tap switches mode, a medium hold
-# saves a waypoint, a long hold toggles the light/dark theme.
-LONG_PRESS_S = 1.5         # hold this long = save waypoint
-EXTRA_LONG_PRESS_S = 3.5   # keep holding this long = toggle theme
+# Button timing: a short tap switches mode (or closes an open menu), a hold
+# of at least LONG_PRESS_MS saves a waypoint. Used by adafruit_debouncer's
+# Button, which wants milliseconds. (Theme is toggled in Settings.)
+LONG_PRESS_MS = 1500
 BUTTON_PIN = board.D5
 
 # Needle feel. ACCEL/HEADING smoothing low-pass the sensor jitter (lower =

@@ -30,13 +30,12 @@ NVM layout (microcontroller.nvm):
 - Byte 1: Pending action.
             0 = no action
             1 = write calibration data from NVM to settings.toml
-            2 = clear (delete) settings.toml to force recalibration
+            2 = clear the MAG_ calibration keys to force recalibration
 - Bytes 2-29: 28 bytes of calibration data (seven 32-bit big-endian
               floats): offset_x, offset_y, offset_z, scale_x, scale_y,
               scale_z, heading_offset
 - Byte 30: theme index (managed by code.py, not used here)
 """
-import os
 import struct
 import board
 import digitalio
@@ -91,10 +90,17 @@ if microcontroller.nvm[0] == 1:
         microcontroller.nvm[1] = ACTION_NONE
 
     elif action == ACTION_CLEAR_CALIBRATION:
+        # Remove only the calibration keys this project owns, preserving any
+        # other entries a user may have added to settings.toml. With the MAG_
+        # lines gone, code.py sees no calibration and hands off to
+        # calibration.py on the next boot.
         try:
-            os.remove("/settings.toml")
+            with open("/settings.toml", "r", encoding="utf-8") as f:
+                kept = [line for line in f if not line.startswith("MAG_")]
+            with open("/settings.toml", "w", encoding="utf-8") as f:
+                f.write("".join(kept))
         except OSError:
-            pass
+            pass   # no file yet, or read-only: nothing to clear
         microcontroller.nvm[1] = ACTION_NONE
 
     microcontroller.nvm[0] = 0

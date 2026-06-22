@@ -31,7 +31,7 @@ import supervisor
 import adafruit_gps
 import adafruit_lis3mdl
 import adafruit_tsc2007
-from adafruit_debouncer import Debouncer
+from adafruit_debouncer import Button
 from adafruit_lsm6ds.lsm6dsox import LSM6DSOX
 from adafruit_max1704x import MAX17048
 from adafruit_hx8357 import HX8357
@@ -41,11 +41,12 @@ import mc_settings
 import mc_ui
 import mc_waypoints
 from mc_compass import (
-    declination_index, marine_mode, mode, rotation_flipped, theme_index,
+    declination_index, marine_mode, mode, rotation_flipped,
     waypoints,
 )
 from mc_config import (
-    BUTTON_PIN, DECLINATION_OPTIONS, HEADING_SMOOTHING, MAX_WAYPOINTS,
+    BUTTON_PIN, DECLINATION_OPTIONS, HEADING_SMOOTHING, LONG_PRESS_MS,
+    MAX_WAYPOINTS,
     MODE_COMPASS, MODE_WAYPOINT, NEEDLE_DEADBAND_DEG,
 )
 
@@ -87,16 +88,14 @@ def detect_battery_gauge():
     """Return a MAX17048 if one answers at 0x36, else None.
 
     The Feather RP2350 has no onboard gauge, so this is an optional external
-    breakout that may not be mounted yet. If absent, the battery indicator
-    is hidden and everything else runs normally.
+    breakout that may not be mounted yet. If absent (or if it fails to
+    initialize), the battery indicator is hidden and everything else runs
+    normally.
     """
-    while not i2c.try_lock():
-        pass
     try:
-        present = 0x36 in i2c.scan()
-    finally:
-        i2c.unlock()
-    return MAX17048(i2c) if present else None
+        return MAX17048(i2c)
+    except (ValueError, OSError):
+        return None
 
 
 battery = detect_battery_gauge()
@@ -105,11 +104,13 @@ battery = detect_battery_gauge()
 # the 480x320 landscape orientation (per Adafruit's reference for this wing).
 touch = adafruit_tsc2007.TSC2007(i2c, invert_x=True, swap_xy=True)
 
-# Momentary button on D5, active-low with an internal pull-up.
+# Momentary button on D5, active-low with an internal pull-up. Button (from
+# adafruit_debouncer) tracks press timing: a tap switches mode or closes a
+# menu, a long press (>= LONG_PRESS_MS) saves a waypoint.
 button_io = digitalio.DigitalInOut(BUTTON_PIN)
 button_io.direction = digitalio.Direction.INPUT
 button_io.pull = digitalio.Pull.UP
-button = Debouncer(button_io)
+button = Button(button_io, long_duration_ms=LONG_PRESS_MS)
 
 # --- Wire the modules together ---
 # mc_compass takes the sensors and loads saved settings + waypoints; mc_ui
@@ -155,7 +156,7 @@ if cal is None:
 heading_offset = cal[6]
 print("Minecraft Compass running.")
 print(f"Heading offset: {heading_offset:0.2f} deg")
-print("Tap: switch mode.  Hold 1.5s: save waypoint.  Hold 3.5s: theme.")
+print("Tap: switch mode (or close a menu).  Hold: save waypoint.")
 
 def handle_save_waypoint():
     """Open the name picker to capture the current fix, or preview it.
@@ -166,10 +167,7 @@ def handle_save_waypoint():
     reports there is no fix yet. A full list is the one hard block.
     """
     if len(waypoints) >= MAX_WAYPOINTS:
-        mc_ui.header_fg.text = "List full"
-        mc_ui.header_shadow.text = "List full"
-        mc_ui.ui["display"].refresh(minimum_frames_per_second=0)
-        time.sleep(1.0)
+        mc_ui.flash_message("List full")
         return
     if not mc_compass.hw["gps"].has_fix:
         # Preview mode: open the picker with no coordinates. Selecting a name
@@ -264,31 +262,12 @@ while True:
         mode[0] = MODE_WAYPOINT if mode[0] == MODE_COMPASS else MODE_COMPASS
         mc_ui.apply_mode_header(mode[0])
         needs_refresh = True
-    elif event == "enter_save":
-        # Crossed the save threshold while holding; show what release does.
-        mc_ui.header_fg.text = "Save?"
-        mc_ui.header_shadow.text = "Save?"
-        needs_refresh = True
-    elif event == "enter_theme":
-        # Kept holding into the theme tier; show what release does now.
-        mc_ui.header_fg.text = "Theme?"
-        mc_ui.header_shadow.text = "Theme?"
-        needs_refresh = True
     elif event == "save":
         # Hold-to-save works in both modes. In Compass Mode the new point
         # becomes the active target (you saved it to go to it). In Waypoint
         # Mode it's saved as a breadcrumb without redirecting the navigation
         # you're already following - select it from the list to switch.
         handle_save_waypoint()
-        mc_ui.apply_mode_header(mode[0])
-        needs_refresh = True
-    elif event == "theme":
-        mc_ui.toggle_theme()
-        theme_name = "Light" if theme_index[0] == 1 else "Dark"
-        mc_ui.header_fg.text = theme_name
-        mc_ui.header_shadow.text = theme_name
-        display.refresh(minimum_frames_per_second=0)
-        time.sleep(0.6)
         mc_ui.apply_mode_header(mode[0])
         needs_refresh = True
 
@@ -360,6 +339,11 @@ while True:
     if now - last_battery_update >= 10.0:  # battery changes slowly
         mc_ui.update_battery()
         last_battery_update = now
+        needs_refresh = True
+
+    # Restore the header when a brief flashed message ("List full", "No fix
+    # yet") has expired. Non-blocking, so the needle never freezes for it.
+    if mc_ui.tick_message():
         needs_refresh = True
 
     # Refresh only when something actually changed (at most the 30 Hz needle

@@ -27,7 +27,7 @@ import vectorio
 from adafruit_display_text import label
 
 import mc_compass
-from mc_compass import rotation_flipped, theme_index
+from mc_compass import mode, rotation_flipped, theme_index
 from mc_config import (
     BATT_BARS, BATT_BAR_EMPTY, BATT_BAR_GAP, BATT_BAR_GREEN, BATT_BAR_H,
     BATT_BAR_W, BATT_NUB_H, BATT_NUB_W, BATT_PCT_X, BATT_PCT_Y, BATT_X,
@@ -510,6 +510,33 @@ def apply_mode_header(active_mode):
     # views clean.
     inventory_group.hidden = active_mode != MODE_WAYPOINT
     gear_group.hidden = active_mode != MODE_COMPASS
+
+
+# Brief header messages (e.g. "List full", "No fix yet") use a non-blocking
+# expiry instead of time.sleep, so the needle and touch stay responsive
+# while the message shows. flash_message() posts one; tick_message() is
+# called each loop and restores the normal header once it expires.
+_message_until = [0.0]   # time.monotonic deadline, or 0.0 when no message
+
+
+def flash_message(text, seconds=1.0):
+    """Show text in the header for a few seconds without blocking the loop."""
+    header_fg.text = text
+    header_shadow.text = text
+    _message_until[0] = time.monotonic() + seconds
+
+
+def tick_message():
+    """Restore the mode header when a flashed message has expired.
+
+    Returns True if it restored the header this call (so the loop can
+    refresh), else False.
+    """
+    if _message_until[0] and time.monotonic() >= _message_until[0]:
+        _message_until[0] = 0.0
+        apply_mode_header(mode[0])
+        return True
+    return False
 
 
 # Cached navigation state, refreshed only when GPS data is polled (slow),
