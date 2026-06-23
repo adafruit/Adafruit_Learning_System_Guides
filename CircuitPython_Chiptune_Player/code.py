@@ -63,7 +63,7 @@ audio = audiobusio.I2SOut(board.A1, board.A2, board.A3)
 # touch screen buttons
 OUTLINE = 0xFF00FF
 LABEL_COLOR = 0x000000
-# pylint: disable=too-many-positional-arguments, global-statement, too-many-branches
+# pylint: disable=global-statement, too-many-branches
 def make_button(action, x, y, w, h, label, fill, label_color=LABEL_COLOR):
     """Build a Button and tag it with the action it triggers."""
     b = Button(
