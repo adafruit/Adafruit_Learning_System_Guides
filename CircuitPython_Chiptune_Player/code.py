@@ -2,6 +2,9 @@
 #
 # SPDX-License-Identifier: MIT
 
+"""CircuitPython Chiptune Player
+Uses AY8912 emulator helper library to play VGM files
+through I2S DAC. TFT FeatherWing for touchscreen GUI"""
 import time
 import os
 import gc
