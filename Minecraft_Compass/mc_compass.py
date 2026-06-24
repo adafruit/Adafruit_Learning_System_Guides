@@ -17,11 +17,12 @@ modules can both read and mutate them through the shared reference.
 import json
 import math
 import os
+import time
 import microcontroller
 
 from mc_config import (
     ACCEL_SMOOTHING, CARDINALS, DECLINATION_DEFAULT_INDEX, DECLINATION_OPTIONS,
-    EARTH_RADIUS_M, MAX_WAYPOINTS, MODE_COMPASS,
+    EARTH_RADIUS_M, LONG_PRESS_MS, MAX_WAYPOINTS, MODE_COMPASS,
     NVM_DECLINATION_BYTE, NVM_MARINE_BYTE, NVM_ROTATION_BYTE, NVM_THEME_BYTE,
     NVM_UNITS_BYTE, THEMES, WAYPOINTS_FILE,
 )
@@ -321,20 +322,43 @@ def read_mag_calibrated(cal_data):
     )
 
 
+_was_down = [False]     # was the button down on the previous poll?
+_press_start = [None]   # time.monotonic() when it went down, or None
+
+
 def poll_button():
-    """Classify button activity using adafruit_debouncer.Button.
+    """Classify button activity from the debounced level, not edge flags.
 
     Returns one of:
       "none"  - nothing this poll
       "short" - a quick tap (switch mode, or close an open overlay)
-      "save"  - a long press (save a waypoint)
-    The Button class does the press timing; short_duration_ms and
-    long_duration_ms are set where the button is created in code.py.
+      "save"  - a long press held at least LONG_PRESS_MS (save a waypoint)
+
+    adafruit_debouncer keeps a clean debounced level in button.value, but
+    its one-shot edge flags (pressed/released) can miss a fast tap. So this
+    does its own edge detection on the level and times the hold with
+    time.monotonic(). The button is active-low (Pull.UP), so value is False
+    while held. monotonic timing is also immune to the ~300-500 ms stall the
+    blocking GPS read adds to the loop once a second.
     """
     button = hw["button"]
     button.update()
-    if button.long_press:
-        return "save"
-    if button.short_count > 0:
+    down = not button.value   # active-low: value False == pressed
+
+    if down and not _was_down[0]:
+        # Falling edge: the button just went down.
+        _was_down[0] = True
+        _press_start[0] = time.monotonic()
+        return "none"
+
+    if not down and _was_down[0]:
+        # Rising edge: the button was just released. Classify by how long it
+        # was held.
+        _was_down[0] = False
+        start = _press_start[0]
+        _press_start[0] = None
+        if start is not None and (time.monotonic() - start) >= LONG_PRESS_MS / 1000:
+            return "save"
         return "short"
+
     return "none"
