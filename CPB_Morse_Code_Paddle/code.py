@@ -14,10 +14,9 @@ buttons.
 import time
 
 import board
-import digitalio
+import keypad
 import synthio
 import usb_audio
-import adafruit_debouncer
 
 # Configuration
 
@@ -137,31 +136,24 @@ def play_morse(text):
                     play_tone(DASH_DURATION)
 
 
-btn_a = digitalio.DigitalInOut(board.BUTTON_A)
-btn_a.switch_to_input(digitalio.Pull.DOWN)
-btn_a_debounce = adafruit_debouncer.Debouncer(btn_a)
-
-btn_b = digitalio.DigitalInOut(board.BUTTON_B)
-btn_b.switch_to_input(digitalio.Pull.DOWN)
-btn_b_debounce = adafruit_debouncer.Debouncer(btn_b)
-
-morse_paddle_dio = digitalio.DigitalInOut(board.A1)
-morse_paddle_dio.switch_to_input(digitalio.Pull.UP)
-morse_paddle_debounce = adafruit_debouncer.Debouncer(morse_paddle_dio)
+btns_builtin = keypad.Keys((board.BUTTON_A, board.BUTTON_B), value_when_pressed=True)
+btn_morse_key = keypad.Keys((board.A1,), value_when_pressed=False)
 
 # Main loop
 
 while True:
-    btn_a_debounce.update()
-    btn_b_debounce.update()
-    morse_paddle_debounce.update()
+    event = btns_builtin.events.get()
+    if event is not None:
+        # built-in A button
+        if event.pressed and event.key_number == 0:
+            play_morse(BTN_A_MESSAGE)
+        # built-in B button
+        elif event.pressed and event.key_number == 1:
+            play_morse(BTN_B_MESSAGE)
 
-    if morse_paddle_debounce.fell:
-        synth.press(60)
-    if morse_paddle_debounce.rose:
-        synth.release(60)
-
-    if btn_a_debounce.rose:
-        play_morse(BTN_A_MESSAGE)
-    if btn_b_debounce.rose:
-        play_morse(BTN_B_MESSAGE)
+    event = btn_morse_key.events.get()
+    if event is not None:
+        if event.pressed and event.key_number == 0:
+            synth.press(TONE_NOTE)
+        elif not event.pressed and event.key_number == 0:
+            synth.release(TONE_NOTE)
