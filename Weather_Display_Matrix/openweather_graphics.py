@@ -135,9 +135,9 @@ class OpenWeather_Graphics(displayio.Group):
         wind = weather["wind"]["speed"]
         print(wind)
         if self.meters_speed:
-            self.wind_text.text = "%d m/s" % wind
+            self.wind_text.text = "%.1f m/s" % wind
         else:
-            self.wind_text.text = "%d mph" % wind
+            self.wind_text.text = "%.1f mph" % wind
 
         self.display.root_group = self.root_group
 
