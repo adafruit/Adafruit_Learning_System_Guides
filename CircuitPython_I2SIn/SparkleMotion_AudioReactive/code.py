@@ -44,11 +44,7 @@ buf = array.array("i", [0] * SAMPLES_PER_FRAME)
 
 
 def to_signed24(u32):
-    # The mic packs a 24-bit signed sample left-justified in 32 bits.
-    signed24_val = u32 >> 8
-    if signed24_val & 0x800000:
-        signed24_val -= 0x1000000
-    return signed24_val
+    return u32 >> 8
 
 
 def wheel(pos):
