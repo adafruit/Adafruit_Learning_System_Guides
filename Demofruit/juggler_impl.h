@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 John Park with Claude Opus 4.8 for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 /*  rt_graham.h — Faithful port of RT1.C to C++/float for RP2350
     
     Original:

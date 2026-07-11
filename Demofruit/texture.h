@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 John Park with Claude Opus 4.8 for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // texture.h — 128x128 RGB565 texture for rotozoom
 // Auto-converted from bitmap.bmp
 // Usage: #include "texture.h"

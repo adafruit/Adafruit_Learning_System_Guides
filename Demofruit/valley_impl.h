@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 John Park with Claude Opus 4.8 for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // valley.h — Wireframe polygonal valley for Fruit Jam RP2350
 // DVHSTX16, 320x240.
 // Right half rendered, mirrored to left around screen center.

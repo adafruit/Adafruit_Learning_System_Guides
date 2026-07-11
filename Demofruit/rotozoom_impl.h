@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 John Park with Claude Opus 4.8 for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // rotozoom.h — Tiling rotozoom + moving sphere lens distortion
 // for Fruit Jam RP2350 / HSTX DVI
 //

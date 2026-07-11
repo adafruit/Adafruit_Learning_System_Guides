@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 John Park with Claude Opus 4.8 for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // song_4.h -- generated from kqvc_e_v12_jp.mod (164240 bytes)
 #pragma once
 

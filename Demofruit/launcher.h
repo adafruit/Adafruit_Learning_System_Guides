@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 John Park with Claude Opus 4.8 for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // launcher.h — boot menu for the Fruit Jam Demoscene Sampler
 // DVHSTX16 + GFX text over a slowly tumbling dim shaded cube.
 // Button3 up, Button2 down, Button1 launch.

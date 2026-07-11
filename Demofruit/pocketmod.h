@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 rombankzero
+//
+// SPDX-License-Identifier: MIT
+
 /* See end of file for license */
 
 #ifndef POCKETMOD_H_INCLUDED

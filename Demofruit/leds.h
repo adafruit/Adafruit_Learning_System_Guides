@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 John Park with Claude Opus 4.8 for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // leds.h — 5-pixel NeoPixel status strip for the Fruit Jam Demoscene Sampler
 //
 // UI grammar (learned once, used everywhere):

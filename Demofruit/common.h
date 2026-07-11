@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 John Park with Claude Opus 4.8 for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // common.h — shared infrastructure for the Fruit Jam Demoscene Sampler
 // Buttons, launch scratch registers, color helper, shared memory arena.
 

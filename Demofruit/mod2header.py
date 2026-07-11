@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# SPDX-FileCopyrightText: 2026 John Park with Claude Opus 4.8 for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """Convert a ProTracker .mod file to a C header for the Fruit Jam demos.
 
 Usage: python3 mod2header.py song.mod [output.h]

@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# SPDX-FileCopyrightText: 2026 John Park with Claude Opus 4.8 for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """Convert a 128x128 24-bit BMP into texture.h for the Demofruit rotozoom demo.
 
 Usage:  python3 bmp2texture.py image.bmp [texture.h]

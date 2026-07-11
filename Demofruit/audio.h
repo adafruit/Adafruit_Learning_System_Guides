@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 John Park with Claude Opus 4.8 for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // audio.h — shared MOD music for the Fruit Jam Demoscene Sampler
 // TLV320DAC3100 codec + arduino-pico I2S (PIO/DMA) + pocketmod.
 //

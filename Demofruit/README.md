@@ -1,11 +1,13 @@
 # Demofruit
 
-This is a demoscene demo for the **Adafruit Fruit Jam** (RP2350). Six classic-style
-effects, live animated menu, per-demo tracker music, and NeoPixel status
-strip.
+A demoscene sampler for the **Adafruit Fruit Jam** (RP2350). Six classic-style
+effects, a live animated menu, per-demo tracker music, and a NeoPixel status
+strip — all in a single sketch (`demofruit.ino`) that flashes as one UF2.
 
-This calls back the Amiga/DOS demoscene of the early 1990s. It includes a
-port of Eric Graham's 1987 *Juggler* raytracer running thousands of times faster than the
+The project is a love letter to the Amiga/DOS demoscene of the early 1990s,
+rebuilt on a microcontroller you can hold in your palm. It culminates in a
+faithful port of Eric Graham's 1987 *Juggler* raytracer — the demo that helped
+sell the world on the Amiga — running thousands of times faster than the
 original hour-per-frame hardware.
 
 ---
@@ -14,7 +16,7 @@ original hour-per-frame hardware.
 
 - **Adafruit Fruit Jam** (RP2350B, 8 MB PSRAM, 16 MB flash, HSTX DVI output)
 - HDMI display
-- Headphones or a powered speaker (audio via the onboard TLV320DAC3100 codec) + 3.5mm TRS cable
+- Headphones or a powered speaker (audio via the onboard TLV320DAC3100 codec)
 - The board's onboard buttons (Button1/2/3) and 5-pixel NeoPixel strip
 
 ### Required build settings (Arduino IDE)
@@ -39,14 +41,15 @@ original hour-per-frame hardware.
 ## The six demos
 
 Each demo began as a standalone sketch and was merged into the sampler. They are
-listed here in menu order, which is also roughly chronological by technique.
+listed here in menu order, which is also roughly chronological by technique — a
+small tour through the era's effects.
 
 ### 1. Starfield
 A forward-warping star field with per-letter bouncing chrome text. The classic
 "space + scroller" demo opener.
 
 - **Button1** — cycle the text message (`Adafruit`, `Fruit Jam`, `kqvc`,
-  `L  4  r  5`; editable at the top of `starfield_impl.h`)
+  `L 4 r 5`; editable at the top of `starfield_impl.h`)
 - **Button2** — step warp intensity
 - **Button3** — randomize star density
 
@@ -89,7 +92,7 @@ baked into `texture.h` (see "Creating the rotozoom image" below).
 - **Button3** — randomize the zoom range
 
 ### 6. The Juggler
-A port of **Eric Graham's 1987 Amiga *Juggler* raytracer** — a robotic
+A faithful port of **Eric Graham's 1987 Amiga *Juggler* raytracer** — a robotic
 figure juggling three mirrored balls over a checkered floor. The original took
 about an hour per frame on a 7 MHz 68000; the Fruit Jam renders a frame in about
 1.5 seconds.
@@ -184,7 +187,9 @@ volume control); it is not adjustable from the demos.
 ### The onboard speaker (A1 jumper)
 
 The onboard speaker is **muted by default**; the headphone jack always works.
-Demofruit gates the speaker behind a hardware jumper:
+The Fruit Jam's audio jack has no usable insertion-detect wiring, so rather
+than auto-muting the speaker when headphones are plugged in, Demofruit gates
+the speaker behind a hardware jumper:
 
 - **To enable the speaker:** connect the **A1 pad (GPIO41)** on the GPIO header
   to **GND** with a jumper wire, then reset/power on the board.
@@ -192,7 +197,7 @@ Demofruit gates the speaker behind a hardware jumper:
 
 The jumper is read once at startup (with an internal pull-up: tied to GND =
 speaker on, left open = muted), and the state is printed to the serial monitor.
-The speaker connector needs the board powered from 5V to be audible.
+The speaker connector needs the board powered from 5 V to be audible.
 
 ---
 

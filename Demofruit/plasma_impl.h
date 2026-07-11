@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 John Park with Claude Opus 4.8 for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+
 // plasma.h — Standalone plasma effect for Fruit Jam RP2350
 // 8-bit indexed plasma rendered through DVHSTX16 via a software
 // palette LUT (256 x RGB565), rebuilt each frame — palette rotation and
