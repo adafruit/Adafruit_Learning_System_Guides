@@ -1,0 +1,10 @@
+# SPDX-FileCopyrightText: 2026 Pedro Ruiz for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
+# settings.toml — copy to CIRCUITPY root and fill in
+CIRCUITPY_WIFI_SSID = "your-network"
+CIRCUITPY_WIFI_PASSWORD = "your-password"
+# optional: hours from UTC for rise/set display (e.g. -4 for EDT);
+# if unset, estimated from longitude (no DST awareness)
+# UTC_OFFSET = "-4"
