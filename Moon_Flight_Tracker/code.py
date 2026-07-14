@@ -31,7 +31,7 @@ import adafruit_requests
 import adafruit_ntp
 from adafruit_display_text import label
 from adafruit_display_shapes.roundrect import RoundRect
-from adafruit_bus_device.i2c_device import I2CDevice
+import adafruit_cst8xx
 import tl021wvc02
 from moon_ephem import moon_altaz_phase, phase_name
 
@@ -126,6 +126,9 @@ displayio.release_displays()
 
 # Init sequence lives in tl021wvc02.py (keeps this module under
 # pylint's 1000-line cap and reusable by other Qualia projects).
+# Not using the adafruit_qualia helper: its Round21 class bakes the panel's
+# stock 16 MHz pclk into the display definition, and this project needs the
+# lower DISPLAY_FREQ to suppress WiFi-burst jitter — so init stays direct.
 
 try:
     board.I2C().deinit()
@@ -625,76 +628,12 @@ BUILDERS = {"radar": build_radar, "list": build_list, "moon": build_moon,
             "loc": build_loc, "detail": build_detail}
 
 # ---------------- touch init ----------------
-class RawCST8XX:
-    """Minimal CST8xx poller — skips the driver's chip-ID whitelist,
-    which rejects some panel revisions ("Did not find supported CST8XX chip")."""
-    def __init__(self, i2c, addr=0x15):
-        self._dev = I2CDevice(i2c, addr)
-        self._buf = bytearray(7)
-
-    def _read(self):
-        with self._dev as d:
-            d.write_then_readinto(bytes([0x00]), self._buf)
-
-    def disable_auto_sleep(self):
-        """CST8xx auto-sleeps after ~5s idle and ignores I2C while asleep —
-        the first tap only WAKES the chip and is swallowed. Reg 0xFE = 0x01,
-        same as the Adafruit lib driver does at init."""
-        with self._dev as d:
-            d.write(bytes([0xFE, 0x01]))
-
-    def dump_id_regs(self):
-        """Read 0xA0-0xAA (chip id / fw version live here on CST816S) —
-        diagnostic for the Adafruit_CircuitPython_CST8XX chip-ID issue."""
-        out = []
-        b = bytearray(1)
-        for reg in range(0xA0, 0xAB):
-            try:
-                with self._dev as d:
-                    d.write_then_readinto(bytes([reg]), b)
-                out.append("{:02X}={:02X}".format(reg, b[0]))
-            except OSError:
-                out.append("{:02X}=NAK".format(reg))
-        return " ".join(out)
-
-    @property
-    def touched(self):
-        self._read()
-        return self._buf[2] & 0x0F
-
-    @property
-    def touches(self):
-        # wake-tolerant read: a sleeping/busy CST8xx NAKs or returns zeros on
-        # the first poke — retry a few times over ~45ms before giving up
-        for _ in range(3):
-            try:
-                self._read()
-                if self._buf[2] & 0x0F:
-                    x = ((self._buf[3] & 0x0F) << 8) | self._buf[4]
-                    y = ((self._buf[5] & 0x0F) << 8) | self._buf[6]
-                    return [{"x": x, "y": y}]
-                return []
-            except OSError:
-                time.sleep(0.015)
-        return []
-
-
-# Touch init: raw poller ONLY. Do not attempt the stock adafruit_cst8xx
-# driver first — its init reconfigures the chip's reporting mode before
-# rejecting the unrecognized chip ID (0xA7 reads 0x00 on this panel batch),
-# which silently breaks polled reads afterward. Tracking issue filed against
-# Adafruit_CircuitPython_CST8XX; revisit once it accepts this variant.
+# Stock driver. Requires adafruit_cst8xx with the merged fix that accepts
+# this panel batch's 0x00 chip ID (bundles after 2026-07-14); it also
+# disables the controller's auto-sleep so the first tap isn't swallowed.
 try:
-    touch = RawCST8XX(board.I2C())
-    _ = touch.touched  # probe one read
-    try:
-        touch.disable_auto_sleep()
-        print("touch: auto-sleep disabled")
-    except Exception as e:
-        print("touch: could not disable auto-sleep:", e)
-    print("touch: raw CST8XX @0x15 ok")
-    if DEBUG_TOUCH:
-        print("touch id regs (boot):", touch.dump_id_regs())
+    touch = adafruit_cst8xx.Adafruit_CST8XX(board.I2C())
+    print("touch: CST8XX ok")
 except Exception as e:
     print("touch init failed:", e)
     touch = None
@@ -838,8 +777,6 @@ def poll_touch():
             if DEBUG_TOUCH:
                 print("tap raw=({},{}) rot=({},{}) screen={} rep={} hit={}".format(
                     pts[0]["x"], pts[0]["y"], tx, ty, screen, is_repeat, hit))
-                if isinstance(touch, RawCST8XX):
-                    print("touch id regs (finger down):", touch.dump_id_regs())
             if hit:
                 show()
                 poll_touch()  # catch a finger held through the rebuild
@@ -959,7 +896,7 @@ while True:
         loc_msg = None
         show()
 
-    # tap detection lives in poll_touch() — see notes there
+    # tap detection lives in poll_touch() — see notes there. No sleep here:
+    # the loop is paced by the touch I2C transaction itself (~1-2 ms), and
+    # any added delay is pure tap latency.
     poll_touch()
-
-    time.sleep(0.01)

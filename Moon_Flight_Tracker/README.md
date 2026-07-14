@@ -18,15 +18,17 @@ Flight tracker that filters to planes likely to cross the moon, for the
 3. Copy these libraries from the CircuitPython bundle into `CIRCUITPY/lib/`:
    - `adafruit_display_text/`
    - `adafruit_display_shapes/` (RoundRect — rounded panel outlines)
-   - `adafruit_bus_device/` (raw CST8xx touch poller)
+   - `adafruit_cst8xx.mpy` (touch — needs the release with the 0x00 chip-ID fix)
    - `adafruit_requests.mpy`
    - `adafruit_connection_manager.mpy`
    - `adafruit_ntp.mpy`
 
-   The display is initialized directly (TL021WVC02 init codes in `code.py`);
-   the `adafruit_qualia` package is NOT required. Touch uses a built-in raw
-   CST8xx I2C poller at 0x15 (the stock focaltouch driver rejects some panel
-   revisions' chip IDs).
+   The display is initialized directly (TL021WVC02 init codes in
+   `tl021wvc02.py`); the `adafruit_qualia` package is NOT required — its
+   Round21 display class pins the stock 16 MHz pixel clock, and this project
+   lowers it to 8 MHz to suppress WiFi-burst jitter. Touch uses the stock
+   `adafruit_cst8xx` driver (needs the release with the 0x00 chip-ID fix,
+   bundles after 2026-07-14).
 
 ## Data sources (no API keys)
 
@@ -77,6 +79,6 @@ live data resumes. Each pass animates incrementally at several fps.
   fetches; raise it in `code.py` if your AP is far and requests time out.
 - Touch: taps landing entirely within a blocking fetch (~1–2 s every 15 s)
   can still be missed — the CST8xx has no event buffer. Everything else is
-  press-edge triggered with wake retries.
+  press-edge triggered.
 - If rotated 90/270 and left/right taps feel swapped, swap those two cases
   in `rotate_touch()`.
