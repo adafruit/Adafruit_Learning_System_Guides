@@ -685,6 +685,20 @@ class RawCST8XX:
         with self._dev as d:
             d.write(bytes([0xFE, 0x01]))
 
+    def dump_id_regs(self):
+        """Read 0xA0-0xAA (chip id / fw version live here on CST816S) —
+        diagnostic for the Adafruit_CircuitPython_CST8XX chip-ID issue."""
+        out = []
+        b = bytearray(1)
+        for reg in range(0xA0, 0xAB):
+            try:
+                with self._dev as d:
+                    d.write_then_readinto(bytes([reg]), b)
+                out.append("{:02X}={:02X}".format(reg, b[0]))
+            except OSError:
+                out.append("{:02X}=NAK".format(reg))
+        return " ".join(out)
+
     @property
     def touched(self):
         self._read()
@@ -707,7 +721,11 @@ class RawCST8XX:
         return []
 
 
-# Raw CST8xx poller at 0x15 (the lib driver rejects this panel's chip ID).
+# Touch init: raw poller ONLY. Do not attempt the stock adafruit_cst8xx
+# driver first — its init reconfigures the chip's reporting mode before
+# rejecting the unrecognized chip ID (0xA7 reads 0x00 on this panel batch),
+# which silently breaks polled reads afterward. Tracking issue filed against
+# Adafruit_CircuitPython_CST8XX; revisit once it accepts this variant.
 try:
     touch = RawCST8XX(board.I2C())
     _ = touch.touched  # probe one read
@@ -717,6 +735,8 @@ try:
     except Exception as e:
         print("touch: could not disable auto-sleep:", e)
     print("touch: raw CST8XX @0x15 ok")
+    if DEBUG_TOUCH:
+        print("touch id regs (boot):", touch.dump_id_regs())
 except Exception as e:
     print("touch init failed:", e)
     touch = None
@@ -860,6 +880,8 @@ def poll_touch():
             if DEBUG_TOUCH:
                 print("tap raw=({},{}) rot=({},{}) screen={} rep={} hit={}".format(
                     pts[0]["x"], pts[0]["y"], tx, ty, screen, is_repeat, hit))
+                if isinstance(touch, RawCST8XX):
+                    print("touch id regs (finger down):", touch.dump_id_regs())
             if hit:
                 show()
                 poll_touch()  # catch a finger held through the rebuild
