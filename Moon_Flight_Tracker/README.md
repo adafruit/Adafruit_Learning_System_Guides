@@ -9,8 +9,12 @@ Flight tracker that filters to planes likely to cross the moon, for the
 2. Copy to `CIRCUITPY/`:
    - `code.py`
    - `moon_ephem.py`
-   - `settings.toml` (from `settings.toml.example`, with your WiFi creds;
-     optional `UTC_OFFSET` pins the rise/set timezone manually)
+   - `tl021wvc02.py` (display init sequence)
+   - your standard `settings.toml` with WiFi credentials
+     (`CIRCUITPY_WIFI_SSID` / `CIRCUITPY_WIFI_PASSWORD`), as in other
+     WiFi projects. Optional: `UTC_OFFSET = "-4"` pins the rise/set
+     timezone manually — normally unnecessary; the device looks up a
+     DST-aware offset for your ZIP automatically.
 3. Copy these libraries from the CircuitPython bundle into `CIRCUITPY/lib/`:
    - `adafruit_display_text/`
    - `adafruit_display_shapes/` (RoundRect — rounded panel outlines)
