@@ -6,6 +6,7 @@ Low-precision moon position + phase for CircuitPython.
 Based on Paul Schlyter's "Computing planetary positions" (accuracy ~0.3 deg,
 plenty for a 0.52-deg moon disc + camera framing).
 '''
+# pylint: disable=too-many-locals
 import math
 
 D2R = math.pi / 180.0
