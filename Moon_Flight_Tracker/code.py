@@ -7,13 +7,16 @@ Alerts when a plane is about to cross (or pass near) the moon,
 for photographing transits.
 Adafruit Qualia ESP32-S3 + 2.1" round 480x480 touch TFT (product 5792).
 '''
-# Screens: RAD (radar) / LIST / MOON / LOC (zip keypad)
+# pylint: disable=broad-except, redefined-outer-name, global-statement
+# pylint: disable=too-many-locals, too-many-branches, too-many-statements
+# pylint: disable=too-many-return-statements
 # Screens: RAD (radar) / LIST / MOON / LOC (zip keypad)
 # Data: adsb.fi open API + on-device moon ephemeris
 import time
 import math
 import os
 import ssl
+import rtc
 import wifi
 import socketpool
 import microcontroller
@@ -28,6 +31,7 @@ import adafruit_requests
 import adafruit_ntp
 from adafruit_display_text import label
 from adafruit_display_shapes.roundrect import RoundRect
+from adafruit_bus_device.i2c_device import I2CDevice
 from moon_ephem import moon_altaz_phase, phase_name
 
 # ---------------- palette ----------------
@@ -74,6 +78,9 @@ moon_rs = None          # ("HH:MM", "HH:MM") local rise/set
 TZ_OFF = -5             # replaced after geocode (UTC_OFFSET env or lon/15)
 loc_msg = None          # (text, color) confirmation on LOC screen
 loc_msg_t = 0
+last_touch = 0          # touch dispatch state (poll_touch)
+last_tx = last_ty = -999
+was_down = False
 
 
 def nvm_get_zip():
@@ -123,8 +130,10 @@ _init_tl021wvc02 = bytes((
     0xc2, 0x02, 0x00, 0x02,
     0xcc, 0x01, 0x10,
     0xcd, 0x01, 0x08,
-    0xb0, 0x10, 0x02, 0x13, 0x1b, 0x0d, 0x10, 0x05, 0x08, 0x07, 0x07, 0x24, 0x04, 0x11, 0x0e, 0x2c, 0x33, 0x1d,
-    0xb1, 0x10, 0x05, 0x13, 0x1b, 0x0d, 0x11, 0x05, 0x08, 0x07, 0x07, 0x24, 0x04, 0x11, 0x0e, 0x2c, 0x33, 0x1d,
+    0xb0, 0x10, 0x02, 0x13, 0x1b, 0x0d, 0x10, 0x05, 0x08, 0x07,
+    0x07, 0x24, 0x04, 0x11, 0x0e, 0x2c, 0x33, 0x1d,
+    0xb1, 0x10, 0x05, 0x13, 0x1b, 0x0d, 0x11, 0x05, 0x08, 0x07,
+    0x07, 0x24, 0x04, 0x11, 0x0e, 0x2c, 0x33, 0x1d,
     0xff, 0x05, 0x77, 0x01, 0x00, 0x00, 0x11,
     0xb0, 0x01, 0x5d,
     0xb1, 0x01, 0x43,
@@ -138,15 +147,19 @@ _init_tl021wvc02 = bytes((
     0xd0, 0x01, 0x88,
     0xe0, 0x03, 0x00, 0x00, 0x02,
     0xe1, 0x0b, 0x03, 0xa0, 0x00, 0x00, 0x04, 0xa0, 0x00, 0x00, 0x00, 0x20, 0x20,
-    0xe2, 0x0d, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0xe2, 0x0d, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00,
     0xe3, 0x04, 0x00, 0x00, 0x11, 0x00,
     0xe4, 0x02, 0x22, 0x00,
-    0xe5, 0x10, 0x05, 0xec, 0xa0, 0xa0, 0x07, 0xee, 0xa0, 0xa0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0xe5, 0x10, 0x05, 0xec, 0xa0, 0xa0, 0x07, 0xee, 0xa0, 0xa0,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0xe6, 0x04, 0x00, 0x00, 0x11, 0x00,
     0xe7, 0x02, 0x22, 0x00,
-    0xe8, 0x10, 0x06, 0xed, 0xa0, 0xa0, 0x08, 0xef, 0xa0, 0xa0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0xe8, 0x10, 0x06, 0xed, 0xa0, 0xa0, 0x08, 0xef, 0xa0, 0xa0,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0xeb, 0x07, 0x00, 0x00, 0x40, 0x40, 0x00, 0x00, 0x00,
-    0xed, 0x10, 0xff, 0xff, 0xff, 0xba, 0x0a, 0xbf, 0x45, 0xff, 0xff, 0x54, 0xfb, 0xa0, 0xab, 0xff, 0xff, 0xff,
+    0xed, 0x10, 0xff, 0xff, 0xff, 0xba, 0x0a, 0xbf, 0x45, 0xff,
+    0xff, 0x54, 0xfb, 0xa0, 0xab, 0xff, 0xff, 0xff,
     0xef, 0x06, 0x10, 0x0d, 0x04, 0x08, 0x3f, 0x1f,
     0xff, 0x05, 0x77, 0x01, 0x00, 0x00, 0x13,
     0xef, 0x01, 0x08,
@@ -225,7 +238,6 @@ pool = socketpool.SocketPool(wifi.radio)
 requests = adafruit_requests.Session(pool, ssl.create_default_context())
 ntp = adafruit_ntp.NTP(pool, tz_offset=0)
 
-import rtc
 
 def sync_time():
     """One-shot NTP -> RTC so we never block on UDP again."""
@@ -267,7 +279,8 @@ def geocode(z):
 def fetch_aircraft():
     """adsb.fi open data — planes within NM_RADIUS of observer."""
     out = []
-    url = "https://opendata.adsb.fi/api/v2/lat/{:.4f}/lon/{:.4f}/dist/{}".format(LAT, LON, NM_RADIUS)
+    url = "https://opendata.adsb.fi/api/v2/lat/{:.4f}/lon/{:.4f}/dist/{}".format(
+        LAT, LON, NM_RADIUS)
     try:
         # short timeout: this call blocks the whole loop (touch included) —
         # better to skip one 15s cycle than freeze for 10s on a slow response
@@ -331,7 +344,8 @@ def fetch_utc_offset():
     Returns hours (e.g. -4.0 for EDT) or None on failure."""
     try:
         r = requests.get(
-            "https://timeapi.io/api/TimeZone/coordinate?latitude={:.4f}&longitude={:.4f}".format(LAT, LON),
+            "https://timeapi.io/api/TimeZone/coordinate"
+            "?latitude={:.4f}&longitude={:.4f}".format(LAT, LON),
             timeout=10)
         d = r.json()
         r.close()
@@ -606,7 +620,8 @@ def build_detail():
     d = math.sqrt(ac["x"] ** 2 + ac["y"] ** 2)
     g.append(text("ALT {}   GS {:.0f} KT".format(ac["alt"], ac["gs"]), CX, 240, CYAN, 2, (0.5, 0)))
     g.append(text("DIST {:.1f} MI   TRK {:.0f}".format(d, ac["track"]), CX, 270, CYAN, 2, (0.5, 0)))
-    g.append(text("SEP {:.1f} DEG   ETA {}:{:02d}".format(sep, eta // 60, eta % 60), CX, 300, col, 2, (0.5, 0)))
+    g.append(text("SEP {:.1f} DEG   ETA {}:{:02d}".format(
+        sep, eta // 60, eta % 60), CX, 300, col, 2, (0.5, 0)))
     g.append(nav_group("LIST"))
     return g
 
@@ -620,7 +635,8 @@ def build_moon():
     g.append(text("{:.0f}% ILLUMINATED".format(illum * 100), CX, 282, PINK, 2, (0.5, 0)))
     g.append(text("ALT {:.0f}   AZ {:.0f}".format(m_alt, m_az), CX, 316, CYAN, 2, (0.5, 0)))
     if moon_rs:
-        g.append(text("RISE {}   SET {}".format(moon_rs[0], moon_rs[1]), CX, 346, MOONC, 2, (0.5, 0)))
+        g.append(text("RISE {}   SET {}".format(moon_rs[0], moon_rs[1]),
+                      CX, 346, MOONC, 2, (0.5, 0)))
     g.append(text("ZIP {}  LAT {:.2f} LON {:.2f}".format(ZIP, LAT, LON), CX, 378, DIM, 1, (0.5, 0)))
     g.append(nav_group("MOON"))
     return g
@@ -655,13 +671,19 @@ class RawCST8XX:
     """Minimal CST8xx poller — skips the driver's chip-ID whitelist,
     which rejects some panel revisions ("Did not find supported CST8XX chip")."""
     def __init__(self, i2c, addr=0x15):
-        from adafruit_bus_device.i2c_device import I2CDevice
         self._dev = I2CDevice(i2c, addr)
         self._buf = bytearray(7)
 
     def _read(self):
         with self._dev as d:
             d.write_then_readinto(bytes([0x00]), self._buf)
+
+    def disable_auto_sleep(self):
+        """CST8xx auto-sleeps after ~5s idle and ignores I2C while asleep —
+        the first tap only WAKES the chip and is swallowed. Reg 0xFE = 0x01,
+        same as the Adafruit lib driver does at init."""
+        with self._dev as d:
+            d.write(bytes([0xFE, 0x01]))
 
     @property
     def touched(self):
@@ -672,7 +694,7 @@ class RawCST8XX:
     def touches(self):
         # wake-tolerant read: a sleeping/busy CST8xx NAKs or returns zeros on
         # the first poke — retry a few times over ~45ms before giving up
-        for attempt in range(3):
+        for _ in range(3):
             try:
                 self._read()
                 if self._buf[2] & 0x0F:
@@ -688,13 +710,9 @@ class RawCST8XX:
 # Raw CST8xx poller at 0x15 (the lib driver rejects this panel's chip ID).
 try:
     touch = RawCST8XX(board.I2C())
-    touch.touched  # probe one read
-    # CST8xx auto-sleeps after ~5s idle and ignores I2C while asleep — the
-    # first tap only WAKES the chip and is swallowed. Disable auto-sleep
-    # (reg 0xFE = 0x01, same as the Adafruit lib driver does at init).
+    _ = touch.touched  # probe one read
     try:
-        with touch._dev as d:
-            d.write(bytes([0xFE, 0x01]))
+        touch.disable_auto_sleep()
         print("touch: auto-sleep disabled")
     except Exception as e:
         print("touch: could not disable auto-sleep:", e)
@@ -777,43 +795,42 @@ def handle_touch(x, y, repeat=False):
         col = max(0, min(2, (x - 135) // 74))
         row = max(0, min(3, (y - 134) // 62))
         k = KEYS[row * 3 + col]
-        if True:
-                if k == "OK":
-                    if zip_draft == "67":
-                        # demo mode: 30s TRANSIT (pink) + 30s NEAR (cyan)
-                        # passes with a fake plane — for filming/testing
-                        demo_t0 = time.monotonic()
-                        screen = "radar"
-                        zip_draft = None
-                        return True
-                    if zip_draft in ("0", "90", "180", "270"):
-                        ROT = int(zip_draft)
-                        display.rotation = ROT
-                        nvm_set_rot(ROT)
-                        loc_msg = ("ROTATION {} SAVED".format(ROT), GREEN)
-                        loc_msg_t = time.monotonic()
-                        zip_draft = None
-                        return True
-                    if zip_draft and len(zip_draft) == 5:
-                        if geocode(zip_draft):
-                            ZIP = zip_draft
-                            nvm_set_zip(ZIP)
-                            loc_msg = ("SAVED {}  {:.2f} {:.2f}".format(ZIP, LAT, LON), GREEN)
-                        else:
-                            loc_msg = ("ZIP LOOKUP FAILED - RETRY", PINK)
-                        zip_draft = None
-                    else:
-                        loc_msg = ("ENTER 5 DIGITS", PINK)
-                    loc_msg_t = time.monotonic()
-                elif k == "<":
-                    zip_draft = (zip_draft or "")[:-1]
-                elif zip_draft and len(zip_draft) >= 5:
-                    # full draft: say so instead of silently ignoring digits
-                    loc_msg = ("5 DIGITS MAX - OK OR <", PINK)
-                    loc_msg_t = time.monotonic()
-                else:
-                    zip_draft = (zip_draft or "") + k
+        if k == "OK":
+            if zip_draft == "67":
+                # demo mode: 30s TRANSIT (pink) + 30s NEAR (cyan)
+                # passes with a fake plane — for filming/testing
+                demo_t0 = time.monotonic()
+                screen = "radar"
+                zip_draft = None
                 return True
+            if zip_draft in ("0", "90", "180", "270"):
+                ROT = int(zip_draft)
+                display.rotation = ROT
+                nvm_set_rot(ROT)
+                loc_msg = ("ROTATION {} SAVED".format(ROT), GREEN)
+                loc_msg_t = time.monotonic()
+                zip_draft = None
+                return True
+            if zip_draft and len(zip_draft) == 5:
+                if geocode(zip_draft):
+                    ZIP = zip_draft
+                    nvm_set_zip(ZIP)
+                    loc_msg = ("SAVED {}  {:.2f} {:.2f}".format(ZIP, LAT, LON), GREEN)
+                else:
+                    loc_msg = ("ZIP LOOKUP FAILED - RETRY", PINK)
+                zip_draft = None
+            else:
+                loc_msg = ("ENTER 5 DIGITS", PINK)
+            loc_msg_t = time.monotonic()
+        elif k == "<":
+            zip_draft = (zip_draft or "")[:-1]
+        elif zip_draft and len(zip_draft) >= 5:
+            # full draft: say so instead of silently ignoring digits
+            loc_msg = ("5 DIGITS MAX - OK OR <", PINK)
+            loc_msg_t = time.monotonic()
+        else:
+            zip_draft = (zip_draft or "") + k
+        return True
     return False
 
 
@@ -854,10 +871,7 @@ def poll_touch():
 
 geocode(ZIP)
 last_fetch = last_moon = last_rs = -9999
-last_touch = 0
 last_demo_frame = 0
-last_tx = last_ty = -999
-was_down = False
 show()
 
 while True:
