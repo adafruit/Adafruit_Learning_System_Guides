@@ -74,7 +74,7 @@ while raw_midi is None:
             print("Found midi device: ", hex(device.idVendor), hex(device.idProduct))
         except ValueError:
             continue
-midi = adafruit_midi.MIDI(midi_in=raw_midi, in_channel=0, debug=True)
+midi = adafruit_midi.MIDI(midi_in=raw_midi, in_channel=0)
 
 # --- Set up DAC & 3.5mm output ---
 mclk_pwm = PWMOut(board.I2S_MCLK, frequency=15_000_000, duty_cycle=2**15)
@@ -309,7 +309,7 @@ while True:
     # if control change button was pressed
     elif isinstance(msg, ControlChange):
 
-        # print(msg)
+        print(msg)
         # print(msg.__bytes__())
 
         if not cc_debounced(msg.control):
@@ -333,4 +333,3 @@ while True:
     # print unknown event messages
     elif msg is not None:
         print(msg)
-        print(dir(msg))
