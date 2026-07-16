@@ -309,9 +309,6 @@ while True:
     # if control change button was pressed
     elif isinstance(msg, ControlChange):
 
-        print(msg)
-        # print(msg.__bytes__())
-
         if not cc_debounced(msg.control):
             # duplicate event from the keyboard within the cooldown window;
             # ignore it
@@ -329,6 +326,9 @@ while True:
             if start_song():
                 pixels[0] = 0x00FF00
                 STATE = "song"
+
+        else:
+            print(msg)
 
     # print unknown event messages
     elif msg is not None:
