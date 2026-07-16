@@ -227,8 +227,8 @@ class SamplerMIDIPlayer(adafruit_midi_parser.MIDIPlayer):
     a no-op, matching the live keyboard's behavior.
     """
 
-    # pylint: disable=unused-argument
-    # `velocity` and `channel` are required by the parent interface
+    # pylint: disable=unused-argument, no-self-use
+    # `self`, `velocity`, and `channel` are required by the parent interface
     # even though they are unused by this subclass implementation.
     def on_note_on(self, note, velocity, channel):
         trigger_note(note)
@@ -287,7 +287,6 @@ while True:
             pixels[0] = 0xFF0000
             STATE = "recording"
 
-            # pylint: disable=consider-using-with
             # cannot use `with` because file must remain open beyond this context
             recording_file = open(OUTPUT_PATH, "wb")
             writer = audiofilewriter.AudioFileWriter(recording_file)
