@@ -5,6 +5,7 @@
 // YBox3 with Pico W and DVI PiCowbell
 // Bouncing ball screensaver written by Phil B.
 // Update user config section with your information
+// as of Philhower 5.7.0, FS needs to be defined under Flash Size
 
 #include <Arduino.h>
 #include <time.h>
