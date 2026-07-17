@@ -18,9 +18,11 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-// ==> Example which shows how to use the built in ESP32 I2S >= 3.0.0
+// As of ESP BSP 3.3.10, need to include arduino-audio-tools by Phil Schatzman
+// https://github.com/pschatzmann/arduino-audio-tools
 
 #include "ESP_I2S.h"
+#include "AudioTools.h"
 #include "BluetoothA2DPSink.h"
 
 const uint8_t I2S_SCK = 8;       /* Audio data bit clock */
