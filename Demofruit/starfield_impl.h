@@ -368,7 +368,7 @@ void drawBouncer(DVHSTX16 &display, float speedN) {
 
 // ── Sampler integration: text list + buttons + run loop ──────────────────────
 // Button1: cycle text  Button2: step warp intensity  Button3: randomize stars
-static const char *_sfTexts[] = { "Adafruit", "Fruit Jam", "LARSSIDE", "H4x0r1ee7" };
+static const char *_sfTexts[] = { "Adafruit", "Fruit Jam", "kqvc", "L 4 r 5 5 5" };
 #define SF_TEXT_COUNT 4
 static int _sfTextIdx = 0;
 static const float _sfWarpSteps[] = { 8.0f, 14.0f, 20.0f, 28.0f };

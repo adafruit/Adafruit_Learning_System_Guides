@@ -5682,353 +5682,353 @@ LOAD /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec5
 .iplt           0x10021304        0x0
  .iplt          0x10021304        0x0 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../lib/gcc/arm-none-eabi/14.3.0/thumb/crtbegin.o
 
-.rodata         0x10021308   0x1588f0
+.rodata         0x10021308   0x1588e8
  *(EXCLUDE_FILE(*libm.a: *libc.a:*lib_a-mem*.o *libgcc.a:) .rodata*)
  .rodata._ZN2plL15_buildMapStaticEv.str1.1
-                0x10021308     0x1421 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
+                0x10021308     0x141a /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
                                  0x3c (size before relaxing)
  .rodata._ZN2plL17_buildAnimateMapsEv.str1.1
-                0x10022729       0x59 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
+                0x10022722       0x59 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
  .rodata._ZL10_menuFrameR8DVHSTX16i.str1.1
-                0x10022729       0x77 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
+                0x10022722       0x77 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
  .rodata._ZN2pl10plasmaInitEv.str1.1
-                0x10022729       0x1c /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
+                0x10022722       0x1c /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
  .rodata._ZN2rt11rtCore0LoopER8DVHSTX16.str1.1
-                0x10022729       0x22 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
+                0x10022722       0x22 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
  .rodata._ZN2rt6rtInitER8DVHSTX16.str1.1
-                0x10022729       0x12 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
- *fill*         0x10022729        0x3 
+                0x10022722       0x12 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
+ *fill*         0x10022722        0x2 
  .rodata._ZN2vy10valleyTickER8DVHSTX16.str1.4
-                0x1002272c      0x209 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
+                0x10022724      0x209 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
                                  0x30 (size before relaxing)
  .rodata._ZN2rz6rzInitEv.str1.1
-                0x10022935       0x2f /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
+                0x1002292d       0x2f /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
  .rodata._ZN2rz11rzCore0LoopER8DVHSTX16.str1.1
-                0x10022935       0x22 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
+                0x1002292d       0x22 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
  .rodata._ZL5use16v.str1.1
-                0x10022935       0x40 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
+                0x1002292d       0x40 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
  .rodata._ZN2sf12starfieldRunER8DVHSTX16.str1.1
-                0x10022935       0x74 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
+                0x1002292d       0x74 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
  .rodata._ZN2pl10plasmaTickER8DVHSTX16.str1.1
-                0x10022935       0xcf /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
+                0x1002292d       0xcf /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
  .rodata._ZN2jg10jugglerRunER8DVHSTX16.str1.1
-                0x10022935       0x1a /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
+                0x1002292d       0x1a /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
  .rodata._ZL12smpAudioInitPKvj.isra.0.str1.1
-                0x10022935       0xd9 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
+                0x1002292d       0xd9 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
  .rodata.setup.str1.1
-                0x10022935       0x92 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
- *fill*         0x10022935        0x3 
+                0x1002292d       0x92 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
+ *fill*         0x1002292d        0x3 
  .rodata._ZTV8DVHSTX16
-                0x10022938       0x58 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
-                0x10022938                _ZTV8DVHSTX16
+                0x10022930       0x58 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
+                0x10022930                _ZTV8DVHSTX16
  .rodata._ZL6_cubeE
-                0x10022990       0x18 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
+                0x10022988       0x18 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
  .rodata._ZL6_cubeF
-                0x100229a8       0x18 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
+                0x100229a0       0x18 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
  .rodata._ZL6_cubeV
-                0x100229c0       0x60 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
+                0x100229b8       0x60 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
  .rodata._ZL9_menuTint
-                0x10022a20       0x12 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
+                0x10022a18       0x12 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
  .rodata.str1.1
-                0x10022a32       0xb1 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
- *fill*         0x10022a32        0x2 
+                0x10022a2a       0xaf /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
+ *fill*         0x10022a2a        0x2 
  .rodata._ZL9menuNames
-                0x10022a34       0x18 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
+                0x10022a2c       0x18 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
  .rodata._ZN2jgL6_jgFpsE
-                0x10022a4c       0x18 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
+                0x10022a44       0x18 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
  .rodata._ZN2jgL8_jgSchedE
-                0x10022a64       0x30 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
+                0x10022a5c       0x30 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
  .rodata._ZZN2jgL11rt_pixbriteEPfPKNS_5PatchEPKNS_5WorldEPKNS_6SphereEE6zenith
-                0x10022a94        0xc /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
+                0x10022a8c        0xc /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
  .rodata._ZN2rzL10_rzPresetsE
-                0x10022aa0       0x3c /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
+                0x10022a98       0x3c /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
  .rodata._ZN2vyL10_shipEdgesE
-                0x10022adc       0x1c /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
+                0x10022ad4       0x1c /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
  .rodata._ZN2vyL11_speedStepsE
-                0x10022af8       0x14 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
+                0x10022af0       0x14 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
  .rodata._ZN2vyL11_wireColorsE
-                0x10022b0c       0x28 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
+                0x10022b04       0x28 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
  .rodata._ZZN2sfL7_sfLedsEvE1C
-                0x10022b34        0xc /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
+                0x10022b2c        0xc /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
  .rodata._ZN2sfL12_sfWarpStepsE
-                0x10022b40       0x10 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
+                0x10022b38       0x10 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
  .rodata._ZN2sfL8_sfTextsE
-                0x10022b50       0x10 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
+                0x10022b48       0x10 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
  .rodata._ZL7texture
-                0x10022b60     0x8000 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
+                0x10022b58     0x8000 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
  .rodata._ZN5song6L8MOD_DATAE
-                0x1002ab60    0x7f344 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
+                0x1002ab58    0x7f344 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
  .rodata._ZN5song5L8MOD_DATAE
-                0x100a9ea4    0x46e9e /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
+                0x100a9e9c    0x46e9e /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
  .rodata._ZN5song4L8MOD_DATAE
-                0x100f0d42     0xfa38 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
+                0x100f0d3a     0xfa38 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
  .rodata._ZN5song3L8MOD_DATAE
-                0x1010077a    0x28190 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
+                0x10100772    0x28190 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
  .rodata._ZN5song2L8MOD_DATAE
-                0x1012890a    0x1d0f8 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
+                0x10128902    0x1d0f8 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
  .rodata._ZN5song1L8MOD_DATAE
-                0x10145a02     0xacd2 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
+                0x101459fa     0xacd2 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
  .rodata._ZN5song0L8MOD_DATAE
-                0x101506d4    0x24958 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
+                0x101506cc    0x24958 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
  .rodata._ZL10_smpBtnPin
-                0x1017502c        0xc /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
+                0x10175024        0xc /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
  .rodata._ZL18FreeSansBold24pt7b
-                0x10175038       0x10 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
+                0x10175030       0x10 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
  .rodata._ZL24FreeSansBold24pt7bGlyphs
-                0x10175048      0x2f8 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
+                0x10175040      0x2f8 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
  .rodata._ZL25FreeSansBold24pt7bBitmaps
-                0x10175340     0x1fcf /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
- *fill*         0x1017730f        0x1 
+                0x10175338     0x1fcf /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/Demofruit.ino.cpp.o
+ *fill*         0x10177307        0x1 
  .rodata.arpeggio.0
-                0x10177310       0x40 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/pocketmod.c.o
- .rodata.sin.1  0x10177350       0x10 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/pocketmod.c.o
+                0x10177308       0x40 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/pocketmod.c.o
+ .rodata.sin.1  0x10177348       0x10 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/pocketmod.c.o
  .rodata.tags.2
-                0x10177360       0xf0 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/pocketmod.c.o
+                0x10177358       0xf0 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/pocketmod.c.o
  .rodata._pocketmod_finetune
-                0x10177450      0x240 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/pocketmod.c.o
+                0x10177448      0x240 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/sketch/pocketmod.c.o
  .rodata.CSWTCH.13
-                0x10177690       0x18 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_DVI_HSTX/Adafruit_dvhstx.cpp.o
+                0x10177688       0x18 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_DVI_HSTX/Adafruit_dvhstx.cpp.o
  .rodata.CSWTCH.11
-                0x101776a8       0x18 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_DVI_HSTX/Adafruit_dvhstx.cpp.o
+                0x101776a0       0x18 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_DVI_HSTX/Adafruit_dvhstx.cpp.o
  .rodata._ZN8pimoroni6DVHSTX19display_setup_clockEv.str1.1
-                0x101776c0       0x32 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_DVI_HSTX/drivers/dvhstx/dvhstx.cpp.o
+                0x101776b8       0x32 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_DVI_HSTX/drivers/dvhstx/dvhstx.cpp.o
  .rodata._ZL28vactive_text_line_header_src
-                0x101776c0       0x38 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_DVI_HSTX/drivers/dvhstx/dvhstx.cpp.o
+                0x101776b8       0x38 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_DVI_HSTX/drivers/dvhstx/dvhstx.cpp.o
  .rodata._ZL23vactive_line_header_src
-                0x101776f8       0x1c /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_DVI_HSTX/drivers/dvhstx/dvhstx.cpp.o
+                0x101776f0       0x1c /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_DVI_HSTX/drivers/dvhstx/dvhstx.cpp.o
  .rodata._ZL24vblank_line_vsync_on_src
-                0x10177714       0x18 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_DVI_HSTX/drivers/dvhstx/dvhstx.cpp.o
+                0x1017770c       0x18 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_DVI_HSTX/drivers/dvhstx/dvhstx.cpp.o
  .rodata._ZL25vblank_line_vsync_off_src
-                0x1017772c       0x18 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_DVI_HSTX/drivers/dvhstx/dvhstx.cpp.o
+                0x10177724       0x18 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_DVI_HSTX/drivers/dvhstx/dvhstx.cpp.o
  .rodata.dvi_timing_1920x1080p_rb2_30hz
-                0x10177744       0x2c /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_DVI_HSTX/drivers/dvhstx/dvi.cpp.o
-                0x10177744                dvi_timing_1920x1080p_rb2_30hz
+                0x1017773c       0x2c /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_DVI_HSTX/drivers/dvhstx/dvi.cpp.o
+                0x1017773c                dvi_timing_1920x1080p_rb2_30hz
  .rodata.dvi_timing_1280x720p_rb_50hz
-                0x10177770       0x2c /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_DVI_HSTX/drivers/dvhstx/dvi.cpp.o
-                0x10177770                dvi_timing_1280x720p_rb_50hz
+                0x10177768       0x2c /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_DVI_HSTX/drivers/dvhstx/dvi.cpp.o
+                0x10177768                dvi_timing_1280x720p_rb_50hz
  .rodata.dvi_timing_1024x768_rb_60hz
-                0x1017779c       0x2c /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_DVI_HSTX/drivers/dvhstx/dvi.cpp.o
-                0x1017779c                dvi_timing_1024x768_rb_60hz
+                0x10177794       0x2c /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_DVI_HSTX/drivers/dvhstx/dvi.cpp.o
+                0x10177794                dvi_timing_1024x768_rb_60hz
  .rodata.dvi_timing_960x540p_60hz
-                0x101777c8       0x2c /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_DVI_HSTX/drivers/dvhstx/dvi.cpp.o
-                0x101777c8                dvi_timing_960x540p_60hz
+                0x101777c0       0x2c /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_DVI_HSTX/drivers/dvhstx/dvi.cpp.o
+                0x101777c0                dvi_timing_960x540p_60hz
  .rodata.dvi_timing_800x450p_60hz
-                0x101777f4       0x2c /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_DVI_HSTX/drivers/dvhstx/dvi.cpp.o
-                0x101777f4                dvi_timing_800x450p_60hz
+                0x101777ec       0x2c /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_DVI_HSTX/drivers/dvhstx/dvi.cpp.o
+                0x101777ec                dvi_timing_800x450p_60hz
  .rodata.dvi_timing_800x480p_60hz
-                0x10177820       0x2c /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_DVI_HSTX/drivers/dvhstx/dvi.cpp.o
-                0x10177820                dvi_timing_800x480p_60hz
+                0x10177818       0x2c /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_DVI_HSTX/drivers/dvhstx/dvi.cpp.o
+                0x10177818                dvi_timing_800x480p_60hz
  .rodata.dvi_timing_720x400p_70hz
-                0x1017784c       0x2c /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_DVI_HSTX/drivers/dvhstx/dvi.cpp.o
-                0x1017784c                dvi_timing_720x400p_70hz
+                0x10177844       0x2c /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_DVI_HSTX/drivers/dvhstx/dvi.cpp.o
+                0x10177844                dvi_timing_720x400p_70hz
  .rodata.dvi_timing_720x576p_50hz
-                0x10177878       0x2c /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_DVI_HSTX/drivers/dvhstx/dvi.cpp.o
-                0x10177878                dvi_timing_720x576p_50hz
+                0x10177870       0x2c /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_DVI_HSTX/drivers/dvhstx/dvi.cpp.o
+                0x10177870                dvi_timing_720x576p_50hz
  .rodata.dvi_timing_720x480p_60hz
-                0x101778a4       0x2c /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_DVI_HSTX/drivers/dvhstx/dvi.cpp.o
-                0x101778a4                dvi_timing_720x480p_60hz
+                0x1017789c       0x2c /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_DVI_HSTX/drivers/dvhstx/dvi.cpp.o
+                0x1017789c                dvi_timing_720x480p_60hz
  .rodata.dvi_timing_800x600p_60hz
-                0x101778d0       0x2c /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_DVI_HSTX/drivers/dvhstx/dvi.cpp.o
-                0x101778d0                dvi_timing_800x600p_60hz
+                0x101778c8       0x2c /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_DVI_HSTX/drivers/dvhstx/dvi.cpp.o
+                0x101778c8                dvi_timing_800x600p_60hz
  .rodata.dvi_timing_640x480p_60hz
-                0x101778fc       0x2c /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_DVI_HSTX/drivers/dvhstx/dvi.cpp.o
-                0x101778fc                dvi_timing_640x480p_60hz
+                0x101778f4       0x2c /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_DVI_HSTX/drivers/dvhstx/dvi.cpp.o
+                0x101778f4                dvi_timing_640x480p_60hz
  .rodata.intel_one_mono
-                0x10177928        0x8 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_DVI_HSTX/drivers/dvhstx/intel_one_mono_2bpp.c.o
-                0x10177928                intel_one_mono
- .rodata.cmaps  0x10177930       0x14 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_DVI_HSTX/drivers/dvhstx/intel_one_mono_2bpp.c.o
+                0x10177920        0x8 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_DVI_HSTX/drivers/dvhstx/intel_one_mono_2bpp.c.o
+                0x10177920                intel_one_mono
+ .rodata.cmaps  0x10177928       0x14 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_DVI_HSTX/drivers/dvhstx/intel_one_mono_2bpp.c.o
  .rodata.glyph_dsc
-                0x10177944      0x300 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_DVI_HSTX/drivers/dvhstx/intel_one_mono_2bpp.c.o
+                0x1017793c      0x300 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_DVI_HSTX/drivers/dvhstx/intel_one_mono_2bpp.c.o
  .rodata.glyph_bitmap
-                0x10177c44      0xee4 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_DVI_HSTX/drivers/dvhstx/intel_one_mono_2bpp.c.o
+                0x10177c3c      0xee4 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_DVI_HSTX/drivers/dvhstx/intel_one_mono_2bpp.c.o
  .rodata._ZTV12Adafruit_GFX
-                0x10178b28       0x58 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_GFX_Library/Adafruit_GFX.cpp.o
-                0x10178b28                _ZTV12Adafruit_GFX
+                0x10178b20       0x58 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_GFX_Library/Adafruit_GFX.cpp.o
+                0x10178b20                _ZTV12Adafruit_GFX
  .rodata._ZTV11GFXcanvas16
-                0x10178b80       0x58 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_GFX_Library/Adafruit_GFX.cpp.o
-                0x10178b80                _ZTV11GFXcanvas16
+                0x10178b78       0x58 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_GFX_Library/Adafruit_GFX.cpp.o
+                0x10178b78                _ZTV11GFXcanvas16
  .rodata._ZL4font
-                0x10178bd8      0x500 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_GFX_Library/Adafruit_GFX.cpp.o
+                0x10178bd0      0x500 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_GFX_Library/Adafruit_GFX.cpp.o
  .rodata._ZTV7TwoWire
-                0x101790d8       0x50 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Wire/Wire.a(Wire.cpp.o)
-                0x101790d8                _ZTV7TwoWire
+                0x101790d0       0x50 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Wire/Wire.a(Wire.cpp.o)
+                0x101790d0                _ZTV7TwoWire
  .rodata._ZN14SPIClassRP20405setRXEh.str1.1
-                0x10179128       0x67 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/SPI/SPI.a(SPI.cpp.o)
+                0x10179120       0x67 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/SPI/SPI.a(SPI.cpp.o)
  .rodata._ZN14SPIClassRP20405beginEb.str1.1
-                0x10179128       0x23 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/SPI/SPI.a(SPI.cpp.o)
+                0x10179120       0x23 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/SPI/SPI.a(SPI.cpp.o)
  .rodata._ZTV14SPIClassRP2040
-                0x10179128       0x40 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/SPI/SPI.a(SPI.cpp.o)
-                0x10179128                _ZTV14SPIClassRP2040
+                0x10179120       0x40 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/SPI/SPI.a(SPI.cpp.o)
+                0x10179120                _ZTV14SPIClassRP2040
  .rodata._ZTV3I2S
-                0x10179168       0x8c /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/I2S/I2S.a(I2S.cpp.o)
-                0x10179168                _ZTV3I2S
+                0x10179160       0x8c /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/I2S/I2S.a(I2S.cpp.o)
+                0x10179160                _ZTV3I2S
  .rodata._ZL21pio_i2s_inout_program
-                0x101791f4        0x8 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/I2S/I2S.a(I2S.cpp.o)
+                0x101791ec        0x8 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/I2S/I2S.a(I2S.cpp.o)
  .rodata._ZL34pio_i2s_inout_program_instructions
-                0x101791fc       0x1a /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/I2S/I2S.a(I2S.cpp.o)
- *fill*         0x10179216        0x2 
+                0x101791f4       0x1a /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/I2S/I2S.a(I2S.cpp.o)
+ *fill*         0x1017920e        0x2 
  .rodata._ZL24pio_i2s_in_slave_program
-                0x10179218        0x8 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/I2S/I2S.a(I2S.cpp.o)
+                0x10179210        0x8 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/I2S/I2S.a(I2S.cpp.o)
  .rodata._ZL37pio_i2s_in_slave_program_instructions
-                0x10179220       0x18 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/I2S/I2S.a(I2S.cpp.o)
+                0x10179218       0x18 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/I2S/I2S.a(I2S.cpp.o)
  .rodata._ZL18pio_i2s_in_program
-                0x10179238        0x8 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/I2S/I2S.a(I2S.cpp.o)
+                0x10179230        0x8 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/I2S/I2S.a(I2S.cpp.o)
  .rodata._ZL31pio_i2s_in_program_instructions
-                0x10179240       0x10 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/I2S/I2S.a(I2S.cpp.o)
+                0x10179238       0x10 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/I2S/I2S.a(I2S.cpp.o)
  .rodata._ZL20pio_lsbj_out_program
-                0x10179250        0x8 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/I2S/I2S.a(I2S.cpp.o)
+                0x10179248        0x8 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/I2S/I2S.a(I2S.cpp.o)
  .rodata._ZL33pio_lsbj_out_program_instructions
-                0x10179258       0x10 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/I2S/I2S.a(I2S.cpp.o)
+                0x10179250       0x10 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/I2S/I2S.a(I2S.cpp.o)
  .rodata._ZL21pio_tdm_inout_program
-                0x10179268        0x8 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/I2S/I2S.a(I2S.cpp.o)
+                0x10179260        0x8 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/I2S/I2S.a(I2S.cpp.o)
  .rodata._ZL34pio_tdm_inout_program_instructions
-                0x10179270        0xc /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/I2S/I2S.a(I2S.cpp.o)
+                0x10179268        0xc /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/I2S/I2S.a(I2S.cpp.o)
  .rodata._ZL19pio_tdm_out_program
-                0x1017927c        0x8 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/I2S/I2S.a(I2S.cpp.o)
+                0x10179274        0x8 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/I2S/I2S.a(I2S.cpp.o)
  .rodata._ZL32pio_tdm_out_program_instructions
-                0x10179284        0x8 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/I2S/I2S.a(I2S.cpp.o)
+                0x1017927c        0x8 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/I2S/I2S.a(I2S.cpp.o)
  .rodata._ZL28pio_i2s_out_slave_32_program
-                0x1017928c        0x8 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/I2S/I2S.a(I2S.cpp.o)
+                0x10179284        0x8 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/I2S/I2S.a(I2S.cpp.o)
  .rodata._ZL41pio_i2s_out_slave_32_program_instructions
-                0x10179294       0x1c /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/I2S/I2S.a(I2S.cpp.o)
+                0x1017928c       0x1c /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/I2S/I2S.a(I2S.cpp.o)
  .rodata._ZL28pio_i2s_out_slave_16_program
-                0x101792b0        0x8 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/I2S/I2S.a(I2S.cpp.o)
+                0x101792a8        0x8 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/I2S/I2S.a(I2S.cpp.o)
  .rodata._ZL41pio_i2s_out_slave_16_program_instructions
-                0x101792b8       0x1a /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/I2S/I2S.a(I2S.cpp.o)
- *fill*         0x101792d2        0x2 
+                0x101792b0       0x1a /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/I2S/I2S.a(I2S.cpp.o)
+ *fill*         0x101792ca        0x2 
  .rodata._ZL19pio_i2s_out_program
-                0x101792d4        0x8 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/I2S/I2S.a(I2S.cpp.o)
+                0x101792cc        0x8 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/I2S/I2S.a(I2S.cpp.o)
  .rodata._ZL32pio_i2s_out_program_instructions
-                0x101792dc       0x10 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/I2S/I2S.a(I2S.cpp.o)
+                0x101792d4       0x10 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/I2S/I2S.a(I2S.cpp.o)
  .rodata._ZL20pio_i2s_mclk_program
-                0x101792ec        0x8 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/I2S/I2S.a(I2S.cpp.o)
+                0x101792e4        0x8 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/I2S/I2S.a(I2S.cpp.o)
  .rodata._ZL33pio_i2s_mclk_program_instructions
-                0x101792f4        0x4 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/I2S/I2S.a(I2S.cpp.o)
+                0x101792ec        0x4 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/I2S/I2S.a(I2S.cpp.o)
  .rodata.channel_config_set_chain_to.part.0.str1.1
-                0x101792f8       0xe0 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/AudioBufferManager/AudioBufferManager.a(AudioBufferManager.cpp.o)
+                0x101792f0       0xe0 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/AudioBufferManager/AudioBufferManager.a(AudioBufferManager.cpp.o)
  .rodata._ZN18AudioBufferManager5beginEiPVv.str1.1
-                0x101792f8       0xed /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/AudioBufferManager/AudioBufferManager.a(AudioBufferManager.cpp.o)
+                0x101792f0       0xed /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/AudioBufferManager/AudioBufferManager.a(AudioBufferManager.cpp.o)
  .rodata._ZL14ws2812_program
-                0x101792f8        0x8 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_NeoPixel/Adafruit_Neopixel_RP2.cpp.o
+                0x101792f0        0x8 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_NeoPixel/Adafruit_Neopixel_RP2.cpp.o
  .rodata._ZL27ws2812_program_instructions
-                0x10179300        0x8 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_NeoPixel/Adafruit_Neopixel_RP2.cpp.o
+                0x101792f8        0x8 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/libraries/Adafruit_NeoPixel/Adafruit_Neopixel_RP2.cpp.o
  .rodata._ZN10PIOProgram7prepareEPP8pio_hw_tPiS3_ii.str1.1
-                0x10179308       0xb2 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/../../cores/3326fda9b3af94190c605fe65fb6c658/core.a(PIOProgram.cpp.o)
- .rodata        0x10179308        0xc /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/../../cores/3326fda9b3af94190c605fe65fb6c658/core.a(PIOProgram.cpp.o)
+                0x10179300       0xb2 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/../../cores/3326fda9b3af94190c605fe65fb6c658/core.a(PIOProgram.cpp.o)
+ .rodata        0x10179300        0xc /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/../../cores/3326fda9b3af94190c605fe65fb6c658/core.a(PIOProgram.cpp.o)
  .rodata._ZN9SerialUSB5beginEm.str1.1
-                0x10179314        0xc /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/../../cores/3326fda9b3af94190c605fe65fb6c658/core.a(SerialUSB.cpp.o)
+                0x1017930c        0xc /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/../../cores/3326fda9b3af94190c605fe65fb6c658/core.a(SerialUSB.cpp.o)
  .rodata._ZTV9SerialUSB
-                0x10179314       0x34 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/../../cores/3326fda9b3af94190c605fe65fb6c658/core.a(SerialUSB.cpp.o)
-                0x10179314                _ZTV9SerialUSB
+                0x1017930c       0x34 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/../../cores/3326fda9b3af94190c605fe65fb6c658/core.a(SerialUSB.cpp.o)
+                0x1017930c                _ZTV9SerialUSB
  .rodata._ZN8USBClass14registerStringEPKc.str1.1
-                0x10179348        0x1 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/../../cores/3326fda9b3af94190c605fe65fb6c658/core.a(USB.cpp.o)
+                0x10179340        0x1 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/../../cores/3326fda9b3af94190c605fe65fb6c658/core.a(USB.cpp.o)
  .rodata._ZN8USBClass24tud_descriptor_device_cbEv.str1.1
-                0x10179348       0x1a /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/../../cores/3326fda9b3af94190c605fe65fb6c658/core.a(USB.cpp.o)
+                0x10179340       0x1a /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/../../cores/3326fda9b3af94190c605fe65fb6c658/core.a(USB.cpp.o)
  .rodata._ZN7arduino5Print7printlnEv.str1.1
-                0x10179348        0x3 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/../../cores/3326fda9b3af94190c605fe65fb6c658/core.a(Print.cpp.o)
+                0x10179340        0x3 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/../../cores/3326fda9b3af94190c605fe65fb6c658/core.a(Print.cpp.o)
  .rodata._ZN7arduino5Print10printFloatEdi.str1.1
-                0x10179348        0xe /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/../../cores/3326fda9b3af94190c605fe65fb6c658/core.a(Print.cpp.o)
+                0x10179340        0xe /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/../../cores/3326fda9b3af94190c605fe65fb6c658/core.a(Print.cpp.o)
  .rodata._GLOBAL__sub_I_rp2040.str1.1
-                0x10179348        0x1 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/../../cores/3326fda9b3af94190c605fe65fb6c658/core.a(main.cpp.o)
+                0x10179340        0x1 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/../../cores/3326fda9b3af94190c605fe65fb6c658/core.a(main.cpp.o)
  .rodata.tlsf_check.str1.1
-                0x10179348       0xc3 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/../../cores/3326fda9b3af94190c605fe65fb6c658/core.a(psram.cpp.o)
+                0x10179340       0xc3 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/../../cores/3326fda9b3af94190c605fe65fb6c658/core.a(psram.cpp.o)
  .rodata.tlsf_add_pool.str1.1
-                0x10179348      0x1ac /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/../../cores/3326fda9b3af94190c605fe65fb6c658/core.a(psram.cpp.o)
+                0x10179340      0x1ac /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/../../cores/3326fda9b3af94190c605fe65fb6c658/core.a(psram.cpp.o)
  .rodata.tlsf_remove_pool.str1.1
-                0x10179348      0x173 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/../../cores/3326fda9b3af94190c605fe65fb6c658/core.a(psram.cpp.o)
+                0x10179340      0x173 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/../../cores/3326fda9b3af94190c605fe65fb6c658/core.a(psram.cpp.o)
  .rodata.tlsf_create.str1.1
-                0x10179348       0xa5 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/../../cores/3326fda9b3af94190c605fe65fb6c658/core.a(psram.cpp.o)
+                0x10179340       0xa5 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/../../cores/3326fda9b3af94190c605fe65fb6c658/core.a(psram.cpp.o)
  .rodata.tlsf_malloc.str1.1
-                0x10179348      0x31f /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/../../cores/3326fda9b3af94190c605fe65fb6c658/core.a(psram.cpp.o)
+                0x10179340      0x31f /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/../../cores/3326fda9b3af94190c605fe65fb6c658/core.a(psram.cpp.o)
  .rodata.tlsf_free.str1.1
-                0x10179348      0x1e6 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/../../cores/3326fda9b3af94190c605fe65fb6c658/core.a(psram.cpp.o)
+                0x10179340      0x1e6 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/../../cores/3326fda9b3af94190c605fe65fb6c658/core.a(psram.cpp.o)
  .rodata.tlsf_realloc.str1.1
-                0x10179348       0x2a /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/../../cores/3326fda9b3af94190c605fe65fb6c658/core.a(psram.cpp.o)
+                0x10179340       0x2a /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/../../cores/3326fda9b3af94190c605fe65fb6c658/core.a(psram.cpp.o)
  .rodata.CSWTCH.212
-                0x10179348       0x10 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/../../cores/3326fda9b3af94190c605fe65fb6c658/core.a(psram.cpp.o)
+                0x10179340       0x10 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/../../cores/3326fda9b3af94190c605fe65fb6c658/core.a(psram.cpp.o)
  .rodata.noInterrupts.str1.1
-                0x10179358       0x13 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/../../cores/3326fda9b3af94190c605fe65fb6c658/core.a(wiring_private.cpp.o)
+                0x10179350       0x13 /Users/jep/Library/Caches/arduino/sketches/6E99665EC3E743B6828A7C19056B54A0/../../cores/3326fda9b3af94190c605fe65fb6c658/core.a(wiring_private.cpp.o)
  .rodata.panic.str1.1
-                0x10179358       0x12 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/hardware/rp2040/5.6.0/lib/rp2350/libpico.a(panic.c.o)
+                0x10179350       0x12 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/hardware/rp2040/5.6.0/lib/rp2350/libpico.a(panic.c.o)
  .rodata.user_irq_claim_unused.str1.1
-                0x10179358       0x1b /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/hardware/rp2040/5.6.0/lib/rp2350/libpico.a(irq.c.o)
+                0x10179350       0x1b /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/hardware/rp2040/5.6.0/lib/rp2350/libpico.a(irq.c.o)
  .rodata.timer_hardware_alarm_claim.str1.1
-                0x10179358       0x22 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/hardware/rp2040/5.6.0/lib/rp2350/libpico.a(timer.c.o)
+                0x10179350       0x22 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/hardware/rp2040/5.6.0/lib/rp2350/libpico.a(timer.c.o)
  .rodata.dma_channel_claim.str1.1
-                0x10179358       0x22 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/hardware/rp2040/5.6.0/lib/rp2350/libpico.a(dma.c.o)
+                0x10179350       0x22 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/hardware/rp2040/5.6.0/lib/rp2350/libpico.a(dma.c.o)
  .rodata.dma_claim_unused_channel.str1.1
-                0x10179358       0x1e /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/hardware/rp2040/5.6.0/lib/rp2350/libpico.a(dma.c.o)
+                0x10179350       0x1e /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/hardware/rp2040/5.6.0/lib/rp2350/libpico.a(dma.c.o)
  .rodata.pio_claim_unused_sm.str1.1
-                0x10179358       0x24 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/hardware/rp2040/5.6.0/lib/rp2350/libpico.a(pio.c.o)
+                0x10179350       0x24 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/hardware/rp2040/5.6.0/lib/rp2350/libpico.a(pio.c.o)
  .rodata.multicore_doorbell_claim_under_lock.str1.1
-                0x10179358       0x53 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/hardware/rp2040/5.6.0/lib/rp2350/libpico.a(multicore.c.o)
+                0x10179350       0x53 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/hardware/rp2040/5.6.0/lib/rp2350/libpico.a(multicore.c.o)
  .rodata.multicore_doorbell_claim_unused.str1.1
-                0x10179358       0x12 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/hardware/rp2040/5.6.0/lib/rp2350/libpico.a(multicore.c.o)
+                0x10179350       0x12 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/hardware/rp2040/5.6.0/lib/rp2350/libpico.a(multicore.c.o)
  .rodata.hard_assertion_failure.str1.1
-                0x10179358        0xc /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/hardware/rp2040/5.6.0/lib/rp2350/libpico.a(runtime.c.o)
+                0x10179350        0xc /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/hardware/rp2040/5.6.0/lib/rp2350/libpico.a(runtime.c.o)
  .rodata._usbd_driver
-                0x10179358       0xa0 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/hardware/rp2040/5.6.0/lib/rp2350/libpico.a(usbd.c.o)
+                0x10179350       0xa0 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/hardware/rp2040/5.6.0/lib/rp2350/libpico.a(usbd.c.o)
  .rodata.spin_lock_claim_unused.str1.1
-                0x101793f8       0x1b /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/hardware/rp2040/5.6.0/lib/rp2350/libpico.a(sync.c.o)
+                0x101793f0       0x1b /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/hardware/rp2040/5.6.0/lib/rp2350/libpico.a(sync.c.o)
  .rodata.str1.1
-                0x101793f8       0x14 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/hardware/rp2040/5.6.0/lib/rp2350/libpico.a(dcd_rp2040.c.o)
+                0x101793f0       0x14 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/hardware/rp2040/5.6.0/lib/rp2350/libpico.a(dcd_rp2040.c.o)
  .rodata.str1.1
-                0x101793f8       0x46 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/hardware/rp2040/5.6.0/lib/rp2350/libpico.a(rp2040_usb.c.o)
+                0x101793f0       0x46 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/hardware/rp2040/5.6.0/lib/rp2350/libpico.a(rp2040_usb.c.o)
  .rodata.str1.4
-                0x101793f8       0x47 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../lib/gcc/arm-none-eabi/14.3.0/../../../../arm-none-eabi/lib/thumb/libc.a(libc_a-rand.o)
+                0x101793f0       0x47 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../lib/gcc/arm-none-eabi/14.3.0/../../../../arm-none-eabi/lib/thumb/libc.a(libc_a-rand.o)
  .rodata.str1.4
-                0x101793f8       0x43 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../lib/gcc/arm-none-eabi/14.3.0/../../../../arm-none-eabi/lib/thumb/libc.a(libc_a-assert.o)
+                0x101793f0       0x43 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../lib/gcc/arm-none-eabi/14.3.0/../../../../arm-none-eabi/lib/thumb/libc.a(libc_a-assert.o)
  .rodata.str1.4
-                0x101793f8        0x2 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../lib/gcc/arm-none-eabi/14.3.0/../../../../arm-none-eabi/lib/thumb/libc.a(libc_a-puts.o)
+                0x101793f0        0x2 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../lib/gcc/arm-none-eabi/14.3.0/../../../../arm-none-eabi/lib/thumb/libc.a(libc_a-puts.o)
  .rodata.str1.4
-                0x101793f8       0x12 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../lib/gcc/arm-none-eabi/14.3.0/../../../../arm-none-eabi/lib/thumb/libc.a(libc_a-locale.o)
+                0x101793f0       0x12 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../lib/gcc/arm-none-eabi/14.3.0/../../../../arm-none-eabi/lib/thumb/libc.a(libc_a-locale.o)
  .rodata.str1.4
-                0x101793f8       0x42 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../lib/gcc/arm-none-eabi/14.3.0/../../../../arm-none-eabi/lib/thumb/libc.a(libc_a-svfprintf.o)
- .rodata        0x101793f8      0x224 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../lib/gcc/arm-none-eabi/14.3.0/../../../../arm-none-eabi/lib/thumb/libc.a(libc_a-svfprintf.o)
+                0x101793f0       0x42 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../lib/gcc/arm-none-eabi/14.3.0/../../../../arm-none-eabi/lib/thumb/libc.a(libc_a-svfprintf.o)
+ .rodata        0x101793f0      0x224 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../lib/gcc/arm-none-eabi/14.3.0/../../../../arm-none-eabi/lib/thumb/libc.a(libc_a-svfprintf.o)
  .rodata.str1.4
-                0x1017961c       0x21 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../lib/gcc/arm-none-eabi/14.3.0/../../../../arm-none-eabi/lib/thumb/libc.a(libc_a-mstats.o)
+                0x10179614       0x21 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../lib/gcc/arm-none-eabi/14.3.0/../../../../arm-none-eabi/lib/thumb/libc.a(libc_a-mstats.o)
  .rodata.str1.4
-                0x1017961c       0x6d /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../lib/gcc/arm-none-eabi/14.3.0/../../../../arm-none-eabi/lib/thumb/libc.a(libc_a-dtoa.o)
- .rodata        0x1017961c      0x101 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../lib/gcc/arm-none-eabi/14.3.0/../../../../arm-none-eabi/lib/thumb/libc.a(libc_a-ctype_.o)
-                0x1017961c                _ctype_
+                0x10179614       0x6d /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../lib/gcc/arm-none-eabi/14.3.0/../../../../arm-none-eabi/lib/thumb/libc.a(libc_a-dtoa.o)
+ .rodata        0x10179614      0x101 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../lib/gcc/arm-none-eabi/14.3.0/../../../../arm-none-eabi/lib/thumb/libc.a(libc_a-ctype_.o)
+                0x10179614                _ctype_
  .rodata.str1.4
-                0x1017971d       0x59 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../lib/gcc/arm-none-eabi/14.3.0/../../../../arm-none-eabi/lib/thumb/libc.a(libc_a-mprec.o)
- *fill*         0x1017971d        0x3 
- .rodata        0x10179720      0x128 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../lib/gcc/arm-none-eabi/14.3.0/../../../../arm-none-eabi/lib/thumb/libc.a(libc_a-mprec.o)
-                0x10179730                __mprec_tinytens
-                0x10179758                __mprec_bigtens
-                0x10179780                __mprec_tens
+                0x10179715       0x59 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../lib/gcc/arm-none-eabi/14.3.0/../../../../arm-none-eabi/lib/thumb/libc.a(libc_a-mprec.o)
+ *fill*         0x10179715        0x3 
+ .rodata        0x10179718      0x128 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../lib/gcc/arm-none-eabi/14.3.0/../../../../arm-none-eabi/lib/thumb/libc.a(libc_a-mprec.o)
+                0x10179728                __mprec_tinytens
+                0x10179750                __mprec_bigtens
+                0x10179778                __mprec_tens
  .rodata.str1.4
-                0x10179848       0x42 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../lib/gcc/arm-none-eabi/14.3.0/../../../../arm-none-eabi/lib/thumb/libc.a(libc_a-vfprintf.o)
- .rodata        0x10179848      0x224 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../lib/gcc/arm-none-eabi/14.3.0/../../../../arm-none-eabi/lib/thumb/libc.a(libc_a-vfprintf.o)
+                0x10179840       0x42 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../lib/gcc/arm-none-eabi/14.3.0/../../../../arm-none-eabi/lib/thumb/libc.a(libc_a-vfprintf.o)
+ .rodata        0x10179840      0x224 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../lib/gcc/arm-none-eabi/14.3.0/../../../../arm-none-eabi/lib/thumb/libc.a(libc_a-vfprintf.o)
  .rodata.str1.4
-                0x10179a6c       0x51 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../lib/gcc/arm-none-eabi/14.3.0/../../../../arm-none-eabi/lib/thumb/libc.a(libc_a-mallstatsr.o)
+                0x10179a64       0x51 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../lib/gcc/arm-none-eabi/14.3.0/../../../../arm-none-eabi/lib/thumb/libc.a(libc_a-mallstatsr.o)
  .rodata.str1.4
-                0x10179a6c       0x2f /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../lib/gcc/arm-none-eabi/14.3.0/../../../../arm-none-eabi/lib/thumb/libc.a(libc_a-vfiprintf.o)
- .rodata        0x10179a6c      0x18c /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../lib/gcc/arm-none-eabi/14.3.0/../../../../arm-none-eabi/lib/thumb/libc.a(libc_a-vfiprintf.o)
+                0x10179a64       0x2f /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../lib/gcc/arm-none-eabi/14.3.0/../../../../arm-none-eabi/lib/thumb/libc.a(libc_a-vfiprintf.o)
+ .rodata        0x10179a64      0x18c /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../lib/gcc/arm-none-eabi/14.3.0/../../../../arm-none-eabi/lib/thumb/libc.a(libc_a-vfiprintf.o)
  *(.srodata*)
-                0x10179bf8                        . = ALIGN (0x4)
+                0x10179bf0                        . = ALIGN (0x4)
  *(SORT_BY_ALIGNMENT(SORT_BY_NAME(.flashdata*)))
-                0x10179bf8                        . = ALIGN (0x4)
+                0x10179bf0                        . = ALIGN (0x4)
 
 .ARM.extab
  *(.ARM.extab* .gnu.linkonce.armextab.*)
-                0x10179bf8                        __exidx_start = .
+                0x10179bf0                        __exidx_start = .
 
-.ARM.exidx      0x10179bf8        0x8
+.ARM.exidx      0x10179bf0        0x8
  *(.ARM.exidx* .gnu.linkonce.armexidx.*)
- .ARM.exidx     0x10179bf8        0x8 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../lib/gcc/arm-none-eabi/14.3.0/thumb/libgcc.a(_udivmoddi4.o)
- .ARM.exidx     0x10179c00        0x0 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../lib/gcc/arm-none-eabi/14.3.0/thumb/libgcc.a(_divdi3.o)
+ .ARM.exidx     0x10179bf0        0x8 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../lib/gcc/arm-none-eabi/14.3.0/thumb/libgcc.a(_udivmoddi4.o)
+ .ARM.exidx     0x10179bf8        0x0 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../lib/gcc/arm-none-eabi/14.3.0/thumb/libgcc.a(_divdi3.o)
                                   0x8 (size before relaxing)
-                0x10179c00                        __exidx_end = .
-                0x10179c00                        . = ALIGN (0x4)
-                0x10179c00                        __binary_info_start = .
+                0x10179bf8                        __exidx_end = .
+                0x10179bf8                        . = ALIGN (0x4)
+                0x10179bf8                        __binary_info_start = .
 
 .binary_info
  *(.binary_info.keep.*)
  *(.binary_info.*)
-                0x10179c00                        __binary_info_end = .
-                0x10179c00                        . = ALIGN (0x4)
+                0x10179bf8                        __binary_info_end = .
+                0x10179bf8                        . = ALIGN (0x4)
 
 .ram_vector_table
                 0x20000000      0x110
@@ -6042,7 +6042,7 @@ LOAD /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec5
                 0x20000110                        . = ALIGN (0x4)
  *(.uninitialized_data*)
 
-.data           0x20000110     0x2fe4 load address 0x10179c00
+.data           0x20000110     0x2fe4 load address 0x10179bf8
                 0x20000110                        __data_start__ = .
  *(vtable)
  *(.time_critical*)
@@ -6356,23 +6356,23 @@ LOAD /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec5
                 0x200030f4                        . = ALIGN (0x4)
 
 .tm_clone_table
-                0x200030f4        0x0 load address 0x1017cbe4
+                0x200030f4        0x0 load address 0x1017cbdc
  .tm_clone_table
                 0x200030f4        0x0 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../lib/gcc/arm-none-eabi/14.3.0/thumb/crtbegin.o
  .tm_clone_table
                 0x200030f4        0x0 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../lib/gcc/arm-none-eabi/14.3.0/thumb/crtend.o
 
-.igot.plt       0x200030f4        0x0 load address 0x1017cbe4
+.igot.plt       0x200030f4        0x0 load address 0x1017cbdc
  .igot.plt      0x200030f4        0x0 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../lib/gcc/arm-none-eabi/14.3.0/thumb/crtbegin.o
 
-.tdata          0x200030f4        0x0 load address 0x1017cbe4
+.tdata          0x200030f4        0x0 load address 0x1017cbdc
                 0x200030f4                        . = ALIGN (0x4)
  *(.tdata .tdata.* .gnu.linkonce.td.*)
                 0x200030f4                        __tdata_end = .
                 0x200030f4                        PROVIDE (__data_end__ = .)
-                0x10179c00                        __etext = LOADADDR (.data)
+                0x10179bf8                        __etext = LOADADDR (.data)
 
-.tbss           0x200030f4        0x0 load address 0x1017cbe4
+.tbss           0x200030f4        0x0 load address 0x1017cbdc
                 0x200030f4                        . = ALIGN (0x4)
                 0x200030f4                        __bss_start__ = .
                 0x200030f4                        __tls_base = .
@@ -6380,7 +6380,7 @@ LOAD /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec5
  *(.tcommon)
                 0x200030f4                        __tls_end = .
 
-.bss            0x200030f8    0x2b008 load address 0x1017cbe4
+.bss            0x200030f8    0x2b008 load address 0x1017cbdc
                 0x200030f8                        . = ALIGN (0x4)
                 0x200030f8                        __tbss_end = .
  *(SORT_BY_ALIGNMENT(SORT_BY_NAME(.bss*)))
@@ -6756,7 +6756,7 @@ LOAD /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec5
  *fill*         0x2002e0fe        0x2 
                 0x2002e100                        __bss_end__ = .
 
-.heap           0x2002e100    0x51f00 load address 0x1017cbe4
+.heap           0x2002e100    0x51f00 load address 0x1017cbdc
                 0x2002e100                        __end__ = .
                 0x2002e100                        end = __end__
  *(.heap*)
@@ -6765,7 +6765,7 @@ LOAD /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec5
  *fill*         0x2002e900    0x51700 
                 0x20080000                        __HeapLimit = .
 
-.scratch_x      0x20080000      0x598 load address 0x1017cbe4
+.scratch_x      0x20080000      0x598 load address 0x1017cbdc
                 0x20080000                        __scratch_x_start__ = .
  *(.scratch_x.*)
  .scratch_x.display
@@ -6778,14 +6778,14 @@ LOAD /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec5
                 0x20080590        0x8 linker stubs
                 0x20080598                        . = ALIGN (0x4)
                 0x20080598                        __scratch_x_end__ = .
-                0x1017cbe4                        __scratch_x_source__ = LOADADDR (.scratch_x)
+                0x1017cbdc                        __scratch_x_source__ = LOADADDR (.scratch_x)
 
-.scratch_y      0x20081000        0x0 load address 0x1017d17c
+.scratch_y      0x20081000        0x0 load address 0x1017d174
                 0x20081000                        __scratch_y_start__ = .
  *(.scratch_y.*)
                 0x20081000                        . = ALIGN (0x4)
                 0x20081000                        __scratch_y_end__ = .
-                0x1017d17c                        __scratch_y_source__ = LOADADDR (.scratch_y)
+                0x1017d174                        __scratch_y_source__ = LOADADDR (.scratch_y)
 
 .stack1_dummy   0x20080598      0x800
  *(.stack1*)
@@ -6795,14 +6795,14 @@ LOAD /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec5
  *(.stack*)
  .stack         0x20081000      0x800 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/hardware/rp2040/5.6.0/lib/rp2350/libpico.a(crt0.S.o)
 
-.flash_end      0x1017d17c       0x14
+.flash_end      0x1017d174       0x14
  *(.embedded_end_block*)
  .embedded_end_block
-                0x1017d17c       0x14 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/hardware/rp2040/5.6.0/lib/rp2350/libpico.a(crt0.S.o)
+                0x1017d174       0x14 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/hardware/rp2040/5.6.0/lib/rp2350/libpico.a(crt0.S.o)
                 [!provide]                        PROVIDE (__flash_binary_end = .)
 
-.rel.dyn        0x1017d190        0x0
- .rel.iplt      0x1017d190        0x0 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../lib/gcc/arm-none-eabi/14.3.0/thumb/crtbegin.o
+.rel.dyn        0x1017d188        0x0
+ .rel.iplt      0x1017d188        0x0 /Volumes/EXPRESS_2TB_HD/Arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../lib/gcc/arm-none-eabi/14.3.0/thumb/crtbegin.o
 
 .psram          0x11000000   0x3b6000
                 0x11000000                        __psram_start__ = .

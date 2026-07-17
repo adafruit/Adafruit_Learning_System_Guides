@@ -49,7 +49,7 @@ A forward-warping star field with per-letter bouncing chrome text. The classic
 "space + scroller" demo opener.
 
 - **Button1** — cycle the text message (`Adafruit`, `Fruit Jam`, `kqvc`,
-  `L 4 r 5`; editable at the top of `starfield_impl.h`)
+  `L 4 r 5 5 5`; editable at the top of `starfield_impl.h`)
 - **Button2** — step warp intensity
 - **Button3** — randomize star density
 
