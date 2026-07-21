@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2026 Erin St Blaine and ChatGPT for Adafruit Industries
+# SPDX-FileCopyrightText: 2026 Erin St Blaine
 # SPDX-License-Identifier: MIT
 
 """Motion-reactive ember and flare animations for an LED polka-dot dress."""
@@ -54,35 +54,8 @@ lis3dh.range = adafruit_lis3dh.RANGE_2_G
 
 
 # --------------------------------------------------
-# DRESS ZONES
+# DRESS LEVELS
 # --------------------------------------------------
-
-# Left skirt:  0-80
-# Right skirt: 81-165
-# Right top:   166-192
-# Left top:    193-215
-
-LEFT_SKIRT = tuple(range(0, 81))
-RIGHT_SKIRT = tuple(range(81, 166))
-RIGHT_TOP = tuple(range(166, 193))
-LEFT_TOP = tuple(range(193, 216))
-
-SKIRT_PIXELS = LEFT_SKIRT + RIGHT_SKIRT
-TOP_PIXELS = RIGHT_TOP + LEFT_TOP
-
-# Reverse one skirt range if its flare travels
-# in the wrong physical direction.
-#
-# RIGHT_SKIRT = tuple(range(165, 80, -1))
-
-
-# --------------------------------------------------
-# SKIRT HEIGHT GROUPS
-# --------------------------------------------------
-
-# Pixel 0 was added to upper.
-# Pixel 139 was added to middle.
-# Pixel 165 was added to upper.
 
 UPPER_SKIRT_PIXELS = (
     0, 1, 2, 3, 4,
@@ -119,6 +92,21 @@ LOWER_SKIRT_PIXELS = (
     129, 130, 131, 132, 133, 134, 135
 )
 
+TOP_LEVEL_PIXELS = tuple(range(166, 216))
+
+SKIRT_PIXELS = (
+    LOWER_SKIRT_PIXELS
+    + MIDDLE_SKIRT_PIXELS
+    + UPPER_SKIRT_PIXELS
+)
+
+DRESS_LEVELS = (
+    LOWER_SKIRT_PIXELS,
+    MIDDLE_SKIRT_PIXELS,
+    UPPER_SKIRT_PIXELS,
+    TOP_LEVEL_PIXELS,
+)
+
 
 # --------------------------------------------------
 # EMBER SETTINGS
@@ -153,7 +141,6 @@ TOP_PIXEL_FADE = 0.82
 
 # Number of new cup sparkles attempted each frame.
 TOP_SPARKLE_COUNT = 4
-
 
 # --------------------------------------------------
 # MOTION SETTINGS
@@ -219,9 +206,9 @@ def fade_all(amount):
         )
 
 
-def clear_zone(zone):
-    """Turn off every pixel in a zone."""
-    for index in zone:
+def clear_group(group):
+    """Turn off every pixel in a group."""
+    for index in group:
         pixels[index] = (0, 0, 0)
 
 
@@ -337,12 +324,12 @@ def animate_top_afterglow():
     """
     if STATE["top_afterglow"] <= 0.01:
         STATE["top_afterglow"] = 0.0
-        clear_zone(TOP_PIXELS)
+        clear_group(TOP_LEVEL_PIXELS)
         return
 
     # Fade all existing cup pixels quickly enough that
     # they continue blinking instead of appearing frozen.
-    for index in TOP_PIXELS:
+    for index in TOP_LEVEL_PIXELS:
         pixels[index] = scale_color(
             pixels[index],
             TOP_PIXEL_FADE,
@@ -351,7 +338,7 @@ def animate_top_afterglow():
     # Add fresh flickering points at the current
     # afterglow brightness level.
     for _ in range(TOP_SPARKLE_COUNT):
-        index = pick_from(TOP_PIXELS)
+        index = pick_from(TOP_LEVEL_PIXELS)
         sparkle_roll = random.random()
 
         if sparkle_roll < 0.12:
@@ -401,64 +388,30 @@ def ember_frame():
 
 
 # --------------------------------------------------
-# SKIRT FLARE
+# LEVEL-BY-LEVEL FLARE
 # --------------------------------------------------
 
-def draw_flare_front(zone, progress):
-    """Draw a bright flare traveling through one skirt zone."""
+def draw_flare_level(level_order, progress):
+    """Dissolve one horizontal dress level into view."""
     progress = max(0.0, min(1.0, progress))
 
-    zone_length = len(zone)
-    front = int(progress * (zone_length - 1))
-
-    for local_index in range(front + 1):
-        pixel_index = zone[local_index]
-        distance = front - local_index
-
-        if distance == 0:
-            pixels[pixel_index] = (255, 180, 60)
-
-        elif distance < 3:
-            pixels[pixel_index] = (255, 70, 5)
-
-        elif distance < 8:
-            pixels[pixel_index] = (180, 10, 0)
-
-        else:
-            pixels[pixel_index] = (55, 0, 0)
-
-
-# --------------------------------------------------
-# CUP DISSOLVE
-# --------------------------------------------------
-
-LEFT_TOP_DISSOLVE = list(LEFT_TOP)
-RIGHT_TOP_DISSOLVE = list(RIGHT_TOP)
-
-shuffle_list(LEFT_TOP_DISSOLVE)
-shuffle_list(RIGHT_TOP_DISSOLVE)
-
-
-def dissolve_zone(zone_order, progress):
-    """Dissolve a zone into view in randomized pixel order."""
-    progress = max(0.0, min(1.0, progress))
-
-    pixels_to_light = int(len(zone_order) * progress)
+    pixels_to_light = int(len(level_order) * progress)
 
     for position in range(pixels_to_light):
-        pixel_index = zone_order[position]
+        pixel_index = level_order[position]
         age = pixels_to_light - position
 
         if age < 3:
-            color = (255, 150, 35)
+            pixels[pixel_index] = (255, 180, 60)
 
         elif age < 8:
-            color = (255, 55, 5)
+            pixels[pixel_index] = (255, 70, 5)
 
         else:
-            color = (170, 8, 0)
+            pixels[pixel_index] = (170, 8, 0)
 
-        pixels[pixel_index] = color
+
+FLARE_LEVEL_ORDERS = [list(level) for level in DRESS_LEVELS]
 
 
 # --------------------------------------------------
@@ -466,45 +419,29 @@ def dissolve_zone(zone_order, progress):
 # --------------------------------------------------
 
 def flare_up():
-    """Run the skirt flare, cup dissolve, and spark burst."""
-    shuffle_list(LEFT_TOP_DISSOLVE)
-    shuffle_list(RIGHT_TOP_DISSOLVE)
+    """Run an upward level-by-level flare and spark burst."""
+    for level_order in FLARE_LEVEL_ORDERS:
+        shuffle_list(level_order)
 
     # Stop any previous afterglow while the new flare runs.
     STATE["top_afterglow"] = 0.0
 
-    # Phase 1: fast skirt flare and cup dissolve.
-    flare_frames = 20
+    # Phase 1: flare upward through all four dress levels.
+    flare_frames = 12
 
     for frame in range(flare_frames):
         fade_all(30)
 
         progress = frame / (flare_frames - 1)
 
-        draw_flare_front(
-            LEFT_SKIRT,
-            progress,
-        )
-
-        draw_flare_front(
-            RIGHT_SKIRT,
-            progress,
-        )
-
-        if progress > 0.35:
-            top_progress = (
-                progress - 0.35
-            ) / 0.65
-
-            dissolve_zone(
-                LEFT_TOP_DISSOLVE,
-                top_progress,
+        for level_index, level_order in enumerate(
+            FLARE_LEVEL_ORDERS
+        ):
+            level_progress = (
+                progress * len(FLARE_LEVEL_ORDERS)
+                - level_index
             )
-
-            dissolve_zone(
-                RIGHT_TOP_DISSOLVE,
-                top_progress,
-            )
+            draw_flare_level(level_order, level_progress)
 
         pixels.show()
         time.sleep(0.01)
@@ -531,19 +468,9 @@ def flare_up():
 
             pixels[index] = color
 
-        # Keep the cups actively flickering during the burst.
-        for _ in range(4):
-            index = pick_from(LEFT_TOP)
-            pixels[index] = random.choice(
-                (
-                    (255, 50, 5),
-                    (255, 120, 30),
-                    (255, 200, 90),
-                )
-            )
-
-        for _ in range(4):
-            index = pick_from(RIGHT_TOP)
+        # Keep the top actively flickering during the burst.
+        for _ in range(8):
+            index = pick_from(TOP_LEVEL_PIXELS)
             pixels[index] = random.choice(
                 (
                     (255, 50, 5),
