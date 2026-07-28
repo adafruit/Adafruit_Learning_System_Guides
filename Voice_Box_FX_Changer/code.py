@@ -35,11 +35,6 @@ GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 PURPLE = (50, 0, 255)
 OFF = (0, 0, 0)
-# start-up purple marquee
-for i in range(8):
-    pixels[i] = PURPLE
-    time.sleep(0.2)
-time.sleep(0.5)
 
 # recording config
 SAMPLE_RATE = 16000
@@ -61,7 +56,6 @@ mic = audioi2sin.I2SIn(
     left_justified=False, # using ICS43434
 )
 
-
 i2s   = audiobusio.I2SOut(board.D10, board.D11, board.SCL)
 mixer = audiomixer.Mixer(
     voice_count=1,
@@ -71,7 +65,7 @@ mixer = audiomixer.Mixer(
     samples_signed=True,
 )
 i2s.play(mixer)
-mixer.voice[0].level = 1.0
+mixer.voice[0].level = 0.5
 
 pitch_shift = audiodelays.PitchShift(
     semitones=0.0,
@@ -118,6 +112,15 @@ amp = audiofilters.Distortion(
 
 loop = False
 recording = False
+file = open("/bootbeeps.wav", "rb")
+wav = audiocore.WaveFile(file)
+mixer.voice[0].play(wav, loop=False)
+# start-up purple marquee
+for i in range(8):
+    pixels[i] = PURPLE
+    time.sleep(0.2)
+time.sleep(0.5)
+mixer.voice[0].level = 1.0
 pixels.fill(OFF)
 
 while True:
