@@ -62,32 +62,32 @@ def level_color(error_degrees):
         return AMBER
     return RED
 
-def update_level(active_mode, x_angle, y_angle, roll_angle):
+def update_level(mode, _x_angle, _y_angle, _roll_angle):
     """Move and recolor the retained vector bubble."""
-    down_references.hidden = active_mode != DOWN
-    horizon_references.hidden = active_mode == DOWN
+    down_references.hidden = mode != DOWN
+    horizon_references.hidden = mode == DOWN
 
-    if active_mode == DOWN:
+    if mode == DOWN:
         bubble_x = BAR_CENTER_X + int(
-            clamp(x_angle / FULL_SCALE_DEGREES, -1.0, 1.0) * HORIZONTAL_TRAVEL
+            clamp(_x_angle / FULL_SCALE_DEGREES, -1.0, 1.0) * HORIZONTAL_TRAVEL
         )
         bubble_y = BAR_CENTER_Y + int(
-            clamp(y_angle / FULL_SCALE_DEGREES, -1.0, 1.0) * VERTICAL_TRAVEL
+            clamp(_y_angle / FULL_SCALE_DEGREES, -1.0, 1.0) * VERTICAL_TRAVEL
         )
-        error = max(abs(x_angle), abs(y_angle))
+        error_amount = max(abs(_x_angle), abs(_y_angle))
     else:
         bubble_x = BAR_CENTER_X + int(
-            clamp(roll_angle / FULL_SCALE_DEGREES, -1.0, 1.0)
+            clamp(_roll_angle / FULL_SCALE_DEGREES, -1.0, 1.0)
             * HORIZONTAL_TRAVEL
         )
         bubble_y = BAR_CENTER_Y
-        error = abs(roll_angle)
+        error_amount = abs(_roll_angle)
 
     bubble_outline.x = bubble_x
     bubble_outline.y = bubble_y
     bubble_fill.x = bubble_x
     bubble_fill.y = bubble_y
-    bubble_palette[0] = level_color(error)
+    bubble_palette[0] = level_color(error_amount)
 
 def take_photo(camera):
     camera.tone(1200, 0.04)
