@@ -1,0 +1,127 @@
+{
+  "name": "DEMOPACK",
+  "presets": [
+    {
+      "list": [
+        {
+          "effect": "pitch_shift",
+          "semitones": {"block":"math","operation":"constrained_lerp","a":-12,"b":12,"c":"$handle"},
+          "mix": 1,
+          "window": 1024,
+          "overlap": 128
+        },
+        {
+          "effect": "distortion",
+          "drive": 0.6,
+          "pre_gain": 12,
+          "post_gain": -8,
+          "mode": "overdrive",
+          "soft_clip": true,
+          "mix": 1
+        },
+        {"effect":"filter","filter":{"mode":"low_pass","frequency":3500,"Q":0.7071},"mix":1}
+      ]
+    },
+    {
+      "list": [
+        {"effect":"filter","filter":{"mode":"high_pass","frequency":200,"Q":0.7071},"mix":1},
+        {"effect": "granular_pitch_shift", "semitones":  8.0, "density": 3.0},
+        {"effect":"echo","max_delay_ms":1200,"delay_ms":750,"decay":0.45,"mix":0.35,"freq_shift":true},
+        {"effect":"freeverb","roomsize":0.75,"damp":0.55,"mix":0.6}
+      ]
+    },
+    {
+      "list": [
+        {"effect":"chorus","max_delay_ms":50,"delay_ms":25,"voices":3,"mix":0.5},
+        {"effect":"phaser","frequency":600,"feedback":0.7,"mix":0.5,"stages":8},
+        {
+          "effect": "multi_tap_delay",
+          "max_delay_ms": 750,
+          "delay_ms": 500,
+          "decay": 0.6,
+          "mix": 0.3,
+          "taps": [
+            [0.333,0.6],
+            [0.666,0.8],
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "blocks": {
+        "sweep": {"block":"lfo","waveform":"sine","rate":1.5,"scale":1000,"offset":2000},
+        "delay_sweep": {"block":"lfo","waveform":"sine","rate":1,"scale":100,"offset": 200}
+      },
+      "list": [
+        {"effect":"pitch_shift","semitones":-6,"mix":1,"window":1024,"overlap":128},
+        {"effect":"chorus","max_delay_ms":450,"delay_ms":"$delay_sweep","voices":3,"mix":0.65},
+        {"effect":"phaser","frequency":"$sweep","feedback":0.7,"mix":0.5,"stages":6}
+      ]
+    }
+  ],
+  "samples": [{
+    "file": "1.wav",
+    "playmode": "startstop",
+    "blocks": {
+      "semitone_sweep": {
+        "block": "lfo",
+        "waveform": "square",
+        "rate": 3,
+        "scale": 12.0,
+        "offset": 0
+      }
+    },
+    "effects": [
+      {
+        "effect": "granular_pitch_shift",
+        "semitones": "$semitone_sweep",
+        "density": 3.0
+      }
+    ]
+  },
+  {
+    "file": "2.wav",
+    "playmode": "hold",
+    "effects": [
+      {"effect":"chorus","max_delay_ms":350,"delay_ms":100,"voices":3,"mix":0.85}
+    ]
+  },
+  {
+    "file": "3.wav",
+    "playmode": "oneshot",
+    "effects": [
+        {"effect":"filter","filter":{"mode":"high_pass","frequency":1200,"Q":0.7071},"mix":1},
+        {"effect": "granular_pitch_shift", "semitones":  -8.0, "density": 3.0},
+        {"effect":"freeverb","roomsize":0.75,"damp":0.55,"mix":0.6}
+    ]
+  },
+  {
+    "file": "4.wav",
+    "playmode": "oneshot",
+
+    "effects": [
+      {
+        "effect": "filter",
+        "filter": {
+          "mode": "high_pass",
+          "frequency": 1200,
+          "Q": 0.7071
+        },
+        "mix": 1
+      },
+      {
+        "effect": "granular_pitch_shift",
+        "semitones": 12.0,
+        "density": 3.0
+      },
+      {
+        "effect": "freeverb",
+        "roomsize": 0.55,
+        "damp": 0.55,
+        "mix": 0.6
+      }
+    ]
+  }
+  ]
+}
