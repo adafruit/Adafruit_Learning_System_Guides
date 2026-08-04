@@ -233,8 +233,6 @@ codec.adc_volume = ADC_VOLUME
 # own ADC biquad, before it ever reaches the I2S bus.
 codec.configure_adc_highpass(frequency=HPF_HZ, sample_rate=RATE)
 
-# left_justified=True is what matches this codec's ADCDAT, which it
-# drives one BCLK ahead of what our own clock source TX program emits.
 mic = audioi2sin.I2SIn(
     board.I2S_BIT_CLOCK,
     board.I2S_WS,
@@ -243,7 +241,6 @@ mic = audioi2sin.I2SIn(
     bit_depth=16,
     mono=True,
     external_clock=True,
-    left_justified=True,
 )
 
 # Two-voice audio mixer sits between the sources and the I2S output.
