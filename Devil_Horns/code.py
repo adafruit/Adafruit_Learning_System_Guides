@@ -37,16 +37,12 @@ EMBER_PULSE_SPEED = 1.4
 EMBER_FLICKER_CHANCE = 8
 EMBER_FLICKER_DECAY = 0.88
 
-# Motion sensitivity.
-MOTION_START = 1.5
-MOTION_FULL = 7.0
-
 # Sharp movement required to trigger the traveling flare.
 FLARE_TRIGGER = 6.0
 FLARE_COOLDOWN = 0.9
 
 # Traveling flare behavior.
-FLARE_STEP_TIME = 0.005
+FLARE_STEP_TIME = 0.02
 FLARE_WIDTH = 5
 
 # Head tilt behavior.
@@ -90,7 +86,6 @@ accelerometer.range = adafruit_lis3dh.RANGE_4_G
 
 previous_x, previous_y, previous_z = accelerometer.acceleration
 
-motion_level = 0.0
 tilt_level = 0.0
 last_flare_time = -FLARE_COOLDOWN
 
@@ -202,7 +197,6 @@ def read_motion_and_tilt():
     # pylint: disable=global-statement
 
     global previous_x, previous_y, previous_z
-    global motion_level
     global tilt_level
 
     x, y, z = accelerometer.acceleration
@@ -220,18 +214,6 @@ def read_motion_and_tilt():
         + delta_y * delta_y
         + delta_z * delta_z
     )
-
-    # Preserve the existing general motion calculation.
-    new_motion = (
-        acceleration_change - MOTION_START
-    ) / (MOTION_FULL - MOTION_START)
-
-    new_motion = max(0.0, min(1.0, new_motion))
-
-    if new_motion > motion_level:
-        motion_level = new_motion
-    else:
-        motion_level *= 0.88
 
     # Head tilt uses the X axis.
     # abs() means left and right tilts behave identically.
@@ -262,8 +244,8 @@ def update_embers():
         ember_flicker[index] *= EMBER_FLICKER_DECAY
 
     # Occasional subtle flare-ups near the horn base.
-    if random.randint(0, 100) < EMBER_FLICKER_CHANCE:
-        flicker_pixel = random.randint(0, 4)
+    if random.random() < EMBER_FLICKER_CHANCE / 100.0:
+        flicker_pixel = random.randint(0, min(4, PIXEL_COUNT - 1))
         ember_flicker[flicker_pixel] = random.uniform(0.15, 0.45)
 
         # Let some flicker spill into the next pixel.
@@ -304,9 +286,13 @@ def update_traveling_flare():
 
     current_time = time.monotonic()
 
-    if current_time - last_flare_step >= FLARE_STEP_TIME:
-        flare_position += 1.0
-        last_flare_step = current_time
+    elapsed_steps = int(
+        (current_time - last_flare_step) / FLARE_STEP_TIME
+    )
+
+    if elapsed_steps > 0:
+        flare_position += elapsed_steps
+        last_flare_step += elapsed_steps * FLARE_STEP_TIME
 
     # End after the flare tail has fully moved past the tip.
     if flare_position - FLARE_WIDTH > PIXEL_COUNT - 1:
@@ -457,7 +443,7 @@ try:
 
         time.sleep(FRAME_DELAY)
 
-except KeyboardInterrupt:
+finally:
     pixels.fill((0, 0, 0))
     pixels.show()
     external_power.value = False
