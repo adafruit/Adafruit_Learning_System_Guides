@@ -43,7 +43,7 @@ void setup() {
   pixel.show();
   
   // set button pin as an input
-  pinMode(BUTTON_PIN, INPUT);
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
 
   // start the serial connection
   Serial.begin(115200);
