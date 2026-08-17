@@ -125,8 +125,8 @@ if avg_distance is not None:
         # pylint: disable=invalid-name
         avg_distance = 22
     print(f"Average distance: {avg_distance:.1f} cm")
-    # Set color based on average distance
-    set_pixel_color(avg_distance)
+    # Set color based on average distance - Moved down after connection test
+    # set_pixel_color(avg_distance)
 
     # Check battery status
     battery_voltage = battery_monitor.cell_voltage
@@ -150,6 +150,9 @@ if avg_distance is not None:
         pixel.fill(OFF)
         time.sleep(10)
         microcontroller.reset()
+
+    # Set color based on average distance
+    set_pixel_color(avg_distance)
 
     # Create a socket pool
     pool = socketpool.SocketPool(wifi.radio)
