@@ -135,22 +135,37 @@ kbd_interface_index = None
 kbd_endpoint_address = None
 keyboard = None
 
-# scan for connected USB devices
-for device in usb.core.find(find_all=True):
-    # check for boot keyboard endpoints on this device
-    kbd_interface_index, kbd_endpoint_address = (
-        adafruit_usb_host_descriptors.find_boot_keyboard_endpoint(device)
-    )
-    # if a boot keyboard interface index and endpoint address were found
-    if kbd_interface_index is not None and kbd_interface_index is not None:
-        keyboard = device
+# Scan for a connected keyboard. On a cold boot the keyboard may not
+#   immediately appear before we enumerate the devices.
+# Retry find() for a few seconds to give it time to appear.
+SCAN_RETRIES = 20        # ~10 seconds total
+SCAN_RETRY_DELAY = 0.5   # seconds between scans
 
-        # detach device from kernel if needed
-        if keyboard.is_kernel_driver_active(0):
-            keyboard.detach_kernel_driver(0)
+for _ in range(SCAN_RETRIES):
+    for device in usb.core.find(find_all=True):
+        # check for boot keyboard endpoints on this device
+        interface_index, endpoint_address = (
+            adafruit_usb_host_descriptors.find_boot_keyboard_endpoint(device)
+        )
+        # only accept a device that actually is a boot keyboard; don't let a
+        # non-keyboard device (e.g. a hub in the adapter) clobber the endpoint
+        if interface_index is not None and endpoint_address is not None:
+            keyboard = device
+            kbd_interface_index = interface_index
+            kbd_endpoint_address = endpoint_address
 
-        # set the configuration so it can be used
-        keyboard.set_configuration()
+            # detach device from kernel if needed
+            if keyboard.is_kernel_driver_active(0):
+                keyboard.detach_kernel_driver(0)
+
+            # set the configuration so it can be used
+            keyboard.set_configuration()
+            break
+
+    if keyboard is not None:
+        break
+
+    time.sleep(SCAN_RETRY_DELAY)
 
 if keyboard is None:
     raise RuntimeError("No boot keyboard endpoint found")
