@@ -41,7 +41,6 @@ cam.vflip = True
 board.DISPLAY.auto_refresh = False
 display_bus = board.DISPLAY.bus
 
-display_bus.send(36, struct.pack(">hh", 0, 239))
 display_bus.send(42, struct.pack(">hh", 0, 239))
 display_bus.send(43, struct.pack(">hh", 0, 80+239))
 t0 = adafruit_ticks.ticks_ms()
