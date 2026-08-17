@@ -15,7 +15,7 @@ int buttonState = 0;
 Adafruit_NeoPixel pixel(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 
 void setup() {
-  pinMode(BUTTON_PIN, INPUT);
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
   pixel.begin();
   pixel.show();            
   pixel.setBrightness(50); 
@@ -25,12 +25,12 @@ void loop() {
   //pixel.clear();
   buttonState = digitalRead(BUTTON_PIN);
 
-  if(buttonState == HIGH) {      
+  if(buttonState == LOW) {      
     pixel.setPixelColor(0, pixel.Color(150, 0, 0));
     pixel.show();
   }
 
-  if(buttonState == LOW) {
+  if(buttonState == HIGH) {
     pixel.setPixelColor(0, pixel.Color(0, 0, 0));
     pixel.show();
   }
