@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-"""Simple test for 3.52" 340x180 quad-color eInk display."""
+"""Simple test for 3.52" 384x180 quad-color eInk display."""
 
 import time
 
