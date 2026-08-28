@@ -45,7 +45,7 @@ GC_US = 5890.0  # one gc.collect() on this heap
 MIXER_PAD_FRAMES = 1
 
 DEFAULT_MOUNT = "/sd"
-DEFAULT_SONG = "/sd/songs/real_existence"
+DEFAULT_SONG = "/sd/songs/adafruit_loop"
 
 
 class WavError(Exception):
