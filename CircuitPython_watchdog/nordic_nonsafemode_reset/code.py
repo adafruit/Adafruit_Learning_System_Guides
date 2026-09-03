@@ -24,7 +24,7 @@ wdt.mode = watchdog.WatchDogMode.RAISE
 # wrap main loop in try/except to catch the WatchDogTimeout
 try:
     while True:
-        pass
+        wdt.feed()
 except watchdog.WatchDogTimeout:
     print("Watchdog bit, doing normal mode reset in 3 seconds")
     time.sleep(3)
