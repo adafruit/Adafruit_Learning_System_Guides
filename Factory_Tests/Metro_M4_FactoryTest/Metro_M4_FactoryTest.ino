@@ -8,6 +8,10 @@
 
 extern Adafruit_TestBed TB;
 
+#ifndef PIN_NEOPIXEL
+#define PIN_NEOPIXEL (40u)
+#endif
+
 void setup() {
   Serial.begin(115200);
   // while (! Serial) delay(10);
@@ -28,6 +32,6 @@ void loop() {
     TB.printI2CBusScan();
   }
   TB.setColor(TB.Wheel(j++));
-  delay(100);
+  delay(10);
   return;
 }

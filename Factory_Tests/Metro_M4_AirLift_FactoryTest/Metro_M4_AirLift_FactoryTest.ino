@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2022 Limor Fried for Adafruit Industries
+// SPDX-FileCopyrightText: 2026 Tyeth Gundry for Adafruit Industries
 //
 // SPDX-License-Identifier: MIT
 
@@ -6,19 +6,16 @@
 #include <Adafruit_TestBed.h>
 extern Adafruit_TestBed TB;
 
-#define NEOPIXEL_I2C_POWER 2
-#define NEOPIXEL_PIN 0
+#ifndef PIN_NEOPIXEL
+#define PIN_NEOPIXEL (40u)
+#endif
 
 // the setup routine runs once when you press reset:
 void setup() {
   Serial.begin(115200);
 
-  // turn on the QT port and NeoPixel
-  pinMode(NEOPIXEL_I2C_POWER, OUTPUT);
-  digitalWrite(NEOPIXEL_I2C_POWER, HIGH);
-  
   // TestBed will handle the neopixel swirl for us
-  TB.neopixelPin = NEOPIXEL_PIN;
+  TB.neopixelPin = PIN_NEOPIXEL;
   TB.neopixelNum = 1;
   TB.begin();
   TB.setColor(0xFF0000); 
@@ -38,9 +35,6 @@ void setup() {
     Serial.println(fv);
   }
 
-  // Set WiFi to station mode and disconnect from an AP if it was previously connected
-  WiFi.mode(WIFI_STA);
-  WiFi.disconnect();
 }
 
 uint32_t last_wifi_scan = 0;
