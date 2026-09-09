@@ -50,6 +50,21 @@ Install with `circup`:
         adafruit_display_text adafruit_bitmap_font neopixel \
         adafruit_requests adafruit_max1704x adafruit_stcc4
 
+## Files
+
+| File | What it holds |
+|------|---------------|
+| `code.py` | Setup, display layout, packet handling, main loop |
+| `mesh_fonts.py` | Bitmap font loading and the size rules the layout uses |
+| `mesh_icons.py` | Weather glyphs drawn with `vectorio`, no bitmap assets |
+| `mesh_sensors.py` | Air quality sensor and battery gauge |
+| `mesh_weather.py` | Forecast lookup, ZIP geocoding, moon phase |
+
+Bring the sensors up before the display, radio or NeoPixel.
+`board.STEMMA_I2C()` claims and manages `I2C_POWER` itself, and if
+another peripheral gets there first the bus comes up with no pull ups,
+which reports as a wiring error rather than a power one.
+
 ## Setup
 
 Copy `settings.toml.example` to `settings.toml` and fill in WiFi

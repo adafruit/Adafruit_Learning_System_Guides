@@ -18,26 +18,31 @@ Receive only. This board does not transmit and will not appear in the
 mesh node list.
 """
 
-import math
 import time
+
+import alarm
 import board
 import digitalio
-import os
-import microcontroller
-import alarm
 import displayio
+import microcontroller
 import terminalio
-import vectorio
-import adafruit_ssd1683
 import adafruit_rfm9x
+import adafruit_ssd1683
 from fourwire import FourWire
-from adafruit_display_text import label, wrap_text_to_pixels
+from adafruit_display_text import label
 from adafruit_meshfruit import meshtastic as meshfruit
 
-try:
-    from adafruit_bitmap_font import bitmap_font
-except ImportError:
-    bitmap_font = None
+import mesh_fonts
+from mesh_fonts import face, size_for, wrap_for
+from mesh_sensors import USE_FAHRENHEIT, read_air, read_battery
+from mesh_icons import draw_weather_icon, icon_moon, icon_sun_marker
+from mesh_weather import (
+    WEATHER_INTERVAL,
+    describe_code,
+    fetch_weather,
+    moon_name,
+    moon_phase,
+)
 
 FREQUENCY = 906.875
 CHANNEL_HASH = 0x08
@@ -49,19 +54,6 @@ HEIGHT = 300
 MARGIN = 10
 TEXT_WIDTH = WIDTH - MARGIN * 2
 
-# Colour carries recency: the newest message is red, older ones black.
-# Size carries fit: a long newest message drops to the medium face so
-# it does not crowd everything else off the panel.
-# All three faces are from the public domain Misc-Fixed family.
-# Weight carries recency (bold = newest), size carries fit.
-FONT_PATHS = {
-    "large_bold": "/fonts/9x18B.pcf",
-    "medium_bold": "/fonts/7x14B.pcf",
-    "medium": "/fonts/7x14.pcf",
-    "name": "/fonts/6x13B.pcf",
-    "small": "/fonts/6x10.pcf",
-}
-MAX_LARGE_LINES = 2
 
 HEADER_BASELINE = 16
 RULE_Y = 30
@@ -82,20 +74,8 @@ SKY_TEXT_X = SKY_ICON_X + 18
 SUN_ROW_Y = 6
 MOON_ROW_Y = 62
 
-# Open-Meteo is free and needs no API key. Coordinates come from
-# settings.toml so the guide does not hardcode a location.
-WEATHER_URL = (
-    "https://api.open-meteo.com/v1/forecast"
-    "?latitude=%s&longitude=%s"
-    "&current=temperature_2m,weather_code"
-    "&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset"
-    "&temperature_unit=%s&timezone=auto&forecast_days=3"
-)
 WEATHER_INTERVAL = 1800  # seconds between fetches
 
-# Open-Meteo wants coordinates, so a ZIP is resolved once per boot
-# through Zippopotam, which is also free and keyless.
-ZIP_URL = "https://api.zippopotam.us/us/%s"
 CONTENT_BOTTOM = 262
 STATUS_RULE_Y = 272
 MESSAGE_GAP = 14
@@ -149,326 +129,47 @@ VIEW_TITLES = {
     "weather": "Weather",
 }
 
-# Readings are pulled once per panel refresh. The display cannot
-# update more than once every 180 seconds, so polling faster would
-# only burn power.
-USE_FAHRENHEIT = True
-AIR_READ_ATTEMPTS = 3
-AIR_READ_RETRY_SECONDS = 1.0
-AIR_SETTLE_SECONDS = 1.0
-
-# Below this percent-per-hour the gauge's rate is noise, so no
-# runtime estimate is shown.
-BATTERY_RATE_FLOOR = 0.5
-
-# Bring the STEMMA sensor up before anything else touches hardware.
-# board.STEMMA_I2C() claims and manages I2C_POWER itself, and if
-# another peripheral gets there first the bus comes up with no pull
-# ups, which surfaces as a wiring error rather than a power one.
-def open_air_sensor():
-    """Bring up the STCC4 on the STEMMA QT port."""
-    try:
-        import adafruit_stcc4  # pylint: disable=import-outside-toplevel
-    except ImportError as import_error:
-        print("air sensor library missing:", import_error)
-        return None
-
-    try:
-        i2c = board.STEMMA_I2C()
-        found = adafruit_stcc4.STCC4(i2c)
-        # Continuous rather than single shot. Single shot returns
-        # "measurement not ready" and then I/O errors on this part;
-        # continuous is the pattern proven on the Data Dispenser
-        # build with the same sensor.
-        found.continuous_measurement = True
-        # The sensor needs a moment before its first conversion.
-        time.sleep(AIR_SETTLE_SECONDS)
-        # Prove it reads here, before the display, radio and pixel
-        # come up. If this works and later reads do not, something
-        # in the rest of the setup is disturbing the bus.
-        try:
-            print("air sensor up:", found.CO2, "ppm")
-        except (RuntimeError, OSError) as first_error:
-            print("air sensor up but first read failed:", first_error)
-        return found
-    except (ValueError, RuntimeError, OSError) as sensor_error:
-        print("air sensor unavailable:", sensor_error)
-        return None
 
 
-sensor = open_air_sensor()
 
 
-def open_battery():
-    """Open the onboard MAX17048 fuel gauge."""
-    try:
-        import adafruit_max1704x  # pylint: disable=import-outside-toplevel
-
-        gauge = adafruit_max1704x.MAX17048(board.STEMMA_I2C())
-        print("battery gauge up")
-        return gauge
-    except (ImportError, ValueError, RuntimeError, OSError) as gauge_error:
-        print("battery gauge unavailable:", gauge_error)
-        return None
 
 
-battery = open_battery()
 
 air = None
 charge = None
 weather = None
 weather_fetched = 0.0
-location = None
 
 
-def restart_air():
-    """Put the sensor back into continuous measurement."""
-    if sensor is None:
-        return
-    try:
-        sensor.continuous_measurement = True
-        time.sleep(AIR_SETTLE_SECONDS)
-    except (RuntimeError, OSError) as restart_error:
-        print("air restart failed:", restart_error)
 
 
-def format_hours(hours):
-    """Render a duration compactly: 45m, 6h, 2d."""
-    if hours < 1:
-        return "%dm" % max(round(hours * 60), 1)
-    if hours < 48:
-        return "%dh" % round(hours)
-    return "%dd" % round(hours / 24)
 
 
-# Condensed WMO weather codes. Full table at open-meteo.com/en/docs
-WMO_CODES = {
-    0: "Clear",
-    1: "Mostly clear",
-    2: "Partly cloudy",
-    3: "Overcast",
-    45: "Fog",
-    48: "Rime fog",
-    51: "Light drizzle",
-    53: "Drizzle",
-    55: "Heavy drizzle",
-    61: "Light rain",
-    63: "Rain",
-    65: "Heavy rain",
-    71: "Light snow",
-    73: "Snow",
-    75: "Heavy snow",
-    77: "Snow grains",
-    80: "Showers",
-    81: "Showers",
-    82: "Heavy showers",
-    85: "Snow showers",
-    86: "Snow showers",
-    95: "Thunderstorm",
-    96: "Thunderstorm",
-    99: "Severe storm",
-}
 
 
-def describe_code(code):
-    """Human readable form of a WMO weather code."""
-    return WMO_CODES.get(code, "Code %s" % code)
 
 
-def clock_time(stamp):
-    """Turn an ISO timestamp into a short 12 hour clock time."""
-    try:
-        hour = int(stamp[11:13])
-        minute = stamp[14:16]
-    except (ValueError, IndexError, TypeError):
-        return None
-    suffix = "a" if hour < 12 else "p"
-    hour = hour % 12 or 12
-    return "%d:%s%s" % (hour, minute, suffix)
 
 
-def resolve_location(session):
-    """Return (latitude, longitude) as strings, or None.
-
-    Explicit coordinates win. Otherwise a ZIP is looked up once and
-    cached for the rest of the session.
-    """
-    global location  # pylint: disable=global-statement
-    if location is not None:
-        return location
-
-    latitude = os.getenv("LATITUDE")
-    longitude = os.getenv("LONGITUDE")
-    if latitude and longitude:
-        location = (latitude, longitude)
-        return location
-
-    zip_code = os.getenv("ZIP_CODE")
-    if not zip_code:
-        print("weather: set ZIP_CODE or LATITUDE/LONGITUDE in settings.toml")
-        return None
-
-    try:
-        response = session.get(ZIP_URL % zip_code, timeout=20)
-        data = response.json()
-        response.close()
-        place = data["places"][0]
-        location = (place["latitude"], place["longitude"])
-        print("weather: %s resolved to %s" % (zip_code, place["place name"]))
-        return location
-    except Exception as zip_error:  # pylint: disable=broad-except
-        print("zip lookup failed:", zip_error)
-        return None
 
 
-def fetch_weather():
-    """Pull a short forecast from Open-Meteo. Returns a dict or None.
-
-    WiFi is brought up only for the fetch and shut down afterwards:
-    the ESP32-S3 radio sits close to the LoRa front end, and there is
-    no reason to keep it running between updates.
-    """
-    ssid = os.getenv("CIRCUITPY_WIFI_SSID")
-    password = os.getenv("CIRCUITPY_WIFI_PASSWORD")
-    if not ssid:
-        print("weather: no wifi credentials in settings.toml")
-        return None
-
-    try:
-        import wifi  # pylint: disable=import-outside-toplevel
-        import socketpool  # pylint: disable=import-outside-toplevel
-        import ssl  # pylint: disable=import-outside-toplevel
-        import adafruit_requests  # pylint: disable=import-outside-toplevel
-
-        wifi.radio.enabled = True
-        if not wifi.radio.connected:
-            wifi.radio.connect(ssid, password)
-        session = adafruit_requests.Session(
-            socketpool.SocketPool(wifi.radio), ssl.create_default_context()
-        )
-
-        coords = resolve_location(session)
-        if coords is None:
-            return None
-
-        url = WEATHER_URL % (
-            coords[0],
-            coords[1],
-            "fahrenheit" if USE_FAHRENHEIT else "celsius",
-        )
-        response = session.get(url, timeout=20)
-        data = response.json()
-        response.close()
-    except Exception as weather_error:  # pylint: disable=broad-except
-        print("weather fetch failed:", weather_error)
-        return None
-    finally:
-        try:
-            wifi.radio.enabled = False
-        except Exception:  # pylint: disable=broad-except
-            pass
-
-    try:
-        current = data["current"]
-        daily = data["daily"]
-        return {
-            "now": round(current["temperature_2m"]),
-            "code": current["weather_code"],
-            "highs": [round(v) for v in daily["temperature_2m_max"]],
-            "lows": [round(v) for v in daily["temperature_2m_min"]],
-            "codes": daily["weather_code"],
-            "sunrise": clock_time(daily["sunrise"][0]),
-            "sunset": clock_time(daily["sunset"][0]),
-            "date": current.get("time") or daily["sunrise"][0],
-        }
-    except (KeyError, TypeError, IndexError) as parse_error:
-        print("weather parse failed:", parse_error)
-        return None
 
 
 def refresh_weather():
     """Fetch if the cached forecast is stale."""
     global weather, weather_fetched  # pylint: disable=global-statement
-    now = time.monotonic()
-    if weather is not None and now - weather_fetched < WEATHER_INTERVAL:
+    elapsed = time.monotonic()
+    if weather is not None and elapsed - weather_fetched < WEATHER_INTERVAL:
         return
-    fetched = fetch_weather()
+    fetched = fetch_weather(USE_FAHRENHEIT)
     if fetched is not None:
         weather = fetched
-        weather_fetched = now
+        weather_fetched = elapsed
 
 
-def read_battery():
-    """Charge state and estimated time remaining.
-
-    charge_rate is percent per hour, signed. Dividing the remaining
-    capacity by it gives a runtime estimate, which matters more than
-    a percentage on a board meant to outlast a power cut.
-    """
-    if battery is None:
-        return None
-    try:
-        percent = min(max(battery.cell_percent, 0), 100)
-        rate = battery.charge_rate
-    except (RuntimeError, OSError) as gauge_error:
-        print("battery read failed:", gauge_error)
-        return None
-
-    label_text = "%d%%" % round(percent)
-
-    # Below about half a percent per hour the estimate is noise.
-    if rate > BATTERY_RATE_FLOOR:
-        return "%s +%s" % (
-            label_text,
-            format_hours((100.0 - percent) / rate),
-        )
-    if rate < -BATTERY_RATE_FLOOR:
-        return "%s %s" % (
-            label_text,
-            format_hours(percent / abs(rate)),
-        )
-    return label_text
 
 
-def read_air():
-    """Read the sensor. Returns a display string, or None.
-
-    Occasional I2C errors are normal here, so retry a couple of times
-    before giving up on this refresh cycle.
-    """
-    if sensor is None:
-        return None
-
-    for attempt in range(AIR_READ_ATTEMPTS):
-        try:
-            # Read CO2 first. The driver fetches the whole
-            # measurement on this property, so asking for
-            # temperature first reports "measurement not ready".
-            co2 = sensor.CO2
-            humidity = sensor.relative_humidity
-            celsius = sensor.temperature
-            degrees = celsius * 9 / 5 + 32 if USE_FAHRENHEIT else celsius
-            unit = "F" if USE_FAHRENHEIT else "C"
-            return "%d ppm   %d%s   %d%%" % (
-                co2,
-                round(degrees),
-                unit,
-                round(humidity),
-            )
-        except (RuntimeError, OSError) as sensor_error:
-            if attempt == AIR_READ_ATTEMPTS - 1:
-                print("air read failed:", sensor_error)
-                return None
-            # A power blip drops the sensor back to idle, where it
-            # never produces a measurement and every read reports
-            # "not ready". Put it back into continuous mode and
-            # give it a conversion to catch up.
-            restart_air()
-            time.sleep(AIR_READ_RETRY_SECONDS)
-    return None
-
-
-# Nothing here is compute bound, so run the CPU slower.
 try:
     microcontroller.cpu.frequency = CPU_FREQUENCY
     print("cpu at", microcontroller.cpu.frequency // 1_000_000, "MHz")
@@ -545,62 +246,17 @@ button.direction = digitalio.Direction.INPUT
 button.pull = digitalio.Pull.UP
 
 
-def load_font(path):
-    """Load a bitmap font, or return None if it is unavailable."""
-    if bitmap_font is None:
-        return None
-    try:
-        return bitmap_font.load_font(path)
-    except (OSError, ValueError) as error:
-        print("font", path, "unavailable:", error)
-        return None
 
 
-FONTS = {name: load_font(path) for name, path in FONT_PATHS.items()}
 
-# Fall back to the built-in face so the board still runs with no font
-# files installed. terminalio.FONT has no bold or intermediate size, so
-# the fallback leans on scale alone.
-FALLBACK = {
-    "large_bold": (terminalio.FONT, 2, 26),
-    "medium_bold": (terminalio.FONT, 1, 14),
-    "medium": (terminalio.FONT, 1, 14),
-    "name": (terminalio.FONT, 1, 14),
-    "small": (terminalio.FONT, 1, 12),
-}
-
-if not all(FONTS.values()):
+if not all(mesh_fonts.FONTS.values()):
     print("bitmap fonts not found, falling back to terminalio")
 
 
-def face(size):
-    """Return (font, scale, line_height) for a named face."""
-    font = FONTS.get(size)
-    if font is not None:
-        return font, 1, font.get_bounding_box()[1] + 4
-    return FALLBACK.get(size, FALLBACK["medium"])
 
 
-def wrap_for(text, size):
-    """Wrap text to the panel width for a named size."""
-    font, scale, line_height = face(size)
-    lines = wrap_text_to_pixels(text, TEXT_WIDTH // scale, font)
-    return lines, font, scale, line_height
 
 
-def size_for(index, text):
-    """Pick a face for a message at this position in the list.
-
-    The newest message is always bold and red. It uses the large face
-    unless it runs long, in which case it steps down to the medium
-    bold face so it does not crowd older messages off the panel.
-    """
-    if index != 0:
-        return "medium"
-    lines, _, _, _ = wrap_for(text, "large_bold")
-    if len(lines) > MAX_LARGE_LINES:
-        return "medium_bold"
-    return "large_bold"
 
 
 messages = []
@@ -620,15 +276,6 @@ view_index = 0
 
 rule_palette = displayio.Palette(1)
 rule_palette[0] = BLACK
-
-black_palette = displayio.Palette(1)
-black_palette[0] = BLACK
-
-red_palette = displayio.Palette(1)
-red_palette[0] = RED
-
-white_palette = displayio.Palette(1)
-white_palette[0] = WHITE
 
 
 def add_rule(group, y_pos, thickness=2):
@@ -758,7 +405,9 @@ def draw_empty(group, text, y_pos=None):
     )
 
 
-def draw_messages(group, top=CONTENT_TOP, bottom=CONTENT_BOTTOM, limit=None):
+def draw_messages(  # pylint: disable=too-many-locals
+    group, top=CONTENT_TOP, bottom=CONTENT_BOTTOM, limit=None
+):
     """Message list. Returns the number of messages shown."""
     if not messages:
         draw_empty(group, "Listening for messages...", y_pos=top + 10)
@@ -805,7 +454,7 @@ def draw_messages(group, top=CONTENT_TOP, bottom=CONTENT_BOTTOM, limit=None):
     return shown
 
 
-def draw_nodes(group):
+def draw_nodes(group):  # pylint: disable=too-many-locals
     """Node list view: who has been heard, how strongly, how often."""
     if not node_stats:
         draw_empty(group, "No nodes heard yet...")
@@ -858,198 +507,29 @@ def draw_nodes(group):
     return shown
 
 
-def icon_cloud(group, cx, cy, palette=None):
-    """Three lobes over a slab, which reads as a cloud at this size."""
-    shader = palette or black_palette
-    group.append(vectorio.Circle(pixel_shader=shader, radius=9, x=cx - 8, y=cy))
-    group.append(vectorio.Circle(pixel_shader=shader, radius=12, x=cx + 4, y=cy - 3))
-    group.append(vectorio.Circle(pixel_shader=shader, radius=8, x=cx + 16, y=cy + 1))
-    group.append(
-        vectorio.Rectangle(
-            pixel_shader=shader, width=32, height=10, x=cx - 10, y=cy
-        )
-    )
 
 
-def icon_sun(group, cx, cy, radius=13, palette=None):
-    """Filled disc with four spokes."""
-    shader = palette or black_palette
-    group.append(vectorio.Circle(pixel_shader=shader, radius=radius, x=cx, y=cy))
-    reach = radius + 7
-    for dx, dy, wide, high in (
-        (-1, -reach, 3, 6),
-        (-1, reach - 5, 3, 6),
-        (-reach, -1, 6, 3),
-        (reach - 5, -1, 6, 3),
-    ):
-        group.append(
-            vectorio.Rectangle(
-                pixel_shader=shader, width=wide, height=high,
-                x=cx + dx, y=cy + dy,
-            )
-        )
 
 
-def icon_drops(group, cx, cy, palette=None, count=3):
-    """Short slanted strokes under a cloud."""
-    shader = palette or black_palette
-    for index in range(count):
-        left = cx - 10 + index * 12
-        group.append(
-            vectorio.Polygon(
-                pixel_shader=shader,
-                points=[(0, 0), (4, 0), (0, 9), (-4, 9)],
-                x=left,
-                y=cy,
-            )
-        )
 
 
-def icon_bolt(group, cx, cy):
-    """Lightning, in red so severe weather carries the accent colour."""
-    group.append(
-        vectorio.Polygon(
-            pixel_shader=red_palette,
-            points=[(8, 0), (0, 12), (5, 12), (-2, 24), (12, 9), (6, 9), (13, 0)],
-            x=cx - 4,
-            y=cy,
-        )
-    )
 
 
-def draw_weather_icon(group, code, cx, cy, color=BLACK):
-    """Pick an icon for a WMO weather code."""
-    shader = red_palette if color == RED else black_palette
-
-    if code == 0:
-        icon_sun(group, cx, cy + 6, palette=shader)
-    elif code in (1, 2):
-        icon_sun(group, cx - 8, cy - 4, radius=9, palette=shader)
-        icon_cloud(group, cx + 2, cy + 8, palette=shader)
-    elif code == 3:
-        icon_cloud(group, cx - 4, cy + 4, palette=shader)
-    elif code in (45, 48):
-        for row in range(3):
-            group.append(
-                vectorio.Rectangle(
-                    pixel_shader=shader,
-                    width=40 - row * 6,
-                    height=5,
-                    x=cx - 18 + row * 3,
-                    y=cy - 6 + row * 12,
-                )
-            )
-    elif code in (71, 73, 75, 77, 85, 86):
-        icon_cloud(group, cx - 4, cy - 4, palette=shader)
-        for index in range(3):
-            group.append(
-                vectorio.Circle(
-                    pixel_shader=shader,
-                    radius=3,
-                    x=cx - 12 + index * 12,
-                    y=cy + 20,
-                )
-            )
-    elif code in (95, 96, 99):
-        icon_cloud(group, cx - 4, cy - 6, palette=shader)
-        icon_bolt(group, cx, cy + 8)
-    else:
-        # every drizzle, rain and shower code
-        icon_cloud(group, cx - 4, cy - 6, palette=shader)
-        icon_drops(group, cx, cy + 10, palette=shader)
 
 
-MOON_NAMES = (
-    "New moon",
-    "Waxing crescent",
-    "First quarter",
-    "Waxing gibbous",
-    "Full moon",
-    "Waning gibbous",
-    "Last quarter",
-    "Waning crescent",
-)
-
-# Days between new moons.
-SYNODIC_MONTH = 29.530588853
 
 
-def days_since_epoch(year, month, day):
-    """Days from 2000-01-01 to the given date, via a Julian day count."""
-    if month <= 2:
-        year -= 1
-        month += 12
-    a = year // 100
-    b = 2 - a + a // 4
-    julian = (
-        int(365.25 * (year + 4716))
-        + int(30.6001 * (month + 1))
-        + day
-        + b
-        - 1524.5
-    )
-    return julian - 2451544.5
 
 
-def moon_phase(stamp):
-    """Fraction through the lunar cycle, 0 at new moon, from an ISO date."""
-    try:
-        year = int(stamp[0:4])
-        month = int(stamp[5:7])
-        day = int(stamp[8:10])
-    except (ValueError, IndexError, TypeError):
-        return None
-    # 2000-01-06 was a new moon, five days past the epoch above.
-    age = (days_since_epoch(year, month, day) - 5.0) % SYNODIC_MONTH
-    return age / SYNODIC_MONTH
 
 
-def moon_name(phase):
-    """Name the phase, snapping to the exact quarters."""
-    return MOON_NAMES[int((phase * 8) + 0.5) % 8]
 
 
-def icon_moon(group, cx, cy, phase, radius=9):
-    """Disc with a white disc slid across it to carve the lit portion."""
-    lit = (1 - math.cos(2 * math.pi * phase)) / 2
-    group.append(
-        vectorio.Circle(pixel_shader=black_palette, radius=radius, x=cx, y=cy)
-    )
-    direction = 1 if phase < 0.5 else -1
-    offset = int(direction * 2 * radius * lit)
-    group.append(
-        vectorio.Circle(
-            pixel_shader=white_palette, radius=radius - 1, x=cx + offset, y=cy
-        )
-    )
 
 
-def icon_sun_marker(group, cx, cy, rising):
-    """Small half sun with an arrow, marking rise or set."""
-    group.append(
-        vectorio.Circle(pixel_shader=black_palette, radius=5, x=cx, y=cy - 1)
-    )
-    group.append(
-        vectorio.Rectangle(
-            pixel_shader=black_palette, width=16, height=2, x=cx - 8, y=cy + 5
-        )
-    )
-    if rising:
-        # Arrow sits above the disc, pointing up out of the horizon.
-        points = [(0, 0), (4, 5), (-4, 5)]
-        arrow_y = cy - 14
-    else:
-        # Arrow drops below the horizon line, pointing down.
-        points = [(0, 5), (4, 0), (-4, 0)]
-        arrow_y = cy + 8
-    group.append(
-        vectorio.Polygon(
-            pixel_shader=black_palette, points=points, x=cx, y=arrow_y
-        )
-    )
 
 
-def draw_weather(group):
+def draw_weather(group):  # pylint: disable=too-many-locals
     """Forecast on the top half, newest messages underneath."""
     if weather is None:
         draw_empty(group, "No forecast yet...")
@@ -1243,7 +723,7 @@ def draw_board():
     print("refreshed")
 
 
-def handle_packet(packet):
+def handle_packet(packet):  # pylint: disable=too-many-return-statements
     """Decode one packet. Returns True if a new message was added."""
     global last_rssi  # pylint: disable=global-statement
     if len(packet) < meshfruit.HEADER_LEN + 1:
