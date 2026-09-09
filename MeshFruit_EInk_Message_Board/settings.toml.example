@@ -9,8 +9,8 @@ CIRCUITPY_WIFI_SSID = "your-network"
 CIRCUITPY_WIFI_PASSWORD = "your-password"
 
 # Either a US ZIP code, resolved once per boot:
-ZIP_CODE = "33896"
+ZIP_CODE = "00"
 
 # Or explicit coordinates, which skip the lookup:
-# LATITUDE = "28.0653"
-# LONGITUDE = "-81.7887"
+# LATITUDE = "00"
+# LONGITUDE = "00"
