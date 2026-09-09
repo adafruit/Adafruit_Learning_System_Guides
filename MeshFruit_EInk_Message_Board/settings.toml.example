@@ -1,0 +1,16 @@
+# SPDX-FileCopyrightText: 2026 Pedro Ruiz for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+#
+# Copy to settings.toml on CIRCUITPY. Only the e-ink board example's
+# weather view needs these.
+
+CIRCUITPY_WIFI_SSID = "your-network"
+CIRCUITPY_WIFI_PASSWORD = "your-password"
+
+# Either a US ZIP code, resolved once per boot:
+ZIP_CODE = "33896"
+
+# Or explicit coordinates, which skip the lookup:
+# LATITUDE = "28.0653"
+# LONGITUDE = "-81.7887"
