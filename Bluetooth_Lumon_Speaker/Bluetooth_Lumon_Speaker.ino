@@ -22,7 +22,7 @@
 // https://github.com/pschatzmann/arduino-audio-tools
 
 #include "ESP_I2S.h"
-#include "AudioTools.h"
+// #include "AudioTools.h" /* previous API changes have needed this included */
 #include "BluetoothA2DPSink.h"
 
 const uint8_t I2S_SCK = 8;       /* Audio data bit clock */
