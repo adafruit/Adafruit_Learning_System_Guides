@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-#ifndef _SECRETS_H THEN
+#ifndef _SECRETS_H
 #define _SECRETS_H
 
 // define your WIFI and Adadfruit IO credentials in this file

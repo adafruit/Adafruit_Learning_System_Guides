@@ -125,8 +125,8 @@ int getDayOfWeek(int year, int month, int day)
 
 void drawCalendar(struct tm * today, struct tm * pickdate)
 {
-  char *dows[7] = {"Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"};
-  char *months[12] = {"January","February","March","April","May","June","July","August","September","October","November","December"};
+  const char *dows[7] = {"Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"};
+  const char *months[12] = {"January","February","March","April","May","June","July","August","September","October","November","December"};
 
   pickdate->tm_wday = getDayOfWeek(pickdate->tm_year,pickdate->tm_mon,pickdate->tm_mday);
 
@@ -196,7 +196,7 @@ void drawCalendar(struct tm * today, struct tm * pickdate)
             }
             if(currentday == BlackCircle)
             {
-              gfx.setTextColor(EPD_INVERSE);
+              gfx.setTextColor(EPD_WHITE);
               gfx.fillCircle(x + (gfx.width()-8)/7/2, y, 16, EPD_BLACK);  
             }
             else if(currentday == RedCircle)
@@ -249,7 +249,7 @@ struct tm *getDate(bool force = false)
   return &date;
 }
 
-void *wget(const char *host, const char *path, int port, char *buff)
+void wget(const char *host, const char *path, int port, char *buff)
 {
   neopixel.setPixelColor(0, neopixel.Color(0, 0, 255));
   neopixel.show(); 
