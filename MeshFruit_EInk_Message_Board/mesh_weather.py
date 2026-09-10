@@ -137,9 +137,6 @@ MOON_NAMES = (
 )
 
 # Days between new moons.
-
-
-# Days between new moons.
 SYNODIC_MONTH = 29.530588853
 
 
