@@ -20,6 +20,7 @@ import os
 import time
 
 import adafruit_max1704x
+import adafruit_meshfruit as meshfruit
 import adafruit_rfm9x
 import adafruit_ssd1683
 import adafruit_stcc4
@@ -33,7 +34,6 @@ import terminalio
 from adafruit_debouncer import Button
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text import label, wrap_text_to_pixels
-from adafruit_meshfruit import meshtastic as meshfruit
 from fourwire import FourWire
 
 import mesh_icons
