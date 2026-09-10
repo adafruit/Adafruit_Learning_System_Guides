@@ -4,30 +4,24 @@
 
 """Forecast lookup and moon phase maths.
 
-Open-Meteo is free and needs no API key. It wants coordinates, so a
-ZIP is resolved once through Zippopotam, which is also keyless.
-Neither service reports moon data, so the phase is computed here.
+Open-Meteo is free and needs no API key. It reports no lunar data, so
+the moon phase is computed here from the date in the response.
 """
 
-import os
+import ssl
 
-WEATHER_INTERVAL = 1800  # seconds between fetches
+import adafruit_requests
+import socketpool
+import wifi
+
+INTERVAL = 1800  # seconds between fetches
 
 
 # Open-Meteo is free and needs no API key. Coordinates come from
 # settings.toml so the guide does not hardcode a location.
-WEATHER_URL = (
-    "https://api.open-meteo.com/v1/forecast"
-    "?latitude=%s&longitude=%s"
-    "&current=temperature_2m,weather_code"
-    "&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset"
-    "&temperature_unit=%s&timezone=auto&forecast_days=3"
-)
-
-
-# Open-Meteo wants coordinates, so a ZIP is resolved once per boot
-# through Zippopotam, which is also free and keyless.
-ZIP_URL = "https://api.zippopotam.us/us/%s"
+HOST = "https://api.open-meteo.com/v1/forecast"
+CURRENT_FIELDS = "temperature_2m,weather_code"
+DAILY_FIELDS = "weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset"
 
 
 # Condensed WMO weather codes. Full table at open-meteo.com/en/docs
@@ -61,7 +55,7 @@ WMO_CODES = {
 
 def describe_code(code):
     """Human readable form of a WMO weather code."""
-    return WMO_CODES.get(code, "Code %s" % code)
+    return WMO_CODES.get(code, f"Code {code}")
 
 
 def clock_time(stamp):
@@ -73,92 +67,45 @@ def clock_time(stamp):
         return None
     suffix = "a" if hour < 12 else "p"
     hour = hour % 12 or 12
-    return "%d:%s%s" % (hour, minute, suffix)
+    return f"{hour}:{minute}{suffix}"
 
 
-location = None
-
-
-def resolve_location(session):
-    """Return (latitude, longitude) as strings, or None.
-
-    Explicit coordinates win. Otherwise a ZIP is looked up once and
-    cached for the rest of the session.
-    """
-    global location  # pylint: disable=global-statement
-    if location is not None:
-        return location
-
-    latitude = os.getenv("LATITUDE")
-    longitude = os.getenv("LONGITUDE")
-    if latitude and longitude:
-        location = (latitude, longitude)
-        return location
-
-    zip_code = os.getenv("ZIP_CODE")
-    if not zip_code:
-        print("weather: set ZIP_CODE or LATITUDE/LONGITUDE in settings.toml")
-        return None
-
-    try:
-        response = session.get(ZIP_URL % zip_code, timeout=20)
-        data = response.json()
-        response.close()
-        place = data["places"][0]
-        location = (place["latitude"], place["longitude"])
-        print("weather: %s resolved to %s" % (zip_code, place["place name"]))
-        return location
-    except Exception as zip_error:  # pylint: disable=broad-except
-        print("zip lookup failed:", zip_error)
-        return None
-
-
-def fetch_weather(use_fahrenheit=True):  # pylint: disable=too-many-locals
+def fetch(ssid, password, latitude, longitude, use_fahrenheit=True):
     """Pull a short forecast from Open-Meteo. Returns a dict or None.
 
-    WiFi is brought up only for the fetch and shut down afterwards:
-    the ESP32-S3 radio sits close to the LoRa front end, and there is
-    no reason to keep it running between updates.
+    WiFi is brought up only for the fetch and shut down afterwards: the
+    ESP32-S3 radio sits close to the LoRa front end, and there is no
+    reason to keep it running between updates.
     """
-    ssid = os.getenv("CIRCUITPY_WIFI_SSID")
-    password = os.getenv("CIRCUITPY_WIFI_PASSWORD")
     if not ssid:
         print("weather: no wifi credentials in settings.toml")
         return None
+    if not latitude or not longitude:
+        print("weather: set LATITUDE and LONGITUDE in settings.toml")
+        return None
+
+    unit = "fahrenheit" if use_fahrenheit else "celsius"
+    url = (
+        f"{HOST}?latitude={latitude}&longitude={longitude}"
+        f"&current={CURRENT_FIELDS}&daily={DAILY_FIELDS}"
+        f"&temperature_unit={unit}&timezone=auto&forecast_days=3"
+    )
 
     try:
-        import wifi  # pylint: disable=import-outside-toplevel
-        import socketpool  # pylint: disable=import-outside-toplevel
-        import ssl  # pylint: disable=import-outside-toplevel
-        import adafruit_requests  # pylint: disable=import-outside-toplevel
-
         wifi.radio.enabled = True
         if not wifi.radio.connected:
             wifi.radio.connect(ssid, password)
         session = adafruit_requests.Session(
             socketpool.SocketPool(wifi.radio), ssl.create_default_context()
         )
-
-        coords = resolve_location(session)
-        if coords is None:
-            return None
-
-        url = WEATHER_URL % (
-            coords[0],
-            coords[1],
-            "fahrenheit" if use_fahrenheit else "celsius",
-        )
         response = session.get(url, timeout=20)
         data = response.json()
         response.close()
-    except Exception as weather_error:  # pylint: disable=broad-except
-        print("weather fetch failed:", weather_error)
+    except (RuntimeError, OSError, ValueError) as error:
+        print("weather fetch failed:", error)
         return None
     finally:
-        try:
-            wifi.radio.enabled = False
-        except Exception:  # pylint: disable=broad-except
-            pass
+        wifi.radio.enabled = False
 
     try:
         current = data["current"]
@@ -173,8 +120,8 @@ def fetch_weather(use_fahrenheit=True):  # pylint: disable=too-many-locals
             "sunset": clock_time(daily["sunset"][0]),
             "date": current.get("time") or daily["sunrise"][0],
         }
-    except (KeyError, TypeError, IndexError) as parse_error:
-        print("weather parse failed:", parse_error)
+    except (KeyError, TypeError, IndexError) as error:
+        print("weather parse failed:", error)
         return None
 
 

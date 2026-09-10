@@ -47,18 +47,16 @@ the STEMMA sensor offline.
 Install with `circup`:
 
     circup install adafruit_meshfruit adafruit_rfm9x adafruit_ssd1683 \
-        adafruit_display_text adafruit_bitmap_font neopixel \
-        adafruit_requests adafruit_max1704x adafruit_stcc4
+        adafruit_display_text adafruit_bitmap_font adafruit_debouncer \
+        neopixel adafruit_requests adafruit_max1704x adafruit_stcc4
 
 ## Files
 
 | File | What it holds |
 |------|---------------|
-| `code.py` | Setup, display layout, packet handling, main loop |
-| `mesh_fonts.py` | Bitmap font loading and the size rules the layout uses |
+| `code.py` | Setup, sensors, display layout, packet handling, main loop |
 | `mesh_icons.py` | Weather glyphs drawn with `vectorio`, no bitmap assets |
-| `mesh_sensors.py` | Air quality sensor and battery gauge |
-| `mesh_weather.py` | Forecast lookup, ZIP geocoding, moon phase |
+| `mesh_weather.py` | Forecast lookup and moon phase |
 
 Bring the sensors up before the display, radio or NeoPixel.
 `board.STEMMA_I2C()` claims and manages `I2C_POWER` itself, and if
@@ -67,8 +65,34 @@ which reports as a wiring error rather than a power one.
 
 ## Setup
 
-Copy `settings.toml.example` to `settings.toml` and fill in WiFi
-credentials and a ZIP code. Add the fonts, see `fonts/README.txt`.
+Add these to `settings.toml` on the CIRCUITPY drive:
+
+```toml
+CIRCUITPY_WIFI_SSID = "your-network-name"
+CIRCUITPY_WIFI_PASSWORD = "your-network-password"
+LATITUDE = "40.7128"
+LONGITUDE = "-74.0060"
+```
+
+Then add the fonts, see `fonts/README.txt`.
+
+## Outside the US
+
+Three things are region specific.
+
+**Radio frequency.** The settings in `code.py` are for the US 915MHz
+band, at 906.875 MHz. Other regions use different bands and different
+slot spacing, so `FREQUENCY` has to change to match whatever the nodes
+around you are using. Check the frequency your own node reports rather
+than trusting a table: with the Meshtastic CLI, `meshtastic --info`
+prints the operating frequency for your region and modem preset.
+
+**Temperature units.** `USE_FAHRENHEIT` in `code.py`. Set it to
+`False` for Celsius, which also switches the forecast request.
+
+One further limitation: the fonts are trimmed to printable ASCII to
+save space, so accented characters will not render. If you need them,
+keep the Latin-1 range when trimming and expect the font files to grow.
 
 ## Using it
 
