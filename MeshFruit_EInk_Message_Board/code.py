@@ -483,9 +483,8 @@ def draw_nodes(group):
     return shown
 
 
-def draw_weather(group):  # pylint: disable=too-many-locals
+def draw_weather(group, weather):  # pylint: disable=too-many-locals
     """Forecast on the top half, newest messages underneath."""
-    weather = forecast["data"]
     if weather is None:
         draw_empty(group, "No forecast yet...", CONTENT_TOP + 10)
     else:
@@ -611,7 +610,7 @@ def draw_status(group, hidden):
     )
 
 
-def build_group(air, charge):
+def build_group(air, charge, weather):
     """Build the full display group for the current view."""
     group = displayio.Group()
 
@@ -626,7 +625,7 @@ def build_group(air, charge):
         shown = draw_nodes(group)
         hidden = max(len(node_stats) - shown, 0)
     elif VIEWS[view_index] == "weather":
-        shown = draw_weather(group)
+        shown = draw_weather(group, weather)
         hidden = max(len(messages) - shown, 0)
     else:
         shown = draw_messages(group)
@@ -661,7 +660,9 @@ def draw_board():
     if VIEWS[view_index] == "weather":
         refresh_weather()
 
-    group, shown, hidden = build_group(read_air(), read_battery())
+    group, shown, hidden = build_group(
+        read_air(), read_battery(), forecast["data"]
+    )
     display.root_group = group
     print("drawing...", shown, "shown,", hidden, "hidden")
     pixel[0] = PIXEL_DRAWING
