@@ -20,7 +20,7 @@ import os
 import time
 
 import adafruit_max1704x
-import adafruit_meshfruit as meshfruit
+import adafruit_meshfruit
 import adafruit_rfm9x
 import adafruit_ssd1683
 import adafruit_stcc4
@@ -183,6 +183,9 @@ rfm9x.preamble_length = 16
 rfm9x.enable_crc = True
 rfm9x._write_u8(SYNC_WORD_REG, MESH_SYNC_WORD)  # pylint: disable=protected-access
 
+# Defaults to the public channel key. Pass psk= for a private channel.
+mesh = adafruit_meshfruit.Meshfruit()
+
 pixel = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.2, auto_write=True)
 
 button_pin = digitalio.DigitalInOut(BUTTON_PIN)
@@ -324,6 +327,16 @@ def save_names():
         raw = short.encode("utf-8")[:NAME_LEN]
         blob += raw + b"\x00" * (NAME_LEN - len(raw))
     microcontroller.nvm[0 : len(blob)] = blob
+
+
+def decode_name(raw):
+    """Decode a NodeInfo name field, or None if it is not valid UTF-8."""
+    if not raw:
+        return None
+    try:
+        return raw.decode("utf-8")
+    except UnicodeError:
+        return None
 
 
 def display_name(node):
@@ -674,9 +687,11 @@ def draw_board():
 
 def handle_packet(packet):  # pylint: disable=too-many-return-statements
     """Decode one packet. Returns True if the panel should redraw."""
-    if len(packet) < meshfruit.HEADER_LEN + 1:
+    if len(packet) < adafruit_meshfruit.HEADER_LEN + 1:
         return False
-    if meshfruit.channel_hash(packet) != CHANNEL_HASH:
+
+    mesh.packet = packet
+    if mesh.channel_hash != CHANNEL_HASH:
         return False
 
     # Sender plus packet ID uniquely identifies a message. The mesh
@@ -688,11 +703,10 @@ def handle_packet(packet):  # pylint: disable=too-many-return-statements
     if len(seen) > SEEN_HISTORY:
         seen.pop(0)
 
-    port, body = meshfruit.parse_data(meshfruit.decrypt(packet))
-    if not body:
+    if not mesh.payload:
         return False
 
-    node = meshfruit.sender_id(packet)
+    node = mesh.sender_id
     radio_state["rssi"] = rfm9x.last_rssi
 
     stats = node_stats.get(node)
@@ -702,8 +716,8 @@ def handle_packet(packet):  # pylint: disable=too-many-return-statements
         stats["rssi"] = rfm9x.last_rssi
         stats["count"] += 1
 
-    if port == meshfruit.PORT_NODEINFO:
-        short = meshfruit.decode_text(meshfruit.parse_user(body).get("short_name"))
+    if mesh.portnum == adafruit_meshfruit.PORT_NODEINFO:
+        short = decode_name(mesh.user.get("short_name"))
         if short and node_names.get(node) != short:
             node_names[node] = short
             save_names()
@@ -712,10 +726,10 @@ def handle_packet(packet):  # pylint: disable=too-many-return-statements
             return any(entry[0] == node for entry in messages)
         return False
 
-    if port != meshfruit.PORT_TEXT_MESSAGE:
+    if mesh.portnum != adafruit_meshfruit.PORT_TEXT_MESSAGE:
         return False
 
-    messages.insert(0, (node, meshfruit.decode_text(body) or "<non-utf8>"))
+    messages.insert(0, (node, mesh.text or "<non-utf8>"))
     del messages[MAX_MESSAGES:]
     print(node, messages[0][1])
     return True
