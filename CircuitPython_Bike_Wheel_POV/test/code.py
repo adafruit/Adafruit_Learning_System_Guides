@@ -2,11 +2,12 @@
 #
 # SPDX-License-Identifier: MIT
 
-"""Simple three-spoke DotStar color test."""
+"""Simple three-spoke DotStar color test using the adafruit_dotstar library."""
 
 import time
+
+import adafruit_dotstar
 import board
-import digitalio
 
 NUM_PIXELS = 36
 
@@ -20,43 +21,26 @@ COLORS = (
 )
 
 
+class SpokeDotStar(adafruit_dotstar.DotStar):
+    """DotStar strip that keeps its pixels lit when its pins are released.
+
+    All three spokes share one clock pin, so only one strip can own the pins
+    at a time. The stock ``deinit`` blanks the strip before releasing the
+    pins; this version releases them and leaves the last colors showing.
+    """
+
+    def deinit(self) -> None:
+        if self._spi:
+            self._spi.deinit()
+        else:
+            self.dpin.deinit()
+            self.cpin.deinit()
+
+
 def write_dotstar(data_pin, color):
     """Fill one DotStar strip with a solid color."""
-    data = digitalio.DigitalInOut(data_pin)
-    clock = digitalio.DigitalInOut(CLOCK_PIN)
-
-    data.direction = digitalio.Direction.OUTPUT
-    clock.direction = digitalio.Direction.OUTPUT
-
-    data.value = False
-    clock.value = False
-
-    def send_byte(value):
-        """Send one byte of data to the DotStar strip."""
-        for bit in range(7, -1, -1):
-            data.value = bool(value & (1 << bit))
-            clock.value = True
-            clock.value = False
-
-    # DotStar start frame
-    for _ in range(4):
-        send_byte(0x00)
-
-    red, green, blue = color
-
-    # Pixel data
-    for _ in range(NUM_PIXELS):
-        send_byte(0xFF)
-        send_byte(blue)
-        send_byte(green)
-        send_byte(red)
-
-    # DotStar end frame
-    for _ in range(4):
-        send_byte(0xFF)
-
-    data.deinit()
-    clock.deinit()
+    with SpokeDotStar(CLOCK_PIN, data_pin, NUM_PIXELS) as strip:
+        strip.fill(color)
 
 
 while True:
