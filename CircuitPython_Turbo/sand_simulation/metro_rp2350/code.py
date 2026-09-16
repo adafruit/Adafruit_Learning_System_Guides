@@ -185,7 +185,7 @@ def make_accelerometer():
         mpu6050.accelerometer_range = adafruit_mpu6050.Range.RANGE_4_G
         print("using MPU6050")
         return mpu6050
-    except Exception as error:
+    except ValueError as error:
         print("no MPU6050:", error)
     try:
         import adafruit_lis3dh  # pylint: disable=import-outside-toplevel
@@ -194,7 +194,7 @@ def make_accelerometer():
         lis3dh.range = adafruit_lis3dh.RANGE_4_G
         print("using LIS3DH")
         return lis3dh
-    except Exception as error:
+    except ValueError as error:
         print("no LIS3DH:", error)
     print("no accelerometer, simulating one")
     return None

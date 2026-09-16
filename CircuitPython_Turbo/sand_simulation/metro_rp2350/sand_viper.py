@@ -41,7 +41,6 @@ import micropython
 from micropython import const
 
 # pylint: disable=undefined-variable, too-many-statements, too-many-locals, too-many-nested-blocks, too-many-branches
-# pylint: disable=consider-using-min-builtin, consider-using-max-builtin
 
 # The slots of params, as indexes into it.
 PARAM_GRID_WIDTH = const(0)  # grid width in cells
