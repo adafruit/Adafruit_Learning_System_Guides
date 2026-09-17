@@ -31,7 +31,7 @@ import displayio
 import microcontroller
 import neopixel
 import terminalio
-from adafruit_debouncer import Button
+from adafruit_debouncer import Debouncer
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text import label, wrap_text_to_pixels
 from fourwire import FourWire
@@ -108,11 +108,8 @@ SEEN_HISTORY = 20
 REFRESH_SECONDS = 20
 
 BUTTON_PIN = board.A0
-LONG_PRESS_MS = 1000
 VIEWS = ("weather", "messages", "nodes")
 VIEW_TITLES = {"weather": "Weather", "messages": "MeshFruit", "nodes": "Nodes"}
-CYCLE_VIEWS = ("weather", "messages")
-HOLD_VIEW = "nodes"
 
 # The panel cannot redraw more than once every 180 seconds, so the
 # pixel carries the fast feedback the display cannot.
@@ -124,8 +121,14 @@ PIXEL_SOON = (50, 40, 0)
 PIXEL_DRAWING = (40, 0, 40)
 REFRESH_SOON_SECONDS = 10
 
+# With no mesh traffic nothing would trigger a redraw, so the battery,
+# air and weather readings would sit stale indefinitely. Redraw on this
+# interval regardless. Each refresh costs about 20 seconds of panel
+# drive, so this trades a little runtime for readings you can trust.
+IDLE_REFRESH_SECONDS = 1800
+
 CPU_FREQUENCY = 80_000_000
-SLEEP_SECONDS = 0.3
+SLEEP_SECONDS = 0.05
 
 AIR_SETTLE_SECONDS = 1.0
 BATTERY_RATE_FLOOR = 0.5
@@ -184,14 +187,14 @@ rfm9x.enable_crc = True
 rfm9x._write_u8(SYNC_WORD_REG, MESH_SYNC_WORD)  # pylint: disable=protected-access
 
 # Defaults to the public channel key. Pass psk= for a private channel.
-mesh = adafruit_meshfruit.Meshfruit()
+mesh = adafruit_meshfruit.Meshtastic_Compatible()
 
 pixel = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.2, auto_write=True)
 
 button_pin = digitalio.DigitalInOut(BUTTON_PIN)
 button_pin.direction = digitalio.Direction.INPUT
 button_pin.pull = digitalio.Pull.UP
-button = Button(button_pin, long_duration_ms=LONG_PRESS_MS)
+button = Debouncer(button_pin)
 
 FONTS = {name: bitmap_font.load_font(path) for name, path in FONT_PATHS.items()}
 
@@ -685,28 +688,28 @@ def draw_board():
     print("refreshed")
 
 
-def handle_packet(packet):  # pylint: disable=too-many-return-statements
-    """Decode one packet. Returns True if the panel should redraw."""
-    if len(packet) < adafruit_meshfruit.HEADER_LEN + 1:
+def handle_packet(raw):  # pylint: disable=too-many-return-statements
+    """Decode one received buffer. Returns True if the panel should redraw."""
+    if len(raw) < adafruit_meshfruit.HEADER_LEN + 1:
         return False
 
-    mesh.packet = packet
-    if mesh.channel_hash != CHANNEL_HASH:
+    packet = mesh.decode(raw)
+    if packet.channel_hash != CHANNEL_HASH:
         return False
 
     # Sender plus packet ID uniquely identifies a message. The mesh
     # rebroadcasts each one several times as the hop count decrements.
-    packet_key = bytes(packet[4:12])
+    packet_key = bytes(raw[4:12])
     if packet_key in seen:
         return False
     seen.append(packet_key)
     if len(seen) > SEEN_HISTORY:
         seen.pop(0)
 
-    if not mesh.payload:
+    if not packet.payload:
         return False
 
-    node = mesh.sender_id
+    node = packet.sender_id
     radio_state["rssi"] = rfm9x.last_rssi
 
     stats = node_stats.get(node)
@@ -716,8 +719,8 @@ def handle_packet(packet):  # pylint: disable=too-many-return-statements
         stats["rssi"] = rfm9x.last_rssi
         stats["count"] += 1
 
-    if mesh.portnum == adafruit_meshfruit.PORT_NODEINFO:
-        short = decode_name(mesh.user.get("short_name"))
+    if packet.portnum == adafruit_meshfruit.PORT_NODEINFO:
+        short = decode_name(packet.user.get("short_name"))
         if short and node_names.get(node) != short:
             node_names[node] = short
             save_names()
@@ -726,10 +729,10 @@ def handle_packet(packet):  # pylint: disable=too-many-return-statements
             return any(entry[0] == node for entry in messages)
         return False
 
-    if mesh.portnum != adafruit_meshfruit.PORT_TEXT_MESSAGE:
+    if packet.portnum != adafruit_meshfruit.PORT_TEXT_MESSAGE:
         return False
 
-    messages.insert(0, (node, mesh.text or "<non-utf8>"))
+    messages.insert(0, (node, packet.text or "<non-utf8>"))
     del messages[MAX_MESSAGES:]
     print(node, messages[0][1])
     return True
@@ -753,29 +756,26 @@ def doze():
 
 load_names()
 draw_board()
+last_draw = time.monotonic()
 print("listening on", FREQUENCY, "MHz")
 
 while True:
     doze()
 
-    incoming = rfm9x.receive(with_header=True, timeout=0.2)
+    incoming = rfm9x.receive(with_header=True, timeout=0.05)
     if incoming and handle_packet(incoming):
         pending = True
         blink(PIXEL_MESSAGE)
 
+    # Active low, so fell means pressed.
     button.update()
-    target = None
-    if button.long_press:
-        target = HOLD_VIEW
-    elif button.short_count:
-        current = VIEWS[view_index]
-        spot = CYCLE_VIEWS.index(current) if current in CYCLE_VIEWS else -1
-        target = CYCLE_VIEWS[(spot + 1) % len(CYCLE_VIEWS)]
-
-    if target is not None and target != VIEWS[view_index]:
-        view_index = VIEWS.index(target)
-        print("view ->", target)
+    if button.fell:
+        view_index = (view_index + 1) % len(VIEWS)
+        print("view ->", VIEWS[view_index])
         blink(PIXEL_PRESS if display.time_to_refresh == 0 else PIXEL_QUEUED)
+        pending = True
+
+    if not pending and time.monotonic() - last_draw > IDLE_REFRESH_SECONDS:
         pending = True
 
     # One warning as the cooldown runs out, so a queued change does not
@@ -787,5 +787,6 @@ while True:
 
     if pending and remaining == 0:
         draw_board()
+        last_draw = time.monotonic()
         pending = False
         warned_soon = False
