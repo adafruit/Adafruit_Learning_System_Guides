@@ -6,6 +6,10 @@
 
 Open-Meteo is free and needs no API key. It reports no lunar data, so
 the moon phase is computed here from the date in the response.
+
+WiFi is left up between fetches. Disabling the radio invalidates the
+socket pool, and building a new one each time exhausts the board's
+sockets after a handful of requests.
 """
 
 import ssl
@@ -15,6 +19,8 @@ import socketpool
 import wifi
 
 INTERVAL = 1800  # seconds between fetches
+
+_SESSION = None
 
 
 # Open-Meteo is free and needs no API key. Coordinates come from
@@ -70,13 +76,25 @@ def clock_time(stamp):
     return f"{hour}:{minute}{suffix}"
 
 
-def fetch(ssid, password, latitude, longitude, use_fahrenheit=True):
-    """Pull a short forecast from Open-Meteo. Returns a dict or None.
+def _session():
+    """Return a requests session, building it once.
 
-    WiFi is brought up only for the fetch and shut down afterwards: the
-    ESP32-S3 radio sits close to the LoRa front end, and there is no
-    reason to keep it running between updates.
+    Creating a new SocketPool for every fetch leaks sockets until the
+    board runs out of them, so the pool and session are made once and
+    reused.
     """
+    global _SESSION  # pylint: disable=global-statement
+    if _SESSION is None:
+        _SESSION = adafruit_requests.Session(
+            socketpool.SocketPool(wifi.radio), ssl.create_default_context()
+        )
+    return _SESSION
+
+
+def fetch(ssid, password, latitude, longitude, use_fahrenheit=True):
+    """Pull a short forecast from Open-Meteo. Returns a dict or None."""
+    global _SESSION  # pylint: disable=global-statement
+
     if not ssid:
         print("weather: no wifi credentials in settings.toml")
         return None
@@ -91,21 +109,21 @@ def fetch(ssid, password, latitude, longitude, use_fahrenheit=True):
         f"&temperature_unit={unit}&timezone=auto&forecast_days=3"
     )
 
+    response = None
     try:
-        wifi.radio.enabled = True
         if not wifi.radio.connected:
             wifi.radio.connect(ssid, password)
-        session = adafruit_requests.Session(
-            socketpool.SocketPool(wifi.radio), ssl.create_default_context()
-        )
-        response = session.get(url, timeout=20)
+        response = _session().get(url, timeout=20)
         data = response.json()
-        response.close()
-    except (RuntimeError, OSError, ValueError) as error:
+    except (RuntimeError, OSError, ValueError, adafruit_requests.OutOfRetries) as error:
+        # A timeout leaves the session holding a dead socket, so drop it
+        # and let the next attempt build a fresh one.
         print("weather fetch failed:", error)
+        _SESSION = None
         return None
     finally:
-        wifi.radio.enabled = False
+        if response is not None:
+            response.close()
 
     try:
         current = data["current"]
