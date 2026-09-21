@@ -128,7 +128,7 @@ REFRESH_SOON_SECONDS = 10
 IDLE_REFRESH_SECONDS = 1800
 
 CPU_FREQUENCY = 80_000_000
-SLEEP_SECONDS = 0.05
+SLEEP_SECONDS = 0.2
 
 AIR_SETTLE_SECONDS = 1.0
 BATTERY_RATE_FLOOR = 0.5
@@ -746,10 +746,16 @@ def doze():
     timer as well keeps the button and refresh cooldown responsive.
     """
     rfm9x.listen()
-    alarm.light_sleep_until_alarms(
-        alarm.pin.PinAlarm(pin=RADIO_IRQ_PIN, value=True),
-        alarm.time.TimeAlarm(monotonic_time=time.monotonic() + SLEEP_SECONDS),
-    )
+    # Setting up the alarm takes time of its own. If the wake time has
+    # already passed by the time it is armed, light_sleep raises, so
+    # skip the nap rather than crashing.
+    try:
+        alarm.light_sleep_until_alarms(
+            alarm.pin.PinAlarm(pin=RADIO_IRQ_PIN, value=True),
+            alarm.time.TimeAlarm(monotonic_time=time.monotonic() + SLEEP_SECONDS),
+        )
+    except ValueError:
+        pass
 
 
 # --- main loop --------------------------------------------------------
@@ -762,6 +768,7 @@ print("listening on", FREQUENCY, "MHz")
 while True:
     doze()
 
+    button.update()
     incoming = rfm9x.receive(with_header=True, timeout=0.05)
     if incoming and handle_packet(incoming):
         pending = True
