@@ -774,7 +774,7 @@ def select_image(
         == image_number
     ):
 
-        return
+        return True
 
     print()
 
@@ -787,16 +787,16 @@ def select_image(
         ],
     )
 
+    # Remember the currently working image so it can be
+    # reloaded if the requested BMP is corrupt or unsupported.
+    old_number = image_number
+    old_filename = image_files[
+        old_number
+    ]
+
     blank_pixels()
 
-    old_data = (
-        image_data
-    )
-
     image_data = None
-
-    del old_data
-
     gc.collect()
 
     try:
@@ -821,11 +821,56 @@ def select_image(
             error,
         )
 
+        # The decoded buffer had to be released before loading the
+        # replacement to conserve RAM. Restore the last known-good
+        # image from CIRCUITPY instead of leaving image_data as None.
+        try:
+
+            image_data, image_width = (
+                load_image(
+                    old_filename
+                )
+            )
+
+            image_number = (
+                old_number
+            )
+
+            image_line = 0
+
+            next_scanline_ns = (
+                time.monotonic_ns()
+            )
+
+            print(
+                "Restored previous image:",
+                old_filename,
+            )
+
+        except (
+            MemoryError,
+            ValueError,
+            OSError,
+            RuntimeError,
+        ) as restore_error:
+
+            print(
+                "Could not restore previous image:",
+                restore_error,
+            )
+
+            # Stop safely rather than attempting playback with
+            # an invalid image buffer.
+            image_data = bytearray()
+            image_width = 0
+
+            return False
+
         if not running:
 
             show_waiting_pixel()
 
-        return
+        return False
 
     image_number = (
         new_number
@@ -855,6 +900,8 @@ def select_image(
     if not running:
 
         show_waiting_pixel()
+
+    return True
 
 
 def switch_folder(
@@ -1192,13 +1239,6 @@ def process_packet(
 
 
     # -----------------------------------------------------------------------
-    # THIS IS A REAL CONTROLLER PACKET
-    # -----------------------------------------------------------------------
-
-    enter_controller_mode()
-
-
-    # -----------------------------------------------------------------------
     # FOLDER + IMAGE
     # -----------------------------------------------------------------------
 
@@ -1221,9 +1261,15 @@ def process_packet(
         != image_number
     )
 
-    select_image(
+    if not select_image(
         new_image
-    )
+    ):
+
+        return False
+
+    # Only latch controller mode after the packet has requested a
+    # folder and image this POI can actually use.
+    enter_controller_mode()
 
     if (
         folder_changed
@@ -1316,8 +1362,12 @@ def process_packet(
         new_auto
     )
 
-    interval = (
-        new_interval
+    interval = max(
+        1,
+        min(
+            60,
+            new_interval,
+        ),
     )
 
     if (
@@ -1578,6 +1628,17 @@ while True:
     # -----------------------------------------------------------------------
     # POV PLAYBACK
     # -----------------------------------------------------------------------
+
+    if (
+        image_width <= 0
+        or not image_data
+    ):
+
+        time.sleep(
+            0.002
+        )
+
+        continue
 
     if (
         now_ns
