@@ -4,9 +4,12 @@
 
 # Protocol information from Thermal_Printer Arduino library
 # https://github.com/bitbank2/Thermal_Printer/
+import time
+
 from adafruit_ble.uuid import StandardUUID
 from adafruit_ble.services import Service
-from adafruit_ble.characteristics.stream import StreamIn
+from adafruit_ble.characteristics import Characteristic
+from adafruit_ble.characteristics.stream import StreamIn, StreamOut
 
 # Switch the printing mode to bitmap
 printimage = b"Qx\xbe\x00\x01\x00\x00\x00\xff"
@@ -143,3 +146,76 @@ class CatPrinter(Service):
     def print_bitmap_row(self, data, reverse_bits=True):
         self.mode = MODE_BITMAP
         self._print_common(data, reverse_bits)
+
+
+class MXW01Printer(Service):
+    """The MXW01 cat printer. It has the same service UUID as `CatPrinter`
+    but a different protocol: commands go to AE01, answers come back as
+    notifications on AE02, and the image goes to AE03 in one piece after
+    a print request that says how many lines are coming."""
+
+    uuid = StandardUUID(0xAE30)
+    # The MXW01 advertises this UUID instead of 0xAE30
+    advertised_uuid = StandardUUID(0xAF30)
+
+    _control = Characteristic(
+        uuid=StandardUUID(0xAE01), properties=Characteristic.WRITE_NO_RESPONSE
+    )
+    _notify = StreamOut(uuid=StandardUUID(0xAE02), timeout=0.1, buffer_size=256)
+    _data = Characteristic(
+        uuid=StandardUUID(0xAE03), properties=Characteristic.WRITE_NO_RESPONSE
+    )
+
+    @property
+    def bitmap_width(self):
+        return 384
+
+    def _command(self, command, payload):
+        buf = bytearray(len(payload) + 8)
+        buf[0] = 0x22
+        buf[1] = 0x21
+        buf[2] = command
+        buf[4] = len(payload) & 0xFF
+        buf[5] = len(payload) >> 8
+        buf[6 : 6 + len(payload)] = payload
+        buf[-2] = checksum(buf, 6, len(payload))
+        buf[-1] = 0xFF
+        self._control = buf
+
+    def _response(self, command, timeout):
+        """Wait for the printer's answer to `command` and return its payload."""
+        header = bytes((0x22, 0x21, command))
+        data = b""
+        deadline = time.monotonic() + timeout
+        while time.monotonic() < deadline:
+            waiting = self._notify.in_waiting
+            if waiting:
+                data += self._notify.read(waiting)
+                start = data.find(header)
+                if start >= 0 and len(data) >= start + 6:
+                    size = data[start + 4] | (data[start + 5] << 8)
+                    if len(data) >= start + 6 + size:
+                        return data[start + 6 : start + 6 + size]
+        raise RuntimeError("The printer did not answer")
+
+    def print_bitmap(self, data, *, intensity=0x5D, progress=None):
+        """Print `data`, 48 bytes per line, 1 = black, with the leftmost pixel
+        of each byte in the lowest bit. ``progress(fraction)`` is called while
+        the image is sent. Returns when the printer has finished."""
+        row_bytes = self.bitmap_width // 8
+        lines = len(data) // row_bytes
+        self._notify.reset_input_buffer()
+        self._command(0xA2, bytes((intensity,)))
+        self._command(0xA9, bytes((lines & 0xFF, lines >> 8, 0x30, 0)))
+        answer = self._response(0xA9, 5)
+        if answer[0] != 0:
+            raise RuntimeError("The printer refused to print (%d)" % answer[0])
+        data = memoryview(data)
+        chunk = 4 * row_bytes
+        for offset in range(0, len(data), chunk):
+            self._data = data[offset : offset + chunk]
+            if progress and offset % (32 * row_bytes) == 0:
+                progress(offset / len(data))
+        self._command(0xAD, b"\x00")
+        # About 1 second per 40 lines, plus a margin
+        self._response(0xAA, 10 + lines / 20)
