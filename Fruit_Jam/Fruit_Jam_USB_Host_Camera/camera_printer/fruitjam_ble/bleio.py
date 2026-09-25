@@ -1040,6 +1040,7 @@ class Adapter:
         """The device name, also served by the GAP Device Name characteristic."""
         return self._name
 
+    # pylint: disable=broad-except
     @name.setter
     def name(self, value):
         self._name = value

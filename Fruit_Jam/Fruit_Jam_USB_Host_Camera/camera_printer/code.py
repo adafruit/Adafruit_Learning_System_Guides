@@ -313,7 +313,8 @@ while True:
             try:
                 print_photo()
                 photo_help()
-            except Exception as e:  # noqa: BLE001  keep the booth running
+            except Exception as e:  # pylint: disable=broad-except
+                # keep the booth running
                 print("Print failed:", repr(e))
                 status("Print failed. 1:retry 2:retake")
         elif key == 1:
