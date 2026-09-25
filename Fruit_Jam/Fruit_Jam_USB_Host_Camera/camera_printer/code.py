@@ -35,7 +35,7 @@ from adafruit_ble.advertising import Advertisement
 from adafruit_ble.advertising.standard import ProvideServicesAdvertisement
 
 import adafruit_usb_host_camera
-from thermalprinter import CatPrinter
+from thermalprinter import CatPrinter, MXW01Printer
 
 # pylint: disable=global-statement
 
@@ -45,6 +45,8 @@ WIDTH, HEIGHT = 320, 240
 CAMERA_WIDTH, CAMERA_HEIGHT = 640, 480
 PRINT_WIDTH, PRINT_HEIGHT = 384, 288  # the printer is 384 dots wide
 PRINTER_NAMES = ("GB0", "GT0", "MX0", "MX1", "YT0")
+# Newer printers with the MXW01 protocol
+MXW01_NAMES = ("MXW01",)
 FEED_ROWS = 80  # blank rows after a photo, so it clears the tear-off edge
 
 # Thermal prints come out dark, so the photo is lightened with a gamma curve
@@ -235,9 +237,21 @@ def is_printer(adv):
     name = adv.complete_name or adv.short_name
     if name:
         print("saw", name, adv.address, adv.rssi)
-        if name.startswith(PRINTER_NAMES):
+        if name.startswith(PRINTER_NAMES + MXW01_NAMES):
             return True
-    return isinstance(adv, ProvideServicesAdvertisement) and CatPrinter in adv.services
+    return is_mxw01(adv) or (
+        isinstance(adv, ProvideServicesAdvertisement) and CatPrinter in adv.services
+    )
+
+
+def is_mxw01(adv):
+    name = adv.complete_name or adv.short_name
+    if name and name.startswith(MXW01_NAMES):
+        return True
+    return (
+        isinstance(adv, ProvideServicesAdvertisement)
+        and MXW01Printer.advertised_uuid in adv.services
+    )
 
 
 def connect_printer():
@@ -262,13 +276,20 @@ def connect_printer():
         connection.disconnect()
         connection = None
         raise RuntimeError("That is not a cat printer")
-    printer = connection[CatPrinter]
+    # Both kinds of printer have the same service UUID but different protocols
+    printer = connection[MXW01Printer if is_mxw01(found) else CatPrinter]
 
 
 def print_photo():
     rows = packed_rows()
     connect_printer()
     blank = bytes(ROW_BYTES)
+    if isinstance(printer, MXW01Printer):
+        printer.print_bitmap(
+            rows + blank * FEED_ROWS,
+            progress=lambda done: status("Printing %d%%" % (100 * done)),
+        )
+        return
     for y in range(PRINT_HEIGHT):
         printer.print_bitmap_row(
             rows[y * ROW_BYTES : (y + 1) * ROW_BYTES], reverse_bits=False
