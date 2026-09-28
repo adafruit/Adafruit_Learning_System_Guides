@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2026 Erin St Blaine for Adafruit Industries
 # SPDX-License-Identifier: MIT
 
-# pylint: disable=too-many-lines,global-statement,redefined-outer-name,too-many-locals,too-many-branches,too-many-statements,too-many-return-statements
+# pylint: disable=too-many-lines,global-statement,redefined-outer-name,too-many-locals,too-many-branches,too-many-statements,too-many-return-statements,too-many-boolean-expressions
 
 """
 Wireless POV Controller
@@ -13,43 +13,41 @@ Hardware:
     Mini I2C Gamepad
 
 Tabs:
-    PLAY
     LIBRARY
+    SHOW
     SETTINGS
 
 Radio packet:
     S,folder,image,running,brightness,speed,auto,interval
 
-PLAY:
-    Three similarly sized image previews:
-        PREVIOUS
-        CURRENT
-        NEXT
-
-    PREVIOUS and NEXT thumbnails are clickable.
-    Their invisible touch areas are larger than the visible images.
-
-    STOP
-    AUTOPLAY OFF / AUTOPLAY 8s
-
 LIBRARY:
-    6 thumbnails per page
-    3 columns x 2 rows
-    Tap thumbnail to play it on all POIs
+    Main live-performance screen
+    9 thumbnails per page in a 3 x 3 grid
+    Tap a thumbnail to play it on all POIs
     Current image gets a cyan border
+    LEFT/RIGHT joystick = previous/next image
+    UP/DOWN joystick = one thumbnail row up/down
+
+SHOW:
+    Record timed image cues
+    Name and save performances in persistent NVM
+    Replay saved performances with timing compensation
 
 SETTINGS:
     Brightness
     Speed
     Autoplay interval
+    Toggle autoplay
+
+Gamepad buttons:
+    A = context action / STOP
+    B = brightness down
+    Y = toggle autoplay
+    X = brightness up
 
 Storage:
     Controller image library lives on CIRCUITPY at /img/<folder>/.
     Folder names and alphabetical BMP order should match the POIs.
-
-RAM strategy:
-    PLAY thumbnails are unloaded whenever leaving PLAY.
-    LIBRARY and SETTINGS are generated only when opened.
 """
 
 import gc
@@ -60,6 +58,8 @@ import board
 import digitalio
 import displayio
 import terminalio
+import microcontroller
+import vectorio
 
 from micropython import const
 
@@ -100,7 +100,16 @@ HEARTBEAT_SECONDS = 1.0
 TOUCH_MIN = 250
 TOUCH_MAX = 3820
 
-LIBRARY_PAGE_SIZE = 6
+LIBRARY_PAGE_SIZE = 9
+
+# Saved performances are kept in the Feather's persistent NVM.
+SHOW_PAGE_SIZE = 4
+SHOW_NAME_MAX = 16
+SHOW_MAGIC = "SUPERNOVA_SHOWS_V1"
+
+# Send recorded image cues slightly early so the POIs' BMP load/render time
+# lands the visible image change closer to the recorded musical beat.
+SHOW_PLAYBACK_LEAD_MS = 500
 
 
 # ===========================================================================
@@ -435,17 +444,11 @@ print(
 
 
 # ===========================================================================
-# PLAYLIST
+# IMAGE SELECTION
 # ===========================================================================
 
-# The image index is alphabetical *within the current folder*.
-# Every POI should contain the same folder names and matching image order.
-
-image_order = list(
-    range(
-        len(images)
-    )
-)
+# Image indices are alphabetical within the current folder. Every POI should
+# contain matching folder names and matching image order.
 
 order_position = 0
 
@@ -463,9 +466,7 @@ def set_current_folder(
     global current_folder
     global IMAGE_DIR
     global images
-    global image_order
     global order_position
-    global library_page
 
     if folder_name not in folders:
         return False
@@ -497,14 +498,7 @@ def set_current_folder(
         new_images
     )
 
-    image_order = list(
-        range(
-            len(images)
-        )
-    )
-
     order_position = 0
-    library_page = 0
 
     print(
         "Selected folder:",
@@ -517,35 +511,17 @@ def set_current_folder(
     return True
 
 
-def file_index_at(position):
-
-    return image_order[
-        position % len(image_order)
-    ]
-
-
 def current_file_index():
+    """Return the selected image index in the current folder."""
 
-    return file_index_at(
+    return (
         order_position
-    )
-
-
-def previous_file_index():
-
-    return file_index_at(
-        order_position - 1
-    )
-
-
-def next_file_index():
-
-    return file_index_at(
-        order_position + 1
+        % len(images)
     )
 
 
 def current_filename():
+    """Return the selected image filename."""
 
     return images[
         current_file_index()
@@ -571,11 +547,40 @@ last_heartbeat = (
     time.monotonic()
 )
 
-current_tab = "play"
+current_tab = "library"
 
 library_page = 0
 folder_page = 0
-library_mode = "folders"
+library_mode = "images"
+
+
+# ===========================================================================
+# SHOW RECORDER STATE
+# ===========================================================================
+
+saved_shows = []
+selected_show_index = None
+show_page = 0
+show_mode = "list"
+
+record_pending = False
+recording = False
+recording_start = 0.0
+recorded_folder = ""
+recorded_cues = []
+recorded_duration_ms = 0
+
+show_name_buffer = ""
+show_name_label = None
+
+delete_confirm_index = None
+
+show_playing = False
+show_playback_start = 0.0
+show_playback_index = 0
+show_time_label = None
+show_now_label = None
+last_show_display_update = 0.0
 
 
 # ===========================================================================
@@ -596,31 +601,28 @@ def rect(
     color,
 ):
 
-    bitmap = displayio.Bitmap(
-        width,
-        height,
-        1,
-    )
-
+    # vectorio.Rectangle is much more memory-efficient than creating a
+    # displayio.Bitmap as large as every solid UI rectangle.
     palette = displayio.Palette(
         1
     )
 
     palette[0] = color
 
-    tile = displayio.TileGrid(
-        bitmap,
+    shape = vectorio.Rectangle(
         pixel_shader=palette,
+        width=width,
+        height=height,
         x=x,
         y=y,
     )
 
     parent.append(
-        tile
+        shape
     )
 
     return (
-        tile,
+        shape,
         palette,
     )
 
@@ -696,14 +698,8 @@ rect(
 
 
 # ===========================================================================
-# PAGE GROUPS
+# PAGE GROUP
 # ===========================================================================
-
-play_group = displayio.Group()
-
-root.append(
-    play_group
-)
 
 dynamic_group = displayio.Group()
 
@@ -764,15 +760,15 @@ def make_tab(
 
 
 make_tab(
-    "play",
-    "PLAY",
+    "library",
+    "LIBRARY",
     0,
     160,
 )
 
 make_tab(
-    "library",
-    "LIBRARY",
+    "show",
+    "SHOW",
     160,
     160,
 )
@@ -786,279 +782,85 @@ make_tab(
 
 
 # ===========================================================================
-# PLAY TOUCH TARGETS
+# RECORDING STATUS OVERLAY
 # ===========================================================================
 
-play_buttons = []
-
-
-def add_play_touch(
-    name,
-    x,
-    y,
-    width,
-    height,
-):
-
-    play_buttons.append(
-        (
-            name,
-            x,
-            y,
-            width,
-            height,
-            None,
-            None,
-        )
-    )
-
-
-def make_play_button(
-    name,
-    caption,
-    x,
-    y,
-    width,
-    height,
-    color=PANEL,
-    scale=1,
-):
-
-    _, palette = rect(
-        play_group,
-        x,
-        y,
-        width,
-        height,
-        color,
-    )
-
-    item = centered_text(
-        play_group,
-        caption,
-        x,
-        y,
-        width,
-        height,
-        WHITE,
-        scale,
-    )
-
-    play_buttons.append(
-        (
-            name,
-            x,
-            y,
-            width,
-            height,
-            palette,
-            item,
-        )
-    )
-
-    return (
-        item,
-        palette,
-    )
-
-
-# ===========================================================================
-# PLAY SCREEN
-# ===========================================================================
-
-text(
-    play_group,
-    "PLAY",
-    12,
-    17,
-    CYAN,
-)
-
-text(
-    play_group,
-    "RF LIVE",
-    407,
-    17,
-    GREEN,
-    1,
-)
-
-
-# ---------------------------------------------------------------------------
-# THREE IMAGE PREVIEWS
-# ---------------------------------------------------------------------------
-
-PREVIEW_Y = 48
-PREVIEW_W = 125
-PREVIEW_H = 70
-
-PREVIEW_PREV_X = 12
-CURRENT_X = 177
-PREVIEW_NEXT_X = 342
-
-CURRENT_Y = PREVIEW_Y
-CURRENT_W = PREVIEW_W
-CURRENT_H = PREVIEW_H
-
-SMALL_Y = PREVIEW_Y
-SMALL_W = PREVIEW_W
-SMALL_H = PREVIEW_H
-
-
-# Previous image background
+record_overlay_group = displayio.Group()
+root.append(record_overlay_group)
 
 rect(
-    play_group,
-    PREVIEW_PREV_X,
-    PREVIEW_Y,
-    PREVIEW_W,
-    PREVIEW_H,
-    PANEL,
+    record_overlay_group,
+    0,
+    0,
+    480,
+    42,
+    RED,
 )
 
-
-# Current image background
-
-rect(
-    play_group,
-    CURRENT_X,
-    CURRENT_Y,
-    CURRENT_W,
-    CURRENT_H,
-    PANEL,
-)
-
-
-# Next image background
-
-rect(
-    play_group,
-    PREVIEW_NEXT_X,
-    PREVIEW_Y,
-    PREVIEW_W,
-    PREVIEW_H,
-    PANEL,
-)
-
-
-# Image groups
-
-previous_preview_group = displayio.Group()
-current_preview_group = displayio.Group()
-next_preview_group = displayio.Group()
-
-play_group.append(
-    previous_preview_group
-)
-
-play_group.append(
-    current_preview_group
-)
-
-play_group.append(
-    next_preview_group
-)
-
-
-# ---------------------------------------------------------------------------
-# PREVIEW LABELS
-# ---------------------------------------------------------------------------
-
-centered_text(
-    play_group,
-    "< PREV",
-    PREVIEW_PREV_X,
-    122,
-    PREVIEW_W,
-    18,
-    CYAN,
-    1,
-)
-
-current_filename_label = centered_text(
-    play_group,
+record_status_label = text(
+    record_overlay_group,
     "",
-    CURRENT_X,
-    122,
-    CURRENT_W,
-    18,
+    12,
+    24,
     WHITE,
     1,
 )
 
-centered_text(
-    play_group,
-    "NEXT >",
-    PREVIEW_NEXT_X,
-    122,
-    PREVIEW_W,
-    18,
-    CYAN,
-    1,
-)
-
-
-# ---------------------------------------------------------------------------
-# LARGE INVISIBLE PREV / NEXT TOUCH TARGETS
-# ---------------------------------------------------------------------------
-
-# Left 155 pixels of the screen = PREVIOUS.
-
-add_play_touch(
-    "previous",
+record_stop_label = centered_text(
+    record_overlay_group,
+    "STOP REC",
+    360,
     0,
-    36,
-    155,
-    110,
-)
-
-
-# Right 155 pixels of the screen = NEXT.
-
-add_play_touch(
-    "next",
-    325,
-    36,
-    155,
-    110,
-)
-
-
-# ---------------------------------------------------------------------------
-# STOP
-# ---------------------------------------------------------------------------
-
-stop_label, stop_palette = make_play_button(
-    "stop",
-    "STOP",
-    170,
-    158,
-    140,
-    48,
-    RED,
-    1,
-)
-
-
-# ---------------------------------------------------------------------------
-# AUTOPLAY
-# ---------------------------------------------------------------------------
-
-auto_label, auto_palette = make_play_button(
-    "auto",
-    "AUTOPLAY OFF",
     120,
-    220,
-    240,
-    46,
-    RED,
+    42,
+    WHITE,
     1,
 )
+
+record_overlay_group.hidden = True
 
 
 # ===========================================================================
 # GENERIC THUMBNAIL CREATOR
 # ===========================================================================
+
+# All thumbnails share this small 16-color RGB palette.
+# The source BMPs remain untouched; colors are remapped only for the preview.
+THUMBNAIL_PALETTE = displayio.Palette(
+    16
+)
+
+for _thumb_index in range(
+    16
+):
+
+    _thumb_r = (
+        255
+        if _thumb_index & 0x08
+        else 0
+    )
+
+    _thumb_g = (
+        (
+            _thumb_index >> 1
+        )
+        & 0x03
+    ) * 85
+
+    _thumb_b = (
+        255
+        if _thumb_index & 0x01
+        else 0
+    )
+
+    THUMBNAIL_PALETTE[
+        _thumb_index
+    ] = (
+        (_thumb_r << 16)
+        | (_thumb_g << 8)
+        | _thumb_b
+    )
+
 
 def _bmp_u16(data, offset):
     """Read a little-endian unsigned 16-bit value."""
@@ -1289,24 +1091,22 @@ def create_thumbnail(
         # allocation much less sensitive to heap fragmentation.
         gc.collect()
 
+        gc.collect()
+
         thumbnail = displayio.Bitmap(
             thumb_width,
             thumb_height,
-            max(
-                2,
-                colors_used,
-            ),
+            16,
         )
 
         # ---------------------------------------------------------------
-        # PALETTE
+        # SOURCE PALETTE -> SHARED 16-COLOR THUMBNAIL PALETTE
         # ---------------------------------------------------------------
 
-        source_palette = displayio.Palette(
-            max(
-                2,
-                colors_used,
-            )
+        # Store only a one-byte lookup per source palette entry instead of
+        # allocating a separate displayio.Palette for every thumbnail.
+        palette_map = bytearray(
+            colors_used
         )
 
         palette_offset = (
@@ -1332,18 +1132,23 @@ def create_thumbnail(
                 )
 
             # BMP palette order is B, G, R, reserved.
-            source_palette[
+            red = entry[2]
+            green = entry[1]
+            blue = entry[0]
+
+            # RGB121: 1 red bit, 2 green bits, 1 blue bit = 16 colors.
+            palette_map[
                 color_index
             ] = (
                 (
-                    entry[2]
-                    << 16
-                )
+                    red >> 7
+                ) << 3
                 | (
-                    entry[1]
-                    << 8
+                    green >> 6
+                ) << 1
+                | (
+                    blue >> 7
                 )
-                | entry[0]
             )
 
         # BMP rows are padded to a multiple of four bytes.
@@ -1466,14 +1271,16 @@ def create_thumbnail(
                     x,
                     y,
                 ] = (
-                    pixel_value
+                    palette_map[
+                        pixel_value
+                    ]
                 )
 
     gc.collect()
 
     tile = displayio.TileGrid(
         thumbnail,
-        pixel_shader=source_palette,
+        pixel_shader=THUMBNAIL_PALETTE,
     )
 
     tile.x = (
@@ -1492,268 +1299,7 @@ def create_thumbnail(
         tile
     )
 
-    return source_palette
-
-
-# ===========================================================================
-# PLAY PREVIEWS
-# ===========================================================================
-
-previous_palette = None
-current_palette = None
-next_palette = None
-
-
-def short_current_name():
-
-    filename = (
-        current_filename()
-    )
-
-    if filename.lower().endswith(
-        ".bmp"
-    ):
-
-        filename = (
-            filename[:-4]
-        )
-
-    if len(filename) > 18:
-
-        filename = (
-            filename[:15]
-            + "..."
-        )
-
-    return filename
-
-
-def update_play_previews():
-
-    global previous_palette
-    global current_palette
-    global next_palette
-
-    # -----------------------------------------------------------------------
-    # REMOVE OLD PREVIEWS
-    # -----------------------------------------------------------------------
-
-    while len(
-        previous_preview_group
-    ):
-
-        previous_preview_group.pop()
-
-    while len(
-        current_preview_group
-    ):
-
-        current_preview_group.pop()
-
-    while len(
-        next_preview_group
-    ):
-
-        next_preview_group.pop()
-
-    previous_palette = None
-    current_palette = None
-    next_palette = None
-
-    gc.collect()
-
-
-    # -----------------------------------------------------------------------
-    # UPDATE CURRENT FILENAME
-    # -----------------------------------------------------------------------
-
-    current_filename_label.text = (
-        short_current_name()
-    )
-
-
-    # -----------------------------------------------------------------------
-    # PREVIOUS
-    # -----------------------------------------------------------------------
-
-    try:
-
-        previous_palette = (
-            create_thumbnail(
-                previous_preview_group,
-                previous_file_index(),
-                PREVIEW_PREV_X,
-                PREVIEW_Y,
-                PREVIEW_W,
-                PREVIEW_H,
-            )
-        )
-
-    except (
-        OSError,
-        ValueError,
-        RuntimeError,
-        MemoryError,
-    ) as error:
-
-        print(
-            "Previous thumbnail failed:",
-            error,
-        )
-
-
-    gc.collect()
-
-
-    # -----------------------------------------------------------------------
-    # CURRENT
-    # -----------------------------------------------------------------------
-
-    try:
-
-        current_palette = (
-            create_thumbnail(
-                current_preview_group,
-                current_file_index(),
-                CURRENT_X,
-                CURRENT_Y,
-                CURRENT_W,
-                CURRENT_H,
-            )
-        )
-
-    except (
-        OSError,
-        ValueError,
-        RuntimeError,
-        MemoryError,
-    ) as error:
-
-        print(
-            "Current thumbnail failed:",
-            error,
-        )
-
-
-    gc.collect()
-
-
-    # -----------------------------------------------------------------------
-    # NEXT
-    # -----------------------------------------------------------------------
-
-    try:
-
-        next_palette = (
-            create_thumbnail(
-                next_preview_group,
-                next_file_index(),
-                PREVIEW_NEXT_X,
-                PREVIEW_Y,
-                PREVIEW_W,
-                PREVIEW_H,
-            )
-        )
-
-    except (
-        OSError,
-        ValueError,
-        RuntimeError,
-        MemoryError,
-    ) as error:
-
-        print(
-            "Next thumbnail failed:",
-            error,
-        )
-
-
-    gc.collect()
-
-    print(
-        "PLAY previews:",
-        images[
-            previous_file_index()
-        ],
-        "/",
-        current_filename(),
-        "/",
-        images[
-            next_file_index()
-        ],
-    )
-
-    print(
-        "Free RAM after PLAY previews:",
-        gc.mem_free(),
-    )
-
-
-# ===========================================================================
-# FREE PLAY PREVIEW RAM
-# ===========================================================================
-
-def unload_play_previews():
-
-    global previous_palette
-    global current_palette
-    global next_palette
-
-    while len(
-        previous_preview_group
-    ):
-
-        previous_preview_group.pop()
-
-    while len(
-        current_preview_group
-    ):
-
-        current_preview_group.pop()
-
-    while len(
-        next_preview_group
-    ):
-
-        next_preview_group.pop()
-
-    previous_palette = None
-    current_palette = None
-    next_palette = None
-
-    gc.collect()
-
-    print(
-        "Free RAM after unloading PLAY previews:",
-        gc.mem_free(),
-    )
-
-
-# ===========================================================================
-# AUTOPLAY BUTTON
-# ===========================================================================
-
-def update_autoplay_button():
-
-    if autoplay:
-
-        auto_label.text = (
-            f"AUTOPLAY {interval}s"
-        )
-
-        auto_palette[0] = (
-            GREEN
-        )
-
-    else:
-
-        auto_label.text = (
-            "AUTOPLAY OFF"
-        )
-
-        auto_palette[0] = (
-            RED
-        )
+    return THUMBNAIL_PALETTE
 
 
 # ===========================================================================
@@ -1765,9 +1311,8 @@ def build_state_message():
     # Folder name travels with every state packet, including heartbeats.
     # This lets an out-of-range POI resync to the correct folder later.
     return (
-        f"S,{current_folder},{current_file_index()},"
-        f"{int(running)},{brightness},{speed},"
-        f"{int(autoplay)},{interval}"
+        f"S,{current_folder},{current_file_index()},{int(running)},"
+        f"{brightness},{speed},{int(autoplay)},{interval}"
     )
 
 
@@ -1844,26 +1389,38 @@ def change_image(
         order_position
         + amount
     ) % len(
-        image_order
+        images
     )
-
-    running = True
 
     last_advance = (
         time.monotonic()
     )
 
-    if current_tab == "play":
+    # While armed, browse/select the first cue without waking the POIs.
+    if record_pending:
 
-        update_play_previews()
+        if current_tab == "library":
+            refresh_library_selection()
+
+        print(
+            "ARMED selection:",
+            current_filename(),
+        )
+
+        return
+
+    running = True
 
     report_state()
 
     send_state()
 
+    record_current_cue()
+
     if current_tab == "library":
 
-        build_library_page()
+        refresh_library_selection()
+
 
 
 def select_file_index(
@@ -1874,31 +1431,47 @@ def select_file_index(
     global running
     global last_advance
 
-    try:
-
-        order_position = (
-            image_order.index(
-                file_index
-            )
-        )
-
-    except ValueError:
+    if not (
+        0
+        <= file_index
+        < len(images)
+    ):
 
         return
 
-    running = True
+    order_position = (
+        file_index
+    )
 
     last_advance = (
         time.monotonic()
     )
 
+    # While armed, change only the controller's selected first cue.
+    if record_pending:
+
+        if current_tab == "library":
+            refresh_library_selection()
+
+        print(
+            "ARMED selection:",
+            current_filename(),
+        )
+
+        return
+
+    running = True
+
     report_state()
 
     send_state()
 
+    record_current_cue()
+
     if current_tab == "library":
 
-        build_library_page()
+        refresh_library_selection()
+
 
 
 # ===========================================================================
@@ -1966,7 +1539,10 @@ def add_dynamic_button(
 # LIBRARY
 # ===========================================================================
 
-library_thumbnail_palettes = []
+# One small background/highlight rectangle per visible thumbnail.
+# Changing its palette color is much faster than rebuilding all thumbnails.
+library_highlight_palettes = []
+library_highlight_indices = []
 
 FOLDER_PAGE_SIZE = 6
 
@@ -1998,11 +1574,13 @@ def folder_page_count():
 def build_folder_page():
     """Show image-library folders from CIRCUITPY."""
 
-    global library_thumbnail_palettes
+    global library_highlight_palettes
+    global library_highlight_indices
 
     clear_dynamic()
 
-    library_thumbnail_palettes = []
+    library_highlight_palettes = []
+    library_highlight_indices = []
 
     gc.collect()
 
@@ -2148,14 +1726,70 @@ def build_folder_page():
     gc.collect()
 
 
+def update_library_highlight():
+    """Update only the selection border colors on the current Library page."""
+
+    if (
+        current_tab != "library"
+        or library_mode != "images"
+    ):
+        return
+
+    selected_index = (
+        current_file_index()
+    )
+
+    for index, palette in zip(
+        library_highlight_indices,
+        library_highlight_palettes,
+    ):
+
+        palette[0] = (
+            CYAN
+            if index == selected_index
+            else BG
+        )
+
+
+def refresh_library_selection():
+    """Move the highlight quickly, rebuilding only when the page changes."""
+
+    global library_page
+
+    if (
+        current_tab != "library"
+        or library_mode != "images"
+    ):
+        return
+
+    new_page = (
+        current_file_index()
+        // LIBRARY_PAGE_SIZE
+    )
+
+    if new_page != library_page:
+
+        library_page = (
+            new_page
+        )
+
+        build_library_page()
+
+    else:
+
+        update_library_highlight()
+
+
 def build_image_library_page():
     """Show thumbnails inside the currently selected folder."""
 
-    global library_thumbnail_palettes
+    global library_highlight_palettes
+    global library_highlight_indices
 
     clear_dynamic()
 
-    library_thumbnail_palettes = []
+    library_highlight_palettes = []
+    library_highlight_indices = []
 
     gc.collect()
 
@@ -2206,12 +1840,10 @@ def build_image_library_page():
     )
 
     CELL_W = 152
-    CELL_H = 88
+    CELL_H = 61
 
-    # Six thumbnails stay resident at once. Keep these modest so all six
-    # fit comfortably in RP2040 RAM even for 256-color source BMPs.
-    THUMB_W = 84
-    THUMB_H = 36
+    THUMB_W = 68
+    THUMB_H = 28
 
     COLUMN_X = (
         2,
@@ -2221,7 +1853,8 @@ def build_image_library_page():
 
     ROW_Y = (
         45,
-        139,
+        107,
+        169,
     )
 
     start = (
@@ -2262,11 +1895,6 @@ def build_image_library_page():
             ]
         )
 
-        selected = (
-            file_index
-            == current_file_index()
-        )
-
         thumb_x = (
             cell_x
             + (
@@ -2281,79 +1909,36 @@ def build_image_library_page():
             + 8
         )
 
-        if selected:
+        # One backplate gives us a 3-pixel selection border around the
+        # thumbnail. Later we only change this palette between BG and CYAN.
+        _, highlight_palette = rect(
+            dynamic_group,
+            thumb_x - 3,
+            thumb_y - 3,
+            THUMB_W + 6,
+            THUMB_H + 6,
+            CYAN
+            if file_index == current_file_index()
+            else BG,
+        )
 
-            border_x = (
-                thumb_x - 3
-            )
+        library_highlight_palettes.append(
+            highlight_palette
+        )
 
-            border_y = (
-                thumb_y - 3
-            )
-
-            border_w = (
-                THUMB_W + 6
-            )
-
-            border_h = (
-                THUMB_H + 6
-            )
-
-            rect(
-                dynamic_group,
-                border_x,
-                border_y,
-                border_w,
-                3,
-                CYAN,
-            )
-
-            rect(
-                dynamic_group,
-                border_x,
-                border_y
-                + border_h
-                - 3,
-                border_w,
-                3,
-                CYAN,
-            )
-
-            rect(
-                dynamic_group,
-                border_x,
-                border_y,
-                3,
-                border_h,
-                CYAN,
-            )
-
-            rect(
-                dynamic_group,
-                border_x
-                + border_w
-                - 3,
-                border_y,
-                3,
-                border_h,
-                CYAN,
-            )
+        library_highlight_indices.append(
+            file_index
+        )
 
         try:
 
-            palette = (
-                create_thumbnail(
-                    dynamic_group,
-                    file_index,
-                    thumb_x,
-                    thumb_y,
-                    THUMB_W,
-                    THUMB_H,
-                )
-            )
-
-            library_thumbnail_palettes.append(
-                palette
+            create_thumbnail(
+                dynamic_group,
+                file_index,
+                thumb_x,
+                thumb_y,
+                THUMB_W,
+                THUMB_H,
             )
 
         except (
@@ -2371,8 +1956,6 @@ def build_image_library_page():
                 error,
             )
 
-            # Lightweight fallback: keep the slot useful even when
-            # the actual thumbnail cannot allocate.
             fallback_name = images[
                 file_index
             ]
@@ -2415,7 +1998,6 @@ def build_image_library_page():
             )
         )
 
-    # Previous page: gray and inactive on the first page.
     if library_page > 0:
 
         add_dynamic_button(
@@ -2462,7 +2044,6 @@ def build_image_library_page():
         1,
     )
 
-    # Next page: gray and inactive on the last page.
     if library_page < total_pages - 1:
 
         add_dynamic_button(
@@ -2506,6 +2087,7 @@ def build_image_library_page():
     )
 
 
+
 def build_library_page():
 
     if library_mode == "folders":
@@ -2515,6 +2097,1453 @@ def build_library_page():
     else:
 
         build_image_library_page()
+
+
+# ===========================================================================
+# SHOW STORAGE
+# ===========================================================================
+
+def _show_storage_text():
+    """Return the serialized show database stored in microcontroller.nvm."""
+
+    nvm = microcontroller.nvm
+
+    if len(nvm) < 4:
+        return ""
+
+    size = (
+        nvm[0]
+        | (
+            nvm[1]
+            << 8
+        )
+    )
+
+    if (
+        size <= 0
+        or size > len(nvm) - 2
+    ):
+        return ""
+
+    try:
+        return bytes(
+            nvm[
+                2:2 + size
+            ]
+        ).decode("utf-8")
+
+    except (
+        UnicodeError,
+        ValueError,
+    ):
+        return ""
+
+
+def load_saved_shows():
+    """Load all recorded performances from persistent NVM."""
+
+    loaded = []
+    data = _show_storage_text()
+
+    if not data:
+        return loaded
+
+    lines = data.splitlines()
+
+    if (
+        not lines
+        or lines[0] != SHOW_MAGIC
+    ):
+        return loaded
+
+    for line in lines[1:]:
+
+        if not line:
+            continue
+
+        parts = line.split(
+            "|",
+            3,
+        )
+
+        if len(parts) != 4:
+            continue
+
+        name = parts[0]
+        folder_name = parts[1]
+
+        try:
+            duration_ms = int(
+                parts[2]
+            )
+
+        except ValueError:
+            continue
+
+        cues = []
+
+        if parts[3]:
+
+            for cue_text in parts[3].split(
+                ";"
+            ):
+
+                cue_parts = cue_text.split(
+                    ",",
+                    1,
+                )
+
+                if len(cue_parts) != 2:
+                    continue
+
+                try:
+                    cue_ms = int(
+                        cue_parts[0]
+                    )
+                    image_index = int(
+                        cue_parts[1]
+                    )
+
+                except ValueError:
+                    continue
+
+                cues.append(
+                    (
+                        cue_ms,
+                        image_index,
+                    )
+                )
+
+        loaded.append(
+            (
+                name,
+                folder_name,
+                duration_ms,
+                cues,
+            )
+        )
+
+    return loaded
+
+
+def serialize_saved_shows():
+    """Serialize saved shows into a compact text representation."""
+
+    lines = [
+        SHOW_MAGIC
+    ]
+
+    for (
+        name,
+        folder_name,
+        duration_ms,
+        cues,
+    ) in saved_shows:
+
+        cue_text = ";".join(
+            f"{cue_ms},{image_index}"
+            for (
+                cue_ms,
+                image_index,
+            ) in cues
+        )
+
+        lines.append(
+            f"{name}|{folder_name}|{duration_ms}|{cue_text}"
+        )
+
+    return (
+        "\n".join(
+            lines
+        )
+        + "\n"
+    )
+
+
+def save_show_database():
+    """Write the complete show database to persistent NVM."""
+
+    data = serialize_saved_shows().encode(
+        "utf-8"
+    )
+
+    nvm = microcontroller.nvm
+    capacity = len(nvm) - 2
+
+    if len(data) > capacity:
+
+        print(
+            "SHOW SAVE FAILED: database needs",
+            len(data),
+            "bytes but NVM has",
+            capacity,
+        )
+
+        return False
+
+    nvm[0] = (
+        len(data)
+        & 0xFF
+    )
+
+    nvm[1] = (
+        len(data)
+        >> 8
+    ) & 0xFF
+
+    nvm[
+        2:2 + len(data)
+    ] = data
+
+    print(
+        "Saved",
+        len(saved_shows),
+        "show(s) using",
+        len(data),
+        "bytes of NVM",
+    )
+
+    return True
+
+
+# ===========================================================================
+# SHOW HELPERS
+# ===========================================================================
+
+def format_show_time(milliseconds):
+    """Format milliseconds as M:SS.t."""
+
+    total_seconds = max(
+        0,
+        milliseconds,
+    ) // 1000
+
+    tenths = (
+        max(
+            0,
+            milliseconds,
+        )
+        % 1000
+    ) // 100
+
+    minutes = (
+        total_seconds
+        // 60
+    )
+
+    seconds = (
+        total_seconds
+        % 60
+    )
+
+    return f"{minutes}:{seconds:02d}.{tenths}"
+
+
+def record_current_cue():
+    """Record the current image selection when a show is being recorded."""
+
+    if not recording:
+        return
+
+    cue_ms = int(
+        (
+            time.monotonic()
+            - recording_start
+        )
+        * 1000
+    )
+
+    recorded_cues.append(
+        (
+            cue_ms,
+            current_file_index(),
+        )
+    )
+
+    print(
+        "REC CUE:",
+        cue_ms,
+        current_filename(),
+    )
+
+
+def update_record_overlay(now):
+    """Update the armed/recording status bar without rebuilding thumbnails."""
+
+    if record_pending:
+
+        if record_status_label.text != "ARMED - choose folder/image":
+            record_status_label.text = (
+                "ARMED - choose folder/image"
+            )
+
+        record_stop_label.text = (
+            "START REC"
+        )
+
+        return
+
+    if recording:
+
+        elapsed_ms = int(
+            (
+                now
+                - recording_start
+            )
+            * 1000
+        )
+
+        message = (
+            "REC  "
+            + format_show_time(
+                elapsed_ms
+            )
+        )
+
+        if record_status_label.text != message:
+            record_status_label.text = (
+                message
+            )
+
+        record_stop_label.text = (
+            "STOP REC"
+        )
+
+
+def begin_recording_now():
+    """Start recording immediately using the currently selected image."""
+
+    global record_pending
+    global recording
+    global recording_start
+    global running
+    global recorded_folder
+
+    if not record_pending:
+        return
+
+    if library_mode != "images":
+
+        record_status_label.text = (
+            "CHOOSE AN IMAGE FIRST"
+        )
+
+        return
+
+    record_pending = False
+    recording = True
+    recording_start = (
+        time.monotonic()
+    )
+
+    # Lock the chosen folder only when recording actually starts.
+    recorded_folder = (
+        current_folder
+    )
+
+    # The selected first image becomes cue zero exactly when START is pressed.
+    running = True
+
+    recorded_cues.append(
+        (
+            0,
+            current_file_index(),
+        )
+    )
+
+    report_state()
+    send_state()
+
+    record_status_label.text = (
+        "REC  0:00.0"
+    )
+
+    record_stop_label.text = (
+        "STOP REC"
+    )
+
+    print(
+        "SHOW RECORDING STARTED:",
+        current_filename(),
+        "at 0 ms",
+    )
+
+
+def start_show_recording():
+    """Arm recording, open the current folder, and wait for START."""
+
+    global autoplay
+    global running
+    global last_advance
+    global library_mode
+    global library_page
+    global record_pending
+    global recording
+    global recorded_folder
+    global recorded_cues
+    global recorded_duration_ms
+
+    autoplay = False
+
+    # Put all POIs into ready/standby mode while the first cue is selected.
+    running = False
+
+    last_advance = (
+        time.monotonic()
+    )
+
+    report_state()
+    send_state()
+
+    recorded_folder = ""
+
+    recorded_cues = []
+    recorded_duration_ms = 0
+
+    record_pending = True
+    recording = False
+
+    library_mode = (
+        "images"
+    )
+
+    library_page = (
+        current_file_index()
+        // LIBRARY_PAGE_SIZE
+    )
+
+    show_tab(
+        "library"
+    )
+
+    record_overlay_group.hidden = (
+        False
+    )
+
+    update_record_overlay(
+        time.monotonic()
+    )
+
+    print(
+        "SHOW ARMED - choose first image, then press A or START REC"
+    )
+
+
+def cancel_show_recording():
+    """Cancel the countdown or current recording without saving it."""
+
+    global record_pending
+    global recording
+    global recorded_cues
+    global show_mode
+
+    record_pending = False
+    recording = False
+    recorded_cues = []
+
+    record_overlay_group.hidden = (
+        True
+    )
+
+    show_mode = "list"
+
+    show_tab(
+        "show"
+    )
+
+
+def finish_show_recording():
+    """Finish recording and open the on-screen naming page."""
+
+    global record_pending
+    global recording
+    global recorded_duration_ms
+    global show_name_buffer
+    global show_mode
+    global current_tab
+
+    if record_pending:
+
+        cancel_show_recording()
+        return
+
+    if not recording:
+        return
+
+    recorded_duration_ms = int(
+        (
+            time.monotonic()
+            - recording_start
+        )
+        * 1000
+    )
+
+    recording = False
+    record_pending = False
+
+    record_overlay_group.hidden = (
+        True
+    )
+
+    show_name_buffer = ""
+    show_mode = "naming"
+    current_tab = "show"
+
+    update_tab_colors()
+    build_show_name_page()
+
+    print(
+        "SHOW RECORDING STOPPED:",
+        len(recorded_cues),
+        "cues,",
+        recorded_duration_ms,
+        "ms",
+    )
+
+
+def add_keyboard_key(
+    caption,
+    name,
+    x,
+    y,
+    width,
+    height,
+):
+    """Add a lightweight text key and touch target."""
+
+    centered_text(
+        dynamic_group,
+        caption,
+        x,
+        y,
+        width,
+        height,
+        WHITE,
+        2,
+    )
+
+    dynamic_buttons.append(
+        (
+            name,
+            x,
+            y,
+            width,
+            height,
+            None,
+            None,
+        )
+    )
+
+
+def build_show_name_page():
+    """Draw the lightweight on-screen keyboard used after recording."""
+
+    global show_name_label
+
+    clear_dynamic()
+
+    gc.collect()
+
+    text(
+        dynamic_group,
+        "NAME SHOW",
+        12,
+        17,
+        CYAN,
+    )
+
+    rect(
+        dynamic_group,
+        12,
+        38,
+        456,
+        42,
+        PANEL,
+    )
+
+    show_name_label = centered_text(
+        dynamic_group,
+        show_name_buffer
+        if show_name_buffer
+        else "_",
+        12,
+        38,
+        456,
+        42,
+        WHITE,
+        2,
+    )
+
+    keyboard_rows = (
+        (
+            "QWERTYUIOP",
+            30,
+            92,
+        ),
+        (
+            "ASDFGHJKL",
+            51,
+            137,
+        ),
+        (
+            "ZXCVBNM",
+            93,
+            182,
+        ),
+    )
+
+    for (
+        letters,
+        start_x,
+        key_y,
+    ) in keyboard_rows:
+
+        for key_number, letter in enumerate(
+            letters
+        ):
+
+            key_x = (
+                start_x
+                + key_number * 42
+            )
+
+            add_keyboard_key(
+                letter,
+                "name_key_" + letter,
+                key_x,
+                key_y,
+                38,
+                38,
+            )
+
+    add_dynamic_button(
+        "name_back",
+        "BACK",
+        12,
+        232,
+        90,
+        42,
+        PANEL,
+        1,
+    )
+
+    add_dynamic_button(
+        "name_space",
+        "SPACE",
+        112,
+        232,
+        130,
+        42,
+        PANEL,
+        1,
+    )
+
+    add_dynamic_button(
+        "name_cancel",
+        "CANCEL",
+        252,
+        232,
+        96,
+        42,
+        PANEL,
+        1,
+    )
+
+    add_dynamic_button(
+        "name_save",
+        "SAVE",
+        358,
+        232,
+        110,
+        42,
+        GREEN,
+        1,
+    )
+
+    gc.collect()
+
+
+def show_page_count():
+    """Return the number of pages needed for saved shows."""
+
+    return max(
+        1,
+        (
+            len(saved_shows)
+            + SHOW_PAGE_SIZE
+            - 1
+        )
+        // SHOW_PAGE_SIZE,
+    )
+
+
+def build_show_page():
+    """Draw saved performances and recording/playback controls."""
+
+    global show_time_label
+    global show_now_label
+
+    clear_dynamic()
+
+    show_time_label = None
+    show_now_label = None
+
+    gc.collect()
+
+    text(
+        dynamic_group,
+        "SHOW",
+        12,
+        17,
+        CYAN,
+    )
+
+    if show_playing:
+
+        (
+            show_name,
+            _folder_name,
+            duration_ms,
+            cues,
+        ) = saved_shows[
+            selected_show_index
+        ]
+
+        text(
+            dynamic_group,
+            show_name[:24],
+            92,
+            17,
+            WHITE,
+            1,
+        )
+
+        show_time_label = centered_text(
+            dynamic_group,
+            "0:00.0",
+            20,
+            58,
+            300,
+            64,
+            CYAN,
+            3,
+        )
+
+        show_now_label = centered_text(
+            dynamic_group,
+            "",
+            20,
+            132,
+            300,
+            34,
+            WHITE,
+            1,
+        )
+
+        text(
+            dynamic_group,
+            "Duration "
+            + format_show_time(
+                duration_ms
+            ),
+            20,
+            188,
+            MUTED,
+            1,
+        )
+
+        text(
+            dynamic_group,
+            f"{len(cues)} cues",
+            20,
+            211,
+            MUTED,
+            1,
+        )
+
+        add_dynamic_button(
+            "show_restart",
+            "RESTART",
+            338,
+            70,
+            130,
+            54,
+            BLUE,
+            1,
+        )
+
+        add_dynamic_button(
+            "show_stop",
+            "STOP SHOW",
+            338,
+            138,
+            130,
+            54,
+            RED,
+            1,
+        )
+
+        return
+
+    add_dynamic_button(
+        "show_record",
+        "RECORD SHOW",
+        315,
+        8,
+        153,
+        34,
+        RED,
+        1,
+    )
+
+    if not saved_shows:
+
+        centered_text(
+            dynamic_group,
+            "NO SAVED SHOWS",
+            20,
+            95,
+            280,
+            70,
+            MUTED,
+            1,
+        )
+
+        text(
+            dynamic_group,
+            "Record a performance to begin.",
+            20,
+            177,
+            MUTED,
+            1,
+        )
+
+        return
+
+    total_pages = (
+        show_page_count()
+    )
+
+    start = (
+        show_page
+        * SHOW_PAGE_SIZE
+    )
+
+    end = min(
+        start + SHOW_PAGE_SIZE,
+        len(saved_shows),
+    )
+
+    row_y = (
+        54,
+        100,
+        146,
+        192,
+    )
+
+    for slot, show_index in enumerate(
+        range(
+            start,
+            end,
+        )
+    ):
+
+        show_name = (
+            saved_shows[
+                show_index
+            ][0]
+        )
+
+        color = (
+            PANEL_ACTIVE
+            if show_index
+            == selected_show_index
+            else PANEL
+        )
+
+        add_dynamic_button(
+            f"show_item_{show_index}",
+            show_name[:22],
+            12,
+            row_y[
+                slot
+            ],
+            310,
+            38,
+            color,
+            1,
+        )
+
+    play_color = (
+        GREEN
+        if selected_show_index
+        is not None
+        else GRAY
+    )
+
+    add_dynamic_button(
+        "show_play",
+        "PLAY",
+        340,
+        60,
+        128,
+        58,
+        play_color,
+        2,
+    )
+
+    delete_color = (
+        RED
+        if selected_show_index
+        is not None
+        else GRAY
+    )
+
+    add_dynamic_button(
+        "show_delete",
+        "DELETE",
+        340,
+        132,
+        128,
+        44,
+        delete_color,
+        1,
+    )
+
+    if show_page > 0:
+
+        add_dynamic_button(
+            "show_prev_page",
+            "< PAGE",
+            12,
+            244,
+            105,
+            30,
+            PANEL,
+            1,
+        )
+
+    centered_text(
+        dynamic_group,
+        f"{show_page + 1}/{total_pages}",
+        175,
+        244,
+        130,
+        30,
+        MUTED,
+        1,
+    )
+
+    if show_page < total_pages - 1:
+
+        add_dynamic_button(
+            "show_next_page",
+            "PAGE >",
+            363,
+            244,
+            105,
+            30,
+            PANEL,
+            1,
+        )
+
+    gc.collect()
+
+
+def save_recorded_show():
+    """Add the just-recorded show to NVM."""
+
+    global selected_show_index
+    global show_page
+    global show_mode
+
+    if not show_name_buffer:
+        return
+
+    new_show = (
+        show_name_buffer,
+        recorded_folder,
+        recorded_duration_ms,
+        list(
+            recorded_cues
+        ),
+    )
+
+    saved_shows.append(
+        new_show
+    )
+
+    if not save_show_database():
+
+        saved_shows.pop()
+
+        text(
+            dynamic_group,
+            "NOT ENOUGH NVM SPACE",
+            12,
+            88,
+            RED,
+            1,
+        )
+
+        return
+
+    selected_show_index = (
+        len(saved_shows) - 1
+    )
+
+    show_page = (
+        selected_show_index
+        // SHOW_PAGE_SIZE
+    )
+
+    show_mode = "list"
+    build_show_page()
+
+
+def build_delete_confirm_page():
+    """Ask for confirmation before deleting the selected show."""
+
+    clear_dynamic()
+
+    gc.collect()
+
+    if (
+        delete_confirm_index is None
+        or delete_confirm_index < 0
+        or delete_confirm_index >= len(saved_shows)
+    ):
+        build_show_page()
+        return
+
+    show_name = (
+        saved_shows[
+            delete_confirm_index
+        ][0]
+    )
+
+    text(
+        dynamic_group,
+        "DELETE SHOW",
+        12,
+        17,
+        CYAN,
+    )
+
+    centered_text(
+        dynamic_group,
+        "Delete",
+        30,
+        68,
+        420,
+        30,
+        WHITE,
+        2,
+    )
+
+    centered_text(
+        dynamic_group,
+        show_name[:28] + "?",
+        30,
+        106,
+        420,
+        42,
+        WHITE,
+        2,
+    )
+
+    add_dynamic_button(
+        "delete_no",
+        "NO",
+        70,
+        190,
+        140,
+        60,
+        PANEL,
+        2,
+    )
+
+    add_dynamic_button(
+        "delete_yes",
+        "YES",
+        270,
+        190,
+        140,
+        60,
+        RED,
+        2,
+    )
+
+    gc.collect()
+
+
+def request_delete_selected_show():
+    """Open a confirmation screen before deleting a saved show."""
+
+    global delete_confirm_index
+    global show_mode
+
+    if (
+        selected_show_index is None
+        or selected_show_index < 0
+        or selected_show_index >= len(saved_shows)
+    ):
+        return
+
+    delete_confirm_index = (
+        selected_show_index
+    )
+
+    show_mode = (
+        "delete_confirm"
+    )
+
+    build_delete_confirm_page()
+
+
+def delete_selected_show():
+    """Delete the selected saved performance from persistent storage."""
+
+    global selected_show_index
+    global show_page
+    global delete_confirm_index
+    global show_mode
+
+    if (
+        delete_confirm_index is None
+        or delete_confirm_index < 0
+        or delete_confirm_index
+        >= len(saved_shows)
+    ):
+        return
+
+    deleted_index = int(
+        delete_confirm_index
+    )
+
+    deleted_name = (
+        saved_shows[
+            deleted_index
+        ][0]
+    )
+
+    saved_shows.pop(
+        deleted_index
+    )
+
+    if not save_show_database():
+
+        print(
+            "WARNING: show list changed in RAM but NVM save failed"
+        )
+
+    if saved_shows:
+
+        selected_show_index = min(
+            deleted_index,
+            len(saved_shows) - 1,
+        )
+
+        show_page = (
+            selected_show_index
+            // SHOW_PAGE_SIZE
+        )
+
+    else:
+
+        selected_show_index = None
+        show_page = 0
+
+    delete_confirm_index = None
+    show_mode = "list"
+
+    print(
+        "Deleted show:",
+        deleted_name,
+    )
+
+    build_show_page()
+
+
+def restart_saved_show():
+    """Restart the current saved performance from time zero."""
+
+    global running
+    global autoplay
+    global show_playing
+    global show_playback_start
+    global show_playback_index
+    global last_advance
+
+    if (
+        selected_show_index is None
+        or selected_show_index < 0
+        or selected_show_index
+        >= len(saved_shows)
+    ):
+        return
+
+    (
+        _show_name,
+        folder_name,
+        _duration_ms,
+        cues,
+    ) = saved_shows[
+        selected_show_index
+    ]
+
+    if not cues:
+        return
+
+    if current_folder != folder_name:
+
+        if not set_current_folder(
+            folder_name
+        ):
+
+            print(
+                "SHOW RESTART FAILED: folder not found:",
+                folder_name,
+            )
+
+            return
+
+    autoplay = False
+    running = True
+
+    last_advance = (
+        time.monotonic()
+    )
+
+    show_playback_index = 0
+    show_playback_start = (
+        time.monotonic()
+    )
+
+    show_playing = True
+
+    build_show_page()
+
+    print(
+        "SHOW RESTART"
+    )
+
+
+def start_saved_show():
+    """Start timed playback of the selected recorded performance."""
+
+    global autoplay
+    global running
+    global show_playing
+    global show_playback_start
+    global show_playback_index
+    global last_advance
+
+    if (
+        selected_show_index is None
+        or selected_show_index < 0
+        or selected_show_index
+        >= len(saved_shows)
+    ):
+        return
+
+    (
+        _show_name,
+        folder_name,
+        _duration_ms,
+        cues,
+    ) = saved_shows[
+        selected_show_index
+    ]
+
+    if not cues:
+        return
+
+    if not set_current_folder(
+        folder_name
+    ):
+
+        print(
+            "SHOW PLAY FAILED: folder not found:",
+            folder_name,
+        )
+
+        return
+
+    autoplay = False
+    running = True
+
+    last_advance = (
+        time.monotonic()
+    )
+
+    show_playback_index = 0
+    show_playback_start = (
+        time.monotonic()
+    )
+
+    show_playing = True
+
+    build_show_page()
+
+    print(
+        "SHOW PLAY:",
+        saved_shows[
+            selected_show_index
+        ][0],
+    )
+
+
+def stop_saved_show():
+    """Stop timed show playback and return the POIs to ready mode."""
+
+    global running
+    global show_playing
+    global show_playback_index
+
+    show_playing = False
+    show_playback_index = 0
+
+    running = False
+
+    report_state()
+    send_state()
+
+    if current_tab == "show":
+        build_show_page()
+
+
+def service_show_playback(now):
+    """Send every cue whose absolute show time has arrived."""
+
+    global running
+    global show_playback_index
+    global show_playing
+    global last_show_display_update
+
+    if not show_playing:
+        return
+
+    (
+        _show_name,
+        _folder_name,
+        duration_ms,
+        cues,
+    ) = saved_shows[
+        selected_show_index
+    ]
+
+    elapsed_ms = int(
+        (
+            now
+            - show_playback_start
+        )
+        * 1000
+    )
+
+    while (
+        show_playback_index
+        < len(cues)
+        and (
+            cues[
+                show_playback_index
+            ][0] == 0
+            or cues[
+                show_playback_index
+            ][0] - SHOW_PLAYBACK_LEAD_MS
+            <= elapsed_ms
+        )
+    ):
+
+        (
+            _cue_ms,
+            image_index,
+        ) = cues[
+            show_playback_index
+        ]
+
+        if (
+            0
+            <= image_index
+            < len(images)
+        ):
+
+            select_file_index(
+                image_index
+            )
+
+            if (
+                current_tab == "show"
+                and show_now_label
+                is not None
+            ):
+
+                filename = images[
+                    image_index
+                ]
+
+                if filename.lower().endswith(
+                    ".bmp"
+                ):
+
+                    filename = (
+                        filename[:-4]
+                    )
+
+                show_now_label.text = (
+                    filename[:24]
+                )
+
+        else:
+
+            print(
+                "SHOW CUE SKIPPED: image index",
+                image_index,
+                "is not in folder",
+                current_folder,
+            )
+
+        show_playback_index += 1
+
+    if (
+        current_tab == "show"
+        and show_time_label
+        is not None
+        and now
+        - last_show_display_update
+        >= 0.1
+    ):
+
+        last_show_display_update = (
+            now
+        )
+
+        show_time_label.text = (
+            format_show_time(
+                elapsed_ms
+            )
+        )
+
+    if (
+        elapsed_ms >= duration_ms
+        and show_playback_index
+        >= len(cues)
+    ):
+
+        show_playing = False
+        show_playback_index = 0
+
+        running = False
+
+        report_state()
+        send_state()
+
+        if current_tab == "show":
+            build_show_page()
+
+        print(
+            "SHOW COMPLETE - POIs READY"
+        )
 
 
 # ===========================================================================
@@ -2702,6 +3731,34 @@ def build_settings_page():
         2,
     )
 
+    add_dynamic_button(
+        "auto",
+        "Toggle Autoplay (Y)",
+        12,
+        244,
+        300,
+        30,
+        GREEN
+        if autoplay
+        else RED,
+        1,
+    )
+
+    centered_text(
+        dynamic_group,
+        "ON"
+        if autoplay
+        else "OFF",
+        330,
+        244,
+        138,
+        30,
+        GREEN
+        if autoplay
+        else RED,
+        1,
+    )
+
     gc.collect()
 
     print(
@@ -2738,21 +3795,6 @@ def show_tab(
 ):
 
     global current_tab
-    global library_thumbnail_palettes
-
-
-    # -----------------------------------------------------------------------
-    # LEAVING PLAY
-    # -----------------------------------------------------------------------
-
-    if (
-        current_tab == "play"
-        and
-        tab_name != "play"
-    ):
-
-        unload_play_previews()
-
 
     current_tab = (
         tab_name
@@ -2760,59 +3802,22 @@ def show_tab(
 
     update_tab_colors()
 
-
-    # -----------------------------------------------------------------------
-    # PLAY
-    # -----------------------------------------------------------------------
-
-    if current_tab == "play":
-
-        clear_dynamic()
-
-        library_thumbnail_palettes = []
-
-        play_group.hidden = (
-            False
-        )
-
-        gc.collect()
-
-        update_play_previews()
-
-        update_autoplay_button()
-
-        gc.collect()
-
-        print(
-            "Free RAM after returning to PLAY:",
-            gc.mem_free(),
-        )
-
-
-    # -----------------------------------------------------------------------
-    # LIBRARY
-    # -----------------------------------------------------------------------
-
-    elif current_tab == "library":
-
-        play_group.hidden = (
-            True
-        )
+    if current_tab == "library":
 
         build_library_page()
 
+    elif current_tab == "show":
 
-    # -----------------------------------------------------------------------
-    # SETTINGS
-    # -----------------------------------------------------------------------
+        if show_mode == "naming":
+            build_show_name_page()
+
+        elif show_mode == "delete_confirm":
+            build_delete_confirm_page()
+
+        else:
+            build_show_page()
 
     elif current_tab == "settings":
-
-        play_group.hidden = (
-            True
-        )
-
-        library_thumbnail_palettes = []
 
         build_settings_page()
 
@@ -2977,6 +3982,34 @@ def hit_test(
 ):
 
     # -----------------------------------------------------------------------
+    # RECORDING OVERLAY FIRST
+    # -----------------------------------------------------------------------
+
+    if (
+        record_pending
+        or recording
+    ):
+
+        if (
+            360 <= x < 480
+            and 0 <= y < 42
+        ):
+
+            return (
+                "button",
+                "record_stop",
+            )
+
+        # Keep the performer in the image Library while recording.
+        if y >= TAB_Y:
+
+            return (
+                "none",
+                None,
+            )
+
+
+    # -----------------------------------------------------------------------
     # TABS FIRST
     # -----------------------------------------------------------------------
 
@@ -3004,43 +4037,21 @@ def hit_test(
 
 
     # -----------------------------------------------------------------------
-    # PLAY BUTTONS / THUMBNAILS
-    # -----------------------------------------------------------------------
-
-    if current_tab == "play":
-
-        name = button_hit(
-            play_buttons,
-            x,
-            y,
-        )
-
-        if name:
-
-            return (
-                "button",
-                name,
-            )
-
-
-    # -----------------------------------------------------------------------
     # DYNAMIC BUTTONS
     # -----------------------------------------------------------------------
 
-    else:
+    name = button_hit(
+        dynamic_buttons,
+        x,
+        y,
+    )
 
-        name = button_hit(
-            dynamic_buttons,
-            x,
-            y,
+    if name:
+
+        return (
+            "button",
+            name,
         )
-
-        if name:
-
-            return (
-                "button",
-                name,
-            )
 
 
     # -----------------------------------------------------------------------
@@ -3104,6 +4115,204 @@ def do_button(
     global folder_page
     global library_mode
     global last_advance
+    global selected_show_index
+    global show_page
+    global show_name_buffer
+    global show_mode
+    global delete_confirm_index
+
+
+    # -----------------------------------------------------------------------
+    # SHOW RECORDING / PLAYBACK
+    # -----------------------------------------------------------------------
+
+    if name == "show_record":
+
+        start_show_recording()
+
+        return
+
+
+    if name == "record_stop":
+
+        if record_pending:
+            begin_recording_now()
+        elif recording:
+            finish_show_recording()
+
+        return
+
+
+    if name == "show_play":
+
+        start_saved_show()
+
+        return
+
+
+    if name == "show_restart":
+
+        restart_saved_show()
+
+        return
+
+
+    if name == "show_stop":
+
+        stop_saved_show()
+
+        return
+
+
+    if name == "show_delete":
+
+        request_delete_selected_show()
+
+        return
+
+
+    if name == "delete_yes":
+
+        delete_selected_show()
+
+        return
+
+
+    if name == "delete_no":
+
+        delete_confirm_index = None
+        show_mode = "list"
+
+        build_show_page()
+
+        return
+
+
+    if name.startswith(
+        "show_item_"
+    ):
+
+        try:
+
+            show_index = int(
+                name.split(
+                    "_"
+                )[-1]
+            )
+
+        except ValueError:
+
+            return
+
+        if (
+            0
+            <= show_index
+            < len(saved_shows)
+        ):
+
+            selected_show_index = (
+                show_index
+            )
+
+            build_show_page()
+
+        return
+
+
+    if name == "show_prev_page":
+
+        show_page = max(
+            0,
+            show_page - 1,
+        )
+
+        build_show_page()
+
+        return
+
+
+    if name == "show_next_page":
+
+        show_page = min(
+            show_page_count() - 1,
+            show_page + 1,
+        )
+
+        build_show_page()
+
+        return
+
+
+    # -----------------------------------------------------------------------
+    # SHOW NAMING KEYBOARD
+    # -----------------------------------------------------------------------
+
+    if name.startswith(
+        "name_key_"
+    ):
+
+        if len(show_name_buffer) < SHOW_NAME_MAX:
+
+            show_name_buffer += (
+                name[-1]
+            )
+
+            if show_name_label is not None:
+                show_name_label.text = (
+                    show_name_buffer
+                )
+
+        return
+
+
+    if name == "name_space":
+
+        if (
+            show_name_buffer
+            and len(show_name_buffer)
+            < SHOW_NAME_MAX
+        ):
+
+            show_name_buffer += " "
+
+            if show_name_label is not None:
+                show_name_label.text = (
+                    show_name_buffer
+                )
+
+        return
+
+
+    if name == "name_back":
+
+        show_name_buffer = (
+            show_name_buffer[:-1]
+        )
+
+        if show_name_label is not None:
+            show_name_label.text = (
+                show_name_buffer
+                if show_name_buffer
+                else "_"
+            )
+
+        return
+
+
+    if name == "name_cancel":
+
+        show_mode = "list"
+
+        build_show_page()
+
+        return
+
+
+    if name == "name_save":
+
+        save_recorded_show()
+
+        return
 
 
     # -----------------------------------------------------------------------
@@ -3161,7 +4370,8 @@ def do_button(
             time.monotonic()
         )
 
-        update_autoplay_button()
+        if current_tab == "settings":
+            build_settings_page()
 
         report_state()
 
@@ -3239,6 +4449,9 @@ def do_button(
 
 
     if name == "library_back":
+
+        if recording:
+            return
 
         library_mode = (
             "folders"
@@ -3337,8 +4550,6 @@ def do_button(
 
         build_settings_page()
 
-        update_autoplay_button()
-
         report_state()
 
         send_state()
@@ -3362,8 +4573,6 @@ def do_button(
         )
 
         build_settings_page()
-
-        update_autoplay_button()
 
         report_state()
 
@@ -3451,52 +4660,113 @@ def change_brightness_from_gamepad(amount):
     send_state()
 
 
-
-def gamepad_change_image(amount):
-    """Change image, transmit it, and keep the Library page on the selection."""
-
-    global library_page
-
-    change_image(amount)
+def library_move_row(row_delta):
+    """Move one thumbnail row up/down, continuing across Library pages."""
 
     if (
-        current_tab == "library"
-        and library_mode == "images"
+        current_tab != "library"
+        or library_mode != "images"
     ):
-        new_page = (
-            current_file_index()
-            // LIBRARY_PAGE_SIZE
-        )
+        return
 
-        if new_page != library_page:
-            library_page = new_page
-            build_library_page()
+    current_index = (
+        current_file_index()
+    )
+
+    target_index = (
+        current_index
+        + row_delta * 3
+    )
+
+    if (
+        target_index < 0
+        or target_index >= len(images)
+    ):
+        return
+
+    select_file_index(
+        target_index
+    )
+
+
+
+def gamepad_change_image(amount):
+    """Change image and keep the Library selection/page synchronized."""
+
+    change_image(
+        amount
+    )
+
 
 
 def gamepad_button_action(button_pin):
     """Handle one newly pressed physical gamepad button."""
 
-    if button_pin == BUTTON_X:
-        # Next image, same as joystick right.
-        gamepad_change_image(1)
-        return
-
-    if button_pin == BUTTON_B:
-        # Previous image, same as joystick left.
-        gamepad_change_image(-1)
-        return
-
-    if button_pin == BUTTON_Y:
-        # Toggle autoplay on/off.
-        do_button("auto")
-        return
-
+    # A is always the context/action button.
     if button_pin == BUTTON_A:
-        # Stop the POI display.
-        do_button("stop")
+
+        if (
+            record_pending
+            or recording
+        ):
+
+            if record_pending:
+                begin_recording_now()
+            else:
+                finish_show_recording()
+
+            return
+
+        if current_tab == "show":
+
+            if show_playing:
+                restart_saved_show()
+            else:
+                start_saved_show()
+
+            return
+
+        # Normal live-use behavior: stop the POI display.
+        do_button(
+            "stop"
+        )
+
         return
 
-    # START and SELECT are intentionally unused for now.
+    # B/X are dedicated brightness controls.
+    if button_pin == BUTTON_B:
+
+        change_brightness_from_gamepad(
+            -BRIGHTNESS_STEP
+        )
+
+        return
+
+    if button_pin == BUTTON_X:
+
+        change_brightness_from_gamepad(
+            BRIGHTNESS_STEP
+        )
+
+        return
+
+    # Y toggles autoplay during normal use. Keep it disabled while actively
+    # arming/recording a show so automatic changes do not contaminate cues.
+    if button_pin == BUTTON_Y:
+
+        if not (
+            record_pending
+            or recording
+        ):
+            do_button(
+                "auto"
+            )
+
+        return
+
+    # START and SELECT are intentionally unused.
+
+
 
 
 # ===========================================================================
@@ -3520,20 +4790,27 @@ print(
     gc.mem_free(),
 )
 
-update_play_previews()
+saved_shows = (
+    load_saved_shows()
+)
 
-update_autoplay_button()
+if saved_shows:
+
+    selected_show_index = 0
+
+print(
+    "Saved shows:",
+    len(saved_shows),
+)
+
+build_library_page()
 
 update_tab_colors()
-
-play_group.hidden = (
-    False
-)
 
 report_state()
 
 print(
-    "Free RAM after PLAY UI:",
+    "Free RAM after LIBRARY UI:",
     gc.mem_free(),
 )
 
@@ -3622,24 +4899,30 @@ while True:
         joystick_latched = True
 
         if joy_direction == "up":
-            # Physical joystick up = brightness up.
-            change_brightness_from_gamepad(
-                BRIGHTNESS_STEP
+            # Move one thumbnail row up. Crossing the top continues onto
+            # the previous 3x3 Library page.
+            library_move_row(
+                -1
             )
 
         elif joy_direction == "down":
-            # Physical joystick down = brightness down.
-            change_brightness_from_gamepad(
-                -BRIGHTNESS_STEP
+            # Move one thumbnail row down. Crossing the bottom continues onto
+            # the next 3x3 Library page.
+            library_move_row(
+                1
             )
 
         elif joy_direction == "left":
-            # Physical joystick left = previous image.
-            gamepad_change_image(-1)
+            # Previous image in reading order.
+            gamepad_change_image(
+                -1
+            )
 
         elif joy_direction == "right":
-            # Physical joystick right = next image.
-            gamepad_change_image(1)
+            # Next image in reading order.
+            gamepad_change_image(
+                1
+            )
 
 
     point = (
@@ -3665,7 +4948,8 @@ while True:
                 slider_changed
             ):
 
-                update_autoplay_button()
+                if current_tab == "settings":
+                    build_settings_page()
 
                 report_state()
 
@@ -3812,6 +5096,26 @@ while True:
 
 
     # -----------------------------------------------------------------------
+    # SHOW RECORDING / PLAYBACK
+    # -----------------------------------------------------------------------
+
+    if (
+        record_pending
+        or recording
+    ):
+
+        update_record_overlay(
+            now
+        )
+
+    if show_playing:
+
+        service_show_playback(
+            now
+        )
+
+
+    # -----------------------------------------------------------------------
     # AUTOPLAY
     # -----------------------------------------------------------------------
 
@@ -3820,7 +5124,11 @@ while True:
         and
         autoplay
         and
-        len(image_order) > 1
+        not show_playing
+        and
+        not recording
+        and
+        len(images) > 1
         and
         active_type is None
         and
@@ -3834,7 +5142,7 @@ while True:
         order_position = (
             order_position + 1
         ) % len(
-            image_order
+            images
         )
 
         last_advance = (
@@ -3842,15 +5150,13 @@ while True:
         )
 
 
-        # Update only the visible page.
+        # Update only what changed on the visible Library page.
+        # Nine thumbnails stay resident; only the selection border changes
+        # unless autoplay crosses onto another 3x3 page.
 
-        if current_tab == "play":
+        if current_tab == "library":
 
-            update_play_previews()
-
-        elif current_tab == "library":
-
-            build_library_page()
+            refresh_library_selection()
 
 
         report_state()
