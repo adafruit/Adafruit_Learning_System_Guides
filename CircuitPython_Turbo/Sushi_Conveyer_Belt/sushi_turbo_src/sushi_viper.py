@@ -32,7 +32,7 @@ PARAM_TILE_HEIGHT = const(5)  # the belt pitch: one tile per slat
 PARAM_SLOT_COUNT = const(6)  # slots in the belt loop
 PARAM_SCROLL = const(7)  # 0 .. slot count * tile height - 1; more moves the belt down
 PARAM_COUNT = const(8)
-# pylint: disable=undefined-variable, too-many-locals, too-many-positional-arguments, unused-argument
+# pylint: disable=undefined-variable, too-many-locals, misplaced-comparison-constant, unused-argument
 
 # load bitmap
 class IndexedBMP:
