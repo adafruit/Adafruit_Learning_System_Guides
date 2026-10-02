@@ -3,44 +3,40 @@
 
 # pylint: disable=too-many-lines,global-statement,redefined-outer-name,too-many-statements,too-many-boolean-expressions
 
-# RF-controlled / Standalone POV Poi
-#
-# Hardware:
-#   Adafruit Feather RP2040 RFM69
-#   36-pixel DotStar strip
-#
-# DotStar wiring:
-#   Clock -> SDA / GP2
-#   Data  -> SCL / GP3
-#
-# Battery monitor:
-#   Battery divider -> A0
-#
-# Images:
-#   /img/<folder>/*.bmp
-#
-# The folder names and alphabetical BMP order should match the controller.
-#
-# Radio packet format:
-#
-#   S,folder,image,running,brightness,speed,auto,interval
-#
-# Example:
-#
-#   S,halloween,2,1,25,500,1,8
-#
-# Modes:
-#
-#   STARTUP:
-#       Show battery level, then listen briefly for controller.
-#
-#   STANDALONE:
-#       If no controller is detected, automatically cycle
-#       through local /img files.
-#
-#   CONTROLLER:
-#       As soon as a valid controller packet is received,
-#       switch permanently to controller control until reboot.
+"""RF-controlled / standalone POV poi.
+
+Hardware:
+    Adafruit Feather RP2040 RFM69
+    36-pixel DotStar strip
+
+DotStar wiring:
+    Clock -> SDA / GP2
+    Data  -> SCL / GP3
+
+Battery monitor:
+    100K / 100K divider -> A0
+
+Images:
+    /img/<folder>/*.bmp
+
+The controller and every poi should use matching folder names and matching
+alphabetical BMP order.
+
+Radio packet:
+    S,folder,image,running,brightness,speed,auto,interval
+
+Modes:
+    STARTUP:
+        Show battery level and briefly listen for the controller.
+
+    STANDALONE:
+        If no controller is detected, autoplay the local image folder.
+
+    CONTROLLER:
+        A valid controller packet switches the poi to controller mode until
+        reboot. Controller-mode autoplay continues locally if RF is lost.
+"""
+
 
 
 import gc
@@ -86,6 +82,12 @@ DOTSTAR_BAUDRATE = 8_000_000
 
 # After battery display, listen this long before beginning standalone mode.
 CONTROLLER_DETECT_SECONDS = 3.0
+
+
+def clamp(value, low, high):
+    """Clamp value to the inclusive range low..high."""
+
+    return max(low, min(high, value))
 
 
 # ===========================================================================
@@ -260,12 +262,10 @@ def show_battery_startup():
         - BATTERY_MIN
     )
 
-    fraction = max(
+    fraction = clamp(
+        fraction,
         0.0,
-        min(
-            1.0,
-            fraction,
-        ),
+        1.0,
     )
 
     lit_pixels = int(
@@ -334,6 +334,12 @@ def is_directory(path):
         return False
 
 
+def folder_path(folder_name):
+    """Return the CIRCUITPY path for one image folder."""
+
+    return f"{IMAGE_ROOT}/{folder_name}"
+
+
 def find_folders():
     """Return available image folders from /img."""
 
@@ -357,11 +363,7 @@ def find_folders():
         if name.startswith("."):
             continue
 
-        path = (
-            IMAGE_ROOT
-            + "/"
-            + name
-        )
+        path = folder_path(name)
 
         if is_directory(path):
             found.append(
@@ -376,23 +378,13 @@ def find_folders():
 def current_image_folder():
     """Return the active folder path."""
 
-    return (
-        IMAGE_ROOT
-        + "/"
-        + current_folder
-    )
+    return folder_path(current_folder)
 
 
-def find_images(
-    folder_name
-):
+def find_images(folder_name):
     """Return BMP files in one folder, alphabetically."""
 
-    path = (
-        IMAGE_ROOT
-        + "/"
-        + folder_name
-    )
+    path = folder_path(folder_name)
 
     try:
 
@@ -501,11 +493,6 @@ def load_image(
 
     gc.collect()
 
-    print(
-        "Free RAM before:",
-        gc.mem_free(),
-    )
-
     bitmap, shader = (
         adafruit_imageload.load(
             path
@@ -600,16 +587,6 @@ def load_image(
         width,
     )
 
-    print(
-        "Converted bytes:",
-        len(rgb),
-    )
-
-    print(
-        "Free RAM after:",
-        gc.mem_free(),
-    )
-
     return (
         rgb,
         width,
@@ -643,17 +620,8 @@ print(
 print(
     "Found",
     len(image_files),
-    "BMP images:",
+    "BMP images",
 )
-
-for number, filename in enumerate(
-    image_files
-):
-
-    print(
-        number,
-        filename,
-    )
 
 
 # ===========================================================================
@@ -1028,6 +996,15 @@ def switch_folder(
     return True
 
 
+def advance_image():
+    """Advance to the next image in the current folder."""
+
+    select_image(
+        (image_number + 1)
+        % len(image_files)
+    )
+
+
 # ===========================================================================
 # MODE CONTROL
 # ===========================================================================
@@ -1285,12 +1262,10 @@ def process_packet(
     # BRIGHTNESS
     # -----------------------------------------------------------------------
 
-    new_brightness = max(
+    new_brightness = clamp(
+        new_brightness,
         0,
-        min(
-            100,
-            new_brightness,
-        ),
+        100,
     )
 
     if (
@@ -1312,12 +1287,10 @@ def process_packet(
     # SPEED
     # -----------------------------------------------------------------------
 
-    new_speed = max(
+    new_speed = clamp(
+        new_speed,
         MIN_SPEED,
-        min(
-            MAX_SPEED,
-            new_speed,
-        ),
+        MAX_SPEED,
     )
 
     if (
@@ -1362,12 +1335,10 @@ def process_packet(
         new_auto
     )
 
-    interval = max(
+    interval = clamp(
+        new_interval,
         1,
-        min(
-            60,
-            new_interval,
-        ),
+        60,
     )
 
     if (
@@ -1568,15 +1539,7 @@ while True:
             now
         )
 
-        next_image = (
-            image_number + 1
-        ) % len(
-            image_files
-        )
-
-        select_image(
-            next_image
-        )
+        advance_image()
 
 
     # -----------------------------------------------------------------------
@@ -1601,15 +1564,7 @@ while True:
             now
         )
 
-        next_image = (
-            image_number + 1
-        ) % len(
-            image_files
-        )
-
-        select_image(
-            next_image
-        )
+        advance_image()
 
 
     # -----------------------------------------------------------------------
