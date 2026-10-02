@@ -203,9 +203,8 @@ def run(
                         action = "f" + line
                         line = None
                     elif ch in "\x08\x7f":
-                        line = (
-                            line[:-1] if line else None
-                        )  # pylint: disable=unsubscriptable-object
+                        # pylint: disable=unsubscriptable-object
+                        line = line[:-1] if line else None
                     else:
                         line += ch
                     if not action and controls and ui:
