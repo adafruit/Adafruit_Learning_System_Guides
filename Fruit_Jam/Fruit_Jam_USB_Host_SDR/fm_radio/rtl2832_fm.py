@@ -1,6 +1,7 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 Tim Cocks for Adafruit Industries
+#
 # SPDX-License-Identifier: GPL-2.0-or-later
 #
-# Copyright (c) 2026 Tim Cocks for Adafruit Industries
 # Derived from works:
 # Original copyright (C) 2012-2014 Steve Markgraf; 2012 Dimitri Stolnikov;
 # (C) 2013 Mauro Carvalho Chehab and Steve Markgraf (R82xx).

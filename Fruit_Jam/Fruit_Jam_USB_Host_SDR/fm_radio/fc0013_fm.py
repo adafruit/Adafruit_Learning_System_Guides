@@ -1,6 +1,7 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 Tim Cocks for Adafruit Industries
+#
 # SPDX-License-Identifier: GPL-2.0-or-later
 #
-# Copyright (c) 2026 Tim Cocks for Adafruit Industries
 # Derived from works:
 # Original copyright (C) 2012 Hans-Frieder Vogt;
 # partially based on driver code from Fitipower,

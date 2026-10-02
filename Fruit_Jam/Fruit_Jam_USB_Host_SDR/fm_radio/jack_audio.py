@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 Tim Cocks for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
 """32 kHz mono PCM streaming to the Fruit Jam's 3.5 mm jack (TLV320DAC3100).
 
 CircuitPython has no queue-style audio sample, so this plays a looped,
