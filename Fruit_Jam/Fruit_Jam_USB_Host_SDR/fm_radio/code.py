@@ -7,6 +7,8 @@ import supervisor
 from fm_radio_jack import run
 from radio_ui_jack import RadioUI
 
+# pylint: disable=broad-except
+
 supervisor.runtime.autoreload = False
 while True:
     try:
