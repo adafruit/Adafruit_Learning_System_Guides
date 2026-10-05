@@ -5,6 +5,10 @@
 # An example using the Adafruit_PicoTTS library to generate speech using an Adafruit Fruit Jam
 #   RP2350 with a onboard TLV320DAC3100 I2S amplifier
 
+# PicoTTS talks at 16 kHz, but the TLV320 library has no 16 kHz setting.
+# We set two DAC registers by hand below to get there, so pylint is told that is OK.
+# pylint: disable=protected-access
+
 import time
 import adafruit_tlv320
 import audiobusio
