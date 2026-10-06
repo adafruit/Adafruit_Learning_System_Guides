@@ -84,13 +84,13 @@ previous = bytearray(38400)
 stats = bytearray(208)
 retry_at = 0.0
 
-def disconnect(error):
+def disconnect(e):
     global camera, current, retry_at  # pylint: disable=global-statement
     if camera is not None:
         camera.close()
     camera = current = None
     retry_at = time.monotonic() + 3
-    print("Camera problem, retrying in 3 s:", type(error).__name__, error)
+    print("Camera problem, retrying in 3 s:", type(e).__name__, e)
     gc.collect()
 
 def connect():

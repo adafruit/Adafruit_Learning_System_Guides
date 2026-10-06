@@ -6,7 +6,7 @@
 
 CircuitPython's turbo builds (CIRCUITPY_LOAD_NATIVE) load viper machine code
 but leave out the inline assembler, so an asm_thumb function in a .mpy comes
-back as a broken bytecode function. 
+back as a broken bytecode function.
 
 This rewrites every asm raw code in the file: ASM -> VIPER, and the two
 asm-only header fields (argument count and type signature) dropped.
@@ -65,7 +65,7 @@ def skip_obj(r):
     if kind in (OBJ_STR, OBJ_BYTES):
         r.byte()  # null terminator
 
-def raw_code(r, out, stats): # pylint: disable=too-many-branches
+def raw_code(r, out, stats): # pylint: disable=too-many-branches, too-many-locals
     """Copy one raw code (and its children) from r to out, relabelling asm."""
     start = r.pos
     kind_len = r.uint()

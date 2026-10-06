@@ -552,6 +552,22 @@ def _texture_size(bmp, max_bytes):
                 width -= 1
     return width, height
 
+def _open_bmp(path, bits, label):
+    """A config.eye BMP, checked for depth; None means use the solid color."""
+    if not path:
+        print("%s: none -- solid color" % label)
+        return None
+    try:
+        bmp = _Bmp(_resolve(path))
+    except (OSError, ValueError) as error:
+        print("%s: %s unusable (%s) -- solid color" % (label, path, error))
+        return None
+    if bmp.bits != bits:
+        print("%s: %s is %d-bit, needs %d -- skipped" % (label, path, bmp.bits, bits))
+        return None
+    if bits == 1 and bmp.height < 2:
+        return None
+    return bmp
 
 def _load_texture(bmp, data, offset, width, height):
     """Decode a 24-bit BMP into data[offset:], resampled to width x height."""
@@ -563,7 +579,6 @@ def _load_texture(bmp, data, offset, width, height):
             file.readinto(row)
             args[0] = offset + y * width
             bgr_row(data, row, args)
-
 
 def _load_eyelid(bmp, data, open_offset, closed_offset, size, *, upper):
     """Per column of a 1-bit eyelid shape, its topmost and bottommost lit
@@ -894,8 +909,8 @@ class Eyes:
         self._gaze_radius_init()
 
         # Size every table, then allocate data once.
-        iris_bmp = self._open_bmp(settings.iris_file, 24, "iris")
-        sclera_bmp = self._open_bmp(settings.sclera_file, 24, "sclera")
+        iris_bmp = _open_bmp(settings.iris_file, 24, "iris")
+        sclera_bmp = _open_bmp(settings.sclera_file, 24, "sclera")
         iris_w, iris_h = _texture_size(iris_bmp, None) if iris_bmp else (1, 1)
         sclera_w, sclera_h = (
             _texture_size(sclera_bmp, _SCLERA_MAX_BYTES) if sclera_bmp else (1, 1)
@@ -938,7 +953,7 @@ class Eyes:
             (settings.upper_file, lids, lids + size, True),
             (settings.lower_file, lids + 2 * size, lids + 3 * size, False),
         ):
-            bmp = self._open_bmp(path, 1, "upper eyelid" if upper else "lower eyelid")
+            bmp = _open_bmp(path, 1, "upper eyelid" if upper else "lower eyelid")
             if bmp:
                 _load_eyelid(bmp, data, open_offset, closed_offset, size, upper=upper)
         self._lids = lids
@@ -975,22 +990,6 @@ class Eyes:
         self._data_address = _address(data)
         self._iris_height = iris_h
         self._reset_animation()
-
-    def _open_bmp(self, path, bits, label):
-        if not path:
-            print("%s: none -- solid color" % label)
-            return None
-        try:
-            bmp = _Bmp(_resolve(path))
-        except (OSError, ValueError) as error:
-            print("%s: %s unusable (%s) -- solid color" % (label, path, error))
-            return None
-        if bmp.bits != bits:
-            print("%s: %s is %d-bit, needs %d -- skipped" % (label, path, bmp.bits, bits))
-            return None
-        if bits == 1 and bmp.height < 2:
-            return None
-        return bmp
 
     def _load_config(self, path):
         """Apply config.eye to settings; return the parsed document, or None."""
