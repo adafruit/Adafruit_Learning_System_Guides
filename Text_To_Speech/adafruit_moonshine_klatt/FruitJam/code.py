@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-# An example using the adafruit_moonshine_klatt library to generate speech using an 
+# An example using the adafruit_moonshine_klatt library to generate speech using an
 #   Adafruit Fruit Jam RP2350 with an onboard TLV320DAC3100 I2S amplifier
 
 # Moonshine Klatt talks at 16 kHz, but the TLV320 library has no 16 kHz setting.
