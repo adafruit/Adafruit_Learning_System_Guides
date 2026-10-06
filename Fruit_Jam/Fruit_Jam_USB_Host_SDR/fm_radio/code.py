@@ -1,11 +1,12 @@
 # SPDX-FileCopyrightText: Copyright (c) 2026 Tim Cocks for Adafruit Industries
 #
 # SPDX-License-Identifier: MIT
-"""Direct RTL-SDR FM reception on Fruit Jam, audio on the 3.5 mm jack."""
+"""Direct RTL-SDR AM/FM reception on Fruit Jam, audio on the 3.5 mm jack."""
+
 import time
 import supervisor
-from fm_radio_jack import run
-from radio_ui_jack import RadioUI
+from am_fm_radio import run
+from radio_ui_am_fm import RadioUI
 
 # pylint: disable=broad-except
 
