@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: Copyright (c) 2026 Tim Cocks for Adafruit Industries
 #
 # SPDX-License-Identifier: MIT
-"""Direct RTL-SDR AM/FM reception on Fruit Jam, audio on the 3.5 mm jack."""
+"""Direct RTL-SDR AM/FM/weather reception on Fruit Jam, audio on the 3.5 mm jack."""
 
 import time
 import supervisor

@@ -1,11 +1,12 @@
 # SPDX-FileCopyrightText: Copyright (c) 2026 Tim Cocks for Adafruit Industries
 #
 # SPDX-License-Identifier: MIT
-"""RTL-SDR AM/FM receiver with audio on the 3.5 mm jack.
+"""RTL-SDR AM/FM/NOAA weather receiver with audio on the 3.5 mm jack.
 
-FM (88-108 MHz) works with any supported dongle. AM (530-1700 kHz) uses the
-RTL2832U's direct sampling input, which the Nooelec NESDR SMArt v5 wires and
-FC0013 dongles do not. AM may also require longer or outdoor antenna.
+FM (88-108 MHz) and NOAA Weather Radio (162.400-162.550 MHz) work with any
+supported dongle. AM (530-1700 kHz) uses the RTL2832U's direct sampling input,
+which the Nooelec NESDR SMArt v5 wires and FC0013 dongles do not. AM may also
+require longer or outdoor antenna.
 """
 
 # The USB bulk ring and the audio DMA buffers can only use internal SRAM, but
@@ -30,12 +31,15 @@ import usb_host_bulk
 import _fm_turbo95 as _fm_turbo
 import _ham_dsp
 from ham_tuner import open_ham_receiver
-from radio_ui_am_fm import RadioUI
+from radio_ui_am_fm import RadioUI, format_frequency
+from radio_presets import Presets, SAVE_PATH
 from jack_audio import JackAudio
 
 # pylint: disable=too-many-locals, too-many-branches, too-many-statements
 # pylint: disable=too-many-arguments
 
+# Built-in presets, in Hz. Stations saved on the radio (hold B2, or s and x)
+# go in /saves/am_fm_radio.json, which can also take these out.
 FM_PRESETS = (93900000, 93100000, 97100000, 101100000, 104300000, 107500000, 88500000)
 # Add your local AM stations here, in Hz.
 AM_PRESETS = (610000,)
@@ -46,18 +50,36 @@ FM_STEP, FM_MIN, FM_MAX = 200000, 88100000, 107900000
 # Asia and Australia use 9 kHz channels instead:
 #   AM_STEP, AM_MIN, AM_MAX = 9000, 531000, 1602000
 AM_STEP, AM_MIN, AM_MAX = 10000, 530000, 1700000
-# Typed frequencies are accepted over these slightly wider ranges.
+# NOAA Weather Radio (US and Canada): seven narrowband FM channels 25 kHz
+# apart, listed here as WX1..WX7, the usual channel numbering.
+WX_CHANNELS = (
+    162550000,
+    162400000,
+    162475000,
+    162425000,
+    162450000,
+    162500000,
+    162525000,
+)
+WX_STEP, WX_MIN, WX_MAX = 25000, 162400000, 162550000
+# Typed frequencies are accepted over these slightly wider ranges. Typed
+# weather frequencies snap to the nearest channel.
 FM_LIMITS = (87500000, 108000000)
 AM_LIMITS = (520000, 1710000)
+WX_LIMITS = (162387500, 162562500)
 
 # Signal bar range in dB for each band. FM shows the wideband I/Q power, AM
-# the power in the AM channel filter. Indoors, empty AM channels read about
-# -40 dB on a NESDR SMArt v5.
+# and weather the power in the channel filter. Indoors, on a NESDR SMArt v5,
+# empty AM channels read about -40 dB, empty weather channels about -32 dB
+# and a local weather station about -15 dB.
 FM_LEVEL_DB = (-30, 0)
 AM_LEVEL_DB = (-45, -10)
-# Added to the headphone volume on AM, so switching bands does not jump in
-# loudness (the AM demodulator has its own AGC).
+WX_LEVEL_DB = (-35, -10)
+# Added to the headphone volume on AM and weather, so switching bands does
+# not jump in loudness (the AM demodulator has its own AGC; weather voice
+# measured about 6 dB louder than FM music).
 AM_VOLUME_OFFSET = 0.0
+WX_VOLUME_OFFSET = -6.0
 
 # The AM demodulator has no DC removal, so the hardware centre sits above the
 # dial frequency, away from the receiver's DC offset. Tuning inside the window
@@ -65,7 +87,11 @@ AM_VOLUME_OFFSET = 0.0
 # retunes the hardware.
 AM_CENTRE_OFFSET = 56000  # centre - dial after a hardware retune
 AM_WINDOW = (12000, 100000)  # allowed centre - dial
-HAM_AM = 1  # _ham_dsp mode number
+# Weather uses the same demodulator in NFM mode. With the hardware centre
+# between the channels, all seven are 12.5-87.5 kHz from it, so changing
+# channel never retunes the hardware.
+WX_CENTRE = 162487500
+HAM_NFM, HAM_AM = 0, 1  # _ham_dsp mode numbers
 
 HOLD_MS = 650  # a button held this long is a hold, not a press
 # Serial console escape sequences (after ESC) for the up and down arrow keys,
@@ -74,12 +100,19 @@ ARROW_KEYS = {"[A": "+", "OA": "+", "[B": "-", "OB": "-"}
 NO_AM = "AM needs a direct-sampling dongle (NESDR SMArt v5)"
 
 
+def wx_channel(hz):
+    """Return the NOAA weather channel nearest to hz."""
+    hz = (hz - WX_MIN + WX_STEP // 2) // WX_STEP * WX_STEP + WX_MIN
+    return min(WX_MAX, max(WX_MIN, hz))
+
+
 def parse_frequency(text):
     """Return (band, Hz) for a typed frequency, without single-precision floats.
 
     '101.1', '101.1mhz', '88.5' -> FM; '610', '610khz', '1190' (whole numbers
-    in AM_LIMITS are kHz) and '0.61' (MHz below 2) -> AM. A number with no
-    unit and no point is otherwise MHz below 2000 and Hz above.
+    in AM_LIMITS are kHz) and '0.61' (MHz below 2) -> AM; '162.55', '162.4'
+    -> WX (snapped to a channel). A number with no unit and no point is
+    otherwise MHz below 2000 and Hz above.
     """
     text = text.strip().lower().replace(" ", "")
     scale = None
@@ -109,6 +142,8 @@ def parse_frequency(text):
         return "FM", hz
     if AM_LIMITS[0] <= hz <= AM_LIMITS[1]:
         return "AM", hz
+    if WX_LIMITS[0] <= hz <= WX_LIMITS[1]:
+        return "WX", wx_channel(hz)
     raise ValueError(text)
 
 
@@ -121,9 +156,9 @@ def fm_level_db(iq):
     return 4.342944819 * math.log(power / 16256.25 + 1e-12)
 
 
-def am_level_db(power_q16):
-    # Mean AM channel power (Q16, from _ham_dsp.status), in dB relative to a
-    # full-scale 8-bit sine.
+def ham_level_db(power_q16):
+    # Mean AM or weather channel power (Q16, from _ham_dsp.status), in dB
+    # relative to a full-scale 8-bit sine.
     return 4.342944819 * math.log(power_q16 / 65536 / 16256.25 + 1e-12)
 
 
@@ -146,6 +181,7 @@ def run(
     band="FM",
     fm_frequency=93900000,
     am_frequency=AM_PRESETS[0],
+    wx_frequency=WX_CHANNELS[0],
     gain=400,
     controls=True,
     volume=-10.0,
@@ -153,19 +189,27 @@ def run(
     direct_input="Q",
     commands=(),
     log_every=5,
+    presets_file=SAVE_PATH,
 ):
     """Run the receiver. seconds=0 runs forever.
 
-    band ('FM' or 'AM') picks the starting band; each band starts on its own
-    frequency (Hz). commands is a list of (seconds, command) pairs, such as
-    (5, 'b') or (8, 'f610'), fed to the command handler for unattended tests.
+    band ('FM', 'AM' or 'WX' for NOAA weather) picks the starting band; each
+    band starts on its own frequency (Hz). commands is a list of (seconds,
+    command) pairs, such as (5, 'b') or (8, 'f610'), fed to the command
+    handler for unattended tests. Presets are saved in presets_file (None
+    keeps them in memory only).
     """
     supervisor.runtime.autoreload = False
     # Free the garbage left by compiling ham_tuner.py first, so where the
     # display bitmaps land (and so how long a redraw takes) is repeatable.
     gc.collect()
     ui = RadioUI() if display else None
-    freq = {"FM": fm_frequency, "AM": am_frequency}
+    freq = {"FM": fm_frequency, "AM": am_frequency, "WX": wx_channel(wx_frequency)}
+    presets = Presets(
+        {"FM": FM_PRESETS, "AM": AM_PRESETS, "WX": WX_CHANNELS},
+        parse_frequency,
+        presets_file,
+    )
     muted = False
     notice = None
     commands = sorted(commands)
@@ -179,14 +223,21 @@ def run(
             status += " / MUTED"
         if band == "AM":
             line1 = "AM, direct sampling, %d kHz steps" % (AM_STEP // 1000)
+            footer = "AM needs an outdoor antenna"
+        elif band == "WX":
+            line1 = "NOAA weather channel WX%d, narrowband FM" % (
+                WX_CHANNELS.index(freq["WX"]) + 1
+            )
+            footer = "NOAA WEATHER RADIO (US / CANADA)"
         else:
             line1 = "256 ksample/s -> 32 kHz mono"
+            footer = "RTL-SDR RECEIVER"
         ui.draw(
             notice or status,
             freq[band],
             line1,
             "receiving directly from the antenna",
-            band == "AM",
+            footer,
         )
         return time.monotonic_ns() - t
 
@@ -212,21 +263,35 @@ def run(
     if band == "AM" and not has_am:
         band = "FM"
         notice = NO_AM
-    centre = freq[band] + (AM_CENTRE_OFFSET if band == "AM" else 0)
+
+    def centre_for(b, hz):
+        # Hardware centre frequency for station hz on band b.
+        if b == "AM":
+            return hz + AM_CENTRE_OFFSET
+        return WX_CENTRE if b == "WX" else hz
+
+    def band_volume():
+        return volume + {"AM": AM_VOLUME_OFFSET, "WX": WX_VOLUME_OFFSET}.get(band, 0)
+
+    centre = centre_for(band, freq[band])
     radio.initialize(frequency=centre, sample_rate=256000, gain=gain)
     radio.hold_buffer()
     fm_state = bytearray(512)
-    am_state = bytearray(8192)
+    ham_state = bytearray(8192)  # AM and weather
 
-    def configure_am():
+    def configure_ham():
         _ham_dsp.configure(
-            am_state, HAM_AM, freq["AM"] - centre, 0, 1 if radio.conjugate else 0
+            ham_state,
+            HAM_AM if band == "AM" else HAM_NFM,
+            freq[band] - centre,
+            0,
+            1 if radio.conjugate else 0,
         )
 
     try:
-        audio = JackAudio(volume=volume + (AM_VOLUME_OFFSET if band == "AM" else 0))
-        if band == "AM":
-            configure_am()
+        audio = JackAudio(volume=band_volume())
+        if band != "FM":
+            configure_ham()
         total = output = 0
         lost_before = 0  # packets lost by streams already stopped
         retunes = 0
@@ -268,14 +333,30 @@ def run(
                     "gain": gain,
                     "tuner": radio.tuner_name,
                     "direct": radio.direct,
+                    "presets": {b: presets.stations(b) for b in freq},
                 }
             ),
         )
 
+        def stop_stream():
+            nonlocal lost_before
+            lost_before += stream.lost_packets
+            stream.deinit()
+            audio.stop()
+            audio.clear()
+            radio.hold_buffer()
+
+        def restart_stream():
+            nonlocal stream, ring, filled, last_ns
+            radio.reset_buffer()
+            filled = 0
+            stream, ring = start_stream(d, audio)
+            # loop_max_ms tracks stalls while receiving, not this stop.
+            last_ns = time.monotonic_ns()
+
         def tune(new_band, hz):
             # Tune to hz, switching band if needed. Returns the redraw time.
-            nonlocal band, centre, stream, ring, filled, fm_state, am_state
-            nonlocal notice, retunes, level, lost_before, last_ns
+            nonlocal band, centre, fm_state, ham_state, notice, retunes, level
             if new_band == "AM" and not has_am:
                 notice = NO_AM
                 print("NO_AM", radio.tuner_name)
@@ -286,23 +367,18 @@ def run(
                 level = None  # the other band's reading means nothing here
             band = new_band
             freq[band] = hz
-            if (
-                band == "AM"
-                and not switching
-                and AM_WINDOW[0] <= centre - hz <= AM_WINDOW[1]
+            if not switching and (
+                band == "WX"  # every channel is within reach of WX_CENTRE
+                or (band == "AM" and AM_WINDOW[0] <= centre - hz <= AM_WINDOW[1])
             ):
-                configure_am()
+                configure_ham()
                 return 0
             # Stop, retune and restart without pausing in between: in testing,
             # a retune after the FIFO was held for several seconds failed with
             # a USB pipe error. Leaving AM fully re-initializes the tuner
             # (gain included) inside radio.tune().
-            lost_before += stream.lost_packets
-            stream.deinit()
-            audio.stop()
-            audio.clear()
-            radio.hold_buffer()
-            centre = hz + (AM_CENTRE_OFFSET if band == "AM" else 0)
+            stop_stream()
+            centre = centre_for(band, hz)
             radio.tune(centre)
             radio.hold_buffer()
             retunes += 1
@@ -310,19 +386,38 @@ def run(
                 fm_state = bytearray(512)
             else:
                 if switching:
-                    am_state = bytearray(8192)
-                configure_am()
+                    ham_state = bytearray(8192)
+                configure_ham()
             if switching:
-                audio.dac.dac_volume = volume + (
-                    AM_VOLUME_OFFSET if band == "AM" else 0
-                )
+                audio.dac.dac_volume = band_volume()
             # A full redraw outlasts the USB ring, so do it while stopped.
             dt = draw()
-            radio.reset_buffer()
-            filled = 0
-            stream, ring = start_stream(d, audio)
-            # loop_max_ms tracks stalls while receiving, not this stop.
-            last_ns = time.monotonic_ns()
+            restart_stream()
+            return dt
+
+        def store(add):
+            # Save (add=True) or remove the station on the dial as a preset.
+            # Returns the redraw time.
+            nonlocal notice
+            hz = freq[band]
+            name = "%s %s" % (band, format_frequency(hz))
+            if not (presets.add(band, hz) if add else presets.remove(band, hz)):
+                notice = "%s IS %s A PRESET" % (name, "ALREADY" if add else "NOT")
+                return 0
+            notice = "%s PRESET %s" % ("SAVED" if add else "REMOVED", name)
+            if not presets_file:
+                return 0
+            # Writing flash stalls the chip for longer than the USB ring
+            # lasts, so stop the stream around it, as for a retune.
+            stop_stream()
+            try:
+                presets.save()
+            except OSError as error:
+                # The change still holds until the radio restarts.
+                print("PRESETS_NOT_SAVED", error)
+                notice = "NOT SAVED: %s" % error
+            dt = draw()
+            restart_stream()
             return dt
 
         while not seconds or time.monotonic() - start < seconds:
@@ -344,7 +439,7 @@ def run(
                 if band == "FM":
                     count = _fm_turbo.process(iq, out, fm_state) // 2
                 else:
-                    count = _ham_dsp.process(iq, out, am_state) // 2
+                    count = _ham_dsp.process(iq, out, ham_state) // 2
                 dt = time.monotonic_ns() - t
                 dsp_total += dt
                 dsp_calls += 1
@@ -357,8 +452,8 @@ def run(
                         level = fm_level_db(iq)
                         low, high = FM_LEVEL_DB
                     else:
-                        level = am_level_db(_ham_dsp.status(am_state)[0])
-                        low, high = AM_LEVEL_DB
+                        level = ham_level_db(_ham_dsp.status(ham_state)[0])
+                        low, high = AM_LEVEL_DB if band == "AM" else WX_LEVEL_DB
                     if ui:
                         ui.level((level - low) / (high - low))
                     last_level = now
@@ -368,7 +463,8 @@ def run(
                 time.sleep(0.0005)
 
             # Buttons act on release, so a hold can be told from a press:
-            # B1 lower / hold: AM <-> FM, B2 higher, B3 mute / hold: preset.
+            # B1 lower / hold: next band, B2 higher / hold: save or remove
+            # this preset, B3 mute / hold: next preset.
             action = None
             event = keys.events.get()
             if event:
@@ -380,7 +476,7 @@ def run(
                     pressed_at[k] = None
                     action = (
                         ("b" if held else "-"),
-                        (None if held else "+"),
+                        ("t" if held else "+"),
                         ("p" if held else "m"),
                     )[k]
             if supervisor.runtime.serial_bytes_available:
@@ -411,6 +507,7 @@ def run(
                         action = "f" + line
                         line = None
                     elif ch in "\x08\x7f":
+                        # pylint: disable=unsubscriptable-object
                         line = line[:-1] if line else None
                     else:
                         line += ch
@@ -437,6 +534,9 @@ def run(
                     if band == "FM":
                         f += FM_STEP if action == "+" else -FM_STEP
                         low, high = FM_MIN, FM_MAX
+                    elif band == "WX":
+                        f += WX_STEP if action == "+" else -WX_STEP
+                        low, high = WX_MIN, WX_MAX
                     else:
                         # Step to the next channel on the AM_STEP grid.
                         if action == "+":
@@ -450,14 +550,25 @@ def run(
                         f = high
                     dt = tune(band, f)
                 elif action == "p":
-                    presets = FM_PRESETS if band == "FM" else AM_PRESETS
+                    stations = presets.stations(band)
                     f = freq[band]
-                    idx = presets.index(f) if f in presets else -1
-                    dt = tune(band, presets[(idx + 1) % len(presets)])
-                elif action in ("b", "a", "n"):
-                    new_band = {"b": "AM" if band == "FM" else "FM", "a": "AM"}.get(
-                        action, "FM"
-                    )
+                    if stations:
+                        idx = stations.index(f) if f in stations else -1
+                        dt = tune(band, stations[(idx + 1) % len(stations)])
+                    else:
+                        notice = "NO %s PRESETS: HOLD B2 OR PRESS s TO SAVE" % band
+                elif action in ("s", "x", "t"):
+                    # s save, x remove, t (B2 hold) whichever applies.
+                    if action == "t":
+                        action = "x" if freq[band] in presets.stations(band) else "s"
+                    dt = store(action == "s")
+                elif action in ("b", "a", "n", "w"):
+                    if action == "b":
+                        # FM -> AM -> weather -> FM, without AM if not possible.
+                        order = ("FM", "AM", "WX") if has_am else ("FM", "WX")
+                        new_band = order[(order.index(band) + 1) % len(order)]
+                    else:
+                        new_band = {"a": "AM", "n": "FM", "w": "WX"}[action]
                     if new_band != band:
                         dt = tune(new_band, freq[new_band])
                 elif action == "m":
@@ -488,6 +599,7 @@ def run(
                                 "muted": muted,
                                 "notice": notice,
                                 "retunes": retunes,
+                                "presets": presets.stations(band),
                             }
                         ),
                     )
@@ -525,6 +637,7 @@ def run(
                     "band": band,
                     "fm_frequency": freq["FM"],
                     "am_frequency": freq["AM"],
+                    "wx_frequency": freq["WX"],
                     "seconds": time.monotonic() - start,
                     "bytes": total,
                     "pcm_samples": output,

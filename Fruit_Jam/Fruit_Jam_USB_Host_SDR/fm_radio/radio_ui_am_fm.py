@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: Copyright (c) 2026 Tim Cocks for Adafruit Industries
 #
 # SPDX-License-Identifier: MIT
-"""AM/FM radio tuner UI."""
+"""AM/FM/weather radio tuner UI."""
 
 import board
 import displayio
@@ -13,18 +13,22 @@ import bitmaptools
 # pylint: disable=too-many-arguments
 
 HELP = (
-    "B1 lower  B2 higher  hold B1: AM/FM",
-    "B3 mute / hold: next preset",
-    "keys: - + tune  b band  a/n AM/FM  p m f<freq>",
+    "B1 lower  B2 higher  hold B1: next band",
+    "B3 mute / hold: next preset  hold B2: save/del",
+    "keys: - + tune  b/a/n/w band  p m f<freq>  s x",
 )
 
 
 def format_frequency(hz):
-    # 101100000 -> '101.1 MHz', 610000 -> '610 kHz', from integers only.
+    # 101100000 -> '101.1 MHz', 162550000 -> '162.550 MHz', 610000 ->
+    # '610 kHz', from integers only. Above the FM band (weather) always show
+    # kHz, so 162.400 lines up with the other channels.
     if not hz:
         return "RADIO LAB"
     if hz < 2000000:
         return "%d kHz" % (hz // 1000)
+    if hz % 100000 or hz > 108000000:
+        return "%d.%03d MHz" % (hz // 1000000, hz // 1000 % 1000)
     return "%d.%d MHz" % (hz // 1000000, hz // 100000 % 10)
 
 
@@ -92,22 +96,15 @@ class RadioUI:
         self.term[term].write("\x1b[%d;1H%s" % (row + 1, text))
         return True
 
-    def draw(self, status, frequency, line1, line2, am=False):
+    def draw(self, status, frequency, line1, line2, footer="RTL-SDR RECEIVER"):
         # Only the rows that changed are rewritten, so this is cheap when, for
         # example, only the status row differs from the last call.
         self.status = status
         self.frequency = frequency
-        changed = self._line(0, 0, "FRUIT JAM / DIRECT USB AM/FM", 49)
+        changed = self._line(0, 0, "FRUIT JAM / DIRECT USB AM/FM/WEATHER", 49)
         changed |= self._line(0, 1, status, 49)
         changed |= self._line(1, 0, format_frequency(frequency), 24)
-        lines = (
-            (line1, line2, "")
-            + HELP
-            + (
-                "AM needs an outdoor antenna" if am else "RTL-SDR RECEIVER",
-                "MONO / 3.5MM HEADPHONE JACK",
-            )
-        )
+        lines = (line1, line2, "") + HELP + (footer, "MONO / 3.5MM HEADPHONE JACK")
         for row, text in enumerate(lines):
             changed |= self._line(2, row, text, 49)
         if changed:
