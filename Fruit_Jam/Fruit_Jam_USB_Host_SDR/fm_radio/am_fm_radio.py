@@ -350,6 +350,7 @@ def run(
             nonlocal stream, ring, filled, last_ns
             radio.reset_buffer()
             filled = 0
+            # pylint: disable=unused-variable
             stream, ring = start_stream(d, audio)
             # loop_max_ms tracks stalls while receiving, not this stop.
             last_ns = time.monotonic_ns()
@@ -401,7 +402,7 @@ def run(
             nonlocal notice
             hz = freq[band]
             name = "%s %s" % (band, format_frequency(hz))
-            if not (presets.add(band, hz) if add else presets.remove(band, hz)):
+            if not presets.add(band, hz) if add else presets.remove(band, hz):
                 notice = "%s IS %s A PRESET" % (name, "ALREADY" if add else "NOT")
                 return 0
             notice = "%s PRESET %s" % ("SAVED" if add else "REMOVED", name)
