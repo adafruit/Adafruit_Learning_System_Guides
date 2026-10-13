@@ -109,15 +109,12 @@ framebuffer = picodvi.Framebuffer(
     color_depth=16,
 )
 target = picogame.Framebuffer(framebuffer, SCREEN_W, SCREEN_H, native_rgb565=True)
-wait_for_vblank = getattr(framebuffer, "wait_for_vblank", None) if WAIT_FOR_VBLANK else None
 overlay = picogame.Canvas(SCREEN_W, SCREEN_H, transparent=_CLEAR)
 overlay.clear(_CLEAR)
 video = None  # the camera sprite, once a camera is connected
 layers = [overlay]
 
 def render():
-    if wait_for_vblank is not None:
-        wait_for_vblank()
     picogame.render(target, layers, None, 0, 0, SCREEN_W, SCREEN_H)
 
 
@@ -199,7 +196,7 @@ def hide_stale_boxes(the_now):
 camera = frame = None
 retry_at = ticks_ms()
 
-def disconnect(error):
+def disconnect(e):
     global camera, frame, video, retry_at  # pylint: disable=global-statement
     if camera is not None:
         camera.close()
@@ -213,7 +210,7 @@ def disconnect(error):
     redraw_boxes()
     render()
     retry_at = (ticks_ms() + 3000) & _TICKS_MASK
-    print("Camera problem, retrying in 3 s:", type(error).__name__, error)
+    print("Camera problem, retrying in 3 s:", type(error).__name__, e)
     gc.collect()
 
 def connect():

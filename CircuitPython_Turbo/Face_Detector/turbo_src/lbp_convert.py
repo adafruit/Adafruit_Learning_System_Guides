@@ -9,7 +9,7 @@ To run::
 
 The binary is a flat run of little-endian signed 32-bit words, so the board
 can read it straight into an ``array.array("i")`` with ``readinto()`` and a
-Viper module can use it as a ``ptr32``. 
+Viper module can use it as a ``ptr32``.
 
 ====== =============================================================
 words  contents
@@ -45,7 +45,7 @@ FEATURE_WORDS = 4
 THRESHOLD_EPS = 1e-5
 INT32_MIN, INT32_MAX = -(2**31), 2**31 - 1
 
-
+# pylint: disable=too-many-boolean-expressions, too-many-locals
 class CascadeError(ValueError):
     """If the XML isn't a cascade this converter can handle."""
 
