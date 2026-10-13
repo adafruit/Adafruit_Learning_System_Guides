@@ -45,7 +45,7 @@ FEATURE_WORDS = 4
 THRESHOLD_EPS = 1e-5
 INT32_MIN, INT32_MAX = -(2**31), 2**31 - 1
 
-# pylint: disable=too-many-boolean-expressions, too-many-locals
+# pylint: disable=too-many-boolean-expressions, too-many-locals, too-many-branches
 class CascadeError(ValueError):
     """If the XML isn't a cascade this converter can handle."""
 
