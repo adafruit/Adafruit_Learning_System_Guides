@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 #
-# Example: Play a 40kHz wav file over HDMI
+# Example: Play a 40kHz wav file over HDMI Audio
 
 import time
 import audiocore
@@ -10,14 +10,15 @@ import board
 import displayio
 import picodvi
 
-WAV_FILE = "/piano.wav"  # path to the WAV file on CIRCUITPY
+WAV_FILE = "/piano.wav"  # path to a 48kHz WAV file on the CIRCUITPY drive
 
 displayio.release_displays()
 fb = picodvi.Framebuffer(320, 240, clk_dp=board.CKP, clk_dn=board.CKN,
                          red_dp=board.D0P, red_dn=board.D0N,
                          green_dp=board.D1P, green_dn=board.D1N,
                          blue_dp=board.D2P, blue_dn=board.D2N)
-audio = picodvi.AudioOut(fb)  # create soon after the Framebuffer (needs internal RAM)
+
+audio = picodvi.AudioOut(fb)  # create soon after the Framebuffer (it needs internal RAM)
 
 wave = audiocore.WaveFile(WAV_FILE)  # Open the wav file
 
