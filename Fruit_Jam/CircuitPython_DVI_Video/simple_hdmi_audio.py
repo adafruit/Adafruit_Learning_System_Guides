@@ -17,6 +17,7 @@ fb = picodvi.Framebuffer(320, 240, clk_dp=board.CKP, clk_dn=board.CKN,
                          green_dp=board.D1P, green_dn=board.D1N,
                          blue_dp=board.D2P, blue_dn=board.D2N)
 
+# Make the HDMI audio object (do this directly after creating the framebuffer for memory management)
 audio = picodvi.AudioOut(fb)
 
 # Make a 1,000 Hz sine wave
