@@ -25,6 +25,6 @@ supervisor.runtime.autoreload = False
 while True:
     try:
         run()
-    except Exception as error:
+    except Exception as error:  # pylint: disable=broad-except
         print("RADIO_ERROR", type(error).__name__, str(error))
         time.sleep(3)

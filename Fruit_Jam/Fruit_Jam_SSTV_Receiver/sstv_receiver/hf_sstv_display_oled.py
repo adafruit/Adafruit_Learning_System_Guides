@@ -40,7 +40,7 @@ sends one of them at a time. Otherwise (the stream paused: saving)
 changes are shown at once. Switching views and picture_show() redraw the
 whole screen, so the receiver does those with the stream paused.
 """
-# pylint: disable=too-many-branches, too-many-locals, attribute-defined-outside-init
+# pylint: disable=too-many-branches, too-many-locals, attribute-defined-outside-init, no-self-use
 import displayio
 import terminalio
 import bitmaptools

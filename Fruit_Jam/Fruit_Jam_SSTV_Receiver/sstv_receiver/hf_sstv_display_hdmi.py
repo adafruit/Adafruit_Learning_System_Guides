@@ -14,7 +14,7 @@ than the USB ring holds): only changed text rows and the image rows just
 drawn are refreshed. The refreshes are quick enough to send at once, so
 the methods the OLED needs for queueing (set_live, service) do nothing.
 """
-# pylint: disable=unused-argument, unnecessary-pass
+# pylint: disable=unused-argument, unnecessary-pass, no-self-use
 import board
 import displayio
 import framebufferio

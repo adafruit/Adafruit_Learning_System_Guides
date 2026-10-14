@@ -67,7 +67,7 @@ waiting), and starts again when it closes. It does not open while a
 picture is coming in.
 """
 # pylint: disable=wrong-import-position, global-statement, import-outside-toplevel, too-many-lines
-# pylint: disable=too-many-locals, consider-using-with, possibly-used-before-assignment
+# pylint: disable=too-many-locals, broad-except
 # pylint: disable=unsupported-assignment-operation, unsubscriptable-object, too-many-nested-blocks
 # pylint: disable=too-many-branches, too-many-statements, wrong-import-order, unused-variable
 # Ring buffer of the 8 kHz audio. Allocated before anything else: it goes to
