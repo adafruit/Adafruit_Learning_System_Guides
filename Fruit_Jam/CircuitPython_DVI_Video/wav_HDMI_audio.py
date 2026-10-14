@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 #
-# Example: Play a 40kHz wav file over HDMI
+# Example: Play a 40kHz wav file over HDMI Audio
 
 import time
 import audiocore
