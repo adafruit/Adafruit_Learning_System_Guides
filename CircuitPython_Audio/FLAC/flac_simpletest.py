@@ -1,9 +1,10 @@
 # SPDX-FileCopyrightText: Copyright (c) 2026 Mikey Sklar for Adafruit Industries
+#
 # SPDX-License-Identifier: MIT
+
 """Play a FLAC file once through the Fruit Jam headphone jack."""
 
 from adafruit_fruitjam.peripherals import Peripherals
-
 import adafruit_flac
 
 decoder = adafruit_flac.FLACDecoder("song.flac")
