@@ -1,9 +1,10 @@
 # SPDX-FileCopyrightText: Copyright (c) 2026 Mikey Sklar for Adafruit Industries
+#
 # SPDX-License-Identifier: MIT
+
 """Play an Ogg Vorbis file once through the Fruit Jam headphone jack."""
 
 from adafruit_fruitjam.peripherals import Peripherals
-
 import adafruit_ogg
 
 # Make the decoder first: it decodes several times faster with its buffers in internal RAM.
