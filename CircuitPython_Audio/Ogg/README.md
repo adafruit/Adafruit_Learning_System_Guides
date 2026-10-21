@@ -3,3 +3,5 @@
 Used in Learning System guide FLAC and Ogg Playback with CircuitPython
 
 https://learn.adafruit.com/flac-and-ogg-playback-with-circuitpython/
+
+See https://github.com/adafruit/Adafruit_CircuitPython_OGG/tree/main/examples
