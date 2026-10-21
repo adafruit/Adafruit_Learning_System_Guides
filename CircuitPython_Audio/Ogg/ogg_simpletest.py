@@ -7,7 +7,7 @@
 from adafruit_fruitjam.peripherals import Peripherals
 import adafruit_ogg
 
-# Make the decoder first: it decodes several times faster with its buffers in internal RAM.
+# Make the decoder: it decodes several times faster with its buffers in internal RAM.
 decoder = adafruit_ogg.OggDecoder("song.ogg")
 
 fruit_jam = Peripherals(audio_output="headphone", sample_rate=decoder.sample_rate)
