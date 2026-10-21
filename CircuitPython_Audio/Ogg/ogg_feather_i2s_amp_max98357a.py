@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: Copyright (c) 2026 Mikey Sklar for Adafruit Industries
 # SPDX-License-Identifier: MIT
-"""Play an Ogg Vorbis file once on a Feather through a MAX98357A I2S amp and a speaker.
+"""Play an Ogg Vorbis file once on a Feather through a MAX98357A I2S amplifier and a speaker.
 
 Wiring: Feather A0 to BCLK, A1 to LRC, A2 to DIN, 3V to Vin, GND to GND. The amp is mono,
 so a mono file at 22 kHz or lower sounds the same and decodes several times faster. On an
