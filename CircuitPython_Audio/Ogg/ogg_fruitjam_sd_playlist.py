@@ -20,7 +20,7 @@ ogg_files = sorted(
 # internal RAM, which Peripherals would otherwise fill. Reuse it for every file.
 decoder = adafruit_ogg.OggDecoder(ogg_files[0])
 
-from adafruit_fruitjam.peripherals import Peripherals  # noqa: E402
+from adafruit_fruitjam.peripherals import Peripherals  # pylint: disable=wrong-import-position
 
 fruit_jam = Peripherals(audio_output="headphone")
 fruit_jam.volume = 0.5
