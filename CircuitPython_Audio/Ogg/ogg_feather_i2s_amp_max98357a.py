@@ -1,5 +1,7 @@
 # SPDX-FileCopyrightText: Copyright (c) 2026 Mikey Sklar for Adafruit Industries
+#
 # SPDX-License-Identifier: MIT
+
 """Play an Ogg Vorbis file once on a Feather through a MAX98357A I2S amplifier and a speaker.
 
 Wiring: Feather A0 to BCLK, A1 to LRC, A2 to DIN, 3V to Vin, GND to GND. The amp is mono,
@@ -9,7 +11,6 @@ ESP32-S3, use 22 kHz or lower: 44.1 kHz stereo does not decode in real time ther
 
 import audiobusio
 import board
-
 import adafruit_ogg
 
 # Make the decoder first: it decodes faster with its buffers in internal RAM.
