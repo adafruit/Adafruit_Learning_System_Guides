@@ -1,5 +1,7 @@
 # SPDX-FileCopyrightText: Copyright (c) 2026 Mikey Sklar for Adafruit Industries
+#
 # SPDX-License-Identifier: MIT
+
 """Play every FLAC file on the Fruit Jam's microSD card, in alphabetical order.
 
 CircuitPython mounts the card at /sd on the Fruit Jam. For files up to 48 kHz; see
@@ -7,9 +9,7 @@ flac_fruitjam_sd_hires.py for 88.2/96 kHz.
 """
 
 import os
-
 from adafruit_fruitjam.peripherals import Peripherals
-
 import adafruit_flac
 
 fruit_jam = Peripherals(audio_output="headphone")
