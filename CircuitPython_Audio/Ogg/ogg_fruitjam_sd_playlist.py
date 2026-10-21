@@ -1,12 +1,13 @@
 # SPDX-FileCopyrightText: Copyright (c) 2026 Mikey Sklar for Adafruit Industries
+#
 # SPDX-License-Identifier: MIT
+
 """Play every Ogg Vorbis file on the Fruit Jam's microSD card, in alphabetical order.
 
 CircuitPython mounts the card at /sd on the Fruit Jam.
 """
 
 import os
-
 import adafruit_ogg
 
 ogg_files = sorted(
