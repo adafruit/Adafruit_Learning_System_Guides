@@ -1,0 +1,2 @@
+A framebuffer benchmark from the start of the project, kept for reference:
+fbtest.py is Viper and asm_thumb, built by tools/build.py --bench.
