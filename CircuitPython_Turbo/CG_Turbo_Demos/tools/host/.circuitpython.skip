@@ -1,0 +1,2 @@
+Desktop stand-ins for CircuitPython modules, so the Viper reference kernels
+run under CPython in the desktop reference renderers. Not CircuitPython.

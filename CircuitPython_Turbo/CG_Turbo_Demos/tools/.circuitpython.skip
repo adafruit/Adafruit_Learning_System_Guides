@@ -1,0 +1,2 @@
+Desktop tools (CPython, NumPy, Pillow): the build, the asset and asm
+generators, and the desktop reference renderers. Not CircuitPython.

@@ -1,0 +1,10 @@
+# scratch output from the tools
+build/
+# the board's original code.py, saved by the first deploy
+backup/
+# Adafruit's mpy-cross, matched to the firmware: see README
+tools/mpy-cross
+__pycache__/
+.DS_Store
+# reference images (not ours to publish)
+reference/
