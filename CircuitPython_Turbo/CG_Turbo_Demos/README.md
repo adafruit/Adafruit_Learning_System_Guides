@@ -1,7 +1,7 @@
 # CG Turbo Demos
 
 Computer graphics demos in the spirit of early SIGGRAPH, running on an
-[Adafruit Fruit Jam](https://www.adafruit.com/search?q=fruit+jam) (RP2350) in
+[Adafruit Fruit Jam](https://www.adafruit.com/product/6200) (RP2350) in
 CircuitPython, with the hot loops in
 [CircuitPython Turbo](https://learn.adafruit.com/circuitpython-turbo): Viper
 code compiled ahead of time with `mpy-cross`, plus `asm_thumb` inner loops.
@@ -12,7 +12,8 @@ Output is 320x240 RGB565, pixel-doubled to 640x480 HDMI by `picodvi`.
 ## install on a Fruit Jam
 
 1. Install [CircuitPython](https://circuitpython.org/board/adafruit_fruit_jam/)
-   10.3.1 or later on the Fruit Jam (tested on 10.3.1 and 11.0.0-alpha.1). The demos'
+   10.3.1 or later on the Fruit Jam (tested on 10.3.1, 11.0.0-alpha.1 and
+   11.0.0-alpha.2). The demos'
    compiled modules are `.mpy` version 6.3: if a future CircuitPython moves
    to a newer `.mpy` version, they stop loading (`ValueError: incompatible
    .mpy file`) until rebuilt (see "build from source").
@@ -28,9 +29,12 @@ Output is 320x240 RGB565, pixel-doubled to 640x480 HDMI by `picodvi`.
 
 ## demos
 
-The board boots into a menu of the demos: button 3 moves up, button 2 down,
-button 1 starts the one highlighted. Each demo shows its buttons in the
-border around its image. Press reset to come back to the menu.
+Everything is driven by the three push buttons on the Fruit Jam itself,
+`BUTTON1` to `BUTTON3` (B1, B2 and B3 below and on screen): no keyboard or
+gamepad needed. The board boots into a menu of the demos: button 3 moves
+up, button 2 down, button 1 starts the one highlighted. Each demo shows its
+buttons in the border around its image. Press reset to come back to the
+menu.
 
 ![The boot menu](docs/menu.png)
 
@@ -121,7 +125,7 @@ about making Turbo code fast on this board.
 - Adafruit Fruit Jam and an HDMI display.
 - Stock CircuitPython 10.3.1 or later (Turbo `.mpy` loading is built in on
   RP2xxx). Developed on `11.0.0-alpha.1-126-gea91926f34`; the same build also
-  runs on 10.3.1.
+  runs on 10.3.1 and 11.0.0-alpha.2.
 
 ## build from source
 
