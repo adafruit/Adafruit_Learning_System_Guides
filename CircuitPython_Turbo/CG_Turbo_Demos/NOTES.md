@@ -11,7 +11,7 @@
 - Metaballs: a push for 60 fps (exact circle spans instead of bounding
   boxes, which might allow more than 10 balls at 30 fps); a 3D version on the Cornell box
   renderer.
-- Cornell box: more scene (glass sphere, the classic boxes), on-screen sample
+- Cornell box: more scene (a glass sphere), on-screen sample
   count, then a baked room with live objects.
 
 VoxelSpace terrain and Cornell box rendering in CircuitPython, with the hot
