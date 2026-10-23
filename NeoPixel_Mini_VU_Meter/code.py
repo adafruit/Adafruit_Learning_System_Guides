@@ -1,7 +1,6 @@
 # SPDX-FileCopyrightText: 2022 Liz Clark for Adafruit Industries
 # SPDX-License-Identifier: MIT
 
-import time
 import array
 import math
 import board
@@ -69,16 +68,14 @@ while True:
 
     #  if the mic input has changed from the last input value...
     if last_input != input_val:
+        #  if the level is lower...
+        if last_input > input_val:
+            for z in range(last_input):
+                #  turn those pixels off
+                pixels[z] = (OFF)
+        #  turn on pixels using the colors array
         for i in range(input_val):
-            #  if the level is lower...
-            if last_input > input_val:
-                for z in range(last_input):
-                    #  turn those pixels off
-                    pixels[z] = (OFF)
-            #  turn on pixels using the colors array
             pixels[i] = (colors[i])
-            pixels.show()
-            #  update last_input
-            last_input = input_val
-
-    time.sleep(0.01)
+        pixels.show()
+        #  update last_input
+        last_input = input_val
