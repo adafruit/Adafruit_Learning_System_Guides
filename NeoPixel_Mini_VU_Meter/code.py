@@ -1,7 +1,6 @@
 # SPDX-FileCopyrightText: 2022 Liz Clark for Adafruit Industries
 # SPDX-License-Identifier: MIT
 
-import time
 import array
 import math
 import board
