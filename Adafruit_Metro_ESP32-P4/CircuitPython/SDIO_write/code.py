@@ -5,9 +5,7 @@ import time
 import board
 import microcontroller
 import storage
-import board
 import sdioio
-import storage
 
 sd = sdioio.SDCard(
     clock=board.SD_CLK,
