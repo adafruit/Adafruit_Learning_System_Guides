@@ -30,7 +30,7 @@ VERBOSE_SCAN = True
 # do anything on the controller and add their indexes here.
 IGNORE_INDEXES = []
 
-DIR_IN = 0x80
+DIR_IN = 0x80  # USB direction bit in endpoint address
 controller = None
 
 if VERBOSE_SCAN:

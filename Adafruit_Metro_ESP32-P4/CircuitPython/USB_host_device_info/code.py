@@ -19,7 +19,7 @@ usb_host.Port(board.USB_HOST_DP, board.USB_HOST_DM)
 
 time.sleep(1) # delay for enumeration
 
-DIR_IN = 0x80
+DIR_IN = 0x80 # USB direction bit in endpoint address
 
 while True:
     print("searching for devices")
