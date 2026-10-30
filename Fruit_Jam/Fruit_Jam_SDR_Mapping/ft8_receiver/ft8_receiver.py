@@ -807,7 +807,7 @@ def run(seconds=0, preset=DEFAULT_PRESET, frequency=None, presets=PRESETS, volum
             audio.clear()
             radio.hold_buffer()
 
-        def resume_stream(keep_slot):  # pylint: disable=unused-variable
+        def resume_stream(keep_slot):
             """Restart the stream; the slot clock is set again from UTC.
             keep_slot: the waterfall being filled stays valid (the gap was
             short and after the slot's transmissions)."""
@@ -817,6 +817,7 @@ def run(seconds=0, preset=DEFAULT_PRESET, frequency=None, presets=PRESETS, volum
                 return
             radio.reset_buffer()
             filled = 0
+            # pylint: disable=unused-variable
             stream, usb_ring = start_stream(d, audio, radio.sample_rate)
             old = (day, sec)
             anchor()
