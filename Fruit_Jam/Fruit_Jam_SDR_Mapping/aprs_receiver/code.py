@@ -32,7 +32,6 @@ del _ballast
 PRESET = 0
 # (lat, lon): show distance and direction to each station, centre the map there
 HOME = None
-# 'map' (stations on an OpenStreetMap map) or 'text' (a line per packet)
 UI = 'map'
 # (lat, lon) to centre the map on without HOME; None: the first position heard
 MAP_CENTRE = None

@@ -33,12 +33,13 @@ the status row: what the colours mean, then the keys and buttons (? or
 Esc hides it; the map's keys do nothing while it shows, the receiver's
 still work).
 
-Drawing: the map is one 8-bit bitmap in the framebuffer's own colours
-(RGB332), over a second one with just the tiles (the underlay). Tiles
-come from aprs_tiles' cache as BMPs in the same colours, read a strip of
-rows at a time into the underlay. Redrawing a rectangle copies it back
-from the underlay, then draws what overlaps it (station dots, their
-calls, home, scale bar, credit; the calls are pre-drawn small bitmaps).
+Drawing: the map is an adafruit_maptiles MapView (lib/adafruit_maptiles:
+the tiles come from its cache on the SD card, /sd/tiles/osm, shared with
+the ADS-B receiver and anything else using the library, as 8-bit BMPs in
+the framebuffer's RGB332 colours). They are read a strip of rows at a
+time into the view's underlay. Redrawing a rectangle copies it back from
+the underlay, then draws what overlaps it (station dots, their calls,
+home, scale bar, credit; the calls are pre-drawn small bitmaps).
 add_packet() only notes what changed; step() then redraws one strip,
 rectangle or text row at a time (each 5-15 ms): refreshing the whole
 screen takes ~100 ms, longer than the receiver can leave the USB
@@ -48,27 +49,22 @@ quiet); until then they are grey.
 """
 import json
 import time
-import bitmaptools
 import displayio
-import terminalio
-import aprs_tiles
+from adafruit_maptiles import rgb332_colour
+from adafruit_maptiles.cache import TileCache
+from adafruit_maptiles.map_view import BLACK, NO_TILE, WHITE, MapView, overlaps, text_bitmap
 import aprs_ui
-from aprs_tiles import BMP_HEADER, TILE, mercator, unmercator, world_x, world_y
 from aprs_ui import packet_row
 
-# pylint: disable=too-many-locals, too-many-branches, too-many-return-statements
-# pylint: disable=too-many-nested-blocks, broad-except
+# pylint: disable=too-many-branches, too-many-return-statements, too-many-nested-blocks
 
-TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
-TILE_DIR = '/sd/tiles/osm'
-CREDIT = '(C) OpenStreetMap contributors'
+USER_AGENT = 'FruitJam-APRS-receiver/1.0 CircuitPython'   # for the tile server
 ZOOM = 9                     # ~75 km across the screen at 40 degrees
 ZOOMS = (3, 15)
 ZOOM_KEYS = {'i': 1, '+': 1, 'o': -1, '-': -1}
 PAN = {'left': (-1, 0), 'right': (1, 0), 'up': (0, -1), 'down': (0, 1),
        'a': (-1, 0), 'd': (1, 0), 'w': (0, -1), 's': (0, 1)}
 PAN_STEP = 0.25              # of the screen, a press
-FIT_MARGIN = 24              # px: r keeps the stations this far inside the map
 MAP_KEYS = tuple(ZOOM_KEYS) + tuple(PAN) + ('r', 'k', 'l', 'z')    # (and Esc: deselect)
 CLEAR_PROMPT = 'CLEAR THE MAP? y: yes, n: no'
 
@@ -76,17 +72,13 @@ W = aprs_ui.WIDTH
 MAP_TOP = 12
 MAP_H = 192
 LIST_ROWS = 3
-STRIP = 8                    # map rows loaded per step
+STRIP = 8                    # map rows loaded or redrawn per step
 MAX_STATIONS = 60
 LABEL_SECONDS = 1800         # calls are shown for stations heard this recently
 KEEP_SECONDS = 3600          # stations not heard this long fall off the map
 
 # Colours are RGB332 values.
-BLACK = 0x00
-WHITE = 0xff                 # (terminalio's font draws its value 1: dark blue)
 YELLOW = 0xfc
-NO_TILE = 0xb6
-WAITING = 0x49
 RED = 0xe0
 GREEN = 0x14
 BLUE = 0x0b
@@ -145,7 +137,7 @@ def detail(p, hhmm, home):
 
 def help_rows():
     """The help page (aprs_ui.HelpPage): the map's colours, then the keys."""
-    c = aprs_tiles.rgb332_colour
+    c = rgb332_colour
     return [
         aprs_ui.HELP_TITLE,
         [('dot', c(RED)), ' vehicle  ', ('dot', c(GREEN)), ' digi, gateway, house  ',
@@ -167,38 +159,11 @@ def help_rows():
     ]
 
 
-def overlaps(a, b):
-    return a[0] < b[2] and b[0] < a[2] and a[1] < b[3] and b[1] < a[3]
-
-
-_glyphs = {}
-
-
-def tag(text, background, width=None, outline=False):
-    """text on background (terminalio's font, 1 pixel margin; with a black
-    outline, 14 pixels high), as a bitmap."""
-    b = displayio.Bitmap(width or 6 * len(text) + 2, 14 if outline else 13, 256)
-    if outline:
-        b.fill(BLACK)
-        bitmaptools.fill_region(b, 1, 1, b.width - 1, b.height - 1, background)
-    else:
-        b.fill(background)
-    for k, ch in enumerate(text):
-        g = _glyphs.get(ch)
-        if g is None:
-            glyph = terminalio.FONT.get_glyph(ord(ch))
-            g = _glyphs[ch] = glyph.tile_index * 6 if glyph else -1
-        if g >= 0:
-            bitmaptools.blit(b, terminalio.FONT.bitmap, b.width - 6 * len(text) - 1 + 6 * k, 1,
-                             x1=g, y1=0, x2=g + 6, y2=12, skip_source_index=0)
-    return b
-
-
 class Station:
     def __init__(self, key):
         self.key = key
         self.label = key[:9]
-        self.lat = self.lon = self.merc = 0.0
+        self.lat = self.lon = 0.0
         self.colour = ORANGE
         self.heard = 0.0
         self.labelled = True
@@ -216,26 +181,16 @@ class MapDisplay(aprs_ui.Display):
 
     def __init__(self, home=None, centre=None, zoom=None, tiles=None):
         self.home = home
-        self.centre = centre or home
-        self.zoom = zoom or ZOOM
-        self.zoom_start = self.zoom  # r: no closer than this
-        self.start = self.centre     # r with no stations: back here
-        self.tiles = tiles or aprs_tiles.TileCache(TILE_DIR, TILE_URL)
+        self.zoom_start = zoom or ZOOM   # r: no closer than this
+        self.start = centre or home  # r with no stations: back here
         self.fb, self.display = aprs_ui.open_framebuffer()
         group = displayio.Group()
         self.top = aprs_ui.TextRows(self.display, group, 1)
         self.columns = self.top.columns
-        self.bitmap = displayio.Bitmap(W, MAP_H, 256)
-        palette = displayio.Palette(256)
-        for v in range(256):
-            palette[v] = aprs_tiles.rgb332_colour(v)
-        group.append(displayio.TileGrid(self.bitmap, pixel_shader=palette, y=MAP_TOP))
+        self.map = MapView(W, MAP_H, self.start, self.zoom_start, y=MAP_TOP, zooms=ZOOMS,
+                           strip=STRIP, cache=tiles or TileCache(user_agent=USER_AGENT))
+        group.append(self.map)
         self.list = aprs_ui.TextRows(self.display, group, LIST_ROWS, y=MAP_TOP + MAP_H)
-        self.under = displayio.Bitmap(W, MAP_H, 256)
-        self.rows = displayio.Bitmap(TILE, STRIP, 256)     # a tile's rows, read from its file
-        self.rows_mv = memoryview(self.rows)
-        self.credit = tag(CREDIT, WHITE)
-        self.scale = None
         self.newest_tag = None
         self.selected = None         # the station picked with k / l
         self.selected_tag = None
@@ -246,189 +201,86 @@ class MapDisplay(aprs_ui.Display):
         self.list_rows = []          # what the rows below the map show
         self.list_todo = []          # list rows to rewrite
         self.rects = []              # map rectangles to redraw
-        self.todo = []               # map strips to (re)load
-        self.queue = []              # (z, x, y) tiles to download / convert
-        self.files = {}              # (x, y) -> open tile BMP, or None, while strips load
-        self.net_error = None
         self.next_age = 0.0
         self.now = time.monotonic    # seconds, for the stations' ages (a replay sets the log's)
         self.help = aprs_ui.HelpPage(self.display, group, help_rows())
         self.display.root_group = group
-        self.set_view()
-        if self.centre is None:
+        if self.map.centre is None:
             while self.step():
                 pass
         self.display.refresh(minimum_frames_per_second=0)
 
     # ------------------------------------------------------------ view
 
-    def set_view(self):
-        """Start (re)loading the map for self.centre and self.zoom."""
-        self._close_files()
-        self.todo = list(range((MAP_H + STRIP - 1) // STRIP))
+    def _moved(self):
+        """After the map's centre or zoom changed: the strips to load are
+        the map's own (step()); the stations go where they now are."""
         self.rects = []
-        self.queue = []
-        self.net_error = None
-        if self.centre is None:
-            return
-        z = self.zoom
-        lat, lon = self.centre
-        self.x0 = int(world_x(lon, z)) - W // 2
-        self.y0 = int(world_y(lat, z)) - MAP_H // 2
-        self.clon = lon
-        self.cmerc = mercator(lat)
-        self.world = TILE << z
-        n = 1 << z
-        ctx, cty = (self.x0 + W // 2) >> 8, (self.y0 + MAP_H // 2) >> 8
-        need = []
-        for ty in range(self.y0 >> 8, ((self.y0 + MAP_H - 1) >> 8) + 1):
-            for tx in range(self.x0 >> 8, ((self.x0 + W - 1) >> 8) + 1):
-                if 0 <= ty < n and not self.tiles.ready(z, tx % n, ty):
-                    need.append(((tx - ctx) ** 2 + (ty - cty) ** 2, tx % n, ty))
-        self.queue = [(z, x, y) for _, x, y in sorted(need)]
-        # The scale bar: the longest 1, 2 or 5 x 10^k that fits in 80 pixels.
-        mpp = aprs_tiles.metres_per_pixel(lat, z)
-        step = 1
-        while step * 10 <= mpp * 80:
-            step *= 10
-        metres = max(m for m in (step, 2 * step, 5 * step) if m <= mpp * 80 or m == step)
-        px = max(1, int(metres / mpp))
-        text = ('%d km' % (metres // 1000)) if metres >= 1000 else ('%d m' % metres)
-        self.scale = tag(text, WHITE, px + 8 + 6 * len(text))
-        bitmaptools.fill_region(self.scale, 3, 9, 3 + px, 11, BLACK)
-        bitmaptools.fill_region(self.scale, 3, 4, 4, 11, BLACK)
-        bitmaptools.fill_region(self.scale, 2 + px, 4, 3 + px, 11, BLACK)
         for s in self.order:
             self._place(s)
+
+    def _near(self, lon):
+        """lon, moved by 360 degrees to the copy of the world nearest the
+        map's centre."""
+        return self.map.clon + (lon - self.map.clon + 180) % 360 - 180
 
     def _place(self, s):
         """Where s goes on the map, and the rectangle it covers."""
         s.xy = s.box = s.rect = None
-        if self.centre is None:
+        if self.map.centre is None:
             return
-        x = W // 2 + round((s.lon - self.clon) / 360 * self.world)
-        y = MAP_H // 2 + round((s.merc - self.cmerc) * self.world)
+        x, y = self.map.xy(s.lat, self._near(s.lon))
         if not (-60 < x < W + 60 and -20 < y < MAP_H + 20):
             return
         s.xy = (x, y)
         d = 5 if s is self.selected else 3
         r = [x - d, y - d, x + d + 1, y + d + 1]
         if s.labelled or s is self.selected:
-            w = 6 * len(s.label) + 2
+            w = 6 * len(s.label) + 5     # (text_bitmap() with an outline)
             lx = x + 5 if x + 5 + w <= W else x - 5 - w
             s.box = (lx, y - 7)
             r = [min(r[0], lx), y - 7, max(r[2], lx + w), y + 7]
         s.rect = r
 
-    def _tile_file(self, x, y):
-        key = (x, y)
-        if key not in self.files:
-            try:
-                self.files[key] = open(self.tiles.path(self.zoom, x, y), 'rb')
-            except OSError:
-                self.files[key] = None
-        return self.files[key]
-
-    def _close_files(self):
-        for f in self.files.values():
-            if f:
-                f.close()
-        self.files = {}
-
-    def _load_strip(self, k):
-        """Map rows k * STRIP .. into the underlay, then onto the screen."""
-        y1 = k * STRIP
-        y2 = min(MAP_H, y1 + STRIP)
-        if self.centre is None:
-            bitmaptools.fill_region(self.under, 0, y1, W, y2, WAITING)
-        n = 1 << self.zoom
-        y = y1
-        while y < y2 and self.centre:
-            # Rows y .. y + h are in the same row of tiles.
-            gy = self.y0 + y
-            ty = gy >> 8
-            h = min(y2 - y, TILE - (gy & 255))
-            sx = 0
-            while sx < W:
-                gx = self.x0 + sx
-                off = gx & 255
-                m = min(TILE - off, W - sx)
-                f = self._tile_file((gx >> 8) % n, ty) if 0 <= ty < n else None
-                if f is None:
-                    bitmaptools.fill_region(self.under, sx, y, sx + m, y + h, NO_TILE)
-                else:
-                    f.seek(BMP_HEADER + (gy & 255) * TILE)
-                    f.readinto(self.rows_mv[:h * TILE])
-                    bitmaptools.blit(self.under, self.rows, sx, y, x1=off, y1=0, x2=off + m, y2=h)
-                sx += m
-            y += h
-        self._show((0, y1, W, y2))
-
     # ---------------------------------------------------------- drawing
-
-    def _fill(self, x1, y1, x2, y2, colour, clip):
-        x1 = max(x1, clip[0])
-        y1 = max(y1, clip[1])
-        x2 = min(x2, clip[2])
-        y2 = min(y2, clip[3])
-        if x1 < x2 and y1 < y2:
-            bitmaptools.fill_region(self.bitmap, x1, y1, x2, y2, colour)
-
-    def _blit(self, src, x, y, clip):
-        """The bitmap src with its top left at x, y, inside clip."""
-        x1 = max(x, clip[0])
-        y1 = max(y, clip[1])
-        x2 = min(x + src.width, clip[2])
-        y2 = min(y + src.height, clip[3])
-        if x1 < x2 and y1 < y2:
-            bitmaptools.blit(self.bitmap, src, x1, y1, x1=x1 - x, y1=y1 - y, x2=x2 - x, y2=y2 - y)
 
     def _show(self, rect):
         """Tiles and everything over them, again, in rect; then refresh."""
-        x1 = max(0, rect[0])
-        y1 = max(0, rect[1])
-        x2 = min(W, rect[2])
-        y2 = min(MAP_H, rect[3])
-        if x1 >= x2 or y1 >= y2:
+        clip = (max(0, rect[0]), max(0, rect[1]), min(W, rect[2]), min(MAP_H, rect[3]))
+        if clip[0] >= clip[2] or clip[1] >= clip[3]:
             return
-        clip = (x1, y1, x2, y2)
-        bitmaptools.blit(self.bitmap, self.under, x1, y1, x1=x1, y1=y1, x2=x2, y2=y2)
-        if self.centre is not None:
+        v = self.map
+        v.restore(clip)
+        if v.centre is not None:
             if self.home:
-                hx = W // 2 + round((self.home[1] - self.clon) / 360 * self.world)
-                hy = MAP_H // 2 + round((mercator(self.home[0]) - self.cmerc) * self.world)
-                if overlaps((hx - 6, hy - 6, hx + 7, hy + 7), clip):
-                    self._fill(hx - 6, hy - 2, hx + 7, hy + 3, WHITE, clip)
-                    self._fill(hx - 2, hy - 6, hx + 3, hy + 7, WHITE, clip)
-                    self._fill(hx - 5, hy - 1, hx + 6, hy + 2, BLACK, clip)
-                    self._fill(hx - 1, hy - 5, hx + 2, hy + 6, BLACK, clip)
+                hx, hy = v.xy(self.home[0], self._near(self.home[1]))
+                v.cross(hx, hy, clip)
             for s in self.order:
                 if s.rect and overlaps(s.rect, clip):
                     x, y = s.xy
-                    self._fill(x - 3, y - 3, x + 4, y + 4, BLACK, clip)
-                    self._fill(x - 2, y - 2, x + 3, y + 3, s.colour, clip)
+                    v.fill(x - 3, y - 3, x + 4, y + 4, BLACK, clip)
+                    v.fill(x - 2, y - 2, x + 3, y + 3, s.colour, clip)
                     if s.box and s is not self.selected:
                         if s is self.newest:
                             if self.newest_tag is None:
-                                self.newest_tag = tag(s.label, YELLOW, outline=True)
-                            self._blit(self.newest_tag, s.box[0], s.box[1], clip)
+                                self.newest_tag = text_bitmap(s.label, YELLOW, outline=True)
+                            v.blit(self.newest_tag, s.box[0], s.box[1], clip)
                         else:
                             if s.tag is None:
-                                s.tag = tag(s.label, WHITE, outline=True)
-                            self._blit(s.tag, s.box[0], s.box[1], clip)
-            self._blit(self.scale, 0, MAP_H - 13, clip)
-            self._blit(self.credit, W - self.credit.width, MAP_H - 13, clip)
+                                s.tag = text_bitmap(s.label, WHITE, outline=True)
+                            v.blit(s.tag, s.box[0], s.box[1], clip)
+            v.draw_legend(clip)
             s = self.selected
             if s and s.rect and overlaps(s.rect, clip):
                 # Over everything: a ring round its dot, its call on cyan.
                 x, y = s.xy
-                self._fill(x - 5, y - 5, x + 6, y + 6, CYAN, clip)
-                self._fill(x - 3, y - 3, x + 4, y + 4, BLACK, clip)
-                self._fill(x - 2, y - 2, x + 3, y + 3, s.colour, clip)
+                v.fill(x - 5, y - 5, x + 6, y + 6, CYAN, clip)
+                v.fill(x - 3, y - 3, x + 4, y + 4, BLACK, clip)
+                v.fill(x - 2, y - 2, x + 3, y + 3, s.colour, clip)
                 if self.selected_tag is None:
-                    self.selected_tag = tag(s.label, CYAN, outline=True)
-                self._blit(self.selected_tag, s.box[0], s.box[1], clip)
-        self.bitmap.dirty(x1, y1, x2, y2)
+                    self.selected_tag = text_bitmap(s.label, CYAN, outline=True)
+                v.blit(self.selected_tag, s.box[0], s.box[1], clip)
+        v.dirty(clip)
         self.display.refresh(minimum_frames_per_second=0)
 
     def _redraw(self, rect):
@@ -448,10 +300,10 @@ class MapDisplay(aprs_ui.Display):
 
     def prepare(self):
         """Before the stream starts: every missing tile, then the whole map."""
-        total = len(self.queue)
-        while self.queue:
+        total = len(self.map.missing)
+        while self.map.missing:
             self.message('Map: tile %d of %d (download, convert)'
-                         % (total - len(self.queue) + 1, total))
+                         % (total - len(self.map.missing) + 1, total))
             self.paused_step()
         while self.step():
             pass
@@ -467,45 +319,22 @@ class MapDisplay(aprs_ui.Display):
             self.list.row(k, self.list_rows[k] if k < len(self.list_rows) else '')
         elif self.rects:
             self._show(self.rects.pop(0))
-        elif self.todo:
-            self._load_strip(self.todo.pop(0))
+        elif self.map.loading:
+            self._show(self.map.load_step())
+            if not self.map.loading:
+                self.map.close()
         else:
-            if self.files:
-                self._close_files()
             return False
         return True
 
     @property
     def needs_pause(self):
-        return bool(self.queue)
+        return bool(self.map.missing)
 
     def paused_step(self):
-        """Download and / or convert the next missing tile."""
-        z, x, y = self.queue.pop(0)
-        t = time.monotonic()
-        fetch = not self.tiles.has_png(z, x, y)
-        try:
-            self.tiles.convert(z, x, y, self.tiles.fetch(z, x, y) if fetch else None)
-        except Exception as error:
-            print('TILE_ERROR', json.dumps({'tile': [z, x, y],
-                                            'error': '%s %s' % (type(error).__name__, error)}))
-            if fetch:
-                # No network (or no server): only convert what is on the card.
-                self.net_error = type(error).__name__
-                self.queue = [q for q in self.queue if self.tiles.has_png(*q)]
-            return
-        print('TILE', json.dumps({'tile': [z, x, y], 'fetched': fetch,
-                                  's': round(time.monotonic() - t, 2)}))
-        if z != self.zoom or self.centre is None:
-            return
-        f = self.files.pop((x, y), None)
-        if f:
-            f.close()
-        # Reload the strips the tile is in.
-        top = (y << 8) - self.y0
-        for k in range(max(0, top // STRIP), min(MAP_H, top + TILE) // STRIP + 1):
-            if k * STRIP < MAP_H and k not in self.todo:
-                self.todo.append(k)
+        """Download and / or convert the next missing tile (step() then
+        reloads the strips it is in)."""
+        self.map.fetch_step()
 
     def command(self, action):
         if self.asking:
@@ -522,30 +351,30 @@ class MapDisplay(aprs_ui.Display):
             self.asking = CLEAR_PROMPT
             self.status_row(self.status_text)
             return True
+        v = self.map
         if action in ZOOM_KEYS:
-            z = max(ZOOMS[0], min(ZOOMS[1], self.zoom + ZOOM_KEYS[action]))
-            if z != self.zoom and self.centre:
-                self.zoom = z
-                self.set_view()
-            print('MAP', json.dumps({'zoom': self.zoom, 'centre': self.centre}))
+            if v.centre and (v.zoom_in() if ZOOM_KEYS[action] > 0 else v.zoom_out()):
+                self._moved()
+            print('MAP', json.dumps({'zoom': v.zoom, 'centre': v.centre}))
             return True
         if action == 'r':
             if self.order:
-                self._fit()
+                # (around the copy of the world nearest the first one)
+                lon0 = self.order[0].lon
+                v.fit([(s.lat, lon0 + (s.lon - lon0 + 180) % 360 - 180) for s in self.order],
+                      self.zoom_start)
+                self._moved()
             elif self.start:
-                self.centre, self.zoom = self.start, self.zoom_start
-                self.set_view()
-            print('MAP', json.dumps({'zoom': self.zoom, 'centre': self.centre}))
+                v.set_view(self.start, self.zoom_start)
+                self._moved()
+            print('MAP', json.dumps({'zoom': v.zoom, 'centre': v.centre}))
             return True
         if action in PAN:
-            if self.centre:
+            if v.centre:
                 dx, dy = PAN[action]
-                x = self.x0 + W // 2 + dx * PAN_STEP * W
-                y = self.y0 + MAP_H // 2 + dy * PAN_STEP * MAP_H
-                self.centre = (unmercator(y / self.world - 0.5),
-                               (x / self.world * 360.0) % 360.0 - 180.0)
-                self.set_view()
-            print('MAP', json.dumps({'zoom': self.zoom, 'centre': self.centre}))
+                v.pan(dx * PAN_STEP, dy * PAN_STEP)
+                self._moved()
+            print('MAP', json.dumps({'zoom': v.zoom, 'centre': v.centre}))
             return True
         if action in ('k', 'l'):
             self._select(1 if action == 'k' else -1)
@@ -568,22 +397,6 @@ class MapDisplay(aprs_ui.Display):
         # The whole map again, a strip at a time (step()).
         self.rects = [[0, y, W, min(MAP_H, y + STRIP)] for y in range(0, MAP_H, STRIP)]
         print('CLEAR')
-
-    def _fit(self):
-        """Centre the map on the stations, at the closest zoom (up to the
-        starting one) that shows them all, FIT_MARGIN px inside the map."""
-        # (around the copy of the world nearest the first one)
-        lon0 = self.order[0].lon
-        lons = [lon0 + (s.lon - lon0 + 180) % 360 - 180 for s in self.order]
-        ys = [s.merc for s in self.order]
-        z = self.zoom_start
-        while z > ZOOMS[0] and ((max(lons) - min(lons)) / 360 * (TILE << z) > W - 2 * FIT_MARGIN
-                                or (max(ys) - min(ys)) * (TILE << z) > MAP_H - 2 * FIT_MARGIN):
-            z -= 1
-        lon = (max(lons) + min(lons)) / 2
-        self.centre = (unmercator((max(ys) + min(ys)) / 2), (lon + 180) % 360 - 180)
-        self.zoom = z
-        self.set_view()
 
     def _select(self, step):
         """The next (step 1) or previous (-1) station on the map, newest
@@ -622,9 +435,9 @@ class MapDisplay(aprs_ui.Display):
                 if s:
                     self._remove(s)
                 return
-            if self.centre is None:
-                self.centre = (p['lat'], p['lon'])
-                self.set_view()
+            if self.map.centre is None:
+                self.map.centre = (p['lat'], p['lon'])
+                self._moved()
             if s is None:
                 s = self.stations[key] = Station(key)
                 if len(self.order) >= MAX_STATIONS:
@@ -632,7 +445,6 @@ class MapDisplay(aprs_ui.Display):
             else:
                 self.order.remove(s)
             s.lat, s.lon = p['lat'], p['lon']
-            s.merc = mercator(s.lat)
             s.colour = marker_colour(p)
         elif s is None:
             return
@@ -683,9 +495,9 @@ class MapDisplay(aprs_ui.Display):
     def show(self, st):
         """The receiver's status (an aprs_ui.Status), about once a second."""
         notes = (' MUTED' if st.muted else '') + ('' if st.sd else ' NO SD')
-        if self.queue:
-            notes += ' map %d' % len(self.queue)
-        if self.net_error:
+        if self.map.missing:
+            notes += ' map %d' % len(self.map.missing)
+        if self.map.net_error:
             notes += ' NO NET'
         if st.note:
             notes += ' ' + st.note
@@ -695,7 +507,7 @@ class MapDisplay(aprs_ui.Display):
         level = ('%4.0fdB %s ' % (st.level, 'DCD' if st.dcd else '   ')
                  if st.level is not None else '')
         self.status_row('%s%-8s %s %s%dp %ds z%d%s' % (
-            freq, st.label[:8], st.utc, level, st.packets, st.stations, self.zoom, notes))
+            freq, st.label[:8], st.utc, level, st.packets, st.stations, self.map.zoom, notes))
         # Stations not heard for KEEP_SECONDS go; their calls go after
         # LABEL_SECONDS.
         now = self.now()
@@ -718,7 +530,7 @@ class MapDisplay(aprs_ui.Display):
 
     def ready(self):
         self._add_line('Listening for APRS packets')
-        if self.centre is None:
+        if self.map.centre is None:
             self._add_line('The map centres on the first position heard')
         while self.list_todo:
             self.step()
@@ -727,4 +539,4 @@ class MapDisplay(aprs_ui.Display):
         return self.top.text() + self.list.text()
 
     def close(self):
-        self._close_files()
+        self.map.close()

@@ -133,7 +133,7 @@ def open_framebuffer():
 
 def snapshot(fb, path):
     """The framebuffer (8-bit RGB332) as a top-down BMP file."""
-    from aprs_tiles import bmp_header
+    from adafruit_maptiles.png import bmp_header
     with open(path, 'wb') as f:
         f.write(bmp_header(WIDTH, HEIGHT))
         f.write(memoryview(fb))
