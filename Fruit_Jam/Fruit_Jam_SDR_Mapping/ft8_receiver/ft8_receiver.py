@@ -90,7 +90,8 @@ import _ham_dsp as dsp
 
 # pylint: disable=too-many-lines, global-statement, import-outside-toplevel
 # pylint: disable=too-many-locals, too-many-branches, too-many-statements
-# pylint: disable=too-many-return-statements, unsubscriptable-object
+# pylint: disable=too-many-return-statements, unsubscriptable-object, broad-except
+# pylint: disable=no-self-use
 
 USB = 2                      # _ham_dsp mode
 RATE32 = 32000
@@ -761,7 +762,7 @@ def run(seconds=0, preset=DEFAULT_PRESET, frequency=None, presets=PRESETS, volum
         """Set the slot clock from UTC, for a stream that has just started."""
         nonlocal pos, day, sec
         ms = clock.utc_ms() - LATENCY_MS
-        day, rem = divmod(ms, 86400000)
+        day, rem = divmod(ms, 86400000)  # pylint: disable=unused-variable
         sec = rem // 15000 * 15
         pos = ((rem - sec * 1000) * 32) & ~3
 
@@ -806,7 +807,7 @@ def run(seconds=0, preset=DEFAULT_PRESET, frequency=None, presets=PRESETS, volum
             audio.clear()
             radio.hold_buffer()
 
-        def resume_stream(keep_slot):
+        def resume_stream(keep_slot):  # pylint: disable=unused-variable
             """Restart the stream; the slot clock is set again from UTC.
             keep_slot: the waterfall being filled stays valid (the gap was
             short and after the slot's transmissions)."""
@@ -1132,7 +1133,7 @@ def run(seconds=0, preset=DEFAULT_PRESET, frequency=None, presets=PRESETS, volum
                     t = (tick() - t) & 0x1fffffff
                     max_ui = max(max_ui, t)
                 elif decoding is not None:
-                    left = _ft8.decode_step(work, specs[decoding], 1)
+                    left = _ft8.decode_step(work, specs[int(decoding)], 1)
                     step_units += 1
                     if not left:
                         finish_decode()

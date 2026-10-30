@@ -43,7 +43,7 @@ import framebufferio
 import terminalio
 import ft8_help
 
-# pylint: disable=import-outside-toplevel
+# pylint: disable=import-outside-toplevel, no-self-use
 
 STATUS_ROWS = 2
 COLUMN_WIDTH = 11    # a message column, the longest call heard: '<K6VHF/HR9>'

@@ -749,7 +749,7 @@ def run(seconds=0, preset=DEFAULT_PRESET, frequency=None, presets=PRESETS, volum
             audio.clear()
             radio.hold_buffer()
 
-        def resume_stream():
+        def resume_stream():  # pylint: disable=unused-variable
             nonlocal stream, usb_ring, filled, paused
             paused -= 1
             if paused:
