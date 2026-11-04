@@ -177,7 +177,7 @@ class _Rows:
                 row[i] = (row[i] + c) & 0xFF
         return int.from_bytes(row, "little")
 
-    def next(self):
+    def next_row(self):
         """The next row's bytes, unfiltered."""
         n, bpp = self.n, self.bpp
         ftype = self.raw[self.pos]
@@ -229,7 +229,7 @@ def sample(data, side=SIDE, step=None):
     rows = _Rows(raw, w, ch)
     last = max(want) if want else -1
     for y in range(last + 1):
-        row = rows.next()
+        row = rows.next_row()
         outs = want.get(y)
         if outs:
             line = []

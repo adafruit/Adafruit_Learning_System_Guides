@@ -247,7 +247,7 @@ class Pictures(unittest.TestCase):
         rows = [bytes(rnd.randrange(256) for _ in range(w * 3)) for _ in range(h)]
         width, height, ct, pal, z = fm1pic.read_png(png(w, h, rows))
         r = fm1pic._Rows(zlib.decompress(z), width, 3)
-        self.assertEqual([r.next() for _ in range(h)], rows)
+        self.assertEqual([r.next_row() for _ in range(h)], rows)
 
     def test_flat_rows_take_the_quick_paeth(self):
         # pixel art: runs of one colour, so most Paeth bytes are Sub
@@ -256,7 +256,7 @@ class Pictures(unittest.TestCase):
             rows.append(b"".join(bytes((((x // 6) * 40 + y // 6) & 0xFF, 7, x // 6)) for x in range(60)))
         width, height, ct, pal, z = fm1pic.read_png(png(60, 30, rows))
         r = fm1pic._Rows(zlib.decompress(z), width, 3)
-        self.assertEqual([r.next() for _ in range(30)], rows)
+        self.assertEqual([r.next_row() for _ in range(30)], rows)
 
     def test_thumbnail(self):
         # 160x80 palette picture, letterboxed onto a square, 3 colours
