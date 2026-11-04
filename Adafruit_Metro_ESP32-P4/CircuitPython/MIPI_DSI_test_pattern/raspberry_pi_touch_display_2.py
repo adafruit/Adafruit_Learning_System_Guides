@@ -41,7 +41,7 @@ _INIT_SEQUENCE = bytes.fromhex(
 )
 
 
-def make_display(i2c):
+def make_display(i2c, *, color_depth=24, rotation=90):
     """Initialize the 7-inch Touch Display 2 at 1280 x 720 landscape."""
     while not i2c.try_lock():
         pass
@@ -62,12 +62,12 @@ def make_display(i2c):
         time.sleep(0.02)
         framebuffer = mipidsi.Display(
             bus, _INIT_SEQUENCE,
-            width=720, height=1280, color_depth=24,
+            width=720, height=1280, color_depth=color_depth,
             hsync_pulse_width=33, hsync_back_porch=50, hsync_front_porch=239,
             vsync_pulse_width=2, vsync_back_porch=30, vsync_front_porch=20,
             pixel_clock_frequency=83_330_000, native_frames_per_second=60,
         )
-        display = framebufferio.FramebufferDisplay(framebuffer, rotation=90)
+        display = framebufferio.FramebufferDisplay(framebuffer, rotation=rotation)
         i2c.writeto(0x45, bytes((3, 0x88)))
         return display
     finally:
