@@ -41,7 +41,7 @@ _INIT_SEQUENCE = bytes.fromhex(
 )
 
 
-def make_display(i2c):
+def make_display(i2c, *, color_depth=24, rotation=90):
     """Initialize the 7-inch Touch Display 2 at 1280 x 720 landscape."""
     while not i2c.try_lock():
         pass
