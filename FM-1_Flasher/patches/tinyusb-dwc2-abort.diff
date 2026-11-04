@@ -1,0 +1,33 @@
+diff --git a/src/portable/synopsys/dwc2/hcd_dwc2.c b/src/portable/synopsys/dwc2/hcd_dwc2.c
+index 09878a2b9..4212ae835 100644
+--- a/src/portable/synopsys/dwc2/hcd_dwc2.c
++++ b/src/portable/synopsys/dwc2/hcd_dwc2.c
+@@ -949,6 +949,28 @@ bool hcd_edpt_abort_xfer(uint8_t rhport, uint8_t dev_addr, uint8_t ep_addr) {
+     }
+   }
+ 
++  // A non-periodic DMA channel (control/bulk) is halted with channel disable. Its halt usually arrives with NAK set,
++  // which handle_channel_in_dma() would retry: the aborted transfer would keep polling and later complete with the
++  // device's next data. Mark it aborting so handle_channel_irq() retires the channel at the halt instead, with no
++  // completion event, as for periodic channels above.
++  if (dma_host_enabled(dwc2)) {
++    const uint8_t ch_id = channel_find_enabled(dwc2, dev_addr, ep_num, ep_dir);
++    if (ch_id < 16) {
++      hcd_xfer_t* xfer = &_hcd_data.xfer[ch_id];
++      edpt->aborting = 1;
++      xfer->aborting = true;
++      channel_disable(dwc2, &dwc2->channel[ch_id]);
++      hcd_int_enable(rhport);
++
++      // Wait for the halt, so the endpoint can take a new transfer and the controller no longer writes to the aborted
++      // transfer's buffer when this returns. It comes within a (micro)frame; give up after ~8 frame-counter ticks.
++      const uint32_t start = dwc2->hfnum & HFNUM_FRNUM_Msk;
++      while (xfer->aborting && (((dwc2->hfnum & HFNUM_FRNUM_Msk) - start) & HCD_FRAME_NUMBER_MASK) < 8) {
++      }
++      return true;
++    }
++  }
++
+   hcd_int_enable(rhport);
+ 
+   // Channel disable may wait for request-queue space in slave mode.
