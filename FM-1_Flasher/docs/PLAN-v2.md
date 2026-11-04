@@ -236,6 +236,14 @@ the hub were 10 firmwares it added or updated later that day. Pictures:
       that had been on the FM-1 a while. Staging an M-VAVE-loader package
       (Amenity, Clatter, Bubba) from Duell takes ~8 s, not ~6. Watch for it;
       a retry, a power cycle or going via V15 gets past it.
+      ZP12 (FM-1_975) → V15 fails every time, the same way: ZP12 asks for
+      four blocks (0x0000, 0x0200, V15's loader at ~0x5F00, 0x0400), gets
+      them, then stops ("device stopped requesting data"; nothing written).
+      The hub's web installer stops at the same place ("the device stopped
+      after 4 requests"), so it's ZP12's updater with packages that carry
+      M-VAVE's loader, not the flasher. Going via a Felucca-loader firmware
+      (ZP12 → SLOOP → V15) should get round it (not tried yet); worth telling zvenson (ZP12's
+      author and the hub's).
 
 ## To look into
 
