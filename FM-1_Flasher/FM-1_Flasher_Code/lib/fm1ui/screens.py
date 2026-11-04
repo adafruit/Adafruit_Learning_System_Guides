@@ -13,6 +13,7 @@ taps and swipes from the App and redraw by changing their objects in place.
 # functions are long by nature.
 # pylint: disable=attribute-defined-outside-init,import-outside-toplevel,no-self-use
 # pylint: disable=too-many-branches,too-many-locals,too-many-statements
+# pylint: disable=cyclic-import  # the cycles go through imports inside functions
 import json
 import time
 

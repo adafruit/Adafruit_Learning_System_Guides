@@ -16,6 +16,7 @@ it. (The Feather reloaded first, to install on an unfragmented heap, DEVNOTES
 # free and start-up quick; methods kept on their class: the screen interface, or overridden; some
 # drawing and protocol functions are long by nature.
 # pylint: disable=import-outside-toplevel,no-self-use,too-many-locals,too-many-statements
+# pylint: disable=cyclic-import  # the cycles go through imports inside functions
 import json
 import time
 

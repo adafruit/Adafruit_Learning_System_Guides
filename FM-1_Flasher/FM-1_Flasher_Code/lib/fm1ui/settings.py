@@ -13,6 +13,7 @@ scan, join, connect and saved (fm1ui.networks.Saved).
 # methods kept on their class: the screen interface, or overridden; some drawing and protocol
 # functions are long by nature.
 # pylint: disable=attribute-defined-outside-init,import-outside-toplevel,no-self-use,too-many-locals
+# pylint: disable=cyclic-import  # the cycles go through imports inside functions
 import displayio
 
 from fm1ui import catalog as C

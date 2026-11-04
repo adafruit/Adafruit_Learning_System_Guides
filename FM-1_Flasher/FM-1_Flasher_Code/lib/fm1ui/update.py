@@ -17,6 +17,7 @@ OSError (network) or ValueError.
 # some drawing and protocol functions are long by nature.
 # pylint: disable=attribute-defined-outside-init,import-outside-toplevel,too-many-branches
 # pylint: disable=too-many-locals,too-many-statements
+# pylint: disable=cyclic-import  # the cycles go through imports inside functions
 import os
 import time
 

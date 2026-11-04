@@ -19,6 +19,7 @@ at a time between touches.
 # internal helpers; some drawing and protocol functions are long by nature.
 # pylint: disable=attribute-defined-outside-init,import-outside-toplevel,no-self-use
 # pylint: disable=protected-access,too-many-locals
+# pylint: disable=cyclic-import  # the cycles go through imports inside functions
 import time
 
 import bitmaptools

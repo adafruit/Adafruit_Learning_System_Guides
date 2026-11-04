@@ -18,6 +18,7 @@ fm1ui.device imports these:
 # kept on their class: the screen interface, or overridden; fm1ui's modules share a few internal
 # helpers.
 # pylint: disable=global-statement,import-outside-toplevel,no-self-use,protected-access
+# pylint: disable=cyclic-import  # the cycles go through imports inside functions
 import time
 
 import board
