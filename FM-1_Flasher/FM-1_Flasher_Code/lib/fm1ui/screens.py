@@ -655,10 +655,11 @@ class ConfirmScreen(Screen):
         self.entry = entry
 
     def message(self):
+        """(ready, text, warning or None)."""
         app, e = self.app, self.entry
         ident = app.identity
         if not ident:
-            return False, "The FM-1 is no longer connected. Go back and tap Connect FM-1."
+            return False, "The FM-1 is no longer connected. Go back and tap Connect FM-1.", None
         current = app.installed_slug()
         cur = app.entry(current) if current else None
         running = C.display_name(cur) if cur else ident
@@ -672,11 +673,15 @@ class ConfirmScreen(Screen):
                     "M-VAVE V15 from the list at any time." % e.name)
         else:
             text = "%s replaces %s on the FM-1." % (e.name, running)
-        return True, text + " Keep the FM-1 on and connected; it takes one to two minutes."
+        from fm1ui import heads
+        warning = None if current == e.slug else heads.advice(app, e)
+        if warning:  # the room goes to the warning
+            return True, text, warning
+        return True, text + " Keep the FM-1 on and connected; it takes one to two minutes.", None
 
     def build(self):
         e = self.entry
-        ready, msg = self.message()
+        ready, msg, warning = self.message()
         self.ready = ready
         title = "Install %s?" % e.name
         width_of = lambda s: ui.width(ui.BODY, s)  # noqa: E731
@@ -698,8 +703,11 @@ class ConfirmScreen(Screen):
             )
         )
         y = L.CONFIRM_TEXT_Y
-        for line in C.wrap(msg, width_of, L.CONFIRM_W)[:L.CONFIRM_LINES]:
-            g.append(ui.text(ui.BODY, line, ui.TEXT, tx, y, (0, 0)))
+        lines = [(line, ui.TEXT) for line in C.wrap(msg, width_of, L.CONFIRM_W)]
+        if warning:
+            lines += [(line, ui.WARN) for line in C.wrap(warning, width_of, L.CONFIRM_W)]
+        for line, color in lines[:L.CONFIRM_LINES]:
+            g.append(ui.text(ui.BODY, line, color, tx, y, (0, 0)))
             y += 19
         self.cancel = ui.Button("Cancel", *L.CANCEL_BTN)
         self.go = ui.Button("Install", *L.GO_BTN, fill=ui.CYAN if ready else ui.BG,

@@ -154,6 +154,90 @@ class Catalog(unittest.TestCase):
         self.assertEqual(C.ellipsize("short", width, 8), "short")
 
 
+class Heads(unittest.TestCase):
+    """fm1ui.heads: the flash-head warning on the confirm screen."""
+
+    V15, AMEN = 0x3FEE, 0x7CDE  # the two heads on the hub (V15/Bubba, Amenity/Clatter)
+    PKGS = {  # slug: (name, product, official loader, head)
+        "stock-v15": ("M-VAVE V15", "FM-1_015", True, V15),
+        "amenity": ("Amenity", "FM-1_8170001", True, AMEN),
+        "clatter": ("Clatter", "FM-1_8133700", True, AMEN),
+        "sloop": ("SLOOP", "FM-1_900", False, None),
+        "386dx": ("386DX", "FM-1_386020000", False, None),
+        "bubba": ("Bubba Machine", "FM-1_003", True, V15),
+    }
+
+    def app(self, ident, head=None):
+        from fm1ui import heads
+        pkgs = self.PKGS
+
+        class Entry:
+            def __init__(self, slug):
+                self.slug, self.name, self.version = slug, pkgs[slug][0], "1"
+                self.product = pkgs[slug][1]
+
+        class Index:
+            def with_product(self, product):
+                return [s for s, v in pkgs.items() if v[1] == product]
+
+        class App:
+            identity = ident
+            index = Index()
+            state = C.State(os.path.join(tempfile.mkdtemp(), "s.json"))
+
+            def entry(self, slug):
+                return Entry(slug) if slug in pkgs else None
+
+            def installed_slug(self):
+                found = self.index.with_product(ident)
+                return found[0] if len(found) == 1 else None
+
+        app = App()
+        app.state.head = head
+        heads._cache.clear()
+        for s, v in pkgs.items():
+            heads._cache[(s, "1")] = (v[2], v[3])
+        return app, heads
+
+    def advice(self, ident, target, head=None):
+        app, heads = self.app(ident, head)
+        return heads.advice(app, app.entry(target))
+
+    def test_felucca_firmware_refuses_another_head(self):
+        msg = self.advice("FM-1_900", "stock-v15", {"head": self.AMEN, "slug": "amenity"})
+        self.assertTrue(msg.startswith("Install Amenity first, then M-VAVE V15, otherwise SLOOP will refuse it"), msg)
+        self.assertIn("SLOOP will refuse", msg)
+
+    def test_no_record_means_the_factory_head(self):
+        self.assertIsNone(self.advice("FM-1_900", "stock-v15"))
+        msg = self.advice("FM-1_900", "amenity")
+        self.assertTrue(msg.startswith("Install M-VAVE V15 first, then Amenity, otherwise"), msg)
+        self.assertIn("probably", msg)
+
+    def test_no_warning_when_it_installs(self):
+        amen = {"head": self.AMEN, "slug": "amenity"}
+        self.assertIsNone(self.advice("FM-1_900", "clatter", amen))  # the same head
+        self.assertIsNone(self.advice("FM-1_8170001", "stock-v15", amen))  # built on V15: no check
+        self.assertIsNone(self.advice("FM-1_900", "386dx", amen))  # a Felucca-style loader
+
+    def test_bubba_takes_only_firmwares_built_on_v15(self):
+        msg = self.advice("FM-1_003", "sloop")
+        self.assertTrue(msg.startswith("Install M-VAVE V15 first, then SLOOP, otherwise Bubba Machine will refuse it"), msg)
+        self.assertIn("only firmwares packaged like V15", msg)
+        msg = self.advice("FM-1_003", "amenity")  # M-VAVE's loader, but another head
+        self.assertTrue(msg.startswith("Install M-VAVE V15 first, then Amenity, otherwise"), msg)
+        self.assertIsNone(self.advice("FM-1_003", "stock-v15"))
+
+    def test_state_keeps_the_head(self):
+        path = os.path.join(tempfile.mkdtemp(), "s.json")
+        s = C.State(path)
+        s.record_install("sloop", "FM-1_900")  # a Felucca-style loader: no head
+        self.assertIsNone(C.State(path).head)
+        s.record_install("amenity", "FM-1_8170001", self.AMEN)
+        s.record_install("sloop", "FM-1_900")  # the head stays Amenity's
+        self.assertEqual(C.State(path).head, {"head": self.AMEN, "slug": "amenity"})
+
+
 class Gestures(unittest.TestCase):
     def setUp(self):
         try:

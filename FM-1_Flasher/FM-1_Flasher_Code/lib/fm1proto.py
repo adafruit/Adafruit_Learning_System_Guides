@@ -569,6 +569,28 @@ def file_sha256(f, step=4096):
     return hexstr(h.digest())
 
 
+# M-VAVE's own update loader (V15's), recognised the way Felucca-based firmwares
+# recognise it (SLOOP's firmware/src/ota.c): its header's two CRC16s and its
+# length. It writes the whole flash image, head included; Felucca-style loaders
+# write only the firmware area.
+OFFICIAL_LOADER = (0xEBAA, 0x5881, 0x4DE1)
+HEAD_LEN = 0x4000  # the flash head: start-up code and settings, before the firmware
+
+
+def official_loader(pkg):
+    """True when an inspected package's update loader is M-VAVE's own."""
+    b = pkg.read(pkg.loader["offset"], 12)
+    return (le(b, 0, 2), le(b, 2, 2), le(b, 8, 4)) == OFFICIAL_LOADER
+
+
+def flash_head(pkg):
+    """CRC16 of an inspected package's flash head, the first 16 KiB of its flash
+    image, which an official loader writes over the FM-1's. Felucca-based
+    firmwares stage such a package only when its head equals the FM-1's
+    (SLOOP's screen: "update failed -5")."""
+    return crc16(pkg.read(pkg.flash["offset"], HEAD_LEN))
+
+
 def prepare(meta, f, verify=True, checked=False):
     """Port of prepare(): validate meta.json against the package in f.
 

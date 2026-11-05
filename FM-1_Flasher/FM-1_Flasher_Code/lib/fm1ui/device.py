@@ -198,6 +198,7 @@ class DeviceState(C.State):
                     self.view = d.get("view", "grid")
                     self.sort = d.get("sort", "az")
                     self.scroll = d.get("scroll", True)
+                    self.head = d.get("head")
                 except ValueError:
                     pass
 
@@ -211,6 +212,7 @@ class DeviceState(C.State):
                 "view": self.view,
                 "sort": self.sort,
                 "scroll": self.scroll,
+                "head": self.head,
             }
         )
         return _nvm_write(self.NVM_STATE, 512, data.encode())
@@ -331,7 +333,8 @@ def run(app, entry):
         up.trace = trace
         print("install: connect", up.connect(force=True))
         up.install(force=True)
-        app.state.record_install(entry.slug, meta["product"])
+        head = P.flash_head(pkg) if P.official_loader(pkg) else None
+        app.state.record_install(entry.slug, meta["product"], head)
         print("install: done in %.1f s" % (time.monotonic() - t0))
         screen.finish(True, "The FM-1 restarted with %s." % entry.name)
         return True

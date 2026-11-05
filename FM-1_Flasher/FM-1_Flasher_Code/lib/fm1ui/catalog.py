@@ -202,6 +202,8 @@ class State:
         self.view = "grid"
         self.sort = "az"
         self.removed = set()  # slugs removed on the device: updates leave them unticked
+        # {"head": CRC, "slug": ...}: the flash head the last M-VAVE-loader install wrote
+        self.head = None
         self.scroll = True
         try:
             with open(path) as f:
@@ -211,6 +213,7 @@ class State:
             self.view = data.get("view", "grid")
             self.sort = data.get("sort", "az")
             self.removed = set(data.get("removed", ()))
+            self.head = data.get("head")
             self.scroll = data.get("scroll", True)
         except (OSError, ValueError):
             pass
@@ -220,6 +223,8 @@ class State:
                 "view": self.view, "sort": self.sort, "scroll": self.scroll}
         if self.removed:
             data["removed"] = sorted(self.removed)
+        if self.head:
+            data["head"] = self.head
         try:
             with open(self.path, "w") as f:
                 json.dump(data, f)
@@ -235,8 +240,12 @@ class State:
         self.save()
         return slug in self.favorites
 
-    def record_install(self, slug, product):
+    def record_install(self, slug, product, head=None):
+        """head: the package's flash head CRC when its loader is M-VAVE's own
+        (it wrote the FM-1's head: fm1ui.heads), else None."""
         self.installed = {"slug": slug, "product": product}
+        if head is not None:
+            self.head = {"head": head, "slug": slug}
         self.save()
 
     def installed_slug(self, identity, index):
