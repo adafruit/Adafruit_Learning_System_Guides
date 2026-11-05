@@ -71,7 +71,7 @@ Open items:
 - [ ] CircuitPython 11 `hashlib` can give wrong digests on a fragmented heap (DEVNOTES §6.7, §6.9). Worked around: the UI installs after a soft reload, hashes 1 KB at a time and recomputes a mismatch. Still to file upstream with a repro.
 - [ ] Optionally start slowed for community firmware and loaders, to avoid the ~3 s loader retry when a reply is lost.
 - [ ] Fix the `RealCommunityPackages` test's folder layout (`FM1_TEST_PKGS`).
-- [ ] ~~Update the upstream issue draft~~: superseded by the Metro's upstream work (docs/PLAN-v2.md, "Upstream and the hub").
+- [x] Propose the enumeration retry and buffer size upstream: superseded by the Metro's upstream work (docs/PLAN-v2.md, "Upstream and the hub").
 
 ## Phase 4: UI (done)
 
@@ -135,7 +135,7 @@ fonts/               # bitmap fonts for the UI
 tools/               # make_sd.py, flash_cli.py, fake_fm1.py (simulated FM-1), usb_descriptors.py
 tests/               # CPython unit tests
 patches/             # CircuitPython / TinyUSB / Pico-PIO-USB patches (see patches/README.md)
-docs/                # upstream issue drafts
+docs/                # PLAN-v2.md, the Metro flasher's plan
 ref/                 # upstream clones, builds, flash dumps (gitignored)
 ```
 
