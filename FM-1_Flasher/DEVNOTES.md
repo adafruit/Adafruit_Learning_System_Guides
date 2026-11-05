@@ -364,8 +364,9 @@ cycles on the Feather, about 17,400 transactions.
 | 120 MHz system clock | board CFLAGS | **Required** on the PIO port | At the stock 125 MHz, ~30 % of OUT writes fail on CircuitPython 11; 0/100 at 120 MHz (§6.5) |
 | Long enumeration waits | TinyUSB `usbh.c` | **Harmful**, reverted | 2 s debounce misses the J window; 200 ms recovery stops the SETUP ACK |
 
-None of this has been posted upstream yet. The draft in `docs/` covers only
-the buffer size. The retry is the finding most worth proposing to TinyUSB.
+None of this was posted upstream from the Feather work. The retry is the
+finding most worth proposing to TinyUSB. The buffer size later went upstream
+for the Metro ESP32-P4 (adafruit/circuitpython#11751, docs/PLAN-v2.md).
 
 ---
 
