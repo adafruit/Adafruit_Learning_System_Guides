@@ -312,5 +312,8 @@ the hub were 10 firmwares it added or updated later that day. Pictures:
       Metro only on the version CircuitPython pins). Open, waiting for
       review. Once it's merged, CircuitPython still has to update its pinned
       TinyUSB; until then the flasher needs the custom build.
+      That build is a ready-made UF2 for the guide (4 November 2026):
+      `main` at 66688d5d05 plus the fix, tested on the Metro with installs
+      between V15 and community firmwares (`patches/README.md`).
 - [ ] Tell the hub's maintainer that flashers will download from the hub
       directly, and ask about the pictures (PNG CORS/BMP/JPEG).

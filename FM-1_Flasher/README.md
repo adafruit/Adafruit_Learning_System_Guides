@@ -4,7 +4,7 @@ A portable CircuitPython device that installs alt firmwares on the M-VAVE FM-1, 
 
 ## Hardware
 
-- [Adafruit Metro ESP32-P4](https://www.adafruit.com/product/6536), running CircuitPython 11 built with the two changes in [`patches/`](patches/README.md). Stock CircuitPython can't mount the FM-1 yet.
+- [Adafruit Metro ESP32-P4](https://www.adafruit.com/product/6536), running the flasher's CircuitPython 11 build (a ready-made UF2 from the guide, or built with the changes in [`patches/`](patches/README.md)). Stock CircuitPython can't run the flasher yet.
 - [Adafruit 2.8" TFT Touch Shield, capacitive](https://www.adafruit.com/product/1947) (ILI9341 320x240, FT6206 touch), stacked on the Metro. No jumpers or wiring.
 - A microSD card in the Metro's own slot, for the firmwares. Any FAT card works; an empty one fills itself from the hub.
 - The FM-1 plugs into the Metro's USB-A host port with an ordinary USB cable.
@@ -22,7 +22,7 @@ Installs from V15 and to community firmwares that use a different loader (such a
 
 ## Setting it up
 
-1. **CircuitPython.** Build it with the patches, following [patches/README.md](patches/README.md), and copy `firmware.uf2` to the Metro's METROP4BOOT drive (double-click reset). The same page covers a Metro that has no TinyUF2 bootloader yet.
+1. **CircuitPython.** Download the flasher's UF2 from the guide (or build it, following [patches/README.md](patches/README.md)). For the METROP4BOOT drive, tap Reset, wait for the LED to turn purple, and tap Boot while it's still purple. Copy the UF2 to the drive. [patches/README.md](patches/README.md) also covers a Metro that has no TinyUF2 bootloader yet.
 2. **The flasher.** `FM-1_Flasher_Code/` is laid out as CIRCUITPY: `code.py`, `lib/` (the flasher's own `fm1ui` and `fm1*` modules), `fonts/` and `splash.bmp`. Either copy it with the guide's Project Bundle, which also brings the libraries from the CircuitPython bundle (`adafruit_ili9341`, `adafruit_focaltouch`, `adafruit_bus_device`, `adafruit_usb_host_descriptors`, `adafruit_requests`, `adafruit_connection_manager`), or, with those libraries already on the board, deploy from this folder:
 
    ```sh
