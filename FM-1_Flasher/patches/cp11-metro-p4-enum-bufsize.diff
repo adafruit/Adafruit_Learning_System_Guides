@@ -1,0 +1,11 @@
+diff --git a/ports/espressif/boards/adafruit_metro_esp32p4/mpconfigboard.mk b/ports/espressif/boards/adafruit_metro_esp32p4/mpconfigboard.mk
+index 4dca7e3879..7867e710cb 100644
+--- a/ports/espressif/boards/adafruit_metro_esp32p4/mpconfigboard.mk
++++ b/ports/espressif/boards/adafruit_metro_esp32p4/mpconfigboard.mk
+@@ -15,3 +15,6 @@ CIRCUITPY_ESP_FLASH_FREQ = 80m
+ CIRCUITPY_ESP_PSRAM_SIZE = 16MB
+ CIRCUITPY_ESP_PSRAM_MODE = hpi
+ CIRCUITPY_ESP_PSRAM_FREQ = 200m
++
++# FM-1 Flasher v2: the FM-1 has a 293-byte configuration descriptor.
++CFLAGS += -DCFG_TUH_ENUMERATION_BUFSIZE=512

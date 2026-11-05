@@ -1,0 +1,8 @@
+ref/
+__pycache__/
+*.pyc
+.venv/
+.DS_Store
+sd_out/
+logs/
+.claude/settings.local.json
