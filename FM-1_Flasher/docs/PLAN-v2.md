@@ -309,8 +309,12 @@ the hub were 10 firmwares it added or updated later that day. Pictures:
 - [ ] The TinyUSB DWC2 abort fix (`patches/tinyusb-dwc2-abort.diff`):
       reported as hathach/tinyusb#4405, and proposed as hathach/tinyusb#4430
       (4 November 2026, the same change rebased onto master; tested on the
-      Metro only on the version CircuitPython pins). Open, waiting for
-      review. Once it's merged, CircuitPython still has to update its pinned
+      Metro only on the version CircuitPython pins). The bot reviews
+      (CodeRabbit, Greptile) asked for the abort comment to say what happens
+      when the wait for the halt times out; two comment-only commits did
+      that (head 853253566), and both bots approved (6 November 2026). CI
+      passes (56 checks, 1 skipped). Open, waiting for a maintainer's
+      review and merge. Once it's merged, CircuitPython still has to update its pinned
       TinyUSB; until then the flasher needs the custom build.
       That build is a ready-made UF2 for the guide (4 November 2026):
       `main` at 66688d5d05 plus the fix, tested on the Metro with installs
