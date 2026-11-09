@@ -322,7 +322,15 @@ the hub were 10 firmwares it added or updated later that day. Pictures:
       (8 November). HiFiPhile proposed folding it into his
       hathach/tinyusb#4265, which rewrites the same abort code, and closing
       #4430; we agreed and offered to rerun the installs against the
-      #4265 head. Once it's merged, CircuitPython still has to update its pinned
+      #4265 head. Hathach agreed too (9 November): the commits move to
+      #4265 with authorship kept, `Fixes #4405` with them, and #4430 closes
+      once #4265 carries the change. Not ported yet. His list for the port
+      includes a timing issue behind a hub (the abort wait is only ~1 ms
+      there, so an aborted split can still be aborting when the next SETUP
+      comes), worth watching in the rerun; the hub's TT buffer recovery is
+      left to hathach/tinyusb#4455. His hardware tests don't reach the
+      #4405 case itself, so the FM-1 installs are its only test so far.
+      Once it's merged, CircuitPython still has to update its pinned
       TinyUSB; until then the flasher needs the custom build.
       That build is a ready-made UF2 for the guide (4 November 2026):
       `main` at 66688d5d05 plus the fix, tested on the Metro with installs
