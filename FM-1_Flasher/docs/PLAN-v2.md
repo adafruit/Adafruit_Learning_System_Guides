@@ -313,8 +313,16 @@ the hub were 10 firmwares it added or updated later that day. Pictures:
       (CodeRabbit, Greptile) asked for the abort comment to say what happens
       when the wait for the halt times out; two comment-only commits did
       that (head 853253566), and both bots approved (6 November 2026). CI
-      passes (56 checks, 1 skipped). Open, waiting for a maintainer's
-      review and merge. Once it's merged, CircuitPython still has to update its pinned
+      passes (56 checks, 1 skipped). On 8 November hathach added six
+      commits after his own review: hub (split) transactions finish before
+      an aborted channel is retired, the wait also stops after 8 ms, and
+      SETUP/clear-stall are refused while an abort waits. That head
+      (e848a1b15), on the TinyUSB CircuitPython pins, passed V15, SLOOP and
+      community installs on the Metro, direct and through a USB hub
+      (8 November). HiFiPhile proposed folding it into his
+      hathach/tinyusb#4265, which rewrites the same abort code, and closing
+      #4430; we agreed and offered to rerun the installs against the
+      #4265 head. Once it's merged, CircuitPython still has to update its pinned
       TinyUSB; until then the flasher needs the custom build.
       That build is a ready-made UF2 for the guide (4 November 2026):
       `main` at 66688d5d05 plus the fix, tested on the Metro with installs
