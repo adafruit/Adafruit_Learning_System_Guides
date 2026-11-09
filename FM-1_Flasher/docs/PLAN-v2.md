@@ -324,7 +324,13 @@ the hub were 10 firmwares it added or updated later that day. Pictures:
       #4430; we agreed and offered to rerun the installs against the
       #4265 head. Hathach agreed too (9 November): the commits move to
       #4265 with authorship kept, `Fixes #4405` with them, and #4430 closes
-      once #4265 carries the change. Not ported yet. His list for the port
+      once #4265 carries the change. Ported the same day (our commit
+      e4c01c9e3 plus his adaptations; #4265 now says it fixes #4405).
+      CircuitPython builds cleanly against #4265's head (faedfe71d, 314
+      commits past its pinned TinyUSB), and on the Metro ChoralRoot, V15,
+      SLOOP and Skiff installs all passed, direct and through a USB hub
+      (reported on #4265, 9 November). Waiting for #4265 to merge, then
+      for CircuitPython to update TinyUSB. His list for the port
       includes a timing issue behind a hub (the abort wait is only ~1 ms
       there, so an aborted split can still be aborting when the next SETUP
       comes), worth watching in the rerun; the hub's TT buffer recovery is
