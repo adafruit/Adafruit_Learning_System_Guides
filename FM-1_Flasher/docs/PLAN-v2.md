@@ -306,7 +306,7 @@ the hub were 10 firmwares it added or updated later that day. Pictures:
 - [ ] Once a CircuitPython build with 66688d5d05 is out, try it on the
       Metro without the TinyUSB fix: installs are expected to fail (a
       timed-out read isn't cancelled), but a test settles it for the guide.
-- [ ] The TinyUSB DWC2 abort fix (`patches/tinyusb-dwc2-abort.diff`):
+- [x] The TinyUSB DWC2 abort fix (`patches/tinyusb-dwc2-abort.diff`):
       reported as hathach/tinyusb#4405, and proposed as hathach/tinyusb#4430
       (4 November 2026, the same change rebased onto master; tested on the
       Metro only on the version CircuitPython pins). The bot reviews
@@ -329,8 +329,11 @@ the hub were 10 firmwares it added or updated later that day. Pictures:
       CircuitPython builds cleanly against #4265's head (faedfe71d, 314
       commits past its pinned TinyUSB), and on the Metro ChoralRoot, V15,
       SLOOP and Skiff installs all passed, direct and through a USB hub
-      (reported on #4265, 9 November). Waiting for #4265 to merge, then
-      for CircuitPython to update TinyUSB. His list for the port
+      (reported on #4265, 9 November). #4265 merged on 10 November
+      (squashed as bab06c109 on TinyUSB master, "Fixes #4405"); #4405 and
+      #4430 are closed. Next: a CircuitPython re-pin of `lib/tinyusb` to a
+      commit with bab06c109, then the stock build replaces the custom UF2.
+      His list for the port
       includes a timing issue behind a hub (the abort wait is only ~1 ms
       there, so an aborted split can still be aborting when the next SETUP
       comes), worth watching in the rerun; the hub's TT buffer recovery is
