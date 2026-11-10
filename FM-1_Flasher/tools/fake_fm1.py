@@ -28,7 +28,7 @@ class FakeFM1:
                  loader_identity="ota-FM-1_015", new_identity=None, new_build=None,
                  reenum_ms=3000, duplicate_finish=1, noise=False, chunk=512,
                  lossy_over=None, lossy_modes=("app", "loader"), retry_ms=3000, retries=2,
-                 reenum_after_boot=None):
+                 reenum_after_boot=None, gone_after_finish=False):
         self.pkg = pkg
         self.clock = clock
         self.identity = identity
@@ -54,6 +54,11 @@ class FakeFM1:
         # drops off the bus on this many-th message after booting the new app.
         self.reenum_after_boot = reenum_after_boot
         self.boot_messages = None
+        # Gone after the final finish: the device restarts on the first finish
+        # reply, and the reply to its repeat fails ("Pipe error"), as the host
+        # sees the restart late through a hub.
+        self.gone_after_finish = gone_after_finish
+        self.restart_pending = False
         self.ignore_identity = 0  # identity queries to leave unanswered (Aisling once didn't answer one)
         self.last_req_at = 0
         self.mode = "app"
@@ -172,6 +177,13 @@ class FakeFM1:
             body = bytes(data[8:])
             if a in (P.FINISH_STAGE1, P.FINISH_STAGE2):
                 assert body == P.SUCCESS
+                if self.gone_after_finish and a == P.FINISH_STAGE2:
+                    # restarts now, but its repeat of the finish is already on its way
+                    self.gone_after_finish = False
+                    self.requests = []
+                    self.restart_pending = True
+                    out.append(bytes(P.frame(P.CMD_READ, self.current)))
+                    return
                 if self.duplicate_finish > 0:
                     self.duplicate_finish -= 1
                     out.append(bytes(P.frame(P.CMD_READ, self.current)))
@@ -206,6 +218,11 @@ class FakeTransport:
     def send(self, msg):
         assert not self.lost, "send on a lost transport"
         dev = self.dev
+        if dev.restart_pending:
+            dev.restart_pending = False
+            dev.log.append(("pipe-error",))
+            dev.reset("app")
+            raise OSError(32, "Pipe error")
         if (dev.lossy_over and len(msg) > dev.lossy_over and dev.mode in dev.lossy_modes
                 and not self.slow_level):
             dev.log.append(("lost", len(msg)))
