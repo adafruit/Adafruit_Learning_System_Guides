@@ -325,14 +325,24 @@ class Updater:
                     continue
                 check(address == finish and n == 8, "update stage mismatch")
                 link.send(P.read_reply(p, P.SUCCESS))
-                # Answer duplicate finish requests before letting go.
+                # Answer duplicate finish requests before letting go. The device
+                # restarts once it has the finish; through a hub the host sees
+                # that late, so a reply can go to a device that's gone and fail
+                # ("Pipe error", seen once on V15 through a hub, 10 November).
+                # The finish is already answered, and the restart is checked
+                # next, so stop answering instead of failing the install.
                 end = self.clock.now_ms() + self.timing["settle"]
                 while self.clock.now_ms() < end and not link.lost:
                     again = link.read(min(100, end - self.clock.now_ms()))
                     if again is not None and again[0] == P.CMD_READ:
                         r = P.read_request(again[1])
                         if r is not None and r[1] == finish and r[2] == 8:
-                            link.send(P.read_reply(again[1], P.SUCCESS))
+                            try:
+                                link.send(P.read_reply(again[1], P.SUCCESS))
+                            except (OSError, FM1Error) as e:  # OSError covers usb.core.USBError
+                                if self.trace:
+                                    self.trace("finish-reply-lost", repr(e))
+                                break
                 return
             check(address <= image_len and n <= image_len - address, "request outside package")
             last = self.clock.now_ms()
