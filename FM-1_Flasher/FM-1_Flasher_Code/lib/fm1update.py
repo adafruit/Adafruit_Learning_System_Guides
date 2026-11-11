@@ -279,6 +279,29 @@ class Updater:
         head = 64 + len(pkg.entries) * 80
         return (head + 255) // 256 + (e["size"] + 255) // 256 + 1
 
+    def _answer_repeated_finish(self, finish):
+        """Answer repeats of the finish request before letting go. The device
+        restarts once it has the finish; through a hub the host sees that late,
+        so a reply can go to a device that's gone and fail ("Pipe error", seen
+        once on V15 through a hub, 10 November). The finish is already
+        answered, and the restart is checked next, so stop answering instead
+        of failing the install."""
+        link = self.link
+        end = self.clock.now_ms() + self.timing["settle"]
+        while self.clock.now_ms() < end and not link.lost:
+            again = link.read(min(100, end - self.clock.now_ms()))
+            if again is None or again[0] != P.CMD_READ:
+                continue
+            r = P.read_request(again[1])
+            if r is None or r[1] != finish or r[2] != 8:
+                continue
+            try:
+                link.send(P.read_reply(again[1], P.SUCCESS))
+            except (OSError, FM1Error) as e:  # OSError covers usb.core.USBError
+                if self.trace:
+                    self.trace("finish-reply-lost", repr(e))
+                return
+
     def serve(self, finish, idle, phase):
         """Answer read requests until the finish marker. Progress counts
         256-byte blocks touched (a byte bitmap would need ~90 KB of RAM)."""
@@ -325,14 +348,7 @@ class Updater:
                     continue
                 check(address == finish and n == 8, "update stage mismatch")
                 link.send(P.read_reply(p, P.SUCCESS))
-                # Answer duplicate finish requests before letting go.
-                end = self.clock.now_ms() + self.timing["settle"]
-                while self.clock.now_ms() < end and not link.lost:
-                    again = link.read(min(100, end - self.clock.now_ms()))
-                    if again is not None and again[0] == P.CMD_READ:
-                        r = P.read_request(again[1])
-                        if r is not None and r[1] == finish and r[2] == 8:
-                            link.send(P.read_reply(again[1], P.SUCCESS))
+                self._answer_repeated_finish(finish)
                 return
             check(address <= image_len and n <= image_len - address, "request outside package")
             last = self.clock.now_ms()

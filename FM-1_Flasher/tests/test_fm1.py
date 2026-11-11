@@ -354,6 +354,33 @@ class Install(unittest.TestCase):
         self.assertEqual(dev.identity, "FM-1_015")
         self.assertEqual(len(dev.bank_writes), 36)
 
+    def test_failed_reply_to_a_repeated_finish_is_not_a_failure(self):
+        # ChoralRoot -> V15 through a hub (10 November): the FM-1 had V15, but
+        # the install ended with "Pipe error" at "Writing firmware 97%". The
+        # reply to a repeated finish went to a device that had restarted.
+        pkg, meta = P.prepare(stock_meta(), io.BytesIO(stock_bytes()))
+        clock = FakeClock()
+        dev = FakeFM1(pkg, clock, identity="FM-1_900", capability=False, gone_after_finish=True)
+        up = U.Updater(finder_for(dev), pkg, meta, clock=clock)
+        traces = []
+        up.trace = lambda *a: traces.append(a)
+        self.assertTrue(up.connect(force=True)["legacy"])
+        up.install(force=True)
+        self.assertIn(("pipe-error",), dev.log)
+        self.assertTrue(any(t[0] == "finish-reply-lost" for t in traces))
+        self.assertEqual(dev.identity, "FM-1_015")
+        self.assertEqual(len(dev.bank_writes), 36)
+
+    def test_failed_reply_to_a_repeated_finish_open_firmware(self):
+        pkg, meta = open_fixture()
+        clock = FakeClock()
+        dev = FakeFM1(pkg, clock, build="ab" * 32, gone_after_finish=True, new_build="cd" * 32)
+        up = U.Updater(finder_for(dev), pkg, meta, clock=clock)
+        up.connect()
+        up.install()
+        self.assertIn(("pipe-error",), dev.log)
+        self.assertEqual(dev.identity, "FM1_OFFICIAL_OPEN")
+
     def test_identity_check_retries_an_unanswered_query(self):
         # Once, Aisling didn't answer the identity check that install() makes
         # after connect(); the install then failed at once.
