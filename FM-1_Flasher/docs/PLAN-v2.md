@@ -334,8 +334,10 @@ the hub were 10 firmwares it added or updated later that day. Pictures:
       #4430 are closed. CircuitPython re-pin of `lib/tinyusb` to
       12611f81a (TinyUSB master with bab06c109): adafruit/circuitpython#11836,
       opened 10 November after mikeysklar's 8-board farm run (USB serial
-      and CIRCUITPY, no errors) and FM-1 installs on the Metro. Once it's
-      merged and released, the stock build replaces the custom UF2.
+      and CIRCUITPY, no errors) and FM-1 installs on the Metro; it also
+      turns off audiopwmio on two ESP32-S2 boards that ran out of internal
+      RAM. Merged 11 November (92da735b06). Next: the stock build replaces
+      the custom UF2.
       His list for the port
       includes a timing issue behind a hub (the abort wait is only ~1 ms
       there, so an aborted split can still be aborting when the next SETUP
