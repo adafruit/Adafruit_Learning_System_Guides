@@ -10,8 +10,9 @@ fm1ui.device imports these:
 - touch: its FT6206 on I2C at 0x38, reporting portrait;
 - SD card: the Metro's own slot, 4-bit SDIO, on pins of its own (so the
   card never shares a bus with the display, unlike the Feather, DEVNOTES 6.18);
-- USB host: the P4's USB-A port (needs the 512-byte enumeration buffer
-  build with the TinyUSB DWC2 abort fix, patches/README.md).
+- USB host: the P4's USB-A port (needs CircuitPython main at 92da735b06
+  or later, for the 512-byte enumeration buffer and the TinyUSB DWC2 abort
+  fix, patches/README.md).
 """
 # Disabled for the Learn Guides lint check: the board's hardware objects are module-level, made
 # once; modules are imported where they're needed, to keep RAM free and start-up quick; methods
