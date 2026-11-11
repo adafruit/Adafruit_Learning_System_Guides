@@ -331,8 +331,11 @@ the hub were 10 firmwares it added or updated later that day. Pictures:
       SLOOP and Skiff installs all passed, direct and through a USB hub
       (reported on #4265, 9 November). #4265 merged on 10 November
       (squashed as bab06c109 on TinyUSB master, "Fixes #4405"); #4405 and
-      #4430 are closed. Next: a CircuitPython re-pin of `lib/tinyusb` to a
-      commit with bab06c109, then the stock build replaces the custom UF2.
+      #4430 are closed. CircuitPython re-pin of `lib/tinyusb` to
+      12611f81a (TinyUSB master with bab06c109): adafruit/circuitpython#11836,
+      opened 10 November after mikeysklar's 8-board farm run (USB serial
+      and CIRCUITPY, no errors) and FM-1 installs on the Metro. Once it's
+      merged and released, the stock build replaces the custom UF2.
       His list for the port
       includes a timing issue behind a hub (the abort wait is only ~1 ms
       there, so an aborted split can still be aborting when the next SETUP
