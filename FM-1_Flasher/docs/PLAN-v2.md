@@ -306,11 +306,50 @@ the hub were 10 firmwares it added or updated later that day. Pictures:
 - [ ] Once a CircuitPython build with 66688d5d05 is out, try it on the
       Metro without the TinyUSB fix: installs are expected to fail (a
       timed-out read isn't cancelled), but a test settles it for the guide.
-- [ ] The TinyUSB DWC2 abort fix (`patches/tinyusb-dwc2-abort.diff`):
+- [x] The TinyUSB DWC2 abort fix (`patches/tinyusb-dwc2-abort.diff`):
       reported as hathach/tinyusb#4405, and proposed as hathach/tinyusb#4430
       (4 November 2026, the same change rebased onto master; tested on the
-      Metro only on the version CircuitPython pins). Open, waiting for
-      review. Once it's merged, CircuitPython still has to update its pinned
-      TinyUSB; until then the flasher needs the custom build.
+      Metro only on the version CircuitPython pins). The bot reviews
+      (CodeRabbit, Greptile) asked for the abort comment to say what happens
+      when the wait for the halt times out; two comment-only commits did
+      that (head 853253566), and both bots approved (6 November 2026). CI
+      passes (56 checks, 1 skipped). On 8 November hathach added six
+      commits after his own review: hub (split) transactions finish before
+      an aborted channel is retired, the wait also stops after 8 ms, and
+      SETUP/clear-stall are refused while an abort waits. That head
+      (e848a1b15), on the TinyUSB CircuitPython pins, passed V15, SLOOP and
+      community installs on the Metro, direct and through a USB hub
+      (8 November). HiFiPhile proposed folding it into his
+      hathach/tinyusb#4265, which rewrites the same abort code, and closing
+      #4430; we agreed and offered to rerun the installs against the
+      #4265 head. Hathach agreed too (9 November): the commits move to
+      #4265 with authorship kept, `Fixes #4405` with them, and #4430 closes
+      once #4265 carries the change. Ported the same day (our commit
+      e4c01c9e3 plus his adaptations; #4265 now says it fixes #4405).
+      CircuitPython builds cleanly against #4265's head (faedfe71d, 314
+      commits past its pinned TinyUSB), and on the Metro ChoralRoot, V15,
+      SLOOP and Skiff installs all passed, direct and through a USB hub
+      (reported on #4265, 9 November). #4265 merged on 10 November
+      (squashed as bab06c109 on TinyUSB master, "Fixes #4405"); #4405 and
+      #4430 are closed. CircuitPython re-pin of `lib/tinyusb` to
+      12611f81a (TinyUSB master with bab06c109): adafruit/circuitpython#11836,
+      opened 10 November after mikeysklar's 8-board farm run (USB serial
+      and CIRCUITPY, no errors) and FM-1 installs on the Metro; it also
+      turns off audiopwmio on two ESP32-S2 boards that ran out of internal
+      RAM. Merged 11 November (92da735b06). The stock main build at
+      92da735b06 passed FM-1 installs directly and through a hub the same
+      day, so the guide now points to circuitpython.org instead of the
+      custom UF2.
+      His list for the port
+      includes a timing issue behind a hub (the abort wait is only ~1 ms
+      there, so an aborted split can still be aborting when the next SETUP
+      comes), worth watching in the rerun; the hub's TT buffer recovery is
+      left to hathach/tinyusb#4455. His hardware tests don't reach the
+      #4405 case itself, so the FM-1 installs are its only test so far.
+      Until CircuitPython updated its pinned TinyUSB (#11836 above), the
+      flasher needed a custom build, a ready-made UF2 hosted on the guide
+      from 4 to 11 November 2026: `main` at 66688d5d05 plus the fix, tested
+      on the Metro with installs between V15 and community firmwares
+      (`patches/README.md`).
 - [ ] Tell the hub's maintainer that flashers will download from the hub
       directly, and ask about the pictures (PNG CORS/BMP/JPEG).

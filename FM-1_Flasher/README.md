@@ -4,7 +4,7 @@ A portable CircuitPython device that installs alt firmwares on the M-VAVE FM-1, 
 
 ## Hardware
 
-- [Adafruit Metro ESP32-P4](https://www.adafruit.com/product/6536), running CircuitPython 11 built with the two changes in [`patches/`](patches/README.md). Stock CircuitPython can't mount the FM-1 yet.
+- [Adafruit Metro ESP32-P4](https://www.adafruit.com/product/6536), running stock CircuitPython 11 from `main` at 92da735b06 or later (the Absolute Newest build on [circuitpython.org](https://circuitpython.org/board/adafruit_metro_esp32p4/) until 11.0.0-alpha.3 or a later release is out).
 - [Adafruit 2.8" TFT Touch Shield, capacitive](https://www.adafruit.com/product/1947) (ILI9341 320x240, FT6206 touch), stacked on the Metro. No jumpers or wiring.
 - A microSD card in the Metro's own slot, for the firmwares. Any FAT card works; an empty one fills itself from the hub.
 - The FM-1 plugs into the Metro's USB-A host port with an ordinary USB cable.
@@ -22,7 +22,7 @@ Installs from V15 and to community firmwares that use a different loader (such a
 
 ## Setting it up
 
-1. **CircuitPython.** Build it with the patches, following [patches/README.md](patches/README.md), and copy `firmware.uf2` to the Metro's METROP4BOOT drive (double-click reset). The same page covers a Metro that has no TinyUF2 bootloader yet.
+1. **CircuitPython.** Download the Metro ESP32-P4's UF2 from [circuitpython.org](https://circuitpython.org/board/adafruit_metro_esp32p4/): the Absolute Newest build until 11.0.0-alpha.3 or a later release is out. For the METROP4BOOT drive, tap Reset, wait for the LED to turn purple, and tap Boot while it's still purple. Copy the UF2 to the drive. [patches/README.md](patches/README.md) also covers a Metro that has no TinyUF2 bootloader yet.
 2. **The flasher.** `FM-1_Flasher_Code/` is laid out as CIRCUITPY: `code.py`, `lib/` (the flasher's own `fm1ui` and `fm1*` modules), `fonts/` and `splash.bmp`. Either copy it with the guide's Project Bundle, which also brings the libraries from the CircuitPython bundle (`adafruit_ili9341`, `adafruit_focaltouch`, `adafruit_bus_device`, `adafruit_usb_host_descriptors`, `adafruit_requests`, `adafruit_connection_manager`), or, with those libraries already on the board, deploy from this folder:
 
    ```sh
@@ -41,7 +41,7 @@ Flashing firmware carries a risk of leaving the FM-1 unbootable. Keep both devic
 - [docs/PLAN-v2.md](docs/PLAN-v2.md): the plan and status for the Metro flasher.
 - [DEVNOTES.md](DEVNOTES.md): what we tried and learned, with evidence (mostly from the Feather version).
 - [fm1-firmware-flasher-brief.md](fm1-firmware-flasher-brief.md): the FM-1's update protocol and package format.
-- [patches/README.md](patches/README.md): the CircuitPython build.
+- [patches/README.md](patches/README.md): installing CircuitPython, and the two upstream fixes the flasher needed.
 - The project's history up to its move here, with its pull requests and tags: [jedgarpark/FM-1_Flasher](https://github.com/jedgarpark/FM-1_Flasher).
 
 The folders: `FM-1_Flasher_Code/` goes on the board; `tools/` (deploy, the simulator, making SD cards, fonts and the splash) and `tests/` run on a computer, and `tools/device/` holds REPL scripts from the bring-up. `tools/` and `tests/` are left out of the Learn Guides lint check (`.circuitpython.skip`).
