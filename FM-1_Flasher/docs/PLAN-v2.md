@@ -40,6 +40,25 @@ place: relaxing them is the next piece of work.
 - Backlight always on unless the "Pin 5" jumper is soldered (then D5).
 - Its own SD slot (CS D4) isn't used: the Metro's SDIO slot is better.
 
+**2.8" TFT Touch Shield, resistive (Adafruit 1651), added 12 November 2026.**
+- The same ILI9341 and pins as the capacitive shield (to confirm on the
+  Metro: SPI from the ICSP header, CS D10, DC D9).
+- Touch: TSC2007 on I2C at 0x48 (`adafruit_tsc2007`), 12-bit raw readings.
+- `fm1ui.metro_p4.Touch` scans I2C at start-up: an FT6206 at 0x38 means the
+  capacitive shield, a TSC2007 at 0x48 the resistive one. `Resistive` takes
+  the median of three reads per sample, treats raw Z1 under 100 as no touch,
+  and needs two samples in a row to start or end a touch, so pressure
+  flicker doesn't split a drag. `RES_CAL` maps raw to screen.
+- [x] Measure `RES_CAL` with `tools/device/metro_spike_resistive.py` (four
+      taps, then a dot that follows the touch): `(True, 0.0912, -12.1,
+      -0.0696, 265.4)` on the first 1651 (12 November 2026). Raw x runs
+      about 3380 (top) to 795 (bottom), raw y about 460 (left) to 3310
+      (right).
+- [ ] Try the whole UI on it: taps on small targets (the keyboard, the
+      tabs), swipes between pages, Scroll pages and dragging Details. Retune
+      `Gestures` thresholds or `Resistive` if needed.
+- [ ] If units differ much, a calibrate screen in Settings, kept in NVM.
+
 ## What v2 fixes
 
 | v1 (Feather RP2350) | v2 (Metro ESP32-P4) |
