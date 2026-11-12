@@ -7,7 +7,9 @@ fm1ui.device imports these:
 
 - display: the 2.8" TFT Touch Shield's ILI9341, 320x240, on board.SPI()
   through the ICSP header (CS D10, DC D9), no jumpers;
-- touch: its FT6206 on I2C at 0x38, reporting portrait;
+- touch: found on I2C at start-up. The capacitive shield (1947) has an
+  FT6206 at 0x38, reporting portrait; the resistive one (1651) a TSC2007 at
+  0x48, read as 12-bit raw values and mapped with RES_CAL;
 - SD card: the Metro's own slot, 4-bit SDIO, on pins of its own (so the
   card never shares a bus with the display, unlike the Feather, DEVNOTES 6.18);
 - USB host: the P4's USB-A port (needs CircuitPython main at 92da735b06
@@ -34,6 +36,12 @@ W, H = 320, 240
 # as (ax, bx, ay, by) for x = ax * raw_y + bx, y = ay * raw_x + by. Measured
 # with tools/device/metro_spike_display.py (the dot followed the finger).
 TOUCH_CAL = (-1, 319, 1, 0)
+# The TSC2007 on the resistive shield: (swap, ax, bx, ay, by) for
+# x = ax * u + bx, y = ay * v + by, where (u, v) is the raw (x, y), or the raw
+# (y, x) when swap is True. Measure it with tools/device/metro_spike_resistive.py.
+RES_CAL = (True, -0.0877, 333.2, 0.0656, -12.8)  # a first guess, not measured yet
+RES_PRESSURE = 100  # raw Z1 below this is no touch (adafruit_tsc2007's own threshold)
+FT6206_ADDR, TSC2007_ADDR = 0x38, 0x48
 
 _host = None  # (power pin, usb_host.Port): kept alive for usb.core
 
@@ -245,27 +253,110 @@ class Network:
             r.close()
 
 
+def find_touch(i2c):
+    """Which touch chip the shield has: "ft6206", "tsc2007" or None."""
+    while not i2c.try_lock():
+        pass
+    try:
+        found = i2c.scan()
+    finally:
+        i2c.unlock()
+    if FT6206_ADDR in found:
+        return "ft6206"
+    if TSC2007_ADDR in found:
+        return "tsc2007"
+    return None
+
+
+class Resistive:
+    """The TSC2007's raw readings made steady enough for Gestures.
+
+    A resistive panel's readings jitter and its pressure flickers, most at
+    the start and end of a touch. Each sample is the median of three reads;
+    a touch starts after two pressed samples in a row and ends after two
+    released ones, so a flicker in the middle of a drag doesn't split it into
+    two taps."""
+
+    READS = 3
+    HOLD = 2  # samples in a row that start or end a touch
+
+    def __init__(self, i2c, cal=RES_CAL, pressure=RES_PRESSURE):
+        import adafruit_tsc2007
+        self.tsc = adafruit_tsc2007.TSC2007(i2c, address=TSC2007_ADDR)
+        self.cal = cal
+        self.pressure = pressure
+        self.point = None  # the touch being reported, in raw units
+        self.run = 0  # samples in a row that disagree with self.point
+
+    def read(self):
+        """The median raw (x, y) of a few reads, or None when not pressed."""
+        xs, ys = [], []
+        for _ in range(self.READS):
+            p = self.tsc.touch
+            if p["pressure"] < self.pressure:
+                return None
+            xs.append(p["x"])
+            ys.append(p["y"])
+        xs.sort()
+        ys.sort()
+        return xs[len(xs) // 2], ys[len(ys) // 2]
+
+    def sample(self):
+        """The current touch in raw units, or None."""
+        p = self.read()
+        if (p is None) == (self.point is None):
+            self.run = 0
+            if p is not None:
+                self.point = p
+            return self.point
+        self.run += 1
+        if self.run >= self.HOLD:
+            self.run = 0
+            self.point = p
+        return self.point
+
+    def map(self, x, y):
+        swap, ax, bx, ay, by = self.cal
+        u, v = (y, x) if swap else (x, y)
+        return (min(W - 1, max(0, int(ax * u + bx))),
+                min(H - 1, max(0, int(ay * v + by))))
+
+
 class Touch:
-    """FT6206 polled into taps and swipes, in display coordinates."""
+    """The shield's touch polled into taps and swipes, in display
+    coordinates: the FT6206 (capacitive shield) or the TSC2007 (resistive
+    shield), whichever answers on I2C. With neither, there are no touches."""
 
     def __init__(self, cal=TOUCH_CAL, debug=False):
-        import adafruit_focaltouch
-        self.ft = adafruit_focaltouch.Adafruit_FocalTouch(board.I2C())
+        i2c = board.I2C()
+        self.kind = find_touch(i2c)
+        self.ft = self.res = None
+        if self.kind == "ft6206":
+            import adafruit_focaltouch
+            self.ft = adafruit_focaltouch.Adafruit_FocalTouch(i2c)
+        elif self.kind == "tsc2007":
+            self.res = Resistive(i2c)
+        print("touch:", self.kind or "none found (no FT6206 at 0x38, no TSC2007 at 0x48)")
         self.cal = cal
         self.debug = debug
         self.first = None
         self.gestures = A.Gestures()
 
     def map(self, x, y):
+        if self.res:
+            return self.res.map(x, y)
         ax, bx, ay, by = self.cal
         return (min(W - 1, max(0, int(ax * y + bx))),
                 min(H - 1, max(0, int(ay * x + by))))
 
     def raw(self):
         try:
-            pts = self.ft.touches
-            if pts:
-                return pts[0]["x"], pts[0]["y"]
+            if self.res:
+                return self.res.sample()
+            if self.ft:
+                pts = self.ft.touches
+                if pts:
+                    return pts[0]["x"], pts[0]["y"]
         except OSError:  # an I2C hiccup reads as no touch
             pass
         return None

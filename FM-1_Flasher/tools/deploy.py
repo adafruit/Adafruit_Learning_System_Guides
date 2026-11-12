@@ -15,7 +15,7 @@ mpy-cross must match the board's CircuitPython version. A .py of the same
 name on the board is removed, so the .mpy is the one imported.
 
 The board is the Metro ESP32-P4 (checked in the drive's boot_out.txt). It also
-needs adafruit_ili9341, adafruit_focaltouch, adafruit_bus_device,
+needs adafruit_ili9341, adafruit_focaltouch, adafruit_tsc2007, adafruit_bus_device,
 adafruit_usb_host_descriptors, adafruit_requests and
 adafruit_connection_manager from the bundle in lib/.
 """

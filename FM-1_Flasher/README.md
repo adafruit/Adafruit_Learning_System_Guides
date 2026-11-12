@@ -5,7 +5,7 @@ A portable CircuitPython device that installs alt firmwares on the M-VAVE FM-1, 
 ## Hardware
 
 - [Adafruit Metro ESP32-P4](https://www.adafruit.com/product/6536), running stock CircuitPython 11 from `main` at 92da735b06 or later (the Absolute Newest build on [circuitpython.org](https://circuitpython.org/board/adafruit_metro_esp32p4/) until 11.0.0-alpha.3 or a later release is out).
-- [Adafruit 2.8" TFT Touch Shield, capacitive](https://www.adafruit.com/product/1947) (ILI9341 320x240, FT6206 touch), stacked on the Metro. No jumpers or wiring.
+- An Adafruit 2.8" TFT Touch Shield (ILI9341 320x240), stacked on the Metro, with no jumpers or wiring: the [capacitive one](https://www.adafruit.com/product/1947) (FT6206 touch) or the [resistive one](https://www.adafruit.com/product/1651) (TSC2007 touch). The flasher finds which at start-up.
 - A microSD card in the Metro's own slot, for the firmwares. Any FAT card works; an empty one fills itself from the hub.
 - The FM-1 plugs into the Metro's USB-A host port with an ordinary USB cable.
 - Power from USB-C, the barrel jack, or a LiPo on the Metro's battery connector.
@@ -23,7 +23,7 @@ Installs from V15 and to community firmwares that use a different loader (such a
 ## Setting it up
 
 1. **CircuitPython.** Download the Metro ESP32-P4's UF2 from [circuitpython.org](https://circuitpython.org/board/adafruit_metro_esp32p4/): the Absolute Newest build until 11.0.0-alpha.3 or a later release is out. For the METROP4BOOT drive, tap Reset, wait for the LED to turn purple, and tap Boot while it's still purple. Copy the UF2 to the drive. [patches/README.md](patches/README.md) also covers a Metro that has no TinyUF2 bootloader yet.
-2. **The flasher.** `FM-1_Flasher_Code/` is laid out as CIRCUITPY: `code.py`, `lib/` (the flasher's own `fm1ui` and `fm1*` modules), `fonts/` and `splash.bmp`. Either copy it with the guide's Project Bundle, which also brings the libraries from the CircuitPython bundle (`adafruit_ili9341`, `adafruit_focaltouch`, `adafruit_bus_device`, `adafruit_usb_host_descriptors`, `adafruit_requests`, `adafruit_connection_manager`), or, with those libraries already on the board, deploy from this folder:
+2. **The flasher.** `FM-1_Flasher_Code/` is laid out as CIRCUITPY: `code.py`, `lib/` (the flasher's own `fm1ui` and `fm1*` modules), `fonts/` and `splash.bmp`. Either copy it with the guide's Project Bundle, which also brings the libraries from the CircuitPython bundle (`adafruit_ili9341`, `adafruit_focaltouch`, `adafruit_tsc2007`, `adafruit_bus_device`, `adafruit_usb_host_descriptors`, `adafruit_requests`, `adafruit_connection_manager`), or, with those libraries already on the board, deploy from this folder:
 
    ```sh
    python3 tools/deploy.py --mpy-cross path/to/circuitpython/mpy-cross/build/mpy-cross

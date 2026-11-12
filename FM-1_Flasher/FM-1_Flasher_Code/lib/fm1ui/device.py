@@ -5,8 +5,8 @@
 running an install.
 
 The display, touch, SD card, USB host and WiFi come from fm1ui.metro_p4
-(Metro ESP32-P4 with the 2.8" TFT Touch Shield). v1's Feather code is at
-the tag v1-feather-final.
+(Metro ESP32-P4 with a 2.8" TFT Touch Shield, capacitive or resistive). v1's
+Feather code is at the tag v1-feather-final.
 
 An install runs in place, from the confirm screen, on a transport opened for
 it. (The Feather reloaded first, to install on an unfragmented heap, DEVNOTES
