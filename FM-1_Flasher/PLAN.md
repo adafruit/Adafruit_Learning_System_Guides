@@ -76,7 +76,7 @@ Open items:
 ## Phase 4: UI (done)
 
 `device/code.py` starts the touch UI in `lib/fm1ui/` (DEVNOTES §6.9–6.11):
-- Firmware list as six picture cards or a two-column text list of 16 names a page, with a tag filter, favourites, and the catalogue's date.
+- Firmware list as six picture cards or a two-column text list of 16 names a page, with a tag filter, favorites, and the catalog's date.
 - Details screen, Connect FM-1, a confirm screen naming what gets replaced, and "Back to official V15" by installing M-VAVE V15 from the list.
 - The install runs after a soft reload, on a fresh heap. The progress screen shows the phase, a bar, elapsed time, "Waiting for the FM-1 to restart…", and the power-cycle hint after a failure.
 - Console printing stays off the screen during installs; it slowed the voice restore from 1.8 s to 6.6 s (DEVNOTES §6.8).
@@ -108,7 +108,7 @@ Open items:
   - [x] An install on a LiPo alone: DRIFT → FOMAJAM in 54 s, no reset during it.
   - [x] ~~Find why the Feather resets in the first minutes on battery~~: not seen again after the white-screen fix and the return to the regular firmware; closed without a cause.
   - [x] Fix the white screen after switching on with EN (DEVNOTES §6.20): after any start (not a reload), send the panel its setup again before the first screen. 9 of 9 power-ons on battery came up, with no added start time; plugging into USB, which reports a reset-pin start, needed it too (3 of 3 after the fix).
-- Low-battery warning, and longer soak tests across more catalogue firmwares.
+- Low-battery warning, and longer soak tests across more catalog firmwares.
 - Then a Fruit Jam port.
 
 ## Recovery
@@ -129,7 +129,7 @@ Open items:
 lib/fm1proto.py      # protocol + package parsing (CPython and CircuitPython)
 lib/fm1update.py     # install state machine over a transport (CPython and CircuitPython)
 lib/fm1usb.py        # USB-MIDI host transport (CircuitPython)
-lib/fm1ui/           # touch UI: screens, drawing, catalogue and state, device glue (CircuitPython)
+lib/fm1ui/           # touch UI: screens, drawing, catalog and state, device glue (CircuitPython)
 device/              # code.py (UI entry point) and on-device scripts: installer, MAX3421E setup, diagnostics
 fonts/               # bitmap fonts for the UI
 tools/               # make_sd.py, flash_cli.py, fake_fm1.py (simulated FM-1), usb_descriptors.py

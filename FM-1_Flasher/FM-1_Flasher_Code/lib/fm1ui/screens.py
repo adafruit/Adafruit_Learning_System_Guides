@@ -90,7 +90,7 @@ class Screen:
 
 
 def tag_label(tag):
-    """The filter button's text: "All", or the tag as the catalogue names it."""
+    """The filter button's text: "All", or the tag as the catalog names it."""
     return tag[0].upper() + tag[1:] if tag else "All"
 
 
@@ -102,7 +102,7 @@ def fm1_status(app):
 
 
 class ListScreen(Screen):
-    """Six cards or 16 names a page, a tag filter, a favourites filter, a sort, and
+    """Six cards or 16 names a page, a tag filter, a favorites filter, a sort, and
     the FM-1 in the header."""
 
     KEEP = Screen.KEEP + ("page", "favorites_only", "tag")
@@ -164,9 +164,9 @@ class ListScreen(Screen):
         self.cards = []
         if not shown:
             if self.favorites_only and self.tag:
-                empty = "No %s favourites." % tag_label(self.tag)
+                empty = "No %s favorites." % tag_label(self.tag)
             elif self.favorites_only:
-                empty = "No favourites yet. Tap the heart on a card to add one."
+                empty = "No favorites yet. Tap the heart on a card to add one."
             elif self.tag:
                 empty = "No %s firmware on the card." % tag_label(self.tag)
             else:
@@ -278,7 +278,7 @@ class ListScreen(Screen):
         return g
 
     def row(self, e, x, y, installed):
-        """One firmware as its name and heart, with the tag's colour stripe."""
+        """One firmware as its name and heart, with the tag's color stripe."""
         rw, rh = L.ROW_W, L.ROW_H
         g = ui.outlined(x, y, rw, rh, ui.PANEL, ui.CYAN if installed else ui.LINE)
         g.append(ui.rect(x + 5, y + 6, 3, rh - 12, ui.kind_color(e.kind)))
@@ -449,7 +449,7 @@ class ListScreen(Screen):
 
 class DetailScreen(Screen):
     """The picture, name, author, version, tags and description, with Back,
-    a favourite toggle and Install (Connect FM-1 until one is connected)."""
+    a favorite toggle and Install (Connect FM-1 until one is connected)."""
 
     KEEP = Screen.KEEP + ("entry", "meta")
 

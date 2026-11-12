@@ -150,7 +150,7 @@ def flat_page(n):
         bitmaptools.fill_region(bmp, x + 1, y + 1, x + CARD_W - 1, y + CARD_H - 1, 1)
         bitmaptools.fill_region(bmp, x + 4, y + 2, x + CARD_W - 4, y + 5, 3 if (n + i) % 2 else 4)
         pic = picture(n * 6 + i).bitmap
-        for py in range(40):  # 16 picture colours at 16..31
+        for py in range(40):  # 16 picture colors at 16..31
             for px in range(40):
                 bmp[x + 30 + px, y + 8 + py] = 16 + pic[px, py]
         for py in range(14):  # stand-ins for the name and version

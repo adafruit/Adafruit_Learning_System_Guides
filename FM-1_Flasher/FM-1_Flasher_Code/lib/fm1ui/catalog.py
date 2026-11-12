@@ -7,7 +7,7 @@ The firmware list comes from firmware/index.txt, written by tools/make_sd.py:
 a first line "updated<TAB>date", then one line per firmware with slug, name,
 version, genre, beta (0/1), product, and the dates the hub added it and
 released it (YYYY-MM-DD, or empty; cards written before the lists could sort
-have no date columns). Favourites, the last install and the list's settings
+have no date columns). Favorites, the last install and the list's settings
 live in a small JSON state file on the card.
 """
 import json
@@ -37,7 +37,7 @@ class Entry:
 
     @property
     def kind(self):
-        """The first genre: what colours the card."""
+        """The first genre: what colors the card."""
         return self.genre.split(",")[0]
 
 
@@ -138,7 +138,7 @@ class Index:
 
 
 def load_index(path):
-    """(catalogue date or None, [Entry]): the whole list, parsed."""
+    """(catalog date or None, [Entry]): the whole list, parsed."""
     index = Index(path)
     return index.updated, [index.entry(i) for i in range(len(index))]
 
@@ -190,7 +190,7 @@ def page_slice(items, page, per_page):
 
 
 class State:
-    """Favourites, the last install, the list view
+    """Favorites, the last install, the list view
     ("grid" or "list"), its sort (one of SORTS) and whether its pages scroll (boards that can,
     fm1ui.flat), kept in a JSON file.
     Writes are best effort: a read-only card just means nothing is remembered."""

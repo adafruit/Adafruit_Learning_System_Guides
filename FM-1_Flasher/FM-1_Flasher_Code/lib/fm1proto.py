@@ -569,8 +569,8 @@ def file_sha256(f, step=4096):
     return hexstr(h.digest())
 
 
-# M-VAVE's own update loader (V15's), recognised the way Felucca-based firmwares
-# recognise it (SLOOP's firmware/src/ota.c): its header's two CRC16s and its
+# M-VAVE's own update loader (V15's), recognized the way Felucca-based firmwares
+# recognize it (SLOOP's firmware/src/ota.c): its header's two CRC16s and its
 # length. It writes the whole flash image, head included; Felucca-style loaders
 # write only the firmware area.
 OFFICIAL_LOADER = (0xEBAA, 0x5881, 0x4DE1)

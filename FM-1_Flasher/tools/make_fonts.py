@@ -31,7 +31,7 @@ import struct
 from PIL import Image, ImageDraw, ImageFont
 
 # (file name, source, weight, pixel size, with EXTRA). The title and mono
-# fonts are ASCII only, to save the device's RAM: the catalogue's names,
+# fonts are ASCII only, to save the device's RAM: the catalog's names,
 # versions and identities are ASCII, and the UI sets a title that isn't in
 # the 14 px bold font (fm1ui.ui.title_font).
 FONTS = (
@@ -42,7 +42,7 @@ FONTS = (
 )
 
 # Beyond ASCII: Latin-1 letters and the Latin Extended-A letters of the
-# languages in the hub's catalogue and nearby ones, and common punctuation.
+# languages in the hub's catalog and nearby ones, and common punctuation.
 EXTRA = ("ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿ"
          "ĀāĆćČčĎďĒēĚěĞğĪīİıŁłŃńŇňŌōŐőŒœŘřŚśŞşŠšŤťŪūŮůŰűŸŹźŻżŽž"
          "–—‘’“”•…·°×©®™←→")

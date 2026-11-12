@@ -12,8 +12,8 @@ A portable CircuitPython device that installs alt firmwares on the M-VAVE FM-1, 
 
 ## What it does
 
-- **Browse** the firmwares on the card as picture cards or a two-column list. Swipe between pages, or drag them with Settings > Scroll pages on. Filter by type (synth, drums, sequencer and so on) or favourites, and sort A-Z, New (newest on the hub) or RcntUp (most recently updated).
-- **Details** for each firmware: the picture, author, version, license and description (drag up and down for long ones), a favourite heart, and Remove, which takes it off the card after asking. M-VAVE's stock V15 can't be removed: it's the way back to the factory firmware.
+- **Browse** the firmwares on the card as picture cards or a two-column list. Swipe between pages, or drag them with Settings > Scroll pages on. Filter by type (synth, drums, sequencer and so on) or favorites, and sort A-Z, New (newest on the hub) or RcntUp (most recently updated).
+- **Details** for each firmware: the picture, author, version, license and description (drag up and down for long ones), a favorite heart, and Remove, which takes it off the card after asking. M-VAVE's stock V15 can't be removed: it's the way back to the factory firmware.
 - **Install:** tap Connect FM-1, then Install. The flasher checks the package, puts the FM-1 into its loader, writes the firmware and waits for the FM-1 to restart. V15 → SLOOP takes about 50 s, SLOOP → V15 with the factory voices about 46 s.
 - **Catalog:** downloads new firmwares and new versions from the hub over WiFi. Details lists what it would fetch, with tick boxes, All and None, a type filter and an Info button for each. Firmwares are only ever added or updated: one the hub drops, or one you removed, is never deleted or brought back by itself.
 - **Settings:** WiFi (scan, type a password on the on-screen keyboard, up to 8 saved networks), Scroll pages, and Credits.
@@ -77,7 +77,7 @@ Keys in the window (the title bar shows the FM-1's state):
 | `s` | Stall: the FM-1 doesn't come back after its restart, so the install waits there and shows the power-cycle hint after 20 s. Press `s` again to let it finish. |
 | `h` | List the keys in the terminal. |
 
-Favourites and the list view are saved in `flasher-sim.json` next to the firmware folder, apart from the card's `flasher.json`. The simulator draws the Metro's 320x240 screen. It doesn't model the device's speed.
+Favorites and the list view are saved in `flasher-sim.json` next to the firmware folder, apart from the card's `flasher.json`. The simulator draws the Metro's 320x240 screen. It doesn't model the device's speed.
 
 With `--do` steps it runs without a window and saves screenshots, for checking a layout change: `--do "tap 100,100" --do "shot detail.png"`.
 
@@ -92,7 +92,7 @@ tools/make_sd.py --out /Volumes/SDCARD --fwsc ref/fm1_open/sdk/firmware/FM-1_015
     --name "M-VAVE V15 (stock)" --author M-VAVE --slug stock-v15
 ```
 
-Each firmware goes in `firmware/<slug>/` as the `.fwsc` and a `meta.json`, and `firmware/index.txt` lists them. Every package is checked the same way the device checks it. Packages already on the card are kept when their SHA-256 still matches the catalogue, so a rerun only downloads what's new or changed.
+Each firmware goes in `firmware/<slug>/` as the `.fwsc` and a `meta.json`, and `firmware/index.txt` lists them. Every package is checked the same way the device checks it. Packages already on the card are kept when their SHA-256 still matches the catalog, so a rerun only downloads what's new or changed.
 
 ## The Feather version (deprecated)
 

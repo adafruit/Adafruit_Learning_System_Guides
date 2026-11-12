@@ -96,8 +96,8 @@ CircuitPython accept.
       - **Enumeration buffer.** On the stock build (288 bytes) the FM-1
         doesn't enumerate; a keyboard does. With 512 the FM-1 (V15,
         `4c4a:c755`) enumerates in 0.2 s.
-      - **TinyUSB: cancelling a running bulk IN.** With host DMA, a
-        `read()` that timed out wasn't cancelled: `hcd_edpt_abort_xfer()`
+      - **TinyUSB: canceling a running bulk IN.** With host DMA, a
+        `read()` that timed out wasn't canceled: `hcd_edpt_abort_xfer()`
         set channel disable and returned, and the halt arrived with NAK set,
         so `handle_channel_in_dma()` re-armed the channel. The stale read took
         the reply to the next query, later writes returned its length
@@ -133,7 +133,7 @@ CircuitPython accept.
 - [x] WiFi (`tools/device/metro_spike_net.py`): `catalog.json` (148 firmwares,
       290 KB) in 3.6 s; SLOOP 2.8.4 streamed to the card at 0.21 MB/s with a
       matching SHA-256 (a full card, ~90 MB, would take ~7 min); 15 MB free
-      RAM. The hub's picture (480x480 full-colour PNG, 4 KB) takes 9.3 s to
+      RAM. The hub's picture (480x480 full-color PNG, 4 KB) takes 9.3 s to
       decode with `adafruit_imageload`: too slow to do all ~150 at once
       (~23 min). Decode on first view and cache, or ask the hub for small
       BMPs. One hard fault into safe mode right after WiFi credentials were
@@ -176,12 +176,12 @@ user found the screens good on the 2.8" panel.
 
 ## Phase 2: Update firmwares on the device
 
-- [x] Move the catalogue logic out of `make_sd.py` into a shared
+- [x] Move the catalog logic out of `make_sd.py` into a shared
       `fm1catalog.py` for CPython and CircuitPython, with swappable fetch
       and file access (also usable by a web page later).
 - [x] An Update firmwares screen: WiFi, a plan ("12 new, 3 updated,
       8 MB"), downloads with progress, SHA-256 against the
-      catalogue plus the full package checks, pictures, `index.txt`, and
+      catalog plus the full package checks, pictures, `index.txt`, and
       no removals: a firmware the hub drops or moves to its own installer
       stays on the card until its owner deletes it (also in `make_sd.py`).
 - [x] Resumable: write to a temporary name, then rename, so a power cut
@@ -198,7 +198,7 @@ Result (2 to 3 November 2026): the Metro brought a card made on 29 October
 up to date over WiFi, 31 new and 45 updated firmwares (46.4 MB), about 9 s
 per firmware with all checks, then the pictures (about 5 s each, PNG decoded
 and reduced on the device). Afterwards the card held all 145 firmwares the
-catalogue had then, with no `.part` files left; the only differences from
+catalog had then, with no `.part` files left; the only differences from
 the hub were 10 firmwares it added or updated later that day. Pictures:
 137 converted, 7 marked as missing on the hub.
 
@@ -268,16 +268,16 @@ the hub were 10 firmwares it added or updated later that day. Pictures:
 ## To look into
 
 - [x] Sort the lists: A-Z, New (newest on the hub first) and RcntUp
-      (newest release first). meta.json keeps the catalogue's `added` and
+      (newest release first). meta.json keeps the catalog's `added` and
       `date`, and `index.txt` carries them as two more columns (older cards'
       six-column lines still read, and sort last). A Sort button in the
-      header beside the tag and favourites tabs steps through the three
-      (the favourites tab is now just the heart); the choice is
+      header beside the tag and favorites tabs steps through the three
+      (the favorites tab is now just the heart); the choice is
       kept in the state. Update firmwares copies the dates into an older
       card's unchanged firmwares (at once when there's nothing to download).
 
-- [x] Move the OK button after an install from the centre to the right,
-      where Install is on the details screen: a centred OK sat over the
+- [x] Move the OK button after an install from the center to the right,
+      where Install is on the details screen: a centered OK sat over the
       list's Catalog button, so the tap that closed it often opened Catalog
       too (user report, 4 November 2026). OK reloads the code, and the touch
       came through to the new list; `fm1ui.app.Gestures` now also ignores a
@@ -305,7 +305,7 @@ the hub were 10 firmwares it added or updated later that day. Pictures:
       Metro with no patch.
 - [ ] Once a CircuitPython build with 66688d5d05 is out, try it on the
       Metro without the TinyUSB fix: installs are expected to fail (a
-      timed-out read isn't cancelled), but a test settles it for the guide.
+      timed-out read isn't canceled), but a test settles it for the guide.
 - [x] The TinyUSB DWC2 abort fix (`patches/tinyusb-dwc2-abort.diff`):
       reported as hathach/tinyusb#4405, and proposed as hathach/tinyusb#4430
       (4 November 2026, the same change rebased onto master; tested on the

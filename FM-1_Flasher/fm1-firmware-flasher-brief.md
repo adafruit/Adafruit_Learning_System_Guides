@@ -31,7 +31,7 @@ Hardware items to check first:
 
 ## 3. Firmware packages (`.fwsc`)
 
-Sizes: FM-1 flash is 1 MiB. Stock V15 is 699,956 bytes. The updater accepts packages from 1,024 to 2,097,152 bytes, and the flash entry inside must be 16 KB to 1,044,480 bytes and a multiple of 4096. In practice expect roughly **0.5–1 MB per firmware**, so the whole catalogue is about 30–40 MB on SD. **Never load a whole package into RAM** (the RP2040 has 264 KB); stream from SD.
+Sizes: FM-1 flash is 1 MiB. Stock V15 is 699,956 bytes. The updater accepts packages from 1,024 to 2,097,152 bytes, and the flash entry inside must be 16 KB to 1,044,480 bytes and a multiple of 4096. In practice expect roughly **0.5–1 MB per firmware**, so the whole catalog is about 30–40 MB on SD. **Never load a whole package into RAM** (the RP2040 has 264 KB); stream from SD.
 
 ### Package layout [verified, from `inspectPackage()` in WebUpdate.js]
 
@@ -126,8 +126,8 @@ Queries: clear the receive queue, send, then wait up to about 1.5 s (750 ms for 
 
 A transfer is about 1,400 round trips of 512 bytes for a 700 KB package. The hub quotes "about a minute"; expect 1–2 minutes on the Feather.
 
-### Catalogue metadata the updater expects (from `prepare()`)
-`schema:1`, `product` (identity), `build_id` (64 hex characters), `family` (7), `bytes`, `sha256` (whole file), `loader_sha256`, `kind` (`"stock"` for V15). Open identities match `^(FM1_OFFICIAL_OPEN|FM1_COMMUNITY_\d+|FM-1_8\d{6})$`. **[unverified]** where build_id comes from for community firmwares. It may be published in release metadata or the hub's catalogue. Check the hub's JS and Felucca's installer.
+### Catalog metadata the updater expects (from `prepare()`)
+`schema:1`, `product` (identity), `build_id` (64 hex characters), `family` (7), `bytes`, `sha256` (whole file), `loader_sha256`, `kind` (`"stock"` for V15). Open identities match `^(FM1_OFFICIAL_OPEN|FM1_COMMUNITY_\d+|FM-1_8\d{6})$`. **[unverified]** where build_id comes from for community firmwares. It may be published in release metadata or the hub's catalog. Check the hub's JS and Felucca's installer.
 
 ## 5. CircuitPython USB host side
 

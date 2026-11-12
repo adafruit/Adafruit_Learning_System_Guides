@@ -3,14 +3,14 @@
 # SPDX-License-Identifier: GPL-3.0-only
 """The hub's card pictures (PNG) as the device's thumb.bmp, on CircuitPython.
 
-thumb.bmp is an 80x80, 8-bit indexed BMP of at most 16 colours (fm1ui.ui
+thumb.bmp is an 80x80, 8-bit indexed BMP of at most 16 colors (fm1ui.ui
 reads it). tools/make_sd.py makes it with Pillow; this does the same on the
-device: decode the PNG, centre it on a square, sample it nearest-neighbour
+device: decode the PNG, center it on a square, sample it nearest-neighbor
 (the pictures are mostly 480 px pixel art, a 6x multiple) and reduce it to 16
-colours by median cut.
+colors by median cut.
 
 PNG rows are stored filtered, each against the row before (Up, Average,
-Paeth) and/or its left neighbour (Sub), so every row has to be unfiltered to
+Paeth) and/or its left neighbor (Sub), so every row has to be unfiltered to
 reach the ones sampled. A per-byte Python loop is slow on a microcontroller
 (~20 us a byte on the Metro), so rows are unfiltered a whole row at a time
 with big-int arithmetic: byte-wise addition without carries between bytes,
@@ -21,7 +21,7 @@ work, and it feeds the running sum as a correction. Average rows (rare in
 the hub's pictures) go byte by byte.
 
 convert() is a generator that yields every few rows, so the UI stays live.
-Handles 8-bit greyscale, RGB, palette, grey+alpha and RGBA, not interlaced.
+Handles 8-bit grayscale, RGB, palette, gray+alpha and RGBA, not interlaced.
 """
 # Disabled for the Learn Guides lint check: modules are imported where they're needed, to keep RAM
 # free and start-up quick; some drawing and protocol functions are long by nature.
@@ -34,7 +34,7 @@ except ImportError:
     _np = None
 
 SIDE = 80
-COLOURS = 16
+COLORS = 16
 BG = 0x0E0C0D  # what the square is padded with (make_sd.py's)
 _CHANNELS = {0: 1, 2: 3, 3: 1, 4: 2, 6: 4}
 
@@ -44,7 +44,7 @@ def _u32(b, o):
 
 
 def read_png(data):
-    """(width, height, colour type, palette or None, zlib data)."""
+    """(width, height, color type, palette or None, zlib data)."""
     if data[:8] != b"\x89PNG\r\n\x1a\n":
         raise ValueError("not a PNG")
     pos, idat, palette = 8, [], None
@@ -58,7 +58,7 @@ def read_png(data):
             w, h, depth, ct, interlace = _u32(body, 0), _u32(body, 4), body[8], body[9], body[12]
             if depth != 8 or interlace or ct not in _CHANNELS:
                 raise ValueError(
-                    "unsupported PNG (depth %d, colour type %d, interlace %d)"
+                    "unsupported PNG (depth %d, color type %d, interlace %d)"
                     % (depth, ct, interlace)
                 )
         elif kind == b"PLTE":
@@ -112,7 +112,7 @@ class _Rows:
         left (and the first pixel): where Paeth isn't simply Sub."""
         bpp = self.bpp
         d = (self.prev_int ^ (self.prev_int << (8 * bpp))) & self.full
-        d |= (1 << (8 * bpp)) - 1  # the first pixel: no left neighbour
+        d |= (1 << (8 * bpp)) - 1  # the first pixel: no left neighbor
         b = d.to_bytes(self.n, "little")
         if _np is not None:
             return _np.nonzero(_np.frombuffer(b, dtype=_np.uint8))[0]
@@ -207,10 +207,10 @@ class _Rows:
 
 
 def sample(data, side=SIDE, step=None):
-    """A generator: the PNG `data` centred on a square and sampled to
+    """A generator: the PNG `data` centered on a square and sampled to
     side x side. Yields None now and then while it works; the last thing it
     yields is the list of side*side 0xRRGGBB pixels, row by row (ints:
-    CircuitPython hashes tuples slowly, and quantize() counts colours)."""
+    CircuitPython hashes tuples slowly, and quantize() counts colors)."""
     w, h, ct, palette, z = read_png(data)
     raw = zlib.decompress(z)
     del z
@@ -265,9 +265,9 @@ def _box(items):
     return (best if len(items) > 1 else -1), at
 
 
-def median_cut(counts, n=COLOURS):
-    """[(0xRRGGBB, [colours it stands for])]: up to n palette colours for
-    {colour: count}, by median cut."""
+def median_cut(counts, n=COLORS):
+    """[(0xRRGGBB, [colors it stands for])]: up to n palette colors for
+    {color: count}, by median cut."""
     items = list(counts.items())
     boxes = [(_box(items), items)]
     while len(boxes) < n:
@@ -289,16 +289,16 @@ def median_cut(counts, n=COLOURS):
     out = []
     for _, box in boxes:
         t = sum(v for _, v in box)
-        colour = 0
+        color = 0
         for shift in (16, 8, 0):
-            colour |= ((sum(((k >> shift) & 0xFF) * v for k, v in box) + t // 2) // t) << shift
-        out.append((colour, [k for k, _ in box]))
+            color |= ((sum(((k >> shift) & 0xFF) * v for k, v in box) + t // 2) // t) << shift
+        out.append((color, [k for k, _ in box]))
     return out
 
 
-def quantize(pixels, n=COLOURS):
-    """(palette, indices): 0xRRGGBB pixels reduced to at most n colours, each
-    colour standing in for the ones in its median-cut box."""
+def quantize(pixels, n=COLORS):
+    """(palette, indices): 0xRRGGBB pixels reduced to at most n colors, each
+    color standing in for the ones in its median-cut box."""
     counts = {}
     for p in pixels:
         counts[p] = counts.get(p, 0) + 1
@@ -307,8 +307,8 @@ def quantize(pixels, n=COLOURS):
         index = dict((c, i) for i, c in enumerate(palette))
     else:
         palette, index = [], {}
-        for i, (colour, members) in enumerate(median_cut(counts, n)):
-            palette.append(colour)
+        for i, (color, members) in enumerate(median_cut(counts, n)):
+            palette.append(color)
             for k in members:
                 index[k] = i
     return palette, bytes(index[p] for p in pixels)

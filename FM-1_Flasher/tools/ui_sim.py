@@ -19,7 +19,7 @@ loop until the Update screen reaches plan, run, done or error; "until Pictures" 
 for the run's phase).
 
 --hub turns on Update firmwares with the real hub over this computer's network
-(--hub-only ID,ID,... shows the device a catalogue of just those firmwares).
+(--hub-only ID,ID,... shows the device a catalog of just those firmwares).
 It writes to --root: use a copy.
 
 Window keys:
@@ -181,7 +181,7 @@ class HubNet:
     # Settings > WiFi's networks, simulated: these are "in range", any
     # password joins except "wrongpass", and the saved list is a JSON file.
     IN_RANGE = [("Home Studio", -48, False), ("Cafe Guest", -71, True), ("Rehearsal Room 5G", -62, False),
-                ("Neighbours", -84, False), ("Venue Backstage", -58, False), ("Printer-1234", -77, True),
+                ("Neighbors", -84, False), ("Venue Backstage", -58, False), ("Printer-1234", -77, True),
                 ("Studio B", -66, False)]
 
     def __init__(self, only=None, wifi_path=None):
@@ -431,7 +431,7 @@ def main():
     ap.add_argument("--do", action="append", default=[], help="script step (headless)")
     ap.add_argument("--scale", type=int, default=2, help="window zoom")
     ap.add_argument("--hub", action="store_true", help="Update firmwares from the real hub (writes to --root)")
-    ap.add_argument("--hub-only", help="with --hub: a catalogue of only these ids (comma-separated)")
+    ap.add_argument("--hub-only", help="with --hub: a catalog of only these ids (comma-separated)")
     args = ap.parse_args()
 
     state = C.State(args.state or os.path.join(os.path.dirname(args.root.rstrip("/")), "flasher-sim.json"))

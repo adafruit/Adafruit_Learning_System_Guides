@@ -7,7 +7,7 @@
   .venv/bin/python tools/deploy.py --mpy-cross ref/cp-metro-p4/mpy-cross/build/mpy-cross
 
 Copies FM-1_Flasher_Code (what the guide's Project Bundle has) to the board:
-code.py, fonts/ (.fmf), the splash (art/splash_text_320.png as a 16-colour
+code.py, fonts/ (.fmf), the splash (art/splash_text_320.png as a 16-color
 splash.bmp, needs Pillow; also refreshed in FM-1_Flasher_Code), and lib/ with
 fm1ui and the fm1 libraries compiled to .mpy. It also sets
 CIRCUITPY_SDCARD_USB = false in settings.toml (takes effect after a reset). The
@@ -51,7 +51,7 @@ def board_id(drive):
 
 
 def write_splash(drive):
-    """Convert the splash PNG to an 8-bit BMP with 16 colours, which OnDiskBitmap
+    """Convert the splash PNG to an 8-bit BMP with 16 colors, which OnDiskBitmap
     reads (154 KB; Pillow writes no 4-bit BMP). Written only when it changed,
     so the board doesn't reload."""
     from PIL import Image

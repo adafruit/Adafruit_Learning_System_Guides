@@ -71,7 +71,7 @@ this file has the story and the evidence. Dates are 2026.
 ## 2. Protocol work (Phase 0, Oct 22)
 
 **Sources.** `m-vave/fm1_open` @ `4c7496da` (`sdk/WebUpdate.js`), the Firmware
-Hub catalogue (`https://thefirmwarehub.com/catalog.json`) and its installer.
+Hub catalog (`https://thefirmwarehub.com/catalog.json`) and its installer.
 
 **What we learned:**
 - **SysEx framing:** `F0`, then a 7-bit-packed stream of
@@ -96,11 +96,11 @@ Hub catalogue (`https://thefirmwarehub.com/catalog.json`) and its installer.
 - **Trimmed packages.** Felucca-family packages drop the 32-byte alignment
   padding from `ota.bin`, so its stored length runs past the end of the file,
   and `WebUpdate.js` rejects them. `inspect(strict=False)` accepts exactly that
-  case. All 84 catalogue packages at the time parse and complete a simulated
+  case. All 84 catalog packages at the time parse and complete a simulated
   install.
 - **Progress.** The web updater's bar stalls near 86 %. Measuring against the
   blocks each stage actually reads fixes it.
-- **Catalogue.** It's updated nightly and CORS-open. Entries carry `id`,
+- **Catalog.** It's updated nightly and CORS-open. Entries carry `id`,
   `name`, `author`, `version`, `product`, `pkg`, `size`, `sha256`,
   `source`/`release`, `loader` and `kind` (a genre). They carry no license,
   `build_id` or `loader_sha256`; `make_sd.py` computes the loader hash.
@@ -329,7 +329,7 @@ We stacked it on the same Feather (CS D10, IRQ D9) with a build that enables
 
 **15 of 15 attaches** (10 power cycles and 5 hot-plugs), each about 6 s after
 the FM-1 came back, with no silent state. Every attach still needed the
-enumeration retry, so that is FM-1 behaviour, not PIO-USB behaviour.
+enumeration retry, so that is FM-1 behavior, not PIO-USB behavior.
 
 **The SysEx stress test** (`device/fm1_sysex_stress.py`, long messages under
 manufacturer 0x7D, which the FM-1 ignores, with identity checks between
@@ -460,7 +460,7 @@ With 64-byte writes and no gap as the default:
 | SLOOP → V15 + voices | 119 s | 73 s | 0 |
 | V15 → ChoralRoot 0.27 | — | 69 s | 0 |
 
-ChoralRoot (from the catalogue through `make_sd.py --catalog choralroot`) ships
+ChoralRoot (from the catalog through `make_sd.py --catalog choralroot`) ships
 its own loader build (sha256 `ab3242c8…`, against SLOOP's `7024be59…`). It also
 reports as `ota-FM-1_900`.
 
@@ -519,7 +519,7 @@ was wrong.
   whole message, and the leading F0 restarts the device's parser.
 - `finder()` tries each device twice before skipping it.
 - `fm1_install` prints its message ring for any exception.
-- `fm1_replug.py` recognises the Felucca-family `1209:xxxx` IDs.
+- `fm1_replug.py` recognizes the Felucca-family `1209:xxxx` IDs.
 
 ### 6.6 What the silent state is (Oct 27)
 
@@ -697,7 +697,7 @@ before an upstream issue.
 ### 6.8 The TFT FeatherWing next to the PIO host (Oct 27)
 
 The TFT FeatherWing V2 3.5" (5872) on Feather 2, with the FM-1 on the 2 m
-cable and the built-in PIO port. `device/tft_check.py` drew colour bars,
+cable and the built-in PIO port. `device/tft_check.py` drew color bars,
 mirrored the console and read touches; nothing it uses (SPI, D5, D6, D9, D10,
 I2C) touches GPIO16–18.
 
@@ -960,7 +960,7 @@ in order of cost:
 - **The package check took 9.3 s for SLOOP and 22.8 s for V15.** §6.10
   measured 1.6 s and about 4 s. The SLOOP install also took 19 s from the
   reload to the start of the check; the V15 one took 5 s. Not yet looked at.
-- **One more failed connect, at 22:46:55,** after the last note. It's unlabelled
+- **One more failed connect, at 22:46:55,** after the last note. It's unlabeled
   and left out of the tables.
 
 ### 6.13 A powered USB hub doesn't help V15 (Oct 29)
@@ -1169,7 +1169,7 @@ The path is relative to the SD card's mount, so it's `/sd/firmware/index.txt`.
 The reset reason was `RESET_PIN`, and the REPL came up at once, so the UI had
 crashed again on the start after the reset. `/sd/flasher.json` was **0
 bytes**: the state save at the end of the install had opened the file, then
-the write failed. Favourites and the installed firmware were lost; the UI
+the write failed. Favorites and the installed firmware were lost; the UI
 copes with an empty file. Read from the REPL with no host running, the card
 was fine: `index.txt` read whole (4,914 bytes, no NULs).
 

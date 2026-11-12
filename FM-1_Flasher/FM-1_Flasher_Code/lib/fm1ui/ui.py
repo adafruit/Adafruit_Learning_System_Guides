@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2026 John Park for Adafruit Industries
 #
 # SPDX-License-Identifier: GPL-3.0-only
-"""Look and drawing helpers: the Firmware Hub's colours, fonts, panels, text,
+"""Look and drawing helpers: the Firmware Hub's colors, fonts, panels, text,
 buttons and icons, as plain displayio objects (CircuitPython or Blinka)."""
 # Disabled for the Learn Guides lint check: modules are imported where they're needed, to keep RAM
 # free and start-up quick; some drawing and protocol functions are long by nature.
@@ -144,7 +144,7 @@ def width(name, s):
 
 
 def palette(color):
-    """One shared single-colour palette per colour."""
+    """One shared single-color palette per color."""
     p = _palettes.get(color)
     if p is None:
         p = displayio.Palette(1)
@@ -154,7 +154,7 @@ def palette(color):
 
 
 def text_palette(color):
-    """Transparent background, `color` ink; shared per colour."""
+    """Transparent background, `color` ink; shared per color."""
     p = _text_palettes.get(color)
     if p is None:
         p = displayio.Palette(2)
@@ -236,8 +236,8 @@ def text(name, s, color, x, y, anchor=(0, 0)):
 
 
 def gear(cx, cy, r, color, hole):
-    """An eight-toothed gear of outer radius r centred at (cx, cy), with a
-    hole in the colour `hole` (the button's fill)."""
+    """An eight-toothed gear of outer radius r centered at (cx, cy), with a
+    hole in the color `hole` (the button's fill)."""
     import math
     inner = r * 0.72
     pts = []
@@ -257,7 +257,7 @@ def triangle(x, y, w, h, color, left):
     return vectorio.Polygon(pixel_shader=palette(color), points=pts, x=x, y=y)
 
 
-# 13x11 heart: '#' is the outline, '+' is filled in only for a favourite
+# 13x11 heart: '#' is the outline, '+' is filled in only for a favorite
 _HEART = (
     "..###...###..",
     ".#+++#.#+++#.",
@@ -323,7 +323,7 @@ def release(group, old):
 
 
 class Button:
-    """A panel with a centred label; `rect` is its hit area."""
+    """A panel with a centered label; `rect` is its hit area."""
 
     def __init__(self, label, x, y, w, h, fill=PANEL, edge=LINE, color=FG, name=NAME):
         self.rect = (x, y, w, h)
@@ -338,7 +338,7 @@ class Button:
         return rx - slack <= x < rx + rw + slack and ry - slack <= y < ry + rh + slack
 
 
-# Pictures go into a fixed pool of 80x80, 16-colour bitmaps made once, at
+# Pictures go into a fixed pool of 80x80, 16-color bitmaps made once, at
 # startup, and reused by every screen: allocated per screen, they fragment
 # the heap until a 3 KB thumbnail no longer fits. A page's six thumbnails
 # take one slot each; the detail screen's 160 px picture takes four. Each
@@ -368,15 +368,15 @@ def load_tiles(path, bitmaps):
             lambda o: head[o] | (head[o + 1] << 8) | (head[o + 2] << 16) | (head[o + 3] << 24)
         )  # noqa: E731
         offset, size, w, h = u32(10), u32(14), u32(18), u32(22)
-        bpp, compression, colours = head[28], u32(30), u32(46) or 256
-        if bpp != 8 or compression or colours > 16 or w != TILE or h != TILE * len(bitmaps):
+        bpp, compression, colors = head[28], u32(30), u32(46) or 256
+        if bpp != 8 or compression or colors > 16 or w != TILE or h != TILE * len(bitmaps):
             raise ValueError(
-                "needs an 8-bit BMP of %d %dx%d tiles, 16 colours" % (len(bitmaps), TILE, TILE)
+                "needs an 8-bit BMP of %d %dx%d tiles, 16 colors" % (len(bitmaps), TILE, TILE)
             )
         f.seek(14 + size)
-        pal_bytes = f.read(4 * colours)
-        pal = displayio.Palette(colours)
-        for i in range(colours):
+        pal_bytes = f.read(4 * colors)
+        pal = displayio.Palette(colors)
+        for i in range(colors):
             pal[i] = (pal_bytes[4 * i + 2] << 16) | (pal_bytes[4 * i + 1] << 8) | pal_bytes[4 * i]
         f.seek(offset)
         for bmp in reversed(bitmaps):  # bottom-up: the last tile comes first
@@ -385,7 +385,7 @@ def load_tiles(path, bitmaps):
 
 
 def shrink(src, factor):
-    """A new bitmap `factor` times smaller, nearest neighbour: the pictures
+    """A new bitmap `factor` times smaller, nearest neighbor: the pictures
     are 480 px pixel art at 6x in a tile, so 2x keeps them sharp. A fresh
     bitmap per call, which only the Metro's 320x240 layout uses (PSRAM)."""
     w, h = src.width // factor, src.height // factor

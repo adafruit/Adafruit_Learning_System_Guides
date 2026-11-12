@@ -14,10 +14,10 @@ Sources:
   --fwsc FILE            stock V15 is recognized by its SHA-256, FM-1_<n>
                          packages install by the community route; FM1 Open
                          packages need --build-id
-  --catalog [ID ...]     download from the FM-1 Firmware Hub catalogue
+  --catalog [ID ...]     download from the FM-1 Firmware Hub catalog
                          (all firmwares plus stock V15, or only the given
                          ids), verifying each package's SHA-256 against the
-                         catalogue, with the hub's card pictures as
+                         catalog, with the hub's card pictures as
                          thumb.bmp/large.bmp (needs Pillow). Packages already
                          on the card are reused when their SHA-256 matches.
                          Firmwares the hub sends to their own installer
@@ -66,16 +66,16 @@ own_installer = K.own_installer
 
 
 def catalog_entries(cat, ids):
-    """The catalogue's firmwares (all, or only `ids`), with stock V15 first.
+    """The catalog's firmwares (all, or only `ids`), with stock V15 first.
     Firmwares with their own installer are left out."""
     try:
         return K.entries(cat, ids or None)
     except KeyError as e:
-        sys.exit("not in the catalogue, no package, or installs from its own page: " + e.args[0])
+        sys.exit("not in the catalog, no package, or installs from its own page: " + e.args[0])
 
 
 def local_package(out, e):
-    """The package already on the card for catalogue entry `e`, if it matches."""
+    """The package already on the card for catalog entry `e`, if it matches."""
     d = os.path.join(out, "firmware", e["id"])
     try:
         meta = json.load(open(os.path.join(d, "meta.json")))
@@ -94,7 +94,7 @@ def from_catalog(ids, out):
         if data is None:
             data = fetch(HUB + e["pkg"])
         if hashlib.sha256(data).hexdigest() != e["sha256"] or len(data) != e["size"]:
-            print("skipping %s: download does not match the catalogue" % e["id"], file=sys.stderr)
+            print("skipping %s: download does not match the catalog" % e["id"], file=sys.stderr)
             continue
         meta = K.meta_for(e)
         result.append((data, meta, e["id"]))
@@ -103,11 +103,11 @@ def from_catalog(ids, out):
 
 def thumbnails(d, cid):
     """thumb.bmp (80 px) and large.bmp (160 px) from the hub's card picture,
-    as 8-bit indexed BMPs of 16 colours. The device reads them into a fixed
+    as 8-bit indexed BMPs of 16 colors. The device reads them into a fixed
     pool of 80x80 bitmaps (fm1ui.ui.slots), so large.bmp is stored as its four
     80 px quarters stacked top to bottom (top left, top right, bottom left,
     bottom right): an 80x320 strip. The pictures are mostly 480 px pixel art,
-    so 6x and 3x nearest-neighbour shrinks stay sharp."""
+    so 6x and 3x nearest-neighbor shrinks stay sharp."""
     try:
         from PIL import Image
     except ImportError:
@@ -192,7 +192,7 @@ def main(argv=None):
     src = ap.add_mutually_exclusive_group(required=True)
     src.add_argument("--html", help="release Update.html with an embedded FM1_PACKAGE")
     src.add_argument("--fwsc", help="a .fwsc package")
-    src.add_argument("--catalog", nargs="*", metavar="ID", help="FM-1 Firmware Hub catalogue ids (none: all)")
+    src.add_argument("--catalog", nargs="*", metavar="ID", help="FM-1 Firmware Hub catalog ids (none: all)")
     ap.add_argument("--meta", help="JSON file with metadata fields for --fwsc")
     ap.add_argument("--build-id", help="64-hex build identity for --fwsc")
     ap.add_argument("--slug", help="folder name under firmware/")
