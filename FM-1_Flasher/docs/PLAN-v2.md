@@ -49,9 +49,11 @@ place: relaxing them is the next piece of work.
   the median of three reads per sample, treats raw Z1 under 100 as no touch,
   and needs two samples in a row to start or end a touch, so pressure
   flicker doesn't split a drag. `RES_CAL` maps raw to screen.
-- [ ] Measure `RES_CAL` with `tools/device/metro_spike_resistive.py` (four
-      taps, then a dot that follows the touch); the value in the code is a
-      first guess.
+- [x] Measure `RES_CAL` with `tools/device/metro_spike_resistive.py` (four
+      taps, then a dot that follows the touch): `(True, 0.0912, -12.1,
+      -0.0696, 265.4)` on the first 1651 (12 November 2026). Raw x runs
+      about 3380 (top) to 795 (bottom), raw y about 460 (left) to 3310
+      (right).
 - [ ] Try the whole UI on it: taps on small targets (the keyboard, the
       tabs), swipes between pages, Scroll pages and dragging Details. Retune
       `Gestures` thresholds or `Resistive` if needed.

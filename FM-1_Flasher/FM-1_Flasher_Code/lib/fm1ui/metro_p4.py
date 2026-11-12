@@ -38,8 +38,10 @@ W, H = 320, 240
 TOUCH_CAL = (-1, 319, 1, 0)
 # The TSC2007 on the resistive shield: (swap, ax, bx, ay, by) for
 # x = ax * u + bx, y = ay * v + by, where (u, v) is the raw (x, y), or the raw
-# (y, x) when swap is True. Measure it with tools/device/metro_spike_resistive.py.
-RES_CAL = (True, -0.0877, 333.2, 0.0656, -12.8)  # a first guess, not measured yet
+# (y, x) when swap is True. Measured with tools/device/metro_spike_resistive.py
+# on a 1651 shield (12 November 2026): screen x follows raw y, screen y falls
+# as raw x rises.
+RES_CAL = (True, 0.0912, -12.1, -0.0696, 265.4)
 RES_PRESSURE = 100  # raw Z1 below this is no touch (adafruit_tsc2007's own threshold)
 FT6206_ADDR, TSC2007_ADDR = 0x38, 0x48
 
