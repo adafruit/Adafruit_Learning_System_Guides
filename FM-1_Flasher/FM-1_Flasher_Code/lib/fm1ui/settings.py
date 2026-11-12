@@ -128,7 +128,7 @@ class _Paged(Screen):  # pylint: disable=abstract-method
 
 class TextScreen(Screen):
     """A title, Back, and lines of text that drag up and down when they're
-    longer than the screen. items are (font, text, colour), each wrapped to
+    longer than the screen. items are (font, text, color), each wrapped to
     the width, with a gap after each; or a subclass's lines()."""
 
     TOP = 40  # under Back
@@ -330,7 +330,7 @@ class WifiScreen(_Paged):
 
     def __init__(self, app):
         super().__init__(app)
-        self.note = None  # (text, colour) in place of the status line
+        self.note = None  # (text, color) in place of the status line
         self.work = None  # ssid to join on the next tick
         self.sure = None  # ssid whose Forget was tapped once
 

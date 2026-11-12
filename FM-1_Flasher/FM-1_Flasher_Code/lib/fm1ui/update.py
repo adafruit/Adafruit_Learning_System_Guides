@@ -40,7 +40,7 @@ def needs_picture(root, slug):
 
 
 def picture_list(root, plan):
-    """Catalogue ids on the card (after the plan runs) without a picture yet."""
+    """Catalog ids on the card (after the plan runs) without a picture yet."""
     fresh = set(e["id"] for e in plan.downloads)
     out = []
     for e in plan.same + plan.downloads:
@@ -126,7 +126,7 @@ def job(root, plan, net, stats):
 
 
 class UpdateScreen:
-    """Connect to WiFi, read the hub's catalogue, show what would change,
+    """Connect to WiFi, read the hub's catalog, show what would change,
     then run the update with a progress bar and a Stop button."""
 
     STEP_S = 0.05  # work per tick before the screen gets a look in
@@ -220,8 +220,8 @@ class UpdateScreen:
         self.pct.set("%d%%" % (100 * done // total) if total else " ")
 
     def _lines(self, items):
-        """Centred lines under the subtitle, for the plan and errors: items
-        are (font, text, colour), each wrapped to the screen."""
+        """Centered lines under the subtitle, for the plan and errors: items
+        are (font, text, color), each wrapped to the screen."""
         g = displayio.Group()
         y = L.PROGRESS_SUB_Y + 40
         for name, s, color in items:
@@ -386,7 +386,7 @@ class UpdateScreen:
             self.advance(now)
 
     def check(self):
-        """Connect and read the catalogue: blocks a few seconds."""
+        """Connect and read the catalog: blocks a few seconds."""
         app = self.app
         err = app.updater.connect()
         if err is None:
@@ -408,7 +408,7 @@ class UpdateScreen:
         app.show()  # the plan has its own buttons (Details)
 
     def add_dates(self):
-        """Nothing to download, but the card's firmwares lack the catalogue's
+        """Nothing to download, but the card's firmwares lack the catalog's
         dates (the list's New and Updated sorts): add them now, once."""
         plan, app = self.plan, self.app
         self.sub.set("Adding dates to the list...")
@@ -714,7 +714,7 @@ class PlanScreen:
 
 
 def plan_info(app, e):
-    """One firmware from Update > Details, as the hub's catalogue describes
+    """One firmware from Update > Details, as the hub's catalog describes
     it (it may not be on the card yet): name, author, version, types and the
     description, on a TextScreen (Back returns)."""
     from fm1ui.settings import TextScreen

@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2026 John Park for Adafruit Industries
 #
 # SPDX-License-Identifier: GPL-3.0-only
-"""fm1catalog (the hub catalogue and the card's folders) and fm1pic (hub
+"""fm1catalog (the hub catalog and the card's folders) and fm1pic (hub
 pictures as thumb.bmp), as the Metro's Update firmwares uses them."""
 import hashlib
 import io
@@ -81,7 +81,7 @@ class Plan(unittest.TestCase):
             self.assertEqual(K.Plan(cat, root).summary(), "Up to date")
 
     def test_dates_for_older_cards(self):
-        """A card made before the lists sorted by date gets the catalogue's
+        """A card made before the lists sorted by date gets the catalog's
         dates copied into unchanged firmwares' meta.json, and index.txt."""
         with tempfile.TemporaryDirectory() as root:
             data = b"pkg"
@@ -250,7 +250,7 @@ class Pictures(unittest.TestCase):
         self.assertEqual([r.next_row() for _ in range(h)], rows)
 
     def test_flat_rows_take_the_quick_paeth(self):
-        # pixel art: runs of one colour, so most Paeth bytes are Sub
+        # pixel art: runs of one color, so most Paeth bytes are Sub
         rows = []
         for y in range(30):
             rows.append(b"".join(bytes((((x // 6) * 40 + y // 6) & 0xFF, 7, x // 6)) for x in range(60)))
@@ -259,7 +259,7 @@ class Pictures(unittest.TestCase):
         self.assertEqual([r.next_row() for _ in range(30)], rows)
 
     def test_thumbnail(self):
-        # 160x80 palette picture, letterboxed onto a square, 3 colours
+        # 160x80 palette picture, letterboxed onto a square, 3 colors
         rows = [bytes((x // 60) % 3 for x in range(160)) for _ in range(80)]
         data = png(160, 80, rows, ctype=3, palette=(255, 0, 0, 0, 255, 0, 0, 0, 255))
         with tempfile.TemporaryDirectory() as d:
@@ -269,9 +269,9 @@ class Pictures(unittest.TestCase):
                 bmp = f.read()
         self.assertEqual(bmp[:2], b"BM")
         w, h, planes, bpp = struct.unpack("<iiHH", bmp[18:30])
-        colours = struct.unpack("<I", bmp[46:50])[0]
+        colors = struct.unpack("<I", bmp[46:50])[0]
         self.assertEqual((w, h, bpp), (80, 80, 8))
-        self.assertEqual(colours, 4)  # red, green, blue and the padding
+        self.assertEqual(colors, 4)  # red, green, blue and the padding
         self.assertEqual(len(bmp), struct.unpack("<I", bmp[10:14])[0] + 80 * 80)
 
     def test_quantize_to_16(self):

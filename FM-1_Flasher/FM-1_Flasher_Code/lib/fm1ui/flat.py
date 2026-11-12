@@ -10,7 +10,7 @@ pages follow the finger and glide to the next one when let go.
 
 ScrollList is ListScreen with the cards replaced by those pages; everything
 else (header, footer, filters, taps) is ListScreen's. It keeps the current
-page and its neighbours across rebuilds, and draws a missing neighbour a card
+page and its neighbors across rebuilds, and draws a missing neighbor a card
 at a time between touches.
 """
 # Disabled for the Learn Guides lint check: screens make their widgets in build(), each time
@@ -30,7 +30,7 @@ from fm1ui import screens as S
 from fm1ui import ui
 from fm1ui.layout import L
 
-# Palette indices: the UI's colours at fixed places (0 stays unused, so ink
+# Palette indices: the UI's colors at fixed places (0 stays unused, so ink
 # is never 0, the "no ink" index of the 1-bit font sheets), then 16 for each
 # card's picture.
 _COLORS = [0x000000, ui.BG, ui.PANEL, ui.LINE, ui.FG, ui.TEXT, ui.DIM, ui.CYAN, ui.OK, ui.WARN,
@@ -39,7 +39,7 @@ for _c in ui.KIND_COLORS.values():
     if _c not in _COLORS:
         _COLORS.append(_c)
 _INDEX = {c: i for i, c in enumerate(_COLORS)}
-PIC0 = 64  # card i's picture colours: PIC0 + 16 * i
+PIC0 = 64  # card i's picture colors: PIC0 + 16 * i
 GLIDE_FRAMES = 8
 FLICK_PX_S = 400  # a let-go this fast turns the page whatever the distance
 BAND_GAP = 4  # between the page band and the footer
@@ -62,7 +62,7 @@ def _sheet(name, index):
         src = ui.font(name).sheet
         s = displayio.Bitmap(src.width, src.height, 256)
         # fill_region, not fill: Blinka's Bitmap.fill (the simulator) fills
-        # only part of a 256-colour bitmap.
+        # only part of a 256-color bitmap.
         bitmaptools.fill_region(s, 0, 0, src.width, src.height, index)
         bitmaptools.blit(s, src, 0, 0, skip_source_index=1)
         _sheets[key] = s
@@ -70,7 +70,7 @@ def _sheet(name, index):
 
 
 class Canvas:
-    """A page: one 256-colour bitmap for the band of the screen from y = top,
+    """A page: one 256-color bitmap for the band of the screen from y = top,
     drawn in screen coordinates."""
 
     def __init__(self, w, top, h):
@@ -153,7 +153,7 @@ class Canvas:
 
     def picture(self, path, x, y, size, placeholder, slot):
         """ui.thumbnail(path, x, y, size, placeholder): the picture shrunk
-        from a pool tile, its colours at PIC0 + 16 * slot."""
+        from a pool tile, its colors at PIC0 + 16 * slot."""
         tile = ui.slots()[0]
         try:
             pal = ui.load_tiles(path, [tile])
@@ -313,7 +313,7 @@ class Scroller:
             return dx // 3
         return max(-L.W, min(L.W, dx))
 
-    def _neighbours(self):
+    def _neighbors(self):
         return [n for n in (self.page + 1, self.page - 1) if 0 <= n < self.pages]
 
     def drag(self, dx, x0, y0):
@@ -323,7 +323,7 @@ class Scroller:
             self.dragging = True
             self.drag_start = (x0, y0)
             self.hist = []
-            for n in self._neighbours():
+            for n in self._neighbors():
                 self._ready(n)
         self.hist.append((time.monotonic(), dx))
         x = self._offset(dx)
@@ -447,7 +447,7 @@ class ScrollList(Scroller, S.ListScreen):
         self.strip = displayio.Group()
         self.strip.append(cur.grid())
         cur.tile.x = 0
-        for n in self._neighbours():
+        for n in self._neighbors():
             p = pages.get(n)
             if p is not None and p.done():
                 self._attach(p)
@@ -464,10 +464,10 @@ class ScrollList(Scroller, S.ListScreen):
         self._attach(self._page(n))
 
     def tick(self, now):
-        """Draw the neighbours a card at a time between touches."""
+        """Draw the neighbors a card at a time between touches."""
         if self.dragging or not getattr(self, "_items", None):
             return
-        for n in self._neighbours():
+        for n in self._neighbors():
             p = self._page(n, finish=False)
             if not p.done():
                 if p.step():
@@ -689,7 +689,7 @@ class ScrollDetail(Scroller, S.DetailScreen):
         self.scroll = max(0, min(self.scroll, cur.max_scroll()))
         self._attach_tile(cur.grid(), self.page)
         cur.tile.y = top - self.scroll
-        for n in self._neighbours():
+        for n in self._neighbors():
             p = self.flat.get(n)
             if p is not None and p.done():
                 self._attach_tile(p.grid(), n)
@@ -724,7 +724,7 @@ class ScrollDetail(Scroller, S.DetailScreen):
     def tick(self, now):
         if self.dragging:
             return
-        for n in self._neighbours():
+        for n in self._neighbors():
             p = self._page(n, finish=False)
             if not p.done():
                 if p.step():

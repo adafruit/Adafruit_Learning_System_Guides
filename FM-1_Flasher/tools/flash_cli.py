@@ -241,7 +241,7 @@ def cmd_install(args):
         print("unbootable (rescue: the Pico Transporter, see PLAN.md).")
         if input("Type INSTALL to write %s to the FM-1: " % meta["product"]).strip() != "INSTALL":
             up.disconnect()
-            sys.exit("cancelled; nothing was written")
+            sys.exit("canceled; nothing was written")
     try:
         up.install(force=args.force)
     except P.FM1Error as e:

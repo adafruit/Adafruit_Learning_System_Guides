@@ -2,13 +2,13 @@
 # SPDX-FileCopyrightText: 2026 John Park for Adafruit Industries
 #
 # SPDX-License-Identifier: GPL-3.0-only
-"""Render the start-up splash from text and two colours (320x240 PNG).
+"""Render the start-up splash from text and two colors (320x240 PNG).
 
   tools/make_splash.py --font ~/Library/Fonts/Gotham-Black.ttf \
       --bg 000000 --fg b061ff --out art/splash_text_320.png
 
 Same layout as art/fff_splash.png: "FM-1" large, "FIRMWARE" and "FLASHER"
-small, centred. The font isn't in the repo (any heavy sans works); only the
+small, centered. The font isn't in the repo (any heavy sans works); only the
 PNG is. tools/deploy.py turns the PNG into CIRCUITPY/splash.bmp.
 """
 import argparse
@@ -20,7 +20,7 @@ from PIL import Image, ImageDraw, ImageFont
 LINES = (("FM-1", 66, 72), ("FIRMWARE", 27, 146), ("FLASHER", 27, 180))
 
 
-def colour(s):
+def color(s):
     return tuple(int(s.lstrip("#")[i:i + 2], 16) for i in (0, 2, 4))
 
 
@@ -44,13 +44,13 @@ def main():
     w, _, h = a.size.partition("x")
     w, h = int(w), int(h)
     k = h / 320
-    im = Image.new("RGB", (w, h), colour(a.bg))
+    im = Image.new("RGB", (w, h), color(a.bg))
     d = ImageDraw.Draw(im)
     for text, cap, top in LINES:
         cap, top = round(cap * k), round(top * k)
         # "ls" anchors at the baseline; caps sit cap pixels above it.
         d.text((w // 2, top + cap), text, font=font_for(a.font, cap),
-               fill=colour(a.fg), anchor="ms")
+               fill=color(a.fg), anchor="ms")
     im.save(a.out)
     print("wrote", a.out)
 

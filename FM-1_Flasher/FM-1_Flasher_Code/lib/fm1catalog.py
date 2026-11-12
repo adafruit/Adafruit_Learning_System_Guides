@@ -1,13 +1,13 @@
 # SPDX-FileCopyrightText: 2026 John Park for Adafruit Industries
 #
 # SPDX-License-Identifier: GPL-3.0-only
-"""The FM-1 Firmware Hub catalogue and the card's firmware folders, for
+"""The FM-1 Firmware Hub catalog and the card's firmware folders, for
 tools/make_sd.py (CPython) and the Metro ESP32-P4's Update firmwares screen
 (CircuitPython). No network code: callers pass in how to fetch.
 
 A card holds firmware/<slug>/ folders (the package, meta.json, pictures) and
 firmware/index.txt, the list the device's UI reads. Folders made from the
-catalogue are named by its id and carry it as meta.json's "catalog_id"; only
+catalog are named by its id and carry it as meta.json's "catalog_id"; only
 those are ever updated here. Nothing is ever removed: a firmware the hub
 drops (or sends to its own installer) stays on the card until its owner
 deletes it.
@@ -15,7 +15,7 @@ deletes it.
 Writes are made safe against a power cut: files are written under a ".part"
 name and renamed into place, meta.json last, and index.txt is rewritten the
 same way. An interrupted update leaves a working card, and the next one
-continues where it stopped (finished firmwares already match the catalogue).
+continues where it stopped (finished firmwares already match the catalog).
 
 Only os functions both Pythons have are used (no os.path, os.makedirs, shutil).
 """
@@ -33,7 +33,7 @@ PART = ".part"
 DATES = ("added", "date")  # when the hub first listed a firmware; its release date
 
 
-# -- the catalogue -------------------------------------------------------------
+# -- the catalog -------------------------------------------------------------
 
 def own_installer(e):
     """True for a firmware the hub sends to its own installer ("Install on its
@@ -43,7 +43,7 @@ def own_installer(e):
 
 
 def entries(cat, ids=None):
-    """The catalogue's installable firmwares (all, or only `ids`), with stock
+    """The catalog's installable firmwares (all, or only `ids`), with stock
     V15 first. Firmwares with their own installer are left out. Raises
     KeyError naming ids that aren't there."""
     out = [e for e in cat["firmwares"] if e.get("pkg") and not own_installer(e)]
@@ -71,7 +71,7 @@ def entries(cat, ids=None):
 
 
 def meta_for(e):
-    """meta.json's catalogue fields for entry `e` (finish() adds the rest)."""
+    """meta.json's catalog fields for entry `e` (finish() adds the rest)."""
     kind = e.get("kind")
     meta = {
         "name": e.get("name") or e["id"],
@@ -257,7 +257,7 @@ def remove(root, slug):
 
 
 def matches(root, e):
-    """Is catalogue entry `e` already on the card, unchanged?"""
+    """Is catalog entry `e` already on the card, unchanged?"""
     d = root + "/" + e["id"]
     m = read_meta(d)
     return bool(m and m.get("sha256") == e["sha256"] and m.get("catalog_id") == e["id"]
@@ -265,14 +265,14 @@ def matches(root, e):
 
 
 def dates_differ(root, e):
-    """Does the card's meta.json for unchanged entry `e` lack the catalogue's
+    """Does the card's meta.json for unchanged entry `e` lack the catalog's
     dates (cards made before the lists could sort by them)?"""
     m = read_meta(root + "/" + e["id"]) or {}
     return any(e.get(k) and m.get(k) != e.get(k) for k in DATES)
 
 
 def set_dates(root, e):
-    """Copy the catalogue's dates into an unchanged firmware's meta.json."""
+    """Copy the catalog's dates into an unchanged firmware's meta.json."""
     d = root + "/" + e["id"]
     m = read_meta(d)
     if m is None:
@@ -284,8 +284,8 @@ def set_dates(root, e):
 
 
 class Plan:
-    """What an update would do: new and updated catalogue entries to
-    download, and unchanged ones whose meta.json needs the catalogue's dates
+    """What an update would do: new and updated catalog entries to
+    download, and unchanged ones whose meta.json needs the catalog's dates
     (`dated`). Ids in `skip` were unticked (Details on the device): they
     stay in new and changed but aren't downloaded. Firmwares the hub no
     longer lists are left alone."""
@@ -352,8 +352,8 @@ def store(root, e, meta):
 
 
 def download(root, e, stream):
-    """A generator: stream catalogue entry `e`'s package to the card, check its
-    size and SHA-256 against the catalogue, run the full package checks and
+    """A generator: stream catalog entry `e`'s package to the card, check its
+    size and SHA-256 against the catalog, run the full package checks and
     store it with meta.json. stream(url) yields the package's bytes in chunks.
     Yields the bytes written so far after each chunk; raises ValueError for a
     download that doesn't match, fm1proto.FM1Error for a rejected package."""
@@ -388,7 +388,7 @@ def download(root, e, stream):
 def write_index(root, updated=None):
     """firmware/index.txt: what the device's list screen reads, one tab-separated
     line per firmware (slug, name, version, genre, beta, product, added, date),
-    stock first, then by name. The first line is the catalogue date. The
+    stock first, then by name. The first line is the catalog date. The
     dates (YYYY-MM-DD, or empty) sort the lists by New and Updated. Returns
     the count."""
     path = root + "/index.txt"
