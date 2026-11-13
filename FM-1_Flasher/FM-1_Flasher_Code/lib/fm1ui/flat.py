@@ -410,7 +410,7 @@ class ScrollList(Scroller, S.ListScreen):
     def _key(self):
         st = self.app.state
         return (self.tag, self.favorites_only, st.view, st.sort, self.app.installed_slug(),
-                tuple(sorted(st.favorites)), id(self.app.index))
+                tuple(sorted(st.favorites)), id(self.app.index), st.new_chip)
 
     def _page(self, n, finish=True):
         """Page n, from the cache or started; finished unless finish=False."""
@@ -432,7 +432,7 @@ class ScrollList(Scroller, S.ListScreen):
         self.dragging = False
         key = self._key()
         if key != self.flat["key"]:
-            self.flat = {"key": key, "pages": {}, "installed": key[3]}
+            self.flat = {"key": key, "pages": {}, "installed": key[4]}
         g = super().build()
         self._items = self.items()
         self.cards = []
