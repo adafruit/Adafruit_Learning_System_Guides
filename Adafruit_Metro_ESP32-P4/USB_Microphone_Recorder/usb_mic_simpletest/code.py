@@ -126,6 +126,7 @@ time.sleep(2)
 
 print("Recording", RECORD_SECONDS, "seconds")
 dropouts = 0
+# pylint: disable=pointless-statement
 mic.overflow  # reading it clears it: forget anything from start-up
 writer = AudioFileWriter(recording)
 writer.play(mic)
