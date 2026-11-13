@@ -123,6 +123,28 @@ class Catalog(unittest.TestCase):
         self.assertEqual(index.select({"zp12", "sloop", "gone"}), [2, 3])
         self.assertEqual(index.with_product("FM-1_900"), ["hortator", "sloop"])
 
+    def test_new_chip_hides_old_chip_firmwares(self):
+        with open(self.index, "w") as f:
+            f.write("updated\tnow\n"
+                    "stock-v15\tM-VAVE V15\tV15\tofficial\t0\tFM-1_015\t\t\t\n"
+                    "a\tA\t1\tdrums\t0\tFM-1_901\t\t\tnew\n"
+                    "b\tB\t1\tdrums\t0\tFM-1_902\t\t\told\n"
+                    "c\tC\t1\tdrums\t0\tFM-1_903\t\t\tany\n"
+                    "d\tD card line\t1\tdrums\t0\tFM-1_904\n")
+        index = C.Index(self.index)
+        names = lambda items: [index.entry(i).slug for i in items]  # noqa: E731
+        self.assertEqual(names(index.select()), ["stock-v15", "a", "b", "c", "d"])
+        self.assertEqual(names(index.select(new_chip=True)), ["stock-v15", "a", "c", "d"])
+        self.assertEqual(names(index.select({"b", "c"}, "drums", "new", True)), ["c"])
+        self.assertEqual((index.entry(2).chip, index.entry(4).chip), ("old", ""))
+
+    def test_new_chip_setting_persists(self):
+        s = C.State(self.state_path)
+        self.assertFalse(s.new_chip)
+        s.new_chip = True
+        s.save()
+        self.assertTrue(C.State(self.state_path).new_chip)
+
     def test_tags(self):
         index = C.Index(self.index)
         self.assertEqual(index.tags(), ["drums", "dev", "groove", "official"])

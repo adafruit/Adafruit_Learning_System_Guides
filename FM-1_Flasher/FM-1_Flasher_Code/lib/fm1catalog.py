@@ -30,7 +30,10 @@ import fm1proto as P
 HUB = "https://thefirmwarehub.com/"
 STOCK_ID = "stock-v15"
 PART = ".part"
-DATES = ("added", "date")  # when the hub first listed a firmware; its release date
+# Copied from the catalog into an unchanged firmware's meta.json when they differ: when the hub
+# first listed it, its release date, and which FM-1 flash chips it saves on ("new": both, "old":
+# only the first FM-1s' 0x856014, "any": it doesn't check the chip)
+SYNCED = ("added", "date", "chip")
 
 
 # -- the catalog -------------------------------------------------------------
@@ -91,6 +94,7 @@ def meta_for(e):
         "date": e.get("date"),
         "added": e.get("added"),
         "installs": e.get("installs"),
+        "chip": e.get("chip"),
     }
     return dict((k, v) for k, v in meta.items() if v is not None)
 
@@ -264,20 +268,22 @@ def matches(root, e):
                 and exists(d + "/" + m.get("file", "")))
 
 
-def dates_differ(root, e):
+def details_differ(root, e):
     """Does the card's meta.json for unchanged entry `e` lack the catalog's
-    dates (cards made before the lists could sort by them)?"""
+    dates or flash chip, or have older ones (cards made before the lists
+    could sort by date, or before the hub marked the chips)?"""
     m = read_meta(root + "/" + e["id"]) or {}
-    return any(e.get(k) and m.get(k) != e.get(k) for k in DATES)
+    return any(e.get(k) and m.get(k) != e.get(k) for k in SYNCED)
 
 
-def set_dates(root, e):
-    """Copy the catalog's dates into an unchanged firmware's meta.json."""
+def set_details(root, e):
+    """Copy the catalog's dates and flash chip into an unchanged firmware's
+    meta.json."""
     d = root + "/" + e["id"]
     m = read_meta(d)
     if m is None:
         return
-    for k in DATES:
+    for k in SYNCED:
         if e.get(k):
             m[k] = e[k]
     write_json(d + "/meta.json", m)
@@ -286,20 +292,20 @@ def set_dates(root, e):
 class Plan:
     """What an update would do: new and updated catalog entries to
     download, and unchanged ones whose meta.json needs the catalog's dates
-    (`dated`). Ids in `skip` were unticked (Details on the device): they
+    or flash chip (`stale`). Ids in `skip` were unticked (Details on the device): they
     stay in new and changed but aren't downloaded. Firmwares the hub no
     longer lists are left alone."""
 
     def __init__(self, cat, root, ids=None):
         self.updated_at = cat.get("updated")
-        self.new, self.changed, self.same, self.dated = [], [], [], []
+        self.new, self.changed, self.same, self.stale = [], [], [], []
         self.skip = set()
         wanted = entries(cat, ids)
         for e in wanted:
             if matches(root, e):
                 self.same.append(e)
-                if dates_differ(root, e):
-                    self.dated.append(e)
+                if details_differ(root, e):
+                    self.stale.append(e)
             elif read_meta(root + "/" + e["id"]):
                 self.changed.append(e)
             else:
@@ -387,10 +393,10 @@ def download(root, e, stream):
 
 def write_index(root, updated=None):
     """firmware/index.txt: what the device's list screen reads, one tab-separated
-    line per firmware (slug, name, version, genre, beta, product, added, date),
-    stock first, then by name. The first line is the catalog date. The
-    dates (YYYY-MM-DD, or empty) sort the lists by New and Updated. Returns
-    the count."""
+    line per firmware (slug, name, version, genre, beta, product, added, date,
+    chip), stock first, then by name. The first line is the catalog date. The
+    dates (YYYY-MM-DD, or empty) sort the lists by New and Updated; chip is
+    the catalog's ("new", "old", "any", or empty). Returns the count."""
     path = root + "/index.txt"
     if updated is None:
         try:
@@ -412,6 +418,7 @@ def write_index(root, updated=None):
             m["product"],
             m.get("added") or "",
             m.get("date") or "",
+            m.get("chip") or "",
         )
         line = "\t".join(str(v).replace("\t", " ").replace("\n", " ") for v in fields)
         rows.append((m.get("kind") != "stock", m.get("name", slug).lower(), line))

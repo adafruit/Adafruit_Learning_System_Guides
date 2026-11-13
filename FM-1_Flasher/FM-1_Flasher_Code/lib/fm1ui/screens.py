@@ -118,7 +118,7 @@ class ListScreen(Screen):
         """Index positions of the entries the filters show."""
         st = self.app.state
         return self.app.index.select(
-            st.favorites if self.favorites_only else None, self.tag, st.sort
+            st.favorites if self.favorites_only else None, self.tag, st.sort, st.new_chip
         )
 
     def per_page(self):
@@ -475,6 +475,8 @@ class DetailScreen(Screen):
         tags = [(g, ui.kind_color(g)) for g in e.genre.split(",") if g]
         if e.beta:
             tags.append(("beta", ui.WARN))
+        if app.state.new_chip and e.chip == C.OLD_CHIP:
+            tags.append(("old chip", ui.WARN))
         if m.get("license"):
             tags.append((m["license"], ui.DIM))
         W, H = L.W, L.H
@@ -660,6 +662,11 @@ class ConfirmScreen(Screen):
         ident = app.identity
         if not ident:
             return False, "The FM-1 is no longer connected. Go back and tap Connect FM-1.", None
+        if app.state.new_chip and e.chip == C.OLD_CHIP:
+            text = ("%s saves only on the first FM-1s' flash chip. This FM-1 has the newer chip "
+                    "(Settings): it would lose its saves at power-off, and could refuse later "
+                    "updates." % e.name)
+            return False, text, None
         current = app.installed_slug()
         cur = app.entry(current) if current else None
         running = C.display_name(cur) if cur else ident
