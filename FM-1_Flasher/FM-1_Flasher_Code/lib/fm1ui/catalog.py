@@ -20,6 +20,9 @@ MONTHS = ("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", 
 SORTS = ("az", "new", "updated")
 SORT_LABELS = {"az": "A-Z", "new": "New", "updated": "RcntUp"}
 _SORT_COLUMN = {"new": 6, "updated": 7}
+# M-VAVE's V16 (20 Oct 2026), from m-vave.com with M-VAVE's own updater only: never on the card.
+# Its updater is V15's, but it writes a flash head of its own (fm1ui.heads).
+V16_PRODUCT = "FM-1_016"
 OLD_CHIP = "old"  # the hub's mark for firmwares that save only on the first FM-1s' flash chip
 
 
@@ -177,6 +180,11 @@ def version_label(version):
     if not version:
         return ""
     return version if version[0] in "vV" else "v" + version
+
+
+def running_name(identity):
+    """What the FM-1 runs, by its identity, when it's no firmware on the card."""
+    return "M-VAVE V16" if identity == V16_PRODUCT else identity
 
 
 def display_name(e):

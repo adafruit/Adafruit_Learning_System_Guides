@@ -98,7 +98,7 @@ def fm1_status(app):
     """"FM-1: <what it runs>" for the connected FM-1."""
     slug = app.installed_slug()
     e = app.entry(slug) if slug else None
-    return "FM-1: " + (C.display_name(e) if e else app.identity)
+    return "FM-1: " + (C.display_name(e) if e else C.running_name(app.identity))
 
 
 class ListScreen(Screen):
@@ -669,9 +669,11 @@ class ConfirmScreen(Screen):
             return False, text, None
         current = app.installed_slug()
         cur = app.entry(current) if current else None
-        running = C.display_name(cur) if cur else ident
+        running = C.display_name(cur) if cur else C.running_name(ident)
         if current == e.slug:
             text = "%s is already on the FM-1. Install it again?" % e.name
+        elif e.product == STOCK_PRODUCT and ident == C.V16_PRODUCT:
+            text = "This installs M-VAVE's V15 and its factory voices, replacing M-VAVE V16."
         elif e.product == STOCK_PRODUCT:
             text = ("This puts back M-VAVE's official firmware and its factory voices, "
                     "replacing %s." % running)

@@ -236,6 +236,24 @@ class Heads(unittest.TestCase):
         self.assertTrue(msg.startswith("Install M-VAVE V15 first, then Amenity, otherwise"), msg)
         self.assertIn("probably", msg)
 
+    def test_v16_takes_anything_and_is_recorded(self):
+        app, heads = self.app("FM-1_016")
+        self.assertIsNone(heads.advice(app, app.entry("amenity")))
+        self.assertTrue(heads.seen(app))
+        self.assertEqual(app.state.head, {"head": heads.V16_HEAD, "slug": "FM-1_016"})
+        self.assertFalse(heads.seen(app))  # once
+
+    def test_after_v16_felucca_refuses_v15(self):
+        v16 = {"head": 0x22B0, "slug": "FM-1_016"}
+        msg = self.advice("FM-1_900", "stock-v15", v16)
+        self.assertTrue(msg.startswith("Install M-VAVE V16 (with M-VAVE's updater) first, then "
+                                       "M-VAVE V15, otherwise SLOOP will refuse it"), msg)
+        self.assertIsNone(self.advice("FM-1_900", "386dx", v16))  # its own loader: no head
+
+    def test_running_name(self):
+        self.assertEqual(C.running_name("FM-1_016"), "M-VAVE V16")
+        self.assertEqual(C.running_name("FM-1_900"), "FM-1_900")
+
     def test_no_warning_when_it_installs(self):
         amen = {"head": self.AMEN, "slug": "amenity"}
         self.assertIsNone(self.advice("FM-1_900", "clatter", amen))  # the same head
