@@ -133,6 +133,9 @@ class App:
         self.connect_failed = False
         self.stack[-1].fm1_changed()
         self.identity = self.probe.connect()
+        if self.identity:
+            from fm1ui import heads
+            heads.seen(self)
         self.connecting = False
         self.connect_failed = self.identity is None
         self.next_probe = time.monotonic() + self.PROBE_EVERY_S

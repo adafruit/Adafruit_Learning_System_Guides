@@ -91,13 +91,37 @@ class Plan(unittest.TestCase):
                             "date": "2026-10-24"}, data)
             p = K.Plan(cat, root)
             self.assertEqual(p.summary(), "Up to date")
-            self.assertEqual([x["id"] for x in p.dated], ["a"])
-            K.set_dates(root, e)
-            self.assertEqual(K.Plan(cat, root).dated, [])
+            self.assertEqual([x["id"] for x in p.stale], ["a"])
+            K.set_details(root, e)
+            self.assertEqual(K.Plan(cat, root).stale, [])
             self.assertEqual(K.read_meta(os.path.join(root, "a"))["added"], "2026-10-08")
             K.write_index(root)
             with open(os.path.join(root, "index.txt")) as f:
-                self.assertTrue(f.read().endswith("\tFM-1_900\t2026-10-08\t2026-10-24\n"))
+                self.assertTrue(f.read().endswith("\tFM-1_900\t2026-10-08\t2026-10-24\t\n"))
+
+    def test_chip_for_older_cards(self):
+        """The hub's flash chip mark reaches unchanged firmwares on a card made
+        before it, and a changed mark is copied again; index.txt carries it."""
+        with tempfile.TemporaryDirectory() as root:
+            data = b"pkg"
+            e = entry("a", data, chip="old")
+            cat = {"firmwares": [e]}
+            put(root, "a", {"catalog_id": "a", "sha256": e["sha256"], "name": "A", "product": "FM-1_900"},
+                data)
+            p = K.Plan(cat, root)
+            self.assertEqual((p.summary(), [x["id"] for x in p.stale]), ("Up to date", ["a"]))
+            K.set_details(root, e)
+            self.assertEqual(K.Plan(cat, root).stale, [])
+            e["chip"] = "new"  # the author added the newer chip
+            self.assertEqual([x["id"] for x in K.Plan(cat, root).stale], ["a"])
+            K.set_details(root, e)
+            K.write_index(root)
+            with open(os.path.join(root, "index.txt")) as f:
+                self.assertTrue(f.read().endswith("\tFM-1_900\t\t\tnew\n"))
+
+    def test_meta_keeps_the_chip(self):
+        self.assertEqual(K.meta_for(entry("a", b"x", chip="old"))["chip"], "old")
+        self.assertNotIn("chip", K.meta_for(entry("a", b"x")))
 
     def test_meta_keeps_the_dates(self):
         meta = K.meta_for(entry("a", b"x", added="2026-10-08", date="2026-10-24"))
@@ -113,8 +137,8 @@ class Card(unittest.TestCase):
             self.assertEqual(K.write_index(root, "today"), 2)
             with open(os.path.join(root, "index.txt")) as f:
                 lines = f.read().splitlines()
-            self.assertEqual(lines, ["updated\ttoday", "s\tZed V15\t\tstock\t0\tFM-1_015\t\t",
-                                     "b\tBeta\t2\tsynth\t0\tFM-1_900\t\t"])
+            self.assertEqual(lines, ["updated\ttoday", "s\tZed V15\t\tstock\t0\tFM-1_015\t\t\t",
+                                     "b\tBeta\t2\tsynth\t0\tFM-1_900\t\t\t"])
             K.write_index(root)  # keeps the date
             with open(os.path.join(root, "index.txt")) as f:
                 self.assertEqual(f.readline(), "updated\ttoday\n")

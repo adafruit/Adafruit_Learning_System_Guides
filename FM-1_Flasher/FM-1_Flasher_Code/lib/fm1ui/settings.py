@@ -273,8 +273,16 @@ class SettingsScreen(Screen):
         )
         self.scroll_g.append(_switch(sx + w - 58, sy + (h - 22) // 2, on))
         g.append(self.scroll_g)
-        self.credits_rect = (x, sy + h + 8, w, h)
-        cx, cy = x, sy + h + 8
+        self.chip_rect = (x, sy + h + 8, w, h)
+        kx, ky = x, sy + h + 8
+        self.chip_g = ui.outlined(*self.chip_rect, ui.PANEL, ui.LINE)
+        self.chip_g.append(
+            ui.text(ui.NAME, "Newer flash chip", ui.FG, kx + 12, ky + h // 2, (0, 0.5))
+        )
+        self.chip_g.append(_switch(kx + w - 58, ky + (h - 22) // 2, self.app.state.new_chip))
+        g.append(self.chip_g)
+        self.credits_rect = (x, ky + h + 8, w, h)
+        cx, cy = x, ky + h + 8
         self.credits_g = ui.outlined(*self.credits_rect, ui.PANEL, ui.LINE)
         self.credits_g.append(ui.text(ui.NAME, "Credits", ui.FG, cx + 12, cy + h // 2, (0, 0.5)))
         self.credits_g.append(ui.triangle(cx + w - 16, cy + h // 2 - 6, 7, 12, ui.DIM, False))
@@ -289,6 +297,8 @@ class SettingsScreen(Screen):
             return self.wifi_g
         if _hit(self.scroll_rect, x, y, 3):
             return self.scroll_g
+        if _hit(self.chip_rect, x, y, 3):
+            return self.chip_g
         if _hit(self.credits_rect, x, y, 3):
             return self.credits_g
         return None
@@ -300,6 +310,8 @@ class SettingsScreen(Screen):
             self.app.push(WifiScreen(self.app))
         elif _hit(self.scroll_rect, x, y, 3):
             self.toggle_scroll()
+        elif _hit(self.chip_rect, x, y, 3):
+            self.toggle_chip()
         elif _hit(self.credits_rect, x, y, 3):
             self.app.push(CreditsScreen(self.app))
 
@@ -315,6 +327,16 @@ class SettingsScreen(Screen):
             setattr(new, k, getattr(old, k))
         old.release()
         app.stack[0] = new
+        app.show()
+
+    def toggle_chip(self):
+        """The FM-1 has the newer flash chip (UC25HQ80, sold since autumn 2026), or the
+        first one: with the newer one, the list leaves out the firmwares the hub marks as
+        saving only on the first, and they can't be installed."""
+        app = self.app
+        app.state.new_chip = not app.state.new_chip
+        app.state.save()
+        app.stack[0].page = 0  # the list's length changes
         app.show()
 
     def swipe(self, dx):

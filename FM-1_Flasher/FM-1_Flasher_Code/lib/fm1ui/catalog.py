@@ -20,12 +20,16 @@ MONTHS = ("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", 
 SORTS = ("az", "new", "updated")
 SORT_LABELS = {"az": "A-Z", "new": "New", "updated": "RcntUp"}
 _SORT_COLUMN = {"new": 6, "updated": 7}
+# M-VAVE's V16 (20 Oct 2026), from m-vave.com with M-VAVE's own updater only: never on the card.
+# Its updater is V15's, but it writes a flash head of its own (fm1ui.heads).
+V16_PRODUCT = "FM-1_016"
+OLD_CHIP = "old"  # the hub's mark for firmwares that save only on the first FM-1s' flash chip
 
 
 class Entry:
-    __slots__ = ("slug", "name", "version", "genre", "beta", "product", "added", "date")
+    __slots__ = ("slug", "name", "version", "genre", "beta", "product", "added", "date", "chip")
 
-    def __init__(self, slug, name, version, genre, beta, product, added="", date=""):
+    def __init__(self, slug, name, version, genre, beta, product, added="", date="", chip=""):
         self.slug = slug
         self.name = name
         self.version = version
@@ -34,6 +38,7 @@ class Entry:
         self.product = product
         self.added = added
         self.date = date
+        self.chip = chip  # the hub's: "new", "old", "any", or "" (fm1catalog.SYNCED)
 
     @property
     def kind(self):
@@ -75,7 +80,7 @@ class Index:
         with open(self.path, "rb") as f:
             f.seek(self.starts[i])
             fields = f.readline().rstrip(b"\r\n").decode().split("\t")
-        fields += [""] * (8 - len(fields))
+        fields += [""] * (9 - len(fields))
         return Entry(
             fields[0],
             fields[1],
@@ -85,6 +90,7 @@ class Index:
             fields[5],
             fields[6],
             fields[7],
+            fields[8],
         )
 
     def slug(self, i):
@@ -97,20 +103,22 @@ class Index:
                 return self.entry(i)
         return None
 
-    def select(self, slugs=None, tag=None, sort="az"):
+    def select(self, slugs=None, tag=None, sort="az", new_chip=False):
         """Positions of the entries whose slug is in `slugs` (all if None)
         and that carry `tag` among their genres (any if None), in `sort`'s
         order (one of SORTS). The dated sorts put the newest first, then by
-        name; entries without a date (stock, own builds) go last."""
+        name; entries without a date (stock, own builds) go last. new_chip
+        leaves out the firmwares the hub marks as saving only on the first
+        FM-1s' flash chip."""
         col = _SORT_COLUMN.get(sort)
-        if slugs is None and tag is None and col is None:
+        if slugs is None and tag is None and col is None and not new_chip:
             return list(range(len(self.starts)))
         out = []
         for i, line in self._lines():
             fields = line.split("\t")
             if (slugs is None or fields[0] in slugs) and (
                 tag is None or tag in fields[3].split(",")
-            ):
+            ) and not (new_chip and len(fields) > 8 and fields[8] == OLD_CHIP):
                 out.append(
                     i if col is None else (-day(fields[col] if len(fields) > col else ""), i)
                 )
@@ -174,6 +182,11 @@ def version_label(version):
     return version if version[0] in "vV" else "v" + version
 
 
+def running_name(identity):
+    """What the FM-1 runs, by its identity, when it's no firmware on the card."""
+    return "M-VAVE V16" if identity == V16_PRODUCT else identity
+
+
 def display_name(e):
     """Name and version, without repeating a version the name already has."""
     if not e.version or e.version.lower() in e.name.lower():
@@ -191,8 +204,8 @@ def page_slice(items, page, per_page):
 
 class State:
     """Favorites, the last install, the list view
-    ("grid" or "list"), its sort (one of SORTS) and whether its pages scroll (boards that can,
-    fm1ui.flat), kept in a JSON file.
+    ("grid" or "list"), its sort (one of SORTS), whether its pages scroll (boards that can,
+    fm1ui.flat) and whether the FM-1 has the newer flash chip (new_chip), kept in a JSON file.
     Writes are best effort: a read-only card just means nothing is remembered."""
 
     def __init__(self, path):
@@ -205,6 +218,9 @@ class State:
         # {"head": CRC, "slug": ...}: the flash head the last M-VAVE-loader install wrote
         self.head = None
         self.scroll = True
+        # Settings > Newer flash chip: the FM-1 has the UC25HQ80 (0xB36014) that units sold
+        # since autumn 2026 carry, so firmwares that know only the first chip are left out
+        self.new_chip = False
         try:
             with open(path) as f:
                 data = json.load(f)
@@ -215,12 +231,15 @@ class State:
             self.removed = set(data.get("removed", ()))
             self.head = data.get("head")
             self.scroll = data.get("scroll", True)
+            self.new_chip = data.get("new_chip", False)
         except (OSError, ValueError):
             pass
 
     def save(self):
         data = {"favorites": sorted(self.favorites), "installed": self.installed,
                 "view": self.view, "sort": self.sort, "scroll": self.scroll}
+        if self.new_chip:
+            data["new_chip"] = True
         if self.removed:
             data["removed"] = sorted(self.removed)
         if self.head:

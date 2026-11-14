@@ -98,7 +98,7 @@ def fm1_status(app):
     """"FM-1: <what it runs>" for the connected FM-1."""
     slug = app.installed_slug()
     e = app.entry(slug) if slug else None
-    return "FM-1: " + (C.display_name(e) if e else app.identity)
+    return "FM-1: " + (C.display_name(e) if e else C.running_name(app.identity))
 
 
 class ListScreen(Screen):
@@ -118,7 +118,7 @@ class ListScreen(Screen):
         """Index positions of the entries the filters show."""
         st = self.app.state
         return self.app.index.select(
-            st.favorites if self.favorites_only else None, self.tag, st.sort
+            st.favorites if self.favorites_only else None, self.tag, st.sort, st.new_chip
         )
 
     def per_page(self):
@@ -475,6 +475,8 @@ class DetailScreen(Screen):
         tags = [(g, ui.kind_color(g)) for g in e.genre.split(",") if g]
         if e.beta:
             tags.append(("beta", ui.WARN))
+        if app.state.new_chip and e.chip == C.OLD_CHIP:
+            tags.append(("old chip", ui.WARN))
         if m.get("license"):
             tags.append((m["license"], ui.DIM))
         W, H = L.W, L.H
@@ -660,11 +662,18 @@ class ConfirmScreen(Screen):
         ident = app.identity
         if not ident:
             return False, "The FM-1 is no longer connected. Go back and tap Connect FM-1.", None
+        if app.state.new_chip and e.chip == C.OLD_CHIP:
+            text = ("%s saves only on the first FM-1s' flash chip. This FM-1 has the newer chip "
+                    "(Settings): it would lose its saves at power-off, and could refuse later "
+                    "updates." % e.name)
+            return False, text, None
         current = app.installed_slug()
         cur = app.entry(current) if current else None
-        running = C.display_name(cur) if cur else ident
+        running = C.display_name(cur) if cur else C.running_name(ident)
         if current == e.slug:
             text = "%s is already on the FM-1. Install it again?" % e.name
+        elif e.product == STOCK_PRODUCT and ident == C.V16_PRODUCT:
+            text = "This installs M-VAVE's V15 and its factory voices, replacing M-VAVE V16."
         elif e.product == STOCK_PRODUCT:
             text = ("This puts back M-VAVE's official firmware and its factory voices, "
                     "replacing %s." % running)

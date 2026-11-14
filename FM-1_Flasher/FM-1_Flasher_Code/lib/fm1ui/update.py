@@ -60,9 +60,9 @@ def job(root, plan, net, stats):
     total, name) as it goes. Counts land in `stats`. Nothing is removed."""
     K.clean_parts(root)
 
-    for i, e in enumerate(plan.dated):  # cards from before the lists sorted by date
-        yield ("Adding dates", i, len(plan.dated), e.get("name") or e["id"])
-        K.set_dates(root, e)
+    for i, e in enumerate(plan.stale):  # cards from before the dates or the chips
+        yield ("Adding details", i, len(plan.stale), e.get("name") or e["id"])
+        K.set_details(root, e)
 
     total = plan.bytes
     base = 0
@@ -401,26 +401,27 @@ class UpdateScreen:
                 self.pics = picture_list(app.root, self.plan)
             except (OSError, ValueError, KeyError) as e:
                 err = "Couldn't read the hub's catalog (%s)." % (str(e) or repr(e))
-            if err is None and self.plan.dated and not (self.plan.downloads or self.pics):
-                self.add_dates()
+            if err is None and self.plan.stale and not (self.plan.downloads or self.pics):
+                self.add_details()
         self.message = err or ""
         self.mode = "error" if err else "plan"
         app.show()  # the plan has its own buttons (Details)
 
-    def add_dates(self):
+    def add_details(self):
         """Nothing to download, but the card's firmwares lack the catalog's
-        dates (the list's New and Updated sorts): add them now, once."""
+        dates (the list's New and Updated sorts) or flash chips (Settings >
+        Newer flash chip): add them now, once."""
         plan, app = self.plan, self.app
-        self.sub.set("Adding dates to the list...")
+        self.sub.set("Adding details to the list...")
         app.refresh()
         try:
-            for e in plan.dated:
-                K.set_dates(app.root, e)
+            for e in plan.stale:
+                K.set_details(app.root, e)
             K.write_index(app.root, plan.updated_at)
             app.reload_index()
         except OSError as e:
-            print("update: dates: %r" % e)
-        plan.dated = []
+            print("update: details: %r" % e)
+        plan.stale = []
 
     def picked(self):
         """Back from Details: the ticks changed what the update fetches."""

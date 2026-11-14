@@ -20,10 +20,16 @@ anything (docs/PLAN-v2.md, Phase 3).
 # pylint: disable=import-outside-toplevel
 import json
 
+from fm1ui.catalog import V16_PRODUCT
+
 STOCK_PRODUCT = "FM-1_015"
 # Firmwares whose updater can't be told from their package: (identity) -> what
 # it takes. "official": only packages with M-VAVE's loader and the FM-1's head.
-UPDATERS = {"FM-1_003": "official"}  # Bubba Machine (hal/fm1/fm1_update.c)
+UPDATERS = {"FM-1_003": "official",  # Bubba Machine (hal/fm1/fm1_update.c)
+            V16_PRODUCT: "any"}  # M-VAVE's V16: its updater is V15's
+# The flash head V16 writes: fm1proto.flash_head of M-VAVE's FM-1.fwsc 016 (SHA-256 d017fb65...).
+# M-VAVE's updater installs V16, so the flasher records it when it sees V16 running (seen()).
+V16_HEAD = 0x22B0
 _cache = {}  # (slug, version) -> (official loader, head CRC or None)
 
 
@@ -49,6 +55,17 @@ def info(app, slug):
     return _cache[key]
 
 
+def seen(app):
+    """Record V16's head when the FM-1 is found running V16: M-VAVE's updater
+    put it there, not the flasher. Returns True when the record changed."""
+    rec = app.state.head or {}
+    if app.identity != V16_PRODUCT or rec.get("head") == V16_HEAD:
+        return False
+    app.state.head = {"head": V16_HEAD, "slug": V16_PRODUCT}
+    app.state.save()
+    return True
+
+
 def _stock_slug(app):
     found = app.index.with_product(STOCK_PRODUCT)
     return found[0] if found else None
@@ -72,7 +89,8 @@ def _running(app):
         takes = "head"
     else:
         takes = None
-    return (app.entry(known).name if known else ident), known, takes
+    from fm1ui import catalog as C
+    return (app.entry(known).name if known else C.running_name(ident)), known, takes
 
 
 def _fm1_head(app):
@@ -121,6 +139,8 @@ def advice(app, entry):
         if s not in (entry.slug, run_slug) and _bridges(app, s, head):
             bridge = app.entry(s).name
             break
+    if bridge is None and via == V16_PRODUCT:
+        bridge = "M-VAVE V16 (with M-VAVE's updater)"
     if bridge:
         return "Install %s first, then %s, otherwise %s." % (bridge, entry.name, refuse)
     return "%s. Install the firmware that last changed it first." % (refuse[0].upper() + refuse[1:])
