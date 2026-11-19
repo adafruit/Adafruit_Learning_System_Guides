@@ -30,7 +30,7 @@ def _rgb565(r, g, b):
     return ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3)
 
 # pylint: disable=too-many-lines, too-many-locals, too-many-branches
-# #pylint: disable=too-many-statements, too-many-positional-arguments, line-too-long
+# #pylint: disable=too-many-statements, broad-except, line-too-long
 # unpack the .WSZ file
 class SkinArchive:
     """Case-insensitive file access to a .wsz"""
