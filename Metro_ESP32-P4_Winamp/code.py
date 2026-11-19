@@ -145,13 +145,17 @@ class AudioChain:
         self.filters = []         # [(kind, synthio.Biquad)] currently in the filter chain
 
 class Vis:
+    # The buffers are made once per audio format (setup_vis) and reused every
+    # frame, so drawing the visualizer allocates almost nothing.
     def __init__(self):
         self.mode = "bars"        # tapping the visualizer cycles "bars" -> "scope" -> "off"
-        self.buf = None           # one FFT's worth of samples, all channels
-        self.window = None        # Hann window, so a pure tone shows as one bar, not a smear
-        self.bands = []           # (first_bin, end_bin, tilt_db) for each of the 19 bars
-        self.ref = 1.0            # FFT magnitude of a full-scale sine: the top of the scale
-        self.channels = 1
+        self.buf = None           # one FFT's worth of samples from the tap, all channels
+        self.channel_views = ()   # ulab views of buf: (left, right) or (mono,)
+        self.mono = None          # float32 work array: channels mixed, then windowed
+        self.scope = None         # every 4th sample of mono, for the oscilloscope
+        self.scope_scale = 1.0    # samples (summed over channels) -> -1..1
+        self.window = None        # Hann window (halved for stereo, to average the channels)
+        self.bands = []           # (first_bin, end_bin, offset) for each of the 19 bars
         self.levels = [0.0] * 19
 
 ui = UI()
@@ -346,12 +350,16 @@ FILTER_MODES = {"peak": synthio.FilterMode.PEAKING_EQ, "low": synthio.FilterMode
 
 # audio visualizer
 def setup_vis(rate, channels):
-    """Sizes and band edges for the visualizer at this sample rate."""
+    """Buffers, window and band edges for the visualizer at this sample rate."""
     n = VIS_FFT_SIZE
-    vis.channels = channels
     vis.buf = array.array("h", [0] * (n * channels))
-    vis.window = 0.5 - 0.5 * np.cos(np.arange(n) * (2 * math.pi / n))
-    vis.ref = 32768 * n / 4  # full-scale sine through a Hann window
+    samples = np.frombuffer(vis.buf, dtype=np.int16)  # a view: sees every new read
+    vis.channel_views = (samples[0::2], samples[1::2]) if channels == 2 else (samples,)
+    vis.mono = np.zeros(n, dtype=np.float)
+    vis.scope = vis.mono[::4]
+    vis.scope_scale = 1 / (32768 * channels)
+    vis.window = (0.5 - 0.5 * np.cos(np.arange(n) * (2 * math.pi / n))) / channels
+    ln_ref = math.log(32768 * n / 4)  # full-scale sine through a Hann window: top of the scale
     # 19 bars spaced evenly on a log scale, like Winamp, 40 Hz .. 16 kHz
     lo, hi = 40.0, min(16000.0, rate * 0.45)
     edges = [lo * (hi / lo) ** (k / 19) for k in range(20)]
@@ -360,44 +368,41 @@ def setup_vis(rate, channels):
     for k in range(19):
         a = bins[k]
         b = max(a + 1, bins[k + 1])  # every bar gets at least one bin
-        center = math.sqrt(edges[k] * edges[k + 1])
-        vis.bands.append((a, b, VIS_TILT_DB * math.log(center / 1000) / math.log(2)))
+        tilt = VIS_TILT_DB * math.log(math.sqrt(edges[k] * edges[k + 1]) / 1000) / math.log(2)
+        # bar height = VIS_LN_SCALE * ln(magnitude) + offset (0 = empty, 1 = full)
+        vis.bands.append((a, b, 1 + tilt / VIS_RANGE_DB - VIS_LN_SCALE * ln_ref))
 
 def read_tap():
-    """Newest audio as a mono float array, or None if not enough has played."""
+    """Newest audio, mixed to mono, into vis.mono (in place). False if not
+    enough has played yet."""
     if chain.tap.available < len(vis.buf):
-        return None
+        return False
     chain.tap.readinto(vis.buf)
     chain.tap.clear()  # drop older audio so the next frame shows what's playing now
-    x = np.array(np.frombuffer(vis.buf, dtype=np.int16), dtype=np.float)
-    if vis.channels == 2:
-        x = (x[0::2] + x[1::2]) * 0.5
-    return x
+    vis.mono[:] = 0
+    for view in vis.channel_views:  # in-place adds convert int16 -> float as they go
+        vis.mono += view
+    return True
 
-def spectrum_levels(x):
-    """19 bar heights (0..1) from one block of samples."""
-    mags = spectrogram(x * vis.window)
-    out = []
-    for a, b, tilt in vis.bands:
-        m = np.max(mags[a:b]) / vis.ref
-        db = 8.685889638 * math.log(m + 1e-9) + tilt  # 20 * log10(m)
-        out.append(max(0.0, min(1.0, (db + VIS_RANGE_DB) / VIS_RANGE_DB)))
-    return out
+def update_bars(mags):
+    """Spectrum magnitudes -> the 19 bar heights (0..1) in vis.levels."""
+    levels = vis.levels
+    for i, (a, b, offset) in enumerate(vis.bands):
+        target = VIS_LN_SCALE * math.log(np.max(mags[a:b]) + 1e-9) + offset
+        target = max(0.0, min(1.0, target))
+        # jump up, fall gradually, like Winamp's analyzer
+        levels[i] = target if target > levels[i] else levels[i] * 0.85
 
 def update_vis():
-    if vis.mode == "off" or player.state != "play":
-        return
-    x = read_tap()
-    if x is None:
+    if vis.mode == "off" or player.state != "play" or not read_tap():
         return
     if vis.mode == "bars":
-        levels = vis.levels
-        for i, target in enumerate(spectrum_levels(x)):
-            # jump up, fall gradually, like Winamp's analyzer
-            levels[i] = target if target > levels[i] else levels[i] * 0.85
-        ui.main.vis.draw_bars(levels)
+        vis.mono *= vis.window
+        update_bars(spectrogram(vis.mono))  # (the one call that still allocates)
+        ui.main.vis.draw_bars(vis.levels)
     else:
-        ui.main.vis.draw_scope(list(x[::4] * (1 / 32768)))
+        vis.mono *= vis.scope_scale
+        ui.main.vis.draw_scope(vis.scope)
 
 def cycle_vis():
     vis.mode = {"bars": "scope", "scope": "off"}.get(vis.mode, "bars")

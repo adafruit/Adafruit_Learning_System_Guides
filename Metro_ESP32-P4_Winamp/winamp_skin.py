@@ -17,7 +17,8 @@ import terminalio
 def _to_str(raw):
     try:
         return raw.decode("utf-8")
-    except Exception:  # cp1252 / cp437 names and text files
+    except Exception: # pylint: disable=broad-except
+        # cp1252 / cp437 names and text files
         return "".join(chr(c) if c < 128 else "?" for c in raw)
 
 def _is_dir(path):
@@ -30,7 +31,7 @@ def _rgb565(r, g, b):
     return ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3)
 
 # pylint: disable=too-many-lines, too-many-locals, too-many-branches
-# #pylint: disable=too-many-statements, broad-except, line-too-long
+# #pylint: disable=too-many-statements, line-too-long
 # unpack the .WSZ file
 class SkinArchive:
     """Case-insensitive file access to a .wsz"""
