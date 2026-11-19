@@ -361,7 +361,8 @@ class ShieldView:
 
     # ------------------------------------------------------------ drawing
 
-    def _button(self, t, enabled, pressed=False, selected=False):
+    @staticmethod
+    def _button(t, enabled, pressed=False, selected=False):
         if pressed or selected:
             t.set_colours(PANEL_BG, ACCENT)
         elif enabled:

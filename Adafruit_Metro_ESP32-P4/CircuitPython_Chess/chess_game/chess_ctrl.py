@@ -125,7 +125,7 @@ class Controller:
 
     def _say(self, text):
         if self.log:
-            self.log(text)
+            self.log(text)  # pylint: disable=not-callable
 
     @property
     def human(self):
@@ -296,7 +296,8 @@ class Controller:
         self._sync()
         self._after_move()
 
-    def _display_to(self, uci):
+    @staticmethod
+    def _display_to(uci):
         # castling is shown by the king's destination, as in UCI
         return square(uci[2:4])
 

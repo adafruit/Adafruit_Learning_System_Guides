@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 # pylint: disable=import-outside-toplevel, too-many-branches, too-many-statements
+# pylint: disable=broad-except  # network/MQTT errors come in many exception types
 """Network transport for online games: Wi-Fi and the two Adafruit IO feeds.
 
 The game state and its rules are in chess_online; this module only sends and

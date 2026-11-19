@@ -48,7 +48,8 @@ class Screens:
     def refresh(self):
         self.display.refresh(target_frames_per_second=None)
 
-    def _bar(self, g, y):
+    @staticmethod
+    def _bar(g, y):
         """Adds a countdown bar at y. Returns (fill shape, full width)."""
         bw = W - 120
         g.append(rect(LINE, 60, y, bw, 4)[0])
@@ -159,7 +160,8 @@ class Screens:
         self.display.root_group = g
         return g
 
-    def _target(self, g, x, y):
+    @staticmethod
+    def _target(g, x, y):
         g.append(vectorio.Circle(pixel_shader=_palette(ACCENT), radius=10, x=x, y=y))
         g.append(vectorio.Circle(pixel_shader=_palette(PANEL_BG), radius=8, x=x, y=y))
         g.append(rect(TEXT, x - 16, y, 33, 1)[0])

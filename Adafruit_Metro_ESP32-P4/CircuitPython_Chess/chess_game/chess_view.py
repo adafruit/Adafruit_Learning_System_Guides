@@ -208,7 +208,8 @@ class Board:
         board.append(cells)
         self.piece_cache = bytearray(64)
 
-    def cell(self, s, flipped):
+    @staticmethod
+    def cell(s, flipped):
         """Square -> (col, row) on screen."""
         f, r = s & 7, s >> 3
         return (7 - f, r) if flipped else (f, 7 - r)
@@ -617,7 +618,8 @@ class View:
         )
         self._button(d["o_back"], True, pressed=self.flash_id == "o_back")
 
-    def _button(self, t, enabled, pressed=False, selected=False):
+    @staticmethod
+    def _button(t, enabled, pressed=False, selected=False):
         if pressed:
             t.set_colours(BUTTON_TEXT, ACCENT)
         elif selected:
