@@ -72,6 +72,7 @@ FOCUS_FOLLOWS_TOUCH = False  # True: a tapped window's title bar lights up, like
                              # Off saves redrawing two full-width title bars per tap.
 VIS_RANGE_DB = 50     # dB from full scale down to an empty bar
 VIS_TILT_DB = 3       # dB per octave added toward treble, as music has less energy there
+VIS_LN_SCALE = 8.685889638 / VIS_RANGE_DB  # ln(magnitude) -> fraction of the bar's dB range
 
 SCALE = W / 275  # full width: 720 / 275 = 2.618. Use 2 for crisp, even pixels.
 
