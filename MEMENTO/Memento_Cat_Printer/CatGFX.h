@@ -3,11 +3,16 @@
 // SPDX-License-Identifier: Unlicense
 // https://github.com/TheNitek/CatGFX
 
+#ifndef CATGFX_H
+#define CATGFX_H
+
 #include <Arduino.h>
 #include <Adafruit_GFX.h>
-#include <BLEDevice.h>
 
-class CatPrinter: public Adafruit_GFX, public BLEAdvertisedDeviceCallbacks {
+// Requires arduino-esp32 4.0 or later
+#include <BLE.h>
+
+class CatPrinter: public Adafruit_GFX {
   public:
     enum class Cmd {
       REVERSE_FEED = 0xA0,
@@ -21,13 +26,11 @@ class CatPrinter: public Adafruit_GFX, public BLEAdvertisedDeviceCallbacks {
       PRINT_COMPRESSED = 0xBF
     };
   CatPrinter(uint16_t h);
-    ~CatPrinter() {
-      delete bleClient;
-    }
+    ~CatPrinter() {}
     void begin(byte *buffer, uint16_t size);
     void fillBuffer(const byte value);
     bool connect(void);
-    bool connect(BLEAddress &address);
+    bool connect(BTAddress &address);
     void disconnect(void);
     void sendLine(const byte *data, const uint8_t len, const bool compressed = true);
     void feed(uint8_t lines);
@@ -51,10 +54,9 @@ class CatPrinter: public Adafruit_GFX, public BLEAdvertisedDeviceCallbacks {
     const BLEUUID SERVICE_UUID;
     const BLEUUID CHAR_UUID_DATA;
 
-    BLEAddress *blePrinterAddress = nullptr;
-    BLERemoteCharacteristic* pRemoteCharacteristicData = nullptr;
-    BLEScan *bleScan = BLEDevice::getScan();
-    BLEClient *bleClient = BLEDevice::createClient();;
+    BTAddress blePrinterAddress;
+    BLEClient bleClient;
+    BLERemoteCharacteristic remoteCharacteristicData;
 
   //Indicates the end of the array with an empty string instead of NULL.
   const static uint8_t NAME_ARRAY_SIZE = 6;
@@ -115,7 +117,9 @@ class CatPrinter: public Adafruit_GFX, public BLEAdvertisedDeviceCallbacks {
       0x3F, 0xBF, 0x7F, 0xFF
     };
 
-    void onResult(BLEAdvertisedDevice advertisedDevice) override;
+    bool isPrinterName(const char *name) const;
     uint8_t crc(const byte *data, const uint8_t len);
     void writeData(byte *data, uint8_t len);
 };
+
+#endif // CATGFX_H
