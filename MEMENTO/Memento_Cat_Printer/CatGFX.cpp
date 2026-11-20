@@ -29,9 +29,12 @@ void CatPrinter::begin(byte *buffer, uint16_t size) {
   pixelBuffer = buffer;
   pixelBufferSize = size;
 
-  BLEDevice::init("ESP32");
-  bleScan->setAdvertisedDeviceCallbacks(this);
-  bleScan->setActiveScan(true);
+  BTStatus status = BLE.begin("ESP32");
+  if (!status) {
+    Serial.printf("BLE init failed: %s\n", status.toString());
+    return;
+  }
+  BLE.getScan().setActiveScan(true); // Printer names arrive in scan responses
 }
 
 void CatPrinter::fillBuffer(const byte value) {
@@ -40,41 +43,64 @@ void CatPrinter::fillBuffer(const byte value) {
 }
 
 bool CatPrinter::connect(void) {
-  bleScan->start(5);
-  if(blePrinterAddress == nullptr) {
+  // Scan for 5 seconds, then pick the first device whose name is on the list.
+  blePrinterAddress = BTAddress();
+  BLEScan::Results results = BLE.getScan().startBlocking(5000);
+  for (const BLEAdvertisedDevice &dev : results) {
+    if (isPrinterName(dev.getName().c_str())) {
+      blePrinterAddress = dev.getAddress();
+      Serial.print("Found Printer: ");
+      Serial.println(blePrinterAddress.toString());
+      break;
+    }
+  }
+  if (!blePrinterAddress) {
     return false;
   }
-  return connect(*blePrinterAddress);
+  return connect(blePrinterAddress);
 }
 
-bool CatPrinter::connect(BLEAddress &address) {
-  if(!bleClient->connect(address)) {
-    Serial.println("Connect failed");
+bool CatPrinter::connect(BTAddress &address) {
+  // A fresh client per connection; assigning releases any previous one.
+  bleClient = BLE.createClient();
+  if (!bleClient) {
+    Serial.println("Could not create BLE client");
+    return false;
+  }
+  BTStatus status = bleClient.connect(address);
+  if (!status) {
+    Serial.printf("Connect failed: %s\n", status.toString());
+    return false;
+  }
+  if (!bleClient.discoverServices()) {
+    bleClient.disconnect();
+    Serial.println("Service discovery failed");
     return false;
   }
 
-  BLERemoteService* pRemoteService = bleClient->getService(SERVICE_UUID);
-  if(pRemoteService != nullptr) {
-    pRemoteCharacteristicData = pRemoteService->getCharacteristic(CHAR_UUID_DATA);
-    if(pRemoteCharacteristicData != nullptr) {
+  BLERemoteService remoteService = bleClient.getService(SERVICE_UUID);
+  if (remoteService) {
+    remoteCharacteristicData = remoteService.getCharacteristic(CHAR_UUID_DATA);
+    if (remoteCharacteristicData) {
       Serial.println("Got data transfer characteristic!");
       return true;
     }
+    bleClient.disconnect();
+    Serial.println("Data characteristic not found");
   }
   else {
-      bleClient->disconnect();
+      bleClient.disconnect();
       Serial.println("Data service not found");
   }
   return false;
 }
 
 void CatPrinter::disconnect(void) {
-  bleClient->disconnect();
-
-  if(blePrinterAddress != nullptr) {
-    delete blePrinterAddress;
-    blePrinterAddress = nullptr;
+  if (bleClient) {
+    bleClient.disconnect();
   }
+  remoteCharacteristicData = BLERemoteCharacteristic();
+  blePrinterAddress = BTAddress();
 }
 
 void CatPrinter::sendLine(const byte *data, const uint8_t len, const bool compressed) {
@@ -140,22 +166,15 @@ void CatPrinter::printBuffer(void) {
   endGraphics();
 }
 
-void CatPrinter::onResult(BLEAdvertisedDevice advertisedDevice) {
-  //Serial.println("on result");
-  uint8_t i = 0;
-  delay(200);
-  while (i < this->NAME_ARRAY_SIZE && strcmp(this->printerNames[i], "") != 0){
-    if (strcmp(advertisedDevice.getName().c_str(), this->printerNames[i]) == 0) {
-    blePrinterAddress = new BLEAddress(advertisedDevice.getAddress());
-    Serial.print("Found Printer: ");
-    Serial.println(blePrinterAddress->toString().c_str());
-    bleScan->stop();
-        break ;
+bool CatPrinter::isPrinterName(const char *name) const {
+  for (uint8_t i = 0; i < NAME_ARRAY_SIZE && strcmp(printerNames[i], "") != 0; i++) {
+    if (strcmp(name, printerNames[i]) == 0) {
+      return true;
     }
-    else
-    i ++;
-    }
+  }
+  return false;
 }
+
 
 void CatPrinter::sendCmd(const CatPrinter::Cmd cmd, const byte *data, const uint8_t len) {
   //Serial.println("send cmd");
@@ -181,7 +200,7 @@ byte CatPrinter::crc(const byte *data, const uint8_t len) {
 
 void CatPrinter::writeData(byte *data, uint8_t len) {
   //Serial.println("write data");
-  if (!bleClient->isConnected()) {
+  if (!bleClient || !bleClient.isConnected() || !remoteCharacteristicData) {
       return;
   }
 
@@ -189,7 +208,7 @@ void CatPrinter::writeData(byte *data, uint8_t len) {
   while (len > PACKET_SIZE) {
     delay(2);
       Serial.print(".");
-      pRemoteCharacteristicData->writeValue(data, PACKET_SIZE);
+      remoteCharacteristicData.writeValue(data, PACKET_SIZE, false);
       data += PACKET_SIZE;
       len -= PACKET_SIZE;
     //Serial.println("wrote packet, len > packet_size");
@@ -197,7 +216,7 @@ void CatPrinter::writeData(byte *data, uint8_t len) {
   }
   if (len) {
   delay(2);
-    pRemoteCharacteristicData->writeValue(data, len);
+    remoteCharacteristicData.writeValue(data, len, false);
   //delay(200);
     Serial.println(".");
   //Serial.println("wrote packet, len < packet_size");
