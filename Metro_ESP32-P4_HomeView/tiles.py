@@ -168,19 +168,20 @@ class ConditionTile(Tile):
 
     def __init__(self, name):
         super().__init__(name)
-        self.center, self.max_width, self.lines = (0, 0), 0, []  # set by resize()
+        self.center, self.max_width = (0, 0), 0  # set by resize()
+        self.top_line = self.bottom_line = None  # made by resize()
 
     def resize(self, width, height):
         super().resize(width, height)
         self.center = (width // 2, height // 2 + 10)
         self.max_width = width - 48
-        self.lines = [text("--", MEDIUM, WHITE, (0.5, 0.5), self.center),
-                      text("", MEDIUM, WHITE, (0.5, 0.5), self.center)]
-        for line in self.lines:
-            self.append(line)
+        self.top_line = text("--", MEDIUM, WHITE, (0.5, 0.5), self.center)
+        self.bottom_line = text("", MEDIUM, WHITE, (0.5, 0.5), self.center)
+        self.append(self.top_line)
+        self.append(self.bottom_line)
 
     def set(self, condition):
-        top, bottom = self.lines
+        top, bottom = self.top_line, self.bottom_line
         top.text, bottom.text = condition, ""
         words = condition.split(" ")
         if top.bounding_box[2] > self.max_width and len(words) > 1:
@@ -400,13 +401,14 @@ class LightTile(Tile):
 
     SLIDER_Y = 180  # vertical center of the dimmer
 
-    def __init__(self, name, feed):
+    def __init__(self, name, feed, on_change):
+        """on_change(feed, "#RRGGBB") is called when the user changes the light."""
         super().__init__(name)
         self.feed = feed
+        self.on_change = on_change
         self.on = False
         self.level = None  # 0-255 once known; remembered while the light is off
         self.dragging = False
-        self.on_change = None  # called with (feed, "#RRGGBB") when the user changes it
         # Made by resize():
         self.switch = self.fill_color = self.fill = self.knob = None
         self.percent = self.hex = None
@@ -493,8 +495,7 @@ class LightTile(Tile):
             super().release(point)
             return
         self.show()
-        if self.on_change:
-            self.on_change(self.feed, self.color())
+        self.on_change(self.feed, self.color())
 
 class PhotoTile(Tile):
     """The latest JPEG photo from a feed (sent as base64 text)"""
