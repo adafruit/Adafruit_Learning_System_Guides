@@ -127,7 +127,7 @@ def make_tile(spec, tab_name):
     elif kind == "temperature":
         tile = TempTile(title, parse_bands(spec.get("bands", [])))
     elif kind == "light":
-        tile = LightTile(title, spec["feed"])
+        tile = LightTile(title, spec["feed"], light_changed)
     elif kind == "weather":
         tile = WeatherTile(title, spec.get("readings", []))
     elif kind == "forecast":
@@ -170,11 +170,20 @@ def make_pages():
         layout.add_content(page, name)
     return layout, tab_grids
 
+def deliver(feed, value):
+    """Show a new value from a feed on everything that displays it."""
+    for receiver in listeners.get(feed, ()):
+        receiver.receive(value)
+
+def light_changed(feed, color):
+    """A light tile was used: show it on any other tiles for that light, then send it."""
+    deliver(feed, color)
+    publish(feed, color)
+
 pages, grids = make_pages()
 weather_tiles = [tile for tile in all_tiles if hasattr(tile, "show_weather")]
 history_tiles = [tile for tile in all_tiles if isinstance(tile, HistoryTile)]
 clock_tiles = [tile for tile in all_tiles if isinstance(tile, ClockTile)]
-light_tiles = [tile for tile in all_tiles if isinstance(tile, LightTile)]
 live_tiles = [tile for tile in all_tiles if isinstance(tile, LiveTile)]
 
 root = displayio.Group()
@@ -182,11 +191,6 @@ for item in (background, title_box, clock_box, title_label, date_label, status_d
              tab_bar, pages):
     root.append(item)
 display.root_group = root
-
-def deliver(feed, value):
-    """Show a new value from a feed on every tile that displays it."""
-    for receiver in listeners.get(feed, ()):
-        receiver.receive(value)
 
 # AIO
 def connected(client):
@@ -298,14 +302,6 @@ def publish(feed, value):
         print("Sent:", feed, "=", value)
     except NETWORK_ERRORS as e:
         print("Publish failed:", e)
-
-def light_changed(feed, color):
-    """A light tile was used: sync any other tiles for that light, then send it."""
-    deliver(feed, color)
-    publish(feed, color)
-
-for light in light_tiles:
-    light.on_change = light_changed
 
 # touch interface interractions
 def show_tab(index):
