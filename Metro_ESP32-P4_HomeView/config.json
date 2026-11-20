@@ -1,0 +1,129 @@
+{
+  "background": ["#E8628F", "#F9A04B"],
+  "colors": {
+    "color1": "#30D158",
+    "color2": "#FFD60A",
+    "color3": "#FF9F0A",
+    "color4": "#FF453A",
+    "color5": "#BF5AF2",
+    "color6": "#A2253A",
+    "color7": "#0A84FF",
+    "color8": "#8E8E93"
+  },
+
+  "tabs": [
+    {
+      "name": "Home",
+      "tiles": [
+        {"type": "weather", "title": "Outside", "at": [0, 0], "size": [2, 2],
+         "readings": [
+           {"label": "Humidity", "feed": "feather-esp32s2108166148.ws-0x62-humidity", "format": "{:.0f}%"},
+           {"label": "CO2", "feed": "feather-esp32s2108166148.ws-0x62-co2", "format": "{:.0f} ppm"},
+           {"label": "PM2.5", "feed": "feather-esp32s2108166148.ws-0x12-pm25-std", "format": "{:.0f}"}
+         ]},
+        {"type": "clock", "at": [2, 0]},
+        {"type": "temperature", "title": "Grow Room", "at": [3, 0],
+         "feed": "qtpy-esp32s3-n4r2164204176.ws-0x3a-ambient-temp-fahrenheit", "bands": "grow_temp"},
+        {"type": "history", "title": "Grow Room", "at": [2, 1], "size": [2, 1],
+         "series": [
+           {"label": "VPD (kPa)", "feed": "vpd", "color": "color1", "format": "{:.1f}"},
+           {"label": "PPFD", "feed": "ppfd", "color": "color2", "format": "{:.0f}"}
+         ]}
+      ]
+    },
+    {
+      "name": "Lights",
+      "tiles": [
+        {"type": "light", "title": "Grow Light", "at": [0, 0], "size": [2, 1],
+         "feed": "feather-esp32s2218179148.ws-001"},
+        {"type": "light", "title": "Loft Light", "at": [2, 0], "size": [2, 1],
+         "feed": "feather-esp32s2200138148.ws-001"},
+        {"type": "light", "title": "Kitchen Light", "at": [1, 1], "size": [2, 1],
+         "feed": "rpi-pico-w119800.ws-001"}
+      ]
+    },
+    {
+      "name": "Grow Room",
+      "tiles": [
+        {"type": "gauge", "title": "Temp (F)", "at": [0, 0], "min": 50, "max": 100, "format": "{:.1f}",
+         "feed": "qtpy-esp32s3-n4r2164204176.ws-0x3a-ambient-temp-fahrenheit", "bands": "grow_temp"},
+        {"type": "gauge", "title": "Leaf Temp (F)", "at": [1, 0], "min": 50, "max": 100, "format": "{:.1f}",
+         "feed": "qtpy-esp32s3-n4r2164204176.ws-0x3a-object-temp-fahrenheit", "bands": "grow_temp"},
+        {"type": "gauge", "title": "Humidity", "at": [2, 0], "min": 0, "max": 100, "format": "{:.0f}%",
+         "feed": "qtpy-esp32s3-n4r2164204176.ws-0x62-humidity", "bands": "grow_humidity"},
+        {"type": "gauge", "title": "CO2", "at": [3, 0], "min": 0, "max": 2000, "format": "{:.0f} ppm",
+         "feed": "qtpy-esp32s3-n4r2164204176.ws-0x62-co2", "bands": "grow_co2"},
+        {"type": "gauge", "title": "PPFD (umol/m2/s)", "at": [0, 1], "min": 0, "max": 1200, "format": "{:.0f}",
+         "feed": "ppfd", "bands": "ppfd"},
+        {"type": "gauge", "title": "VPD (kPa)", "at": [1, 1], "min": 0, "max": 2, "format": "{:.2f}",
+         "feed": "vpd", "bands": "vpd"},
+        {"type": "gauge", "title": "Light (lux)", "at": [2, 1], "min": 0, "max": 50000, "format": "{:.0f}",
+         "feed": "qtpy-esp32s3-n4r2164204176.ws-0x10-light", "bands": "grow_lux"},
+        {"type": "light", "title": "Grow Light", "at": [3, 1],
+         "feed": "feather-esp32s2218179148.ws-001"}
+      ]
+    },
+    {
+      "name": "Loft",
+      "tiles": [
+        {"type": "gauge", "title": "Temp (F)", "at": [1, 0], "min": 40, "max": 100, "format": "{:.1f}",
+         "feed": "feather-esp32s2200138148.ws-0x77-ambient-temp-fahrenheit", "bands": "room_temp"},
+        {"type": "gauge", "title": "Humidity", "at": [2, 0], "min": 0, "max": 100, "format": "{:.0f}%",
+         "feed": "feather-esp32s2200138148.ws-0x77-humidity", "bands": "room_humidity"},
+        {"type": "gauge", "title": "Light (lux)", "at": [1, 1], "min": 0, "max": 1000, "format": "{:.0f}",
+         "feed": "feather-esp32s2200138148.ws-0x29-light", "bands": "room_lux"},
+        {"type": "light", "title": "Loft Light", "at": [2, 1],
+         "feed": "feather-esp32s2200138148.ws-001"}
+      ]
+    },
+    {
+      "name": "Kitchen",
+      "tiles": [
+        {"type": "gauge", "title": "Temp (F)", "at": [1, 0], "min": 40, "max": 100, "format": "{:.1f}",
+         "feed": "rpi-pico-w119800.ws-0x44-ambient-temp-fahrenheit", "bands": "room_temp"},
+        {"type": "gauge", "title": "Humidity", "at": [2, 0], "min": 0, "max": 100, "format": "{:.0f}%",
+         "feed": "rpi-pico-w119800.ws-0x44-humidity", "bands": "room_humidity"},
+        {"type": "gauge", "title": "Light (lux)", "at": [1, 1], "min": 0, "max": 1000, "format": "{:.0f}",
+         "feed": "rpi-pico-w119800.ws-0x29-light", "bands": "room_lux"},
+        {"type": "light", "title": "Kitchen Light", "at": [2, 1],
+         "feed": "rpi-pico-w119800.ws-001"}
+      ]
+    },
+    {
+      "name": "Outside",
+      "tiles": [
+        {"type": "forecast", "title": "Temperature", "at": [0, 0], "size": [2, 2]},
+        {"type": "gauge", "title": "Humidity", "at": [2, 0], "min": 0, "max": 100, "format": "{:.0f}%",
+         "feed": "feather-esp32s2108166148.ws-0x62-humidity"},
+        {"type": "gauge", "title": "CO2", "at": [3, 0], "min": 0, "max": 2000, "format": "{:.0f} ppm",
+         "feed": "feather-esp32s2108166148.ws-0x62-co2", "bands": "outdoor_co2"},
+        {"type": "gauge", "title": "PM2.5 (ug/m3)", "at": [2, 1], "min": 0, "max": 150, "format": "{:.0f}",
+         "feed": "feather-esp32s2108166148.ws-0x12-pm25-std", "bands": "pm25"},
+        {"type": "conditions", "title": "Conditions", "at": [3, 1]}
+      ]
+    },
+    {
+      "name": "Security",
+      "grid": [9, 2],
+      "tiles": [
+        {"type": "photo", "title": "Birdfeeder", "at": [0, 0], "size": [4, 2], "feed": "birdfeeder"},
+        {"type": "live", "title": "Live", "at": [4, 0], "size": [5, 2]}
+      ]
+    }
+  ],
+
+  "bands": {
+    "outdoor_co2": [[800, "Good", "color1"], [1000, "Fair", "color2"], [1500, "Poor", "color3"], [null, "Bad", "color4"]],
+    "pm25": [[9.0, "Good", "color1"], [35.4, "Moderate", "color2"], [55.4, "Unhealthy (SG)", "color3"],
+             [125.4, "Unhealthy", "color4"], [225.4, "Very Unhealthy", "color5"], [null, "Hazardous", "color6"]],
+    "grow_temp": [[65, "Cold", "color7"], [85, "Good", "color1"], [90, "Warm", "color3"], [null, "Hot", "color4"]],
+    "grow_humidity": [[40, "Dry", "color3"], [70, "Good", "color1"], [null, "Humid", "color7"]],
+    "grow_co2": [[600, "Low", "color2"], [1500, "Good", "color1"], [2000, "High", "color3"], [null, "Too High", "color4"]],
+    "ppfd": [[5, "Lights Off", "color8"], [200, "Low", "color2"], [1000, "Good", "color1"], [null, "Intense", "color3"]],
+    "vpd": [[0.4, "Too Low", "color7"], [1.6, "Good", "color1"], [null, "Too High", "color4"]],
+    "grow_lux": [[10, "Dark", "color8"], [null, "Lights On", "color2"]],
+    "room_temp": [[65, "Cold", "color7"], [78, "Comfortable", "color1"], [85, "Warm", "color3"], [null, "Hot", "color4"]],
+    "room_humidity": [[30, "Dry", "color3"], [60, "Comfortable", "color1"], [null, "Humid", "color7"]],
+    "room_lux": [[10, "Dark", "color8"], [300, "Dim", "color2"], [null, "Bright", "color2"]]
+  }
+}
