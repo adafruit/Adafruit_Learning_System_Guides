@@ -5,7 +5,7 @@
 # - The single-file guide runs directly as CIRCUITPY/code.py.
 # - Wi-Fi/BLE failures must not terminate the remote control loop.
 # - Two small state-management functions update shared device selection.
-# pylint: disable=too-many-lines,broad-except,global-statement
+# pylint: disable=too-many-lines,broad-except,global-statement,too-many-branches
 
 # Xbox WLED Controller — Adafruit Learn example.
 #
