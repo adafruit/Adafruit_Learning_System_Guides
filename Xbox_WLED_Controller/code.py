@@ -1,10 +1,13 @@
+# SPDX-FileCopyrightText: 2026 Erin St Blaine for Adafruit Industries
+# SPDX-License-Identifier: MIT
+
 # Pylint exceptions for embedded CircuitPython application:
 # - The single-file guide runs directly as CIRCUITPY/code.py.
 # - Wi-Fi/BLE failures must not terminate the remote control loop.
 # - Two small state-management functions update shared device selection.
-# pylint: disable=too-many-lines,broad-exception-caught,global-statement
+# pylint: disable=too-many-lines,broad-except,global-statement
 
-# Tutorial-ready draft; confirm copyright and license before publishing.
+# Xbox WLED Controller — Adafruit Learn example.
 #
 # Xbox Controller -> CircuitPython -> WLED
 # Hardware: Adafruit Feather ESP32-S3 TFT (#5483), Xbox Wireless Controller
@@ -300,6 +303,9 @@ def change_palette(direction):
     if not devices:
         show("No WLED: press UP")
         return
+    if not cancel_identification():
+        show("Restore pending; retry later")
+        return
     name, ip, _ = devices[selected]
     try:
         ensure_control_state(ip)
@@ -368,8 +374,7 @@ def get_saved_presets(ip):
 
 # Saving presets involves validation, state capture, naming, and verification.
 # Keep this sequence together to preserve tested error recovery behavior.
-# pylint: disable-next=too-many-locals,too-many-branches,too-many-statements
-def save_current_as_preset():
+def save_current_as_preset():  # pylint: disable=too-many-locals,too-many-branches,too-many-statements
     """Save the current lighting state in the first UNUSED preset slot.
 
     Does not overwrite existing presets/playlists and does not change
@@ -377,6 +382,9 @@ def save_current_as_preset():
     """
     if not devices:
         show("No WLED: press UP")
+        return
+    if not cancel_identification():
+        show("Restore pending; retry later")
         return
     name, ip, _ = devices[selected]
     try:
@@ -449,23 +457,25 @@ def save_current_as_preset():
 def recall_boot_preset():
     """PLAY the preset WLED is already configured to use on power-up.
 
-    Reading /json/info does not modify boot settings. This function
-    deliberately does NOT write to /json/cfg.
+    Read boot preset from /json/cfg (read-only). Never change boot settings.
     """
     if not devices:
         show("No WLED: press UP")
         return
+    if not cancel_identification():
+        show("Restore pending; retry later")
+        return
     name, ip, _ = devices[selected]
     try:
         try:
-            with requests.get(f"http://{ip}/json/info",
+            with requests.get(f"http://{ip}/json/cfg",
                               timeout=HTTP_TIMEOUT) as response:
                 if response.status_code != 200:
-                    raise RuntimeError(f"Info HTTP {response.status_code}")
-                info = response.json()
+                    raise RuntimeError(f"Config HTTP {response.status_code}")
+                config = response.json()
         finally:
             adafruit_connection_manager.connection_manager_close_all(pool)
-        boot_id = int(info.get("leds", {}).get("bootps", 0))
+        boot_id = int(config.get("def", {}).get("ps", 0) or 0)
         if boot_id <= 0:
             show("No boot preset assigned")
             return
@@ -482,16 +492,19 @@ def recall_boot_preset():
         show(f"Boot {preset_type} {boot_id}: {preset_name}"[:35])
         print("Recalled configured boot preset:", name, boot_id, preset_name)
     except Exception as error:
-        # Leave network ready even if /json/info failed.
+        # Leave network ready even if /json/cfg failed.
         adafruit_connection_manager.connection_manager_close_all(pool)
         print("Boot preset error:", name, repr(error))
         show("Boot preset error")
 
 
-def change_preset(direction):
+def change_preset(direction):  # pylint: disable=too-many-branches
     """One saved preset per right-stick horizontal flick."""
     if not devices:
         show("No WLED: press UP")
+        return
+    if not cancel_identification():
+        show("Restore pending; retry later")
         return
     name, ip, _ = devices[selected]
     try:
@@ -548,6 +561,9 @@ def change_effect(direction):
     if not devices:
         show("No WLED: press UP")
         return
+    if not cancel_identification():
+        show("Restore pending; retry later")
+        return
     name, ip, _ = devices[selected]
     try:
         ensure_control_state(ip)
@@ -577,6 +593,9 @@ def change_brightness(direction):
     """Adjust brightness quickly, without a GET for every step."""
     if not devices:
         show("No WLED: press UP")
+        return
+    if not cancel_identification():
+        show("Restore pending; retry later")
         return
     name, ip, _ = devices[selected]
     try:
@@ -617,6 +636,9 @@ def toggle():
     if not devices:
         show("No WLED: press UP")
         return
+    if not cancel_identification():
+        show("Restore pending; retry later")
+        return
     name, ip, _ = devices[selected]
     try:
         old = get_state(ip)
@@ -639,6 +661,9 @@ def toggle_sync_send():
     """Toggle WLED's UDP sync SEND only for the selected project."""
     if not devices:
         show("No WLED: press UP")
+        return
+    if not cancel_identification():
+        show("Restore pending; retry later")
         return
     name, ip, _ = devices[selected]
     try:
@@ -669,14 +694,20 @@ SELECTION_SETTLE = 0.35
 BLINK_HOLD = 0.14
 ident = {"phase": "idle", "deadline": 0, "ip": None,
          "name": None, "original": None, "restore_segments": None,
-         "yellow": None}
+         "yellow": None, "playlist_id": -1, "retry_count": 0}
+RESTORE_RETRY_SECONDS = 1.0
+RESTORE_MAX_RETRIES = 5
 
 
 def restore_identification():
-    """Restore the device being flashed, even when another device is selected."""
+    """Restore a flashed fixture; retain the snapshot if any request fails.
+
+    Restoring the segment effects alone cannot resume a running WLED
+    playlist. Applying its saved playlist preset restarts that playlist.
+    """
     if ident["original"] is None:
         ident["phase"] = "idle"
-        return
+        return True
     original = ident["original"]
     try:
         restore = {"on": original.get("on", False),
@@ -684,23 +715,53 @@ def restore_identification():
                    "tt": 0, "udpn": {"nn": True},
                    "seg": ident["restore_segments"]}
         set_state(ident["ip"], restore)
-    except Exception as error:
-        print("Restore failed:", ident["name"], repr(error))
-        show("Restore failed: " + str(ident["name"])[:14])
+        playlist_id = ident["playlist_id"]
+        if playlist_id > 0:
+            # WLED's 'pl' is read-only. Recalling its stored preset ID
+            # restarts the playlist from the beginning, not mid-track.
+            set_state(ident["ip"], {"ps": playlist_id,
+                                    "udpn": {"nn": True}})
+    except Exception as restore_error:
+        ident["retry_count"] += 1
+        print("Restore failed:", ident["name"], repr(restore_error))
+        ident["phase"] = "restoring"
+        ident["deadline"] = time.monotonic() + RESTORE_RETRY_SECONDS
+        if ident["retry_count"] == RESTORE_MAX_RETRIES:
+            show("Restore stuck; check WLED")
+        else:
+            show("Restore retry: " + str(ident["name"])[:14])
+        return False
+    # Only discard the original when WLED accepted restoration.
     ident["original"] = None
+    ident["restore_segments"] = None
+    ident["yellow"] = None
+    ident["playlist_id"] = -1
+    ident["retry_count"] = 0
     ident["phase"] = "idle"
+    reset_control_cache()
+    return True
+
+
+def cancel_identification():
+    """Stop any pending flash, restoring it before other WLED commands."""
+    if ident["original"] is not None:
+        if not restore_identification():
+            return False
+    ident["phase"] = "idle"
+    return True
 
 
 def queue_identification():
-    """Called when changing project: show selection NOW, blink after a pause."""
-    if ident["original"] is not None:
-        restore_identification()
+    """Show selection now, and flash only after D-pad activity settles."""
+    if not cancel_identification():
+        return False
     ident["phase"] = "waiting" if devices else "idle"
     ident["deadline"] = time.monotonic() + SELECTION_SETTLE
     ident["ip"] = None
     ident["original"] = None
     ident["restore_segments"] = None
     ident["yellow"] = None
+    return True
 
 
 def begin_identification():
@@ -739,16 +800,17 @@ def begin_identification():
             ident["phase"] = "idle"
             return
         ident["original"] = original
+        ident["playlist_id"] = int(original.get("pl", -1) or -1)
+        ident["retry_count"] = 0
         ident["restore_segments"] = restore_segments
         ident["yellow"] = {"on": True, "bri": 180, "tt": 0,
                            "udpn": {"nn": True}, "seg": yellow_segments}
         set_state(ip, ident["yellow"])
         ident["phase"] = "yellow1"
         ident["deadline"] = time.monotonic() + BLINK_HOLD
-    except Exception as error:
-        print("Identify error:", name, repr(error))
+    except Exception as identify_error:
+        print("Identify error:", name, repr(identify_error))
         show(name[:18] + " offline/error")
-        # If yellow was sent successfully but a later step fails, restore it.
         if ident["original"] is not None:
             restore_identification()
         else:
@@ -756,12 +818,15 @@ def begin_identification():
 
 
 def identification_tick():
-    """Advance one step without sleeping. Run every loop iteration."""
+    """Advance the nonblocking blink or retry a failed restoration."""
     phase = ident["phase"]
     if phase == "idle" or time.monotonic() < ident["deadline"]:
         return
     if phase == "waiting":
         begin_identification()
+        return
+    if phase == "restoring":
+        restore_identification()
         return
     try:
         if phase == "yellow1":
@@ -776,20 +841,22 @@ def identification_tick():
                                     "udpn": {"nn": True}})
             ident["phase"] = "dark2"
         elif phase == "dark2":
-            restore_identification()
-            # Fetch names after blinking, not while users flick between projects.
-            refresh_display_details()
+            if restore_identification():
+                refresh_display_details()
             return
         ident["deadline"] = time.monotonic() + BLINK_HOLD
-    except Exception as error:
-        print("Blink step error:", repr(error))
+    except Exception as blink_error:
+        print("Blink step error:", repr(blink_error))
         restore_identification()
 
 
 def change_selection(delta):
-    global selected
+    global selected  # pylint: disable=global-statement
     if not devices:
         show("No WLED: press UP")
+        return
+    if not cancel_identification():
+        show("Restore pending; retry later")
         return
     selected = (selected + delta) % len(devices)
     reset_control_cache()
@@ -913,6 +980,7 @@ while True:
             packet_buffer = _bleio.PacketBuffer(
                 input_report, buffer_size=10, max_packet_size=64
             )
+            input_report.set_cccd(notify=True)
             report = bytearray(64)
             previous_a = False
             previous_b = False
@@ -941,9 +1009,6 @@ while True:
                     if (b and not previous_b) or (x and not previous_x):
                         # Avoid saving the yellow identification flash or
                         # having it override a freshly recalled preset.
-                        if ident["original"] is not None:
-                            restore_identification()
-                        ident["phase"] = "idle"
                         if b and not previous_b:
                             recall_boot_preset()
                         if x and not previous_x:
@@ -961,9 +1026,6 @@ while True:
                             rt_armed = False
                             # Never send the identification yellow blink to
                             # the rest of the WLED sync group.
-                            if ident["original"] is not None:
-                                restore_identification()
-                            ident["phase"] = "idle"
                             toggle_sync_send()
                     if dpad != previous_dpad:
                         if dpad == DPAD_RIGHT:
@@ -971,11 +1033,9 @@ while True:
                         elif dpad == DPAD_LEFT:
                             change_selection(-1)
                         elif dpad == DPAD_UP:
-                            if ident["original"] is not None:
-                                restore_identification()
-                            ident["phase"] = "idle"
-                            discover()  # UP refreshes available projects
-                            refresh_display_details()
+                            if cancel_identification():
+                                discover()  # UP refreshes available projects
+                                refresh_display_details()
                     # Any new controller action cancels a pending identification
                     # to avoid applying adjustments during the blink.
                     # Left stick UP/DOWN: palettes, LEFT/RIGHT: effects.
